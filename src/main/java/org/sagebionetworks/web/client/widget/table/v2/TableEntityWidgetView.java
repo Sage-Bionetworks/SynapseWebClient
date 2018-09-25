@@ -54,12 +54,6 @@ public interface TableEntityWidgetView extends IsWidget {
 	public void setQueryResultsVisible(boolean visible);
 
 	/**
-	 * Show or hide the Query Progress widget.
-	 * @param b
-	 */
-	public void setQueryProgressVisible(boolean visible);
-
-	/**
 	 * Set the query results widget.
 	 * @param queryResultsWidget
 	 */
@@ -76,6 +70,7 @@ public interface TableEntityWidgetView extends IsWidget {
 	 * @param b
 	 */
 	public void setQueryInputVisible(boolean visible);
+	public void setTableToolbarVisible(boolean visible);
 
 	/**
 	 * Add a modal to the page.

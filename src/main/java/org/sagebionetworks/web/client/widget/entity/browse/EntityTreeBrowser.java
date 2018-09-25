@@ -14,19 +14,17 @@ import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -36,8 +34,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		SynapseWidgetPresenter {
 	private EntityTreeBrowserView view;
 	private SynapseJavascriptClient jsClient;
-	private AuthenticationController authenticationController;
-	private GlobalApplicationState globalApplicationState;
 	AdapterFactory adapterFactory;
 	private Set<EntityTreeItem> alreadyFetchedEntityChildren;
 	private PortalGinInjector ginInjector;
@@ -45,23 +41,28 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	EntitySelectedHandler entitySelectedHandler;
 	CallbackP<String> entityClickedHandler;
 	EntityFilter filter = EntityFilter.ALL;
+	SynapseAlert synAlert;
+	private SortBy currentSortBy;
+	private Direction currentDirection;
+	private String rootEntityId;
+	public static final SortBy DEFAULT_SORT_BY = SortBy.NAME;
+	public static final Direction DEFAULT_DIRECTION = Direction.ASC;
 	
 	@Inject
 	public EntityTreeBrowser(PortalGinInjector ginInjector,
 			EntityTreeBrowserView view, 
 			SynapseJavascriptClient synapseClient,
-			AuthenticationController authenticationController,
-			GlobalApplicationState globalApplicationState,
 			IconsImageBundle iconsImageBundle, 
-			AdapterFactory adapterFactory) {
+			AdapterFactory adapterFactory,
+			SynapseAlert synAlert) {
 		this.view = view;
 		this.jsClient = synapseClient;
-		this.authenticationController = authenticationController;
-		this.globalApplicationState = globalApplicationState;
 		this.adapterFactory = adapterFactory;
 		this.ginInjector = ginInjector;
 		alreadyFetchedEntityChildren = new HashSet<EntityTreeItem>();
 		view.setPresenter(this);
+		this.synAlert = synAlert;
+		view.setSynAlert(synAlert);
 	}
 	
 	public void clear() {
@@ -74,17 +75,28 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	 * 
 	 * @param entityId
 	 */
-	public void configure(String searchId) {
-		view.clear();
-		view.setLoadingVisible(true);
-		getChildren(searchId, null, null);
+	public void configure(String entityId) {
+		this.rootEntityId = entityId;
+		onSort(currentSortBy, currentDirection);
 	}
 	
 	public void configure(List<EntityHeader> headers) {
+		//set existing headers.
+		rootEntityId = null;
 		view.clear();
 		view.setLoadingVisible(true);
 		addHeaders(headers);
 		view.setLoadingVisible(false);
+		// if we are only configuring with a single entity, then we can show the sorting UI for the child queries
+	}
+	
+	@Override
+	public void onSort(SortBy sortColumn, Direction sortDirection) {
+		currentSortBy = sortColumn;
+		currentDirection = sortDirection;
+		view.clear();
+		view.setLoadingVisible(true);
+		getChildren(rootEntityId, null, null);
 	}
 	
 	public void addHeaders(List<EntityHeader> headers) {
@@ -128,6 +140,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	public void getChildren(final String parentId,
 			final EntityTreeItem parent, String nextPageToken) {
 		EntityChildrenRequest request = createGetEntityChildrenRequest(parentId, nextPageToken);
+		synAlert.clear();
 		// ask for the folder children, then the files
 		jsClient.getEntityChildren(request,
 				new AsyncCallback<EntityChildrenResponse>() {
@@ -155,9 +168,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 
 					@Override
 					public void onFailure(Throwable caught) {
-						DisplayUtils.handleServiceException(caught,
-								globalApplicationState,
-								authenticationController.isLoggedIn(), view);
+						synAlert.handleException(caught);
 					}
 				});
 	}
@@ -239,8 +250,14 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		EntityChildrenRequest request = new EntityChildrenRequest();
 		request.setNextPageToken(nextPageToken);
 		request.setParentId(parentId);
-		request.setSortBy(SortBy.NAME);
-		request.setSortDirection(Direction.ASC);
+		if (currentSortBy == null) {
+			currentSortBy = DEFAULT_SORT_BY;
+		}
+		if (currentDirection == null) {
+			currentDirection = DEFAULT_DIRECTION;
+		}
+		request.setSortBy(currentSortBy);
+		request.setSortDirection(currentDirection);
 		request.setIncludeTypes(filter.getEntityQueryValues());
 		
 		return request;

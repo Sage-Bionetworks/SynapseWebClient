@@ -85,7 +85,7 @@ public class AddExternalRepoModalViewImpl implements AddExternalRepoModalView{
 
 	@Override
 	public void showSuccess(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

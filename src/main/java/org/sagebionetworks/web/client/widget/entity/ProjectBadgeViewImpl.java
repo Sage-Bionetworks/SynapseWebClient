@@ -43,10 +43,12 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 	String projectId;
 	public static PlaceChanger placeChanger = null;
 	public static final ClickHandler PROJECT_BADGE_CLICKHANDLER = event -> {
-		Anchor anchor = (Anchor)event.getSource();
-		event.preventDefault();
-		String projectId = anchor.getElement().getAttribute(ATTRIBUTE_PROJECT_ID);
-		placeChanger.goTo(new Synapse(projectId));
+		if (!DisplayUtils.isAnyModifierKeyDown(event)) {
+			Anchor anchor = (Anchor)event.getSource();
+			event.preventDefault();
+			String projectId = anchor.getElement().getAttribute(ATTRIBUTE_PROJECT_ID);
+			placeChanger.goTo(new Synapse(projectId));
+		}
 	};
 	@Inject
 	public ProjectBadgeViewImpl(final Binder uiBinder,
@@ -77,7 +79,7 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 	
 	@Override
 	public String getSimpleDateString(Date date) {
-		return dateTimeUtils.convertDateToSimpleString(date);
+		return dateTimeUtils.getDateString(date);
 	}
 	
 	@Override

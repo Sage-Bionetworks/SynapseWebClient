@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client;
 
 
-import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
 import static org.sagebionetworks.web.client.ClientProperties.GB;
 import static org.sagebionetworks.web.client.ClientProperties.KB;
 import static org.sagebionetworks.web.client.ClientProperties.MB;
@@ -17,7 +16,6 @@ import static org.sagebionetworks.web.client.DisplayConstants.PRIMARY_BUTTON_STY
 
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.gwtbootstrap3.client.ui.Button;
@@ -26,7 +24,6 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalBody;
 import org.gwtbootstrap3.client.ui.ModalFooter;
 import org.gwtbootstrap3.client.ui.ModalSize;
-import org.gwtbootstrap3.client.ui.Popover;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
@@ -52,9 +49,6 @@ import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.Down;
-import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -70,32 +64,24 @@ import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.exceptions.BadRequestException;
-import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
-import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
-import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
+import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.i18n.client.NumberFormat;
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.HTML;
@@ -121,8 +107,18 @@ public class DisplayUtils {
 		source.selectAll();
 	};
 	public static final ClickHandler DO_NOTHING_CLICKHANDLER = event -> {
-		event.preventDefault();
+		if (!DisplayUtils.isAnyModifierKeyDown(event)) {
+			event.preventDefault();	
+		} else {
+			event.stopPropagation();
+		}
 	};
+	
+	public static final Handler getHideModalOnDetachHandler() {
+		return event -> {
+			((Modal)event.getSource()).hide();
+		};
+	}
 	
 	/**
 	 * This key down handler prevents the user from tabbing forward off of the given Focusable widget.
@@ -139,6 +135,31 @@ public class DisplayUtils {
 		};
 	}
 	
+	public static void focusOnChildInput(Widget w) {
+		// in case no input is found, focus on the first button that we can find
+		focusOnChild(w, "button");
+		focusOnChild(w, "input");
+	}
+	
+	private static void focusOnChild(Widget w, String tagName) {
+		NodeList<com.google.gwt.dom.client.Element> children = w.getElement().getElementsByTagName(tagName);
+		if (children != null && children.getLength() > 0) {
+			children.getItem(0).focus();
+		} 
+	}
+	
+	/**
+	 * This key down handler invokes the  when ESC is clicked.
+	 * @return
+	 */
+	public static KeyDownHandler getESCKeyDownHandler(ClickHandler callback) {
+		return event -> {
+			if (KeyCodes.KEY_ESCAPE == event.getNativeKeyCode()) {
+				event.preventDefault();
+				callback.onClick(null);
+			}
+		};
+	}
 	public static NotifySettings getDefaultSettings() {
 		NotifySettings notifySettings = NotifySettings.newSettings();
 		notifySettings.setTemplate("<div data-notify=\"container\" class=\"col-xs-11 alert alert-{0}\" role=\"alert\">\n" + 
@@ -151,15 +172,7 @@ public class DisplayUtils {
 		notifySettings.setNewestOnTop(true);
 		return notifySettings;
 	}
-	/**
-	 * Returns a properly aligned icon from an ImageResource
-	 * @param icon
-	 * @return
-	 */
-	public static String getIconHtml(ImageResource icon) {
-		if(icon == null) return null;		
-		return "<span class=\"iconSpan\">" + AbstractImagePrototype.create(icon).getHTML() + "</span>";
-	}
+	
 	public static String getFriendlySize(double size, boolean abbreviatedUnits) {
 		NumberFormat df = NumberFormat.getDecimalFormat();
 		if(size >= TB) {
@@ -176,62 +189,6 @@ public class DisplayUtils {
         }
         return df.format(size) + " bytes";
     }
-	
-	/**
-	 * Handles the exception. Returns true if the user has been alerted to the exception already
-	 * @param ex
-	 * @param placeChanger
-	 * @return true if the user has been prompted
-	 */
-	public static boolean handleServiceException(Throwable ex, GlobalApplicationState globalApplicationState, boolean isLoggedIn, ShowsErrors view) {
-		//send exception to the javascript console
-		if (displayUtilsLogger != null && ex != null)
-			displayUtilsLogger.log(Level.SEVERE, ex.getMessage());
-		if(ex instanceof ReadOnlyModeException || ex instanceof SynapseDownException) {
-			globalApplicationState.getPlaceChanger().goTo(new Down(DEFAULT_PLACE_TOKEN));
-			return true;
-		} else if(ex instanceof UnauthorizedException) {
-			// send user to login page						
-			showInfo(DisplayConstants.SESSION_TIMEOUT, DisplayConstants.SESSION_HAS_TIMED_OUT);
-			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGOUT_TOKEN));
-			return true;
-		} else if(ex instanceof ForbiddenException) {			
-			if(!isLoggedIn) {				
-				view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
-				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-			} else {
-				view.showErrorMessage(DisplayConstants.ERROR_FAILURE_PRIVLEDGES + " " + ex.getMessage());
-			}
-			return true;
-		} else if(ex instanceof BadRequestException) {
-			//show error (not to file a jira though)
-			view.showErrorMessage(ex.getMessage());
-			return true;
-		} else if(ex instanceof NotFoundException) {
-			view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
-			globalApplicationState.getPlaceChanger().goTo(new Home(DEFAULT_PLACE_TOKEN));
-			return true;
-		} else if (ex instanceof UnknownErrorException) {
-			//An unknown error occurred. 
-			//Exception handling on the backend now throws the reason into the exception message.  Easy!
-			showErrorMessage(ex, globalApplicationState.getJiraURLHelper(), isLoggedIn, ex.getMessage());
-			return true;
-		}
-		
-		// For other exceptions, allow the consumer to send a good message to the user
-		return false;
-	}
-	
-	public static boolean checkForRepoDown(Throwable caught, PlaceChanger placeChanger, SynapseView view) {
-		if(caught instanceof ReadOnlyModeException) {
-			view.showErrorMessage(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
-			return true;
-		} else if(caught instanceof SynapseDownException) {
-			placeChanger.goTo(new Down(DEFAULT_PLACE_TOKEN));
-			return true;
-		}
-		return false;
-	}
 		
 	/**
 	 * Returns a panel used to show a component is loading in the view
@@ -258,21 +215,20 @@ public class DisplayUtils {
 		return div;
 	}
 
-
 	/**
 	 * Shows an info message to the user in the "Global Alert area".
 	 * @param title
 	 * @param message
 	 */
-	public static void showInfo(String title, String message) {
+	public static void showInfo(String message) {
 		NotifySettings settings = getDefaultSettings();
 		settings.setType(NotifyType.INFO);
-		notify(title, message, settings);
+		notify(message, settings);
 	}
 	
-	public static void notify(String title, String message, NotifySettings settings) {
+	public static void notify(String message, NotifySettings settings) {
 		try{
-			Notify.notify(title, message, settings);
+			Notify.notify("", message, settings);
 		} catch(Throwable t) {
 			SynapseJSNIUtilsImpl._consoleError(getStackTrace(t));
 		}
@@ -283,7 +239,7 @@ public class DisplayUtils {
 	 * @param title
 	 * @param message
 	 */
-	public static void showError(String title, String message, Integer timeout) {
+	public static void showError(String message, Integer timeout) {
 		NotifySettings settings = getDefaultSettings();
 		settings.setType(NotifyType.DANGER);
 		settings.setAllowDismiss(false);
@@ -291,7 +247,7 @@ public class DisplayUtils {
 			settings.setDelay(timeout);	
 		}
 		settings.setZIndex(2001);
-		notify(title, message, settings);
+		notify(message, settings);
 	}
 	
 	public static void showErrorMessage(String message) {
@@ -354,7 +310,7 @@ public class DisplayUtils {
 							@Override
 							public void onSuccess(String result) {
 								d.hide();
-								showInfo("Report sent", "Thank you!");
+								showInfo("Report sent. Thank you!");
 							}
 
 							@Override
@@ -459,16 +415,18 @@ public class DisplayUtils {
 	}
 	
     public static native void focusOnBootboxButton(String buttonStyle) /*-{
-    		$wnd.jQuery(".bootbox ." + buttonStyle).focus();
+		try {
+			$wnd.jQuery(".bootbox ." + buttonStyle).focus();
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
-
 	
 	public static void showPopup(String title, 
 			String message,
 			DisplayUtils.MessagePopup iconStyle,
 			final Callback primaryButtonCallback,
 			final Callback secondaryButtonCallback) {
-		
 		SafeHtml popupHtml = getPopupSafeHtml(title, message, iconStyle);
 		boolean isSecondaryButton = secondaryButtonCallback != null;
 		
@@ -569,10 +527,6 @@ public class DisplayUtils {
 		return getWarningHtml(DisplayConstants.MARKDOWN_WIDGET_WARNING, warningText);
 	}
 	
-	public static String getMarkdownAPITableWarningHtml(String warningText) {
-		return getWarningHtml(DisplayConstants.MARKDOWN_API_TABLE_WARNING, warningText);
-	}
-	
 	public static String getWarningHtml(String title, String warningText) {
 		return getAlertHtml(title, warningText, BootstrapAlertType.WARNING);
 	}
@@ -584,7 +538,6 @@ public class DisplayUtils {
 	public static String getBadgeHtml(String i) {
 		return "<span class=\"badge moveup-4\">"+i+"</span>";
 	}
-
 	
 	public static String uppercaseFirstLetter(String display) {
 		return display.substring(0, 1).toUpperCase() + display.substring(1);		
@@ -595,24 +548,9 @@ public class DisplayUtils {
 		return "#!" + getTeamPlaceString(Team.class) + ":" + place.toToken();
 	}
 	
-	public static String getTeamSearchHistoryToken(String searchTerm, Integer start) {
-		TeamSearch place = new TeamSearch(searchTerm, start);
-		return "#!" + getTeamSearchPlaceString(TeamSearch.class) + ":" + place.toToken();
-	}
-	
-	public static String getPeopleSearchHistoryToken(String searchTerm, Integer start) {
-		PeopleSearch place = new PeopleSearch(searchTerm, start);
-		return "#!" + getPeopleSearchPlaceString(PeopleSearch.class) + ":" + place.toToken();
-	}
-	
 	public static String getTrashHistoryToken(String token, Integer start) {
 		Trash place = new Trash(token, start);
 		return "#!" + getTrashPlaceString(Trash.class) + ":" + place.toToken();
-	}
-
-	public static String getSearchHistoryToken(String searchQuery, Long start) {
-		Search place = new Search(searchQuery, start);
-		return "#!" + getSearchPlaceString(Search.class) + ":" + place.toToken();
 	}
 	
 	public static String getSynapseHistoryToken(String entityId) {
@@ -704,34 +642,6 @@ public class DisplayUtils {
 		return fullPlaceName;
 	}
 	
-	/**
-	 * Create the url to a profile attachment image.
-	 * @param baseURl
-	 * @param userId
-	 * @param tokenId
-	 * @param fileName
-	 * @return
-	 */
-	public static String createUserProfileAttachmentUrl(String baseURl, String userId, String fileHandleId, boolean preview){
-		StringBuilder builder = new StringBuilder();
-		builder.append(baseURl);
-		builder.append("?"+WebConstants.USER_PROFILE_USER_ID+"=");
-		builder.append(userId);
-		builder.append("&"+WebConstants.USER_PROFILE_IMAGE_ID+"=");
-		builder.append(fileHandleId);
-		builder.append("&"+WebConstants.USER_PROFILE_PREVIEW+"=");
-		builder.append(preview);
-		return builder.toString();
-	}
-	
-	public static Popover addPopover(Widget widget, String message) {
-		Popover popover = new Popover(widget);
-		popover.setPlacement(Placement.AUTO);
-		popover.setIsHtml(true);
-		popover.setContent(message);
-		return popover;
-	}
-	
 	public static Tooltip addTooltip(Widget widget, String tooltipText){
 		return addTooltip(widget, tooltipText, Placement.AUTO);
 	}
@@ -782,13 +692,6 @@ public class DisplayUtils {
 			return null;
 		}
 	}-*/;
-
-	public static Anchor createIconLink(AbstractImagePrototype icon, ClickHandler clickHandler) {
-		Anchor anchor = new Anchor();
-		anchor.setHTML(icon.getHTML());
-		anchor.addClickHandler(clickHandler);
-		return anchor;
-	}
 	
 	public static boolean isInTestWebsite(CookieProvider cookies) {
 		return isInCookies(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY, cookies);
@@ -874,17 +777,6 @@ public class DisplayUtils {
 				WebConstants.TEAM_PARAM_KEY + "=" + teamId;
 	}
 	
-	/**
-	 * Create the url to the raw file handle id (must be the owner to access)
-	 * @param baseURl
-	 * @param rawFileHandleId
-	 * @return
-	 */
-	public static String createRawFileHandleUrl(String baseFileHandleUrl, String rawFileHandleId){
-		return baseFileHandleUrl + "?" +
-				WebConstants.RAW_FILE_HANDLE_PARAM + "=" + rawFileHandleId;
-	}
-
 	public static String createEntityVersionString(Reference ref) {
 		return createEntityVersionString(ref.getTargetId(), ref.getTargetVersionNumber());
 	}
@@ -1239,6 +1131,10 @@ public class DisplayUtils {
 		int docViewBottom = docViewTop + Window.getClientHeight() + paddingBottom;
 		int elemTop = widget.getAbsoluteTop();
 //		int elemBottom = elemTop + widget.getOffsetHeight();
-		return docViewBottom >= elemTop;
+		return docViewBottom >= elemTop && elemTop != 0;
+	}
+	
+	public static boolean isAnyModifierKeyDown(ClickEvent event) {
+		return event.isAltKeyDown() || event.isControlKeyDown() || event.isMetaKeyDown() || event.isShiftKeyDown();
 	}
 }

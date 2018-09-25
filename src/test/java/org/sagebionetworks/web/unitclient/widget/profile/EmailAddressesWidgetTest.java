@@ -147,7 +147,7 @@ public class EmailAddressesWidgetTest {
 		widget.configure(mockUserProfile);
 		widget.additionalEmailValidation(EMAIL3 + "    ");
 		verify(mockSynapseClient).additionalEmailValidation(eq(USER_ID), eq(EMAIL3), anyString(), any(AsyncCallback.class));
-		verify(mockPopupUtils).showInfo(DisplayConstants.EMAIL_ADDED, "");
+		verify(mockPopupUtils).showInfo(DisplayConstants.EMAIL_ADDED);
 	}
 	
 	@Test

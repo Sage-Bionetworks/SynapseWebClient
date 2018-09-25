@@ -30,12 +30,12 @@ public class MapViewImpl implements MapView {
 			SynapseJSNIUtils synapseJSNIUtils) {
 		widget = binder.createAndBindUi(this);
 		this.headerWidget = headerWidget;
-		headerWidget.configure(false);
+		headerWidget.configure();
 	}
 	
 	@Override
 	public void setPresenter(Presenter presenter) {
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

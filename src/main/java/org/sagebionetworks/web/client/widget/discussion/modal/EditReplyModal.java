@@ -5,6 +5,9 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.validation.ValidationResult;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
@@ -26,22 +29,27 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 	private DiscussionForumClientAsync discussionForumClient;
 	private SynapseAlert synAlert;
 	private MarkdownEditorWidget markdownEditor;
+	private PopupUtilsView popupUtils;
 	private String replyId;
 	private String message;
 	Callback editReplyCallback;
-
+	GlobalApplicationState globalAppState;
 	@Inject
 	public EditReplyModal(
 			ReplyModalView view,
 			DiscussionForumClientAsync discussionForumClient,
 			SynapseAlert synAlert,
-			MarkdownEditorWidget markdownEditor
+			MarkdownEditorWidget markdownEditor,
+			PopupUtilsView popupUtils,
+			GlobalApplicationState globalAppState
 			) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
 		fixServiceEntryPoint(discussionForumClient);
 		this.synAlert = synAlert;
 		this.markdownEditor = markdownEditor;
+		this.popupUtils = popupUtils;
+		this.globalAppState = globalAppState;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setModalTitle(EDIT_REPLY_MODAL_TITLE);
@@ -60,14 +68,31 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 		markdownEditor.hideUploadRelatedCommands();
 		markdownEditor.showExternalImageButton();
 		markdownEditor.configure(message);
+		globalAppState.setIsEditing(true);
 		view.showDialog();
 	}
 
 	@Override
 	public void hide() {
+		globalAppState.setIsEditing(false);
 		view.hideDialog();
 	}
 
+	@Override
+	public void onCancel() {
+		if (!markdownEditor.getMarkdown().equals(message)) {
+			popupUtils.showConfirmDialog(DisplayConstants.UNSAVED_CHANGES, DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, () -> {
+				onCancelAfterConfirm();
+			});
+		} else {
+			onCancelAfterConfirm();
+		}
+	}
+	
+	public void onCancelAfterConfirm() {
+		hide();
+	}
+	
 	@Override
 	public void onSave() {
 		synAlert.clear();
@@ -90,7 +115,7 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 
 			@Override
 			public void onSuccess(DiscussionReplyBundle result) {
-				view.hideDialog();
+				hide();
 				view.showSuccess(SUCCESS_TITLE, SUCCESS_MESSAGE);
 				if (editReplyCallback != null) {
 					editReplyCallback.invoke();

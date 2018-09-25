@@ -71,11 +71,10 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 			});
 		}
 		EntityFilter filter;
-		if (TableType.fileview.equals(tableType)) {
-			filter = EntityFilter.CONTAINER;
-		} else {
-			//project view
+		if (TableType.projects.equals(tableType)) {
 			filter = EntityFilter.PROJECT;
+		} else {
+			filter = EntityFilter.CONTAINER;
 		}
 		finder.configureMulti(filter, showVersions, selectionHandler);
 	}

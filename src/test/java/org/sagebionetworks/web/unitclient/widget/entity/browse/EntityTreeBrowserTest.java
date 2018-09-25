@@ -52,6 +52,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -61,10 +62,6 @@ import com.google.gwt.user.client.ui.IsTreeItem;
 public class EntityTreeBrowserTest {
 	@Mock
 	EntityTreeBrowserView mockView;
-	@Mock
-	AuthenticationController mockAuthenticationController;
-	@Mock
-	GlobalApplicationState mockGlobalApplicationState;
 	@Mock
 	IconsImageBundle mockIconsImageBundle;
 	@Mock
@@ -86,8 +83,12 @@ public class EntityTreeBrowserTest {
 	IsTreeItem mockLoadingItem;
 	@Captor
 	ArgumentCaptor<ClickHandler> clickHandlerCaptor;
+	@Captor
+	ArgumentCaptor<EntityChildrenRequest> entityChildrenRequestCaptor;
 	@Mock
 	EntityHeader mockEntityHeader;
+	@Mock
+	SynapseAlert mockSynAlert;
 	String parentId;
 
 	@Before
@@ -95,8 +96,8 @@ public class EntityTreeBrowserTest {
 		MockitoAnnotations.initMocks(this);
 		adapterFactory = new AdapterFactoryImpl();
 		entityTreeBrowser = new EntityTreeBrowser(mockInjector, mockView,
-				mockSynapseJavascriptClient, mockAuthenticationController,  mockGlobalApplicationState,
-				mockIconsImageBundle, adapterFactory);
+				mockSynapseJavascriptClient,
+				mockIconsImageBundle, adapterFactory, mockSynAlert);
 		verify(mockView).setPresenter(entityTreeBrowser);
 		reset(mockView);
 		parentId = "testParentId";
@@ -128,16 +129,28 @@ public class EntityTreeBrowserTest {
 		when(mockEntityHeader.getType()).thenReturn(FileEntity.class.getName());
 		
 		entityTreeBrowser.setEntityClickedHandler(mockEntityClickedCallback);
-		entityTreeBrowser.getChildren("123", null, null);
+		entityTreeBrowser.configure("123");
 		
-		ArgumentCaptor<EntityChildrenRequest> captor = ArgumentCaptor
-				.forClass(EntityChildrenRequest.class);
-		verify(mockSynapseJavascriptClient).getEntityChildren(captor.capture(), any(AsyncCallback.class));
-		EntityChildrenRequest request = captor.getValue();
+		verify(mockSynapseJavascriptClient).getEntityChildren(entityChildrenRequestCaptor.capture(), any(AsyncCallback.class));
+		EntityChildrenRequest request = entityChildrenRequestCaptor.getValue();
 		assertEquals("123", request.getParentId());
 		assertNull(request.getNextPageToken());
 		verify(mockEntityTreeItem).setClickHandler(clickHandlerCaptor.capture());
 		verify(mockEntityClickedCallback, never()).invoke(anyString());
+		assertEquals(EntityTreeBrowser.DEFAULT_SORT_BY, request.getSortBy());
+		assertEquals(EntityTreeBrowser.DEFAULT_DIRECTION, request.getSortDirection());
+		
+		//verify user selecting another sorting option resets the query, and changes the request sort parameters
+		entityTreeBrowser.onSort(SortBy.CREATED_ON, Direction.DESC);
+		
+		verify(mockView, times(2)).clear();
+		verify(mockSynapseJavascriptClient, times(2)).getEntityChildren(entityChildrenRequestCaptor.capture(), any(AsyncCallback.class));
+		request = entityChildrenRequestCaptor.getValue();
+		assertEquals(SortBy.CREATED_ON, request.getSortBy());
+		assertEquals(Direction.DESC, request.getSortDirection());
+		assertNull(request.getNextPageToken());
+		assertEquals("123", request.getParentId());
+		
 		clickHandlerCaptor.getValue().onClick(null);
 		verify(mockEntityClickedCallback).invoke(childEntityId);
 	}
@@ -157,8 +170,8 @@ public class EntityTreeBrowserTest {
 		mockSynapseJavascriptClient = mock(SynapseJavascriptClient.class);
 		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
 		entityTreeBrowser = new EntityTreeBrowser(mockInjector, mockView,
-				mockSynapseJavascriptClient, mockAuthenticationController, mockGlobalApplicationState,
-				mockIconsImageBundle, adapterFactory);
+				mockSynapseJavascriptClient,
+				mockIconsImageBundle, adapterFactory, mockSynAlert);
 		entityTreeBrowser.getChildren("123", null, null);
 		// capture the servlet call
 		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor
@@ -304,5 +317,4 @@ public class EntityTreeBrowserTest {
 		result.setType(FileEntity.class.getName());
 		assertFalse(entityTreeBrowser.isExpandable(result));
 	}
-	
 }

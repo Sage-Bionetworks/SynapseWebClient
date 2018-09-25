@@ -9,14 +9,13 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -35,10 +34,9 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	private EntityBundle bundle;
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalApplicationState;
-	private AuthenticationController authenticationController;
 	public static final Integer VERSION_LIMIT = 100;
 	public PreflightController preflightController;
-	
+	private SynapseAlert synAlert;
 	private boolean canEdit;
 	private Long versionNumber;
 	int currentOffset;
@@ -47,16 +45,17 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	public FileHistoryWidget(FileHistoryWidgetView view,
 			 SynapseClientAsync synapseClient, 
 			 GlobalApplicationState globalApplicationState, 
-			 AuthenticationController authenticationController,
-			 PreflightController preflightController) {
+			 PreflightController preflightController,
+			 SynapseAlert synAlert) {
 		super();
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
 		this.preflightController = preflightController;
 		this.view.setPresenter(this);
+		this.synAlert = synAlert;
+		view.setSynAlert(synAlert);
 	}
 	
 	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
@@ -85,23 +84,18 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 				versionLabel = version.toString();
 			vb.setVersionLabel(versionLabel);
 			vb.setVersionComment(comment);
-			
+			synAlert.clear();
 			synapseClient.updateEntity(vb,
 					new AsyncCallback<Entity>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							if (!DisplayUtils.handleServiceException(
-									caught, globalApplicationState,
-									authenticationController.isLoggedIn(), view)) {
-								view.showEditVersionInfoError(DisplayConstants.ERROR_UPDATE_FAILED
-										+ ": " + caught.getMessage());
-							}
+							synAlert.handleException(caught);
 						}
 						
 						@Override
 						public void onSuccess(Entity result) {
 							view.hideEditVersionInfo();
-							view.showInfo(DisplayConstants.VERSION_INFO_UPDATED, "Updated " + vb.getName());
+							view.showInfo(DisplayConstants.VERSION_INFO_UPDATED + ": " + vb.getName());
 							refreshFileHistory();
 						}
 					});
@@ -110,18 +104,15 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	
 	@Override
 	public void deleteVersion(final Long versionNumber) {
+		synAlert.clear();
 		synapseClient.deleteEntityVersionById(bundle.getEntity().getId(), versionNumber, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				if (!DisplayUtils.handleServiceException(caught,
-						globalApplicationState,
-						authenticationController.isLoggedIn(), view)) {
-					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE + "\n" + caught.getMessage());
-				}
+				synAlert.handleException(caught);
 			}
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo("Version deleted", "Version "+ versionNumber + " of " + bundle.getEntity().getId() + " " + DisplayConstants.LABEL_DELETED);
+				view.showInfo("Version "+ versionNumber + " of " + bundle.getEntity().getId() + " " + DisplayConstants.LABEL_DELETED);
 				//SWC-4002: if deleting the version that we're looking at, go to the latest version
 				if (versionNumber.equals(FileHistoryWidget.this.versionNumber)) {
 					gotoCurrentVersion();
@@ -139,6 +130,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	}
 	
 	public void refreshFileHistory() {
+		synAlert.clear();
 		view.clearVersions();
 		currentOffset = 0;
 		onMore();

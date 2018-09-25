@@ -38,8 +38,8 @@ import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
@@ -71,7 +71,7 @@ public class ApproveUserAccessModalTest {
 	@Mock
 	DataAccessClientAsync mockDataAccessClient;
 	@Mock
-	GlobalApplicationState mockGlobalApplicationState;
+	SynapseProperties mockSynapseProperties;
 	@Mock
 	JobTrackingWidget mockProgressWidget;
 	@Mock
@@ -118,8 +118,8 @@ public class ApproveUserAccessModalTest {
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		dialog = new ApproveUserAccessModal(mockView, mockSynAlert, mockPeopleSuggestWidget, mockProvider, mockSynapseClient, mockGlobalApplicationState, mockProgressWidget, mockDataAccessClient);
-		when(mockGlobalApplicationState.getSynapseProperty(anyString())).thenReturn("syn7444807");
+		dialog = new ApproveUserAccessModal(mockView, mockSynAlert, mockPeopleSuggestWidget, mockProvider, mockSynapseClient, mockSynapseProperties, mockProgressWidget, mockDataAccessClient);
+		when(mockSynapseProperties.getSynapseProperty(anyString())).thenReturn("syn7444807");
 		
 		message = "Message";
 		userId = "1234567";
@@ -243,7 +243,7 @@ public class ApproveUserAccessModalTest {
 	@Test
 	public void testOnSubmitNoMessage() {
 		dialog.configure(actList, mockEntityBundle);
-		when(mockGlobalApplicationState.getSynapseProperty(anyString())).thenReturn(null);
+		when(mockSynapseProperties.getSynapseProperty(anyString())).thenReturn(null);
 		when(mockView.getEmailMessage()).thenReturn("");
 		dialog.onUserSelected(mockUser);
 		dialog.onSubmit();
@@ -348,7 +348,7 @@ public class ApproveUserAccessModalTest {
 		
 		verify(mockView).setApproveProcessing(false);
 		verify(mockView).hide();
-		verify(mockView).showInfo(APPROVED_USER, EMAIL_SENT);
+		verify(mockView).showInfo(APPROVED_USER + EMAIL_SENT);
 	}
 	
 	@Test
@@ -382,7 +382,7 @@ public class ApproveUserAccessModalTest {
 		vCaptor.getValue().onSuccess((Void)null);
 		verify(mockView).setRevokeProcessing(false);
 		verify(mockView).hide();
-		verify(mockView).showInfo(REVOKED_USER, "");
+		verify(mockView).showInfo(REVOKED_USER);
 	}
 	
 	@Test
@@ -396,7 +396,7 @@ public class ApproveUserAccessModalTest {
 		vCaptor.getValue().onSuccess((Void)null);
 		verify(mockView).setRevokeProcessing(false);
 		verify(mockView).hide();
-		verify(mockView).showInfo(REVOKED_USER, "");
+		verify(mockView).showInfo(REVOKED_USER);
 	}
 
 }

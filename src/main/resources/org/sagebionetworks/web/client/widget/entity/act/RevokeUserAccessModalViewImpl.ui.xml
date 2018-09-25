@@ -9,7 +9,7 @@
 
 	<bh:Div>
 		<!-- Dialog for revoking user -->
-		<b:Modal ui:field="modal" title="Revoke User Access" closable="true" dataBackdrop="STATIC" dataKeyboard="false">
+		<b:Modal ui:field="modal" title="Revoke User Access" closable="true" dataBackdrop="STATIC" dataKeyboard="true">
 			<b:ModalBody>
 				<bh:Div addStyleNames="margin-top-10 margin-bottom-10">
 					<b:Heading size="H5" text="User" addStyleNames="margin-left-10 margin-right-10 margin-top-20" />

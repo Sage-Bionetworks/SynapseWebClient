@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
 
 import com.google.gwt.core.shared.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -61,7 +62,8 @@ public class LoadingSpinner implements IsWidget, SupportsLazyLoadInterface {
 		if (widget == null) {
 			widget = uiBinder.createAndBindUi(this);
 			if (size != null) {
-				widget.setSize(size, size);	
+				widget.setSize(size, size);
+				widget.getElement().setAttribute("style", "width:"+size + ";height:"+size+"; background-size:"+size + " " + size + ";");
 			}
 		}
 		spinnerContainer.clear();
@@ -98,4 +100,11 @@ public class LoadingSpinner implements IsWidget, SupportsLazyLoadInterface {
 	public boolean isVisible() {
 		return spinnerContainer.isVisible();
 	}
+	public void setMarginLeft(double margin) {
+		spinnerContainer.setMarginLeft(margin);
+	}
+	public void setMarginRight(double margin) {
+		spinnerContainer.setMarginLeft(margin);
+	}
+
 }

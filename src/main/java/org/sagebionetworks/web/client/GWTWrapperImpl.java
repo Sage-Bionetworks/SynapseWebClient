@@ -8,9 +8,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
-import com.google.gwt.regexp.shared.MatchResult;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
@@ -222,5 +221,15 @@ public class GWTWrapperImpl implements GWTWrapper {
 	@Override
 	public String getFriendlySize(double size, boolean abbreviatedUnits) {
 		return DisplayUtils.getFriendlySize(size, abbreviatedUnits);
+	}
+	
+	@Override
+	public DateTimeFormat getFormat(String formatPattern) {
+		return DateTimeFormat.getFormat(formatPattern);
+	}
+	
+	@Override
+	public DateTimeFormat getFormat(PredefinedFormat predefinedFormat) {
+		return DateTimeFormat.getFormat(predefinedFormat);
 	}
 }

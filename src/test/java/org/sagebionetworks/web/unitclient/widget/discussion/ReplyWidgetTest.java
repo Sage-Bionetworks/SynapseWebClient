@@ -4,7 +4,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -19,8 +19,10 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
@@ -34,6 +36,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.RequestBuilderMockStubber;
 
+import com.google.gwt.dev.javac.testing.impl.MockJavaResource;
 import com.google.gwt.dev.util.collect.HashSet;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -71,6 +74,10 @@ public class ReplyWidgetTest {
 	DateTimeUtils mockDateTimeUtils;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	ClientCache mockClientCache;
+	@Mock
+	PopupUtilsView mockPopupUtils;
 	Set<String> moderatorIds;
 	ReplyWidget replyWidget;
 	
@@ -84,7 +91,7 @@ public class ReplyWidgetTest {
 		replyWidget = new ReplyWidget(mockView, mockAuthorWidget, mockDateTimeUtils,
 				mockSynAlert, mockRequestBuilder, mockDiscussionForumClientAsync,
 				mockAuthController, mockEditReplyModal, mockMarkdownWidget, mockGwt, mockCopyTextModal,
-				mockSynapseJavascriptClient);
+				mockSynapseJavascriptClient, mockClientCache,mockPopupUtils);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
 		moderatorIds = new HashSet<String>();
 	}
@@ -280,11 +287,30 @@ public class ReplyWidgetTest {
 		verify(mockEditReplyModal).configure(anyString(), anyString(), any(Callback.class));
 		verify(mockEditReplyModal).show();
 	}
+	
+	@Test
+	public void testConfigureMessageFromCache() throws RequestException {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
+		boolean isThreadDeleted = false;
+		String messageKey = "messageKey1112";
+		DiscussionReplyBundle bundle = createReplyBundle("123", "1", messageKey,
+				new Date(), isDeleted, CREATED_BY, isEdited);
+		String message = "message";
+		when(mockClientCache.contains(messageKey + WebConstants.MESSAGE_SUFFIX)).thenReturn(true);
+		when(mockClientCache.get(messageKey + WebConstants.MESSAGE_SUFFIX)).thenReturn(message);
+		
+		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted);
+		
+		verifyZeroInteractions(mockSynapseJavascriptClient, mockRequestBuilder);
+		verify(mockMarkdownWidget).configure(message);
+	}
 
 	@Test
 	public void testOnClickDeleteReply() {
 		replyWidget.onClickDeleteReply();
-		verify(mockView).showDeleteConfirm(anyString(), any(Callback.class));
+		verify(mockPopupUtils).showConfirmDelete(anyString(), any(Callback.class));
 	}
 
 	@SuppressWarnings("unchecked")

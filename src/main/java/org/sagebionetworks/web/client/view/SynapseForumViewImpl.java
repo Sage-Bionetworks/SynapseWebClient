@@ -23,7 +23,7 @@ public class SynapseForumViewImpl implements SynapseForumView {
 			SynapseForumViewImplUiBinder binder, 
 			Header headerWidget) {
 		widget = binder.createAndBindUi(this);
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

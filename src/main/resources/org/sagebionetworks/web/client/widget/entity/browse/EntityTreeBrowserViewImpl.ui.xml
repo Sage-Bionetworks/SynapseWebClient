@@ -9,8 +9,8 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
     
 	<bh:Div>
+		<bh:Div ui:field="synAlertContainer"/>
 	    <bh:Span ui:field="emptyUI" text="&#8212; Empty"/>
-	    
 	    <!-- File browser tree "table" header -->
 	    <t:Table ui:field="entityTreeHeader" width="100%">
 			<t:TableRow>
@@ -24,10 +24,10 @@
 				<t:TableHeader width="165px" addStyleNames="visible-md visible-lg">
 					<bh:Span text="Modified On" />
 				</t:TableHeader>
-				<t:TableHeader width="100px" addStyleNames="visible-lg text-align-right">
+				<t:TableHeader width="140px" addStyleNames="visible-lg text-align-right">
 					<bh:Span text="Size" addStyleNames="margin-right-30"/>
 				</t:TableHeader>
-				<t:TableHeader width="65px" addStyleNames="visible-lg">
+				<t:TableHeader width="70px" addStyleNames="visible-lg">
 					<bh:Span text="MD5"/>
 				</t:TableHeader>
 				<t:TableHeader width="130px" addStyleNames="visible-md visible-lg">

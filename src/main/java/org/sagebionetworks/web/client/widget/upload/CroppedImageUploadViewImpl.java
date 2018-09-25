@@ -148,9 +148,13 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 	}-*/;
 
 	private static native void _getCroppedImageBlob(CroppedImageUploadViewImpl v) /*-{
-		$wnd.cropping.result({type: 'blob', format: 'jpeg', quality: 1, circle: false}).then(function(blob) {
-			v.@org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl::saveCroppedImage(Lcom/google/gwt/core/client/JavaScriptObject;)(blob);
-		});
+		try {
+			$wnd.cropping.result({type: 'blob', format: 'jpeg', quality: 1, circle: false}).then(function(blob) {
+				v.@org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl::saveCroppedImage(Lcom/google/gwt/core/client/JavaScriptObject;)(blob);
+			});
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
 	
 	public void saveCroppedImage() {
@@ -167,7 +171,6 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 	
 	public void cancelCropImage() {
 		loadingUI.setVisible(false);
-		previewModal.hide();
 		resetForm();
 	}
 
@@ -216,6 +219,7 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 	public void resetForm() {
 		this.form.reset();
 		setUploadedFileText("");
+		previewModal.hide();
 	}
 
 	@Override

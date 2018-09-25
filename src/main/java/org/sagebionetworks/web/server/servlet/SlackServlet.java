@@ -22,15 +22,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.client.exceptions.IllegalArgumentException;
 import org.sagebionetworks.web.shared.WebConstants;
-
-import com.google.inject.Inject;
 
 public class SlackServlet extends HttpServlet {
 
@@ -45,11 +43,6 @@ public class SlackServlet extends HttpServlet {
 	public static final String SYNAPSE_ID_REGEX = "\\s*[sS]{1}[yY]{1}[nN]{1}\\d+\\s*";
 	Pattern p = Pattern.compile(SYNAPSE_ID_REGEX);
 	
-	/**
-	 * Injected with Gin
-	 */
-	@SuppressWarnings("unused")
-	private ServiceUrlProvider urlProvider;
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
 
 	/**
@@ -59,16 +52,6 @@ public class SlackServlet extends HttpServlet {
 	 */
 	public void setSynapseProvider(SynapseProvider synapseProvider) {
 		this.synapseProvider = synapseProvider;
-	}
-
-	/**
-	 * Essentially the constructor. Setup synapse client.
-	 *
-	 * @param provider
-	 */
-	@Inject
-	public void setServiceUrlProvider(ServiceUrlProvider provider) {
-		this.urlProvider = provider;
 	}
 
 	@Override
@@ -242,9 +225,9 @@ public class SlackServlet extends HttpServlet {
 	 */
 	private SynapseClient createNewClient() {
 		SynapseClient client = synapseProvider.createNewClient();
-		client.setAuthEndpoint(urlProvider.getPrivateAuthBaseUrl());
-		client.setRepositoryEndpoint(urlProvider.getRepositoryServiceUrl());
-		client.setFileEndpoint(StackConfiguration.getFileServiceEndpoint());
+		client.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
+		client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
+		client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
 		return client;
 	}
 

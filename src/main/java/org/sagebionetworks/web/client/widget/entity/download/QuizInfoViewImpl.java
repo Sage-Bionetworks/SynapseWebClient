@@ -32,7 +32,7 @@ public class QuizInfoViewImpl extends Composite implements QuizInfoWidgetView {
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
+	public void showInfo(String message) {
 	}
 
 	@Override

@@ -1,11 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static org.sagebionetworks.repo.model.util.ModelConstants.VALID_ENTITY_NAME_REGEX;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreUploadDestination;
@@ -24,6 +26,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
@@ -42,6 +45,7 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
@@ -62,7 +66,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private UploaderView view;
 	private HandlerManager handlerManager;
 	private Entity entity;
-	private String parentEntityId;
+	private String parentEntityId, currentFileParentEntityId;
 	//set if we are uploading to an existing file entity
 	private String entityId;
 	private CallbackP<String> fileHandleIdCallback;
@@ -74,6 +78,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	AuthenticationController authenticationController;
 	
 	private String[] fileNames;
+	private String[] currentFilePath;
+	private int currentFilePathElement;
 	private int currIndex;
 	private JavaScriptObject fileList;
 	private NumberFormat percentFormat;
@@ -84,7 +90,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private S3DirectUploader s3DirectUploader;
 	private String bucketName, endpointUrl, keyPrefixUUID;
 	private SynapseJavascriptClient jsClient;
-	
+	private SynapseProperties synapseProperties;
 	@Inject
 	public Uploader(
 			UploaderView view, 			
@@ -95,7 +101,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			MultipartUploader multiPartUploader,
 			GlobalApplicationState globalAppState,
 			S3DirectUploader s3DirectUploader,
-			SynapseJavascriptClient jsClient
+			SynapseJavascriptClient jsClient,
+			SynapseProperties synapseProperties
 			) {
 	
 		this.view = view;		
@@ -109,23 +116,17 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.multiPartUploader = multiPartUploader;
 		this.s3DirectUploader = s3DirectUploader;
 		this.jsClient = jsClient;
+		this.synapseProperties = synapseProperties;
 		view.setPresenter(this);
 		clearHandlers();
 	}		
 
-	public Widget asWidget(Entity entity) {
-		return asWidget(entity, null, null, true);
-	}
-	
-	public Widget asWidget(String parentEntityId) {
-		return asWidget((Entity)null, parentEntityId, null, true);
-	}
-	
-	public Widget asWidget(Entity entity, String parentEntityId, CallbackP<String> fileHandleIdCallback, boolean isEntity) {
+	public Widget configure(Entity entity, String parentEntityId, CallbackP<String> fileHandleIdCallback, boolean isEntity) {
 		this.view.setPresenter(this);
 		this.entity = entity;
 		this.entityId = entity != null ? entity.getId() : null;
 		this.parentEntityId = parentEntityId;
+		this.currentFileParentEntityId = parentEntityId;
 		this.fileHandleIdCallback = fileHandleIdCallback;
 		this.view.createUploadForm(isEntity, parentEntityId);
 		view.resetToInitialState();
@@ -148,6 +149,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		handlerManager = new HandlerManager(this);		
 		this.entity = null;
 		this.parentEntityId = null;
+		this.currentFileParentEntityId = null;
 		this.currentUploadType = null;
 		this.currentExternalUploadUrl = null;
 		bucketName = null;
@@ -234,7 +236,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		} else {
 			//we have a parent entity, check to see where we are suppose to upload the file(s)
 			String uploadDestinationsEntityId = parentEntityId != null ? parentEntityId : entity.getId();
-			synapseClient.getUploadDestinations(uploadDestinationsEntityId, new AsyncCallback<List<UploadDestination>>() {
+			jsClient.getUploadDestinations(uploadDestinationsEntityId, new AsyncCallback<List<UploadDestination>>() {
 				public void onSuccess(List<UploadDestination> uploadDestinations) {
 
 					if (uploadDestinations == null || uploadDestinations.isEmpty()) {
@@ -315,6 +317,18 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * Get the upload destination (based on the project settings), and continue the upload.
 	 */
 	public void uploadBasedOnConfiguration() {
+		// create necessary folders based on webkitRelativePath for the current item, and set parent entity id to correct parent
+		// reset the current file parent entity id to the original.
+		String relativePath = synapseJsniUtils.getWebkitRelativePath(fileList, currIndex);
+		if (relativePath == null || relativePath.isEmpty()) {
+			uploadBasedOnConfigurationAfterFolderCreation();
+		} else {
+			String[] path = relativePath.split("[/]");
+			mkdirs(path);
+		}
+	}
+	
+	private void uploadBasedOnConfigurationAfterFolderCreation() {
 		if (validateFileName(fileNames[currIndex])) {
 			if (currentUploadType == UploadType.S3) {
 				uploadToS3();
@@ -335,15 +349,83 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}	
 		return valid;
 	}
+	
+	/**
+	 * Create any missing folders based on the relative path
+	 * @param relativePath
+	 */
+	public void mkdirs(String[] path) {
+		// current file path (remove file name)
+		this.currentFilePath = new String[path.length-1];
+		for (int i = 0; i < path.length - 1; i++) {
+			currentFilePath[i] = path[i];
+		}
+		this.currentFilePathElement = 0;
+		this.currentFileParentEntityId = parentEntityId;
+		mkdir();
+	}
+	
+	private void mkdir() {
+		// look up the name (does that entity name exist?)
+		jsClient.lookupChild(currentFilePath[currentFilePathElement], currentFileParentEntityId, new AsyncCallback<String>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				if (caught instanceof NotFoundException) {
+					// did not find this container, create it!
+					createCurrentPathElement();
+				} else {
+					uploadError("Unable to create target folder structure: " + synapseJsniUtils.getWebkitRelativePath(fileList, currIndex), caught);
+				}
+			}
+			@Override
+			public void onSuccess(String parentId) {
+				currentFileParentEntityId = parentId;
+				mkNextDir();
+			}
+		});
+	}
+	
+	private void createCurrentPathElement() {
+		Folder f = new Folder();
+		f.setName(currentFilePath[currentFilePathElement]);
+		f.setParentId(currentFileParentEntityId);
+		jsClient.createEntity(f)
+			.addCallback(
+				new FutureCallback<Entity>() {
+					@Override
+					public void onSuccess(Entity entity) {
+						//update the current file parent (container) id to this new folder.
+						currentFileParentEntityId = entity.getId();
+						mkNextDir();
+					}
 
+					@Override
+					public void onFailure(Throwable caught) {
+						uploadError("Unable to create target folder structure: " + synapseJsniUtils.getWebkitRelativePath(fileList, currIndex), caught);
+					}
+				},
+				directExecutor()
+			);
+	}
+	
+	private void mkNextDir() {
+		currentFilePathElement++;
+		if (currentFilePathElement < currentFilePath.length) {
+			mkdir();
+		} else {
+			// done making folders!
+			uploadBasedOnConfigurationAfterFolderCreation();
+		}
+	}
+	
 	/**
 	 * Given a sftp link, return a link that goes through the sftp proxy to do the action (GET file or POST upload form)
 	 * @param realSftpUrl
 	 * @param globalAppState
 	 * @return
 	 */
-	public static String getSftpProxyLink(String fileNameOverride, String realSftpUrl, GlobalApplicationState globalAppState, GWTWrapper gwt) {
-		String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
+	public static String getSftpProxyLink(String fileNameOverride, String realSftpUrl, SynapseProperties synapseProperties, GWTWrapper gwt) {
+		String sftpProxy = synapseProperties.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
 		if (sftpProxy != null) {
 			String delimiter = sftpProxy.contains("?") ? "&" : "?";
 			
@@ -361,7 +443,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			Callback callback = new Callback() {
 				@Override
 				public void invoke() {
-					view.submitForm(getSftpProxyLink("", url, globalAppState, gwt));		
+					view.submitForm(getSftpProxyLink("", url, synapseProperties, gwt));		
 				}
 			};
 			checkForExistingFileName(fileNames[currIndex], callback);
@@ -439,10 +521,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * @param callback Called when upload should continue.  Otherwise, it is not called.
 	 */
 	public void checkForExistingFileName(final String fileName, final Callback callback) {
-		if (entity != null || parentEntityId == null) {
+		if (entity != null || currentFileParentEntityId == null) {
 			callback.invoke();
 		} else {
-			synapseClient.getFileEntityIdWithSameName(fileName, parentEntityId, new AsyncCallback<String>() {
+			synapseClient.getFileEntityIdWithSameName(fileName, currentFileParentEntityId, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(final String result) {
 					//there was already a file with this name in the directory.
@@ -460,7 +542,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 							new Callback() {
 								@Override
 								public void invoke() {
-									handleCancelledFileUpload();
+									processNextFile();
 								}
 							});
 				}
@@ -473,7 +555,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						//there was an entity found with same parent ID and name, but
 						//it was not a File Entity.
 						view.showErrorMessage("An item named \""+fileName+"\" already exists in this location. File could not be uploaded.");
-						handleCancelledFileUpload();
+						processNextFile();
 					} else {
 						uploadError(caught.getMessage(), caught);
 					}
@@ -495,7 +577,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 
-	private void handleCancelledFileUpload() {
+	private void processNextFile() {
 		if (currIndex + 1 == fileNames.length) {
 			//uploading the last file
 			if (!fileHasBeenUploaded) {
@@ -509,14 +591,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			}
 		} else {
 			//more files to upload
-			currIndex++;
-			handleUploads();
+			uploadNextFile();
 		}
 	}
 	
 	public void setFileEntityFileHandle(String fileHandleId) {
-		if (entityId != null || parentEntityId != null) {
-			synapseClient.setFileEntityFileHandle(fileHandleId, entityId, parentEntityId, new AsyncCallback<String>() {
+		if (entityId != null || currentFileParentEntityId != null) {
+			synapseClient.setFileEntityFileHandle(fileHandleId, entityId, currentFileParentEntityId, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String entityId) {
 					fileHasBeenUploaded = true;
@@ -526,8 +607,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						refreshAfterSuccessfulUpload(entityId);
 					} else {
 						//more files to upload
-						currIndex++;
-						handleUploads();
+						uploadNextFile();
 					}
 				}
 				@Override
@@ -540,6 +620,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			fileHandleIdCallback.invoke(fileHandleId);
 			uploadSuccess();
 		}
+	}
+	
+	public void uploadNextFile() {
+		currIndex++;
+		// SWC-4274: reset entity id
+		Uploader.this.entityId=null;
+		handleUploads();
 	}
 	
 	@Override
@@ -591,7 +678,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			@Override
 			public void onSuccess(Entity result) {
 				entity = result;
-				view.showInfo(DisplayConstants.TEXT_LINK_FILE, DisplayConstants.TEXT_LINK_SUCCESS);
+				view.showInfo(DisplayConstants.TEXT_LINK_SUCCESS);
 				entityUpdated();
 			}
 			@Override
@@ -610,7 +697,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	public void createNewExternalFileEntity(final String path, final String name, Long fileSize, String contentType, String md5, final Long storageLocationId) {
 		try {
-			synapseClient.createExternalFile(parentEntityId, path, name, contentType, fileSize, md5, storageLocationId, getExternalFileUpdatedCallback());
+			synapseClient.createExternalFile(currentFileParentEntityId, path, name, contentType, fileSize, md5, storageLocationId, getExternalFileUpdatedCallback());
 		} catch (RestServiceException e) {
 			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);	
 		}
@@ -628,7 +715,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public void setUploaderLinkNameVisible(boolean visible) {
 		view.setUploaderLinkNameVisible(visible);
 	}
-
 	
 	public void addCancelHandler(CancelHandler handler) {
 		handlerManager.addHandler(CancelEvent.getType(), handler);
@@ -743,7 +829,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	private void uploadSuccess() {
-		view.showInfo(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayConstants.TEXT_UPLOAD_SUCCESS);
+		view.showInfo(DisplayConstants.TEXT_UPLOAD_SUCCESS);
 		view.clear();
 		globalAppState.clearDropZoneHandler();
 		view.resetToInitialState();

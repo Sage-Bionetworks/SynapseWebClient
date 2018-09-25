@@ -36,7 +36,7 @@ public class SubscriptionViewImpl implements SubscriptionView {
 			) {
 		widget = binder.createAndBindUi(this);
 		this.headerWidget = headerWidget;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		followButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -55,7 +55,7 @@ public class SubscriptionViewImpl implements SubscriptionView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
@@ -70,8 +70,8 @@ public class SubscriptionViewImpl implements SubscriptionView {
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

@@ -13,14 +13,17 @@ import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
+import org.sagebionetworks.web.client.widget.table.SortEntityChildrenDropdownButton;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.ClientBundleWithLookup;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
@@ -50,9 +53,10 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	Table entityTreeHeader;
 	@UiField
 	Hr hrUnderTableHeaders;
+	@UiField
+	Div synAlertContainer;
 	Div entityTreeContainer = new Div();
 	private Widget widget;
-
 	@Inject
 	public EntityTreeBrowserViewImpl(IconsImageBundle iconsImageBundle,
 			Binder uiBinder) {
@@ -78,7 +82,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	public Widget asWidget() {
 		return widget;
 	}
-
+	
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -90,8 +94,8 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override
@@ -157,9 +161,11 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		childToAdd.asTreeItem().addItem(createDummyItem());
 		if (isSelectable) {
 			// Add select functionality.
-			childToAdd.setClickHandler(event -> {
+			ClickHandler selectClickHandler = event -> {
 				selectEntity(childToAdd);
-			});
+			};
+			childToAdd.setModifiedByUserBadgeClickHandler(selectClickHandler);
+			childToAdd.setClickHandler(selectClickHandler);
 		}
 		// Update fields.
 		getTreeItem2entityTreeItem().put(childToAdd.asTreeItem(), childToAdd);
@@ -293,5 +299,10 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	@Override
 	public void showLoading() {
 		setLoadingVisible(true);
+	}
+	@Override
+	public void setSynAlert(IsWidget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
 	}
 }

@@ -11,7 +11,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface WikiPageDeleteConfirmationDialogView extends IsWidget, ShowsErrors {
 	void setPresenter(Presenter presenter);
 	void showModal(String wikiPageId, Map<String, V2WikiHeader> id2HeaderMap, Map<String, List<V2WikiHeader>> id2ChildrenMap);
-	void showInfo(String header, String message);
+	void showInfo(String message);
 	
 	public interface Presenter {
 		void onDeleteWiki();

@@ -11,6 +11,7 @@ import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.place.Profile;
@@ -53,10 +54,12 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	public static final String USER_ID_ATTRIBUTE = "data-profile-user-id";
 	public static PlaceChanger placeChanger = null;
 	public static final ClickHandler STANDARD_CLICKHANDLER = event -> {
-		event.preventDefault();
-		Widget panel = (Widget)event.getSource();
-		String userId = panel.getElement().getAttribute(USER_ID_ATTRIBUTE);
-		placeChanger.goTo(new Profile(userId));
+		if (!DisplayUtils.isAnyModifierKeyDown(event)) {
+			event.preventDefault();
+			Widget panel = (Widget)event.getSource();
+			String userId = panel.getElement().getAttribute(USER_ID_ATTRIBUTE);
+			placeChanger.goTo(new Profile(userId));
+		}
 	};
 	
 	public static final ClickHandler NEW_WINDOW_CLICKHANDLER = event -> {
@@ -127,6 +130,8 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	public void doNothingOnClick() {
 		handlerRegistration.removeHandler();
 		handlerRegistration = usernameLink.addClickHandler(DO_NOTHING_CLICKHANDLER);
+		pictureHandlerRegistration.removeHandler();
+		pictureHandlerRegistration = pictureFocusPanel.addClickHandler(DO_NOTHING_CLICKHANDLER);
 	}
 	
 	@Override
@@ -175,7 +180,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
+	public void showInfo(String message) {
 		// TODO Auto-generated method stub
 	}
 
@@ -214,5 +219,9 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	@Override
 	public void setHeight(String height) {
 		widget.setHeight(height);
+	}
+	@Override
+	public void addUsernameLinkStyle(String style) {
+		usernameLink.addStyleName(style);
 	}
 }

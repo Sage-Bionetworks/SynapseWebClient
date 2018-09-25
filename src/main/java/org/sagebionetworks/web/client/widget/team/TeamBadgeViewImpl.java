@@ -35,10 +35,12 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	public static PlaceChanger placeChanger = null;
 	public static final String TEAM_ID_ATTRIBUTE = "data-team-id";
 	public static final ClickHandler STANDARD_CLICKHANDLER = event -> {
-		event.preventDefault();
-		Widget panel = (Widget)event.getSource();
-		String teamId = panel.getElement().getAttribute(TEAM_ID_ATTRIBUTE);
-		placeChanger.goTo(new org.sagebionetworks.web.client.place.Team(teamId));
+		if (!DisplayUtils.isAnyModifierKeyDown(event)) {
+			event.preventDefault();
+			Widget panel = (Widget)event.getSource();
+			String teamId = panel.getElement().getAttribute(TEAM_ID_ATTRIBUTE);
+			placeChanger.goTo(new org.sagebionetworks.web.client.place.Team(teamId));
+		}
 	};
 	
 	@Inject
@@ -65,12 +67,13 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 			anchor.addClickHandler(STANDARD_CLICKHANDLER);
 		} else {
 			anchor.addClickHandler(event -> {
-				event.preventDefault();
-				customClickHandler.onClick(event);
+				if (!DisplayUtils.isAnyModifierKeyDown(event)) {
+					event.preventDefault();
+					customClickHandler.onClick(event);
+				}
 			});
 		}
 		notificationsPanel.clear();
-		if(team == null)  throw new IllegalArgumentException("Team is required");
 		anchor.getElement().setAttribute(TEAM_ID_ATTRIBUTE, teamId);
 		if(team != null) {
 			String name = maxNameLength == null ? team.getName() : DisplayUtils.stubStrPartialWord(team.getName(), maxNameLength);
@@ -128,7 +131,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
+	public void showInfo(String message) {
 	}
 
 	@Override

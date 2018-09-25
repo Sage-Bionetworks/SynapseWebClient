@@ -57,9 +57,11 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
 				Synapse synapsePlace = (Synapse)data.getPlace();
 				anchor.setHref("#" + DisplayUtils.getSynapseHistoryTokenNoHash(synapsePlace.getEntityId(), synapsePlace.getVersionNumber(), synapsePlace.getArea(), synapsePlace.getAreaToken()));
 			}
-			anchor.addClickHandler(event -> {			
-				event.preventDefault();
-				presenter.goTo(data.getPlace());
+			anchor.addClickHandler(event -> {
+				if (!(DisplayUtils.isAnyModifierKeyDown(event))) {
+					event.preventDefault();
+					presenter.goTo(data.getPlace());
+				}
 			});
 			if (i > 0) {
 				panel.add(new InlineHTML(SafeHtmlUtils.fromSafeConstant(ClientProperties.BREADCRUMB_SEP)));
@@ -86,8 +88,8 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

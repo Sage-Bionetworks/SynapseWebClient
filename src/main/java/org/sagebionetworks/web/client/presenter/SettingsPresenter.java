@@ -154,7 +154,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 				view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 			}
 		} else {
-			view.showInfo("Error", "Reset Password failed. Please Login again.");
+			view.showInfo("Reset Password failed. Please Login again.");
 			goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		}
 	}
@@ -188,7 +188,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 				synapseClient.updateUserProfile(myProfile, new AsyncCallback<Void>() {
 					@Override
 					public void onSuccess(Void result) {
-						view.showInfo(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS, "");
+						view.showInfo(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS);
 						authenticationController.updateCachedProfile(myProfile);
 					}
 
@@ -256,7 +256,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
-				view.showInfo(DisplayConstants.API_KEY_CHANGED, "");
+				view.showInfo(DisplayConstants.API_KEY_CHANGED);
 				view.setApiKey(result);
 			}
 

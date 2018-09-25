@@ -47,7 +47,7 @@ public class FileCellEditorImpl implements FileCellEditor, FileCellEditorView.Pr
 
 	@Override
 	public boolean isValid() {
-		String value = StringUtils.trimWithEmptyAsNull(view.getValue());
+		String value = StringUtils.emptyAsNull(view.getValue());
 		if(value != null){
 			try {
 				Long.parseLong(value);

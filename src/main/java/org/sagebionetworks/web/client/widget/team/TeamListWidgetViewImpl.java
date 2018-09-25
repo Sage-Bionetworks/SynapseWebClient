@@ -45,8 +45,8 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

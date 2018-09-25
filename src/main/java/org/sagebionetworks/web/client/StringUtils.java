@@ -12,14 +12,13 @@ public class StringUtils {
 	/**
 	 * Compare two cell values and decide if there is a change.
 	 * This method will treat empty string and null as equal.
-	 * Also non-null strings are trimmed before compared.
 	 * @param original
 	 * @param changed
 	 * @return
 	 */
 	public static boolean isValueChanged(String inOriginal, String inChanged){
-		String tOriginal = trimWithEmptyAsNull(inOriginal);
-		String tChanged = trimWithEmptyAsNull(inChanged);
+		String tOriginal = emptyAsNull(inOriginal);
+		String tChanged = emptyAsNull(inChanged);
 		if(tOriginal == null){
 			if(tChanged == null){
 				return false;
@@ -30,18 +29,13 @@ public class StringUtils {
 		}
 	}
 	/**
-	 * @return Returns null if the passed value is null.  Returns null if the trimmed string is empty else the trimmed string.  
+	 * @return Returns null if the passed value is null.  Returns null if the string is empty (or only whitespace), else the string.  
 	 */
-	public static String trimWithEmptyAsNull(String toUpdate){
-		if(toUpdate == null){
+	public static String emptyAsNull(String toUpdate){
+		if(toUpdate == null || toUpdate.isEmpty() || toUpdate.trim().isEmpty()){
 			return null;
-		}else{
-			String trim = toUpdate.trim();
-			if(trim.isEmpty()){
-				return null;
-			}else{
-				return trim;
-			}
+		} else {
+			return toUpdate;
 		}
 	}
 	

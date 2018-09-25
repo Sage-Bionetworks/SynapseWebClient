@@ -11,8 +11,8 @@
 			<b:Anchor addStyleNames="favoriteIcon textDecorationNone" ui:field="favoriteIcon" icon="STAR" visible="false"/>
 		</b:Tooltip>
 		<b:Tooltip trigger="HOVER" placement="RIGHT" title="Click the star to add this to your favorites!">
-			<b:Anchor addStyleNames="greyText-imp textDecorationNone" ui:field="notFavoriteIcon" icon="STAR_O" visible="false"/>
+			<b:Anchor addStyleNames="synapse-green textDecorationNone" ui:field="notFavoriteIcon" icon="STAR_O" visible="false"/>
 		</b:Tooltip>
-		<w:LoadingSpinner ui:field="loadingUI" size="16px" />
+		<w:LoadingSpinner ui:field="loadingUI" size="28px" marginLeft="6" marginRight="6" />
 	</bh:Span>
 </ui:UiBinder>

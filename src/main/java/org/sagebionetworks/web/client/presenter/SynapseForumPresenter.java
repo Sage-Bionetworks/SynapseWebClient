@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -22,20 +22,20 @@ public class SynapseForumPresenter extends AbstractActivity implements Presenter
 	SynapseForumView view;
 
 	GlobalApplicationState globalApplicationState;
-	CookieProvider cookies;
 	ForumWidget forumWidget;
+	SynapseProperties synapseProperties;
 
 	@Inject
 	public SynapseForumPresenter(
 			SynapseForumView view,
 			GlobalApplicationState globalApplicationState,
-			CookieProvider cookies,
-			ForumWidget forumWidget
+			ForumWidget forumWidget,
+			SynapseProperties synapseProperties
 			) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
-		this.cookies = cookies;
 		this.forumWidget = forumWidget;
+		this.synapseProperties = synapseProperties;
 		view.setForumWidget(forumWidget.asWidget());
 	}
 
@@ -43,7 +43,7 @@ public class SynapseForumPresenter extends AbstractActivity implements Presenter
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
 		panel.setWidget(view);
-		showForum(globalApplicationState.getSynapseProperty(WebConstants.FORUM_SYNAPSE_ID_PROPERTY));
+		showForum(synapseProperties.getSynapseProperty(WebConstants.FORUM_SYNAPSE_ID_PROPERTY));
 	}
 
 	public void showForum(String entityId) {

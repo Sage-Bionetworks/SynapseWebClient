@@ -8,7 +8,7 @@
 	<bh:Div addStyleNames="discussionReply light-border lightGreyBackground padding-5 margin-bottom-5 margin-left-30">
 		<bh:Div>
 			<bh:Span ui:field="author"></bh:Span>
-			<b:Label text="Moderator" ui:field="moderatorBadge" visible="false" addStyleNames="synapse-purple-bg margin-left-5"/>
+			<b:Label text="Moderator" ui:field="moderatorBadge" visible="false" addStyleNames="synapse-accent-primary-bg margin-left-5"/>
 		</bh:Div>
 		<bh:Div width="100%">
 			<w:LoadingSpinner ui:field="loadingMessage" visible="false" addStyleNames="displayInline" size="16px"/>

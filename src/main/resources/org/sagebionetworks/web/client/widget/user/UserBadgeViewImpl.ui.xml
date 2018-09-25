@@ -5,13 +5,13 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-	<bh:Div addStyleNames="displayInlineBlock">
+	<bh:Div addStyleNames="displayInlineBlock overflowHidden vertical-align-middle ">
 		<bh:Span addStyleNames="flexcontainer-row">
 			<bh:Span ui:field="pictureSpan" addStyleNames="flexcontainer-column flexcontainer-justify-center">
 				<g:FocusPanel ui:field="pictureFocusPanel" addStyleNames="margin-right-5 imageButton displayInlineBlock">
 					<bh:Span>
-						<bh:Span ui:field="defaultUserPicture" addStyleNames="fa-stack">
-							<b:Icon ui:field="squareIcon" type="SQUARE_O" addStyleNames="fa-stack-2x"/>
+						<bh:Span ui:field="defaultUserPicture" addStyleNames="fa-stack userProfileImage">
+							<b:Icon ui:field="squareIcon" type="CIRCLE_O" addStyleNames="fa-stack-2x"/>
 							<bh:Strong ui:field="defaultUserPictureLetter" text="J" addStyleNames="fa-stack-1x"/>
 						</bh:Span>
 						<g:Image ui:field="userPicture" addStyleNames="userProfileImage margin-left-2" />

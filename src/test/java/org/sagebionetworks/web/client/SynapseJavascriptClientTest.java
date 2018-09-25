@@ -1,29 +1,28 @@
 package org.sagebionetworks.web.client;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static com.google.gwt.http.client.RequestBuilder.GET;
+import static com.google.gwt.http.client.RequestBuilder.POST;
+import static com.google.gwt.http.client.RequestBuilder.PUT;
 import static org.apache.http.HttpStatus.*;
-import static org.sagebionetworks.web.shared.WebConstants.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.*;
+import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
+import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.*;
-import static com.google.gwt.http.client.RequestBuilder.*;
-import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.*;
-
-import org.sagebionetworks.web.shared.exceptions.*;
-
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-
-import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.asynch.AsynchType;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -48,7 +47,6 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.BulkFileDownloadRequest;
-import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.table.DownloadFromTableRequest;
 import org.sagebionetworks.repo.model.table.EntityView;
@@ -56,17 +54,33 @@ import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
-import org.sagebionetworks.repo.model.table.UploadToTableRequest;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
-import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
+import org.sagebionetworks.web.shared.exceptions.ConflictException;
+import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
+import org.sagebionetworks.web.shared.exceptions.LockedException;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
+import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
+import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 public class SynapseJavascriptClientTest {
 	SynapseJavascriptClient client;
 	private static SynapseJavascriptFactory synapseJsFactory = new SynapseJavascriptFactory();
@@ -86,7 +100,7 @@ public class SynapseJavascriptClientTest {
 	@Mock
 	SynapseJSNIUtils mockJsniUtils;
 	@Mock
-	ClientCache mockClientCache;
+	SynapseProperties mockSynapseProperties;
 	@Captor
 	ArgumentCaptor<RequestCallback> requestCallbackCaptor;
 	@Mock
@@ -105,13 +119,13 @@ public class SynapseJavascriptClientTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		when(mockClientCache.get(REPO_SERVICE_URL_KEY)).thenReturn(REPO_ENDPOINT);
-		when(mockClientCache.get(FILE_SERVICE_URL_KEY)).thenReturn(FILE_ENDPOINT);
+		when(mockSynapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY)).thenReturn(REPO_ENDPOINT);
+		when(mockSynapseProperties.getSynapseProperty(FILE_SERVICE_URL_KEY)).thenReturn(FILE_ENDPOINT);
 		when(mockGinInjector.getRequestBuilder()).thenReturn(mockRequestBuilder);
 		when(mockGinInjector.getAuthenticationController()).thenReturn(mockAuthController);
 		client = new SynapseJavascriptClient(
 				jsonObjectAdapter, 
-				mockClientCache, 
+				mockSynapseProperties, 
 				mockGwt,
 				synapseJsFactory,
 				mockGinInjector,
@@ -141,7 +155,7 @@ public class SynapseJavascriptClientTest {
 		client.getEntityBundle(entityId, partsMask, mockAsyncCallback);
 		
 		//verify url and method
-		String url = REPO_ENDPOINT + ENTITY_URI_PATH + "/" + entityId + BUNDLE_MASK_PATH + partsMask;
+		String url = REPO_ENDPOINT + ENTITY + "/" + entityId + BUNDLE_MASK_PATH + partsMask;
 		verify(mockRequestBuilder).configure(GET, url);
 		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		verify(mockRequestBuilder, never()).setHeader(eq(SESSION_TOKEN_HEADER), anyString());
@@ -169,7 +183,7 @@ public class SynapseJavascriptClientTest {
 		client.getEntityBundleForVersion(entityId, versionNumber, partsMask, mockAsyncCallback);
 		
 		//verify url and method
-		String url = REPO_ENDPOINT + ENTITY_URI_PATH + "/" + entityId + REPO_SUFFIX_VERSION + "/" + versionNumber + BUNDLE_MASK_PATH + partsMask;
+		String url = REPO_ENDPOINT + ENTITY + "/" + entityId + REPO_SUFFIX_VERSION + "/" + versionNumber + BUNDLE_MASK_PATH + partsMask;
 		verify(mockRequestBuilder).configure(GET, url);
 		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		verify(mockRequestBuilder).setHeader(SESSION_TOKEN_HEADER, USER_SESSION_TOKEN);
@@ -264,7 +278,7 @@ public class SynapseJavascriptClientTest {
 		
 		client.getEntityChildren(entityChildrenRequest, mockAsyncCallback);
 		//verify url and method
-		String url = REPO_ENDPOINT + ENTITY_URI_PATH + CHILDREN;
+		String url = REPO_ENDPOINT + ENTITY + CHILDREN;
 		verify(mockRequestBuilder).configure(POST, url);
 		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
@@ -413,7 +427,7 @@ public class SynapseJavascriptClientTest {
 		
 		//verify url and method
 		String url = REPO_ENDPOINT + 
-			ENTITY_URI_PATH + "/" + entityId;
+			ENTITY + "/" + entityId;
 		verify(mockRequestBuilder).configure(GET, url);
 	}
 	
@@ -424,7 +438,7 @@ public class SynapseJavascriptClientTest {
 		
 		//verify url and method
 		String url = REPO_ENDPOINT + 
-			ENTITY_URI_PATH + "/" + entityId +
+			ENTITY + "/" + entityId +
 			REPO_SUFFIX_VERSION + "/" + versionNumber;
 		verify(mockRequestBuilder).configure(GET, url);
 	}

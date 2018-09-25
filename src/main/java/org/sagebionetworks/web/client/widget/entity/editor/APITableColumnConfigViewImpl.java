@@ -63,7 +63,7 @@ public class APITableColumnConfigViewImpl implements APITableColumnConfigView {
 		}
 		data.setInputColumnNames(inputColumnNamesSet);
 		data.setRendererFriendlyName(rendererField.getSelectedValue());
-		data.setSort(COLUMN_SORT_TYPE.valueOf(sortField.getSelectedValue()));
+		data.setSort(COLUMN_SORT_TYPE.valueOf(sortField.getSelectedValue().toUpperCase()));
 	}
 	public void setColumnName(String text) {
 		this.columnName.setValue(text);

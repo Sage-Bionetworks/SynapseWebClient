@@ -1,12 +1,10 @@
 package org.sagebionetworks.web.client;
 
-import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
 import org.sagebionetworks.web.client.utils.Callback;
 
 public interface PopupUtilsView {
-	void showInfo(String title, String message);
-	void notify(String title, String message, NotifySettings settings);
-	void showError(String title, String message, Integer timeout);
+	void showInfo(String message);
+	void showError(String message, Integer timeout);
 	void showErrorMessage(String message);
 	void showErrorMessage(String title, String message);
 	void showInfoDialog(
@@ -26,4 +24,6 @@ public interface PopupUtilsView {
 			Callback yesCallback
 			);
 	void openInNewWindow(String url);
+	void showConfirmDelete(String message, 
+			Callback callback);
 }

@@ -280,7 +280,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 				if (isSubmit) {
 					submitDataAccessRequest();
 				} else {
-					popupUtils.showInfo(SAVED_PROGRESS_MESSAGE, "");
+					popupUtils.showInfo(SAVED_PROGRESS_MESSAGE);
 					modalPresenter.setLoading(false);
 					modalPresenter.onFinished();
 				}

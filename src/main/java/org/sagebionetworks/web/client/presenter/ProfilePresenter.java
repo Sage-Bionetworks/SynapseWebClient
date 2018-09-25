@@ -1,21 +1,24 @@
 package org.sagebionetworks.web.client.presenter;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Challenge;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.PaginatedTeamIds;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserBundle;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
+import org.sagebionetworks.repo.model.principal.AliasType;
+import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
+import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
@@ -26,12 +29,8 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.UserProfileClientAsync;
-import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Certificate;
 import org.sagebionetworks.web.client.place.Home;
@@ -54,12 +53,11 @@ import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
-import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -69,7 +67,6 @@ import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
 public class ProfilePresenter extends AbstractActivity implements ProfileView.Presenter, Presenter<Profile> {
-		
 	public static final int DELAY_GET_MY_TEAMS = 300;
 	public static final String USER_PROFILE_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.visible.state";
 	public static final String USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.certification.message.visible.state";
@@ -84,13 +81,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	private Profile place;
 	private ProfileView view;
-	private SynapseClientAsync synapseClient;
-	private UserProfileClientAsync userProfileClient;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private CookieProvider cookies;
 	private UserProfileModalWidget userProfileModalWidget;
-	private LinkedInServiceAsync linkedInService;
 	private GWTWrapper gwt;
 	private OpenTeamInvitationsWidget openInvitesWidget;
 	
@@ -130,14 +124,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public ProfilePresenter(ProfileView view,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
-			SynapseClientAsync synapseClient,
 			CookieProvider cookies,
-			LinkedInServiceAsync linkedInServic,
 			GWTWrapper gwt,
 			TeamListWidget myTeamsWidget,
 			OpenTeamInvitationsWidget openInvitesWidget,
 			PortalGinInjector ginInjector,
-			UserProfileClientAsync userProfileClient,
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
 			DateTimeUtils dateTimeUtils,
 			SynapseJavascriptClient jsClient) {
@@ -145,17 +136,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.ginInjector = ginInjector;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
 		this.cookies = cookies;
-		this.linkedInService = linkedInServic;
-		fixServiceEntryPoint(linkedInService);
 		this.gwt = gwt;
 		this.myTeamsWidget = myTeamsWidget;
 		this.openInvitesWidget = openInvitesWidget;
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
-		this.userProfileClient = userProfileClient;
-		fixServiceEntryPoint(userProfileClient);
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.dateTimeUtils = dateTimeUtils;
 		this.jsClient = jsClient;
@@ -282,6 +267,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void updateArea(ProfileArea area, boolean pushState) {
+		currentArea = area;
 		if (area != null && place != null && !area.equals(place.getArea())) {
 			place.setArea(area, filterType, filterTeamId);
 			if (pushState) {
@@ -381,11 +367,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void unbindOrcIdAfterConfirmation() {
-		userProfileClient.unbindOAuthProvidersUserId(OAuthProvider.ORCID, currentUserBundle.getORCID(), new AsyncCallback<Void>() {
+		jsClient.unbindOAuthProvidersUserId(OAuthProvider.ORCID, currentUserBundle.getORCID(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				//ORC id successfully removed.  refresh so that the user bundle and UI are up to date
-				view.showInfo("Success", "ORC ID has been unbound.");
+				view.showInfo("ORC ID has been successfully unbound.");
 				globalApplicationState.refreshPage();
 			}
 			@Override
@@ -755,7 +741,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void getTeamRequestCount(String userId, final Team team) {
-		synapseClient.getOpenRequestCount(userId, team.getId(), new AsyncCallback<Long>() {
+		jsClient.getOpenMembershipRequestCount(team.getId(), new AsyncCallback<Long>() {
 			@Override
 			public void onFailure(Throwable caught) {
 			}
@@ -837,7 +823,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void addProjectResults(List<ProjectHeader> projectHeaders) {
 		for (int i = 0; i < projectHeaders.size(); i++) {
 			ProjectBadge badge = ginInjector.getProjectBadgeWidget();
-			badge.addStyleName("margin-bottom-10 col-xs-12");
 			badge.configure(projectHeaders.get(i));
 			Widget widget = badge.asWidget();
 			loadMoreProjectsWidgetContainer.add(widget);
@@ -851,10 +836,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			badge.configure(challenge);
 			Widget widget = badge.asWidget();
 			view.addChallengeWidget(widget);
-			if (currentArea != null && currentArea.equals(ProfileArea.CHALLENGES)) {
-				// SWC-3213: extra call to make sure challenge tab is currently shown
-				view.setTabSelected(ProfileArea.CHALLENGES);
-			}
 		}
 	}
 	
@@ -899,7 +880,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	
 	@Override
 	public void createProject() {
 		//prompt for project name
@@ -914,24 +894,29 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			getPromptForProjectNameDialog().showError(DisplayConstants.PLEASE_ENTER_PROJECT_NAME);
 			return;
 		}
-		
-		CreateEntityUtil.createProject(name, synapseClient, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String newProjectId) {
-				getPromptForProjectNameDialog().hide();
-				view.showInfo(DisplayConstants.LABEL_PROJECT_CREATED, name);
-				globalApplicationState.getPlaceChanger().goTo(new Synapse(newProjectId));						
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				if(caught instanceof ConflictException) {
-					getPromptForProjectNameDialog().showError(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
-				} else {
-					getPromptForProjectNameDialog().showError(caught.getMessage());
-				}
-			}
-		});
+		Project project = new Project();
+		project.setName(name);
+		jsClient.createEntity(project)
+			.addCallback(
+					new FutureCallback<Entity>() {
+						@Override
+						public void onSuccess(Entity entity) {
+							getPromptForProjectNameDialog().hide();
+							view.showInfo(DisplayConstants.LABEL_PROJECT_CREATED + name);
+							globalApplicationState.getPlaceChanger().goTo(new Synapse(entity.getId()));	
+						}
+	
+						@Override
+						public void onFailure(Throwable caught) {
+							if(caught instanceof ConflictException) {
+								getPromptForProjectNameDialog().showError(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
+							} else {
+								getPromptForProjectNameDialog().showError(caught.getMessage());
+							}
+						}
+					},
+					directExecutor()
+		);
 	}
 
 	@Override
@@ -948,13 +933,16 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			getPromptForTeamNameDialog().showError(DisplayConstants.PLEASE_ENTER_TEAM_NAME);
 			return;
 		}
-
-		synapseClient.createTeam(teamName, new AsyncCallback<String>() {
+		
+		Team newTeam = new Team();
+		newTeam.setName(teamName);
+		newTeam.setCanPublicJoin(false);
+		jsClient.createTeam(newTeam, new AsyncCallback<Team>() {
 			@Override
-			public void onSuccess(String newTeamId) {
+			public void onSuccess(Team team) {
 				getPromptForTeamNameDialog().hide();
-				view.showInfo(DisplayConstants.LABEL_TEAM_CREATED, teamName);
-				globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(newTeamId));						
+				view.showInfo(DisplayConstants.LABEL_TEAM_CREATED + teamName);
+				globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(team.getId()));						
 			}
 			
 			@Override
@@ -978,16 +966,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	private void profileUpdated() {
-		view.showInfo("Success", "Your profile has been updated.");
+		view.showInfo("Your profile has been successfully updated.");
 		editMyProfile();
 		view.refreshHeader();
-	}
-	
-	private void loggedInCheck() {
-		if (!authenticationController.isLoggedIn()) {
-			view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
-			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-		}
 	}
 	
 	private void showView(Profile place) {
@@ -1007,7 +988,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 		
 		if (token.equals("oauth_bound")) {
-			view.showInfo("", DisplayConstants.SUCCESSFULLY_LINKED_OAUTH2_ACCOUNT);
+			view.showInfo(DisplayConstants.SUCCESSFULLY_LINKED_OAUTH2_ACCOUNT);
 			token = "v";
 		}
 		if (token.equals("v") || token.startsWith("v/") || token.isEmpty()) {
@@ -1028,37 +1009,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			updateProfileView(place.getUserId());
 		}
 		else {
-			//if this contains an oauth_token, it's from linkedin
-			if (token.contains("oauth_token")) {
-				// User just logged in to LinkedIn. Get the request token and their info to update
-				// their profile with.
-
-				//must be logged in
-				loggedInCheck();
-
-				String requestToken = "";
-				String verifier = "";
-				if (token.startsWith("?"))
-					token = token.substring(1);
-				String[] oAuthTokens = token.split("&");
-				for(String s : oAuthTokens) {
-					String[] tokenParts = s.split("=");
-					if(tokenParts[0].equals("oauth_token")) {
-						requestToken = tokenParts[1];
-					} else if(tokenParts[0].equals("oauth_verifier")) {
-						verifier = tokenParts[1];
-					}
-				}
-				
-				globalApplicationState.replaceCurrentPlace(new Profile(authenticationController.getCurrentUserPrincipalId()));
-				
-				if(requestToken != null && !requestToken.equals("") && verifier != null && !verifier.equals("")) {
-					updateProfileWithLinkedIn(requestToken, verifier);
-				} else {
-					view.showErrorMessage("Unable to import LinkedIn profile.");
-					globalApplicationState.refreshPage();
-				}
-			} else if (Profile.EDIT_PROFILE_TOKEN.equals(token)) {
+			if (Profile.EDIT_PROFILE_TOKEN.equals(token)) {
 				editMyProfile();
 			} else {
 				//if this is a number, then treat it as a a user id
@@ -1073,9 +1024,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void getUserIdFromUsername(String userName) {
-		synapseClient.getUserIdFromUsername(userName, new AsyncCallback<String>() {
+		PrincipalAliasRequest request = new PrincipalAliasRequest();
+		request.setAlias(userName);
+		request.setType(AliasType.USER_NAME);
+		jsClient.getPrincipalAlias(request, new AsyncCallback<PrincipalAliasResponse>() {
 			@Override
-			public void onSuccess(String userId) {
+			public void onSuccess(PrincipalAliasResponse principalAlias) {
+				String userId = principalAlias.getPrincipalId().toString();
 				place.setUserId(userId);
 				updateProfileView(userId);
 			}
@@ -1199,11 +1154,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				view.setSettingsWidget(getSettingsPresenter().asWidget());
 				break;
 			case CHALLENGES:
+				refreshChallenges();
+				break;
 			default:
 				break;
 		}
-		//always refreshes challenges to determine if tab should be shown
-		refreshChallenges();
 	}
 	
 	/**
@@ -1291,62 +1246,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		
 	}
 
-	@Override
-	public void onImportLinkedIn() {
-		redirectToLinkedIn();
-	}
-	
-	public void redirectToLinkedIn() {
-		profileSynAlert.clear();
-		linkedInService.returnAuthUrl(gwt.getHostPageBaseURL(), new AsyncCallback<LinkedInInfo>() {
-			@Override
-			public void onSuccess(LinkedInInfo result) {
-				// Store the requestToken secret in a cookie, set to expire in five minutes
-				Date date = new Date(System.currentTimeMillis() + 300000);
-				cookies.setCookie(CookieKeys.LINKEDIN, result.getRequestSecret(), date);
-				// Open the LinkedIn authentication window in the same tab
-				view.open(result.getAuthUrl());
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				profileSynAlert.handleException(caught);
-			}
-		});
-	}
-	
-	/**
-	 * This method will update the current user's profile using LinkedIn
-	 */
-	public void updateProfileWithLinkedIn(String requestToken, String verifier) {
-		// Grab the requestToken secret from the cookie. If it's expired, show an error message.
-		// If not, grab the user's info for an update.
-		profileSynAlert.clear();
-		view.showLoading();
-		String secret = cookies.getCookie(CookieKeys.LINKEDIN);
-		if(secret == null || secret.equals("")) {
-			view.showErrorMessage("Your request has timed out. Please reload the page and try again.");
-		} else {
-			linkedInService.getCurrentUserInfo(requestToken, secret, verifier, gwt.getHostPageBaseURL(), new AsyncCallback<UserProfile>() {
-				@Override
-				public void onSuccess(UserProfile linkedInProfile) {
-					view.hideLoading();
-					// Give the user a chance to edit the profile.
-					getUserProfileModalWidget().showEditProfile(linkedInProfile.getOwnerId(), linkedInProfile, new Callback(){
-						@Override
-						public void invoke() {
-							profileUpdated();
-						}});
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					profileSynAlert.handleException(caught);								
-				}
-			});
-		}
-	}
-	
+
 	@Override
 	public void editVerificationSubmissionClicked() {
 		//edit the existing submission

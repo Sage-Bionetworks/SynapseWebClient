@@ -25,6 +25,7 @@ import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
@@ -50,8 +51,8 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public static final String NO_EMAIL_MESSAGE = "You must enter an email to send to the user";
 	public static final String NO_USER_SELECTED = "You must select a user to approve";
 	public static final String APPROVE_BUT_FAIL_TO_EMAIL = "User has been approved, but an error was encountered while emailing them: ";
-	public static final String APPROVED_USER = "Successfully Approved User";
-	public static final String REVOKED_USER = "Successfully Revoked User Access";
+	public static final String APPROVED_USER = "Successfully Approved User. ";
+	public static final String REVOKED_USER = "Successfully Revoked User Access. ";
 	public static final String EMAIL_SENT = "An email has been sent to notify them";
 	public static final String MESSAGE_BLANK = "You must enter an email message to approve this user";
 	public static final String NO_APPROVAL_FOUND = "There was no approval found for the specified user and requirement";
@@ -70,7 +71,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	private SynapseSuggestBox peopleSuggestWidget;
 	private Map<String, AccessRequirement> arMap;
 	private SynapseClientAsync synapseClient;
-	private GlobalApplicationState globalApplicationState;
+	private SynapseProperties synapseProperties;
 	private JobTrackingWidget progressWidget;
 	private DataAccessClientAsync dataAccessClient;
 	@Inject
@@ -79,7 +80,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			SynapseSuggestBox peopleSuggestBox,
 			UserGroupSuggestionProvider provider, 
 			SynapseClientAsync synapseClient,
-			GlobalApplicationState globalApplicationState,
+			SynapseProperties synapseProperties,
 			JobTrackingWidget progressWidget,
 			DataAccessClientAsync dataAccessClient) {
 		this.view = view;
@@ -87,7 +88,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		this.peopleSuggestWidget = peopleSuggestBox;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
-		this.globalApplicationState = globalApplicationState;
+		this.synapseProperties = synapseProperties;
 		this.progressWidget = progressWidget;
 		this.dataAccessClient = dataAccessClient;
 		fixServiceEntryPoint(dataAccessClient);
@@ -203,7 +204,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public Query getDefaultQuery() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(SELECT_FROM);
-		builder.append(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.act.synapse_storage_id"));
+		builder.append(synapseProperties.getSynapseProperty("org.sagebionetworks.portal.act.synapse_storage_id"));
 		builder.append(WHERE);
 		builder.append(datasetId + "'");
 		
@@ -237,7 +238,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			public void onSuccess(Void result) {
 				view.setRevokeProcessing(false);
 				view.hide();
-				view.showInfo(REVOKED_USER, "");
+				view.showInfo(REVOKED_USER);
 			}
 		});
 	}
@@ -288,7 +289,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			public void onSuccess(String result) {
 				view.setApproveProcessing(false);
 				view.hide();
-				view.showInfo(APPROVED_USER, EMAIL_SENT);
+				view.showInfo(APPROVED_USER + EMAIL_SENT);
 			}
 		});
 	}

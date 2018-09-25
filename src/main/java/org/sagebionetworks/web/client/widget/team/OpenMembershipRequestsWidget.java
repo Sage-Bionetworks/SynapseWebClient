@@ -83,7 +83,7 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 					requestMessages.add(requestMessage);
 					requestIds.add(request.getId());
 					profiles.add(b.getUserProfile());
-					createdOnDates.add(dateTimeUtils.convertDateToSmallString(request.getCreatedOn()));
+					createdOnDates.add(dateTimeUtils.getDateTimeString(request.getCreatedOn()));
 				}
 				view.configure(profiles, requestMessages, createdOnDates, requestIds);
 				gwt.restoreWindowPosition();
@@ -113,7 +113,7 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 		synapseClient.addTeamMember(userId, teamId, "", gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				popupUtils.showInfo(ACCEPTED_REQUEST_MESSAGE,"");
+				popupUtils.showInfo(ACCEPTED_REQUEST_MESSAGE);
 				teamUpdatedCallback.invoke();
 			}
 			@Override
@@ -132,7 +132,7 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 				new FutureCallback<Void>() {
 					@Override
 					public void onSuccess(Void aVoid) {
-						popupUtils.showInfo(DELETED_REQUEST_MESSAGE,"");
+						popupUtils.showInfo(DELETED_REQUEST_MESSAGE);
 						teamUpdatedCallback.invoke();
 					}
 

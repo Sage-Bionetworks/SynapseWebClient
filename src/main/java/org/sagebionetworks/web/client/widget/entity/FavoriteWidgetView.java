@@ -14,6 +14,6 @@ public interface FavoriteWidgetView extends IsWidget {
 	void setFavWidgetContainerVisible(boolean isVisible);
 
 	void setLoadingVisible(boolean isVisible);
-
+	void setLoadingSize(int px);
 	void showErrorMessage(String errorSaveFavoriteMessage);
 }

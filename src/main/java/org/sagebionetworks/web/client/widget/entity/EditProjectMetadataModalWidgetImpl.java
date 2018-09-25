@@ -53,8 +53,8 @@ public class EditProjectMetadataModalWidgetImpl implements EditProjectMetadataMo
 
 	@Override
 	public void onPrimary() {
-		String name = StringUtils.trimWithEmptyAsNull(view.getEntityName());
-		String alias = StringUtils.trimWithEmptyAsNull(view.getAlias());
+		String name = StringUtils.emptyAsNull(view.getEntityName());
+		String alias = StringUtils.emptyAsNull(view.getAlias());
 		boolean isSameAlias = startingAlias == null ? alias == null : startingAlias.equals(alias);
 		if(name == null){
 			view.showError(RenameEntityModalWidgetImpl.NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);

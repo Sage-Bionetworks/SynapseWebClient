@@ -76,6 +76,9 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 		if (!DisplayUtils.isDefined(queryString)) {
 			throw new IllegalArgumentException("A query is required.");
 		}
+		if (view.isPaging() && queryString.toUpperCase().contains("ORDER BY ")) {
+			throw new IllegalArgumentException("Please use the Column \"Sort\" dropdown menu to specify the order instead of including \"order by\" in the query.");
+		}
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, getServicePathFromView());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, view.isPaging().toString());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGESIZE_KEY, DEFAULT_PAGE_SIZE);

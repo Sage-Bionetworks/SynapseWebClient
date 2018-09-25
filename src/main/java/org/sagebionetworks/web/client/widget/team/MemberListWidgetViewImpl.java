@@ -161,6 +161,8 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 		}
 		
 		loadMoreWidget.add(singleRow);
+		// SWC-4280: after attaching to the DOM, reference the element offset height in an attempt to force layout calculation (reflow):
+		singleRow.getOffsetHeight();
 	}
 	
 	@Override
@@ -188,7 +190,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 	
 	@Override
 	public void showInfo(String message) {
-		DisplayUtils.showInfo(message, "");
+		DisplayUtils.showInfo(message);
 	}
 	
 	@Override

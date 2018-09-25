@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.footer;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -25,9 +24,10 @@ public class Footer implements FooterView.Presenter, IsWidget {
 		this.globalAppState = globalAppState;
 		this.jiraHelper = jiraHelper;
 		view.setPresenter(this);
+		init();
 	}
 
-	public Widget asWidget() {
+	public void init() {
 		globalAppState.checkVersionCompatibility(new AsyncCallback<VersionState>() {
 			@Override
 			public void onSuccess(VersionState state) {
@@ -51,6 +51,9 @@ public class Footer implements FooterView.Presenter, IsWidget {
 			}
 		});
 		view.refresh();
+	}
+	
+	public Widget asWidget() {
 		return view.asWidget();
 	}
 	

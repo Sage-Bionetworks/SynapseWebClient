@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.team;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -53,7 +54,7 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 		};
 		String pictureUrl = null;
 		if (team.getIcon() != null && team.getIcon().length() > 0) {
-			pictureUrl = DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId());
+			pictureUrl = synapseJSNIUtils.getFileHandleAssociationUrl(team.getId(), FileHandleAssociateType.TeamAttachment, team.getIcon());
 		}
 		
 		addBadgeMedia(team.getId(), DisplayUtils.getMediaObject(name, description, clickHandler,  pictureUrl, false, 5));
@@ -72,6 +73,7 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 			anchor.setHref(DisplayUtils.getTeamHistoryToken(teamId));	
 		}
 		anchor.add(mediaObjectPanel);
+		anchor.addStyleName("clearfix");
 		mediaObjectPanel.addStyleName("displayInline");
 		add(notificationsPanel);
 		add(anchor);
@@ -90,7 +92,7 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
+	public void showInfo(String message) {
 	}
 
 	@Override

@@ -4,13 +4,21 @@ import java.util.Date;
 
 public interface DateTimeUtils {
 
-	String convertDateToSmallString(Date toFormat);
+	String getDateTimeString(Date toFormat);
 	/**
 	 * Return a friendly relative date string.  Like "4 hours ago"
 	 * @param toFormat
 	 * @return
 	 */
 	String getRelativeTime(Date toFormat);
+	
+	/**
+	 * 
+	 * @param toFormat
+	 * @param forceRelative  if true, even if the date is far into the future or past it will return the relative time
+	 * @return
+	 */
+	String getRelativeTime(Date toFormat, boolean forceRelative);
 	/**
 	 * Return a friendly calendar date string.  Like "Yesterday at 3:32 PM"
 	 * @param toFormat
@@ -23,7 +31,7 @@ public interface DateTimeUtils {
 	 * @return
 	 */
 	String getLongFriendlyDate(Date toFormat);
-	String convertDateToSimpleString(Date toFormat);
+	String getDateString(Date toFormat);
 	void setShowUTCTime(boolean showUTC);
 	boolean isShowingUTCTime();
 }

@@ -10,11 +10,13 @@ import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.MarkdownIt;
 import org.sagebionetworks.web.client.MarkdownItImpl;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -55,10 +57,11 @@ public class HelpWidget implements IsWidget {
 	private String popoverElementId;
 	private String closePopoverJs;
 	
-	private static MarkdownIt markdownIt = new MarkdownItImpl();
+	private static MarkdownIt markdownIt = new MarkdownItImpl(GWT.create(SynapseJSNIUtilsImpl.class));
 	public interface Binder extends UiBinder<Widget, HelpWidget> {}
 	private static Binder uiBinder = GWT.create(Binder.class);
 	String text="", basicHelpText="", moreHelpHTML="", iconStyles="lightGreyText", closeHTML = "";
+	
 	public HelpWidget() {
 		widget = uiBinder.createAndBindUi(this);
 		anchor.getElement().setAttribute("tabindex", "0");
@@ -74,6 +77,7 @@ public class HelpWidget implements IsWidget {
 				helpPopover.show();
 			}
 		});
+		helpPopover.asWidget().addDomHandler(DisplayUtils.getESCKeyDownHandler(event-> {hidePopover();}), KeyDownEvent.getType());
 	}
 
 	public void setText(String text) {
@@ -123,6 +127,10 @@ public class HelpWidget implements IsWidget {
 		moreInfoText.addClassName(styleNames);
 	}
 	
+	public void setAddAnchorStyleNames(String styleNames) {
+		anchor.addStyleName(styleNames);
+	}
+	
 	public void setPull(Pull pull) {
 		widget.addStyleName(pull.getCssName());
 	}
@@ -141,5 +149,27 @@ public class HelpWidget implements IsWidget {
 	
 	public void focus() {
 		anchor.setFocus(true);
+	}
+	
+	// SWC-4292: On static initialization of class, add a listener for the bootstrap modal close event.  If the event fires, make sure all popovers are hidden.
+	static {
+		_addModalHideListener();
+	}
+
+	private static native void _addModalHideListener() /*-{
+		try {
+			$wnd.jQuery($doc.body).on('hidden.bs.modal', function () {
+			    //call static method when modal is hidden
+			    @org.sagebionetworks.web.client.widget.HelpWidget::hideAllPopovers()();
+			});
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
+	
+	public static void hideAllPopovers() {
+		for (HelpWidget h : POPOVERS) {
+			h.getHelpPopover().hide();	
+		}
 	}
 }

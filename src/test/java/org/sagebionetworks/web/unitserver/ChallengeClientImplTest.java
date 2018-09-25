@@ -64,7 +64,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
-import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
@@ -83,7 +82,6 @@ public class ChallengeClientImplTest {
 	public static final String TEST_HOME_PAGE_BASE = "http://mysynapse.org/";
 	SynapseProvider mockSynapseProvider;
 	TokenProvider mockTokenProvider;
-	ServiceUrlProvider mockUrlProvider;
 	SynapseClient mockSynapse;
 	ChallengeClientImpl synapseClient;
 	String entityId = "123";
@@ -134,14 +132,12 @@ public class ChallengeClientImplTest {
 	public void before() throws SynapseException, JSONObjectAdapterException{
 		mockSynapse = Mockito.mock(SynapseClient.class);
 		mockSynapseProvider = Mockito.mock(SynapseProvider.class);
-		mockUrlProvider = Mockito.mock(ServiceUrlProvider.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 		mockTokenProvider = Mockito.mock(TokenProvider.class);
 		
 		synapseClient = new ChallengeClientImpl();
 		synapseClient.setSynapseProvider(mockSynapseProvider);
 		synapseClient.setTokenProvider(mockTokenProvider);
-		synapseClient.setServiceUrlProvider(mockUrlProvider);
 		
 		//user can change permissions on eval 2, but not on 1
 		userEvaluationPermissions = new UserEvaluationPermissions();
@@ -382,41 +378,6 @@ public class ChallengeClientImplTest {
 		assertTrue(results.contains(EVAL_ID_2));
 		verify(mockSynapse).getEvaluationByContentSource(eq(testChallengeProject),anyInt(),anyInt());
 		verify(mockSynapse).getChallenge(anyString());
-	}
-	
-	@Test
-	public void testGetEvaluations() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
-		when(mockSynapse.getEvaluation(anyString())).thenReturn(new Evaluation());
-		List<String> evaluationIds = new ArrayList<String>();
-		evaluationIds.add("1");
-		evaluationIds.add("2");
-		PaginatedResults<Evaluation> evaluations = synapseClient.getEvaluations(evaluationIds);
-		
-		verify(mockSynapse, Mockito.times(2)).getEvaluation(anyString());
-		
-//		org.sagebionetworks.web.shared.PaginatedResults<Evaluation> evaluationObjectList = 
-//				nodeModelCreator.createPaginatedResults(evaluationsJson, Evaluation.class);
-		assertEquals(2, evaluations.getTotalNumberOfResults());
-		assertEquals(2, evaluations.getResults().size());
-	}
-
-	
-	@Test
-	public void testHasSubmitted() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
-		String sharedEntityId = "syn123455";
-		setupGetAvailableEvaluations(sharedEntityId);
-		
-		org.sagebionetworks.reflection.model.PaginatedResults<Submission> submissions = new org.sagebionetworks.reflection.model.PaginatedResults<Submission>();
-		//verify when all empty, hasSubmitted returns false
-		when(mockSynapse.getMySubmissions(anyString(), anyLong(), anyLong())).thenReturn(submissions);
-		assertFalse(synapseClient.hasSubmitted());
-		
-		//verify when there is a submission, it returns true
-		submissions.setTotalNumberOfResults(1);
-		List<Submission> submissionList = new ArrayList<Submission>();
-		submissionList.add(new Submission());
-		submissions.setResults(submissionList);
-		assertTrue(synapseClient.hasSubmitted());
 	}
 	
 	public void setupGetEvaluationsForEntity(String sharedEntityId) throws SynapseException {

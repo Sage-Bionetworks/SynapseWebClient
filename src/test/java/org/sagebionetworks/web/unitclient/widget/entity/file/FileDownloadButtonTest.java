@@ -2,11 +2,12 @@ package org.sagebionetworks.web.unitclient.widget.entity.file;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.inOrder;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -17,7 +18,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -29,16 +29,14 @@ import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -58,7 +56,6 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.IsWidget;
 
 public class FileDownloadButtonTest {
 	@Mock
@@ -68,7 +65,7 @@ public class FileDownloadButtonTest {
 	@Mock
 	LoginModalWidget mockLoginModalWidget;
 	@Mock
-	GlobalApplicationState mockGlobalAppState;
+	SynapseProperties mockSynapseProperties;
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
@@ -99,8 +96,6 @@ public class FileDownloadButtonTest {
 	@Mock
 	CookieProvider mockCookies;
 	@Mock
-	PlaceChanger mockPlaceChanger;
-	@Mock
 	RestrictionInformationResponse mockRestrictionInformation;
 	@Mock
 	AwsSdk mockAwsSdk;
@@ -117,21 +112,23 @@ public class FileDownloadButtonTest {
 	public static final String SFTP_ENDPOINT = "https://sftp.org/sftp";
 	public static final String SFTP_HOST = "my.sftp.server";
 	public static final String ENTITY_ID = "syn210";
+	public static final Long VERSION = 32L;
 	public static final String fileHandleAssociationUrl="http://mytestfilehandleassociationurl/filehandleassociation";
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new FileDownloadButton(mockView, mockSynapseClient, mockLoginModalWidget, mockGlobalAppState, mockSynAlert, mockGinInjector,
+		widget = new FileDownloadButton(mockView, mockSynapseClient, mockLoginModalWidget, mockSynAlert, mockGinInjector,
 				mockSynapseJavascriptClient, mockAuthController, mockJsniUtils, mockGwt, mockCookies, mockAwsSdk, mockPopupUtilsView);
-		when(mockGlobalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(SFTP_ENDPOINT);
+		when(mockSynapseProperties.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(SFTP_ENDPOINT);
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
 		when(mockFileEntity.getId()).thenReturn(ENTITY_ID);
+		when(mockFileEntity.getVersionNumber()).thenReturn(VERSION);
 		fileHandles = new ArrayList<FileHandle>();
 		when(mockEntityBundle.getFileHandles()).thenReturn(fileHandles);
 		when(mockGinInjector.getFileClientsHelp()).thenReturn(mockFileClientsHelp);
+		when(mockGinInjector.getSynapseProperties()).thenReturn(mockSynapseProperties);
 		AsyncMockStubber.callSuccessWith(SFTP_HOST).when(mockSynapseClient).getHost(anyString(), any(AsyncCallback.class));
 		when(mockJsniUtils.getFileHandleAssociationUrl(anyString(), any(FileHandleAssociateType.class), anyString())).thenReturn(fileHandleAssociationUrl);
-		when(mockGlobalAppState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockRestrictionInformation.getHasUnmetAccessRequirement()).thenReturn(false);
 	}
 	
@@ -180,7 +177,7 @@ public class FileDownloadButtonTest {
 		verify(mockView).setIsDirectDownloadLink(fileHandleAssociationUrl);
 		
 		verify(mockView).addWidget(mockFileClientsHelp);
-		verify(mockFileClientsHelp).configure(ENTITY_ID);
+		verify(mockFileClientsHelp).configure(ENTITY_ID, VERSION);
 	}
 	
 	@Test
@@ -233,7 +230,7 @@ public class FileDownloadButtonTest {
 		when(mockFileHandle.getExternalURL()).thenReturn(fileUrl);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
 		verify(mockView).setIsAuthorizedDirectDownloadLink();
-		verify(mockFileClientsHelp, never()).configure(anyString()); //no client help for sftp download
+		verify(mockFileClientsHelp, never()).configure(anyString(), anyLong()); //no client help for sftp download
 		verify(mockLoginModalWidget).configure(fileUrl,  FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
 		verify(mockSynapseClient).getHost(anyString(), any(AsyncCallback.class));
 		verify(mockLoginModalWidget).setInstructionMessage(DisplayConstants.DOWNLOAD_CREDENTIALS_REQUIRED + SFTP_HOST);

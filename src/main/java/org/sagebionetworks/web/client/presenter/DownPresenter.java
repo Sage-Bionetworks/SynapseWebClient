@@ -18,11 +18,10 @@ import com.google.inject.Inject;
 
 public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 	public static final int SECOND_MS = 1000;
-	//check back every 10s if down.
-	public static final int DELAY_MS = 10000;
+	//check back every 20s if down.
+	public static final int DELAY_MS = 20000;
 	public int timeToNextRefresh;
 	private DownView view;
-	GWTWrapper gwt;
 	GlobalApplicationState globalAppState;
 	Callback updateTimerCallback;
 	StackConfigServiceAsync stackConfigService;
@@ -34,10 +33,10 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 			GlobalApplicationState globalAppState,
 			StackConfigServiceAsync stackConfigService) {
 		this.view = view;
-		this.gwt = gwt;
 		this.globalAppState = globalAppState;
 		this.stackConfigService = stackConfigService;
 		fixServiceEntryPoint(stackConfigService);
+		timeToNextRefresh = DELAY_MS;
 		updateTimerCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -101,7 +100,10 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 	@Override
 	public void setPlace(Down place) {
 		view.init();
-		timeToNextRefresh = DELAY_MS;
-		checkForRepoDown();
+		timeToNextRefresh = 0;
+	}
+	
+	public int getTimeToNextRefresh() {
+		return timeToNextRefresh;
 	}
 }

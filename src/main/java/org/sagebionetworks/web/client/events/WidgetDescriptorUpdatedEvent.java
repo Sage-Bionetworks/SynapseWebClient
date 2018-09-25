@@ -21,10 +21,6 @@ public class WidgetDescriptorUpdatedEvent extends GwtEvent<WidgetDescriptorUpdat
 		isDeleted = false;
 	}
 	
-	public static Type<WidgetDescriptorUpdatedHandler> getType() {
-		return TYPE;
-	}
-	
 	@Override
 	public com.google.gwt.event.shared.GwtEvent.Type<WidgetDescriptorUpdatedHandler> getAssociatedType() {
 		return TYPE;

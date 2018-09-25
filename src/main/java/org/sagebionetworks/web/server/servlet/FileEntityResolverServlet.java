@@ -13,14 +13,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.shared.WebConstants;
-
-import com.google.inject.Inject;
 
 /**
  * Given a File entity id and version, will return json in the form:
@@ -36,11 +32,6 @@ public class FileEntityResolverServlet extends HttpServlet {
 
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 	
-	/**
-	 * Injected with Gin
-	 */
-	@SuppressWarnings("unused")
-	private ServiceUrlProvider urlProvider;
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
 	private TokenProvider tokenProvider = new TokenProvider() {
 		@Override
@@ -56,16 +47,6 @@ public class FileEntityResolverServlet extends HttpServlet {
 	 */
 	public void setSynapseProvider(SynapseProvider synapseProvider) {
 		this.synapseProvider = synapseProvider;
-	}
-
-	/**
-	 * Essentially the constructor. Setup synapse client.
-	 *
-	 * @param provider
-	 */
-	@Inject
-	public void setServiceUrlProvider(ServiceUrlProvider provider) {
-		this.urlProvider = provider;
 	}
 
 	/**
@@ -140,9 +121,9 @@ public class FileEntityResolverServlet extends HttpServlet {
 	 */
 	private SynapseClient createNewClient(String sessionToken) {
 		SynapseClient client = synapseProvider.createNewClient();
-		client.setAuthEndpoint(urlProvider.getPrivateAuthBaseUrl());
-		client.setRepositoryEndpoint(urlProvider.getRepositoryServiceUrl());
-		client.setFileEndpoint(StackConfiguration.getFileServiceEndpoint());
+		client.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
+		client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
+		client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
 		if (sessionToken != null)
 			client.setSessionToken(sessionToken);
 		return client;

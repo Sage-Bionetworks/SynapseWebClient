@@ -32,8 +32,12 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 
 	private static native void _recordPageVisit(String token) /*-{
-		$wnd.ga('set', 'page', '/#'+token);
-		$wnd.ga('send', 'pageview');
+		try {
+			$wnd.ga('set', 'page', '/#'+token);
+			$wnd.ga('send', 'pageview');
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
 	
 	@Override
@@ -42,7 +46,8 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 
 	private static native void _sendAnalyticsEvent(String eventCategoryValue, String eventActionValue, String eventLabelValue) /*-{
-		$wnd.ga('send', 
+		try {
+			$wnd.ga('send', 
 			{
 			  hitType: 'event',
 			  eventCategory: eventCategoryValue,
@@ -50,6 +55,9 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 			  eventLabel: eventLabelValue,
 			  fieldsObject: { nonInteraction: true}
 			});
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
 
 	
@@ -66,6 +74,21 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	public static native void _highlightCodeBlocks() /*-{
 		try {
 			$wnd.jQuery('pre code').each(function(i, e) {$wnd.hljs.highlightBlock(e)});
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
+	
+	@Override
+	public void loadSummaryDetailsShim() {
+		_loadSummaryDetailsShim();
+	}
+	
+	public static native void _loadSummaryDetailsShim() /*-{
+		try {
+			$wnd.jQuery('summary').each(function(i, e) {
+				$wnd.details_shim(e)
+				});
 		} catch (err) {
 			console.error(err);
 		}
@@ -90,15 +113,21 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	@Override
-	public String getBaseProfileAttachmentUrl() {
-		return GWTWrapperImpl.getRealGWTModuleBaseURL() + "profileAttachment";
-	}
-	
-	@Override
 	public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId) {
 		return GWTWrapperImpl.getRealGWTModuleBaseURL() + WebConstants.FILE_HANDLE_ASSOCIATION_SERVLET + "?" + 
 				WebConstants.ASSOCIATED_OBJECT_ID_PARAM_KEY + "=" + objectId + "&" +
 				WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY + "=" + objectType.toString() + "&" + 
+				WebConstants.FILE_HANDLE_ID_PARAM_KEY + "=" + fileHandleId;
+	}
+
+	/**
+	 * Create the url to the raw file handle id (must be the owner to access)
+	 * @param rawFileHandleId
+	 * @return
+	 */
+	@Override
+	public String getRawFileHandleUrl(String fileHandleId) {
+		return GWTWrapperImpl.getRealGWTModuleBaseURL() + WebConstants.FILE_HANDLE_ASSOCIATION_SERVLET + "?" + 
 				WebConstants.FILE_HANDLE_ID_PARAM_KEY + "=" + fileHandleId;
 	}
 
@@ -248,6 +277,15 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	private final static native String _getContentType(JavaScriptObject fileList, int index) /*-{
 		return fileList[index].type;
+	}-*/;
+	
+	@Override
+	public String getWebkitRelativePath(JavaScriptObject fileList, int index) {
+		return _getWebkitRelativePath(fileList, index);
+	}
+	
+	private final static native String _getWebkitRelativePath(JavaScriptObject fileList, int index) /*-{
+		return fileList[index].webkitRelativePath;
 	}-*/;
 	
 	@Override
@@ -419,6 +457,14 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		}
 	}-*/;
 
+	public final static native void _scrollIntoView(Element el) /*-{
+		try {
+			el.scrollIntoView({behavior: 'smooth'});
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
+	
 	@Override
 	public void loadCss(final String url) {
 		final LinkElement link = Document.get().createLinkElement();
@@ -451,30 +497,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
-	public void showTwitterFeed(String dataWidgetId, String elementId,
-			String linkColor, String borderColor, int tweetCount) {
-		_showTwitterFeed(dataWidgetId, elementId, linkColor, borderColor, tweetCount);		
-	}
-
-	private final static native void _showTwitterFeed(String dataWidgetId,
-			String elementId, String linkColorHex, String borderColorHex,
-			int tweetCount) /*-{
-		try {
-			if (typeof $wnd.twttr !== 'undefined') {
-				var element = $doc.getElementById(elementId);
-				$wnd.twttr.widgets.createTimeline(dataWidgetId, element, {
-					chrome : "nofooter noheader",
-					linkColor : linkColorHex,
-					borderColor : borderColorHex,
-					tweetLimit : tweetCount
-				});
-			}
-		} catch (err) {
-			console.error(err);
-		}
-	}-*/;
-	
-	@Override
 	public boolean elementSupportsAttribute(Element el, String attribute) {
 		return _elementSupportsAttribute(el.getTagName(), attribute);
 	}
@@ -489,14 +511,14 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	public String sanitizeHtml(String html) {
 		if (!isFilterXssInitialized) {
 			//init
-			initFilterXss();
-			isFilterXssInitialized = true;
+			isFilterXssInitialized = initFilterXss();
 		}
 		return _sanitizeHtml(html);
 	}
 
-	private final static native void initFilterXss() /*-{
-		var options = {
+	private final static native boolean initFilterXss() /*-{
+		try {
+			var options = {
 				whiteList: {
 				    a:      ['target', 'href', 'title'],
 				    abbr:   ['title'],
@@ -521,18 +543,18 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				    dd:     [],
 				    del:    ['datetime'],
 				    details: ['open'],
-				    div:    [],
+				    div:    ['class'],
 				    dl:     [],
 				    dt:     [],
 				    em:     [],
 				    font:   ['color', 'size', 'face'],
 				    footer: [],
-				    h1:     [],
-				    h2:     [],
-				    h3:     [],
-				    h4:     [],
-				    h5:     [],
-				    h6:     [],
+				    h1:     ['toc'],
+				    h2:     ['toc'],
+				    h3:     ['toc'],
+				    h4:     ['toc'],
+				    h5:     ['toc'],
+				    h6:     ['toc'],
 				    head:   [],
 				    header: [],
 				    hr:     [],
@@ -550,15 +572,16 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				    s:      [],
 				    section:[],
 				    small:  [],
-				    span:   [],
+				    span:   ['data-widgetparams', 'class', 'id'],
 				    sub:    [],
+				    summary: [],
 				    sup:    [],
 				    strong: [],
-				    table:  ['width', 'border', 'align', 'valign'],
+				    table:  ['width', 'border', 'align', 'valign', 'class'],
 				    tbody:  ['align', 'valign'],
 				    td:     ['width', 'rowspan', 'colspan', 'align', 'valign'],
 				    tfoot:  ['align', 'valign'],
-				    th:     ['width', 'rowspan', 'colspan', 'align', 'valign'],
+				    th:     ['width', 'rowspan', 'colspan', 'align', 'valign', 'class'],
 				    thead:  ['align', 'valign'],
 				    tr:     ['rowspan', 'align', 'valign'],
 				    tt:     [],
@@ -576,15 +599,22 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				    }
 				},
 				safeAttrValue: function (tag, name, value) {
-					// returning nothing means keep the default behavior
+					// returning nothing removes the value
 					if (tag === 'img' && name === 'src') {
-						if (value && value.startsWith('data:image/')) {
+						if (value && (value.startsWith('data:image/') || value.startsWith('http'))) {
 							return value;
 						}
+					} else {
+						return value; 
 					}
 				}
 			};
 			$wnd.xss = new $wnd.filterXSS.FilterXSS(options);
+			return true;
+		} catch (err) {
+			console.error(err);
+			return false;
+		}
 	}-*/;
 	
 	private final static native String _sanitizeHtml(String html) /*-{

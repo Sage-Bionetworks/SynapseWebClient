@@ -7,9 +7,9 @@
 	<bh:Div width="100%">
 		<bh:Div ui:field="blockUI" width="100%">
 			<bh:Div addStyleNames="margin-bottom-10">
-				<g:TextBox ui:field="emailAddressField" height="43px" width="100%"/>
+				<b:TextBox ui:field="emailAddressField" height="43px" width="100%" />
 			</bh:Div>
-			<b:Button ui:field="registerBtn" text="Create account" size="LARGE" type="SUCCESS" width="100%"/>
+			<b:Button ui:field="registerBtn" text="Send registration info" size="LARGE" type="SUCCESS" width="100%"/>
 		</bh:Div>
 		<bh:Div ui:field="synAlertContainer" />
 	</bh:Div>

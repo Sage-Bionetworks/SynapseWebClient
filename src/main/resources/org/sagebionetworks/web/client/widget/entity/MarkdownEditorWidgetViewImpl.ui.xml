@@ -17,6 +17,7 @@
 				  <b:DropDownMenu>
 				    <b:AnchorListItem ui:field="attachmentLink" text="Attachment"/>
 				    <b:AnchorListItem ui:field="buttonLink" text="Button Link"/>
+				    <b:AnchorListItem ui:field="detailsSummaryLink" text="Collapsible Section (Details/Summary)"/>
 				    <b:AnchorListItem ui:field="entityListLink" text="Entity List"/>
 				    <b:AnchorListItem ui:field="previewLink" text="File Preview"/>
 				    <b:AnchorListItem ui:field="genomeBrowserLink" text="Genome Browser"/>
@@ -123,13 +124,5 @@
 		    </bh:Div>
 		</bh:Div>
 	    <bh:Div ui:field="selectTeamModalContainer"/>
-		<b:Modal ui:field="formattingGuideModal" size="LARGE" title="Formatting Guide" closable="false" dataBackdrop="STATIC" dataKeyboard="false">
-		  <b:ModalBody>
-		    <g:SimplePanel ui:field="formattingGuideContainer" />
-		  </b:ModalBody>
-		  <b:ModalFooter>
-		    <b:Button ui:field="formattingGuideOkButton" type="PRIMARY">OK</b:Button>
-		  </b:ModalFooter>
-		</b:Modal>
 	</bh:Div>
 </ui:UiBinder>

@@ -68,6 +68,6 @@ public interface EditAnnotationsDialogView extends IsWidget {
 	void removeAnnotationEditor(Widget editor);
 	void clearAnnotationEditors();
 	
-	void showInfo(String title, String message);
+	void showInfo(String message);
 
 }

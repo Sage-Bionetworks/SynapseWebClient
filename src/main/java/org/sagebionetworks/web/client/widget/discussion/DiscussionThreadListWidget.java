@@ -26,7 +26,7 @@ import com.google.inject.Inject;
 
 public class DiscussionThreadListWidget implements DiscussionThreadListWidgetView.Presenter{
 
-	public static final Long LIMIT = 10L;
+	public static final Long LIMIT = 20L;
 	public static final DiscussionThreadOrder DEFAULT_ORDER = DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY;
 	public static final Boolean DEFAULT_ASCENDING = false;
 	public static final DiscussionFilter DEFAULT_FILTER = DiscussionFilter.EXCLUDE_DELETED;

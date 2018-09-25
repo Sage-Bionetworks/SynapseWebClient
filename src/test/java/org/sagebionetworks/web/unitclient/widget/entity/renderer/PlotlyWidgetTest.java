@@ -1,20 +1,20 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
 import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.ClientProperties.*;
-import static org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget.LIMIT;
+import static org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget.*;
 import static org.sagebionetworks.web.shared.WidgetConstants.BAR_MODE;
 import static org.sagebionetworks.web.shared.WidgetConstants.*;
 import static org.sagebionetworks.web.shared.WidgetConstants.TABLE_QUERY_KEY;
@@ -22,6 +22,7 @@ import static org.sagebionetworks.web.shared.WidgetConstants.TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TITLE;
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +45,7 @@ import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.plotly.PlotlyTraceWrapper;
@@ -55,6 +57,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetView;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
+import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
@@ -104,11 +107,16 @@ public class PlotlyWidgetTest {
 	ArgumentCaptor<String> stringCaptor;
 	@Captor
 	ArgumentCaptor<AsyncCallback> webResourceLoadedCallbackCaptor;
+	@Captor
+	ArgumentCaptor<Query> queryCaptor;
+	
 	Map<String, String> params;
 	public static final String X_COLUMN_NAME = "x";
 	public static final String Y1_COLUMN_NAME = "y1";
 	public static final String Y2_COLUMN_NAME = "y2";
-	
+	public static final Long MAX_ROWS_PER_PAGE = 400L;
+	public static final String TABLE_ID = "syn2389723";
+	String sql;
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
@@ -125,6 +133,7 @@ public class PlotlyWidgetTest {
 		
 		when(mockQueryResultBundle.getSelectColumns()).thenReturn(selectColumns);
 		when(mockQueryResultBundle.getQueryResult()).thenReturn(mockQueryResult);
+		when(mockQueryResultBundle.getMaxRowsPerPage()).thenReturn(MAX_ROWS_PER_PAGE);
 		when(mockQueryResult.getQueryResults()).thenReturn(mockRowSet);
 		when(mockRowSet.getRows()).thenReturn(rows);
 		when(mockXColumn.getName()).thenReturn(X_COLUMN_NAME);
@@ -133,6 +142,9 @@ public class PlotlyWidgetTest {
 		when(mockRow.getValues()).thenReturn(rowValues);
 		when(mockResourceLoader.isLoaded(eq(PLOTLY_JS))).thenReturn(true);
 		when(mockResourceLoader.isLoaded(eq(PLOTLY_REACT_JS))).thenReturn(true);
+		
+		sql = "select x, y1, y2 from "+TABLE_ID+" where x>2";
+		params.put(TABLE_QUERY_KEY, sql);
 	}
 	
 	@Test
@@ -156,12 +168,11 @@ public class PlotlyWidgetTest {
 		String yAxisLabel = "Y Axis";
 		GraphType type = GraphType.BAR;
 		BarMode mode = BarMode.STACK;
+		AxisType xAxisType = AxisType.LINEAR;
+		AxisType yAxisType = AxisType.CATEGORY;
 		String plotTitle = "Plot Title";
-		String tableId = "syn12345";
 		boolean showLegend = false;
 		boolean isHorizontal = false;
-		String sql = "select x, y1, y2 from "+tableId+" where x>2";
-		params.put(TABLE_QUERY_KEY, sql);
 		params.put(TITLE, plotTitle);
 		params.put(X_AXIS_TITLE, xAxisLabel);
 		params.put(Y_AXIS_TITLE, yAxisLabel);
@@ -169,6 +180,8 @@ public class PlotlyWidgetTest {
 		params.put(BAR_MODE, mode.toString());
 		params.put(SHOW_LEGEND, Boolean.toString(showLegend));
 		params.put(IS_HORIZONTAL, Boolean.toString(isHorizontal));
+		params.put(X_AXIS_TYPE, xAxisType.toString());
+		params.put(Y_AXIS_TYPE, yAxisType.toString());
 		
 		selectColumns.add(mockXColumn);
 		selectColumns.add(mockY1Column);
@@ -176,8 +189,10 @@ public class PlotlyWidgetTest {
 		rowValues.add("row1X");
 		rowValues.add("1.1");
 		rowValues.add("2.2");
-		rows.add(mockRow);
-		when(mockQueryResultBundle.getQueryCount()).thenReturn(LIMIT + 1);
+		// add DEFAULT_LIMIT rows to the result (the max, so the widget will attempt to look for a second page of data).
+		for (int i = 0; i < DEFAULT_LIMIT; i++) {
+			rows.add(mockRow);	
+		}
 		
 		widget.configure(pageKey, params, null, null);
 		
@@ -185,7 +200,7 @@ public class PlotlyWidgetTest {
 		verify(mockView).setSourceDataLinkVisible(false);
 		verify(mockView, never()).setSourceDataLinkVisible(true);
 		String sourceDataLink = stringCaptor.getValue();
-		assertTrue(sourceDataLink.contains(tableId));
+		assertTrue(sourceDataLink.contains(TABLE_ID));
 		assertTrue(sourceDataLink.contains(queryToken));
 		
 		//verify query params, and plot configuration based on results
@@ -193,33 +208,50 @@ public class PlotlyWidgetTest {
 		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
 		//check query
 		QueryBundleRequest request = queryBundleRequestCaptor.getValue();
-		assertEquals(new Long(BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_COUNT), request.getPartMask());
-		assertEquals("syn12345", request.getEntityId());
+		assertEquals(DEFAULT_PART_MASK, request.getPartMask());
+		assertEquals(TABLE_ID, request.getEntityId());
 		assertEquals((Long)0L, request.getQuery().getOffset());
 		assertEquals(sql, request.getQuery().getSql());
 		// complete first page load
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
 		
-		verify(mockView, never()).showChart(eq(plotTitle), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), anyBoolean());
+		verify(mockView, never()).showChart(eq(plotTitle), anyString(), anyString(), anyList(), anyString(), any(), any(), anyBoolean());
 		
 		//test final page
 		rows.clear();
 		verify(mockJobTracker, times(2)).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
 		//verify offset updated
 		request = queryBundleRequestCaptor.getValue();
-		assertEquals(LIMIT, request.getQuery().getOffset());
-		
-		verify(mockView, times(2)).setLoadingMessage(stringCaptor.capture());
-		String loadingMessage = stringCaptor.getValue();
-		assertTrue(loadingMessage.contains(LIMIT.toString()));
+		assertEquals(DEFAULT_LIMIT, request.getQuery().getOffset());
+		assertEquals(new Long(BUNDLE_MASK_QUERY_RESULTS), request.getPartMask());
+		assertEquals(MAX_ROWS_PER_PAGE, request.getQuery().getLimit());
+		//only sets the loading message on the third page (to avoid always showing "Loaded DEFAULT_LIMIT rows" message).
+		verify(mockView).setLoadingMessage("Loading...");
 		
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
-		verify(mockView).showChart(eq(plotTitle), eq(xAxisLabel), eq(yAxisLabel), plotlyTraceArrayCaptor.capture(), eq(mode.toString().toLowerCase()), anyString(), anyString(), eq(showLegend));
+		verify(mockView).showChart(eq(plotTitle), eq(xAxisLabel), eq(yAxisLabel), plotlyTraceArrayCaptor.capture(), eq(mode.toString().toLowerCase()), eq(xAxisType), eq(yAxisType), eq(showLegend));
 		List traces = plotlyTraceArrayCaptor.getValue();
 		assertTrue(traces.size() > 0);
 		assertEquals(type.toString().toLowerCase(), ((PlotlyTraceWrapper)traces.get(0)).getType());
 		assertEquals(isHorizontal, ((PlotlyTraceWrapper)traces.get(0)).isHorizontal());
 		verify(mockView).setSourceDataLinkVisible(true);
+		
+		// test onclick with horizontal=false (verify x-value is used in query)
+		reset(mockQueryTokenProvider);
+		String xValue = "20";
+		String yValue = "A";
+		widget.onClick(xValue, yValue);
+		
+		verify(mockQueryTokenProvider).queryToToken(queryCaptor.capture());
+		Query q = queryCaptor.getValue();
+		assertTrue(q.getIncludeEntityEtag());
+		assertEquals((Long)TableEntityWidget.DEFAULT_OFFSET, q.getOffset());
+		assertEquals((Long)TableEntityWidget.DEFAULT_LIMIT, q.getLimit());
+		assertTrue(q.getIsConsistent());
+		String sql = q.getSql();
+		assertTrue(sql.contains("\"" + X_COLUMN_NAME + "\"='"+xValue+"'"));
+		assertTrue(sql.contains(TABLE_ID));
+		verify(mockView).newWindow(anyString());
 	}
 	
 	@Test
@@ -271,7 +303,7 @@ public class PlotlyWidgetTest {
 		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
 		
-		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), anyBoolean());
+		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), any(), any(), anyBoolean());
 		
 		verify(mockResourceLoader).isLoaded(eq(PLOTLY_JS));
 		verify(mockResourceLoader).requires(eq(PLOTLY_JS), webResourceLoadedCallbackCaptor.capture());
@@ -280,11 +312,11 @@ public class PlotlyWidgetTest {
 		Exception ex = new Exception();
 		callback.onFailure(ex);
 		verify(mockSynAlert).handleException(ex);
-		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), anyBoolean());
+		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), any(), any(), anyBoolean());
 		
 		when(mockResourceLoader.isLoaded(eq(PLOTLY_JS))).thenReturn(true);
 		callback.onSuccess(null);
-		verify(mockView).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), eq(showLegend));
+		verify(mockView).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), eq(AxisType.AUTO), eq(AxisType.AUTO), eq(showLegend));
 	}
 	
 	@Test
@@ -300,7 +332,7 @@ public class PlotlyWidgetTest {
 		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
 		
-		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), anyBoolean());
+		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), any(), any(), anyBoolean());
 		
 		verify(mockResourceLoader).isLoaded(eq(PLOTLY_REACT_JS));
 		verify(mockResourceLoader).requires(eq(PLOTLY_REACT_JS), webResourceLoadedCallbackCaptor.capture());
@@ -309,11 +341,11 @@ public class PlotlyWidgetTest {
 		Exception ex = new Exception();
 		callback.onFailure(ex);
 		verify(mockSynAlert).handleException(ex);
-		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), anyBoolean());
+		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), any(), any(), anyBoolean());
 		
 		when(mockResourceLoader.isLoaded(eq(PLOTLY_REACT_JS))).thenReturn(true);
 		callback.onSuccess(null);
-		verify(mockView).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), eq(showLegend));
+		verify(mockView).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), any(), any(), eq(showLegend));
 	}	
 
 	@Test
@@ -387,9 +419,43 @@ public class PlotlyWidgetTest {
 		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
 		
-		verify(mockView).showChart(anyString(), eq(yAxisTitle), eq(xAxisTitle), plotlyTraceArrayCaptor.capture(), anyString(), anyString(), anyString(), anyBoolean());
+		verify(mockView).showChart(anyString(), eq(yAxisTitle), eq(xAxisTitle), plotlyTraceArrayCaptor.capture(), anyString(), any(), any(), anyBoolean());
 		List traces = plotlyTraceArrayCaptor.getValue();
 		assertTrue(traces.size() > 0);
 		assertEquals(isHorizontal, ((PlotlyTraceWrapper)traces.get(0)).isHorizontal());
+		
+		// test onclick with horizontal=true (verify y-value is used in query)
+		reset(mockQueryTokenProvider);
+		String xValue = "20";
+		String yValue = "A";
+		widget.onClick(xValue, yValue);
+		
+		verify(mockQueryTokenProvider).queryToToken(queryCaptor.capture());
+		Query q = queryCaptor.getValue();
+		String sql = q.getSql();
+		assertTrue(sql.contains("\"" + X_COLUMN_NAME + "\"='"+yValue+"'"));
+		verify(mockView).newWindow(anyString());
+	}
+	
+	@Test
+	public void testXColumnIsAlias() {
+		params.put(TYPE, GraphType.BAR.toString());
+		params.put(BAR_MODE, BarMode.STACK.toString());
+		selectColumns.add(mockXColumn);
+		selectColumns.add(mockY1Column);
+		rowValues.add("1.1");
+		rowValues.add("2.2");
+		rows.add(mockRow);
+		sql = "select hour(FROM_UNIXTIME(\"createdOn\"/1000)) as \"x\", y1, y2 from "+TABLE_ID+" where x>10";
+		params.put(TABLE_QUERY_KEY, sql);
+		
+		widget.configure(null, params, null, null);
+		
+		// test onclick when x column is an alias.  should do nothing
+		reset(mockQueryTokenProvider);
+		widget.onClick("20", "A");
+		
+		verify(mockQueryTokenProvider, never()).queryToToken(any(Query.class));
+		verify(mockView, never()).newWindow(anyString());
 	}
 }

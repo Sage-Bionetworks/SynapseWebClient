@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client;
 
+import org.sagebionetworks.repo.model.subscription.SortByType;
+import org.sagebionetworks.repo.model.subscription.SortDirection;
 import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
@@ -13,16 +15,12 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("subscriptionclient")	
 public interface SubscriptionClient extends RemoteService {
 	
-	SubscriptionPagedResults getAllSubscriptions(SubscriptionObjectType objectType, Long limit, Long offset) throws RestServiceException;
-	
 	Subscription getSubscription(Long subscriptionId) throws RestServiceException;
 	
 	Subscription subscribe(Topic toSubscribe) throws RestServiceException;
 	
 	void unsubscribe(Long subscriptionId) throws RestServiceException;
 	
-	void unsubscribeAll() throws RestServiceException;
-
 	SubscriptionPagedResults listSubscription(SubscriptionRequest request)
 			throws RestServiceException;
 }

@@ -9,7 +9,6 @@ import java.util.List;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Link;
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -20,7 +19,6 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -152,38 +150,36 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				view.setLoadingVisible(false);
-				if (globalApplicationState.isWikiBasedEntity(entityId) && !DisplayUtils.isInTestWebsite(cookies)) {
-					globalApplicationState.getPlaceChanger().goTo(new Wiki(entityId, ObjectType.ENTITY.toString(), null));
-				}
-				else {
-					// Redirect if Entity is a Link
-					if(bundle.getEntity() instanceof Link) {
-						Reference ref = ((Link)bundle.getEntity()).getLinksTo();
-						entityId = null;
-						if(ref != null){
-							// redefine where the page is and refresh
-							entityId = ref.getTargetId();
-							versionNumber = ref.getTargetVersionNumber();
-							refresh();
-							return;
-						} else {
-							// show error and then allow entity bundle to go to view
-							view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
-						}
+				// Redirect if Entity is a Link
+				if(bundle.getEntity() instanceof Link) {
+					Reference ref = ((Link)bundle.getEntity()).getLinksTo();
+					entityId = null;
+					if(ref != null){
+						// redefine where the page is and refresh
+						entityId = ref.getTargetId();
+						versionNumber = ref.getTargetVersionNumber();
+						refresh();
+						return;
+					} else {
+						// show error and then allow entity bundle to go to view
+						view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
 					}
-					EntityHeader projectHeader = DisplayUtils.getProjectHeader(bundle.getPath());
-					if(projectHeader == null) view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+				}
+				EntityHeader projectHeader = DisplayUtils.getProjectHeader(bundle.getPath());
+				if(projectHeader == null) {
+					synAlert.showError(DisplayConstants.ERROR_GENERIC_RELOAD);
+				} else {
 					entityPageTop.configure(bundle.getEntity(), versionNumber, projectHeader, area, areaToken);
 					view.setEntityPageTopWidget(entityPageTop);
 					view.setEntityPageTopVisible(true);
-					headerWidget.configure(false, projectHeader);
+					headerWidget.configure(projectHeader);	
 				}
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setLoadingVisible(false);
-				headerWidget.configure(false);
+				headerWidget.configure();
 				if(caught instanceof NotFoundException) {
 					show404();
 				} else if(caught instanceof ForbiddenException && authenticationController.isLoggedIn()) {

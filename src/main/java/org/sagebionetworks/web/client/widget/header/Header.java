@@ -11,15 +11,11 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Trash;
-import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -27,6 +23,7 @@ import com.google.inject.Inject;
 
 public class Header implements HeaderView.Presenter, IsWidget {
 
+	public static final String SYNAPSE = "SYNAPSE";
 	public static final String N_A = "n/a";
 	public static final String ANONYMOUS = "VISITOR_UNIQUE_ID";
 	public static final String SYNAPSE_ORG = "@synapse.org";
@@ -58,33 +55,13 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		this.globalApplicationState = globalApplicationState;
 		this.jsClient = jsClient;
 		this.favWidget = favWidget;
+		favWidget.setLoadingSize(16);
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.portalGinInjector = portalGinInjector;
 		view.clear();
 		this.pendoSdk = pendoSdk;
 		view.setPresenter(this);
 		initStagingAlert();
-		initStuAnnouncementWidget();
-	}
-	
-	public void initStuAnnouncementWidget() {
-		try {
-			GWT.runAsync(StuAnnouncementWidget.class, new RunAsyncCallback() {
-				@Override
-				public void onSuccess() {
-					StuAnnouncementWidget stuAnnouncementWidget = portalGinInjector.getStuAnnouncementWidget();
-					view.setStuAnnouncementWidget(stuAnnouncementWidget.asWidget());
-					stuAnnouncementWidget.init();		
-				}
-				
-				@Override
-				public void onFailure(Throwable e) {
-					synapseJSNIUtils.consoleError(e.getMessage());
-				}
-			});
-		} catch (Exception e) {
-			synapseJSNIUtils.consoleError(e.getMessage());
-		}
 	}
 	
 	public void initStagingAlert() {
@@ -93,36 +70,18 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		view.setStagingAlertVisible(visible);
 	}
 	
-	public void setMenuItemActive(MenuItems menuItem) {
-		view.setMenuItemActive(menuItem);
-	}
-
-	public void removeMenuItemActive(MenuItems menuItem) {
-		view.removeMenuItemActive(menuItem);
-	}
-	
-	public void configure(boolean largeLogo) {
-		view.setProjectHeaderText("Synapse");
+	public void configure() {
+		view.setProjectHeaderText(SYNAPSE);
 		view.setProjectHeaderAnchorTarget("#");
 		view.hideProjectFavoriteWidget();
-		setLogo(largeLogo);
 	}
 	
-	public void setLogo(boolean largeLogo) {
-		if (largeLogo) {
-			view.showLargeLogo();
-		} else {
-			view.showSmallLogo();
-		}
-	}
-	
-	public void configure(boolean largeLogo, EntityHeader projectHeader) {
+	public void configure(EntityHeader projectHeader) {
 		String projectId = projectHeader.getId();
 		favWidget.configure(projectId);
 		view.setProjectHeaderAnchorTarget("#!Synapse:" + projectId);
 		view.setProjectHeaderText(projectHeader.getName());
 		view.showProjectFavoriteWidget();
-		setLogo(largeLogo);
 	}
 
 	public Widget asWidget() {
@@ -143,6 +102,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		if (authenticationController.isLoggedIn() && userSessionData.getProfile() != null) {
 			String userName = userSessionData.getProfile().getUserName();
 			pendoSdk.initialize(authenticationController.getCurrentUserPrincipalId(), userName + SYNAPSE_ORG);
+			refreshFavorites();
 		} else {
 			pendoSdk.initialize(ANONYMOUS, N_A);
 		}
@@ -166,28 +126,13 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	}
 
 	@Override
-	public void onDashboardClick() {
-		if (authenticationController.isLoggedIn()) {
-			globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()));
-		} else {
-			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-		}	
-	}
-
-	@Override
 	public void onLoginClick() {
 		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));	
 	}
 
 	@Override
-	public void onRegisterClick() {
-		globalApplicationState.getPlaceChanger().goTo(new RegisterAccount(ClientProperties.DEFAULT_PLACE_TOKEN));	
-	}
-
-	@Override
-	public void onFavoriteClick() {
+	public void refreshFavorites() {
 		if(authenticationController.isLoggedIn()) {
-			view.showFavoritesLoading();
 			jsClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
 				@Override
 				public void onSuccess(List<EntityHeader> favorites) {

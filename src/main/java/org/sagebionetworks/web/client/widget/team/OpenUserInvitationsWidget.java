@@ -27,7 +27,7 @@ import com.google.inject.Inject;
 
 public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.Presenter {
 	public static final Integer INVITATION_BATCH_LIMIT = 10;
-
+	public static final String RESENT_INVITATION = "Invitation resent";
 	private OpenUserInvitationsWidgetView view;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
@@ -80,13 +80,14 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 		jsClient.deleteMembershipInvitation(invitationId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				popupUtils.showInfo(DELETED_INVITATION_MESSAGE,"");
+				popupUtils.showInfo(DELETED_INVITATION_MESSAGE);
 				refresh();
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
+				refresh();
 			}
 		});
 	}
@@ -129,7 +130,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 		// Add the invitations to the view
 		for (OpenTeamInvitationBundle b : bundles) {
 			MembershipInvitation mis = b.getMembershipInvitation();
-			String createdOn = dateTimeUtils.convertDateToSmallString(b.getMembershipInvitation().getCreatedOn());
+			String createdOn = dateTimeUtils.getDateTimeString(b.getMembershipInvitation().getCreatedOn());
 			if (b.getUserProfile() != null) {
 				// Invitee is an existing user
 				UserBadge userBadge = ginInjector.getUserBadgeWidget();
@@ -139,7 +140,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 				// Invitee is an email address
 				EmailInvitationBadge emailInvitationBadge = ginInjector.getEmailInvitationBadgeWidget();
 				emailInvitationBadge.configure(mis.getInviteeEmail());
-				view.addInvitation(emailInvitationBadge, mis.getId(), mis.getMessage(), createdOn);
+				view.addInvitation(emailInvitationBadge, null, mis.getId(), mis.getMessage(), createdOn);
 			} else {
 				synAlert.showError("Membership invitation with ID " + mis.getId() + " is not in a valid state.");
 			}
@@ -168,4 +169,23 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	public void setVisible(boolean visible) {
 		view.asWidget().setVisible(visible);
 	}
+	
+	@Override
+	public void resendInvitation(String membershipInvitationId) {
+		gwt.saveWindowPosition();
+		synapseClient.resendTeamInvitation(membershipInvitationId, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				popupUtils.showInfo(RESENT_INVITATION);
+				refresh();
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+				refresh();
+			}
+		});
+	}
+
 }

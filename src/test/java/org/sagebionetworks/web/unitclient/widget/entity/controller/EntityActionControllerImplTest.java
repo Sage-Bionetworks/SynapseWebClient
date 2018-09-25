@@ -25,6 +25,7 @@ import static org.sagebionetworks.web.client.widget.entity.controller.EntityActi
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.MOVE_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.RENAME_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.UPDATE_DOI_FOR;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WIKI;
 
@@ -66,11 +67,11 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.Doi;
+import org.sagebionetworks.repo.model.doi.v2.DoiAssociation;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -82,6 +83,7 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -203,6 +205,8 @@ public class EntityActionControllerImplTest {
 	AddExternalRepoModal mockAddExternalRepoModal; 
 	@Mock
 	GWTWrapper mockGWT;
+	@Mock
+	SynapseProperties mockSynapseProperties;
 	Set<ResourceAccess> resourceAccessSet;
 	
 	public static final String SELECTED_TEAM_ID = "987654";
@@ -238,6 +242,7 @@ public class EntityActionControllerImplTest {
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		
+		when(mockPortalGinInjector.getSynapseProperties()).thenReturn(mockSynapseProperties);
 		when(mockPortalGinInjector.getAccessControlListModalWidget()).thenReturn(mockAccessControlListModalWidget);
 		when(mockPortalGinInjector.getRenameEntityModalWidget()).thenReturn(mockRenameEntityModalWidget);
 		when(mockPortalGinInjector.getEditFileMetadataModalWidget()).thenReturn(mockEditFileMetadataModalWidget);
@@ -251,11 +256,10 @@ public class EntityActionControllerImplTest {
 		when(mockPortalGinInjector.getSelectTeamModal()).thenReturn(mockSelectTeamModal);
 		when(mockPortalGinInjector.getApproveUserAccessModal()).thenReturn(mockApproveUserAccessModal);
 		when(mockPortalGinInjector.getChallengeClientAsync()).thenReturn(mockChallengeClient);
-		when(mockPortalGinInjector.getUserProfileClientAsync()).thenReturn(mockUserProfileClient);
 		when(mockPortalGinInjector.getSynapseClientAsync()).thenReturn(mockSynapseClient);
 		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockPortalGinInjector.getEvaluationSubmitter()).thenReturn(mockSubmitter);
-		when(mockGlobalApplicationState.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
+		when(mockSynapseProperties.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
 		when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(mockSynapseJavascriptClient);
 		when(mockPortalGinInjector.getCreateTableViewWizard()).thenReturn(mockCreateTableViewWizard);
 		when(mockPortalGinInjector.getUploadTableModalWidget()).thenReturn(mockUploadTableModalWidget);
@@ -289,6 +293,7 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(table);
 		entityBundle.setPermissions(permissions);
 		entityBundle.setDoi(new Doi());
+		entityBundle.setDoiAssociation(new DoiAssociation());
 		entityBundle.setAccessRequirements(accessReqs);
 		entityBundle.setBenefactorAcl(mockACL);
 		resourceAccessSet = new HashSet<>();
@@ -832,8 +837,8 @@ public class EntityActionControllerImplTest {
 		verify(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		// an attempt to delete should be made
 		verify(mockSynapseJavascriptClient).deleteEntityById(anyString(), any(AsyncCallback.class));
-		verify(mockView).showInfo(DELETED, THE + EntityTypeUtils.getDisplayName(EntityType.table) + WAS_SUCCESSFULLY_DELETED);
-		verify(mockPlaceChanger).goTo(new Synapse(parentId, null, EntityArea.TABLES, null) );
+		verify(mockView).showInfo(THE + EntityTypeUtils.getDisplayName(EntityType.table) + WAS_SUCCESSFULLY_DELETED);
+		verify(mockPlaceChanger).goTo(new Synapse(parentId, null, EntityArea.TABLES, null));
 	}
 	
 	@Test
@@ -875,7 +880,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		// call under test
 		Place result = controller.createDeletePlace();
-		Place expected = new Synapse(parentId);
+		Place expected = new Synapse(parentId, null, EntityArea.FILES, null);
 		assertEquals(expected, result);
 	}
 
@@ -1225,7 +1230,7 @@ public class EntityActionControllerImplTest {
 		String target = "syn9876";
 		controller.createLink(target);
 		verify(mockView, never()).showErrorMessage(anyString());
-		verify(mockView).showInfo(DisplayConstants.TEXT_LINK_SAVED, DisplayConstants.TEXT_LINK_SAVED);
+		verify(mockView).showInfo(DisplayConstants.TEXT_LINK_SAVED);
 		Entity capture = argument.getValue();
 		assertNotNull(capture);
 		assertTrue(capture instanceof Link);
@@ -1270,7 +1275,7 @@ public class EntityActionControllerImplTest {
 		controller.onAction(Action.CREATE_LINK);
 		verify(mockEntityFinder, never()).configure(anyBoolean(), any(SelectedHandler.class));
 		verify(mockEntityFinder, never()).show();
-		verify(mockView, never()).showInfo(anyString(), anyString());
+		verify(mockView, never()).showInfo(anyString());
 	}
 	
 	@Test
@@ -1281,7 +1286,7 @@ public class EntityActionControllerImplTest {
 		controller.onAction(Action.CREATE_LINK);
 		verify(mockEntityFinder).configure(eq(EntityFilter.CONTAINER), anyBoolean(), any(SelectedHandler.class));
 		verify(mockEntityFinder).show();
-		verify(mockView).showInfo(DisplayConstants.TEXT_LINK_SAVED, DisplayConstants.TEXT_LINK_SAVED);
+		verify(mockView).showInfo(DisplayConstants.TEXT_LINK_SAVED);
 	}
 	
 	@Test
@@ -1432,7 +1437,7 @@ public class EntityActionControllerImplTest {
 		
 		capturedCallback.callback("a valid name");
 		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		verify(mockPlaceChanger).goTo(new Synapse(entityId, null, EntityArea.WIKI, newWikiPageId));
 	}
 	
@@ -1455,7 +1460,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		controller.onAction(Action.CREATE_DOI);
 		verify(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		//refresh page
 		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
 	}
@@ -1504,7 +1509,53 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, false);
 		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_DOI, true);
 	}
-	
+
+	@Test
+	public void testConfigureCreateOrUpdateDoiNotFound() throws Exception {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+
+		entityBundle.setDoiAssociation(null);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		//initially hide, then show
+		verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
+		verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
+	}
+
+	@Test
+	public void testConfigureCreateOrUpdateDoiView() throws Exception {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+
+		// Create DOI not available for Views
+		entityBundle.setDoiAssociation(null);
+		entityBundle.setEntity(new EntityView());
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
+		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
+	}
+
+	@Test
+	public void testConfigureCreateOrUpdateDoiNotFoundNonEditable() throws Exception {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+
+		permissions.setCanEdit(false);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		//initially hide, never show
+		verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
+		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
+	}
+
+	@Test
+	public void testConfigureCreateOrUpdateDoiFound() throws Exception {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		//hide, and then show with 'update' text
+		verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
+		verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
+		verify(mockActionMenu).setActionText(Action.CREATE_OR_UPDATE_DOI, UPDATE_DOI_FOR + EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass())));
+
+	}
+
 	@Test
 	public void testOnSelectChallengeTeam() {
 		AsyncMockStubber.callSuccessWith(null).when(mockChallengeClient).createChallenge(any(Challenge.class), any(AsyncCallback.class));
@@ -1520,7 +1571,7 @@ public class EntityActionControllerImplTest {
 		ArgumentCaptor<Challenge> captor = ArgumentCaptor.forClass(Challenge.class);
 		verify(mockChallengeClient).createChallenge(captor.capture(), any(AsyncCallback.class));
 		verify(mockPlaceChanger).goTo(new Synapse(entityId, null, EntityArea.ADMIN, null) );
-		verify(mockView).showInfo(DisplayConstants.CHALLENGE_CREATED, "");
+		verify(mockView).showInfo(DisplayConstants.CHALLENGE_CREATED);
 		Challenge c = captor.getValue();
 		assertNull(c.getId());
 		assertEquals(SELECTED_TEAM_ID, c.getParticipantTeamId());
@@ -1736,7 +1787,7 @@ public class EntityActionControllerImplTest {
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		controller.onAction(Action.ADD_FILE_VIEW);
-		verify(mockCreateTableViewWizard).configure(entityId, TableType.fileview);
+		verify(mockCreateTableViewWizard).configure(entityId, TableType.files);
 		verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
 	}
 	@Test
@@ -1744,7 +1795,7 @@ public class EntityActionControllerImplTest {
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		controller.onAction(Action.ADD_PROJECT_VIEW);
-		verify(mockCreateTableViewWizard).configure(entityId, TableType.projectview);
+		verify(mockCreateTableViewWizard).configure(entityId, TableType.projects);
 		verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
 	}
 	@Test

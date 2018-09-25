@@ -6,7 +6,7 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<b:Modal ui:field="modal" title="Leave Team" closable="true"
-		dataBackdrop="STATIC" dataKeyboard="false">
+		dataBackdrop="STATIC" dataKeyboard="true">
 		<b:ModalBody>
 		    <bh:Text>You will lose access to resources shared with the team. Are you sure?</bh:Text>
 			<g:SimplePanel ui:field="synAlertPanel"/>

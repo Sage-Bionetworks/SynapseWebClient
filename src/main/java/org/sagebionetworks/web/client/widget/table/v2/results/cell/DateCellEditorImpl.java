@@ -37,7 +37,7 @@ public class DateCellEditorImpl implements DateCellEditor {
 
 	@Override
 	public void setValue(String value) {
-		value = StringUtils.trimWithEmptyAsNull(value);
+		value = StringUtils.emptyAsNull(value);
 		Date date = null;
 		originalTime = null;
 		if(value != null){

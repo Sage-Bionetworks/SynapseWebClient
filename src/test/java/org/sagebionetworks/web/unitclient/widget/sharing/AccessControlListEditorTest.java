@@ -31,7 +31,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroupHeader;
@@ -39,9 +38,9 @@ import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -84,7 +83,8 @@ public class AccessControlListEditorTest {
 	private static EntityBundle entityBundleTransport_inheritedACL;
 	private static Project project;
 	private static UserGroupHeaderResponsePage userGroupHeaderRP;
-	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
+	SynapseProperties mockSynapseProperties;
 	@Captor
 	ArgumentCaptor<ArrayList<String>> listCaptor;
 	@Mock
@@ -113,8 +113,7 @@ public class AccessControlListEditorTest {
 		mockHasChangeHandler = Mockito.mock(HasChangesHandler.class);
 		mockAuthenticationController = mock(AuthenticationController.class, RETURNS_DEEP_STUBS);
 		mockACLEView = mock(AccessControlListEditorView.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		when(mockGlobalApplicationState.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
+		when(mockSynapseProperties.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
 		when(mockPublicPrincipalIds.getPublicAclPrincipalId()).thenReturn(TEST_PUBLIC_PRINCIPAL_ID);
 		mockGwt = mock(GWTWrapper.class);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(new Long(ADMIN_ID).toString());
@@ -128,7 +127,7 @@ public class AccessControlListEditorTest {
 		acle = new AccessControlListEditor(mockACLEView,
 				mockSynapseClient,
 				mockAuthenticationController,
-				mockGlobalApplicationState, 
+				mockSynapseProperties, 
 				mockGwt,
 				mockSynapseJavascriptClient,
 				mockSynAlert
@@ -267,8 +266,8 @@ public class AccessControlListEditorTest {
 		assertEquals("Created ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
 		// verify initially inherited acl, then local ACL
-		verify(mockACLEView, times(1)).buildWindow(anyBoolean(), anyBoolean(), eq(INHERITED_ACL_ID), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD));
-		verify(mockACLEView, times(2)).buildWindow(anyBoolean(), anyBoolean(), eq(ENTITY_ID), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD));
+		verify(mockACLEView, times(1)).buildWindow(anyBoolean(), anyBoolean(), eq(INHERITED_ACL_ID), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
+		verify(mockACLEView, times(2)).buildWindow(anyBoolean(), anyBoolean(), eq(ENTITY_ID), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
 		
 		verify(mockACLEView).setPublicAclPrincipalId(any(Long.class));
 		
@@ -316,7 +315,7 @@ public class AccessControlListEditorTest {
 		
 		assertEquals("Updated ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
-		verify(mockACLEView, times(6)).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD));
+		verify(mockACLEView, times(6)).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
 		verify(mockACLEView).setPublicAclPrincipalId(any(Long.class));
 		
 		ArgumentCaptor<Set> recipientSetCaptor = ArgumentCaptor.forClass(Set.class);
@@ -407,7 +406,7 @@ public class AccessControlListEditorTest {
 		returnedACL.setResourceAccess(null);
 		assertTrue(localACL.equals(returnedACL));
 		verify(mockACLEView, never()).showErrorMessage(anyString());
-		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD));
+		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
 		
 		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
@@ -439,7 +438,7 @@ public class AccessControlListEditorTest {
 		
 		assertEquals("Updated ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
-		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD));
+		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
 		
 		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
@@ -462,7 +461,7 @@ public class AccessControlListEditorTest {
 		
 		verify(mockSynapseClient).deleteAcl(eq(ENTITY_ID), any(AsyncCallback.class));
 		verify(mockACLEView, never()).showErrorMessage(anyString());
-		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD));
+		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
 		
 		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
@@ -518,7 +517,7 @@ public class AccessControlListEditorTest {
 		
 		assertEquals("Updated ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
-		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD));
+		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -526,7 +525,8 @@ public class AccessControlListEditorTest {
 	public void setAdminAccessTest() throws Exception {
 		// configure mocks
 		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		
+		boolean isLoggedIn = true;
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(isLoggedIn);
 		// update
 		acle.refresh();
 		acle.setAccess(ADMIN_ID, PermissionLevel.CAN_VIEW);
@@ -538,7 +538,7 @@ public class AccessControlListEditorTest {
 		String aclEntityId = ENTITY_ID;
 		boolean canEnableInheritance = true;
 		boolean canChangePermission = true;
-		verify(mockACLEView).buildWindow(eq(isProject), eq(isInherited), eq(aclEntityId), eq(canEnableInheritance), eq(canChangePermission), eq(PermissionLevel.CAN_DOWNLOAD));
+		verify(mockACLEView).buildWindow(eq(isProject), eq(isInherited), eq(aclEntityId), eq(canEnableInheritance), eq(canChangePermission), eq(PermissionLevel.CAN_DOWNLOAD), eq(isLoggedIn));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -551,7 +551,7 @@ public class AccessControlListEditorTest {
 		acle.refresh();
 		acle.pushChangesToSynapse(false,mockPushToSynapseCallback);
 		
-		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD));
+		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -566,6 +566,6 @@ public class AccessControlListEditorTest {
 		acle.pushChangesToSynapse(false,mockPushToSynapseCallback);
 
 		verify(mockSynAlert).showError(anyString());
-		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD));
+		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
 	}
 }

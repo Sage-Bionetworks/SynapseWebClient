@@ -25,6 +25,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.widget.Button;
@@ -87,6 +88,8 @@ public class PlotlyConfigEditorTest {
 		when(mockY2ColumnModel.getName()).thenReturn(Y2_COLUMN_NAME);
 		AsyncMockStubber.callSuccessWith(mockTableEntity).when(mockSynapseJavascriptClient).getEntity(anyString(), any(AsyncCallback.class));
 		when(mockTableEntity.getName()).thenReturn(TABLE_NAME);
+		when(mockView.getXAxisType()).thenReturn(AxisType.AUTO);
+		when(mockView.getYAxisType()).thenReturn(AxisType.AUTO);
 	}
 	
 	@Test
@@ -185,6 +188,12 @@ public class PlotlyConfigEditorTest {
 		WikiPageKey wikiKey = null;
 		DialogCallback callback = null;
 		editor.configure(wikiKey, params, callback);
+		
+		// user changed axis type
+		AxisType xAxisType = AxisType.CATEGORY;
+		AxisType yAxisType = AxisType.LINEAR;
+		when(mockView.getXAxisType()).thenReturn(xAxisType);
+		when(mockView.getYAxisType()).thenReturn(yAxisType);
 
 		// simulate table selected, x column selected, and y column added
 		String newSynId = "syn999999";
@@ -221,6 +230,8 @@ public class PlotlyConfigEditorTest {
 		assertEquals(yAxisLabel, params.get(Y_AXIS_TITLE));
 		assertEquals(GraphType.SCATTER.toString(), params.get(TYPE));
 		assertEquals(Boolean.toString(showLegend), params.get(SHOW_LEGEND));
+		assertEquals(xAxisType.toString(), params.get(X_AXIS_TYPE));
+		assertEquals(yAxisType.toString(), params.get(Y_AXIS_TYPE));
 	}
 	
 	@Test
@@ -257,6 +268,9 @@ public class PlotlyConfigEditorTest {
 		assertEquals(GraphType.BAR.toString(), params.get(TYPE));
 		assertEquals(Boolean.toString(isHorizontalBarChart), params.get(IS_HORIZONTAL));
 		assertEquals(mode.toString(), params.get(BAR_MODE));
+		// if axis type is set to auto, do not include the parameter in the output.
+		assertNull(params.get(X_AXIS_TYPE));
+		assertNull(params.get(Y_AXIS_TYPE));
 	}
 	
 	@Test (expected=IllegalArgumentException.class)

@@ -77,28 +77,6 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public DiscussionThreadBundle updateThreadTitle(String threadId,
-			UpdateThreadTitle newTitle) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return synapseClient.updateThreadTitle(threadId, newTitle);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public DiscussionThreadBundle updateThreadMessage(String threadId,
-			UpdateThreadMessage newMessage) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return synapseClient.updateThreadMessage(threadId, newMessage);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
 	public void markThreadAsDeleted(String threadId)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();

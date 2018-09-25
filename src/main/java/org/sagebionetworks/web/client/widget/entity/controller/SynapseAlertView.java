@@ -7,14 +7,6 @@ import com.google.gwt.user.client.ui.Widget;
  *
  */
 public interface SynapseAlertView extends IsWidget {
-	
-	/**
-	 * Show info to the user.
-	 * @param string
-	 * @param string
-	 */
-	void showInfo(String header, String message);
-	
 	/**
 	 * Gather information from the user to create a jira issue
 	 * @param errorMessage

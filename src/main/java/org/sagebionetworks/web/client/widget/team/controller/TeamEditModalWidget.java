@@ -7,13 +7,14 @@ import java.util.Set;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.util.ModelConstants;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -22,6 +23,7 @@ import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -38,9 +40,9 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 	SynapseClientAsync synapseClient;
 	ImageUploadWidget uploader;
 	String uploadedFileHandleId;
-	String baseImageURL;
 	Long authenticatedUserGroupId;
 	AuthenticationController authController;
+	SynapseJSNIUtils jsniUtils;
 	
 	@Inject
 	public TeamEditModalWidget(
@@ -50,24 +52,24 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 			final ImageUploadWidget uploader, 
 			SynapseJSNIUtils jsniUtils,
 			AuthenticationController authenticationController,
-			GlobalApplicationState globalApplicationState,
+			SynapseProperties synapseProperties,
 			PortalGinInjector ginInjector) {
 		this.synAlert = synAlert;
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.uploader = uploader;
+		this.jsniUtils = jsniUtils;
 		uploader.setView(ginInjector.getCroppedImageUploadView());
-		this.baseImageURL = jsniUtils.getBaseFileHandleUrl();
 		this.authController = authenticationController;
-		authenticatedUserGroupId = Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID));
+		authenticatedUserGroupId = Long.parseLong(synapseProperties.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID));
 		uploader.configure(new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload fileUpload) {
 				uploader.setUploadedFileText(fileUpload.getFileMeta().getFileName());
 				view.hideLoading();
 				uploadedFileHandleId = fileUpload.getFileHandleId();
-				view.setImageURL(DisplayUtils.createRawFileHandleUrl(baseImageURL, uploadedFileHandleId));
+				view.setImageURL(jsniUtils.getRawFileHandleUrl(uploadedFileHandleId));
 			}
 		});
 		uploader.setUploadingCallback(new Callback() {
@@ -104,7 +106,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 			synapseClient.updateTeam(team, teamACL, new AsyncCallback<Team>() {
 				@Override
 				public void onSuccess(Team result) {
-					view.showInfo(DisplayConstants.UPDATE_TEAM_SUCCESS, "");
+					view.showInfo(DisplayConstants.UPDATE_TEAM_SUCCESS);
 					if (refreshCallback != null)
 						refreshCallback.invoke();
 					view.hide();
@@ -138,7 +140,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 		view.clear();
 		view.configure(team);
 		if (team.getIcon() != null)
-			view.setImageURL(DisplayUtils.createRawFileHandleUrl(baseImageURL, team.getIcon()));
+			view.setImageURL(jsniUtils.getFileHandleAssociationUrl(team.getId(), FileHandleAssociateType.TeamAttachment, team.getIcon()));
 		else
 			view.setDefaultIconVisible();
 		

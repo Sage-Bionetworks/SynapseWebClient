@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.UrlCache;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 
@@ -12,15 +11,13 @@ import com.google.inject.Inject;
 
 public class UserTeamConfigViewImpl extends SimplePanel implements UserTeamConfigView {
 
-	UrlCache urlCache;
 	SynapseJSNIUtils synapseJSNIUtils;
 	SynapseSuggestBox suggestBox;
 	UserGroupSuggestionProvider oracle;
 	
 	@Inject
-	public UserTeamConfigViewImpl(UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils,
+	public UserTeamConfigViewImpl(SynapseJSNIUtils synapseJSNIUtils,
 			SynapseSuggestBox suggestBox, UserGroupSuggestionProvider provider) {
-		this.urlCache = urlCache;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.suggestBox = suggestBox;
 		this.suggestBox.setSuggestionProvider(provider);
@@ -69,7 +66,7 @@ public class UserTeamConfigViewImpl extends SimplePanel implements UserTeamConfi
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 }

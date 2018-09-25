@@ -7,7 +7,7 @@
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
   	<bh:Div>
-		<b:Modal ui:field="dialog" title="" closable="true" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal-fullscreen">
+		<b:Modal ui:field="dialog" title="" closable="true" dataBackdrop="STATIC" dataKeyboard="true" addStyleNames="modal-fullscreen">
 			<b:ModalBody>
 				<bh:Div ui:field="accessRequirementWidgetContainer"/>
 			</b:ModalBody>

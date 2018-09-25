@@ -123,6 +123,7 @@ public class S3DirectUploader implements S3DirectUploadHandler {
 		this.fileName = fileName;
 		this.contentType = contentType;
 		this.view = view;
+		this.blob = blob;
 		synapseJsniUtils.getFileMd5(blob, new MD5Callback() {
 			@Override
 			public void setMD5(String hexValue) {

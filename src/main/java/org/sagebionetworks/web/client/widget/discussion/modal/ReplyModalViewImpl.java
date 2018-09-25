@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -33,18 +34,17 @@ public class ReplyModalViewImpl implements ReplyModalView {
 	@Inject
 	public ReplyModalViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
+		ClickHandler onCancel = event -> {
+			presenter.onCancel();
+		};
 		saveButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onSave();
 			}
 		});
-		cancelButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				replyModal.hide();
-			}
-		});
+		cancelButton.addClickHandler(onCancel);
+		replyModal.addDomHandler(DisplayUtils.getESCKeyDownHandler(onCancel), KeyDownEvent.getType());
 	}
 
 	@Override
@@ -60,6 +60,7 @@ public class ReplyModalViewImpl implements ReplyModalView {
 	@Override
 	public void showDialog() {
 		replyModal.show();
+		DisplayUtils.focusOnChildInput(replyModal);
 	}
 
 	@Override
@@ -84,7 +85,7 @@ public class ReplyModalViewImpl implements ReplyModalView {
 
 	@Override
 	public void showSuccess(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

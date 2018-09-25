@@ -26,7 +26,6 @@ import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
@@ -63,11 +62,6 @@ public interface SynapseClientAsync {
 
 	void search(SearchQuery searchQuery, AsyncCallback<SearchResults> callback);
  	
-	void getRepositoryServiceUrl(AsyncCallback<String> callback);
-
-	void createOrUpdateEntity(Entity entity, Annotations annos,
-			boolean isNew, AsyncCallback<String> callback);
-	
 	void deleteEntityVersionById(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
 	void updateUserProfile(UserProfile userProfileJson, AsyncCallback<Void> callback);
@@ -104,8 +98,6 @@ public interface SynapseClientAsync {
 	void updateExternalFile(String entityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
 
 	void createExternalFile(String parentEntityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
-
-	void getRootWikiId(String ownerId, String ownerType, AsyncCallback<String> callback);
 	void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<FileHandleResults> callback);
 	
 	void restoreV2WikiPage(String ownerId, String ownerType, String wikiId,
@@ -130,21 +122,19 @@ public interface SynapseClientAsync {
 	 * TEAMS
 	 */
 	/////////////////
-	void createTeam(String teamName,AsyncCallback<String> callback);
 	void deleteTeam(String teamId,AsyncCallback<Void> callback);
 	void getTeamsBySearch(String searchTerm, Integer limit, Integer offset,
 			AsyncCallback<PaginatedResults<Team>> callback);
 	void getTeamBundle(String userId, String teamId, boolean isLoggedIn, AsyncCallback<TeamBundle> callback);
-	void getOpenRequestCount(String currentUserId, String teamId, AsyncCallback<Long> callback);
 	void getOpenInvitations(String userId, AsyncCallback<ArrayList<OpenUserInvitationBundle>> callback);
 	void getOpenTeamInvitations(String teamId, Integer limit, Integer offset, AsyncCallback<ArrayList<OpenTeamInvitationBundle>> callback);
+	void resendTeamInvitation(String membershipInvitationId, String hostPageBaseURL, AsyncCallback<Void> callback);
 	void getOpenRequests(String teamId, AsyncCallback<List<MembershipRequestBundle>> callback);
 	void updateTeam(Team team, AccessControlList teamAcl, AsyncCallback<Team> callback);
 	void deleteTeamMember(String currentUserId, String targetUserId, String teamId, AsyncCallback<Void> callback);
 	void getTeamMembers(String teamId, String fragment, Integer limit, Integer offset, AsyncCallback<TeamMemberPagedResults> callback);	
 	void getTeamMemberCount(String teamId, AsyncCallback<Long> callback);
 	void requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL, Date expiresOn, AsyncCallback<TeamMembershipStatus> callback);
-	void deleteOpenMembershipRequests(String currentUserId, String teamId, AsyncCallback<Void> callback);
 	void inviteMember(String userGroupId, String teamId, String message, String hostPageBaseURL, AsyncCallback<Void> callback);
 	void inviteNewMember(String email, String teamId, String message, String hostPageBaseURL, AsyncCallback<Void> callback);
 	/////////////////
@@ -235,14 +225,6 @@ public interface SynapseClientAsync {
 	void createTableColumns(List<ColumnModel> value,
 			AsyncCallback<List<ColumnModel>> asyncCallback);
 	
-	/**
-	 * Return the upload destinations associated with this parent entity (container)
-	 * @param parentEntityId
-	 * @return
-	 * @throws RestServiceException
-	 */
-	void getUploadDestinations(String parentEntityId, AsyncCallback<List<UploadDestination>> callback);
-	
 	void getHost(String urlString, AsyncCallback<String> callback);
 
 	void updateEntity(Entity toUpdate, AsyncCallback<Entity> callback);
@@ -271,7 +253,6 @@ public interface SynapseClientAsync {
 	void setIsTeamAdmin(String currentUserId, String targetUserId,
 			String teamId, boolean isTeamAdmin, AsyncCallback<Void> callback);
 
-	void getUserIdFromUsername(String username, AsyncCallback<String> callback);
 	void getUserProfileFromUsername(String username, AsyncCallback<UserProfile> callback);
 
 	void deleteAccessRequirement(Long accessRequirementId, AsyncCallback<Void> callback);
@@ -286,8 +267,6 @@ public interface SynapseClientAsync {
 
 	void isUserAllowedToRenderHTML(String userId, AsyncCallback<Boolean> callback);
 	
-	void isWiki(String id, AsyncCallback<Boolean> callback);
-
 	void isChallenge(String id, AsyncCallback<Boolean> callback);
 
 	void addTeamMember(String userGroupId, String teamId, String message, String hostPageBaseURL,

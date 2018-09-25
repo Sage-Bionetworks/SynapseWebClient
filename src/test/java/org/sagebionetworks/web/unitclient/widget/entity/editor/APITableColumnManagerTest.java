@@ -1,9 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,14 +22,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnManager;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnManagerView;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
-import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.ui.Widget;
 
 public class APITableColumnManagerTest {

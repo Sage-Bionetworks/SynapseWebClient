@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -47,10 +48,9 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	public static final String UNPIN_THREAD_ACTION_TEXT = "Unpin Thread";
 	private static final DiscussionReplyOrder DEFAULT_ORDER = DiscussionReplyOrder.CREATED_ON;
 	public static final Boolean DEFAULT_ASCENDING = true;
-	public static final Long LIMIT = 5L;
+	public static final Long LIMIT = 30L;
 	private static final DiscussionFilter DEFAULT_FILTER = DiscussionFilter.EXCLUDE_DELETED;
 
-	private static final String CONFIRM_DELETE_DIALOG_TITLE = "Confirm Deletion";
 	private static final String CONFIRM_RESTORE_DIALOG_TITLE = "Confirm Restoration";
 	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this thread?";
 	private static final String DELETE_SUCCESS_TITLE = "Thread deleted";
@@ -69,7 +69,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	RequestBuilderWrapper requestBuilder;
 	AuthenticationController authController;
 	GlobalApplicationState globalApplicationState;
-	EditDiscussionThreadModal editThreadModal;
 	MarkdownWidget markdownWidget;
 	LoadMoreWidgetContainer repliesContainer;
 	SubscribeButtonWidget subscribeButtonWidget;
@@ -92,9 +91,11 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	private SubscribersWidget threadSubscribersWidget;
 	Topic threadTopic = new Topic();
 	private ActionMenuWidget actionMenu;
-	ActionMenuWidget.ActionListener editActionListener, unpinActionListener, pinActionListener, deleteActionListener;
+	ActionMenuWidget.ActionListener editActionListener, unpinActionListener, pinActionListener, deleteActionListener, restoreActionListener;
 	Boolean isPinned;
 	PopupUtilsView popupUtils;
+	ClientCache clientCache;
+	String message;
 	
 	@Inject
 	public SingleDiscussionThreadWidget(
@@ -107,7 +108,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			RequestBuilderWrapper requestBuilder,
 			AuthenticationController authController,
 			GlobalApplicationState globalApplicationState,
-			EditDiscussionThreadModal editThreadModal,
 			MarkdownWidget markdownWidget,
 			LoadMoreWidgetContainer loadMoreWidgetContainer,
 			SubscribeButtonWidget subscribeButtonWidget,
@@ -115,7 +115,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			NewReplyWidget secondNewReplyWidget,
 			SubscribersWidget threadSubscribersWidget,
 			SynapseJavascriptClient jsClient,
-			PopupUtilsView popupUtils
+			PopupUtilsView popupUtils,
+			ClientCache clientCache
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
@@ -127,7 +128,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.requestBuilder = requestBuilder;
 		this.authController = authController;
 		this.globalApplicationState = globalApplicationState;
-		this.editThreadModal = editThreadModal;
+		
 		this.markdownWidget = markdownWidget;
 		this.repliesContainer = loadMoreWidgetContainer;
 		this.subscribeButtonWidget = subscribeButtonWidget;
@@ -136,10 +137,11 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.threadSubscribersWidget = threadSubscribersWidget;
 		this.jsClient = jsClient;
 		this.popupUtils = popupUtils;
+		this.clientCache = clientCache;
+		
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setAuthor(authorWidget.asWidget());
-		view.setEditThreadModal(editThreadModal.asWidget());
 		view.setMarkdownWidget(markdownWidget.asWidget());
 		view.setSubscribeButtonWidget(subscribeButtonWidget.asWidget());
 		view.setNewReplyContainer(newReplyWidget.asWidget());
@@ -169,30 +171,22 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			}
 		};
 		threadTopic.setObjectType(SubscriptionObjectType.THREAD);
-		editActionListener = new ActionMenuWidget.ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				onClickEditThread();
-			}
+		editActionListener = action -> {
+			onClickEditThread();
 		};
-		pinActionListener = new ActionMenuWidget.ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				onClickPinThread();
-			}
+		pinActionListener = action -> {
+			onClickPinThread();
 		};
-		unpinActionListener = new ActionMenuWidget.ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				onClickUnpinThread();
-			}
+		unpinActionListener = action -> {
+			onClickUnpinThread();
 		};
 		
-		deleteActionListener = new ActionMenuWidget.ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				onClickDeleteThread();
-			}
+		deleteActionListener = action -> {
+			onClickDeleteThread();
+		};
+		
+		restoreActionListener = action -> {
+			onClickRestore();
 		};
 	}
 
@@ -217,7 +211,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 		authorWidget.configure(bundle.getCreatedBy());
 		configureMessage();
-		if (!bundle.getId().equals(globalApplicationState.getSynapseProperty(ForumWidget.DEFAULT_THREAD_ID_KEY))) {
+		if (!bundle.getId().equals(ginInjector.getSynapseProperties().getSynapseProperty(ForumWidget.DEFAULT_THREAD_ID_KEY))) {
 			view.setSubscribersWidgetContainerVisible(true);
 			if (replyId != null) {
 				configureReply(replyId);
@@ -273,6 +267,15 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			view.setUnpinIconVisible(isCurrentUserModerator && isPinned);
 			view.setPinIconVisible(isCurrentUserModerator && !isPinned);
 			view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
+			if (actionMenu != null) {
+				actionMenu.setActionVisible(Action.RESTORE_THREAD, false);
+				actionMenu.setActionVisible(Action.DELETE_THREAD, isCurrentUserModerator);
+			}
+		} else {
+			if (actionMenu != null) {
+				actionMenu.setActionVisible(Action.RESTORE_THREAD, isCurrentUserModerator);
+				actionMenu.setActionVisible(Action.DELETE_THREAD, false);
+			}
 		}
 		configureActionMenu();
 	}
@@ -281,6 +284,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		if (actionMenu != null) {
 			actionMenu.setActionListener(Action.EDIT_THREAD, editActionListener);
 			actionMenu.setActionListener(Action.DELETE_THREAD, deleteActionListener);
+			actionMenu.setActionListener(Action.RESTORE_THREAD, restoreActionListener);
 			if (isPinned) {
 				// thread is pinned
 				actionMenu.setActionListener(Action.PIN_THREAD, unpinActionListener);
@@ -328,21 +332,28 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	public void configureMessage() {
 		synAlert.clear();
 		markdownWidget.clear();
-		view.setLoadingMessageVisible(true);
 		subscribeButtonWidget.configure(SubscriptionObjectType.THREAD, threadId, actionMenu);
-		jsClient.getThreadUrl(messageKey, new AsyncCallback<String>(){
+		//check cache for message
+		if (clientCache.contains(messageKey + WebConstants.MESSAGE_SUFFIX)) {
+			//cache hit
+			setMessage(clientCache.get(messageKey + WebConstants.MESSAGE_SUFFIX));
+		} else {
+			//cache miss
+			view.setLoadingMessageVisible(true);
+			jsClient.getThreadUrl(messageKey, new AsyncCallback<String>(){
 
-			@Override
-			public void onFailure(Throwable caught) {
-				view.setLoadingMessageVisible(false);
-				synAlert.handleException(caught);
-			}
+				@Override
+				public void onFailure(Throwable caught) {
+					view.setLoadingMessageVisible(false);
+					synAlert.handleException(caught);
+				}
 
-			@Override
-			public void onSuccess(String result) {
-				getMessage(result);
-			}
-		});
+				@Override
+				public void onSuccess(String result) {
+					getMessage(result);
+				}
+			});
+		}
 	}
 
 	public void getMessage(String url) {
@@ -358,8 +369,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 					if (statusCode == Response.SC_OK) {
 						String message = response.getText();
 						view.setLoadingMessageVisible(false);
-						markdownWidget.configure(message);
-						configureEditThreadModal(message);
+						setMessage(message);
 					} else {
 						onError(null, new IllegalArgumentException("Unable to retrieve message for thread " + threadId + ". Reason: " + response.getStatusText()));
 					}
@@ -376,15 +386,11 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			synAlert.handleException(e);
 		}
 	}
-
-	private void configureEditThreadModal(String message) {
-		editThreadModal.configure(threadId, title, message, new Callback(){
-
-			@Override
-			public void invoke() {
-				reconfigureThread();
-			}
-		});
+	
+	public void setMessage(String message) {
+		this.message = message;
+		markdownWidget.configure(message);
+		clientCache.put(messageKey + WebConstants.MESSAGE_SUFFIX, message);
 	}
 
 	public void configureReplies() {
@@ -472,11 +478,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	
 	@Override
 	public void onClickDeleteThread() {
-		popupUtils.showConfirmDialog(CONFIRM_DELETE_DIALOG_TITLE, DELETE_CONFIRM_MESSAGE, new Callback() {
-			@Override
-			public void invoke() {
-				deleteThread();
-			}
+		popupUtils.showConfirmDelete(DELETE_CONFIRM_MESSAGE, () -> {
+			deleteThread();
 		});
 	}
 
@@ -501,6 +504,11 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 	@Override
 	public void onClickEditThread() {
+		EditDiscussionThreadModal editThreadModal = ginInjector.getEditDiscussionThreadModal();
+		view.setEditThreadModal(editThreadModal.asWidget());
+		editThreadModal.configure(threadId, title, message, () -> {
+			reconfigureThread();
+		});
 		editThreadModal.show();
 	}
 

@@ -6,10 +6,13 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -43,12 +46,11 @@ public class NewReplyWidgetViewImpl implements NewReplyWidgetView{
 				presenter.onClickNewReply();
 			}
 		});
-		cancelButton.addClickHandler(new ClickHandler(){
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onCancel();
-			}
-		});
+		ClickHandler onCancel = event -> {
+			presenter.onCancel();
+		};
+		cancelButton.addClickHandler(onCancel);
+		widget.addDomHandler(DisplayUtils.getESCKeyDownHandler(onCancel), KeyDownEvent.getType());
 		saveButton.addClickHandler(new ClickHandler(){
 			@Override
 			public void onClick(ClickEvent event) {
@@ -95,7 +97,7 @@ public class NewReplyWidgetViewImpl implements NewReplyWidgetView{
 
 	@Override
 	public void showSuccess(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override
@@ -112,6 +114,13 @@ public class NewReplyWidgetViewImpl implements NewReplyWidgetView{
 	public void showConfirmDialog(String restoreTitle, String restoreMessage, Callback yesCallback,
 			Callback noCallback) {
 		DisplayUtils.showConfirmDialog(restoreTitle, restoreMessage, yesCallback, noCallback);
+	}
+	
+	@Override
+	public void scrollIntoView() {
+		Scheduler.get().scheduleDeferred(() -> {
+			Window.scrollTo(0, markdownEditorContainer.getAbsoluteTop());
+		});
 	}
 
 }

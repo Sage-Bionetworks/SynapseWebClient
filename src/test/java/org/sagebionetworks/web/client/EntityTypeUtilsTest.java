@@ -40,14 +40,14 @@ public class EntityTypeUtilsTest {
 	
 	@Test
 	public void testGetIconTypeForEntityClassName() {
-		assertEquals(IconType.FILE_O, EntityTypeUtils.getIconTypeForEntityClassName(FileEntity.class.getName()));
+		assertEquals(IconType.FILE, EntityTypeUtils.getIconTypeForEntityClassName(FileEntity.class.getName()));
 		assertEquals(IconType.FOLDER, EntityTypeUtils.getIconTypeForEntityClassName(Folder.class.getName()));
 		assertEquals(IconType.LIST_ALT, EntityTypeUtils.getIconTypeForEntityClassName(Project.class.getName()));
 		assertEquals(IconType.TABLE, EntityTypeUtils.getIconTypeForEntityClassName(TableEntity.class.getName()));
 		assertEquals(IconType.TH_LIST, EntityTypeUtils.getIconTypeForEntityClassName(EntityView.class.getName()));
 		assertEquals(IconType.LINK, EntityTypeUtils.getIconTypeForEntityClassName(Link.class.getName()));
 		
-		assertEquals(IconType.FILE_O, EntityTypeUtils.getIconTypeForEntityClassName("default"));
+		assertEquals(IconType.FILE, EntityTypeUtils.getIconTypeForEntityClassName("default"));
 	}
 
 }

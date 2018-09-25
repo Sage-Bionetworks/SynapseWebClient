@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.auth.LoginRequest;
-import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -26,14 +24,5 @@ public interface UserAccountService extends RemoteService {
 
 	String createUserStep2(String userName, String fName, String lName, String password, EmailValidationSignedToken emailValidationSignedToken) throws RestServiceException;
 
-	void terminateSession(String sessionToken) throws RestServiceException;
-
-	String getPrivateAuthServiceUrl();
-
-	String getPublicAuthServiceUrl();
-
-	String getTermsOfUse();
-
 	PublicPrincipalIds getPublicAndAuthenticatedGroupPrincipalIds();
-
 }

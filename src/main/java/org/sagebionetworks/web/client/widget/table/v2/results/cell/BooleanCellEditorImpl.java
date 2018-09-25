@@ -47,7 +47,7 @@ public class BooleanCellEditorImpl implements BooleanCellEditor {
 
 	@Override
 	public void setValue(String value) {
-		value = StringUtils.trimWithEmptyAsNull(value);
+		value = StringUtils.emptyAsNull(value);
 		if(value == null){
 			view.setValue(0);
 		}else{

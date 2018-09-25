@@ -36,14 +36,11 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Trash;
-import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
-import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidget;
 import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -64,8 +61,6 @@ public class HeaderTest {
 	List<EntityHeader> entityHeaders;
 	@Mock
 	CookieProvider mockCookies;
-	@Mock
-	StuAnnouncementWidget mockStuAnnouncementWidget;
 	@Mock
 	PendoSdk mockPendoSdk;
 	@Mock
@@ -89,7 +84,6 @@ public class HeaderTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		//by default, mock that we are on the production website
 		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn(Header.WWW_SYNAPSE_ORG);
-		when(mockPortalGinInjector.getStuAnnouncementWidget()).thenReturn(mockStuAnnouncementWidget);
 		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPendoSdk, mockPortalGinInjector);
 		entityHeaders = new ArrayList<EntityHeader>();
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
@@ -110,21 +104,6 @@ public class HeaderTest {
 	@Test
 	public void testAsWidget(){
 		header.asWidget();
-	}
-
-	@Test
-	public void testOnDashboardClickLoggedIn() {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn("008");
-		header.onDashboardClick();
-		verify(mockPlaceChanger).goTo(isA(Profile.class));
-	}
-
-	@Test
-	public void testOnDashboardClickAnonymous() {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		header.onDashboardClick();
-		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 
 	@Test
@@ -164,15 +143,9 @@ public class HeaderTest {
 	}
 
 	@Test
-	public void testOnRegisterClick() {
-		header.onRegisterClick();
-		verify(mockPlaceChanger).goTo(isA(RegisterAccount.class));
-	}
-
-	@Test
 	public void testOnFavoriteClickEmptyCase() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		header.onFavoriteClick();
+		header.refreshFavorites();
 		verify(mockView).clearFavorite();
 		verify(mockView).setEmptyFavorite();
 	}
@@ -186,7 +159,7 @@ public class HeaderTest {
 		entityHeader2.setId("syn012345");
 		entityHeaders.add(entityHeader1);
 		entityHeaders.add(entityHeader2);
-		header.onFavoriteClick();
+		header.refreshFavorites();
 		verify(mockView).clearFavorite();
 		verify(mockView).addFavorite(entityHeaders);
 	}
@@ -197,8 +170,7 @@ public class HeaderTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		UserSessionData userSessionData = new UserSessionData();
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(userSessionData);
-		header.onFavoriteClick();
-		verify(mockView).showFavoritesLoading();
+		header.refreshFavorites();
 		verify(mockView).clearFavorite();
 		verify(mockSynapseJavascriptClient, times(1)).getFavorites(any(AsyncCallback.class));
 		//initially empty
@@ -210,8 +182,7 @@ public class HeaderTest {
 		entityHeaders.add(entityHeader1);
 		
 		// User should ask for favorites each time favorites button is clicked
-		header.onFavoriteClick();
-		verify(mockView, times(2)).showFavoritesLoading();
+		header.refreshFavorites();
 		verify(mockView, times(2)).clearFavorite();
 		verify(mockSynapseJavascriptClient, times(2)).getFavorites(any(AsyncCallback.class));
 		verify(mockView).addFavorite(entityHeaders);
@@ -222,23 +193,9 @@ public class HeaderTest {
 		// SWC-2805: User is not logged in.  This is an odd case, since the favorites menu should not be shown.
 		// in this case, do not even try to update the favorites, will show whatever we had (possibly stale, like the rest of the page).
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		header.onFavoriteClick();
-		verify(mockView, never()).showFavoritesLoading();
+		header.refreshFavorites();
 		verify(mockView, never()).clearFavorite();
 		verify(mockSynapseJavascriptClient, never()).getFavorites(any(AsyncCallback.class));
-	}
-	
-	@Test
-	public void testShowLargeLogo() {
-		header.configure(true);
-		verify(mockView).showLargeLogo();
-		verify(mockView, never()).showSmallLogo();
-	}
-	@Test
-	public void testShowSmallLogo() {
-		header.configure(false);
-		verify(mockView, never()).showLargeLogo();
-		verify(mockView).showSmallLogo();
 	}
 	
 	@Test

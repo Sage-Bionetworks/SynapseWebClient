@@ -18,7 +18,7 @@ public class FilesBrowser implements SynapseWidgetPresenter {
 	public FilesBrowser(FilesBrowserView view,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController) {
-		this.view = view;		
+		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 	}	

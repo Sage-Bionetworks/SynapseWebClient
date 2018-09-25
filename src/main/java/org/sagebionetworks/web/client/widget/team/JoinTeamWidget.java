@@ -421,7 +421,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				if (teamMembershipStatus.getIsMember()) {
 					refresh();
 				} else {
-					view.showInfo("Request Sent", "");
+					view.showInfo("Request Sent");
 				}
 				if (teamUpdatedCallback != null)
 					teamUpdatedCallback.invoke();

@@ -1,16 +1,23 @@
 package org.sagebionetworks.web.server.servlet;
 
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
-import org.sagebionetworks.StackConfiguration;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.status.StackStatus;
 import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
 import org.sagebionetworks.web.client.StackConfigService;
+import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl.PortalPropertiesHolder;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl.PortalVersionHolder;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+
+import com.google.gwt.thirdparty.guava.common.base.Supplier;
+import com.google.gwt.thirdparty.guava.common.base.Suppliers;
 
 /**
 * 
@@ -21,24 +28,33 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 *
 */
 public class StackConfigServiceImpl extends SynapseClientBase implements StackConfigService {
-	
+	static private Log log = LogFactory.getLog(StackConfigServiceImpl.class);
 	public static final long serialVersionUID = 46893767375462651L;
 
-	@Override
-	public String getDoiPrefix() {
-		return StackConfiguration.getEzidDoiPrefix();
+	private final Supplier<SynapseVersionInfo> synapseVersionCache = Suppliers.memoizeWithExpiration(versionSupplier(), 5, TimeUnit.MINUTES);
+
+	public SynapseVersionInfo getSynapseVersionInfo() {
+		return synapseVersionCache.get();
 	}
 
+	private Supplier<SynapseVersionInfo> versionSupplier() {
+		return new Supplier<SynapseVersionInfo>() {
+			public SynapseVersionInfo get() {
+				try {
+					org.sagebionetworks.client.SynapseClient synapseClient = createAnonymousSynapseClient();
+					return synapseClient.getVersionInfo();
+				} catch (SynapseException e) {
+					log.error(e);
+					return null;
+				}
+			}
+		};
+	}
+	
 	@Override
 	public String getSynapseVersions() throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createAnonymousSynapseClient();
-		try {
-			SynapseVersionInfo versionInfo = synapseClient.getVersionInfo();
-			return PortalVersionHolder.getVersionInfo() + ","
-					+ versionInfo.getVersion();
-		} catch (Exception e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
+		return PortalVersionHolder.getVersionInfo() + ","
+				+ getSynapseVersionInfo().getVersion();
 	}
 	
 	@Override
@@ -54,9 +70,9 @@ public class StackConfigServiceImpl extends SynapseClientBase implements StackCo
 	@Override
 	public HashMap<String, String> getSynapseProperties(){
 		HashMap<String, String> properties = PortalPropertiesHolder.getPropertiesMap();
-		properties.put(WebConstants.REPO_SERVICE_URL_KEY, StackConfiguration.getRepositoryServiceEndpoint());
-		properties.put(WebConstants.FILE_SERVICE_URL_KEY, StackConfiguration.getFileServiceEndpoint());
-		properties.put(WebConstants.AUTH_PUBLIC_SERVICE_URL_KEY, StackConfiguration.getAuthenticationServicePublicEndpoint());
+		properties.put(WebConstants.REPO_SERVICE_URL_KEY, StackEndpoints.getRepositoryServiceEndpoint());
+		properties.put(WebConstants.FILE_SERVICE_URL_KEY, StackEndpoints.getFileServiceEndpoint());
+		properties.put(WebConstants.AUTH_PUBLIC_SERVICE_URL_KEY, StackEndpoints.getAuthenticationServicePublicEndpoint());
 		properties.put(WebConstants.SYNAPSE_VERSION_KEY, PortalVersionHolder.getVersionInfo());
 		return properties;
 	}

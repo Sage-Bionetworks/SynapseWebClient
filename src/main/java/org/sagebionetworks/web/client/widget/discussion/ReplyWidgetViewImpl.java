@@ -125,11 +125,6 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	}
 
 	@Override
-	public void showDeleteConfirm(String deleteConfirmMessage, Callback deleteCallback) {
-		DisplayUtils.confirmDelete(deleteConfirmMessage, deleteCallback);
-	}
-
-	@Override
 	public void setEditIconVisible(boolean visible) {
 		editIcon.setVisible(visible);
 	}
@@ -156,7 +151,7 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 
 	@Override
 	public void showSuccess(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		DisplayUtils.showInfo(message);
 	}
 	
 	@Override

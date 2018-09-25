@@ -47,7 +47,7 @@ public class APITableColumnRendererDateTest {
 		DateTimeFormat mockDateTimeFormat = mock(DateTimeFormat.class);
 		when(mockGwt.getDateTimeFormat(PredefinedFormat.ISO_8601)).thenReturn(mockDateTimeFormat);
 		when(mockDateTimeFormat.format(any(Date.class))).thenReturn(formattedDate);
-		when(mockDateTimeUtils.convertDateToSmallString(any(Date.class))).thenReturn(formattedDate);
+		when(mockDateTimeUtils.getDateTimeString(any(Date.class))).thenReturn(formattedDate);
 		renderer = new APITableColumnRendererDate(mockGwt, mockDateTimeUtils);
 		columnData = new HashMap<String, List<String>>();
 		config = new APITableColumnConfig();

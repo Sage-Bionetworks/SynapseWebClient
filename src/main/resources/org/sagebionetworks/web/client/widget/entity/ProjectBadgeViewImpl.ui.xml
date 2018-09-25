@@ -5,15 +5,15 @@
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   >
-	<bh:Div>
+	<bh:Div addStyleNames="light-border-bottom" marginBottom="9" paddingBottom="7">
 		<b:Icon ui:field="icon" type="LIST_ALT" addStyleNames="displayInline margin-right-5 lightGreyText"/>
 		<b:Tooltip isHtml="true" placement="RIGHT" ui:field="tooltip" trigger="HOVER">
 			<g:Anchor ui:field="anchor" addStyleNames="displayInline font-size-1-1em"/>
 		</b:Tooltip>
 		<bh:Span ui:field="favoritesWidgetContainer"/>
-		<bh:Span ui:field="additionalTextUI" addStyleNames="margin-left-5">
-			<bh:Span addStyleNames="smallGreyText">Last activity on: </bh:Span>
-			<bh:Span ui:field="additionalText" addStyleNames="smallGreyText"></bh:Span>
+		<bh:Span ui:field="additionalTextUI" addStyleNames="margin-left-5 right">
+			<bh:Span>Last activity on: </bh:Span>
+			<bh:Span ui:field="additionalText" />
 		</bh:Span>
 	</bh:Div>
 </ui:UiBinder>

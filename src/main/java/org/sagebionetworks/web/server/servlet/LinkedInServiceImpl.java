@@ -11,20 +11,12 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.http.entity.ContentType;
-import org.codehaus.jackson.map.util.LinkedNode;
-import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
-import org.sagebionetworks.table.query.model.LikePredicate;
 import org.sagebionetworks.web.client.LinkedInService;
-import org.sagebionetworks.web.server.RestTemplateProvider;
+import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.shared.LinkedInInfo;
-import org.scribe.builder.ServiceBuilder;
-import org.scribe.builder.api.LinkedInApi;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
 import org.scribe.model.Token;
@@ -38,7 +30,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.google.inject.Inject;
 
 public class LinkedInServiceImpl extends RemoteServiceServlet implements
 		LinkedInService, TokenProvider {
@@ -56,22 +47,6 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements
 	private String portalCallbackUrl;
 	
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
-
-	/**
-	 * Injected with Gin
-	 */
-	private ServiceUrlProvider urlProvider;
-
-	/**
-	 * Injected via Gin
-	 * 
-	 * @param provider
-	 */
-	@Inject
-	public void setServiceUrlProvider(ServiceUrlProvider provider) {
-		this.urlProvider = provider;
-	}
-
 	/**
 	 * Returns the authorization URL for LinkedIn as well as any exception that
 	 * occurs and the requestToken secret
@@ -253,15 +228,13 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements
 	 * missing then it cannot run. Public for tests.
 	 */
 	public void validateService(String newCallbackUrl) {
-		if (urlProvider == null)
-			throw new IllegalStateException(
-					"The org.sagebionetworks.rest.api.root.url was not set");
 		if (oAuthService == null || !newCallbackUrl.equals(portalCallbackUrl)) {
 			portalCallbackUrl = newCallbackUrl;
-			oAuthService = new ServiceBuilder().provider(LinkedInApi.class)
-					.apiKey(StackConfiguration.getPortalLinkedInKey())
-					.apiSecret(StackConfiguration.getPortalLinkedInSecret())
-					.callback(portalCallbackUrl + "#!Profile:").build();
+			//TODO: use repo service for this feature (portal has no access to Synapse credentials.
+//			oAuthService = new ServiceBuilder().provider(LinkedInApi.class)
+//					.apiKey(StackConfiguration.getPortalLinkedInKey())
+//					.apiSecret(StackConfiguration.getPortalLinkedInSecret())
+//					.callback(portalCallbackUrl + "#!Profile:").build();
 		}
 	}
 
@@ -284,10 +257,9 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements
 		SynapseClient synapseClient = synapseProvider
 				.createNewClient();
 		synapseClient.setSessionToken(sessionToken);
-		synapseClient.setRepositoryEndpoint(urlProvider
-				.getRepositoryServiceUrl());
-		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
-		synapseClient.setFileEndpoint(StackConfiguration
+		synapseClient.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
+		synapseClient.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
+		synapseClient.setFileEndpoint(StackEndpoints
 				.getFileServiceEndpoint());
 		// Append the portal's version information to the user agent.
 		synapseClient.appendUserAgent(SynapseClientBase.PORTAL_USER_AGENT);

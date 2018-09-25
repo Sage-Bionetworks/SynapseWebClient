@@ -11,8 +11,11 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.widget.asynch.TeamAsyncHandler;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.team.TeamBadgeView;
@@ -39,9 +42,9 @@ public class TeamBadgeTest {
 	@Mock
 	TeamAsyncHandler mockTeamAsyncHandler;
 	@Mock
-	SynapseJavascriptClient mockJsClient;
+	SynapseJSNIUtils mockSnapseJsniUtils;
 	@Mock
-	GlobalApplicationState mockGlobalApplicationState;
+	SynapseProperties mockSynapseProperties;
 	public static final String TEAM_ICON_URL = "http://team.icon.png";
 	public static final String PUBLIC_USER_ID = "222";
 	public static final String AUTHENTICATED_USERS_GROUP_ID = "444";
@@ -51,10 +54,10 @@ public class TeamBadgeTest {
 		team = new Team();
 		team.setName("name");
 		team.setId(principalId);
-		when(mockJsClient.getTeamIconUrl(anyString())).thenReturn(TEAM_ICON_URL);
-		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID)).thenReturn(PUBLIC_USER_ID);
-		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID)).thenReturn(AUTHENTICATED_USERS_GROUP_ID);
-		badge = new TeamBadge(mockView, mockTeamAsyncHandler, mockJsClient, mockGlobalApplicationState);
+		when(mockSnapseJsniUtils.getFileHandleAssociationUrl(anyString(), any(FileHandleAssociateType.class), anyString())).thenReturn(TEAM_ICON_URL);
+		when(mockSynapseProperties.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID)).thenReturn(PUBLIC_USER_ID);
+		when(mockSynapseProperties.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID)).thenReturn(AUTHENTICATED_USERS_GROUP_ID);
+		badge = new TeamBadge(mockView, mockTeamAsyncHandler, mockSynapseProperties, mockSnapseJsniUtils);
 		
 	}
 	

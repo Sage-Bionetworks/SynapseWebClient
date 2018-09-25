@@ -102,17 +102,21 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 				expandClickHandler.onClick(null);
 			}
 			l.addClickHandler(event -> {
-				event.preventDefault();
-				expandClickHandler.onClick(null);
-				presenter.reloadWiki(root);
+				if (!DisplayUtils.isAnyModifierKeyDown(event)) {
+					event.preventDefault();
+					expandClickHandler.onClick(null);
+					presenter.reloadWiki(root);
+				}
 			});
 			for (SubpageNavTreeNode child : root.getChildren()) {
 				addTreeItemsRecursive(subList, child);
 			}
 		} else {
 			l.addClickHandler(event -> {
-				event.preventDefault();
-				presenter.reloadWiki(root);
+				if (!DisplayUtils.isAnyModifierKeyDown(event)) {
+					event.preventDefault();
+					presenter.reloadWiki(root);
+				}
 			});
 		}
 	}
@@ -123,8 +127,8 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

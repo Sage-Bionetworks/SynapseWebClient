@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -35,7 +36,7 @@ public class ReferenceWidgetViewImpl extends FlowPanel implements ReferenceWidge
 				HTMLPanel parentPanel = (HTMLPanel)getParent();
 				Element heading = parentPanel.getElementById(WidgetConstants.FOOTNOTE_ID_WIDGET_PREFIX + id);
 				final Element scrollToElement = heading;
-				Window.scrollTo(0, scrollToElement.getOffsetTop());
+				SynapseJSNIUtilsImpl._scrollIntoView(scrollToElement);
 			}
 		});
 		add(a);

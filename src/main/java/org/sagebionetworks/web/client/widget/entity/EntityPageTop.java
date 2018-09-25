@@ -442,7 +442,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			getTabVisibilityCallback(EntityArea.DOCKER, dockerTab.asTab()).onSuccess(true);
 		} else {
 			// otherwise only show the tabs only if content is present.
-			synapseClient.isWiki(projectHeader.getId(), getTabVisibilityCallback(EntityArea.WIKI, wikiTab.asTab())); 
+			synapseJavascriptClient.isWiki(projectHeader.getId(), getTabVisibilityCallback(EntityArea.WIKI, wikiTab.asTab())); 
 			synapseJavascriptClient.isFileOrFolder(projectHeader.getId(), getTabVisibilityCallback(EntityArea.FILES, filesTab.asTab())); 
 			synapseJavascriptClient.isTable(projectHeader.getId(), getTabVisibilityCallback(EntityArea.TABLES, tablesTab.asTab()));
 			synapseJavascriptClient.isDocker(projectHeader.getId(), getTabVisibilityCallback(EntityArea.DOCKER, dockerTab.asTab()));
@@ -617,7 +617,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				public void noWikiFound() {
 					if (isWikiTabShown && projectBundle.getRootWikiId() != null && !projectBundle.getRootWikiId().equals(wikiAreaToken)) {
 						// attempted to load a wiki, but it was not found.  Show a message, and redirect to the root.
-						view.showInfo("Wiki not found (id=" + wikiAreaToken + "), loading root wiki page instead.","");
+						view.showInfo("Wiki not found (id=" + wikiAreaToken + "), loading root wiki page instead.");
 						wikiTab.asTab().setContentStale(true);
 						wikiAreaToken = projectBundle.getRootWikiId();
 						configureWikiTab();	

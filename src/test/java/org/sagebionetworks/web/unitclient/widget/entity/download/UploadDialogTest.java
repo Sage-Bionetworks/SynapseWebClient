@@ -41,7 +41,7 @@ public class UploadDialogTest {
 		boolean isEntity = true;
 		widget.configure(title, entity, parentEntityId, handler, fileHandleIdCallback, isEntity);
 		
-		verify(mockUploader).asWidget(entity, parentEntityId, fileHandleIdCallback, isEntity);
+		verify(mockUploader).configure(entity, parentEntityId, fileHandleIdCallback, isEntity);
 		verify(view).configureDialog(eq(title), any(Widget.class));
 		
 		verify(mockUploader).clearHandlers();

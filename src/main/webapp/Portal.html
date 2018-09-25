@@ -1,5 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
+<!DOCTYPE html>
+<html dir="ltr" lang="en-US">
 	<head>
 		<title>Synapse | Sage Bionetworks</title>
 		<meta name="description" content="Synapse is a platform for supporting scientific collaborations centered around shared biomedical data sets.  Our goal is to make biomedical research more transparent, more reproducible, and more accessible to a broader audience of scientists.  Synapse serves as the host site for a variety of scientific collaborations, individual research projects, and DREAM challenges." />
@@ -34,12 +34,12 @@
 		<meta http-equiv="pragma" content="no-cache" />
 		<!-- end cache control -->
 		
-		<link rel="icon" type="image/png"  href="favicon.png?v=3" />
+		<link rel="icon" href="favicon.png?v=4" />
 		<link href="/opensearch.xml" rel="search" title="Synapse" type="application/opensearchdescription+xml" />
 		<link rel="manifest" href="manifest.json" />
-		
+		<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Lato" />
 		<!-- Google Analytics -->
-		<script type="text/javascript">
+		<script>
 			window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
 			ga('create', 'UA-29804340-1', 'auto');
 			ga('send', 'pageview');
@@ -48,48 +48,51 @@
 		
 		
 		<script>
-			// determine cdn endpoint (staging, prod, or dev)
+			// determine cdn endpoint (staging or prod, do not use a cdn for local or dev builds)
 			var cdnEndpoint = "//cdn-" + location.hostname + "/";
-			var localhostRegex = /^(127[.]{1}0[.]{1}0[.]{1}1)$|^(localhost)$/;
-			if (localhostRegex.test(location.hostname)) {
+			var synapseOrgRegex = /(www|staging|tst)\.synapse\.org$/;
+			if (!synapseOrgRegex.test(location.hostname)) {
 				cdnEndpoint = "";
 			}
 			window.cdnEndpoint = cdnEndpoint;
 			
 			var link = document.createElement( "link" );
-			link.href = cdnEndpoint + "loading.css";
-			link.type = "text/css";
+			link.href = cdnEndpoint + "loadinglogo.css";
 			link.rel = "stylesheet";
 			document.head.appendChild(link);
 
 			var script = document.createElement('script');
 			script.onload = function () {
-				head.load("Portal.css");
+				head.load(cdnEndpoint + "Portal8.css");
+				head.load(cdnEndpoint + "css/bootstrap-custom-theme.min.css?v=1");
 				head.load("//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js");
 				head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js");
-				head.load(cdnEndpoint + "js/spark-md5.min.js");
-				head.load(cdnEndpoint + "js/swfobject/swfobject.js");
+				head.load("https://cdn.pendo.io/agent/static/f155f8f7-30b9-4cc3-671a-70f99f803504/pendo.js");
+				head.load("//cdn.jsdelivr.net/npm/moment@2.22.1/min/moment.min.js");
+				head.load("//cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.1.8/jsPlumb.min.js");
+				head.load("//cdnjs.cloudflare.com/ajax/libs/swfobject/2.2/swfobject.min.js");
 				head.load(cdnEndpoint + "js/jquery.tablesorter.min.js");
 				head.load(cdnEndpoint + "js/jquery.tablesorter.scinot.js");
-				head.load(cdnEndpoint + "js/highlight.pack.js");
-				head.load("//cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.1.8/jsPlumb.min.js");
-				head.load(cdnEndpoint + "js/init-nchart.js");
-				head.load("//cdn.jsdelivr.net/npm/moment@2.21.0/min/moment.min.js");
-				head.load("//cdn.jsdelivr.net/markdown-it/6.0.0/markdown-it.min.js");
-				head.load(cdnEndpoint + "js/markdown-it-plugins-11.min.js");
-				head.load(cdnEndpoint + "js/polyfill.js");
-				head.load(cdnEndpoint + "js/xss.min.js");
-				head.load(cdnEndpoint + "js/pica.min.js");
-				head.load("//www.google-analytics.com/analytics.js");
-				head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css");
-				head.load("//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css");
+				head.load(cdnEndpoint + "icons/font/synapseicons.css?v=1");
 				head.load("//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css");
+				head.load(cdnEndpoint + "js/highlight.pack.js");
+				head.load(cdnEndpoint + "js/init-nchart.js");
+				head.load("//cdn.jsdelivr.net/markdown-it/6.0.0/markdown-it.min.js");
+				head.load(cdnEndpoint + "js/markdown-it-plugins-15.min.js");
+				head.load(cdnEndpoint + "js/polyfill-2.js");
+				head.load(cdnEndpoint + "js/details-shim.min.js");
+				head.load(cdnEndpoint + "js/xss.min.js");
+				head.load("//cdnjs.cloudflare.com/ajax/libs/pica/4.1.1/pica.min.js");
+				head.load("//www.google-analytics.com/analytics.js");
 				head.load("https://unpkg.com/react@16.2.0/umd/react.production.min.js");
 				head.load("https://unpkg.com/react-dom@16.2.0/umd/react-dom.production.min.js");
-				head.load("https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.1/croppie.min.css");
-				head.load("https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.1/croppie.min.js");
-				head.load("https://cdn.pendo.io/agent/static/f155f8f7-30b9-4cc3-671a-70f99f803504/pendo.js");
+				head.load("https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.2/croppie.min.js");
+				head.load("//cdnjs.cloudflare.com/ajax/libs/spark-md5/3.0.0/spark-md5.min.js");
 				head.load(cdnEndpoint + "js/diff/diffview.css");
+				head.load(cdnEndpoint + "css/details-shim.min.css");
+				head.load("https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.2/croppie.min.css");
+				head.load("//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css");
+				head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.css");
 			};
 			script.src = cdnEndpoint + "js/head.load.min.js";
 			document.head.appendChild(script);
@@ -126,40 +129,25 @@
 			</noscript>
             
             <div style="display:none;">
-              <form id="login_form" method="post" target='hiddeniframe'>
-                <input id="synapse_username" name="username"/>
-                <input id="synapse_password" name="password" type="password"/>
-                <input id="synapse_signin_btn" name="signInBtn" type="submit" />
-                <iframe name='hiddeniframe'></iframe>
-              </form>
+				<form id="login_form" target="hiddeniframe" role="form" class="signin-panel margin-top-15" method="post" action="/expect_405">
+					<input id="synapse_username" type="text" name="uname">
+					<input id="synapse_password" name="psw" type="password">
+					<button id="synapse_signin_btn" type="submit">Sign in</button>
+					<iframe name='hiddeniframe' style="display:none;"></iframe>
+				</form>
             </div>
             
             <!-- This is the GWT-generated body -->
 			<div id="alertWrapper">
 				<div id="alertContainer"></div>
 			</div>
-			<div id="headerPanel"></div>
-			<div id="rootPanel"></div>
-			<div id="footerPanel"></div>
 			<div id="initialLoadingUI" style="padding-top: 180px">
-				<div class="sk-circle" style="width: 80px; height: 80px;">
-					<div class="sk-circle1 sk-child"></div>
-					<div class="sk-circle2 sk-child"></div>
-					<div class="sk-circle3 sk-child"></div>
-					<div class="sk-circle4 sk-child"></div>
-					<div class="sk-circle5 sk-child"></div>
-					<div class="sk-circle6 sk-child"></div>
-					<div class="sk-circle7 sk-child"></div>
-					<div class="sk-circle8 sk-child"></div>
-					<div class="sk-circle9 sk-child"></div>
-					<div class="sk-circle10 sk-child"></div>
-					<div class="sk-circle11 sk-child"></div>
-					<div class="sk-circle12 sk-child"></div>
-				</div>
-				<center>
-					<h4 style="color: #1e7098; margin-top: 10px; font-family: Sans-serif">Loading...</h4>
-				</center>
+				<div class="spinner" style="width:80px; height:80px; background-size:80px 80px;"> </div>
+				<h4 style="color: #1e7098; margin-top: 10px; font-family: Sans-serif; text-align:center">Loading...</h4>
 			</div>
+			<div id="headerPanel" class="zeroOpacity"></div>
+			<div id="rootPanel" class="zeroOpacity"></div>
+			<div id="footerPanel"></div>
 		</div>
 		<div class="clear"></div>
 	</body>

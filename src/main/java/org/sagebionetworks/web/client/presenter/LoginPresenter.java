@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.ChangeUsername;
+import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
@@ -91,7 +92,8 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		String token = place.toToken();
 		if(LoginPlace.LOGOUT_TOKEN.equals(token)) {
 			authenticationController.logoutUser();
-			view.showLogout();
+			view.showInfo(DisplayConstants.LOGOUT_TEXT);
+			globalApplicationState.getPlaceChanger().goTo(new Home(ClientProperties.DEFAULT_PLACE_TOKEN));
 		} else if (WebConstants.OPEN_ID_UNKNOWN_USER_ERROR_TOKEN.equals(token)) {
 			// User does not exist, redirect to Registration page
 			view.showErrorMessage(DisplayConstants.CREATE_ACCOUNT_MESSAGE_SSO);
@@ -169,16 +171,8 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	
 	public void showTermsOfUse(final Callback callback) {
 		synAlert.clear();
-		authenticationController.getTermsOfUse(new AsyncCallback<String>() {
-			public void onSuccess(String termsOfUseContents) {
-				view.hideLoggingInLoader();
-				view.showTermsOfUse(termsOfUseContents, callback);		
-			}
-			public void onFailure(Throwable t) {
-				synAlert.handleException(t);
-				view.showLogin();									
-			}
-		});
+		view.hideLoggingInLoader();
+		view.showTermsOfUse(callback);		
 	}
 	
 	public void userAuthenticated() {

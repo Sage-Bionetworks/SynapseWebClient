@@ -14,7 +14,6 @@ public class ClientProperties {
 	public static final String DEFAULT_PLACE_TOKEN = "0";
 	
 	public static final String SYNAPSE_ID_PREFIX = "syn";
-	public static final Character[] ESCAPE_CHARACTERS = new Character[] { '.','{','}','(',')','+','-' };
 	
 	public static final String[] IMAGE_CONTENT_TYPES = new String[] {"image/bmp","image/pjpeg","image/jpeg","image/jpg", "image/jpe","image/gif","image/png", "image/svg+xml"};
 	public static final HashSet<String> IMAGE_CONTENT_TYPES_SET = new HashSet<String>(Arrays.asList(IMAGE_CONTENT_TYPES));
@@ -36,7 +35,6 @@ public class ClientProperties {
 	 */
 	public static final String IMAGE_CENTERING_TABLE_START = "<table width=\"100%\" height=\"100%\" align=\"center\" valign=\"center\"><tr><td>";
 	public static final String IMAGE_CENTERING_TABLE_END = "</td></tr></table>";
-	public static final String STYLE_BREAK_WORD = "break-word";
 	public static final String STYLE_DISPLAY_INLINE = "inline-block";
 	
 	/*
@@ -45,7 +43,6 @@ public class ClientProperties {
 	public static final WebResource SYNAPSE_REACT_COMPONENTS_JS = new WebResource("js/react-components/synapse-react-components.min.js", ResourceType.JAVASCRIPT);
 	public static final WebResource MATHJAX_LOADER_JS = new WebResource("js/mathjax-loader.js", ResourceType.JAVASCRIPT);
 	public static final WebResource MATHJAX_JS = new WebResource("https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=default", ResourceType.JAVASCRIPT);
-	public static final WebResource TWITTER_JS = new WebResource("https://platform.twitter.com/widgets.js", ResourceType.JAVASCRIPT);
 	public static final WebResource PLOTLY_JS = new WebResource("https://cdn.plot.ly/plotly-1.33.1.min.js", ResourceType.JAVASCRIPT);
 	public static final WebResource PLOTLY_REACT_JS = new WebResource("https://unpkg.com/react-plotly.js@1.3.0/dist/create-plotly-component.min.js", ResourceType.JAVASCRIPT);
 	public static final WebResource AWS_SDK_JS = new WebResource("js/aws-sdk-2.86.0.min.js", ResourceType.JAVASCRIPT);

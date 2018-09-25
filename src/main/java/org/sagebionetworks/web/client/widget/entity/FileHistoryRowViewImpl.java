@@ -21,8 +21,6 @@ public class FileHistoryRowViewImpl implements FileHistoryRowView {
 	public interface Binder extends UiBinder<Widget, FileHistoryRowViewImpl> {}
 	
 	@UiField
-	FormControlStatic versionName;
-	@UiField
 	Anchor versionNameLink;
 	@UiField
 	FormControlStatic versionComment;
@@ -66,7 +64,6 @@ public class FileHistoryRowViewImpl implements FileHistoryRowView {
 	public void configure(Long versionNumber, String versionLinkHref, String versionName,
 			String modifiedByUserId, String modifiedOn, String size,
 			String md5, String versionComment, Callback deleteCallback) {
-		this.versionName.setText(versionName);
 		this.versionNameLink.setText(versionName);
 		this.modifiedOn.setText(modifiedOn);
 		this.versionComment.setText(versionComment);
@@ -87,8 +84,9 @@ public class FileHistoryRowViewImpl implements FileHistoryRowView {
 		deleteButton.setVisible(canEdit);
 	}
 	@Override
-	public void setIsVersionLink(boolean isLink) {
-		versionNameLink.setVisible(isLink);
-		versionName.setVisible(!isLink);
+	public void setIsVersionSelected(boolean isVersionSelected) {
+		if (isVersionSelected) {
+			versionNameLink.addStyleName("boldText");
+		}
 	}
 }

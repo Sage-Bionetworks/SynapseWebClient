@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityId;
 import org.sagebionetworks.repo.model.EntityInstanceFactory;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -27,6 +28,7 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.asynch.AsyncJobId;
+import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBodyInstanceFactory;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
@@ -37,14 +39,24 @@ import org.sagebionetworks.repo.model.discussion.EntityThreadCounts;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.discussion.MessageURL;
 import org.sagebionetworks.repo.model.discussion.ThreadCount;
+import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.doi.v2.Doi;
+import org.sagebionetworks.repo.model.doi.v2.DoiResponse;
+import org.sagebionetworks.repo.model.file.AddPartResponse;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
+import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlResponse;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
+import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
+import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.file.UploadDestinationInstanceFactory;
+import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.subscription.SubscriberCount;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
+import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -67,6 +79,8 @@ public class SynapseJavascriptFactory {
 		WikiPage,
 		ListWrapperUserProfile,
 		ListWrapperTeam,
+		ListWrapperUploadDestinations,
+		SubscriptionPagedResults,
 		UserGroupHeaderResponse,
 		UserBundle,
 		Count,
@@ -76,6 +90,7 @@ public class SynapseJavascriptFactory {
 		V2WikiPage,
 		V2WikiOrderHint,
 		DockerRepository,
+		PaginatedDockerCommit,
 		FileEntity,
 		Project,
 		Folder,
@@ -84,6 +99,7 @@ public class SynapseJavascriptFactory {
 		Link,
 		Preview,
 		Entity, // used for services where we don't know what type of entity is returned (but object has concreteType set)
+		EntityId,
 		Forum,
 		DiscussionThreadBundle,
 		DiscussionReplyBundle,
@@ -107,6 +123,12 @@ public class SynapseJavascriptFactory {
 		ChallengePagedResults,
 		Etag,
 		Activity,
+		MultipartUploadStatus,
+		BatchPresignedUploadUrlResponse,
+		AddPartResponse,
+		PaginatedResultsTotalNumberOfResults,
+		PrincipalAliasResponse,
+		Doi,
 		None,
 		String
 	}
@@ -196,8 +218,16 @@ public class SynapseJavascriptFactory {
 			return new UserProfile(json);
 		case FileHandleResults :
 			return new FileHandleResults(json).getList();
+		case PaginatedResultsTotalNumberOfResults :
+			return json.getLong("totalNumberOfResults");
+		case PrincipalAliasResponse :
+			return new PrincipalAliasResponse(json);
+		case EntityId :
+			return new EntityId(json).getId();
 		case ChallengePagedResults:
 			return new ChallengePagedResults(json).getResults();
+		case SubscriptionPagedResults :
+			return new SubscriptionPagedResults(json);
 		case JSON :
 			return json;
 		case PaginatedResultsEntityHeader :
@@ -209,6 +239,15 @@ public class SynapseJavascriptFactory {
 				entityHeaderList.add(new EntityHeader(jsonObject));
 			}
 			return entityHeaderList;
+		case PaginatedDockerCommit :
+			// json really represents a PaginatedResults (cannot reference here in js)
+			List<DockerCommit> dockerCommitList = new ArrayList<>();
+			JSONArrayAdapter dockerCommitJsonArray = json.getJSONArray("results");
+			for (int i = 0; i < dockerCommitJsonArray.length(); i++) {
+				JSONObjectAdapter jsonObject = dockerCommitJsonArray.getJSONObject(i);
+				dockerCommitList.add(new DockerCommit(jsonObject));
+			}
+			return dockerCommitList;
 		case PaginatedResultProjectHeader : 
 			// json really represents a PaginatedResults (cannot reference here in js)
 			List<ProjectHeader> projectHeaderList = new ArrayList<>();
@@ -253,6 +292,20 @@ public class SynapseJavascriptFactory {
 				teamList.add(new Team(jsonObject));
 			}
 			return teamList;
+		case ListWrapperUploadDestinations :
+			List<UploadDestination> uploadDestinationList = new ArrayList<>();
+			UploadDestinationInstanceFactory uploadDestinationFactory = UploadDestinationInstanceFactory.singleton();
+			JSONArrayAdapter jsonUploadDestinationsArray = json.getJSONArray("list");
+			for (int i = 0; i < jsonUploadDestinationsArray.length(); i++) {
+				JSONObjectAdapter jsonObject = jsonUploadDestinationsArray.getJSONObject(i);
+				String concreteType = jsonObject.getString("concreteType");
+				UploadDestination response = uploadDestinationFactory.newInstance(concreteType);
+				response.initializeFromJSONObject(jsonObject);
+				uploadDestinationList.add(response);
+			}
+			return uploadDestinationList;
+		case Doi:
+			return new Doi(json);
 		case MembershipInvitation:
 			return new MembershipInvitation(json);
 		case InviteeVerificationSignedToken:
@@ -267,6 +320,12 @@ public class SynapseJavascriptFactory {
 			return new Etag(json);
 		case Activity:
 			return new Activity(json);
+		case MultipartUploadStatus : 
+			return new MultipartUploadStatus(json);
+		case BatchPresignedUploadUrlResponse :
+			return new BatchPresignedUploadUrlResponse(json);
+		case AddPartResponse :
+			return new AddPartResponse(json);
 		default:
 			throw new IllegalArgumentException("No match found for : "+ type);
 		}

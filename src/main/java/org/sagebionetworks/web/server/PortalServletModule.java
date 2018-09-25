@@ -15,7 +15,6 @@ import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
 import org.sagebionetworks.web.server.servlet.DataAccessClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionMessageServlet;
-import org.sagebionetworks.web.server.servlet.DockerClientImpl;
 import org.sagebionetworks.web.server.servlet.FileEntityResolverServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleAssociationServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
@@ -23,18 +22,17 @@ import org.sagebionetworks.web.server.servlet.FileUploaderJnlp;
 import org.sagebionetworks.web.server.servlet.JiraClientImpl;
 import org.sagebionetworks.web.server.servlet.JiraJavaClient;
 import org.sagebionetworks.web.server.servlet.JiraJavaClientImpl;
-import org.sagebionetworks.web.server.servlet.LayoutServiceImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
-import org.sagebionetworks.web.server.servlet.MultipartFileUploadClientImpl;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
 import org.sagebionetworks.web.server.servlet.SlackServlet;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
 import org.sagebionetworks.web.server.servlet.SubscriptionClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
-import org.sagebionetworks.web.server.servlet.UserProfileAttachmentServlet;
 import org.sagebionetworks.web.server.servlet.UserProfileClientImpl;
+import org.sagebionetworks.web.server.servlet.filter.DigitalHealthFilter;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
+import org.sagebionetworks.web.server.servlet.filter.MHealthFilter;
 import org.sagebionetworks.web.server.servlet.filter.PlacesRedirectFilter;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.RegisterAccountFilter;
@@ -73,6 +71,11 @@ public class PortalServletModule extends ServletModule {
 		bind(DreamFilter.class).in(Singleton.class);
 		filter("/dream").through(DreamFilter.class);
 		
+		bind(DigitalHealthFilter.class).in(Singleton.class);
+		filter("/digitalhealth").through(DigitalHealthFilter.class);
+		bind(MHealthFilter.class).in(Singleton.class);
+		filter("/mHealth").through(MHealthFilter.class);
+		
 		bind(RegisterAccountFilter.class).in(Singleton.class);
 		filter("/" + RegisterAccountFilter.URL_PATH).through(RegisterAccountFilter.class);
 		
@@ -98,10 +101,6 @@ public class PortalServletModule extends ServletModule {
 		
 		bind(UserProfileClientImpl.class).in(Singleton.class);
 		serve("/Portal/userprofileclient").with(UserProfileClientImpl.class);
-		
-		// setup the layout service
-		bind(LayoutServiceImpl.class).in(Singleton.class);
-		serve("/Portal/layout").with(LayoutServiceImpl.class);
 		
 		// Setup the User Account service mapping
 		bind(UserAccountServiceImpl.class).in(Singleton.class);
@@ -131,20 +130,9 @@ public class PortalServletModule extends ServletModule {
 		bind(AliasRedirectorServlet.class).in(Singleton.class);
 		serve("/Portal/"+WebConstants.ALIAS_REDIRECTOR_SERVLET).with(AliasRedirectorServlet.class);
 
-
-		// Multipart file upload
-		bind(MultipartFileUploadClientImpl.class).in(Singleton.class);
-		serve("/Portal/multipartFileUploadClient").with(MultipartFileUploadClientImpl.class);
-
-		
 		// FileHandle upload
 		bind(FileEntityResolverServlet.class).in(Singleton.class);
 		serve("/Portal/"+WebConstants.FILE_ENTITY_RESOLVER_SERVLET).with(FileEntityResolverServlet.class);
-				
-		
-		// User Profile Attachment (photo)
-		bind(UserProfileAttachmentServlet.class).in(Singleton.class);
-		serve("/Portal/profileAttachment").with(UserProfileAttachmentServlet.class);
 		
 		// Setup the LinkedIn service mapping
 		bind(LinkedInServiceImpl.class).in(Singleton.class);
@@ -157,10 +145,6 @@ public class PortalServletModule extends ServletModule {
 		// Discussion message download
 		bind(DiscussionMessageServlet.class).in(Singleton.class);
 		serve("/Portal"+WebConstants.DISCUSSION_MESSAGE_SERVLET).with(DiscussionMessageServlet.class);
-
-		// Setup the Docker service mapping
-		bind(DockerClientImpl.class).in(Singleton.class);
-		serve("/Portal/dockerclient").with(DockerClientImpl.class);
 
 		//Jira client service mapping
 		bind(JiraClientImpl.class).in(Singleton.class);

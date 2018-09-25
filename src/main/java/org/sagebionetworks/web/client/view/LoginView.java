@@ -15,11 +15,9 @@ public interface LoginView extends IsWidget, SynapseView {
 	
 	void hideLoggingInLoader();
 	
-	void showLogout();
-	
 	void showLogin();	
 	
-	void showTermsOfUse(String content, Callback callback);
+	void showTermsOfUse(Callback callback);
 
 	void setSynAlert(IsWidget w);
 	

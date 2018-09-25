@@ -8,6 +8,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -34,6 +35,7 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 	SynapseJavascriptClient jsClient;
 	WikiPageDeleteConfirmationDialog wikiPageDeleteConfirmationDialog;
 	PortalGinInjector ginInjector;
+	PopupUtilsView popupUtils;
 	
 	@Inject
 	public WikiMarkdownEditor(
@@ -41,12 +43,14 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 			MarkdownEditorWidget editor,
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
-			SynapseJavascriptClient jsClient, 
-			PortalGinInjector ginInjector) {
+			SynapseJavascriptClient jsClient,
+			PortalGinInjector ginInjector,
+			PopupUtilsView popupUtils) {
 		this.view = view;
 		this.editor = editor;
 		this.synapseClient = synapseClient;
 		this.ginInjector = ginInjector;
+		this.popupUtils = popupUtils;
 		fixServiceEntryPoint(synapseClient);
 		this.globalApplicationState = globalApplicationState;
 		this.jsClient = jsClient;
@@ -183,13 +187,24 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 	}
 	
 	public void cancelClicked() {
+		if (!editor.getMarkdown().equals(currentPage.getMarkdown())) {
+			// markdown has changed, confirm before closing
+			popupUtils.showConfirmDialog(DisplayConstants.UNSAVED_CHANGES, DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, () -> {
+				cancelAfterConfirm();
+			});
+		} else {
+			cancelAfterConfirm();
+		}
+	}
+
+	public void cancelAfterConfirm() {
 		globalApplicationState.setIsEditing(false);
 		view.hideEditorModal();
 		//TODO: update should not be necessary, but widget loading is based on div ids that are overloaded when the formatting guide is initialized
 		if (wikiPageUpdatedHandler != null)
 			wikiPageUpdatedHandler.invoke(currentPage);
 	}
-
+	
 	public void hideEditorModal() {
 		view.hideEditorModal();
 	}

@@ -49,6 +49,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
+import org.sagebionetworks.web.client.widget.doi.CreateOrUpdateDoiModal;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
@@ -103,6 +104,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public static final String RENAME_PREFIX = "Rename ";
 	
 	public static final int IS_ACT_MEMBER_MASK = 0x20;
+
+	public static final String CREATE_DOI_FOR = "Create DOI for  ";
+	public static final String UPDATE_DOI_FOR = "Update DOI for  ";
+
 	EntityArea currentArea;
 	
 	EntityActionControllerView view;
@@ -127,7 +132,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	boolean isCurrentVersion;
 	ActionMenuWidget actionMenu;
 	EntityUpdatedHandler entityUpdateHandler;
-	UploadDialogWidget uploader;
 	WikiMarkdownEditor wikiEditor;
 	ProvenanceEditorWidget provenanceEditor;
 	StorageLocationWidget storageLocationEditor;
@@ -135,6 +139,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	CookieProvider cookies;
 	ChallengeClientAsync challengeClient;
 	SelectTeamModal selectTeamModal;
+	CreateOrUpdateDoiModal createOrUpdateDoiModal;
 	ApproveUserAccessModal approveUserAccessModal;
 	PortalGinInjector ginInjector;
 	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
@@ -212,6 +217,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		return selectTeamModal;
 	}
 	
+	private CreateOrUpdateDoiModal getCreateOrUpdateDoiModal() {
+		if (createOrUpdateDoiModal == null) {
+			createOrUpdateDoiModal = ginInjector.getCreateOrUpdateDoiModal();
+			view.addWidget(createOrUpdateDoiModal.asWidget());
+		}
+		return createOrUpdateDoiModal;
+	}
+
 	private ChallengeClientAsync getChallengeClient() {
 		if (challengeClient == null) {
 			challengeClient = ginInjector.getChallengeClientAsync();
@@ -302,12 +315,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		return submitter;
 	}
 	
-	private UploadDialogWidget getUploadDialogWidget() {
-		if (uploader == null) {
-			uploader = ginInjector.getUploadDialogWidget();
-			view.addWidget(uploader.asWidget());
-		}
-		return uploader;
+	private UploadDialogWidget getNewUploadDialogWidget() {
+		UploadDialogWidget uploadDialogWidget = ginInjector.getUploadDialogWidget();
+		view.setUploadDialogWidget(uploadDialogWidget.asWidget());
+		return uploadDialogWidget;
 	}
 	private WikiMarkdownEditor getWikiMarkdownEditor() {
 		if (wikiEditor == null) {
@@ -375,6 +386,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureFileUpload();
 		configureProvenance();
 		configureChangeStorageLocation();
+		configureCreateOrUpdateDoi();
 		configureCreateDOI();
 		configureEditProjectMetadataAction();
 		configureEditFileMetadataAction();
@@ -447,7 +459,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		getChallengeClient().createChallenge(c, new AsyncCallback<Challenge>() {
 			@Override
 			public void onSuccess(Challenge v) {
-				view.showInfo(DisplayConstants.CHALLENGE_CREATED, "");
+				view.showInfo(DisplayConstants.CHALLENGE_CREATED);
 				// go to challenge tab
 				Place gotoPlace = new Synapse(entity.getId(), null, EntityArea.ADMIN, null);
 				getGlobalApplicationState().getPlaceChanger().goTo(gotoPlace);
@@ -481,17 +493,21 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureCreateDOI() {
-		boolean canEdit = permissions.getCanEdit();
-		actionMenu.setActionVisible(Action.CREATE_DOI, false);
-		if (canEdit &&
-				!isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea) &&
-				!(entityBundle.getEntity() instanceof EntityView)) {
-			actionMenu.setActionListener(Action.CREATE_DOI, this);
-			if (entityBundle.getDoi() == null) {
-				// show command if not returned, thus not in existence
-				actionMenu.setActionVisible(Action.CREATE_DOI, true);
-				actionMenu.setActionText(Action.CREATE_DOI, "Create DOI for  " + enityTypeDisplay);
+		if (!DisplayUtils.isInTestWebsite(cookies)) {
+			boolean canEdit = permissions.getCanEdit();
+			actionMenu.setActionVisible(Action.CREATE_DOI, false);
+			if (canEdit &&
+					!isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea) &&
+					!(entityBundle.getEntity() instanceof EntityView)) {
+				actionMenu.setActionListener(Action.CREATE_DOI, this);
+				if (entityBundle.getDoi() == null) {
+					// show command if not returned, thus not in existence
+					actionMenu.setActionVisible(Action.CREATE_DOI, true);
+					actionMenu.setActionText(Action.CREATE_DOI, CREATE_DOI_FOR + enityTypeDisplay);
+				}
 			}
+		} else {
+			actionMenu.setActionVisible(Action.CREATE_DOI, false);
 		}
 	}
 	
@@ -540,7 +556,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		getSynapseClient().createDoi(entity.getId(), getVersion(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void v) {
-				view.showInfo(DisplayConstants.DOI_REQUEST_SENT_TITLE, DisplayConstants.DOI_REQUEST_SENT_MESSAGE);
+				view.showInfo(DisplayConstants.DOI_REQUEST_SENT_TITLE + DisplayConstants.DOI_REQUEST_SENT_MESSAGE);
 				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
 			}
 			@Override
@@ -548,6 +564,31 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				view.showErrorMessage(caught.getMessage());
 			}
 		});
+	}
+
+	private void configureCreateOrUpdateDoi() {
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			boolean canEdit = permissions.getCanEdit();
+			actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
+			if (canEdit &&
+					!isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea) &&
+					!(entityBundle.getEntity() instanceof EntityView)) {
+				actionMenu.setActionListener(Action.CREATE_OR_UPDATE_DOI, this);
+				actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
+				if (entityBundle.getDoiAssociation() == null) {
+					// show command if not returned, thus not in existence
+					actionMenu.setActionText(Action.CREATE_OR_UPDATE_DOI, CREATE_DOI_FOR + enityTypeDisplay);
+				} else {
+					actionMenu.setActionText(Action.CREATE_OR_UPDATE_DOI, UPDATE_DOI_FOR + enityTypeDisplay);
+				}
+			}
+		} else {
+			actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
+		}
+	}
+
+	private void onCreateOrUpdateDoi() {
+		getCreateOrUpdateDoiModal().configureAndShow(entity.getId(), ObjectType.ENTITY, getVersion(), entityUpdateHandler);
 	}
 
 	private void onCreateChallenge() {
@@ -575,7 +616,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		getChallengeClient().deleteChallenge(currentChallengeId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo(DELETED, THE + "challenge" + WAS_SUCCESSFULLY_DELETED); 
+				view.showInfo(THE + "challenge" + WAS_SUCCESSFULLY_DELETED); 
 				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
 			}
 			
@@ -790,8 +831,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.SHARE, true);
 			actionMenu.setActionListener(Action.SHARE, this);
 			actionMenu.setActionText(Action.SHARE, enityTypeDisplay + " Sharing Settings");
-			GlobalApplicationState globalAppState = getGlobalApplicationState();
-			if(PublicPrivateBadge.isPublic(entityBundle.getBenefactorAcl(), globalAppState.getPublicPrincipalIds())){
+			if(PublicPrivateBadge.isPublic(entityBundle.getBenefactorAcl(), ginInjector.getSynapseProperties().getPublicPrincipalIds())){
 				actionMenu.setActionIcon(Action.SHARE, IconType.GLOBE);
 			}else{
 				actionMenu.setActionIcon(Action.SHARE, IconType.LOCK);
@@ -929,6 +969,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case CREATE_DOI:
 			onCreateDOI();
 			break;
+		case CREATE_OR_UPDATE_DOI:
+			onCreateOrUpdateDoi();
+			break;
 		case ADD_EVALUATION_QUEUE:
 			onAddEvaluationQueue();
 			break;
@@ -1006,7 +1049,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		preflightController.checkCreateEntity(entityBundle, EntityView.class.getName(), new Callback() {
 			@Override
 			public void invoke() {
-				postCheckCreateTableOrView(TableType.fileview);
+				postCheckCreateTableOrView(TableType.files);
 			}
 		});
 	}
@@ -1015,7 +1058,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		preflightController.checkCreateEntity(entityBundle, EntityView.class.getName(), new Callback() {
 			@Override
 			public void invoke() {
-				postCheckCreateTableOrView(TableType.projectview);
+				postCheckCreateTableOrView(TableType.projects);
 			}
 		});
 	}
@@ -1038,7 +1081,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		preflightController.checkUploadToEntity(this.entityBundle, new Callback() {
 			@Override
 			public void invoke() {
-				UploadDialogWidget uploader = getUploadDialogWidget();
+				UploadDialogWidget uploader = getNewUploadDialogWidget();
 				uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, null,
 						entityBundle.getEntity().getId(), entityUpdateHandler, null, true);
 				uploader.setUploaderLinkNameVisible(true);
@@ -1109,10 +1152,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void postCheckUploadFile(){
-		getUploadDialogWidget().configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, entityUpdateHandler, null, true);
-		getUploadDialogWidget().disableMultipleFileUploads();
-		getUploadDialogWidget().setUploaderLinkNameVisible(false);
-		getUploadDialogWidget().show();
+		UploadDialogWidget uploadDialogWidget = getNewUploadDialogWidget();
+		uploadDialogWidget.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, entityUpdateHandler, null, true);
+		uploadDialogWidget.disableMultipleFileUploads();
+		uploadDialogWidget.setUploaderLinkNameVisible(false);
+		uploadDialogWidget.show();
 	}
 
 	private void onSubmit() {
@@ -1172,7 +1216,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			
 			@Override
 			public void onSuccess(Entity result) {
-				view.showInfo(DisplayConstants.TEXT_LINK_SAVED, DisplayConstants.TEXT_LINK_SAVED);
+				view.showInfo(DisplayConstants.TEXT_LINK_SAVED);
 			}
 			
 			@Override
@@ -1303,14 +1347,13 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			getSynapseClient().createV2WikiPageWithV1(entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), page, new AsyncCallback<WikiPage>() {
 	            @Override
 	            public void onSuccess(WikiPage result) {
-	                view.showInfo("'" + name + "' Page Added", "");
+	                view.showInfo("'" + name + "' Page Added");
 	                Synapse newPlace = new Synapse(entityBundle.getEntity().getId(), getVersion(), EntityArea.WIKI, result.getId());
 	                getGlobalApplicationState().getPlaceChanger().goTo(newPlace);
 	            }
 	            @Override
 	            public void onFailure(Throwable caught) {
-	                if(!DisplayUtils.handleServiceException(caught, getGlobalApplicationState(), authenticationController.isLoggedIn(), view))
-	                    view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED + ": " + caught.getMessage());
+	            	view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED + ": " + caught.getMessage());
 	            }
 	        });
 		}
@@ -1438,7 +1481,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		getSynapseJavascriptClient().deleteEntityById(entityId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo(DELETED, THE + enityTypeDisplay + WAS_SUCCESSFULLY_DELETED); 
+				view.showInfo(THE + enityTypeDisplay + WAS_SUCCESSFULLY_DELETED); 
 				// Go to entity's parent
 				Place gotoPlace = createDeletePlace();
 				getGlobalApplicationState().getPlaceChanger().goTo(gotoPlace);
@@ -1446,9 +1489,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, getGlobalApplicationState(),isUserAuthenticated, view)) {
-					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);			
-				}
+				view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);			
 			}
 		});
 	}
@@ -1463,6 +1504,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if(parentId != null && !(entityBundle.getEntity() instanceof Project)) {					
 			if(entityBundle.getEntity() instanceof Table) gotoPlace = new Synapse(parentId, null, EntityArea.TABLES, null);
 			else if(entityBundle.getEntity() instanceof DockerRepository) gotoPlace = new Synapse(parentId, null, EntityArea.DOCKER, null);
+			else if(entityBundle.getEntity() instanceof FileEntity || entityBundle.getEntity() instanceof Folder) gotoPlace = new Synapse(parentId, null, EntityArea.FILES, null);
 			else gotoPlace = new Synapse(parentId);
 		} else {
 			gotoPlace = new Profile(authenticationController.getCurrentUserPrincipalId());

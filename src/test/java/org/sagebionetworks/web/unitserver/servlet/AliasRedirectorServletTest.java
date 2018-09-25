@@ -1,20 +1,18 @@
 package org.sagebionetworks.web.unitserver.servlet;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.mock;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.mockito.stubbing.Answer;
-import javax.servlet.ServletException;
+
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,35 +21,19 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
-import org.sagebionetworks.StackConfiguration;
+import org.mockito.stubbing.Answer;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
-import org.sagebionetworks.repo.model.dao.WikiPageKey;
-import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
-import org.sagebionetworks.repo.model.file.FileHandleAssociation;
-import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.UserGroupHeader;
-import org.sagebionetworks.repo.model.table.RowReference;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
-import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.cookie.CookieKeys;
-import org.sagebionetworks.web.client.exceptions.IllegalArgumentException;
+import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.AliasRedirectorServlet;
-import org.sagebionetworks.web.server.servlet.FileHandleAssociationServlet;
-import org.sagebionetworks.web.server.servlet.FileHandleServlet;
-import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
-import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.WebConstants;
-
-import com.google.gwt.util.tools.shared.Md5Utils;
-import com.google.gwt.util.tools.shared.StringUtils;
+import org.sagebionetworks.web.unitserver.SynapseClientBaseTest;
 
 public class AliasRedirectorServletTest {
 
@@ -59,8 +41,6 @@ public class AliasRedirectorServletTest {
 	HttpServletRequest mockRequest;
 	@Mock
 	HttpServletResponse mockResponse;
-	@Mock
-	ServiceUrlProvider mockUrlProvider;
 	@Mock
 	SynapseProvider mockSynapseProvider;
 	@Mock
@@ -70,21 +50,17 @@ public class AliasRedirectorServletTest {
 	@Mock
 	UserGroupHeader mockUserGroupHeader;
 	
-	String authBaseUrl = "authbase";
-	String repoServiceUrl = "repourl";
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
 	@Captor
 	ArgumentCaptor<List<String>> stringListCaptor;
+	
 	@Before
 	public void setup() throws IOException, SynapseException, JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
 		servlet = new AliasRedirectorServlet();
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 		
-		mockUrlProvider = mock(ServiceUrlProvider.class);
-		
-		servlet.setServiceUrlProvider(mockUrlProvider);
 		servlet.setSynapseProvider(mockSynapseProvider);
 		
 		// Setup output stream and response
@@ -95,9 +71,6 @@ public class AliasRedirectorServletTest {
 		when(mockRequest.getRequestURI()).thenReturn("");
 		when(mockRequest.getContextPath()).thenReturn("");
 	
-		when(mockUrlProvider.getPrivateAuthBaseUrl()).thenReturn(authBaseUrl);
-		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(repoServiceUrl);
-
 		when(mockSynapse.getUserGroupHeadersByAliases(anyList())).thenReturn(Collections.singletonList(mockUserGroupHeader));
 		
 		//when asking to encode the redirect URL, just return the input param.
@@ -106,6 +79,7 @@ public class AliasRedirectorServletTest {
 				return (String) invocation.getArguments()[0];
 			}
 		});
+		SynapseClientBaseTest.setupTestEndpoints();
 	}
 	
 	@Test
@@ -128,8 +102,8 @@ public class AliasRedirectorServletTest {
 		assertTrue(redirectUrl.contains(ownerId));
 		
 		//as an additional test, verify that synapse client is set up
-		verify(mockSynapse).setAuthEndpoint(authBaseUrl);
-		verify(mockSynapse).setRepositoryEndpoint(repoServiceUrl);
+		verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
+		verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
 		
 		//look for no cache headers
 		verify(mockResponse).setHeader(eq(WebConstants.CACHE_CONTROL_KEY), eq(WebConstants.CACHE_CONTROL_VALUE_NO_CACHE));

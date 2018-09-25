@@ -28,7 +28,6 @@ import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
@@ -85,23 +84,6 @@ public interface SynapseClient extends RemoteService{
 	Entity updateEntity(Entity toUpdate) throws RestServiceException;
 	
 	/**
-	 * Get the repository service URL
-	 * @return
-	 */
-	String getRepositoryServiceUrl();
-	
-
-	/**
-	 * Create or update an entity
-	 * @param entity
-	 * @param annos
-	 * @param isNew
-	 * @return
-	 * @throws RestServiceException 
-	 */
-	String createOrUpdateEntity(Entity entity, Annotations annos, boolean isNew) throws RestServiceException;
-
-	/**
 	 * Updates the user's profile json object 
 	 * @param userProfile json object of the user's profile
 	 * @throws RestServiceException
@@ -135,8 +117,6 @@ public interface SynapseClient extends RemoteService{
 	AccessRequirement createOrUpdateAccessRequirement(AccessRequirement arEW) throws RestServiceException;
 	
 	List<AccessRequirement> getTeamAccessRequirements(String teamId) throws RestServiceException;
-
-	String getRootWikiId(String ownerId, String ownerType) throws RestServiceException;
 	FileHandleResults getWikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
 	
 	 // V2 Wiki crud
@@ -154,11 +134,9 @@ public interface SynapseClient extends RemoteService{
 
 	void removeFavorite(String entityId) throws RestServiceException;
 
-	String createTeam(String teamName) throws RestServiceException;
 	void deleteTeam(String teamId) throws RestServiceException;
 	PaginatedResults<Team> getTeamsBySearch(String searchTerm, Integer limit, Integer offset) throws RestServiceException;
 	TeamBundle getTeamBundle(String userId, String teamId, boolean isLoggedIn) throws RestServiceException;
-	Long getOpenRequestCount(String currentUserId, String teamId) throws RestServiceException;
 	ArrayList<OpenUserInvitationBundle> getOpenInvitations(String userId) throws RestServiceException;
 	ArrayList<OpenTeamInvitationBundle> getOpenTeamInvitations(String teamId, Integer limit, Integer offset) throws RestServiceException;
 	List<MembershipRequestBundle> getOpenRequests(String teamId) throws RestServiceException;
@@ -167,7 +145,6 @@ public interface SynapseClient extends RemoteService{
 	void deleteTeamMember(String currentUserId, String targetUserId, String teamId) throws RestServiceException;
 	Team updateTeam(Team team, AccessControlList teamAcl) throws RestServiceException;
 	TeamMemberPagedResults getTeamMembers(String teamId, String fragment, Integer limit, Integer offset) throws RestServiceException;
-	void deleteOpenMembershipRequests(String currentUserId, String teamId) throws RestServiceException;
 	TeamMembershipStatus requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL, Date expiresOn) throws RestServiceException;
 	void inviteMember(String userGroupId, String teamId, String message, String hostPageBaseURL) throws RestServiceException;
 	void inviteNewMember(String email, String teamId, String message, String hostPageBaseURL) throws RestServiceException;
@@ -247,16 +224,7 @@ public interface SynapseClient extends RemoteService{
 	 */
 	List<ColumnModel> createTableColumns(List<ColumnModel> value) throws RestServiceException;
 	
-	/**
-	 * Return the upload destinations associated with this parent entity (container)
-	 * @param parentEntityId
-	 * @return
-	 * @throws RestServiceException
-	 */
-	List<UploadDestination> getUploadDestinations(String parentEntityId) throws RestServiceException;
-	
 	String getHost(String urlString) throws RestServiceException;
-
 
 	void updateAnnotations(String entityId, Annotations annotations) throws RestServiceException;
 
@@ -284,8 +252,6 @@ public interface SynapseClient extends RemoteService{
 	
 	Entity moveEntity(String entityId, String newParentEntityId) throws RestServiceException;
 
-	String getUserIdFromUsername(String username) throws RestServiceException;
-
 	UserProfile getUserProfileFromUsername(String username) throws RestServiceException;
 
 	Entity updateFileEntity(FileEntity toUpdate, FileHandleCopyRequest copyRequest) throws RestServiceException;
@@ -301,8 +267,6 @@ public interface SynapseClient extends RemoteService{
 
 	long getTeamMemberCount(String teamId) throws RestServiceException;
 	
-	boolean isWiki(String projectId) throws RestServiceException;
-
 	boolean isChallenge(String projectId) throws RestServiceException;
 
 	void deleteAccessRequirement(Long accessRequirementId) throws RestServiceException;
@@ -314,4 +278,6 @@ public interface SynapseClient extends RemoteService{
 	void removeEmail(String email) throws RestServiceException;
 
 	ArrayList<String[]> parseCsv(String csvPreviewText, char delimiter) throws RestServiceException;
+
+	void resendTeamInvitation(String membershipInvitationId, String hostPageBaseURL) throws RestServiceException;
 }

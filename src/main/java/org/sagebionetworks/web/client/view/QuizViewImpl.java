@@ -5,6 +5,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -77,7 +78,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.certificateWidget = certificateWidget;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		successContainer.setWidget(certificateWidget.asWidget());
 		tryAgainLink.addClickHandler(new ClickHandler() {
 			@Override
@@ -102,7 +103,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 	@Override
 	public void setPresenter(Presenter loginPresenter) {
 		this.presenter = loginPresenter;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();
 		com.google.gwt.user.client.Window.scrollTo(0, 0); // scroll user to top of page
 	}
@@ -118,8 +119,8 @@ public class QuizViewImpl extends Composite implements QuizView {
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override
@@ -186,7 +187,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 		//show failure message and quiz
 		DisplayUtils.hide(quizSuccessUI);
 		DisplayUtils.show(quizFailureUI);
-		quizFailureUI.scrollIntoView();
+		SynapseJSNIUtilsImpl._scrollIntoView(quizFailureUI);
 		quizContainer.setVisible(true);
 	}
 	

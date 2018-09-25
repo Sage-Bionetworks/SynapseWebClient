@@ -207,7 +207,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@Override
 	public void showPasswordChangeSuccess() {
 		resetChangePasswordUI();
-		showInfo("Password has been successfully changed", "");
+		showInfo("Password has been successfully changed");
 	}
 
 	@Override
@@ -240,8 +240,8 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	}
 	
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 	
 	@Override

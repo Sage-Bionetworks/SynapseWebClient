@@ -18,7 +18,7 @@ public class EntityIdCellEditorImpl extends AbstractCellEditor implements Entity
 	public static final String MUST_BE_OF_THE_FORM_SYN123 = "Must be in the form of a Synapse ID. For example: 'syn123'";
 	public static final String SYN_PREFIX = "syn";
 	public static final String PLACE_HOLDER = "Example: 'syn123'";
-	public static final RegExp SYN_PATTERN = RegExp.compile("^(syn)?\\d+(\\.(\\d)+)?$", "i");
+	public static final RegExp SYN_PATTERN = RegExp.compile("^\\s*(syn)?\\d+(\\.(\\d)+)?\\s*$", "i");
 	
 
 	@Inject
@@ -29,7 +29,7 @@ public class EntityIdCellEditorImpl extends AbstractCellEditor implements Entity
 
 	@Override
 	public boolean isValid() {
-		String value = StringUtils.trimWithEmptyAsNull(this.getValue());
+		String value = StringUtils.emptyAsNull(this.getValue());
 		if(value != null){
 			boolean isValid = SYN_PATTERN.test(value);
 			if(!isValid){

@@ -16,13 +16,13 @@ public class DoubleCellEditorImpl extends AbstractCellEditor implements DoubleCe
 	public static final String VALUE_MUST_BE_A_DOUBLE = "Value must be a double (i.e.,'-1.234e-3').";
 
 	@Inject
-	public DoubleCellEditorImpl(CellEditorView view) {
+	public DoubleCellEditorImpl(NumberCellEditorView view) {
 		super(view);
 	}
 
 	@Override
 	public boolean isValid() {
-		String value = StringUtils.trimWithEmptyAsNull(this.getValue());
+		String value = StringUtils.emptyAsNull(this.getValue());
 		if(value != null){
 			try{
 				// if it parses it is valid.

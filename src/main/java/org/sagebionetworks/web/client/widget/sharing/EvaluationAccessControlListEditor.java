@@ -21,8 +21,8 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -55,7 +55,6 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	private AuthenticationController authenticationController;
 	private JSONObjectAdapter jsonObjectAdapter;
 	
-	GlobalApplicationState globalApplicationState;
 	PublicPrincipalIds publicPrincipalIds;
 	
 	// Evaluation components
@@ -71,7 +70,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	public EvaluationAccessControlListEditor(AccessControlListEditorView view,
 			SynapseJavascriptClient jsClient,
 			AuthenticationController authenticationController,
-			GlobalApplicationState globalApplicationState,
+			SynapseProperties synapseProperties,
 			JSONObjectAdapter jsonObjectAdapter,
 			ChallengeClientAsync challengeClient,
 			SynapseAlert synAlert
@@ -81,7 +80,6 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 		this.challengeClient = challengeClient;
 		fixServiceEntryPoint(challengeClient);
 		this.authenticationController = authenticationController;
-		this.globalApplicationState = globalApplicationState;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.synAlert = synAlert;
 		userGroupHeaders = new HashMap<String, UserGroupHeader>();
@@ -90,7 +88,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 		view.setPermissionsToDisplay(getPermList(), getPermissionsToDisplay());
 		view.setNotifyCheckboxVisible(false);
 		view.setDeleteLocalACLButtonVisible(false);
-		publicPrincipalIds = globalApplicationState.getPublicPrincipalIds();
+		publicPrincipalIds = synapseProperties.getPublicPrincipalIds();
 		initViewPrincipalIds();
 	}
 
@@ -212,7 +210,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	private void setViewDetails() {
 		validateEditorState();
 		view.showLoading();
-		view.buildWindow(false, false, null, false, true, PermissionLevel.CAN_VIEW);
+		view.buildWindow(false, false, null, false, true, PermissionLevel.CAN_VIEW, authenticationController.isLoggedIn());
 		populateAclEntries();
 		updateIsPublicAccess();
 	}

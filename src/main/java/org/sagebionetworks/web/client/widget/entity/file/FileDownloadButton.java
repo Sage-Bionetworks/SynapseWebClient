@@ -14,7 +14,6 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -50,7 +49,6 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	private EntityUpdatedHandler entityUpdatedHandler;
 	private SynapseClientAsync synapseClient;
 	private LoginModalWidget loginModalWidget;
-	private GlobalApplicationState globalAppState;
 	private SynapseAlert synAlert;
 	private PortalGinInjector ginInjector;
 	SynapseJavascriptClient jsClient;
@@ -68,7 +66,6 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	public FileDownloadButton(FileDownloadButtonView view, 
 			SynapseClientAsync synapseClient, 
 			LoginModalWidget loginModalWidget,
-			GlobalApplicationState globalAppState,
 			SynapseAlert synAlert,
 			PortalGinInjector ginInjector,
 			SynapseJavascriptClient jsClient,
@@ -82,7 +79,6 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.loginModalWidget = loginModalWidget;
-		this.globalAppState = globalAppState;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
 		this.jsClient = jsClient;
@@ -134,7 +130,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 					String directDownloadUrl = getDirectDownloadURL((FileEntity)entityBundle.getEntity(), dataFileHandle, fileNameOverride);
 					
 					//special case, if this starts with sftp proxy, then handle
-					String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
+					String sftpProxy = ginInjector.getSynapseProperties().getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
 					if (directDownloadUrl.startsWith(sftpProxy)) {
 						view.setIsAuthorizedDirectDownloadLink();
 						loginModalWidget.configure(directDownloadUrl, FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
@@ -146,7 +142,8 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 						if (!isHidingClientHelp) {
 							FileClientsHelp clientsHelp = ginInjector.getFileClientsHelp();
 							view.addWidget(clientsHelp);
-							clientsHelp.configure(entityBundle.getEntity().getId());
+							FileEntity entity = (FileEntity)entityBundle.getEntity();
+							clientsHelp.configure(entity.getId(), entity.getVersionNumber());
 						}
 					}
 				}
@@ -185,7 +182,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 		else {
 			if (externalUrl.toLowerCase().startsWith(WebConstants.SFTP_PREFIX)) {
 				//point to sftp proxy instead
-				directDownloadURL = Uploader.getSftpProxyLink(fileNameOverride, externalUrl, globalAppState, gwt);
+				directDownloadURL = Uploader.getSftpProxyLink(fileNameOverride, externalUrl, ginInjector.getSynapseProperties(), gwt);
 			} else {
 				directDownloadURL = externalUrl;	
 			}

@@ -2,28 +2,35 @@ package org.sagebionetworks.web.unitclient.widget.profile;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+
 import static org.mockito.Mockito.*;
+
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.profile.ProfileImageView;
 import org.sagebionetworks.web.client.widget.profile.ProfileImageWidgetImpl;
 
 public class ProfileImageWidgetImplTest {
-	
+	@Mock
 	ProfileImageView mockView;
+	@Mock
 	SynapseJSNIUtils mockJniUtils;
-	ProfileImageWidgetImpl widget;
+	@Mock
 	Callback callback;
-	String baseUrl;
 	
+	ProfileImageWidgetImpl widget;
+	public static final String RAW_FILE_HANDLE_URL = "http://raw.file.handle/";
+	public static final String FILE_HANDLE_ASSOCIATION_URL = "http://file.handle.association/";
 	@Before
 	public void before(){
-		mockView = Mockito.mock(ProfileImageView.class);
-		mockJniUtils = Mockito.mock(SynapseJSNIUtils.class);
-		callback = Mockito.mock(Callback.class);
-		baseUrl = "baseUrl";
-		when(mockJniUtils.getBaseProfileAttachmentUrl()).thenReturn(baseUrl);
+		MockitoAnnotations.initMocks(this);
+		when(mockJniUtils.getFileHandleAssociationUrl(anyString(), any(FileHandleAssociateType.class), anyString())).thenReturn(FILE_HANDLE_ASSOCIATION_URL);
+		when(mockJniUtils.getRawFileHandleUrl(anyString())).thenReturn(RAW_FILE_HANDLE_URL);
+		
 		widget = new ProfileImageWidgetImpl(mockView, mockJniUtils);
 		widget.setRemovePictureCallback(callback);
 	}
@@ -42,7 +49,7 @@ public class ProfileImageWidgetImplTest {
 	@Test
 	public void testConfigureFileHandle(){
 		widget.configure("123");
-		verify(mockView).setImageUrl("baseUrl?imageId=123&userId=null&preview=false&applied=false");
+		verify(mockView).setImageUrl(RAW_FILE_HANDLE_URL);
 		verify(mockView).setRemovePictureButtonVisible(true);
 	}
 	
@@ -58,7 +65,7 @@ public class ProfileImageWidgetImplTest {
 		String userId = "007";
 		String imageId = "444";
 		widget.configure(userId, imageId);
-		verify(mockView).setImageUrl("baseUrl?imageId=444&userId=007&preview=true&applied=true");
+		verify(mockView).setImageUrl(FILE_HANDLE_ASSOCIATION_URL);
 		verify(mockView).setRemovePictureButtonVisible(true);
 	}
 

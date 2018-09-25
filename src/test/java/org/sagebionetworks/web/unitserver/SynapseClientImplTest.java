@@ -37,6 +37,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,6 +46,7 @@ import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -145,7 +147,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.util.SerializationUtils;
-import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
+import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
@@ -166,8 +168,6 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
-import com.google.appengine.repackaged.com.google.common.base.Objects;
-
 /**
  * Test for the SynapseClientImpl
  * 
@@ -182,7 +182,6 @@ public class SynapseClientImplTest {
 	
 	SynapseProvider mockSynapseProvider;
 	TokenProvider mockTokenProvider;
-	ServiceUrlProvider mockUrlProvider;
 	SynapseClient mockSynapse;
 	SynapseClientImpl synapseClient;
 	String entityId = "123";
@@ -262,6 +261,13 @@ public class SynapseClientImplTest {
 	List<EntityHeader> entityChildrenPage;
 	@Mock
 	Challenge mockChallenge;
+	@Mock
+	MembershipInvitation mockMembershipInvitation;
+	@Captor
+	ArgumentCaptor<String> stringCaptor1;
+	@Captor
+	ArgumentCaptor<String> stringCaptor2;
+	
 	public static final String OLD_COLUMN_MODEL_ID1 = "4444";
 	public static final String OLD_COLUMN_MODEL_ID2 = "4445";
 	public static final String NEW_COLUMN_MODEL_ID = "837837";
@@ -284,7 +290,6 @@ public class SynapseClientImplTest {
 		MockitoAnnotations.initMocks(this);
 		mockSynapse = Mockito.mock(SynapseClient.class);
 		mockSynapseProvider = Mockito.mock(SynapseProvider.class);
-		mockUrlProvider = Mockito.mock(ServiceUrlProvider.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 		mockTokenProvider = Mockito.mock(TokenProvider.class);
 		mockPaginatedMembershipRequest = Mockito.mock(PaginatedResults.class);
@@ -293,7 +298,6 @@ public class SynapseClientImplTest {
 		synapseClient = new SynapseClientImpl();
 		synapseClient.setSynapseProvider(mockSynapseProvider);
 		synapseClient.setTokenProvider(mockTokenProvider);
-		synapseClient.setServiceUrlProvider(mockUrlProvider);
 
 		// Setup the the entity
 		entity = new ExampleEntity();
@@ -627,83 +631,6 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testCreateOrUpdateEntityFalse()
-			throws JSONObjectAdapterException, RestServiceException,
-			SynapseException {
-		ExampleEntity in = new ExampleEntity();
-		in.setName("some name");
-		in.setDescription("some description");
-		in.setEntityType(ExampleEntity.class.getName());
-
-		ExampleEntity out = new ExampleEntity();
-		out.setName("some name");
-		out.setDescription("some description");
-		out.setEntityType(ExampleEntity.class.getName());
-		out.setId("syn123");
-		out.setEtag("45");
-
-		// when in comes in then return out.
-		when(mockSynapse.putEntity(in)).thenReturn(out);
-		String result = synapseClient.createOrUpdateEntity(in, null, false);
-		assertEquals(out.getId(), result);
-		verify(mockSynapse).putEntity(in);
-	}
-
-	@Test
-	public void testCreateOrUpdateEntityTrue()
-			throws JSONObjectAdapterException, RestServiceException,
-			SynapseException {
-		ExampleEntity in = new ExampleEntity();
-		in.setName("some name");
-		in.setDescription("some description");
-		in.setEntityType(ExampleEntity.class.getName());
-
-		ExampleEntity out = new ExampleEntity();
-		out.setName("some name");
-		out.setDescription("some description");
-		out.setEntityType(ExampleEntity.class.getName());
-		out.setId("syn123");
-		out.setEtag("45");
-
-		// when in comes in then return out.
-		when(mockSynapse.createEntity(in)).thenReturn(out);
-		String result = synapseClient.createOrUpdateEntity(in, null, true);
-		assertEquals(out.getId(), result);
-		verify(mockSynapse).createEntity(in);
-	}
-
-	@Test
-	public void testCreateOrUpdateEntityTrueWithAnnos()
-			throws JSONObjectAdapterException, RestServiceException,
-			SynapseException {
-		ExampleEntity in = new ExampleEntity();
-		in.setName("some name");
-		in.setDescription("some description");
-		in.setEntityType(ExampleEntity.class.getName());
-
-		Annotations annos = new Annotations();
-		annos.addAnnotation("someString", "one");
-
-		ExampleEntity out = new ExampleEntity();
-		out.setName("some name");
-		out.setDescription("some description");
-		out.setEntityType(ExampleEntity.class.getName());
-		out.setId("syn123");
-		out.setEtag("45");
-
-		// when in comes in then return out.
-		when(mockSynapse.createEntity(in)).thenReturn(out);
-		String result = synapseClient.createOrUpdateEntity(in, annos, true);
-		assertEquals(out.getId(), result);
-		verify(mockSynapse).createEntity(in);
-		annos.setEtag(out.getEtag());
-		annos.setId(out.getId());
-		verify(mockSynapse).updateAnnotations(out.getId(), annos);
-	}
-
-	
-
-	@Test
 	public void testMoveEntity()
 			throws JSONObjectAdapterException, RestServiceException,
 			SynapseException {
@@ -768,7 +695,7 @@ public class SynapseClientImplTest {
 	public void testGetUserProfile() throws Exception {
 		// verify call is directly calling the synapse client provider
 		String testRepoUrl = "http://mytestrepourl";
-		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(testRepoUrl);
+		System.setProperty(StackEndpoints.REPO_ENDPOINT_KEY, testRepoUrl);
 		UserProfile userProfile = synapseClient.getUserProfile(testUserId);
 		assertEquals(userProfile, testUserProfile);
 	}
@@ -1263,47 +1190,6 @@ public class SynapseClientImplTest {
 		assertEquals(message, request.getMessage());
 	}
 
-
-	@Test
-	public void testGetOpenRequestCountUnauthorized() throws SynapseException,
-			RestServiceException {
-		// is not an admin
-		TeamMember testTeamMember = new TeamMember();
-		testTeamMember.setIsAdmin(false);
-		when(mockSynapse.getTeamMember(anyString(), anyString())).thenReturn(
-				testTeamMember);
-
-		Long count = synapseClient.getOpenRequestCount("myUserId", "myTeamId");
-		// should never ask for open request count
-		verify(mockSynapse, Mockito.never()).getOpenMembershipRequests(
-				anyString(), anyString(), anyLong(), anyLong());
-		assertNull(count);
-	}
-
-	@Test
-	public void testGetOpenRequestCount() throws SynapseException,
-			RestServiceException, MalformedURLException,
-			JSONObjectAdapterException {
-		// is admin
-		TeamMember testTeamMember = new TeamMember();
-		testTeamMember.setIsAdmin(true);
-		when(mockSynapse.getTeamMember(anyString(), anyString())).thenReturn(
-				testTeamMember);
-
-		Long testCount = 42L;
-		PaginatedResults<MembershipRequest> testOpenRequests = new PaginatedResults<MembershipRequest>();
-		testOpenRequests.setTotalNumberOfResults(testCount);
-		when(
-				mockSynapse.getOpenMembershipRequests(anyString(), anyString(),
-						anyLong(), anyLong())).thenReturn(testOpenRequests);
-
-		Long count = synapseClient.getOpenRequestCount("myUserId", "myTeamId");
-
-		verify(mockSynapse, Mockito.times(1)).getOpenMembershipRequests(
-				anyString(), anyString(), anyLong(), anyLong());
-		assertEquals(testCount, count);
-	}
-
 	@Test
 	public void testGetOpenTeamInvitations() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
@@ -1697,22 +1583,6 @@ public class SynapseClientImplTest {
 	public void testGetHostBadUrl() throws RestServiceException {
 		synapseClient.getHost("foobar");
 	}
-
-	@Test
-	public void testGetRootWikiId() throws JSONObjectAdapterException,
-			SynapseException, RestServiceException {
-		org.sagebionetworks.repo.model.dao.WikiPageKey key = new org.sagebionetworks.repo.model.dao.WikiPageKey();
-		key.setOwnerObjectId("1");
-		key.setOwnerObjectType(ObjectType.ENTITY);
-		String expectedId = "123";
-		key.setWikiPageId(expectedId);
-		when(mockSynapse.getRootWikiPageKey(anyString(), any(ObjectType.class)))
-				.thenReturn(key);
-
-		String actualId = synapseClient.getRootWikiId("1",
-				ObjectType.ENTITY.toString());
-		assertEquals(expectedId, actualId);
-	}
 		
 	@Test(expected = BadRequestException.class)
 	public void testHandleSignedTokenNull() throws RestServiceException, SynapseException{
@@ -1963,23 +1833,6 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
-	public void testGetUserIdFromUsername() throws UnsupportedEncodingException, SynapseException, RestServiceException {
-		//find the user id based on user name
-		Long targetUserId = 4L;
-		when(mockPrincipalAliasResponse.getPrincipalId()).thenReturn(targetUserId);
-		when(mockSynapse.getPrincipalAlias(any(PrincipalAliasRequest.class))).thenReturn(mockPrincipalAliasResponse);
-		String userId = synapseClient.getUserIdFromUsername("luke");
-		assertEquals(targetUserId.toString(), userId);
-	}
-	
-	@Test(expected = BadRequestException.class)
-	public void testGetUserIdFromUsernameBackendError() throws UnsupportedEncodingException, SynapseException, RestServiceException {
-		//test error from backend
-		when(mockSynapse.getPrincipalAlias(any(PrincipalAliasRequest.class))).thenThrow(new SynapseBadRequestException());
-		synapseClient.getUserIdFromUsername("bad-request");
-	}
-	
-	@Test
 	public void testGetTableUpdateTransactionRequestNoChange()  throws RestServiceException, SynapseException {
 		String tableId = "syn93939";
 		
@@ -2032,7 +1885,7 @@ public class SynapseClientImplTest {
 	
 	private ColumnChange getColumnChange(String oldColumnId, List<ColumnChange> changes) {
 		for (ColumnChange columnChange : changes) {
-			if (Objects.equal(oldColumnId, columnChange.getOldColumnId())) {
+			if (Objects.equals(oldColumnId, columnChange.getOldColumnId())) {
 				return columnChange;
 			}
 		}
@@ -2151,19 +2004,6 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
-	public void testIsWiki() throws RestServiceException, SynapseException {
-		org.sagebionetworks.repo.model.dao.WikiPageKey key = new org.sagebionetworks.repo.model.dao.WikiPageKey();
-		key.setOwnerObjectId("2");
-		key.setOwnerObjectType(ObjectType.ENTITY);
-		key.setWikiPageId("456");
-		when(mockSynapse.getRootWikiPageKey(anyString(), any(ObjectType.class))).thenReturn(key);
-
-		assertTrue(synapseClient.isWiki("2"));
-		when(mockSynapse.getRootWikiPageKey(anyString(), any(ObjectType.class))).thenThrow(new SynapseNotFoundException());
-		assertFalse(synapseClient.isWiki("3"));
-	}
-	
-	@Test
 	public void testIsChallenge() throws RestServiceException, SynapseException {
 		when(mockSynapse.getChallengeForProject(anyString())).thenReturn(mockChallenge);
 		when(mockSynapse.canAccess(anyString(), eq(ACCESS_TYPE.UPDATE))).thenReturn(true);
@@ -2211,4 +2051,27 @@ public class SynapseClientImplTest {
 		assertEquals("b1, b2", parsed.get(0)[1]);
 		assertEquals("c1 \"c2\"", parsed.get(0)[2]);
 	}
+	
+	@Test
+	public void testResendTeamInvitation() throws RestServiceException, SynapseException{
+		String membershipInvitationId = "1212";
+		String hostPageBaseURL = "http://localhost/Portal.html";
+		when(mockSynapse.getMembershipInvitation(anyString())).thenReturn(mockMembershipInvitation);
+		//SWC-4360: if the email and principal ID are set, then the email should be cleared)
+		when(mockMembershipInvitation.getInviteeEmail()).thenReturn("something@gmail.com");
+		when(mockMembershipInvitation.getInviteeId()).thenReturn("123");
+		
+		synapseClient.resendTeamInvitation(membershipInvitationId, hostPageBaseURL);
+		
+		verify(mockSynapse).getMembershipInvitation(membershipInvitationId);
+		verify(mockMembershipInvitation).setCreatedBy(null);
+		verify(mockMembershipInvitation).setCreatedOn(null);
+		verify(mockMembershipInvitation).setId(null);
+		verify(mockMembershipInvitation).setInviteeEmail(null);
+		verify(mockSynapse).createMembershipInvitation(eq(mockMembershipInvitation), stringCaptor1.capture(), stringCaptor2.capture());
+		assertTrue(stringCaptor1.getValue().startsWith(hostPageBaseURL));
+		assertTrue(stringCaptor2.getValue().startsWith(hostPageBaseURL));
+		verify(mockSynapse).deleteMembershipInvitation(membershipInvitationId);
+	}
+
 }

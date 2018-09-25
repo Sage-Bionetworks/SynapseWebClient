@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.ListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 
@@ -46,8 +47,10 @@ public class TabViewImpl implements TabView {
 		tabClickedHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				event.preventDefault();
-				presenter.onTabClicked();
+				if (!DisplayUtils.isAnyModifierKeyDown(event)) {
+					event.preventDefault();
+					presenter.onTabClicked();
+				}
 			}
 		};
 	}

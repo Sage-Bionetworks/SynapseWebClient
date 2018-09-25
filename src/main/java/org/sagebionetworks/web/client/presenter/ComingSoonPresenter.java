@@ -1,16 +1,13 @@
 package org.sagebionetworks.web.client.presenter;
 
-import static org.sagebionetworks.web.client.ClientProperties.*;
+import static org.sagebionetworks.web.client.ClientProperties.SYNAPSE_REACT_COMPONENTS_JS;
+
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
-import org.sagebionetworks.web.client.services.LayoutServiceAsync;
-import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.view.ComingSoonView;
 
 import com.google.gwt.activity.shared.AbstractActivity;

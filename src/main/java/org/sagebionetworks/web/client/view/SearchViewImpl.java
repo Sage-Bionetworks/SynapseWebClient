@@ -10,6 +10,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
@@ -22,6 +23,7 @@ import org.sagebionetworks.repo.model.search.FacetConstraint;
 import org.sagebionetworks.repo.model.search.FacetTypeNames;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
+import org.sagebionetworks.repo.model.search.query.KeyRange;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DateTimeUtils;
@@ -33,6 +35,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.SearchQueryUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -60,7 +63,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class SearchViewImpl extends Composite implements SearchView {
-
+	private static final int MAX_FACET_VALUES_SHOWN = 10;
 	private static final int HIT_DESCRIPTION_LENGTH_CHAR = 270;
 	private static final int FACET_NAME_LENGTH_CHAR = 21;
 	private static final int MINUTE_IN_SEC = 60;
@@ -117,7 +120,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		this.ginInjector = ginInjector;
 		this.dateTimeUtils = dateTimeUtils;
 		this.markdownIt = markdownIt;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		searchButton.addClickHandler(new ClickHandler() {				
 			@Override
 			public void onClick(ClickEvent event) {					
@@ -137,24 +140,21 @@ public class SearchViewImpl extends Composite implements SearchView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;		
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();
-		headerWidget.setSearchVisible(false);		
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
 
 	@Override
 	public void setSearchResults(SearchResults searchResults,
-			String searchTerm, boolean newQuery) {
+			String searchTerm) {
 		// set searchTerm into search box
 		searchField.setText(searchTerm);
 		facetButtons = new ArrayList<Button>();
-		// show existing facets			
+		// show existing facets
 		String facetNames = createShownFacets(searchResults);
-		Long start = presenter.getStart();
-		String pageTitleStartNumber = start != null && start > 0 ? " (from result " + (start+1) + ")" : ""; 
 		String pageTitleSearchTerm = searchTerm != null && searchTerm.length() > 0 ? "'"+searchTerm + "' " : "";
-		synapseJSNIUtils.setPageTitle("Search: " + pageTitleSearchTerm + facetNames + pageTitleStartNumber);
+		synapseJSNIUtils.setPageTitle("Search: " + pageTitleSearchTerm + facetNames);
 		narrowResultsPanel.setVisible(true);
 		currentFacetsPanel.setVisible(true);
 	}
@@ -166,17 +166,17 @@ public class SearchViewImpl extends Composite implements SearchView {
 	}
 	
 	@Override
-	public Widget getResults(SearchResults searchResults, String searchTerm) {
+	public Widget getResults(SearchResults searchResults, String searchTerm, boolean isFirstPage) {
 		// create search result list
 		List<Hit> hits = searchResults.getHits();
 		Panel searchResultsPanel;				
 		if (hits != null && hits.size() > 0) {
 			searchResultsPanel = createSearchResults(hits, searchResults.getStart().intValue());			
-
-			// create facet widgets
-			createFacetWidgets(searchResults);			
-			
-		} else if (searchResults.getStart() == 0) {
+			if (isFirstPage) {
+				// create facet widgets
+				createFacetWidgets(searchResults);			
+			}
+		} else if (isFirstPage) {
 			searchResultsPanel = new HTMLPanel(new SafeHtmlBuilder().appendHtmlConstant("<h4>" + DisplayConstants.LABEL_NO_SEARCH_RESULTS_PART1)
 			.appendEscaped(searchTerm)
 			.appendHtmlConstant(DisplayConstants.LABEL_NO_SEARCH_RESULTS_PART2 + "</h4>").toSafeHtml());
@@ -224,25 +224,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 			}
 			
 			String text = facet.getValue();
-			if(text.contains("..")) {				
-				text = presenter.getDisplayForTimeFacet(facet.getKey(), facet.getValue());
-				if (text != null) {
-					text = formatFacetName(facet.getKey()) + ": " + text;
-				} else {
-					// continuous variable, in this case time in seconds
-					String valueAsString = facet.getValue().replaceAll("\\.\\.", "");
-					
-					String formattedDateString;
-					try{
-						long valueInMiliseconds = Long.parseLong(valueAsString) * 1000;
-						formattedDateString = valueInMiliseconds == 0 ? "any time": dateTimeUtils.convertDateToSimpleString(new Date(valueInMiliseconds));
-					}catch (NumberFormatException e){
-						formattedDateString = valueAsString;
-					}
-					
-					text = formatFacetName(facet.getKey()) + " >= " + formattedDateString;
-				}
-			}
 			facetNames.append(text);
 			facetNames.append(" ");
 			Button btn = new Button("", IconType.TIMES, event -> {				
@@ -272,9 +253,49 @@ public class SearchViewImpl extends Composite implements SearchView {
 			currentFacets.add(btn);
 			facetButtons.add(btn);
 		}
+		addTimeFacets(searchResults, facetNames, currentFacets);
 		currentFacetsPanel.clear();
 		currentFacetsPanel.add(currentFacets);
 		return facetNames.toString();
+	}
+	
+	private void addTimeFacets(SearchResults searchResults, StringBuilder facetNames, FlowPanel currentFacets) {
+		for(final KeyRange facet : presenter.getAppliedTimeFacets()) {
+			String text = presenter.getDisplayForTimeFacet(facet.getKey(), facet.getMin());
+			if (text != null) {
+				text = formatFacetName(facet.getKey()) + ": " + text;
+			} else {
+				// continuous variable, in this case time in seconds
+				String valueAsString = facet.getMin();
+				
+				String formattedDateString;
+				try{
+					long valueInMiliseconds = Long.parseLong(valueAsString) * 1000;
+					formattedDateString = valueInMiliseconds == 0 ? "any time": dateTimeUtils.getDateString(new Date(valueInMiliseconds));
+				}catch (NumberFormatException e){
+					formattedDateString = valueAsString;
+				}
+				
+				text = formatFacetName(facet.getKey()) + " >= " + formattedDateString;
+			}
+			
+			facetNames.append(text);
+			facetNames.append(" ");
+			Button btn = new Button(text, IconType.TIMES, event -> {				
+				// disable all buttons to allow only one click
+				for(Button facetButton : facetButtons) {
+					facetButton.setEnabled(false);
+				}
+				Window.scrollTo(0, 0);
+				presenter.removeTimeFacetAndRefresh(facet.getKey());						
+			});
+			
+			btn.setHeight(BUTTON_HEIGHT);
+			btn.addStyleName("margin-right-5 margin-top-5");
+			btn.setPull(Pull.LEFT);
+			currentFacets.add(btn);
+			facetButtons.add(btn);
+		}
 	}
 
 	private void createFacetWidgets(SearchResults searchResults) {
@@ -329,8 +350,8 @@ public class SearchViewImpl extends Composite implements SearchView {
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override
@@ -373,13 +394,13 @@ public class SearchViewImpl extends Composite implements SearchView {
 		Widget createdByBadgeWidget = createdByBadge.asWidget();
 		attributionPanel.add(createdByBadgeWidget);
 		
-		inlineHtml = new InlineHTML(" on " + dateTimeUtils.convertDateToSimpleString(new Date(hit.getCreated_on()*1000)) + ", Updated by ");
+		inlineHtml = new InlineHTML(" on " + dateTimeUtils.getDateString(new Date(hit.getCreated_on()*1000)) + ", Updated by ");
 		inlineHtml.addStyleName("hitattribution");
 		
 		attributionPanel.add(inlineHtml);
 		Widget modifiedByBadgeWidget = modifiedByBadge.asWidget();
 		attributionPanel.add(modifiedByBadgeWidget);
-		inlineHtml = new InlineHTML(" on " + dateTimeUtils.convertDateToSimpleString(new Date(hit.getModified_on()*1000)));
+		inlineHtml = new InlineHTML(" on " + dateTimeUtils.getDateString(new Date(hit.getModified_on()*1000)));
 		inlineHtml.addStyleName("hitattribution");
 		
 		attributionPanel.add(inlineHtml);
@@ -444,7 +465,8 @@ public class SearchViewImpl extends Composite implements SearchView {
 		//if(facet.getMin() == null || facet.getMax() == null || facet.getMin() >= facet.getMax()) return null;		
 		
 		FlowPanel lc = new FlowPanel();
-		lc.add(new HTML("<h6 style=\"margin-top: 15px;\">" + formatFacetName(facet.getName()) + "</h6>"));		
+		Heading facetTitle = new Heading(HeadingSize.H4, formatFacetName(facet.getName()));
+		lc.add(facetTitle);		
 		FlexTable table = new FlexTable();
 		
 		// convert to miliseconds
@@ -481,15 +503,14 @@ public class SearchViewImpl extends Composite implements SearchView {
 		return lc;
 	}
 
-	private Anchor createTimeFacet(final Facet facet, final long startTime, final String title) {
+	private Anchor createTimeFacet(final Facet facet, final Long startTime, final String title) {
 		Anchor a;
 		a = new Anchor(title);
-		final String facetValue = startTime + "..";
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
 				Window.scrollTo(0, 0);
-				presenter.addTimeFacet(facet.getName(), facetValue, title);
+				presenter.addTimeFacet(facet.getName(), startTime.toString(), title);
 			}
 		});
 		return a;
@@ -500,7 +521,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		a = new Anchor(title);
 		a.addClickHandler( event -> {
 			Window.scrollTo(0, 0);
-			presenter.removeFacetAndRefresh(facet.getName());
+			presenter.removeTimeFacetAndRefresh(facet.getName());
 		});
 		return a;
 	}
@@ -511,55 +532,83 @@ public class SearchViewImpl extends Composite implements SearchView {
 		if(facet != null && facet.getConstraints() != null && facet.getConstraints().size() > 0) {
 			lc = new FlowPanel();
 			String displayName = facetToDisplay.containsKey(facet.getName()) ? formatFacetName(facetToDisplay.get(facet.getName())) : formatFacetName(facet.getName());
-			//special case.  if this is the created_by facet, then add a UserBadge
-			boolean isModifiedByFacet = "modified_by".equalsIgnoreCase(facet.getName());
-			boolean isCreatedByFacet = "created_by".equalsIgnoreCase(facet.getName());
-			lc.add(new HTML("<h6 style=\"margin-top: 15px;\">" + displayName + "</h6>"));
+			Heading facetTitle = new Heading(HeadingSize.H4, displayName);
+			lc.add(facetTitle);
 			FlowPanel flowPanel = new FlowPanel();
-			//FlexTable flexTable = new FlexTable();
-			int i=0;
-			
-			for(final FacetConstraint constraint : facet.getConstraints()) {
+			lc.add(flowPanel);
+			for (int i = 0; i < facet.getConstraints().size(); i++) {
 				// show top 10
-				if(i>=10) {
+				if(i>=MAX_FACET_VALUES_SHOWN) {
+					// add a button to show the rest of the facet values
+					Button showAll = new Button();
+					boolean isMax = facet.getConstraints().size() == SearchQueryUtils.MAX_FACET_VALUES_COUNT;
+					String buttonText = isMax ? "Show " : "Show all ";
+					showAll.setText(buttonText + facet.getConstraints().size());
+					showAll.setSize(ButtonSize.EXTRA_SMALL);
+					showAll.setMarginTop(10);
+					lc.add(showAll);
+					showAll.addClickHandler(event -> {
+						showAll.setVisible(false);
+						showAllFacetValues(flowPanel, facet);
+					});
 					break;
 				}
 				
-				// skip the prefixed facet values
-				if(constraint.getValue().contains(":")) {
-					continue;
+				FlowPanel valueContainer = getFacetValue(facet, i);
+				if (valueContainer != null) {
+					flowPanel.add(valueContainer);	
 				}
-				FlowPanel valueContainer = new FlowPanel();
-				String stub = DisplayUtils.stubStr(constraint.getValue(), FACET_NAME_LENGTH_CHAR);
-				ClickHandler clickHandler = new ClickHandler() {				
-					@Override
-					public void onClick(ClickEvent event) {
-						Window.scrollTo(0, 0);
-						presenter.addFacet(facet.getName(), constraint.getValue());				
-					}
-				};
-				if (isCreatedByFacet || isModifiedByFacet) {
-					stub = "";
-					UserBadge badge = ginInjector.getUserBadgeWidget();
-					badge.configure(getSearchUserId(constraint.getValue()));
-					badge.setCustomClickHandler(clickHandler);
-					Widget widget = badge.asWidget();
-					valueContainer.add(widget);
-				}
-				Anchor a = new Anchor(stub + " (" + constraint.getCount() + ")");
-				if (!stub.equalsIgnoreCase(constraint.getValue()) && !isCreatedByFacet && !isModifiedByFacet) {
-					valueContainer.add(DisplayUtils.addTooltip(a, constraint.getValue(), Placement.RIGHT));
-				} else {
-					valueContainer.add(a);
-				}
-				
-				a.addClickHandler(clickHandler);	
-				flowPanel.add(valueContainer);
-				i++;
 			}		
-			lc.add(flowPanel);
 		}
 		return lc;
+	}
+	
+	private void showAllFacetValues(FlowPanel p, Facet facet) {
+		for (int i = MAX_FACET_VALUES_SHOWN; i < facet.getConstraints().size(); i++) {
+			FlowPanel valueContainer = getFacetValue(facet, i);
+			if (valueContainer != null) {
+				p.add(valueContainer);	
+			}
+		}
+	}
+	
+	private FlowPanel getFacetValue(Facet facet, int i) {
+		//special case.  if this is the created_by facet, then add a UserBadge
+		boolean isModifiedByFacet = "modified_by".equalsIgnoreCase(facet.getName());
+		boolean isCreatedByFacet = "created_by".equalsIgnoreCase(facet.getName());
+		
+		FacetConstraint constraint  = facet.getConstraints().get(i);
+		
+		// skip the prefixed facet values
+		if(constraint.getValue().contains(":")) {
+			return null;
+		}
+		FlowPanel valueContainer = new FlowPanel();
+		String stub = DisplayUtils.stubStr(constraint.getValue(), FACET_NAME_LENGTH_CHAR);
+		ClickHandler clickHandler = new ClickHandler() {				
+			@Override
+			public void onClick(ClickEvent event) {
+				Window.scrollTo(0, 0);
+				presenter.addFacet(facet.getName(), constraint.getValue());				
+			}
+		};
+		if (isCreatedByFacet || isModifiedByFacet) {
+			stub = "";
+			UserBadge badge = ginInjector.getUserBadgeWidget();
+			badge.configure(getSearchUserId(constraint.getValue()));
+			badge.setCustomClickHandler(clickHandler);
+			Widget widget = badge.asWidget();
+			valueContainer.add(widget);
+		}
+		Anchor a = new Anchor(stub + " (" + constraint.getCount() + ")");
+		if (!stub.equalsIgnoreCase(constraint.getValue()) && !isCreatedByFacet && !isModifiedByFacet) {
+			valueContainer.add(DisplayUtils.addTooltip(a, constraint.getValue(), Placement.RIGHT));
+		} else {
+			valueContainer.add(a);
+		}
+		
+		a.addClickHandler(clickHandler);
+		return valueContainer;
 	}
 
 	private String formatFacetName(String name) {

@@ -1,12 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
 import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
+
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -36,6 +38,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	PortalGinInjector ginInjector;
 	Throwable ex;
 	UserListener reloadOnLoginListener;
+	SynapseJSNIUtils jsniUtils;
 	
 	@Inject
 	public SynapseAlertImpl(
@@ -43,12 +46,14 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authController,
 			GWTWrapper gwt,
-			PortalGinInjector ginInjector
+			PortalGinInjector ginInjector,
+			SynapseJSNIUtils jsniUtils
 			) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authController = authController;
 		this.ginInjector = ginInjector;
+		this.jsniUtils = jsniUtils;
 		view.setPresenter(this);
 		
 		reloadOnLoginListener = new UserListener() {
@@ -121,7 +126,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 				@Override
 				public void onSuccess(String key) {
 					view.hideJiraDialog();
-					String jiraEndpoint = globalApplicationState.getSynapseProperty(WebConstants.CONFLUENCE_ENDPOINT);
+					String jiraEndpoint = ginInjector.getSynapseProperties().getSynapseProperty(WebConstants.CONFLUENCE_ENDPOINT);
 					String url = jiraEndpoint + BROWSE_PATH + key;
 					view.showJiraIssueOpen(key, url);
 				}
@@ -167,5 +172,10 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	public void clear() {
 		view.clearState();
 		ex = null;
+	}
+	
+	@Override
+	public void consoleError(String errorMessage) {
+		jsniUtils.consoleError(errorMessage);
 	}
 }

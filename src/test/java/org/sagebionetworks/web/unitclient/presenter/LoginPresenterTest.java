@@ -24,6 +24,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.place.ChangeUsername;
+import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
@@ -89,8 +90,8 @@ public class LoginPresenterTest {
 	public void testSetPlaceLogout() {
 		when(mockLoginPlace.toToken()).thenReturn(LoginPlace.LOGOUT_TOKEN);
 		loginPresenter.setPlace(mockLoginPlace);
-		verify(mockView).showLogout();
 		verify(mockAuthenticationController).logoutUser();
+		verify(mockPlaceChanger).goTo(any(Home.class));
 	}
 
 	@Test 
@@ -116,11 +117,10 @@ public class LoginPresenterTest {
 		
 		AsyncMockStubber.callSuccessWith(usd).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));		
 		usd.getSession().setAcceptsTermsOfUse(false);
-		AsyncMockStubber.callSuccessWith("tou").when(mockAuthenticationController).getTermsOfUse(any(AsyncCallback.class));
 		
 		//method under test
 		loginPresenter.setPlace(mockLoginPlace);
-		verify(mockView).showTermsOfUse(anyString(), touCallbackCaptor.capture());
+		verify(mockView).showTermsOfUse(touCallbackCaptor.capture());
 		Callback touCallback = touCallbackCaptor.getValue();
 		//set up revalidateSession response such that user has now accepted the tou
 		usd.getSession().setAcceptsTermsOfUse(true);
@@ -131,7 +131,7 @@ public class LoginPresenterTest {
 		verify(mockAuthenticationController).signTermsOfUse(eq(true), any(AsyncCallback.class));
 		verify(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
 		// verify we only showed this once:
-		verify(mockView).showTermsOfUse(anyString(), any(Callback.class));
+		verify(mockView).showTermsOfUse(any(Callback.class));
 		//go to the last place (or the user dashboard Profile place if last place is not set)
 		verify(mockGlobalApplicationState).gotoLastPlace(any(Profile.class));
 	}
@@ -142,10 +142,9 @@ public class LoginPresenterTest {
 		
 		AsyncMockStubber.callSuccessWith(usd).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));		
 		usd.getSession().setAcceptsTermsOfUse(true);
-		AsyncMockStubber.callSuccessWith("tou").when(mockAuthenticationController).getTermsOfUse(any(AsyncCallback.class));
 		
 		loginPresenter.setPlace(mockLoginPlace);
-		verify(mockView, never()).showTermsOfUse(anyString(), any(Callback.class));
+		verify(mockView, never()).showTermsOfUse(any(Callback.class));
 		verify(mockGlobalApplicationState).gotoLastPlace();
 	}
 	
@@ -227,7 +226,6 @@ public class LoginPresenterTest {
 		when(mockLoginPlace.toToken()).thenReturn(fakeToken);
 		AsyncMockStubber.callSuccessWith(usd).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));		
 		usd.getSession().setAcceptsTermsOfUse(false);
-		AsyncMockStubber.callSuccessWith("tou").when(mockAuthenticationController).getTermsOfUse(any(AsyncCallback.class));
 		
 		//run the test
 		loginPresenter.setPlace(mockLoginPlace);
@@ -235,7 +233,7 @@ public class LoginPresenterTest {
 		verify(mockAuthenticationController).revalidateSession(eq(fakeToken), any(AsyncCallback.class));
 		
 		//shows terms of use
-		verify(mockView).showTermsOfUse(anyString(), any(Callback.class));
+		verify(mockView).showTermsOfUse(any(Callback.class));
 	}
 
 	@Test
@@ -261,17 +259,5 @@ public class LoginPresenterTest {
 	public void testGotoPlace() {
 		loginPresenter.goTo(mockLoginPlace);
 		verify(mockPlaceChanger).goTo(mockLoginPlace);
-	}
-	
-	@Test
-	public void testGetTermsOfUseFailure() {
-		Exception ex = new Exception();
-		AsyncMockStubber.callFailureWith(ex).when(mockAuthenticationController).getTermsOfUse(any(AsyncCallback.class));
-		
-		loginPresenter.showTermsOfUse(mockTouCallback);
-		
-		verify(mockSynAlert).clear();
-		verify(mockSynAlert).handleException(ex);
-		verify(mockView).showLogin();
 	}
 }

@@ -139,7 +139,7 @@ public class PasswordResetPresenterTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(any(String.class), any(String.class), any(AsyncCallback.class));
 		presenter.resetPassword("myPassword");
 		//verify password reset text is shown in the view
-		verify(mockView).showInfo(anyString(), eq(DisplayConstants.PASSWORD_RESET_TEXT));
+		verify(mockView).showInfo(eq(DisplayConstants.PASSWORD_RESET_TEXT));
 		//verify that place is changed to last place
 		verify(mockGlobalApplicationState).gotoLastPlace();
 	}
@@ -154,7 +154,7 @@ public class PasswordResetPresenterTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(any(String.class), any(String.class), any(AsyncCallback.class));
 		presenter.resetPassword("myPassword");
 		//verify password reset text is shown in the view
-		verify(mockView).showInfo(anyString(), eq(DisplayConstants.PASSWORD_RESET_TEXT));
+		verify(mockView).showInfo(eq(DisplayConstants.PASSWORD_RESET_TEXT));
 		//verify that place is changed to login place
 		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
@@ -169,7 +169,7 @@ public class PasswordResetPresenterTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(any(String.class), any(String.class), any(AsyncCallback.class));
 		presenter.resetPassword("myPassword");
 		//verify password reset text is shown in the view
-		verify(mockView).showInfo(anyString(), eq(DisplayConstants.PASSWORD_RESET_TEXT));
+		verify(mockView).showInfo(eq(DisplayConstants.PASSWORD_RESET_TEXT));
 		//verify that place is changed to login page
 		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}

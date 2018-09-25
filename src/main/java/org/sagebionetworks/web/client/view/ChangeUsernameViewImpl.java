@@ -46,7 +46,7 @@ public class ChangeUsernameViewImpl extends Composite implements ChangeUsernameV
 			Header headerWidget) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		username.getElement().setAttribute("placeholder", "Username");
 		changeUsernameButton.setText(DisplayConstants.SAVE_BUTTON_LABEL);
 		username.addKeyDownHandler(new KeyDownHandler() {				
@@ -68,7 +68,7 @@ public class ChangeUsernameViewImpl extends Composite implements ChangeUsernameV
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
@@ -83,8 +83,8 @@ public class ChangeUsernameViewImpl extends Composite implements ChangeUsernameV
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

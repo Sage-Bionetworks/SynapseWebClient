@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
-import static org.sagebionetworks.web.client.DisplayUtils.*;
+import static org.sagebionetworks.web.client.DisplayUtils.TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER;
+
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.Emphasis;
@@ -14,13 +15,9 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -73,10 +70,12 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	public static final String ENTITY_ID_ATTRIBUTE = "data-entity-id";
 	
 	public static final ClickHandler STANDARD_CLICKHANDLER = event -> {
-		event.preventDefault();
-		Widget panel = (Widget)event.getSource();
-		String entityId = panel.getElement().getAttribute(ENTITY_ID_ATTRIBUTE);
-		placeChanger.goTo(new Synapse(entityId));
+		if (!DisplayUtils.isAnyModifierKeyDown(event)) {
+			event.preventDefault();
+			Widget panel = (Widget)event.getSource();
+			String entityId = panel.getElement().getAttribute(ENTITY_ID_ATTRIBUTE);
+			placeChanger.goTo(new Synapse(entityId));
+		}
 	};
 	
 	@Inject
@@ -149,8 +148,10 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			clickHandlerRegistration.removeHandler();	
 		}
 		clickHandlerRegistration = entityAnchor.addClickHandler(event -> {
-			event.preventDefault();
-			handler.onClick(event);
+			if (!DisplayUtils.isAnyModifierKeyDown(event)) {
+				event.preventDefault();
+				handler.onClick(event);
+			}
 		});
 	}
 	

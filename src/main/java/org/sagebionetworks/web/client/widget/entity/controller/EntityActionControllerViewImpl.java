@@ -29,6 +29,8 @@ public class EntityActionControllerViewImpl implements
 	Pre infoDialogText;
 	@UiField
 	Div extraWidgetsContainer;
+	@UiField
+	Div uploadDialogWidgetContainer;
 	
 	Span widget = new Span();
 	Widget viewWidget = null;
@@ -60,8 +62,8 @@ public class EntityActionControllerViewImpl implements
 	}
 
 	@Override
-	public void showInfo(String tile, String message) {
-		DisplayUtils.showInfo(tile, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override
@@ -92,5 +94,12 @@ public class EntityActionControllerViewImpl implements
 	public void addWidget(IsWidget w) {
 		lazyConstruct();
 		extraWidgetsContainer.add(w);
+	}
+	
+	@Override
+	public void setUploadDialogWidget(IsWidget w) {
+		lazyConstruct();
+		uploadDialogWidgetContainer.clear();
+		uploadDialogWidgetContainer.add(w);
 	}
 }

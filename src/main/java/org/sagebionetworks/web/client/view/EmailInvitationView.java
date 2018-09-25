@@ -18,7 +18,7 @@ public interface EmailInvitationView extends IsWidget {
 
 	void hideLoading();
 
-	void showInfo(String title, String message);
+	void showInfo(String message);
 
 	void clear();
 

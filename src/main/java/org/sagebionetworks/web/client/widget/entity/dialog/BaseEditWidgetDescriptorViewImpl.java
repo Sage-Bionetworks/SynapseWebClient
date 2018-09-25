@@ -87,8 +87,8 @@ public class BaseEditWidgetDescriptorViewImpl implements BaseEditWidgetDescripto
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 	
 	@Override
@@ -107,6 +107,7 @@ public class BaseEditWidgetDescriptorViewImpl implements BaseEditWidgetDescripto
 					//finish setting up the main dialog
 					String friendlyName = widgetRegistrar.getFriendlyTypeName(contentTypeKey);
 					modal.setTitle(friendlyName);
+					DisplayUtils.focusOnChildInput(modal);
 				} else {
 					showErrorMessage("No editor found for the content type: " + contentTypeKey);
 				}

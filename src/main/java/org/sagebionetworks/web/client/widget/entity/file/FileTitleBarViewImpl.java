@@ -90,8 +90,10 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
 		currentVersionLink.addClickHandler(event -> {
-			event.preventDefault();
-			globalAppState.getPlaceChanger().goTo(new Synapse(currentEntityId));
+			if (!DisplayUtils.isAnyModifierKeyDown(event)) {
+				event.preventDefault();
+				globalAppState.getPlaceChanger().goTo(new Synapse(currentEntityId));
+			}
 		});
 	}
 	
@@ -150,8 +152,8 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

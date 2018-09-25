@@ -27,8 +27,16 @@ public class APITableConfig {
 		uri = descriptor.get(WidgetConstants.API_TABLE_WIDGET_PATH_KEY);
 		//always initialize column configs (could be an empty list)
 		columnConfigs = parseTableColumnConfigs(descriptor);
+		// SWC-3847: default paging to true (it's typically true for Leaderboards)
+		isPaging = true;
+		isQueryTableResults = false;
+		isShowOnlyIfLoggedIn = false;
+		isShowRowNumber = false;
+		rowNumberColName = "";
+		jsonResultsArrayKeyName = "results";
+		cssStyleName = "";
+
 		if (uri != null) {
-			isPaging = false;
 			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY)){
 				isPaging = Boolean.parseBoolean(descriptor.get(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY));
 				if (isPaging) {
@@ -40,31 +48,24 @@ public class APITableConfig {
 						pageSize = 10;
 				}	
 			}
-			isQueryTableResults = false;
 			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_QUERY_TABLE_RESULTS)){
 				isQueryTableResults = Boolean.parseBoolean(descriptor.get(WidgetConstants.API_TABLE_WIDGET_QUERY_TABLE_RESULTS));
 			}
 			
-			isShowOnlyIfLoggedIn = false;
 			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_SHOW_IF_LOGGED_IN)){
 				isShowOnlyIfLoggedIn = Boolean.parseBoolean(descriptor.get(WidgetConstants.API_TABLE_WIDGET_SHOW_IF_LOGGED_IN));
 			}
 
-			
-			isShowRowNumber = false;
-			rowNumberColName = "";
 			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY)){
 				isShowRowNumber = Boolean.parseBoolean(descriptor.get(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY));
 				if (isShowRowNumber && descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY))
 					rowNumberColName =descriptor.get(WidgetConstants.API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY);
 			}
 			
-			jsonResultsArrayKeyName = "results";
 			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY)){
 				jsonResultsArrayKeyName = descriptor.get(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY);
 			}
 			
-			cssStyleName = "";
 			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE)){
 				cssStyleName = descriptor.get(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE);
 			}
@@ -92,7 +93,7 @@ public class APITableConfig {
 				}
 				config.setInputColumnNames(inputColumnNames);
 				if (parts.length > 3) {
-					config.setSort(COLUMN_SORT_TYPE.valueOf(parts[3]));
+					config.setSort(COLUMN_SORT_TYPE.valueOf(parts[3].toUpperCase()));
 				} else config.setSort(COLUMN_SORT_TYPE.NONE);
 				
 				if (parts.length > 4) { 

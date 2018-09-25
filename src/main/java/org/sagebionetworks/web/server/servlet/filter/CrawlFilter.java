@@ -58,7 +58,6 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
-import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
@@ -500,10 +499,7 @@ public class CrawlFilter implements Filter {
 	public void init(FilterConfig config) throws ServletException {
 		this.sc = config.getServletContext();
 		synapseClient = new SynapseClientImpl();
-		ServiceUrlProvider urlProvider = new ServiceUrlProvider();
-		synapseClient.setServiceUrlProvider(urlProvider);
 		discussionForumClient = new DiscussionForumClientImpl();
-		discussionForumClient.setServiceUrlProvider(urlProvider);
 		jsonObjectAdapter = new JSONObjectAdapterImpl();
     }
 }

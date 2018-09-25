@@ -16,13 +16,13 @@ public class IntegerCellEditorImpl extends AbstractCellEditor implements Integer
 	public static final String VALUE_MUST_BE_AN_INTEGER = "Value must be an integer.";
 
 	@Inject
-	public IntegerCellEditorImpl(CellEditorView view) {
+	public IntegerCellEditorImpl(NumberCellEditorView view) {
 		super(view);
 	}
 
 	@Override
 	public boolean isValid() {
-		String value = StringUtils.trimWithEmptyAsNull(this.getValue());
+		String value = StringUtils.emptyAsNull(this.getValue());
 		if(value != null){
 			try{
 				// if it parses it is valid.

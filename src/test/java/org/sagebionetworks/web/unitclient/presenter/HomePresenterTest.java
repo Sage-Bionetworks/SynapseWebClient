@@ -1,7 +1,8 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -14,6 +15,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -30,16 +33,17 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
-import org.sagebionetworks.web.client.resources.WebResource;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class HomePresenterTest {
@@ -65,10 +69,11 @@ public class HomePresenterTest {
 	List<EntityHeader> testEvaluationResults;
 	List<OpenUserInvitationBundle> openInvitations;
 	
-	String testTeamId = "42";
 	UserSessionData testSessionData;
 	@Mock
 	ResourceLoader mockResourceLoader;
+	@Captor
+	ArgumentCaptor<Place> placeCaptor;
 	
 	@Before
 	public void setup() throws RestServiceException, JSONObjectAdapterException{
@@ -82,8 +87,6 @@ public class HomePresenterTest {
 		testEvaluationResults.add(testEvaluation);
 		testBatchResults.setTotalNumberOfResults(1);
 		testBatchResults.setResults(testEvaluationResults);
-		
-		AsyncMockStubber.callSuccessWith(testTeamId).when(mockSynapseClient).createTeam(anyString(),any(AsyncCallback.class));
 		
 		openInvitations = new ArrayList<OpenUserInvitationBundle>();
 		AsyncMockStubber.callSuccessWith(openInvitations).when(mockSynapseClient).getOpenInvitations(anyString(), any(AsyncCallback.class));
@@ -120,21 +123,6 @@ public class HomePresenterTest {
 		verify(mockView).refresh();
 	}
 	
-	@Test
-	public void testNewsFeed() throws JSONObjectAdapterException {
-		homePresenter.loadNewsFeed();
-		
-		verify(mockView).prepareTwitterContainer(anyString(), anyInt());
-		when(mockResourceLoader.isLoaded(any(WebResource.class))).thenReturn(false);
-		homePresenter.twitterContainerReady("twitterElementId");
-		verify(mockResourceLoader).isLoaded(any(WebResource.class));
-		verify(mockResourceLoader).requires(any(WebResource.class), any(AsyncCallback.class));
-		
-		when(mockResourceLoader.isLoaded(any(WebResource.class))).thenReturn(true);
-		homePresenter.twitterContainerReady("twitterElementId");
-		verify(mockSynapseJSNIUtils).showTwitterFeed(anyString(), anyString(), anyString(), anyString(), eq(HomePresenter.TWEET_COUNT));
-	}	
-	
 	
 	@Test
 	public void testCheckAcceptToUAnonymous() {
@@ -160,7 +148,10 @@ public class HomePresenterTest {
 		
 		verify(mockAuthenticationController).getCurrentUserSessionData();
 		//should automatically log you out
-		verify(mockAuthenticationController).logoutUser();
+		verify(mockPlaceChanger).goTo(placeCaptor.capture());
+		Place targetPlace = placeCaptor.getValue();
+		assertTrue(targetPlace instanceof LoginPlace);
+		assertEquals(((LoginPlace)targetPlace).toToken(), LoginPlace.SHOW_TOU);
 	}
 	
 	@Test

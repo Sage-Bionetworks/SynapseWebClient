@@ -27,10 +27,10 @@ public class DateCellRendererImpl implements DateCellRenderer {
 	@Override
 	public void setValue(String value) {
 		// Strings come in as longs
-		this.value = StringUtils.trimWithEmptyAsNull(value);
+		this.value = StringUtils.emptyAsNull(value);
 		if (this.value != null) {
 			Date date = new Date(Long.parseLong(this.value));
-			view.setValue(dateTimeUtils.convertDateToSmallString(date));
+			view.setValue(dateTimeUtils.getDateTimeString(date));
 		}else{
 			view.setValue("");
 		}

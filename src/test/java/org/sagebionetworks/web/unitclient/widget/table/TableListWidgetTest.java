@@ -57,8 +57,9 @@ public class TableListWidgetTest {
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
-	CallbackP<String> mockTableClickedCallback;
-	
+	CallbackP<EntityHeader> mockTableClickedCallback;
+	@Mock
+	EntityHeader mockEntityHeader;
 	List<EntityHeader> searchResults;
 	
 	
@@ -95,7 +96,7 @@ public class TableListWidgetTest {
 	public void testConfigureUnderPageSize(){
 		widget.configure(parentBundle);
 		verify(mockView, times(2)).hideLoading();
-		verify(mockView).resetSortUI();
+		verify(mockView).setSortUI(TableListWidget.DEFAULT_SORT_BY, TableListWidget.DEFAULT_DIRECTION);
 		verify(mockLoadMoreWidgetContainer).setIsMore(false);
 	}
 	
@@ -103,7 +104,7 @@ public class TableListWidgetTest {
 	public void testConfigureOverPageSize(){
 		when(mockResults.getNextPageToken()).thenReturn("ismore");
 		widget.configure(parentBundle);
-		verify(mockView).resetSortUI();
+		verify(mockView).setSortUI(TableListWidget.DEFAULT_SORT_BY, TableListWidget.DEFAULT_DIRECTION);
 		verify(mockLoadMoreWidgetContainer).setIsMore(true);
 	}
 	
@@ -120,10 +121,10 @@ public class TableListWidgetTest {
 	@Test
 	public void testOnTableClicked() {
 		widget.setTableClickedCallback(mockTableClickedCallback);
-		widget.onTableClicked(ENTITY_ID);
+		widget.onTableClicked(mockEntityHeader);
 		
 		verify(mockView).showLoading();
 		verify(mockView).clearTableWidgets();
-		verify(mockTableClickedCallback).invoke(ENTITY_ID);
+		verify(mockTableClickedCallback).invoke(mockEntityHeader);
 	}
 }

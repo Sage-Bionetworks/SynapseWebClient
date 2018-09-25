@@ -11,7 +11,7 @@ import static org.sagebionetworks.web.client.ContentTypeUtils.isTAB;
 import static org.sagebionetworks.web.client.ContentTypeUtils.isTextType;
 import static org.sagebionetworks.web.client.ContentTypeUtils.isWebRecognizedCodeFileName;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
+import static org.sagebionetworks.web.client.ClientProperties.MB;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -62,7 +62,8 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	public enum PreviewFileType {
 		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB, HTML, PDF, IPYNB, VIDEO, MARKDOWN
 	}
-
+	public static final long MAX_HTML_FILE_SIZE = 5 * new Double(MB).longValue();
+	
 	PreviewWidgetView view;
 	RequestBuilderWrapper requestBuilder;
 	SynapseJSNIUtils synapseJSNIUtils;
@@ -226,6 +227,8 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		} else if (previewFileHandle != null) {
 			PreviewFileType previewType = getPreviewFileType(previewFileHandle, originalFileHandle);
 			renderFilePreview(previewType, previewFileHandle);
+		} else {
+			view.showNoPreviewAvailable(bundle.getEntity().getId(), ((FileEntity)bundle.getEntity()).getVersionNumber());
 		}
 	}
 	
@@ -256,9 +259,14 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				view.setPreviewWidget(videoWidget);
 				break;
 			case HTML :
-				HtmlPreviewWidget htmlPreviewWidget = ginInjector.getHtmlPreviewWidget();
-				htmlPreviewWidget.configure(bundle.getEntity().getId(), fileHandleToShow);
-				view.setPreviewWidget(htmlPreviewWidget);
+				if (fileHandleToShow.getContentSize() != null && fileHandleToShow.getContentSize() < MAX_HTML_FILE_SIZE) {
+					HtmlPreviewWidget htmlPreviewWidget = ginInjector.getHtmlPreviewWidget();
+					htmlPreviewWidget.configure(bundle.getEntity().getId(), fileHandleToShow);
+					view.setPreviewWidget(htmlPreviewWidget);
+				} else {
+					view.showNoPreviewAvailable(bundle.getEntity().getId(), ((FileEntity)bundle.getEntity()).getVersionNumber());
+				}
+				
 				break;
 			default :
 				view.showLoading();

@@ -153,14 +153,6 @@ public class WebConstants {
 	//Synapse Properties
 	public static final String CHALLENGE_TUTORIAL_PROPERTY ="org.sagebionetworks.portal.challenge_synapse_id";
 	public static final String CHALLENGE_WRITE_UP_TUTORIAL_PROPERTY ="org.sagebionetworks.portal.challenge_writeup_synapse_id";
-	public static final String GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.gettingstartedguide_synapse_id";
-	public static final String GETTING_STARTED_GUIDE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.gettingstartedguide_wiki_id";
-	public static final String CREATE_PROJECT_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.createproject_synapse_id";
-	public static final String CREATE_PROJECT_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.createproject_wiki_id";
-	public static final String R_CLIENT_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.rclient_synapse_id";
-	public static final String R_CLIENT_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.rclient_wiki_id";
-	public static final String PYTHON_CLIENT_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.pythonclient_synapse_id";
-	public static final String PYTHON_CLIENT_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.pythonclient_wiki_id";
 	public static final String FORMATTING_GUIDE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.formattingguide_synapse_id";
 	public static final String FORMATTING_GUIDE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.formattingguide_wiki_id";
 	public static final String CHALLENGE_PARTICIPATION_INFO_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.challenge_participation_info_synapse_id";
@@ -247,6 +239,7 @@ public class WebConstants {
 	
 	//ClientCache key suffixes (used to avoid collision in the cache)
 	public static final String USER_PROFILE_SUFFIX = "_USER_PROFILE";
+	public static final String MESSAGE_SUFFIX = "_DISCUSSION_MESSAGE";
 	public static final String USERNAME_SUFFIX = "_USERNAME_2_ID";
 	public static final String TEMP_IMAGE_ATTACHMENT_SUFFIX = "_TEMP_IMAGE_ATTACHMENT";
 	public static final String WIKIPAGE_SUFFIX = "_WIKI_PAGE";
@@ -301,4 +294,7 @@ public class WebConstants {
 	public static final String FILE_SERVICE_URL_KEY = "fileServiceUrl";
 	public static final String AUTH_PUBLIC_SERVICE_URL_KEY = "authPublicServiceUrl";
 	public static final String SYNAPSE_VERSION_KEY = "synapseVersionInfo";
+	
+	//View mask constants
+	public static final int FILE = 0x01, PROJECT=0x02, TABLE=0x04, FOLDER=0x08, VIEW=0x10, DOCKER=0x20;
 }

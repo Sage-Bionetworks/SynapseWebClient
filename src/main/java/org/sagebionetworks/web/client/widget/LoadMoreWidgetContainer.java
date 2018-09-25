@@ -97,5 +97,6 @@ public class LoadMoreWidgetContainer implements IsWidget, HasWidgets {
 	 */
 	public void setIsProcessing(boolean isProcessing) {
 		this.isProcessing = isProcessing;
+		view.setLoadMoreVisibility(true);
 	}
 }

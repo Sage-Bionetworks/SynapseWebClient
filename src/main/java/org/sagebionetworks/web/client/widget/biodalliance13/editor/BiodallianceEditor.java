@@ -54,7 +54,7 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 		
 		Species species = BiodallianceWidget.DEFAULT_SPECIES;
 		if (descriptor.containsKey(WidgetConstants.BIODALLIANCE_SPECIES_KEY)){
-			species = Species.valueOf(descriptor.get(WidgetConstants.BIODALLIANCE_SPECIES_KEY));
+			species = Species.valueOf(descriptor.get(WidgetConstants.BIODALLIANCE_SPECIES_KEY).toUpperCase());
 		}
 		
 		String chr = BiodallianceWidget.DEFAULT_CHR;

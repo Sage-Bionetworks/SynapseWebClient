@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -14,6 +15,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -57,29 +59,32 @@ public class AddFolderDialogWidget implements AddFolderDialogWidgetView.Presente
 	public void show(String parentEntityId) {
 		Folder folder = new Folder();
 		folder.setParentId(parentEntityId);
-		folder.setEntityType(Folder.class.getName());
 		synAlert.clear();
-		synapseClient.createOrUpdateEntity(folder, null, true, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(final String folderEntityId) {
-				currentFolderEntityId = folderEntityId;
-				Callback refreshSharingAndDataUseWidget = new Callback() {
-					@Override
-					public void invoke() {
-						// entity was updated by the sharing and data use widget.
-						sharingAndDataUseWidget.setEntity(folderEntityId);
-					}
-				};
-				sharingAndDataUseWidget.configure(folderEntityId, true,
-						refreshSharingAndDataUseWidget);
-				view.show();
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				popupUtils.showErrorMessage(FOLDER_CREATION_ERROR, caught.getMessage());
-			}
-		});
+		jsClient.createEntity(folder)
+			.addCallback(
+					new FutureCallback<Entity>() {
+						@Override
+						public void onSuccess(Entity entity) {
+							currentFolderEntityId = entity.getId();
+							Callback refreshSharingAndDataUseWidget = new Callback() {
+								@Override
+								public void invoke() {
+									// entity was updated by the sharing and data use widget.
+									sharingAndDataUseWidget.setEntity(currentFolderEntityId);
+								}
+							};
+							sharingAndDataUseWidget.configure(currentFolderEntityId, true,
+									refreshSharingAndDataUseWidget);
+							view.show();	
+						}
+	
+						@Override
+						public void onFailure(Throwable caught) {
+							popupUtils.showErrorMessage(FOLDER_CREATION_ERROR, caught.getMessage());
+						}
+					},
+					directExecutor()
+		);
 	}
 	
 	@Override
@@ -104,7 +109,7 @@ public class AddFolderDialogWidget implements AddFolderDialogWidgetView.Presente
 			@Override
 			public void onSuccess(Entity result) {
 				view.hide();
-				popupUtils.showInfo("Folder '" + folder.getName() + "' Added", "");
+				popupUtils.showInfo("Folder '" + folder.getName() + "' Added");
 				globalAppState.refreshPage();
 			}
 			@Override

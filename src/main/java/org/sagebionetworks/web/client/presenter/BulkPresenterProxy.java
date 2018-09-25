@@ -49,6 +49,7 @@ import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -75,6 +76,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 	Place place;
 	PortalGinInjector ginjector;
 	AppLoadingView loading;
+	Footer footer;
 	GlobalApplicationState globalApplicationState;
 	GWTWrapper gwt;
 	SynapseJSNIUtils jsniUtils;
@@ -86,11 +88,13 @@ public class BulkPresenterProxy extends AbstractActivity {
 			GlobalApplicationState globalApplicationState,
 			GWTWrapper gwt,
 			SynapseJSNIUtils jsniUtils,
-			AuthenticationController authController) {
+			AuthenticationController authController,
+			Footer footer) {
 		this.globalApplicationState = globalApplicationState;
 		this.gwt = gwt;
 		this.jsniUtils = jsniUtils;
 		this.authController = authController;
+		this.footer = footer;
 		versionCheckCallback = new AsyncCallback<VersionState>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -117,6 +121,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 		// detect prefetch
 		if (panel == null && eventBus == null) return;
 		if (loading != null) loading.hide();
+		
 		//NOTE:  DO NOT USE SHARED METHOD FOR runAsync().  GWT split points defined by GWT.runAsync() line (attempt to pull out into shared method results in a single fragment! 
 		if (place instanceof Home) {
 			GWT.runAsync(Home.class, new RunAsyncCallback() {

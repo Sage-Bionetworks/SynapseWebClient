@@ -5,7 +5,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -19,24 +23,21 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.util.ModelConstants;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetImpl;
 import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidget;
 import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidgetView;
 import org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl;
-import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
-import org.sagebionetworks.web.client.widget.upload.FileValidator;
-import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
 import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.users.AclUtils;
@@ -49,15 +50,25 @@ public class TeamEditModalWidgetTest {
 	public static final Long AUTHENTICATED_USERS_GROUP_ID = 938L;
 	public static final Long TEAM_ID = 1114L;
 	TeamEditModalWidget presenter;
+	@Mock
 	SynapseAlert mockSynAlert;
+	@Mock
 	TeamEditModalWidgetView mockView;
+	@Mock
 	SynapseJSNIUtils mockJSNIUtils;
+	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
 	ImageUploadWidget mockUploader;
+	@Mock
 	AuthenticationController mockAuthenticationController;
+	@Mock
 	Team mockTeam;
+	@Mock
 	Callback mockRefreshCallback;
+	@Mock
 	FileUpload mockFileUpload;
+	@Mock
 	FileMetadata mockFileMeta;
 	
 	Callback startedUploadingCallback;
@@ -73,31 +84,22 @@ public class TeamEditModalWidgetTest {
 	Exception caught = new Exception("this is an exception");
 	private AccessControlList acl;
 	@Mock
-	GlobalApplicationState mockGlobalApplicationState;
+	SynapseProperties mockSynapseProperties;
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
 	@Mock
 	CroppedImageUploadViewImpl mockImageUploadView;
-	
+	public static final String RAW_FILE_HANDLE_URL = "http://raw.file.handle/";
+	public static final String FILE_HANDLE_ASSOCIATION_URL = "http://file.handle.association/";
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		mockSynAlert = mock(SynapseAlert.class);
-		mockView = mock(TeamEditModalWidgetView.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockUploader = mock(ImageUploadWidget.class);
-		mockJSNIUtils = mock(SynapseJSNIUtils.class);
-		mockTeam = mock(Team.class);
 		when(mockTeam.getId()).thenReturn(TEAM_ID.toString());
 		acl = createACL(TEAM_ID);
-		mockRefreshCallback = mock(Callback.class);
-		mockFileUpload = mock(FileUpload.class);
-		mockFileMeta = mock(FileMetadata.class);
 		when(mockPortalGinInjector.getCroppedImageUploadView()).thenReturn(mockImageUploadView);
-		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID)).thenReturn(AUTHENTICATED_USERS_GROUP_ID.toString());
+		when(mockSynapseProperties.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID)).thenReturn(AUTHENTICATED_USERS_GROUP_ID.toString());
 		presenter = new TeamEditModalWidget(mockSynAlert, mockView, mockSynapseClient,
-				mockUploader, mockJSNIUtils, mockAuthenticationController, mockGlobalApplicationState, mockPortalGinInjector);
+				mockUploader, mockJSNIUtils, mockAuthenticationController, mockSynapseProperties, mockPortalGinInjector);
 		AsyncMockStubber.callSuccessWith(acl).when(mockSynapseClient).getTeamAcl(eq(TEAM_ID.toString()), any(AsyncCallback.class));
 		when(mockTeam.getIcon()).thenReturn(oldIcon);
 		presenter.setRefreshCallback(mockRefreshCallback);
@@ -119,6 +121,8 @@ public class TeamEditModalWidgetTest {
 		when(mockView.getName()).thenReturn(newName);
 		when(mockView.getDescription()).thenReturn(newDesc);
 		when(mockView.getPublicJoin()).thenReturn(newPublicJoin);
+		when(mockJSNIUtils.getRawFileHandleUrl(anyString())).thenReturn(RAW_FILE_HANDLE_URL);
+		when(mockJSNIUtils.getFileHandleAssociationUrl(anyString(), any(FileHandleAssociateType.class), anyString())).thenReturn(FILE_HANDLE_ASSOCIATION_URL);
 	}
 	
 	public static AccessControlList createACL(Long teamId) {
@@ -139,7 +143,6 @@ public class TeamEditModalWidgetTest {
 	}
 	@Test
 	public void testConstruction() {
-		verify(mockJSNIUtils).getBaseFileHandleUrl();
 		verify(mockUploader).configure(any(CallbackP.class));
 		verify(mockUploader).setUploadingCallback(any(Callback.class));
 		verify(mockView).setUploadWidget(mockUploader.asWidget());
@@ -164,7 +167,7 @@ public class TeamEditModalWidgetTest {
 		verify(mockView, times(2)).hideLoading();
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockView, times(2)).setImageURL(captor.capture());
-		assertTrue(captor.getValue().contains(fileHandleId));
+		assertEquals(RAW_FILE_HANDLE_URL, captor.getValue());
 		verify(mockFileUpload).getFileHandleId();
 		
 		presenter.onConfirm();
@@ -177,7 +180,7 @@ public class TeamEditModalWidgetTest {
 		verify(mockTeam).setCanPublicJoin(newPublicJoin);
 		verify(mockTeam).setIcon(newIcon);
 		verify(mockSynapseClient).updateTeam(eq(mockTeam), eq(acl), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		verify(mockRefreshCallback).invoke();
 		verify(mockView).hide();
 	}
@@ -196,7 +199,7 @@ public class TeamEditModalWidgetTest {
 		
 		verify(mockTeam).setIcon(null);
 		verify(mockSynapseClient).updateTeam(eq(mockTeam), eq(acl), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		verify(mockRefreshCallback).invoke();
 		verify(mockView).hide();
 	}
@@ -228,7 +231,7 @@ public class TeamEditModalWidgetTest {
 		verify(mockTeam).setCanPublicJoin(newPublicJoin);
 		verify(mockTeam).setIcon(null);
 		verify(mockSynapseClient).updateTeam(eq(mockTeam), eq(acl), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		verify(mockRefreshCallback).invoke();
 		verify(mockView).hide();
 	}	
@@ -265,7 +268,7 @@ public class TeamEditModalWidgetTest {
 		verify(mockSynAlert).clear();
 		verify(mockView).hideLoading();
 		verify(mockView).configure(mockTeam);
-		verify(mockView).setImageURL(anyString());
+		verify(mockView).setImageURL(FILE_HANDLE_ASSOCIATION_URL);
 		verify(mockView).show();
 	}
 	

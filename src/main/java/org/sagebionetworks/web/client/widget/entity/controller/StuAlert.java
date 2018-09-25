@@ -77,11 +77,11 @@ public class StuAlert implements StuAlertView.Presenter  {
 		view.showRequestAccessButtonLoading();
 		UserSessionData userData = authController.getCurrentUserSessionData();
 		String userDisplayName = DisplayUtils.getDisplayName(userData.getProfile());
-		String message = userDisplayName + " has requested access to an entity that you own. \nTo grant access, please visit " + gwt.getHostPageBaseURL() + "#!Synapse:" + entityId + " to change the Share settings.";
+		String message = userDisplayName + " has requested access to an entity that you own. \nTo grant access, please visit " + gwt.getHostPageBaseURL() + "#!Synapse:" + entityId + " to change the Share settings.\n  More information about " + userDisplayName + " can be found by visiting " + gwt.getHostPageBaseURL() + "#!Profile:" + userData.getProfile().getOwnerId() + ".";
 		synapseClient.sendMessageToEntityOwner(entityId, "Requesting access to " + entityId, message, gwt.getHostPageBaseURL(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
-				view.showInfo("Request sent", "");
+				view.showInfo("Request sent");
 				view.hideRequestAccessUI();
 			}
 			@Override

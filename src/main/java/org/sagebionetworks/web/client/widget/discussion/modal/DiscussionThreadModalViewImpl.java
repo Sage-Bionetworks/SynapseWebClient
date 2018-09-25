@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -37,18 +38,17 @@ public class DiscussionThreadModalViewImpl implements DiscussionThreadModalView 
 	@Inject
 	public DiscussionThreadModalViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
+		ClickHandler onCancel = event -> {
+			presenter.onCancel();
+		};
 		saveButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onSave();
 			}
 		});
-		cancelButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				threadModal.hide();
-			}
-		});
+		cancelButton.addClickHandler(onCancel);
+		threadModal.addDomHandler(DisplayUtils.getESCKeyDownHandler(onCancel), KeyDownEvent.getType());
 	}
 
 	@Override
@@ -64,6 +64,7 @@ public class DiscussionThreadModalViewImpl implements DiscussionThreadModalView 
 	@Override
 	public void showDialog() {
 		threadModal.show();
+		DisplayUtils.focusOnChildInput(threadModal);
 	}
 
 	@Override
@@ -89,7 +90,7 @@ public class DiscussionThreadModalViewImpl implements DiscussionThreadModalView 
 
 	@Override
 	public void showSuccess(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

@@ -6,22 +6,5 @@
 	<ui:with field='help' type='org.sagebionetworks.web.client.help.HelpMessages' />
 	<bh:Div addStyleNames="discussionTabContent">
 		<bh:Div ui:field="forumContainer"></bh:Div>
-		<g:FlowPanel addStyleNames="help-panel">
-			<b:BlockQuote styleName="panel scroll-auto">
-				<b:Icon type="COMMENTS" pull="LEFT" addStyleNames="font-size-150" />
-				<b:Heading text="Synapse Discussions" size="H4" />
-				<bh:Text><ui:text from='{help.discussionForum}'/></bh:Text>
-				
-				<!--  Recipe for Context-Sensitive Help dialog -->
-				<!-- <h:HelpButton href="https://docs.synapse.org/discussionForum" placement="RIGHT">
-					<ui:text from='{help.discussionForum}'/>
-				</h:HelpButton>  -->
-				
-				<bh:Div addStyleNames="margin-10">
-					<b:Button ui:field="learnMoreButton" text="Learn More" type="PRIMARY"/>
-				</bh:Div>
-			</b:BlockQuote>
-		</g:FlowPanel>
-
 	</bh:Div>
 </ui:UiBinder>

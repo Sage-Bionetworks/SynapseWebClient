@@ -32,7 +32,9 @@ import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.presenter.RejectReasonWidget;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ShowEmailsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
@@ -57,7 +59,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 	@Mock
 	DataAccessClientAsync mockClient;
 	@Mock
-	BigPromptModalView mockPromptModalView;
+	BigPromptModalView mockPromptModalWidget;
 	@Mock
 	FileHandleWidget mockDucFileRenderer;
 	@Mock
@@ -86,7 +88,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 	@Mock
 	ShowEmailsButton mockShowEmailsButton;
 	public static final String SUBMISSION_ID = "9876545678987";
-	public static final String INSTITUTION = "Univerisity of Washington";
+	public static final String INSTITUTION = "University of Washington";
 	public static final String INTENDED_DATA_USE = "lorem ipsum";
 	public static final String PROJECT_LEAD = "Mr. Rogers";
 	public static final String SMALL_DATE_STRING = "1/2/33";
@@ -106,12 +108,12 @@ public class ACTDataAccessSubmissionWidgetTest {
 		when(mockResearchProjectSnapshot.getInstitution()).thenReturn(INSTITUTION);
 		when(mockResearchProjectSnapshot.getIntendedDataUseStatement()).thenReturn(INTENDED_DATA_USE);
 		when(mockResearchProjectSnapshot.getProjectLead()).thenReturn(PROJECT_LEAD);
-		when(mockDateTimeUtils.convertDateToSmallString(any(Date.class))).thenReturn(SMALL_DATE_STRING);
+		when(mockDateTimeUtils.getDateTimeString(any(Date.class))).thenReturn(SMALL_DATE_STRING);
 		
 		widget = new ACTDataAccessSubmissionWidget(mockView, 
 				mockSynapseAlert, 
-				mockClient, 
-				mockPromptModalView, 
+				mockClient,
+				mockPromptModalWidget,
 				mockDucFileRenderer, 
 				mockIrbFileRenderer, 
 				mockFileHandleList, 
@@ -120,7 +122,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 				mockDateTimeUtils, 
 				mockShowEmailsButton);
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmission).when(mockClient).updateDataAccessSubmissionState(anyString(), any(SubmissionState.class), anyString(), any(AsyncCallback.class));
-		verify(mockPromptModalView).configure(anyString(),  anyString(), anyString(),  promptModalPresenterCaptor.capture());
+		verify(mockPromptModalWidget).configure(anyString(),  anyString(), anyString(),  promptModalPresenterCaptor.capture());
 		confirmRejectionCallback = promptModalPresenterCaptor.getValue();
 	}
 
@@ -245,6 +247,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 		verify(mockView).hideActions();
 		verify(mockView).showApproveButton();
 		verify(mockView).showRejectButton();
+		verify(mockView).setRejectedReasonVisible(false);
 		
 		widget.onMoreInfo();
 		// no duc or irb, verify they are hidden
@@ -256,32 +259,46 @@ public class ACTDataAccessSubmissionWidgetTest {
 	public void testConfigureOtherStates() {
 		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.CANCELLED);
 		widget.configure(mockDataAccessSubmission);
+		verify(mockView).setRejectedReasonVisible(false);
 		
+		// rejected, with null reason
 		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.REJECTED);
+		String rejectedReason = null;
+		when(mockDataAccessSubmission.getRejectedReason()).thenReturn(rejectedReason);
 		widget.configure(mockDataAccessSubmission);
+		verify(mockView).setRejectedReasonVisible(true);
+		verify(mockView).setRejectedReason("");
+		
+		// rejected, with a reason
+		rejectedReason = "missing required signature";
+		when(mockDataAccessSubmission.getRejectedReason()).thenReturn(rejectedReason);
+		widget.configure(mockDataAccessSubmission);
+		verify(mockView, times(2)).setRejectedReasonVisible(true);
+		verify(mockView).setRejectedReason(rejectedReason);
 		
 		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.APPROVED);
 		widget.configure(mockDataAccessSubmission);
 		
-		verify(mockView, times(3)).hideActions();
+		verify(mockView, times(4)).hideActions();
 		verify(mockView, never()).showApproveButton();
 		verify(mockView, never()).showRejectButton();
 	}
 	
 	@Test
 	public void testUpdateDataAccessSubmissionState() {
+	    // initially they are not rejected
 		widget.configure(mockDataAccessSubmission);
 		String rejectionReason = "missing info";
-		when(mockPromptModalView.getValue()).thenReturn(rejectionReason);
+		when(mockPromptModalWidget.getValue()).thenReturn(rejectionReason);
 		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.REJECTED);
 		
 		confirmRejectionCallback.invoke();
 		
-		verify(mockPromptModalView).hide();
+		verify(mockPromptModalWidget).hide();
 		verify(mockClient).updateDataAccessSubmissionState(eq(SUBMISSION_ID), eq(SubmissionState.REJECTED), eq(rejectionReason), any(AsyncCallback.class));
 		verify(mockView).setState(SubmissionState.REJECTED.name());
 	}
-	
+
 	@Test
 	public void testUpdateDataAccessSubmissionStateFailure() {
 		widget.configure(mockDataAccessSubmission);

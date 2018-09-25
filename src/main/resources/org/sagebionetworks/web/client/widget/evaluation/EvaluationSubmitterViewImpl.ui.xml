@@ -8,7 +8,7 @@
   	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
   	<g:FlowPanel>
   		<b:Modal title="Submit to Challenge"
-				dataBackdrop="STATIC" dataKeyboard="false" ui:field="dockerCommitModal" addStyleNames="modal-fullscreen">
+				dataBackdrop="STATIC" dataKeyboard="true" ui:field="dockerCommitModal" addStyleNames="modal-fullscreen">
 			<b:ModalBody>
 				<bh:Div>
 					<b:FieldSet>
@@ -28,7 +28,7 @@
 			</b:ModalFooter>
 		</b:Modal>
 		<b:Modal title="Submit to Challenge"
-				dataBackdrop="STATIC" dataKeyboard="false" ui:field="modal1">
+				dataBackdrop="STATIC" dataKeyboard="true" ui:field="modal1">
 			<b:ModalBody>
 				<bh:Div>
 					<b:FieldSet>
@@ -61,7 +61,7 @@
 			</b:ModalFooter>
 		</b:Modal>
 		<b:Modal title="Submit to Challenge"
-				dataBackdrop="STATIC" dataKeyboard="false" ui:field="modal2">
+				dataBackdrop="STATIC" dataKeyboard="true" ui:field="modal2">
 			<b:ModalBody>
 				<b:FieldSet>
 					<bh:Div>

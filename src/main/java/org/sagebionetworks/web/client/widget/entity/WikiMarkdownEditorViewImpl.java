@@ -75,6 +75,7 @@ public class WikiMarkdownEditorViewImpl implements WikiMarkdownEditorView {
 		cancelButton.addDomHandler(DisplayUtils.getPreventTabHandler(cancelButton), KeyDownEvent.getType());
 		editorDialog.addCloseHandler(onCancel);
 		deleteButton.addClickHandler(onDelete);
+		editorDialog.addDomHandler(DisplayUtils.getESCKeyDownHandler(onCancel), KeyDownEvent.getType());
 	}
 	
 	@Override
@@ -109,8 +110,8 @@ public class WikiMarkdownEditorViewImpl implements WikiMarkdownEditorView {
 	}
 	
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 	
 	@Override

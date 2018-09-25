@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget.getTableType;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.Entity;
@@ -152,8 +151,8 @@ public class TableEntityWidget implements IsWidget,
 			QueryChangeHandler qch, ActionMenuWidget actionMenu) {
 		this.entityBundle = bundle;
 		Entity table = bundle.getEntity();
-		this.tableType = getTableType(table);
-		queryInputWidget.setDownloadFilesVisible(TableType.fileview.equals(tableType));
+		this.tableType = TableType.getTableType(table);
+		queryInputWidget.setDownloadFilesVisible(tableType.isIncludeFiles());
 		this.tableId = bundle.getEntity().getId();
 		this.tableBundle = bundle.getTableBundle();
 		this.canEdit = canEdit;
@@ -343,7 +342,8 @@ public class TableEntityWidget implements IsWidget,
 				Query q = getDefaultQuery();
 				q.setSql(sql);
 				showAdvancedSearchUI();
-				setQuery(q, false);	
+				// set the current query. results have not changed, so set isFromResults=true 
+				setQuery(q, true);	
 			}
 			
 			@Override
@@ -426,6 +426,7 @@ public class TableEntityWidget implements IsWidget,
 		// Disabling menu items does not seem to work well so we hide the items instead.
 		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
 		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, false);
+		view.setTableToolbarVisible(false);
 	}
 
 	@Override
@@ -439,6 +440,7 @@ public class TableEntityWidget implements IsWidget,
 		if (wasSuccessful) {
 			this.queryChangeHandler.onQueryChange(this.currentQuery);
 		}
+		view.setTableToolbarVisible(true);
 	}
 
 	/**
@@ -531,7 +533,8 @@ public class TableEntityWidget implements IsWidget,
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String sql) {
-				fileViewClientsHelp.setQuery(sql);
+				String escapedSql = sql.replace("\"", "\\\"");
+				fileViewClientsHelp.setQuery(escapedSql);
 				fileViewClientsHelp.show();
 			}
 			

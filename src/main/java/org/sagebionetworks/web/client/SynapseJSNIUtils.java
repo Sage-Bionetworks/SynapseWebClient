@@ -17,15 +17,13 @@ public interface SynapseJSNIUtils {
 	public String getCurrentHistoryToken();
 	
 	public void highlightCodeBlocks();
-	
+	void loadSummaryDetailsShim();
 	public void loadTableSorters();
 	
 	public String getBaseFileHandleUrl();
 	
-	public String getBaseProfileAttachmentUrl();
-	
 	public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId);
-
+	public String getRawFileHandleUrl(String fileHandleId);
 	public int randomNextInt();
 	
 	public String getLocationPath();
@@ -50,6 +48,7 @@ public interface SynapseJSNIUtils {
 	public void getFilePartMd5(JavaScriptObject blob, int currentChunk, Long chunkSize, MD5Callback md5Callback);
 	public double getFileSize(JavaScriptObject blob);
 	String[] getMultipleUploadFileNames(JavaScriptObject fileList);
+	String getWebkitRelativePath(JavaScriptObject fileList, int index);
 	public void consoleLog(String message);
 	public void consoleError(String message);
 	
@@ -61,8 +60,6 @@ public interface SynapseJSNIUtils {
 	 * initialize the behavior for on pop state
 	 */
 	public void initOnPopStateHandler();
-	
-	public void showTwitterFeed(String dataWidgetId, String elementId, String linkColor, String borderColor, int tweetCount);
 	
 	public String getCurrentURL();
 	public String getCurrentHostName();

@@ -9,7 +9,7 @@ public interface RevokeUserAccessModalView extends IsWidget {
 	void setSynAlert(Widget asWidget);
 	void setUserPickerWidget(Widget w);
 	void setRevokeProcessing(boolean processing);
-	void showInfo(String title, String message);
+	void showInfo(String message);
 	void show();
 	void hide();
 	public interface Presenter {

@@ -116,7 +116,6 @@ public class JoinTeamWidgetTest {
 		status.setHasUnmetAccessRequirement(false);
 		joinWidget.configure(teamId, false, status, mockTeamUpdatedCallback, null, null, null, null, false);
 		
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteOpenMembershipRequests(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(status).when(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), anyString(), any(Date.class), any(AsyncCallback.class));
 		
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createAccessApproval(any(AccessApproval.class), any(AsyncCallback.class));
@@ -343,7 +342,7 @@ public class JoinTeamWidgetTest {
 	public void testJoinRequestStep3() throws Exception {
 		joinWidget.sendJoinRequestStep3();
 		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), eq((Date)null), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		//verify that team updated callback is invoked
 		verify(mockTeamUpdatedCallback).invoke();
 	}
@@ -374,7 +373,7 @@ public class JoinTeamWidgetTest {
 		joinWidget.sendJoinRequestStep3();
 		ArgumentCaptor<Date> dateCaptor = ArgumentCaptor.forClass(Date.class);
 		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), dateCaptor.capture(), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		//verify that wiki page refresh is invoked
 		verify(mockWidgetRefreshRequired).invoke();
 		

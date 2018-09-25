@@ -53,7 +53,7 @@ public class SignedTokenViewImpl implements SignedTokenView {
 		widget = binder.createAndBindUi(this);
 		
 		this.headerWidget = headerWidget;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		ClickHandler okClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -79,7 +79,7 @@ public class SignedTokenViewImpl implements SignedTokenView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

@@ -45,8 +45,8 @@ public class StuAlertViewImpl implements
 	}
 	
 	@Override
-	public void showInfo(String tile, String message) {
-		DisplayUtils.showInfo(tile, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

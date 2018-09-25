@@ -84,7 +84,7 @@ public class MarkdownWidgetTest {
 		when(mockWikiPage.getMarkdown()).thenReturn(testMarkdown);
 		mockElementWrapper = mock(ElementWrapper.class);
 		//the mockElement to be rendered will be an image
-		when(mockElementWrapper.getAttribute("widgetParams")).thenReturn(elementContentType);
+		when(mockElementWrapper.getAttribute("data-widgetParams")).thenReturn(elementContentType);
 		presenter = new MarkdownWidget(mockSynapseJavascriptClient, mockSynapseJSNIUtils, mockWidgetRegistrar, mockCookies, mockResourceLoader, mockGwt, mockInjector, mockView, mockSynAlert, mockMarkdownIt);
 	}
 	
@@ -110,6 +110,9 @@ public class MarkdownWidgetTest {
 		
 		//verify tablesorter applied
 		verify(mockSynapseJSNIUtils).loadTableSorters();
+		
+		//verify summary/details tag shim run
+		verify(mockSynapseJSNIUtils).loadSummaryDetailsShim();
 		
 		//verify loadMath
 		verify(mockSynapseJSNIUtils).processWithMathJax(mockElementWrapper.getElement());
