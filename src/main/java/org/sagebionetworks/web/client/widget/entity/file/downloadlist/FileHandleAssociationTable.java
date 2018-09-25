@@ -18,6 +18,12 @@ import com.google.inject.Inject;
 
 public class FileHandleAssociationTable implements IsWidget, SortingListener {
 	
+	public static final String FILE_NAME_COLUMN_NAME = "File Name";
+	public static final String ACCESS_COLUMN_NAME = "Access";
+	public static final String CREATED_BY_COLUMN_NAME = "Created By";
+	public static final String CREATED_ON_COLUMN_NAME = "Created On";
+	public static final String SIZE_COLUMN_NAME = "Size";
+	
 	private FileHandleAssociationTableView view;
 	PortalGinInjector ginInjector;
 	Callback accessRestrictionDetectedCallback;
@@ -66,15 +72,15 @@ public class FileHandleAssociationTable implements IsWidget, SortingListener {
 		view.setSort(currentlySortingColumn,  sortDir);
 		// now sort the data
 		Comparator<FileHandleAssociationRow> comparator = null;
-		if ("File Name".equals(header)) {
+		if (FILE_NAME_COLUMN_NAME.equals(header)) {
 			comparator = SortDirection.ASC.equals(sortDir) ? fileNameAscComparator : fileNameDescComparator;
-		} else if ("Access".equals(header)) {
+		} else if (ACCESS_COLUMN_NAME.equals(header)) {
 			comparator = SortDirection.ASC.equals(sortDir) ? accessAscComparator : accessDescComparator;
-		} else if ("Created By".equals(header)) {
+		} else if (CREATED_BY_COLUMN_NAME.equals(header)) {
 			comparator = SortDirection.ASC.equals(sortDir) ? createdByAscComparator : createdByDescComparator;
-		} else if ("Created On".equals(header)) {
+		} else if (CREATED_ON_COLUMN_NAME.equals(header)) {
 			comparator = SortDirection.ASC.equals(sortDir) ? createdOnAscComparator : createdOnDescComparator;
-		} else if ("Size".equals(header)) {
+		} else if (SIZE_COLUMN_NAME.equals(header)) {
 			comparator = SortDirection.ASC.equals(sortDir) ? fileSizeAscComparator : fileSizeDescComparator;
 		}
 		Collections.sort(rows, comparator);
@@ -107,7 +113,6 @@ public class FileHandleAssociationTable implements IsWidget, SortingListener {
 	Comparator<FileHandleAssociationRow> createdOnDescComparator = (row1, row2) -> {
 		return row2.getCreatedOn().compareTo(row1.getCreatedOn());
 	};
-
 	Comparator<FileHandleAssociationRow> fileSizeAscComparator = (row1, row2) -> {
 		return row1.getFileSize().compareTo(row2.getFileSize());
 	};
