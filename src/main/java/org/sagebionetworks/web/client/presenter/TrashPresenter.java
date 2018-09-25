@@ -11,7 +11,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.view.TrashView;
-import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
@@ -31,10 +30,8 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	public static final String TRASH_RESTORED_TITLE = "Restored ";
 	public static final String TRASH_PURGED_TITLE = "Permanently Removed ";
 	public static final String TRASH_EMPTIED_TITLE = "Trash Emptied!";
-	public static final String TRASH_EMPTIED_MESSAGE = "Your trash was successfully emptied.";
 	
 	public static final String ERROR_RESTORING_ENTITY_TITLE = "Sorry, an error occurred while restoring this entity.";
-	public static final String ERROR_EMPTYING_TRASH_TITLE = "Sorry, an error occurred while emptying your trash.";
 	public static final String ERROR_DELETING_SELECTED_TITLE = "Sorry, an error occured while deleting your selected entities.";
 	public static final String ERROR_FETCHING_TRASH_TITLE = "Sorry, an error occured while fetching your trash.";
 	
@@ -70,24 +67,6 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 		this.view.setPresenter(this);
 		this.view.clear();
 		showView(place);
-	}
-		
-	@Override
-	public void purgeAll() {
-		synAlert.clear();
-		synapseClient.purgeTrashForUser(new AsyncCallback<Void>() {	
-			@Override
-			public void onSuccess(Void result) {
-				view.showInfo(TRASH_EMPTIED_MESSAGE);
-				view.refreshTable();
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				createFailureDisplay(ERROR_EMPTYING_TRASH_TITLE, caught);
-			}
-			
-		});
 	}
 
 	@Override
