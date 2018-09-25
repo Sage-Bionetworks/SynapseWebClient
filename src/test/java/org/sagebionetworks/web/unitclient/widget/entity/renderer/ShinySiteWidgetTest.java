@@ -106,13 +106,13 @@ public class ShinySiteWidgetTest {
 		//default false
 		assertFalse(ShinySiteWidget.isIncludePrincipalId(descriptor));
 		//explicitly false
-		descriptor.put(WidgetConstants.SHINYSITE_INCLUDE_PRINCIPAL_ID_KEY, "false");
+		descriptor.put(WidgetConstants.INCLUDE_PRINCIPAL_ID_KEY, "false");
 		assertFalse(ShinySiteWidget.isIncludePrincipalId(descriptor));
 		//parse true
-		descriptor.put(WidgetConstants.SHINYSITE_INCLUDE_PRINCIPAL_ID_KEY, "tRuE");
+		descriptor.put(WidgetConstants.INCLUDE_PRINCIPAL_ID_KEY, "tRuE");
 		assertTrue(ShinySiteWidget.isIncludePrincipalId(descriptor));
 		//invalid param should default to false
-		descriptor.put(WidgetConstants.SHINYSITE_INCLUDE_PRINCIPAL_ID_KEY, "invalid");
+		descriptor.put(WidgetConstants.INCLUDE_PRINCIPAL_ID_KEY, "invalid");
 		assertFalse(ShinySiteWidget.isIncludePrincipalId(descriptor));
 	}
 	

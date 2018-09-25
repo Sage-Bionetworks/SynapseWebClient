@@ -4,27 +4,34 @@ import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
-
+import static org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget.*;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ButtonLinkWidget implements WidgetRendererPresenter {
 	
+	public static final String SYNAPSE_USER_ID_QUERY_PARAM = "synapseUserId=";
 	private ButtonLinkWidgetView view;
+	private AuthenticationController authController;
 	private Map<String,String> descriptor;
 	private GWTWrapper gwt;
 	public static final String LINK_OPENS_NEW_WINDOW = "openNewWindow";
 	public static final String WIDTH = "width";
 	
 	@Inject
-	public ButtonLinkWidget(ButtonLinkWidgetView view, GWTWrapper gwt) {
+	public ButtonLinkWidget(
+			ButtonLinkWidgetView view, 
+			GWTWrapper gwt, 
+			AuthenticationController authController) {
 		this.view = view;
 		this.gwt = gwt;
+		this.authController = authController;
 	}
 	
 	@Override
@@ -32,6 +39,10 @@ public class ButtonLinkWidget implements WidgetRendererPresenter {
 		this.descriptor = widgetDescriptor;
 		String url = descriptor.get(WidgetConstants.LINK_URL_KEY);
 		String buttonText = descriptor.get(WidgetConstants.TEXT_KEY);
+		if(isIncludePrincipalId(descriptor) && authController.isLoggedIn()) {
+			String prefix = url.contains("?") ? "&" : "?";
+			url += prefix + SYNAPSE_USER_ID_QUERY_PARAM + authController.getCurrentUserPrincipalId();
+		}
 		boolean isHighlight = false;
 		if (descriptor.containsKey(WebConstants.HIGHLIGHT_KEY)){
 			isHighlight = Boolean.parseBoolean(descriptor.get(WebConstants.HIGHLIGHT_KEY));
