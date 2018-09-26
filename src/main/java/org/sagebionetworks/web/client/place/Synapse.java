@@ -121,8 +121,6 @@ public class Synapse extends Place {
 		calculateToken(entityId, versionNumber, area, areaToken);
 	}
 
-
-
 	@Prefix("!Synapse")
 	public static class Tokenizer implements PlaceTokenizer<Synapse> {
         @Override
