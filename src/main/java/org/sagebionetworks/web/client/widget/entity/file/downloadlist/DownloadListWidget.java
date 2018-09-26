@@ -76,7 +76,10 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 		view.setDownloadPackageUIVisible(false);
 		synAlert.clear();
 		packageSizeSummary.clear();
-		
+		refreshDownloadList();
+	}
+	
+	public void refreshDownloadList() {
 		jsClient.getDownloadList(new AsyncCallback<DownloadList>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -131,11 +134,12 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 			
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
-				eventBus.fireEvent(new DownloadListUpdatedEvent());
 				view.setProgressTrackingWidgetVisible(false);
 				BulkFileDownloadResponse bulkFileDownloadResponse = (BulkFileDownloadResponse) response;
 				view.setPackageDownloadURL(jsniUtils.getRawFileHandleUrl(bulkFileDownloadResponse.getResultZipFileHandleId()));
 				view.setDownloadPackageUIVisible(true);
+				refreshDownloadList();
+				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}
 			
 			@Override
