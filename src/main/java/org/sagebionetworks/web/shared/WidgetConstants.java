@@ -192,7 +192,7 @@ public class WidgetConstants {
 	public static final String WIDGET_ENTITY_VERSION_KEY = "version";
 	
 	public static final String SHINYSITE_SITE_KEY = "site";	
-	public static final String SHINYSITE_INCLUDE_PRINCIPAL_ID_KEY = "includePrincipalId";
+	public static final String INCLUDE_PRINCIPAL_ID_KEY = "includePrincipalId";
 	public static final String HEIGHT_KEY = "height";
 	public static final int SHINYSITE_DEFAULT_HEIGHT_PX = 400;
 	
