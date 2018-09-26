@@ -1137,4 +1137,9 @@ public class DisplayUtils {
 	public static boolean isAnyModifierKeyDown(ClickEvent event) {
 		return event.isAltKeyDown() || event.isControlKeyDown() || event.isMetaKeyDown() || event.isShiftKeyDown();
 	}
+	public static String capitalize(String s) {
+		if (s.isEmpty()) return s;
+		if (s.length() == 1) return s.toUpperCase();
+		return s.toUpperCase().charAt(0)+s.toLowerCase().substring(1,s.length());
+	}
 }

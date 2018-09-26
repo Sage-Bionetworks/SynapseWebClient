@@ -343,6 +343,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, false);
 		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
+		verify(mockActionMenu).setToolsButtonIcon("Docker Repository Tools", IconType.GEAR);
 	}
 	
 	private void setPublicCanRead() {
@@ -655,7 +656,7 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testConfigureAddEvaluationOnChallengeTab(){
-		currentEntityArea = EntityArea.ADMIN;
+		currentEntityArea = EntityArea.CHALLENGE;
 		entityBundle.setEntity(new Project());
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionVisible(Action.ADD_EVALUATION_QUEUE, true);
@@ -1570,7 +1571,7 @@ public class EntityActionControllerImplTest {
 		
 		ArgumentCaptor<Challenge> captor = ArgumentCaptor.forClass(Challenge.class);
 		verify(mockChallengeClient).createChallenge(captor.capture(), any(AsyncCallback.class));
-		verify(mockPlaceChanger).goTo(new Synapse(entityId, null, EntityArea.ADMIN, null) );
+		verify(mockPlaceChanger).goTo(new Synapse(entityId, null, EntityArea.CHALLENGE, null) );
 		verify(mockView).showInfo(DisplayConstants.CHALLENGE_CREATED);
 		Challenge c = captor.getValue();
 		assertNull(c.getId());
@@ -1619,7 +1620,7 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testConfigureChallengeFound() throws Exception {
 		// currentArea is on the challenge tab
-		currentEntityArea = EntityArea.ADMIN;
+		currentEntityArea = EntityArea.CHALLENGE;
 		entityBundle.setEntity(new Project());
 		AsyncMockStubber.callSuccessWith(new Challenge()).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
