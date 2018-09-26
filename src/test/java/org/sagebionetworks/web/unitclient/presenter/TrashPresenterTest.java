@@ -88,23 +88,6 @@ public class TrashPresenterTest {
 	}
 	
 	@Test
-	public void testPurgeAll() {
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapse).purgeTrashForUser(
-				any(AsyncCallback.class));
-		presenter.purgeAll();
-		verify(mockView).showInfo(anyString());
-	}
-	
-	@Test
-	public void testPurgeAllFailure() {
-		Exception caught = new Exception("this is an exception");
-		AsyncMockStubber.callFailureWith(caught).when(mockSynapse).purgeTrashForUser(
-				any(AsyncCallback.class));
-		presenter.purgeAll();
-		verify(mockSynAlert).showError(anyString());	
-	}
-
-	@Test
 	public void testPurgeEntities() {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapse).purgeMultipleTrashedEntitiesForUser(
 				anySet(), any(AsyncCallback.class));
