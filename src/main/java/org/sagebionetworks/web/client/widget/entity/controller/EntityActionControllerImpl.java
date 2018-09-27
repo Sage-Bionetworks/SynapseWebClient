@@ -84,6 +84,8 @@ import com.google.inject.Inject;
 
 public class EntityActionControllerImpl implements EntityActionController, ActionListener{
 	
+	public static final String TOOLS = " Tools";
+
 	public static final String MOVE_PREFIX = "Move ";
 
 	public static final String EDIT_WIKI_PREFIX = "Edit ";
@@ -366,6 +368,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		// hide all commands by default
 		actionMenu.hideAllActions();
 		gwt.scheduleExecution(reconfigureActionsCallback, 2000);
+		if (!(entity instanceof Project)) {
+			actionMenu.setToolsButtonIcon(enityTypeDisplay + TOOLS, IconType.GEAR);
+		} else if (currentArea != null) {
+			actionMenu.setToolsButtonIcon(DisplayUtils.capitalize(currentArea.name()) + TOOLS, IconType.GEAR);
+		}
 	}
 	
 	private void reconfigureActions() {
@@ -461,7 +468,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			public void onSuccess(Challenge v) {
 				view.showInfo(DisplayConstants.CHALLENGE_CREATED);
 				// go to challenge tab
-				Place gotoPlace = new Synapse(entity.getId(), null, EntityArea.ADMIN, null);
+				Place gotoPlace = new Synapse(entity.getId(), null, EntityArea.CHALLENGE, null);
 				getGlobalApplicationState().getPlaceChanger().goTo(gotoPlace);
 			}
 			@Override
@@ -518,7 +525,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		boolean canEdit = permissions.getCanEdit();
 		if(entityBundle.getEntity() instanceof Project && canEdit && 
 				((DisplayUtils.isInTestWebsite(cookies) && currentArea == null)|| 
-				EntityArea.ADMIN.equals(currentArea))) {
+				EntityArea.CHALLENGE.equals(currentArea))) {
 			actionMenu.setActionListener(Action.CREATE_CHALLENGE, this);
 			actionMenu.setActionListener(Action.DELETE_CHALLENGE, this);
 			
@@ -528,7 +535,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				public void onSuccess(Challenge result) {
 					// challenge found
 					currentChallengeId = result.getId();
-					actionMenu.setActionVisible(Action.DELETE_CHALLENGE, EntityArea.ADMIN.equals(currentArea));
+					actionMenu.setActionVisible(Action.DELETE_CHALLENGE, EntityArea.CHALLENGE.equals(currentArea));
 				}
 				@Override
 				public void onFailure(Throwable caught) {
@@ -778,7 +785,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureAddEvaluationAction(){
-		if(entityBundle.getEntity() instanceof Project && currentArea == EntityArea.ADMIN){
+		if(entityBundle.getEntity() instanceof Project && currentArea == EntityArea.CHALLENGE){
 			actionMenu.setActionVisible(Action.ADD_EVALUATION_QUEUE, permissions.getCanEdit());
 			actionMenu.setActionListener(Action.ADD_EVALUATION_QUEUE, this);
 		}else{
@@ -1110,7 +1117,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		getEvaluationEditorModal().configure(entity.getId(), new Callback() {
 			@Override
 			public void invoke() {
-				Place gotoPlace = new Synapse(entity.getId(), null, EntityArea.ADMIN, null);
+				Place gotoPlace = new Synapse(entity.getId(), null, EntityArea.CHALLENGE, null);
 				getGlobalApplicationState().getPlaceChanger().goTo(gotoPlace);
 			}
 		});

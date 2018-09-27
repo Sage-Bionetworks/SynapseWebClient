@@ -77,7 +77,7 @@ public class ChallengeTabTest {
 		Synapse place = captor.getValue();
 		assertEquals(entityId, place.getEntityId());
 		assertNull(place.getVersionNumber());
-		assertEquals(EntityArea.ADMIN, place.getArea());
+		assertEquals(EntityArea.CHALLENGE, place.getArea());
 		assertNull(place.getAreaToken());
 	}
 

@@ -236,7 +236,6 @@ public class EntityPageTopTest {
 		verify(mockTabs).addTab(mockDiscussionInnerTab);
 		verify(mockTabs).addTab(mockDockerInnerTab);
 		
-		verify(mockProjectActionMenuWidget).setToolsButtonIcon(EntityPageTop.PROJECT_SETTINGS, IconType.GEAR);
 		verify(mockEventBinder).bindEventHandlers(pageTop, mockEventBus);
 	}
 	
@@ -301,6 +300,7 @@ public class EntityPageTopTest {
 		// entity area for the project settings doesn't apply (so it's set to null).
 		EntityArea projectSettingsEntityArea = null;
 		verify(mockProjectActionController).configure(mockProjectActionMenuWidget, mockProjectBundle, true, projectWikiId, projectSettingsEntityArea, mockEntityUpdatedHandler);
+		verify(mockProjectActionMenuWidget).setToolsButtonIcon(EntityPageTop.PROJECT_SETTINGS, IconType.GEAR);
 		
 		verify(mockFilesTab, never()).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockFilesTab, never()).configure(mockProjectBundle, mockEntityUpdatedHandler, versionNumber, mockActionMenuWidget);
@@ -376,6 +376,7 @@ public class EntityPageTopTest {
 
 		verify(mockTabs).showTab(mockFilesInnerTab, false);
 		verify(mockProjectMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
+		verify(mockProjectActionMenuWidget).setToolsButtonIcon(EntityPageTop.PROJECT_SETTINGS, IconType.GEAR);
 		
 		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockFilesTab).configure(mockEntityBundle, mockEntityUpdatedHandler, versionNumber, mockActionMenuWidget);
@@ -396,7 +397,7 @@ public class EntityPageTopTest {
 		verify(mockWikiInnerTab).setEntityNameAndPlace(projectName, expectedPlace);
 		expectedPlace.setArea(EntityArea.TABLES);
 		verify(mockTablesInnerTab).setEntityNameAndPlace(projectName, expectedPlace);
-		expectedPlace.setArea(EntityArea.ADMIN);
+		expectedPlace.setArea(EntityArea.CHALLENGE);
 		verify(mockChallengeInnerTab).setEntityNameAndPlace(projectName, expectedPlace);
 		expectedPlace.setArea(EntityArea.DISCUSSION);
 		verify(mockDiscussionInnerTab).setEntityNameAndPlace(projectName, expectedPlace);
@@ -616,7 +617,7 @@ public class EntityPageTopTest {
 	@Test
 	public void testConfigureWithFileGoToChallengeAdminTab(){
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
-		Synapse.EntityArea area = Synapse.EntityArea.ADMIN;
+		Synapse.EntityArea area = Synapse.EntityArea.CHALLENGE;
 		String areaToken = null;
 		Long versionNumber = null;
 		pageTop.configure(mockFileEntity, versionNumber, mockProjectHeader, area, areaToken);
