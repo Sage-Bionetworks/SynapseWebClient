@@ -413,7 +413,7 @@
 	        			<bh:Span text="OUR PARTNERS" addStyleNames="partnersHeading displayBlock" />
 						<g:HTMLPanel addStyleNames="center">
 							<span class="margin-bottom-5 margin-right-15"><a href="http://www.nhlbi.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/nih-heart.svg' height="80px" width="15%" /></a></span>                            
-							<span class="margin-bottom-5 margin-right-15"><a href="http://www.nimh.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/nih-mental.svg' height="80px" width="15%" /></a></span>                                                       
+							<span class="margin-bottom-5 margin-right-15"><a href="http://www.nimh.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/nih-mental.png' height="80px" width="15%" /></a></span>                                                       
 							<span class="margin-bottom-5 margin-right-15"><a href="http://www.sloan.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/sloan.svg' height="80px" width="15%" /></a></span>
 							<span class="margin-bottom-5 margin-right-15"><a href="http://www.nia.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/nih-aging.svg' height="80px" width="15%" /></a></span>
 							<span class="margin-bottom-5 margin-right-15"><a href="http://www.lsdfa.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/life-sciences.svg' height="80px" width="15%" /></a></span>
