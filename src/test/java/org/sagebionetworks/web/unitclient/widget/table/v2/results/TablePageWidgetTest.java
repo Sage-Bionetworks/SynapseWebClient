@@ -472,7 +472,7 @@ public class TablePageWidgetTest {
 		//facets would have been shown, but force advanced mode.
 		widget.setFacetsVisible(false);
 		widget.configure(bundle, query, null, isEditable, tableType, null, mockPageChangeListner, mockFacetChangedHandler, mockResetFacetsHandler);
-		verify(mockFacetsWidget, never()).configure(eq(facets), eq(mockFacetChangedHandler), anyList());
+		verify(mockFacetsWidget).configure(eq(facets), eq(mockFacetChangedHandler), anyList());
 		verify(mockView, never()).setFacetsVisible(true);
 		verify(mockView, atLeastOnce()).setFacetsVisible(false);
 	}
