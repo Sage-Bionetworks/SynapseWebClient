@@ -42,19 +42,7 @@ public class DisplayUtilsTest {
 	private String textWithMarkdown = "This is the **test** markdown\nthat will be used.";
 	private String markdownDelimiter = "*";
 	private String markdownDelimiter2 = "**";
-	private String errorMessage= "my test error message";
-	private GlobalApplicationState mockGlobalApplicationState;
-	private PlaceChanger mockPlaceChanger;
-	private SynapseView mockView;
 	
-	@Before
-	public void setup(){
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockView = mock(SynapseView.class);
-		mockPlaceChanger = mock(PlaceChanger.class);
-		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-	}	
-
 	@Test
 	public void testWidgetNotSelectedState() {
 		WidgetSelectionState state = new WidgetSelectionState();
@@ -335,6 +323,14 @@ public class DisplayUtilsTest {
 		//verify ref with version defined using "/version/" notation
 		testRef = DisplayUtils.parseEntityVersionString(validSynId + WebConstants.ENTITY_VERSION_STRING + validVersion);
 		assertEquals(expectedRef, testRef);
+	}
+	
+	@Test
+	public void testCapitalize() {
+		assertEquals(null, DisplayUtils.capitalize(null));
+		assertEquals("", DisplayUtils.capitalize(""));
+		assertEquals("F", DisplayUtils.capitalize("f"));
+		assertEquals("Hello", DisplayUtils.capitalize("heLLO"));
 	}
 }
 

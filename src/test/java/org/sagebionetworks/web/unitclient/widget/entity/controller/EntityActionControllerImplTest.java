@@ -369,6 +369,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionListener(Action.ADD_FILE_VIEW, controller);
 		verify(mockActionMenu).setActionVisible(Action.ADD_PROJECT_VIEW, canCertifiedUserEdit);
 		verify(mockActionMenu).setActionListener(Action.ADD_PROJECT_VIEW, controller);
+		verify(mockActionMenu).setToolsButtonIcon("Tables Tools", IconType.GEAR);
 	}
 	@Test
 	public void testConfigureProjectLevelTableCommandsCannotEdit(){
@@ -395,6 +396,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.ADD_TABLE, false);
 		verify(mockActionMenu).setActionVisible(Action.ADD_FILE_VIEW, false);
 		verify(mockActionMenu).setActionVisible(Action.ADD_PROJECT_VIEW, false);
+		verify(mockActionMenu).setToolsButtonIcon("Files Tools", IconType.GEAR);
 	}
 	
 	@Test
@@ -482,6 +484,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_TABLE_SCHEMA, true);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
+		verify(mockActionMenu).setToolsButtonIcon("Table Tools", IconType.GEAR);
 	}
 	
 	@Test
@@ -543,6 +546,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
 		verify(mockActionMenu).setActionListener(Action.EDIT_WIKI_PAGE, controller);
 		verify(mockActionMenu).setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI_PREFIX+EntityTypeUtils.getDisplayName(EntityType.project)+WIKI);
+		verify(mockActionMenu).setToolsButtonIcon("Wiki Tools", IconType.GEAR);
 	}
 	
 	@Test
@@ -553,6 +557,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
 		verify(mockActionMenu).setActionListener(Action.EDIT_WIKI_PAGE, controller);
 		verify(mockActionMenu).setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI_PREFIX+EntityTypeUtils.getDisplayName(EntityType.folder)+WIKI);
+		verify(mockActionMenu).setToolsButtonIcon("Folder Tools", IconType.GEAR);
 	}
 	
 	@Test
@@ -1605,6 +1610,7 @@ public class EntityActionControllerImplTest {
 		InOrder inOrder = inOrder(mockActionMenu);
 		inOrder.verify(mockActionMenu).setActionVisible(Action.CREATE_CHALLENGE, false);
 		inOrder.verify(mockActionMenu).setActionVisible(Action.CREATE_CHALLENGE, true);
+		verify(mockActionMenu, never()).setToolsButtonIcon(anyString(), any(IconType.class));
 	}
 
 	@Test
