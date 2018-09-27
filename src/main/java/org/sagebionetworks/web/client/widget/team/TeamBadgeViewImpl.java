@@ -90,7 +90,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 				Image profilePicture = new Image();
 				profilePicture.setUrl(teamIconUrl);
 				profilePicture.setHeight("24px");
-				profilePicture.addStyleName("imageButton userProfileImage displayInline margin-right-4");
+				profilePicture.addStyleName("imageButton displayInline margin-right-4");
 				profilePicture.addClickHandler(clickHandler);
 				add(profilePicture);
 			} else {
