@@ -694,7 +694,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			 //use default picture
 			 profilePicture = defaultProfilePicture;
 		 }
-		 profilePicture.addStyleName("margin-10 userProfileImage");
+		 profilePicture.addStyleName("margin-10");
 		 return profilePicture;
 	 }
 	 
