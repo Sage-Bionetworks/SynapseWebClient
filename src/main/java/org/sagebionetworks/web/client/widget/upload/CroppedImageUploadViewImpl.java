@@ -96,7 +96,7 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 		saveCropButton.addClickHandler(event -> {
 			saveCroppedImage();
 		});
-		previewModal.getElement().setAttribute("style", "z-index: 3000");
+		previewModal.getElement().setAttribute("style", "z-index: 3000; height: 700px;");
 		previewModal.addShownHandler(event -> {
 			previewModalBody.clear();
 			Image image = new Image();

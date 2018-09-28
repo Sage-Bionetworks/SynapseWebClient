@@ -200,6 +200,7 @@ public class SynapseJavascriptClient {
 	public static final String APPLICATION_JSON_CHARSET_UTF8 = "application/json; charset="+SYNAPSE_ENCODING_CHARSET;
 	public static final String REPO_SUFFIX_VERSION = "/version";
 	public static final String TEAM = "/team";
+	public static final String MEMBER = "/member";
 	public static final String WIKI_VERSION_PARAMETER = "?wikiVersion=";
 	public static final String FAVORITE_URI_PATH = "/favorite";
 	public static final String USER_GROUP_HEADER_PREFIX_PATH = "/userGroupHeaders?prefix=";
@@ -1190,7 +1191,11 @@ public class SynapseJavascriptClient {
 		}
 		doGet(url, OBJECT_TYPE.SubscriptionPagedResults, callback);
 	}
-	
+	public void deleteTeamMember(String teamId, String memberId, AsyncCallback<Void> callback) {
+		String url = getRepoServiceUrl() + TEAM + "/" + teamId + MEMBER + "/" + memberId;
+		doDelete(url, callback);
+	}
+
 	public void addFileToDownloadList(String fileHandleId, String fileEntityId, AsyncCallback<DownloadList> callback) {
 		List<FileHandleAssociation> toAdd = new ArrayList<FileHandleAssociation>();
 		FileHandleAssociation fha = new FileHandleAssociation();

@@ -131,7 +131,6 @@ public interface SynapseClientAsync {
 	void resendTeamInvitation(String membershipInvitationId, String hostPageBaseURL, AsyncCallback<Void> callback);
 	void getOpenRequests(String teamId, AsyncCallback<List<MembershipRequestBundle>> callback);
 	void updateTeam(Team team, AccessControlList teamAcl, AsyncCallback<Team> callback);
-	void deleteTeamMember(String currentUserId, String targetUserId, String teamId, AsyncCallback<Void> callback);
 	void getTeamMembers(String teamId, String fragment, Integer limit, Integer offset, AsyncCallback<TeamMemberPagedResults> callback);	
 	void getTeamMemberCount(String teamId, AsyncCallback<Long> callback);
 	void requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL, Date expiresOn, AsyncCallback<TeamMembershipStatus> callback);

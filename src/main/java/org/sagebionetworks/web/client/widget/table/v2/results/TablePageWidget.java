@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -141,18 +142,16 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			keyboardNavigationHandler = null;
 		}
 		List<FacetColumnResult> facets = bundle.getFacets();
-		
 		boolean isFacetsSupported = !isEditable && 
 				facetChangedHandler != null && 
 				facets != null && 
 				!facets.isEmpty()
 				&& facetsVisible;
-		
+		facetsWidget.configure(facets, facetChangedHandler, types);
 		if (isFacetsSupported) {
-			facetsWidget.configure(facets, facetChangedHandler, types);
 			setFacetsVisible(facetsWidget.isShowingFacets());
 		} else {
-			setFacetsVisible(isFacetsSupported);
+			setFacetsVisible(false);
 		}
 		view.setTableHeaders(headers);
 		rows = new ArrayList<RowWidget>(rowCount);
@@ -327,6 +326,6 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	}
 	public void setTableVisible(boolean visible) {
 		view.setTableVisible(visible);
-		view.setFacetsVisible(facetsWidget.isShowingFacets());
+		view.setFacetsVisible(facetsVisible && facetsWidget.isShowingFacets());
 	}
 }

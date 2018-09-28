@@ -15,7 +15,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
  */
 public class SynapsePlaceTest {
 	
-	public static final String ADMIN_DELIMITER = Synapse.getDelimiter(Synapse.EntityArea.ADMIN);
+	public static final String ADMIN_DELIMITER = Synapse.getDelimiter(Synapse.EntityArea.CHALLENGE);
 	public static final String WIKI_DELIMITER = Synapse.getDelimiter(Synapse.EntityArea.WIKI);
 	public static final String FILES_DELIMITER = Synapse.getDelimiter(Synapse.EntityArea.FILES);
 	public static final String TABLES_DELIMITER = Synapse.getDelimiter(Synapse.EntityArea.TABLES);
@@ -88,7 +88,7 @@ public class SynapsePlaceTest {
 		
 		Assert.assertEquals(testEntityId, place.getEntityId());
 		Assert.assertEquals(testVersionNumber, place.getVersionNumber());
-		Assert.assertEquals(Synapse.EntityArea.ADMIN, place.getArea());
+		Assert.assertEquals(Synapse.EntityArea.CHALLENGE, place.getArea());
 		Assert.assertNull(place.getAreaToken());
 		Assert.assertEquals(testToken, tokenizer.getToken(place));
 	}
@@ -151,7 +151,7 @@ public class SynapsePlaceTest {
 		
 		Assert.assertEquals(testEntityId, place.getEntityId());
 		Assert.assertNull(place.getVersionNumber());
-		Assert.assertEquals(Synapse.EntityArea.ADMIN, place.getArea());
+		Assert.assertEquals(Synapse.EntityArea.CHALLENGE, place.getArea());
 		Assert.assertNull(place.getAreaToken());
 		Assert.assertEquals(testToken, tokenizer.getToken(place));
 	}

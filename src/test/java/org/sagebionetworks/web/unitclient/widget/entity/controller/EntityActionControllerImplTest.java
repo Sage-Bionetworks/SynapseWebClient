@@ -343,6 +343,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, false);
 		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
+		verify(mockActionMenu).setToolsButtonIcon("Docker Repository Tools", IconType.GEAR);
 	}
 	
 	private void setPublicCanRead() {
@@ -368,6 +369,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionListener(Action.ADD_FILE_VIEW, controller);
 		verify(mockActionMenu).setActionVisible(Action.ADD_PROJECT_VIEW, canCertifiedUserEdit);
 		verify(mockActionMenu).setActionListener(Action.ADD_PROJECT_VIEW, controller);
+		verify(mockActionMenu).setToolsButtonIcon("Tables Tools", IconType.GEAR);
 	}
 	@Test
 	public void testConfigureProjectLevelTableCommandsCannotEdit(){
@@ -394,6 +396,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.ADD_TABLE, false);
 		verify(mockActionMenu).setActionVisible(Action.ADD_FILE_VIEW, false);
 		verify(mockActionMenu).setActionVisible(Action.ADD_PROJECT_VIEW, false);
+		verify(mockActionMenu).setToolsButtonIcon("Files Tools", IconType.GEAR);
 	}
 	
 	@Test
@@ -481,6 +484,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_TABLE_SCHEMA, true);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
+		verify(mockActionMenu).setToolsButtonIcon("Table Tools", IconType.GEAR);
 	}
 	
 	@Test
@@ -542,6 +546,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
 		verify(mockActionMenu).setActionListener(Action.EDIT_WIKI_PAGE, controller);
 		verify(mockActionMenu).setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI_PREFIX+EntityTypeUtils.getDisplayName(EntityType.project)+WIKI);
+		verify(mockActionMenu).setToolsButtonIcon("Wiki Tools", IconType.GEAR);
 	}
 	
 	@Test
@@ -552,6 +557,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
 		verify(mockActionMenu).setActionListener(Action.EDIT_WIKI_PAGE, controller);
 		verify(mockActionMenu).setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI_PREFIX+EntityTypeUtils.getDisplayName(EntityType.folder)+WIKI);
+		verify(mockActionMenu).setToolsButtonIcon("Folder Tools", IconType.GEAR);
 	}
 	
 	@Test
@@ -655,7 +661,7 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testConfigureAddEvaluationOnChallengeTab(){
-		currentEntityArea = EntityArea.ADMIN;
+		currentEntityArea = EntityArea.CHALLENGE;
 		entityBundle.setEntity(new Project());
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionVisible(Action.ADD_EVALUATION_QUEUE, true);
@@ -1570,7 +1576,7 @@ public class EntityActionControllerImplTest {
 		
 		ArgumentCaptor<Challenge> captor = ArgumentCaptor.forClass(Challenge.class);
 		verify(mockChallengeClient).createChallenge(captor.capture(), any(AsyncCallback.class));
-		verify(mockPlaceChanger).goTo(new Synapse(entityId, null, EntityArea.ADMIN, null) );
+		verify(mockPlaceChanger).goTo(new Synapse(entityId, null, EntityArea.CHALLENGE, null) );
 		verify(mockView).showInfo(DisplayConstants.CHALLENGE_CREATED);
 		Challenge c = captor.getValue();
 		assertNull(c.getId());
@@ -1604,6 +1610,7 @@ public class EntityActionControllerImplTest {
 		InOrder inOrder = inOrder(mockActionMenu);
 		inOrder.verify(mockActionMenu).setActionVisible(Action.CREATE_CHALLENGE, false);
 		inOrder.verify(mockActionMenu).setActionVisible(Action.CREATE_CHALLENGE, true);
+		verify(mockActionMenu, never()).setToolsButtonIcon(anyString(), any(IconType.class));
 	}
 
 	@Test
@@ -1619,7 +1626,7 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testConfigureChallengeFound() throws Exception {
 		// currentArea is on the challenge tab
-		currentEntityArea = EntityArea.ADMIN;
+		currentEntityArea = EntityArea.CHALLENGE;
 		entityBundle.setEntity(new Project());
 		AsyncMockStubber.callSuccessWith(new Challenge()).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
