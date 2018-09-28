@@ -1375,17 +1375,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public void deleteTeamMember(String currentUserId, String targetUserId,
-			String teamId) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			synapseClient.removeTeamMember(teamId, targetUserId);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
 	public Team updateTeam(Team team, AccessControlList teamAcl) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {

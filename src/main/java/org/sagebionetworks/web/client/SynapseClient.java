@@ -142,7 +142,6 @@ public interface SynapseClient extends RemoteService{
 	List<MembershipRequestBundle> getOpenRequests(String teamId) throws RestServiceException;
 
 	void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin) throws RestServiceException;
-	void deleteTeamMember(String currentUserId, String targetUserId, String teamId) throws RestServiceException;
 	Team updateTeam(Team team, AccessControlList teamAcl) throws RestServiceException;
 	TeamMemberPagedResults getTeamMembers(String teamId, String fragment, Integer limit, Integer offset) throws RestServiceException;
 	TeamMembershipStatus requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL, Date expiresOn) throws RestServiceException;
