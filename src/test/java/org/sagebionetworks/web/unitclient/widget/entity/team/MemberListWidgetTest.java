@@ -5,7 +5,6 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -14,12 +13,14 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
@@ -32,32 +33,34 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+@RunWith(MockitoJUnitRunner.class)
 public class MemberListWidgetTest {
 
+	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	MemberListWidgetView mockView;
 	String teamId = "123";
 	MemberListWidget widget;
+	@Mock
 	AuthenticationController mockAuthenticationController;
+	@Mock
 	Callback mockTeamUpdatedCallback;
 	boolean isAdmin;
 	@Mock
 	LoadMoreWidgetContainer mockMembersContainer;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
-		MockitoAnnotations.initMocks(this);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockView = mock(MemberListWidgetView.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		mockTeamUpdatedCallback = mock(Callback.class);
-		widget = new MemberListWidget(mockView, mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState, mockMembersContainer);
+		widget = new MemberListWidget(mockView, mockSynapseClient, mockJsClient, mockAuthenticationController, mockGlobalApplicationState, mockMembersContainer);
 		isAdmin = true;
 		
 		AsyncMockStubber.callSuccessWith(getTestTeamMembers()).when(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteTeamMember(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).deleteTeamMember(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setIsTeamAdmin(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 	}
 	
@@ -107,7 +110,7 @@ public class MemberListWidgetTest {
 	public void testRemoveMember() throws Exception {
 		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
 		widget.removeMember("a user id");
-		verify(mockSynapseClient).deleteTeamMember(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockJsClient).deleteTeamMember(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString());
 		verify(mockTeamUpdatedCallback).invoke();
 	}
@@ -116,9 +119,9 @@ public class MemberListWidgetTest {
 		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
 		String error = "unhandled exception";
 		Exception ex = new Exception(error);
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).deleteTeamMember(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).deleteTeamMember(anyString(), anyString(), any(AsyncCallback.class));
 		widget.removeMember("a user id");
-		verify(mockSynapseClient).deleteTeamMember(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockJsClient).deleteTeamMember(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(error);
 	}
 	@Test
@@ -126,9 +129,9 @@ public class MemberListWidgetTest {
 		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
 		String badRequestMessage = "Team must have at least one administrator.";
 		Exception ex = new BadRequestException(badRequestMessage);
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).deleteTeamMember(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).deleteTeamMember(anyString(), anyString(), any(AsyncCallback.class));
 		widget.removeMember("a user id");
-		verify(mockSynapseClient).deleteTeamMember(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockJsClient).deleteTeamMember(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(badRequestMessage);
 	}
 	
