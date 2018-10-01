@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.file.BulkFileDownloadResponse;
 import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.repo.model.file.DownloadOrder;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
+import org.sagebionetworks.repo.model.file.ZipFileFormat;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
@@ -124,6 +125,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 		BulkFileDownloadRequest request = new BulkFileDownloadRequest();
 		request.setRequestedFiles(order.getFiles());
 		request.setZipFileName(order.getZipFileName());
+		request.setZipFileFormat(ZipFileFormat.Flat);
 		view.setCreatePackageUIVisible(false);
 		progressWidget.startAndTrackJob("", true, AsynchType.BulkFileDownload, request, new AsynchronousProgressHandler() {
 			@Override

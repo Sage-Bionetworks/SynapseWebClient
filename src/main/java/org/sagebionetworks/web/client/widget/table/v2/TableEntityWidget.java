@@ -165,6 +165,7 @@ public class TableEntityWidget implements IsWidget,
 		this.view.configure(bundle, this.canEdit);
 		this.actionMenu = actionMenu;
 		this.entityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass()));
+		addToDownloadList.clear();
 		configureActions();
 		checkState();
 		initSimpleAdvancedQueryState();

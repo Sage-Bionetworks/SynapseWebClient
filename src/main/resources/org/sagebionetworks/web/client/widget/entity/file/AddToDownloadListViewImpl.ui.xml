@@ -25,7 +25,7 @@
 					<bh:Span text="files added to your Downloads List." marginLeft="2" />
 				</bh:Span>
 			</bh:Span>
-			<b:Anchor text="VIEW DOWNLOAD LIST" pull="RIGHT" ui:field="viewDownloadListLink" addStyleNames="color-white font-size-17" marginTop="13"/>	
+			<b:Anchor text="VIEW DOWNLOAD LIST" pull="RIGHT" ui:field="viewDownloadListLink" addStyleNames="color-white font-size-17" marginTop="13" marginRight="10"/>	
 		</b:Alert>
 		<bh:Div ui:field="synAlertContainer" />
 	</bh:Div>

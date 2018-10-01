@@ -40,6 +40,7 @@ public class FilesBrowser implements SynapseWidgetPresenter, FilesBrowserView.Pr
 	public void configure(String entityId) {
 		this.entityId = entityId;
 		view.clear();
+		addToDownloadList.clear();
 		view.configure(entityId);
 	}
 	

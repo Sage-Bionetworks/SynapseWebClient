@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.Container;
 import org.gwtbootstrap3.client.ui.ProgressBar;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Text;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -23,7 +24,7 @@ import com.google.inject.Inject;
 public class AsynchronousProgressViewImpl implements AsynchronousProgressView {
 
 	public interface Binder extends
-			UiBinder<Container, AsynchronousProgressViewImpl> {
+			UiBinder<Div, AsynchronousProgressViewImpl> {
 	}
 
 	@UiField
@@ -31,16 +32,14 @@ public class AsynchronousProgressViewImpl implements AsynchronousProgressView {
 	@UiField
 	Div spinnerColumn;
 	@UiField
-	Span title;
+	Div title;
 	@UiField
 	ProgressBar progressBar;
 	@UiField
 	Button cancelButton;
 	@UiField
-	Span message;
-	
+	Div message;
 	Presenter presenter;
-
 	Div container;
 
 	@Inject
@@ -66,7 +65,8 @@ public class AsynchronousProgressViewImpl implements AsynchronousProgressView {
 
 	@Override
 	public void setTitle(String title) {
-		this.title.setText(title);
+		this.title.clear();
+		this.title.add(new Text(title));
 	}
 
 	@Override
@@ -80,17 +80,22 @@ public class AsynchronousProgressViewImpl implements AsynchronousProgressView {
 			String message) {
 		progressBar.setPercent(percent);
 		progressBar.setText(text);
-		this.message.setText(message);
+		this.message.clear();
+		if (message != null) {
+			this.message.add(new Text(message));	
+		}
 	}
 
 	@Override
 	public void setIndetermianteProgress(String message) {
-		this.message.setText(message);
+		this.message.clear();
+		if (message != null) {
+			this.message.add(new Text(message));	
+		}
 	}
 
 	@Override
 	public boolean isAttached() {
 		return progressBar.isAttached();
 	}
-
 }

@@ -8,6 +8,9 @@ import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.file.AddFileToDownloadListRequest;
+import org.sagebionetworks.repo.model.file.AddFileToDownloadListResponse;
+import org.sagebionetworks.repo.model.file.DownloadList;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -39,6 +42,8 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	SynapseJavascriptClient jsClient;
 	Integer fileCount = null;
 	Double fileSize = null;
+	List<FileHandleAssociation> downloadListBefore, downloadListAfter;
+	
 	@Inject
 	public AddToDownloadList(AddToDownloadListView view, 
 			PortalGinInjector ginInjector,
@@ -59,8 +64,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 		view.setPresenter(this);
 		view.hideAll();
 	}
-	
-	private void init() {
+	public void clear() {
 		fileCount = null;
 		fileSize = null;
 		request = new AddFileToDownloadListRequest();
@@ -69,14 +73,14 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	}
 	
 	public void addToDownloadList(Query query) {
-		init();
+		clear();
 		// TODO: waiting for service to return the file count and size.
 		request.setQuery(query);
 		confirmAddQueryResultsToDownloadList();
 	}
 	
 	public void addToDownloadList(String folderId) {
-		init();
+		clear();
 		request.setFolderId(folderId);
 		confirmAddFolderChildrenToDownloadList();
 	}
@@ -117,7 +121,26 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	
 	@Override
 	public void onConfirmAddToDownloadList() {
+		// get the current count in the download list
 		view.hideAll();
+		getDownloadListBeforeAdd();
+	}
+	
+	public void getDownloadListBeforeAdd() {
+		jsClient.getDownloadList(new AsyncCallback<DownloadList>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+				view.hideAll();
+			}
+			public void onSuccess(DownloadList downloadList) {
+				downloadListBefore = downloadList.getFilesToDownload();
+				startAddingFiles();
+			};
+		});
+	}
+	
+	public void startAddingFiles() {
 		AsynchronousProgressWidget progress = ginInjector.creatNewAsynchronousProgressWidget();
 		view.setAsynchronousProgressWidget(progress);
 		view.showAsynchronousProgressWidget();
@@ -130,12 +153,16 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 			
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
-//				view.hideAll();
-				if (fileSize != null) {
-					view.showSuccess(fileCount);	
+				AddFileToDownloadListResponse addFileToDownloadListResponse = (AddFileToDownloadListResponse) response;
+				downloadListAfter = addFileToDownloadListResponse.getDownloadList().getFilesToDownload();
+				view.hideAll();
+				downloadListAfter.removeAll(downloadListBefore);
+				if (downloadListAfter.size() > 0) {
+					view.showSuccess(downloadListAfter.size());
 				} else {
-					popupUtilsView.showInfo(SUCCESS_ADDED_FILES_MESSAGE);	
+					popupUtilsView.showInfo("No new files have been added to the Download List.");	
 				}
+				
 				//fire event to trigger UI element in header!
 				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}
