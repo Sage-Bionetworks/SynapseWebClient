@@ -30,6 +30,7 @@ import com.google.inject.Inject;
 
 public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presenter {
 	
+	public static final String NO_NEW_FILES_ADDED_MESSAGE = "No new files have been added to the Download List.";
 	public static final String SUCCESS_ADDED_FILES_MESSAGE = "Successfully added files to the Download List.";
 	public static final String ADD_QUERY_FILES_CONFIRMATION_MESSAGE = "Add all files from this query result to the Download List?";
 	AddToDownloadListView view;
@@ -160,7 +161,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 				if (downloadListAfter.size() > 0) {
 					view.showSuccess(downloadListAfter.size());
 				} else {
-					popupUtilsView.showInfo("No new files have been added to the Download List.");	
+					popupUtilsView.showInfo(NO_NEW_FILES_ADDED_MESSAGE);	
 				}
 				
 				//fire event to trigger UI element in header!

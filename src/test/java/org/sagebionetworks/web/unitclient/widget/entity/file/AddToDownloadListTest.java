@@ -12,6 +12,8 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.file.AddFileToDownloadListRequest;
+import org.sagebionetworks.repo.model.file.AddFileToDownloadListResponse;
+import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -26,8 +28,10 @@ import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListView;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.PackageSizeSummary;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AddToDownloadListTest {
@@ -51,7 +55,12 @@ public class AddToDownloadListTest {
 	PackageSizeSummary mockPackageSizeSummary;
 	@Mock
 	SynapseJavascriptClient mockJsClient;
-	
+	@Mock
+	DownloadList mockDownloadListBefore;
+	@Mock
+	AddFileToDownloadListResponse mockAddFileToDownloadListResponse;
+	@Mock
+	DownloadList mockDownloadListAfter;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
 	@Captor
@@ -66,6 +75,8 @@ public class AddToDownloadListTest {
 		widget = new AddToDownloadList(mockView, mockGinInjector, mockPopupUtils, mockEventBus, mockSynAlert, mockPackageSizeSummary, mockJsClient);
 		when(mockGinInjector.creatNewAsynchronousProgressWidget()).thenReturn(mockAsynchronousProgressWidget);
 		when(mockGinInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
+		AsyncMockStubber.callSuccessWith(mockDownloadListBefore).when(mockJsClient).getDownloadList(any(AsyncCallback.class));
+		when(mockAddFileToDownloadListResponse.getDownloadList()).thenReturn(mockDownloadListAfter);
 	}
 
 	@Test
@@ -77,7 +88,7 @@ public class AddToDownloadListTest {
 		//simulate user confirmation
 		callbackCaptor.getValue().invoke();
 		
-		verify(mockView).hideAll();
+		verify(mockView, times(2)).hideAll();
 		verify(mockView).setAsynchronousProgressWidget(mockAsynchronousProgressWidget);
 		verify(mockAsynchronousProgressWidget).startAndTrackJob(anyString(), eq(false), eq(AsynchType.AddFileToDownloadList), requestCaptor.capture(), asyncProgressHandlerCaptor.capture());
 		
@@ -86,10 +97,10 @@ public class AddToDownloadListTest {
 		assertEquals(mockQuery, request.getQuery());
 
 		//simulate completing job
-		asyncProgressHandlerCaptor.getValue().onComplete(null);
+		asyncProgressHandlerCaptor.getValue().onComplete(mockAddFileToDownloadListResponse);
 		
-		verify(mockView, times(2)).hideAll();
-		verify(mockPopupUtils).showInfo(AddToDownloadList.SUCCESS_ADDED_FILES_MESSAGE);
+		verify(mockView, times(3)).hideAll();
+		verify(mockPopupUtils).showInfo(AddToDownloadList.NO_NEW_FILES_ADDED_MESSAGE);
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
 	}
 	
