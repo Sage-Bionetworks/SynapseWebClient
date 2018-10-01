@@ -66,11 +66,13 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 		view.hideAll();
 	}
 	public void clear() {
+		view.hideAll();
 		fileCount = null;
 		fileSize = null;
 		request = new AddFileToDownloadListRequest();
 		packageSizeSummary.clear();
 		synAlert.clear();
+		
 	}
 	
 	public void addToDownloadList(Query query) {
@@ -123,16 +125,15 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	@Override
 	public void onConfirmAddToDownloadList() {
 		// get the current count in the download list
-		view.hideAll();
 		getDownloadListBeforeAdd();
 	}
 	
 	public void getDownloadListBeforeAdd() {
+		view.hideAll();
 		jsClient.getDownloadList(new AsyncCallback<DownloadList>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
-				view.hideAll();
 			}
 			public void onSuccess(DownloadList downloadList) {
 				downloadListBefore = downloadList.getFilesToDownload();

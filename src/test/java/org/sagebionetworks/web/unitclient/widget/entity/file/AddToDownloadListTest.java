@@ -88,7 +88,7 @@ public class AddToDownloadListTest {
 		//simulate user confirmation
 		callbackCaptor.getValue().invoke();
 		
-		verify(mockView, times(2)).hideAll();
+		verify(mockView, times(3)).hideAll();
 		verify(mockView).setAsynchronousProgressWidget(mockAsynchronousProgressWidget);
 		verify(mockAsynchronousProgressWidget).startAndTrackJob(anyString(), eq(false), eq(AsynchType.AddFileToDownloadList), requestCaptor.capture(), asyncProgressHandlerCaptor.capture());
 		
@@ -99,7 +99,7 @@ public class AddToDownloadListTest {
 		//simulate completing job
 		asyncProgressHandlerCaptor.getValue().onComplete(mockAddFileToDownloadListResponse);
 		
-		verify(mockView, times(3)).hideAll();
+		verify(mockView, times(4)).hideAll();
 		verify(mockPopupUtils).showInfo(AddToDownloadList.NO_NEW_FILES_ADDED_MESSAGE);
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
 	}

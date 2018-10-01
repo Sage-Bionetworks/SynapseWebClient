@@ -19,7 +19,7 @@
 		<bh:Div ui:field="progressContainer" addStyleNames="center" visible="false"/>
 		<b:Alert ui:field="successfullyAddedUI" addStyleNames="fullWidthAlert" type="INFO" visible="false" height="60px">
 			<bh:Span marginLeft="10">
-				<b:Icon addStyleNames="font-size-17" type="CHECK" marginLeft="5" marginTop="17"/>
+				<b:Icon addStyleNames="font-size-17" type="CHECK_CIRCLE" marginLeft="5" marginTop="17"/>
 				<bh:Span addStyleNames="font-size-17" marginLeft="10" marginTop="13" >
 					<bh:Span ui:field="fileCount" />
 					<bh:Span text="files added to your Downloads List." marginLeft="2" />
