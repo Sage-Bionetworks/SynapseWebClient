@@ -47,6 +47,12 @@ public class PackageSizeSummary implements IsWidget {
 		updateView();
 	}
 	
+	public void addFiles(int fileCount, double fileSize) {
+		totalFileCount += fileCount;
+		totalFileSize += fileSize;
+		updateView();
+	}
+	
 	private void updateView() {
 		view.setFileCount(totalFileCount);
 		view.setSize(gwt.getFriendlySize(totalFileSize, true));
@@ -75,5 +81,9 @@ public class PackageSizeSummary implements IsWidget {
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+	
+	public void addTextStyle(String style) {
+		view.addTextStyle(style);
 	}
 }

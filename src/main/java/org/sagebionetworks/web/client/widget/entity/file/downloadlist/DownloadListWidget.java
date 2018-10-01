@@ -54,6 +54,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 		this.eventBus = eventBus;
 		this.fhaTable = fhaTable;
 		this.packageSizeSummary = packageSizeSummary;
+		packageSizeSummary.addTextStyle("synapse-green");
 		this.progressWidget = progressWidget;
 		this.jsniUtils = jsniUtils;
 		view.setSynAlert(synAlert);

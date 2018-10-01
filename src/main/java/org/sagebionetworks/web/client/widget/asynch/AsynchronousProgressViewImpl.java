@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.Container;
 import org.gwtbootstrap3.client.ui.ProgressBar;
-import org.gwtbootstrap3.client.ui.html.Text;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -27,21 +27,21 @@ public class AsynchronousProgressViewImpl implements AsynchronousProgressView {
 	}
 
 	@UiField
-	Column progressColumn;
+	Div progressColumn;
 	@UiField
-	Column spinnerColumn;
+	Div spinnerColumn;
 	@UiField
-	Text title;
+	Span title;
 	@UiField
 	ProgressBar progressBar;
 	@UiField
 	Button cancelButton;
 	@UiField
-	Text message;
+	Span message;
 	
 	Presenter presenter;
 
-	Container container;
+	Div container;
 
 	@Inject
 	public AsynchronousProgressViewImpl(final Binder uiBinder) {

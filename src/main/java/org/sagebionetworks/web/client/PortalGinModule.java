@@ -391,6 +391,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListView;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItemView;
@@ -1433,5 +1435,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(FileHandleAssociationTableView.class).to(FileHandleAssociationTableViewImpl.class);
 		bind(FileHandleAssociationRowView.class).to(FileHandleAssociationRowViewImpl.class);
 		bind(PackageSizeSummaryView.class).to(PackageSizeSummaryViewImpl.class);
+		bind(AddToDownloadListView.class).to(AddToDownloadListViewImpl.class);
 	}
 }

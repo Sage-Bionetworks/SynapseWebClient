@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.file.downloadlist;
 
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 
 import com.google.gwt.core.client.GWT;
@@ -13,9 +14,15 @@ public class PackageSizeSummaryViewImpl implements PackageSizeSummaryView, IsWid
 	Widget w;
 	interface PackageSizeSummaryViewImplUiBinder extends UiBinder<Widget, PackageSizeSummaryViewImpl> {}
 	@UiField
+	Span fileCountSpan;
+	@UiField
 	Text fileCount;
 	@UiField
+	Span fileSizeSpan;
+	@UiField
 	Text fileSize;
+	@UiField
+	Span estimatedTimeSpan;
 	@UiField
 	Text estimatedTime;
 	private static PackageSizeSummaryViewImplUiBinder uiBinder = GWT
@@ -39,5 +46,11 @@ public class PackageSizeSummaryViewImpl implements PackageSizeSummaryView, IsWid
 	@Override
 	public void setSize(String friendlyFileSize) {
 		fileSize.setText(friendlyFileSize);
+	}
+	@Override
+	public void addTextStyle(String style) {
+		fileCountSpan.addStyleName(style);
+		fileSizeSpan.addStyleName(style);
+		estimatedTimeSpan.addStyleName(style);
 	}
 }
