@@ -553,6 +553,6 @@ public class TableEntityWidget implements IsWidget,
 	
 	@Override
 	public void onAddToDownloadList() {
-		addToDownloadList.addToDownloadList(currentQuery);
+		addToDownloadList.addToDownloadList(entityBundle.getEntity().getId(), currentQuery);
 	}
 }

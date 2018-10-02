@@ -3,7 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.file;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
-
+import static org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,12 +21,12 @@ import org.sagebionetworks.repo.model.file.AddFileToDownloadListResponse;
 import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.table.Query;
+import org.sagebionetworks.repo.model.table.QueryBundleRequest;
+import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.web.client.PopupUtilsView;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -45,8 +45,6 @@ public class AddToDownloadListTest {
 	AddToDownloadList widget;
 	@Mock
 	AddToDownloadListView mockView;
-	@Mock
-	PortalGinInjector mockGinInjector;
 	@Mock
 	EventBus mockEventBus;
 	@Mock
@@ -69,58 +67,87 @@ public class AddToDownloadListTest {
 	DownloadList mockDownloadListAfter;
 	@Mock
 	EntityChildrenResponse mockEntityChildrenResponse;
+	@Mock
+	QueryResultBundle mockQueryResultBundle;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
 	@Captor
 	ArgumentCaptor<AddFileToDownloadListRequest> requestCaptor;
+	@Captor
+	ArgumentCaptor<QueryBundleRequest> queryBundleRequestCaptor;
 	@Captor
 	ArgumentCaptor<AsynchronousProgressHandler> asyncProgressHandlerCaptor;
 	@Captor
 	ArgumentCaptor<EntityChildrenRequest> entityChildrenRequestCaptor;
 	@Mock
 	FileHandleAssociation mockFileHandleAssociation;
-	String folderId = "syn10932";
+	String folderId = "syn10932", queryEntityId = "syn9";
 	Long testFolderChildCount = 22L, testFolderSumFileSizesBytes = 7777777L;
 	List<FileHandleAssociation> downloadListFilesBefore, downloadListFilesAfter;
+	Long queryCount = 4L;
+	Long querySumFileSize = 88L;
 	@Before
 	public void setUp() throws Exception {
 		downloadListFilesBefore = new ArrayList<FileHandleAssociation>();
 		downloadListFilesAfter = new ArrayList<FileHandleAssociation>();
-		widget = new AddToDownloadList(mockView, mockGinInjector, mockPopupUtils, mockEventBus, mockSynAlert, mockPackageSizeSummary, mockJsClient);
-		when(mockGinInjector.creatNewAsynchronousProgressWidget()).thenReturn(mockAsynchronousProgressWidget);
-		when(mockGinInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
+		widget = new AddToDownloadList(mockView, mockAsynchronousProgressWidget, mockPopupUtils, mockEventBus, mockSynAlert, mockPackageSizeSummary, mockJsClient);
 		AsyncMockStubber.callSuccessWith(mockDownloadListBefore).when(mockJsClient).getDownloadList(any(AsyncCallback.class));
 		when(mockAddFileToDownloadListResponse.getDownloadList()).thenReturn(mockDownloadListAfter);
 		when(mockEntityChildrenResponse.getTotalChildCount()).thenReturn(testFolderChildCount);
 		when(mockEntityChildrenResponse.getSumFileSizesBytes()).thenReturn(testFolderSumFileSizesBytes);
 		when(mockDownloadListBefore.getFilesToDownload()).thenReturn(downloadListFilesBefore);
 		when(mockDownloadListAfter.getFilesToDownload()).thenReturn(downloadListFilesAfter);
+		when(mockQueryResultBundle.getQueryCount()).thenReturn(queryCount);
+		//TODO: mock query sum file size
+		querySumFileSize = 0L;
+//		when(mockQueryResultBundle.getSumFileSizesBytes()).thenReturn(querySumFileSize);
 	}
 
 	@Test
 	public void testAddQueryToDownloadList() {
-		widget.addToDownloadList(mockQuery);
+		widget.addToDownloadList(queryEntityId, mockQuery);
 		
-		verify(mockPopupUtils).showConfirmDialog(anyString(), eq(AddToDownloadList.ADD_QUERY_FILES_CONFIRMATION_MESSAGE), callbackCaptor.capture());
+		verify(mockAsynchronousProgressWidget).startAndTrackJob(anyString(), eq(false), eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), asyncProgressHandlerCaptor.capture());
 		
-		//simulate user confirmation
-		callbackCaptor.getValue().invoke();
+		//verify query request params
+		QueryBundleRequest queryBundleRequest = queryBundleRequestCaptor.getValue();
+		assertEquals(mockQuery, queryBundleRequest.getQuery());
+		assertEquals(queryEntityId, queryBundleRequest.getEntityId());
+		assertEquals(FILE_SIZE_QUERY_PART_MASK, queryBundleRequest.getPartMask());
+		verify(mockView).showAsynchronousProgressWidget();
 		
+		//simulate success
+		AsynchronousProgressHandler queryBundleRequestProgressHandler = asyncProgressHandlerCaptor.getValue();
+		queryBundleRequestProgressHandler.onComplete(mockQueryResultBundle);
 		verify(mockView, times(3)).hideAll();
+		verify(mockPackageSizeSummary).addFiles(queryCount.intValue(), querySumFileSize.doubleValue());
+		verify(mockView).showConfirmAdd();
+		
+		//simulate user confirms
+		widget.onConfirmAddToDownloadList();
+		
+		verify(mockView, times(4)).hideAll();
 		verify(mockJsClient).getDownloadList(any(AsyncCallback.class));
 		verify(mockView).setAsynchronousProgressWidget(mockAsynchronousProgressWidget);
 		verify(mockAsynchronousProgressWidget).startAndTrackJob(anyString(), eq(false), eq(AsynchType.AddFileToDownloadList), requestCaptor.capture(), asyncProgressHandlerCaptor.capture());
 		
-		//verify request
+		//verify add file to download list request
 		AddFileToDownloadListRequest request = requestCaptor.getValue();
 		assertEquals(mockQuery, request.getQuery());
 
 		//simulate completing job
-		asyncProgressHandlerCaptor.getValue().onComplete(mockAddFileToDownloadListResponse);
+		AsynchronousProgressHandler addFileToDownloadListProgressHandler = asyncProgressHandlerCaptor.getValue(); 
+		addFileToDownloadListProgressHandler.onComplete(mockAddFileToDownloadListResponse);
 		
-		verify(mockView, times(4)).hideAll();
+		verify(mockView, times(5)).hideAll();
 		verify(mockPopupUtils).showInfo(AddToDownloadList.NO_NEW_FILES_ADDED_MESSAGE);
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
+		
+		//verify error handling in query bundle progress handler
+		Exception ex = new Exception("unable to get query bundle");
+		queryBundleRequestProgressHandler.onFailure(ex);
+		verify(mockSynAlert).handleException(ex);
+		verify(mockView, times(6)).hideAll();
 	}
 	
 	@Test

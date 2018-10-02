@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_COUNT;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,8 +14,9 @@ import org.sagebionetworks.repo.model.file.AddFileToDownloadListResponse;
 import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.table.Query;
+import org.sagebionetworks.repo.model.table.QueryBundleRequest;
+import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.web.client.PopupUtilsView;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
@@ -33,19 +36,21 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	public static final String NO_NEW_FILES_ADDED_MESSAGE = "No new files have been added to the Download List.";
 	public static final String SUCCESS_ADDED_FILES_MESSAGE = "Successfully added files to the Download List.";
 	public static final String ADD_QUERY_FILES_CONFIRMATION_MESSAGE = "Add all files from this query result to the Download List?";
+	public static final Long FILE_SIZE_QUERY_PART_MASK = BUNDLE_MASK_QUERY_COUNT; //TODO: add new bit to get total size
 	AddToDownloadListView view;
 	PopupUtilsView popupUtilsView;
-	PortalGinInjector ginInjector;
 	AddFileToDownloadListRequest request;
 	EventBus eventBus;
 	SynapseAlert synAlert;
 	PackageSizeSummary packageSizeSummary;
 	SynapseJavascriptClient jsClient;
 	List<FileHandleAssociation> downloadListBefore, downloadListAfter;
+	AsynchronousProgressWidget progress;
+	String queryEntityID;
 	
 	@Inject
 	public AddToDownloadList(AddToDownloadListView view, 
-			PortalGinInjector ginInjector,
+			AsynchronousProgressWidget progress,
 			PopupUtilsView popupUtilsView,
 			EventBus eventBus,
 			SynapseAlert synAlert,
@@ -54,7 +59,8 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 		this.jsClient = jsClient;
 		this.view = view;
 		this.popupUtilsView = popupUtilsView;
-		this.ginInjector = ginInjector;
+		this.progress = progress;
+		view.setAsynchronousProgressWidget(progress);
 		this.eventBus = eventBus;
 		this.synAlert = synAlert;
 		view.setSynAlert(synAlert);
@@ -71,7 +77,8 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 		
 	}
 	
-	public void addToDownloadList(Query query) {
+	public void addToDownloadList(String entityID, Query query) {
+		queryEntityID = entityID;
 		clear();
 		// TODO: waiting for service to return the file count and size.
 		request.setQuery(query);
@@ -85,8 +92,34 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	}
 	
 	public void confirmAddQueryResultsToDownloadList() {
-		popupUtilsView.showConfirmDialog("", ADD_QUERY_FILES_CONFIRMATION_MESSAGE, () -> {
-			onConfirmAddToDownloadList();
+		// run the query, ask for the stats
+		QueryBundleRequest queryBundleRequest = new QueryBundleRequest();
+		queryBundleRequest.setEntityId(queryEntityID);
+		queryBundleRequest.setQuery(request.getQuery());
+		queryBundleRequest.setPartMask(FILE_SIZE_QUERY_PART_MASK);
+		view.showAsynchronousProgressWidget();
+		progress.startAndTrackJob("Calculating the total query result file size", false, AsynchType.TableQuery, queryBundleRequest, new AsynchronousProgressHandler() {
+			@Override
+			public void onFailure(Throwable failure) {
+				synAlert.handleException(failure);
+				view.hideAll();
+			}
+			
+			@Override
+			public void onComplete(AsynchronousResponseBody response) {
+				QueryResultBundle queryResultBundle = (QueryResultBundle) response;
+				view.hideAll();
+				//TODO: get sum file sizes from query result
+//				double sumFileSizesBytes = queryResultBundle.getSumFileSizesBytes().doubleValue();
+				double sumFileSizesBytes = 0.0;
+				packageSizeSummary.addFiles(queryResultBundle.getQueryCount().intValue(), sumFileSizesBytes);
+				view.showConfirmAdd();
+			}
+			
+			@Override
+			public void onCancel() {
+				view.hideAll();
+			}
 		});
 	}
 	
@@ -133,8 +166,6 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	}
 	
 	public void startAddingFiles() {
-		AsynchronousProgressWidget progress = ginInjector.creatNewAsynchronousProgressWidget();
-		view.setAsynchronousProgressWidget(progress);
 		view.showAsynchronousProgressWidget();
 		progress.startAndTrackJob("Adding files to Download List", false, AsynchType.AddFileToDownloadList, request, new AsynchronousProgressHandler() {
 			@Override
