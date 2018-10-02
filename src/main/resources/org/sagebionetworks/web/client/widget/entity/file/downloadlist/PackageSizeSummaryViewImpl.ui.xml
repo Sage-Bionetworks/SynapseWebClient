@@ -22,5 +22,9 @@
 		<bh:Span ui:field="estimatedTimeSpan" marginRight="20">
 			<bh:Text ui:field="estimatedTime"/>
 		</bh:Span>
+		<bh:Span ui:field="estimatedTimeLoading" marginRight="20" addStyleNames="inline-block movedown-4">
+			<w:LoadingSpinner size="20px"/>
+		</bh:Span>
+		
 	</bh:Span>
 </ui:UiBinder>

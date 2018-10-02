@@ -3,7 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.file.downloadlist;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
-
+import static org.sagebionetworks.web.client.widget.entity.file.downloadlist.PackageSizeSummary.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -67,7 +67,7 @@ public class PackageSizeSummaryTest {
 	@Before
 	public void setUp() throws Exception {
 		widget = new PackageSizeSummary(mockView, mockGwt, mockDownloadSpeedTester, mockJsniUtils, mockDateTimeUtils);
-		when(mockGwt.getFriendlySize(anyDouble(), anyBoolean())).thenReturn(ZERO_BYTES, FRIENDLY_SIZE);
+		when(mockGwt.getFriendlySize(anyDouble(), anyBoolean())).thenReturn(FRIENDLY_SIZE);
 		when(mockDateTimeUtils.getFriendlyTimeEstimate(anyLong())).thenReturn(FRIENDLY_TIME_ESTIMATE);
 		widget.clear();
 	}
@@ -75,9 +75,10 @@ public class PackageSizeSummaryTest {
 	@Test
 	public void testClear() {
 		// cleared in setup
-		verify(mockView).setFileCount(0);
-		verify(mockView).setSize(ZERO_BYTES);
-		verify(mockDownloadSpeedTester).testDownloadSpeed(any(AsyncCallback.class));
+		verify(mockView).setEstimatedDownloadTime(NO_VALUE_STRING);
+		verify(mockView).setFileCount(NO_VALUE_STRING);
+		verify(mockView).setSize(NO_VALUE_STRING);
+		verify(mockDownloadSpeedTester, never()).testDownloadSpeed(any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -86,7 +87,7 @@ public class PackageSizeSummaryTest {
 		
 		widget.addFile(fileSize1);
 		
-		verify(mockView).setFileCount(1);
+		verify(mockView).setFileCount(Integer.toString(1));
 		verify(mockView).setSize(FRIENDLY_SIZE);
 		verify(mockDownloadSpeedTester).testDownloadSpeed(any(AsyncCallback.class));
 		
@@ -94,7 +95,7 @@ public class PackageSizeSummaryTest {
 		
 		widget.addFile(fileSize2);
 		
-		verify(mockView).setFileCount(2);
+		verify(mockView).setFileCount(Integer.toString(2));
 		//verify it did not start another download speed test
 		verify(mockDownloadSpeedTester).testDownloadSpeed(any(AsyncCallback.class));
 	}

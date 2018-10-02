@@ -25,6 +25,8 @@ public class PackageSizeSummaryViewImpl implements PackageSizeSummaryView, IsWid
 	Span estimatedTimeSpan;
 	@UiField
 	Text estimatedTime;
+	@UiField
+	Span estimatedTimeLoading;
 	private static PackageSizeSummaryViewImplUiBinder uiBinder = GWT
 			.create(PackageSizeSummaryViewImplUiBinder.class);
 	@Inject
@@ -40,8 +42,8 @@ public class PackageSizeSummaryViewImpl implements PackageSizeSummaryView, IsWid
 		estimatedTime.setText(time);
 	}
 	@Override
-	public void setFileCount(int count) {
-		fileCount.setText(Integer.toString(count));
+	public void setFileCount(String count) {
+		fileCount.setText(count);
 	}
 	@Override
 	public void setSize(String friendlyFileSize) {
@@ -52,5 +54,10 @@ public class PackageSizeSummaryViewImpl implements PackageSizeSummaryView, IsWid
 		fileCountSpan.addStyleName(style);
 		fileSizeSpan.addStyleName(style);
 		estimatedTimeSpan.addStyleName(style);
+	}
+	@Override
+	public void setEstimatedDownloadTimeLoadingVisible(boolean visible) {
+		estimatedTimeSpan.setVisible(!visible);
+		estimatedTimeLoading.setVisible(visible);
 	}
 }
