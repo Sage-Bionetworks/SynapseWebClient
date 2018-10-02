@@ -9,7 +9,7 @@ public interface AddToDownloadListView extends IsWidget {
 	void setAsynchronousProgressWidget(IsWidget w);
 	void showAsynchronousProgressWidget();
 	void showSuccess(int fileCount);
-	void setSynAlert(IsWidget w);
+	void add(IsWidget w);
 	void setPresenter(Presenter p);
 	public interface Presenter {
 		void onConfirmAddToDownloadList();

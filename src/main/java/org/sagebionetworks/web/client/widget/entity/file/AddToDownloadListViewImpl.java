@@ -18,8 +18,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class AddToDownloadListViewImpl implements AddToDownloadListView, IsWidget {
-	Widget w;
-	interface PackageSizeSummaryViewImplUiBinder extends UiBinder<Widget, AddToDownloadListViewImpl> {}
+	Div w;
+	interface PackageSizeSummaryViewImplUiBinder extends UiBinder<Div, AddToDownloadListViewImpl> {}
 	@UiField
 	Alert confirmationUI;
 	@UiField
@@ -36,8 +36,6 @@ public class AddToDownloadListViewImpl implements AddToDownloadListView, IsWidge
 	Span fileCount;
 	@UiField
 	Anchor viewDownloadListLink;
-	@UiField
-	Div synAlertContainer;
 	
 	Presenter presenter;
 	private static PackageSizeSummaryViewImplUiBinder uiBinder = GWT
@@ -94,9 +92,7 @@ public class AddToDownloadListViewImpl implements AddToDownloadListView, IsWidge
 		successfullyAddedUI.setVisible(true);
 	}
 	@Override
-	public void setSynAlert(IsWidget w) {
-		w.asWidget().addStyleName("fullWidthAlert");
-		synAlertContainer.clear();
-		synAlertContainer.add(w);
+	public void add(IsWidget widget) {
+		w.add(widget);
 	}
 }

@@ -12,6 +12,7 @@ import com.google.inject.Inject;
 
 public class PackageSizeSummary implements IsWidget {
 	
+	public static final String FILES = " files";
 	public static final String NO_VALUE_STRING = "-";
 	public static final String UNKNOWN_TIME = NO_VALUE_STRING;
 	private PackageSizeSummaryView view;
@@ -57,7 +58,7 @@ public class PackageSizeSummary implements IsWidget {
 	}
 	
 	private void updateView() {
-		view.setFileCount(Integer.toString(totalFileCount));
+		view.setFileCount(Integer.toString(totalFileCount) + FILES);
 		view.setSize(gwt.getFriendlySize(totalFileSize, true));
 		view.setEstimatedDownloadTime(UNKNOWN_TIME);
 		if (!isTestingDownloadSpeed) {

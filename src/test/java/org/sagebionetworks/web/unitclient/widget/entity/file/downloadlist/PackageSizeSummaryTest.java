@@ -87,7 +87,7 @@ public class PackageSizeSummaryTest {
 		
 		widget.addFile(fileSize1);
 		
-		verify(mockView).setFileCount(Integer.toString(1));
+		verify(mockView).setFileCount(Integer.toString(1) + FILES);
 		verify(mockView).setSize(FRIENDLY_SIZE);
 		verify(mockDownloadSpeedTester).testDownloadSpeed(any(AsyncCallback.class));
 		
@@ -95,7 +95,7 @@ public class PackageSizeSummaryTest {
 		
 		widget.addFile(fileSize2);
 		
-		verify(mockView).setFileCount(Integer.toString(2));
+		verify(mockView).setFileCount(Integer.toString(2) + FILES);
 		//verify it did not start another download speed test
 		verify(mockDownloadSpeedTester).testDownloadSpeed(any(AsyncCallback.class));
 	}

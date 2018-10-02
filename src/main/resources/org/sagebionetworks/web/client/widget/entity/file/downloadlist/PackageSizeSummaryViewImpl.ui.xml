@@ -12,7 +12,6 @@
 		<b:Icon type="FILE" marginRight="10"/>
 		<bh:Span ui:field="fileCountSpan" marginRight="20">
 			<bh:Text ui:field="fileCount"/>
-			<bh:Text text="files" addStyleNames="margin-left-2"/>
 		</bh:Span>
 		<b:Icon type="DATABASE" marginRight="10"/>
 		<bh:Span ui:field="fileSizeSpan" marginRight="20">
@@ -22,7 +21,7 @@
 		<bh:Span ui:field="estimatedTimeSpan" marginRight="20">
 			<bh:Text ui:field="estimatedTime"/>
 		</bh:Span>
-		<bh:Span ui:field="estimatedTimeLoading" marginRight="20" addStyleNames="inline-block movedown-4">
+		<bh:Span ui:field="estimatedTimeLoading" marginRight="20" addStyleNames="inline-block movedown-4" visible="false">
 			<w:LoadingSpinner size="20px"/>
 		</bh:Span>
 		

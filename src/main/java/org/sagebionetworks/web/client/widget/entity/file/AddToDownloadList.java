@@ -63,7 +63,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 		view.setAsynchronousProgressWidget(progress);
 		this.eventBus = eventBus;
 		this.synAlert = synAlert;
-		view.setSynAlert(synAlert);
+		view.add(synAlert);
 		this.packageSizeSummary = packageSizeSummary;
 		view.setPackageSizeSummary(packageSizeSummary);
 		view.setPresenter(this);
