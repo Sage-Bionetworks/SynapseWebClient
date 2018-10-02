@@ -41,8 +41,6 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	SynapseAlert synAlert;
 	PackageSizeSummary packageSizeSummary;
 	SynapseJavascriptClient jsClient;
-	Integer fileCount = null;
-	Double fileSize = null;
 	List<FileHandleAssociation> downloadListBefore, downloadListAfter;
 	
 	@Inject
@@ -67,8 +65,6 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	}
 	public void clear() {
 		view.hideAll();
-		fileCount = null;
-		fileSize = null;
 		request = new AddFileToDownloadListRequest();
 		packageSizeSummary.clear();
 		synAlert.clear();
@@ -110,16 +106,10 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 			}
 			@Override
 			public void onSuccess(EntityChildrenResponse entityChildrenResponse) {
-				updateFileCountFileSize(entityChildrenResponse.getTotalChildCount().intValue(), entityChildrenResponse.getSumFileSizesBytes().doubleValue());
+				packageSizeSummary.addFiles(entityChildrenResponse.getTotalChildCount().intValue(), entityChildrenResponse.getSumFileSizesBytes().doubleValue());
+				view.showConfirmAdd();
 			}
 		});
-	}
-	
-	public void updateFileCountFileSize(Integer fileCount, Double fileSize) {
-		this.fileCount = fileCount;
-		this.fileSize = fileSize;
-		packageSizeSummary.addFiles(fileCount, fileSize);
-		view.showConfirmAdd();		
 	}
 	
 	@Override
