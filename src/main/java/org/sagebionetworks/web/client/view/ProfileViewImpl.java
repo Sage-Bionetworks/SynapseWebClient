@@ -987,14 +987,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void showProfile() {
 		UIObject.setVisible(profileUI, true);
-		dashboardUI.addClassName("col-md-9");
+		dashboardUI.addClassName("col-md-8");
 		dashboardUI.setAttribute("style", "min-width: 400px;");
 	}
 	
 	@Override
 	public void hideProfile() {
 		UIObject.setVisible(profileUI, false);
-		dashboardUI.removeClassName("col-md-9");
+		dashboardUI.removeClassName("col-md-8");
 	}
 	
 	@Override
