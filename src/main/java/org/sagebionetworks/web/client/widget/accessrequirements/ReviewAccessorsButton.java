@@ -15,7 +15,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ReviewAccessorsButton implements IsWidget {
-	public static final String MANAGE_ACCESS_BUTTON_TEXT = "Review Accessors";
+	public static final String MANAGE_ACCESS_BUTTON_TEXT = "Review Data Requestors";
 	public Button button;
 	public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	AccessRequirement ar;
