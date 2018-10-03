@@ -28,97 +28,18 @@
             </b:Alert>
 
             <div class="margin-10">
-                <div class="margin-top-5 row" style="width: 100%;">
-                    <div ui:field="profileUI" class="profileUI inline-block vertical-align-top col-xs-12 col-md-4">
-                        <div class="padding-15 light-border">
-                            <w:LoadingSpinner ui:field="profilePictureLoadingUI" visible="false" size="50px" />
-                            <g:SimplePanel ui:field="profileSynAlertPanel" />
-                            <g:SimplePanel ui:field="picturePanel" styleName="margin-left-10 displayInlineBlock" height="180px" width="180px" />
-                            <!-- View Profile Panel -->
-                            <bh:Div ui:field="viewProfilePanel" addStyleNames="margin-bottom-10">
-                                <g:Image ui:field="certificationBadge" resource='{sageImageBundle.certificate}' addStyleNames="displayInline imageButton margin-top-10 vertical-align-top moveup-8 margin-right-10"
-                                    height="32px" width="25px" />
-                                <b:Heading ui:field="displayNameField" addStyleNames="displayInline" size="H2" />
-                                <b:Heading ui:field="headlineField" size="H4" />
-                                <b:Alert type="INFO" ui:field="verifyAlert" addStyleNames="synapse-blue-bg">
-                                    <bh:Div>
-                                        <b:Heading size="H5" addStyleNames="boldText color-white" text="Profile validation" />
-                                        <b:Button ui:field="dismissValidationUIButton" styleName="close pull-right moveup-35 color-white fullOpacity" text="x" />
-                                        <bh:Paragraph>
-                                            <bh:Text>Certified users with a validated profile can access more features and data.</bh:Text>
-                                            <b:Anchor ui:field="requestProfileValidationLink1" text="Validate your profile today!" addStyleNames="color-white" />
-                                        </bh:Paragraph>
-                                        <bh:Paragraph>
-                                            <bh:OrderedList>
-                                                <b:ListItem>
-                                                    <b:Anchor ui:field="reviewProfileLink" text="Review and complete your profile." addStyleNames="color-white" />
-                                                </b:ListItem>
-                                                <b:ListItem>
-                                                    <b:Anchor ui:field="createOrcIdLink" text="Create/populate a public ORCID profile or link to your existing one." addStyleNames="color-white"
-                                                    />
-                                                </b:ListItem>
-                                                <b:ListItem>
-                                                    <b:Anchor ui:field="requestProfileValidationLink2" text="Request profile validation." addStyleNames="color-white" />
-                                                </b:ListItem>
-                                            </bh:OrderedList>
-                                        </bh:Paragraph>
-                                    </bh:Div>
-                                    <w:HelpWidget addAnchorStyleNames="color-white" helpMarkdown="A Synapse Qualified Researcher is a Certified User with a validated user profile.&#10;Synapse Qualified Researchers are eligible to request access to Bridge data."
-                                        text="More info..." href="http://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#validated-profile"
-                                        iconStyles="color-white" addMoreInfoStyleNames="color-white" />
-
-                                </b:Alert>
-                                <bh:Div addStyleNames="margin-top-5 margin-bottom-5">
-                                    <bh:Div>
-                                        <v:VerificationIDCardViewImpl ui:field="idCard" />
-                                        <b:Button ui:field="verifiedBadge" addStyleNames="margin-right-5" icon="CHECK_SQUARE_O" type="PRIMARY" size="SMALL">Profile Validated</b:Button>
-                                        <b:Button ui:field="verificationSubmittedButton" type="PRIMARY" size="SMALL" addStyleNames="margin-right-5">Profile Validation Pending</b:Button>
-                                        <b:Button ui:field="verificationRejectedButton" type="WARNING" size="SMALL" addStyleNames="margin-right-5">Profile Validation Rejected</b:Button>
-                                        <b:Button ui:field="verificationSuspendedButton" type="WARNING" size="SMALL" addStyleNames="margin-right-5">Validated Profile Suspended</b:Button>
-                                        <b:Button ui:field="resubmitProfileValidationButton" type="PRIMARY" size="SMALL" addStyleNames="margin-right-5">Revalidate My Profile</b:Button>
-                                        <b:Button ui:field="verificationApprovedButton" type="DEFAULT" size="SMALL" addStyleNames="margin-right-5">Profile Validation Details</b:Button>
-                                        <b:Button ui:field="submitProfileValidationButton" type="PRIMARY" size="SMALL">Validate My Profile</b:Button>
-                                    </bh:Div>
-                                </bh:Div>
-
-                                <bh:Paragraph ui:field="industryLocationField" addStyleNames="user-profile-industry-location" />
-                                <bh:Paragraph ui:field="summaryField" addStyleNames="user-profile-summary" />
-                                <bh:Div>
-                                    <b:Anchor ui:field="urlField" target="_blank" />
-                                </bh:Div>
-                                <bh:Div>
-                                    <b:Anchor ui:field="orcIdField" target="_blank" addStyleNames="margin-right-15" />
-                                    <bh:Span ui:field="unbindButtonUI">
-                                        <b:Tooltip title="Unlink this ORC ID from your Synapse profile.">
-                                            <b:Icon type="TIMES" ui:field="unbindButton" addStyleNames="imageButton text-danger" />
-                                        </b:Tooltip>
-                                    </bh:Span>
-                                </bh:Div>
-                                <bh:Div addStyleNames="margin-top-5" ui:field="createdOnUI">
-                                    <bh:Text>Joined&nbsp;</bh:Text>
-                                    <bh:Text ui:field="createdOnText" />
-                                </bh:Div>
-                                <b:TextBox ui:field="synapseEmailField" width="100%" addStyleNames="border-none noBackground margin-right-15 margin-left-neg-2"
-                                    readOnly="true" />
-                            </bh:Div>
-                            <b:Container fluid="true">
-                                <b:Row>
-                                    <b:Column size="XS_12">
-                                        <b:Button ui:field="editProfileButton" icon="EDIT" type="PRIMARY" pull="RIGHT">Edit Profile</b:Button>
-                                        <b:Button ui:field="linkORCIDButton" pull="RIGHT" addStyleNames="margin-right-10">Link to ORCID</b:Button>
-                                    </b:Column>
-                                </b:Row>
-                            </b:Container>
-                            <g:SimplePanel ui:field="editUserProfilePanel" />
-                        </div>
-                        <b:Button ui:field="hideProfileButton" size="EXTRA_SMALL" pull="RIGHT" icon="CHEVRON_LEFT" text="Hide Profile" addStyleNames="margin-top-5"
-                            visible="false" />
-                    </div>
+                <div class="margin-top-5 row">
                     <div ui:field="dashboardUI" class="inline-block col-xs-12">
-                        <b:Button ui:field="showProfileButton" size="EXTRA_SMALL" icon="CHEVRON_RIGHT" text="Show Profile" visible="false" />
                         <div>
                             <div ui:field="navtabContainer">
                                 <ul class="nav nav-tabs entity-tabs margin-top-15 border-none">
+                                	<li class="entity-tab active margin-left-15" ui:field="profileListItem">
+                                        <a class="text-align-center link no-background">
+                                            <g:FocusPanel ui:field="profileFocusPanel" addStyleNames="displayInline" tabIndex="-1">
+                                                <b:Anchor ui:field="profileLink" addStyleNames="textDecorationNone">Profile</b:Anchor>
+                                            </g:FocusPanel>
+                                        </a>
+                                    </li>
                                     <li class="entity-tab active margin-left-15" ui:field="projectsListItem">
                                         <a class="text-align-center link no-background">
                                             <g:FocusPanel ui:field="projectsFocusPanel" addStyleNames="displayInline" tabIndex="-1">
@@ -167,6 +88,91 @@
                         </div>
                         <div>
                             <div>
+                            	<div class="tab-background margin-10" ui:field="profileTabContainer">
+				                    <div ui:field="profileUI" class="profileUI inline-block vertical-align-top">
+				                        <div class="padding-15 light-border">
+				                            <w:LoadingSpinner ui:field="profilePictureLoadingUI" visible="false" size="50px" />
+				                            <g:SimplePanel ui:field="profileSynAlertPanel" />
+				                            <g:SimplePanel ui:field="picturePanel" styleName="margin-left-10 displayInlineBlock" height="180px" width="180px" />
+				                            <!-- View Profile Panel -->
+				                            <bh:Div ui:field="viewProfilePanel" addStyleNames="margin-bottom-10">
+				                                <g:Image ui:field="certificationBadge" resource='{sageImageBundle.certificate}' addStyleNames="displayInline imageButton margin-top-10 vertical-align-top moveup-8 margin-right-10"
+				                                    height="32px" width="25px" />
+				                                <b:Heading ui:field="displayNameField" addStyleNames="displayInline" size="H2" />
+				                                <b:Heading ui:field="headlineField" size="H4" />
+				                                <b:Alert type="INFO" ui:field="verifyAlert" addStyleNames="synapse-blue-bg">
+				                                    <bh:Div>
+				                                        <b:Heading size="H5" addStyleNames="boldText color-white" text="Profile validation" />
+				                                        <b:Button ui:field="dismissValidationUIButton" styleName="close pull-right moveup-35 color-white fullOpacity" text="x" />
+				                                        <bh:Paragraph>
+				                                            <bh:Text>Certified users with a validated profile can access more features and data.</bh:Text>
+				                                            <b:Anchor ui:field="requestProfileValidationLink1" text="Validate your profile today!" addStyleNames="color-white" />
+				                                        </bh:Paragraph>
+				                                        <bh:Paragraph>
+				                                            <bh:OrderedList>
+				                                                <b:ListItem>
+				                                                    <b:Anchor ui:field="reviewProfileLink" text="Review and complete your profile." addStyleNames="color-white" />
+				                                                </b:ListItem>
+				                                                <b:ListItem>
+				                                                    <b:Anchor ui:field="createOrcIdLink" text="Create/populate a public ORCID profile or link to your existing one." addStyleNames="color-white"
+				                                                    />
+				                                                </b:ListItem>
+				                                                <b:ListItem>
+				                                                    <b:Anchor ui:field="requestProfileValidationLink2" text="Request profile validation." addStyleNames="color-white" />
+				                                                </b:ListItem>
+				                                            </bh:OrderedList>
+				                                        </bh:Paragraph>
+				                                    </bh:Div>
+				                                    <w:HelpWidget addAnchorStyleNames="color-white" helpMarkdown="A Synapse Qualified Researcher is a Certified User with a validated user profile.&#10;Synapse Qualified Researchers are eligible to request access to Bridge data."
+				                                        text="More info..." href="http://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#validated-profile"
+				                                        iconStyles="color-white" addMoreInfoStyleNames="color-white" />
+				
+				                                </b:Alert>
+				                                <bh:Div addStyleNames="margin-top-5 margin-bottom-5">
+				                                    <bh:Div>
+				                                        <v:VerificationIDCardViewImpl ui:field="idCard" />
+				                                        <b:Button ui:field="verifiedBadge" addStyleNames="margin-right-5" icon="CHECK_SQUARE_O" type="PRIMARY" size="SMALL">Profile Validated</b:Button>
+				                                        <b:Button ui:field="verificationSubmittedButton" type="PRIMARY" size="SMALL" addStyleNames="margin-right-5">Profile Validation Pending</b:Button>
+				                                        <b:Button ui:field="verificationRejectedButton" type="WARNING" size="SMALL" addStyleNames="margin-right-5">Profile Validation Rejected</b:Button>
+				                                        <b:Button ui:field="verificationSuspendedButton" type="WARNING" size="SMALL" addStyleNames="margin-right-5">Validated Profile Suspended</b:Button>
+				                                        <b:Button ui:field="resubmitProfileValidationButton" type="PRIMARY" size="SMALL" addStyleNames="margin-right-5">Revalidate My Profile</b:Button>
+				                                        <b:Button ui:field="verificationApprovedButton" type="DEFAULT" size="SMALL" addStyleNames="margin-right-5">Profile Validation Details</b:Button>
+				                                        <b:Button ui:field="submitProfileValidationButton" type="PRIMARY" size="SMALL">Validate My Profile</b:Button>
+				                                    </bh:Div>
+				                                </bh:Div>
+				
+				                                <bh:Paragraph ui:field="industryLocationField" addStyleNames="user-profile-industry-location" />
+				                                <bh:Paragraph ui:field="summaryField" addStyleNames="user-profile-summary" />
+				                                <bh:Div>
+				                                    <b:Anchor ui:field="urlField" target="_blank" />
+				                                </bh:Div>
+				                                <bh:Div>
+				                                    <b:Anchor ui:field="orcIdField" target="_blank" addStyleNames="margin-right-15" />
+				                                    <bh:Span ui:field="unbindButtonUI">
+				                                        <b:Tooltip title="Unlink this ORC ID from your Synapse profile.">
+				                                            <b:Icon type="TIMES" ui:field="unbindButton" addStyleNames="imageButton text-danger" />
+				                                        </b:Tooltip>
+				                                    </bh:Span>
+				                                </bh:Div>
+				                                <bh:Div addStyleNames="margin-top-5" ui:field="createdOnUI">
+				                                    <bh:Text>Joined&nbsp;</bh:Text>
+				                                    <bh:Text ui:field="createdOnText" />
+				                                </bh:Div>
+				                                <b:TextBox ui:field="synapseEmailField" width="100%" addStyleNames="border-none noBackground margin-right-15 margin-left-neg-2"
+				                                    readOnly="true" />
+				                            </bh:Div>
+				                            <b:Container fluid="true">
+				                                <b:Row>
+				                                    <b:Column size="XS_12">
+				                                        <b:Button ui:field="editProfileButton" icon="EDIT" type="PRIMARY" pull="RIGHT">Edit Profile</b:Button>
+				                                        <b:Button ui:field="linkORCIDButton" pull="RIGHT" addStyleNames="margin-right-10">Link to ORCID</b:Button>
+				                                    </b:Column>
+				                                </b:Row>
+				                            </b:Container>
+				                            <g:SimplePanel ui:field="editUserProfilePanel" />
+				                        </div>
+				                    </div>
+                            	</div>
                                 <div class="tab-background margin-10" ui:field="projectsTabContainer">
                                     <div ui:field="createProjectUI" class="margin-bottom-10 margin-top-10 row">
                                         <div class="col-xs-12 col-sm-8">

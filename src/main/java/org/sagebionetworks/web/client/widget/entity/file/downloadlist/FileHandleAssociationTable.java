@@ -44,6 +44,7 @@ public class FileHandleAssociationTable implements IsWidget, SortingListener {
 	
 	public void configure(List<FileHandleAssociation> fhas, CallbackP<Double> addToPackageSizeCallback, CallbackP<FileHandleAssociation> onRemove) {
 		view.clear();
+		view.setScrollBarColumnVisible(fhas.size() > 9);
 		// create a fha table row for each fha
 		rows = new ArrayList<>();
 		for (FileHandleAssociation fha : fhas) {

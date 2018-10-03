@@ -69,7 +69,6 @@ import com.google.inject.Inject;
 
 public class ProfilePresenter extends AbstractActivity implements ProfileView.Presenter, Presenter<Profile> {
 	public static final int DELAY_GET_MY_TEAMS = 300;
-	public static final String USER_PROFILE_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.visible.state";
 	public static final String USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.certification.message.visible.state";
 	public static final String USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.validation.message.visible.state";
 	
@@ -295,7 +294,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				&& authenticationController.getCurrentUserPrincipalId().equals(
 						userId);
 		if (currentArea == null || (ProfileArea.SETTINGS.equals(currentArea) && !isOwner)) {
-			currentArea = ProfileArea.PROJECTS;
+			currentArea = ProfileArea.PROFILE;
 		}
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
 		view.clear();
@@ -343,7 +342,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			public void onSuccess(UserBundle bundle) {
 				view.hideLoading();
 				currentUserBundle = bundle;
-				initializeShowHideProfile(isOwner);
 				boolean isCertified = bundle.getIsCertified();
 				if (isCertified) {
 					view.addCertifiedBadge();
@@ -391,26 +389,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				profileSynAlert.handleException(caught);
 			}
 		});	
-	}
-	
-	public void initializeShowHideProfile(boolean isOwner) {
-		if (isOwner) {
-			boolean isProfileVisible = true;
-			try {
-				String cookieValue = cookies.getCookie(USER_PROFILE_VISIBLE_STATE_KEY);
-				if (cookieValue != null && !cookieValue.isEmpty()) {
-					isProfileVisible = Boolean.valueOf(cookieValue);	
-				}
-			} catch (Exception e) {
-				//if there are any problems getting the profile visibility state, ignore and use default (show)
-			}
-			setIsProfileVisible(isProfileVisible);
-		} else {
-			//not the owner
-			//show the profile, and hide the profile button
-			setIsProfileVisible(true);
-			view.setHideProfileButtonVisible(false);
-		}
 	}
 	
 	public void initializeShowHideCertification(boolean isOwner) {
@@ -498,34 +476,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 	}
 	
-	@Override
-	public void hideProfileButtonClicked() {
-		setIsProfileVisible(false);
-		setIsProfileVisibleCookie(false);
-	}
-	
-	@Override
-	public void showProfileButtonClicked() {
-		setIsProfileVisible(true);
-		setIsProfileVisibleCookie(true);
-	}
-	
-	private void setIsProfileVisible(boolean isVisible) {
-		if (isVisible){
-			view.showProfile();
-		} else {
-			view.hideProfile();
-		}
-		view.setShowProfileButtonVisible(!isVisible);
-		view.setHideProfileButtonVisible(isVisible);
-	}
-	
-	public void setIsProfileVisibleCookie(boolean isVisible) {
-		Date yearFromNow = new Date();
-		CalendarUtil.addMonthsToDate(yearFromNow, 12);
-		cookies.setCookie(USER_PROFILE_VISIBLE_STATE_KEY, Boolean.toString(isVisible), yearFromNow);
-	}
-	
 	public void refreshProjects() {
 		currentProjectOffset = 0;
 		loadMoreProjectsWidgetContainer = ginInjector.getLoadMoreProjectsWidgetContainer();
@@ -533,10 +483,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		loadMoreProjectsWidgetContainer.setIsMore(false);
 		loadMoreProjectsWidgetContainer.configure(getMoreProjectsCallback);
 		getMoreProjects();
-		if (isOwner) {
-			// refresh owner teams to update the team notification count, and team filter
-			gwt.scheduleExecution(refreshTeamsCallback, DELAY_GET_MY_TEAMS);
-		}
+		scheduleRefreshTeamsIfOwner();
 	}
 	
 	public void refreshChallenges() {
@@ -1155,6 +1102,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	private void refreshData(ProfileArea tab) {
 		switch (tab) {
+			case PROFILE:
+				//update teams (for notification count)
+				scheduleRefreshTeamsIfOwner();
+				break;
 			case PROJECTS:
 				setProjectFilterAndRefresh(filterType, filterTeamId);
 				break;
@@ -1174,6 +1125,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				break;
 			default:
 				break;
+		}
+	}
+	
+	private void scheduleRefreshTeamsIfOwner() {
+		if (isOwner) {
+			// refresh owner teams to update the team notification count, and team filter
+			gwt.scheduleExecution(refreshTeamsCallback, DELAY_GET_MY_TEAMS);
 		}
 	}
 	

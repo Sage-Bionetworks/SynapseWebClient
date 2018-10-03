@@ -12,4 +12,5 @@ public interface FileHandleAssociationTableView extends IsWidget {
 	void showAccessRestrictionsDetectedUI();
 	void setSortingListener(SortingListener sortingListener);
 	void setSort(String headerName, SortDirection sortDir);
+	void setScrollBarColumnVisible(boolean visible);
 }

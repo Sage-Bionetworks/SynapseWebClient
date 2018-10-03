@@ -45,6 +45,7 @@ import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -158,7 +159,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			view.showHasWikiIcon();
 		}
 		
-		if (eb.getEntity() instanceof FileEntity) {
+		if (eb.getEntity() instanceof FileEntity && dataFileHandle != null) {
 			view.showAddToDownloadList();
 		}
 		

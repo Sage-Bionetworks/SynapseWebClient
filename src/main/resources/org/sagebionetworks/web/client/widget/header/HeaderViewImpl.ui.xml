@@ -50,6 +50,7 @@
 					<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" />
 					<b:Icon type="ANGLE_DOWN" addStyleNames="margin-left-30 color-white"/>
 					<b:DropDownMenu ui:field="dashboardDropdownMenu" width="100%">
+						<b:AnchorListItem ui:field="myProfileLink">Profile</b:AnchorListItem>
 						<b:AnchorListItem ui:field="myDashboardLink">Projects</b:AnchorListItem>
 						<b:AnchorListItem ui:field="myTeamsLink">Teams</b:AnchorListItem>
 						<b:AnchorListItem ui:field="myChallengesLink">Challenges</b:AnchorListItem>

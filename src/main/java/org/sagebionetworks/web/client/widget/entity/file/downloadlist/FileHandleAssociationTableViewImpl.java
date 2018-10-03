@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortingListener;
@@ -38,6 +39,8 @@ public class FileHandleAssociationTableViewImpl implements FileHandleAssociation
 	SortableTableHeaderImpl createdOnHeader;
 	@UiField
 	SortableTableHeaderImpl fileSizeHeader;
+	@UiField
+	TableHeader scrollBarColumnHeader;
 	ArrayList<SortableTableHeaderImpl> headers = new ArrayList<>();
 	private static FileHandleAssociationTableViewImplUiBinder uiBinder = GWT
 			.create(FileHandleAssociationTableViewImplUiBinder.class);
@@ -88,5 +91,9 @@ public class FileHandleAssociationTableViewImpl implements FileHandleAssociation
 				header.setIcon(null);	
 			}
 		}
+	}
+	@Override
+	public void setScrollBarColumnVisible(boolean visible) {
+		scrollBarColumnHeader.setVisible(visible);	
 	}
 }

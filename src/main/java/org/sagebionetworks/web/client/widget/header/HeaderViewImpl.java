@@ -76,6 +76,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	AnchorListItem logoutLink;
 	@UiField
+	AnchorListItem myProfileLink;
+	@UiField
 	AnchorListItem myDashboardLink;
 	@UiField
 	AnchorListItem myTeamsLink;
@@ -205,6 +207,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			presenter.onLogoClick();
 		});
 		
+		myProfileLink.addClickHandler(event -> {
+			Profile place = new Profile(userId, ProfileArea.PROFILE);
+			globalAppState.getPlaceChanger().goTo(place);
+			hideDropdown();
+		});
 		myDashboardLink.addClickHandler(event -> {
 			Profile place = new Profile(userId, ProfileArea.PROJECTS);
 			globalAppState.getPlaceChanger().goTo(place);
