@@ -31,7 +31,7 @@
 					<b:TextArea ui:field="intendedDataUseField" readOnly="true" visibleLines="10"/>
 				</b:FormGroup>
 				<b:FormGroup ui:field="accessorsUI">
-					<b:FormLabel>Accessors</b:FormLabel>
+					<b:FormLabel>Data Requestors</b:FormLabel>
 					<bh:Div ui:field="accessorsContainer" />
 					<bh:Div ui:field="showEmailsButtonContainer"/>
 				</b:FormGroup>
