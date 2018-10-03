@@ -90,7 +90,7 @@
                             <div>
                             	<div class="tab-background margin-10" ui:field="profileTabContainer">
 				                    <div ui:field="profileUI" class="profileUI inline-block vertical-align-top">
-				                        <div class="padding-15 light-border">
+				                        <div class="padding-15">
 				                            <w:LoadingSpinner ui:field="profilePictureLoadingUI" visible="false" size="50px" />
 				                            <g:SimplePanel ui:field="profileSynAlertPanel" />
 				                            <g:SimplePanel ui:field="picturePanel" styleName="margin-left-10 displayInlineBlock" height="180px" width="180px" />
