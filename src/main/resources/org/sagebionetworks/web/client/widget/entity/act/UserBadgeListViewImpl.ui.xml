@@ -4,11 +4,9 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.widget" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
-	<bh:Div>
+	<bh:Div marginTop="5" marginBottom="15">
 		<s:SelectionToolbar ui:field="selectionToolbar" />
-		<t:Table width="100%">
-			<t:TBody ui:field="userBadgeContainer" />
-		</t:Table>
+		<bh:Div width="100%" ui:field="userBadgeContainer" />
 	</bh:Div>
 
 </ui:UiBinder>

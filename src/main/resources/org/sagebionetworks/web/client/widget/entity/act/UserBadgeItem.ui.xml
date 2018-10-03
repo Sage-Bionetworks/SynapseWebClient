@@ -5,20 +5,15 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
-	<t:TableRow>
-		<t:TableData width="35px">
-			<b:CheckBox ui:field="select" />
-		</t:TableData>
-		<t:TableData width="100%">
-			<bh:Span ui:field="userBadgeContainer" addStyleNames="movedown-5" />
-			<b:ButtonGroup>
-				<b:Button ui:field="dropdown" dataToggle="DROPDOWN" size="EXTRA_SMALL" text="Renew" addStyleNames="margin-top-10 moveup-10" />
-				<b:DropDownMenu>
-					<b:AnchorListItem ui:field="renew" text="Renew"/>
-					<b:AnchorListItem ui:field="revoke" text="Revoke"/>
-				</b:DropDownMenu>
-			</b:ButtonGroup>
-
-		</t:TableData>
-	</t:TableRow>
+	<bh:Div marginTop="5">
+		<b:InlineCheckBox ui:field="select" />
+		<bh:Div ui:field="userBadgeContainer" addStyleNames="inline-block" />
+		<b:ButtonGroup>
+			<b:Button ui:field="dropdown" dataToggle="DROPDOWN" size="EXTRA_SMALL" text="Renew" addStyleNames="margin-left-10" />
+			<b:DropDownMenu>
+				<b:AnchorListItem ui:field="renew" text="Renew"/>
+				<b:AnchorListItem ui:field="revoke" text="Revoke"/>
+			</b:DropDownMenu>
+		</b:ButtonGroup>
+	</bh:Div>
 </ui:UiBinder>

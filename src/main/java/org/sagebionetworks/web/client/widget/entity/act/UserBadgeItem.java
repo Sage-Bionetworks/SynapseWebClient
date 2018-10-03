@@ -2,7 +2,8 @@ package org.sagebionetworks.web.client.widget.entity.act;
 
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.CheckBox;
+import org.gwtbootstrap3.client.ui.InlineCheckBox;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.dataaccess.AccessType;
 import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
@@ -26,9 +27,9 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 	public interface UserBadgeItemUiBinder extends UiBinder<Widget, UserBadgeItem> {}
 	
 	@UiField
-	CheckBox select;
+	InlineCheckBox select;
 	@UiField
-	Span userBadgeContainer;
+	Div userBadgeContainer;
 	@UiField
 	Button dropdown;
 	@UiField
@@ -118,7 +119,7 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 		
 		ProfileCertifiedValidatedWidget w = portalGinInjector.getProfileCertifiedValidatedWidget();
 		w.configure(Long.parseLong(userId));
-		w.asWidget().addStyleName("moveup-8 margin-left-5");
+		w.asWidget().addStyleName("margin-left-5");
 		userBadgeContainer.add(w.asWidget());
 		
 		return this;
@@ -141,6 +142,9 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 	
 	public void setSelectVisible(boolean visible) {
 		select.setVisible(visible);
+		if (!visible) {
+			userBadgeContainer.setMarginLeft(20);
+		}
 	}
 	
 	public String getUserId() {

@@ -20,9 +20,9 @@
 					<b:PanelBody>
 						<b:FormGroup>
 							<b:FormLabel>Accessor requirements</b:FormLabel>
-							<b:CheckBox ui:field="certifiedCheckbox" text="Accessors must be certified." />
+							<b:CheckBox ui:field="certifiedCheckbox" text="Data Requestors must be certified." />
 							<b:CheckBox ui:field="validatedCheckbox"
-								text="Accessors must have a validated profile." />
+								text="Data Requestors must have a validated profile." />
 						</b:FormGroup>
 						<b:FormGroup>
 							<b:FormLabel>DUC</b:FormLabel>
