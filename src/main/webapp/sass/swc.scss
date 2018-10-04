@@ -584,6 +584,7 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 .min-width-100 {
 	min-width: 100px;
 }
+
 .min-width-150 {
 	min-width: 150px;
 }
@@ -1045,10 +1046,6 @@ i.font-size-5x {
 .font-size-12x,
 i.font-size-12x {
 	font-size:12em;
-}
-
-.vertical-align-bottom {
-	vertical-align: bottom;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -1736,12 +1733,17 @@ ol.lowerroman {
 	margin-top: 10px !important;
 }
 
-#body .vertical-align-middle {
-	vertical-align: middle;
-}
-
-#body .vertical-align-top {
-	vertical-align: top;
+#body {
+	.vertical-align-middle {
+		vertical-align: middle;
+	}
+	
+	.vertical-align-top {
+		vertical-align: top;
+	}
+	.vertical-align-bottom {
+		vertical-align: bottom;
+	}
 }
 
 .top-right {
@@ -2719,12 +2721,4 @@ div.border {
 
 @include placeholder {
 	font-style:italic;
-}
-
-#rootPanel .fullWidthAlert {
-	@include border-radius(0px);
-	margin-left: -15px;
-	margin-right: -15px;
-	box-shadow: none;
-	padding: 7px 15px;
 }
