@@ -1,6 +1,9 @@
 package org.sagebionetworks.web.client.view;
 
+import org.sagebionetworks.web.client.presenter.EntityPresenter;
+
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 
 public interface EntityView extends IsWidget {
 		
@@ -28,4 +31,5 @@ public interface EntityView extends IsWidget {
 	void showErrorMessage(String message);
 	void setEntityPageTopVisible(boolean isVisible);
 	void setOpenTeamInvitesVisible(boolean isVisible);
+	EventBinder<EntityPresenter> getEventBinder();
 }

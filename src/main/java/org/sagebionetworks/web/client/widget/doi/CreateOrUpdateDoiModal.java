@@ -17,7 +17,6 @@ import org.sagebionetworks.repo.model.doi.v2.DoiTitle;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -25,6 +24,7 @@ import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -36,7 +36,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 	private CreateOrUpdateDoiModalView view;
 	private JobTrackingWidget jobTrackingWidget;
 	private SynapseJavascriptClient javascriptClient;
-	private EntityUpdatedHandler entityUpdatedHandler;
+	private EventBus eventBus;
 	private Doi doi;
 	private SynapseAlert synapseAlert;
 	private PopupUtilsView popupUtilsView;
@@ -46,22 +46,23 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 								  JobTrackingWidget jobTrackingWidget,
 								  SynapseJavascriptClient javascriptClient,
 								  SynapseAlert synapseAlert,
-								  PopupUtilsView popupUtilsView) {
+								  PopupUtilsView popupUtilsView,
+								  EventBus eventBus) {
 		this.view = view;
 		this.jobTrackingWidget = jobTrackingWidget;
 		this.javascriptClient = javascriptClient;
 		this.synapseAlert = synapseAlert;
 		this.popupUtilsView = popupUtilsView;
+		this.eventBus = eventBus;
 		view.setSynAlert(synapseAlert);
 		view.setJobTrackingWidget(jobTrackingWidget);
 		view.setPresenter(this);
 		view.setModalTitle(DOI_MODAL_TITLE);
 	}
 
-	public void configureAndShow(String objectId, ObjectType objectType, Long versionNumber, EntityUpdatedHandler entityUpdatedHandler) {
+	public void configureAndShow(String objectId, ObjectType objectType, Long versionNumber) {
 		view.reset();
 		synapseAlert.clear();
-		this.entityUpdatedHandler = entityUpdatedHandler;
 		doi = new Doi();
 		getExistingDoi(objectId, objectType, versionNumber);
 	}
@@ -117,7 +118,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
 				popupUtilsView.showInfo(DOI_CREATED_MESSAGE + newDoi.getObjectId());
-				entityUpdatedHandler.onPersistSuccess(new EntityUpdatedEvent());
+				eventBus.fireEvent(new EntityUpdatedEvent());
 				view.setIsLoading(false);
 				view.hide();
 			}

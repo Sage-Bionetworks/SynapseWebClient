@@ -4,20 +4,16 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnModelPage;
 import org.sagebionetworks.repo.model.table.EntityView;
-import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
-import org.sagebionetworks.repo.model.table.ViewTypeMask;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
@@ -47,7 +43,6 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	SynapseClientAsync synapseClient;
 	String tableId;
 	EntityBundle bundle;
-	EntityUpdatedHandler updateHandler;
 	JobTrackingWidget jobTrackingWidget;
 	ViewDefaultColumns fileViewDefaultColumns;
 	TableType tableType;
@@ -97,11 +92,10 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	}
 	
 	@Override
-	public void configure(EntityBundle bundle, boolean isEditable, EntityUpdatedHandler updateHandler) {
+	public void configure(EntityBundle bundle, boolean isEditable) {
 		this.isEditable = isEditable;
 		this.bundle = bundle;
 		List<ColumnModel> startingModels = bundle.getTableBundle().getColumnModels();
-		this.updateHandler = updateHandler;
 		viewer.configure(ViewType.VIEWER, this.isEditable);
 		boolean isEditableView = isEditable && bundle.getEntity() instanceof EntityView;
 		tableType = TableType.getTableType(bundle.getEntity());
@@ -197,7 +191,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		baseView.setJobTrackingWidgetVisible(false);
 		// Hide the dialog
 		baseView.hideEditor();
-		updateHandler.onPersistSuccess(new EntityUpdatedEvent());
+		ginInjector.getEventBus().fireEvent(new EntityUpdatedEvent());
 	}
 	
 	public void startTrackingJob(TableUpdateTransactionRequest request) {

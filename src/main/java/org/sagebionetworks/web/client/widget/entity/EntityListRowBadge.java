@@ -13,8 +13,6 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -54,12 +52,6 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 		view.setCreatedByWidget(userBadge.asWidget());
 		view.setPresenter(this);
 		fileDownloadButton.setSize(ButtonSize.EXTRA_SMALL);
-		fileDownloadButton.setEntityUpdatedHandler(new EntityUpdatedHandler() {
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				getEntityBundle();
-			}
-		});
 		Callback loadDataCallback = new Callback() {
 			@Override
 			public void invoke() {

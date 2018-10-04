@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client.widget.table;
 
 import org.sagebionetworks.repo.model.table.Query;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 
-public interface QueryChangeHandler extends EntityUpdatedHandler{
+public interface QueryChangeHandler {
 	
 	/**
 	 * Call to notify of a query change.
@@ -16,4 +16,5 @@ public interface QueryChangeHandler extends EntityUpdatedHandler{
 	 * @return
 	 */
 	public Query getQueryString();
+	void onPersistSuccess(EntityUpdatedEvent event);
 }

@@ -26,8 +26,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
@@ -89,12 +87,6 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		
 		lazyLoadHelper.configure(loadDataCallback, view);
 		fileDownloadButton.setSize(ButtonSize.EXTRA_SMALL);
-		fileDownloadButton.setEntityUpdatedHandler(new EntityUpdatedHandler() {
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				getEntityBundle();
-			}
-		});
 		view.setPresenter(this);
 	}
 	
