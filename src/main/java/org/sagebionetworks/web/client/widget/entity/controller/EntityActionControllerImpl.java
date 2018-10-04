@@ -1269,7 +1269,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			
 			@Override
 			public void onSuccess(Entity result) {
-				eventBus.fireEvent(new EntityUpdatedEvent());
+				fireEntityUpdatedEvent();
 			}
 			
 			@Override
