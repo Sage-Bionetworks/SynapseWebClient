@@ -4,20 +4,20 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 
 	<t:TableRow>
-		<t:TableData>
-			<b:CheckBox ui:field="select" />
+		<t:TableData addStyleNames="vertical-align-middle">
+			<b:CheckBox width="25px" ui:field="select"/>
 		</t:TableData>
 
-		<t:TableData>
+		<t:TableData addStyleNames="vertical-align-middle">
 			<b:FormControlStatic ui:field="nameStatic" visible="false"/>
-			<b:FormGroup ui:field="nameGroup">
+			<b:FormGroup ui:field="nameGroup" addStyleNames="margin-bottom-0-imp">
 				<b:TextBox ui:field="name" placeholder="Column Name" />
-				<b:HelpBlock ui:field="nameHelp" />
+				<b:HelpBlock ui:field="nameHelp" visible="false"/>
 			</b:FormGroup>
 		</t:TableData>
-		<t:TableData>
+		<t:TableData addStyleNames="vertical-align-middle">
 			<b:FormControlStatic ui:field="typeStatic" width="100px" visible="false"/>
-			<g:ListBox ui:field="type" width="100px">
+			<g:ListBox ui:field="type" width="100px" height="34px">
 			  <g:item>String</g:item>
 			  <g:item>Boolean</g:item>
 			  <g:item>Integer</g:item>
@@ -30,21 +30,21 @@
 			  <g:item>User</g:item>
 			</g:ListBox>
 		</t:TableData>
-		<t:TableData>
+		<t:TableData addStyleNames="vertical-align-middle">
 			<b:FormControlStatic ui:field="maxSizeStatic" width="75px" visible="false"/>
-			<b:FormGroup ui:field="sizeGroup">
+			<b:FormGroup ui:field="sizeGroup" addStyleNames="margin-bottom-0-imp">
 				<b:TextBox ui:field="maxSize" placeholder="Size" width="75px" />
-				<b:HelpBlock ui:field="sizeHelp" />
+				<b:HelpBlock ui:field="sizeHelp" visible="false"/>
 			</b:FormGroup>
 		</t:TableData>
-		<t:TableData>
+		<t:TableData addStyleNames="vertical-align-middle">
 			<g:SimplePanel ui:field="defaultPanel" />
 		</t:TableData>
-		<t:TableData>
+		<t:TableData addStyleNames="vertical-align-middle">
 			<b:TextBox ui:field="restrictValues" placeholder="value1, value2, value-n..." />
 		</t:TableData>
-		<t:TableData>
-			<g:ListBox ui:field="facet" width="100px">
+		<t:TableData addStyleNames="vertical-align-middle">
+			<g:ListBox ui:field="facet" width="100px" height="34px">
 			</g:ListBox>
 		</t:TableData>
 	</t:TableRow>
