@@ -103,8 +103,8 @@ public class EntityViewImpl implements EntityView {
 	}
 	
 	/** Event binder code **/
-	interface EBinder extends EventBinder<EntityPresenter> {};
-	private final EBinder eventBinder = GWT.create(EBinder.class);
+	interface EntityViewBinder extends EventBinder<EntityPresenter> {};
+	private final EntityViewBinder eventBinder = GWT.create(EntityViewBinder.class);
 	@Override
 	public EventBinder<EntityPresenter> getEventBinder() {
 		return eventBinder;
