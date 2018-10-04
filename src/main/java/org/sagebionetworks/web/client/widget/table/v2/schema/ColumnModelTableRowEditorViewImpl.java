@@ -213,24 +213,28 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 
 	@Override
 	public void setNameError(String error) {
+		nameHelp.setVisible(true);
 		this.nameGroup.setValidationState(ValidationState.ERROR);
 		this.nameHelp.setText(error);
 	}
 
 	@Override
 	public void clearNameError() {
+		nameHelp.setVisible(false);
 		this.nameGroup.setValidationState(ValidationState.NONE);
 		this.nameHelp.setText("");
 	}
 
 	@Override
 	public void setSizeError(String error) {
+		this.sizeHelp.setVisible(true);
 		this.sizeGroup.setValidationState(ValidationState.ERROR);
 		this.sizeHelp.setText(error);
 	}
 
 	@Override
 	public void clearSizeError() {
+		this.sizeHelp.setVisible(false);
 		this.sizeGroup.setValidationState(ValidationState.NONE);
 		this.sizeHelp.setText("");
 	}
