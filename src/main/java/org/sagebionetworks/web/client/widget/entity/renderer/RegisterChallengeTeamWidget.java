@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -39,6 +40,7 @@ public class RegisterChallengeTeamWidget implements SingleButtonView.Presenter, 
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		view.setPresenter(this);
+		view.setButtonSize(ButtonSize.LARGE);
 		view.setButtonType(ButtonType.PRIMARY);
 	}
 	

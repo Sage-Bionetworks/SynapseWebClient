@@ -17,12 +17,12 @@
 		    <bh:Span addStyleNames="alert alert-info inline-block" ui:field="requestOpenMessageSpan" text="Your request to join this team has been sent."/>
 		    
 		    <!-- For non-simple requests where the user can send a request message. -->
-		    <b:Button text="Request to Join Team" icon="PLUS" ui:field="requestButton" visible="false" dataToggle="COLLAPSE"/>
+		    <b:Button text="Request to Join Team" icon="PLUS" ui:field="requestButton" visible="false" dataToggle="COLLAPSE" size="LARGE"/>
 		    <b:Collapse addStyleNames="margin-top-5 highlight-box highlight-line-min" ui:field="requestUIPanel" toggle="false">
 		        <b:TextArea width="500px" placeholder="Enter message... (optional)" ui:field="messageArea"/>
 		    	<b:Button text="Send request" addStyleNames="margin-top-10" ui:field="sendRequestButton"/>
 		    </b:Collapse>
-		    <bh:Span addStyleNames="alert alert-info inline-block" ui:field="isMemberMessageSpan" text="Already a member"/>
+		    <bh:Span addStyleNames="alert alert-success inline-block" ui:field="isMemberMessageSpan" text="Already a member"/>
 		</g:HTMLPanel>
 		<b:Button type="PRIMARY" size="LARGE" ui:field="anonUserButton" visible="false" text="Join"/>
 		<bh:Div ui:field="synAlertContainer"/>
