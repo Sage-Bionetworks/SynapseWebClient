@@ -1,28 +1,17 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
 import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -35,8 +24,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
@@ -51,20 +39,33 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 
+@RunWith(MockitoJUnitRunner.class)
 public class EntityPresenterTest {
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	EventBinder mockEventBinder;
+
 	EntityPresenter entityPresenter;
+	@Mock
 	EntityView mockView;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	AuthenticationController mockAuthenticationController;
-	CookieProvider mockCookies;
+	@Mock
 	PlaceChanger mockPlaceChanger;
+	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
+	@Mock
 	StuAlert mockSynAlert;
+	@Mock
 	OpenTeamInvitationsWidget mockOpenInviteWidget;
+	@Mock
 	Header mockHeaderWidget;
+	@Mock
 	EntityPageTop mockEntityPageTop;
 	String EntityId = "1";
 	Synapse place = new Synapse("Synapse:"+ EntityId);
@@ -78,25 +79,17 @@ public class EntityPresenterTest {
 	EntityHeader mockProjectEntityHeader;
 	String rootWikiId = "12333";
 	FileHandleResults rootWikiAttachments;
-	GWTWrapper gwtWrapper;
+	@Mock
+	GWTWrapper mockGwtWrapper;
+	@Mock
+	EventBus mockEventBus;
 	
 	@Before
 	public void setup() throws Exception{
-		MockitoAnnotations.initMocks(this);
-		mockView = mock(EntityView.class);
-		gwtWrapper = mock(GWTWrapper.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockPlaceChanger = mock(PlaceChanger.class);
+		when(mockView.getEventBinder()).thenReturn(mockEventBinder);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		mockCookies = mock(CookieProvider.class);
-		mockSynAlert = mock(StuAlert.class);
-		mockOpenInviteWidget = mock(OpenTeamInvitationsWidget.class);
-		mockHeaderWidget = mock(Header.class);
-		mockEntityPageTop = mock(EntityPageTop.class);
 		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseJavascriptClient,
-				mockCookies, mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockOpenInviteWidget, gwtWrapper);
+				mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockOpenInviteWidget, mockGwtWrapper, mockEventBus);
 		Entity testEntity = new Project();
 		eb = new EntityBundle();
 		eb.setEntity(testEntity);
@@ -111,8 +104,8 @@ public class EntityPresenterTest {
 	
 	@Test
 	public void testConstruction() {
-		verify(mockEntityPageTop).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockHeaderWidget, never()).configure(); // waits to configure for entity header
+		verify(mockEventBinder).bindEventHandlers(entityPresenter, mockEventBus);
 	}
 	
 	@Test
@@ -196,10 +189,7 @@ public class EntityPresenterTest {
 	
 	@Test
 	public void testEntityUpdatedHandler() {
-		ArgumentCaptor<EntityUpdatedHandler> captor = ArgumentCaptor.forClass(EntityUpdatedHandler.class);
-		verify(mockEntityPageTop).setEntityUpdatedHandler(captor.capture());
-		//invoke and verify
-		captor.getValue().onPersistSuccess(null);
+		entityPresenter.onEntityUpdatedEvent(new EntityUpdatedEvent());
 		
 		verify(mockGlobalApplicationState).refreshPage();
 	}

@@ -1,27 +1,20 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.*;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.when;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -40,7 +33,6 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.ChangeSynapsePlaceEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -66,6 +58,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.web.bindery.event.shared.binder.EventBinder;
 
+@RunWith(MockitoJUnitRunner.class)
 public class EntityPageTopTest {
 
 	@Mock
@@ -125,8 +118,6 @@ public class EntityPageTopTest {
 	@Mock
 	ActionMenuWidget mockProjectActionMenuWidget;
 	@Mock
-	EntityUpdatedHandler mockEntityUpdatedHandler;
-	@Mock
 	AccessControlList mockACL;
 	@Mock
 	CookieProvider mockCookies;
@@ -157,7 +148,6 @@ public class EntityPageTopTest {
 	boolean canModerate = false;
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
 		when(mockFilesTab.asTab()).thenReturn(mockFilesInnerTab);
 		when(mockWikiTab.asTab()).thenReturn(mockWikiInnerTab);
 		when(mockTablesTab.asTab()).thenReturn(mockTablesInnerTab);
@@ -184,7 +174,6 @@ public class EntityPageTopTest {
 				mockSynapseJavascriptClient,
 				mockGlobalApplicationState,
 				mockEventBus);
-		pageTop.setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		AsyncMockStubber.callSuccessWith(mockProjectBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		
@@ -299,26 +288,26 @@ public class EntityPageTopTest {
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class), eq(mockActionMenuWidget));
 		// entity area for the project settings doesn't apply (so it's set to null).
 		EntityArea projectSettingsEntityArea = null;
-		verify(mockProjectActionController).configure(mockProjectActionMenuWidget, mockProjectBundle, true, projectWikiId, projectSettingsEntityArea, mockEntityUpdatedHandler);
+		verify(mockProjectActionController).configure(mockProjectActionMenuWidget, mockProjectBundle, true, projectWikiId, projectSettingsEntityArea);
 		verify(mockProjectActionMenuWidget).setToolsButtonIcon(EntityPageTop.PROJECT_SETTINGS, IconType.GEAR);
 		
 		verify(mockFilesTab, never()).setProject(projectEntityId, mockProjectBundle, null);
-		verify(mockFilesTab, never()).configure(mockProjectBundle, mockEntityUpdatedHandler, versionNumber, mockActionMenuWidget);
+		verify(mockFilesTab, never()).configure(mockProjectBundle, versionNumber, mockActionMenuWidget);
 		verify(mockTablesTab, never()).setProject(projectEntityId, mockProjectBundle, null);
-		verify(mockTablesTab, never()).configure(mockProjectBundle, mockEntityUpdatedHandler, areaToken, mockActionMenuWidget);
+		verify(mockTablesTab, never()).configure(mockProjectBundle, areaToken, mockActionMenuWidget);
 		verify(mockChallengeTab, never()).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab, never()).configure(projectEntityId, projectName, areaToken, canModerate, mockActionMenuWidget);
-		verify(mockDockerTab, never()).configure(mockProjectBundle, mockEntityUpdatedHandler, areaToken, mockActionMenuWidget);
+		verify(mockDockerTab, never()).configure(mockProjectBundle, areaToken, mockActionMenuWidget);
 		
 		clickAllTabs();
 		
 		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
-		verify(mockFilesTab).configure(mockProjectBundle, mockEntityUpdatedHandler, versionNumber, mockActionMenuWidget);
+		verify(mockFilesTab).configure(mockProjectBundle, versionNumber, mockActionMenuWidget);
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
-		verify(mockTablesTab).configure(mockProjectBundle, mockEntityUpdatedHandler, areaToken, mockActionMenuWidget);
+		verify(mockTablesTab).configure(mockProjectBundle, areaToken, mockActionMenuWidget);
 		verify(mockChallengeTab).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, areaToken, canModerate, mockActionMenuWidget);
-		verify(mockDockerTab).configure(mockProjectBundle, mockEntityUpdatedHandler, areaToken, mockActionMenuWidget);
+		verify(mockDockerTab).configure(mockProjectBundle, areaToken, mockActionMenuWidget);
 	}
 	
 	private void clickAllTabs() {
@@ -354,7 +343,7 @@ public class EntityPageTopTest {
 		String areaToken = "1234";
 		Long versionNumber = null;
 		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
-		verify(mockEntityActionController).configure(eq(mockActionMenuWidget), eq(mockProjectBundle), eq(true), eq(areaToken), eq(area), any(EntityUpdatedHandler.class));
+		verify(mockEntityActionController).configure(eq(mockActionMenuWidget), eq(mockProjectBundle), eq(true), eq(areaToken), eq(area));
 	}
 	
 	@Test
@@ -379,14 +368,14 @@ public class EntityPageTopTest {
 		verify(mockProjectActionMenuWidget).setToolsButtonIcon(EntityPageTop.PROJECT_SETTINGS, IconType.GEAR);
 		
 		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
-		verify(mockFilesTab).configure(mockEntityBundle, mockEntityUpdatedHandler, versionNumber, mockActionMenuWidget);
+		verify(mockFilesTab).configure(mockEntityBundle, versionNumber, mockActionMenuWidget);
 		
 		verify(mockWikiTab, never()).configure(eq(projectEntityId), eq(projectName), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class), any(ActionMenuWidget.class));
 		verify(mockTablesTab, never()).setProject(projectEntityId, mockProjectBundle, null);
-		verify(mockTablesTab, never()).configure(any(EntityBundle.class), eq(mockEntityUpdatedHandler), eq(areaToken), any(ActionMenuWidget.class));
+		verify(mockTablesTab, never()).configure(any(EntityBundle.class), eq(areaToken), any(ActionMenuWidget.class));
 		verify(mockChallengeTab, never()).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab, never()).configure(projectEntityId, projectName, null, canModerate, mockActionMenuWidget);
-		verify(mockDockerTab, never()).configure(mockEntityBundle, mockEntityUpdatedHandler, null, mockActionMenuWidget);
+		verify(mockDockerTab, never()).configure(mockEntityBundle, null, mockActionMenuWidget);
 		
 		//verify tab places have been set (allows for right-click of tab, before the tab has been initialized)
 		Long projectVersionNumber = null;
@@ -473,7 +462,7 @@ public class EntityPageTopTest {
 		verify(mockProjectMetadata, Mockito.never()).configure(mockProjectBundle, null, null);
 		EntityBundle expectedProjectEntityBundle = null;
 		verify(mockFilesTab).setProject(projectEntityId, expectedProjectEntityBundle, projectLoadError);
-		verify(mockFilesTab).configure(mockEntityBundle, mockEntityUpdatedHandler, versionNumber, mockActionMenuWidget);
+		verify(mockFilesTab).configure(mockEntityBundle, versionNumber, mockActionMenuWidget);
 		
 		clickAllTabs();
 		//project bundle is null, unable to get wiki id or canEdit.
@@ -481,10 +470,10 @@ public class EntityPageTopTest {
 		canEdit = false;
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(wikiId), eq(canEdit), any(WikiPageWidget.Callback.class), any(ActionMenuWidget.class));
 		verify(mockTablesTab).setProject(projectEntityId, null, projectLoadError);
-		verify(mockTablesTab).configure(any(EntityBundle.class), eq(mockEntityUpdatedHandler), eq(areaToken), any(ActionMenuWidget.class));
+		verify(mockTablesTab).configure(any(EntityBundle.class), eq(areaToken), any(ActionMenuWidget.class));
 		verify(mockChallengeTab).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, canModerate, mockActionMenuWidget);
-		verify(mockDockerTab).configure(null, mockEntityUpdatedHandler, null, mockActionMenuWidget);
+		verify(mockDockerTab).configure(null, null, mockActionMenuWidget);
 	}
 	
 	@Test
@@ -499,15 +488,15 @@ public class EntityPageTopTest {
 		verify(mockProjectMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
 		
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
-		verify(mockTablesTab).configure(mockEntityBundle, mockEntityUpdatedHandler, areaToken, mockActionMenuWidget);
+		verify(mockTablesTab).configure(mockEntityBundle, areaToken, mockActionMenuWidget);
 		
 		clickAllTabsTable();
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class), eq(mockActionMenuWidget));
 		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
-		verify(mockFilesTab).configure(mockProjectBundle, mockEntityUpdatedHandler, versionNumber, mockActionMenuWidget);
+		verify(mockFilesTab).configure(mockProjectBundle, versionNumber, mockActionMenuWidget);
 		verify(mockChallengeTab).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, canModerate, mockActionMenuWidget);
-		verify(mockDockerTab).configure(mockProjectBundle, mockEntityUpdatedHandler, null, mockActionMenuWidget);
+		verify(mockDockerTab).configure(mockProjectBundle, null, mockActionMenuWidget);
 	}
 	
 	private void clickAllTabsTable() {
@@ -562,14 +551,14 @@ public class EntityPageTopTest {
 		
 		verify(mockProjectMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
 		
-		verify(mockDockerTab).configure(mockEntityBundle, mockEntityUpdatedHandler, areaToken, mockActionMenuWidget);
+		verify(mockDockerTab).configure(mockEntityBundle, areaToken, mockActionMenuWidget);
 		
 		clickAllTabsDocker();
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class), eq(mockActionMenuWidget));
 		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
-		verify(mockFilesTab).configure(mockProjectBundle, mockEntityUpdatedHandler, versionNumber, mockActionMenuWidget);
+		verify(mockFilesTab).configure(mockProjectBundle, versionNumber, mockActionMenuWidget);
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
-		verify(mockTablesTab).configure(mockProjectBundle, mockEntityUpdatedHandler, null, mockActionMenuWidget);
+		verify(mockTablesTab).configure(mockProjectBundle, null, mockActionMenuWidget);
 		verify(mockChallengeTab).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, canModerate, mockActionMenuWidget);
 	}
@@ -625,13 +614,7 @@ public class EntityPageTopTest {
 		verify(mockProjectMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
 		//ignore specified area, target entity is a File so configure and show the Files tab
 		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
-		verify(mockFilesTab).configure(mockEntityBundle, mockEntityUpdatedHandler, versionNumber, mockActionMenuWidget);
-	}
-	
-	@Test
-	public void testFireEntityUpdatedEvent() {
-		pageTop.fireEntityUpdatedEvent();
-		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+		verify(mockFilesTab).configure(mockEntityBundle, versionNumber, mockActionMenuWidget);
 	}
 	
 	@Test
@@ -677,7 +660,7 @@ public class EntityPageTopTest {
 		when(mockWikiInnerTab.isContentStale()).thenReturn(true);
 		//since the project does not have a root wiki id, it should go to the files tab
 		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
-		verify(mockFilesTab).configure(mockProjectBundle, mockEntityUpdatedHandler, versionNumber, mockActionMenuWidget);
+		verify(mockFilesTab).configure(mockProjectBundle, versionNumber, mockActionMenuWidget);
 	}
 	
 	@Test
@@ -829,7 +812,7 @@ public class EntityPageTopTest {
 
 		verify(mockPlaceChanger, never()).goTo(newPlace);
 		//reconfigures tools menu with the correct area
-		verify(mockEntityActionController).configure(eq(mockActionMenuWidget), eq(mockProjectBundle), eq(true), eq(areaToken), eq(EntityArea.DISCUSSION), any(EntityUpdatedHandler.class));
+		verify(mockEntityActionController).configure(eq(mockActionMenuWidget), eq(mockProjectBundle), eq(true), eq(areaToken), eq(EntityArea.DISCUSSION));
 		//configured the discussion tab
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, areaToken, canModerate, mockActionMenuWidget);
 	}
