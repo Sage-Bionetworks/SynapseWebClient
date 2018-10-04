@@ -56,6 +56,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private SynapseJavascriptClient jsClient;
 	@Inject
 	public EntityPresenter(EntityView view,
+			EntityPresenterEventBinder entityPresenterEventBinder,
 			GlobalApplicationState globalAppState,
 			AuthenticationController authenticationController,
 			SynapseJavascriptClient jsClient,
@@ -75,7 +76,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.jsClient = jsClient;
 		this.gwt = gwt;
 		clear();
-		view.getEventBinder().bindEventHandlers(this, eventBus);
+		entityPresenterEventBinder.getEventBinder().bindEventHandlers(this, eventBus);
 	}
 
 	@Override

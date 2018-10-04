@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
+import org.sagebionetworks.web.client.presenter.EntityPresenterEventBinder;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
@@ -47,7 +48,8 @@ public class EntityPresenterTest {
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	EventBinder mockEventBinder;
-
+	@Mock
+	EntityPresenterEventBinder mockEntityPresenterEventBinder;
 	EntityPresenter entityPresenter;
 	@Mock
 	EntityView mockView;
@@ -86,9 +88,9 @@ public class EntityPresenterTest {
 	
 	@Before
 	public void setup() throws Exception{
-		when(mockView.getEventBinder()).thenReturn(mockEventBinder);
+		when(mockEntityPresenterEventBinder.getEventBinder()).thenReturn(mockEventBinder);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseJavascriptClient,
+		entityPresenter = new EntityPresenter(mockView, mockEntityPresenterEventBinder, mockGlobalApplicationState, mockAuthenticationController, mockSynapseJavascriptClient,
 				mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockOpenInviteWidget, mockGwtWrapper, mockEventBus);
 		Entity testEntity = new Project();
 		eb = new EntityBundle();

@@ -101,12 +101,4 @@ public class EntityViewImpl implements EntityView {
 	public void setOpenTeamInvitesVisible(boolean isVisible) {
 		openInvitesPanel.setVisible(isVisible);
 	}
-	
-	/** Event binder code **/
-	interface EntityViewBinder extends EventBinder<EntityPresenter> {};
-	private final EntityViewBinder eventBinder = GWT.create(EntityViewBinder.class);
-	@Override
-	public EventBinder<EntityPresenter> getEventBinder() {
-		return eventBinder;
-	}
 }
