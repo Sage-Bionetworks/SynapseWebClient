@@ -156,7 +156,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	@Override
 	public void scrollWikiHeadingIntoView() {
-		if (wikiHeading != null) {
+		if (wikiHeading != null && !DisplayUtils.isInViewport(wikiHeading)) {
 			SynapseJSNIUtilsImpl._scrollIntoView(wikiHeading.getElement());
 		}
 	}
