@@ -95,7 +95,7 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	
 	@Override
 	public void removeMember(String principalId) {
-		jsClient.deleteTeamMember(principalId, teamId, new AsyncCallback<Void>() {
+		jsClient.deleteTeamMember(teamId, principalId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				//success, refresh the team
