@@ -126,12 +126,11 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 
 	@Override
 	public String getResourceTypeGeneral() {
-		return resourceTypeGeneralSelect.getTitle();
+		return resourceTypeGeneralSelectButton.getText();
 	}
 
 	@Override
 	public void setResourceTypeGeneral(String resourceTypeGeneral) {
-		// Since the select elements aren't in the enum order, go through the "option" elements
 		resourceTypeGeneralSelectButton.setText(resourceTypeGeneral);
 	}
 
