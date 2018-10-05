@@ -113,7 +113,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 		doi.setTitles(new ArrayList<>());
 		doi.getTitles().add(new DoiTitle());
 		doi.getTitles().get(0).setTitle(entity.getName());
-		doi.setPublicationYear(Long.valueOf(dateTimeUtils.getYear(dateTimeUtils.getCurrentDate())));
+		doi.setPublicationYear(Long.valueOf(dateTimeUtils.getYear(dateTimeUtils.getCurrentTime())));
 		getFormattedCreatorNameFromPrincipalId(principalId).addCallback(new FutureCallback<String>() {
 			@Override
 			public void onSuccess(@NullableDecl String result) {
@@ -254,7 +254,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 		}
 
 		if (doi.getPublicationYear() == null) {
-			doi.setPublicationYear(Long.valueOf(dateTimeUtils.getYear(dateTimeUtils.getCurrentDate())));
+			doi.setPublicationYear(Long.valueOf(dateTimeUtils.getYear(dateTimeUtils.getCurrentTime())));
 		}
 
 		view.setCreators(convertMultipleCreatorsToString(doi.getCreators()));

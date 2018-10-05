@@ -111,7 +111,7 @@ public class DateTimeUtilsImpl implements DateTimeUtils {
 		return formatter.format(toFormat);
 	}
 
-	public Date getCurrentDate() {
+	public Date getCurrentTime() {
 		return new Date();
 	}
 

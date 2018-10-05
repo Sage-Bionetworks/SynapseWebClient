@@ -427,7 +427,7 @@ public class CreateOrUpdateDoiModalTest {
 		Date testingDate = new Date();
 		testingDate.setTime(100); // 100 ms after unix epoch (1970-01-01)
 		String expectedYear = "1970";
-		when(mockDateTimeUtils.getCurrentDate()).thenReturn(testingDate);
+		when(mockDateTimeUtils.getCurrentTime()).thenReturn(testingDate);
 		when(mockDateTimeUtils.getYear(testingDate)).thenReturn(expectedYear);
 		// All fields are filled out in the createDoi method
 		Doi doi = createDoi();
