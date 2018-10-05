@@ -2670,6 +2670,12 @@ div.border {
 		max-width: 330px;
 		transition: max-width 0.4s ease-in-out;
 	}
+	.resetTop {
+		top: inherit;
+	}
+	.resetLeft {
+		left: inherit;
+	}
 }
 #rootPanel {
 	summary { color:$synapse-blue; }
