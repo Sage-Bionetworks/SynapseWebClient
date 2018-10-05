@@ -25,7 +25,11 @@
 						</b:FormGroup>
 						<b:FormGroup>
 							<b:FormLabel>General Resource Type</b:FormLabel>
-							<b:ListBox ui:field="resourceTypeGeneralSelect"/>
+							<bh:Div>
+								<b:Button ui:field="resourceTypeGeneralSelectButton" dataToggle="DROPDOWN" text="General Resource Type" width="160px"/>
+								<b:DropDownMenu ui:field="resourceTypeGeneralSelect" addStyleNames="resetTop resetLeft"/>
+							</bh:Div>
+
 						</b:FormGroup>
 						<b:FormGroup>
 							<b:FormLabel>Publication Year</b:FormLabel>
@@ -33,7 +37,7 @@
 						</b:FormGroup>
 					</b:Form>
 				</bh:Div>
-				<bh:Div ui:field="aliasUI">
+				<bh:Div ui:field="doiOverwriteWarning">
 					<b:Alert type="WARNING" addStyleNames="margin-top-10">
 						<bh:Strong text="Note: &nbsp;" />
 						<bh:Text text="Updating the DOI information will cause old information to be lost!"/>

@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.doi.v2.Doi;
@@ -14,6 +16,8 @@ import org.sagebionetworks.repo.model.doi.v2.DoiRequest;
 import org.sagebionetworks.repo.model.doi.v2.DoiResourceType;
 import org.sagebionetworks.repo.model.doi.v2.DoiResourceTypeGeneral;
 import org.sagebionetworks.repo.model.doi.v2.DoiTitle;
+import org.sagebionetworks.web.client.DateTimeUtils;
+import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -23,6 +27,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.Widget;
@@ -31,7 +36,6 @@ import com.google.inject.Inject;
 public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presenter {
 	public static final String DOI_CREATED_MESSAGE = "DOI successfully updated for ";
 	public static final String DOI_MODAL_TITLE = "Create or Update a DOI";
-	public static final String DOI_SERVICES_UNAVAILABLE_AT_THIS_TIME = "DOI services unavailable at this time.";
 
 	private CreateOrUpdateDoiModalView view;
 	private JobTrackingWidget jobTrackingWidget;
@@ -40,6 +44,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 	private Doi doi;
 	private SynapseAlert synapseAlert;
 	private PopupUtilsView popupUtilsView;
+	private DateTimeUtils dateTimeUtils;
 
 	@Inject
 	public CreateOrUpdateDoiModal(CreateOrUpdateDoiModalView view,
@@ -47,54 +52,133 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 								  SynapseJavascriptClient javascriptClient,
 								  SynapseAlert synapseAlert,
 								  PopupUtilsView popupUtilsView,
-								  EventBus eventBus) {
+								  EventBus eventBus,
+								  DateTimeUtils dateTimeUtils) {
 		this.view = view;
 		this.jobTrackingWidget = jobTrackingWidget;
 		this.javascriptClient = javascriptClient;
 		this.synapseAlert = synapseAlert;
 		this.popupUtilsView = popupUtilsView;
 		this.eventBus = eventBus;
+		this.dateTimeUtils = dateTimeUtils;
 		view.setSynAlert(synapseAlert);
 		view.setJobTrackingWidget(jobTrackingWidget);
 		view.setPresenter(this);
 		view.setModalTitle(DOI_MODAL_TITLE);
 	}
 
-	public void configureAndShow(String objectId, ObjectType objectType, Long versionNumber) {
+	public void configureAndShow(Entity entity, Long entityVersion, String principalId) {
 		view.reset();
 		synapseAlert.clear();
 		doi = new Doi();
-		getExistingDoi(objectId, objectType, versionNumber);
-	}
-
-	public void getExistingDoi(String objectId, ObjectType objectType, Long objectVersion) {
-		javascriptClient.getDoi(objectId, objectType, objectVersion).addCallback(new FutureCallback<Doi>() {
+		javascriptClient.getDoi(entity.getId(), ObjectType.ENTITY, entityVersion).addCallback(new FutureCallback<Doi>() {
 			@Override
 			public void onSuccess(@NullableDecl Doi doi) {
-				populateForms(doi);
+				boolean doiExists = true;
+				setDoi(doi);
+				populateForms();
+				view.showOverwriteWarning(doiExists);
+				view.show();
+			}
+
+			@Override
+			public void onFailure(Throwable t1) {
+				if (t1 instanceof NotFoundException) {
+					createNewDoiAndShow(entity, entityVersion, principalId);
+				} else {
+					popupUtilsView.showErrorMessage(t1.getMessage());
+				}
+			}
+		}, directExecutor());
+	}
+
+	/**
+	 * Do not use!!! Public only for testing purposes
+	 *
+	 * Creates a new DOI object from the given information and shows the modal.
+	 */
+	public void createNewDoiAndShow(Entity entity, Long entityVersion, String principalId) {
+		if (entity == null) {
+			throw new IllegalArgumentException("Cannot configure a new DOI. The entity cannot be null.");
+		}
+		boolean doiExists = false;
+		doi = new Doi();
+		doi.setObjectId(entity.getId());
+		doi.setObjectType(ObjectType.ENTITY);
+		doi.setObjectVersion(entityVersion);
+		doi.setResourceType(new DoiResourceType());
+		doi.getResourceType().setResourceTypeGeneral(getSuggestedResourceTypeGeneral(
+				EntityTypeUtils.getEntityTypeForEntityClassName(entity.getClass().getName())
+		));
+		doi.setTitles(new ArrayList<>());
+		doi.getTitles().add(new DoiTitle());
+		doi.getTitles().get(0).setTitle(entity.getName());
+		doi.setPublicationYear(Long.valueOf(dateTimeUtils.getYear(dateTimeUtils.getCurrentDate())));
+		getFormattedCreatorNameFromPrincipalId(principalId).addCallback(new FutureCallback<String>() {
+			@Override
+			public void onSuccess(@NullableDecl String result) {
+				doi.setCreators(new ArrayList<>());
+				doi.getCreators().add(new DoiCreator());
+				doi.getCreators().get(0).setCreatorName(result);
+				populateForms();
+				view.showOverwriteWarning(doiExists);
 				view.show();
 			}
 
 			@Override
 			public void onFailure(Throwable t) {
-				if (t instanceof NotFoundException) {
-					doi.setObjectId(objectId);
-					doi.setObjectType(objectType);
-					doi.setObjectVersion(objectVersion);
-					view.show();
-				} else {
-					popupUtilsView.showErrorMessage(t.getMessage());
-				}
+				// There should never be an issue with getting your own profile, so we should show an error
+				popupUtilsView.showErrorMessage(t.getMessage());
+				// It doesn't affect creating a DOI, so we can still show the modal.
+				populateForms();
+				view.showOverwriteWarning(doiExists);
+				view.show();
 			}
 		}, directExecutor());
 	}
-	
+
+	/**
+	 * Do not use!!! Public only for testing purposes
+	 *
+	 * Retrieves a user's name in "Last, First" format.
+	 * If the user has not set a first and last name, returns an empty string.
+	 */
+	public FluentFuture<String> getFormattedCreatorNameFromPrincipalId(String principalID) {
+		return javascriptClient.getUserProfile(principalID).transform(profile -> {
+			String formattedName;
+			if (profile != null && profile.getLastName() != null && profile.getFirstName() != null &&
+				!profile.getLastName().isEmpty() && !profile.getFirstName().isEmpty()) {
+				formattedName = formatPersonalName(profile.getLastName(), profile.getFirstName());
+			} else { // The user may not have set their first and last names
+				formattedName = "";
+			}
+			return formattedName;
+		}, directExecutor());
+	}
+
+	public static String formatPersonalName(String lastName, String firstName) {
+		return lastName + ", " + firstName;
+	}
+
 	public Widget asWidget() {
 		return view.asWidget();
 	}
 
 	public void hide() {
 		view.hide();
+	}
+
+	/**
+	 * Do not use!!! Public only for testing purposes
+	 *
+	 * Gets the most likely DoiResourceTypeGeneral based on the entity type.
+	 */
+	public static DoiResourceTypeGeneral getSuggestedResourceTypeGeneral(EntityType type) {
+		if (type.equals(EntityType.project) || type.equals(EntityType.folder)) {
+			return DoiResourceTypeGeneral.Collection;
+		} else {
+			return DoiResourceTypeGeneral.Dataset;
+		}
 	}
 
 	@Override
@@ -148,9 +232,8 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 	 * Do not use!!! Public only for testing purposes
 	 *
 	 * Retrieves DOI fields from a class variable, translates them, and loads them into the view
-	 * @param doi
 	 */
-	public void populateForms(Doi doi) {
+	public void populateForms() {
 		if (doi == null) {
 			doi = new Doi();
 		}
@@ -171,7 +254,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 		}
 
 		if (doi.getPublicationYear() == null) {
-			doi.setPublicationYear(2018L); // TODO: Current date?
+			doi.setPublicationYear(Long.valueOf(dateTimeUtils.getYear(dateTimeUtils.getCurrentDate())));
 		}
 
 		view.setCreators(convertMultipleCreatorsToString(doi.getCreators()));
