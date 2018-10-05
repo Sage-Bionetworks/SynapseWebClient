@@ -7,10 +7,10 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -53,11 +53,11 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 	ScopeWidgetView view;
 	SynapseClientAsync synapseClient;
 	EntityBundle bundle;
-	EntityUpdatedHandler updateHandler;
 	EntityContainerListWidget viewScopeWidget, editScopeWidget;
 	SynapseAlert synAlert;
 	EntityView currentView;
 	TableType tableType;
+	EventBus eventBus;
 	
 	/**
 	 * New presenter with its view.
@@ -68,24 +68,24 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 			SynapseClientAsync synapseClient, 
 			EntityContainerListWidget viewScopeWidget, 
 			EntityContainerListWidget editScopeWidget,
-			SynapseAlert synAlert){
+			SynapseAlert synAlert,
+			EventBus eventBus){
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.view = view;
 		this.viewScopeWidget = viewScopeWidget;
 		this.editScopeWidget = editScopeWidget;
 		this.synAlert = synAlert;
-		
+		this.eventBus = eventBus;
 		view.setPresenter(this);
 		view.setEditableEntityListWidget(editScopeWidget.asWidget());
 		view.setEntityListWidget(viewScopeWidget.asWidget());
 		view.setSynAlert(synAlert.asWidget());
 	}
 
-	public void configure(EntityBundle bundle, boolean isEditable, EntityUpdatedHandler updateHandler) {
+	public void configure(EntityBundle bundle, boolean isEditable) {
 		this.isEditable = isEditable;
 		this.bundle = bundle;
-		this.updateHandler = updateHandler;
 		boolean isVisible = bundle.getEntity() instanceof EntityView;
 		if (isVisible) {
 			currentView = (EntityView) bundle.getEntity();
@@ -123,7 +123,7 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 			public void onSuccess(Entity entity) {
 				view.setLoading(false);
 				view.hideModal();
-				updateHandler.onPersistSuccess(new EntityUpdatedEvent());
+				eventBus.fireEvent(new EntityUpdatedEvent());
 			}
 			@Override
 			public void onFailure(Throwable caught) {

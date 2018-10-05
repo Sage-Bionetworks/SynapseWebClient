@@ -8,7 +8,6 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
@@ -19,6 +18,7 @@ import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -28,7 +28,6 @@ public class DockerRepoWidget {
 	private DockerRepoWidgetView view;
 	private WikiPageWidget wikiPageWidget;
 	private ProvenanceWidget provWidget;
-	private EntityUpdatedHandler handler;
 	private EntityMetadata metadata;
 	private ModifiedCreatedByWidget modifiedCreatedBy;
 	private DockerTitleBar dockerTitleBar;
@@ -36,7 +35,7 @@ public class DockerRepoWidget {
 	private CookieProvider cookies;
 	private boolean canEdit;
 	private DockerRepository entity;
-
+	private EventBus eventBus;
 	@Inject
 	public DockerRepoWidget(
 			DockerRepoWidgetView view,
@@ -46,7 +45,8 @@ public class DockerRepoWidget {
 			EntityMetadata metadata,
 			ModifiedCreatedByWidget modifiedCreatedBy,
 			DockerCommitListWidget dockerCommitListWidget,
-			CookieProvider cookies
+			CookieProvider cookies,
+			EventBus eventBus
 			) {
 		this.view = view;
 		this.wikiPageWidget = wikiPageWidget;
@@ -56,6 +56,7 @@ public class DockerRepoWidget {
 		this.modifiedCreatedBy = modifiedCreatedBy;
 		this.dockerCommitListWidget = dockerCommitListWidget;
 		this.cookies = cookies;
+		this.eventBus = eventBus;
 		view.setWikiPage(wikiPageWidget.asWidget());
 		view.setProvenance(provWidget.asWidget());
 		view.setTitlebar(dockerTitleBar.asWidget());
@@ -68,11 +69,9 @@ public class DockerRepoWidget {
 		return view.asWidget();
 	}
 
-	public void configure(EntityBundle bundle, final EntityUpdatedHandler handler, ActionMenuWidget actionMenu) {
+	public void configure(EntityBundle bundle, ActionMenuWidget actionMenu) {
 		this.entity = (DockerRepository)bundle.getEntity();
-		this.handler = handler;
 		this.canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
-		metadata.setEntityUpdatedHandler(handler);
 		metadata.configure(bundle, null, actionMenu);
 		dockerTitleBar.configure(entity);
 		modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
@@ -94,7 +93,7 @@ public class DockerRepoWidget {
 		final WikiPageWidget.Callback wikiCallback = new WikiPageWidget.Callback() {
 			@Override
 			public void pageUpdated() {
-				handler.onPersistSuccess(new EntityUpdatedEvent());
+				eventBus.fireEvent(new EntityUpdatedEvent());
 			}
 			@Override
 			public void noWikiFound() {

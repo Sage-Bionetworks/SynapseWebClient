@@ -415,11 +415,6 @@ public class TableEntityWidget implements IsWidget,
 	}
 
 	@Override
-	public void onPersistSuccess(EntityUpdatedEvent event) {
-		this.queryChangeHandler.onPersistSuccess(event);
-	}
-
-	@Override
 	public void queryExecutionStarted() {
 		// Pass this along to the input widget.
 		this.queryInputWidget.queryExecutionStarted();

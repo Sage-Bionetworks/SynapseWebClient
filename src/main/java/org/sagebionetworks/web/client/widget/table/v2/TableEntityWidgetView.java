@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.table.v2;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -14,7 +13,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  */
 public interface TableEntityWidgetView extends IsWidget {
 	
-	public interface Presenter extends EntityUpdatedHandler {
+	public interface Presenter {
 		void onShowSimpleSearch();
 		void onShowAdvancedSearch();
 	}

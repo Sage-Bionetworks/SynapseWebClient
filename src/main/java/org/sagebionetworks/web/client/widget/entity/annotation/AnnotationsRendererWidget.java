@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
@@ -21,7 +20,6 @@ public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.
 	private AnnotationsRendererWidgetView view;
 	private AnnotationTransformer annotationTransformer;
 	private EditAnnotationsDialog editorDialog;
-	EntityUpdatedHandler entityUpdatedHandler;
 	List<Annotation> annotationsList;
 	private PreflightController preflightController;
 	private PortalGinInjector ginInjector;
@@ -74,16 +72,12 @@ public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.
 		return view.asWidget();
 	}
 
-	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		this.entityUpdatedHandler = handler;
-	}
-
 	@Override
 	public void onEdit() {
 		preflightController.checkUploadToEntity(bundle, new Callback() {
 			@Override
 			public void invoke() {
-				getEditAnnotationsDialog().configure(bundle, entityUpdatedHandler);
+				getEditAnnotationsDialog().configure(bundle);
 			}
 		});
 	}

@@ -16,6 +16,8 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.cookie.GWTCookieImpl;
 import org.sagebionetworks.web.client.presenter.DownPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
+import org.sagebionetworks.web.client.presenter.EntityPresenterEventBinder;
+import org.sagebionetworks.web.client.presenter.EntityPresenterEventBinderImpl;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.resources.ResourceLoaderImpl;
@@ -1421,5 +1423,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SynapseProperties.class).to(SynapsePropertiesImpl.class).in(Singleton.class);
 		bind(Moment.class).to(MomentImpl.class);
 		bind(DownloadSpeedTester.class).to(DownloadSpeedTesterImpl.class);
+		bind(EntityPresenterEventBinder.class).to(EntityPresenterEventBinderImpl.class);
 	}
 }

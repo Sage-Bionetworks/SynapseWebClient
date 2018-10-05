@@ -388,13 +388,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			this.queryResultEditor = ginInjector.createNewQueryResultEditorWidget();
 			view.setEditorWidget(this.queryResultEditor);
 		}
-		this.queryResultEditor.showEditor(bundle, tableType, new Callback() {
-			@Override
-			public void invoke() {
-				cachedFullQueryResultBundle = null;
-				runQuery();
-			}
-		});
+		this.queryResultEditor.showEditor(bundle, tableType);
 	}
 
 	@Override

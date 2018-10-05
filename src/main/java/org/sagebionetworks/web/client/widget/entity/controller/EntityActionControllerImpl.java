@@ -39,7 +39,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -77,6 +76,7 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -124,6 +124,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	EvaluationSubmitter submitter;
 	EditFileMetadataModalWidget editFileMetadataModalWidget;
 	EditProjectMetadataModalWidget editProjectMetadataModalWidget;
+	EventBus eventBus;
 	
 	EntityBundle entityBundle;
 	String wikiPageId;
@@ -133,7 +134,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	boolean isUserAuthenticated;
 	boolean isCurrentVersion;
 	ActionMenuWidget actionMenu;
-	EntityUpdatedHandler entityUpdateHandler;
 	WikiMarkdownEditor wikiEditor;
 	ProvenanceEditorWidget provenanceEditor;
 	StorageLocationWidget storageLocationEditor;
@@ -162,7 +162,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			AuthenticationController authenticationController,
 			CookieProvider cookies,
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			EventBus eventBus) {
 		super();
 		this.view = view;
 		this.ginInjector = ginInjector;
@@ -171,10 +172,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.cookies = cookies;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.gwt = gwt;
+		this.eventBus = eventBus;
 		entityUpdatedWizardCallback = new WizardCallback() {
 			@Override
 			public void onFinished() {
-				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+				fireEntityUpdatedEvent();
 			}
 			
 			@Override
@@ -185,6 +187,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			reconfigureActions();
 		};
 	}
+	
+	private void fireEntityUpdatedEvent() {
+		eventBus.fireEvent(new EntityUpdatedEvent());
+	}
+	
 	private WikiPageDeleteConfirmationDialog getWikiPageDeleteConfirmationDialog() {
 		if (wikiPageDeleteConfirmationDialog == null) {
 			wikiPageDeleteConfirmationDialog = ginInjector.getWikiPageDeleteConfirmationDialog();
@@ -353,10 +360,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	@Override
 	public void configure(ActionMenuWidget actionMenu,
-			EntityBundle entityBundle, boolean isCurrentVersion, String wikiPageId, EntityArea currentArea,  EntityUpdatedHandler handler) {
+			EntityBundle entityBundle, boolean isCurrentVersion, String wikiPageId, EntityArea currentArea) {
 		this.entityBundle = entityBundle;
 		this.wikiPageId = wikiPageId;
-		this.entityUpdateHandler = handler;
 		this.permissions = entityBundle.getPermissions();
 		this.actionMenu = actionMenu;
 		this.entity = entityBundle.getEntity();
@@ -564,7 +570,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			@Override
 			public void onSuccess(Void v) {
 				view.showInfo(DisplayConstants.DOI_REQUEST_SENT_TITLE + DisplayConstants.DOI_REQUEST_SENT_MESSAGE);
-				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+				fireEntityUpdatedEvent();
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -595,7 +601,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void onCreateOrUpdateDoi() {
-		getCreateOrUpdateDoiModal().configureAndShow(entity.getId(), ObjectType.ENTITY, getVersion(), entityUpdateHandler);
+		getCreateOrUpdateDoiModal().configureAndShow(entity.getId(), ObjectType.ENTITY, getVersion());
 	}
 
 	private void onCreateChallenge() {
@@ -623,8 +629,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		getChallengeClient().deleteChallenge(currentChallengeId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo(THE + "challenge" + WAS_SUCCESSFULLY_DELETED); 
-				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+				view.showInfo(THE + "challenge" + WAS_SUCCESSFULLY_DELETED);
+				fireEntityUpdatedEvent();
 			}
 			
 			@Override
@@ -1029,22 +1035,16 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		});
 	}
 	private void postCheckCreateExternalDockerRepo(){
-		getAddExternalRepoModal().configuration(entityBundle.getEntity().getId(), new Callback() {
-			@Override
-			public void invoke() {
-				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
-			}
+		getAddExternalRepoModal().configuration(entityBundle.getEntity().getId(), () -> {
+			fireEntityUpdatedEvent();
 		});
 		getAddExternalRepoModal().show();
 	}
 	
 	public void onUploadTable() {
 		// This operation creates an entity and uploads data to the entity so both checks must pass.
-		preflightController.checkCreateEntityAndUpload(entityBundle, TableEntity.class.getName(), new Callback() {
-			@Override
-			public void invoke() {
-				postCheckUploadTable();
-			}
+		preflightController.checkCreateEntityAndUpload(entityBundle, TableEntity.class.getName(), () -> {
+			postCheckUploadTable();
 		});
 	}
 	private void postCheckUploadTable(){
@@ -1053,29 +1053,20 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	public void onAddFileView() {
-		preflightController.checkCreateEntity(entityBundle, EntityView.class.getName(), new Callback() {
-			@Override
-			public void invoke() {
-				postCheckCreateTableOrView(TableType.files);
-			}
+		preflightController.checkCreateEntity(entityBundle, EntityView.class.getName(), () -> {
+			postCheckCreateTableOrView(TableType.files);
 		});
 	}
 	
 	public void onAddProjectView() {
-		preflightController.checkCreateEntity(entityBundle, EntityView.class.getName(), new Callback() {
-			@Override
-			public void invoke() {
-				postCheckCreateTableOrView(TableType.projects);
-			}
+		preflightController.checkCreateEntity(entityBundle, EntityView.class.getName(), () -> {
+			postCheckCreateTableOrView(TableType.projects);
 		});
 	}
 	
 	public void onAddTable() {
-		preflightController.checkCreateEntity(entityBundle, TableEntity.class.getName(), new Callback() {
-			@Override
-			public void invoke() {
-				postCheckCreateTableOrView(TableType.table);
-			}
+		preflightController.checkCreateEntity(entityBundle, TableEntity.class.getName(), () -> {
+			postCheckCreateTableOrView(TableType.table);
 		});
 	}
 	
@@ -1090,7 +1081,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			public void invoke() {
 				UploadDialogWidget uploader = getNewUploadDialogWidget();
 				uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, null,
-						entityBundle.getEntity().getId(), entityUpdateHandler, null, true);
+						entityBundle.getEntity().getId(), null, true);
 				uploader.setUploaderLinkNameVisible(true);
 				uploader.show();		
 			}
@@ -1139,12 +1130,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void postChangeStorageLocation() {
-		getStorageLocationWidget().configure(this.entityBundle, entityUpdateHandler);
+		getStorageLocationWidget().configure(this.entityBundle);
 		getStorageLocationWidget().show();
 	}
 	
 	private void onEditProvenance() {
-		getProvenanceEditorWidget().configure(this.entityBundle, entityUpdateHandler);
+		getProvenanceEditorWidget().configure(this.entityBundle);
 		getProvenanceEditorWidget().show();
 	}
 	
@@ -1160,7 +1151,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	private void postCheckUploadFile(){
 		UploadDialogWidget uploadDialogWidget = getNewUploadDialogWidget();
-		uploadDialogWidget.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, entityUpdateHandler, null, true);
+		uploadDialogWidget.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, null, true);
 		uploadDialogWidget.disableMultipleFileUploads();
 		uploadDialogWidget.setUploaderLinkNameVisible(false);
 		uploadDialogWidget.show();
@@ -1278,7 +1269,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			
 			@Override
 			public void onSuccess(Entity result) {
-				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+				fireEntityUpdatedEvent();
 			}
 			
 			@Override
@@ -1315,11 +1306,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void postCheckEditWiki(){
 		//markdown editor will create a wiki if it does not already exist
 		WikiPageKey key = new WikiPageKey(this.entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), wikiPageId);
-		getWikiMarkdownEditor().configure(key, new CallbackP<WikiPage>() {
-			@Override
-			public void invoke(WikiPage param) {
-				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
-			}
+		getWikiMarkdownEditor().configure(key, wikiPage -> {
+			fireEntityUpdatedEvent();
 		});
 	}
 
@@ -1380,11 +1368,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * Called if the preflight check for a rename passes.
 	 */
 	private void postCheckRename(){
-		getRenameEntityModalWidget().onRename(this.entity, new Callback() {
-			@Override
-			public void invoke() {
-				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
-			}
+		getRenameEntityModalWidget().onRename(this.entity, () -> {
+			fireEntityUpdatedEvent();
 		});
 	}
 
@@ -1409,11 +1394,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 */
 	private void postCheckEditFileMetadata() {
 		FileHandle originalFileHandle = DisplayUtils.getFileHandle(entityBundle);
-		getEditFileMetadataModalWidget().configure((FileEntity)entityBundle.getEntity(), originalFileHandle, new Callback() {
-			@Override
-			public void invoke() {
-				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
-			}
+		getEditFileMetadataModalWidget().configure((FileEntity)entityBundle.getEntity(), originalFileHandle, () -> {
+			fireEntityUpdatedEvent();
 		});
 	}
 	
@@ -1435,11 +1417,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if (canChangeSettings == null) {
 			canChangeSettings = false;
 		}
-		getEditProjectMetadataModalWidget().configure((Project)entityBundle.getEntity(), canChangeSettings, new Callback() {
-			@Override
-			public void invoke() {
-				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
-			}
+		getEditProjectMetadataModalWidget().configure((Project)entityBundle.getEntity(), canChangeSettings, () -> {
+			fireEntityUpdatedEvent();
 		});
 	}
 	
@@ -1522,11 +1501,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	@Override
 	public void onShare() {
 		getAccessControlListModalWidget().configure(entity, permissions.getCanChangePermissions());
-		this.getAccessControlListModalWidget().showSharing(new Callback() {
-			@Override
-			public void invoke() {
-				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
-			}
+		this.getAccessControlListModalWidget().showSharing(() -> {
+			fireEntityUpdatedEvent();
 		});
 	}
 

@@ -3,28 +3,23 @@ package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
-import static org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY;
-import static org.sagebionetworks.web.client.widget.table.v2.results.RowSetUtils.ETAG_COLUMN_NAME;
+import static org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.file.BulkFileDownloadResponse;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityUpdateFailureCode;
 import org.sagebionetworks.repo.model.table.EntityUpdateResult;
 import org.sagebionetworks.repo.model.table.EntityUpdateResults;
-import org.sagebionetworks.repo.model.table.PartialRow;
-import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
@@ -37,6 +32,7 @@ import org.sagebionetworks.repo.model.table.TableUpdateTransactionResponse;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorView;
@@ -46,21 +42,24 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.asynch.JobTrackingWidgetStub;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
 
+import com.google.gwt.event.shared.EventBus;
+
 /**
  * Unit tests for QueryResultEditorWidget.
  * 
  * @author John
  *
  */
+@RunWith(MockitoJUnitRunner.class)
 public class QueryResultEditorWidgetTest {
-
+	@Mock
 	QueryResultEditorView mockView;
+	@Mock
 	TablePageWidget mockPageWidget;
 	QueryResultEditorWidget widget;
 	JobTrackingWidgetStub jobTrackingStub;
+	@Mock
 	GlobalApplicationState mockGlobalState;
-	Callback mockCallback;
-	
 
 	QueryResult results;
 	RowSet rowSet;
@@ -87,18 +86,15 @@ public class QueryResultEditorWidgetTest {
 	EntityUpdateResult mockEntityUpdateResult2;
 	@Mock
 	ClientCache mockClientCache;
+	@Mock
+	EventBus mockEventBus;
 	List<TableUpdateResponse> tableUpdateResults;
 	TableType tableType;
 	public static final String ENTITY_ID = "syn999";
 	@Before
 	public void before() throws JSONObjectAdapterException{
-		MockitoAnnotations.initMocks(this);
-		mockView = Mockito.mock(QueryResultEditorView.class);
-		mockPageWidget = Mockito.mock(TablePageWidget.class);
 		jobTrackingStub = new JobTrackingWidgetStub();
-		mockGlobalState = Mockito.mock(GlobalApplicationState.class);
-		mockCallback = Mockito.mock(Callback.class);
-		widget = new QueryResultEditorWidget(mockView, mockPageWidget, jobTrackingStub, mockGlobalState,mockClientCache);
+		widget = new QueryResultEditorWidget(mockView, mockPageWidget, jobTrackingStub, mockGlobalState,mockClientCache, mockEventBus);
 
 		schema = TableModelTestUtils.createColumsWithNames("one", "two");
 		headers = TableModelTestUtils.buildSelectColumns(schema);
@@ -170,7 +166,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnEdit(){
-		widget.showEditor(bundle, tableType, mockCallback);
+		widget.showEditor(bundle, tableType);
 		verify(mockView).setErrorMessageVisible(false);
 		verify(mockView).hideProgress();
 		verify(mockView).setSaveButtonLoading(false);
@@ -184,7 +180,7 @@ public class QueryResultEditorWidgetTest {
 	@Test
 	public void testOnEditView(){
 		tableType = TableType.files;
-		widget.showEditor(bundle, tableType, mockCallback);
+		widget.showEditor(bundle, tableType);
 		verify(mockView).setAddRowButtonVisible(false);
 		verify(mockView).setButtonToolbarVisible(false);
 	}
@@ -192,7 +188,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnCancelNoChanges(){
-		widget.showEditor(bundle, tableType, mockCallback);
+		widget.showEditor(bundle, tableType);
 		reset(mockView);
 		reset(mockGlobalState);
 		// No changes
@@ -203,7 +199,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnCancelWithChangesConfirmOkay(){
-		widget.showEditor(bundle, tableType, mockCallback);
+		widget.showEditor(bundle, tableType);
 		reset(mockView);
 		reset(mockGlobalState);
 		
@@ -219,7 +215,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnCancelWithChangesConfirmCanceld(){
-		widget.showEditor(bundle, tableType, mockCallback);
+		widget.showEditor(bundle, tableType);
 		reset(mockView);
 		reset(mockGlobalState);
 		
@@ -235,7 +231,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveNoChanges(){
-		widget.showEditor(bundle, tableType, mockCallback);
+		widget.showEditor(bundle, tableType);
 		reset(mockView);
 		reset(mockGlobalState);
 		
@@ -246,13 +242,13 @@ public class QueryResultEditorWidgetTest {
 		verify(mockGlobalState).setIsEditing(false);
 		verify(mockView).hideEditor();
 		verify(mockPageWidget, never()).isValid();
-		// callback should not be invoked
-		verify(mockCallback, never()).invoke();
+		// update should not be invoked
+		verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
 	}
 	
 	@Test
 	public void testOnSaveWithChagnesNotValid(){
-		widget.showEditor(bundle, tableType, mockCallback);
+		widget.showEditor(bundle, tableType);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -269,13 +265,13 @@ public class QueryResultEditorWidgetTest {
 		verify(mockView).hideProgress();
 		verify(mockView).showErrorMessage(QueryResultEditorWidget.SEE_THE_ERRORS_ABOVE);
 		verify(mockView).setSaveButtonLoading(false);
-		// callback should not be invoked
-		verify(mockCallback, never()).invoke();
+		// update should not be invoked
+		verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
 	}
 	
 	@Test
 	public void testOnSaveWithChangesValidJobSuccessful(){
-		widget.showEditor(bundle, tableType, mockCallback);
+		widget.showEditor(bundle, tableType);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -303,7 +299,7 @@ public class QueryResultEditorWidgetTest {
 		verify(mockGlobalState).setIsEditing(false);
 		
 		// The callback should be invoked
-		verify(mockCallback).invoke();
+		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 		
 		verify(mockClientCache, never()).put(anyString(), anyString(), anyLong());
 	}
@@ -312,7 +308,7 @@ public class QueryResultEditorWidgetTest {
 	@Test
 	public void testOnSaveWithChangesValidJobSuccessfulIsView(){
 		tableType = TableType.projects;
-		widget.showEditor(bundle, tableType, mockCallback);
+		widget.showEditor(bundle, tableType);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -342,8 +338,8 @@ public class QueryResultEditorWidgetTest {
 		// end false
 		verify(mockGlobalState).setIsEditing(false);
 		
-		// The callback should be invoked
-		verify(mockCallback).invoke();
+		// The event should be sent
+		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 		
 		verify(mockClientCache).put(eq(ENTITY_ID + VIEW_RECENTLY_CHANGED_KEY), anyString(), anyLong());
 	}
@@ -351,7 +347,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveWithChagnesValidJobFailed(){
-		widget.showEditor(bundle, tableType, mockCallback);
+		widget.showEditor(bundle, tableType);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -381,12 +377,12 @@ public class QueryResultEditorWidgetTest {
 		
 		// still editing when fails.
 		verify(mockGlobalState, never()).setIsEditing(false);
-		verify(mockCallback, never()).invoke();
+		verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
 	}
 	
 	@Test
 	public void testOnSaveWithChagnesValidJobCanceled(){
-		widget.showEditor(bundle, tableType, mockCallback);
+		widget.showEditor(bundle, tableType);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -405,11 +401,10 @@ public class QueryResultEditorWidgetTest {
 		// progress should be visible while the job runs.
 		verify(mockView).showProgress();
 		
-		// The editor should be hidden and the callback invoked
+		// The editor should be hidden and the event sent
 		// end false
 		verify(mockGlobalState).setIsEditing(false);
-		// The callback should be invoked
-		verify(mockCallback).invoke();
+		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 	}
 	
 	@Test

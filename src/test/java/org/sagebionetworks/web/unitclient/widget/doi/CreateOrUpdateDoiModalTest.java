@@ -32,7 +32,6 @@ import org.sagebionetworks.repo.model.doi.v2.DoiTitle;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.doi.CreateOrUpdateDoiModal;
@@ -42,6 +41,7 @@ import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.common.util.concurrent.FluentFuture;
+import com.google.gwt.event.shared.EventBus;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CreateOrUpdateDoiModalTest {
@@ -69,7 +69,7 @@ public class CreateOrUpdateDoiModalTest {
 	@Mock
 	SynapseJavascriptClient mockSynapseClient;
 	@Mock
-	EntityUpdatedHandler mockEntityUpdatedHandler;
+	EventBus mockEventBus;
 	@Mock
 	PopupUtilsView mockPopupUtilsView;
 	@Mock
@@ -84,7 +84,7 @@ public class CreateOrUpdateDoiModalTest {
 
 	@Before
 	public void setup() {
-		presenter = new CreateOrUpdateDoiModal(mockView, mockJobTrackingWidget, mockSynapseClient, mockSynAlert, mockPopupUtilsView);
+		presenter = new CreateOrUpdateDoiModal(mockView, mockJobTrackingWidget, mockSynapseClient, mockSynAlert, mockPopupUtilsView, mockEventBus);
 		creators = new ArrayList<>();
 		DoiCreator creator1 = new DoiCreator();
 		DoiCreator creator2 = new DoiCreator();
@@ -170,7 +170,7 @@ public class CreateOrUpdateDoiModalTest {
 	public void testConfigureAndShow() {
 		when(mockSynapseClient.getDoi(objectId, objectType, objectVersion)).thenReturn(mockFluentFuture);
 		// Call under test
-		presenter.configureAndShow(objectId, objectType, objectVersion, mockEntityUpdatedHandler);
+		presenter.configureAndShow(objectId, objectType, objectVersion);
 
 		verify(mockView).reset();
 		verify(mockSynAlert).clear();
@@ -179,7 +179,7 @@ public class CreateOrUpdateDoiModalTest {
 	@Test
 	public void testOnSaveDoiSuccess() {
 		when(mockSynapseClient.getDoi(objectId, objectType, objectVersion)).thenReturn(mockFluentFuture);
-		presenter.configureAndShow(objectId, objectType, objectVersion, mockEntityUpdatedHandler);
+		presenter.configureAndShow(objectId, objectType, objectVersion);
 		when(mockView.getCreators()).thenReturn(creatorsAsString);
 		when(mockView.getTitles()).thenReturn(titlesAsString);
 		when(mockView.getResourceTypeGeneral()).thenReturn(rtg.name());
@@ -201,7 +201,7 @@ public class CreateOrUpdateDoiModalTest {
 		verify(mockView).setIsLoading(false);
 		verify(mockView).hide();
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(""), eq(false), eq(AsynchType.Doi), doiRequestCaptor.capture(), any(AsynchronousProgressHandler.class));
-		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 		assertEquals(creators, doiRequestCaptor.getValue().getDoi().getCreators());
 		assertEquals(titles, doiRequestCaptor.getValue().getDoi().getTitles());
 		assertEquals(rtg, doiRequestCaptor.getValue().getDoi().getResourceType().getResourceTypeGeneral());

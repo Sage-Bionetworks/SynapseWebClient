@@ -9,7 +9,6 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -41,7 +40,6 @@ public class DockerTab implements DockerTabView.Presenter{
 	Throwable projectBundleLoadError;
 	String projectEntityId;
 	String areaToken;
-	EntityUpdatedHandler handler;
 	CallbackP<String> entitySelectedCallback;
 	
 	@Inject
@@ -89,11 +87,10 @@ public class DockerTab implements DockerTabView.Presenter{
 		tab.addTabClickedCallback(onClickCallback);
 	}
 
-	public void configure(EntityBundle entityBundle, EntityUpdatedHandler handler, String areaToken, ActionMenuWidget actionMenu) {
+	public void configure(EntityBundle entityBundle, String areaToken, ActionMenuWidget actionMenu) {
 		lazyInject();
 		this.actionMenu = actionMenu;
 		this.areaToken = areaToken;
-		this.handler = handler;
 		synAlert.clear();
 		setTargetBundle(entityBundle);
 	}
@@ -141,7 +138,7 @@ public class DockerTab implements DockerTabView.Presenter{
 				breadcrumb.configure(links, ((DockerRepository)entity).getRepositoryName());
 				DockerRepoWidget repoWidget = ginInjector.createNewDockerRepoWidget();
 				view.setDockerRepoWidget(repoWidget.asWidget());
-				repoWidget.configure(bundle, handler, actionMenu);
+				repoWidget.configure(bundle, actionMenu);
 			} else if (isProject) {
 				areaToken = null;
 				showProjectLevelUI();

@@ -18,9 +18,9 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -36,14 +36,14 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 	Activity activity;
 	EntityFinder entityFinder;
 	ProvenanceURLDialogWidget urlDialog;
-	EntityUpdatedHandler entityUpdatedHandler;
-
+	EventBus eventBus;
 	
 	@Inject
 	public ProvenanceEditorWidget(ProvenanceEditorWidgetView view,
 			SynapseClientAsync synapseClient, SynapseAlert synAlert,
 			PortalGinInjector ginInjector, EntityFinder entityFinder,
-			ProvenanceURLDialogWidget urlDialog) {
+			ProvenanceURLDialogWidget urlDialog,
+			EventBus eventBus) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -51,6 +51,7 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 		this.ginInjector = ginInjector;
 		this.entityFinder = entityFinder;
 		this.urlDialog = urlDialog;
+		this.eventBus = eventBus;
 		usedProvenanceList = ginInjector.getProvenanceListWidget();
 		executedProvenanceList = ginInjector.getProvenanceListWidget();
 		usedProvenanceList.setEntityFinder(entityFinder);
@@ -64,9 +65,7 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 		view.setPresenter(this);
 	}
 	
-	@Override
-	public void configure(EntityBundle entityBundle, EntityUpdatedHandler entityUpdatedHandler) {
-		this.entityUpdatedHandler = entityUpdatedHandler;
+	public void configure(EntityBundle entityBundle) {
 		clear();
 		Entity entity = entityBundle.getEntity();
 		synapseClient.getOrCreateActivityForEntityVersion(entity.getId(), null, new AsyncCallback<Activity>() {
@@ -164,7 +163,7 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 			@Override
 			public void onSuccess(Void result) {
 				view.hide();
-				entityUpdatedHandler.onPersistSuccess(new EntityUpdatedEvent());
+				eventBus.fireEvent(new EntityUpdatedEvent());
 			}
 		});
 		
@@ -203,9 +202,5 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 	 */
 	public void setActivty(Activity act) {
 		this.activity = act;
-	}
-	
-	public void setEntityUpdatedHandler(EntityUpdatedHandler updatedHandler) {
-		this.entityUpdatedHandler = updatedHandler;
 	}
 }
