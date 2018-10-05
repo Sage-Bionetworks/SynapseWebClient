@@ -51,8 +51,8 @@ import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.common.util.concurrent.FluentFuture;
-import com.google.gwt.event.shared.EventBus;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.gwt.event.shared.EventBus;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CreateOrUpdateDoiModalTest {
@@ -85,6 +85,7 @@ public class CreateOrUpdateDoiModalTest {
 	SynapseJavascriptClient mockSynapseClient;
 	@Mock
 	EventBus mockEventBus;
+	@Mock
 	Entity mockEntity;
 	@Mock
 	UserProfile mockUserProfile;
