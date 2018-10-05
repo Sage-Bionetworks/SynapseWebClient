@@ -596,7 +596,11 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		boolean isCurrentVersion = filesVersionNumber == null;
 		entityActionController.configure(entityActionMenu, filesEntityBundle, isCurrentVersion, null, area);
 	}
-
+	
+	public void fireEntityUpdatedEvent() {
+		eventBus.fireEvent(new EntityUpdatedEvent());
+	}
+	
 	public void configureWikiTab() {
 		if (wikiTab.asTab().isContentStale()) {
 			final boolean isWikiTabShown = area == EntityArea.WIKI;
@@ -611,7 +615,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			final WikiPageWidget.Callback callback = new WikiPageWidget.Callback() {
 				@Override
 				public void pageUpdated() {
-					eventBus.fireEvent(new EntityUpdatedEvent());
+					fireEntityUpdatedEvent();
 				}
 				@Override
 				public void noWikiFound() {

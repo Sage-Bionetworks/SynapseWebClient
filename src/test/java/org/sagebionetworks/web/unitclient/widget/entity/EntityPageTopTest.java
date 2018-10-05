@@ -562,6 +562,12 @@ public class EntityPageTopTest {
 		verify(mockChallengeTab).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, canModerate, mockActionMenuWidget);
 	}
+	
+	@Test
+	public void testFireEntityUpdatedEvent() {
+		pageTop.fireEntityUpdatedEvent();
+		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
+	}
 
 	private void clickAllTabsDocker() {
 		//now go through and click on the tabs, verify project metadata visibility
