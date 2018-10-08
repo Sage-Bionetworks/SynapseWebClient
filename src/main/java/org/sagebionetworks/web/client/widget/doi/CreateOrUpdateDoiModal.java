@@ -3,12 +3,14 @@ package org.sagebionetworks.web.client.widget.doi;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.doi.v2.Doi;
 import org.sagebionetworks.repo.model.doi.v2.DoiCreator;
@@ -27,7 +29,6 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
-import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.Widget;
@@ -67,7 +68,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 		view.setModalTitle(DOI_MODAL_TITLE);
 	}
 
-	public void configureAndShow(Entity entity, Long entityVersion, String principalId) {
+	public void configureAndShow(Entity entity, Long entityVersion, UserProfile userProfile) {
 		view.reset();
 		synapseAlert.clear();
 		doi = new Doi();
@@ -82,11 +83,15 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 			}
 
 			@Override
-			public void onFailure(Throwable t1) {
-				if (t1 instanceof NotFoundException) {
-					createNewDoiAndShow(entity, entityVersion, principalId);
+			public void onFailure(Throwable t) {
+				boolean doiExists = false;
+				if (t instanceof NotFoundException) {
+					setDoi(createNewDoi(entity, entityVersion, userProfile));
+					populateForms();
+					view.showOverwriteWarning(doiExists);
+					view.show();
 				} else {
-					popupUtilsView.showErrorMessage(t1.getMessage());
+					popupUtilsView.showErrorMessage(t.getMessage());
 				}
 			}
 		}, directExecutor());
@@ -95,46 +100,34 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 	/**
 	 * Do not use!!! Public only for testing purposes
 	 *
-	 * Creates a new DOI object from the given information and shows the modal.
+	 * Creates a 'skeleton' DOI object that a user is given as a template to mint a DOI, where the populated values are
+	 * 'best guesses' for what the user may want to enter.
 	 */
-	public void createNewDoiAndShow(Entity entity, Long entityVersion, String principalId) {
-		if (entity == null) {
-			throw new IllegalArgumentException("Cannot configure a new DOI. The entity cannot be null.");
-		}
-		boolean doiExists = false;
-		doi = new Doi();
-		doi.setObjectId(entity.getId());
-		doi.setObjectType(ObjectType.ENTITY);
-		doi.setObjectVersion(entityVersion);
-		doi.setResourceType(new DoiResourceType());
-		doi.getResourceType().setResourceTypeGeneral(getSuggestedResourceTypeGeneral(
+	public Doi createNewDoi(Entity entity, Long entityVersion, UserProfile userProfile) {
+		Doi newDoi = new Doi();
+		newDoi.setObjectId(entity.getId());
+		newDoi.setObjectType(ObjectType.ENTITY);
+		newDoi.setObjectVersion(entityVersion);
+
+		List<DoiCreator> creators = new ArrayList<>();
+		DoiCreator creator = new DoiCreator();
+		creator.setCreatorName(getFormattedCreatorName(userProfile));
+		creators.add(creator);
+		newDoi.setCreators(creators);
+
+		List<DoiTitle> titles = new ArrayList<>();
+		DoiTitle title = new DoiTitle();
+		title.setTitle(entity.getName());
+		titles.add(title);
+		newDoi.setTitles(titles);
+
+		newDoi.setResourceType(new DoiResourceType());
+		newDoi.getResourceType().setResourceTypeGeneral(getSuggestedResourceTypeGeneral(
 				EntityTypeUtils.getEntityTypeForEntityClassName(entity.getClass().getName())
 		));
-		doi.setTitles(new ArrayList<>());
-		doi.getTitles().add(new DoiTitle());
-		doi.getTitles().get(0).setTitle(entity.getName());
-		doi.setPublicationYear(Long.valueOf(dateTimeUtils.getYear(dateTimeUtils.getCurrentTime())));
-		getFormattedCreatorNameFromPrincipalId(principalId).addCallback(new FutureCallback<String>() {
-			@Override
-			public void onSuccess(@NullableDecl String result) {
-				doi.setCreators(new ArrayList<>());
-				doi.getCreators().add(new DoiCreator());
-				doi.getCreators().get(0).setCreatorName(result);
-				populateForms();
-				view.showOverwriteWarning(doiExists);
-				view.show();
-			}
 
-			@Override
-			public void onFailure(Throwable t) {
-				// There should never be an issue with getting your own profile, so we should show an error
-				popupUtilsView.showErrorMessage(t.getMessage());
-				// It doesn't affect creating a DOI, so we can still show the modal.
-				populateForms();
-				view.showOverwriteWarning(doiExists);
-				view.show();
-			}
-		}, directExecutor());
+		newDoi.setPublicationYear(Long.valueOf(dateTimeUtils.getYear(new Date())));
+		return newDoi;
 	}
 
 	/**
@@ -143,21 +136,14 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 	 * Retrieves a user's name in "Last, First" format.
 	 * If the user has not set a first and last name, returns an empty string.
 	 */
-	public FluentFuture<String> getFormattedCreatorNameFromPrincipalId(String principalID) {
-		return javascriptClient.getUserProfile(principalID).transform(profile -> {
-			String formattedName;
-			if (profile != null && profile.getLastName() != null && profile.getFirstName() != null &&
-				!profile.getLastName().isEmpty() && !profile.getFirstName().isEmpty()) {
-				formattedName = formatPersonalName(profile.getLastName(), profile.getFirstName());
-			} else { // The user may not have set their first and last names
-				formattedName = "";
-			}
-			return formattedName;
-		}, directExecutor());
-	}
-
-	public static String formatPersonalName(String lastName, String firstName) {
-		return lastName + ", " + firstName;
+	public static String getFormattedCreatorName(UserProfile userProfile) {
+		if (userProfile != null &&
+				userProfile.getLastName() != null && userProfile.getFirstName() != null &&
+				!userProfile.getLastName().isEmpty() && !userProfile.getFirstName().isEmpty()) {
+			return userProfile.getLastName() + ", " + userProfile.getFirstName();
+		} else {
+			return "";
+		}
 	}
 
 	public Widget asWidget() {
@@ -231,7 +217,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 	/**
 	 * Do not use!!! Public only for testing purposes
 	 *
-	 * Retrieves DOI fields from a class variable, translates them, and loads them into the view
+	 * Retrieves DOI fields from an instance variable (if it exists) and loads them into the view.
 	 */
 	public void populateForms() {
 		if (doi == null) {
@@ -254,15 +240,13 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 		}
 
 		if (doi.getPublicationYear() == null) {
-			doi.setPublicationYear(Long.valueOf(dateTimeUtils.getYear(dateTimeUtils.getCurrentTime())));
+			doi.setPublicationYear(Long.valueOf(dateTimeUtils.getYear(new Date())));
 		}
 
 		view.setCreators(convertMultipleCreatorsToString(doi.getCreators()));
 		view.setTitles(convertMultipleTitlesToString(doi.getTitles()));
 		view.setResourceTypeGeneral(doi.getResourceType().getResourceTypeGeneral().name());
 		view.setPublicationYear(doi.getPublicationYear());
-
-		setDoi(doi);
 	}
 
 	/**

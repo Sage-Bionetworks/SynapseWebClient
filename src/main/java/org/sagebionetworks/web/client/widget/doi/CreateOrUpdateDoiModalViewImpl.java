@@ -60,8 +60,12 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 		mintDoiButton.setEnabled(true);
 		cancelButton.addClickHandler(event -> doiModal.hide());
 
+		initializeResourceTypeGeneralSelect();
+	}
+
+	private void initializeResourceTypeGeneralSelect() {
 		// SWC-4445
-		// initialize the resource type general by adding common types to the top and adding a separator.
+		// initialize the resource type general select field by adding typical types to the top and adding a separator.
 		AnchorListItem datasetItem = new AnchorListItem();
 		datasetItem.setText(DoiResourceTypeGeneral.Dataset.name());
 		datasetItem.addClickHandler(event -> setResourceTypeGeneral(DoiResourceTypeGeneral.Dataset.name()));
@@ -73,6 +77,7 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 		resourceTypeGeneralSelect.add(collectionItem);
 
 		resourceTypeGeneralSelect.add(new Divider());
+
 		for (DoiResourceTypeGeneral rtg : DoiResourceTypeGeneral.values()) {
 			if (!rtg.equals(DoiResourceTypeGeneral.Dataset) && !rtg.equals(DoiResourceTypeGeneral.Collection)) {
 				AnchorListItem otherItem = new AnchorListItem();

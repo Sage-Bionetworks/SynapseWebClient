@@ -1,14 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.doi;
 
-import static com.google.gwt.thirdparty.guava.common.util.concurrent.MoreExecutors.directExecutor;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
@@ -18,13 +15,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityType;
@@ -51,7 +49,6 @@ import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.common.util.concurrent.FluentFuture;
-import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.event.shared.EventBus;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -65,7 +62,6 @@ public class CreateOrUpdateDoiModalTest {
 	private static final Long pubYear = 2005L;
 	private static final String creatorsAsString = "author 1\nauthor 2";
 	private static final String titlesAsString = "title 1\ntitle 2";
-	private static final String principalId = "123";
 	private static final String lastName = "Last-name";
 	private static final String firstName = "FIRST";
 	private static final String entityName = "A Cool Entity";
@@ -135,157 +131,143 @@ public class CreateOrUpdateDoiModalTest {
 	}
 
 	@Test
-	public void testConfigureAndShow() {
-		when(mockEntity.getId()).thenReturn(objectId);
-		when(mockSynapseClient.getDoi(objectId, objectType, objectVersion)).thenReturn(mockDoiFuture);
-		// Call under test
-		presenter.configureAndShow(mockEntity, objectVersion, principalId);
-
-		verify(mockView).reset();
-		verify(mockSynAlert).clear();
-	}
-
-	@Test
-	public void testConfigureAndShowSuccessAndPopulateForms() {
-		when(mockEntity.getId()).thenReturn(objectId);
+	public void testConfigureAndShowDoiExists() {
 		boolean doiExists = true;
-		// Set up a DOI to populate forms
 		Doi doi = createDoi();
-		when(mockSynapseClient.getDoi(objectId, ObjectType.ENTITY, objectVersion)).thenReturn(getDoneFuture(doi));
+		when(mockEntity.getId()).thenReturn(objectId);
+		when(mockSynapseClient.getDoi(objectId, objectType, objectVersion)).thenReturn(getDoneFuture(doi));
 
 		// Call under test
-		presenter.configureAndShow(mockEntity, objectVersion, principalId);
+		presenter.configureAndShow(mockEntity, objectVersion, mockUserProfile);
 
-		verify(mockView).show();
-		verify(mockSynapseClient).getDoi(objectId, ObjectType.ENTITY, objectVersion);
+		// Ensure that populateForms() was called
 		verify(mockView).setCreators(anyString());
 		verify(mockView).setTitles(anyString());
-		verify(mockView).setResourceTypeGeneral(rtg.name());
-		verify(mockView).setPublicationYear(pubYear);
-		assertEquals(presenter.getDoi(), doi);
-	}
+		verify(mockView).setResourceTypeGeneral(anyString());
+		verify(mockView).setPublicationYear(anyLong());
 
+		InOrder viewInOrderVerifier = Mockito.inOrder(mockView);
+		viewInOrderVerifier.verify(mockView).reset();
+		viewInOrderVerifier.verify(mockView).showOverwriteWarning(doiExists);
+		viewInOrderVerifier.verify(mockView).show();
+		verify(mockSynAlert).clear();
+
+		assertEquals(doi.getObjectId(), presenter.getDoi().getObjectId());
+		assertEquals(doi.getObjectType(), presenter.getDoi().getObjectType());
+		assertEquals(doi.getObjectVersion(), presenter.getDoi().getObjectVersion());
+		assertEquals(doi.getCreators(), presenter.getDoi().getCreators());
+		assertEquals(doi.getTitles(), presenter.getDoi().getTitles());
+		assertEquals(doi.getResourceType(), presenter.getDoi().getResourceType());
+		assertEquals(doi.getPublicationYear(), presenter.getDoi().getPublicationYear());
+	}
 
 	@Test
 	public void testConfigureAndShowNotFoundExceptionFailure() {
 		when(mockEntity.getId()).thenReturn(objectId);
 		when(mockEntity.getName()).thenReturn(entityName);
+		when(mockUserProfile.getLastName()).thenReturn(lastName);
+		when(mockUserProfile.getFirstName()).thenReturn(firstName);
 		when(mockDateTimeUtils.getYear(any(Date.class))).thenReturn(pubYearString);
+		when(mockSynapseClient.getDoi(objectId, ObjectType.ENTITY, objectVersion)).thenReturn(getFailedFuture(new NotFoundException()));
+
 		Doi expectedDoi = new Doi();
 		expectedDoi.setObjectId(objectId);
 		expectedDoi.setObjectType(ObjectType.ENTITY);
 		expectedDoi.setObjectVersion(objectVersion);
-		expectedDoi.setCreators(new ArrayList<>());
-		expectedDoi.getCreators().add(new DoiCreator());
-		expectedDoi.getCreators().get(0).setCreatorName(lastName + ", " + firstName);
-		expectedDoi.setTitles(new ArrayList<>());
-		expectedDoi.getTitles().add(new DoiTitle());
-		expectedDoi.getTitles().get(0).setTitle(entityName);
+		List<DoiCreator> expectedCreators = new ArrayList<>();
+		DoiCreator expectedCreator = new DoiCreator();
+		expectedCreator.setCreatorName(CreateOrUpdateDoiModal.getFormattedCreatorName(mockUserProfile));
+		expectedCreators.add(expectedCreator);
+		expectedDoi.setCreators(expectedCreators);
+		List<DoiTitle> expectedTitles = new ArrayList<>();
+		DoiTitle expectedTitle = new DoiTitle();
+		expectedTitle.setTitle(entityName);
+		expectedTitles.add(expectedTitle);
+		expectedDoi.setTitles(expectedTitles);
 		expectedDoi.setPublicationYear(pubYear);
 		expectedDoi.setResourceType(new DoiResourceType());
 		expectedDoi.getResourceType().setResourceTypeGeneral(DoiResourceTypeGeneral.Dataset);
-		boolean doiExists = false;
-		// Make sure the DOI has none of the fields filled out beforehand
-		presenter.setDoi(new Doi());
-
-		when(mockSynapseClient.getDoi(objectId, ObjectType.ENTITY, objectVersion)).thenReturn(getFailedFuture(new NotFoundException()));
-		when(mockSynapseClient.getUserProfile(principalId)).thenReturn(getDoneFuture(mockUserProfile));
-		when(mockUserProfile.getLastName()).thenReturn(lastName);
-		when(mockUserProfile.getFirstName()).thenReturn(firstName);
-
 
 		// Call under test
-		presenter.configureAndShow(mockEntity, objectVersion, principalId);
+		presenter.configureAndShow(mockEntity, objectVersion, mockUserProfile);
 
-		verify(mockView).show();
-		assertEquals(expectedDoi, presenter.getDoi());
+		// Ensure that populateForms() was called
+		verify(mockView).setCreators(anyString());
+		verify(mockView).setTitles(anyString());
+		verify(mockView).setResourceTypeGeneral(anyString());
+		verify(mockView).setPublicationYear(anyLong());
+
+		boolean doiExists = false;
+		InOrder viewInOrderVerifier = Mockito.inOrder(mockView);
+		viewInOrderVerifier.verify(mockView).reset();
+		viewInOrderVerifier.verify(mockView).showOverwriteWarning(doiExists);
+		viewInOrderVerifier.verify(mockView).show();
+		verify(mockSynAlert).clear();
+
+		assertEquals(expectedDoi.getObjectId(), presenter.getDoi().getObjectId());
+		assertEquals(expectedDoi.getObjectType(), presenter.getDoi().getObjectType());
+		assertEquals(expectedDoi.getObjectVersion(), presenter.getDoi().getObjectVersion());
+		assertEquals(expectedDoi.getCreators(), presenter.getDoi().getCreators());
+		assertEquals(expectedDoi.getTitles(), presenter.getDoi().getTitles());
+		assertEquals(expectedDoi.getResourceType(), presenter.getDoi().getResourceType());
+		assertEquals(expectedDoi.getPublicationYear(), presenter.getDoi().getPublicationYear());
 	}
 
 	@Test
 	public void testConfigureAndShowOtherFailure() {
 		when(mockEntity.getId()).thenReturn(objectId);
-		// Make sure the DOI has none of the fields filled out beforehand
-		presenter.setDoi(new Doi());
-
 		Throwable error = new Throwable("error message");
 		when(mockSynapseClient.getDoi(objectId, ObjectType.ENTITY, objectVersion)).thenReturn(getFailedFuture(error));
 
 		// Call under test
-		presenter.configureAndShow(mockEntity, objectVersion, principalId);
-
+		presenter.configureAndShow(mockEntity, objectVersion, mockUserProfile);
 
 		verify(mockView, never()).show();
 		verify(mockPopupUtilsView).showErrorMessage(error.getMessage());
-		assertNotEquals(objectId, presenter.getDoi().getObjectId());
-		assertNotEquals(objectType, presenter.getDoi().getObjectType());
-		assertNotEquals(objectVersion, presenter.getDoi().getObjectVersion());
 	}
 
 	@Test
-	public void testCreateNewDoiWithFormatNameSuccess() {
+	public void testCreateNewDoi() {
 		when(mockEntity.getId()).thenReturn(objectId);
 		when(mockEntity.getName()).thenReturn(entityName);
 		when(mockUserProfile.getFirstName()).thenReturn(firstName);
 		when(mockUserProfile.getLastName()).thenReturn(lastName);
-		when(mockSynapseClient.getUserProfile(principalId)).thenReturn(getDoneFuture(mockUserProfile));
 		when(mockDateTimeUtils.getYear(any(Date.class))).thenReturn(pubYearString);
 
-		// Call under test
-		presenter.createNewDoiAndShow(mockEntity, objectVersion, principalId);
+		DoiCreator expectedCreator = new DoiCreator();
+		expectedCreator.setCreatorName(CreateOrUpdateDoiModal.getFormattedCreatorName(mockUserProfile));
+		List<DoiCreator> expectedCreators = new ArrayList<>();
+		expectedCreators.add(expectedCreator);
 
-		Doi result = presenter.getDoi();
+		DoiTitle expectedTitle = new DoiTitle();
+		expectedTitle.setTitle(entityName);
+		List<DoiTitle> expectedTitles = new ArrayList<>();
+		expectedTitles.add(expectedTitle);
+
+		// Call under test
+		Doi result = presenter.createNewDoi(mockEntity, objectVersion, mockUserProfile);
+
 		assertEquals(objectId, result.getObjectId());
 		assertEquals(ObjectType.ENTITY, result.getObjectType());
 		assertEquals(objectVersion, result.getObjectVersion());
 		assertEquals(CreateOrUpdateDoiModal.getSuggestedResourceTypeGeneral(
 				EntityTypeUtils.getEntityTypeForEntityClassName(mockEntity.getClass().getName())
 		), result.getResourceType().getResourceTypeGeneral());
-		assertEquals(entityName, result.getTitles().get(0).getTitle());
-		assertEquals(CreateOrUpdateDoiModal.formatPersonalName(lastName, firstName), result.getCreators().get(0).getCreatorName());
-		assertEquals(pubYear, result.getPublicationYear());
-		verify(mockView).showOverwriteWarning(false);
-		verify(mockView).show();
+		assertEquals(expectedCreators, result.getCreators());
+		assertEquals(expectedTitles, result.getTitles());
+		assertEquals(pubYearString, result.getPublicationYear().toString());
 	}
-
-	@Test
-	public void testCreateNewDoiAndShowWithFormatNameFailure() {
-		when(mockEntity.getId()).thenReturn(objectId);
-		when(mockEntity.getName()).thenReturn(entityName);
-		String errorMessage = "error";
-		when(mockSynapseClient.getUserProfile(principalId)).thenReturn(getFailedFuture(new Throwable(errorMessage)));
-		when(mockDateTimeUtils.getYear(any(Date.class))).thenReturn(pubYearString);
-
-
-		// Call under test
-		presenter.createNewDoiAndShow(mockEntity, objectVersion, principalId);
-
-		Doi result = presenter.getDoi();
-		assertEquals(objectId, result.getObjectId());
-		assertEquals(ObjectType.ENTITY, result.getObjectType());
-		assertEquals(objectVersion, result.getObjectVersion());
-		assertEquals(CreateOrUpdateDoiModal.getSuggestedResourceTypeGeneral(
-				EntityTypeUtils.getEntityTypeForEntityClassName(mockEntity.getClass().getName())
-		), result.getResourceType().getResourceTypeGeneral());
-		assertEquals(entityName, result.getTitles().get(0).getTitle());
-		assertEquals(new ArrayList<>(), result.getCreators());
-		assertEquals(pubYear, result.getPublicationYear());
-		verify(mockPopupUtilsView).showErrorMessage(errorMessage);
-		verify(mockView).showOverwriteWarning(false);
-		verify(mockView).show();
-	}
-
 
 	@Test
 	public void testOnSaveDoiSuccess() {
-		when(mockEntity.getId()).thenReturn(objectId);
-		when(mockSynapseClient.getDoi(objectId, objectType, objectVersion)).thenReturn(mockDoiFuture);
-		presenter.configureAndShow(mockEntity, objectVersion, principalId);
 		when(mockView.getCreators()).thenReturn(creatorsAsString);
 		when(mockView.getTitles()).thenReturn(titlesAsString);
 		when(mockView.getResourceTypeGeneral()).thenReturn(rtg.name());
 		when(mockView.getPublicationYear()).thenReturn(pubYear);
 
-		presenter.setDoi(new Doi());
+		Doi doi = new Doi();
+		doi.setObjectId(objectId);
+		presenter.setDoi(doi);
 
 		// Call under test
 		presenter.onSaveDoi();
@@ -301,14 +283,13 @@ public class CreateOrUpdateDoiModalTest {
 		verify(mockView).setIsLoading(false);
 		verify(mockView).hide();
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(""), eq(false), eq(AsynchType.Doi), doiRequestCaptor.capture(), any(AsynchronousProgressHandler.class));
+		verify(mockPopupUtilsView).showInfo(CreateOrUpdateDoiModal.DOI_CREATED_MESSAGE + objectId);
 		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 		assertEquals(creators, doiRequestCaptor.getValue().getDoi().getCreators());
 		assertEquals(titles, doiRequestCaptor.getValue().getDoi().getTitles());
 		assertEquals(rtg, doiRequestCaptor.getValue().getDoi().getResourceType().getResourceTypeGeneral());
 		assertEquals(pubYear, doiRequestCaptor.getValue().getDoi().getPublicationYear());
 	}
-
-
 
 	@Test
 	public void testOnSaveDoiFailure() {
@@ -348,7 +329,6 @@ public class CreateOrUpdateDoiModalTest {
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(""), eq(false), eq(AsynchType.Doi),
 				any(DoiRequest.class), asyncProgressHandlerCaptor.capture());
 
-		NotFoundException failureException = new NotFoundException();
 		asyncProgressHandlerCaptor.getValue().onCancel();
 
 		verify(mockView).setIsLoading(false);
@@ -424,11 +404,8 @@ public class CreateOrUpdateDoiModalTest {
 
 	@Test
 	public void testPopulateFormsNullPublicationYear() {
-		Date testingDate = new Date();
-		testingDate.setTime(100); // 100 ms after unix epoch (1970-01-01)
 		String expectedYear = "1970";
-		when(mockDateTimeUtils.getCurrentTime()).thenReturn(testingDate);
-		when(mockDateTimeUtils.getYear(testingDate)).thenReturn(expectedYear);
+		when(mockDateTimeUtils.getYear(any(Date.class))).thenReturn(expectedYear);
 		// All fields are filled out in the createDoi method
 		Doi doi = createDoi();
 		doi.setPublicationYear(null);
@@ -502,74 +479,60 @@ public class CreateOrUpdateDoiModalTest {
 	}
 
 	@Test
-	public void testGetFormattedCreatorNameFromPrincipalIdSuccess() {
+	public void testGetFormattedCreatorName() {
 		when(mockUserProfile.getLastName()).thenReturn(lastName);
 		when(mockUserProfile.getFirstName()).thenReturn(firstName);
-		when(mockSynapseClient.getUserProfile(principalId)).thenReturn(getDoneFuture(mockUserProfile));
-		FluentFuture<String> formattedNameFuture = presenter.getFormattedCreatorNameFromPrincipalId(principalId);
-		// Null check + empty string check + formatting would be 3 invocations of each field
-		verify(mockUserProfile, times(3)).getLastName();
-		verify(mockUserProfile, times(3)).getFirstName();
-
-		formattedNameFuture.addCallback(new FutureCallback<String>() {
-			@Override
-			public void onSuccess(@NullableDecl String result) {
-				// Name should be formatted according to the static method
-				assertEquals(CreateOrUpdateDoiModal.formatPersonalName(lastName, firstName), result);
-			}
-
-			@Override
-			public void onFailure(Throwable t) {
-				fail("Expected to succeed");
-			}
-		}, directExecutor());
-	}
-
-	@Test
-	public void testGetFormattedCreatorNameFromPrincipalIdMissingName() {
-		when(mockUserProfile.getLastName()).thenReturn("Other name is missing");
-		when(mockUserProfile.getFirstName()).thenReturn("");
-		when(mockSynapseClient.getUserProfile(principalId)).thenReturn(getDoneFuture(mockUserProfile));
-		FluentFuture<String> formattedNameFuture = presenter.getFormattedCreatorNameFromPrincipalId(principalId);
-		// Null check + empty string check would be 2 invocations of each field
-		verify(mockUserProfile, times(2)).getLastName();
-		verify(mockUserProfile, times(2)).getFirstName();
-
-		formattedNameFuture.addCallback(new FutureCallback<String>() {
-			@Override
-			public void onSuccess(@NullableDecl String result) {
-				// Since a name was missing, the formatted name should just be an empty string
-				assertEquals("", result);
-			}
-
-			@Override
-			public void onFailure(Throwable t) {
-				fail("Expected to succeed");
-			}
-		}, directExecutor());
-	}
-
-	@Test
-	public void testGetFormattedCreatorNameFromPrincipalIdFailure() {
-		when(mockSynapseClient.getUserProfile(principalId)).thenReturn(getFailedFuture());
-		FluentFuture<String> failedFuture = presenter.getFormattedCreatorNameFromPrincipalId(principalId);
-		failedFuture.addCallback(new FutureCallback<String>() {
-			@Override
-			public void onSuccess(@NullableDecl String result) {
-				fail("Expected future to fail.");
-			}
-
-			@Override
-			public void onFailure(Throwable t) {
-				// As expected
-			}
-		}, directExecutor());
-	}
-
-	@Test
-	public void testFormatName() {
+		String actual = CreateOrUpdateDoiModal.getFormattedCreatorName(mockUserProfile);
 		String expected = lastName + ", " + firstName;
-		assertEquals(expected, CreateOrUpdateDoiModal.formatPersonalName(lastName, firstName));
+
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testGetFormattedCreatorNameNullUserProfile() {
+		String actual = CreateOrUpdateDoiModal.getFormattedCreatorName(null);
+		String expected = "";
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testGetFormattedCreatorNameNullLastName() {
+		when(mockUserProfile.getLastName()).thenReturn(null);
+		when(mockUserProfile.getFirstName()).thenReturn(firstName);
+		String actual = CreateOrUpdateDoiModal.getFormattedCreatorName(mockUserProfile);
+		String expected = "";
+
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testGetFormattedCreatorNameNullFirstName() {
+		when(mockUserProfile.getLastName()).thenReturn(lastName);
+		when(mockUserProfile.getFirstName()).thenReturn(null);
+		String actual = CreateOrUpdateDoiModal.getFormattedCreatorName(mockUserProfile);
+		String expected = "";
+
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testGetFormattedCreatorNameEmptyLastName() {
+		when(mockUserProfile.getLastName()).thenReturn("");
+		when(mockUserProfile.getFirstName()).thenReturn(firstName);
+		String actual = CreateOrUpdateDoiModal.getFormattedCreatorName(mockUserProfile);
+		String expected = "";
+
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testGetFormattedCreatorNameEmptyFirstName() {
+		when(mockUserProfile.getLastName()).thenReturn(lastName);
+		when(mockUserProfile.getFirstName()).thenReturn("");
+		String actual = CreateOrUpdateDoiModal.getFormattedCreatorName(mockUserProfile);
+		String expected = "";
+
+		assertEquals(expected, actual);
 	}
 
 	@Test
