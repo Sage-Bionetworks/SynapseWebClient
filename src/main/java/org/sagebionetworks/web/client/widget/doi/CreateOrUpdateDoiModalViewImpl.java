@@ -1,11 +1,9 @@
 package org.sagebionetworks.web.client.widget.doi;
 
-import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Divider;
-import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.IntegerBox;
+import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -33,9 +31,7 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 	@UiField
 	TextArea titlesField;
 	@UiField
-	DropDownMenu resourceTypeGeneralSelect;
-	@UiField
-	Button resourceTypeGeneralSelectButton;
+	ListBox resourceTypeGeneralSelect;
 	@UiField
 	IntegerBox publicationYearField;
 	@UiField
@@ -66,24 +62,13 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 	private void initializeResourceTypeGeneralSelect() {
 		// SWC-4445
 		// initialize the resource type general select field by adding typical types to the top and adding a separator.
-		AnchorListItem datasetItem = new AnchorListItem();
-		datasetItem.setText(DoiResourceTypeGeneral.Dataset.name());
-		datasetItem.addClickHandler(event -> setResourceTypeGeneral(DoiResourceTypeGeneral.Dataset.name()));
-		resourceTypeGeneralSelect.add(datasetItem);
-
-		AnchorListItem collectionItem = new AnchorListItem();
-		collectionItem.setText(DoiResourceTypeGeneral.Collection.name());
-		collectionItem.addClickHandler(event -> setResourceTypeGeneral(DoiResourceTypeGeneral.Collection.name()));
-		resourceTypeGeneralSelect.add(collectionItem);
-
-		resourceTypeGeneralSelect.add(new Divider());
-
+		resourceTypeGeneralSelect.addItem(DoiResourceTypeGeneral.Dataset.name());
+		resourceTypeGeneralSelect.addItem(DoiResourceTypeGeneral.Collection.name());
+		resourceTypeGeneralSelect.addItem("────────────────────");
+		resourceTypeGeneralSelect.getElement().getElementsByTagName("option").getItem(2).setAttribute("disabled", "disabled");
 		for (DoiResourceTypeGeneral rtg : DoiResourceTypeGeneral.values()) {
 			if (!rtg.equals(DoiResourceTypeGeneral.Dataset) && !rtg.equals(DoiResourceTypeGeneral.Collection)) {
-				AnchorListItem otherItem = new AnchorListItem();
-				otherItem.setText(rtg.name());
-				otherItem.addClickHandler(event -> setResourceTypeGeneral(rtg.name()));
-				resourceTypeGeneralSelect.add(otherItem);
+				resourceTypeGeneralSelect.addItem(rtg.name());
 			}
 		}
 	}
@@ -131,12 +116,17 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 
 	@Override
 	public String getResourceTypeGeneral() {
-		return resourceTypeGeneralSelectButton.getText();
+		return resourceTypeGeneralSelect.getSelectedValue();
 	}
 
 	@Override
 	public void setResourceTypeGeneral(String resourceTypeGeneral) {
-		resourceTypeGeneralSelectButton.setText(resourceTypeGeneral);
+		for (int i = 0; i < resourceTypeGeneralSelect.getItemCount(); i++) {
+			if (resourceTypeGeneral.equals(resourceTypeGeneralSelect.getValue(i))) {
+				resourceTypeGeneralSelect.setSelectedIndex(i);
+				break;
+			}
+		}
 	}
 
 	@Override
