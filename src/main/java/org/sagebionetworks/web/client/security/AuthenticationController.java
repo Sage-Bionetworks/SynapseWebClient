@@ -52,12 +52,6 @@ public interface AuthenticationController {
 	public UserSessionData getCurrentUserSessionData();
 
 	/**
-	 * Get the UserProfile object
-	 * @return
-	 */
-	UserProfile getCurrentUserProfile();
-
-	/**
 	 * Redownload the user's session data 
 	 */
 	void reloadUserSessionData();

@@ -221,15 +221,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 
 	@Override
-	public UserProfile getCurrentUserProfile() {
-		if (currentUser != null) {
-			return currentUser.getProfile();
-		} else {
-			return null;
-		}
-	}
-
-	@Override
 	public String getCurrentUserSessionToken() {
 		if(currentUser != null) return currentUser.getSession().getSessionToken();
 		else return null;

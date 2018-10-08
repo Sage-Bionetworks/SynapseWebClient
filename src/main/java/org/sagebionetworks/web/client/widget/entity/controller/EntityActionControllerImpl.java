@@ -601,7 +601,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void onCreateOrUpdateDoi() {
-		getCreateOrUpdateDoiModal().configureAndShow(entity, getVersion(), authenticationController.getCurrentUserProfile());
+		getCreateOrUpdateDoiModal().configureAndShow(entity, getVersion(), authenticationController.getCurrentUserSessionData().getProfile());
 	}
 
 	private void onCreateChallenge() {
