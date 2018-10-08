@@ -33,7 +33,6 @@ public interface DateTimeUtils {
 	String getLongFriendlyDate(Date toFormat);
 	String getDateString(Date toFormat);
 	String getYear(Date toFormat);
-	Date getCurrentTime();
 	void setShowUTCTime(boolean showUTC);
 	boolean isShowingUTCTime();
 }

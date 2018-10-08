@@ -111,10 +111,6 @@ public class DateTimeUtilsImpl implements DateTimeUtils {
 		return formatter.format(toFormat);
 	}
 
-	public Date getCurrentTime() {
-		return new Date();
-	}
-
 	@Override
 	public void setShowUTCTime(boolean showUTC) {
 		currentTimezone = showUTC ? UTC_TIMEZONE : null;
