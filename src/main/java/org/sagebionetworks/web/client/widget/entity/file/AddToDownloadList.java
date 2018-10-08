@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_COUNT;
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_SUM_FILE_SIZES;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	public static final String NO_NEW_FILES_ADDED_MESSAGE = "No new files have been added to the Download List.";
 	public static final String SUCCESS_ADDED_FILES_MESSAGE = "Successfully added files to the Download List.";
 	public static final String ADD_QUERY_FILES_CONFIRMATION_MESSAGE = "Add all files from this query result to the Download List?";
-	public static final Long FILE_SIZE_QUERY_PART_MASK = BUNDLE_MASK_QUERY_COUNT; //TODO: add new bit to get total size
+	public static final Long FILE_SIZE_QUERY_PART_MASK = BUNDLE_MASK_QUERY_SUM_FILE_SIZES; 
 	AddToDownloadListView view;
 	PopupUtilsView popupUtilsView;
 	AddFileToDownloadListRequest request;
@@ -80,7 +80,6 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	public void addToDownloadList(String entityID, Query query) {
 		queryEntityID = entityID;
 		clear();
-		// TODO: waiting for service to return the file count and size.
 		request.setQuery(query);
 		confirmAddQueryResultsToDownloadList();
 	}
@@ -109,9 +108,11 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 			public void onComplete(AsynchronousResponseBody response) {
 				QueryResultBundle queryResultBundle = (QueryResultBundle) response;
 				view.hideAll();
-				//TODO: get sum file sizes from query result
-//				double sumFileSizesBytes = queryResultBundle.getSumFileSizesBytes().doubleValue();
+				//get sum file sizes from query result
 				double sumFileSizesBytes = 0.0;
+				if (queryResultBundle.getSumFileSizes() != null && queryResultBundle.getSumFileSizes().getSumFileSizesBytes() != null) {
+					sumFileSizesBytes = queryResultBundle.getSumFileSizes().getSumFileSizesBytes().doubleValue();
+				}
 				packageSizeSummary.addFiles(queryResultBundle.getQueryCount().intValue(), sumFileSizesBytes);
 				view.showConfirmAdd();
 			}

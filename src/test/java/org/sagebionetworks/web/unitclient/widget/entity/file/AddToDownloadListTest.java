@@ -23,6 +23,7 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
+import org.sagebionetworks.repo.model.table.SumFileSizes;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
@@ -81,6 +82,8 @@ public class AddToDownloadListTest {
 	ArgumentCaptor<EntityChildrenRequest> entityChildrenRequestCaptor;
 	@Mock
 	FileHandleAssociation mockFileHandleAssociation;
+	@Mock
+	SumFileSizes mockSumFileSizes;
 	String folderId = "syn10932", queryEntityId = "syn9";
 	Long testFolderChildCount = 22L, testFolderSumFileSizesBytes = 7777777L;
 	List<FileHandleAssociation> downloadListFilesBefore, downloadListFilesAfter;
@@ -98,9 +101,10 @@ public class AddToDownloadListTest {
 		when(mockDownloadListBefore.getFilesToDownload()).thenReturn(downloadListFilesBefore);
 		when(mockDownloadListAfter.getFilesToDownload()).thenReturn(downloadListFilesAfter);
 		when(mockQueryResultBundle.getQueryCount()).thenReturn(queryCount);
-		//TODO: mock query sum file size
-		querySumFileSize = 0L;
-//		when(mockQueryResultBundle.getSumFileSizesBytes()).thenReturn(querySumFileSize);
+		//mock query sum file size
+		querySumFileSize = 20L;
+		when(mockSumFileSizes.getSumFileSizesBytes()).thenReturn(querySumFileSize);
+		when(mockQueryResultBundle.getSumFileSizes()).thenReturn(mockSumFileSizes);
 	}
 
 	@Test
