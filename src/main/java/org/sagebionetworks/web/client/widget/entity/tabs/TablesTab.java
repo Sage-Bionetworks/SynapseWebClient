@@ -16,7 +16,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -49,7 +48,6 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	Breadcrumb breadcrumb;
 	EntityMetadata metadata;
 	boolean annotationsShown;
-	EntityUpdatedHandler handler;
 	QueryTokenProvider queryTokenProvider;
 	EntityBundle projectBundle;
 	EntityBundle entityBundle;
@@ -122,9 +120,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 
 	@Override
 	public void onPersistSuccess(EntityUpdatedEvent event) {
-		if (handler != null) {
-			handler.onPersistSuccess(event);
-		}
+		ginInjector.getEventBus().fireEvent(event);
 	}
 	
 	public void initBreadcrumbLinkClickedHandler() {
@@ -149,12 +145,10 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		this.projectBundleLoadError = projectBundleLoadError;
 	}
 	
-	public void configure(EntityBundle entityBundle, EntityUpdatedHandler handler, String areaToken, ActionMenuWidget entityActionMenu) {
+	public void configure(EntityBundle entityBundle, String areaToken, ActionMenuWidget entityActionMenu) {
 		lazyInject();
 		this.areaToken = areaToken;
-		this.handler = handler;
 		this.entityActionMenu = entityActionMenu;
-		metadata.setEntityUpdatedHandler(handler);
 		synAlert.clear();
 		setTargetBundle(entityBundle);
 	}

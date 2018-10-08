@@ -41,7 +41,7 @@ public class TeamLeaveModalWidget implements IsWidget, TeamLeaveModalWidgetView.
 	public void onConfirm() {
 		synAlert.clear();
 		String userId = authenticationController.getCurrentUserPrincipalId();
-		jsClient.deleteTeamMember(userId, team.getId(), new AsyncCallback<Void>() {
+		jsClient.deleteTeamMember(team.getId(), userId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				view.showInfo(DisplayConstants.LEAVE_TEAM_SUCCESS);

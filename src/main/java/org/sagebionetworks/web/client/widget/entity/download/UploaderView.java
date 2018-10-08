@@ -64,8 +64,6 @@ public interface UploaderView extends IsWidget, SynapseView, HasAttachHandlers {
 		 */
 		void handleSubmitResult(String resultHtml);
 		
-		void clearHandlers();
-		
 		/**
 		 * Called when cancel is clicked in the view
 		 */

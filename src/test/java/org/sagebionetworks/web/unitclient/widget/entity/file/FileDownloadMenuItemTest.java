@@ -36,7 +36,6 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -72,8 +71,6 @@ public class FileDownloadMenuItemTest {
 	ExternalFileHandle mockFileHandle;
 	@Mock
 	ExternalObjectStoreFileHandle mockObjectStoreFileHandle;
-	@Mock
-	EntityUpdatedHandler mockEntityUpdatedHandler;
 	@Mock
 	EntityUpdatedEvent mockEntityUpdatedEvent;
 	@Mock
@@ -253,13 +250,6 @@ public class FileDownloadMenuItemTest {
 		
 		verify(mockView).setIsDirectDownloadLink(FileDownloadMenuItem.ACCESS_REQUIREMENTS_LINK + ENTITY_ID + "&" + AccessRequirementsPlace.TYPE_PARAM + "=" + RestrictableObjectType.ENTITY.toString());
 		assertNull(widget.getFileHandle());
-	}
-
-	@Test
-	public void testFireEntityUpdatedEvent() {
-		widget.setEntityUpdatedHandler(mockEntityUpdatedHandler);
-		widget.fireEntityUpdatedEvent(mockEntityUpdatedEvent);
-		verify(mockEntityUpdatedHandler).onPersistSuccess(mockEntityUpdatedEvent);
 	}
 
 	@Test

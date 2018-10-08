@@ -62,7 +62,7 @@ public class UserIdCellRendererImplTest {
 		String userId = "1";
 		renderer.setValue(userId);
 		verify(mockUserBadge).configure(userId);
-		verify(mockUserBadge).setCustomClickHandler(null);
+		verify(mockUserBadge, never()).setCustomClickHandler(any(ClickHandler.class));
 	}
 	
 	@Test
@@ -79,7 +79,7 @@ public class UserIdCellRendererImplTest {
 		when(mockUserGroupHeader.getIsIndividual()).thenReturn(false);
 		String userId = "1";
 		renderer.setValue(userId);
-		verify(mockTeamBadge).configure(userId, (ClickHandler)null);
+		verify(mockTeamBadge).configure(userId);
 	}
 	
 	@Test

@@ -13,12 +13,10 @@ import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
@@ -139,9 +137,11 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 		return view.asWidget();
 	}
     
-	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		fileDownloadMenuItem.setEntityUpdatedHandler(handler);
+	public static boolean isDataPossiblyWithin(FileEntity fileEntity) {
+		String dataFileHandleId = fileEntity.getDataFileHandleId();
+		return (dataFileHandleId != null && dataFileHandleId.length() > 0);
 	}
+
 	public void configureExternalFile(ExternalFileHandle externalFileHandle) {
 		view.setExternalUrlUIVisible(true);
 		view.setExternalUrl(externalFileHandle.getExternalURL());

@@ -1,6 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.entity.annotation;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,14 +18,9 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
-
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
@@ -108,20 +110,16 @@ public class AnnotationsRendererWidgetTest {
 	@Test
 	public void testOnEdit() {
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
-		EntityUpdatedHandler updateHandler = mock(EntityUpdatedHandler.class);
 		widget.configure(mockBundle, true, true);
-		widget.setEntityUpdatedHandler(updateHandler);
 		
 		//test that on edit, we pass the bundle and update handler to the edit dialog
 		widget.onEdit();
 		
-		ArgumentCaptor<EntityUpdatedHandler> updateCaptor = ArgumentCaptor.forClass(EntityUpdatedHandler.class);
 		ArgumentCaptor<EntityBundle> bundleCaptor = ArgumentCaptor.forClass(EntityBundle.class);
 		
 		verify(mockView).addEditorToPage(any(Widget.class));
-		verify(mockEditAnnotationsDialog).configure(bundleCaptor.capture(), updateCaptor.capture());
+		verify(mockEditAnnotationsDialog).configure(bundleCaptor.capture());
 		
-		assertEquals(updateCaptor.getValue(), updateHandler);
 		assertEquals(bundleCaptor.getValue(), mockBundle);
 	}
 	
@@ -132,7 +130,7 @@ public class AnnotationsRendererWidgetTest {
 		//test that on edit, we pass the bundle and update handler to the edit dialog
 		widget.onEdit();
 		
-		verify(mockEditAnnotationsDialog, never()).configure(any(EntityBundle.class), any(EntityUpdatedHandler.class));
+		verify(mockEditAnnotationsDialog, never()).configure(any(EntityBundle.class));
 	}
 	
 

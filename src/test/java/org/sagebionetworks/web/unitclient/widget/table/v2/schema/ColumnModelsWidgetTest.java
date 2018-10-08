@@ -40,7 +40,6 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
@@ -58,6 +57,7 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -76,8 +76,6 @@ public class ColumnModelsWidgetTest {
 	ColumnModelsView mockViewer;
 	@Mock
 	ColumnModelsEditorWidget mockEditor;
-	@Mock
-	EntityUpdatedHandler mockUpdateHandler;
 	@Mock
 	PortalGinInjector mockGinInjector;
 	@Mock
@@ -109,6 +107,8 @@ public class ColumnModelsWidgetTest {
 	List<ColumnModel> mockAnnotationColumnsPage1;
 	@Mock
 	List<ColumnModel> mockAnnotationColumnsPage2;
+	@Mock
+	EventBus mockEventBus;
 	public static final String NEXT_PAGE_TOKEN = "nextPageToken";
 
 	TableEntity table;
@@ -152,7 +152,7 @@ public class ColumnModelsWidgetTest {
 		when(mockColumnModelPage2.getResults()).thenReturn(mockAnnotationColumnsPage2);
 		
 		AsyncMockStubber.callSuccessWith(mockColumnModelPage1, mockColumnModelPage2).when(mockSynapseClient).getPossibleColumnModelsForViewScope(any(ViewScope.class), anyString(), any(AsyncCallback.class));
-
+		when(mockGinInjector.getEventBus()).thenReturn(mockEventBus);
 	}
 	
 	@Test
@@ -168,7 +168,7 @@ public class ColumnModelsWidgetTest {
 		boolean isEditable = true;
 		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
 		tableBundle.setColumnModels(schema);
-		widget.configure(mockBundle, isEditable, mockUpdateHandler);
+		widget.configure(mockBundle, isEditable);
 		verify(mockViewer).configure(ViewType.VIEWER, isEditable);
 		// All rows should be added to both the viewer and editor
 		verify(mockViewer, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
@@ -181,7 +181,7 @@ public class ColumnModelsWidgetTest {
 		when(mockBundle.getEntity()).thenReturn(mockView);
 		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
 		tableBundle.setColumnModels(schema);
-		widget.configure(mockBundle, isEditable, mockUpdateHandler);
+		widget.configure(mockBundle, isEditable);
 		verify(mockViewer).configure(ViewType.VIEWER, isEditable);
 		// All rows should be added to both the viewer and editor
 		verify(mockViewer, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
@@ -196,7 +196,7 @@ public class ColumnModelsWidgetTest {
 		when(mockView.getType()).thenReturn(org.sagebionetworks.repo.model.table.ViewType.file);
 		when(mockBundle.getEntity()).thenReturn(mockView);
 		tableBundle.setColumnModels(TableModelTestUtils.createOneOfEachType(true));
-		widget.configure(mockBundle, isEditable, mockUpdateHandler);
+		widget.configure(mockBundle, isEditable);
 		widget.getDefaultColumnsForView();
 		verify(mockEditor).addColumns(mockDefaultColumnModels);
 	}
@@ -208,7 +208,7 @@ public class ColumnModelsWidgetTest {
 		when(mockView.getType()).thenReturn(org.sagebionetworks.repo.model.table.ViewType.project);
 		when(mockBundle.getEntity()).thenReturn(mockView);
 		tableBundle.setColumnModels(TableModelTestUtils.createOneOfEachType(true));
-		widget.configure(mockBundle, isEditable, mockUpdateHandler);
+		widget.configure(mockBundle, isEditable);
 		widget.getDefaultColumnsForView();
 		verify(mockEditor).addColumns(mockDefaultColumnModels);
 	}
@@ -224,7 +224,7 @@ public class ColumnModelsWidgetTest {
 		Long viewScopeMask = 1234L;
 		when(mockView.getViewTypeMask()).thenReturn(viewScopeMask);
 
-		widget.configure(mockBundle, isEditable, mockUpdateHandler);
+		widget.configure(mockBundle, isEditable);
 		
 		String firstPageToken = null;
 		widget.getPossibleColumnModelsForViewScope(firstPageToken);
@@ -249,7 +249,7 @@ public class ColumnModelsWidgetTest {
 		when(mockView.getType()).thenReturn(viewtype);
 		when(mockView.getViewTypeMask()).thenReturn(null);
 		
-		widget.configure(mockBundle, isEditable, mockUpdateHandler);
+		widget.configure(mockBundle, isEditable);
 		
 		String firstPageToken = null;
 		widget.getPossibleColumnModelsForViewScope(firstPageToken);
@@ -267,7 +267,7 @@ public class ColumnModelsWidgetTest {
 		when(mockBundle.getEntity()).thenReturn(mockView);
 		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
 		tableBundle.setColumnModels(schema);
-		widget.configure(mockBundle, isEditable, mockUpdateHandler);
+		widget.configure(mockBundle, isEditable);
 		
 		String error = "error message getting annotation column models";
 		Exception ex = new Exception(error);
@@ -283,7 +283,7 @@ public class ColumnModelsWidgetTest {
 		boolean isEditable = true;
 		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
 		tableBundle.setColumnModels(schema);
-		widget.configure(mockBundle, isEditable, mockUpdateHandler);
+		widget.configure(mockBundle, isEditable);
 		// show the editor
 		widget.onEditColumns();
 		verify(mockEditor).configure(TableType.table, schema);
@@ -295,7 +295,7 @@ public class ColumnModelsWidgetTest {
 		boolean isEditable = false;
 		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
 		tableBundle.setColumnModels(schema);
-		widget.configure(mockBundle, isEditable, mockUpdateHandler);
+		widget.configure(mockBundle, isEditable);
 		// should fail
 		widget.onEditColumns();
 	}
@@ -304,7 +304,7 @@ public class ColumnModelsWidgetTest {
 		boolean isEditable = true;
 		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
 		tableBundle.setColumnModels(schema);
-		widget.configure(mockBundle, isEditable, mockUpdateHandler);
+		widget.configure(mockBundle, isEditable);
 		// Show the dialog
 		widget.onEditColumns();
 		when(mockEditor.getEditedColumnModels()).thenReturn(TableModelTestUtils.createOneOfEachType(false));
@@ -326,10 +326,8 @@ public class ColumnModelsWidgetTest {
 		verify(mockBaseView).setLoading();
 		verify(mockBaseView).hideEditor();
 		verify(mockBaseView).hideErrors();
-		// Save success should be called.
-		verify(mockUpdateHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 	}
-	
 
 	@Test
 	public void testOnPrimaryAsyncCancelled(){
@@ -356,7 +354,7 @@ public class ColumnModelsWidgetTest {
 		boolean isEditable = true;
 		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
 		tableBundle.setColumnModels(schema);
-		widget.configure(mockBundle, isEditable, mockUpdateHandler);
+		widget.configure(mockBundle, isEditable);
 		// Show the dialog
 		widget.onEditColumns();
 		when(mockEditor.validate()).thenReturn(false);
@@ -374,7 +372,7 @@ public class ColumnModelsWidgetTest {
 		boolean isEditable = true;
 		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
 		tableBundle.setColumnModels(schema);
-		widget.configure(mockBundle, isEditable, mockUpdateHandler);
+		widget.configure(mockBundle, isEditable);
 		// Show the dialog
 		widget.onEditColumns();
 		String errorMessage = "Something went wrong";

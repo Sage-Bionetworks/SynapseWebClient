@@ -141,7 +141,8 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 			presenter.findOldVersions();
 			afterJSPlumbLoad();
 		}
-		if (startingNodeContainer != null) {
+		
+		if (startingNodeContainer != null && graph.getNodes().size() > 3 && DisplayUtils.isInViewport(startingNodeContainer)) {
 			startingNodeContainer.getElement().scrollIntoView();
 		}
 	}

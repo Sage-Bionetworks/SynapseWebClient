@@ -28,7 +28,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItem;
@@ -59,8 +58,6 @@ public class FileTitleBarTest {
 	Long synStorageLocationId = 1L;
 	@Mock
 	FileDownloadMenuItem mockFileDownloadButton;
-	@Mock
-	EntityUpdatedHandler mockEntityUpdatedHandler;
 	@Mock
 	ExternalObjectStoreFileHandle mockExternalObjectStoreFileHandle;
 	@Mock
@@ -155,12 +152,6 @@ public class FileTitleBarTest {
 		
 		verify(mockJsClient).addFileToDownloadList(eq(DATA_FILE_HANDLE_ID), eq(ENTITY_ID), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(errorMessage);
-	}
-	
-	@Test
-	public void testSetEntityUpdateHandler() {
-		fileTitleBar.setEntityUpdatedHandler(mockEntityUpdatedHandler);
-		verify(mockFileDownloadButton).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 	}
 	
 	@Test

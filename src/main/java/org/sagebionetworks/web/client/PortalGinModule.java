@@ -16,6 +16,8 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.cookie.GWTCookieImpl;
 import org.sagebionetworks.web.client.presenter.DownPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
+import org.sagebionetworks.web.client.presenter.EntityPresenterEventBinder;
+import org.sagebionetworks.web.client.presenter.EntityPresenterEventBinderImpl;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.resources.ResourceLoaderImpl;
@@ -1430,11 +1432,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(WikiDiffView.class).to(WikiDiffViewImpl.class);
 		bind(SynapseProperties.class).to(SynapsePropertiesImpl.class).in(Singleton.class);
 		bind(Moment.class).to(MomentImpl.class);
-		bind(DownloadSpeedTester.class).to(DownloadSpeedTesterImpl.class).in(Singleton.class);;
-		bind(DownloadListWidgetView.class).to(DownloadListWidgetViewImpl.class);
-		bind(FileHandleAssociationTableView.class).to(FileHandleAssociationTableViewImpl.class);
-		bind(FileHandleAssociationRowView.class).to(FileHandleAssociationRowViewImpl.class);
-		bind(PackageSizeSummaryView.class).to(PackageSizeSummaryViewImpl.class);
-		bind(AddToDownloadListView.class).to(AddToDownloadListViewImpl.class);
+		bind(DownloadSpeedTester.class).to(DownloadSpeedTesterImpl.class);
 	}
 }

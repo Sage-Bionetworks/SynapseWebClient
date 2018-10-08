@@ -19,8 +19,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
@@ -35,7 +33,6 @@ import com.google.inject.Inject;
 public class EntityMetadata implements Presenter {
 
 	private EntityMetadataView view;
-	private EntityUpdatedHandler entityUpdatedHandler;
 	private AnnotationsRendererWidget annotationsWidget;
 	private DoiWidget doiWidget;
 	private DoiWidgetV2 doiWidgetV2;
@@ -123,17 +120,7 @@ public class EntityMetadata implements Presenter {
 	public void setVisible(boolean visible) {
 		view.setDetailedMetadataVisible(visible);
 	}
-	@Override
-	public void fireEntityUpdatedEvent() {
-		if (entityUpdatedHandler != null)
-			entityUpdatedHandler.onPersistSuccess(new EntityUpdatedEvent());
-	}
-	
-	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		this.entityUpdatedHandler = handler;
-		this.annotationsWidget.setEntityUpdatedHandler(entityUpdatedHandler);
-	}
-
+		
 	public void setAnnotationsVisible(boolean visible) {
 		view.setAnnotationsVisible(visible);
 	}

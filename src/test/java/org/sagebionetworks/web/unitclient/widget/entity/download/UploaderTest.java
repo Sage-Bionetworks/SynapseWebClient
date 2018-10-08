@@ -17,7 +17,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.utils.FutureUtils.*;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -27,12 +28,13 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -60,8 +62,9 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.callback.MD5Callback;
-import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.events.UploadSuccessHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -76,9 +79,10 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.upload.MultipartUploaderStub;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-
+@RunWith(MockitoJUnitRunner.class)
 public class UploaderTest {
 	@Mock
 	S3DirectUploader mockS3DirectUploader;
@@ -96,12 +100,17 @@ public class UploaderTest {
 	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl(); // alt: GwtAdapterFactory
+	@Mock
+	EventBus mockEventBus;
 	
 	Uploader uploader;
 	@Mock
 	GWTWrapper mockGwt;
 	FileEntity testEntity;
-	CancelHandler cancelHandler;
+	@Mock
+	CancelHandler mockCancelHandler;
+	@Mock
+	UploadSuccessHandler mockUploadSuccessHandler;
 	String parentEntityId;
 	private Long storageLocationId;
 	String md5 = "e10e3f4491440ce7b48edc97f03307bb";
@@ -130,7 +139,6 @@ public class UploaderTest {
 	
 	@Before
 	public void before() throws Exception {
-		MockitoAnnotations.initMocks(this);
 		multipartUploader = new MultipartUploaderStub();
 		testEntity = new FileEntity();
 		testEntity.setName("test file");
@@ -154,7 +162,6 @@ public class UploaderTest {
 		AsyncMockStubber.callSuccessWith("entityID").when(mockSynapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  any(AsyncCallback.class));
 		
 		when(mockGwt.createXMLHttpRequest()).thenReturn(null);
-		cancelHandler = mock(CancelHandler.class);
 		
 		String[] fileNames = {"newFile.txt"};
 		when(mockSynapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(fileNames);
@@ -174,8 +181,10 @@ public class UploaderTest {
 				mockGlobalApplicationState, 
 				mockS3DirectUploader,
 				mockSynapseJavascriptClient,
-				mockSynapseProperties);
-		uploader.addCancelHandler(cancelHandler);
+				mockSynapseProperties,
+				mockEventBus);
+		uploader.setCancelHandler(mockCancelHandler);
+		uploader.setSuccessHandler(mockUploadSuccessHandler);
 		parentEntityId = "syn1234";
 		uploader.configure(null, parentEntityId, null, true);
 		
@@ -296,7 +305,6 @@ public class UploaderTest {
 	
 	@Test
 	public void testDirectUploadHappyCase() throws Exception {
-		uploader.addCancelHandler(cancelHandler);
 		verify(mockView).showUploadingToSynapseStorage();
 		verify(mockView).enableMultipleFileUploads(true);
 		final String file1 = "file1.txt";
@@ -312,6 +320,8 @@ public class UploaderTest {
 		verify(mockView).clear();
 		verify(mockGlobalApplicationState).clearDropZoneHandler();
 		verify(mockView, times(2)).resetToInitialState();
+		verify(mockUploadSuccessHandler).onSuccessfulUpload();
+		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 	}
 	
 	@Test
@@ -356,7 +366,7 @@ public class UploaderTest {
 	
 	private void verifyUploadError() {
 		verify(mockView).showErrorMessage(anyString(), anyString());
-		verify(cancelHandler).onCancel(any(CancelEvent.class));
+		verify(mockCancelHandler).onCancel();
 	}
 	
 	@Test
@@ -367,7 +377,7 @@ public class UploaderTest {
 		
 		verify(mockView).clear();
 		verify(mockGlobalApplicationState).clearDropZoneHandler();
-		verify(cancelHandler).onCancel(any(CancelEvent.class));
+		verify(mockCancelHandler).onCancel();
 		assertTrue(multipartUploader.isCanceled());
 	}
 	

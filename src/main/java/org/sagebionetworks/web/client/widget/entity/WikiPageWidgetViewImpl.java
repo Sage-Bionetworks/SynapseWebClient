@@ -156,7 +156,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	@Override
 	public void scrollWikiHeadingIntoView() {
-		if (wikiHeading != null) {
+		if (wikiHeading != null && !DisplayUtils.isInViewport(wikiHeading)) {
 			SynapseJSNIUtilsImpl._scrollIntoView(wikiHeading.getElement());
 		}
 	}
@@ -333,7 +333,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		wikiCompareButton.setVisible(visible);
 	}
 	
-
 	/** Event binder code **/
 	interface EBinder extends EventBinder<WikiPageWidget> {};
 	private final EBinder eventBinder = GWT.create(EBinder.class);

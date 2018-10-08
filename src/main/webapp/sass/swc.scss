@@ -1047,10 +1047,6 @@ i.font-size-12x {
 	font-size:12em;
 }
 
-.vertical-align-bottom {
-	vertical-align: bottom;
-}
-
 h1, h2, h3, h4, h5, h6 {
 	word-wrap: break-word;
 }
@@ -1736,13 +1732,19 @@ ol.lowerroman {
 	margin-top: 10px !important;
 }
 
-#body .vertical-align-middle {
-	vertical-align: middle;
+#body {
+	.vertical-align-middle {
+		vertical-align: middle;
+	}
+	
+	.vertical-align-top {
+		vertical-align: top;
+	}
+	.vertical-align-bottom {
+		vertical-align: bottom;
+	}
 }
 
-#body .vertical-align-top {
-	vertical-align: top;
-}
 
 .top-right {
 	position: absolute;
