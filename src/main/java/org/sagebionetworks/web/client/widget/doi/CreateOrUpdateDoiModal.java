@@ -77,9 +77,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 			public void onSuccess(@NullableDecl Doi doi) {
 				boolean doiExists = true;
 				setDoi(doi);
-				populateForms();
-				view.showOverwriteWarning(doiExists);
-				view.show();
+				populateAndShowView(doiExists);
 			}
 
 			@Override
@@ -87,14 +85,18 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 				boolean doiExists = false;
 				if (t instanceof NotFoundException) {
 					setDoi(createNewDoi(entity, entityVersion, userProfile));
-					populateForms();
-					view.showOverwriteWarning(doiExists);
-					view.show();
+					populateAndShowView(doiExists);
 				} else {
 					popupUtilsView.showErrorMessage(t.getMessage());
 				}
 			}
 		}, directExecutor());
+	}
+
+	private void populateAndShowView(boolean doiExists) {
+		populateForms();
+		view.showOverwriteWarning(doiExists);
+		view.show();
 	}
 
 	/**
