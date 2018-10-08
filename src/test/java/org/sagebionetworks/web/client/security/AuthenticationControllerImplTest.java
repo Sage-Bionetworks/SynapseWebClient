@@ -292,4 +292,31 @@ public class AuthenticationControllerImplTest {
 		verify(loginCallback, never()).onFailure(ex);
 		verify(mockPlaceChanger).goTo(any(Down.class));
 	}
+
+	@Test
+	public void testGetCurrentUserProfile() {
+		String principalId = "4321";
+		UserProfile profile = new UserProfile();
+		profile.setOwnerId(principalId);
+		sessionData.setProfile(profile);
+		sessionData.setSession(new Session());
+		sessionData.getSession().setSessionToken("4321");
+
+		AsyncCallback<UserSessionData> callback = mock(AsyncCallback.class);
+
+		// not logged in
+		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn(null);
+		assertNull(authenticationController.getCurrentUserProfile());
+
+		// logged in
+		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
+		authenticationController.revalidateSession("token", callback);
+		assertEquals(profile, authenticationController.getCurrentUserProfile());
+
+		// empty user profile
+		sessionData.setProfile(null);
+		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
+		authenticationController.revalidateSession("token", callback);
+		assertNull(authenticationController.getCurrentUserProfile());
+	}
 }
