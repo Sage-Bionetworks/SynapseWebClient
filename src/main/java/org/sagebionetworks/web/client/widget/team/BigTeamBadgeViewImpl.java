@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineHTML;
@@ -60,8 +61,8 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 		if (team.getIcon() != null && team.getIcon().length() > 0) {
 			pictureUrl = synapseJSNIUtils.getFileHandleAssociationUrl(team.getId(), FileHandleAssociateType.TeamAttachment, team.getIcon());
 		}
-		String sanitizedDescription = synapseJSNIUtils.sanitizeHtml(description);
-		addBadgeMedia(team.getId(), DisplayUtils.getMediaObject(name, linkify.linkify(sanitizedDescription), clickHandler,  pictureUrl, false, 5));
+		String descriptionWithoutHtml = SafeHtmlUtils.htmlEscape(description);
+		addBadgeMedia(team.getId(), DisplayUtils.getMediaObject(name, linkify.linkify(descriptionWithoutHtml), clickHandler,  pictureUrl, false, 5));
 	}
 	
 	@Override
