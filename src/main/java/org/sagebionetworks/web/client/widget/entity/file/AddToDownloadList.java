@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_SUM_FILE_SIZES;
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.PackageSizeSummary;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -36,7 +37,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	public static final String NO_NEW_FILES_ADDED_MESSAGE = "No new files have been added to the Download List.";
 	public static final String SUCCESS_ADDED_FILES_MESSAGE = "Successfully added files to the Download List.";
 	public static final String ADD_QUERY_FILES_CONFIRMATION_MESSAGE = "Add all files from this query result to the Download List?";
-	public static final Long FILE_SIZE_QUERY_PART_MASK = BUNDLE_MASK_QUERY_SUM_FILE_SIZES; 
+	public static final Long FILE_SIZE_QUERY_PART_MASK = BUNDLE_MASK_QUERY_SUM_FILE_SIZES | BUNDLE_MASK_QUERY_COUNT; 
 	AddToDownloadListView view;
 	PopupUtilsView popupUtilsView;
 	AddFileToDownloadListRequest request;
@@ -106,6 +107,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 			
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
+				GWT.debugger();
 				QueryResultBundle queryResultBundle = (QueryResultBundle) response;
 				view.hideAll();
 				//get sum file sizes from query result
