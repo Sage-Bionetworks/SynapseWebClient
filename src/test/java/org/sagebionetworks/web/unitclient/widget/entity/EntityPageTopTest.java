@@ -286,6 +286,11 @@ public class EntityPageTopTest {
 		verify(mockView).scrollToTop();
 		
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class), eq(mockActionMenuWidget));
+		
+		//verify it only asks for the project bundle once (SWC-4458)
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(projectEntityId), eq(EntityPageTop.ALL_PARTS_MASK), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, never()).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
+		
 		// entity area for the project settings doesn't apply (so it's set to null).
 		EntityArea projectSettingsEntityArea = null;
 		verify(mockProjectActionController).configure(mockProjectActionMenuWidget, mockProjectBundle, true, projectWikiId, projectSettingsEntityArea);
