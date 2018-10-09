@@ -6,7 +6,7 @@
 
 	<t:TableRow>
 		<t:TableData>
-			<b:CheckBox ui:field="select"/>
+			<b:CheckBox ui:field="select" width="40px"/>
 		</t:TableData>
 	</t:TableRow>
 </ui:UiBinder>
