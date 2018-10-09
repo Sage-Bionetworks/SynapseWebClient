@@ -52,11 +52,18 @@ public class UserIdCellRendererImpl implements UserIdCellRenderer{
 					if (result.getIsIndividual()) {
 						UserBadge badge = ginInjector.getUserBadgeWidget();
 						badge.configure(principalId);
-						badge.setCustomClickHandler(customClickHandler);
+						if (customClickHandler != null) {
+							badge.setCustomClickHandler(customClickHandler);	
+						}
 						view.add(badge);
 					} else {
 						TeamBadge badge = ginInjector.getTeamBadgeWidget();
-						badge.configure(principalId, customClickHandler);
+						if (customClickHandler != null) {
+							badge.configure(principalId, customClickHandler);	
+						} else {
+							badge.configure(principalId);
+						}
+						
 						view.add(badge);
 					}
 				}

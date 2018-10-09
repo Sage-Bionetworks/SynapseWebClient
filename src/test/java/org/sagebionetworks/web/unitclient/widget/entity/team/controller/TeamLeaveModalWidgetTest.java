@@ -63,7 +63,7 @@ public class TeamLeaveModalWidgetTest {
 		verify(mockSynAlert).clear();
 		verify(mockAuthenticationController).getCurrentUserPrincipalId();
 		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor.forClass(AsyncCallback.class);
-		verify(mockJsClient).deleteTeamMember(eq(userId), eq(teamId), captor.capture());
+		verify(mockJsClient).deleteTeamMember(eq(teamId), eq(userId), captor.capture());
 		captor.getValue().onSuccess(null);
 		verify(mockView).showInfo(anyString());
 		verify(mockRefreshCallback).invoke();
@@ -75,7 +75,7 @@ public class TeamLeaveModalWidgetTest {
 		verify(mockSynAlert).clear();
 		verify(mockAuthenticationController).getCurrentUserPrincipalId();
 		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor.forClass(AsyncCallback.class);
-		verify(mockJsClient).deleteTeamMember(eq(userId), eq(teamId), captor.capture());
+		verify(mockJsClient).deleteTeamMember(eq(teamId), eq(userId), captor.capture());
 		captor.getValue().onFailure(caught);
 		verify(mockSynAlert).handleException(caught);
 	}

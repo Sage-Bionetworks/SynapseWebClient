@@ -1,27 +1,5 @@
 package org.sagebionetworks.web.client.events;
 
-import com.google.gwt.event.shared.GwtEvent;
+import com.google.web.bindery.event.shared.binder.GenericEvent;
 
-public class EntityUpdatedEvent extends GwtEvent<EntityUpdatedHandler> {
-
-	private static final Type<EntityUpdatedHandler> TYPE = new Type<EntityUpdatedHandler>();
-	
-	public EntityUpdatedEvent() {
-		
-	}
-	
-	public static Type<EntityUpdatedHandler> getType() {
-		return TYPE;
-	}
-	
-	@Override
-	public com.google.gwt.event.shared.GwtEvent.Type<EntityUpdatedHandler> getAssociatedType() {
-		return TYPE;
-	}
-
-	@Override
-	protected void dispatch(EntityUpdatedHandler handler) {
-		handler.onPersistSuccess(this);
-	}
-
-}
+public class EntityUpdatedEvent extends GenericEvent {}

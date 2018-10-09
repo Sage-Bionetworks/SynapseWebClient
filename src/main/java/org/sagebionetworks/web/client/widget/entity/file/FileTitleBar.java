@@ -12,10 +12,8 @@ import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseProperties;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
@@ -124,10 +122,6 @@ public class FileTitleBar implements SynapseWidgetPresenter {
 		return view.asWidget();
 	}
     
-	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		fileDownloadButton.setEntityUpdatedHandler(handler);
-	}
-
 	public static boolean isDataPossiblyWithin(FileEntity fileEntity) {
 		String dataFileHandleId = fileEntity.getDataFileHandleId();
 		return (dataFileHandleId != null && dataFileHandleId.length() > 0);

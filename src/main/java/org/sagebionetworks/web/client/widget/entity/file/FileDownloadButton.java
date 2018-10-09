@@ -20,8 +20,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -46,7 +44,6 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	public static final String LOGIN_PLACE_LINK = "#!LoginPlace:0";
 	private FileDownloadButtonView view;
 	private EntityBundle entityBundle;
-	private EntityUpdatedHandler entityUpdatedHandler;
 	private SynapseClientAsync synapseClient;
 	private LoginModalWidget loginModalWidget;
 	private SynapseAlert synAlert;
@@ -199,15 +196,6 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 		return view.asWidget();
 	}
     
-	public void fireEntityUpdatedEvent(EntityUpdatedEvent event) {
-		if (entityUpdatedHandler != null)
-			entityUpdatedHandler.onPersistSuccess(event);
-	}
-	
-	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		this.entityUpdatedHandler = handler;
-	}
-	
 	public void queryForSftpLoginInstructions(String url) {
 		synapseClient.getHost(url, new AsyncCallback<String>() {
 			@Override

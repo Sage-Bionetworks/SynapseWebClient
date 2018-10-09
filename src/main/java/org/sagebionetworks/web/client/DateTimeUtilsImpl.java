@@ -10,6 +10,8 @@ import com.google.inject.Inject;
 
 public class DateTimeUtilsImpl implements DateTimeUtils {
 	public static final String UTC = " 'UTC'";
+	public static final String YEAR_ONLY_FORMAT_STRING = "yyyy";
+	public static DateTimeFormat YEAR_ONLY_FORMAT;
 	public static final String DATE_ONLY_FORMAT_STRING = "MM/dd/yyyy";
 	private static DateTimeFormat DATE_ONLY_FORMAT;
 	private static DateTimeFormat DATE_ONLY_UTC_FORMAT;
@@ -27,6 +29,7 @@ public class DateTimeUtilsImpl implements DateTimeUtils {
 	@Inject
 	public DateTimeUtilsImpl(Moment moment, GWTWrapper gwt) {
 		this.moment = moment;
+		YEAR_ONLY_FORMAT = gwt.getFormat(YEAR_ONLY_FORMAT_STRING);
 		DATE_ONLY_FORMAT = gwt.getFormat(DATE_ONLY_FORMAT_STRING);
 		DATE_ONLY_UTC_FORMAT = gwt.getFormat(DATE_ONLY_FORMAT_STRING + UTC);
 		SMALL_DATE_FORMAT = gwt.getFormat(SMALL_DATE_FORMAT_STRING);
@@ -102,7 +105,12 @@ public class DateTimeUtilsImpl implements DateTimeUtils {
 		DateTimeFormat formatter = isShowingUTCTime() ? DATE_ONLY_UTC_FORMAT : DATE_ONLY_FORMAT;
 		return formatter.format(toFormat);
 	}
-	
+
+	public String getYear(Date toFormat) {
+		DateTimeFormat formatter = YEAR_ONLY_FORMAT;
+		return formatter.format(toFormat);
+	}
+
 	@Override
 	public void setShowUTCTime(boolean showUTC) {
 		currentTimezone = showUTC ? UTC_TIMEZONE : null;

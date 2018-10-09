@@ -1,15 +1,23 @@
 package org.sagebionetworks.web.unitclient;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-import static org.sagebionetworks.web.client.DateTimeUtilsImpl.*;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.DateTimeUtilsImpl.DATE_ONLY_FORMAT_STRING;
+import static org.sagebionetworks.web.client.DateTimeUtilsImpl.LONG_DATE_FORMAT_STRING;
+import static org.sagebionetworks.web.client.DateTimeUtilsImpl.SMALL_DATE_FORMAT_STRING;
+import static org.sagebionetworks.web.client.DateTimeUtilsImpl.UTC;
+import static org.sagebionetworks.web.client.DateTimeUtilsImpl.YEAR_ONLY_FORMAT_STRING;
+
 import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.web.client.DateTimeUtilsImpl;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.Moment;
@@ -18,6 +26,7 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 
+@RunWith(MockitoJUnitRunner.class)
 public class DateTimeUtilsImplTest {
 	
 	@Mock
@@ -38,12 +47,13 @@ public class DateTimeUtilsImplTest {
 	DateTimeFormat mockLongDateFormatUTC;
 	@Mock
 	DateTimeFormat mockISO8601Format;
+	@Mock
+	DateTimeFormat mockYearFormat;
 	
 	DateTimeUtilsImpl dateTimeUtils;
 	
 	@Before
 	public void setup(){
-		MockitoAnnotations.initMocks(this);
 		when(mockGWT.getFormat(DATE_ONLY_FORMAT_STRING)).thenReturn(mockDateOnlyFormat);
 		when(mockGWT.getFormat(DATE_ONLY_FORMAT_STRING + UTC)).thenReturn(mockDateOnlyFormatUTC);
 		when(mockGWT.getFormat(SMALL_DATE_FORMAT_STRING)).thenReturn(mockSmallDateFormat);
@@ -51,6 +61,7 @@ public class DateTimeUtilsImplTest {
 		when(mockGWT.getFormat(LONG_DATE_FORMAT_STRING)).thenReturn(mockLongDateFormat);
 		when(mockGWT.getFormat(LONG_DATE_FORMAT_STRING + UTC)).thenReturn(mockLongDateFormatUTC);
 		when(mockGWT.getFormat(PredefinedFormat.ISO_8601)).thenReturn(mockISO8601Format);
+		when(mockGWT.getFormat(YEAR_ONLY_FORMAT_STRING)).thenReturn(mockYearFormat);
 		dateTimeUtils = new DateTimeUtilsImpl(mockMoment, mockGWT);
 	}	
 
@@ -86,6 +97,13 @@ public class DateTimeUtilsImplTest {
 		d = new Date();
 		dateTimeUtils.getRelativeTime(d);
 		verify(mockMoment).getRelativeTime(anyString());
+	}
+
+	@Test
+	public void testGetYear() {
+		Date d = new Date();
+		dateTimeUtils.getYear(d);
+		verify(mockYearFormat).format(d);
 	}
 }
 

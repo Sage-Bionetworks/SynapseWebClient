@@ -34,7 +34,6 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -102,8 +101,6 @@ public class FilesTabTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	@Mock
 	PlaceChanger mockPlaceChanger;
-	@Mock
-	EntityUpdatedHandler mockEntityUpdatedHandler;
 	@Mock
 	Project mockProjectEntity;
 	@Mock
@@ -217,10 +214,7 @@ public class FilesTabTest {
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 		
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockProjectEntityBundle, mockEntityUpdatedHandler, version, mockActionMenuWidget);
-		
-		verify(mockFileTitleBar).setEntityUpdatedHandler(mockEntityUpdatedHandler);
-		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
+		tab.configure(mockProjectEntityBundle, version, mockActionMenuWidget);
 		
 		verify(mockView, times(2)).setFileTitlebarVisible(false);
 		verify(mockView, times(2)).setFolderTitlebarVisible(false);
@@ -254,7 +248,7 @@ public class FilesTabTest {
 	public void testConfigureWithFileNoFileHandles() {
 		Long version = 4L;
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
-		tab.configure(mockEntityBundle, mockEntityUpdatedHandler, version, mockActionMenuWidget);
+		tab.configure(mockEntityBundle, version, mockActionMenuWidget);
 		
 		verify(mockView, times(2)).setPreviewVisible(false);
 		verify(mockView, never()).setPreviewVisible(true);
@@ -272,11 +266,8 @@ public class FilesTabTest {
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
 		
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockEntityBundle, mockEntityUpdatedHandler, version, mockActionMenuWidget);
+		tab.configure(mockEntityBundle, version, mockActionMenuWidget);
 
-		verify(mockFileTitleBar).setEntityUpdatedHandler(mockEntityUpdatedHandler);
-		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
-		
 		verify(mockView).setFileTitlebarVisible(false);
 		verify(mockView).setFileTitlebarVisible(true);
 		verify(mockView, times(2)).setFolderTitlebarVisible(false);
@@ -330,10 +321,7 @@ public class FilesTabTest {
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 		
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockEntityBundle, mockEntityUpdatedHandler, version, mockActionMenuWidget);
-		
-		verify(mockFileTitleBar).setEntityUpdatedHandler(mockEntityUpdatedHandler);
-		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
+		tab.configure(mockEntityBundle, version, mockActionMenuWidget);
 		
 		verify(mockView, times(2)).setFileTitlebarVisible(false);
 		verify(mockView).setFolderTitlebarVisible(false);

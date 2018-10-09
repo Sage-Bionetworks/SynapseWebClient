@@ -16,6 +16,7 @@ public interface CreateOrUpdateDoiModalView extends IsWidget {
 	void setResourceTypeGeneral(String resourceTypeGeneral);
 	Long getPublicationYear();
 	void setPublicationYear(Long publicationYear);
+	void showOverwriteWarning(boolean showWarning);
 	void show();
 	void hide();
 	void setModalTitle(String title);

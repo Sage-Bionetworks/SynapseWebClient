@@ -93,8 +93,8 @@ public class TableEntityWidgetViewImpl extends Composite implements
 
 	@Override
 	public void configure(EntityBundle bundle, boolean isEditable) {
-		this.columnModelsWidget.configure(bundle, isEditable, this.presenter);
-		this.scopeWidget.configure(bundle, isEditable, this.presenter);
+		this.columnModelsWidget.configure(bundle, isEditable);
+		this.scopeWidget.configure(bundle, isEditable);
 	}
 
 	@Override

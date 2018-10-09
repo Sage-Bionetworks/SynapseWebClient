@@ -102,7 +102,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				boolean isCurrentVersion = true;
-				entityActionController.configure(actionMenu, bundle, isCurrentVersion, bundle.getRootWikiId(), EntityArea.TABLES, null);
+				entityActionController.configure(actionMenu, bundle, isCurrentVersion, bundle.getRootWikiId(), EntityArea.TABLES);
 				boolean canEdit = false;
 				tableEntityWidget.configure(bundle, canEdit, TableQueryResultWikiWidget.this, actionMenu);
 				hideEditActions();

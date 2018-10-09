@@ -15,9 +15,9 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -29,28 +29,28 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 	StorageLocationWidgetView view;
 	SynapseClientAsync synapseClient;
 	SynapseAlert synAlert;
-	EntityUpdatedHandler entityUpdatedHandler;
 	EntityBundle entityBundle;
 	CookieProvider cookies;
+	EventBus eventBus;
 	
 	@Inject
 	public StorageLocationWidget(StorageLocationWidgetView view,
 			SynapseClientAsync synapseClient, 
 			SynapseAlert synAlert, 
-			CookieProvider cookies) {
+			CookieProvider cookies,
+			EventBus eventBus) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.synAlert = synAlert;
 		this.cookies = cookies;
+		this.eventBus = eventBus;
 		view.setSynAlertWidget(synAlert);
 		view.setPresenter(this);
 	}
 	
-	@Override
-	public void configure(EntityBundle entityBundle, EntityUpdatedHandler entityUpdatedHandler) {
+	public void configure(EntityBundle entityBundle) {
 		this.entityBundle = entityBundle;
-		this.entityUpdatedHandler = entityUpdatedHandler;
 		clear();
 		view.setLoading(true);
 		getStorageLocationSetting();
@@ -154,7 +154,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 				@Override
 				public void onSuccess(Void result) {
 					view.hide();
-					entityUpdatedHandler.onPersistSuccess(new EntityUpdatedEvent());
+					eventBus.fireEvent(new EntityUpdatedEvent());
 				}
 			};
 			synapseClient.createStorageLocationSetting(entityBundle.getEntity().getId(), setting, callback);	
@@ -219,8 +219,5 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		RegExp regEx = RegExp.compile(WebConstants.VALID_SFTP_URL_REGEX, "gmi");
 		MatchResult matchResult = regEx.exec(url);
 		return (matchResult != null && url.equals(matchResult.getGroup(0))); 
-	}
-	public void setEntityUpdatedHandler(EntityUpdatedHandler updatedHandler) {
-		this.entityUpdatedHandler = updatedHandler;
 	}
 }

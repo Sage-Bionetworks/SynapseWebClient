@@ -27,7 +27,6 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -67,8 +66,6 @@ public class DockerTabTest {
 	UserEntityPermissions mockPermissions;
 	@Mock
 	EntityBundle mockProjectEntityBundle;
-	@Mock
-	EntityUpdatedHandler mockEntityUpdatedHandler;
 	@Mock
 	DockerRepository mockDockerRepoEntity;
 	@Mock
@@ -169,7 +166,7 @@ public class DockerTabTest {
 		String areaToken = null;
 		tab.setEntitySelectedCallback(mockUpdateEntityCallback);
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockProjectEntityBundle, mockEntityUpdatedHandler, areaToken, mockActionMenuWidget);
+		tab.configure(mockProjectEntityBundle, areaToken, mockActionMenuWidget);
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockTab).setEntityNameAndPlace(eq(projectName), any(Synapse.class));
 		verify(mockView, times(2)).setBreadcrumbVisible(false);
@@ -185,7 +182,7 @@ public class DockerTabTest {
 		mockProjectEntityBundle = null;
 		tab.setEntitySelectedCallback(mockUpdateEntityCallback);
 		tab.setProject(projectEntityId, mockProjectEntityBundle, mockProjectBundleLoadError);
-		tab.configure(mockProjectEntityBundle, mockEntityUpdatedHandler, areaToken, mockActionMenuWidget);
+		tab.configure(mockProjectEntityBundle, areaToken, mockActionMenuWidget);
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockTab).setEntityNameAndPlace(eq(projectEntityId), any(Synapse.class));
 		verify(mockDockerRepoListWidget, never()).configure(projectEntityId);
@@ -198,7 +195,7 @@ public class DockerTabTest {
 		String areaToken = null;
 		tab.setEntitySelectedCallback(mockUpdateEntityCallback);
 		tab.setProject(projectEntityId, mockProjectEntityBundle, mockProjectBundleLoadError);
-		tab.configure(mockDockerRepoEntityBundle, mockEntityUpdatedHandler, areaToken, mockActionMenuWidget);
+		tab.configure(mockDockerRepoEntityBundle, areaToken, mockActionMenuWidget);
 		verify(mockTab).setEntityNameAndPlace(eq(dockerRepoName), any(Synapse.class));
 		verify(mockTab).showTab();
 		verify(mockView).setBreadcrumbVisible(true);

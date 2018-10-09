@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 
@@ -23,7 +22,7 @@ public interface EntityActionController extends IsWidget {
 	 * @param entityBundle
 	 * @param isCurrentVersion
 	 */
-	public void configure(ActionMenuWidget actionMenu, EntityBundle entityBundle, boolean isCurrentVersion, String wikiPageKey, EntityArea currentArea, EntityUpdatedHandler handler);
+	public void configure(ActionMenuWidget actionMenu, EntityBundle entityBundle, boolean isCurrentVersion, String wikiPageKey, EntityArea currentArea);
 
 	/**
 	 * Delete action selected
