@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.*;
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_COUNT;
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_SUM_FILE_SIZES;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,6 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.PackageSizeSummary;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -107,7 +107,6 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 			
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
-				GWT.debugger();
 				QueryResultBundle queryResultBundle = (QueryResultBundle) response;
 				view.hideAll();
 				//get sum file sizes from query result
