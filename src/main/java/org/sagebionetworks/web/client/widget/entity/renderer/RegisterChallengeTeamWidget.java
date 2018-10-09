@@ -26,7 +26,7 @@ public class RegisterChallengeTeamWidget implements SingleButtonView.Presenter, 
 	private PortalGinInjector ginInjector;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
-	public static final String DEFAULT_BUTTON_TEXT = "Register a Team";
+	public static final String DEFAULT_BUTTON_TEXT = "Register Team";
 	String challengeId;
 	Callback widgetRefreshRequired;
 	
