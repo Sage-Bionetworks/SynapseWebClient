@@ -72,7 +72,7 @@ public class SubscribersWidgetViewImpl implements SubscribersWidgetView {
 	
 	@Override
 	public void setSubscriberCount(Long count) {
-		followersLink.setText(FOLLOWERS + "(" + count + ")");
+		followersLink.setText(FOLLOWERS + " (" + count + ")");
 	}
 	
 	@Override

@@ -2,10 +2,12 @@ package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -17,6 +19,7 @@ import org.sagebionetworks.web.client.widget.team.InviteWidget;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -56,7 +59,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@UiField
 	SimplePanel memberListPanel;
 	@UiField
-	Span totalMemberCountField;
+	Text totalMemberCountField;
 	@UiField
 	Span publicJoinField;
 	@UiField
@@ -77,7 +80,10 @@ public class TeamViewImpl extends Composite implements TeamView {
 	Modal mapModal;
 	@UiField
 	Anchor showMapLink;
-	
+	@UiField
+	org.gwtbootstrap3.client.ui.TextBox memberSearchTextBox;
+	@UiField
+	Button memberSearchButton;
 	private Presenter presenter;
 	private Header headerWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -94,10 +100,15 @@ public class TeamViewImpl extends Composite implements TeamView {
 		this.gwt = gwt;
 		setDropdownHandlers();
 		headerWidget.configure();
-		showMapLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onShowMap();
+		showMapLink.addClickHandler(event -> {
+			presenter.onShowMap();
+		});
+		memberSearchButton.addClickHandler(event -> {
+			presenter.onMemberSearch(memberSearchTextBox.getValue());
+		});
+		memberSearchTextBox.addKeyDownHandler(event -> {
+			if(KeyCodes.KEY_ENTER == event.getNativeKeyCode()){
+				memberSearchButton.click();
 			}
 		});
 	}
@@ -108,66 +119,33 @@ public class TeamViewImpl extends Composite implements TeamView {
 	}
 	
 	private void setDropdownHandlers() {
-		inviteMemberItem.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				gwt.scheduleDeferred(new Callback() {
-					@Override
-					public void invoke() {
-						presenter.showInviteModal();		
-					}
-				});
-			}
+		inviteMemberItem.addClickHandler(event ->  {
+			gwt.scheduleDeferred(() -> {
+				presenter.showInviteModal();		
+			});
 		});
-		editTeamItem.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				gwt.scheduleDeferred(new Callback() {
-					@Override
-					public void invoke() {
-						presenter.showEditModal();		
-					}
-				});
-			}
+		editTeamItem.addClickHandler(event -> {
+			gwt.scheduleDeferred(() -> {
+				presenter.showEditModal();		
+			});
 		});
-		deleteTeamItem.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				gwt.scheduleDeferred(new Callback() {
-					@Override
-					public void invoke() {
-						presenter.showDeleteModal();		
-					}
-				});
-			}
+		deleteTeamItem.addClickHandler(event -> {
+			gwt.scheduleDeferred(() -> {
+				presenter.showDeleteModal();		
+			});
 		});
-		leaveTeamItem.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				gwt.scheduleDeferred(new Callback() {
-					@Override
-					public void invoke() {
-						presenter.showLeaveModal();		
-					}
-				});
-			}
+		leaveTeamItem.addClickHandler(event -> {
+			gwt.scheduleDeferred(() -> {
+				presenter.showLeaveModal();		
+			});
 		});
-		synapseEmailField.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				synapseEmailField.selectAll();
-			}
+		synapseEmailField.addClickHandler(event -> {
+			synapseEmailField.selectAll();
 		});
-		manageAccessItem.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				gwt.scheduleDeferred(new Callback() {
-					@Override
-					public void invoke() {
-						presenter.onManageAccess();		
-					}
-				});
-			}
+		manageAccessItem.addClickHandler(event -> {
+			gwt.scheduleDeferred(() -> {
+				presenter.onManageAccess();		
+			});
 		});
 	}
 	
@@ -181,6 +159,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		leaveTeamItem.setVisible(false);
 		publicJoinField.setVisible(false);
 		synapseEmailField.setValue("");
+		memberSearchTextBox.setValue("");
 	}
 	
 	@Override
@@ -285,7 +264,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	}
 
 	@Override
-	public void setTotalMemberCount(String memberCount) {
+	public void setMemberCountShown(String memberCount) {
 		totalMemberCountField.setText(memberCount);
 	}
 

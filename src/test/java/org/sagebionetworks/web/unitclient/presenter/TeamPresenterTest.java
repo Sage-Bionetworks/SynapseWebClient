@@ -163,7 +163,7 @@ public class TeamPresenterTest {
 		
 		//once
 		verify(mockView).setPublicJoinVisible(canPublicJoin);
-		verify(mockView).setTotalMemberCount(totalMembershipCount.toString());
+		verify(mockView).setMemberCountShown(totalMembershipCount.toString());
 		verify(mockView).setMediaObjectPanel(mockTeam);
 		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockView).showMemberMenuItems();
@@ -199,7 +199,7 @@ public class TeamPresenterTest {
 		
 		//once
 		verify(mockView).setPublicJoinVisible(false);
-		verify(mockView).setTotalMemberCount(totalMembershipCount.toString());
+		verify(mockView).setMemberCountShown(totalMembershipCount.toString());
 		verify(mockView).setMediaObjectPanel(mockTeam);
 		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockJoinWidget).configure(eq(teamId), anyBoolean(), eq(mockTeamMembershipStatus), 
@@ -221,7 +221,7 @@ public class TeamPresenterTest {
 		
 		//once
 		verify(mockView).setPublicJoinVisible(canPublicJoin);
-		verify(mockView).setTotalMemberCount(totalMembershipCount.toString());
+		verify(mockView).setMemberCountShown(totalMembershipCount.toString());
 		verify(mockView).setMediaObjectPanel(mockTeam);
 		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockView).showMemberMenuItems();
