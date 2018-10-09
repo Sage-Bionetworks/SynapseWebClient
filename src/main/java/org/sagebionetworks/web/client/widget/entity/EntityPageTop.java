@@ -49,7 +49,6 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -91,6 +90,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	private CookieProvider cookies;
 	private EventBus eventBus;
 	public boolean pushTabUrlToBrowserHistory = false;
+	
+	public static final int ALL_PARTS_MASK = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME | BENEFACTOR_ACL | TABLE_DATA | ACL | BENEFACTOR_ACL;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -294,7 +295,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	public void configureProject() {
 		view.setProjectLoadingVisible(true);
 		hideTabs();
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME | BENEFACTOR_ACL | TABLE_DATA | ACL | BENEFACTOR_ACL;
 		projectBundle = null;
 		projectBundleLoadError = null;
 		projectMetadata.setVisible(false);
@@ -319,11 +319,10 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				showSelectedTabs();
 			}
 		};
-		synapseJavascriptClient.getEntityBundle(projectHeader.getId(), mask, callback);
+		synapseJavascriptClient.getEntityBundle(projectHeader.getId(), ALL_PARTS_MASK, callback);
 	}
 
 	public void configureEntity(String entityId, final Long version) {
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME | BENEFACTOR_ACL | TABLE_DATA | ACL | BENEFACTOR_ACL;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
@@ -342,7 +341,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		if (entityId != null && projectBundle != null && entityId.equals(projectBundle.getEntity().getId())) {
 			callback.onSuccess(projectBundle);
 		} else {
-			synapseJavascriptClient.getEntityBundleForVersion(entityId, version, mask, callback);	
+			synapseJavascriptClient.getEntityBundleForVersion(entityId, version, ALL_PARTS_MASK, callback);	
 		}
 	}
 
