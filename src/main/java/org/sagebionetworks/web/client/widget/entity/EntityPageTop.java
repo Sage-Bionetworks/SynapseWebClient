@@ -49,6 +49,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -338,7 +339,11 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				view.showErrorMessage(caught.getMessage());
 			}
 		};
-		synapseJavascriptClient.getEntityBundleForVersion(entityId, version, mask, callback);
+		if (entityId != null && projectBundle != null && entityId.equals(projectBundle.getEntity().getId())) {
+			callback.onSuccess(projectBundle);
+		} else {
+			synapseJavascriptClient.getEntityBundleForVersion(entityId, version, mask, callback);	
+		}
 	}
 
 	public void reconfigureCurrentArea() {
