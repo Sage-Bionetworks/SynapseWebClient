@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 
@@ -27,6 +28,7 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	private SynapseJavascriptClient jsClient;
 	private AuthenticationController authenticationController;
 	private Callback teamUpdatedCallback;
+	private CallbackP<Long> membersShownCallback;
 	private LoadMoreWidgetContainer membersContainer;
 	
 	@Inject
@@ -54,10 +56,11 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 		});
 	}
 
-	public void configure(String teamId, boolean isAdmin, Callback teamUpdatedCallback) {
+	public void configure(String teamId, boolean isAdmin, Callback teamUpdatedCallback, CallbackP<Long> membersShownCallback) {
 		this.teamId = teamId;
 		this.isAdmin = isAdmin;
 		this.teamUpdatedCallback = teamUpdatedCallback;
+		this.membersShownCallback = membersShownCallback;
 		view.clearMembers();
 		offset = 0;
 		loadMore();
@@ -68,7 +71,7 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	}
 	
 	public void refresh() {
-		configure(teamId, isAdmin, teamUpdatedCallback);
+		configure(teamId, isAdmin, teamUpdatedCallback, membersShownCallback);
 	}
 	
 	public void loadMore() {
@@ -78,6 +81,9 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 				offset += MEMBER_LIMIT;
 				
 				long numberOfMembers = memberList.getTotalNumberOfResults();
+				if (membersShownCallback != null) {
+					membersShownCallback.invoke(numberOfMembers);
+				}
 				membersContainer.setIsMore(offset < numberOfMembers);
 				view.addMembers(memberList.getResults(), isAdmin);
 			}
@@ -126,7 +132,6 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 		});
 	}
 	
-	@Override
 	public void search(String searchTerm) {
 		//New search term, and the offset must reset
 		this.searchTerm = searchTerm;

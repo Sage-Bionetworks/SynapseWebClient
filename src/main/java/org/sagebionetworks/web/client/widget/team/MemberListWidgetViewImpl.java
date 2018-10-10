@@ -2,9 +2,6 @@ package org.sagebionetworks.web.client.widget.team;
 
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.Row;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -21,15 +18,11 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -39,27 +32,15 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 	
 	private Presenter presenter;
 	private PortalGinInjector portalGinInjector;
-	private TextBox searchField;
-	private SimplePanel memberSearchContainer;
 	private SimplePanel loadMoreWidgetContainer;
 	private LoadMoreWidgetContainer loadMoreWidget;
-	private Div membersPanel;
+	
 	@Inject
 	public MemberListWidgetViewImpl(SageImageBundle sageImageBundle,
 			PortalGinInjector portalGinInjector) {
 		this.portalGinInjector = portalGinInjector;
-		memberSearchContainer = new SimplePanel();
-		membersPanel = new Div();
-		membersPanel.addStyleName("light-border padding-10");
-		Div membersTitle = new Div();
-		membersTitle.addStyleName("highlight-title");
-		membersTitle.add(new Text(DisplayConstants.MEMBERS));
-		membersPanel.add(membersTitle);
 		loadMoreWidgetContainer = new SimplePanel();
-		membersPanel.add(loadMoreWidgetContainer);
-		configureSearchBox();
-		add(memberSearchContainer);
-		add(membersPanel);
+		add(loadMoreWidgetContainer);
 	}
 	@Override
 	public void setMembersContainer(LoadMoreWidgetContainer loadMoreWidget) {
@@ -71,41 +52,6 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-
-	private void configureSearchBox() {
-		memberSearchContainer.clear();
-		SimplePanel container;
-		Row horizontalTable = new Row();
-		horizontalTable.addStyleName("margin-bottom-5");
-	    searchField = new TextBox();
-	    searchField.setWidth("300px");
-	    searchField.addStyleName("form-control");
-	    searchField.addKeyDownHandler(new KeyDownHandler() {				
-			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					presenter.search(searchField.getValue());
-	            }					
-			}
-		});
-		Button searchButton = DisplayUtils.createButton("Member Search");
-		searchButton.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.search(searchField.getValue());
-			}
-		});
-		
-		// add to table and page
-		container = new SimplePanel(searchButton);
-		container.addStyleName("right width-150 padding-left-5");
-		horizontalTable.add(container);
-		container = new SimplePanel(searchField);
-		container.addStyleName("right");
-		horizontalTable.add(container);
-		memberSearchContainer.add(horizontalTable);
-	}
-	
 	
 	@Override
 	public void addMembers(List<TeamMemberBundle> members, boolean isAdmin) {

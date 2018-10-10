@@ -38,10 +38,6 @@
 	        <g:SimplePanel ui:field="synAlertPanel"/>
 	    	<div class="row">
 		    	<g:HTMLPanel ui:field="mainContainer" styleName="col-md-12">
-		    		<bh:Div>
-			    		<bh:Span addStyleNames="boldText margin-right-5" text="Total members: " />
-			    	    <bh:Span ui:field="totalMemberCountField" />
-		    		</bh:Div>
 		    	    <bh:Span ui:field="publicJoinField" visible="false" addStyleNames="boldText margin-right-5" text="Can be joined without team manager authorization " />
 		    	    <g:TextBox ui:field="synapseEmailField" width="100%" addStyleNames="border-none noBackground margin-right-15" readOnly="true" />
 		    	    <b:Anchor ui:field="showMapLink" text="Show map" icon="MAP_MARKER" visible="false"/>
@@ -57,7 +53,23 @@
 		    	    <g:SimplePanel ui:field="joinTeamPanel" addStyleNames="margin-bottom-5"/>
 		    		<g:SimplePanel ui:field="openMembershipRequestsPanel" addStyleNames="margin-bottom-5"/>
 		    		<g:SimplePanel ui:field="openUserInvitationsPanel" addStyleNames="margin-bottom-5"/>
-		    		<g:SimplePanel ui:field="memberListPanel" addStyleNames="margin-bottom-5"/>
+		    		<bh:Div pull="RIGHT" marginTop="10" marginBottom="5" width="445px">
+		    			<b:InputGroup>
+							<b:TextBox ui:field="memberSearchTextBox" height="35px" width="300px" />
+							<b:InputGroupButton>
+								<b:Button ui:field="memberSearchButton" text="Member Search" icon="SEARCH"/>
+							</b:InputGroupButton>
+						</b:InputGroup>
+		    		</bh:Div>
+		    		<bh:ClearFix/>
+		    		<bh:Div addStyleNames="margin-bottom-5 padding-10 light-border">
+		    			<bh:Div addStyleNames="highlight-title">
+			    			<bh:Text>Members (</bh:Text>
+			    			<bh:Text ui:field="totalMemberCountField" />
+			    			<bh:Text>)</bh:Text>
+			    		</bh:Div>
+			    		<g:SimplePanel ui:field="memberListPanel"/>
+		    		</bh:Div>
 		    	</g:HTMLPanel>
 		   	</div>
 		   	<div>

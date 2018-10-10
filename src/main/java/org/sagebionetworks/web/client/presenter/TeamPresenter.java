@@ -169,19 +169,19 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				team = result.getTeam();
 				TeamMembershipStatus teamMembershipStatus = result.getTeamMembershipStatus();
 				boolean isAdmin = result.isUserAdmin();
-				Callback refreshCallback = new Callback() {
-					@Override
-					public void invoke() {
-						refresh(teamId);
-					}
+				Callback refreshCallback = () -> {
+					refresh(teamId);
+				};
+				CallbackP<Long> memberCountUpdated = count -> {
+					view.setMemberCountShown(count.toString());
 				};
 				boolean canPublicJoin = team.getCanPublicJoin() == null ? false : team.getCanPublicJoin();
 				view.setPublicJoinVisible(canPublicJoin);
-				view.setTotalMemberCount(result.getTotalMemberCount().toString());
+				view.setMemberCountShown(result.getTotalMemberCount().toString());
 				view.setMediaObjectPanel(team);
 				boolean canSendEmail = teamMembershipStatus != null && teamMembershipStatus.getCanSendEmail();
 				view.setTeamEmailAddress(getTeamEmail(team.getName(), canSendEmail));
-				memberListWidget.configure(teamId, isAdmin, refreshCallback);				
+				memberListWidget.configure(teamId, isAdmin, refreshCallback, memberCountUpdated);				
 				openMembershipRequestsWidget.setVisible(isAdmin);
 				
 				if (teamMembershipStatus == null || !teamMembershipStatus.getIsMember()) {
@@ -287,6 +287,10 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	public void onManageAccess() {
 		AccessRequirementsPlace place = new AccessRequirementsPlace(AccessRequirementsPlace.ID_PARAM + "=" + team.getId() + "&" + AccessRequirementsPlace.TYPE_PARAM + "=" + RestrictableObjectType.TEAM.toString());
 		goTo(place);
+	}
+	@Override
+	public void onMemberSearch(String searchTerm) {
+		memberListWidget.search(searchTerm);
 	}
 }
 

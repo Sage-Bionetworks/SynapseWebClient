@@ -25,6 +25,5 @@ public interface MemberListWidgetView extends IsWidget {
 		void goTo(Place place);
 		void removeMember(String principalId);
 		void setIsAdmin(String principalId, boolean isAdmin);
-		void search(String searchTerm);
 	}
 }
