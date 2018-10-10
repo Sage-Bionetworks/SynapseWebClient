@@ -7,11 +7,13 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.Linkify;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineHTML;
@@ -25,14 +27,17 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 	SageImageBundle sageImageBundle;
 	IconsImageBundle iconsImageBundle;
 	SimplePanel notificationsPanel;
+	Linkify linkify;
 	@Inject
 	public BigTeamBadgeViewImpl(SynapseJSNIUtils synapseJSNIUtils,
 			GlobalApplicationState globalApplicationState,
-			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle) {
+			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle,
+			Linkify linkify) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.globalApplicationState = globalApplicationState;
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
+		this.linkify = linkify;
 		addStyleName("bigTeamBadge");
 		notificationsPanel = new SimplePanel();
 		notificationsPanel.addStyleName("displayInline pull-left margin-left-5");
@@ -56,8 +61,8 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 		if (team.getIcon() != null && team.getIcon().length() > 0) {
 			pictureUrl = synapseJSNIUtils.getFileHandleAssociationUrl(team.getId(), FileHandleAssociateType.TeamAttachment, team.getIcon());
 		}
-		
-		addBadgeMedia(team.getId(), DisplayUtils.getMediaObject(name, description, clickHandler,  pictureUrl, false, 5));
+		String descriptionWithoutHtml = SafeHtmlUtils.htmlEscape(description);
+		addBadgeMedia(team.getId(), DisplayUtils.getMediaObject(name, linkify.linkify(descriptionWithoutHtml), clickHandler,  pictureUrl, false, 5));
 	}
 	
 	@Override
