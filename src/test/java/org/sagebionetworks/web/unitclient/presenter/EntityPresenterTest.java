@@ -119,11 +119,11 @@ public class EntityPresenterTest {
 		
 		entityPresenter.setPlace(place);
 		//verify that background image is cleared
-		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), eq(EntityPageTop.ALL_PARTS_MASK), any(AsyncCallback.class));
 		verify(mockView, times(2)).setLoadingVisible(Mockito.anyBoolean());
 		verify(mockView).setEntityPageTopVisible(true);
 		verify(mockEntityPageTop, atLeastOnce()).clearState();
-		verify(mockEntityPageTop).configure(eq(eb.getEntity()), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
+		verify(mockEntityPageTop).configure(eq(eb), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
 		verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop);
 		verify(mockView).setOpenTeamInvitesWidget(mockOpenInviteWidget);
 		verify(mockHeaderWidget).refresh();
@@ -142,7 +142,7 @@ public class EntityPresenterTest {
 		verify(mockView, times(2)).setLoadingVisible(Mockito.anyBoolean());
 		verify(mockView).setEntityPageTopVisible(true);
 		verify(mockEntityPageTop, atLeastOnce()).clearState();
-		verify(mockEntityPageTop).configure(eq(eb.getEntity()), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
+		verify(mockEntityPageTop).configure(eq(eb), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
 		
 		verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop);
 	}

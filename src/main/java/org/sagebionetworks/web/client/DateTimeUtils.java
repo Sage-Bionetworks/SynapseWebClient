@@ -32,6 +32,7 @@ public interface DateTimeUtils {
 	 */
 	String getLongFriendlyDate(Date toFormat);
 	String getDateString(Date toFormat);
+	String getYear(Date toFormat);
 	void setShowUTCTime(boolean showUTC);
 	boolean isShowingUTCTime();
 	String getFriendlyTimeEstimate(long totalSeconds);

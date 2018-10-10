@@ -1439,5 +1439,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(FileHandleAssociationRowView.class).to(FileHandleAssociationRowViewImpl.class);
 		bind(AddToDownloadListView.class).to(AddToDownloadListViewImpl.class);
 		bind(EntityPresenterEventBinder.class).to(EntityPresenterEventBinderImpl.class);
+		bind(Linkify.class).to(LinkifyImpl.class);
 	}
 }

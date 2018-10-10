@@ -57,6 +57,7 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -184,6 +185,22 @@ public class PreviewWidgetTest {
 		verify(mockView).setImagePreview(anyString());
 	}
 	
+	@Test
+	public void testErrorResponse() {
+		String statusText = "Not found";
+		when(mockResponse.getStatusCode()).thenReturn(Response.SC_NOT_FOUND);
+		when(mockResponse.getStatusText()).thenReturn(statusText);
+		PreviewFileHandle fh = new PreviewFileHandle();
+		fh.setId("previewFileId");
+		fh.setFileName("preview.txt");
+		fh.setContentType("txt/plain");
+		testFileHandleList.add(fh);
+		
+		previewWidget.configure(testBundle);
+		
+		verify(mockView).addSynapseAlertWidget(any(IsWidget.class));
+		verify(mockSynapseAlert).showError(statusText);
+	}
 	
 	@Test
 	public void testPreviewHtmlContentType(){
