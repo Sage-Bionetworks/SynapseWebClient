@@ -1424,5 +1424,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(Moment.class).to(MomentImpl.class);
 		bind(DownloadSpeedTester.class).to(DownloadSpeedTesterImpl.class);
 		bind(EntityPresenterEventBinder.class).to(EntityPresenterEventBinderImpl.class);
+		bind(Linkify.class).to(LinkifyImpl.class);
 	}
 }

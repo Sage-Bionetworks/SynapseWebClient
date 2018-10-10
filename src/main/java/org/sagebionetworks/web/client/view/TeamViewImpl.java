@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.Linkify;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -20,6 +21,7 @@ import org.sagebionetworks.web.client.widget.team.InviteWidget;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -88,16 +90,20 @@ public class TeamViewImpl extends Composite implements TeamView {
 	private Header headerWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private GWTWrapper gwt;
+	private Linkify linkify;
+	
 	@Inject
 	public TeamViewImpl(TeamViewImplUiBinder binder, 
 			InviteWidget inviteWidget, 
 			Header headerWidget, 
 			SynapseJSNIUtils synapseJSNIUtils,
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			Linkify linkify) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.gwt = gwt;
+		this.linkify = linkify;
 		setDropdownHandlers();
 		headerWidget.configure();
 		showMapLink.addClickHandler(event -> {
@@ -208,7 +214,8 @@ public class TeamViewImpl extends Composite implements TeamView {
 		if (team.getIcon() != null) {
 			pictureUrl = synapseJSNIUtils.getFileHandleAssociationUrl(team.getId(), FileHandleAssociateType.TeamAttachment, team.getIcon());
 		}
-		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(team.getName(), team.getDescription(), null,  pictureUrl, false, 2);
+		String descriptionWithoutHtml = SafeHtmlUtils.htmlEscape(team.getDescription());
+		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(team.getName(), linkify.linkify(descriptionWithoutHtml), null,  pictureUrl, false, 2);
 		mediaObjectContainer.setWidget(mediaObjectPanel.asWidget());
 		mapModal.setTitle(team.getName());
 	}	
