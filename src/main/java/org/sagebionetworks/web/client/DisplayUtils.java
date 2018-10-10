@@ -1025,7 +1025,7 @@ public class DisplayUtils {
  		mediaBodyPanel.addStyleName("media-body");
  		mediaBodyPanel.add(headingHtml);
  		if (description != null)
- 			mediaBodyPanel.add(new HTML(SafeHtmlUtils.htmlEscape(description)));
+ 			mediaBodyPanel.add(new HTML(description));
  		panel.add(mediaBodyPanel);
  		return panel;
 	}
