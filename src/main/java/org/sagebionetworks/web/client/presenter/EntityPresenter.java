@@ -136,7 +136,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		view.setSynAlertWidget(synAlert.asWidget());
 		// Hide the view panel contents until async callback completes
 		view.setLoadingVisible(true);
-		int mask = ENTITY | ENTITY_PATH;
+		int mask = EntityPageTop.ALL_PARTS_MASK;
 		final AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
@@ -160,7 +160,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 				if(projectHeader == null) {
 					synAlert.showError(DisplayConstants.ERROR_GENERIC_RELOAD);
 				} else {
-					entityPageTop.configure(bundle.getEntity(), versionNumber, projectHeader, area, areaToken);
+					entityPageTop.configure(bundle, versionNumber, projectHeader, area, areaToken);
 					view.setEntityPageTopWidget(entityPageTop);
 					view.setEntityPageTopVisible(true);
 					headerWidget.configure(projectHeader);	
