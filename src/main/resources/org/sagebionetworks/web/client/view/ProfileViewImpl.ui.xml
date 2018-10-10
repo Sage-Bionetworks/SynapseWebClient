@@ -40,7 +40,7 @@
                                             </g:FocusPanel>
                                         </a>
                                     </li>
-                                    <li class="entity-tab active margin-left-15" ui:field="projectsListItem">
+                                    <li class="entity-tab active" ui:field="projectsListItem">
                                         <a class="text-align-center link no-background">
                                             <g:FocusPanel ui:field="projectsFocusPanel" addStyleNames="displayInline" tabIndex="-1">
                                                 <b:Anchor ui:field="projectsLink" addStyleNames="textDecorationNone">Projects</b:Anchor>
