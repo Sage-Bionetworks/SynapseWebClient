@@ -35,6 +35,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.RequestBuilderMockStubber;
 
 import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -151,4 +152,19 @@ public class DownloadSpeedTesterImplTest {
 		verifyZeroInteractions(mockRequestBuilder, mockJsClient);
 		verify(mockCallback).onSuccess(Double.valueOf(cachedDownloadSpeedString));
 	}
+	
+	@Test
+	public void testCachedInvalidValueDownloadSpeed() throws RequestException {
+		String cachedDownloadSpeedString = Double.toString(Double.POSITIVE_INFINITY);
+		when(mockClientCache.contains(DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY)).thenReturn(true);
+		when(mockClientCache.get(DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY)).thenReturn(cachedDownloadSpeedString);
+		
+		downloadSpeedTester.testDownloadSpeed(mockCallback);
+		
+		//verify it runs the test
+		verify(mockJsClient).getEntity(anyString(), any(AsyncCallback.class));
+		verify(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
+		verify(mockCallback).onSuccess(anyDouble());
+	}
+
 }

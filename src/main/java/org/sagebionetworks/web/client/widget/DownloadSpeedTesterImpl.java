@@ -63,8 +63,11 @@ public class DownloadSpeedTesterImpl implements DownloadSpeedTester {
 	public void testDownloadSpeed(final AsyncCallback<Double> callback) {
 		if (clientCache.contains(ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY)) {
 			String downloadSpeedString = clientCache.get(ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY);
-			callback.onSuccess(Double.parseDouble(downloadSpeedString));
-			return;
+			double downloadSpeed = Double.parseDouble(downloadSpeedString);
+			if (!Double.isInfinite(downloadSpeed) && !Double.isNaN(downloadSpeed)) {
+				callback.onSuccess(Double.parseDouble(downloadSpeedString));
+				return;
+			}
 		}
 		// must be logged in to check download speed
 		if (authController.isLoggedIn()) {
