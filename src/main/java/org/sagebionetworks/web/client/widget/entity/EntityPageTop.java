@@ -59,7 +59,7 @@ import com.google.web.bindery.event.shared.binder.EventHandler;
 public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	public static final String PROJECT_SETTINGS = "Project Settings";
 	private EntityPageTopView view;
-	private EntityBundle projectBundle, filesEntityBundle, tablesEntityBundle, dockerEntityBundle;
+	private EntityBundle currentTargetEntityBundle, projectBundle, filesEntityBundle, tablesEntityBundle, dockerEntityBundle;
 	private Throwable projectBundleLoadError;
 	private Entity entity;
 	private SynapseJavascriptClient synapseJavascriptClient;
@@ -91,7 +91,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	private EventBus eventBus;
 	public boolean pushTabUrlToBrowserHistory = false;
 	
-	public static final int ALL_PARTS_MASK = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME | BENEFACTOR_ACL | TABLE_DATA | ACL | BENEFACTOR_ACL;
+	public static final int ALL_PARTS_MASK = ENTITY | ENTITY_PATH | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME | BENEFACTOR_ACL | TABLE_DATA | ACL | BENEFACTOR_ACL;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -258,7 +258,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	 *
 	 * @param bundle
 	 */
-	public void configure(Entity entity, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea initArea, String areaToken) {
+	public void configure(EntityBundle targetEntityBundle, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea initArea, String areaToken) {
+		this.currentTargetEntityBundle = targetEntityBundle;
 		pushTabUrlToBrowserHistory = false;
 		this.projectHeader = projectHeader;
 		this.area = initArea;
@@ -268,7 +269,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		discussionAreaToken = null;
 		dockerAreaToken = null;
 		filesVersionNumber = versionNumber;
-		this.entity = entity;
+		this.entity = targetEntityBundle.getEntity();
 
 		//note: the files/tables/wiki/discussion/docker tabs rely on the project bundle, so they are configured later
 		configureProject();
@@ -308,18 +309,22 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				
 				initAreaToken();
 				showSelectedTabs();
-				configureEntity(entity.getId(), filesVersionNumber);
+				updateEntityBundle(currentTargetEntityBundle, filesVersionNumber);
 			}
 
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setProjectLoadingVisible(false);
 				projectBundleLoadError = caught;
-				configureEntity(entity.getId(), filesVersionNumber);
+				updateEntityBundle(currentTargetEntityBundle, filesVersionNumber);
 				showSelectedTabs();
 			}
 		};
-		synapseJavascriptClient.getEntityBundle(projectHeader.getId(), ALL_PARTS_MASK, callback);
+		if (projectHeader.getId().equals(currentTargetEntityBundle.getEntity().getId())) {
+			callback.onSuccess(currentTargetEntityBundle);
+		} else {
+			synapseJavascriptClient.getEntityBundle(projectHeader.getId(), ALL_PARTS_MASK, callback);	
+		}
 	}
 
 	public void configureEntity(String entityId, final Long version) {
@@ -327,10 +332,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				updateEntityBundle(bundle, version);
-				boolean isCurrentVersion = version == null;
-				entityActionController.configure(entityActionMenu, bundle, isCurrentVersion, null, area);
-				projectMetadata.setVisible(bundle.getEntity() instanceof Project);
-				reconfigureCurrentArea();
 			}
 
 			@Override
@@ -379,6 +380,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	}
 
 	public void updateEntityBundle(EntityBundle bundle, Long version) {
+		this.currentTargetEntityBundle = bundle;
 		entity = bundle.getEntity();
 		// Redirect if Entity is a Link
 		if(entity instanceof Link) {
@@ -411,6 +413,10 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				dockerChanged(bundle);
 			}
 		}
+		boolean isCurrentVersion = version == null;
+		entityActionController.configure(entityActionMenu, bundle, isCurrentVersion, null, area);
+		projectMetadata.setVisible(bundle.getEntity() instanceof Project);
+		reconfigureCurrentArea();
 	}
 
 	private void dockerChanged(EntityBundle bundle) {
