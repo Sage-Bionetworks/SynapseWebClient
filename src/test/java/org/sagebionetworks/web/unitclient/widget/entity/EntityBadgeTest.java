@@ -87,7 +87,6 @@ public class EntityBadgeTest {
 	String rootWikiKeyId;
 	List<Annotation> annotationList;
 	Annotations annotations;
-	UserBadge mockUserBadge;
 	UserEntityPermissions mockPermissions;
 	AccessControlList mockBenefactorAcl;
 	@Mock
@@ -98,8 +97,6 @@ public class EntityBadgeTest {
 	PublicPrincipalIds mockPublicPrincipalIds;
 	@Mock
 	ResourceAccess mockResourceAccess;
-	@Mock
-	DateTimeUtils mockDateTimeUtils;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
@@ -119,16 +116,15 @@ public class EntityBadgeTest {
 		getInfoCallback = mock(AsyncCallback.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockTransformer = mock(AnnotationTransformer.class);
-		mockUserBadge = mock(UserBadge.class);
 		mockPermissions = mock(UserEntityPermissions.class);
 		when(mockPermissions.getCanPublicRead()).thenReturn(true);
 		mockBenefactorAcl = mock(AccessControlList.class);
 		when(mockBenefactorAcl.getId()).thenReturn("not the current entity id");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer,
-				mockUserBadge, mockSynapseJavascriptClient,
+				mockSynapseJavascriptClient,
 				mockFileDownloadButton, mockLazyLoadHelper,
-				mockDateTimeUtils, mockPopupUtils, mockSynapseProperties);
+				mockPopupUtils, mockSynapseProperties);
 		
 		when(mockSynapseProperties.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
 		annotationList = new ArrayList<Annotation>();
@@ -204,12 +200,6 @@ public class EntityBadgeTest {
 		String entityId = "syn12345";
 		FileEntity testFile = new FileEntity();
 		testFile.setId(entityId);
-		Long modifiedByPrincipalId = 12345L;
-		testFile.setModifiedBy(modifiedByPrincipalId.toString());
-		Date modifiedOn = new Date();
-		String smallDateString="10/02/2000 01:26:45PM";
-		when(mockDateTimeUtils.getDateTimeString(any(Date.class))).thenReturn(smallDateString);
-		testFile.setModifiedOn(modifiedOn);
 		when(mockPublicPrincipalIds.isPublic(anyLong())).thenReturn(true);
 		entityThreadCount = 1L;
 		setupEntity(testFile);
@@ -217,11 +207,6 @@ public class EntityBadgeTest {
 		widget.getEntityBundle();
 		
 		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		verify(mockUserBadge).configure(modifiedByPrincipalId.toString());
-		verify(mockView).setModifiedByWidgetVisible(true);
-		verify(mockDateTimeUtils).getDateTimeString(modifiedOn);
-		verify(mockView).setModifiedOn(smallDateString);
-				
 		verify(mockView).showPublicIcon();
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).showHasWikiIcon();
