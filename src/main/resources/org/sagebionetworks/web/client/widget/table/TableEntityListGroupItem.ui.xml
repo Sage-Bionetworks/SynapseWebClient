@@ -9,6 +9,7 @@
 
 	<t:Table width="100%" height="36px">
 		<t:TableRow>
+			<t:TableHeader width="20px"/>
 			<t:TableData width="20px">
 				<g:FocusPanel ui:field="iconContainer">
 					<b:Icon ui:field="icon" type="TABLE"/>
@@ -19,7 +20,7 @@
 					<g:FlowPanel ui:field="entityContainer" addStyleNames="displayInline pull-left"/>
 				</bh:Div>
 			</t:TableData>
-			<t:TableData width="310px" addStyleNames="visible-xl overflow-x-hidden">
+			<t:TableData width="310px" addStyleNames="visible-md visible-lg overflow-x-hidden">
 				<bh:Div ui:field="modifiedByField"/>
 			</t:TableData>
 			<t:TableData width="165px" addStyleNames="visible-md visible-lg overflow-x-hidden">

@@ -2,15 +2,15 @@ package org.sagebionetworks.web.client.widget.table;
 import static org.sagebionetworks.web.client.DisplayUtils.TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER;
 
 import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DateTimeUtils;
+import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -38,6 +38,8 @@ public class TableEntityListGroupItem implements IsWidget {
 	Label modifiedOnField;
 	@UiField
 	FlowPanel entityContainer;
+	@UiField
+	Icon icon;
 
 	public interface Binder extends UiBinder<IsWidget, TableEntityListGroupItem> {}
 	public IsWidget w;
@@ -68,6 +70,7 @@ public class TableEntityListGroupItem implements IsWidget {
 		if (header.getModifiedOn() != null) {
 			modifiedOnField.setText(dateTimeUtils.getDateTimeString(header.getModifiedOn()));	
 		}
+		icon.setType(EntityTypeUtils.getIconTypeForEntityClassName(header.getType()));
 	}
 	
 	@Override

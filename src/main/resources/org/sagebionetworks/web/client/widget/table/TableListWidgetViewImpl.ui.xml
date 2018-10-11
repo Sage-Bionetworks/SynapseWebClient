@@ -11,25 +11,27 @@
 		<bh:Div ui:field="sortButtonContainer"/>
 		<w:LoadingSpinner size="40px" ui:field="loadingUI" addStyleNames="center-block center" visible="false"/>
 		<bh:Span ui:field="emptyUI" text="&#8212; Empty" visible="false" marginLeft="15"/>
-		<t:Table ui:field="columnHeaders" width="100%">
-			<t:TableRow>
-				<t:TableHeader width="20px" />
-				<t:TableHeader>
-					<bh:Span text="Name" />
-				</t:TableHeader>
-				<t:TableHeader width="310px" addStyleNames="visible-xl">
-					<bh:Span text="Modified By"/>
-				</t:TableHeader>
-				<t:TableHeader width="165px" addStyleNames="visible-md visible-lg">
-					<bh:Span text="Modified On" />
-				</t:TableHeader>
-				<t:TableHeader width="130px" addStyleNames="visible-md visible-lg">
-					<bh:Span text="ID" />
-				</t:TableHeader>
-			</t:TableRow>
-		</t:Table>
-		<bh:Hr ui:field="hrUnderTableHeaders" addStyleNames="margin-top-5 margin-bottom-5" />
-		<bh:Div ui:field="tablesList" />
-		<bh:Div ui:field="loadMoreWidgetContainer"/>
+		<bh:Div addStyleNames="highlight-box padding-10" marginTop="0">
+			<t:Table ui:field="columnHeaders" width="100%">
+				<t:TableRow>
+					<t:TableHeader width="20px"/>
+					<t:TableHeader>
+						<bh:Span text="Name" />
+					</t:TableHeader>
+					<t:TableHeader width="310px" addStyleNames="visible-md visible-lg">
+						<bh:Span text="Modified By"/>
+					</t:TableHeader>
+					<t:TableHeader width="165px" addStyleNames="visible-md visible-lg">
+						<bh:Span text="Modified On" />
+					</t:TableHeader>
+					<t:TableHeader width="130px" addStyleNames="visible-md visible-lg">
+						<bh:Span text="ID" />
+					</t:TableHeader>
+				</t:TableRow>
+			</t:Table>
+			<bh:Hr ui:field="hrUnderTableHeaders" addStyleNames="margin-top-5 margin-bottom-5" />
+			<bh:Div ui:field="tablesList" />
+			<bh:Div ui:field="loadMoreWidgetContainer"/>
+		</bh:Div>
 	</g:HTMLPanel>
 </ui:UiBinder>
