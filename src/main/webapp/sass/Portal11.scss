@@ -147,6 +147,7 @@ end sticky footer
 	}
 	.checkbox, .radio {
 		padding-left: 0px;
+		min-width: 27px;
 	}
 	input[type="checkbox"], input[type="radio"] {
 		display:none;
