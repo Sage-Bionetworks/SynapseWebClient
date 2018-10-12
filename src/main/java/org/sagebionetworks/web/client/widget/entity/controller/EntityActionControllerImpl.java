@@ -400,7 +400,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureProvenance();
 		configureChangeStorageLocation();
 		configureCreateOrUpdateDoi();
-		configureCreateDOI();
 		configureEditProjectMetadataAction();
 		configureEditFileMetadataAction();
 		configureAddEvaluationAction();
@@ -505,26 +504,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 	
-	private void configureCreateDOI() {
-		if (!DisplayUtils.isInTestWebsite(cookies)) {
-			boolean canEdit = permissions.getCanEdit();
-			actionMenu.setActionVisible(Action.CREATE_DOI, false);
-			if (canEdit &&
-					!isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea) &&
-					!(entityBundle.getEntity() instanceof EntityView)) {
-				actionMenu.setActionListener(Action.CREATE_DOI, this);
-				if (entityBundle.getDoi() == null) {
-					// show command if not returned, thus not in existence
-					actionMenu.setActionVisible(Action.CREATE_DOI, true);
-					actionMenu.setActionText(Action.CREATE_DOI, "DOI minting is under maintenance");
-					actionMenu.setActionEnabled(Action.CREATE_DOI, false);
-				}
-			}
-		} else {
-			actionMenu.setActionVisible(Action.CREATE_DOI, false);
-		}
-	}
-	
 	private void configureCreateChallenge() {
 		currentChallengeId = null;
 		actionMenu.setActionVisible(Action.CREATE_CHALLENGE, false);
@@ -581,23 +560,19 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void configureCreateOrUpdateDoi() {
-		if (DisplayUtils.isInTestWebsite(cookies)) {
-			boolean canEdit = permissions.getCanEdit();
-			actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
-			if (canEdit &&
-					!isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea) &&
-					!(entityBundle.getEntity() instanceof EntityView)) {
-				actionMenu.setActionListener(Action.CREATE_OR_UPDATE_DOI, this);
-				actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
-				if (entityBundle.getDoiAssociation() == null) {
-					// show command if not returned, thus not in existence
-					actionMenu.setActionText(Action.CREATE_OR_UPDATE_DOI, CREATE_DOI_FOR + enityTypeDisplay);
-				} else {
-					actionMenu.setActionText(Action.CREATE_OR_UPDATE_DOI, UPDATE_DOI_FOR + enityTypeDisplay);
-				}
+		boolean canEdit = permissions.getCanEdit();
+		actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
+		if (canEdit &&
+				!isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea) &&
+				!(entityBundle.getEntity() instanceof EntityView)) {
+			actionMenu.setActionListener(Action.CREATE_OR_UPDATE_DOI, this);
+			actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
+			if (entityBundle.getDoiAssociation() == null) {
+				// show command if not returned, thus not in existence
+				actionMenu.setActionText(Action.CREATE_OR_UPDATE_DOI, CREATE_DOI_FOR + enityTypeDisplay);
+			} else {
+				actionMenu.setActionText(Action.CREATE_OR_UPDATE_DOI, UPDATE_DOI_FOR + enityTypeDisplay);
 			}
-		} else {
-			actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
 		}
 	}
 
@@ -979,9 +954,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			break;
 		case CHANGE_STORAGE_LOCATION:
 			onChangeStorageLocation();
-			break;
-		case CREATE_DOI:
-			onCreateDOI();
 			break;
 		case CREATE_OR_UPDATE_DOI:
 			onCreateOrUpdateDoi();
