@@ -970,14 +970,15 @@ public class SynapseJavascriptClient {
 		return getFuture(cb -> doPost(url, entry, OBJECT_TYPE.None, cb));
 	}
 	
-	public FluentFuture<Void> logError(String label, Throwable ex) {
+	public FluentFuture<Void> logError(Throwable ex) {
 		LogEntry entry = new LogEntry();
-		String exceptionString = ex.getMessage();
-		if (exceptionString == null) {
-			exceptionString = ex.toString();
+		String exceptionString = gwt.getCurrentHistoryToken().substring(1) + ":" + ex.getMessage();
+		String versionInfo = getSynapseVersionInfo();
+		if (versionInfo.contains("-")) {
+			versionInfo = versionInfo.substring(0, versionInfo.indexOf('-'));	
 		}
 		String outputExceptionString = exceptionString.substring(0, Math.min(exceptionString.length(), MAX_LOG_ENTRY_LABEL_SIZE));
-		entry.setLabel(getSynapseVersionInfo() + ": " + label + ": " + outputExceptionString);
+		entry.setLabel(versionInfo + ":" + outputExceptionString);
 		entry.setMessage(gwt.getCurrentURL() + " : \n" + ex.getMessage());
 		return logError(entry);
 	}
