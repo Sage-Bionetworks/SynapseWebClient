@@ -439,9 +439,13 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	public void consoleError(String message) {
 		_consoleError(message);
 	}
+	@Override
+	public void consoleError(Throwable t) {
+		_consoleError(t);
+	}
 
-	public final static native void _consoleError(String message) /*-{
-		console.error(message);
+	public final static native void _consoleError(Object ob) /*-{
+		console.error(ob);
 	}-*/;
 	
 	@Override

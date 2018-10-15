@@ -33,7 +33,6 @@ import com.google.inject.Inject;
 public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public static final String RECENTLY_CHECKED_SYNAPSE_VERSION = "org.sagebionetworks.web.client.recently-checked-synapse-version";
 	public static final String DEFAULT_REFRESH_PLACE = "!Home:0";
-	public static final String UNCAUGHT_JS_EXCEPTION = "Uncaught JS Exception:";
 	private PlaceController placeController;
 	private CookieProvider cookieProvider;
 	private AppPlaceHistoryMapper appPlaceHistoryMapper;
@@ -94,11 +93,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public void handleUncaughtException(Throwable e) {
 		try {
 			GWT.debugger();
-			jsClient.logError(UNCAUGHT_JS_EXCEPTION, unwrap(e));
+			jsClient.logError(unwrap(e));
 		} catch (Throwable t) {
 			synapseJSNIUtils.consoleError("Unable to log uncaught exception to server: " + t.getMessage());
 		} finally {
-			synapseJSNIUtils.consoleError(UNCAUGHT_JS_EXCEPTION + e.getMessage() + ": " + e.getStackTrace());	
+			synapseJSNIUtils.consoleError(e);	
 		}
 	}
 	
