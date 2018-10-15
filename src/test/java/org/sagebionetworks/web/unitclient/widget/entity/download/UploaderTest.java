@@ -772,7 +772,7 @@ public class UploaderTest {
 	public void testUploadFailed() {
 		String message = "meow there's an error.";
 		uploader.uploadFailed(message);
-		verify(mockSynapseJavascriptClient).logError(eq(message), any(Exception.class));
+		verify(mockSynapseJavascriptClient).logError(any(Exception.class));
 	}
 	
 	@Test

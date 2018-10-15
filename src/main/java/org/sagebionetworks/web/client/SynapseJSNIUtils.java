@@ -51,6 +51,7 @@ public interface SynapseJSNIUtils {
 	String getWebkitRelativePath(JavaScriptObject fileList, int index);
 	public void consoleLog(String message);
 	public void consoleError(String message);
+	public void consoleError(Throwable t);
 	
 	public void processWithMathJax(Element element);	
 
