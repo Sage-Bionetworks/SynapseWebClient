@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.PresignedAndFileHandleURLAsyncHandler;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -124,9 +125,9 @@ public class DownloadSpeedTesterImpl implements DownloadSpeedTester {
 					int statusCode = response.getStatusCode();
 					if (statusCode == Response.SC_OK) {
 						// done!
-						long endTime = new Date().getTime();
-						long msElapsed = endTime - startTime;
-						double downloadSpeed = fileSize / (msElapsed / 1000);
+						double endTime = new Date().getTime();
+						double msElapsed = endTime - startTime;
+						double downloadSpeed = fileSize / (msElapsed / 1000.0);
 						updateCachedDownloadSpeed(downloadSpeed); 
 						callback.onSuccess(downloadSpeed);
 					} else {
