@@ -22,9 +22,12 @@ import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.repo.model.file.FileResultFailureCode;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandlerImpl;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -40,6 +43,12 @@ public class FileHandleAsyncHandlerImplTest {
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	GWTWrapper mockGwt;
+	@Mock
+	ClientCache mockClientCache;
+	@Mock
+	AdapterFactory mockAdapterFactory;
+	@Mock
+	JSONObjectAdapter mockJSONObjectAdapter;
 	String fileHandleId = "123";
 	@Mock
 	AsyncCallback mockCallback;
@@ -58,12 +67,13 @@ public class FileHandleAsyncHandlerImplTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		fileHandleAsyncHandler = new FileHandleAsyncHandlerImpl(mockSynapseJavascriptClient, mockGwt);
+		fileHandleAsyncHandler = new FileHandleAsyncHandlerImpl(mockSynapseJavascriptClient, mockGwt, mockClientCache, mockAdapterFactory);
 		resultList = new ArrayList<FileResult>();
 		AsyncMockStubber.callSuccessWith(mockResult).when(mockSynapseJavascriptClient).getFileHandleAndUrlBatch(any(BatchFileRequest.class), any(AsyncCallback.class));
 		when(mockResult.getRequestedFiles()).thenReturn(resultList);
 		when(mockFileResult.getFileHandleId()).thenReturn(fileHandleId);
 		when(mockFileAssociation.getFileHandleId()).thenReturn(fileHandleId);
+		when(mockAdapterFactory.createNew()).thenReturn(mockJSONObjectAdapter);
 	}
 	
 	@Test

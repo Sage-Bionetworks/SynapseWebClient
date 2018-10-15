@@ -53,6 +53,12 @@ public class FileHandleAssociationTable implements IsWidget, SortingListener {
 			view.addRow(row);
 			rows.add(row);
 		}
+		// if previously sorted, apply to new data
+		if (currentlySortingColumn != null) {
+			// toggle sort direction so that it will toggle back to the correct sort
+			sortDir = SortDirection.ASC.equals(sortDir) ? SortDirection.DESC : SortDirection.ASC;
+			onToggleSort(currentlySortingColumn);
+		}
 	}
 	
 	@Override
