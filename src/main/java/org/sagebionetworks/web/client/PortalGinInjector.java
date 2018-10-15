@@ -195,6 +195,7 @@ import org.sagebionetworks.web.client.widget.sharing.AclAddPeoplePanel;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGrid;
 import org.sagebionetworks.web.client.widget.subscription.TopicRowWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
+import org.sagebionetworks.web.client.widget.table.TableEntityListGroupItem;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
@@ -587,4 +588,5 @@ public interface PortalGinInjector extends Ginjector {
 	EditDiscussionThreadModal getEditDiscussionThreadModal();
 	DownloadListWidget getDownloadListWidget();
 	FileHandleAssociationRow getFileHandleAssociationRow(); 
+	TableEntityListGroupItem getTableEntityListGroupItem();
 }

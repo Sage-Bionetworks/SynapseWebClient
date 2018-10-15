@@ -6,16 +6,16 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,12 +37,10 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PopupUtilsView;
@@ -56,18 +54,14 @@ import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
-import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItem;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import org.springframework.mock.web.MockJspWriter;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 
 public class EntityBadgeTest {
 
@@ -91,7 +85,6 @@ public class EntityBadgeTest {
 	String rootWikiKeyId;
 	List<Annotation> annotationList;
 	Annotations annotations;
-	UserBadge mockUserBadge;
 	UserEntityPermissions mockPermissions;
 	AccessControlList mockBenefactorAcl;
 	@Mock
@@ -100,8 +93,6 @@ public class EntityBadgeTest {
 	PublicPrincipalIds mockPublicPrincipalIds;
 	@Mock
 	ResourceAccess mockResourceAccess;
-	@Mock
-	DateTimeUtils mockDateTimeUtils;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
@@ -125,16 +116,15 @@ public class EntityBadgeTest {
 		getInfoCallback = mock(AsyncCallback.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockTransformer = mock(AnnotationTransformer.class);
-		mockUserBadge = mock(UserBadge.class);
 		mockPermissions = mock(UserEntityPermissions.class);
 		when(mockPermissions.getCanPublicRead()).thenReturn(true);
 		mockBenefactorAcl = mock(AccessControlList.class);
 		when(mockBenefactorAcl.getId()).thenReturn("not the current entity id");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer,
-				mockUserBadge, mockSynapseJavascriptClient,
+				mockSynapseJavascriptClient,
 				mockLazyLoadHelper,
-				mockDateTimeUtils, mockPopupUtils, mockSynapseProperties, 
+				mockPopupUtils, mockSynapseProperties, 
 				mockEventBus);
 		
 		when(mockSynapseProperties.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
@@ -214,12 +204,6 @@ public class EntityBadgeTest {
 		String entityId = "syn12345";
 		FileEntity testFile = new FileEntity();
 		testFile.setId(entityId);
-		Long modifiedByPrincipalId = 12345L;
-		testFile.setModifiedBy(modifiedByPrincipalId.toString());
-		Date modifiedOn = new Date();
-		String smallDateString="10/02/2000 01:26:45PM";
-		when(mockDateTimeUtils.getDateTimeString(any(Date.class))).thenReturn(smallDateString);
-		testFile.setModifiedOn(modifiedOn);
 		when(mockPublicPrincipalIds.isPublic(anyLong())).thenReturn(true);
 		entityThreadCount = 1L;
 		setupEntity(testFile);
@@ -227,11 +211,6 @@ public class EntityBadgeTest {
 		widget.getEntityBundle();
 		
 		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		verify(mockUserBadge).configure(modifiedByPrincipalId.toString());
-		verify(mockView).setModifiedByWidgetVisible(true);
-		verify(mockDateTimeUtils).getDateTimeString(modifiedOn);
-		verify(mockView).setModifiedOn(smallDateString);
-				
 		verify(mockView).showPublicIcon();
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).showHasWikiIcon();
