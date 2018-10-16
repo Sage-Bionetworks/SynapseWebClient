@@ -1770,6 +1770,9 @@ ol.lowerroman {
 		float: left;
 		max-width: 460px;
 	}
+	.min-width-200-unless-xs {
+		min-width: 200px;
+	}
 }
 @media (max-width: 500px) {
     .hidden-xxs {
