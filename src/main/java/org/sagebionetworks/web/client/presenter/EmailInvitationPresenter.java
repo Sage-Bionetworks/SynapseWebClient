@@ -41,7 +41,7 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 	private SynapseAlert synapseAlert;
 	private AuthenticationController authController;
 	private PlaceChanger placeChanger;
-
+	private String teamId;
 	@Inject
 	public EmailInvitationPresenter(
 			EmailInvitationView view,
@@ -83,6 +83,7 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 					new FutureCallback<MembershipInvitation>() {
 						@Override
 						public void onSuccess(MembershipInvitation mis) {
+							teamId = mis.getTeamId();
 							if (!authController.isLoggedIn()) {
 								initializeView(mis);
 							} else {
@@ -110,7 +111,7 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 					new FutureCallback<Void>() {
 						@Override
 						public void onSuccess(Void aVoid) {
-							placeChanger.goTo(new Profile(authController.getCurrentUserPrincipalId(), Synapse.ProfileArea.TEAMS));
+							placeChanger.goTo(new org.sagebionetworks.web.client.place.Team(teamId));
 						}
 
 						@Override
