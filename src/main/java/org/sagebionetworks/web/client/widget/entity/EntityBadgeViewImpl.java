@@ -93,7 +93,10 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		this.dateTimeUtils = dateTimeUtils;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		initWidget(uiBinder.createAndBindUi(this));
-		placeChanger = globalAppState.getPlaceChanger();
+		if (EntityBadgeViewImpl.placeChanger == null) {
+			EntityBadgeViewImpl.placeChanger = ginInjector.getGlobalApplicationState().getPlaceChanger(); 
+		}
+		
 		idField.addClickHandler(TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER);
 		md5Field.addClickHandler(TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER);
 		addToDownloadListLink.addClickHandler(event -> {
