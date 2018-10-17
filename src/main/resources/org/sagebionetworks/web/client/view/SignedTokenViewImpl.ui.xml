@@ -36,28 +36,30 @@
 						dataDismiss="MODAL">Cancel</b:Button>
 				</b:ModalFooter>
 			</b:Modal>
-			<!-- Success UI -->
-			<b:Row ui:field="successUI">
-				<b:Column size="XS_12, MD_6" offset="MD_3">
-					<bh:Div>
-						<b:Alert type="SUCCESS">
-							<b:Heading size="H3" ui:field="successMessage" addStyleNames="color-white" />
-						</b:Alert>
-					</bh:Div>
-				</b:Column>
-			</b:Row>
-			
-			<!-- Error UI and standard ok button-->
-			<b:Row>
-				<b:Column size="XS_12, MD_6" offset="MD_3">
-					<g:SimplePanel ui:field="synapseAlertContainer" />
-				</b:Column>
-			</b:Row>
-			<b:Row addStyleNames="margin-top-60">
-				<b:Column size="XS_12, MD_6" offset="MD_3">
-					<b:Button ui:field="okButton" type="PRIMARY" text="Continue" size="LARGE" pull="RIGHT"></b:Button>
-				</b:Column>
-			</b:Row>
+			<bh:Div ui:field="otherUI">
+				<!-- Success UI -->
+				<b:Row ui:field="successUI">
+					<b:Column size="XS_12, MD_6" offset="MD_3">
+						<bh:Div>
+							<b:Alert type="SUCCESS">
+								<b:Heading size="H3" ui:field="successMessage" addStyleNames="color-white" />
+							</b:Alert>
+						</bh:Div>
+					</b:Column>
+				</b:Row>
+				
+				<!-- Error UI and standard ok button-->
+				<b:Row>
+					<b:Column size="XS_12, MD_6" offset="MD_3">
+						<g:SimplePanel ui:field="synapseAlertContainer" />
+					</b:Column>
+				</b:Row>
+				<b:Row addStyleNames="margin-top-60">
+					<b:Column size="XS_12, MD_6" offset="MD_3">
+						<b:Button ui:field="okButton" type="PRIMARY" text="Continue" size="LARGE" pull="RIGHT"></b:Button>
+					</b:Column>
+				</b:Row>
+			</bh:Div>
 		</b:Container>
 	</bh:Div>
 
