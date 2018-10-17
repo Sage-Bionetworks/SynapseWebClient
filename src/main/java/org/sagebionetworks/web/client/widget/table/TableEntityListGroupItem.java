@@ -7,6 +7,8 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
@@ -47,10 +49,13 @@ public class TableEntityListGroupItem implements IsWidget {
 	private DateTimeUtils dateTimeUtils;
 	
 	@Inject
-	TableEntityListGroupItem(Binder binder, UserBadge modifiedByBadge, DateTimeUtils dateTimeUtils){
+	TableEntityListGroupItem(Binder binder, UserBadge modifiedByBadge, DateTimeUtils dateTimeUtils, PortalGinInjector ginInjector){
 		w = binder.createAndBindUi(this);
 		this.modifiedByBadge = modifiedByBadge;
 		this.dateTimeUtils = dateTimeUtils;
+		if (EntityBadgeViewImpl.placeChanger == null) {
+			EntityBadgeViewImpl.placeChanger = ginInjector.getGlobalApplicationState().getPlaceChanger(); 
+		}
 		idField.addClickHandler(TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER);
 	}
 	
