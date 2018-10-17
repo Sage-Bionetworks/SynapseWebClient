@@ -85,9 +85,9 @@ public class EmailInvitationPresenterTest {
 		presenter.setPlace(place);
 		verify(jsClient).getInviteeVerificationSignedToken(mis.getId());
 		verify(jsClient).updateInviteeId(inviteeVerificationSignedToken);
-		ArgumentCaptor<Profile> captor = ArgumentCaptor.forClass(Profile.class);
+		ArgumentCaptor<org.sagebionetworks.web.client.place.Team> captor = ArgumentCaptor.forClass(org.sagebionetworks.web.client.place.Team.class);
 		verify(placeChanger).goTo(captor.capture());
-		assertEquals(Synapse.ProfileArea.TEAMS, captor.getValue().getArea());
+		assertEquals(mis.getTeamId(), captor.getValue().getTeamId());
 	}
 
 	@Test

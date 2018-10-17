@@ -868,7 +868,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	@Override
 	public void uploadFailed(String string) {
 		this.uploadError(string, new Exception(string));
-		jsClient.logError(string, new Exception(string));
+		jsClient.logError(new Exception(string));
 	}
 	
 	/**

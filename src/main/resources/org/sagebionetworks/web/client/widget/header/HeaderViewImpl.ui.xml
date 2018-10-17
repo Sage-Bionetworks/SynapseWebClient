@@ -36,7 +36,7 @@
 	        	<g:Image ui:field="synapseLogo" url="images/logo.svg" 
 	        	    addStyleNames="imageButton margin-right-5 moveup-5" width="35px" height="35px"/>
 	            <b:Heading size="H3" addStyleNames="displayInline color-white">
-	            	<b:Anchor ui:field="projectHeadingAnchor" addStyleNames="color-white textDecorationNone lato notransition hidden-xxs"/>
+	            	<b:Anchor ui:field="projectHeadingAnchor" addStyleNames="color-white textDecorationNone lato notransition"/>
 	        	</b:Heading>
 		  	</bh:Div>
 		  	<bh:Div ui:field="projectFavoritePanelUI" addStyleNames="inline-block favoriteIcon hidden-xs vertical-align-top">
@@ -46,7 +46,7 @@
 		  		<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-10 margin-right-10 padding-left-15" visible="false">
 					<b:Button ui:field="loginLink" text="&nbsp;&nbsp;&nbsp;Sign in&nbsp;&nbsp;&nbsp;" type="SUCCESS" marginTop="7"/>
 				</g:SimplePanel>
-				<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-left-10 padding-right-10 imageButton min-width-200 hideLeftPixelOnHover" visible="false" height="53px" paddingTop="10">
+				<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-left-10 padding-right-10 imageButton min-width-200-unless-xs hideLeftPixelOnHover" visible="false" height="53px" paddingTop="10">
 					<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" />
 					<b:Icon type="ANGLE_DOWN" addStyleNames="margin-left-30 color-white"/>
 					<b:DropDownMenu ui:field="dashboardDropdownMenu" width="100%">

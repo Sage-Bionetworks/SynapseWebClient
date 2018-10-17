@@ -137,7 +137,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		userBadge.setStyleNames("padding-top-2");
 		this.globalAppState = globalAppState;
 		userBadge.setSize(BadgeSize.LARGE);
-		userBadge.addUsernameLinkStyle("color-white textDecorationNone padding-left-5");
+		userBadge.addUsernameLinkStyle("color-white textDecorationNone padding-left-5 hidden-xxs");
 		// add search panel first
 		searchBox.setVisible(true);
 		searchBoxContainer.add(searchBox.asWidget());
