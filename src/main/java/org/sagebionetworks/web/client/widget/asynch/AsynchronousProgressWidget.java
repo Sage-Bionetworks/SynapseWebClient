@@ -20,7 +20,7 @@ public class AsynchronousProgressWidget implements
 	/**
 	 * The format used to convert doubles to strings.
 	 */
-	public static final String PERCENT_FORMAT = "00";
+	public static final String PERCENT_FORMAT = "0";
 	/**
 	 * The number of milliseconds to wait between status checks.
 	 */
