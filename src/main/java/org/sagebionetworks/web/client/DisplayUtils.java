@@ -173,21 +173,22 @@ public class DisplayUtils {
 		return notifySettings;
 	}
 	
+	private static final NumberFormat fileSizeFormat = NumberFormat.getFormat("0.0");
+	private static final NumberFormat decimalFormat = NumberFormat.getDecimalFormat();
 	public static String getFriendlySize(double size, boolean abbreviatedUnits) {
-		NumberFormat df = NumberFormat.getDecimalFormat();
 		if(size >= TB) {
-            return df.format(size/TB) + (abbreviatedUnits?" TB":" Terabytes");
+            return decimalFormat.format(size/TB) + (abbreviatedUnits?" TB":" Terabytes");
         }
 		if(size >= GB) {
-            return df.format(size/GB) + (abbreviatedUnits?" GB":" Gigabytes");
+            return decimalFormat.format(size/GB) + (abbreviatedUnits?" GB":" Gigabytes");
         }
 		if(size >= MB) {
-            return df.format(size/MB) + (abbreviatedUnits?" MB":" Megabytes");
+            return fileSizeFormat.format(size/MB) + (abbreviatedUnits?" MB":" Megabytes");
         }
 		if(size >= KB) {
-            return df.format(size/KB) + (abbreviatedUnits?" KB":" Kilobytes");
+            return fileSizeFormat.format(size/KB) + (abbreviatedUnits?" KB":" Kilobytes");
         }
-        return df.format(size) + " bytes";
+        return fileSizeFormat.format(size) + " bytes";
     }
 		
 	/**

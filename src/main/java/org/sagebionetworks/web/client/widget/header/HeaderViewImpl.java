@@ -86,6 +86,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	AnchorListItem mySettingsLink;
 	@UiField
+	AnchorListItem myDownloadsLink;
+	@UiField
 	AnchorListItem helpForumLink;
 	@UiField
 	AnchorListItem sendFeedbackLink;
@@ -229,6 +231,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		});
 		mySettingsLink.addClickHandler(event -> {
 			Profile place = new Profile(userId, ProfileArea.SETTINGS);
+			globalAppState.getPlaceChanger().goTo(place);
+			hideDropdown();
+		});
+		myDownloadsLink.addClickHandler(event -> {
+			Profile place = new Profile(userId, ProfileArea.DOWNLOADS);
 			globalAppState.getPlaceChanger().goTo(place);
 			hideDropdown();
 		});
