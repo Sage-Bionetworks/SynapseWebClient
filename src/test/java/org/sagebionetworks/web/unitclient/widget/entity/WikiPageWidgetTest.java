@@ -144,6 +144,8 @@ public class WikiPageWidgetTest {
 		verify(mockView).setLoadingVisible(true);
 		verify(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), any(Long.class));
+		verify(mockView).setNoWikiCanEditMessageVisible(false);
+		verify(mockView).setNoWikiCannotEditMessageVisible(false);
 		verify(mockView).setWikiHistoryWidget(any(IsWidget.class));
 		verify(mockView).setModifiedCreatedByHistoryPanelVisible(true);
 		verify(mockView).setModifiedOn(formattedDate);
@@ -181,7 +183,7 @@ public class WikiPageWidgetTest {
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null);
 		
 		verify(mockStuAlert, never()).handleException(any(Exception.class));
-		verify(mockView).setMarkdownVisible(false);
+		verify(mockView, times(2)).setMarkdownVisible(false);
 		verify(mockView).setWikiHistoryVisible(false);
 		verify(mockView).setNoWikiCannotEditMessageVisible(true);
 		verify(mockView).setModifiedCreatedByHistoryPanelVisible(false);
@@ -194,7 +196,7 @@ public class WikiPageWidgetTest {
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null);
 		
 		verify(mockStuAlert, never()).handleException(any(Exception.class));
-		verify(mockView).setMarkdownVisible(false);
+		verify(mockView, times(2)).setMarkdownVisible(false);
 		verify(mockView).setWikiHistoryVisible(false);
 		verify(mockView).setNoWikiCanEditMessageVisible(true);
 		verify(mockView).setModifiedCreatedByHistoryPanelVisible(false);
@@ -360,5 +362,26 @@ public class WikiPageWidgetTest {
 		presenter.onWikiSubpagesExpandEvent(mockWikiSubpagesExpandEvent);
 		verify(mockView).expandWikiSubpages();
 	}
-
+	
+	@Test
+	public void testSetWikiPageEmptyMarkdownCannotEdit() {
+		boolean canEdit = false;
+		testPage.setMarkdown("");
+		
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, null), canEdit, null);
+		
+		verify(mockView).setNoWikiCannotEditMessageVisible(true);
+		verify(mockView).setMarkdownVisible(false);
+	}
+	
+	@Test
+	public void testSetWikiPageNullMarkdownCanEdit() {
+		boolean canEdit = true;
+		testPage.setMarkdown(null);
+		
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, null), canEdit, null);
+		
+		verify(mockView).setNoWikiCanEditMessageVisible(true);
+		verify(mockView).setMarkdownVisible(false);
+	}
 }
