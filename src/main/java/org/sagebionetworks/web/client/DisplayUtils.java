@@ -173,9 +173,16 @@ public class DisplayUtils {
 		return notifySettings;
 	}
 	
-	private static final NumberFormat fileSizeFormat = NumberFormat.getFormat("0.0");
-	private static final NumberFormat decimalFormat = NumberFormat.getDecimalFormat();
+	private static NumberFormat fileSizeFormat = null;
+	private static NumberFormat decimalFormat = null;
+	
 	public static String getFriendlySize(double size, boolean abbreviatedUnits) {
+		if (fileSizeFormat == null) {
+			fileSizeFormat = NumberFormat.getFormat("0.0");
+		}
+		if (decimalFormat == null) {
+			decimalFormat = NumberFormat.getDecimalFormat();
+		}
 		if(size >= TB) {
             return decimalFormat.format(size/TB) + (abbreviatedUnits?" TB":" Terabytes");
         }
