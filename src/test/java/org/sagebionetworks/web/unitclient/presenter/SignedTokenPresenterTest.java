@@ -8,19 +8,23 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.JoinTeamSignedToken;
 import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
+import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.place.SignedToken;
@@ -33,18 +37,27 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.NotificationTokenType;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.core.ext.Generator.RunsLocal;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class SignedTokenPresenterTest {
 	
 	SignedTokenPresenter presenter;
+	@Mock
 	SignedTokenView mockView;
+	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
 	GWTWrapper mockGWTWrapper;
+	@Mock
 	SynapseAlert mockSynapseAlert;
+	@Mock
 	SignedToken testPlace;
+	@Mock
 	UserBadge mockUserBadge;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
 	public static final String TEST_TOKEN = "314159bar";
 	public static final String TEST_HOME_PAGE_BASE = "https://www.synapse.org/";
@@ -56,22 +69,16 @@ public class SignedTokenPresenterTest {
 	PlaceChanger mockPlaceChanger;
 	@Mock
 	AuthenticationController mockAuthenticationController;
+	@Mock
+	PopupUtilsView mockPopupUtils;
 	@Captor
 	ArgumentCaptor<AsyncCallback> asyncCaptor;
 	
 	@Before
 	public void setup(){
-		MockitoAnnotations.initMocks(this);
-		mockView = mock(SignedTokenView.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockGWTWrapper = mock(GWTWrapper.class);
-		mockSynapseAlert = mock(SynapseAlert.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockUserBadge = mock(UserBadge.class);
-		presenter = new SignedTokenPresenter(mockView, mockSynapseClient, mockGWTWrapper, mockSynapseAlert, mockGlobalApplicationState, mockUserBadge, mockAuthenticationController);
+		presenter = new SignedTokenPresenter(mockView, mockSynapseClient, mockGWTWrapper, mockSynapseAlert, mockGlobalApplicationState, mockUserBadge, mockAuthenticationController, mockPopupUtils);
 		verify(mockView).setPresenter(presenter);
 		
-		testPlace = mock(SignedToken.class);
 		when(testPlace.getTokenType()).thenReturn(NotificationTokenType.JoinTeam.toString());
 		when(testPlace.getSignedEncodedToken()).thenReturn(TEST_TOKEN);
 		when(mockGWTWrapper.getHostPageBaseURL()).thenReturn(TEST_HOME_PAGE_BASE);
@@ -93,7 +100,22 @@ public class SignedTokenPresenterTest {
 	}	
 	
 	@Test
-	public void testSetPlace() {
+	public void testSetPlaceJoinTeamSignedToken() {
+		presenter.setPlace(testPlace);
+		
+		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).handleSignedToken(any(SignedTokenInterface.class), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseAlert).clear();
+		verify(mockView, times(2)).clear();
+		verify(mockView, atLeast(2)).setLoadingVisible(anyBoolean());
+		verify(mockPopupUtils).showInfo(SUCCESS_RESPONSE_MESSAGE);
+		verify(mockPlaceChanger).goTo(isA(Team.class));
+	}
+	
+	@Test
+	public void testSetPlaceEmailValidationSignedToken() {
+		AsyncMockStubber.callSuccessWith(new EmailValidationSignedToken()).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
+		
 		presenter.setPlace(testPlace);
 		
 		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
