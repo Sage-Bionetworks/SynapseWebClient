@@ -38,8 +38,9 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 	
 	String fileName, createdBy;
 	Date createdOn;
-	Long fileSize;
+	Long fileSize = null;
 	Boolean hasAccess = true;
+	CallbackP<Double> addToPackageSizeCallback;
 	@Inject
 	public FileHandleAssociationRow(
 			FileHandleAssociationRowView view,
@@ -62,6 +63,7 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 	public void configure(FileHandleAssociation fha, Callback accessRestrictionDetectedCallback, CallbackP<Double> addToPackageSizeCallback, CallbackP<FileHandleAssociation> onDeleteCallback) {
 		this.fha = fha;
 		this.onDeleteCallback = onDeleteCallback;
+		this.addToPackageSizeCallback = addToPackageSizeCallback;
 		entityHeaderAsyncHandler.getEntityHeader(fha.getAssociateObjectId(), new AsyncCallback<EntityHeader>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -99,14 +101,22 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 					if (contentSize != null) {
 						fileSize = contentSize;
 						view.setFileSize(gwt.getFriendlySize(contentSize.doubleValue(), true));
-						if (view.isAttached()) {
-							addToPackageSizeCallback.invoke(contentSize.doubleValue());	
-						}
+						updateTotalPackageSize();
 					}
 					updateCreatedBy(fileHandle.getCreatedBy());
 				}
 			};
 		});
+	}
+	@Override
+	public void onViewAttached() {
+		updateTotalPackageSize();
+	}
+	
+	public void updateTotalPackageSize() {
+		if (view.isAttached() && fileSize != null) {
+			addToPackageSizeCallback.invoke(fileSize.doubleValue());
+		}
 	}
 	
 	private void setHasAccess(boolean hasAccess) {

@@ -306,9 +306,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		if (settingsPresenter != null) {
 			settingsPresenter.clear();	
 		}
-		if (downloadListWidget != null) {
-			downloadListWidget.refresh();
-		}
 		myTeamsWidget.clear();
 		view.clearTeamNotificationCount();
 		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;

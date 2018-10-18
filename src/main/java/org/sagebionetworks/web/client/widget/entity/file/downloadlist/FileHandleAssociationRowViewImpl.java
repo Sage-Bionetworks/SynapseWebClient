@@ -39,6 +39,11 @@ public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRo
 		removeLink.addClickHandler(event->{
 			presenter.onRemove();
 		});
+		w.addAttachHandler(event -> {
+			if (event.isAttached()) {
+				presenter.onViewAttached();
+			}
+		});
 	}
 	@Override
 	public Widget asWidget() {
