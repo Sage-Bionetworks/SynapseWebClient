@@ -18,7 +18,7 @@
 							percent="0" text="0%" />
 					</b:Progress>
 				</bh:Div>
-				<b:Anchor ui:field="cancelLink" text="Cancel" pull="RIGHT" marginTop="13" marginRight="12" addStyleNames="color-white"/>
+				<b:Anchor ui:field="cancelLink" text="Cancel" marginTop="13" marginRight="12" addStyleNames="color-white margin-left-auto"/>
 			</bh:Div>
 		</b:Alert>
 	</bh:Div>
