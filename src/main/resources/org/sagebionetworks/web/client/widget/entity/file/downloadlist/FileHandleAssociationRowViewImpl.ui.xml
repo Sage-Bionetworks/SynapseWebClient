@@ -13,10 +13,10 @@
 			<b:Anchor ui:field="fileNameLink" addStyleNames="overflow-x-hidden"/>
 		</t:TableData>
 		<t:TableData ui:field="accessContainer" addStyleNames="min-width-70 hidden-xs" width="70px">
-			<bh:Span ui:field="hasAccess" addStyleNames="synapse-green-bg color-white" visible="false" paddingTop="2" paddingRight="2" paddingBottom="4" paddingLeft="2">
+			<bh:Span ui:field="hasAccess" addStyleNames="synapse-green-bg color-white img-circle" visible="false" paddingTop="2" paddingRight="1" paddingBottom="4" paddingLeft="2">
 				<b:Icon type="LOCK_OPEN"/>
 			</bh:Span>
-			<bh:Span ui:field="noAccess" addStyleNames="synapse-yellow-bg color-white" visible="false" paddingTop="2" paddingRight="2" paddingBottom="4" paddingLeft="2">
+			<bh:Span ui:field="noAccess" addStyleNames="synapse-yellow-bg color-white img-circle" visible="false" paddingTop="2" paddingRight="1" paddingBottom="4" paddingLeft="2">
 				<b:Icon type="MINUS_CIRCLE"/>
 			</bh:Span>
 		</t:TableData>
