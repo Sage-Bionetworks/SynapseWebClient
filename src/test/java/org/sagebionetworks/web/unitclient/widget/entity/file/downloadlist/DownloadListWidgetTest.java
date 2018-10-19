@@ -131,7 +131,7 @@ public class DownloadListWidgetTest {
 		verify(mockJsClient).createDownloadOrderFromUsersDownloadList(eq(fileName + DownloadListWidget.ZIP_EXTENSION), any(AsyncCallback.class));
 		verify(mockView).setProgressTrackingWidgetVisible(true);
 		verify(mockView).setCreatePackageUIVisible(false);
-		verify(mockProgressWidget).startAndTrackJob(anyString(), eq(true), eq(AsynchType.BulkFileDownload), requestCaptor.capture(), progressHandlerCaptor.capture());
+		verify(mockProgressWidget).startAndTrackJob(anyString(), eq(false), eq(AsynchType.BulkFileDownload), requestCaptor.capture(), progressHandlerCaptor.capture());
 		
 		//verify request
 		BulkFileDownloadRequest request = requestCaptor.getValue();
@@ -163,7 +163,7 @@ public class DownloadListWidgetTest {
 	public void testFailureCreatingPackage() {
 		Exception ex = new Exception("failed to create package");
 		widget.startDownload(mockDownloadOrder);
-		verify(mockProgressWidget).startAndTrackJob(anyString(), eq(true), eq(AsynchType.BulkFileDownload), requestCaptor.capture(), progressHandlerCaptor.capture());
+		verify(mockProgressWidget).startAndTrackJob(anyString(), eq(false), eq(AsynchType.BulkFileDownload), requestCaptor.capture(), progressHandlerCaptor.capture());
 		
 		progressHandlerCaptor.getValue().onFailure(ex);
 		
