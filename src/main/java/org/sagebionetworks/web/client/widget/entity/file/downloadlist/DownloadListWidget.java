@@ -127,7 +127,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 		request.setZipFileName(order.getZipFileName());
 		request.setZipFileFormat(ZipFileFormat.Flat);
 		view.setCreatePackageUIVisible(false);
-		progressWidget.startAndTrackJob("", true, AsynchType.BulkFileDownload, request, new AsynchronousProgressHandler() {
+		progressWidget.startAndTrackJob("", false, AsynchType.BulkFileDownload, request, new AsynchronousProgressHandler() {
 			@Override
 			public void onFailure(Throwable failure) {
 				view.setProgressTrackingWidgetVisible(false);
