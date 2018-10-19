@@ -41,6 +41,10 @@ public class AsynchronousProgressWidget implements
 		this.view.setPresenter(this);
 	}
 
+	public void setView(AsynchronousProgressView altView) {
+		this.view = altView;
+		altView.setPresenter(this);
+	}
 	/**
 	 * Reset this widget to track the passed status.
 	 * 

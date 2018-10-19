@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.client.widget.asynch.InlineAsynchronousProgressViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.PackageSizeSummary;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
@@ -52,6 +53,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	@Inject
 	public AddToDownloadList(AddToDownloadListView view, 
 			AsynchronousProgressWidget progress,
+			InlineAsynchronousProgressViewImpl inlineProgressView,
 			PopupUtilsView popupUtilsView,
 			EventBus eventBus,
 			SynapseAlert synAlert,
@@ -61,6 +63,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 		this.view = view;
 		this.popupUtilsView = popupUtilsView;
 		this.progress = progress;
+		progress.setView(inlineProgressView);
 		view.setAsynchronousProgressWidget(progress);
 		this.eventBus = eventBus;
 		this.synAlert = synAlert;
@@ -169,7 +172,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	
 	public void startAddingFiles() {
 		view.showAsynchronousProgressWidget();
-		progress.startAndTrackJob("Adding files to Download List", false, AsynchType.AddFileToDownloadList, request, new AsynchronousProgressHandler() {
+		progress.startAndTrackJob("Adding files to Download List...", false, AsynchType.AddFileToDownloadList, request, new AsynchronousProgressHandler() {
 			@Override
 			public void onFailure(Throwable failure) {
 				synAlert.handleException(failure);

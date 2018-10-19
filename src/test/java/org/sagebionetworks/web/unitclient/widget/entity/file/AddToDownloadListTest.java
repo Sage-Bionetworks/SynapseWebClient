@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.client.widget.asynch.InlineAsynchronousProgressViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadListView;
@@ -50,6 +51,8 @@ public class AddToDownloadListTest {
 	EventBus mockEventBus;
 	@Mock
 	AsynchronousProgressWidget mockAsynchronousProgressWidget;
+	@Mock
+	InlineAsynchronousProgressViewImpl mockInlineAsynchronousProgressView;
 	@Mock
 	PopupUtilsView mockPopupUtils;
 	@Mock
@@ -93,7 +96,7 @@ public class AddToDownloadListTest {
 	public void setUp() throws Exception {
 		downloadListFilesBefore = new ArrayList<FileHandleAssociation>();
 		downloadListFilesAfter = new ArrayList<FileHandleAssociation>();
-		widget = new AddToDownloadList(mockView, mockAsynchronousProgressWidget, mockPopupUtils, mockEventBus, mockSynAlert, mockPackageSizeSummary, mockJsClient);
+		widget = new AddToDownloadList(mockView, mockAsynchronousProgressWidget, mockInlineAsynchronousProgressView, mockPopupUtils, mockEventBus, mockSynAlert, mockPackageSizeSummary, mockJsClient);
 		AsyncMockStubber.callSuccessWith(mockDownloadListBefore).when(mockJsClient).getDownloadList(any(AsyncCallback.class));
 		when(mockAddFileToDownloadListResponse.getDownloadList()).thenReturn(mockDownloadListAfter);
 		when(mockEntityChildrenResponse.getTotalChildCount()).thenReturn(testFolderChildCount);
@@ -109,6 +112,8 @@ public class AddToDownloadListTest {
 
 	@Test
 	public void testAddQueryToDownloadList() {
+		verify(mockAsynchronousProgressWidget).setView(mockInlineAsynchronousProgressView);
+		
 		widget.addToDownloadList(queryEntityId, mockQuery);
 		
 		verify(mockAsynchronousProgressWidget).startAndTrackJob(anyString(), eq(false), eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), asyncProgressHandlerCaptor.capture());

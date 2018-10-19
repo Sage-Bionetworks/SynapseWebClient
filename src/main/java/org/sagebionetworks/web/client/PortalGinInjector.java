@@ -56,6 +56,7 @@ import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.Cr
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.OpenSubmissionWidget;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.client.widget.asynch.InlineAsynchronousProgressViewImpl;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditor;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditor;
@@ -450,6 +451,7 @@ public interface PortalGinInjector extends Ginjector {
 
 	// Asynchronous
 	AsynchronousProgressWidget creatNewAsynchronousProgressWidget();
+	InlineAsynchronousProgressViewImpl getInlineAsynchronousProgressView();
 
 	UserTeamBadge getUserTeamBadgeWidget();
 	TeamBadge getTeamBadgeWidget();
