@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.client.widget.asynch.InlineAsynchronousProgressViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidget;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidgetView;
@@ -73,9 +74,12 @@ public class DownloadListWidgetTest {
 	ArgumentCaptor<AsynchronousProgressHandler> progressHandlerCaptor;
 	@Mock
 	BulkFileDownloadResponse mockBulkFileDownloadResponse;
+	@Mock
+	InlineAsynchronousProgressViewImpl mockInlineAsynchronousProgressView;
+	
 	@Before
 	public void setUp() throws Exception {
-		widget = new DownloadListWidget(mockView, mockSynAlert, mockJsClient, mockEventBus, mockFhaTable, mockPackageSizeSummary, mockProgressWidget, mockJsniUtils);
+		widget = new DownloadListWidget(mockView, mockSynAlert, mockJsClient, mockEventBus, mockFhaTable, mockPackageSizeSummary, mockProgressWidget, mockInlineAsynchronousProgressView, mockJsniUtils);
 		when(mockDownloadList.getFilesToDownload()).thenReturn(mockFhas);
 		when(mockDownloadOrder.getFiles()).thenReturn(mockFhas);
 		AsyncMockStubber.callSuccessWith(mockDownloadList).when(mockJsClient).getDownloadList(any(AsyncCallback.class));

@@ -421,15 +421,18 @@ end sticky footer
 	font: 10px;	
 }
 
+.dropshadow-on-hover:hover {
+	@include box-shadow(2px 3px 5px 0px rgba(0,0,0,0.75));
+}
 /* drop shaddow */
-.dropshaddow {
+.dropshadow {
 	background: #fff;
 	border: 1px solid;
 	border-color: #dcdcdc #d1d1d1 #c3c3c3;
 	@include box-shadow(rgba(0, 0, 0, 0.3) 0 1px 3px);
 }
 
-.dropshaddow:nth-child(1n) {
+.dropshadow:nth-child(1n) {
 	border: none;
 }
 

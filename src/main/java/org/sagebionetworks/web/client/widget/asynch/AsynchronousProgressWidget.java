@@ -122,11 +122,4 @@ public class AsynchronousProgressWidget implements
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-
-	@Override
-	public void onCancel() {
-		// Calling cancel on the tracker will feed-back to this widget.
-		jobTracker.cancel();
-	}
-
 }

@@ -52,8 +52,9 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	private LazyLoadHelper lazyLoadHelper;
 	private PopupUtilsView popupUtils;
 	private SynapseProperties synapseProperties;
-	private FileHandle dataFileHandle;
 	private EventBus eventBus;
+	private String dataFileHandleId;
+	
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
 			GlobalApplicationState globalAppState,
@@ -116,7 +117,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		Annotations annotations = eb.getAnnotations();
 		String rootWikiId = eb.getRootWikiId();
 		List<FileHandle> handles = eb.getFileHandles();
-		dataFileHandle = getDataFileHandle(handles);
+		FileHandle dataFileHandle = getDataFileHandle(handles);
 		if (PublicPrivateBadge.isPublic(eb.getBenefactorAcl(), synapseProperties.getPublicPrincipalIds())) {
 			view.showPublicIcon();
 		} else {
@@ -141,7 +142,8 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			view.showHasWikiIcon();
 		}
 		
-		if (eb.getEntity() instanceof FileEntity && dataFileHandle != null) {
+		if (eb.getEntity() instanceof FileEntity && ((FileEntity)eb.getEntity()).getDataFileHandleId() != null) {
+			dataFileHandleId = ((FileEntity)eb.getEntity()).getDataFileHandleId();
 			view.showAddToDownloadList();
 		}
 		
@@ -232,7 +234,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	@Override
 	public void onAddToDownloadList() {
 		// TODO: add special popup to report how many items are in the current download list, and link to download list.
-		jsClient.addFileToDownloadList(dataFileHandle.getId(), entityHeader.getId(), new AsyncCallback<DownloadList>() {
+		jsClient.addFileToDownloadList(dataFileHandleId, entityHeader.getId(), new AsyncCallback<DownloadList>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setError(caught.getMessage());

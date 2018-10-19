@@ -64,11 +64,7 @@ public class AddToDownloadListTest {
 	@Mock
 	SynapseJavascriptClient mockJsClient;
 	@Mock
-	DownloadList mockDownloadListBefore;
-	@Mock
 	AddFileToDownloadListResponse mockAddFileToDownloadListResponse;
-	@Mock
-	DownloadList mockDownloadListAfter;
 	@Mock
 	EntityChildrenResponse mockEntityChildrenResponse;
 	@Mock
@@ -89,20 +85,13 @@ public class AddToDownloadListTest {
 	SumFileSizes mockSumFileSizes;
 	String folderId = "syn10932", queryEntityId = "syn9";
 	Long testFolderChildCount = 22L, testFolderSumFileSizesBytes = 7777777L;
-	List<FileHandleAssociation> downloadListFilesBefore, downloadListFilesAfter;
 	Long queryCount = 4L;
 	Long querySumFileSize = 88L;
 	@Before
 	public void setUp() throws Exception {
-		downloadListFilesBefore = new ArrayList<FileHandleAssociation>();
-		downloadListFilesAfter = new ArrayList<FileHandleAssociation>();
 		widget = new AddToDownloadList(mockView, mockAsynchronousProgressWidget, mockInlineAsynchronousProgressView, mockPopupUtils, mockEventBus, mockSynAlert, mockPackageSizeSummary, mockJsClient);
-		AsyncMockStubber.callSuccessWith(mockDownloadListBefore).when(mockJsClient).getDownloadList(any(AsyncCallback.class));
-		when(mockAddFileToDownloadListResponse.getDownloadList()).thenReturn(mockDownloadListAfter);
 		when(mockEntityChildrenResponse.getTotalChildCount()).thenReturn(testFolderChildCount);
 		when(mockEntityChildrenResponse.getSumFileSizesBytes()).thenReturn(testFolderSumFileSizesBytes);
-		when(mockDownloadListBefore.getFilesToDownload()).thenReturn(downloadListFilesBefore);
-		when(mockDownloadListAfter.getFilesToDownload()).thenReturn(downloadListFilesAfter);
 		when(mockQueryResultBundle.getQueryCount()).thenReturn(queryCount);
 		//mock query sum file size
 		querySumFileSize = 20L;
@@ -136,7 +125,6 @@ public class AddToDownloadListTest {
 		widget.onConfirmAddToDownloadList();
 		
 		verify(mockView, times(4)).hideAll();
-		verify(mockJsClient).getDownloadList(any(AsyncCallback.class));
 		verify(mockView).setAsynchronousProgressWidget(mockAsynchronousProgressWidget);
 		verify(mockAsynchronousProgressWidget).startAndTrackJob(anyString(), eq(false), eq(AsynchType.AddFileToDownloadList), requestCaptor.capture(), asyncProgressHandlerCaptor.capture());
 		
@@ -149,7 +137,7 @@ public class AddToDownloadListTest {
 		addFileToDownloadListProgressHandler.onComplete(mockAddFileToDownloadListResponse);
 		
 		verify(mockView, times(5)).hideAll();
-		verify(mockPopupUtils).showInfo(AddToDownloadList.NO_NEW_FILES_ADDED_MESSAGE);
+		verify(mockView).showSuccess(queryCount.intValue());
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
 		
 		//verify error handling in query bundle progress handler
@@ -174,14 +162,10 @@ public class AddToDownloadListTest {
 		verify(mockPackageSizeSummary).addFiles(testFolderChildCount.intValue(), testFolderSumFileSizesBytes.doubleValue());
 		verify(mockView).showConfirmAdd();
 		
-		//going to simulate a new file is added to the download list
-		downloadListFilesAfter.add(mockFileHandleAssociation);
-		
 		//simulate user confirmation
 		widget.onConfirmAddToDownloadList();
 		
 		verify(mockView, times(3)).hideAll();
-		verify(mockJsClient).getDownloadList(any(AsyncCallback.class));
 		verify(mockView).setAsynchronousProgressWidget(mockAsynchronousProgressWidget);
 		verify(mockAsynchronousProgressWidget).startAndTrackJob(anyString(), eq(false), eq(AsynchType.AddFileToDownloadList), requestCaptor.capture(), asyncProgressHandlerCaptor.capture());
 		
@@ -192,7 +176,7 @@ public class AddToDownloadListTest {
 		//simulate completing job
 		asyncProgressHandlerCaptor.getValue().onComplete(mockAddFileToDownloadListResponse);
 
-		verify(mockView).showSuccess(downloadListFilesAfter.size() - downloadListFilesBefore.size());
+		verify(mockView).showSuccess(testFolderChildCount.intValue());
 
 		//execute job failure code
 		Exception e = new Exception();

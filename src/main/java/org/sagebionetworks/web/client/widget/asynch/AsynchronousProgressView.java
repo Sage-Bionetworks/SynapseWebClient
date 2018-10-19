@@ -10,11 +10,6 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface AsynchronousProgressView extends IsWidget{
 
 	public interface Presenter {
-		/**
-		 * Called when the user clicks cancel.
-		 */
-		void onCancel();
-		
 	}
 	
 	/**

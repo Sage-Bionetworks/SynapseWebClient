@@ -11,9 +11,6 @@ import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.file.AddFileToDownloadListRequest;
-import org.sagebionetworks.repo.model.file.AddFileToDownloadListResponse;
-import org.sagebionetworks.repo.model.file.DownloadList;
-import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
@@ -46,9 +43,9 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	SynapseAlert synAlert;
 	PackageSizeSummary packageSizeSummary;
 	SynapseJavascriptClient jsClient;
-	List<FileHandleAssociation> downloadListBefore, downloadListAfter;
 	AsynchronousProgressWidget progress;
 	String queryEntityID;
+	int fileCountToAdd;
 	
 	@Inject
 	public AddToDownloadList(AddToDownloadListView view, 
@@ -74,6 +71,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 		view.hideAll();
 	}
 	public void clear() {
+		fileCountToAdd = 0;
 		view.hideAll();
 		request = new AddFileToDownloadListRequest();
 		packageSizeSummary.clear();
@@ -117,7 +115,8 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 				if (queryResultBundle.getSumFileSizes() != null && queryResultBundle.getSumFileSizes().getSumFileSizesBytes() != null) {
 					sumFileSizesBytes = queryResultBundle.getSumFileSizes().getSumFileSizesBytes().doubleValue();
 				}
-				packageSizeSummary.addFiles(queryResultBundle.getQueryCount().intValue(), sumFileSizesBytes);
+				fileCountToAdd = queryResultBundle.getQueryCount().intValue();
+				packageSizeSummary.addFiles(fileCountToAdd, sumFileSizesBytes);
 				view.showConfirmAdd();
 			}
 			
@@ -144,7 +143,8 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 			}
 			@Override
 			public void onSuccess(EntityChildrenResponse entityChildrenResponse) {
-				packageSizeSummary.addFiles(entityChildrenResponse.getTotalChildCount().intValue(), entityChildrenResponse.getSumFileSizesBytes().doubleValue());
+				fileCountToAdd = entityChildrenResponse.getTotalChildCount().intValue();
+				packageSizeSummary.addFiles(fileCountToAdd, entityChildrenResponse.getSumFileSizesBytes().doubleValue());
 				view.showConfirmAdd();
 			}
 		});
@@ -152,25 +152,11 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	
 	@Override
 	public void onConfirmAddToDownloadList() {
-		// get the current count in the download list
-		getDownloadListBeforeAdd();
-	}
-	
-	public void getDownloadListBeforeAdd() {
-		view.hideAll();
-		jsClient.getDownloadList(new AsyncCallback<DownloadList>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
-			public void onSuccess(DownloadList downloadList) {
-				downloadListBefore = downloadList.getFilesToDownload();
-				startAddingFiles();
-			};
-		});
+		startAddingFiles();
 	}
 	
 	public void startAddingFiles() {
+		view.hideAll();
 		view.showAsynchronousProgressWidget();
 		progress.startAndTrackJob("Adding files to Download List...", false, AsynchType.AddFileToDownloadList, request, new AsynchronousProgressHandler() {
 			@Override
@@ -181,15 +167,8 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 			
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
-				AddFileToDownloadListResponse addFileToDownloadListResponse = (AddFileToDownloadListResponse) response;
-				downloadListAfter = addFileToDownloadListResponse.getDownloadList().getFilesToDownload();
 				view.hideAll();
-				downloadListAfter.removeAll(downloadListBefore);
-				if (downloadListAfter.size() > 0) {
-					view.showSuccess(downloadListAfter.size());
-				} else {
-					popupUtilsView.showInfo(NO_NEW_FILES_ADDED_MESSAGE);	
-				}
+				view.showSuccess(fileCountToAdd);
 				
 				//fire event to trigger UI element in header!
 				eventBus.fireEvent(new DownloadListUpdatedEvent());

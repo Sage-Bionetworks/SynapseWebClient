@@ -5,7 +5,6 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -29,7 +28,7 @@ public class AddToDownloadListViewImpl implements AddToDownloadListView, IsWidge
 	@UiField
 	Anchor cancelLink;
 	@UiField
-	Div progressContainer;
+	Alert progressContainer;
 	@UiField
 	Alert successfullyAddedUI;
 	@UiField

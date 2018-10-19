@@ -20,6 +20,7 @@
 		<bh:Div ui:field="synAlertContainer" />
 		<bh:Div addStyleNames="flexcontainer-row">
 			<bh:Div ui:field="packageSummaryContainer" addStyleNames="flexcontainer-column" marginTop="8" />
+			<bh:Div ui:field="progressTrackingContainer" addStyleNames="inline-block"/>
 			<bh:Span ui:field="createPackageReadyUI" visible="false" addStyleNames="flexcontainer-column flexcontainer-column-fill-width flexcontainer-column-flow-reset" >
 				<bh:Span addStyleNames="border-left-1" />
 				<bh:Span marginTop="3" marginLeft="10">
@@ -30,13 +31,13 @@
 			<bh:Span ui:field="downloadPackageReadyUI" visible="false" addStyleNames="flexcontainer-column flexcontainer-column-fill-width flexcontainer-column-flow-reset">
 				<bh:Span addStyleNames="border-left-1" />
 				<b:Icon addStyleNames="font-size-17 synapse-green" type="CHECK" marginLeft="5" marginTop="14"/>
-				<bh:Span text="Package created! Ready for download." marginLeft="5" marginTop="10" />
+				<bh:Span addStyleNames="font-size-17"  text="Package created! Ready for download." marginLeft="5" marginTop="10" />
 			</bh:Span>
 			<bh:Span addStyleNames="flexcontainer-column" >
 				<b:Button type="PRIMARY" text="Create Package" icon="FOLDER_PLUS" ui:field="createPackageButton" marginTop="3"/>
 				<b:Button type="PRIMARY" text="Download Package" icon="DOWNLOAD" ui:field="downloadPackageButton" marginTop="3"/>
 			</bh:Span>
 		</bh:Div>
-		<bh:Div ui:field="progressTrackingContainer"/>
+		
 	</bh:Div>
 </ui:UiBinder>

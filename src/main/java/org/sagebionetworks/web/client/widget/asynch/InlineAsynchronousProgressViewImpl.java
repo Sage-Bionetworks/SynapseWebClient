@@ -37,8 +37,6 @@ public class InlineAsynchronousProgressViewImpl implements AsynchronousProgressV
 	@UiField
 	ProgressBar progressBar;
 	@UiField
-	Anchor cancelLink;
-	@UiField
 	Div message;
 	Presenter presenter;
 	Div container;
@@ -46,12 +44,6 @@ public class InlineAsynchronousProgressViewImpl implements AsynchronousProgressV
 	@Inject
 	public InlineAsynchronousProgressViewImpl(final Binder uiBinder) {
 		container = uiBinder.createAndBindUi(this);
-		this.cancelLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onCancel();
-			}
-		});
 	}
 
 	@Override

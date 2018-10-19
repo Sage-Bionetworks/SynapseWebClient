@@ -204,6 +204,7 @@ public class EntityBadgeTest {
 		String entityId = "syn12345";
 		FileEntity testFile = new FileEntity();
 		testFile.setId(entityId);
+		testFile.setDataFileHandleId("123");
 		when(mockPublicPrincipalIds.isPublic(anyLong())).thenReturn(true);
 		entityThreadCount = 1L;
 		setupEntity(testFile);
@@ -386,6 +387,7 @@ public class EntityBadgeTest {
 		when(mockDataFileHandle.getId()).thenReturn(fileHandleId);
 		FileEntity testFile = new FileEntity();
 		testFile.setId(entityId);
+		testFile.setDataFileHandleId(fileHandleId);
 		setupEntity(testFile);
 		configure();
 		widget.getEntityBundle();
@@ -405,6 +407,7 @@ public class EntityBadgeTest {
 		when(mockDataFileHandle.getId()).thenReturn(fileHandleId);
 		FileEntity testFile = new FileEntity();
 		testFile.setId(entityId);
+		testFile.setDataFileHandleId(fileHandleId);
 		setupEntity(testFile);
 		configure();
 		widget.getEntityBundle();

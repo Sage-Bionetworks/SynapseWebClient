@@ -23,11 +23,6 @@
 			</bh:Div>
 		</bh:Div>			
 		<bh:Div>
-			<bh:Div addStyleNames="margin-top-10 center">
-				<b:Button ui:field="cancelButton" type="LINK" size="SMALL" text="CANCEL"/>
-			</bh:Div>
-		</bh:Div>
-		<bh:Div>
 			<bh:Div ui:field="message" addStyleNames="center"/>
 		</bh:Div>
 	</bh:Div>

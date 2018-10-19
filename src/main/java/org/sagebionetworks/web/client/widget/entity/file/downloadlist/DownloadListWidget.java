@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.client.widget.asynch.InlineAsynchronousProgressViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
@@ -48,6 +49,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 			FileHandleAssociationTable fhaTable,
 			PackageSizeSummary packageSizeSummary,
 			AsynchronousProgressWidget progressWidget,
+			InlineAsynchronousProgressViewImpl inlineAsyncProgressView,
 			SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.jsClient = jsClient;
@@ -57,6 +59,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 		this.packageSizeSummary = packageSizeSummary;
 		packageSizeSummary.addTextStyle("synapse-green");
 		this.progressWidget = progressWidget;
+		progressWidget.setView(inlineAsyncProgressView);
 		this.jsniUtils = jsniUtils;
 		view.setSynAlert(synAlert);
 		view.setFileHandleAssociationTable(fhaTable);
@@ -127,7 +130,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 		request.setZipFileName(order.getZipFileName());
 		request.setZipFileFormat(ZipFileFormat.Flat);
 		view.setCreatePackageUIVisible(false);
-		progressWidget.startAndTrackJob("", false, AsynchType.BulkFileDownload, request, new AsynchronousProgressHandler() {
+		progressWidget.startAndTrackJob("Creating package...", false, AsynchType.BulkFileDownload, request, new AsynchronousProgressHandler() {
 			@Override
 			public void onFailure(Throwable failure) {
 				view.setProgressTrackingWidgetVisible(false);
