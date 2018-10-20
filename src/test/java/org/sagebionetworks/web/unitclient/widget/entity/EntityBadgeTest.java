@@ -48,6 +48,7 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
@@ -105,6 +106,8 @@ public class EntityBadgeTest {
 	ArgumentCaptor<ClickHandler> clickHandlerCaptor;
 	@Mock
 	S3FileHandle mockDataFileHandle;
+	@Mock
+	AuthenticationController mockAuthController;
 	
 	Set<ResourceAccess> resourceAccessSet;
 	@Before
@@ -125,8 +128,10 @@ public class EntityBadgeTest {
 				mockSynapseJavascriptClient,
 				mockLazyLoadHelper,
 				mockPopupUtils, mockSynapseProperties, 
-				mockEventBus);
+				mockEventBus,
+				mockAuthController);
 		
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockSynapseProperties.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
 		annotationList = new ArrayList<Annotation>();
 		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, KEY1, Collections.EMPTY_LIST));

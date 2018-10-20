@@ -26,6 +26,8 @@ import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
@@ -49,6 +51,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	private EntityHeader entityHeader;
 	private AnnotationTransformer transformer;
 	private SynapseJavascriptClient jsClient;
+	private AuthenticationController authController;
 	private LazyLoadHelper lazyLoadHelper;
 	private PopupUtilsView popupUtils;
 	private SynapseProperties synapseProperties;
@@ -63,7 +66,8 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			LazyLoadHelper lazyLoadHelper,
 			PopupUtilsView popupUtils,
 			SynapseProperties synapseProperties,
-			EventBus eventBus) {
+			EventBus eventBus,
+			AuthenticationController authController) {
 		this.view = view;
 		this.globalAppState = globalAppState;
 		this.transformer = transformer;
@@ -73,7 +77,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		this.popupUtils = popupUtils;
 		this.synapseProperties = synapseProperties;
 		this.eventBus = eventBus;
-
+		this.authController = authController;
 		Callback loadDataCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -233,6 +237,10 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	
 	@Override
 	public void onAddToDownloadList() {
+		if (!authController.isLoggedIn()) {
+			globalAppState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+			return;
+		}
 		// TODO: add special popup to report how many items are in the current download list, and link to download list.
 		jsClient.addFileToDownloadList(dataFileHandleId, entityHeader.getId(), new AsyncCallback<DownloadList>() {
 			@Override
