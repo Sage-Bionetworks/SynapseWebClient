@@ -1,10 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.file.downloadlist;
 
 import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -30,6 +29,10 @@ public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRo
 	Text fileSize;
 	@UiField
 	Anchor removeLink;
+	@UiField
+	Anchor requestAccessLink;
+	@UiField
+	Icon hasAccessCheck;
 	Presenter presenter;
 	private static FileHandleAssociationRowViewImplUiBinder uiBinder = GWT
 			.create(FileHandleAssociationRowViewImplUiBinder.class);
@@ -61,17 +64,15 @@ public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRo
 	public void setFileSize(String value) {
 		fileSize.setText(value);
 	}
+	
 	@Override
 	public void setHasAccess(boolean value) {
 		hasAccess.setVisible(value);
 		noAccess.setVisible(!value);
-//		requestAccessLink.setVisible(!value);
+		if (value) {
+			hasAccessCheck.setVisible(true);
+		}
 	}
-	
-//	@Override
-//	public void setEntityId(String entityId) {
-//		requestAccessLink.setHref("#!AccessRequirements:TYPE=ENTITY&ID=" + entityId);
-//	}
 	
 	@Override
 	public void setPresenter(Presenter p) {
@@ -85,5 +86,12 @@ public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRo
 	public void setFileName(String fileName, String entityId) {
 		fileNameLink.setText(fileName);
 		fileNameLink.setHref("#!Synapse:"+entityId);
+	}
+	
+	@Override
+	public void showHasUnmetAccessRequirements(String entityId) {
+		hasAccessCheck.setVisible(false);
+		requestAccessLink.setVisible(true);
+		requestAccessLink.setHref("#!AccessRequirements:TYPE=ENTITY&ID=" + entityId);
 	}
 }

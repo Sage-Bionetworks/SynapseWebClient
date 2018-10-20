@@ -123,16 +123,13 @@ public abstract class BaseFileHandleAsyncHandlerImpl {
 									callback.onFailure(ex);	
 								}
 							} else {
+								if (isIncludeFileHandles() && !isIncludePreSignedURLs()) {
+									cacheFileResult(fileResult);
+								}
 								for (AsyncCallback<FileResult> callback : callbacks) {
 									callback.onSuccess(fileResult);	
 								}
 							}
-						}
-					}
-					if (isIncludeFileHandles() && !isIncludePreSignedURLs()) {
-						//populate file handle cache with results
-						for (FileResult fileResult : results.getRequestedFiles()) {
-							cacheFileResult(fileResult);
 						}
 					}
 					NotFoundException notReturnedException = new NotFoundException(DisplayConstants.ERROR_LOADING);

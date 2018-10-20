@@ -14,6 +14,9 @@
 				<tr:SortableTableHeaderImpl ui:field="createdByHeader" addStyleNames="font-weight-normal min-width-150 visible-md visible-lg" width="150px" text="Created By"/>
 				<tr:SortableTableHeaderImpl ui:field="createdOnHeader" addStyleNames="font-weight-normal min-width-150 hidden-xs" width="150px" text="Created On"/>
 				<tr:SortableTableHeaderImpl ui:field="fileSizeHeader" addStyleNames="font-weight-normal min-width-100 visible-md visible-lg" width="100px" text="Size"/>
+				<t:TableHeader addStyleNames="hidden-xs" width="70px">
+					<b:Icon addStyleNames="font-size-17 synapse-blue" type="CHECK" marginLeft="5" marginTop="2"/>
+				</t:TableHeader> 
 				<t:TableHeader addStyleNames="min-width-25" width="25px" text=""/> <!-- delete item column. -->
 				<t:TableHeader ui:field="scrollBarColumnHeader" width="20px" text=""/> <!-- column to account for scroll bar! -->
 			</t:TableRow>

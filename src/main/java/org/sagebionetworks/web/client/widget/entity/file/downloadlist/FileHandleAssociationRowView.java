@@ -10,6 +10,7 @@ public interface FileHandleAssociationRowView extends IsWidget {
 	void setFileSize(String fileSize);
 	void setPresenter(Presenter p);
 	boolean isAttached();
+	void showHasUnmetAccessRequirements(String entityId);
 	public interface Presenter {
 		void onRemove();
 		void onViewAttached();

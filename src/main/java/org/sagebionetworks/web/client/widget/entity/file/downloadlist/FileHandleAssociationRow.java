@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.entity.file.downloadlist;
 import java.util.Date;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
+import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
@@ -11,6 +13,7 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
@@ -33,8 +36,10 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 	FileHandleAssociation fha;
 	EntityHeader entityHeader;
 	CallbackP<FileHandleAssociation> onDeleteCallback;
+	Callback accessRestrictionDetectedCallback;
 	DateTimeUtils dateTimeUtils;
 	GWTWrapper gwt;
+	SynapseJavascriptClient jsClient;
 	
 	String fileName, createdBy;
 	Date createdOn;
@@ -49,7 +54,8 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 			SynapseJSNIUtils jsniUtils,
 			EntityHeaderAsyncHandler entityHeaderAsyncHandler,
 			DateTimeUtils dateTimeUtils,
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.fhaAsyncHandler = fhaAsyncHandler;
 		this.userProfileAsyncHandler = userProfileAsyncHandler;
@@ -57,6 +63,7 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 		this.entityHeaderAsyncHandler = entityHeaderAsyncHandler;
 		this.dateTimeUtils = dateTimeUtils;
 		this.gwt = gwt;
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 	}
 	
@@ -64,6 +71,7 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 		this.fha = fha;
 		this.onDeleteCallback = onDeleteCallback;
 		this.addToPackageSizeCallback = addToPackageSizeCallback;
+		this.accessRestrictionDetectedCallback = accessRestrictionDetectedCallback;
 		entityHeaderAsyncHandler.getEntityHeader(fha.getAssociateObjectId(), new AsyncCallback<EntityHeader>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -84,7 +92,7 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 				if (!(caught instanceof ForbiddenException)) {
 					jsniUtils.consoleError(caught.getMessage());
 				} else {
-					accessRestrictionDetectedCallback.invoke();	
+					getRestrictionInformation();
 				}
 			}
 			public void onSuccess(FileResult result) {
@@ -108,6 +116,22 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 			};
 		});
 	}
+	
+	public void getRestrictionInformation() {
+		jsClient.getRestrictionInformation(fha.getAssociateObjectId(), RestrictableObjectType.ENTITY, new AsyncCallback<RestrictionInformationResponse>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				jsniUtils.consoleError(caught);
+			}
+			public void onSuccess(RestrictionInformationResponse restrictionInformation) {
+				if (restrictionInformation.getHasUnmetAccessRequirement()) {
+					view.showHasUnmetAccessRequirements(fha.getAssociateObjectId());
+					accessRestrictionDetectedCallback.invoke();
+				}
+			};
+		});
+	}
+	
 	@Override
 	public void onViewAttached() {
 		updateTotalPackageSize();

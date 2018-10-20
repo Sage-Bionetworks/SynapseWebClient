@@ -29,6 +29,10 @@
 		<t:TableData addStyleNames="min-width-100 visible-md visible-lg" width="100px">
 			<bh:Text ui:field="fileSize"/>
 		</t:TableData>
+		<t:TableData addStyleNames="hidden-xs" width="70px">
+			<b:Anchor ui:field="requestAccessLink" text="Request Access" visible="false" />
+			<b:Icon ui:field="hasAccessCheck" addStyleNames="font-size-17 synapse-blue" type="CHECK" marginLeft="5" marginTop="2" visible="false" />
+		</t:TableData>
 		<t:TableData addStyleNames="min-width-25" width="25px"> <!-- Less than header column width to account for table data scroll bar (from scroll pane)-->
 			<b:Anchor icon="TRASH" ui:field="removeLink" />
 		</t:TableData>

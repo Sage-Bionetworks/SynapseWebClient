@@ -9,9 +9,13 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
+import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
@@ -21,6 +25,7 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
@@ -31,6 +36,7 @@ import org.sagebionetworks.web.client.widget.entity.file.downloadlist.FileHandle
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.dev.javac.testing.impl.MockJavaResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -44,6 +50,8 @@ public class FileHandleAssociationRowTest {
 	UserProfileAsyncHandler mockUserProfileAsyncHandler;
 	@Mock
 	SynapseJSNIUtils mockJsniUtils;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
 	@Mock
 	EntityHeaderAsyncHandler mockEntityHeaderAsyncHandler;
 	@Mock
@@ -66,6 +74,10 @@ public class FileHandleAssociationRowTest {
 	FileHandle mockFileHandle;
 	@Mock
 	UserProfile mockUserProfile;
+	@Captor
+	ArgumentCaptor<AsyncCallback<RestrictionInformationResponse>> asyncCallbackCaptor;
+	@Mock
+	RestrictionInformationResponse mockRestrictionInformationResponse;
 	
 	public static final String ENTITY_ID = "syn92832";
 	public static final String FILENAME = "filename.txt";
@@ -78,8 +90,9 @@ public class FileHandleAssociationRowTest {
 	 
 	@Before
 	public void setUp() throws Exception {
-		widget = new FileHandleAssociationRow(mockView, mockFhaAsyncHandler, mockUserProfileAsyncHandler, mockJsniUtils, mockEntityHeaderAsyncHandler, mockDateTimeUtils, mockGwt);
+		widget = new FileHandleAssociationRow(mockView, mockFhaAsyncHandler, mockUserProfileAsyncHandler, mockJsniUtils, mockEntityHeaderAsyncHandler, mockDateTimeUtils, mockGwt, mockJsClient);
 		when(mockFileResult.getFileHandle()).thenReturn(mockFileHandle);
+		when(mockFha.getAssociateObjectId()).thenReturn(ENTITY_ID);
 		when(mockEntityHeader.getName()).thenReturn(FILENAME);
 		when(mockEntityHeader.getId()).thenReturn(ENTITY_ID);
 		when(mockFileHandle.getCreatedOn()).thenReturn(CREATED_ON);
@@ -148,6 +161,13 @@ public class FileHandleAssociationRowTest {
 		
 		verify(mockView).setHasAccess(false);
 		assertEquals(false, widget.getHasAccess());
+		verify(mockAccessRestrictionDetectedCallback, never()).invoke();
+		
+		verify(mockJsClient).getRestrictionInformation(eq(ENTITY_ID), eq(RestrictableObjectType.ENTITY), asyncCallbackCaptor.capture());
+		when(mockRestrictionInformationResponse.getHasUnmetAccessRequirement()).thenReturn(true);
+		asyncCallbackCaptor.getValue().onSuccess(mockRestrictionInformationResponse);
+		
+		verify(mockView).showHasUnmetAccessRequirements(ENTITY_ID);
 		verify(mockAccessRestrictionDetectedCallback).invoke();
 	}
 	
