@@ -50,6 +50,7 @@ import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
@@ -108,7 +109,8 @@ public class EntityBadgeTest {
 	S3FileHandle mockDataFileHandle;
 	@Mock
 	AuthenticationController mockAuthController;
-	
+	@Mock
+	CallbackP<EntityHeader> mockEntityHeaderCallback;
 	Set<ResourceAccess> resourceAccessSet;
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -394,13 +396,15 @@ public class EntityBadgeTest {
 		testFile.setId(entityId);
 		testFile.setDataFileHandleId(fileHandleId);
 		setupEntity(testFile);
-		configure();
+		EntityHeader header = configure();
+		widget.setOnAddedToDownloadList(mockEntityHeaderCallback);
+		
 		widget.getEntityBundle();
 		
 		widget.onAddToDownloadList();
 		
 		verify(mockSynapseJavascriptClient).addFileToDownloadList(eq(fileHandleId), eq(entityId), any(AsyncCallback.class));
-		verify(mockPopupUtils).showInfo(entityName + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
+		verify(mockEntityHeaderCallback).invoke(header);
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
 	}
 	
