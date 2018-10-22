@@ -49,4 +49,6 @@ public interface AsynchronousProgressView extends IsWidget{
 	 * @return
 	 */
 	public boolean isAttached();
+	
+	public void showWhiteSpinner();
 }

@@ -6,7 +6,7 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<bh:Div addStyleNames="flexcontainer-row" width="100%">
 		<bh:Div ui:field="spinnerColumn" visible="false" addStyleNames="inline-block">
-			<w:LoadingSpinner size="45px" addStyleNames="inline-block" />
+			<w:LoadingSpinner ui:field="spinner" size="45px" addStyleNames="inline-block" />
 		</bh:Div>
 		<bh:Div addStyleNames="font-size-17 inline-block" ui:field="title" marginLeft="15" marginTop="12" />
 		<bh:Div addStyleNames="font-size-17 hidden-xs inline-block" ui:field="message" marginLeft="20" marginTop="12" height="60px"/>

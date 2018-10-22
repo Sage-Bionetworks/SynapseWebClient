@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.InfoAlert;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -30,11 +31,7 @@ public class AddToDownloadListViewImpl implements AddToDownloadListView, IsWidge
 	@UiField
 	Alert progressContainer;
 	@UiField
-	Alert successfullyAddedUI;
-	@UiField
-	Span fileCount;
-	@UiField
-	Anchor viewDownloadListLink;
+	InfoAlert successfullyAddedUI;
 	
 	Presenter presenter;
 	private static PackageSizeSummaryViewImplUiBinder uiBinder = GWT
@@ -42,7 +39,7 @@ public class AddToDownloadListViewImpl implements AddToDownloadListView, IsWidge
 	@Inject
 	public AddToDownloadListViewImpl(AuthenticationController authController, GlobalApplicationState globalAppState) {
 		w = uiBinder.createAndBindUi(this);
-		viewDownloadListLink.addClickHandler(event -> {
+		successfullyAddedUI.addClickHandler(event -> {
 			Profile place = new Profile(authController.getCurrentUserPrincipalId() + "/downloads");
 			globalAppState.getPlaceChanger().goTo(place);
 		});
@@ -87,7 +84,7 @@ public class AddToDownloadListViewImpl implements AddToDownloadListView, IsWidge
 	}
 	@Override
 	public void showSuccess(int fileCount) {
-		this.fileCount.setText(Integer.toString(fileCount));
+		successfullyAddedUI.setMessage(fileCount + " files added to your Downloads List.");
 		successfullyAddedUI.setVisible(true);
 	}
 	@Override

@@ -7,5 +7,6 @@ public interface PackageSizeSummaryView extends IsWidget {
 	void setSize(String friendlyFileSize);
 	void setEstimatedDownloadTimeLoadingVisible(boolean visible);
 	void setEstimatedDownloadTime(String time);
+	void showWhiteSpinner();
 	void addTextStyle(String style);
 }

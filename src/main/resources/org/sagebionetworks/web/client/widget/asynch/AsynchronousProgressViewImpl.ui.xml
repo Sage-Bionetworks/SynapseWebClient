@@ -17,7 +17,7 @@
 			</b:Progress>
 		</bh:Div>
 		<bh:Div ui:field="spinnerColumn" visible="false">
-			<w:LoadingSpinner size="45px" addStyleNames="center-in-div"/>
+			<w:LoadingSpinner ui:field="spinner" size="45px" addStyleNames="center-in-div"/>
 			<bh:Div addStyleNames="margin-top-10 center">
 				<bh:Text>Loading...</bh:Text>
 			</bh:Div>

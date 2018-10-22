@@ -93,4 +93,7 @@ public class PackageSizeSummary implements IsWidget {
 	public void addTextStyle(String style) {
 		view.addTextStyle(style);
 	}
+	public void showWhiteSpinner() {
+		view.showWhiteSpinner();
+	}
 }

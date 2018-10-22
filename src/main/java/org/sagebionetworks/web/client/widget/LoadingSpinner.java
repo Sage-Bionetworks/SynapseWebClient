@@ -62,4 +62,10 @@ public class LoadingSpinner implements IsWidget {
 	public boolean isAttached() {
 		return loadingSpinnerDiv.isAttached();
 	}
+	public void setIsWhite(boolean isWhite) {
+		String spinnerStyle = isWhite ? "white-spinner" : "spinner";
+		String oldStyle = isWhite ? "spinner" : "white-spinner";
+		loadingSpinnerDiv.removeStyleName(oldStyle);
+		loadingSpinnerDiv.addStyleName(spinnerStyle);
+	}
 }

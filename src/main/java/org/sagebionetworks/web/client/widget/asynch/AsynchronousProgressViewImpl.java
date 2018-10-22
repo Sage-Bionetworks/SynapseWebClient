@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ProgressBar;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -29,6 +30,8 @@ public class AsynchronousProgressViewImpl implements AsynchronousProgressView {
 	Div progressColumn;
 	@UiField
 	Div spinnerColumn;
+	@UiField
+	LoadingSpinner spinner;
 	@UiField
 	Div title;
 	@UiField
@@ -87,5 +90,9 @@ public class AsynchronousProgressViewImpl implements AsynchronousProgressView {
 	@Override
 	public boolean isAttached() {
 		return progressBar.isAttached();
+	}
+	@Override
+	public void showWhiteSpinner() {
+		spinner.setIsWhite(true);
 	}
 }

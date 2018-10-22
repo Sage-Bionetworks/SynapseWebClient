@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.file.downloadlist;
 
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -27,6 +28,8 @@ public class PackageSizeSummaryViewImpl implements PackageSizeSummaryView, IsWid
 	Text estimatedTime;
 	@UiField
 	Span estimatedTimeLoading;
+	@UiField
+	LoadingSpinner spinner;
 	private static PackageSizeSummaryViewImplUiBinder uiBinder = GWT
 			.create(PackageSizeSummaryViewImplUiBinder.class);
 	@Inject
@@ -59,5 +62,9 @@ public class PackageSizeSummaryViewImpl implements PackageSizeSummaryView, IsWid
 	public void setEstimatedDownloadTimeLoadingVisible(boolean visible) {
 		estimatedTimeSpan.setVisible(!visible);
 		estimatedTimeLoading.setVisible(visible);
+	}
+	@Override
+	public void showWhiteSpinner() {
+		spinner.setIsWhite(true);
 	}
 }
