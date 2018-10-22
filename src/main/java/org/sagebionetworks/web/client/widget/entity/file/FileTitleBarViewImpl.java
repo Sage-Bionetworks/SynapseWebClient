@@ -11,7 +11,10 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.InfoAlert;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 
 import com.google.gwt.core.client.GWT;
@@ -76,7 +79,8 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	Anchor currentVersionLink;
 	@UiField
 	Div versionInfoUI;
-	
+	@UiField
+	InfoAlert addedToDownloadListAlert;
 	interface FileTitleBarViewImplUiBinder extends UiBinder<Widget, FileTitleBarViewImpl> {
 	}
 	private String currentEntityId;
@@ -86,7 +90,8 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	public FileTitleBarViewImpl(
 			FavoriteWidget favoriteWidget,
 			Md5Link md5Link, 
-			GlobalApplicationState globalAppState) {
+			GlobalApplicationState globalAppState,
+			AuthenticationController authController) {
 		this.favoriteWidget = favoriteWidget;
 		this.md5Link = md5Link;
 		
@@ -107,6 +112,10 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		programmaticOptionsLink.addClickHandler(event->{
 			presenter.onProgrammaticDownloadOptions();
 		});
+		addedToDownloadListAlert.addClickHandler(event -> {
+			Profile place = new Profile(authController.getCurrentUserPrincipalId() + "/downloads");
+			globalAppState.getPlaceChanger().goTo(place);
+		});
 	}
 	@Override
 	public void setPresenter(Presenter p) {
@@ -114,6 +123,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	}
 	@Override
 	public void createTitlebar(Entity entity) {
+		addedToDownloadListAlert.setVisible(false);
 		currentEntityId = entity.getId();
 		favoriteWidget.configure(currentEntityId);
 		md5Link.clear();
@@ -201,5 +211,10 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@Override
 	public void setVersion(Long versionNumber) {
 		version.setText(versionNumber.toString());
+	}
+	@Override
+	public void showAddedToDownloadListAlert(String message) {
+		addedToDownloadListAlert.setMessage(message);
+		addedToDownloadListAlert.setVisible(true);	
 	}
 }

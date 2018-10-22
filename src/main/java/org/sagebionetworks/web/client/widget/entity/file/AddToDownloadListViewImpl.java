@@ -31,7 +31,7 @@ public class AddToDownloadListViewImpl implements AddToDownloadListView, IsWidge
 	@UiField
 	Alert progressContainer;
 	@UiField
-	InfoAlert successfullyAddedUI;
+	InfoAlert addedToDownloadListAlert;
 	
 	Presenter presenter;
 	private static PackageSizeSummaryViewImplUiBinder uiBinder = GWT
@@ -39,7 +39,7 @@ public class AddToDownloadListViewImpl implements AddToDownloadListView, IsWidge
 	@Inject
 	public AddToDownloadListViewImpl(AuthenticationController authController, GlobalApplicationState globalAppState) {
 		w = uiBinder.createAndBindUi(this);
-		successfullyAddedUI.addClickHandler(event -> {
+		addedToDownloadListAlert.addClickHandler(event -> {
 			Profile place = new Profile(authController.getCurrentUserPrincipalId() + "/downloads");
 			globalAppState.getPlaceChanger().goTo(place);
 		});
@@ -62,7 +62,7 @@ public class AddToDownloadListViewImpl implements AddToDownloadListView, IsWidge
 	public void hideAll() {
 		confirmationUI.setVisible(false);
 		progressContainer.setVisible(false);
-		successfullyAddedUI.setVisible(false);
+		addedToDownloadListAlert.setVisible(false);
 	}
 	@Override
 	public void setPackageSizeSummary(IsWidget w) {
@@ -84,8 +84,8 @@ public class AddToDownloadListViewImpl implements AddToDownloadListView, IsWidge
 	}
 	@Override
 	public void showSuccess(int fileCount) {
-		successfullyAddedUI.setMessage(fileCount + " files added to your Downloads List.");
-		successfullyAddedUI.setVisible(true);
+		addedToDownloadListAlert.setMessage(fileCount + " files added to your Downloads List.");
+		addedToDownloadListAlert.setVisible(true);
 	}
 	@Override
 	public void add(IsWidget widget) {

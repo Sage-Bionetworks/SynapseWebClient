@@ -138,7 +138,7 @@ public class FileTitleBarTest {
 		fileTitleBar.onAddToDownloadList();
 		
 		verify(mockJsClient).addFileToDownloadList(eq(DATA_FILE_HANDLE_ID), eq(ENTITY_ID), any(AsyncCallback.class));
-		verify(mockView).showInfo(FILE_NAME + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
+		verify(mockView).showAddedToDownloadListAlert(FILE_NAME + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
 	}
 

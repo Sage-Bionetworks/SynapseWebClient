@@ -181,7 +181,7 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 			}
 			@Override
 			public void onSuccess(DownloadList result) {
-				view.showInfo(entity.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
+				view.showAddedToDownloadListAlert(entity.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
 				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}
 		});
