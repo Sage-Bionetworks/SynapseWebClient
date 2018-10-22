@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
@@ -57,6 +58,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	private SynapseProperties synapseProperties;
 	private EventBus eventBus;
 	private String dataFileHandleId;
+	private CallbackP<EntityHeader> onAddedToDownloadList;
 	
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
@@ -249,9 +251,12 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			}
 			@Override
 			public void onSuccess(DownloadList result) {
-				popupUtils.showInfo(entityHeader.getName() + ADDED_TO_DOWNLOAD_LIST);
+				onAddedToDownloadList.invoke(entityHeader);
 				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}
 		});
+	}
+	public void setOnAddedToDownloadList(CallbackP<EntityHeader> onAddedToDownloadList) {
+		this.onAddedToDownloadList = onAddedToDownloadList;
 	}
 }

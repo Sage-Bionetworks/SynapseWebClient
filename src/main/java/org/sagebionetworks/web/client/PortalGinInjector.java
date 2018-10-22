@@ -591,4 +591,5 @@ public interface PortalGinInjector extends Ginjector {
 	DownloadListWidget getDownloadListWidget();
 	FileHandleAssociationRow getFileHandleAssociationRow(); 
 	TableEntityListGroupItem getTableEntityListGroupItem();
+	SynapseJSNIUtilsImpl getSynapseJSNIUtils();
 }

@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -47,7 +48,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	private String rootEntityId;
 	public static final SortBy DEFAULT_SORT_BY = SortBy.NAME;
 	public static final Direction DEFAULT_DIRECTION = Direction.ASC;
-	
+	public CallbackP<EntityHeader> onAddToDownloadList;
 	@Inject
 	public EntityTreeBrowser(PortalGinInjector ginInjector,
 			EntityTreeBrowserView view, 
@@ -63,6 +64,9 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		view.setPresenter(this);
 		this.synAlert = synAlert;
 		view.setSynAlert(synAlert);
+		onAddToDownloadList = entityHeader -> {
+			view.showAddedToDownloadListAlert(entityHeader.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
+		};
 	}
 	
 	public void clear() {
@@ -272,6 +276,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 				entityClickedHandler.invoke(header.getId());
 			});
 		}
+		childItem.setOnAddedToDownloadList(onAddToDownloadList);
 		return childItem;
 	}
 
