@@ -136,6 +136,7 @@ public class DownloadListWidgetTest {
 		verify(mockJsClient).createDownloadOrderFromUsersDownloadList(eq(fileName + DownloadListWidget.ZIP_EXTENSION), any(AsyncCallback.class));
 		verify(mockView).setProgressTrackingWidgetVisible(true);
 		verify(mockView).setCreatePackageUIVisible(false);
+		verify(mockJsniUtils).sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, DownloadListWidget.DOWNLOAD_LIST_PACKAGE_CREATED_EVENT_NAME);
 		verify(mockProgressWidget).startAndTrackJob(anyString(), eq(false), eq(AsynchType.BulkFileDownload), requestCaptor.capture(), progressHandlerCaptor.capture());
 		
 		//verify request

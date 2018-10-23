@@ -31,6 +31,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 	
 	public static final String ZIP_EXTENSION = ".zip";
 	public static final String DOWNLOAD_LIST_CLEARED_EVENT_NAME = "DownloadListCleared";
+	public static final String DOWNLOAD_LIST_PACKAGE_CREATED_EVENT_NAME = "PackageCreated";
 	public static final String EMPTY_FILENAME_MESSAGE_ = "Please provide a package file name and try again.";
 	private DownloadListWidgetView view;
 	SynapseAlert synAlert;
@@ -120,6 +121,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 			}
 			public void onSuccess(DownloadOrder downloadOrder) {
 				// and attempt to download!
+				jsniUtils.sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, DOWNLOAD_LIST_PACKAGE_CREATED_EVENT_NAME);
 				startDownload(downloadOrder);
 			}; 
 		});
