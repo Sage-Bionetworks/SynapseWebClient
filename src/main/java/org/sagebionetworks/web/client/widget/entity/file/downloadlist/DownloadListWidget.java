@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.InlineAsynchronousProgressViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 import com.google.gwt.event.shared.EventBus;
@@ -29,6 +30,7 @@ import com.google.inject.Inject;
 public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, DownloadListWidgetView.Presenter {
 	
 	public static final String ZIP_EXTENSION = ".zip";
+	public static final String DOWNLOAD_LIST_CLEARED_EVENT_NAME = "DownloadListCleared";
 	public static final String EMPTY_FILENAME_MESSAGE_ = "Please provide a package file name and try again.";
 	private DownloadListWidgetView view;
 	SynapseAlert synAlert;
@@ -167,6 +169,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 			@Override
 			public void onSuccess(Void result) {
 				refresh();
+				jsniUtils.sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, DOWNLOAD_LIST_CLEARED_EVENT_NAME);
 				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}
 		});

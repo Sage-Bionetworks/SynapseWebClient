@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.InlineAsynchronousProgressViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidget;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidgetView;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.FileHandleAssociationTable;
@@ -184,6 +185,7 @@ public class DownloadListWidgetTest {
 		verify(mockJsClient).clearDownloadList(any(AsyncCallback.class));
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
 		verify(mockJsClient).getDownloadList(any(AsyncCallback.class));
+		verify(mockJsniUtils).sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, DownloadListWidget.DOWNLOAD_LIST_CLEARED_EVENT_NAME);
 	}
 	
 	@Test

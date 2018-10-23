@@ -411,7 +411,7 @@ public class EntityBadgeTest {
 		verify(mockSynapseJavascriptClient).addFileToDownloadList(eq(fileHandleId), eq(entityId), any(AsyncCallback.class));
 		verify(mockEntityHeaderCallback).invoke(header);
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
-		verify(mockSynapseJSNIUtils).sendAnalyticsEvent(AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, Integer.toString(1));
+		verify(mockSynapseJSNIUtils).sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, Integer.toString(1));
 	}
 	
 	@Test
