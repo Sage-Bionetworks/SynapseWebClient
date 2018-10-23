@@ -14,11 +14,13 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
@@ -41,6 +43,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	FileHandle dataFileHandle;
 	PopupUtilsView popupUtils;
 	EventBus eventBus;
+	SynapseJSNIUtils jsniUtils;
 	@Inject
 	public EntityListRowBadge(EntityListRowBadgeView view, 
 			UserBadge userBadge,
@@ -48,7 +51,8 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 			LazyLoadHelper lazyLoadHelper,
 			DateTimeUtils dateTimeUtils,
 			PopupUtilsView popupUtils,
-			EventBus eventBus) {
+			EventBus eventBus,
+			SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.createdByUserBadge = userBadge;
 		this.dateTimeUtils = dateTimeUtils;
@@ -56,6 +60,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.popupUtils = popupUtils;
 		this.eventBus = eventBus;
+		this.jsniUtils = jsniUtils;
 		view.setCreatedByWidget(userBadge.asWidget());
 		view.setPresenter(this);
 		Callback loadDataCallback = new Callback() {
@@ -188,6 +193,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 			}
 			@Override
 			public void onSuccess(DownloadList result) {
+				jsniUtils.sendAnalyticsEvent(AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, Integer.toString(1));
 				popupUtils.showInfo(entityName + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
 				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}

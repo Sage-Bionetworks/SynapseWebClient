@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
@@ -33,6 +34,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 
@@ -59,6 +61,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	private EventBus eventBus;
 	private String dataFileHandleId;
 	private CallbackP<EntityHeader> onAddedToDownloadList;
+	private SynapseJSNIUtils jsniUtils;
 	
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
@@ -69,7 +72,8 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			PopupUtilsView popupUtils,
 			SynapseProperties synapseProperties,
 			EventBus eventBus,
-			AuthenticationController authController) {
+			AuthenticationController authController,
+			SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.globalAppState = globalAppState;
 		this.transformer = transformer;
@@ -80,6 +84,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		this.synapseProperties = synapseProperties;
 		this.eventBus = eventBus;
 		this.authController = authController;
+		this.jsniUtils = jsniUtils;
 		Callback loadDataCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -251,6 +256,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			}
 			@Override
 			public void onSuccess(DownloadList result) {
+				jsniUtils.sendAnalyticsEvent(AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, Integer.toString(1));
 				onAddedToDownloadList.invoke(entityHeader);
 				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}

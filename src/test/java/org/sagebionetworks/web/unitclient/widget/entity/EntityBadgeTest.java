@@ -44,6 +44,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PopupUtilsView;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.cache.ClientCache;
@@ -56,6 +57,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -103,6 +105,8 @@ public class EntityBadgeTest {
 	SynapseProperties mockSynapseProperties;
 	@Mock
 	EventBus mockEventBus;
+	@Mock
+	SynapseJSNIUtils mockSynapseJSNIUtils;
 	@Captor
 	ArgumentCaptor<ClickHandler> clickHandlerCaptor;
 	@Mock
@@ -131,7 +135,8 @@ public class EntityBadgeTest {
 				mockLazyLoadHelper,
 				mockPopupUtils, mockSynapseProperties, 
 				mockEventBus,
-				mockAuthController);
+				mockAuthController,
+				mockSynapseJSNIUtils);
 		
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockSynapseProperties.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
@@ -406,6 +411,7 @@ public class EntityBadgeTest {
 		verify(mockSynapseJavascriptClient).addFileToDownloadList(eq(fileHandleId), eq(entityId), any(AsyncCallback.class));
 		verify(mockEntityHeaderCallback).invoke(header);
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
+		verify(mockSynapseJSNIUtils).sendAnalyticsEvent(AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, Integer.toString(1));
 	}
 	
 	@Test

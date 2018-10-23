@@ -25,11 +25,13 @@ import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItem;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
@@ -61,6 +63,8 @@ public class FileTitleBarTest {
 	@Mock
 	ExternalObjectStoreFileHandle mockExternalObjectStoreFileHandle;
 	@Mock
+	SynapseJSNIUtils mockSynapseJSNIUtils;
+	@Mock
 	PaginatedResults<VersionInfo> mockVersionResults;
 	@Mock
 	SynapseJavascriptClient mockJsClient;
@@ -78,7 +82,7 @@ public class FileTitleBarTest {
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
-		fileTitleBar = new FileTitleBar(mockView, mockSynapseProperties, mockFileDownloadButton, mockSynapseClient, mockJsClient, mockFileClientsHelp, mockEventBus);
+		fileTitleBar = new FileTitleBar(mockView, mockSynapseProperties, mockFileDownloadButton, mockSynapseClient, mockJsClient, mockFileClientsHelp, mockEventBus, mockSynapseJSNIUtils);
 		when(mockFileEntity.getId()).thenReturn(ENTITY_ID);
 		when(mockFileEntity.getName()).thenReturn(FILE_NAME);
 		when(mockFileEntity.getDataFileHandleId()).thenReturn(DATA_FILE_HANDLE_ID);
@@ -140,6 +144,7 @@ public class FileTitleBarTest {
 		verify(mockJsClient).addFileToDownloadList(eq(DATA_FILE_HANDLE_ID), eq(ENTITY_ID), any(AsyncCallback.class));
 		verify(mockView).showAddedToDownloadListAlert(FILE_NAME + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
+		verify(mockSynapseJSNIUtils).sendAnalyticsEvent(AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, Integer.toString(1));
 	}
 
 	@Test

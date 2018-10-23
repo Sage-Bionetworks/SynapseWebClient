@@ -25,6 +25,7 @@ import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.SumFileSizes;
 import org.sagebionetworks.web.client.PopupUtilsView;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -60,6 +61,8 @@ public class AddToDownloadListTest {
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
+	SynapseJSNIUtils mockSynapseJSNIUtils;
+	@Mock
 	PackageSizeSummary mockPackageSizeSummary;
 	@Mock
 	SynapseJavascriptClient mockJsClient;
@@ -89,7 +92,7 @@ public class AddToDownloadListTest {
 	Long querySumFileSize = 88L;
 	@Before
 	public void setUp() throws Exception {
-		widget = new AddToDownloadList(mockView, mockAsynchronousProgressWidget, mockInlineAsynchronousProgressView, mockPopupUtils, mockEventBus, mockSynAlert, mockPackageSizeSummary, mockJsClient);
+		widget = new AddToDownloadList(mockView, mockAsynchronousProgressWidget, mockInlineAsynchronousProgressView, mockPopupUtils, mockEventBus, mockSynAlert, mockPackageSizeSummary, mockJsClient, mockSynapseJSNIUtils);
 		when(mockEntityChildrenResponse.getTotalChildCount()).thenReturn(testFolderChildCount);
 		when(mockEntityChildrenResponse.getSumFileSizesBytes()).thenReturn(testFolderSumFileSizesBytes);
 		when(mockQueryResultBundle.getQueryCount()).thenReturn(queryCount);
@@ -138,6 +141,7 @@ public class AddToDownloadListTest {
 		
 		verify(mockView, times(5)).hideAll();
 		verify(mockView).showSuccess(queryCount.intValue());
+		verify(mockSynapseJSNIUtils).sendAnalyticsEvent(FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, queryCount.toString());
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
 		
 		//verify error handling in query bundle progress handler

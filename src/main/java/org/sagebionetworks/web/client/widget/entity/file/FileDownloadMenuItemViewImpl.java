@@ -23,7 +23,7 @@ public class FileDownloadMenuItemViewImpl implements FileDownloadMenuItemView {
 
 	private static FileDownloadMenuItemViewImplUiBinder uiBinder = GWT.create(FileDownloadMenuItemViewImplUiBinder.class);
 	Widget widget;
-	ClickHandler licensedDownloadClickHandler, authorizedDirectDownloadClickHandler;
+	ClickHandler licensedDownloadClickHandler, authorizedDirectDownloadClickHandler, directDownloadClickHandler;
 	HandlerRegistration downloadLinkHandlerRegistration;
 	
 	@Inject
@@ -38,6 +38,9 @@ public class FileDownloadMenuItemViewImpl implements FileDownloadMenuItemView {
 		
 		authorizedDirectDownloadClickHandler = event -> {
 			presenter.onAuthorizedDirectDownloadClicked();
+		};
+		directDownloadClickHandler = event -> {
+			presenter.onDirectDownloadClicked();
 		};
 	}
 	
@@ -67,6 +70,7 @@ public class FileDownloadMenuItemViewImpl implements FileDownloadMenuItemView {
 	public void setIsDirectDownloadLink(String href) {
 		clearClickHandlers();
 		downloadLink.setHref(href);
+		downloadLinkHandlerRegistration = downloadLink.addClickHandler(directDownloadClickHandler);
 	}
 	
 	@Override

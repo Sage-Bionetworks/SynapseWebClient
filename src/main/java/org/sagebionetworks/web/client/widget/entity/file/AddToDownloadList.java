@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.web.client.PopupUtilsView;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
@@ -41,11 +42,13 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	AddFileToDownloadListRequest request;
 	EventBus eventBus;
 	SynapseAlert synAlert;
+	SynapseJSNIUtils jsniUtils;
 	PackageSizeSummary packageSizeSummary;
 	SynapseJavascriptClient jsClient;
 	AsynchronousProgressWidget progress;
 	String queryEntityID;
 	int fileCountToAdd;
+	public static final String FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME = "FilesAddedToDownloadList";
 	
 	@Inject
 	public AddToDownloadList(AddToDownloadListView view, 
@@ -55,7 +58,8 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 			EventBus eventBus,
 			SynapseAlert synAlert,
 			PackageSizeSummary packageSizeSummary,
-			SynapseJavascriptClient jsClient) {
+			SynapseJavascriptClient jsClient,
+			SynapseJSNIUtils jsniUtils) {
 		this.jsClient = jsClient;
 		this.view = view;
 		this.popupUtilsView = popupUtilsView;
@@ -65,6 +69,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 		view.setAsynchronousProgressWidget(progress);
 		this.eventBus = eventBus;
 		this.synAlert = synAlert;
+		this.jsniUtils = jsniUtils;
 		view.add(synAlert);
 		this.packageSizeSummary = packageSizeSummary;
 		packageSizeSummary.showWhiteSpinner();
@@ -169,6 +174,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 			
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
+				jsniUtils.sendAnalyticsEvent(FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, Integer.toString(fileCountToAdd));
 				view.hideAll();
 				view.showSuccess(fileCountToAdd);
 				

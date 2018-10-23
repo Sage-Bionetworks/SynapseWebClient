@@ -14,6 +14,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
@@ -37,6 +38,7 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 	private SynapseJavascriptClient jsClient;
 	private FileClientsHelp fileClientsHelp;
 	private EventBus eventBus;
+	private SynapseJSNIUtils jsniUtils;
 	@Inject
 	public FileTitleBar(FileTitleBarView view, 
 			SynapseProperties synapseProperties,
@@ -44,7 +46,8 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 			SynapseClientAsync synapseClient,
 			SynapseJavascriptClient jsClient,
 			FileClientsHelp fileClientsHelp,
-			EventBus eventBus) {
+			EventBus eventBus,
+			SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.synapseProperties = synapseProperties;
 		this.fileDownloadMenuItem = fileDownloadButton;
@@ -53,6 +56,7 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 		this.jsClient = jsClient;
 		this.fileClientsHelp = fileClientsHelp;
 		this.eventBus = eventBus;
+		this.jsniUtils = jsniUtils;
 		view.setFileDownloadMenuItem(fileDownloadButton.asWidget());
 		view.setPresenter(this);
 	}
@@ -181,6 +185,7 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 			}
 			@Override
 			public void onSuccess(DownloadList result) {
+				jsniUtils.sendAnalyticsEvent(AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, Integer.toString(1));
 				view.showAddedToDownloadListAlert(entity.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
 				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}

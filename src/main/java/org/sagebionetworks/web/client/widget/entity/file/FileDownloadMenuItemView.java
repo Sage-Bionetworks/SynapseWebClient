@@ -21,5 +21,6 @@ public interface FileDownloadMenuItemView extends IsWidget {
 		void queryForSftpLoginInstructions(String directDownloadUrl);
 		void onUnauthenticatedS3DirectDownloadClicked();
 		void onAuthorizedDirectDownloadClicked();
+		void onDirectDownloadClicked();
 	}
 }

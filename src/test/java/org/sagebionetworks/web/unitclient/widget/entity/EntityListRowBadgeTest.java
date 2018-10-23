@@ -30,12 +30,14 @@ import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadgeView;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItem;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -65,6 +67,8 @@ public class EntityListRowBadgeTest {
 	@Mock
 	EventBus mockEventBus;
 	@Mock
+	SynapseJSNIUtils mockSynapseJSNIUtils;
+	@Mock
 	FileEntity mockFileEntity;
 	@Mock
 	S3FileHandle mockDataFileHandle;
@@ -72,7 +76,7 @@ public class EntityListRowBadgeTest {
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
 		widget = new EntityListRowBadge(mockView, mockUserBadge, mockSynapseJavascriptClient,
-				mockLazyLoadHelper, mockDateTimeUtils, mockPopupUtils, mockEventBus);
+				mockLazyLoadHelper, mockDateTimeUtils, mockPopupUtils, mockEventBus, mockSynapseJSNIUtils);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).addFileToDownloadList(anyString(), anyString(), any(AsyncCallback.class));
 	}
 	@Test
@@ -200,6 +204,7 @@ public class EntityListRowBadgeTest {
 		verify(mockSynapseJavascriptClient).addFileToDownloadList(eq(fileHandleId), eq(entityId), any(AsyncCallback.class));
 		verify(mockPopupUtils).showInfo(entityName + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
+		verify(mockSynapseJSNIUtils).sendAnalyticsEvent(AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, Integer.toString(1));
 	}
 	
 	@Test
