@@ -193,7 +193,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 			}
 			@Override
 			public void onSuccess(DownloadList result) {
-				jsniUtils.sendAnalyticsEvent(AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, Integer.toString(1));
+				jsniUtils.sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, "1");
 				popupUtils.showInfo(entityName + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
 				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}

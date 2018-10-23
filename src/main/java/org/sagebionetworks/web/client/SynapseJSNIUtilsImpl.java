@@ -53,6 +53,10 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
+	public void sendAnalyticsEvent(String eventCategory, String eventAction, String eventLabelValue) {
+		_sendAnalyticsEvent(eventCategory, eventAction, eventLabelValue);
+	}
+	@Override
 	public void sendAnalyticsEvent(String eventCategory, String eventAction) {
 		_sendAnalyticsEvent(eventCategory, eventAction, getCurrentURL());
 	}

@@ -224,6 +224,6 @@ public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter,
 	@Override
 	public void onDirectDownloadClicked() {
 		// user already directly sent to download fha, just send the event to analytics
-		jsniUtils.sendAnalyticsEvent(FILE_DIRECTLY_DOWNLOADED_EVENT_NAME, "1");
+		jsniUtils.sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, FILE_DIRECTLY_DOWNLOADED_EVENT_NAME);
 	}
 }

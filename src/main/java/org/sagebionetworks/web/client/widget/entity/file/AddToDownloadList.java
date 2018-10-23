@@ -49,6 +49,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	String queryEntityID;
 	int fileCountToAdd;
 	public static final String FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME = "FilesAddedToDownloadList";
+	public static final String DOWNLOAD_ACTION_EVENT_NAME = "Download";
 	
 	@Inject
 	public AddToDownloadList(AddToDownloadListView view, 
@@ -174,7 +175,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 			
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
-				jsniUtils.sendAnalyticsEvent(FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, Integer.toString(fileCountToAdd));
+				jsniUtils.sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, Integer.toString(fileCountToAdd));
 				view.hideAll();
 				view.showSuccess(fileCountToAdd);
 				
