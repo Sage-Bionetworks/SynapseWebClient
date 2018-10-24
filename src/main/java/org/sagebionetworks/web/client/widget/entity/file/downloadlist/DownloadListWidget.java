@@ -107,7 +107,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 	}
 	
 	@Override
-	public void onDownloadPackage(String zipFileName) {
+	public void onCreatePackage(String zipFileName) {
 		synAlert.clear();
 		if (zipFileName.isEmpty()) {
 			synAlert.showError(EMPTY_FILENAME_MESSAGE_);
@@ -148,7 +148,6 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 				BulkFileDownloadResponse bulkFileDownloadResponse = (BulkFileDownloadResponse) response;
 				view.setPackageDownloadURL(jsniUtils.getRawFileHandleUrl(bulkFileDownloadResponse.getResultZipFileHandleId()));
 				view.setDownloadPackageUIVisible(true);
-				refreshDownloadList();
 				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}
 			
@@ -193,5 +192,10 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+	
+	@Override
+	public void onDownloadPackage() {
+		refreshDownloadList();
 	}
 }

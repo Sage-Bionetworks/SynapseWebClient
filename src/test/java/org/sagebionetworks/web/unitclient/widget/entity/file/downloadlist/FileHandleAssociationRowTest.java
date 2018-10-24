@@ -117,8 +117,6 @@ public class FileHandleAssociationRowTest {
 		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback, mockOnDeleteCallback);
 		
 		verify(mockView).setFileName(FILENAME, ENTITY_ID);
-		verify(mockView).setHasAccess(true);
-		verify(mockView, never()).setHasAccess(false);
 		verify(mockView).setCreatedOn(FRIENDLY_DATE);
 		verify(mockView).setFileSize(FRIENDLY_SIZE);
 		verify(mockAddToPackageSizeCallback).invoke(CONTENT_SIZE.doubleValue());
@@ -148,7 +146,6 @@ public class FileHandleAssociationRowTest {
 		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback, mockOnDeleteCallback);
 		
 		verifyZeroInteractions(mockAccessRestrictionDetectedCallback);
-		verify(mockView).setHasAccess(false);
 		assertEquals(false, widget.getHasAccess());
 	}
 	
@@ -159,7 +156,6 @@ public class FileHandleAssociationRowTest {
 
 		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback, mockOnDeleteCallback);
 		
-		verify(mockView).setHasAccess(false);
 		assertEquals(false, widget.getHasAccess());
 		verify(mockAccessRestrictionDetectedCallback, never()).invoke();
 		
@@ -178,7 +174,6 @@ public class FileHandleAssociationRowTest {
 
 		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback, mockOnDeleteCallback);
 		
-		verify(mockView).setHasAccess(false);
 		assertEquals(false, widget.getHasAccess());
 		verify(mockJsniUtils).consoleError(errorMessage);
 		verifyZeroInteractions(mockAccessRestrictionDetectedCallback);

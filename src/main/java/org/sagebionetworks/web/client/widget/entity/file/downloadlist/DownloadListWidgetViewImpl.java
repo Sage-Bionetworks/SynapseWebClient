@@ -50,10 +50,11 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 			presenter.onClearDownloadList();
 		});
 		createPackageButton.addClickHandler(event-> {
-			presenter.onDownloadPackage(fileName.getText());
+			presenter.onCreatePackage(fileName.getText());
 		});
 		downloadPackageButton.addClickHandler(event -> {
 			Window.open(downloadUrl, "", "");
+			presenter.onDownloadPackage();
 		});
 	}
 	

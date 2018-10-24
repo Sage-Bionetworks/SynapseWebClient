@@ -120,7 +120,7 @@ public class DownloadListWidgetTest {
 
 	@Test
 	public void testOnDownloadPackageEmptyZipfileName() {
-		widget.onDownloadPackage("");
+		widget.onCreatePackage("");
 		
 		verify(mockSynAlert).showError(DownloadListWidget.EMPTY_FILENAME_MESSAGE_);
 		verify(mockJsClient, never()).createDownloadOrderFromUsersDownloadList(anyString(), any(AsyncCallback.class));
@@ -131,7 +131,7 @@ public class DownloadListWidgetTest {
 		String fileName = "package";
 		when(mockDownloadOrder.getZipFileName()).thenReturn(fileName + DownloadListWidget.ZIP_EXTENSION);
 		
-		widget.onDownloadPackage(fileName);
+		widget.onCreatePackage(fileName);
 		
 		verify(mockJsClient).createDownloadOrderFromUsersDownloadList(eq(fileName + DownloadListWidget.ZIP_EXTENSION), any(AsyncCallback.class));
 		verify(mockView).setProgressTrackingWidgetVisible(true);
@@ -160,7 +160,7 @@ public class DownloadListWidgetTest {
 		Exception ex = new Exception("failed to create order");
 		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).createDownloadOrderFromUsersDownloadList(anyString(), any(AsyncCallback.class));
 		
-		widget.onDownloadPackage("test");
+		widget.onCreatePackage("test");
 		
 		verify(mockSynAlert).handleException(ex);
 	}

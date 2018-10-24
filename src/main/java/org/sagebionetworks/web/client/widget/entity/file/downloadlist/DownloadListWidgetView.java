@@ -14,6 +14,7 @@ public interface DownloadListWidgetView extends IsWidget {
 	void setPackageDownloadURL(String downloadUrl);
 	public interface Presenter {
 		void onClearDownloadList();
-		void onDownloadPackage(String zipFileName);
+		void onCreatePackage(String zipFileName);
+		void onDownloadPackage();
 	}
 }

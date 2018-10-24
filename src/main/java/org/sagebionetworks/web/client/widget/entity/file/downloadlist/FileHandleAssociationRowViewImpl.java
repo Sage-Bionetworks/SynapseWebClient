@@ -22,6 +22,10 @@ public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRo
 	@UiField
 	Span noAccess;
 	@UiField
+	Span tooLarge;
+	@UiField
+	Span externalLink;
+	@UiField
 	Text createdBy;
 	@UiField
 	Text createdOn;
@@ -31,8 +35,6 @@ public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRo
 	Anchor removeLink;
 	@UiField
 	Anchor requestAccessLink;
-	@UiField
-	Icon hasAccessCheck;
 	Presenter presenter;
 	private static FileHandleAssociationRowViewImplUiBinder uiBinder = GWT
 			.create(FileHandleAssociationRowViewImplUiBinder.class);
@@ -66,15 +68,6 @@ public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRo
 	}
 	
 	@Override
-	public void setHasAccess(boolean value) {
-		hasAccess.setVisible(value);
-		noAccess.setVisible(!value);
-		if (value) {
-			hasAccessCheck.setVisible(true);
-		}
-	}
-	
-	@Override
 	public void setPresenter(Presenter p) {
 		this.presenter = p;
 	}
@@ -90,8 +83,19 @@ public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRo
 	
 	@Override
 	public void showHasUnmetAccessRequirements(String entityId) {
-		hasAccessCheck.setVisible(false);
+		hasAccess.setVisible(false);
+		noAccess.setVisible(true);
 		requestAccessLink.setVisible(true);
 		requestAccessLink.setHref("#!AccessRequirements:TYPE=ENTITY&ID=" + entityId);
+	}
+	@Override
+	public void showIsLink() {
+		hasAccess.setVisible(false);
+		externalLink.setVisible(true);
+	}
+	@Override
+	public void showTooLarge() {
+		hasAccess.setVisible(false);
+		tooLarge.setVisible(true);
 	}
 }

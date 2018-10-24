@@ -13,11 +13,23 @@
 			<b:Anchor ui:field="fileNameLink" addStyleNames="overflow-x-hidden"/>
 		</t:TableData>
 		<t:TableData ui:field="accessContainer" addStyleNames="min-width-70 hidden-xs" width="70px">
-			<bh:Span ui:field="hasAccess" addStyleNames="synapse-green-bg color-white img-circle" visible="false" paddingTop="2" paddingRight="1" paddingBottom="4" paddingLeft="2">
+			<bh:Span ui:field="hasAccess" addStyleNames="synapse-green-bg color-white img-circle" paddingTop="2" paddingRight="1" paddingBottom="4" paddingLeft="2">
 				<b:Icon type="LOCK_OPEN"/>
 			</bh:Span>
 			<bh:Span ui:field="noAccess" addStyleNames="synapse-yellow-bg color-white img-circle" visible="false" paddingTop="2" paddingRight="1" paddingBottom="4" paddingLeft="2">
-				<b:Icon type="MINUS_CIRCLE"/>
+				<b:Tooltip placement="BOTTOM" title="Your list has restricted files that can’t be downloaded. You must request access to these restricted files via Access Conditions page. All files will remain in the list and can be downloaded from here once your access is granted.">
+					<b:Icon type="MINUS_CIRCLE"/>
+				</b:Tooltip>
+			</bh:Span>
+			<bh:Span ui:field="tooLarge" addStyleNames="bg-danger color-white img-circle" visible="false" paddingTop="2" paddingRight="1" paddingBottom="4" paddingLeft="2">
+				<b:Tooltip placement="BOTTOM" title="Your list contains files that are too large to download as a package and must be downloaded manually. Click on the item to go to the manual download page.">
+					<b:Icon type="DATABASE"/>
+				</b:Tooltip>
+			</bh:Span>
+			<bh:Span ui:field="externalLink" addStyleNames="synapse-green-bg color-white img-circle" visible="false" paddingTop="2" paddingRight="1" paddingBottom="4" paddingLeft="2">
+				<b:Tooltip placement="BOTTOM" title="Your list contains external links, which must be downloaded manually. Clicking on the item will take you the download page.">
+					<b:Icon type="LINK"/>
+				</b:Tooltip>
 			</bh:Span>
 		</t:TableData>
 		<t:TableData addStyleNames="min-width-150 hidden-xs visible-md visible-lg" width="150px">
@@ -31,7 +43,6 @@
 		</t:TableData>
 		<t:TableData addStyleNames="hidden-xs" width="70px">
 			<b:Anchor ui:field="requestAccessLink" text="Request Access" visible="false" />
-			<b:Icon ui:field="hasAccessCheck" addStyleNames="font-size-17 synapse-blue" type="CHECK" marginLeft="5" marginTop="2" visible="false" />
 		</t:TableData>
 		<t:TableData addStyleNames="min-width-25" width="25px"> <!-- Less than header column width to account for table data scroll bar (from scroll pane)-->
 			<b:Anchor icon="TRASH" ui:field="removeLink" />

@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.file.ExternalFileHandleInterface;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
@@ -110,8 +111,14 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 						fileSize = contentSize;
 						view.setFileSize(gwt.getFriendlySize(contentSize.doubleValue(), true));
 						updateTotalPackageSize();
+						if (fileSize > 1000000000) {
+							view.showTooLarge();
+						}
 					}
 					updateCreatedBy(fileHandle.getCreatedBy());
+					if (fileHandle instanceof ExternalFileHandleInterface) {
+						view.showIsLink();
+					}
 				}
 			};
 		});
@@ -145,7 +152,6 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 	
 	private void setHasAccess(boolean hasAccess) {
 		this.hasAccess = hasAccess;
-		view.setHasAccess(hasAccess);
 	}
 	
 	public void updateCreatedBy(String userId) {
