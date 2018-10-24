@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.repo.model.file.DownloadOrder;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.ZipFileFormat;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
@@ -43,6 +44,8 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 	CallbackP<FileHandleAssociation> onRemoveFileHandleAssociation;
 	AsynchronousProgressWidget progressWidget;
 	SynapseJSNIUtils jsniUtils;
+	int downloadOrderFileCount;
+	
 	@Inject
 	public DownloadListWidget(
 			DownloadListWidgetView view, 
@@ -73,6 +76,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 		
 		addToPackageSizeCallback = fileSize -> {
 			packageSizeSummary.addFile(fileSize);
+			view.setMultiplePackagesRequiredVisible(packageSizeSummary.getTotalFileSize() > ClientProperties.GB);
 		};
 		onRemoveFileHandleAssociation = fha -> {
 			onRemoveFileHandleAssociation(fha);
@@ -80,10 +84,12 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 	}
 	
 	public void refresh() {
+		view.hideFilesDownloadedAlert();
 		view.setCreatePackageUIVisible(true);
 		view.setDownloadPackageUIVisible(false);
 		synAlert.clear();
 		packageSizeSummary.clear();
+		view.setMultiplePackagesRequiredVisible(false);
 		refreshDownloadList();
 	}
 	
@@ -144,6 +150,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 			
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
+				downloadOrderFileCount = order.getFiles().size();
 				view.setProgressTrackingWidgetVisible(false);
 				BulkFileDownloadResponse bulkFileDownloadResponse = (BulkFileDownloadResponse) response;
 				view.setPackageDownloadURL(jsniUtils.getRawFileHandleUrl(bulkFileDownloadResponse.getResultZipFileHandleId()));
@@ -196,6 +203,9 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 	
 	@Override
 	public void onDownloadPackage() {
-		refreshDownloadList();
+		// refresh UI (change UI back to Create Package)
+		refresh();
+		// show info alert indicating how many files were in the downloaded package
+		view.showFilesDownloadedAlert(downloadOrderFileCount);
 	}
 }

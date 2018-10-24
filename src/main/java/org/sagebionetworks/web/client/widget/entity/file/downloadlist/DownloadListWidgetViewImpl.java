@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.widget.InfoAlert;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -37,6 +38,10 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 	Span downloadPackageReadyUI;
 	@UiField
 	Button downloadPackageButton;
+	@UiField
+	InfoAlert multiplePackagesRequiredAlert;
+	@UiField
+	InfoAlert filesDownloadedAlert;
 	String downloadUrl;
 	Widget w;
 	interface DownloadListWidgetViewImplUiBinder extends UiBinder<Widget, DownloadListWidgetViewImpl> {}
@@ -104,5 +109,18 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 	@Override
 	public void setPackageDownloadURL(String downloadUrl) {
 		this.downloadUrl = downloadUrl;
+	}
+	@Override
+	public void setMultiplePackagesRequiredVisible(boolean visible) {
+		multiplePackagesRequiredAlert.setVisible(visible);
+	}
+	@Override
+	public void showFilesDownloadedAlert(int fileCount) {
+		filesDownloadedAlert.setMessage(fileCount + " files were downloaded and removed from the list.");
+		filesDownloadedAlert.setVisible(true);
+	}
+	@Override
+	public void hideFilesDownloadedAlert() {
+		filesDownloadedAlert.setVisible(false);	
 	}
 }

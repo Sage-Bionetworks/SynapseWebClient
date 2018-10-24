@@ -18,6 +18,8 @@
 		<bh:Div ui:field="fileHandleAssociationTableContainer" />
 		
 		<bh:Div ui:field="synAlertContainer" />
+		<w:InfoAlert ui:field="multiplePackagesRequiredAlert" visible="false" alertType="DEFAULT" icon="QUESTION_CIRCLE" message="Due to number and size of the files in this list, multiple zip file packages will be required.  Click Create Package to start the download process." linkText="" addStyleNames="greyBackground" />
+		<w:InfoAlert ui:field="filesDownloadedAlert" visible="false" alertType="INFO" icon="CHECK_CIRCLE" message="" linkText="" />
 		<bh:Div addStyleNames="flexcontainer-row">
 			<bh:Div ui:field="packageSummaryContainer" addStyleNames="flexcontainer-column" marginTop="8" />
 			<bh:Div ui:field="progressTrackingContainer" addStyleNames="inline-block"/>

@@ -12,6 +12,9 @@ public interface DownloadListWidgetView extends IsWidget {
 	void setCreatePackageUIVisible(boolean visible);
 	void setDownloadPackageUIVisible(boolean visible);
 	void setPackageDownloadURL(String downloadUrl);
+	void setMultiplePackagesRequiredVisible(boolean visible);
+	void showFilesDownloadedAlert(int fileCount);
+	void hideFilesDownloadedAlert();
 	public interface Presenter {
 		void onClearDownloadList();
 		void onCreatePackage(String zipFileName);

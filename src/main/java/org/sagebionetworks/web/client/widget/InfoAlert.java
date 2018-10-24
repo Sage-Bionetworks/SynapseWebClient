@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -74,5 +75,8 @@ public class InfoAlert implements IsWidget {
 	}
 	public void setLinkText(String text) {
 		link.setText(text.toUpperCase());
+	}
+	public void setAlertType(AlertType type) {
+		w.setType(type);
 	}
 }
