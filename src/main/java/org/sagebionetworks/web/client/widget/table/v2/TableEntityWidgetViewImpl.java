@@ -56,6 +56,8 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	Anchor showSimpleSearch;
 	@UiField
 	Anchor showAdvancedSearch;
+	@UiField
+	Div addToDownloadListContainer;
 	PortalGinInjector ginInjector;
 	ColumnModelsWidget columnModelsWidget;
 	ScopeWidget scopeWidget;
@@ -165,5 +167,10 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	@Override
 	public void setTableToolbarVisible(boolean visible) {
 		tableToolbar.setVisible(visible);
+	}
+	@Override
+	public void setAddToDownloadList(IsWidget w) {
+		addToDownloadListContainer.clear();
+		addToDownloadListContainer.add(w);
 	}
 }

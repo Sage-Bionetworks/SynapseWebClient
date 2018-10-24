@@ -22,8 +22,6 @@ public class BasicTitleBarViewImpl implements BasicTitleBarView {
 	SimplePanel favoritePanel;
 	@UiField
 	Icon entityIcon;
-	@UiField
-	Span containerHelpContainer;
 	interface BasicTitleBarViewImplUiBinder extends UiBinder<Widget, BasicTitleBarViewImpl> {
 	}
 
@@ -73,17 +71,6 @@ public class BasicTitleBarViewImpl implements BasicTitleBarView {
 	@Override
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message);
-	}
-	
-	@Override
-	public void setContainerHelpWidget(Widget w) {
-		containerHelpContainer.clear();
-		containerHelpContainer.add(w);
-	}
-	
-	@Override
-	public void setContainerHelpWidgetVisible(boolean visible) {
-		containerHelpContainer.setVisible(visible);
 	}
 	
 	@Override

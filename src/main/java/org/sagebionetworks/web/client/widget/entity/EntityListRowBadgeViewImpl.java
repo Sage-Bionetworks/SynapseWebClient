@@ -39,7 +39,7 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 	Label createdOnField;
 	
 	@UiField
-	Span fileDownloadButtonContainer;
+	org.gwtbootstrap3.client.ui.Anchor addToDownloadListLink;
 	@UiField
 	Label descriptionField;
 	@UiField
@@ -117,9 +117,8 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 		return DisplayUtils.isInViewport(this);
 	}
 	@Override
-	public void setFileDownloadButton(Widget w) {
-		fileDownloadButtonContainer.clear();
-		fileDownloadButtonContainer.add(w);
+	public void showAddToDownloadList() {
+		addToDownloadListLink.setVisible(true);
 	}
 	@Override
 	public void setDescriptionVisible(boolean visible) {

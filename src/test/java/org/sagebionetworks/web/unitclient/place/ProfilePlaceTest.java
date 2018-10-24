@@ -22,11 +22,19 @@ public class ProfilePlaceTest {
 		Profile place = tokenizer.getPlace(testToken);
 		
 		assertEquals(testUserId, place.getUserId());
-		//default area is projects
-		assertEquals(Synapse.ProfileArea.PROJECTS, place.getArea());
+		//default area is profile
+		assertEquals(Synapse.ProfileArea.PROFILE, place.getArea());
 		assertEquals(testToken, tokenizer.getToken(place));
 	}
 	
+	@Test
+	public void testProfileCase() {
+		String testToken = testUserId + PROFILE_DELIMITER;
+		Profile place = tokenizer.getPlace(testToken);
+		assertEquals(testUserId, place.getUserId());
+		assertEquals(Synapse.ProfileArea.PROFILE, place.getArea());
+		assertEquals(testToken, tokenizer.getToken(place));
+	}
 	
 	@Test
 	public void testProjectsCase() {
@@ -128,6 +136,7 @@ public class ProfilePlaceTest {
 	
 	public static final String SETTINGS_DELIMITER = Profile.getDelimiter(Synapse.ProfileArea.SETTINGS);
 	public static final String PROJECTS_DELIMITER = Profile.getDelimiter(Synapse.ProfileArea.PROJECTS);
+	public static final String PROFILE_DELIMITER = Profile.getDelimiter(Synapse.ProfileArea.PROFILE);
 	public static final String CHALLENGES_DELIMITER = Profile.getDelimiter(Synapse.ProfileArea.CHALLENGES);
 	public static final String TEAMS_DELIMITER = Profile.getDelimiter(Synapse.ProfileArea.TEAMS);
 	

@@ -7,13 +7,15 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.PresignedAndFileHandleURLAsyncHandler;
-import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -22,6 +24,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class DownloadSpeedTesterImpl implements DownloadSpeedTester {
+	public static final String ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY = "ESTIMATED_DOWNLOAD_SPEED";
 	public static final String TEST_FILE_SYN_ID = "syn12600511";
 	long startTime;
 	RequestBuilderWrapper requestBuilder;
@@ -29,6 +32,7 @@ public class DownloadSpeedTesterImpl implements DownloadSpeedTester {
 	
 	AuthenticationController authController;
 	SynapseJavascriptClient jsClient;
+	ClientCache clientCache;
 	/**
 	 * Three step process.
 	 * 1.  Get the test file entity (for the target file handle id).
@@ -37,6 +41,7 @@ public class DownloadSpeedTesterImpl implements DownloadSpeedTester {
 	 * 
 	 * If we want to make the test more accurate, we could increase the size of the data file.
 	 * Note: Make sure the data file is properly optimized and compressed. The default compression on connections to the webserver would cause an overestimate if this is not the case.
+	 * Not sure why every app needs to run their own speed test. NetInfo is not well-supported at the time of writing: https://caniuse.com/#feat=netinfo
 	 * @param authController
 	 * @param presignedUrlAsyncHandler
 	 * @param requestBuilder
@@ -47,14 +52,24 @@ public class DownloadSpeedTesterImpl implements DownloadSpeedTester {
 			AuthenticationController authController,
 			PresignedAndFileHandleURLAsyncHandler presignedUrlAsyncHandler,
 			RequestBuilderWrapper requestBuilder,
-			SynapseJavascriptClient jsClient) {
+			SynapseJavascriptClient jsClient,
+			ClientCache clientCache) {
 		this.authController = authController;
 		this.presignedUrlAsyncHandler = presignedUrlAsyncHandler;
 		this.requestBuilder = requestBuilder;
 		this.jsClient = jsClient;
+		this.clientCache = clientCache;
 	}
 	@Override
 	public void testDownloadSpeed(final AsyncCallback<Double> callback) {
+		if (clientCache.contains(ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY)) {
+			String downloadSpeedString = clientCache.get(ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY);
+			double downloadSpeed = Double.parseDouble(downloadSpeedString);
+			if (!Double.isInfinite(downloadSpeed) && !Double.isNaN(downloadSpeed)) {
+				callback.onSuccess(Double.parseDouble(downloadSpeedString));
+				return;
+			}
+		}
 		// must be logged in to check download speed
 		if (authController.isLoggedIn()) {
 			jsClient.getEntity(TEST_FILE_SYN_ID, new AsyncCallback<Entity>() {
@@ -94,6 +109,10 @@ public class DownloadSpeedTesterImpl implements DownloadSpeedTester {
 		});
 	}
 	
+	public void updateCachedDownloadSpeed(Double downloadSpeed) {
+		//cache speed for 10 minutes
+		clientCache.put(ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY, downloadSpeed.toString(), new Date(System.currentTimeMillis() + 1000*60*10).getTime());
+	}
 	public void testDownloadSpeedStep3(String url, double fileSize, AsyncCallback<Double> callback) {
 		requestBuilder.configure(RequestBuilder.GET, url);
 		try {
@@ -106,9 +125,11 @@ public class DownloadSpeedTesterImpl implements DownloadSpeedTester {
 					int statusCode = response.getStatusCode();
 					if (statusCode == Response.SC_OK) {
 						// done!
-						long endTime = new Date().getTime();
-						long msElapsed = endTime - startTime;
-						callback.onSuccess(fileSize / (msElapsed / 1000));
+						double endTime = new Date().getTime();
+						double msElapsed = endTime - startTime;
+						double downloadSpeed = fileSize / (msElapsed / 1000.0);
+						updateCachedDownloadSpeed(downloadSpeed); 
+						callback.onSuccess(downloadSpeed);
 					} else {
 						onError(null, new IllegalArgumentException("Unable to retrieve test file. Reason: " + response.getStatusText()));
 					}

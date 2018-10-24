@@ -3,17 +3,22 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Hr;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
+import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
+import org.sagebionetworks.web.client.widget.InfoAlert;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
-import org.sagebionetworks.web.client.widget.table.SortEntityChildrenDropdownButton;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -56,11 +61,18 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	@UiField
 	Div synAlertContainer;
 	Div entityTreeContainer = new Div();
+	AuthenticationController authController;
+	GlobalApplicationState globalAppState;
+	InfoAlert addedToDownloadListAlert = null;
 	private Widget widget;
 	@Inject
 	public EntityTreeBrowserViewImpl(IconsImageBundle iconsImageBundle,
-			Binder uiBinder) {
+			Binder uiBinder, 
+			AuthenticationController authController, 
+			GlobalApplicationState globalAppState) {
 		this.iconsImageBundle = iconsImageBundle;
+		this.authController = authController;
+		this.globalAppState = globalAppState;
 		this.widget = uiBinder.createAndBindUi(this);
 		// Make sure to show this and hide the tree on empty.
 		hideEmptyUI();
@@ -304,5 +316,27 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
+	}
+	
+	private void initAddedToDownloadListAlert() {
+		if (addedToDownloadListAlert == null) {
+			addedToDownloadListAlert = new InfoAlert();
+			addedToDownloadListAlert.setIcon(IconType.CHECK_CIRCLE);
+			addedToDownloadListAlert.addClickHandler(event -> {
+				Profile place = new Profile(authController.getCurrentUserPrincipalId() + "/downloads");
+				globalAppState.getPlaceChanger().goTo(place);
+			});
+			addedToDownloadListAlert.setLinkText("view download list");
+		} else {
+			addedToDownloadListAlert.asWidget().removeFromParent();
+		}
+	}
+	
+	@Override
+	public void showAddedToDownloadListAlert(String message) {
+		initAddedToDownloadListAlert();
+		addedToDownloadListAlert.setMessage(message);
+		mainContainer.insert(addedToDownloadListAlert.asWidget(), 0);
+		SynapseJSNIUtilsImpl._scrollIntoView(addedToDownloadListAlert.asWidget().getElement());
 	}
 }

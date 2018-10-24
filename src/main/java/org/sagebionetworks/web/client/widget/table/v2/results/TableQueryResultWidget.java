@@ -56,6 +56,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	public static final long BUNDLE_MASK_QUERY_MAX_ROWS_PER_PAGE = 0x8;
 	public static final long BUNDLE_MASK_QUERY_COLUMN_MODELS = 0x10;
 	public static final long BUNDLE_MASK_QUERY_FACETS = 0x20;
+	public static final long BUNDLE_MASK_QUERY_SUM_FILE_SIZES = 0x40;
+	
 
 	private static final Long ALL_PARTS_MASK = new Long(255);
 	SynapseClientAsync synapseClient;

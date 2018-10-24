@@ -83,6 +83,7 @@ import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
@@ -96,6 +97,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ProfilePresenterTest {
@@ -177,6 +179,8 @@ public class ProfilePresenterTest {
 	Project mockProject;
 	@Mock
 	PrincipalAliasResponse mockPrincipalAliasResponse;
+	@Mock
+	DownloadListWidget mockDownloadListWidget;
 	
 	List<Team> myTeams;
 	List<String> teamIds;
@@ -205,6 +209,7 @@ public class ProfilePresenterTest {
 		when(mockInjector.getProjectBadgeWidget()).thenReturn(mockProjectBadge);
 		when(mockInjector.getChallengeBadgeWidget()).thenReturn(mockChallengeBadge);
 		when(mockInjector.getSettingsPresenter()).thenReturn(mockSettingsPresenter);
+		when(mockInjector.getDownloadListWidget()).thenReturn(mockDownloadListWidget);
 		userProfile.setDisplayName("tester");
 		userProfile.setOwnerId("1");
 		userProfile.setEmail("original.email@sagebase.org");
@@ -358,7 +363,6 @@ public class ProfilePresenterTest {
 		verify(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		
 		verify(mockSynapseJavascriptClient, never()).getUserTeams(anyString(), anyBoolean(), anyString());
-		verifyProfileShown(false);
 		
 		//not logged in, should not ask for this user favs
 		verify(mockSynapseJavascriptClient, never()).getFavorites(any(AsyncCallback.class));
@@ -441,7 +445,7 @@ public class ProfilePresenterTest {
 		when(place.getUserId()).thenReturn("4");
 		when(place.getArea()).thenReturn(ProfileArea.SETTINGS);
 		profilePresenter.setPlace(place);
-		verify(mockView).setTabSelected(eq(ProfileArea.PROJECTS));
+		verify(mockView).setTabSelected(eq(ProfileArea.PROFILE));
 		verify(mockView).addCertifiedBadge();
 		verify(mockView, never()).setGetCertifiedVisible(anyBoolean());
 	}		
@@ -1049,6 +1053,18 @@ public class ProfilePresenterTest {
 	}
 	
 	@Test
+	public void testDownloadsTabOwner() {
+		profilePresenter.setPlace(place);
+		profilePresenter.setIsOwner(true);
+		when(place.getArea()).thenReturn(ProfileArea.DOWNLOADS);
+		
+		profilePresenter.tabClicked(ProfileArea.DOWNLOADS);
+		
+		verify(mockDownloadListWidget).refresh();
+		verify(mockView).setDownloadListWidget(any(IsWidget.class));
+	}
+	
+	@Test
 	public void testGetTeamsError() {
 		profilePresenter.setPlace(place);
 		String errorMessage = "error loading teams";
@@ -1140,7 +1156,7 @@ public class ProfilePresenterTest {
 		ArgumentCaptor<Profile> captor = ArgumentCaptor.forClass(Profile.class);
 		verify(mockPlaceChanger).goTo(captor.capture());
 		Profile capturedPlace = captor.getValue();
-		assertEquals(ProfileArea.PROJECTS, capturedPlace.getArea());
+		assertEquals(ProfileArea.PROFILE, capturedPlace.getArea());
 		assertEquals(testUserId, capturedPlace.getUserId());
 	}
 	@Test
@@ -1380,79 +1396,6 @@ public class ProfilePresenterTest {
 		profilePresenter.updateArea(ProfileArea.PROJECTS, false);
 		verify(mockPlaceChanger, never()).goTo(isA(Profile.class));
 	}
-	
-	private void verifyProfileHidden(boolean isCookieExpected) {
-		verify(mockView).hideProfile();
-		verify(mockView).setShowProfileButtonVisible(true);
-		verify(mockView).setHideProfileButtonVisible(false);
-		if (isCookieExpected)
-			verify(mockCookies).setCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY), eq(Boolean.toString(false)), any(Date.class));
-		else
-			verify(mockCookies, never()).setCookie(anyString(), anyString(), any(Date.class));
-	}
-	private void verifyProfileShown(boolean isCookieExpected) {
-		verify(mockView).showProfile();
-		verify(mockView).setShowProfileButtonVisible(false);
-		verify(mockView, Mockito.atLeastOnce()).setHideProfileButtonVisible(true);
-		if (isCookieExpected)
-			verify(mockCookies).setCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY), eq(Boolean.toString(true)), any(Date.class));
-		else
-			verify(mockCookies, never()).setCookie(anyString(), anyString(), any(Date.class));
-	}
-	
-	@Test
-	public void testInitShowHideProfileNotOwner() {
-		profilePresenter.initializeShowHideProfile(false);
-		verifyProfileShown(false);
-		//and verify that hide profile button was hidden
-		verify(mockView, Mockito.atLeastOnce()).setHideProfileButtonVisible(false);
-	}
-	
-	@Test
-	public void testInitShowHideProfileNullCookieValue() {
-		//return null
-		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn(null);
-		profilePresenter.initializeShowHideProfile(true);
-		verifyProfileShown(false);
-	}
-	
-	@Test
-	public void testInitShowHideProfileEmptyCookieValue() {
-		//return null
-		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn("");
-		profilePresenter.initializeShowHideProfile(true);
-		verifyProfileShown(false);
-	}
-	@Test
-	public void testInitShowHideProfileTrueCookieValue() {
-		//return null
-		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn("true");
-		profilePresenter.initializeShowHideProfile(true);
-		verifyProfileShown(false);
-	}
-	@Test
-	public void testInitShowHideProfileFalseCookieValue() {
-		//return null
-		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn("false");
-		profilePresenter.initializeShowHideProfile(true);
-		verifyProfileHidden(false);
-	}
-	
-	@Test
-	public void testHideProfileButtonClicked() {
-		//return null
-		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn("true");
-		profilePresenter.hideProfileButtonClicked();
-		verifyProfileHidden(true);
-	}
-	@Test
-	public void testShowProfileButtonClicked() {
-		//return null
-		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn("false");
-		profilePresenter.showProfileButtonClicked();
-		verifyProfileShown(true);
-	}
-	
 	@Test
 	public void testInitUserFavorites() {
 		List<EntityHeader> favorites = new ArrayList<EntityHeader>();
@@ -1743,8 +1686,8 @@ public class ProfilePresenterTest {
 		verify(mockPlaceChanger).goTo(captor.capture());
 		Profile capturedPlace = (Profile)captor.getValue();
 		assertEquals(currentUserId, capturedPlace.getUserId());
-		//default area, projects
-		assertEquals(ProfileArea.PROJECTS, capturedPlace.getArea());
+		//default area, profile
+		assertEquals(ProfileArea.PROFILE, capturedPlace.getArea());
 	}
 	@Test
 	public void testVWithAreaTokenLoggedIn() {

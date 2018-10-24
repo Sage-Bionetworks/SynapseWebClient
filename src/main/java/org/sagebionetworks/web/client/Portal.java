@@ -64,7 +64,8 @@ public class Portal implements EntryPoint {
 					try {
 						// load the previous session, if there is one
 						ginjector.getAuthenticationController().reloadUserSessionData();
-
+						// make sure jsni utils code is available to the client
+						ginjector.getSynapseJSNIUtils();
 						EventBus eventBus = ginjector.getEventBus();
 						PlaceController placeController = new PlaceController(eventBus);
 

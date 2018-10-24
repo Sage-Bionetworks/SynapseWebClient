@@ -47,6 +47,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
@@ -100,6 +101,8 @@ public class TableEntityWidgetTest {
 	FileViewClientsHelp mockFileViewClientsHelp;
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
+	@Mock
+	AddToDownloadList mockAddToDownloadList;
 	@Captor
 	ArgumentCaptor<ActionListener> actionListenerCaptor;
 	
@@ -137,6 +140,7 @@ public class TableEntityWidgetTest {
 				mockPreflightController, 
 				mockSynapseClient, 
 				mockFileViewClientsHelp,
+				mockAddToDownloadList,
 				mockPortalGinInjector);
 		
 		AsyncMockStubber.callSuccessWith(FACET_SQL).when(mockSynapseClient).generateSqlWithFacets(anyString(), anyList(), anyList(), any(AsyncCallback.class));
@@ -634,7 +638,7 @@ public class TableEntityWidgetTest {
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
 		widget.configure(entityBundle, true, mockQueryChangeHandler, mockActionMenu);
 		
-		widget.onShowDownloadFiles();
+		widget.onShowDownloadFilesProgrammatically();
 		
 		verify(mockFileViewClientsHelp).setQuery(EXPECTED_SQL_FOR_CLIENT);
 		verify(mockFileViewClientsHelp).show();

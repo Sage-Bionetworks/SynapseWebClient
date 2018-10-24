@@ -20,7 +20,7 @@ public class AsynchronousProgressWidget implements
 	/**
 	 * The format used to convert doubles to strings.
 	 */
-	public static final String PERCENT_FORMAT = "000.00";
+	public static final String PERCENT_FORMAT = "0";
 	/**
 	 * The number of milliseconds to wait between status checks.
 	 */
@@ -41,6 +41,10 @@ public class AsynchronousProgressWidget implements
 		this.view.setPresenter(this);
 	}
 
+	public void setView(AsynchronousProgressView altView) {
+		this.view = altView;
+		altView.setPresenter(this);
+	}
 	/**
 	 * Reset this widget to track the passed status.
 	 * 
@@ -118,11 +122,4 @@ public class AsynchronousProgressWidget implements
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-
-	@Override
-	public void onCancel() {
-		// Calling cancel on the tracker will feed-back to this widget.
-		jobTracker.cancel();
-	}
-
 }

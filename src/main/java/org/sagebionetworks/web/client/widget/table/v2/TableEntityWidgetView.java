@@ -84,4 +84,5 @@ public interface TableEntityWidgetView extends IsWidget {
 	void showConfirmDialog(String title, String confirmationMessage, Callback yesCallback);
 	void setSimpleSearchLinkVisible(boolean visible);
 	void setAdvancedSearchLinkVisible(boolean visible);
+	void setAddToDownloadList(IsWidget w);
 }

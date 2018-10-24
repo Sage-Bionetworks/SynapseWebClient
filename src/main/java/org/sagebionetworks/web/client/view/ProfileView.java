@@ -46,10 +46,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setFavoritesFilterSelected();
 	void setSharedDirectlyWithMeFilterSelected();
 	void setFavoritesHelpPanelVisible(boolean isVisible);
-	void showProfile();
-	void hideProfile();
-	void setShowProfileButtonVisible(boolean isVisible);
-	void setHideProfileButtonVisible(boolean isVisible);
 	void setProfileEditButtonVisible(boolean isVisible);
 	void setOrcIDLinkButtonVisible(boolean isVisible);
 	void setProjectSortVisible(boolean isVisible);
@@ -69,9 +65,8 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setVerificationSubmittedButtonVisible(boolean isVisible);
 	void setVerificationDetailsButtonVisible(boolean isVisible);
 	void setSettingsWidget(Widget w);
+	void setDownloadListWidget(IsWidget w);
 	public interface Presenter {
-		void showProfileButtonClicked();
-		void hideProfileButtonClicked();
 		void createProject();
 		void createTeam();
 		void goTo(Place place);

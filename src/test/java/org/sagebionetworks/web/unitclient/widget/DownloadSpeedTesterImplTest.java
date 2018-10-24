@@ -17,9 +17,11 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.repo.model.file.FileResultFailureCode;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.DownloadSpeedTesterImpl;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
@@ -33,6 +35,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.RequestBuilderMockStubber;
 
 import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -61,7 +64,8 @@ public class DownloadSpeedTesterImplTest {
 	AsyncCallback<Double> mockCallback;
 	@Captor
 	ArgumentCaptor<Throwable> throwableCaptor;
-	
+	@Mock
+	ClientCache mockClientCache;
 	public static final String FILE_HANDLE_ID = "876567";
 	public static final Long FILE_CONTENT_SIZE = 1L;
 	public static final String PRESIGNED_URL = "https://s3.presigned.url/test.zip";
@@ -81,7 +85,9 @@ public class DownloadSpeedTesterImplTest {
 		AsyncMockStubber.callSuccessWith(mockFileResult).when(mockFileHandleAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse).when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		
-		downloadSpeedTester = new DownloadSpeedTesterImpl(mockAuthController, mockFileHandleAsyncHandler, mockRequestBuilder, mockJsClient);
+		downloadSpeedTester = new DownloadSpeedTesterImpl(mockAuthController, mockFileHandleAsyncHandler, mockRequestBuilder, mockJsClient, mockClientCache);
+		when(mockClientCache.get(DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY)).thenReturn(null);
+		when(mockClientCache.contains(DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY)).thenReturn(false);
 	}
 
 	@Test
@@ -134,4 +140,31 @@ public class DownloadSpeedTesterImplTest {
 		verify(mockCallback).onFailure(throwableCaptor.capture());
 		assertTrue(throwableCaptor.getValue().getMessage().contains(statusText));
 	}
+	
+	@Test
+	public void testCachedDownloadSpeed() {
+		String cachedDownloadSpeedString = "188267.37037";
+		when(mockClientCache.contains(DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY)).thenReturn(true);
+		when(mockClientCache.get(DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY)).thenReturn(cachedDownloadSpeedString);
+		
+		downloadSpeedTester.testDownloadSpeed(mockCallback);
+		
+		verifyZeroInteractions(mockRequestBuilder, mockJsClient);
+		verify(mockCallback).onSuccess(Double.valueOf(cachedDownloadSpeedString));
+	}
+	
+	@Test
+	public void testCachedInvalidValueDownloadSpeed() throws RequestException {
+		String cachedDownloadSpeedString = Double.toString(Double.POSITIVE_INFINITY);
+		when(mockClientCache.contains(DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY)).thenReturn(true);
+		when(mockClientCache.get(DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY)).thenReturn(cachedDownloadSpeedString);
+		
+		downloadSpeedTester.testDownloadSpeed(mockCallback);
+		
+		//verify it runs the test
+		verify(mockJsClient).getEntity(anyString(), any(AsyncCallback.class));
+		verify(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
+		verify(mockCallback).onSuccess(anyDouble());
+	}
+
 }

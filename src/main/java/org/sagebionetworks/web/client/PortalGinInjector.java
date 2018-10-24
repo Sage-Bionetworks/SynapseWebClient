@@ -56,6 +56,7 @@ import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.Cr
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.OpenSubmissionWidget;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.client.widget.asynch.InlineAsynchronousProgressViewImpl;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditor;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditor;
@@ -134,6 +135,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialog;
+import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidget;
+import org.sagebionetworks.web.client.widget.entity.file.downloadlist.FileHandleAssociationRow;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererCancelControl;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererEntityIdAnnotations;
@@ -448,6 +451,7 @@ public interface PortalGinInjector extends Ginjector {
 
 	// Asynchronous
 	AsynchronousProgressWidget creatNewAsynchronousProgressWidget();
+	InlineAsynchronousProgressViewImpl getInlineAsynchronousProgressView();
 
 	UserTeamBadge getUserTeamBadgeWidget();
 	TeamBadge getTeamBadgeWidget();
@@ -584,5 +588,8 @@ public interface PortalGinInjector extends Ginjector {
 	QuizInfoDialog getQuizInfoDialog();
 	EvaluationRowWidget getEvaluationRowWidget();
 	EditDiscussionThreadModal getEditDiscussionThreadModal();
+	DownloadListWidget getDownloadListWidget();
+	FileHandleAssociationRow getFileHandleAssociationRow(); 
 	TableEntityListGroupItem getTableEntityListGroupItem();
+	SynapseJSNIUtilsImpl getSynapseJSNIUtils();
 }

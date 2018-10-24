@@ -124,4 +124,24 @@ public class DateTimeUtilsImpl implements DateTimeUtils {
 	public TimeZone getCurrentTimezone() {
 		return currentTimezone;
 	}
+	
+	@Override
+	public String getFriendlyTimeEstimate(long totalSeconds) {
+		long seconds = totalSeconds % 60;
+	    long totalMinutes = totalSeconds / 60;
+	    long minutes = totalMinutes % 60;
+	    long hours = totalMinutes / 60;
+	    StringBuilder sb = new StringBuilder();
+	    boolean isHours = hours > 0;
+	    if (isHours) {
+	    	sb.append(hours + " h ");
+	    }
+	    if (minutes > 0) {
+	    	sb.append(minutes + " min ");
+	    }
+	    if (!isHours && (seconds > 0 || sb.toString().isEmpty())) {
+	    	sb.append(seconds + " s");
+	    }
+	    return sb.toString().trim();
+	}
 }

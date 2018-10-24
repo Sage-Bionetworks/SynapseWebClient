@@ -19,8 +19,6 @@ public class ContainerClientsHelpImpl implements ContainerClientsHelp {
 	@UiField
 	SpanElement id2;
 	@UiField
-	Anchor link;
-	@UiField
 	Modal modal;
 	@UiField
 	TabListItem cliTabListItem;
@@ -38,12 +36,6 @@ public class ContainerClientsHelpImpl implements ContainerClientsHelp {
 	@Inject
 	public ContainerClientsHelpImpl(Binder binder) {
 		this.widget = binder.createAndBindUi(this);
-		link.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				modal.show();
-			}
-		});
 		FileClientsHelpViewImpl.setId(cliTabListItem, cliTabPane);
 		FileClientsHelpViewImpl.setId(pythonTabListItem, pythonTabPane);
 	}
@@ -53,9 +45,10 @@ public class ContainerClientsHelpImpl implements ContainerClientsHelp {
 	}
 	
 	@Override
-	public void configure(String entityId) {
+	public void configureAndShow(String entityId) {
 		this.entityId = entityId;
 		id1.setInnerHTML(entityId);
 		id2.setInnerHTML(entityId);
+		modal.show();
 	}
 }

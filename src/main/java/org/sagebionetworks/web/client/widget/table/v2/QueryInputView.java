@@ -33,7 +33,7 @@ public interface QueryInputView extends IsWidget {
 		/**
 		 * Called when the user clicks download results.
 		 */
-		void onDownloadResults();
+		void onExportTable();
 		/**
 		 * Called when the user clicks show query.
 		 */
@@ -41,7 +41,8 @@ public interface QueryInputView extends IsWidget {
 		/**
 		 * Called when the user clicks download files.
 		 */
-		void onDownloadFiles();
+		void onDownloadFilesProgrammatically();
+		void onAddToDownloadList();
 	}
 	
 	/**
