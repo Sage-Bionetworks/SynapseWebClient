@@ -30,7 +30,6 @@ import com.google.inject.Inject;
 
 public class FileHandleAssociationRow implements IsWidget, FileHandleAssociationRowView.Presenter {
 	
-	public static final int ONE_GB = 1000000000;
 	FileHandleAssociationRowView view;
 	FileHandleAsyncHandler fhaAsyncHandler;
 	UserProfileAsyncHandler userProfileAsyncHandler;
