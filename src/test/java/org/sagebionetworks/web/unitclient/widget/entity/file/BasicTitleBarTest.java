@@ -46,15 +46,13 @@ public class BasicTitleBarTest {
 	Entity entity;
 	String testEntityName = "Entity Name";
 	String entityId = "syn123";
-	@Mock
-	ContainerClientsHelp mockContainerClientsHelp;
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
 		mockView = mock(BasicTitleBarView.class);
 		mockAuthController = mock(AuthenticationController.class);
 		mockFavoriteWidget = mock(FavoriteWidget.class);
-		titleBar = new BasicTitleBar(mockView, mockAuthController, mockFavoriteWidget, mockContainerClientsHelp);
+		titleBar = new BasicTitleBar(mockView, mockAuthController, mockFavoriteWidget);
 		mockBundle = mock(EntityBundle.class);
 		entity = new Folder();
 		entity.setId(entityId);
@@ -77,8 +75,6 @@ public class BasicTitleBarTest {
 		verify(mockView).setFavoritesWidgetVisible(true);
 		verify(mockView).setTitle(testEntityName);
 		verify(mockView).setIconType(IconType.FOLDER);
-		verify(mockContainerClientsHelp).configure(entityId);
-		verify(mockView).setContainerHelpWidgetVisible(true);
 	}
 	
 	@Test
@@ -90,9 +86,5 @@ public class BasicTitleBarTest {
 		titleBar.configure(mockBundle);
 		verify(mockView).setFavoritesWidgetVisible(false);
 		verify(mockView).setIconType(IconType.TABLE);
-		verify(mockContainerClientsHelp).configure(entityId);
-		verify(mockView).setContainerHelpWidgetVisible(false);
 	}
-
-
 }

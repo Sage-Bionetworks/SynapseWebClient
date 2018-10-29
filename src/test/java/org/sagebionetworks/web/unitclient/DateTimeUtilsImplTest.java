@@ -1,16 +1,9 @@
 package org.sagebionetworks.web.unitclient;
 
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.DateTimeUtilsImpl.DATE_ONLY_FORMAT_STRING;
-import static org.sagebionetworks.web.client.DateTimeUtilsImpl.LONG_DATE_FORMAT_STRING;
-import static org.sagebionetworks.web.client.DateTimeUtilsImpl.SMALL_DATE_FORMAT_STRING;
-import static org.sagebionetworks.web.client.DateTimeUtilsImpl.UTC;
-import static org.sagebionetworks.web.client.DateTimeUtilsImpl.YEAR_ONLY_FORMAT_STRING;
-
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+import static org.sagebionetworks.web.client.DateTimeUtilsImpl.*;
 import java.util.Date;
 
 import org.junit.Before;
@@ -98,6 +91,18 @@ public class DateTimeUtilsImplTest {
 		dateTimeUtils.getRelativeTime(d);
 		verify(mockMoment).getRelativeTime(anyString());
 	}
+	
+	@Test
+	public void testFriendlyTimeEstimate() {
+		assertEquals("0 s", dateTimeUtils.getFriendlyTimeEstimate(0));
+		assertEquals("5 s", dateTimeUtils.getFriendlyTimeEstimate(5));
+		assertEquals("1 min", dateTimeUtils.getFriendlyTimeEstimate(60));
+		assertEquals("1 min 8 s", dateTimeUtils.getFriendlyTimeEstimate(60 + 8));
+		assertEquals("1 h", dateTimeUtils.getFriendlyTimeEstimate(60*60));
+		assertEquals("1 h 1 min", dateTimeUtils.getFriendlyTimeEstimate(60*60 + 60));
+		// ignore seconds if greater than an hour
+		assertEquals("1 h 1 min", dateTimeUtils.getFriendlyTimeEstimate(60*60 + 60 + 9));
+	}
 
 	@Test
 	public void testGetYear() {
@@ -105,6 +110,7 @@ public class DateTimeUtilsImplTest {
 		dateTimeUtils.getYear(d);
 		verify(mockYearFormat).format(d);
 	}
+
 }
 
 

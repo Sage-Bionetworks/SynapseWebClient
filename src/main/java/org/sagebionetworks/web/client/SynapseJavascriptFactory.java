@@ -46,6 +46,9 @@ import org.sagebionetworks.repo.model.doi.v2.DoiResponse;
 import org.sagebionetworks.repo.model.file.AddPartResponse;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlResponse;
+import org.sagebionetworks.repo.model.file.DownloadList;
+import org.sagebionetworks.repo.model.file.DownloadOrder;
+import org.sagebionetworks.repo.model.file.DownloadOrderSummaryResponse;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
@@ -128,6 +131,9 @@ public class SynapseJavascriptFactory {
 		AddPartResponse,
 		PaginatedResultsTotalNumberOfResults,
 		PrincipalAliasResponse,
+		DownloadList,
+		DownloadOrder,
+		DownloadOrderSummaryResponse,
 		Doi,
 		None,
 		String
@@ -224,6 +230,12 @@ public class SynapseJavascriptFactory {
 			return new PrincipalAliasResponse(json);
 		case EntityId :
 			return new EntityId(json).getId();
+		case DownloadList : 
+			return new DownloadList(json);
+		case DownloadOrder : 
+			return new DownloadOrder(json);
+		case DownloadOrderSummaryResponse :
+			return new DownloadOrderSummaryResponse(json);
 		case ChallengePagedResults:
 			return new ChallengePagedResults(json).getResults();
 		case SubscriptionPagedResults :

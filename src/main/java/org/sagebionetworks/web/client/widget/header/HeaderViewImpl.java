@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.DropDown;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -27,14 +28,17 @@ import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 
 public class HeaderViewImpl extends Composite implements HeaderView {
 	public interface Binder extends UiBinder<Widget, HeaderViewImpl> {
@@ -72,6 +76,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	AnchorListItem logoutLink;
 	@UiField
+	AnchorListItem myProfileLink;
+	@UiField
 	AnchorListItem myDashboardLink;
 	@UiField
 	AnchorListItem myTeamsLink;
@@ -79,6 +85,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	AnchorListItem myChallengesLink;
 	@UiField
 	AnchorListItem mySettingsLink;
+	@UiField
+	AnchorListItem myDownloadsLink;
 	@UiField
 	AnchorListItem helpForumLink;
 	@UiField
@@ -101,6 +109,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	Alert stagingAlert;
 	@UiField
 	AnchorListItem documentationLink;
+	@UiField
+	Div downloadListNotificationUI;
+	@UiField
+	FocusPanel downloadListLink;
+	@UiField
+	Label downloadListFileCount;
 	
 	private Presenter presenter;
 	private SearchBox searchBox;
@@ -195,6 +209,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			presenter.onLogoClick();
 		});
 		
+		myProfileLink.addClickHandler(event -> {
+			Profile place = new Profile(userId, ProfileArea.PROFILE);
+			globalAppState.getPlaceChanger().goTo(place);
+			hideDropdown();
+		});
 		myDashboardLink.addClickHandler(event -> {
 			Profile place = new Profile(userId, ProfileArea.PROJECTS);
 			globalAppState.getPlaceChanger().goTo(place);
@@ -215,6 +234,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			globalAppState.getPlaceChanger().goTo(place);
 			hideDropdown();
 		});
+		myDownloadsLink.addClickHandler(event -> {
+			Profile place = new Profile(userId, ProfileArea.DOWNLOADS);
+			globalAppState.getPlaceChanger().goTo(place);
+			hideDropdown();
+		});
 		helpForumLink.addClickHandler(event -> {
 			SynapseForumPlace place = new SynapseForumPlace("default");
 			globalAppState.getPlaceChanger().goTo(place);
@@ -226,7 +250,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		});
 		
 		xsFavoritesLink.addClickHandler(event -> {
-			Profile place = new Profile("v/projects/favorites");
+			Profile place = new Profile(userId + "/projects/favorites");
 			globalAppState.getPlaceChanger().goTo(place);
 			hideDropdown();
 		});
@@ -235,6 +259,10 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			Search place = new Search("");
 			globalAppState.getPlaceChanger().goTo(place);
 			hideDropdown();
+		});
+		downloadListLink.addClickHandler(event -> {
+			Profile place = new Profile(userId + "/downloads");
+			globalAppState.getPlaceChanger().goTo(place);
 		});
 	}
 	
@@ -316,5 +344,22 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@Override
 	public void setStagingAlertVisible(boolean visible) {
 		stagingAlert.setVisible(visible);	
+	}
+	
+	/** Event binder code **/
+	interface EBinder extends EventBinder<Header> {};
+	private final EBinder eventBinder = GWT.create(EBinder.class);
+	
+	@Override
+	public EventBinder<Header> getEventBinder() {
+		return eventBinder;
+	}
+	@Override
+	public void setDownloadListFileCount(Integer count) {
+		downloadListFileCount.setText(count.toString());
+	}
+	@Override
+	public void setDownloadListUIVisible(boolean visible) {
+		downloadListNotificationUI.setVisible(visible);
 	}
 }

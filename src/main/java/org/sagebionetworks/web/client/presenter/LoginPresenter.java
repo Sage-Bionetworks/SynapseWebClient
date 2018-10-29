@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -160,7 +161,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	@Override
 	public void goToLastPlace() {
 		view.hideLoggingInLoader();
-		Place defaultPlace = new Profile(authenticationController.getCurrentUserPrincipalId());
+		Place defaultPlace = new Profile(authenticationController.getCurrentUserPrincipalId(), ProfileArea.PROJECTS);
 		globalApplicationState.gotoLastPlace(defaultPlace);
 	}
 	

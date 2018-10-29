@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SessionTokenDetector;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
@@ -65,9 +66,12 @@ public class AuthenticationControllerImplTest {
 	@Mock
 	SynapseJavascriptClient mockJsClient;
 	@Mock
+	SynapseJSNIUtils mockSynapseJSNIUtils;
+	@Mock
 	Header mockHeader;
 	
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
+	public static final String USER_ID = "98208";
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -75,14 +79,16 @@ public class AuthenticationControllerImplTest {
 		//by default, return a valid user session data if asked
 		sessionData = new UserSessionData();
 		sessionData.setIsSSO(false);
-		sessionData.setProfile(new UserProfile());
+		UserProfile profile = new UserProfile();
+		sessionData.setProfile(profile);
+		profile.setOwnerId(USER_ID);
 		sessionData.setSession(new Session());
 		sessionData.getSession().setSessionToken("1111");
 		
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
 		when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
 		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
-		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockGinInjector);
+		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockGinInjector, mockSynapseJSNIUtils);
 		when(mockGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockGinInjector.getHeader()).thenReturn(mockHeader);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -155,10 +161,12 @@ public class AuthenticationControllerImplTest {
 		verify(mockClientCache).put(eq(AuthenticationControllerImpl.USER_SESSION_DATA_CACHE_KEY), anyString(), anyLong());
 		
 		// empty user profile
+		reset(mockSynapseJSNIUtils);
 		sessionData.setProfile(null);
 		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));	
 		authenticationController.revalidateSession("token", callback);
 		assertNull(authenticationController.getCurrentUserPrincipalId());
+		verify(mockSynapseJSNIUtils, never()).setAnalyticsUserId(anyString());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -185,12 +193,6 @@ public class AuthenticationControllerImplTest {
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
 		authenticationController.revalidateSession("token", callback);
 		assertEquals(sessionData, authenticationController.getCurrentUserSessionData());	
-		
-		// empty user profile
-		sessionData.setProfile(null);
-		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));	
-		authenticationController.revalidateSession("token", callback);
-		assertNull(authenticationController.getCurrentUserPrincipalId());
 	}
 	
 	@Test
@@ -203,6 +205,7 @@ public class AuthenticationControllerImplTest {
 		verify(mockSessionTokenDetector).initializeSessionTokenState();
 		verify(mockHeader).refresh();
 		verify(mockJsClient).logout();
+		verify(mockSynapseJSNIUtils).setAnalyticsUserId("");
 	}
 	
 	@Test
@@ -259,6 +262,7 @@ public class AuthenticationControllerImplTest {
 		verify(loginCallback).onSuccess(any(UserSessionData.class));
 		verify(mockSessionTokenDetector).initializeSessionTokenState();
 		verify(mockHeader).refresh();
+		verify(mockSynapseJSNIUtils).setAnalyticsUserId(USER_ID);
 	}
 	
 	@Test

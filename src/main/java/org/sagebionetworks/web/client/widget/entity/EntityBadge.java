@@ -11,29 +11,35 @@ import static org.sagebionetworks.repo.model.EntityBundle.THREAD_COUNT;
 
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
+import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
-import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -41,35 +47,44 @@ import com.google.inject.Inject;
 
 public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Presenter {
 	
+	public static final String ADDED_TO_DOWNLOAD_LIST = " has been added to your download list.";
 	public static final String LINK_SUCCESSFULLY_DELETED = "Successfully removed link";
 	private EntityBadgeView view;
 	private GlobalApplicationState globalAppState;
 	private EntityHeader entityHeader;
 	private AnnotationTransformer transformer;
 	private SynapseJavascriptClient jsClient;
-	private FileDownloadButton fileDownloadButton;
+	private AuthenticationController authController;
 	private LazyLoadHelper lazyLoadHelper;
 	private PopupUtilsView popupUtils;
 	private SynapseProperties synapseProperties;
+	private EventBus eventBus;
+	private String dataFileHandleId;
+	private CallbackP<EntityHeader> onAddedToDownloadList;
+	private SynapseJSNIUtils jsniUtils;
 	
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
 			GlobalApplicationState globalAppState,
 			AnnotationTransformer transformer,
 			SynapseJavascriptClient jsClient,
-			FileDownloadButton fileDownloadButton,
 			LazyLoadHelper lazyLoadHelper,
 			PopupUtilsView popupUtils,
-			SynapseProperties synapseProperties) {
+			SynapseProperties synapseProperties,
+			EventBus eventBus,
+			AuthenticationController authController,
+			SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.globalAppState = globalAppState;
 		this.transformer = transformer;
 		
 		this.jsClient = jsClient;
-		this.fileDownloadButton = fileDownloadButton;
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.popupUtils = popupUtils;
 		this.synapseProperties = synapseProperties;
+		this.eventBus = eventBus;
+		this.authController = authController;
+		this.jsniUtils = jsniUtils;
 		Callback loadDataCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -78,7 +93,6 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		};
 		
 		lazyLoadHelper.configure(loadDataCallback, view);
-		fileDownloadButton.setSize(ButtonSize.EXTRA_SMALL);
 		view.setPresenter(this);
 	}
 	
@@ -114,6 +128,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		Annotations annotations = eb.getAnnotations();
 		String rootWikiId = eb.getRootWikiId();
 		List<FileHandle> handles = eb.getFileHandles();
+		FileHandle dataFileHandle = getDataFileHandle(handles);
 		if (PublicPrivateBadge.isPublic(eb.getBenefactorAcl(), synapseProperties.getPublicPrincipalIds())) {
 			view.showPublicIcon();
 		} else {
@@ -126,8 +141,8 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		if (eb.getEntity() instanceof Link && eb.getPermissions().getCanDelete()) {
 			view.showUnlinkIcon();
 		}
-		view.setSize(getContentSize(handles));
-		view.setMd5(getContentMd5(handles));
+		view.setSize(getContentSize(dataFileHandle));
+		view.setMd5(getContentMd5(dataFileHandle));
 		
 		boolean hasLocalSharingSettings = eb.getBenefactorAcl().getId().equals(entityHeader.getId());
 		if (hasLocalSharingSettings) {
@@ -138,10 +153,9 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			view.showHasWikiIcon();
 		}
 		
-		if (eb.getEntity() instanceof FileEntity) {
-			fileDownloadButton.hideClientHelp();
-			fileDownloadButton.configure(eb);
-			view.setFileDownloadButton(fileDownloadButton.asWidget());
+		if (eb.getEntity() instanceof FileEntity && ((FileEntity)eb.getEntity()).getDataFileHandleId() != null) {
+			dataFileHandleId = ((FileEntity)eb.getEntity()).getDataFileHandleId();
+			view.showAddToDownloadList();
 		}
 		
 		if (eb.getThreadCount() > 0) {
@@ -149,28 +163,31 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		}
 	}
 	
-	public String getContentSize(List<FileHandle> handles) {
+	public static FileHandle getDataFileHandle(List<FileHandle> handles) {
 		if (handles != null) {
 			for (FileHandle handle: handles) {
 				if (!(handle instanceof PreviewFileHandle)) {
-					Long contentSize = handle.getContentSize();
-					if (contentSize != null && contentSize > 0) {
-						return view.getFriendlySize(contentSize, true);
-					}
+					return handle;
 				}
+			}
+		}
+		return null;
+	}
+
+	public String getContentSize(FileHandle dataFileHandle) {
+		if (dataFileHandle != null) {
+			Long contentSize = dataFileHandle.getContentSize();
+			if (contentSize != null && contentSize > 0) {
+				return view.getFriendlySize(contentSize, true);
 			}
 		}
 		return "";
 	}
 	
 
-	public String getContentMd5(List<FileHandle> handles) {
-		if (handles != null) {
-			for (FileHandle handle: handles) {
-				if (!(handle instanceof PreviewFileHandle)) {
-					return handle.getContentMd5();
-				}
-			}
+	public String getContentMd5(FileHandle dataFileHandle) {
+		if (dataFileHandle != null) {
+			return dataFileHandle.getContentMd5();
 		}
 		return "";
 	}
@@ -223,5 +240,29 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 				globalAppState.refreshPage();
 			}
 		});
+	}
+	
+	@Override
+	public void onAddToDownloadList() {
+		if (!authController.isLoggedIn()) {
+			globalAppState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+			return;
+		}
+		// TODO: add special popup to report how many items are in the current download list, and link to download list.
+		jsClient.addFileToDownloadList(dataFileHandleId, entityHeader.getId(), new AsyncCallback<DownloadList>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setError(caught.getMessage());
+			}
+			@Override
+			public void onSuccess(DownloadList result) {
+				jsniUtils.sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, "1");
+				onAddedToDownloadList.invoke(entityHeader);
+				eventBus.fireEvent(new DownloadListUpdatedEvent());
+			}
+		});
+	}
+	public void setOnAddedToDownloadList(CallbackP<EntityHeader> onAddedToDownloadList) {
+		this.onAddedToDownloadList = onAddedToDownloadList;
 	}
 }

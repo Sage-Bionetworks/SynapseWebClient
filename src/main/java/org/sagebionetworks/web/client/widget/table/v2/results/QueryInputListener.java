@@ -32,5 +32,6 @@ public interface QueryInputListener {
 	/**
 	 * user clicked download files (from view) button.
 	 */
-	public void onShowDownloadFiles();
+	public void onShowDownloadFilesProgrammatically();
+	void onAddToDownloadList();
 }

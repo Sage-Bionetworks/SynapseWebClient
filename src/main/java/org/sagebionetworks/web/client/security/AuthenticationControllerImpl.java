@@ -15,6 +15,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DateTimeUtilsImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -24,6 +25,7 @@ import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -47,6 +49,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private ClientCache localStorage;
 	private AdapterFactory adapterFactory;
 	private PortalGinInjector ginInjector;
+	private SynapseJSNIUtils jsniUtils;
 	
 	@Inject
 	public AuthenticationControllerImpl(
@@ -55,7 +58,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			SessionStorage sessionStorage, 
 			ClientCache localStorage, 
 			AdapterFactory adapterFactory,
-			PortalGinInjector ginInjector){
+			PortalGinInjector ginInjector,
+			SynapseJSNIUtils jsniUtils){
 		this.cookies = cookies;
 		this.userAccountService = userAccountService;
 		fixServiceEntryPoint(userAccountService);
@@ -63,6 +67,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		this.localStorage = localStorage;
 		this.adapterFactory = adapterFactory;
 		this.ginInjector = ginInjector;
+		this.jsniUtils = jsniUtils;
 	}
 
 	@Override
@@ -105,7 +110,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	public void logoutUser() {
 		// terminate the session, remove the cookie
 		ginInjector.getSynapseJavascriptClient().logout();
-		
+		jsniUtils.setAnalyticsUserId("");
 		cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
 		localStorage.clear();
 		sessionStorage.clear();
@@ -131,6 +136,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser), tomorrow.getTime());
 				ginInjector.getSessionTokenDetector().initializeSessionTokenState();
 				ginInjector.getHeader().refresh();
+				if (currentUser.getProfile() != null) {
+					jsniUtils.setAnalyticsUserId(currentUser.getProfile().getOwnerId());	
+				}
 				callback.onSuccess(currentUser);
 			}
 			
@@ -206,6 +214,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				currentUser = getUserSessionData(sessionStorageString);
 				// session token is not in the local storage
 				currentUser.getSession().setSessionToken(sessionToken);
+				if (currentUser.getProfile() != null) {
+					jsniUtils.setAnalyticsUserId(currentUser.getProfile().getOwnerId());	
+				}
 			} else {
 				logoutUser();
 			}

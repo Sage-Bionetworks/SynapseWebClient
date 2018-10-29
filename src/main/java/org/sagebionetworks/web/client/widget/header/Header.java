@@ -4,11 +4,14 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
+import org.sagebionetworks.web.client.events.WikiSubpagesCollapseEvent;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Trash;
@@ -16,10 +19,13 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 
+import com.google.gwt.core.shared.GWT;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.binder.EventHandler;
 
 public class Header implements HeaderView.Presenter, IsWidget {
 
@@ -49,7 +55,8 @@ public class Header implements HeaderView.Presenter, IsWidget {
 			FavoriteWidget favWidget, 
 			SynapseJSNIUtils synapseJSNIUtils, 
 			PendoSdk pendoSdk,
-			PortalGinInjector portalGinInjector) {
+			PortalGinInjector portalGinInjector,
+			EventBus eventBus) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -62,6 +69,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		this.pendoSdk = pendoSdk;
 		view.setPresenter(this);
 		initStagingAlert();
+		view.getEventBinder().bindEventHandlers(this, eventBus);
 	}
 	
 	public void initStagingAlert() {
@@ -103,8 +111,10 @@ public class Header implements HeaderView.Presenter, IsWidget {
 			String userName = userSessionData.getProfile().getUserName();
 			pendoSdk.initialize(authenticationController.getCurrentUserPrincipalId(), userName + SYNAPSE_ORG);
 			refreshFavorites();
+			onDownloadListUpdatedEvent(null);
 		} else {
 			pendoSdk.initialize(ANONYMOUS, N_A);
+			view.setDownloadListUIVisible(false);
 		}
 	}
 
@@ -151,5 +161,21 @@ public class Header implements HeaderView.Presenter, IsWidget {
 				}
 			});
 		}
+	}
+	@EventHandler
+	public void onDownloadListUpdatedEvent(DownloadListUpdatedEvent event) {
+		//update Download List count, show if > 0
+		jsClient.getDownloadList(new AsyncCallback<DownloadList>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setDownloadListUIVisible(false);
+				synapseJSNIUtils.consoleError("Unable to get download list! " + caught.getMessage());
+			}
+			public void onSuccess(DownloadList downloadList) {
+				int count = downloadList.getFilesToDownload().size();
+				view.setDownloadListUIVisible(count > 0);
+				view.setDownloadListFileCount(count);
+			};
+		});
 	}
 }

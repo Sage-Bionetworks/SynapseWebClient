@@ -13,7 +13,9 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 public interface SynapseJSNIUtils {
 
 	public void recordPageVisit(String token);
+	void setAnalyticsUserId(String userId);
 	void sendAnalyticsEvent(String eventCategory, String eventAction);
+	void sendAnalyticsEvent(String eventCategory, String eventAction, String eventLabelValue);
 	public String getCurrentHistoryToken();
 	
 	public void highlightCodeBlocks();

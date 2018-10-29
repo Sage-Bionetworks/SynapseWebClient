@@ -212,7 +212,7 @@ public class QueryInputWidgetTest {
 	public void testOnDownlaod(){
 		String sql = "select * from syn123";
 		widget.configure(sql, mockQueryInputListener, false);
-		widget.onDownloadFiles();
-		verify(mockQueryInputListener).onShowDownloadFiles();
+		widget.onDownloadFilesProgrammatically();
+		verify(mockQueryInputListener).onShowDownloadFilesProgrammatically();
 	}
 }

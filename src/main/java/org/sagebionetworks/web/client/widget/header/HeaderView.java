@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 
 public interface HeaderView extends IsWidget {
 	/**
@@ -41,4 +42,7 @@ public interface HeaderView extends IsWidget {
 	void setStagingAlertVisible(boolean visible);
 	void openNewWindow(String url);
 	void clear();
+	EventBinder<Header> getEventBinder();
+	void setDownloadListUIVisible(boolean visible);
+	void setDownloadListFileCount(Integer count);
 }

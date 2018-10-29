@@ -3,17 +3,14 @@ package org.sagebionetworks.web.unitclient.widget.entity.file;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -43,10 +40,8 @@ import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.aws.AwsSdk;
-import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
-import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButtonView;
+import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItem;
+import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItemView;
 import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -56,17 +51,15 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FormPanel;
 
-public class FileDownloadButtonTest {
+public class FileDownloadMenuItemTest {
 	@Mock
-	FileDownloadButtonView mockView;
+	FileDownloadMenuItemView mockView;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
 	@Mock
 	LoginModalWidget mockLoginModalWidget;
 	@Mock
 	SynapseProperties mockSynapseProperties;
-	@Mock
-	SynapseAlert mockSynAlert;
 	@Mock
 	PortalGinInjector mockGinInjector;
 	
@@ -78,8 +71,6 @@ public class FileDownloadButtonTest {
 	ExternalFileHandle mockFileHandle;
 	@Mock
 	ExternalObjectStoreFileHandle mockObjectStoreFileHandle;
-	@Mock
-	FileClientsHelp mockFileClientsHelp;
 	@Mock
 	EntityUpdatedEvent mockEntityUpdatedEvent;
 	@Mock
@@ -103,7 +94,7 @@ public class FileDownloadButtonTest {
 	@Captor
 	ArgumentCaptor<CallbackP> callbackPCaptor;
 	
-	FileDownloadButton widget;
+	FileDownloadMenuItem widget;
 	List<FileHandle> fileHandles;
 	
 	public static final String SFTP_ENDPOINT = "https://sftp.org/sftp";
@@ -114,7 +105,7 @@ public class FileDownloadButtonTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new FileDownloadButton(mockView, mockSynapseClient, mockLoginModalWidget, mockSynAlert, mockGinInjector,
+		widget = new FileDownloadMenuItem(mockView, mockSynapseClient, mockLoginModalWidget, mockGinInjector,
 				mockSynapseJavascriptClient, mockAuthController, mockJsniUtils, mockGwt, mockCookies, mockAwsSdk, mockPopupUtilsView);
 		when(mockSynapseProperties.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(SFTP_ENDPOINT);
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
@@ -122,7 +113,6 @@ public class FileDownloadButtonTest {
 		when(mockFileEntity.getVersionNumber()).thenReturn(VERSION);
 		fileHandles = new ArrayList<FileHandle>();
 		when(mockEntityBundle.getFileHandles()).thenReturn(fileHandles);
-		when(mockGinInjector.getFileClientsHelp()).thenReturn(mockFileClientsHelp);
 		when(mockGinInjector.getSynapseProperties()).thenReturn(mockSynapseProperties);
 		AsyncMockStubber.callSuccessWith(SFTP_HOST).when(mockSynapseClient).getHost(anyString(), any(AsyncCallback.class));
 		when(mockJsniUtils.getFileHandleAssociationUrl(anyString(), any(FileHandleAssociateType.class), anyString())).thenReturn(fileHandleAssociationUrl);
@@ -151,7 +141,7 @@ public class FileDownloadButtonTest {
 		// Not Logged in Test: Download
 		when(mockAuthController.isLoggedIn()).thenReturn(false);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
-		verify(mockView).setIsDirectDownloadLink(FileDownloadButton.LOGIN_PLACE_LINK);
+		verify(mockView).setIsDirectDownloadLink(FileDownloadMenuItem.LOGIN_PLACE_LINK);
 		assertNull(widget.getFileHandle());
 	}
 	
@@ -172,27 +162,6 @@ public class FileDownloadButtonTest {
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
 		assertNotNull(widget.getFileHandle());
 		verify(mockView).setIsDirectDownloadLink(fileHandleAssociationUrl);
-		
-		verify(mockView).addWidget(mockFileClientsHelp);
-		verify(mockFileClientsHelp).configure(ENTITY_ID, VERSION);
-	}
-	
-	@Test
-	public void testHideClientHelp() throws RestServiceException {
-		widget.hideClientHelp();
-		
-		//verify that once we tell the widget to hide client help, it is not shown after getting the restriction information
-		String fileHandleId = "22";
-		S3FileHandle fileHandle = new S3FileHandle();
-		fileHandle.setId(fileHandleId);
-		List fileHandles = new ArrayList<FileHandle>();
-		fileHandles.add(fileHandle);
-		when(mockEntityBundle.getFileHandles()).thenReturn(fileHandles);
-		when(mockFileEntity.getDataFileHandleId()).thenReturn(fileHandleId);
-		when(mockAuthController.isLoggedIn()).thenReturn(true);
-		
-		widget.configure(mockEntityBundle, mockRestrictionInformation);
-		verify(mockView, never()).addWidget(mockFileClientsHelp);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -227,7 +196,6 @@ public class FileDownloadButtonTest {
 		when(mockFileHandle.getExternalURL()).thenReturn(fileUrl);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
 		verify(mockView).setIsAuthorizedDirectDownloadLink();
-		verify(mockFileClientsHelp, never()).configure(anyString(), anyLong()); //no client help for sftp download
 		verify(mockLoginModalWidget).configure(fileUrl,  FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
 		verify(mockSynapseClient).getHost(anyString(), any(AsyncCallback.class));
 		verify(mockLoginModalWidget).setInstructionMessage(DisplayConstants.DOWNLOAD_CREDENTIALS_REQUIRED + SFTP_HOST);
@@ -280,7 +248,7 @@ public class FileDownloadButtonTest {
 		when(mockRestrictionInformation.getHasUnmetAccessRequirement()).thenReturn(true);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
 		
-		verify(mockView).setIsDirectDownloadLink(FileDownloadButton.ACCESS_REQUIREMENTS_LINK + ENTITY_ID + "&" + AccessRequirementsPlace.TYPE_PARAM + "=" + RestrictableObjectType.ENTITY.toString());
+		verify(mockView).setIsDirectDownloadLink(FileDownloadMenuItem.ACCESS_REQUIREMENTS_LINK + ENTITY_ID + "&" + AccessRequirementsPlace.TYPE_PARAM + "=" + RestrictableObjectType.ENTITY.toString());
 		assertNull(widget.getFileHandle());
 	}
 
@@ -289,11 +257,4 @@ public class FileDownloadButtonTest {
 		widget.onAuthorizedDirectDownloadClicked();
 		verify(mockLoginModalWidget).showModal();
 	}
-
-	@Test
-	public void testSetSize() {
-		widget.setSize(ButtonSize.LARGE);
-		verify(mockView).setButtonSize(ButtonSize.LARGE);
-	}
-
 }

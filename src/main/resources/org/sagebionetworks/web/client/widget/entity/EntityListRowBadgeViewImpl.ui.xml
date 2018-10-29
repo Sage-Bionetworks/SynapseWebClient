@@ -27,7 +27,7 @@
 					<bh:Div addStyleNames="margin-right-5"> 
 						<g:Anchor ui:field="entityLink" target="_blank" styleName="displayInline pull-left link"/>
 						<b:Tooltip title="Download">
-							<bh:Span ui:field="fileDownloadButtonContainer" addStyleNames="right margin-right-10"/>
+							<b:Anchor icon="DOWNLOAD" text="+" ui:field="addToDownloadListLink" addStyleNames="right margin-right-10" visible="false"/>
 						</b:Tooltip>
 					</bh:Div>
 				</t:TableData>

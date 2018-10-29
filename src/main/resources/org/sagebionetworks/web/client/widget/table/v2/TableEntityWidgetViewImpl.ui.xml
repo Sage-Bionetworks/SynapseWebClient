@@ -22,17 +22,17 @@
 		</bh:Div>
 		
 		<b:Alert ui:field="tableMessage" type="INFO" visible="false"/>
-		<bh:Div ui:field="tableToolbar">
+		<bh:Div ui:field="tableToolbar" height="55px">
 			<bh:Div>
 				<b:Anchor ui:field="showSimpleSearch" text="Show simple search" visible="false"/>
 			</bh:Div>
 			<bh:Div>
 				<g:SimplePanel ui:field="queryInputPanel" addStyleNames="displayInline"/>
-				<b:Anchor ui:field="showAdvancedSearch" text="Show advanced search" pull="LEFT" addStyleNames="moveup-18" visible="false"/>
+				<b:Anchor ui:field="showAdvancedSearch" text="Show advanced search" addStyleNames="moveup-18" visible="false"/>
 			</bh:Div>
 		</bh:Div>
 		
-		
+		<bh:Div ui:field="addToDownloadListContainer" />
 		<bh:Div styleName="margin-top-5" />
 		<g:SimplePanel ui:field="queryResultsPanel" />
 		

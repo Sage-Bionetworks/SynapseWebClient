@@ -1,10 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.header;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -26,6 +25,8 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.file.DownloadList;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -34,6 +35,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Trash;
@@ -44,18 +46,26 @@ import org.sagebionetworks.web.client.widget.header.HeaderView;
 import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.junit.GWTMockUtilities;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 
 public class HeaderTest {
 
 	Header header;
+	@Mock
 	HeaderView mockView;
+	@Mock
 	AuthenticationController mockAuthenticationController;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
+	@Mock
 	PlaceChanger mockPlaceChanger;
+	@Mock
 	FavoriteWidget mockFavWidget;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	List<EntityHeader> entityHeaders;
@@ -71,24 +81,34 @@ public class HeaderTest {
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
+	@Mock
+	EventBus mockEventBus;
+	@Mock
+	EventBinder<Header> mockEventBinder;
+	@Mock
+	DownloadList mockDownloadList;
+	List<FileHandleAssociation> downloadListFhas;
+	@Mock
+	FileHandleAssociation mockFha1;
+	@Mock
+	FileHandleAssociation mockFha2;
+	
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
+		when(mockView.getEventBinder()).thenReturn(mockEventBinder);
 		GWTMockUtilities.disarm();
-		mockView = Mockito.mock(HeaderView.class);		
-		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
-		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
-		mockPlaceChanger = mock(PlaceChanger.class);
-		mockFavWidget = mock(FavoriteWidget.class);
-		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		//by default, mock that we are on the production website
 		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn(Header.WWW_SYNAPSE_ORG);
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPendoSdk, mockPortalGinInjector);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPendoSdk, mockPortalGinInjector, mockEventBus);
 		entityHeaders = new ArrayList<EntityHeader>();
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);
 		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
+		downloadListFhas = new ArrayList<>();
+		when(mockDownloadList.getFilesToDownload()).thenReturn(downloadListFhas);
+		AsyncMockStubber.callSuccessWith(mockDownloadList).when(mockSynapseJavascriptClient).getDownloadList(any(AsyncCallback.class));
 	}
 	@After
 	public void tearDown() {
@@ -267,5 +287,37 @@ public class HeaderTest {
 		verify(mockView).refresh();
 		verify(mockView).setSearchVisible(true);
 		verify(mockPendoSdk).initialize(ANONYMOUS, N_A);
+	}
+	
+	@Test
+	public void testOnDownloadListUpdatedEvent() {
+		header.onDownloadListUpdatedEvent(new DownloadListUpdatedEvent());
+
+		verify(mockSynapseJavascriptClient).getDownloadList(any(AsyncCallback.class));
+		verify(mockView).setDownloadListUIVisible(false);
+		verify(mockView).setDownloadListFileCount(0);
+		
+		//add a file to the download list, and fire an update event
+		downloadListFhas.add(mockFha1);
+		header.onDownloadListUpdatedEvent(new DownloadListUpdatedEvent());
+
+		verify(mockView).setDownloadListUIVisible(true);
+		verify(mockView).setDownloadListFileCount(1);
+
+		downloadListFhas.add(mockFha2);
+		header.onDownloadListUpdatedEvent(new DownloadListUpdatedEvent());
+
+		verify(mockView, times(2)).setDownloadListUIVisible(true);
+		verify(mockView).setDownloadListFileCount(2);
+	}
+	
+	@Test
+	public void testOnDownloadListUpdatedFailure() {
+		AsyncMockStubber.callFailureWith(new Exception("error")).when(mockSynapseJavascriptClient).getDownloadList(any(AsyncCallback.class));
+		header.onDownloadListUpdatedEvent(new DownloadListUpdatedEvent());
+
+		verify(mockSynapseJavascriptClient).getDownloadList(any(AsyncCallback.class));
+		verify(mockView).setDownloadListUIVisible(false);
+		verify(mockSynapseJSNIUtils).consoleError(anyString());
 	}
 }

@@ -1,14 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
-import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelpView;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -19,35 +15,27 @@ public class BasicTitleBar implements BasicTitleBarView.Presenter, SynapseWidget
 	private BasicTitleBarView view;
 	private AuthenticationController authenticationController;
 	private FavoriteWidget favWidget;
-	private ContainerClientsHelp containerDownloadHelp;
 	@Inject
-	public BasicTitleBar(BasicTitleBarView view, AuthenticationController authenticationController, FavoriteWidget favWidget, ContainerClientsHelp containerDownloadHelp) {
+	public BasicTitleBar(BasicTitleBarView view, AuthenticationController authenticationController, FavoriteWidget favWidget) {
 		this.view = view;
 		this.authenticationController = authenticationController;
-		this.containerDownloadHelp = containerDownloadHelp;
 		this.favWidget = favWidget;
-		
 		view.setPresenter(this);
 		view.setFavoritesWidget(favWidget.asWidget());
-		view.setContainerHelpWidget(containerDownloadHelp.asWidget());
 	}	
 	
 	public void configure(EntityBundle bundle) {
-		containerDownloadHelp.configure(bundle.getEntity().getId());
 		favWidget.configure(bundle.getEntity().getId());
 		view.setFavoritesWidgetVisible(authenticationController.isLoggedIn());
 		view.setTitle(bundle.getEntity().getName());
 		view.setIconType(EntityTypeUtils.getIconTypeForEntity(bundle.getEntity()));
-		view.setContainerHelpWidgetVisible(bundle.getEntity() instanceof Folder);
 	}
 	
 	public void configure(EntityHeader entityHeader) {
-		containerDownloadHelp.configure(entityHeader.getId());
 		favWidget.configure(entityHeader.getId());
 		view.setFavoritesWidgetVisible(authenticationController.isLoggedIn());
 		view.setTitle(entityHeader.getName());
 		view.setIconType(EntityTypeUtils.getIconTypeForEntityClassName(entityHeader.getType()));
-		view.setContainerHelpWidgetVisible(Folder.class.getName().equals(entityHeader.getType()));
 	}
 	
 	public void clearState() {

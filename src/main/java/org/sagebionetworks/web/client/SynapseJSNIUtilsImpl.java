@@ -25,7 +25,19 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	
 	private static ProgressCallback progressCallback;
-	
+
+	@Override
+	public void setAnalyticsUserId(String userID) {
+		_setAnalyticsUserId(userID);
+	}
+	private static native void _setAnalyticsUserId(String userID) /*-{
+		try {
+			$wnd.ga('set', 'userId', userID);
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
+
 	@Override
 	public void recordPageVisit(String token) {
 		_recordPageVisit(token);
@@ -40,6 +52,10 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		}
 	}-*/;
 	
+	@Override
+	public void sendAnalyticsEvent(String eventCategory, String eventAction, String eventLabelValue) {
+		_sendAnalyticsEvent(eventCategory, eventAction, eventLabelValue);
+	}
 	@Override
 	public void sendAnalyticsEvent(String eventCategory, String eventAction) {
 		_sendAnalyticsEvent(eventCategory, eventAction, getCurrentURL());
