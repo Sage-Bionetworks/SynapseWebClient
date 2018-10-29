@@ -119,7 +119,7 @@ public class SynapseAlertViewImpl implements
 	public void showError(String error) {
 		lazyConstruct();
 		synapseAlertContainer.setVisible(true);
-		alert.setText(error);
+		alertText.setText(error);
 		alert.setVisible(true);
 	}
 	
