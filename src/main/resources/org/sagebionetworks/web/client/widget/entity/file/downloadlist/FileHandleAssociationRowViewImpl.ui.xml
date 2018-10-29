@@ -26,7 +26,7 @@
 					<b:Icon type="DATABASE"/>
 				</b:Tooltip>
 			</bh:Span>
-			<bh:Span ui:field="externalLink" addStyleNames="synapse-green-bg color-white img-circle" visible="false" paddingTop="2" paddingRight="1" paddingBottom="4" paddingLeft="2">
+			<bh:Span ui:field="externalLink" addStyleNames="synapse-green-bg color-white img-circle" visible="false" paddingTop="3" paddingRight="5" paddingBottom="3" paddingLeft="5">
 				<b:Tooltip placement="BOTTOM" title="Your list contains external links, which must be downloaded manually. Clicking on the item will take you the download page.">
 					<b:Icon type="LINK"/>
 				</b:Tooltip>
