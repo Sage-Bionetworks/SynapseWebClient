@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.file.ExternalFileHandleInterface;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -111,7 +112,7 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 						fileSize = contentSize;
 						view.setFileSize(gwt.getFriendlySize(contentSize.doubleValue(), true));
 						updateTotalPackageSize();
-						if (fileSize > 1000000000) {
+						if (fileSize > ClientProperties.GB) {
 							view.showTooLarge();
 						}
 					}

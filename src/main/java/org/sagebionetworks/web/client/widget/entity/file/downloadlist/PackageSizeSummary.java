@@ -96,4 +96,7 @@ public class PackageSizeSummary implements IsWidget {
 	public void showWhiteSpinner() {
 		view.showWhiteSpinner();
 	}
+	public double getTotalFileSize() {
+		return totalFileSize;
+	}
 }
