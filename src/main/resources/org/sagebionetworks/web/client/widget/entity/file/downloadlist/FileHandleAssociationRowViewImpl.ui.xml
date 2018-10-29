@@ -33,16 +33,14 @@
 			</bh:Span>
 		</t:TableData>
 		<t:TableData addStyleNames="min-width-150 hidden-xs visible-md visible-lg" width="150px">
-			<bh:Text ui:field="createdBy"/>	
+			<bh:Text ui:field="createdBy"/>
+			<b:Anchor ui:field="requestAccessLink" text="Request Access" visible="false" marginLeft="-35"/>	
 		</t:TableData>
 		<t:TableData addStyleNames="min-width-150 hidden-xs" width="150px">
 			<bh:Text ui:field="createdOn"/>
 		</t:TableData>
 		<t:TableData addStyleNames="min-width-100 visible-md visible-lg" width="100px">
 			<bh:Text ui:field="fileSize"/>
-		</t:TableData>
-		<t:TableData addStyleNames="hidden-xs" width="70px">
-			<b:Anchor ui:field="requestAccessLink" text="Request Access" visible="false" />
 		</t:TableData>
 		<t:TableData addStyleNames="min-width-25" width="25px"> <!-- Less than header column width to account for table data scroll bar (from scroll pane)-->
 			<b:Anchor icon="TRASH" ui:field="removeLink" />
