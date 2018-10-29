@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -135,7 +136,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser), tomorrow.getTime());
 				ginInjector.getSessionTokenDetector().initializeSessionTokenState();
 				ginInjector.getHeader().refresh();
-				jsniUtils.setAnalyticsUserId(currentUser.getProfile().getOwnerId());
+				if (currentUser.getProfile() != null) {
+					jsniUtils.setAnalyticsUserId(currentUser.getProfile().getOwnerId());	
+				}
 				callback.onSuccess(currentUser);
 			}
 			
@@ -211,7 +214,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				currentUser = getUserSessionData(sessionStorageString);
 				// session token is not in the local storage
 				currentUser.getSession().setSessionToken(sessionToken);
-				jsniUtils.setAnalyticsUserId(currentUser.getProfile().getOwnerId());
+				if (currentUser.getProfile() != null) {
+					jsniUtils.setAnalyticsUserId(currentUser.getProfile().getOwnerId());	
+				}
 			} else {
 				logoutUser();
 			}

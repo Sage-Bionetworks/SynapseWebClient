@@ -159,6 +159,14 @@ public class AuthenticationControllerImplTest {
 		authenticationController.updateCachedProfile(updatedProfile);
 		assertEquals(updatedProfile, authenticationController.getCurrentUserSessionData().getProfile());
 		verify(mockClientCache).put(eq(AuthenticationControllerImpl.USER_SESSION_DATA_CACHE_KEY), anyString(), anyLong());
+		
+		// empty user profile
+		reset(mockSynapseJSNIUtils);
+		sessionData.setProfile(null);
+		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));	
+		authenticationController.revalidateSession("token", callback);
+		assertNull(authenticationController.getCurrentUserPrincipalId());
+		verify(mockSynapseJSNIUtils, never()).setAnalyticsUserId(anyString());
 	}
 	
 	@SuppressWarnings("unchecked")
