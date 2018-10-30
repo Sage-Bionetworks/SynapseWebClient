@@ -33,7 +33,7 @@ import com.google.inject.Inject;
 
 public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presenter {
 	
-	public static final String NO_NEW_FILES_ADDED_MESSAGE = "No new files have been added to the Download List.";
+	public static final String ZERO_FILES_IN_FOLDER_MESSAGE = "If a folder contains no files, no files will be added to the download list. Additionally, sub-folders cannot be added directly; please navigate into the directory that contains the files you’d like to download to add them.";
 	public static final String SUCCESS_ADDED_FILES_MESSAGE = "Successfully added files to the Download List.";
 	public static final String ADD_QUERY_FILES_CONFIRMATION_MESSAGE = "Add all files from this query result to the Download List?";
 	public static final Long FILE_SIZE_QUERY_PART_MASK = BUNDLE_MASK_QUERY_SUM_FILE_SIZES | BUNDLE_MASK_QUERY_COUNT; 
@@ -152,8 +152,12 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 			@Override
 			public void onSuccess(EntityChildrenResponse entityChildrenResponse) {
 				fileCountToAdd = entityChildrenResponse.getTotalChildCount().intValue();
-				packageSizeSummary.addFiles(fileCountToAdd, entityChildrenResponse.getSumFileSizesBytes().doubleValue());
-				view.showConfirmAdd();
+				if (fileCountToAdd == 0) {
+					synAlert.showError(ZERO_FILES_IN_FOLDER_MESSAGE);
+				} else {
+					packageSizeSummary.addFiles(fileCountToAdd, entityChildrenResponse.getSumFileSizesBytes().doubleValue());
+					view.showConfirmAdd();
+				}
 			}
 		});
 	}

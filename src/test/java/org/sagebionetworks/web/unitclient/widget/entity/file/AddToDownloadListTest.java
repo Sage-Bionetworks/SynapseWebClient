@@ -189,4 +189,13 @@ public class AddToDownloadListTest {
 		verify(mockView, times(5)).hideAll();
 		verify(mockSynAlert).handleException(e);
 	}
+	
+	@Test
+	public void testAddEmptyFolderToDownloadList() {
+		when(mockEntityChildrenResponse.getTotalChildCount()).thenReturn(0L);
+		AsyncMockStubber.callSuccessWith(mockEntityChildrenResponse).when(mockJsClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
+		widget.addToDownloadList(folderId);
+
+		verify(mockSynAlert).showError(ZERO_FILES_IN_FOLDER_MESSAGE);
+	}
 }
