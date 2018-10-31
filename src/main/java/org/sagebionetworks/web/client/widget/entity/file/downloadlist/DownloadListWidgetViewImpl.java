@@ -58,7 +58,7 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 			presenter.onCreatePackage(fileName.getText());
 		});
 		downloadPackageButton.addClickHandler(event -> {
-			Window.open(downloadUrl, "", "");
+			Window.open(downloadUrl, "_self", "");
 			presenter.onDownloadPackage();
 		});
 	}
@@ -122,5 +122,9 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 	@Override
 	public void hideFilesDownloadedAlert() {
 		filesDownloadedAlert.setVisible(false);	
+	}
+	@Override
+	public void setPackageName(String zipFileName) {
+		fileName.setText(zipFileName);
 	}
 }
