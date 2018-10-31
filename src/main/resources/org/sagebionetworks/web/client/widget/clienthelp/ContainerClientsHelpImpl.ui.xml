@@ -12,11 +12,19 @@
 		<b:ModalBody>
 			<b:TabPanel>
 				<b:NavTabs>
-					<b:TabListItem active="true" ui:field="cliTabListItem" text="Command Line" />
-					<b:TabListItem ui:field="pythonTabListItem" text="Python" />
+					<b:TabListItem active="true" ui:field="pythonTabListItem" text="Python" />
+					<b:TabListItem ui:field="cliTabListItem" text="Command Line" />
 				</b:NavTabs>
 				<b:TabContent>
-					<b:TabPane ui:field="cliTabPane" active="true" >
+					<b:TabPane ui:field="pythonTabPane" active="true">
+						<g:HTMLPanel>
+							<pre>
+								<code class="nohighlight">import synapseclient<br/>import synapseutils<br/><br/>syn = synapseclient.Synapse()<br/>syn.login('synapse_username','password')<br/>files = synapseutils.syncFromSynapse(syn, '<span ui:field="id2"/>')<br/>
+								</code>
+							</pre>
+					    </g:HTMLPanel>
+					</b:TabPane>
+					<b:TabPane ui:field="cliTabPane" >
 					  	<g:HTMLPanel>
 							<pre>
 								<code class="nohighlight">
@@ -24,14 +32,6 @@
 								</code>
 							</pre>
 						</g:HTMLPanel>
-					</b:TabPane>
-					<b:TabPane ui:field="pythonTabPane">
-						<g:HTMLPanel>
-							<pre>
-								<code class="nohighlight">import synapseclient<br/>import synapseutils<br/><br/>syn = synapseclient.Synapse()<br/>syn.login('synapse_username','password')<br/>files = synapseutils.syncFromSynapse(syn, '<span ui:field="id2"/>')<br/>
-								</code>
-							</pre>
-					    </g:HTMLPanel>
 					</b:TabPane>
 				</b:TabContent>
 			</b:TabPanel>
