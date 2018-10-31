@@ -37,7 +37,7 @@ public class SearchQueryUtils {
 		// start with a blank, valid query
 		query.setQueryTerm(Collections.singletonList(""));
 		
-		List<SearchFieldName> facetFieldNames = Arrays.asList(EntityType, Consortium, Disease, ModifiedOn, ModifiedBy, CreatedOn, NumSamples, Tissue, CreatedBy);
+		List<SearchFieldName> facetFieldNames = Arrays.asList(EntityType, Consortium, ModifiedOn, ModifiedBy, CreatedOn, Tissue, CreatedBy);
 		List<SearchFacetOption> facetOptions = new ArrayList<>();
 		for (SearchFieldName fieldName : facetFieldNames) {
 			SearchFacetOption facetOption = new SearchFacetOption();
