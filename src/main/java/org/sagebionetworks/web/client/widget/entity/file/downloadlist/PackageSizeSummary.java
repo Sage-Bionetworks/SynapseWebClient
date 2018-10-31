@@ -99,4 +99,7 @@ public class PackageSizeSummary implements IsWidget {
 	public double getTotalFileSize() {
 		return totalFileSize;
 	}
+	public int getTotalFileCount() {
+		return totalFileCount;
+	}
 }

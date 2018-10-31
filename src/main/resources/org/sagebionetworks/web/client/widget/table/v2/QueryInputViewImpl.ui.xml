@@ -26,10 +26,10 @@
 					<b:DropDown addStyleNames="displayInlineBlock right" >
 						<b:Button dataToggle="DROPDOWN" type="PRIMARY" text="Download Options" marginRight="5" marginLeft="5" height="34px"  />
 						<b:DropDownMenu ui:field="dropdownMenu" addStyleNames="dropdown-menu-right">
-							<b:AnchorListItem ui:field="addToDownloadListLink">Direct file download</b:AnchorListItem>
-							<b:AnchorListItem ui:field="programmaticOptionsLink">Programmatic Options</b:AnchorListItem>
-							<b:Divider ui:field="downloadOptionsDivider" />
 							<b:AnchorListItem ui:field="exportTableLink">Export Table</b:AnchorListItem>
+							<b:AnchorListItem ui:field="addToDownloadListLink">Add to Download List</b:AnchorListItem>
+							<b:Divider ui:field="downloadOptionsDivider" />
+							<b:AnchorListItem ui:field="programmaticOptionsLink">Programmatic Options</b:AnchorListItem>
 						</b:DropDownMenu>
 					</b:DropDown>
 					<b:Tooltip title="Edit query results">

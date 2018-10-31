@@ -47,6 +47,7 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 	Date createdOn;
 	Long fileSize = null;
 	Boolean hasAccess = true;
+	boolean hasUpdatedPackageSize = false;
 	CallbackP<Double> addToPackageSizeCallback;
 	@Inject
 	public FileHandleAssociationRow(
@@ -70,6 +71,7 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 	}
 	
 	public void configure(FileHandleAssociation fha, Callback accessRestrictionDetectedCallback, CallbackP<Double> addToPackageSizeCallback, CallbackP<FileHandleAssociation> onDeleteCallback) {
+		hasUpdatedPackageSize = false;
 		this.fha = fha;
 		this.onDeleteCallback = onDeleteCallback;
 		this.addToPackageSizeCallback = addToPackageSizeCallback;
@@ -146,7 +148,8 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 	}
 	
 	public void updateTotalPackageSize() {
-		if (view.isAttached() && fileSize != null) {
+		if (!hasUpdatedPackageSize && view.isAttached() && fileSize != null && fileSize <= ClientProperties.GB) {
+			hasUpdatedPackageSize = true;
 			addToPackageSizeCallback.invoke(fileSize.doubleValue());
 		}
 	}
