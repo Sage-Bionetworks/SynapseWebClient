@@ -85,6 +85,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 	
 	public void refresh() {
 		view.hideFilesDownloadedAlert();
+		view.setPackageName("");
 		view.setCreatePackageUIVisible(true);
 		view.setDownloadPackageUIVisible(false);
 		synAlert.clear();
