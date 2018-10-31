@@ -215,6 +215,7 @@ public class UploaderTest {
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
 		verify(mockSynapseClient).createExternalFile(anyString(), anyString(), anyString(), anyString(), eq((Long)null), eq((String)null), eq(storageLocationId), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString());
+		verify(mockUploadSuccessHandler).onSuccessfulUpload();
 	}
 	
 	@Test
