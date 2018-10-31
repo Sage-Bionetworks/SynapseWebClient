@@ -7,5 +7,5 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
-	<b:AnchorListItem ui:field="downloadLink" text="Download file" />
+	<b:AnchorListItem ui:field="downloadLink" text="Download File" />
 </ui:UiBinder>
