@@ -682,11 +682,15 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			public void onSuccess(Entity result) {
 				entity = result;
 				view.showInfo(DisplayConstants.TEXT_LINK_SUCCESS);
+				if (successHandler != null) {
+					successHandler.onSuccessfulUpload();
+				}
+
 				entityUpdated();
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
+				view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED + ": " + caught.getMessage());
 			}
 		};
 	}
@@ -835,7 +839,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		if (successHandler != null) {
 			successHandler.onSuccessfulUpload();
 		}
-		eventBus.fireEvent(new EntityUpdatedEvent());
+		entityUpdated();
 	}
 	
 	private void resetUploadProgress() {
