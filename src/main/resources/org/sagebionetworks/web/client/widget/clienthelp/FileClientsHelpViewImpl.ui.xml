@@ -14,21 +14,13 @@
 			<b:ModalBody>
 				<b:TabPanel>
 					<b:NavTabs>
-						<b:TabListItem ui:field="cliTabListItem" active="true" text="Command Line" />
-						<b:TabListItem ui:field="pythonTabListItem" text="Python" />
+						<b:TabListItem ui:field="pythonTabListItem" text="Python" active="true" />
 						<b:TabListItem ui:field="rTabListItem" text="R" />
+						<b:TabListItem ui:field="cliTabListItem" text="Command Line" />
+						
 					</b:NavTabs>
 					<b:TabContent>
-						<b:TabPane ui:field="cliTabPane" active="true">
-							<g:HTMLPanel>
-								<pre>
-									<code class="nohighlight">
-										synapse get <span ui:field="id1"/> <span ui:field="versionUI1">--version <span ui:field="version1"/></span>
-									</code>
-								</pre>
-							</g:HTMLPanel>
-						</b:TabPane>
-						<b:TabPane ui:field="pythonTabPane">
+						<b:TabPane ui:field="pythonTabPane" active="true">
 							<g:HTMLPanel>
 								<pre>
 									<code class="nohighlight">
@@ -59,6 +51,16 @@
 								</pre>
 							</g:HTMLPanel>
 						</b:TabPane>
+						<b:TabPane ui:field="cliTabPane">
+							<g:HTMLPanel>
+								<pre>
+									<code class="nohighlight">
+										synapse get <span ui:field="id1"/> <span ui:field="versionUI1">--version <span ui:field="version1"/></span>
+									</code>
+								</pre>
+							</g:HTMLPanel>
+						</b:TabPane>
+						
 					</b:TabContent>
 				</b:TabPanel>
 			</b:ModalBody>
