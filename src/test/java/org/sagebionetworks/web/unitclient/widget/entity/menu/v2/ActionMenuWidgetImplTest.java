@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.menu.v2;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -108,7 +109,7 @@ public class ActionMenuWidgetImplTest {
 		verify(mockDelete).setVisible(true);
 		verify(mockRename, never()).setVisible(true);
 	}
-	
+
 	@Test
 	public void testActionSetText(){
 		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView);
@@ -117,7 +118,17 @@ public class ActionMenuWidgetImplTest {
 		verify(mockDelete).setText(text);
 		verify(mockRename, never()).setText(anyString());
 	}
-	
+
+	@Test
+	public void testActionSetEnabledDisabled(){
+		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView);
+		widget.setActionEnabled(Action.DELETE_ENTITY, false);
+		verify(mockDelete).setEnabled(false);
+		widget.setActionEnabled(Action.DELETE_ENTITY, true);
+		verify(mockDelete).setEnabled(true);
+		verify(mockRename, never()).setEnabled(anyBoolean());
+	}
+
 	@Test
 	public void testActionSetIcon(){
 		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView);

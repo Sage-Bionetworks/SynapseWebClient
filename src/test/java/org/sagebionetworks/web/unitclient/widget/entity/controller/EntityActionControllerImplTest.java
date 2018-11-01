@@ -1441,7 +1441,7 @@ public class EntityActionControllerImplTest {
 		//refresh page
 		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 	}
-	
+
 	@Test
 	public void testCreateDoiFail() throws Exception {
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
@@ -1458,6 +1458,8 @@ public class EntityActionControllerImplTest {
 		//initially hide, then show
 		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, false);
 		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, true);
+		// Should be disabled (temporarily)
+		verify(mockActionMenu).setActionEnabled(Action.CREATE_DOI, false);
 	}
 	
 	@Test

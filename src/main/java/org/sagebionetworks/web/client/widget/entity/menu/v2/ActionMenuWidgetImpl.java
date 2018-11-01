@@ -73,6 +73,11 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener, A
 	}
 
 	@Override
+	public void setActionEnabled(Action action, boolean enabled) {
+		getActionView(action).setEnabled(enabled);
+	}
+
+	@Override
 	public void setActionIcon(Action action, IconType icon) {
 		getActionView(action).setIcon(icon);
 	}

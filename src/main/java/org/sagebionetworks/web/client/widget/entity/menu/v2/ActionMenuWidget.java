@@ -24,7 +24,14 @@ public interface ActionMenuWidget extends IsWidget {
 	 * @param visible
 	 */
 	public void setActionVisible(Action action, boolean visible);
-	
+
+	/**
+	 * Enable or disable an action. Actions are enabled by default.
+	 * @param action
+	 * @param enabled
+	 */
+	public void setActionEnabled(Action action, boolean enabled);
+
 	/**
 	 * The text shown for this action.
 	 * @param action
