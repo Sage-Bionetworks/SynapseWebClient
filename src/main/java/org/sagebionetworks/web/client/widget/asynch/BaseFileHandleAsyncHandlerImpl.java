@@ -21,6 +21,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public abstract class BaseFileHandleAsyncHandlerImpl {
@@ -35,11 +36,13 @@ public abstract class BaseFileHandleAsyncHandlerImpl {
 	
 	private ClientCache clientCache;
 	private AdapterFactory adapterFactory;
+	private GWTWrapper gwt;
 	
 	public BaseFileHandleAsyncHandlerImpl(SynapseJavascriptClient jsClient, GWTWrapper gwt, ClientCache clientCache, AdapterFactory adapterFactory) {
 		this.jsClient = jsClient;
 		this.clientCache = clientCache;
 		this.adapterFactory = adapterFactory;
+		this.gwt = gwt;
 		Callback callback = new Callback() {
 			@Override
 			public void invoke() {
@@ -50,12 +53,13 @@ public abstract class BaseFileHandleAsyncHandlerImpl {
 	}
 	
 	public void getFileResult(FileHandleAssociation fileHandleAssociation, AsyncCallback<FileResult> callback) {
-		
 		if (isIncludeFileHandles() && !isIncludePreSignedURLs() && clientCache.contains(fileHandleAssociation.getFileHandleId() + WebConstants.FILE_HANDLE_SUFFIX)) {
 			FileResult fileResult = getFileResultFromCache(fileHandleAssociation.getFileHandleId(), adapterFactory, clientCache);
 			if (fileResult != null) {
 				//done!
-				callback.onSuccess(fileResult);
+				gwt.scheduleDeferred(() -> {
+					callback.onSuccess(fileResult);	
+				});
 				return;
 			}
 		}
