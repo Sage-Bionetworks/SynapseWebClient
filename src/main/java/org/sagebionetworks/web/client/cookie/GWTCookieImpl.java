@@ -16,7 +16,7 @@ import com.google.gwt.user.client.Window;
  *
  */
 public class GWTCookieImpl implements CookieProvider {
-
+	
 	@Override
 	public String getCookie(String name) {
 		return Cookies.getCookie(name);
@@ -40,13 +40,12 @@ public class GWTCookieImpl implements CookieProvider {
 	@Override
 	public void setCookie(String name, String value, Date expires) {
 		String domain = CookieUtils.getDomain(Window.Location.getHostName());
-		Cookies.setCookie(name, value, expires, domain, null, false);
+		boolean isSecure = domain != null;
+		setCookie(name, value, expires, domain, null, isSecure);
 	}
 	
 	@Override
-	public void setCookie(String name, String value, Date expires,
-			String domain, String path, boolean secure) {
+	public void setCookie(String name, String value, Date expires, String domain, String path, boolean secure) {
 		Cookies.setCookie(name, value, expires, domain, path, secure);
 	}
-
 }
