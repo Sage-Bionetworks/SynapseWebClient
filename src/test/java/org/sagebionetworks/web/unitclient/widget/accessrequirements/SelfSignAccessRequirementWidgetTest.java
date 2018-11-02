@@ -150,6 +150,15 @@ public class SelfSignAccessRequirementWidgetTest {
 	}
 	
 	@Test
+	public void testAnonymous() {
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		widget.setRequirement(mockAccessRequirement, mockRefreshCallback);
+		lazyLoadDataCallback.invoke();
+		verify(mockView).showUnapprovedHeading();
+		verify(mockView).showLoginButton();
+	}
+	
+	@Test
 	public void testUnapprovedState() {
 		widget.setRequirement(mockAccessRequirement, mockRefreshCallback);
 		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);

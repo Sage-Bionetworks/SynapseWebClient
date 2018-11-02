@@ -185,6 +185,15 @@ public class ManagedACTAccessRequirementWidgetTest {
 	}
 	
 	@Test
+	public void testAnonymous() {
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+		lazyLoadDataCallback.invoke();
+		verify(mockView).showUnapprovedHeading();
+		verify(mockView).showLoginButton();
+	}
+	
+	@Test
 	public void testApprovedStateWithExpiration() {
 		String friendlyDate = "June 9th, 2018";
 		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);

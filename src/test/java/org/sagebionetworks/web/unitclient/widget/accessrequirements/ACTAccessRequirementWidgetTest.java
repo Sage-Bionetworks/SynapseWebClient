@@ -175,6 +175,15 @@ public class ACTAccessRequirementWidgetTest {
 	}
 	
 	@Test
+	public void testAnonymous() {
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+		lazyLoadDataCallback.invoke();
+		verify(mockView).showUnapprovedHeading();
+		verify(mockView).showLoginButton();
+	}
+	
+	@Test
 	public void testUnApprovedStateNoOpenJira() {
 		when(mockACTAccessRequirement.getOpenJiraIssue()).thenReturn(false);
 		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);

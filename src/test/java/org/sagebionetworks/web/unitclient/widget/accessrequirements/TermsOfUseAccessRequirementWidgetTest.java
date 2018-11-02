@@ -142,6 +142,15 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	}
 	
 	@Test
+	public void testAnonymous() {
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		widget.setRequirement(mockTermsOfUseAccessRequirement, mockRefreshCallback);
+		lazyLoadDataCallback.invoke();
+		verify(mockView).showUnapprovedHeading();
+		verify(mockView).showLoginButton();
+	}
+	
+	@Test
 	public void testUnApprovedState() {
 		widget.setRequirement(mockTermsOfUseAccessRequirement, mockRefreshCallback);
 		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
