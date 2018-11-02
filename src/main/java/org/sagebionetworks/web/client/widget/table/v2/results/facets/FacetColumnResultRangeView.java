@@ -14,4 +14,9 @@ public interface FacetColumnResultRangeView extends IsWidget {
 	void setMax(String max);
 	String getMax();
 	void setSynAlert(Widget w);
+	void setIsAnyValue();
+	void setIsRange();
+	void setIsNotSet();
+	boolean isAnyValue();
+	boolean isNotSet();
 }

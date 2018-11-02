@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 import org.sagebionetworks.repo.model.table.FacetColumnRangeRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnResultRange;
+import org.sagebionetworks.repo.model.table.TableConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -33,11 +34,21 @@ public class FacetColumnResultRangeWidget implements IsWidget, FacetColumnResult
 		this.facet = facet;
 		this.onFacetRequest = onFacetRequest;
 		view.setColumnName(facet.getColumnName());
-		if (facet.getSelectedMin() != null) {
-			view.setMin(facet.getSelectedMin());
-		}
-		if (facet.getSelectedMax() != null) {
-			view.setMax(facet.getSelectedMax());
+		boolean isAny = facet.getSelectedMin() == null && facet.getSelectedMax() == null;
+		boolean isNotSetFilter = (facet.getSelectedMin() != null && facet.getSelectedMin().equals(TableConstants.NULL_VALUE_KEYWORD)) ||
+				(facet.getSelectedMax() != null && facet.getSelectedMax().equals(TableConstants.NULL_VALUE_KEYWORD));
+		if (isAny) {
+			view.setIsAnyValue();
+		} else if (isNotSetFilter) {
+			view.setIsNotSet();
+		} else {
+			if (facet.getSelectedMin() != null) {
+				view.setMin(facet.getSelectedMin());
+			}
+			if (facet.getSelectedMax() != null) {
+				view.setMax(facet.getSelectedMax());
+			}
+			view.setIsRange();
 		}
 	}
 	
@@ -79,14 +90,20 @@ public class FacetColumnResultRangeWidget implements IsWidget, FacetColumnResult
 	public void onFacetChange() {
 		FacetColumnRangeRequest facetColumnRangeRequest = new FacetColumnRangeRequest();
 		facetColumnRangeRequest.setColumnName(facet.getColumnName());
-		Double newMin = getNewMin();
-		if (newMin != null) {
-			facetColumnRangeRequest.setMin(Double.toString(newMin));	
+		if (view.isNotSet()) {
+			facetColumnRangeRequest.setMin(TableConstants.NULL_VALUE_KEYWORD);
+			facetColumnRangeRequest.setMax(TableConstants.NULL_VALUE_KEYWORD);
+		} else if (!view.isAnyValue()) {
+			Double newMin = getNewMin();
+			if (newMin != null) {
+				facetColumnRangeRequest.setMin(Double.toString(newMin));	
+			}
+			Double newMax = getNewMax();
+			if (newMax != null) {
+				facetColumnRangeRequest.setMax(Double.toString(newMax));
+			}
 		}
-		Double newMax = getNewMax();
-		if (newMax != null) {
-			facetColumnRangeRequest.setMax(Double.toString(newMax));
-		}
+		// note, if isAnyValue, request contains null min and null max
 		onFacetRequest.invoke(facetColumnRangeRequest);
 	}
 	

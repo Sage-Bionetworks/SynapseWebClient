@@ -4,6 +4,7 @@ import org.gwtbootstrap3.extras.slider.client.ui.Range;
 import org.sagebionetworks.repo.model.table.FacetColumnRangeRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnResultRange;
+import org.sagebionetworks.repo.model.table.TableConstants;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -28,25 +29,34 @@ public class FacetColumnResultSliderRangeWidget implements IsWidget, FacetColumn
 		view.setColumnName(facet.getColumnName());
 		Number minMin = Double.parseDouble(facet.getColumnMin());
 		Number maxMax = Double.parseDouble(facet.getColumnMax());
+		view.setMin(minMin.doubleValue());
+		view.setMax(maxMax.doubleValue());
 		double stepSize = getStepSize(minMin, maxMax);
+		view.setSliderStepSize(stepSize);
 		
+		
+		boolean isAny = facet.getSelectedMin() == null && facet.getSelectedMax() == null;
+		boolean isNotSetFilter = (facet.getSelectedMin() != null && facet.getSelectedMin().equals(TableConstants.NULL_VALUE_KEYWORD)) ||
+				(facet.getSelectedMax() != null && facet.getSelectedMax().equals(TableConstants.NULL_VALUE_KEYWORD));
+		if (isAny) {
+			view.setIsAnyValue();
+		} else if (isNotSetFilter) {
+			view.setIsNotSet();
+		} else {
+			view.setIsRange();
+		}
+
 		Number min = minMin;
 		if (facet.getSelectedMin() != null) {
 			min = Double.parseDouble(facet.getSelectedMin());
 		}
-		
 		Number max = maxMax;
 		if (facet.getSelectedMax() != null) {
 			max = Double.parseDouble(facet.getSelectedMax());
 		}
-		view.setMin(minMin.doubleValue());
-		view.setMax(maxMax.doubleValue());
-		
 		if (min != null && max != null) {
 			view.setRange(new Range(min.doubleValue(), max.doubleValue()));	
 		}
-		
-		view.setSliderStepSize(stepSize);
 	}
 	
 	public double getStepSize(Number min, Number max) {
@@ -61,11 +71,19 @@ public class FacetColumnResultSliderRangeWidget implements IsWidget, FacetColumn
 	}
 	
 	@Override
-	public void onFacetChange(Range selectedRange) {
+	public void onFacetChange() {
 		FacetColumnRangeRequest facetColumnRangeRequest = new FacetColumnRangeRequest();
 		facetColumnRangeRequest.setColumnName(facet.getColumnName());
-		facetColumnRangeRequest.setMin(Double.toString(selectedRange.getMinValue()));
-		facetColumnRangeRequest.setMax(Double.toString(selectedRange.getMaxValue()));
+		
+		if (view.isNotSet()) {
+			facetColumnRangeRequest.setMin(TableConstants.NULL_VALUE_KEYWORD);
+			facetColumnRangeRequest.setMax(TableConstants.NULL_VALUE_KEYWORD);
+		} else if (!view.isAnyValue()) {
+			Range selectedRange = view.getRange();
+			facetColumnRangeRequest.setMin(Double.toString(selectedRange.getMinValue()));
+			facetColumnRangeRequest.setMax(Double.toString(selectedRange.getMaxValue()));
+		}
+		// note, if isAnyValue, request contains null min and null max
 		onFacetRequest.invoke(facetColumnRangeRequest);
 	}
 	

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Strong;
@@ -9,6 +10,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -27,6 +29,14 @@ public class FacetColumnResultRangeViewImpl implements FacetColumnResultRangeVie
 	Div synAlertContainer;
 	Widget w;
 	Presenter presenter;
+	@UiField
+	Radio notSetRadio;
+	@UiField
+	Radio anyRadio;
+	@UiField
+	Radio rangeRadio;
+	@UiField
+	HorizontalPanel rangeUI;
 	
 	@Inject
 	public FacetColumnResultRangeViewImpl(Binder binder){
@@ -36,6 +46,18 @@ public class FacetColumnResultRangeViewImpl implements FacetColumnResultRangeVie
 			public void onClick(ClickEvent event) {
 				presenter.onFacetChange();
 			}
+		});
+		
+		notSetRadio.addClickHandler(event-> {
+			rangeUI.setVisible(false);
+			presenter.onFacetChange();
+		});
+		anyRadio.addClickHandler(event -> {
+			rangeUI.setVisible(false);
+			presenter.onFacetChange();
+		});
+		rangeRadio.addClickHandler(event -> {
+			rangeUI.setVisible(true);
 		});
 	}
 
@@ -76,5 +98,31 @@ public class FacetColumnResultRangeViewImpl implements FacetColumnResultRangeVie
 	@Override
 	public void setColumnName(String name) {
 		columnName.setText(name);
+		String radioName = name.replaceAll("\\W", "") + "_radios";
+		notSetRadio.setName(radioName);
+		anyRadio.setName(radioName);
+		rangeRadio.setName(radioName);
+	}
+	
+	@Override
+	public boolean isNotSet() {
+		return notSetRadio.getValue();
+	}
+	@Override
+	public boolean isAnyValue() {
+		return anyRadio.getValue();
+	}
+	@Override
+	public void setIsAnyValue() {
+		anyRadio.setValue(true, true);
+	}
+	@Override
+	public void setIsNotSet() {
+		notSetRadio.setValue(true, true);
+	}
+	@Override
+	public void setIsRange() {
+		rangeRadio.setValue(true, true);
+		rangeUI.setVisible(true);
 	}
 }
