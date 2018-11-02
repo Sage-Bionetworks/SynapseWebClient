@@ -516,7 +516,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				if (entityBundle.getDoi() == null) {
 					// show command if not returned, thus not in existence
 					actionMenu.setActionVisible(Action.CREATE_DOI, true);
-					actionMenu.setActionText(Action.CREATE_DOI, "DOI minting is temporarily disabled");
+					actionMenu.setActionText(Action.CREATE_DOI, "DOI minting is under maintenance");
 					actionMenu.setActionEnabled(Action.CREATE_DOI, false);
 				}
 			}
