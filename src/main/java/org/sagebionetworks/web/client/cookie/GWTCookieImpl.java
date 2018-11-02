@@ -46,24 +46,6 @@ public class GWTCookieImpl implements CookieProvider {
 	
 	@Override
 	public void setCookie(String name, String value, Date expires, String domain, String path, boolean secure) {
-		double expiresTime = (expires == null) ? 0 : expires.getTime();
-		boolean httpOnly = false;
-		_setCookie(name, value, expiresTime, domain, path, secure, httpOnly);
+		Cookies.setCookie(name, value, expires, domain, path, secure);
 	}
-
-	private static native void _setCookie(String name, String value, double expires, String domain, String path, boolean secure, boolean httpOnly) /*-{
-	  var c = name + '=' + value;
-	  if ( expires )
-	    c += ';expires=' + (new Date(expires)).toGMTString();
-	  if (domain)
-	    c += ';domain=' + domain;
-	  if (path)
-	    c += ';path=' + path;
-	  if (secure)
-	    c += ';secure';
-	  if (httpOnly)
-	  	c += ';HttpOnly';
-
-	  $doc.cookie = c;
-	}-*/;
 }
