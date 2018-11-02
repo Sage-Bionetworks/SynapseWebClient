@@ -504,28 +504,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 	
-<<<<<<< HEAD
-	private void configureCreateDOI() {
-		if (!DisplayUtils.isInTestWebsite(cookies)) {
-			boolean canEdit = permissions.getCanEdit();
-			actionMenu.setActionVisible(Action.CREATE_DOI, false);
-			if (canEdit &&
-					!isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea) &&
-					!(entityBundle.getEntity() instanceof EntityView)) {
-				actionMenu.setActionListener(Action.CREATE_DOI, this);
-				if (entityBundle.getDoi() == null) {
-					// show command if not returned, thus not in existence
-					actionMenu.setActionVisible(Action.CREATE_DOI, true);
-					actionMenu.setActionText(Action.CREATE_DOI, CREATE_DOI_FOR + enityTypeDisplay);
-				}
-			}
-		} else {
-			actionMenu.setActionVisible(Action.CREATE_DOI, false);
-		}
-	}
-	
-=======
->>>>>>> a7859c810... remove old doi widget and pull new DOI widget out of alpha mode
 	private void configureCreateChallenge() {
 		currentChallengeId = null;
 		actionMenu.setActionVisible(Action.CREATE_CHALLENGE, false);
