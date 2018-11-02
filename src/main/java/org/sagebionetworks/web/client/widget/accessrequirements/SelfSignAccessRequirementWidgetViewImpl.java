@@ -4,6 +4,8 @@ import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -26,6 +28,8 @@ public class SelfSignAccessRequirementWidgetViewImpl implements SelfSignAccessRe
 	SimplePanel wikiContainer; 
 	@UiField
 	Button signTermsButton;
+	@UiField
+	Button loginButton;
 	@UiField
 	Button certifyButton;
 	@UiField
@@ -51,33 +55,24 @@ public class SelfSignAccessRequirementWidgetViewImpl implements SelfSignAccessRe
 	Presenter presenter;
 	
 	@Inject
-	public SelfSignAccessRequirementWidgetViewImpl(Binder binder){
+	public SelfSignAccessRequirementWidgetViewImpl(Binder binder, GlobalApplicationState globalAppState){
 		this.w = binder.createAndBindUi(this);
-		signTermsButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onSignTerms();
-			}
+		signTermsButton.addClickHandler(event -> {
+			presenter.onSignTerms();
 		});
-		validateProfileButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onValidateProfile();
-			}
+		validateProfileButton.addClickHandler(event -> {
+			presenter.onValidateProfile();
 		});
-		certifyButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onCertify();
-			}
+		certifyButton.addClickHandler(event -> {
+			presenter.onCertify();
 		});
-		w.addAttachHandler(new AttachEvent.Handler() {
-			
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				if (event.isAttached()) {
-					onAttachCallback.invoke();
-				}
+		loginButton.addClickHandler(event -> {
+			globalAppState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+		});
+
+		w.addAttachHandler(event -> {
+			if (event.isAttached()) {
+				onAttachCallback.invoke();
 			}
 		});
 	}
@@ -124,6 +119,7 @@ public class SelfSignAccessRequirementWidgetViewImpl implements SelfSignAccessRe
 		certifyNote.setVisible(false);
 		validateProfileButton.setVisible(false);
 		validateProfileNote.setVisible(false);
+		loginButton.setVisible(false);
 	}
 	@Override
 	public void showGetCertifiedUI() {
@@ -167,5 +163,9 @@ public class SelfSignAccessRequirementWidgetViewImpl implements SelfSignAccessRe
 	public void setManageAccessWidget(IsWidget w) {
 		manageAccessContainer.clear();
 		manageAccessContainer.add(w);
+	}
+	@Override
+	public void showLoginButton() {
+		loginButton.setVisible(true);	
 	}
 }

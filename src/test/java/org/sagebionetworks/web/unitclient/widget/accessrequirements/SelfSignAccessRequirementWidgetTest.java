@@ -124,6 +124,7 @@ public class SelfSignAccessRequirementWidgetTest {
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(CURRENT_USER_ID);
 		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionStatus).when(mockDataAccessClient).getAccessRequirementStatus(anyString(), any(AsyncCallback.class));
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
 	}
 
 	@Test

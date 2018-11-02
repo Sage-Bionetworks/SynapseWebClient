@@ -135,6 +135,7 @@ public class AccessRequirementsPresenterTest {
 		when(mockBatchAccessApprovalInfoResponse.getResults()).thenReturn(accessRequirementApprovalStatus);
 		when(mockGinInjector.getAccessRequirementWidget()).thenReturn(mockAccessRequirementWidget);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(CURRENT_USER_ID);
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
 	}	
 	
 	@Test

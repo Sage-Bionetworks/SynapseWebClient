@@ -102,6 +102,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
 		verify(mockLazyLoadHelper).configure(callbackCaptor.capture(), eq(mockView));
 		lazyLoadDataCallback = callbackCaptor.getValue();
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionStatus).when(mockDataAccessClient).getAccessRequirementStatus(anyString(), any(AsyncCallback.class));
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
 	}
 
 	@Test
