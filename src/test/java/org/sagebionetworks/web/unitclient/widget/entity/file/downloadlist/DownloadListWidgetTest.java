@@ -119,7 +119,7 @@ public class DownloadListWidgetTest {
 	}
 
 	@Test
-	public void testOnDownloadPackageEmptyZipfileName() {
+	public void testOnCreatePackageEmptyZipfileName() {
 		widget.onCreatePackage("");
 		
 		verify(mockSynAlert).showError(DownloadListWidget.EMPTY_FILENAME_MESSAGE_);
@@ -127,7 +127,7 @@ public class DownloadListWidgetTest {
 	}
 	
 	@Test
-	public void testOnDownloadPackage() {
+	public void testOnCreatePackage() {
 		String fileName = "package";
 		when(mockDownloadOrder.getZipFileName()).thenReturn(fileName + DownloadListWidget.ZIP_EXTENSION);
 		
@@ -199,7 +199,6 @@ public class DownloadListWidgetTest {
 		verify(mockSynAlert).handleException(ex);
 	}
 
-
 	@Test
 	public void testOnRemoveFileHandleAssociation() {
 		widget.onRemoveFileHandleAssociation(mockFha);
@@ -219,6 +218,20 @@ public class DownloadListWidgetTest {
 		verify(mockSynAlert).handleException(ex);
 	}
 
+	@Test
+	public void testOnDownloadPackage() {
+		widget.onDownloadPackage();
+		
+		//verify when the user clicks download package, the package list is refreshed (and view reset)
+		verify(mockView).hideFilesDownloadedAlert();
+		verify(mockView).setPackageName("");
+		verify(mockView).setCreatePackageUIVisible(true);
+		verify(mockView).setDownloadPackageUIVisible(false);
+		verify(mockSynAlert).clear();
+		verify(mockPackageSizeSummary, times(2)).clear();
+		verify(mockView).setMultiplePackagesRequiredVisible(false);
+		verify(mockJsClient).getDownloadList(any(AsyncCallback.class));
+	}
 
 	@Test
 	public void testAsWidget() {

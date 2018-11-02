@@ -14,6 +14,7 @@ public interface DownloadListWidgetView extends IsWidget {
 	void setPackageDownloadURL(String downloadUrl);
 	void setMultiplePackagesRequiredVisible(boolean visible);
 	void showFilesDownloadedAlert(int fileCount);
+	void setPackageName(String zipFileName);
 	void hideFilesDownloadedAlert();
 	public interface Presenter {
 		void onClearDownloadList();
