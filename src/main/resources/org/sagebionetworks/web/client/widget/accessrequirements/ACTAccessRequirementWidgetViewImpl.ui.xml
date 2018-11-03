@@ -45,6 +45,7 @@
 				<bh:Div ui:field="deleteAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
 				<bh:Div ui:field="requestAccessButtonContainer" pull="RIGHT">
 					<b:Button ui:field="requestAccessButton" type="PRIMARY" text="Request Access" visible="false" addStyleNames="margin-right-5 margin-top-5"/>
+					<b:Button ui:field="loginButton" type="PRIMARY" text="Request Access" visible="false" addStyleNames="margin-right-5 margin-top-5"/>
 				</bh:Div>
 				<b:Alert type="SUCCESS" ui:field="requestApprovedMessage" text="Your data access request has been approved." pull="RIGHT" visible="false" addStyleNames="small-alert margin-top-5 margin-right-2"/>
 			</bh:Div>

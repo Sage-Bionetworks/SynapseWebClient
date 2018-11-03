@@ -45,6 +45,7 @@
 				</bh:Div>
 				<bh:Div ui:field="requestAccessButtonContainer" pull="RIGHT">
 					<b:Button ui:field="requestAccessButton" type="PRIMARY" text="Request Access" visible="false" addStyleNames="margin-right-5 margin-top-5"/>
+					<b:Button ui:field="loginButton" type="PRIMARY" text="Request Access" visible="false" addStyleNames="margin-right-5 margin-top-5"/>
 				</bh:Div>
 				<bh:Div ui:field="requestSubmittedByOther" visible="false">
 					<b:Alert type="INFO" text="Data access has been requested on your behalf by:" pull="RIGHT" addStyleNames="small-alert margin-top-5 margin-right-2">

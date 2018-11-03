@@ -169,6 +169,13 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	}
 
 	public void getStatusForEachAccessRequirement() {
+		if (!authController.isLoggedIn()) {
+			for (AccessRequirement ar : allArs) {
+				unmetAccessRequirementsDiv.add(getAccessRequirementWidget(ar));
+			}
+			return;
+		}
+		
 		List<String> arIds = new ArrayList<String>();
 		for (AccessRequirement accessRequirement : allArs) {
 			arIds.add(Long.toString(accessRequirement.getId()));

@@ -130,6 +130,7 @@ public class ManagedACTAccessRequirementWidgetTest {
 		when(mockUserSessionData.getProfile()).thenReturn(mockProfile);
 		when(mockProfile.getEmails()).thenReturn(Collections.singletonList("email@email.com"));
 		when(mockSubjectIds.get(anyInt())).thenReturn(new RestrictableObjectDescriptor());
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
 	}
 
 	@Test
@@ -181,6 +182,15 @@ public class ManagedACTAccessRequirementWidgetTest {
 		verify(mockView).showRequestApprovedMessage();
 		verify(mockView).showUpdateRequestButton();
 		verify(mockView, never()).showExpirationDate(anyString());
+	}
+	
+	@Test
+	public void testAnonymous() {
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+		lazyLoadDataCallback.invoke();
+		verify(mockView).showUnapprovedHeading();
+		verify(mockView).showLoginButton();
 	}
 	
 	@Test

@@ -135,6 +135,7 @@ public class AccessRequirementsPresenterTest {
 		when(mockBatchAccessApprovalInfoResponse.getResults()).thenReturn(accessRequirementApprovalStatus);
 		when(mockGinInjector.getAccessRequirementWidget()).thenReturn(mockAccessRequirementWidget);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(CURRENT_USER_ID);
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
 	}	
 	
 	@Test
@@ -199,4 +200,17 @@ public class AccessRequirementsPresenterTest {
 		assertEquals(RestrictableObjectType.TEAM, subject.getType());
 		verify(mockTeamBadge).configure(TEAM_ID);
 	}	
+	
+	@Test
+	public void testAnonymous() {
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		when(mockPlace.getParam(AccessRequirementsPlace.ID_PARAM)).thenReturn(ENTITY_ID);
+		when(mockPlace.getParam(AccessRequirementsPlace.TYPE_PARAM)).thenReturn(RestrictableObjectType.ENTITY.toString());
+
+		presenter.setPlace(mockPlace);
+		verify(mockDataAccessClient).getAccessRequirements(subjectCaptor.capture(), eq(AccessRequirementsPresenter.LIMIT), eq(0L), any(AsyncCallback.class));
+		verify(mockDataAccessClient, never()).getAccessRequirementStatus(any(BatchAccessApprovalInfoRequest.class), any(AsyncCallback.class));
+		
+		verify(mockUnmetAccessRequirementsDiv, times(4)).add(any(IsWidget.class));
+	}
 }
