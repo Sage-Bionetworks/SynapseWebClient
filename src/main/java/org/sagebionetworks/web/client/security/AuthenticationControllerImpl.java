@@ -20,7 +20,6 @@ import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 
@@ -70,7 +69,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			@Override
 			public void onSuccess(LoginResponse session) {
 				storeAuthenticationReceipt(username, session.getAuthenticationReceipt());
-				revalidateSession(session.getSessionToken(), callback);
+				setNewSessionToken(session.getSessionToken(), callback);
 			}
 			
 			@Override
@@ -93,62 +92,59 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		return request;
 	}
 	
-	@Override
-	public void revalidateSession(final String token, final AsyncCallback<UserProfile> callback) {
-		currentUserSessionToken = null;
+	/**
+	 * Called to update the session token.
+	 * @param token
+	 * @param callback
+	 */
+	public void setNewSessionToken(String token, final AsyncCallback<UserProfile> callback) {
 		if(token == null) {
 			callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 			return;
 		}
-		//set the session cookie for same domain calls, and save the token locally for cross domain (backend) calls.
-		updateSessionTokenCookie(token, new AsyncCallback<Void>() {
+		ginInjector.getSynapseJavascriptClient().initSession(token, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				if (isToUException(caught)) {
-					ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
+				logoutUser();
+				if (caught instanceof SynapseDownException || caught instanceof ReadOnlyModeException) {
+					ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new Down(ClientProperties.DEFAULT_PLACE_TOKEN));
 				} else {
-					logoutUser();
-					if (caught instanceof SynapseDownException || caught instanceof ReadOnlyModeException) {
-						ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new Down(ClientProperties.DEFAULT_PLACE_TOKEN));
-					} else {
-						callback.onFailure(caught);
-					}
+					callback.onFailure(caught);
 				}
 			}
 			@Override
 			public void onSuccess(Void result) {
-				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
-				currentUserSessionToken = token;
-				
-				userAccountService.getCurrentUserSessionData(new AsyncCallback<UserSessionData>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						callback.onFailure(caught);	
-					}
-					@Override
-					public void onSuccess(UserSessionData newData) {
-						if (!newData.getSession().getAcceptsTermsOfUse()) {
-							ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
-						} else {
-							currentUserProfile = newData.getProfile();
-							jsniUtils.setAnalyticsUserId(getCurrentUserPrincipalId());
-							callback.onSuccess(newData.getProfile());
-							ginInjector.getSessionDetector().initializeSessionTokenState();	
-						}
-					}
-				});
+				initializeFromExistingSessionCookie(callback);
 			}
 		});
 	}
 	
-	private boolean isToUException(Throwable caught) {
-		return caught instanceof ForbiddenException && caught.getMessage().toLowerCase().contains("terms");
+	/**
+	 * Session cookie should be set before this call 
+	 * @param callback
+	 */
+	public void initializeFromExistingSessionCookie(final AsyncCallback<UserProfile> callback) {
+		userAccountService.getCurrentUserSessionData(new AsyncCallback<UserSessionData>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);	
+			}
+			@Override
+			public void onSuccess(UserSessionData newData) {
+				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
+				if (!newData.getSession().getAcceptsTermsOfUse()) {
+					ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
+				} else {
+					currentUserSessionToken = newData.getSession().getSessionToken();
+					currentUserProfile = newData.getProfile();
+					jsniUtils.setAnalyticsUserId(getCurrentUserPrincipalId());
+					callback.onSuccess(newData.getProfile());
+					ginInjector.getSessionDetector().initializeSessionTokenState();	
+				}
+			}
+		});
 	}
 	
-	private void updateSessionTokenCookie(String token, AsyncCallback<Void> callback) {
-		ginInjector.getSynapseJavascriptClient().initSession(token, callback);
-	}
-
 	@Override
 	public void logoutUser() {
 		// terminate the session, remove the cookie
@@ -159,14 +155,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		currentUserProfile = null;
 		ginInjector.getHeader().refresh();
 		ginInjector.getSessionDetector().initializeSessionTokenState();
-		updateSessionTokenCookie(WebConstants.EXPIRE_SESSION_TOKEN, new AsyncCallback<Void>() {
-			@Override
-			public void onFailure(Throwable caught) {
-			}
-			@Override
-			public void onSuccess(Void result) {
-			}
-		});
+		ginInjector.getSynapseJavascriptClient().initSession(WebConstants.EXPIRE_SESSION_TOKEN, null);
 	}
 	
 	@Override
@@ -189,8 +178,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	
 	@Override
 	public void reloadUserSessionData(Callback afterReload) {
-		// attempt to get session token from cookies
-		userAccountService.getCurrentSessionToken(new AsyncCallback<String>() {
+		// attempt to get session token from existing cookie (if there is one)
+		initializeFromExistingSessionCookie(new AsyncCallback<UserProfile>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				logoutUser();
@@ -198,22 +187,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				afterReload.invoke();
 			}
 			@Override
-			public void onSuccess(String token) {
-				if (token != null) {
-					revalidateSession(token, new AsyncCallback<UserProfile>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							jsniUtils.consoleError(caught);
-							afterReload.invoke();
-						}
-						@Override
-						public void onSuccess(UserProfile result) {
-							afterReload.invoke();
-						}
-					});	
-				} else {
-					afterReload.invoke();
-				}
+			public void onSuccess(UserProfile result) {
+				afterReload.invoke();
 			}
 		});
 	}

@@ -16,11 +16,16 @@ public interface AuthenticationController {
 	public void loginUser(String username, String password, AsyncCallback<UserProfile> callback);
 	
 	/**
-	 * revalidates the given session token
+	 * sets a new session token
 	 * @param token
 	 */
-	public void revalidateSession(String token, AsyncCallback<UserProfile> callback);
+	void setNewSessionToken(String token, final AsyncCallback<UserProfile> callback);
 	
+	/**
+	 * attempts to load from an existing session cookie
+	 * @param callback
+	 */
+	void initializeFromExistingSessionCookie(final AsyncCallback<UserProfile> callback);
 	/**
 	 * Terminates the session of the current user
 	 */

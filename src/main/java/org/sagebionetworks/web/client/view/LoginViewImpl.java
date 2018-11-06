@@ -105,9 +105,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 		loginWidgetPanel.clear();
 		loginWidget.asWidget().removeFromParent();
 		loginWidgetPanel.add(loginWidget.asWidget());
-		loginWidget.setUserListener(() -> {
-			presenter.updateUser();
-		});
 	}
 	
 	@Override

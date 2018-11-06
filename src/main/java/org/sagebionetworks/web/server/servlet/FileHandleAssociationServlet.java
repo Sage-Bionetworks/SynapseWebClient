@@ -122,11 +122,6 @@ public class FileHandleAssociationServlet extends HttpServlet {
 			response.sendRedirect(getBaseUrl(request) + "#!Error:"+entryString);
 		}
 	}
-	
-	@Override
-	public void doPost(final HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
-	}
 		
 	/**
 	 * Get the session token

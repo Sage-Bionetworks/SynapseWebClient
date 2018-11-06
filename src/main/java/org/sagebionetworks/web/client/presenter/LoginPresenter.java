@@ -58,7 +58,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 					// Have to get the UserSessionData again, 
 					// since it won't contain the UserProfile if the terms haven't been signed
 					synAlert.clear();
-					authenticationController.revalidateSession(authenticationController.getCurrentUserSessionToken(), new AsyncCallback<UserProfile>() {
+					authenticationController.initializeFromExistingSessionCookie(new AsyncCallback<UserProfile>() {
 						@Override
 						public void onFailure(
 								Throwable caught) {
@@ -120,13 +120,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	
 	private void gotoChangeUsernamePlace() {
 		globalApplicationState.getPlaceChanger().goTo(new ChangeUsername(ClientProperties.DEFAULT_PLACE_TOKEN));
-	}
-	
-
-	
-	@Override
-	public void updateUser() {
-		revalidateSession(authenticationController.getCurrentUserSessionToken());
 	}
 	
 	/**
@@ -200,7 +193,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				}
 			};
 			
-			authenticationController.revalidateSession(token, callback);
+			authenticationController.setNewSessionToken(token, callback);
 		}
 	}
 }

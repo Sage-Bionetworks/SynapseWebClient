@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.view;
 
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -24,6 +23,5 @@ public interface LoginView extends IsWidget, SynapseView {
 	public interface Presenter {
 		void goTo(Place place);
 		void goToLastPlace();
-		void updateUser();
     }
 }
