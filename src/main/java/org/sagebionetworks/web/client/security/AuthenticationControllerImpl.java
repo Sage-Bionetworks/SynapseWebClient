@@ -104,10 +104,10 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		updateSessionTokenCookie(token, new AsyncCallback<String>() {
 			@Override
 			public void onFailure(Throwable caught) {
+				logoutUser();
 				if (caught instanceof SynapseDownException || caught instanceof ReadOnlyModeException) {
 					ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new Down(ClientProperties.DEFAULT_PLACE_TOKEN));
 				} else {
-					logoutUser();
 					callback.onFailure(caught);
 				}
 			}
@@ -230,8 +230,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			@Override
 			public void onSuccess(String token) {
 				String localSession = getCurrentUserSessionToken();
+				// if the local session does not match the actual session, reload the app
 				if (!Objects.equals(token, localSession)) {
-					logoutUser();
 					Window.Location.reload();
 				} else {
 					ginInjector.getHeader().refresh();

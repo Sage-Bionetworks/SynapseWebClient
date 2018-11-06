@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,20 +51,23 @@ public class InitSessionServlet extends HttpServlet {
 			throws ServletException, IOException {
 		// return the Set-Cookie response with the session token
 		try {
-			String expiresString = "";
 			String sessionToken = request.getParameter(WebConstants.SESSION_TOKEN_KEY);
 			if (sessionToken == null || sessionToken.isEmpty()) {
 				sessionToken = WebConstants.EXPIRE_SESSION_TOKEN;
 			}
+			Cookie cookie = new Cookie(USER_LOGIN_TOKEN, sessionToken);
+			
 			if (!WebConstants.EXPIRE_SESSION_TOKEN.equals(sessionToken)) {
 				// validate session token is valid
 				createNewClient(sessionToken).getUserSessionData();
+				cookie.setMaxAge(60*60*24);
 			} else {
-				expiresString = " expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+				cookie.setMaxAge(0);
 			}
 			boolean isSecure = Boolean.parseBoolean(request.getParameter(WebConstants.IS_SECURE_COOKIE_KEY));
-			String secureString = isSecure ? " Secure;" : ""; 
-			response.setHeader("Set-Cookie", USER_LOGIN_TOKEN + "="+sessionToken+"; Domain=; HttpOnly; " + secureString + expiresString);
+			cookie.setSecure(isSecure);
+			cookie.setHttpOnly(true);
+			response.addCookie(cookie);
 		} catch (SynapseException e) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			response.getOutputStream().write("Invalid session token".getBytes("UTF-8"));
