@@ -3,6 +3,7 @@ package org.sagebionetworks.web.server.servlet;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.AuthorizationConstants;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
@@ -127,6 +128,19 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		}
 	}
 
+	@Override
+	public UserProfile getMyUserProfile() throws RestServiceException {
+		validateService();
+
+		SynapseClient client = createSynapseClient();
+		try {
+			return client.getMyProfile();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	
 	@Override
 	public String createUserStep2(String userName, String fName, String lName, String password, EmailValidationSignedToken emailValidationSignedToken) throws RestServiceException {
 		validateService();

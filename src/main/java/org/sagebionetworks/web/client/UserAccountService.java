@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -26,4 +27,6 @@ public interface UserAccountService extends RemoteService {
 	String getCurrentSessionToken() throws RestServiceException;
 
 	boolean isTermsOfUseSigned() throws RestServiceException;
+
+	UserProfile getMyUserProfile() throws RestServiceException;
 }

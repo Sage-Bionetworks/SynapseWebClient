@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -28,4 +29,5 @@ public interface UserAccountServiceAsync {
 	void getCurrentSessionToken(AsyncCallback<String> callback);
 	
 	void isTermsOfUseSigned(AsyncCallback<Boolean> callback);
+	void getMyUserProfile(AsyncCallback<UserProfile> callback);
 }

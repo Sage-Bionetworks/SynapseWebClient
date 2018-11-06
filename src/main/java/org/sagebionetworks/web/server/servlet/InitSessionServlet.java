@@ -50,17 +50,20 @@ public class InitSessionServlet extends HttpServlet {
 			throws ServletException, IOException {
 		// return the Set-Cookie response with the session token
 		try {
+			String expiresString = "";
 			String sessionToken = request.getParameter(WebConstants.SESSION_TOKEN_KEY);
-			if (sessionToken == null) {
-				sessionToken = "";
+			if (sessionToken == null || sessionToken.isEmpty()) {
+				sessionToken = WebConstants.EXPIRE_SESSION_TOKEN;
 			}
-			if (sessionToken.isEmpty()) {
+			if (!WebConstants.EXPIRE_SESSION_TOKEN.equals(sessionToken)) {
 				// validate session token is valid
 				createNewClient(sessionToken).getUserSessionData();
+			} else {
+				expiresString = " expires=Thu, 01 Jan 1970 00:00:00 GMT;";
 			}
 			boolean isSecure = Boolean.parseBoolean(request.getParameter(WebConstants.IS_SECURE_COOKIE_KEY));
 			String secureString = isSecure ? " Secure;" : ""; 
-			response.setHeader("Set-Cookie", USER_LOGIN_TOKEN + "="+sessionToken+"; Domain=; HttpOnly; " + secureString);
+			response.setHeader("Set-Cookie", USER_LOGIN_TOKEN + "="+sessionToken+"; Domain=; HttpOnly; " + secureString + expiresString);
 		} catch (SynapseException e) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			response.getOutputStream().write("Invalid session token".getBytes("UTF-8"));

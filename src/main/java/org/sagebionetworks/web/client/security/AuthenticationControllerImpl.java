@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.security;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
-import java.util.Date;
 import java.util.Objects;
 
 import org.sagebionetworks.repo.model.UserProfile;
@@ -20,9 +19,11 @@ import org.sagebionetworks.web.client.cookie.CookieUtils;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -100,9 +101,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			return;
 		}
 		//set the session cookie for same domain calls, and save the token locally for cross domain (backend) calls.
-		String domain = CookieUtils.getDomain(Window.Location.getHostName());
-		boolean isSecure = domain != null;
-		ginInjector.getSynapseJavascriptClient().doGetString(jsniUtils.getSessionCookieUrl(token, isSecure), false, new AsyncCallback<String>() {
+		updateSessionTokenCookie(token, new AsyncCallback<String>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught instanceof SynapseDownException || caught instanceof ReadOnlyModeException) {
@@ -114,10 +113,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			}
 			@Override
 			public void onSuccess(String result) {
-				Date tomorrow = DateTimeUtilsImpl.getDayFromNow();
 				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
 				currentUserSessionToken = token;
-				ginInjector.getSynapseJavascriptClient().getUserProfile(null, new AsyncCallback<UserProfile>() {
+				userAccountService.getMyUserProfile(new AsyncCallback<UserProfile>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						callback.onFailure(caught);	
@@ -131,6 +129,12 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			}
 		});
 	}
+	
+	private void updateSessionTokenCookie(String token, AsyncCallback<String> callback) {
+		String domain = CookieUtils.getDomain(Window.Location.getHostName());
+		boolean isSecure = domain != null;
+		ginInjector.getSynapseJavascriptClient().doGetString(jsniUtils.getSessionCookieUrl(token, isSecure), false, callback);
+	}
 
 	@Override
 	public void logoutUser() {
@@ -141,6 +145,14 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		currentUserSessionToken = null;
 		currentUserProfile = null;
 		ginInjector.getHeader().refresh();
+		updateSessionTokenCookie(WebConstants.EXPIRE_SESSION_TOKEN, new AsyncCallback<String>() {
+			@Override
+			public void onFailure(Throwable caught) {
+			}
+			@Override
+			public void onSuccess(String result) {
+			}
+		});
 	}
 	
 	@Override
@@ -167,6 +179,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		userAccountService.getCurrentSessionToken(new AsyncCallback<String>() {
 			@Override
 			public void onFailure(Throwable caught) {
+				logoutUser();
 				jsniUtils.consoleError(caught);
 				afterReload.invoke();
 			}
@@ -184,6 +197,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 							afterReload.invoke();
 						}
 					});	
+				} else {
+					afterReload.invoke();
 				}
 			}
 		});
