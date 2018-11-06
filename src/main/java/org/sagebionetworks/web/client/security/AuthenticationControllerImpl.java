@@ -124,6 +124,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					public void onSuccess(UserProfile newProfile) {
 						currentUserProfile = newProfile;
 						callback.onSuccess(newProfile);
+						ginInjector.getSessionTokenDetector().initializeSessionTokenState();
 					}
 				});
 			}
@@ -145,6 +146,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		currentUserSessionToken = null;
 		currentUserProfile = null;
 		ginInjector.getHeader().refresh();
+		ginInjector.getSessionTokenDetector().initializeSessionTokenState();
 		updateSessionTokenCookie(WebConstants.EXPIRE_SESSION_TOKEN, new AsyncCallback<String>() {
 			@Override
 			public void onFailure(Throwable caught) {
