@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.server.servlet;
 
+import static org.sagebionetworks.web.client.cookie.CookieKeys.USER_LOGIN_TOKEN;
+
+import java.io.BufferedReader;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -11,9 +14,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.StackEndpoints;
-import static org.sagebionetworks.web.client.cookie.CookieKeys.*;
 import org.sagebionetworks.web.shared.WebConstants;
 
 /**
@@ -49,9 +53,38 @@ public class InitSessionServlet extends HttpServlet {
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+
+	}
+	
+	/**
+	 * Create a new Synapse client.
+	 *
+	 * @return
+	 */
+	private SynapseClient createNewClient(String sessionToken) {
+		SynapseClient client = synapseProvider.createNewClient();
+		client.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
+		client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
+		client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
+		if (sessionToken != null)
+			client.setSessionToken(sessionToken);
+		return client;
+	}
+
+	@Override
+	public void doPost(final HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
 		// return the Set-Cookie response with the session token
 		try {
-			String sessionToken = request.getParameter(WebConstants.SESSION_TOKEN_KEY);
+			StringBuffer jb = new StringBuffer();
+			String line = null;
+			BufferedReader reader = request.getReader();
+			while ((line = reader.readLine()) != null)
+				jb.append(line);
+			JSONObjectAdapter adapter = new JSONObjectAdapterImpl(jb.toString());
+			Session s = new Session(adapter);
+			String sessionToken = s.getSessionToken();
 			if (sessionToken == null || sessionToken.isEmpty()) {
 				sessionToken = WebConstants.EXPIRE_SESSION_TOKEN;
 			}
@@ -75,29 +108,10 @@ public class InitSessionServlet extends HttpServlet {
 				cookie.setDomain(".synapse.org");
 			}
 			response.addCookie(cookie);
-		} catch (SynapseException e) {
+		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			response.getOutputStream().write("Invalid session token".getBytes("UTF-8"));
 			response.getOutputStream().flush();
 		}
 	}
-	
-	/**
-	 * Create a new Synapse client.
-	 *
-	 * @return
-	 */
-	private SynapseClient createNewClient(String sessionToken) {
-		SynapseClient client = synapseProvider.createNewClient();
-		client.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
-		client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
-		client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
-		if (sessionToken != null)
-			client.setSessionToken(sessionToken);
-		return client;
-	}
-
-	@Override
-	public void doPost(final HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {}
 }

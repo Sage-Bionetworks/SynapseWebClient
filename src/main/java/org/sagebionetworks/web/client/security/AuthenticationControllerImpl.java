@@ -23,7 +23,6 @@ import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -101,7 +100,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			return;
 		}
 		//set the session cookie for same domain calls, and save the token locally for cross domain (backend) calls.
-		updateSessionTokenCookie(token, new AsyncCallback<String>() {
+		updateSessionTokenCookie(token, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				if (isToUException(caught)) {
@@ -116,7 +115,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				}
 			}
 			@Override
-			public void onSuccess(String result) {
+			public void onSuccess(Void result) {
 				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
 				currentUserSessionToken = token;
 				userAccountService.getMyUserProfile(new AsyncCallback<UserProfile>() {
@@ -144,8 +143,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		return caught instanceof ForbiddenException && caught.getMessage().toLowerCase().contains("terms");
 	}
 	
-	private void updateSessionTokenCookie(String token, AsyncCallback<String> callback) {
-		ginInjector.getSynapseJavascriptClient().doGetString(jsniUtils.getSessionCookieUrl(token), false, callback);
+	private void updateSessionTokenCookie(String token, AsyncCallback<Void> callback) {
+		ginInjector.getSynapseJavascriptClient().initSession(token, callback);
 	}
 
 	@Override
@@ -158,12 +157,12 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		currentUserProfile = null;
 		ginInjector.getHeader().refresh();
 		ginInjector.getSessionDetector().initializeSessionTokenState();
-		updateSessionTokenCookie(WebConstants.EXPIRE_SESSION_TOKEN, new AsyncCallback<String>() {
+		updateSessionTokenCookie(WebConstants.EXPIRE_SESSION_TOKEN, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
 			}
 			@Override
-			public void onSuccess(String result) {
+			public void onSuccess(Void result) {
 			}
 		});
 	}

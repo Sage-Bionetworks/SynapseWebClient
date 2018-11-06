@@ -58,6 +58,7 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
+import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
@@ -1250,6 +1251,18 @@ public class SynapseJavascriptClient {
 	public void getDownloadOrderHistory(DownloadOrderSummaryRequest request, AsyncCallback<DownloadOrderSummaryResponse> callback) {
 		String url = getFileServiceUrl() + "/download/order/history";
 		doPost(url, request, OBJECT_TYPE.DownloadOrderSummaryResponse, callback);
+	}
+	
+	/**
+	 * call to ask the server to set the session cookie
+	 * @param token
+	 * @param callback
+	 */
+	public void initSession(String token, AsyncCallback<Void> callback) {
+		Session s = new Session();
+		s.setSessionToken(token);
+		String url = jsniUtils.getSessionCookieUrl();
+		doPost(url, s, OBJECT_TYPE.None, callback);
 	}
 }
 

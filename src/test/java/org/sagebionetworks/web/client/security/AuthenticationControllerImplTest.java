@@ -76,7 +76,7 @@ public class AuthenticationControllerImplTest {
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
 		//by default, return a valid user session data if asked
-		AsyncMockStubber.callSuccessWith("1111").when(mockJsClient).doGetString(anyString(), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).initSession(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("1111").when(mockUserAccountService).getCurrentSessionToken(any(AsyncCallback.class));
 		profile = new UserProfile();
 		profile.setOwnerId(USER_ID);
@@ -133,8 +133,7 @@ public class AuthenticationControllerImplTest {
 		authenticationController.logoutUser();
 		
 		//sets session cookie
-		verify(mockJsClient).doGetString(anyString(), anyBoolean(), any(AsyncCallback.class));
-		verify(mockSynapseJSNIUtils).getSessionCookieUrl(WebConstants.EXPIRE_SESSION_TOKEN);
+		verify(mockJsClient).initSession(eq(WebConstants.EXPIRE_SESSION_TOKEN), any(AsyncCallback.class));
 		verify(mockClientCache).clear();
 		verify(mockSessionDetector).initializeSessionTokenState();
 		verify(mockHeader).refresh();
@@ -219,7 +218,7 @@ public class AuthenticationControllerImplTest {
 		loginResponse.setSessionToken("213344");
 		AsyncMockStubber.callSuccessWith(loginResponse).when(mockJsClient).login(any(LoginRequest.class), any(AsyncCallback.class));
 		ReadOnlyModeException ex = new ReadOnlyModeException();
-		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).doGetString(anyString(), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).initSession(anyString(), any(AsyncCallback.class));
 		String username = "testusername";
 		String password = "pw";
 		AsyncCallback loginCallback = mock(AsyncCallback.class);

@@ -28,6 +28,5 @@ public interface UserAccountServiceAsync {
 	 */
 	void getCurrentSessionToken(AsyncCallback<String> callback);
 	
-	void isTermsOfUseSigned(AsyncCallback<Boolean> callback);
 	void getMyUserProfile(AsyncCallback<UserProfile> callback);
 }

@@ -117,18 +117,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 	
 	@Override
-	public boolean isTermsOfUseSigned() throws RestServiceException {
-		validateService();
-
-		SynapseClient client = createSynapseClient();
-		try {
-			return client.getUserSessionData().getSession().getAcceptsTermsOfUse();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
 	public UserProfile getMyUserProfile() throws RestServiceException {
 		validateService();
 

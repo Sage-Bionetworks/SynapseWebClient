@@ -112,7 +112,6 @@ public class WebConstants {
 	/** END FileHandleAssociation servlet params **/
 	
 	public static final String SESSION_TOKEN_KEY = "t";
-	public static final String IS_SECURE_COOKIE_KEY = "secure";
 	public static final String EXPIRE_SESSION_TOKEN = "deleted";
 	public static final String ENTITY_PARAM_KEY = "entityId";
 	

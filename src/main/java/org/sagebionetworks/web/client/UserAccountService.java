@@ -26,7 +26,5 @@ public interface UserAccountService extends RemoteService {
 
 	String getCurrentSessionToken() throws RestServiceException;
 
-	boolean isTermsOfUseSigned() throws RestServiceException;
-
 	UserProfile getMyUserProfile() throws RestServiceException;
 }
