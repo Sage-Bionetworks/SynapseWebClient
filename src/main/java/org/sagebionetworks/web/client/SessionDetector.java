@@ -5,6 +5,7 @@ import java.util.Objects;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
+import com.google.gwt.user.client.Window;
 import com.google.inject.Inject;
 
 public class SessionDetector {
@@ -37,8 +38,8 @@ public class SessionDetector {
 			// compare the local user id to the one in the cache (across browser, current value)
 			String currentSessionUserId = getSessionMarker();
 			if (!Objects.equals(authController.getCurrentUserPrincipalId(), currentSessionUserId)) {
-				// session token state mismatch, update the app state by refreshing the page
-				globalAppState.refreshPage();
+				// session token state mismatch, update the app state by reloading (refresh leads to auth controller detecting app reload)
+				Window.Location.reload();
 			}
 		}, INTERVAL_MS);
 	}
