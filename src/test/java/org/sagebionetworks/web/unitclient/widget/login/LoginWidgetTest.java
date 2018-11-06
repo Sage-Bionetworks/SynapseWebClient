@@ -82,7 +82,6 @@ public class LoginWidgetTest {
 		verify(mockUserListener).invoke();
 		verify(mockView).clear();
 		verify(mockView).clearUsername();
-		verify(mockAuthController).checkForSignedTermsOfUse();
 	}
 	
 	@Test

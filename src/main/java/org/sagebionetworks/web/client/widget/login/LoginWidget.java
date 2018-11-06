@@ -54,7 +54,6 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 			public void onSuccess(UserProfile profile) {
 				clear();
 				fireUserChange();
-				authenticationController.checkForSignedTermsOfUse();
 			}
 
 			@Override

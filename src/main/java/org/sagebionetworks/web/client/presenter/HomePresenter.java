@@ -5,7 +5,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
@@ -54,7 +53,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	public void setPlace(Home place) {
 		this.place = place;		
 		view.setPresenter(this);
-		checkAcceptToU();
 		view.refresh();
 		if(authenticationController.isLoggedIn()) {
 			view.showLoggedInUI(authenticationController.getCurrentUserProfile());
@@ -73,11 +71,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
         view.clear();
         return null;
     }
-
-	
-	public void checkAcceptToU() {
-		authenticationController.checkForSignedTermsOfUse();
-	}
 	
 	@Override
 	public void onUserChange() {

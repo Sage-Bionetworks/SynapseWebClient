@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -106,7 +105,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		} else if (LoginPlace.CHANGE_USERNAME.equals(token) && authenticationController.isLoggedIn()) {
 			//go to the change username page
 			gotoChangeUsernamePlace();
-		} else if (LoginPlace.SHOW_TOU.equals(token) && authenticationController.isLoggedIn()) {
+		} else if (LoginPlace.SHOW_TOU.equals(token) && authenticationController.getCurrentUserSessionToken() != null) {
 			showTermsOfUse(getAcceptTermsOfUseCallback());	
 		} else if (!ClientProperties.DEFAULT_PLACE_TOKEN.equals(token) && 
 				!LoginPlace.CHANGE_USERNAME.equals(token) && 
@@ -175,7 +174,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	public void userAuthenticated() {
 		view.hideLoggingInLoader();
 		//the user should be logged in now.
-		if (!authenticationController.isLoggedIn()) {
+		if (authenticationController.getCurrentUserSessionToken() == null) {
 			view.showErrorMessage("An error occurred during login. Please try logging in again.");
 			view.showLogin();
 		} else {
@@ -188,13 +187,11 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		// parse token
 		view.showLoggingInLoader();
 		if(token != null) {
-			final String sessionToken = token;
 			synAlert.clear();
 			AsyncCallback<UserProfile> callback = new AsyncCallback<UserProfile>() {	
 				@Override
 				public void onSuccess(UserProfile result) {
 					userAuthenticated();
-					authenticationController.checkForSignedTermsOfUse();
 				}
 				@Override
 				public void onFailure(Throwable caught) {
@@ -203,7 +200,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				}
 			};
 			
-			authenticationController.revalidateSession(sessionToken, callback);
+			authenticationController.revalidateSession(token, callback);
 		}
 	}
 }

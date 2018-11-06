@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.security;
 
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.utils.Callback;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface AuthenticationController {
@@ -64,6 +64,4 @@ public interface AuthenticationController {
 	public void updateCachedProfile(UserProfile updatedProfile);
 	
 	void checkForUserChange();
-	
-	void checkForSignedTermsOfUse();
 }

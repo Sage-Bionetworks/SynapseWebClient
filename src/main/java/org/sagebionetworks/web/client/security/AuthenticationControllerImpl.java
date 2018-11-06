@@ -19,9 +19,11 @@ import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -102,11 +104,15 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		updateSessionTokenCookie(token, new AsyncCallback<String>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				logoutUser();
-				if (caught instanceof SynapseDownException || caught instanceof ReadOnlyModeException) {
-					ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new Down(ClientProperties.DEFAULT_PLACE_TOKEN));
+				if (isToUException(caught)) {
+					ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
 				} else {
-					callback.onFailure(caught);
+					logoutUser();
+					if (caught instanceof SynapseDownException || caught instanceof ReadOnlyModeException) {
+						ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new Down(ClientProperties.DEFAULT_PLACE_TOKEN));
+					} else {
+						callback.onFailure(caught);
+					}
 				}
 			}
 			@Override
@@ -116,7 +122,11 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				userAccountService.getMyUserProfile(new AsyncCallback<UserProfile>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						callback.onFailure(caught);	
+						if (isToUException(caught)) {
+							ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
+						} else {
+							callback.onFailure(caught);	
+						}
 					}
 					@Override
 					public void onSuccess(UserProfile newProfile) {
@@ -128,6 +138,10 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				});
 			}
 		});
+	}
+	
+	private boolean isToUException(Throwable caught) {
+		return caught instanceof ForbiddenException && caught.getMessage().toLowerCase().contains("terms");
 	}
 	
 	private void updateSessionTokenCookie(String token, AsyncCallback<String> callback) {
@@ -237,26 +251,5 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				}
 			}
 		});
-	}
-	
-	@Override
-	public void checkForSignedTermsOfUse() {
-		if (isLoggedIn()) {
-			// SWC-4278: do not log user out (that will clear all state, and the user may be in the middle of signing the pledge!)
-			// Instead, redirect to the pledge.
-			userAccountService.isTermsOfUseSigned(new AsyncCallback<Boolean>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					jsniUtils.consoleError(caught);
-				}
-				@Override
-				public void onSuccess(Boolean isSigned) {
-					if (!isSigned) {
-						ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
-					} // else, this is a no-op
-				}
-			});
-			
-		}
 	}
 }
