@@ -5,7 +5,6 @@ import java.util.Objects;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.inject.Inject;
 
 public class SessionDetector {
@@ -15,7 +14,6 @@ public class SessionDetector {
 	AuthenticationController authController;
 	GlobalApplicationState globalAppState;
 	GWTWrapper gwt;
-	boolean isSessionMarker;
 	public static final String SESSION_MARKER = "SESSION_MARKER";
 	@Inject
 	public SessionDetector(
@@ -30,14 +28,15 @@ public class SessionDetector {
 		initializeSessionTokenState();
 	}
 	
-	private boolean isSessionMarkerSet() {
-		return clientCache.contains(SESSION_MARKER);
+	private String getSessionMarker() {
+		return clientCache.get(SESSION_MARKER);
 	}
 	
 	public void start() {
 		gwt.scheduleFixedDelay(() -> {
-			boolean isNowSessionToken = isSessionMarkerSet();
-			if (!Objects.equals(isSessionMarker, isNowSessionToken)) {
+			// compare the local user id to the one in the cache (across browser, current value)
+			String currentSessionUserId = getSessionMarker();
+			if (!Objects.equals(authController.getCurrentUserPrincipalId(), currentSessionUserId)) {
 				// session token state mismatch, update the app state by refreshing the page
 				globalAppState.refreshPage();
 			}
@@ -47,11 +46,10 @@ public class SessionDetector {
 	public void initializeSessionTokenState() {
 		//Re-initialize session token state
 		if (authController.isLoggedIn()) {
-			// when a session is given, keep state for a day (less if logout or invalid session token is detected)
-			clientCache.put(SESSION_MARKER, Boolean.TRUE.toString(), 1000L*60L*60L*24L);
+			// when a session is given, keep state until logout (or invalid session token is detected)
+			clientCache.put(SESSION_MARKER, authController.getCurrentUserPrincipalId(), DateTimeUtilsImpl.getYearFromNow().getTime());
 		} else {
 			clientCache.remove(SESSION_MARKER);
 		}
-		isSessionMarker = isSessionMarkerSet();
 	}
 }
