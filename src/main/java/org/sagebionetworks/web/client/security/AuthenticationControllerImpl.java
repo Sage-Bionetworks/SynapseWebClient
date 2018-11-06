@@ -5,6 +5,7 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import java.util.Objects;
 
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -118,21 +119,22 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			public void onSuccess(Void result) {
 				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
 				currentUserSessionToken = token;
-				userAccountService.getMyUserProfile(new AsyncCallback<UserProfile>() {
+				
+				userAccountService.getCurrentUserSessionData(new AsyncCallback<UserSessionData>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						if (isToUException(caught)) {
-							ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
-						} else {
-							callback.onFailure(caught);	
-						}
+						callback.onFailure(caught);	
 					}
 					@Override
-					public void onSuccess(UserProfile newProfile) {
-						currentUserProfile = newProfile;
-						jsniUtils.setAnalyticsUserId(getCurrentUserPrincipalId());
-						callback.onSuccess(newProfile);
-						ginInjector.getSessionDetector().initializeSessionTokenState();
+					public void onSuccess(UserSessionData newData) {
+						if (!newData.getSession().getAcceptsTermsOfUse()) {
+							ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
+						} else {
+							currentUserProfile = newData.getProfile();
+							jsniUtils.setAnalyticsUserId(getCurrentUserPrincipalId());
+							callback.onSuccess(newData.getProfile());
+							ginInjector.getSessionDetector().initializeSessionTokenState();	
+						}
 					}
 				});
 			}

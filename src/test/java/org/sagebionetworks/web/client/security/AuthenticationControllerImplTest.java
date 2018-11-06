@@ -70,6 +70,7 @@ public class AuthenticationControllerImplTest {
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
 	UserProfile profile;
+	UserSessionData usd;
 	public static final String USER_ID = "98208";
 	
 	@Before
@@ -78,9 +79,14 @@ public class AuthenticationControllerImplTest {
 		//by default, return a valid user session data if asked
 		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).initSession(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("1111").when(mockUserAccountService).getCurrentSessionToken(any(AsyncCallback.class));
+		usd = new UserSessionData();
 		profile = new UserProfile();
 		profile.setOwnerId(USER_ID);
-		AsyncMockStubber.callSuccessWith(profile).when(mockUserAccountService).getMyUserProfile(any(AsyncCallback.class));
+		usd.setProfile(profile);
+		Session session = new Session();
+		session.setAcceptsTermsOfUse(true);
+		usd.setSession(session);
+		AsyncMockStubber.callSuccessWith(usd).when(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
 		when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
 		authenticationController = new AuthenticationControllerImpl(mockUserAccountService, mockClientCache, mockCookieProvider, mockGinInjector, mockSynapseJSNIUtils);
 		when(mockGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
@@ -119,7 +125,7 @@ public class AuthenticationControllerImplTest {
 		
 	@Test
 	public void testGetCurrentUserPrincipalIdNullProfile() throws Exception {
-		AsyncMockStubber.callSuccessWith(null).when(mockUserAccountService).getMyUserProfile(any(AsyncCallback.class));
+		usd.setProfile(null);
 		
 		authenticationController.reloadUserSessionData(mockCallback);
 		
