@@ -121,6 +121,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					@Override
 					public void onSuccess(UserProfile newProfile) {
 						currentUserProfile = newProfile;
+						jsniUtils.setAnalyticsUserId(getCurrentUserPrincipalId());
 						callback.onSuccess(newProfile);
 						ginInjector.getSessionDetector().initializeSessionTokenState();
 					}
