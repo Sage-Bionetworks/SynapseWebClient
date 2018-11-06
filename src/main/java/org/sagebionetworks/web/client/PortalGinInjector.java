@@ -410,7 +410,6 @@ public interface PortalGinInjector extends Ginjector {
 	UserBadge getUserBadgeWidget();
 	EmailInvitationBadge getEmailInvitationBadgeWidget();
 	VersionTimer getVersionTimer();
-	SessionTokenDetector getSessionTokenDetector();
 	QuestionContainerWidget getQuestionContainerWidget();
 	SynapseAlert getSynapseAlertWidget();
 	EntityRefProvEntryView getEntityRefEntry();

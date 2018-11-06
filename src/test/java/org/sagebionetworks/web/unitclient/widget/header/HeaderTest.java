@@ -74,8 +74,6 @@ public class HeaderTest {
 	@Mock
 	PendoSdk mockPendoSdk;
 	@Mock
-	UserSessionData mockUserSessionData;
-	@Mock
 	UserProfile mockUserProfile;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
@@ -105,7 +103,6 @@ public class HeaderTest {
 		entityHeaders = new ArrayList<EntityHeader>();
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);
-		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
 		downloadListFhas = new ArrayList<>();
 		when(mockDownloadList.getFilesToDownload()).thenReturn(downloadListFhas);
 		AsyncMockStubber.callSuccessWith(mockDownloadList).when(mockSynapseJavascriptClient).getDownloadList(any(AsyncCallback.class));
@@ -188,8 +185,7 @@ public class HeaderTest {
 	public void testFavoriteRoundTrip() {
 		// After User Logged in
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		UserSessionData userSessionData = new UserSessionData();
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(userSessionData);
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(mockUserProfile);
 		header.refreshFavorites();
 		verify(mockView).clearFavorite();
 		verify(mockSynapseJavascriptClient, times(1)).getFavorites(any(AsyncCallback.class));
@@ -244,13 +240,13 @@ public class HeaderTest {
 		String userId = "10001";
 		String userName = "testuser";
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(mockUserSessionData);
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(mockUserProfile);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
 		when(mockUserProfile.getUserName()).thenReturn(userName);
 		
 		header.refresh();
 		
-		verify(mockView).setUser(mockUserSessionData);
+		verify(mockView).setUser(mockUserProfile);
 		verify(mockView).refresh();
 		verify(mockView).setSearchVisible(true);
 		
@@ -276,14 +272,13 @@ public class HeaderTest {
 		String userId = "10001";
 		String userName = "testuser";
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(mockUserSessionData);
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(null);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
 		when(mockUserProfile.getUserName()).thenReturn(userName);
-		when(mockUserSessionData.getProfile()).thenReturn(null);
 		
 		header.refresh();
 		
-		verify(mockView).setUser(mockUserSessionData);
+		verify(mockView).setUser(mockUserProfile);
 		verify(mockView).refresh();
 		verify(mockView).setSearchVisible(true);
 		verify(mockPendoSdk).initialize(ANONYMOUS, N_A);

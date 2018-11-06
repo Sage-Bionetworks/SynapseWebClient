@@ -6,26 +6,23 @@ import java.util.Date;
 import java.util.Objects;
 
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DateTimeUtilsImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.cookie.CookieUtils;
 import org.sagebionetworks.web.client.place.Down;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -39,39 +36,33 @@ import com.google.inject.Inject;
  *
  */
 public class AuthenticationControllerImpl implements AuthenticationController {
-	public static final String USER_SESSION_DATA_CACHE_KEY = "org.sagebionetworks.UserSessionData";
 	public static final String USER_AUTHENTICATION_RECEIPT = "_authentication_receipt";
 	private static final String AUTHENTICATION_MESSAGE = "Invalid usename or password.";
-	private static UserSessionData currentUser;
-	private CookieProvider cookies;
+	private static String currentUserSessionToken;
+	private static UserProfile currentUserProfile;
 	private UserAccountServiceAsync userAccountService;	
-	private SessionStorage sessionStorage;
 	private ClientCache localStorage;
-	private AdapterFactory adapterFactory;
 	private PortalGinInjector ginInjector;
 	private SynapseJSNIUtils jsniUtils;
+	private CookieProvider cookies;
 	
 	@Inject
 	public AuthenticationControllerImpl(
-			CookieProvider cookies, 
-			UserAccountServiceAsync userAccountService, 
-			SessionStorage sessionStorage, 
-			ClientCache localStorage, 
-			AdapterFactory adapterFactory,
+			UserAccountServiceAsync userAccountService,
+			ClientCache localStorage,
+			CookieProvider cookies,
 			PortalGinInjector ginInjector,
 			SynapseJSNIUtils jsniUtils){
-		this.cookies = cookies;
 		this.userAccountService = userAccountService;
 		fixServiceEntryPoint(userAccountService);
-		this.sessionStorage = sessionStorage;
 		this.localStorage = localStorage;
-		this.adapterFactory = adapterFactory;
+		this.cookies = cookies;
 		this.ginInjector = ginInjector;
 		this.jsniUtils = jsniUtils;
 	}
 
 	@Override
-	public void loginUser(final String username, String password, final AsyncCallback<UserSessionData> callback) {
+	public void loginUser(final String username, String password, final AsyncCallback<UserProfile> callback) {
 		if(username == null || password == null) callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 		LoginRequest loginRequest = getLoginRequest(username, password);
 		ginInjector.getSynapseJavascriptClient().login(loginRequest, new AsyncCallback<LoginResponse>() {		
@@ -102,46 +93,16 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 	
 	@Override
-	public void revalidateSession(final String token, final AsyncCallback<UserSessionData> callback) {
-		setUser(token, callback);
-	}
-
-	@Override
-	public void logoutUser() {
-		// terminate the session, remove the cookie
-		ginInjector.getSynapseJavascriptClient().logout();
-		jsniUtils.setAnalyticsUserId("");
-		cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
-		localStorage.clear();
-		sessionStorage.clear();
-		currentUser = null;
-		ginInjector.getSessionTokenDetector().initializeSessionTokenState();
-		ginInjector.getHeader().refresh();
-	}
-	
-	private void setUser(final String token, final AsyncCallback<UserSessionData> callback) {
+	public void revalidateSession(final String token, final AsyncCallback<UserProfile> callback) {
+		currentUserSessionToken = null;
 		if(token == null) {
-			sessionStorage.clear();
 			callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 			return;
 		}
-
-		userAccountService.getUserSessionData(token, new AsyncCallback<UserSessionData>() {
-			@Override
-			public void onSuccess(UserSessionData userSessionData) {
-				Date tomorrow = DateTimeUtilsImpl.getDayFromNow();
-				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
-				cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
-				currentUser = userSessionData;
-				localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser), tomorrow.getTime());
-				ginInjector.getSessionTokenDetector().initializeSessionTokenState();
-				ginInjector.getHeader().refresh();
-				if (currentUser.getProfile() != null) {
-					jsniUtils.setAnalyticsUserId(currentUser.getProfile().getOwnerId());	
-				}
-				callback.onSuccess(currentUser);
-			}
-			
+		//set the session cookie for same domain calls, and save the token locally for cross domain (backend) calls.
+		String domain = CookieUtils.getDomain(Window.Location.getHostName());
+		boolean isSecure = domain != null;
+		ginInjector.getSynapseJavascriptClient().doGetString(jsniUtils.getSessionCookieUrl(token, isSecure), false, new AsyncCallback<String>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught instanceof SynapseDownException || caught instanceof ReadOnlyModeException) {
@@ -151,90 +112,91 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					callback.onFailure(caught);
 				}
 			}
+			@Override
+			public void onSuccess(String result) {
+				Date tomorrow = DateTimeUtilsImpl.getDayFromNow();
+				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
+				currentUserSessionToken = token;
+				ginInjector.getSynapseJavascriptClient().getUserProfile(null, new AsyncCallback<UserProfile>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						callback.onFailure(caught);	
+					}
+					@Override
+					public void onSuccess(UserProfile newProfile) {
+						currentUserProfile = newProfile;
+						callback.onSuccess(newProfile);
+					}
+				});
+			}
 		});
 	}
-	
-	public String getUserSessionDataString(UserSessionData session) {
-		JSONObjectAdapter adapter = adapterFactory.createNew();
-		try {
-			String sessionToken = session.getSession().getSessionToken();
-			//session token not stored in local storage
-			session.getSession().setSessionToken("");
-			session.writeToJSONObject(adapter);
-			session.getSession().setSessionToken(sessionToken);
-			return adapter.toJSONString();
-		} catch (JSONObjectAdapterException e) {
-			return null;
-		}
+
+	@Override
+	public void logoutUser() {
+		// terminate the session, remove the cookie
+		ginInjector.getSynapseJavascriptClient().logout();
+		jsniUtils.setAnalyticsUserId("");
+		localStorage.clear();
+		currentUserSessionToken = null;
+		currentUserProfile = null;
+		ginInjector.getHeader().refresh();
 	}
-	
-	public UserSessionData getUserSessionData(String sessionString) {
-		try {
-			return new UserSessionData(adapterFactory.createNew(sessionString));
-		} catch (JSONObjectAdapterException e) {
-			return null;
-		}
-	}
-	
 	
 	@Override
 	public void updateCachedProfile(UserProfile updatedProfile){
-		if(currentUser != null) {
-			currentUser.setProfile(updatedProfile);
-			Date tomorrow = DateTimeUtilsImpl.getDayFromNow();
-			localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser), tomorrow.getTime());
-		}
+		currentUserProfile = updatedProfile;
 	}
 
 	@Override
 	public boolean isLoggedIn() {
-		String token = cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN);
-		return token != null && !token.isEmpty() && currentUser != null;
+		return currentUserSessionToken != null && !currentUserSessionToken.isEmpty() && currentUserProfile != null;
 	}
 
 	@Override
 	public String getCurrentUserPrincipalId() {
-		if(currentUser != null) {
-			UserProfile profileObj = currentUser.getProfile();
-			if(profileObj != null && profileObj.getOwnerId() != null) {							
-				return profileObj.getOwnerId();						
-			}
+		if(currentUserProfile != null) {
+			return currentUserProfile.getOwnerId();						
 		} 
 		return null;
 	}
 	
 	@Override
-	public void reloadUserSessionData() {
-		String sessionToken = cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN);
-		// try to set current user and bundle from session cache
-		if (sessionToken != null) {
-			// load user session data from session storage
-			String sessionStorageString = localStorage.get(USER_SESSION_DATA_CACHE_KEY);
-			if (sessionStorageString != null) {
-				currentUser = getUserSessionData(sessionStorageString);
-				// session token is not in the local storage
-				currentUser.getSession().setSessionToken(sessionToken);
-				if (currentUser.getProfile() != null) {
-					jsniUtils.setAnalyticsUserId(currentUser.getProfile().getOwnerId());	
-				}
-			} else {
-				logoutUser();
+	public void reloadUserSessionData(Callback afterReload) {
+		// attempt to get session token from cookies
+		userAccountService.getCurrentSessionToken(new AsyncCallback<String>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				jsniUtils.consoleError(caught);
+				afterReload.invoke();
 			}
-		}
+			@Override
+			public void onSuccess(String token) {
+				if (token != null) {
+					revalidateSession(token, new AsyncCallback<UserProfile>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							jsniUtils.consoleError(caught);
+							afterReload.invoke();
+						}
+						@Override
+						public void onSuccess(UserProfile result) {
+							afterReload.invoke();
+						}
+					});	
+				}
+			}
+		});
 	}
 
 	@Override
-	public UserSessionData getCurrentUserSessionData() {
-		if (isLoggedIn()) {
-			return currentUser;
-		} else
-			return null;
+	public UserProfile getCurrentUserProfile() {
+		return currentUserProfile;
 	}
 
 	@Override
 	public String getCurrentUserSessionToken() {
-		if(currentUser != null) return currentUser.getSession().getSessionToken();
-		else return null;
+		return currentUserSessionToken;
 	}
 	
 	@Override
@@ -244,27 +206,43 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	
 	@Override
 	public void checkForUserChange() {
-		String currentSession = cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN);
-		String localSession = getCurrentUserSessionToken();
-		if (!Objects.equals(currentSession, localSession)) {
-			Window.Location.reload();
-		}
-		
-		//also revalidate user session
-		if (currentSession != null) {
-			revalidateSession(currentSession, new AsyncCallback<UserSessionData>() {
-				@Override
-				public void onSuccess(UserSessionData result) {
-					// still valid (and call has updated expiration)
+		userAccountService.getCurrentSessionToken(new AsyncCallback<String>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				jsniUtils.consoleError(caught);
+				logoutUser();
+			}
+			@Override
+			public void onSuccess(String token) {
+				String localSession = getCurrentUserSessionToken();
+				if (!Objects.equals(token, localSession)) {
+					logoutUser();
+					Window.Location.reload();
+				} else {
 					ginInjector.getHeader().refresh();
 				}
-				
+			}
+		});
+	}
+	
+	@Override
+	public void checkForSignedTermsOfUse() {
+		if (isLoggedIn()) {
+			// SWC-4278: do not log user out (that will clear all state, and the user may be in the middle of signing the pledge!)
+			// Instead, redirect to the pledge.
+			userAccountService.isTermsOfUseSigned(new AsyncCallback<Boolean>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					//invalid session token
-					Window.Location.reload();
+					jsniUtils.consoleError(caught);
 				}
-			});	
+				@Override
+				public void onSuccess(Boolean isSigned) {
+					if (!isSigned) {
+						ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
+					} // else, this is a no-op
+				}
+			});
+			
 		}
 	}
 }

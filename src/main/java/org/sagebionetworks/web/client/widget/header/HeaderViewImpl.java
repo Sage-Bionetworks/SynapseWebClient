@@ -13,6 +13,7 @@ import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -295,15 +296,15 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	}
 	
 	@Override
-	public void setUser(UserSessionData userData) {
+	public void setUser(UserProfile profile) {
 		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
 	 	trashLink.setVisible(isInTestWebsite);
 	 	userBadge.clearState();
-	 	if (userData != null && userData.getProfile() != null) {
+	 	if (profile != null) {
 			//has user data, update the user name and add user commands (and set to the current user name)
-	 		userBadge.configure(userData.getProfile());
+	 		userBadge.configure(profile);
 	 		userBadge.setDoNothingOnClick();
-	 		userId = userData.getProfile().getOwnerId();
+	 		userId = profile.getOwnerId();
 	 		loginLinkUI.setVisible(false);
 			logoutLink.setVisible(true);
 			dashboardDropdown.setVisible(true);

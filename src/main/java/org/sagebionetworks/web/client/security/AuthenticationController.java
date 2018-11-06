@@ -13,13 +13,13 @@ public interface AuthenticationController {
 	 * @param password
 	 * @return
 	 */
-	public void loginUser(String username, String password, AsyncCallback<UserSessionData> callback);
+	public void loginUser(String username, String password, AsyncCallback<UserProfile> callback);
 	
 	/**
 	 * revalidates the given session token
 	 * @param token
 	 */
-	public void revalidateSession(String token, AsyncCallback<UserSessionData> callback);
+	public void revalidateSession(String token, AsyncCallback<UserProfile> callback);
 	
 	/**
 	 * Terminates the session of the current user
@@ -46,15 +46,15 @@ public interface AuthenticationController {
 	public String getCurrentUserSessionToken();
 	
 	/**
-	 * Get the UserSessionData object 
+	 * Get the UserProfile object 
 	 * @return
 	 */
-	public UserSessionData getCurrentUserSessionData();
+	public UserProfile getCurrentUserProfile();
 
 	/**
 	 * Redownload the user's session data 
 	 */
-	void reloadUserSessionData();
+	void reloadUserSessionData(Callback afterReload);
 
 	/**
 	 * Signs the terms of use for a user
@@ -64,4 +64,6 @@ public interface AuthenticationController {
 	public void updateCachedProfile(UserProfile updatedProfile);
 	
 	void checkForUserChange();
+	
+	void checkForSignedTermsOfUse();
 }

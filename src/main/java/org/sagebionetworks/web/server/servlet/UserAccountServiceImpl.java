@@ -3,7 +3,6 @@ package org.sagebionetworks.web.server.servlet;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.AuthorizationConstants;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
@@ -77,17 +76,21 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		}
 	}
 	
-	@Override 
-	public UserSessionData getUserSessionData(String sessionToken) throws RestServiceException {
+	@Override
+	public String getCurrentSessionToken() throws RestServiceException {
 		validateService();
-		SynapseClient synapseClient = createSynapseClient(sessionToken);
+		String sessionToken = tokenProvider.getSessionToken();
 		try {
-			return synapseClient.getUserSessionData();
+			if (sessionToken != null) {
+				//validate
+				createSynapseClient(sessionToken).getUserSessionData();
+			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
+		return sessionToken;
 	}
-
+	
 	@Override
 	public void signTermsOfUse(String sessionToken, boolean acceptsTerms) throws RestServiceException {
 		validateService();
@@ -107,6 +110,18 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		SynapseClient client = createAnonymousSynapseClient();
 		try {
 			client.newAccountEmailValidation(newUser, portalEndpoint);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public boolean isTermsOfUseSigned() throws RestServiceException {
+		validateService();
+
+		SynapseClient client = createSynapseClient();
+		try {
+			return client.getUserSessionData().getSession().getAcceptsTermsOfUse();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

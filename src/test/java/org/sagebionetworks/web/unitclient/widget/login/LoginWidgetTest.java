@@ -26,10 +26,10 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetView;
-import org.sagebionetworks.web.client.widget.login.UserListener;
 import org.sagebionetworks.web.shared.exceptions.LockedException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
@@ -53,7 +53,7 @@ public class LoginWidgetTest {
 	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	@Mock
-	UserListener mockUserListener;
+	Callback mockUserListener;
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 	@Mock
 	Session mockSession;
@@ -93,8 +93,8 @@ public class LoginWidgetTest {
 		String p = "pass";
 		loginWidget.setUsernameAndPassword(u, p);
 		
-		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<UserSessionData>) any());
-		verify(mockUserListener).userChanged(any(UserSessionData.class));
+		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback) any());
+		verify(mockUserListener).invoke();
 		verify(mockView).clear();
 		verify(mockView).clearUsername();
 	}
@@ -106,7 +106,7 @@ public class LoginWidgetTest {
 		String p = "pass";
 		loginWidget.setUsernameAndPassword(u, p);
 		
-		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<UserSessionData>) any());
+		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback) any());
 		verify(mockPlaceChanger).goTo(placeCaptor.capture());
 		Place place = placeCaptor.getValue();
 		assertTrue(place instanceof LoginPlace);
@@ -121,8 +121,8 @@ public class LoginWidgetTest {
 		Exception ex = new Exception(unhandledExceptionMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
 		loginWidget.setUsernameAndPassword(u, p);
-		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<UserSessionData>) any());
-		verify(mockUserListener, never()).userChanged(any(UserSessionData.class));
+		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback) any());
+		verify(mockUserListener, never()).invoke();
 		verify(mockSynAlert).handleException(ex);
 		verify(mockView).clear();
 		verify(mockView, never()).clearUsername();
@@ -137,8 +137,8 @@ public class LoginWidgetTest {
 		UnauthorizedException ex = new UnauthorizedException(notFoundMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
 		loginWidget.setUsernameAndPassword(u, p);
-		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<UserSessionData>) any());
-		verify(mockUserListener, never()).userChanged(any(UserSessionData.class));
+		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback) any());
+		verify(mockUserListener, never()).invoke();
 		verify(mockView).clear();
 		verify(mockView, never()).clearUsername();
 		verify(mockSynAlert).clear();
@@ -153,8 +153,8 @@ public class LoginWidgetTest {
 		UnauthorizedException ex = new UnauthorizedException(notFoundMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
 		loginWidget.setUsernameAndPassword(u, p);
-		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<UserSessionData>) any());
-		verify(mockUserListener, never()).userChanged(any(UserSessionData.class));
+		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback) any());
+		verify(mockUserListener, never()).invoke();
 		verify(mockView).clear();
 		verify(mockView, never()).clearUsername();
 		verify(mockSynAlert).clear();

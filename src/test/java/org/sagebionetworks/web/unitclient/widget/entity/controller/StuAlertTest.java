@@ -44,8 +44,6 @@ public class StuAlertTest {
 	GWTWrapper mockGWT;
 	@Mock
 	UserProfile mockProfile;
-	@Mock
-	UserSessionData mockUSD;
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
 	public static final String HOST_PAGE_URL="http://foobar";
@@ -54,8 +52,7 @@ public class StuAlertTest {
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 		widget = new StuAlert(mockView, mockSynapseClient, mockSynapseAlert, mockGWT, mockAuthenticationController);
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(mockUSD);
-		when(mockUSD.getProfile()).thenReturn(mockProfile);
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(mockProfile);
 		when(mockProfile.getOwnerId()).thenReturn(USER_ID);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).sendMessageToEntityOwner(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		

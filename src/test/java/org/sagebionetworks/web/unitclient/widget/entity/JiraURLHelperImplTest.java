@@ -17,10 +17,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.JiraClientAsync;
-import org.sagebionetworks.web.client.exceptions.IllegalArgumentException;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.JiraGovernanceConstants;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
@@ -51,12 +49,10 @@ public class JiraURLHelperImplTest {
 		when(mockGWTWrapper.getCurrentURL()).thenReturn(TEST_URL);
 		mockAuthController = mock(AuthenticationController.class);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
-		UserSessionData mockSessionData = mock(UserSessionData.class);
-		when(mockAuthController.getCurrentUserSessionData()).thenReturn(mockSessionData);
 		testProfile = new UserProfile();
 		testProfile.setUserName("007");
 		testProfile.setEmails(Collections.singletonList("test@test.com"));
-		when(mockSessionData.getProfile()).thenReturn(testProfile);
+		when(mockAuthController.getCurrentUserProfile()).thenReturn(testProfile);
 		
 		helper = new JiraURLHelperImpl(new JiraGovernanceConstants() {
 			@Override

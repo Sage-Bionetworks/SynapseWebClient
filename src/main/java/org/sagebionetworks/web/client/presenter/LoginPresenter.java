@@ -59,7 +59,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 					// Have to get the UserSessionData again, 
 					// since it won't contain the UserProfile if the terms haven't been signed
 					synAlert.clear();
-					authenticationController.revalidateSession(authenticationController.getCurrentUserSessionToken(), new AsyncCallback<UserSessionData>() {
+					authenticationController.revalidateSession(authenticationController.getCurrentUserSessionToken(), new AsyncCallback<UserProfile>() {
 						@Override
 						public void onFailure(
 								Throwable caught) {
@@ -68,7 +68,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 						}
 
 						@Override
-						public void onSuccess(UserSessionData result) {
+						public void onSuccess(UserProfile result) {
 							// Signed ToU. Check for temp username, passing record, and then forward
 							userAuthenticated();
 						}	
@@ -107,11 +107,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			//go to the change username page
 			gotoChangeUsernamePlace();
 		} else if (LoginPlace.SHOW_TOU.equals(token) && authenticationController.isLoggedIn()) {
-			if (!authenticationController.getCurrentUserSessionData().getSession().getAcceptsTermsOfUse()) {
-				showTermsOfUse(getAcceptTermsOfUseCallback());	
-			} else {
-				globalApplicationState.gotoLastPlace();
-			}
+			showTermsOfUse(getAcceptTermsOfUseCallback());	
 		} else if (!ClientProperties.DEFAULT_PLACE_TOKEN.equals(token) && 
 				!LoginPlace.CHANGE_USERNAME.equals(token) && 
 				!"".equals(token) && 
@@ -130,8 +126,8 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 
 	
 	@Override
-	public void setNewUser(UserSessionData newUser) {
-		revalidateSession(newUser.getSession().getSessionToken());
+	public void updateUser() {
+		revalidateSession(authenticationController.getCurrentUserSessionToken());
 	}
 	
 	/**
@@ -139,7 +135,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	 */
 	public void checkForTempUsername(){
 		//get my profile, and check for a default username
-		UserProfile userProfile = authenticationController.getCurrentUserSessionData().getProfile();
+		UserProfile userProfile = authenticationController.getCurrentUserProfile();
 		if (userProfile != null && DisplayUtils.isTemporaryUsername(userProfile.getUserName())) {
 			gotoChangeUsernamePlace();
 		} else {
@@ -194,15 +190,11 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		if(token != null) {
 			final String sessionToken = token;
 			synAlert.clear();
-			AsyncCallback<UserSessionData> callback = new AsyncCallback<UserSessionData>() {	
+			AsyncCallback<UserProfile> callback = new AsyncCallback<UserProfile>() {	
 				@Override
-				public void onSuccess(UserSessionData result) {
-					if (!authenticationController.getCurrentUserSessionData().getSession().getAcceptsTermsOfUse()) {
-						showTermsOfUse(getAcceptTermsOfUseCallback());		
-					} else {
-						// user is logged in. forward to destination after checking for username
-						userAuthenticated();
-					}
+				public void onSuccess(UserProfile result) {
+					userAuthenticated();
+					authenticationController.checkForSignedTermsOfUse();
 				}
 				@Override
 				public void onFailure(Throwable caught) {

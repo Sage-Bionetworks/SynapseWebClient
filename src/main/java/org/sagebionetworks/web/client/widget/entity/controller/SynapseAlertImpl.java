@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
 
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -12,9 +11,9 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
-import org.sagebionetworks.web.client.widget.login.UserListener;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -37,7 +36,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	SynapseAlertView view;
 	PortalGinInjector ginInjector;
 	Throwable ex;
-	UserListener reloadOnLoginListener;
+	Callback reloadOnLoginListener;
 	SynapseJSNIUtils jsniUtils;
 	
 	@Inject
@@ -56,11 +55,8 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 		this.jsniUtils = jsniUtils;
 		view.setPresenter(this);
 		
-		reloadOnLoginListener = new UserListener() {
-			@Override
-			public void userChanged(UserSessionData newUser) {
-				SynapseAlertImpl.this.view.reload();
-			}
+		reloadOnLoginListener = () -> {
+			SynapseAlertImpl.this.view.reload();
 		};
 	}
 

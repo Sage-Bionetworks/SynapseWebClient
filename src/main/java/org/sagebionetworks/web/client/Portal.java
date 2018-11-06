@@ -63,56 +63,53 @@ public class Portal implements EntryPoint {
 				public void onSuccess() {
 					try {
 						// load the previous session, if there is one
-						ginjector.getAuthenticationController().reloadUserSessionData();
-						// make sure jsni utils code is available to the client
-						ginjector.getSynapseJSNIUtils();
-						EventBus eventBus = ginjector.getEventBus();
-						PlaceController placeController = new PlaceController(eventBus);
+						ginjector.getAuthenticationController().reloadUserSessionData(() -> {
+							// make sure jsni utils code is available to the client
+							ginjector.getSynapseJSNIUtils();
+							EventBus eventBus = ginjector.getEventBus();
+							PlaceController placeController = new PlaceController(eventBus);
 
-						// Start ActivityManager for the main widget with our ActivityMapper
-						AppActivityMapper activityMapper = new AppActivityMapper(ginjector, new SynapseJSNIUtilsImpl(), null);
-						ActivityManager activityManager = new ActivityManager(activityMapper, eventBus);
-						activityManager.setDisplay(appWidget);
-						
-						// All pages get added to the root panel
-						appWidget.addStyleName("rootPanel");
-
-						// Start PlaceHistoryHandler with our PlaceHistoryMapper
-						AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);
-						final PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);		
-						historyHandler.register(placeController, eventBus, AppActivityMapper.getDefaultPlace());						
-						Header header = ginjector.getHeader();
-						RootPanel.get("headerPanel").add(header);
-						Footer footer = ginjector.getFooter();
-						RootPanel.get("footerPanel").add(footer);
-						
-						RootPanel.get("rootPanel").add(appWidget);
-						RootPanel.get("initialLoadingUI").setVisible(false);
-						fullOpacity(RootPanel.get("headerPanel"), RootPanel.get("rootPanel"));
-						final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
-						globalApplicationState.setPlaceController(placeController);
-						globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
-						globalApplicationState.init(new Callback() {
+							// Start ActivityManager for the main widget with our ActivityMapper
+							AppActivityMapper activityMapper = new AppActivityMapper(ginjector, new SynapseJSNIUtilsImpl(), null);
+							ActivityManager activityManager = new ActivityManager(activityMapper, eventBus);
+							activityManager.setDisplay(appWidget);
 							
-							@Override
-							public void invoke() {
-								//listen for window close (or navigating away)
-								registerWindowClosingHandler(globalApplicationState);
-								registerOnPopStateHandler(globalApplicationState);
+							// All pages get added to the root panel
+							appWidget.addStyleName("rootPanel");
+
+							// Start PlaceHistoryHandler with our PlaceHistoryMapper
+							AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);
+							final PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);		
+							historyHandler.register(placeController, eventBus, AppActivityMapper.getDefaultPlace());						
+							Header header = ginjector.getHeader();
+							RootPanel.get("headerPanel").add(header);
+							Footer footer = ginjector.getFooter();
+							RootPanel.get("footerPanel").add(footer);
+							
+							RootPanel.get("rootPanel").add(appWidget);
+							RootPanel.get("initialLoadingUI").setVisible(false);
+							fullOpacity(RootPanel.get("headerPanel"), RootPanel.get("rootPanel"));
+							final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
+							globalApplicationState.setPlaceController(placeController);
+							globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
+							globalApplicationState.init(new Callback() {
 								
-								// start version timer
-								ginjector.getVersionTimer().start();
-								// start timer to check for user logout (session expired, or user explicitly logged out)
-								ginjector.getSessionTokenDetector().start();
-								
-								// Goes to place represented on URL or default place
-								historyHandler.handleCurrentHistory();
-								delayLoadOfZxcvbn();
-								globalApplicationState.initializeDropZone();
-							}
+								@Override
+								public void invoke() {
+									//listen for window close (or navigating away)
+									registerWindowClosingHandler(globalApplicationState);
+									registerOnPopStateHandler(globalApplicationState);
+									
+									// start version timer
+									ginjector.getVersionTimer().start();
+									
+									// Goes to place represented on URL or default place
+									historyHandler.handleCurrentHistory();
+									delayLoadOfZxcvbn();
+									globalApplicationState.initializeDropZone();
+								}
+							});
 						});
-						
-						
 					} catch (Throwable e) {
 						onFailure(e);
 					}

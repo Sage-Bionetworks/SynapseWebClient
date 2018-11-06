@@ -24,6 +24,6 @@ public interface LoginView extends IsWidget, SynapseView {
 	public interface Presenter {
 		void goTo(Place place);
 		void goToLastPlace();
-		void setNewUser(UserSessionData newUser);
+		void updateUser();
     }
 }

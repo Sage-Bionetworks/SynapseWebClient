@@ -57,7 +57,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		checkAcceptToU();
 		view.refresh();
 		if(authenticationController.isLoggedIn()) {
-			view.showLoggedInUI(authenticationController.getCurrentUserSessionData());
+			view.showLoggedInUI(authenticationController.getCurrentUserProfile());
 			//note that the session token is validated on every place change (and on app load)
 		} else {
 			if (cookies.getCookie(CookieKeys.USER_LOGGED_IN_RECENTLY) != null) {
@@ -76,11 +76,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 
 	
 	public void checkAcceptToU() {
-		if (authenticationController.isLoggedIn() && !authenticationController.getCurrentUserSessionData().getSession().getAcceptsTermsOfUse()) {
-			// SWC-4278: do not log user out (that will clear all state, and the user may be in the middle of signing the pledge!)
-			// Instead, redirect to the pledge.
-			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
-		}
+		authenticationController.checkForSignedTermsOfUse();
 	}
 	
 	@Override

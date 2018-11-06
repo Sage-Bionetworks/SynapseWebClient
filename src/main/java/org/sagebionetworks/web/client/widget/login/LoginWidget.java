@@ -1,9 +1,11 @@
 package org.sagebionetworks.web.client.widget.login;
 
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
@@ -19,7 +21,7 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	public static final String PLEASE_TRY_AGAIN = ". Please try again.";
 	private LoginWidgetView view;
 	private AuthenticationController authenticationController;	
-	private UserListener listener;	
+	private Callback listener;	
 	private GlobalApplicationState globalApplicationState;
 	private SynapseAlert synAlert;
 	
@@ -43,26 +45,19 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 		return view.asWidget();
 	}
 	
-	public void setUserListener(UserListener listener){
+	public void setUserListener(Callback listener){
 		this.listener = listener;
 	}
 	
 	@Override
 	public void setUsernameAndPassword(final String username, final String password) {
 		synAlert.clear();
-		authenticationController.loginUser(username, password, new AsyncCallback<UserSessionData>() {
+		authenticationController.loginUser(username, password, new AsyncCallback<UserProfile>() {
 			@Override
-			public void onSuccess(UserSessionData userSessionData) {
+			public void onSuccess(UserProfile profile) {
 				clear();
-				try {
-					if (!userSessionData.getSession().getAcceptsTermsOfUse()) {
-						globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
-					} else {
-						fireUserChange(userSessionData);	
-					}
-				} catch (Exception ex) {
-					onFailure(ex);
-				}
+				fireUserChange();
+				authenticationController.checkForSignedTermsOfUse();
 			}
 
 			@Override
@@ -83,9 +78,9 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	}
 
 	// needed?
-	private void fireUserChange(UserSessionData user) {
+	private void fireUserChange() {
 		if (listener != null)
-			listener.userChanged(user);
+			listener.invoke();
 	}
 
 	@Override

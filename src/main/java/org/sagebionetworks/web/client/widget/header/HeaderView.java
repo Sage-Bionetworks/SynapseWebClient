@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.header;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -33,7 +34,7 @@ public interface HeaderView extends IsWidget {
 	public void clearFavorite();
 	public void setEmptyFavorite();
 	public void addFavorite(List<EntityHeader> headers);
-	void setUser(UserSessionData userData);
+	void setUser(UserProfile profile);
 	void setProjectHeaderText(String text);
 	void setProjectHeaderAnchorTarget(String href);
 	void setProjectFavoriteWidget(IsWidget favWidget);
