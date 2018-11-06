@@ -8,7 +8,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import com.google.gwt.core.shared.GWT;
 import com.google.inject.Inject;
 
-public class SessionTokenDetector {
+public class SessionDetector {
 
 	public static final int INTERVAL_MS = 1000*10; //check every 10 seconds
 	ClientCache clientCache;
@@ -18,7 +18,7 @@ public class SessionTokenDetector {
 	boolean isSessionMarker;
 	public static final String SESSION_MARKER = "SESSION_MARKER";
 	@Inject
-	public SessionTokenDetector(
+	public SessionDetector(
 			AuthenticationController authController,
 			GlobalApplicationState globalAppState,
 			GWTWrapper gwt,
