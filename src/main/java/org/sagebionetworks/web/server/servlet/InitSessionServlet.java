@@ -64,9 +64,16 @@ public class InitSessionServlet extends HttpServlet {
 			} else {
 				cookie.setMaxAge(0);
 			}
-			boolean isSecure = Boolean.parseBoolean(request.getParameter(WebConstants.IS_SECURE_COOKIE_KEY));
+			boolean isSecure = "https".equals(request.getScheme().toLowerCase());
 			cookie.setSecure(isSecure);
 			cookie.setHttpOnly(true);
+			cookie.setPath("/");
+			
+			String domain = request.getServerName();
+			String lowerCaseDomain = domain.toLowerCase();
+			if (lowerCaseDomain.contains(".synapse.org")) {
+				cookie.setDomain(".synapse.org");
+			}
 			response.addCookie(cookie);
 		} catch (SynapseException e) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

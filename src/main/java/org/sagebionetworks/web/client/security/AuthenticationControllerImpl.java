@@ -15,7 +15,6 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.cookie.CookieUtils;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -23,7 +22,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -132,9 +130,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 	
 	private void updateSessionTokenCookie(String token, AsyncCallback<String> callback) {
-		String domain = CookieUtils.getDomain(Window.Location.getHostName());
-		boolean isSecure = domain != null;
-		ginInjector.getSynapseJavascriptClient().doGetString(jsniUtils.getSessionCookieUrl(token, isSecure), false, callback);
+		ginInjector.getSynapseJavascriptClient().doGetString(jsniUtils.getSessionCookieUrl(token), false, callback);
 	}
 
 	@Override
