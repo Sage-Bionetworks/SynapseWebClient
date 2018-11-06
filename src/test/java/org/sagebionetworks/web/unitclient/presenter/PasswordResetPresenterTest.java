@@ -15,8 +15,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -25,7 +23,6 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
@@ -124,7 +121,6 @@ public class PasswordResetPresenterTest {
 		verify(mockView).showExpiredRequest();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testResetPassword() {
 		//mock a successful user service call
@@ -138,25 +134,9 @@ public class PasswordResetPresenterTest {
 		//verify that place is changed to last place
 		verify(mockGlobalApplicationState).gotoLastPlace();
 	}
-//	
-//	@SuppressWarnings("unchecked")
-//	@Test
-//	public void testResetPassword2() {
-//		//if terms not accepted, send to login page instead
-//		resetAll();
-//		currentUserSessionData.getSession().setAcceptsTermsOfUse(false);
-//		presenter.setPlace(place);
-//		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(any(String.class), any(String.class), any(AsyncCallback.class));
-//		presenter.resetPassword("myPassword");
-//		//verify password reset text is shown in the view
-//		verify(mockView).showInfo(eq(DisplayConstants.PASSWORD_RESET_TEXT));
-//		//verify that place is changed to login place
-//		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
-//	}
 	
-	@SuppressWarnings("unchecked")
 	@Test
-	public void testResetPassword3() {
+	public void testResetPassword2() {
 		//if there is a failure to re-login using the available credentials, send to the login page instead
 		resetAll();
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockAuthenticationController).loginUser(anyString(), anyString(), any(AsyncCallback.class));
@@ -169,22 +149,8 @@ public class PasswordResetPresenterTest {
 		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 	
-//	@SuppressWarnings("unchecked")
-//	@Test
-//	public void testResetPassword4() {
-//		//or if the profile is unavailable
-//		resetAll();
-//		presenter.setPlace(place);
-//		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(any(String.class), any(String.class), any(AsyncCallback.class));
-//		currentUserSessionData.setProfile(null);
-//		presenter.resetPassword("myPassword");
-//		//verify that place is changed to Login
-//		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
-//	}
-	
-	@SuppressWarnings("unchecked")
 	@Test
-	public void testResetPassword5() {
+	public void testResetPassword3() {
 		//or if the profile username is not set
 		resetAll();
 		presenter.setPlace(place);
@@ -195,9 +161,8 @@ public class PasswordResetPresenterTest {
 		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Test
-	public void testResetPassword6() {
+	public void testResetPassword4() {
 		//or if the profile username is a temporary username
 		resetAll();
 		presenter.setPlace(place);
@@ -208,9 +173,6 @@ public class PasswordResetPresenterTest {
 		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 	
-	
-	
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testServiceFailure() {
 		//without the registration token set, mock a failed user service call
@@ -223,5 +185,4 @@ public class PasswordResetPresenterTest {
 		//verify password reset failed text is shown in the view
 		verify(mockSynAlert).handleException(ex);
 	}
-
 }
