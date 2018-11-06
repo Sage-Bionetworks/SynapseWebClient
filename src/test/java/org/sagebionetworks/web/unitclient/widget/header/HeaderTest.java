@@ -278,7 +278,7 @@ public class HeaderTest {
 		
 		header.refresh();
 		
-		verify(mockView).setUser(mockUserProfile);
+		verify(mockView).setUser(null);
 		verify(mockView).refresh();
 		verify(mockView).setSearchVisible(true);
 		verify(mockPendoSdk).initialize(ANONYMOUS, N_A);

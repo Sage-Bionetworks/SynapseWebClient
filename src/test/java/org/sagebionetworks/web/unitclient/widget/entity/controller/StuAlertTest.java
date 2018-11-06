@@ -53,6 +53,7 @@ public class StuAlertTest {
 		MockitoAnnotations.initMocks(this);
 		widget = new StuAlert(mockView, mockSynapseClient, mockSynapseAlert, mockGWT, mockAuthenticationController);
 		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(mockProfile);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(USER_ID);
 		when(mockProfile.getOwnerId()).thenReturn(USER_ID);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).sendMessageToEntityOwner(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		
