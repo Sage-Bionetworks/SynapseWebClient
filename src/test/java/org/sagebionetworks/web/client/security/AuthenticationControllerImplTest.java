@@ -84,6 +84,7 @@ public class AuthenticationControllerImplTest {
 		profile.setOwnerId(USER_ID);
 		usd.setProfile(profile);
 		Session session = new Session();
+		session.setSessionToken("1111");
 		session.setAcceptsTermsOfUse(true);
 		usd.setSession(session);
 		AsyncMockStubber.callSuccessWith(usd).when(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
@@ -100,7 +101,7 @@ public class AuthenticationControllerImplTest {
 		authenticationController.reloadUserSessionData(mockCallback);
 		
 		// attempt to get the current session
-		verify(mockUserAccountService).getCurrentSessionToken(any(AsyncCallback.class));
+		verify(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
 		assertTrue(authenticationController.isLoggedIn());
 		verify(mockCallback).invoke();
 		assertEquals(USER_ID, authenticationController.getCurrentUserPrincipalId());
@@ -113,8 +114,8 @@ public class AuthenticationControllerImplTest {
 	
 	@Test
 	public void testReloadUserSessionDataNullToken() {
-		AsyncMockStubber.callSuccessWith(null).when(mockUserAccountService).getCurrentSessionToken(any(AsyncCallback.class));
-		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn(null);
+		// when there is a null token, getting the current user session data will fail
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
 		
 		authenticationController.reloadUserSessionData(mockCallback);
 		
@@ -139,7 +140,7 @@ public class AuthenticationControllerImplTest {
 		authenticationController.logoutUser();
 		
 		//sets session cookie
-		verify(mockJsClient).initSession(eq(WebConstants.EXPIRE_SESSION_TOKEN), any(AsyncCallback.class));
+		verify(mockJsClient).initSession(eq(WebConstants.EXPIRE_SESSION_TOKEN));
 		verify(mockClientCache).clear();
 		verify(mockSessionDetector).initializeSessionTokenState();
 		verify(mockHeader).refresh();
@@ -216,22 +217,6 @@ public class AuthenticationControllerImplTest {
 		
 		verify(loginCallback).onFailure(ex);
 	}
-	
-	@Test
-	public void testLoginUserFailureReadOnlyMode() {
-		//successfully log the user in, but put the stack into read only mode after login (so session token validation fails with a ReadOnlyException).
-		LoginResponse loginResponse = new LoginResponse();
-		loginResponse.setSessionToken("213344");
-		AsyncMockStubber.callSuccessWith(loginResponse).when(mockJsClient).login(any(LoginRequest.class), any(AsyncCallback.class));
-		ReadOnlyModeException ex = new ReadOnlyModeException();
-		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).initSession(anyString(), any(AsyncCallback.class));
-		String username = "testusername";
-		String password = "pw";
-		AsyncCallback loginCallback = mock(AsyncCallback.class);
-		
-		authenticationController.loginUser(username, password, loginCallback);
-		
-		verify(loginCallback, never()).onFailure(ex);
-		verify(mockPlaceChanger).goTo(any(Down.class));
-	}
+
+	// Note.  If login when the stack is in READ_ONLY mode, then the widgets SynapseAlert should send user to the Down page.
 }

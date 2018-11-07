@@ -102,7 +102,6 @@ public class HomePresenterTest {
 		testProfile = new UserProfile();
 		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(testProfile);
 		
-		AsyncMockStubber.callSuccessWith(null).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(),  any(AsyncCallback.class));
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 	}	

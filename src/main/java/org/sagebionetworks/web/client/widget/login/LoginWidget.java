@@ -53,7 +53,7 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 			@Override
 			public void onSuccess(UserProfile profile) {
 				clear();
-				globalApplicationState.gotoLastPlace();
+				fireUserChange();
 			}
 
 			@Override
@@ -71,6 +71,15 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	public void clear() {
 		view.clear();
 		view.clearUsername();
+	}
+
+	// needed?
+	private void fireUserChange() {
+		if (listener != null) {
+			listener.invoke();
+		} else {
+			globalApplicationState.gotoLastPlace();
+		}
 	}
 
 	@Override

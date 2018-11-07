@@ -155,7 +155,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		currentUserProfile = null;
 		ginInjector.getHeader().refresh();
 		ginInjector.getSessionDetector().initializeSessionTokenState();
-		ginInjector.getSynapseJavascriptClient().initSession(WebConstants.EXPIRE_SESSION_TOKEN, null);
+		ginInjector.getSynapseJavascriptClient().initSession(WebConstants.EXPIRE_SESSION_TOKEN);
 	}
 	
 	@Override

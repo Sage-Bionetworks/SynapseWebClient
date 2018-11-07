@@ -79,7 +79,6 @@ public class LoginWidgetTest {
 		loginWidget.setUsernameAndPassword(u, p);
 		
 		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback) any());
-		verify(mockUserListener).invoke();
 		verify(mockView).clear();
 		verify(mockView).clearUsername();
 	}

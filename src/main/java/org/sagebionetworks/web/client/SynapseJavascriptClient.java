@@ -1252,7 +1252,11 @@ public class SynapseJavascriptClient {
 		String url = getFileServiceUrl() + "/download/order/history";
 		doPost(url, request, OBJECT_TYPE.DownloadOrderSummaryResponse, callback);
 	}
-	
+
+	public void initSession(String token) {
+		initSession(token, null);
+	}
+
 	/**
 	 * call to ask the server to set the session cookie
 	 * @param token

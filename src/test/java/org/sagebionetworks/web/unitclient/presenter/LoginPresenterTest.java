@@ -82,7 +82,8 @@ public class LoginPresenterTest {
 		verify(mockView).setPresenter(loginPresenter);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
-		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockAuthenticationController).setNewSessionToken(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockAuthenticationController).initializeFromExistingSessionCookie(any(AsyncCallback.class));
 	}	
 	
 	@Test 
@@ -125,7 +126,7 @@ public class LoginPresenterTest {
 		touCallback.invoke();
 		
 		verify(mockAuthenticationController).signTermsOfUse(eq(true), any(AsyncCallback.class));
-		verify(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
+		verify(mockAuthenticationController).initializeFromExistingSessionCookie(any(AsyncCallback.class));
 		// verify we only showed this once:
 		verify(mockView).showTermsOfUse(any(Callback.class));
 		//go to the last place (or the user dashboard Profile place if last place is not set)
@@ -142,7 +143,7 @@ public class LoginPresenterTest {
 		
 		loginPresenter.setPlace(mockLoginPlace);
 		
-		verify(mockAuthenticationController).revalidateSession(eq(fakeToken), any(AsyncCallback.class));
+		verify(mockAuthenticationController).setNewSessionToken(eq(fakeToken), any(AsyncCallback.class));
 		verify(mockGlobalApplicationState).gotoLastPlace(any(Place.class));
 	}
 	
@@ -172,26 +173,6 @@ public class LoginPresenterTest {
 		when(mockLoginPlace.toToken()).thenReturn(LoginPlace.CHANGE_USERNAME);
 		loginPresenter.setPlace(mockLoginPlace);
 		verify(mockPlaceChanger).goTo(isA(ChangeUsername.class));
-	}
-
-	@Test
-	public void testOpenInvitations() {
-		String fakeToken = "0e79b99-4bf8-4999-b3a2-5f8c0a9499eb";
-		when(mockLoginPlace.toToken()).thenReturn(fakeToken);
-		
-		loginPresenter.setPlace(mockLoginPlace);
-		verify(mockAuthenticationController).revalidateSession(eq(fakeToken), any(AsyncCallback.class));
-	}
-	
-	
-	@Test
-	public void testUpdateUser() {
-		String newSessionToken = "my session token";
-		when(mockAuthenticationController.getCurrentUserSessionToken()).thenReturn(newSessionToken);
-		
-		loginPresenter.updateUser();
-		
-		verify(mockAuthenticationController).revalidateSession(eq(newSessionToken), any(AsyncCallback.class));
 	}
 
 	@Test

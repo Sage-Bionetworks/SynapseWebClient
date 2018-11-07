@@ -56,12 +56,6 @@ public class InitSessionServletTest {
 	@Mock
 	HttpServletResponse mockResponse;
 	@Mock
-	SynapseProvider mockSynapseProvider;
-	@Mock
-	SynapseClient mockSynapse;
-	@Mock
-	UserSessionData mockUserSessionData;
-	@Mock
 	ServletOutputStream responseOutputStream;
 	@Captor
 	ArgumentCaptor<Cookie> cookieCaptor;
@@ -71,10 +65,6 @@ public class InitSessionServletTest {
 	public void setup() throws IOException, SynapseException {
 		MockitoAnnotations.initMocks(this);
 		servlet = new InitSessionServlet();
-		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
-
-		when(mockSynapse.getUserSessionData()).thenReturn(mockUserSessionData);
-		servlet.setSynapseProvider(mockSynapseProvider);
 		
 		// Setup output stream and response
 		when(mockResponse.getOutputStream()).thenReturn(responseOutputStream);
@@ -98,9 +88,6 @@ public class InitSessionServletTest {
 		
 		servlet.doPost(mockRequest, mockResponse);
 		
-		//verify the session token is validated
-		verify(mockSynapse).setSessionToken(TEST_SESSION_TOKEN);
-		verify(mockSynapse).getUserSessionData();
 		//verify the response Set-Cookie values
 		verify(mockResponse).addCookie(cookieCaptor.capture());
 		Cookie cookie = cookieCaptor.getValue();
@@ -124,8 +111,6 @@ public class InitSessionServletTest {
 		
 		servlet.doPost(mockRequest, mockResponse);
 		
-		//verify the session token is not validated
-		verifyZeroInteractions(mockSynapse);
 		//verify the response Set-Cookie values
 		verify(mockResponse).addCookie(cookieCaptor.capture());
 		Cookie cookie = cookieCaptor.getValue();
@@ -136,21 +121,6 @@ public class InitSessionServletTest {
 		assertTrue(cookie.isHttpOnly());
 		assertFalse(cookie.getSecure());
 		assertEquals(InitSessionServlet.ROOT_PATH, cookie.getPath());
-	}
-	
-	@Test
-	public void testSetSessionCookieInvalidSessionToken() throws Exception {
-		when(mockSynapse.getUserSessionData()).thenThrow(new ForbiddenException());
-		setupSessionInRequest(TEST_SESSION_TOKEN);
-		
-		servlet.doPost(mockRequest, mockResponse);
-		
-		//verify the session token is validated
-		verify(mockSynapse).setSessionToken(TEST_SESSION_TOKEN);
-		verify(mockSynapse).getUserSessionData();
-		
-		verify(mockResponse, never()).addCookie(any(Cookie.class));
-		verify(mockResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 	}
 }	
 
