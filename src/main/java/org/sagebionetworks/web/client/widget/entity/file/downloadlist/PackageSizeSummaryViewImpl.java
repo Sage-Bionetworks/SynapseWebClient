@@ -17,15 +17,9 @@ public class PackageSizeSummaryViewImpl implements PackageSizeSummaryView, IsWid
 	@UiField
 	Span fileCountSpan;
 	@UiField
-	Text fileCount;
-	@UiField
 	Span fileSizeSpan;
 	@UiField
-	Text fileSize;
-	@UiField
 	Span estimatedTimeSpan;
-	@UiField
-	Text estimatedTime;
 	@UiField
 	Span estimatedTimeLoading;
 	@UiField
@@ -40,17 +34,34 @@ public class PackageSizeSummaryViewImpl implements PackageSizeSummaryView, IsWid
 	public Widget asWidget() {
 		return w;
 	}
-	@Override
-	public void setEstimatedDownloadTime(String time) {
-		estimatedTime.setText(time);
+	private void setSpanValue(Span span, String value) {
+		span.clear();
+		String[] splitValue = value.split("\\s");
+		if (splitValue.length > 1) {
+			Span s1 = new Span();
+			s1.add(new Text(splitValue[0]));
+			s1.addStyleName("font-weight-700 font-size-15");
+			
+			Span s2 = new Span();
+			s2.add(new Text(value.substring(splitValue[0].length())));
+			s2.addStyleName("font-size-15");
+			
+			span.add(s1);
+			span.add(s2);
+		}
 	}
 	@Override
+	public void setEstimatedDownloadTime(String time) {
+		setSpanValue(estimatedTimeSpan, time);
+	}
+	
+	@Override
 	public void setFileCount(String count) {
-		fileCount.setText(count);
+		setSpanValue(fileCountSpan, count);
 	}
 	@Override
 	public void setSize(String friendlyFileSize) {
-		fileSize.setText(friendlyFileSize);
+		setSpanValue(fileSizeSpan, friendlyFileSize);
 	}
 	@Override
 	public void addTextStyle(String style) {
