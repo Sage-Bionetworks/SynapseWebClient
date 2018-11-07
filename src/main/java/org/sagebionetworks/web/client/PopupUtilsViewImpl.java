@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.Window;
@@ -9,6 +10,11 @@ public class PopupUtilsViewImpl implements PopupUtilsView {
 	@Override
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message);
+	}
+	
+	@Override
+	public void showInfo(String message, String href, String buttonText, IconType iconType) {
+		DisplayUtils.showInfo(message, href, buttonText, iconType);
 	}
 
 	@Override

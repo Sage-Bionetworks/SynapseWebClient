@@ -54,10 +54,6 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 		entityBadge.setClickHandler(handler);
 	}
 	
-	public void setOnAddedToDownloadList(CallbackP<EntityHeader> onAdd) {
-		entityBadge.setOnAddedToDownloadList(onAdd);
-	}
-	
 	public void setModifiedByUserBadgeClickHandler(ClickHandler handler) {
 		entityBadge.setModifiedByUserBadgeClickHandler(handler);
 	}
