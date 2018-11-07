@@ -148,6 +148,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 
 	@Override
+	public String getSessionCookieUrl() {
+		return GWTWrapperImpl.getRealGWTModuleBaseURL() + WebConstants.SESSION_COOKIE_SERVLET;
+	}
+	
+	@Override
 	public int randomNextInt() {
 		return Random.nextInt();
 	}

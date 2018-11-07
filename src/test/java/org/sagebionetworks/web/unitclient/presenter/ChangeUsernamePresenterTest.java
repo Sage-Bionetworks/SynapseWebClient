@@ -44,7 +44,6 @@ public class ChangeUsernamePresenterTest {
 	PlaceChanger mockPlaceChanger;
 	AcceptsOneWidget mockPanel;
 	EventBus mockEventBus;
-	UserSessionData usd;
 	UserProfile profile;
 	
 	@Before
@@ -57,16 +56,12 @@ public class ChangeUsernamePresenterTest {
 		mockEventBus = mock(EventBus.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockSynAlert = mock(SynapseAlert.class);
-		usd = new UserSessionData();
-		Session session = new Session();
-		usd.setSession(session);
 		
 		profile = new UserProfile();
 		profile.setOwnerId("1233");
 		profile.setUserName("valid-username");
-		usd.setProfile(profile);
 		
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(usd);
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(profile);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		presenter = new ChangeUsernamePresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, jsonObjectAdapter, mockSynAlert);
 		presenter.start(mockPanel, mockEventBus);

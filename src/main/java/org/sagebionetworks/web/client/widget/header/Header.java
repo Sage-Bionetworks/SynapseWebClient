@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.header;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -102,13 +103,13 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	}
 
 	public void refresh() {
-		UserSessionData userSessionData = authenticationController.getCurrentUserSessionData();
-		view.setUser(userSessionData);
+		UserProfile profile = authenticationController.getCurrentUserProfile();
+		view.setUser(profile);
 		view.refresh();
 		view.setSearchVisible(true);
 		view.setProjectFavoriteWidget(favWidget);
-		if (authenticationController.isLoggedIn() && userSessionData.getProfile() != null) {
-			String userName = userSessionData.getProfile().getUserName();
+		if (authenticationController.isLoggedIn() && profile != null) {
+			String userName = profile.getUserName();
 			pendoSdk.initialize(authenticationController.getCurrentUserPrincipalId(), userName + SYNAPSE_ORG);
 			refreshFavorites();
 			onDownloadListUpdatedEvent(null);

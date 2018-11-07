@@ -92,13 +92,11 @@ public class JoinTeamWidgetTest {
         mockAuthenticationController = mock(AuthenticationController.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 
-        UserSessionData currentUser = new UserSessionData();                
         currentUserProfile = new UserProfile();
         ars = new ArrayList<AccessRequirement>();
         
         currentUserProfile.setOwnerId("1");
-        currentUser.setProfile(currentUserProfile);
-        when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(currentUser);
+        when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(currentUserProfile);
         when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
         when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
         AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).hasAccess(anyString(), anyString(), anyString(), any(AsyncCallback.class));

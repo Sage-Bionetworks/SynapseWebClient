@@ -91,8 +91,6 @@ public class ManagedACTAccessRequirementWidgetTest {
 	@Mock
 	UserBadge mockSubmitterUserBadge;
 	@Mock
-	UserSessionData mockUserSessionData;
-	@Mock
 	UserProfile mockProfile;
 	@Mock
 	SubmissionStatus mockSubmissionStatus;
@@ -126,8 +124,7 @@ public class ManagedACTAccessRequirementWidgetTest {
 		when(mockDataAccessSubmissionStatus.getCurrentSubmissionStatus()).thenReturn(mockSubmissionStatus);
 		when(mockSubmissionStatus.getSubmissionId()).thenReturn(SUBMISSION_ID);
 		when(mockSubmissionStatus.getSubmittedBy()).thenReturn(SUBMITTER_ID);
-		when(mockAuthController.getCurrentUserSessionData()).thenReturn(mockUserSessionData);
-		when(mockUserSessionData.getProfile()).thenReturn(mockProfile);
+		when(mockAuthController.getCurrentUserProfile()).thenReturn(mockProfile);
 		when(mockProfile.getEmails()).thenReturn(Collections.singletonList("email@email.com"));
 		when(mockSubjectIds.get(anyInt())).thenReturn(new RestrictableObjectDescriptor());
 		when(mockAuthController.isLoggedIn()).thenReturn(true);

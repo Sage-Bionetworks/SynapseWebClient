@@ -85,4 +85,5 @@ public interface SynapseJSNIUtils {
 
 	Element getElementById(String elementId);
 	String getCdnEndpoint();
+	String getSessionCookieUrl();
 }

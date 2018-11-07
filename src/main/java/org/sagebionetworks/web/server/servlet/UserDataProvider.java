@@ -53,29 +53,4 @@ public class UserDataProvider {
 		//Cannot find user login data in the cookies.  Treating as anonymous.;
 		return null;
 	}
-	
-	/**
-	 * Add the user data to the header if it exists.
-	 * @param threadLocalRequest
-	 * @param headers
-	 */
-	public static void addUserDataToHeader(HttpServletRequest threadLocalRequest, HttpHeaders headers){
-		// First try to get the user data from the cookies
-		String token = getThreadLocalUserToken(threadLocalRequest);
-		if(token != null){
-			headers.add(SESSION_TOKEN_KEY, token);
-		}
-	}
-
-	/**
-	 * Add the user data to the header if it exists.
-	 * @param token
-	 * @param headers
-	 */
-	public static void addUserDataToHeader(String token, HttpHeaders headers){
-		// Add the token to the header if it is not null
-		if(token != null){
-			headers.add(SESSION_TOKEN_KEY, token);
-		}
-	}
 }

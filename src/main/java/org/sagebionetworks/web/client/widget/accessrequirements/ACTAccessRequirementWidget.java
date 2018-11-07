@@ -161,7 +161,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	@Override
 	public void onRequestAccess() {
 		// request access via Jira
-		UserProfile userProfile = authController.getCurrentUserSessionData().getProfile();
+		UserProfile userProfile = authController.getCurrentUserProfile();
 		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
 		String primaryEmail = DisplayUtils.getPrimaryEmail(userProfile);
 		String createJiraIssueURL = jiraURLHelper.createRequestAccessIssue(

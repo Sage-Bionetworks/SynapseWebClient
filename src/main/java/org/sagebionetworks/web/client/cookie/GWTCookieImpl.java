@@ -39,8 +39,8 @@ public class GWTCookieImpl implements CookieProvider {
 
 	@Override
 	public void setCookie(String name, String value, Date expires) {
+		boolean isSecure = Window.Location.getProtocol().toLowerCase().startsWith("https");
 		String domain = CookieUtils.getDomain(Window.Location.getHostName());
-		boolean isSecure = domain != null;
 		setCookie(name, value, expires, domain, null, isSecure);
 	}
 	

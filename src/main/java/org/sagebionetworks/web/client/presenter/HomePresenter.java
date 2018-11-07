@@ -5,7 +5,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
@@ -54,10 +53,9 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	public void setPlace(Home place) {
 		this.place = place;		
 		view.setPresenter(this);
-		checkAcceptToU();
 		view.refresh();
 		if(authenticationController.isLoggedIn()) {
-			view.showLoggedInUI(authenticationController.getCurrentUserSessionData());
+			view.showLoggedInUI(authenticationController.getCurrentUserProfile());
 			//note that the session token is validated on every place change (and on app load)
 		} else {
 			if (cookies.getCookie(CookieKeys.USER_LOGGED_IN_RECENTLY) != null) {
@@ -73,15 +71,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
         view.clear();
         return null;
     }
-
-	
-	public void checkAcceptToU() {
-		if (authenticationController.isLoggedIn() && !authenticationController.getCurrentUserSessionData().getSession().getAcceptsTermsOfUse()) {
-			// SWC-4278: do not log user out (that will clear all state, and the user may be in the middle of signing the pledge!)
-			// Instead, redirect to the pledge.
-			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
-		}
-	}
 	
 	@Override
 	public void onUserChange() {

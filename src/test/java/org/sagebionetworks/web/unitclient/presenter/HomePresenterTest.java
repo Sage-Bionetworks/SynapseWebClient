@@ -1,12 +1,9 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -21,8 +18,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -33,7 +29,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
@@ -69,7 +64,7 @@ public class HomePresenterTest {
 	List<EntityHeader> testEvaluationResults;
 	List<OpenUserInvitationBundle> openInvitations;
 	
-	UserSessionData testSessionData;
+	UserProfile testProfile;
 	@Mock
 	ResourceLoader mockResourceLoader;
 	@Captor
@@ -104,14 +99,9 @@ public class HomePresenterTest {
 		verify(mockView).setPresenter(homePresenter);
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		testSessionData = new UserSessionData();
-		Session testSession = new Session();
-		testSession.setAcceptsTermsOfUse(true);
-		testSessionData.setSession(testSession);
-		testSessionData.setIsSSO(false);
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(testSessionData);
+		testProfile = new UserProfile();
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(testProfile);
 		
-		AsyncMockStubber.callSuccessWith(null).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(),  any(AsyncCallback.class));
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 	}	
@@ -122,38 +112,7 @@ public class HomePresenterTest {
 		homePresenter.setPlace(place);
 		verify(mockView).refresh();
 	}
-	
-	
-	@Test
-	public void testCheckAcceptToUAnonymous() {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		homePresenter.checkAcceptToU();
-		//should not ask for the session information, or try to log you out
-		verify(mockAuthenticationController, never()).getCurrentUserSessionData();
-		verify(mockAuthenticationController, never()).logoutUser();
-	}
 
-	@Test
-	public void testCheckAcceptToULoggedInToUSigned() {
-		homePresenter.checkAcceptToU();
-		verify(mockAuthenticationController).getCurrentUserSessionData();
-		//should not log you out
-		verify(mockAuthenticationController, never()).logoutUser();
-	}
-	
-	@Test
-	public void testCheckAcceptToULoggedInToUUnsigned() {
-		testSessionData.getSession().setAcceptsTermsOfUse(false);
-		homePresenter.checkAcceptToU();
-		
-		verify(mockAuthenticationController).getCurrentUserSessionData();
-		//should automatically log you out
-		verify(mockPlaceChanger).goTo(placeCaptor.capture());
-		Place targetPlace = placeCaptor.getValue();
-		assertTrue(targetPlace instanceof LoginPlace);
-		assertEquals(((LoginPlace)targetPlace).toToken(), LoginPlace.SHOW_TOU);
-	}
-	
 	@Test
 	public void testAnonymousNotLoggedInRecently() {
 		when(mockCookies.getCookie(CookieKeys.USER_LOGGED_IN_RECENTLY)).thenReturn(null);

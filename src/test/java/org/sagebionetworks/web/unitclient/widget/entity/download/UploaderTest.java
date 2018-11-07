@@ -143,10 +143,9 @@ public class UploaderTest {
 		testEntity = new FileEntity();
 		testEntity.setName("test file");
 		testEntity.setId("syn99");
-		UserSessionData sessionData = new UserSessionData();
-		sessionData.setProfile(new UserProfile());
+		UserProfile profile = new UserProfile();
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(sessionData);
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(profile);
 		when(mockSynapseJsniUtils.getContentType(any(JavaScriptObject.class), anyInt())).thenReturn("image/png");
 		S3UploadDestination d = new S3UploadDestination();
 		d.setUploadType(UploadType.S3);

@@ -462,7 +462,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			
 			if (newPrincipalIdSet.size() > 0) {
 				//now send a message to these users
-				String userDisplayName = DisplayUtils.getDisplayName(authenticationController.getCurrentUserSessionData().getProfile());
+				String userDisplayName = DisplayUtils.getDisplayName(authenticationController.getCurrentUserProfile());
 				String message = DisplayUtils.getShareMessage(userDisplayName, entity.getId(), gwt.getHostPageBaseURL());
 				String subject = entity.getName() + DisplayConstants.SHARED_ON_SYNAPSE_SUBJECT;
 				synAlert.clear();

@@ -77,17 +77,21 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		}
 	}
 	
-	@Override 
-	public UserSessionData getUserSessionData(String sessionToken) throws RestServiceException {
+	@Override
+	public String getCurrentSessionToken() throws RestServiceException {
 		validateService();
-		SynapseClient synapseClient = createSynapseClient(sessionToken);
+		String sessionToken = tokenProvider.getSessionToken();
 		try {
-			return synapseClient.getUserSessionData();
+			if (sessionToken != null) {
+				//validate
+				createSynapseClient(sessionToken).getUserSessionData();
+			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
+		return sessionToken;
 	}
-
+	
 	@Override
 	public void signTermsOfUse(String sessionToken, boolean acceptsTerms) throws RestServiceException {
 		validateService();
@@ -111,7 +115,20 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
+	@Override
+	public UserSessionData getCurrentUserSessionData() throws RestServiceException {
+		validateService();
 
+		SynapseClient client = createSynapseClient();
+		try {
+			return client.getUserSessionData();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	
 	@Override
 	public String createUserStep2(String userName, String fName, String lName, String password, EmailValidationSignedToken emailValidationSignedToken) throws RestServiceException {
 		validateService();

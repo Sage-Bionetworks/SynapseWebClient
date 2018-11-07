@@ -76,10 +76,9 @@ public class SynapseAlertImplTest {
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 		widget = new SynapseAlertImpl(mockView, mockGlobalApplicationState, mockAuthenticationController, mockGWT, mockPortalGinInjector, mockJsniUtils);
-		UserSessionData mockUSD = mock(UserSessionData.class);
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(mockUSD);
 		UserProfile mockProfile = mock(UserProfile.class);
-		when(mockUSD.getProfile()).thenReturn(mockProfile);
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(mockProfile);
+		
 		AsyncMockStubber.callSuccessWith(newJiraKey).when(mockJiraClient).createIssueOnBackend(anyString(),  any(Throwable.class),  anyString(), any(AsyncCallback.class));
 		
 		when(mockGWT.getHostPageBaseURL()).thenReturn(HOST_PAGE_URL);

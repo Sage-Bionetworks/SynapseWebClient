@@ -84,15 +84,13 @@ public class RestrictionWidgetTest {
 				mockIsACTMemberAsyncHandler,
 				mockSynapseJavascriptClient);
 		
-		UserSessionData usd = new UserSessionData();
 		List<String> emailAddresses = new ArrayList<String>();
 		emailAddresses.add("test@test.com");
 		UserProfile up = new UserProfile();
 		up.setOwnerId("101");
 		up.setEmails(emailAddresses);
-		usd.setProfile(up);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(usd);
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(up);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(mockRestrictionInformation).when(mockSynapseJavascriptClient).getRestrictionInformation(anyString(), any(RestrictableObjectType.class), any(AsyncCallback.class));
 		when(mockEntity.getId()).thenReturn(ENTITY_ID);

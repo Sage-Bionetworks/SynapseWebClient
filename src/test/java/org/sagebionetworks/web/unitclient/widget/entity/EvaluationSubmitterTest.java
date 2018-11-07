@@ -114,12 +114,10 @@ public class EvaluationSubmitterTest {
 		verify(mockView).setTeamSelectSynAlertWidget(mockSynAlert.asWidget());
 		verify(mockView).setContributorsSynAlertWidget(mockSynAlert.asWidget());
 		verify(mockView).setDockerCommitSynAlert(mockSynAlert.asWidget());
-		UserSessionData usd = new UserSessionData();
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("test owner ID");
-		usd.setProfile(profile);
 		
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(usd);
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(profile);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		returnSubmission = new Submission();
 		returnSubmission.setId("363636");

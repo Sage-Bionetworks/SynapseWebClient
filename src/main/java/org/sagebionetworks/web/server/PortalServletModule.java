@@ -19,6 +19,7 @@ import org.sagebionetworks.web.server.servlet.FileEntityResolverServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleAssociationServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
 import org.sagebionetworks.web.server.servlet.FileUploaderJnlp;
+import org.sagebionetworks.web.server.servlet.InitSessionServlet;
 import org.sagebionetworks.web.server.servlet.JiraClientImpl;
 import org.sagebionetworks.web.server.servlet.JiraJavaClient;
 import org.sagebionetworks.web.server.servlet.JiraJavaClientImpl;
@@ -117,6 +118,10 @@ public class PortalServletModule extends ServletModule {
 		// FileHandle upload
 		bind(FileHandleServlet.class).in(Singleton.class);
 		serve("/Portal/"+WebConstants.FILE_HANDLE_UPLOAD_SERVLET).with(FileHandleServlet.class);
+		
+		// Session cookie
+		bind(InitSessionServlet.class).in(Singleton.class);
+		serve("/Portal/"+WebConstants.SESSION_COOKIE_SERVLET).with(InitSessionServlet.class);
 		
 		// FileHandleAssociation download
 		bind(FileHandleAssociationServlet.class).in(Singleton.class);

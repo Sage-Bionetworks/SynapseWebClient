@@ -65,12 +65,12 @@ public class CertificatePresenterTest {
 				adapterFactory,
 				mockSynAlert);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(new UserSessionData());
 		profile = new UserProfile();
 		principalId = "1239";
 		profile.setOwnerId(principalId);
 		profile.setUserName("Fooooo");
 		AsyncMockStubber.callSuccessWith(profile).when(mockSynapseJavascriptClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(profile);
 		
 		passingRecord = new PassingRecord();
 		String passingRecordJson = passingRecord.writeToJSONObject(adapterFactory.createNew()).toJSONString();
