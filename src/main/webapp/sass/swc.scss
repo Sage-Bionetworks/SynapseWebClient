@@ -2755,7 +2755,7 @@ div.border {
 	font-style:italic;
 }
 
-#rootPanel .fullWidthAlert {
+#body .fullWidthAlert {
 	@include border-radius(0px);
 	box-shadow: none;
 	padding: 7px 15px;
