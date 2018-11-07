@@ -53,6 +53,10 @@ a:focus{color:$synapse-blue; text-decoration:underline;}
 	.synapse-blue-bg-gradient {
 		background: linear-gradient(180deg, $synapse-blue 0%, $synapse-blue-end-gradient 100%);
 	}
+
+	.black-25-percent {
+		color: rgba(0, 0, 0, 0.25);
+	}
 }
 
 .pagination>li>a, .pagination>li>span {
@@ -957,7 +961,9 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 
 .font-italic { font-style: italic; }
 .font-size-1-1em { font-size: 1.1em; }
-
+.font-weight-700 {
+	font-weight: 700;
+}
 .font-weight-bolder {
 	font-weight: bolder;
 }
