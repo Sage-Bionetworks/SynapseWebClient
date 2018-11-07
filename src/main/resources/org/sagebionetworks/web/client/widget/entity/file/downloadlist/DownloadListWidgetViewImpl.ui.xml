@@ -15,7 +15,7 @@
 				<b:Anchor ui:field="clearAllLink" text="Clear All"/>
 			</bh:Div>
 		</bh:Div>
-		<bh:Div ui:field="fileHandleAssociationTableContainer" />
+		<bh:Div ui:field="fileHandleAssociationTableContainer" addStyleNames="synapse-green-border border-top-2"  />
 		
 		<bh:Div ui:field="synAlertContainer" />
 		<w:InfoAlert ui:field="multiplePackagesRequiredAlert" visible="false" alertType="DEFAULT" icon="QUESTION_CIRCLE" message="Due to number and size of the files in this list, multiple zip file packages will be required.  Click Create Package to start the download process." linkText="" addStyleNames="greyBackground" />
