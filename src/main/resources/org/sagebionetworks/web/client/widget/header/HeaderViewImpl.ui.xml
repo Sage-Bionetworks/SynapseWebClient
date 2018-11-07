@@ -81,7 +81,7 @@
 					<bh:Div ui:field="searchBoxContainer" marginTop="14"/>
 				</bh:Div>
 				<bh:Div pull="RIGHT" height="53px" paddingLeft="7" paddingRight="3" paddingTop="9" ui:field="downloadListNotificationUI" visible="false">
-					<b:Tooltip text="Click to view items in your download list.">
+					<b:Tooltip text="Click to view items in your download list." placement="BOTTOM">
 						<g:FocusPanel height="35px" addStyleNames="synapse-green-bg img-circle displayInlineBlock dropshadow-on-hover" ui:field="downloadListLink">
 							<b:Icon type="DOWNLOAD" addStyleNames="imageButton color-white" size="LARGE" marginTop="9" marginRight="5" marginBottom="5" marginLeft="5"/>
 						</g:FocusPanel>
