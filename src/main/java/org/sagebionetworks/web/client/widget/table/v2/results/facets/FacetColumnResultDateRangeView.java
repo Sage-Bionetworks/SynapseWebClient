@@ -16,4 +16,9 @@ public interface FacetColumnResultDateRangeView extends IsWidget {
 	Date getMin();
 	Date getMax();
 	void setSynAlert(Widget w);
+	void setIsAnyValue();
+	void setIsRange();
+	void setIsNotSet();
+	boolean isAnyValue();
+	boolean isNotSet();
 }
