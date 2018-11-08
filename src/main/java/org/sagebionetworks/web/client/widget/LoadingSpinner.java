@@ -14,6 +14,7 @@ public class LoadingSpinner implements IsWidget {
 	
 	@UiField
 	Div loadingSpinnerDiv;
+	boolean isVisible = true;
 	
 	/**
 	 * ## Usage
@@ -34,6 +35,7 @@ public class LoadingSpinner implements IsWidget {
 	}
 	
 	public void setVisible(boolean visible) {
+		isVisible = visible;
 		loadingSpinnerDiv.setVisible(visible);
 	}
 	
@@ -44,6 +46,7 @@ public class LoadingSpinner implements IsWidget {
 	public void setSize(String size) {
 		loadingSpinnerDiv.setSize(size, size);
 		loadingSpinnerDiv.getElement().setAttribute("style", "width:"+size + ";height:"+size+"; background-size:"+size + " " + size + ";");
+		loadingSpinnerDiv.setVisible(isVisible);
 	}
 	
 	public void setAddStyleNames(String styleNames) {
