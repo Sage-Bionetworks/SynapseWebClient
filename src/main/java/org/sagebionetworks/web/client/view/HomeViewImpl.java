@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.Profile;
@@ -14,7 +13,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.users.RegisterWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
-import org.sagebionetworks.web.client.widget.login.UserListener;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -113,11 +111,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 		});
 		registerWidgetContainer.add(registerWidget.asWidget());
 		
-		loginWidget.setUserListener(new UserListener() {
-			@Override
-			public void userChanged(UserSessionData newUser) {
-				presenter.onUserChange();
-			}
+		loginWidget.setUserListener(() -> {
+			presenter.onUserChange();
 		});
 		// Other links
 		dreamChallengesBox.addClickHandler(new ClickHandler() {
@@ -198,10 +193,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 
 	
 	@Override
-	public void showLoggedInUI(UserSessionData userData) {
-		setUserProfilePicture(userData);
+	public void showLoggedInUI(UserProfile profile) {
+		setUserProfilePicture(profile);
 		dashboardUI.setVisible(true);
-		userDisplayName.setText(userData.getProfile().getUserName().toUpperCase());
+		userDisplayName.setText(profile.getUserName().toUpperCase());
 	}
 
 	@Override
@@ -222,9 +217,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 		userBadge.configurePicture();
 	}
 	
-	private void setUserProfilePicture(UserSessionData userData) {
-		if (userData != null && userData.getProfile() != null) {
-			UserProfile profile = userData.getProfile();
+	private void setUserProfilePicture(UserProfile profile) {
+		if (profile != null) {
 			userBadge.configure(profile);
 			userBadge.setDoNothingOnClick();
 		}

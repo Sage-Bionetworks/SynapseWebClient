@@ -32,21 +32,33 @@ a {color:$synapse-blue;text-decoration:none;}
 a:visited{color:$synapse-blue; text-decoration:none;}
 a:hover{color:$synapse-blue; text-decoration:underline;}
 a:focus{color:$synapse-blue; text-decoration:underline;}
-.synapse-yellow, #body .synapse-yellow {color:$synapse-yellow;}
-.synapse-blue, #body .synapse-blue {color:$synapse-blue;}
-.synapse-purple, #body .synapse-purple {color:$synapse-purple;}
-.synapse-green, #body .synapse-green {color:$synapse-green;}
+#body {
+	.synapse-yellow {color:$synapse-yellow;}
+	.synapse-blue {color:$synapse-blue;}
+	.synapse-purple {color:$synapse-purple;}
+	.synapse-green {color:$synapse-green;}
+	
+	.synapse-yellow-bg {background-color:$synapse-yellow;}
+	.synapse-blue-bg {background-color:$synapse-blue;}
+	.synapse-purple-bg {background-color:$synapse-purple;}
+	.synapse-green-bg {background-color:$synapse-green;}
+	.synapse-orange-bg {background-color:$synapse-orange;}
+	.synapse-accent-primary-bg {background-color:$synapse-accent-primary;}
 
-.synapse-yellow-bg, #body .synapse-yellow-bg {background-color:$synapse-yellow;}
-.synapse-blue-bg, #body .synapse-blue-bg {background-color:$synapse-blue;}
-.synapse-purple-bg, #body .synapse-purple-bg {background-color:$synapse-purple;}
-.synapse-green-bg, #body .synapse-green-bg {background-color:$synapse-green;}
-.synapse-orange-bg, #body .synapse-orange-bg {background-color:$synapse-orange;}
-.synapse-accent-primary-bg, #body .synapse-accent-primary-bg {background-color:$synapse-accent-primary;}
+	.synapse-yellow-border {border-color:$synapse-yellow;}
+	.synapse-blue-border {border-color:$synapse-blue;}
+	.synapse-purple-border {border-color:$synapse-purple;}
+	.synapse-green-border {border-color:$synapse-green;}
+	
+	.synapse-blue-bg-gradient {
+		background: linear-gradient(180deg, $synapse-blue 0%, $synapse-blue-end-gradient 100%);
+	}
 
-.synapse-blue-bg-gradient, #body .synapse-blue-bg-gradient {
-	background: linear-gradient(180deg, $synapse-blue 0%, $synapse-blue-end-gradient 100%);
+	.black-25-percent {
+		color: rgba(0, 0, 0, 0.25);
+	}
 }
+
 .pagination>li>a, .pagination>li>span {
 	color: $synapse-blue;
 }
@@ -949,7 +961,9 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 
 .font-italic { font-style: italic; }
 .font-size-1-1em { font-size: 1.1em; }
-
+.font-weight-700 {
+	font-weight: 700;
+}
 .font-weight-bolder {
 	font-weight: bolder;
 }
@@ -2225,6 +2239,10 @@ td.datePickerMonth {
   border-top: 1px solid #dddddd;
 }
 
+.border-top-2 {
+  border-top: 2px solid;
+}
+
 .read-only-box {
 	padding: 5px;
     border: 1px solid #dddddd;
@@ -2737,10 +2755,8 @@ div.border {
 	font-style:italic;
 }
 
-#rootPanel .fullWidthAlert {
+#body .fullWidthAlert {
 	@include border-radius(0px);
-	margin-left: -15px;
-	margin-right: -15px;
 	box-shadow: none;
 	padding: 7px 15px;
 }

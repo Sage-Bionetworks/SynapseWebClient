@@ -1,16 +1,13 @@
 package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.CheckBox;
-import org.gwtbootstrap3.client.ui.Container;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
-import org.sagebionetworks.web.client.widget.login.UserListener;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.DivElement;
@@ -108,12 +105,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 		loginWidgetPanel.clear();
 		loginWidget.asWidget().removeFromParent();
 		loginWidgetPanel.add(loginWidget.asWidget());
-		loginWidget.setUserListener(new UserListener() {			
-			@Override
-			public void userChanged(UserSessionData newUser) {
-				presenter.setNewUser(newUser);
-			}
-		});
 	}
 	
 	@Override

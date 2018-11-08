@@ -19,6 +19,7 @@
 			<bh:Div addStyleNames="margin-top-5">
 				<bh:Div ui:field="manageAccessContainer" pull="RIGHT" addStyleNames="margin-right-5" />
 				<b:Button ui:field="signTermsButton" type="PRIMARY" text="Accept Terms of Use" pull="RIGHT" visible="false" addStyleNames="margin-right-5"/>
+				<b:Button ui:field="loginButton" type="PRIMARY" text="Accept Terms of Use" pull="RIGHT" visible="false" addStyleNames="margin-right-5"/>
 				<b:Button ui:field="certifyButton" type="PRIMARY" text="Get certified" pull="RIGHT" visible="false" addStyleNames="margin-right-5"/>
 				<b:Alert ui:field="certifyNote" type="INFO" text="You must be a certified user in order to access." pull="RIGHT" visible="false" addStyleNames="small-alert margin-right-2" />
 				<b:Button ui:field="validateProfileButton" type="PRIMARY" text="Validate profile" pull="RIGHT" visible="false" addStyleNames="margin-right-5"/>

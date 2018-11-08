@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -75,6 +76,7 @@ public class EntityBadgeTest {
 	private static final String KEY3 = "key3";
 	private static final String KEY1 = "key1";
 	private static final String KEY2 = "key2";
+	private static final String USER_ID = "12430";
 	GlobalApplicationState mockGlobalApplicationState;
 	PlaceChanger mockPlaceChanger;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
@@ -113,8 +115,6 @@ public class EntityBadgeTest {
 	S3FileHandle mockDataFileHandle;
 	@Mock
 	AuthenticationController mockAuthController;
-	@Mock
-	CallbackP<EntityHeader> mockEntityHeaderCallback;
 	Set<ResourceAccess> resourceAccessSet;
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -153,6 +153,7 @@ public class EntityBadgeTest {
 		resourceAccessSet.add(mockResourceAccess);
 		when(mockBenefactorAcl.getResourceAccess()).thenReturn(resourceAccessSet);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).addFileToDownloadList(anyString(), anyString(), any(AsyncCallback.class));
+		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(USER_ID);
 	}
 	
 	private EntityBundle setupEntity(Entity entity) {
@@ -402,14 +403,13 @@ public class EntityBadgeTest {
 		testFile.setDataFileHandleId(fileHandleId);
 		setupEntity(testFile);
 		EntityHeader header = configure();
-		widget.setOnAddedToDownloadList(mockEntityHeaderCallback);
 		
 		widget.getEntityBundle();
 		
 		widget.onAddToDownloadList();
 		
 		verify(mockSynapseJavascriptClient).addFileToDownloadList(eq(fileHandleId), eq(entityId), any(AsyncCallback.class));
-		verify(mockEntityHeaderCallback).invoke(header);
+		verify(mockPopupUtils).showInfo(header.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST, "#!Profile:"+USER_ID+"/downloads", EntityBadge.VIEW_DOWNLOAD_LIST, IconType.CHECK_CIRCLE);
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
 		verify(mockSynapseJSNIUtils).sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, Integer.toString(1));
 	}

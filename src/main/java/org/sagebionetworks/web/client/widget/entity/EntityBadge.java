@@ -11,6 +11,7 @@ import static org.sagebionetworks.repo.model.EntityBundle.THREAD_COUNT;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -47,6 +48,7 @@ import com.google.inject.Inject;
 
 public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Presenter {
 	
+	public static final String VIEW_DOWNLOAD_LIST = "view download list";
 	public static final String ADDED_TO_DOWNLOAD_LIST = " has been added to your download list.";
 	public static final String LINK_SUCCESSFULLY_DELETED = "Successfully removed link";
 	private EntityBadgeView view;
@@ -60,7 +62,6 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	private SynapseProperties synapseProperties;
 	private EventBus eventBus;
 	private String dataFileHandleId;
-	private CallbackP<EntityHeader> onAddedToDownloadList;
 	private SynapseJSNIUtils jsniUtils;
 	
 	@Inject
@@ -257,12 +258,10 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			@Override
 			public void onSuccess(DownloadList result) {
 				jsniUtils.sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, "1");
-				onAddedToDownloadList.invoke(entityHeader);
+				String href = "#!Profile:"+authController.getCurrentUserPrincipalId()+"/downloads";
+				popupUtils.showInfo(entityHeader.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST, href, VIEW_DOWNLOAD_LIST, IconType.CHECK_CIRCLE);
 				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}
 		});
-	}
-	public void setOnAddedToDownloadList(CallbackP<EntityHeader> onAddedToDownloadList) {
-		this.onAddedToDownloadList = onAddedToDownloadList;
 	}
 }

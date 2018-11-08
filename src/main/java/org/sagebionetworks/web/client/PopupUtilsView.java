@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.utils.Callback;
 
 public interface PopupUtilsView {
@@ -26,4 +27,5 @@ public interface PopupUtilsView {
 	void openInNewWindow(String url);
 	void showConfirmDelete(String message, 
 			Callback callback);
+	void showInfo(String message, String href, String buttonText, IconType iconType);
 }

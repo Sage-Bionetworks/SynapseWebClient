@@ -102,6 +102,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
 		verify(mockLazyLoadHelper).configure(callbackCaptor.capture(), eq(mockView));
 		lazyLoadDataCallback = callbackCaptor.getValue();
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionStatus).when(mockDataAccessClient).getAccessRequirementStatus(anyString(), any(AsyncCallback.class));
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
 	}
 
 	@Test
@@ -138,6 +139,15 @@ public class TermsOfUseAccessRequirementWidgetTest {
 		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(true);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showApprovedHeading();
+	}
+	
+	@Test
+	public void testAnonymous() {
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		widget.setRequirement(mockTermsOfUseAccessRequirement, mockRefreshCallback);
+		lazyLoadDataCallback.invoke();
+		verify(mockView).showUnapprovedHeading();
+		verify(mockView).showLoginButton();
 	}
 	
 	@Test

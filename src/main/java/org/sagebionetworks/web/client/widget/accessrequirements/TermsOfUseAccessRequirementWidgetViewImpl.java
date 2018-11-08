@@ -4,6 +4,8 @@ import org.gwtbootstrap3.client.ui.BlockQuote;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -34,6 +36,8 @@ public class TermsOfUseAccessRequirementWidgetViewImpl implements TermsOfUseAcce
 	@UiField
 	Button signTermsButton;
 	@UiField
+	Button loginButton;
+	@UiField
 	Div editAccessRequirementContainer;
 	@UiField
 	Div deleteAccessRequirementContainer;
@@ -49,21 +53,17 @@ public class TermsOfUseAccessRequirementWidgetViewImpl implements TermsOfUseAcce
 	Presenter presenter;
 	
 	@Inject
-	public TermsOfUseAccessRequirementWidgetViewImpl(Binder binder){
+	public TermsOfUseAccessRequirementWidgetViewImpl(Binder binder, GlobalApplicationState globalAppState){
 		this.w = binder.createAndBindUi(this);
-		signTermsButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onSignTerms();
-			}
+		signTermsButton.addClickHandler(event -> {
+			presenter.onSignTerms();
 		});
-		w.addAttachHandler(new AttachEvent.Handler() {
-			
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				if (event.isAttached()) {
-					onAttachCallback.invoke();
-				}
+		loginButton.addClickHandler(event -> {
+			globalAppState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+		});
+		w.addAttachHandler(event -> {
+			if (event.isAttached()) {
+				onAttachCallback.invoke();
 			}
 		});
 	}
@@ -116,7 +116,8 @@ public class TermsOfUseAccessRequirementWidgetViewImpl implements TermsOfUseAcce
 	public void resetState() {
 		approvedHeading.setVisible(false);
 		unapprovedHeading.setVisible(false);
-		signTermsButton.setVisible(false);	
+		signTermsButton.setVisible(false);
+		loginButton.setVisible(false);
 	}
 	
 	@Override
@@ -151,5 +152,8 @@ public class TermsOfUseAccessRequirementWidgetViewImpl implements TermsOfUseAcce
 		manageAccessContainer.clear();
 		manageAccessContainer.add(w);
 	}
-
+	@Override
+	public void showLoginButton() {
+		loginButton.setVisible(true);
+	}
 }

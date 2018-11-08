@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
@@ -147,6 +148,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				WebConstants.FILE_HANDLE_ID_PARAM_KEY + "=" + fileHandleId;
 	}
 
+	@Override
+	public String getSessionCookieUrl() {
+		return GWTWrapperImpl.getRealGWTModuleBaseURL() + WebConstants.SESSION_COOKIE_SERVLET;
+	}
+	
 	@Override
 	public int randomNextInt() {
 		return Random.nextInt();
@@ -725,7 +731,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 			Notify.hideAll();
 			NotifySettings settings = DisplayUtils.getDefaultSettings();
 			settings.setType(NotifyType.INFO);
-			Notify.notify("Copied to clipboard", settings);
+			Notify.notify("", "Copied to clipboard", IconType.CHECK_CIRCLE, settings);
 		} catch (Throwable t) {
 			consoleError(t.getMessage());
 		}

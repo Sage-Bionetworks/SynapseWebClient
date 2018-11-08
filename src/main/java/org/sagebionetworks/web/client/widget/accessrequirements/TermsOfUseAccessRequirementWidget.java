@@ -108,7 +108,6 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	
 	public void setDataAccessSubmissionStatus(BasicAccessRequirementStatus status) {
 		// set up view based on DataAccessSubmission state
-		view.resetState();
 		if (status.getIsApproved()) {
 			view.showApprovedHeading();	
 		} else {
@@ -116,8 +115,16 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			view.showSignTermsButton();
 		}
 	}
-	
+	public void showAnonymous() {
+		view.showUnapprovedHeading();
+		view.showLoginButton();
+	}
 	public void refreshApprovalState() {
+		view.resetState();
+		if (!authController.isLoggedIn()) {
+			showAnonymous();
+			return;
+		}
 		dataAccessClient.getAccessRequirementStatus(ar.getId().toString(), new AsyncCallback<AccessRequirementStatus>() {
 			@Override
 			public void onFailure(Throwable caught) {

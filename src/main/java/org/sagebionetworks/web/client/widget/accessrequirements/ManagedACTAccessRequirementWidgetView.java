@@ -37,6 +37,7 @@ public interface ManagedACTAccessRequirementWidgetView extends IsWidget, Support
 	void hideButtonContainers();
 	void setReviewAccessRequestsWidgetContainerVisible(boolean visible);
 	void showExpirationDate(String dateString);
+	void showLoginButton();
 	/**
 	 * Presenter interface
 	 */

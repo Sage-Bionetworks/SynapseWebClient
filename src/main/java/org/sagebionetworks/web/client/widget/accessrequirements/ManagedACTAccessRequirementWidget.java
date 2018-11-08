@@ -167,7 +167,11 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 				break;
 		}
 	}
-	
+	public void showAnonymous() {
+		view.showUnapprovedHeading();
+		view.showLoginButton();
+	}
+
 	public void showUnapproved() {
 		view.showUnapprovedHeading();
 		view.showRequestAccessButton();
@@ -181,6 +185,10 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 	
 	public void refreshApprovalState() {
 		view.resetState();
+		if (!authController.isLoggedIn()) {
+			showAnonymous();
+			return;
+		}
 		dataAccessClient.getAccessRequirementStatus(ar.getId().toString(), new AsyncCallback<AccessRequirementStatus>() {
 			@Override
 			public void onFailure(Throwable caught) {

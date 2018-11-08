@@ -111,6 +111,8 @@ public class WebConstants {
 	public static final String FILE_HANDLE_ID_PARAM_KEY = "fileHandleId";
 	/** END FileHandleAssociation servlet params **/
 	
+	public static final String SESSION_TOKEN_KEY = "t";
+	public static final String EXPIRE_SESSION_TOKEN = "deleted";
 	public static final String ENTITY_PARAM_KEY = "entityId";
 	
 	public static final String TEAM_PARAM_KEY = "teamId";
@@ -185,6 +187,7 @@ public class WebConstants {
 	public static final String ALIAS_PARAM_KEY = "alias";
 	public static final String SLACK_SERVLET = "slack";
 	public static final String FILE_HANDLE_UPLOAD_SERVLET = "filehandle";
+	public static final String SESSION_COOKIE_SERVLET = "sessioncookie";
 	public static final String FILE_ENTITY_RESOLVER_SERVLET = "fileresolver";
 	public static final String JIRA_PROJECT_ID ="org.sagebionetworks.portal.jira_project_id";
 	public static final String JIRA_PROJECT_KEY ="org.sagebionetworks.portal.jira_project_key";

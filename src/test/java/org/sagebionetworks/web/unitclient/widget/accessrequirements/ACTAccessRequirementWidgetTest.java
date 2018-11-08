@@ -19,12 +19,10 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.dataaccess.BasicAccessRequirementStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -89,8 +87,6 @@ public class ACTAccessRequirementWidgetTest {
 	@Mock
 	PopupUtilsView mockPopupUtils;
 	@Mock
-	UserSessionData mockUserSessionData;
-	@Mock
 	UserProfile mockProfile;
 	@Mock
 	ReviewAccessorsButton mockManageAccessButton;
@@ -129,10 +125,10 @@ public class ACTAccessRequirementWidgetTest {
 		lazyLoadDataCallback = callbackCaptor.getValue();
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionStatus).when(mockDataAccessClient).getAccessRequirementStatus(anyString(), any(AsyncCallback.class));
 		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
-		when(mockAuthController.getCurrentUserSessionData()).thenReturn(mockUserSessionData);
-		when(mockUserSessionData.getProfile()).thenReturn(mockProfile);
+		when(mockAuthController.getCurrentUserProfile()).thenReturn(mockProfile);
 		when(mockProfile.getEmails()).thenReturn(Collections.singletonList("email@email.com"));
 		when(mockSubjectIds.get(anyInt())).thenReturn(new RestrictableObjectDescriptor());
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
 	}
 
 	@Test
@@ -171,6 +167,15 @@ public class ACTAccessRequirementWidgetTest {
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showApprovedHeading();
 		verify(mockView).showRequestApprovedMessage();
+	}
+	
+	@Test
+	public void testAnonymous() {
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+		lazyLoadDataCallback.invoke();
+		verify(mockView).showUnapprovedHeading();
+		verify(mockView).showLoginButton();
 	}
 	
 	@Test

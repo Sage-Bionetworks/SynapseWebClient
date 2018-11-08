@@ -9,6 +9,7 @@ import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -22,7 +23,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SessionTokenDetector;
+import org.sagebionetworks.web.client.SessionDetector;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -34,15 +35,13 @@ import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Down;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-/**
- * @author dburdick
- *
- */
 public class AuthenticationControllerImplTest {
 
 	AuthenticationControllerImpl authenticationController;
@@ -50,9 +49,6 @@ public class AuthenticationControllerImplTest {
 	CookieProvider mockCookieProvider;
 	@Mock
 	UserAccountServiceAsync mockUserAccountService;
-	UserSessionData sessionData;
-	@Mock
-	SessionStorage mockSessionStorage;
 	@Mock
 	ClientCache mockClientCache;
 	@Mock
@@ -62,147 +58,91 @@ public class AuthenticationControllerImplTest {
 	@Mock
 	PlaceChanger mockPlaceChanger;
 	@Mock
-	SessionTokenDetector mockSessionTokenDetector;
-	@Mock
 	SynapseJavascriptClient mockJsClient;
 	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	@Mock
 	Header mockHeader;
-	
-	AdapterFactory adapterFactory = new AdapterFactoryImpl();
+	@Mock
+	SessionDetector mockSessionDetector;
+	@Mock
+	Callback mockCallback;
+	@Captor
+	ArgumentCaptor<String> stringCaptor;
+	UserProfile profile;
+	UserSessionData usd;
 	public static final String USER_ID = "98208";
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
 		//by default, return a valid user session data if asked
-		sessionData = new UserSessionData();
-		sessionData.setIsSSO(false);
-		UserProfile profile = new UserProfile();
-		sessionData.setProfile(profile);
+		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).initSession(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("1111").when(mockUserAccountService).getCurrentSessionToken(any(AsyncCallback.class));
+		usd = new UserSessionData();
+		profile = new UserProfile();
 		profile.setOwnerId(USER_ID);
-		sessionData.setSession(new Session());
-		sessionData.getSession().setSessionToken("1111");
-		
-		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
+		usd.setProfile(profile);
+		Session session = new Session();
+		session.setSessionToken("1111");
+		session.setAcceptsTermsOfUse(true);
+		usd.setSession(session);
+		AsyncMockStubber.callSuccessWith(usd).when(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
 		when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
-		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
-		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockGinInjector, mockSynapseJSNIUtils);
+		authenticationController = new AuthenticationControllerImpl(mockUserAccountService, mockClientCache, mockCookieProvider, mockGinInjector, mockSynapseJSNIUtils);
 		when(mockGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockGinInjector.getHeader()).thenReturn(mockHeader);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		when(mockGinInjector.getSessionTokenDetector()).thenReturn(mockSessionTokenDetector);
+		when(mockGinInjector.getSessionDetector()).thenReturn(mockSessionDetector);
 	}
 	
 	@Test
 	public void testReloadUserSessionData() {
-		authenticationController.reloadUserSessionData();
-		verify(mockHeader).refresh();
-		//look for user session data in local cache
-		verify(mockClientCache).get(AuthenticationControllerImpl.USER_SESSION_DATA_CACHE_KEY);
+		authenticationController.reloadUserSessionData(mockCallback);
 		
-		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn(null);
-		assertFalse(authenticationController.isLoggedIn());
-		
-		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("");
-		assertFalse(authenticationController.isLoggedIn());
+		// attempt to get the current session
+		verify(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
+		assertTrue(authenticationController.isLoggedIn());
+		verify(mockCallback).invoke();
+		assertEquals(USER_ID, authenticationController.getCurrentUserPrincipalId());
 		
 		//and if we log out, then our full session has been lost and isLoggedIn always reports false
 		authenticationController.logoutUser();
 		
-		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
-		assertFalse(authenticationController.isLoggedIn());
-		
-		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn(null);
-		assertFalse(authenticationController.isLoggedIn());
-		
-		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("");
-		assertFalse(authenticationController.isLoggedIn());
+		assertNull(authenticationController.getCurrentUserPrincipalId());
 	}
 	
 	@Test
 	public void testReloadUserSessionDataNullToken() {
-		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn(null);
-		authenticationController.reloadUserSessionData();
-		//should not attempt to load session from cache
-		verify(mockClientCache, times(0)).get(AuthenticationControllerImpl.USER_SESSION_DATA_CACHE_KEY);
-	}
-
+		// when there is a null token, getting the current user session data will fail
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
 		
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testGetCurrentUserPrincipalId() throws Exception {
-		String principalId = "4321";
-		UserSessionData sessionData = new UserSessionData();
-		sessionData.setIsSSO(false);
-		UserProfile profile = new UserProfile();
-		profile.setOwnerId(principalId);
-		sessionData.setProfile(profile);
-		sessionData.setSession(new Session());
-		sessionData.getSession().setSessionToken("1234");
+		authenticationController.reloadUserSessionData(mockCallback);
 		
-		AsyncCallback<UserSessionData> callback = mock(AsyncCallback.class);
-		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));	
-		
-		// not logged in
+		assertFalse(authenticationController.isLoggedIn());
 		assertNull(authenticationController.getCurrentUserPrincipalId());
-		
-		// logged in
-		authenticationController.revalidateSession("token", callback);
-		assertEquals(principalId, authenticationController.getCurrentUserPrincipalId());	
-		
-		//try updating the cached profile (verify it updates the local storage cached value).
-		reset(mockClientCache);
-		UserProfile updatedProfile = new UserProfile();
-		updatedProfile.setOwnerId("888888888");
-		authenticationController.updateCachedProfile(updatedProfile);
-		assertEquals(updatedProfile, authenticationController.getCurrentUserSessionData().getProfile());
-		verify(mockClientCache).put(eq(AuthenticationControllerImpl.USER_SESSION_DATA_CACHE_KEY), anyString(), anyLong());
-		
-		// empty user profile
-		reset(mockSynapseJSNIUtils);
-		sessionData.setProfile(null);
-		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));	
-		authenticationController.revalidateSession("token", callback);
-		assertNull(authenticationController.getCurrentUserPrincipalId());
-		verify(mockSynapseJSNIUtils, never()).setAnalyticsUserId(anyString());
+		verify(mockCallback).invoke();
 	}
-	
-	@SuppressWarnings("unchecked")
+		
 	@Test
-	public void testGetCurrentUserBundle() throws Exception {
-		String principalId = "4321";
-		UserSessionData sessionData = new UserSessionData();
-		sessionData.setIsSSO(false);
-		UserProfile profile = new UserProfile();
-		profile.setOwnerId(principalId);
-		sessionData.setProfile(profile);
-		sessionData.setSession(new Session());
-		sessionData.getSession().setSessionToken("4321");
+	public void testGetCurrentUserPrincipalIdNullProfile() throws Exception {
+		usd.setProfile(null);
 		
+		authenticationController.reloadUserSessionData(mockCallback);
 		
-		AsyncCallback<UserSessionData> callback = mock(AsyncCallback.class);
-		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));	
-		
-		// not logged in
-		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn(null);
-		assertNull(authenticationController.getCurrentUserSessionData());
-		
-		// logged in
-		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
-		authenticationController.revalidateSession("token", callback);
-		assertEquals(sessionData, authenticationController.getCurrentUserSessionData());	
+		assertFalse(authenticationController.isLoggedIn());
+		assertNull(authenticationController.getCurrentUserPrincipalId());
+		verify(mockCallback).invoke();
 	}
 	
 	@Test
 	public void testLogout() {
 		authenticationController.logoutUser();
 		
-		verify(mockCookieProvider).removeCookie(CookieKeys.USER_LOGIN_TOKEN);
-		verify(mockSessionStorage).clear();
+		//sets session cookie
+		verify(mockJsClient).initSession(eq(WebConstants.EXPIRE_SESSION_TOKEN));
 		verify(mockClientCache).clear();
-		verify(mockSessionTokenDetector).initializeSessionTokenState();
+		verify(mockSessionDetector).initializeSessionTokenState();
 		verify(mockHeader).refresh();
 		verify(mockJsClient).logout();
 		verify(mockSynapseJSNIUtils).setAnalyticsUserId("");
@@ -259,9 +199,8 @@ public class AuthenticationControllerImplTest {
 		//verify the new receipt is cached
 		verify(mockClientCache).put(eq(username + AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT), eq(newAuthReceipt), anyLong());
 		
-		verify(loginCallback).onSuccess(any(UserSessionData.class));
-		verify(mockSessionTokenDetector).initializeSessionTokenState();
-		verify(mockHeader).refresh();
+		verify(loginCallback).onSuccess(any(UserProfile.class));
+		verify(mockSessionDetector).initializeSessionTokenState();
 		verify(mockSynapseJSNIUtils).setAnalyticsUserId(USER_ID);
 	}
 	
@@ -278,22 +217,6 @@ public class AuthenticationControllerImplTest {
 		
 		verify(loginCallback).onFailure(ex);
 	}
-	
-	@Test
-	public void testLoginUserFailureReadOnlyMode() {
-		//successfully log the user in, but put the stack into read only mode after login (so session token validation fails with a ReadOnlyException).
-		LoginResponse loginResponse = new LoginResponse();
-		loginResponse.setSessionToken("213344");
-		AsyncMockStubber.callSuccessWith(loginResponse).when(mockJsClient).login(any(LoginRequest.class), any(AsyncCallback.class));
-		ReadOnlyModeException ex = new ReadOnlyModeException();
-		AsyncMockStubber.callFailureWith(ex).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
-		String username = "testusername";
-		String password = "pw";
-		AsyncCallback loginCallback = mock(AsyncCallback.class);
-		
-		authenticationController.loginUser(username, password, loginCallback);
-		
-		verify(loginCallback, never()).onFailure(ex);
-		verify(mockPlaceChanger).goTo(any(Down.class));
-	}
+
+	// Note.  If login when the stack is in READ_ONLY mode, then the widgets SynapseAlert should send user to the Down page.
 }

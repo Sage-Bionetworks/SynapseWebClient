@@ -124,6 +124,7 @@ public class SelfSignAccessRequirementWidgetTest {
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(CURRENT_USER_ID);
 		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionStatus).when(mockDataAccessClient).getAccessRequirementStatus(anyString(), any(AsyncCallback.class));
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
 	}
 
 	@Test
@@ -146,6 +147,15 @@ public class SelfSignAccessRequirementWidgetTest {
 		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(true);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showApprovedHeading();
+	}
+	
+	@Test
+	public void testAnonymous() {
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		widget.setRequirement(mockAccessRequirement, mockRefreshCallback);
+		lazyLoadDataCallback.invoke();
+		verify(mockView).showUnapprovedHeading();
+		verify(mockView).showLoginButton();
 	}
 	
 	@Test
