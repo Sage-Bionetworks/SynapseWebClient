@@ -105,7 +105,10 @@ public class FacetColumnResultSliderRangeWidgetTest {
 		Double newMin = 3.0;
 		Double newMax = 6.0;
 		Range newRange = new Range(newMin, newMax);
-		widget.onFacetChange(newRange);
+		when(mockView.getRange()).thenReturn(newRange);
+		
+		widget.onFacetChange();
+
 		verify(mockOnFacetRequest).invoke(requestCaptor.capture());
 		FacetColumnRangeRequest request = requestCaptor.getValue();
 		assertEquals(Double.toString(newMin), request.getMin());
