@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget;
 import org.gwtbootstrap3.client.ui.html.Div;
 
 import com.google.gwt.core.shared.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -14,7 +15,6 @@ public class LoadingSpinner implements IsWidget {
 	
 	@UiField
 	Div loadingSpinnerDiv;
-	boolean isVisible = true;
 	
 	/**
 	 * ## Usage
@@ -35,7 +35,6 @@ public class LoadingSpinner implements IsWidget {
 	}
 	
 	public void setVisible(boolean visible) {
-		isVisible = visible;
 		loadingSpinnerDiv.setVisible(visible);
 	}
 	
@@ -45,9 +44,14 @@ public class LoadingSpinner implements IsWidget {
 	
 	public void setSize(String size) {
 		loadingSpinnerDiv.setSize(size, size);
-		loadingSpinnerDiv.getElement().setAttribute("style", "width:"+size + ";height:"+size+"; background-size:"+size + " " + size + ";");
-		loadingSpinnerDiv.setVisible(isVisible);
+		_setSize(loadingSpinnerDiv.getElement(), size);
 	}
+	
+	public static native void _setSize(Element elem, String size) /*-{
+		elem.style.width = size;
+		elem.style.height = size;
+		elem.style.backgroundSize = size + ' ' + size;
+	}-*/;
 	
 	public void setAddStyleNames(String styleNames) {
 		loadingSpinnerDiv.addStyleName(styleNames);
