@@ -132,14 +132,14 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			@Override
 			public void onSuccess(UserSessionData newData) {
 				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
+				currentUserSessionToken = newData.getSession().getSessionToken();
+				currentUserProfile = newData.getProfile();
+				ginInjector.getSessionDetector().initializeSessionTokenState();
 				if (!newData.getSession().getAcceptsTermsOfUse()) {
 					ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
 				} else {
-					currentUserSessionToken = newData.getSession().getSessionToken();
-					currentUserProfile = newData.getProfile();
 					jsniUtils.setAnalyticsUserId(getCurrentUserPrincipalId());
-					callback.onSuccess(newData.getProfile());
-					ginInjector.getSessionDetector().initializeSessionTokenState();	
+					callback.onSuccess(newData.getProfile());	
 				}
 			}
 		});
