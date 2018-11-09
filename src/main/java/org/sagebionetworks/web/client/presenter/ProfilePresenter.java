@@ -945,9 +945,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		
 		if (token.equals("oauth_bound")) {
 			view.showInfo(DisplayConstants.SUCCESSFULLY_LINKED_OAUTH2_ACCOUNT);
-			token = "v";
+			token = Profile.VIEW_PROFILE_TOKEN;
 		}
-		if (token.equals("v") || token.startsWith("v/") || token.isEmpty()) {
+		if (token.equals(Profile.VIEW_PROFILE_TOKEN) || token.startsWith(Profile.VIEW_PROFILE_TOKEN + "/") || token.isEmpty()) {
 			Place gotoPlace = null;
 			if (authenticationController.isLoggedIn()) {
 				//replace url with current user id

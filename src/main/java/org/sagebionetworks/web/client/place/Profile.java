@@ -9,6 +9,7 @@ import com.google.gwt.place.shared.Prefix;
 
 public class Profile extends Place{
 	public static final String EDIT_PROFILE_TOKEN="edit";
+	public static final String VIEW_PROFILE_TOKEN="v";
 	public static final String DELIMITER = "/"; 
 	
 	private String token;
