@@ -2,6 +2,7 @@ package org.sagebionetworks.web.server.servlet;
 
 import static org.sagebionetworks.web.client.cookie.CookieKeys.USER_LOGIN_TOKEN;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -12,7 +13,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
@@ -22,6 +24,7 @@ import org.sagebionetworks.web.shared.WebConstants;
  * Servlet for setting the session token HttpOnly cookie.
  */
 public class InitSessionServlet extends HttpServlet {
+	static private Log log = LogFactory.getLog(InitSessionServlet.class);
 	public static final String ROOT_PATH = "/";
 	public static final String SYNAPSE_ORG = ".synapse.org";
 	private static final long serialVersionUID = 1L;
@@ -47,7 +50,13 @@ public class InitSessionServlet extends HttpServlet {
 		
 		// return the Set-Cookie response with the session token
 		try {
-			String sessionJson = IOUtils.toString(request.getReader());
+			StringBuilder buffer = new StringBuilder();
+			BufferedReader reader = request.getReader();
+			String line;
+			while ((line = reader.readLine()) != null) {
+				buffer.append(line);
+			}
+			String sessionJson = buffer.toString();
 			JSONObjectAdapter adapter = new JSONObjectAdapterImpl(sessionJson);
 			Session s = new Session(adapter);
 			String sessionToken = s.getSessionToken();
@@ -73,6 +82,8 @@ public class InitSessionServlet extends HttpServlet {
 			}
 			response.addCookie(cookie);
 		} catch (Exception e) {
+			log.error(e);
+			e.printStackTrace();
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			response.getOutputStream().write("Invalid session token".getBytes("UTF-8"));
 			response.getOutputStream().flush();
