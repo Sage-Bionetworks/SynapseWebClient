@@ -4,7 +4,6 @@ import static org.sagebionetworks.web.client.cookie.CookieKeys.USER_LOGIN_TOKEN;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
