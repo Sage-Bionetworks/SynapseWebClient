@@ -2,7 +2,6 @@ package org.sagebionetworks.web.server.servlet;
 
 import static org.sagebionetworks.web.client.cookie.CookieKeys.USER_LOGIN_TOKEN;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -13,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sagebionetworks.repo.model.auth.Session;
@@ -50,13 +50,7 @@ public class InitSessionServlet extends HttpServlet {
 		
 		// return the Set-Cookie response with the session token
 		try {
-			StringBuilder buffer = new StringBuilder();
-			BufferedReader reader = request.getReader();
-			String line;
-			while ((line = reader.readLine()) != null) {
-				buffer.append(line);
-			}
-			String sessionJson = buffer.toString();
+			String sessionJson = IOUtils.toString(request.getReader());
 			JSONObjectAdapter adapter = new JSONObjectAdapterImpl(sessionJson);
 			Session s = new Session(adapter);
 			String sessionToken = s.getSessionToken();
@@ -85,7 +79,7 @@ public class InitSessionServlet extends HttpServlet {
 			log.error(e);
 			e.printStackTrace();
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			response.getOutputStream().write("Invalid session token".getBytes("UTF-8"));
+			response.getOutputStream().write(("Invalid session token - " + e.getMessage()).getBytes("UTF-8"));
 			response.getOutputStream().flush();
 		}
 	}
