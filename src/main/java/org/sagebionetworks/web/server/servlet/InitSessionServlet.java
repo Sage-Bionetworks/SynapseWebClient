@@ -26,7 +26,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 public class InitSessionServlet extends HttpServlet {
 	static private Log log = LogFactory.getLog(InitSessionServlet.class);
 	public static final String ROOT_PATH = "/";
-	public static final String SYNAPSE_ORG = ".synapse.org";
+	public static final String SYNAPSE_ORG = "synapse.org";
 	private static final long serialVersionUID = 1L;
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 	public static final int ONE_DAY_IN_SECONDS = 60*60*24;
@@ -71,7 +71,7 @@ public class InitSessionServlet extends HttpServlet {
 			
 			String domain = request.getServerName();
 			String lowerCaseDomain = domain.toLowerCase();
-			if (lowerCaseDomain.contains(SYNAPSE_ORG)) {
+			if (lowerCaseDomain.contains("."+SYNAPSE_ORG)) {
 				cookie.setDomain(SYNAPSE_ORG);
 			}
 			response.addCookie(cookie);
