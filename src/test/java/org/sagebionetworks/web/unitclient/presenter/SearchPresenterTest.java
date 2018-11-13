@@ -133,18 +133,6 @@ public class SearchPresenterTest {
 		assertEquals(new Synapse(term), SearchUtil.willRedirect(new Search(term))); 
 	}
 
-	@Test 
-	public void testGetAppliedFacets() {
-		List<KeyValue> facets = searchPresenter.getAppliedFacets();
-		boolean found = false;
-		for(KeyValue facet : facets) {
-			if("project".equals(facet.getValue()) && "node_type".equals(facet.getKey()))
-				found = true;
-
-		}
-		assertTrue(found);
-	}
-	
 	private List<KeyValue> getFacet(String facetName) {
 		List<KeyValue> facets = searchPresenter.getAppliedFacets();
 		List<KeyValue> foundFacets = new ArrayList<KeyValue>();
@@ -201,7 +189,8 @@ public class SearchPresenterTest {
 		assertEquals(facetValue, facetValues.get(0).getMin());
 		
 		searchPresenter.removeTimeFacetAndRefresh(facetName);
-		verify(mockSynapseClient, times(3)).search(any(SearchQuery.class), any(AsyncCallback.class)); // 4
+		//optimization.  if search is empty (no search term and no facets) then a search is not performed (empty results are shown).
+		verify(mockSynapseClient, times(2)).search(any(SearchQuery.class), any(AsyncCallback.class)); // 4
 		assertTrue(getTimeFacet(facetName).isEmpty());
 	}
 }

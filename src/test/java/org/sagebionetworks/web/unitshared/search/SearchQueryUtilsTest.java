@@ -33,8 +33,6 @@ public class SearchQueryUtilsTest {
 		
 		// verify boolean query
 		List<KeyValue> bq = query.getBooleanQuery();
-		assertEquals(1, bq.size());
-		assertEquals(SEARCH_KEY_NODE_TYPE, bq.get(0).getKey());
-		assertEquals(PROJECT_NODE_TYPE, bq.get(0).getValue());
+		assertEquals(0, bq.size());
 	}
 }
