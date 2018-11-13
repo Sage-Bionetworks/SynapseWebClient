@@ -14,7 +14,7 @@
 		<bh:Div ui:field="rangeUI" visible="false">
 			<g:HorizontalPanel verticalAlignment="ALIGN_MIDDLE">
 				<b3:RangeSlider ui:field="slider" min="0" max="100" step="5" value="[0,100]"/> 
-				<b:Button ui:field="applyButton" type="LINK" addStyleNames="margin-left-2" text="Apply" />
+				<b:Button ui:field="applyButton" type="LINK" addStyleNames="margin-left-15" text="Apply" />
 			</g:HorizontalPanel>
 			<bh:Span ui:field="minField" addStyleNames="margin-left-20"/><bh:Span text=":" addStyleNames="margin-left-5 margin-right-5" /><bh:Span ui:field="maxField"/>
 		</bh:Div>
