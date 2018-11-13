@@ -60,8 +60,8 @@ public class FacetColumnResultRangeWidgetTest {
 		verify(mockView).setSynAlert(any(Widget.class));
 		verify(mockSynapseAlert).clear();
 		verify(mockView).setColumnName(COLUMN_NAME);
-		verify(mockView, never()).setMin(anyString());
-		verify(mockView, never()).setMax(anyString());
+		verify(mockView).setMin(COLUMN_MIN);
+		verify(mockView).setMax(COLUMN_MAX);
 	}
 	
 	@Test
@@ -72,7 +72,7 @@ public class FacetColumnResultRangeWidgetTest {
 		verify(mockSynapseAlert).clear();
 		verify(mockView).setColumnName(COLUMN_NAME);
 		verify(mockView).setMin(Double.toString(minSelected));
-		verify(mockView, never()).setMax(anyString());
+		verify(mockView).setMax(COLUMN_MAX);
 	}
 	
 	@Test
@@ -82,7 +82,7 @@ public class FacetColumnResultRangeWidgetTest {
 		widget.configure(mockView, mockFacet, mockOnFacetRequest);
 		verify(mockSynapseAlert).clear();
 		verify(mockView).setColumnName(COLUMN_NAME);
-		verify(mockView, never()).setMin(anyString());
+		verify(mockView).setMin(COLUMN_MIN);
 		verify(mockView).setMax(Double.toString(maxSelected));
 	}
 
