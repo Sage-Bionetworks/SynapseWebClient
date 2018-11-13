@@ -56,18 +56,21 @@ public class FacetsWidget implements IsWidget {
 							// if there are no values found in the column, don't show the facet
 							if (rangeFacet.getColumnMin() != null) {
 								isShowingFacets = true;
+								
+								FacetColumnResultRangeWidget rangeWidget = ginInjector.getFacetColumnResultRangeWidget();
+								FacetColumnResultRangeView rangeView = null;
+								
 								if (ColumnType.INTEGER.equals(cm.getColumnType())) {
-									FacetColumnResultSliderRangeWidget rangeWidget = ginInjector.getFacetColumnResultSliderRangeWidget();
-									rangeWidget.configure(rangeFacet, facetChangedHandler);
-									view.add(rangeWidget);	
+									rangeView = ginInjector.getFacetColumnResultSliderRangeViewImpl();
 								} else if (ColumnType.DOUBLE.equals(cm.getColumnType())) {
-									FacetColumnResultRangeWidget rangeWidget = ginInjector.getFacetColumnResultRangeWidget();
-									rangeWidget.configure(rangeFacet, facetChangedHandler);
-									view.add(rangeWidget);
+									rangeView = ginInjector.getFacetColumnResultRangeViewImpl();
 								} else if (ColumnType.DATE.equals(cm.getColumnType())) {
-									FacetColumnResultDateRangeWidget rangeWidget = ginInjector.getFacetColumnResultDateRangeWidget();
-									rangeWidget.configure(rangeFacet, facetChangedHandler);
-									view.add(rangeWidget);
+									rangeView = ginInjector.getFacetColumnResultDateRangeViewImpl();
+								}
+
+								if (rangeView != null) {
+									rangeWidget.configure(rangeView, rangeFacet, facetChangedHandler);
+									view.add(rangeWidget);	
 								}
 							}
 							

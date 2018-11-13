@@ -22,18 +22,20 @@ public class FacetColumnResultRangeWidget implements IsWidget, FacetColumnResult
 	CallbackP<FacetColumnRequest> onFacetRequest;
 	SynapseAlert synAlert;
 	@Inject
-	public FacetColumnResultRangeWidget(FacetColumnResultRangeView view, SynapseAlert synAlert) {
-		this.view = view;
+	public FacetColumnResultRangeWidget(SynapseAlert synAlert) {
 		this.synAlert = synAlert;
-		view.setSynAlert(synAlert.asWidget());
-		view.setPresenter(this);
 	}
 	
-	public void configure(FacetColumnResultRange facet, CallbackP<FacetColumnRequest> onFacetRequest) {
+	public void configure(FacetColumnResultRangeView view, FacetColumnResultRange facet, CallbackP<FacetColumnRequest> onFacetRequest) {
+		this.view = view;
+		view.setSynAlert(synAlert.asWidget());
+		view.setPresenter(this);
 		synAlert.clear();
 		this.facet = facet;
 		this.onFacetRequest = onFacetRequest;
 		view.setColumnName(facet.getColumnName());
+		view.setLowerBound(facet.getColumnMin());
+		view.setUpperBound(facet.getColumnMax());
 		boolean isAny = facet.getSelectedMin() == null && facet.getSelectedMax() == null;
 		boolean isNotSetFilter = (facet.getSelectedMin() != null && facet.getSelectedMin().equals(TableConstants.NULL_VALUE_KEYWORD)) ||
 				(facet.getSelectedMax() != null && facet.getSelectedMax().equals(TableConstants.NULL_VALUE_KEYWORD));

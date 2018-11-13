@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results.facets;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
-import java.util.Date;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,8 +18,6 @@ import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnResultRange;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeView;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeView;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeWidget;
 
@@ -48,21 +47,17 @@ public class FacetColumnResultRangeWidgetTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new FacetColumnResultRangeWidget(mockView, mockSynapseAlert);
+		widget = new FacetColumnResultRangeWidget(mockSynapseAlert);
 		when(mockFacet.getColumnName()).thenReturn(COLUMN_NAME);
 		when(mockFacet.getColumnMin()).thenReturn(COLUMN_MIN);
 		when(mockFacet.getColumnMax()).thenReturn(COLUMN_MAX);
 	}
-
-	@Test
-	public void testConstruction() {
-		verify(mockView).setPresenter(widget);
-		verify(mockView).setSynAlert(any(Widget.class));
-	}
 	
 	@Test
 	public void testConfigureNoMinMaxSelected() {
-		widget.configure(mockFacet, mockOnFacetRequest);
+		widget.configure(mockView, mockFacet, mockOnFacetRequest);
+		verify(mockView).setPresenter(widget);
+		verify(mockView).setSynAlert(any(Widget.class));
 		verify(mockSynapseAlert).clear();
 		verify(mockView).setColumnName(COLUMN_NAME);
 		verify(mockView, never()).setMin(anyString());
@@ -73,7 +68,7 @@ public class FacetColumnResultRangeWidgetTest {
 	public void testConfigureMinSelected() {
 		Double minSelected = 22.01;
 		when(mockFacet.getSelectedMin()).thenReturn(Double.toString(minSelected));
-		widget.configure(mockFacet, mockOnFacetRequest);
+		widget.configure(mockView, mockFacet, mockOnFacetRequest);
 		verify(mockSynapseAlert).clear();
 		verify(mockView).setColumnName(COLUMN_NAME);
 		verify(mockView).setMin(Double.toString(minSelected));
@@ -84,7 +79,7 @@ public class FacetColumnResultRangeWidgetTest {
 	public void testConfigureMaxSelected() {
 		Double maxSelected = 500.01;
 		when(mockFacet.getSelectedMax()).thenReturn(Double.toString(maxSelected));
-		widget.configure(mockFacet, mockOnFacetRequest);
+		widget.configure(mockView, mockFacet, mockOnFacetRequest);
 		verify(mockSynapseAlert).clear();
 		verify(mockView).setColumnName(COLUMN_NAME);
 		verify(mockView, never()).setMin(anyString());
@@ -93,7 +88,7 @@ public class FacetColumnResultRangeWidgetTest {
 
 	@Test
 	public void testOnFacetChange() {
-		widget.configure(mockFacet, mockOnFacetRequest);
+		widget.configure(mockView, mockFacet, mockOnFacetRequest);
 		
 		widget.onFacetChange();
 		verify(mockOnFacetRequest).invoke(requestCaptor.capture());
@@ -104,8 +99,9 @@ public class FacetColumnResultRangeWidgetTest {
 
 	@Test
 	public void testAsWidget() {
+		widget.configure(mockView, mockFacet, mockOnFacetRequest);
+		
 		widget.asWidget();
 		verify(mockView).asWidget();
 	}
-
 }

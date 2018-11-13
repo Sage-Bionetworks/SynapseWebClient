@@ -19,4 +19,9 @@ public interface FacetColumnResultRangeView extends IsWidget {
 	void setIsNotSet();
 	boolean isAnyValue();
 	boolean isNotSet();
+	
+	// slider view requires the lowerbound and upperbound (which it uses to determine the stepsize too). 
+	// These are no-ops for other range types
+	void setLowerBound(String lowerbound);
+	void setUpperBound(String upperbound);
 }

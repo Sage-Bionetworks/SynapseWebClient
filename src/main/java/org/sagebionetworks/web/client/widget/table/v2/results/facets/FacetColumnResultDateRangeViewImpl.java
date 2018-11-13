@@ -14,7 +14,7 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class FacetColumnResultDateRangeViewImpl implements FacetColumnResultDateRangeView {
+public class FacetColumnResultDateRangeViewImpl implements FacetColumnResultRangeView {
 	
 	public interface Binder extends UiBinder<Widget, FacetColumnResultDateRangeViewImpl> {}
 	@UiField
@@ -68,21 +68,27 @@ public class FacetColumnResultDateRangeViewImpl implements FacetColumnResultDate
 	}
 	
 	@Override
-	public Date getMin() {
-		return minDateTimePicker.getValue();
+	public String getMin() {
+		if (minDateTimePicker.getValue() != null) {
+			return Long.toString(minDateTimePicker.getValue().getTime());
+		}
+		return null;
 	}
 	@Override
-	public void setMin(Date min) {
-		minDateTimePicker.setValue(min);
+	public void setMin(String min) {
+		minDateTimePicker.setValue(parseDate(min));
 	}
 	@Override
-	public Date getMax() {
-		return maxDateTimePicker.getValue();
+	public String getMax() {
+		if (maxDateTimePicker.getValue() != null) {
+			return Long.toString(maxDateTimePicker.getValue().getTime());
+		}
+		return null;
 	}
 	
 	@Override
-	public void setMax(Date max) {
-		maxDateTimePicker.setValue(max);
+	public void setMax(String max) {
+		maxDateTimePicker.setValue(parseDate(max));
 	}
 	
 	@Override
@@ -119,5 +125,22 @@ public class FacetColumnResultDateRangeViewImpl implements FacetColumnResultDate
 	public void setIsRange() {
 		rangeRadio.setValue(true, true);
 		rangeUI.setVisible(true);
+	}
+	
+	public static Date parseDate(String s) {
+		Date number = null;
+		if (s != null) {
+			number = new Date(Long.parseLong(s));
+		}
+	    return number;
+	}
+
+	@Override
+	public void setLowerBound(String lowerbound) {
+		// no-op
+	}
+	@Override
+	public void setUpperBound(String upperbound) {
+		// no-op
 	}
 }

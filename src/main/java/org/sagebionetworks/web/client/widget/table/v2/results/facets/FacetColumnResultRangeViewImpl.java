@@ -125,4 +125,12 @@ public class FacetColumnResultRangeViewImpl implements FacetColumnResultRangeVie
 		rangeRadio.setValue(true, true);
 		rangeUI.setVisible(true);
 	}
+	@Override
+	public void setLowerBound(String lowerbound) {
+		// no-op
+	}
+	@Override
+	public void setUpperBound(String upperbound) {
+		// no-op
+	}
 }

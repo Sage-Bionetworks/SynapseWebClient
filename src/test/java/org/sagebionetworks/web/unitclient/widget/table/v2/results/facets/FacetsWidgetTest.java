@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results.facets;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +26,10 @@ import org.sagebionetworks.repo.model.table.FacetType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.DivView;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeWidget;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultSliderRangeWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultSliderRangeViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 
@@ -49,11 +54,13 @@ public class FacetsWidgetTest {
 	@Mock
 	FacetColumnResultValuesWidget mockFacetColumnResultValuesWidget;
 	@Mock
-	FacetColumnResultSliderRangeWidget mockFacetColumnResultSliderRangeWidget;
-	@Mock
 	FacetColumnResultRangeWidget mockFacetColumnResultRangeWidget;
 	@Mock
-	FacetColumnResultDateRangeWidget mockFacetColumnResultDateRangeWidget;
+	FacetColumnResultRangeViewImpl mockFacetColumnResultRangeView;
+	@Mock
+	FacetColumnResultDateRangeViewImpl mockFacetColumnResultDateView;
+	@Mock
+	FacetColumnResultSliderRangeViewImpl mockFacetColumnResultSliderView;
 	
 	FacetsWidget widget;
 	List<FacetColumnResult> facets;
@@ -74,9 +81,11 @@ public class FacetsWidgetTest {
 		when(mockFacetColumnResultRange.getFacetType()).thenReturn(FacetType.range);
 		
 		when(mockGinInjector.getFacetColumnResultValuesWidget()).thenReturn(mockFacetColumnResultValuesWidget);
-		when(mockGinInjector.getFacetColumnResultSliderRangeWidget()).thenReturn(mockFacetColumnResultSliderRangeWidget);
 		when(mockGinInjector.getFacetColumnResultRangeWidget()).thenReturn(mockFacetColumnResultRangeWidget);
-		when(mockGinInjector.getFacetColumnResultDateRangeWidget()).thenReturn(mockFacetColumnResultDateRangeWidget);
+		
+		when(mockGinInjector.getFacetColumnResultRangeViewImpl()).thenReturn(mockFacetColumnResultRangeView);
+		when(mockGinInjector.getFacetColumnResultSliderRangeViewImpl()).thenReturn(mockFacetColumnResultSliderView);
+		when(mockGinInjector.getFacetColumnResultDateRangeViewImpl()).thenReturn(mockFacetColumnResultDateView);
 		
 		when(mockFacetColumnResultRange.getColumnMin()).thenReturn("3");
 		when(mockFacetColumnResultRange.getColumnMax()).thenReturn("120");
@@ -158,7 +167,7 @@ public class FacetsWidgetTest {
 		assertTrue(widget.isShowingFacets());
 		verify(mockView).clear();
 		verify(mockView).add(any(IsWidget.class));
-		verify(mockFacetColumnResultSliderRangeWidget).configure(mockFacetColumnResultRange, mockFacetChangedHandler);
+		verify(mockFacetColumnResultRangeWidget).configure(mockFacetColumnResultSliderView, mockFacetColumnResultRange, mockFacetChangedHandler);
 	}
 
 	@Test
@@ -169,7 +178,7 @@ public class FacetsWidgetTest {
 		assertTrue(widget.isShowingFacets());
 		verify(mockView).clear();
 		verify(mockView).add(any(IsWidget.class));
-		verify(mockFacetColumnResultRangeWidget).configure(mockFacetColumnResultRange, mockFacetChangedHandler);
+		verify(mockFacetColumnResultRangeWidget).configure(mockFacetColumnResultRangeView, mockFacetColumnResultRange, mockFacetChangedHandler);
 	}
 	
 	@Test
@@ -180,9 +189,8 @@ public class FacetsWidgetTest {
 		assertTrue(widget.isShowingFacets());
 		verify(mockView).clear();
 		verify(mockView).add(any(IsWidget.class));
-		verify(mockFacetColumnResultDateRangeWidget).configure(mockFacetColumnResultRange, mockFacetChangedHandler);
+		verify(mockFacetColumnResultRangeWidget).configure(mockFacetColumnResultDateView, mockFacetColumnResultRange, mockFacetChangedHandler);
 	}
-
 
 	@Test
 	public void testAsWidget() {

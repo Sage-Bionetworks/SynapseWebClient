@@ -11,12 +11,11 @@ import org.gwtbootstrap3.extras.slider.client.ui.base.event.SlideStopHandler;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultSliderRangeView {
-	
+public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultRangeView {
+	public static final int NUMBER_OF_STEPS = 200;
 	public interface Binder extends UiBinder<Widget, FacetColumnResultSliderRangeViewImpl> {	}
 	@UiField
 	Strong columnName;
@@ -40,8 +39,10 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultSl
 	Radio rangeRadio;
 	@UiField
 	Div rangeUI;
+	@UiField
+	Div synAlertContainer;
 	Range currentRange;
-	
+	Double currentSelectedMin, currentSelectedMax, currentLowerbound, currentUpperbound;
 	@Inject
 	public FacetColumnResultSliderRangeViewImpl(Binder binder){
 		w = binder.createAndBindUi(this);
@@ -68,21 +69,28 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultSl
 
 	
 	@Override
-	public void setMin(double min) {
-		slider.setMin(min);
+	public void setMin(String min) {
+		if (min != null) {
+			currentSelectedMin = Double.valueOf(min);
+		}
+		updateRange();
 	}
 	
 	@Override
-	public void setMax(double max) {
-		slider.setMax(max);
+	public void setMax(String max) {
+		if (max != null) {
+			currentSelectedMin = Double.valueOf(max);
+		}
+		updateRange();
 	}
 	
-	@Override
-	public void setRange(Range range) {
-		currentRange = range;
-		slider.setValue(range);
-		minField.setText(range.getMinValue() + "");
-		maxField.setText(range.getMaxValue() + "");
+	private void updateRange() {
+		if (currentSelectedMin != null && currentSelectedMax != null) {
+			currentRange = new Range(currentSelectedMin, currentSelectedMax);
+			slider.setValue(range);
+			minField.setText(range.getMinValue() + "");
+			maxField.setText(range.getMaxValue() + "");
+		}
 	}
 	
 	@Override
@@ -94,10 +102,7 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultSl
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-	@Override
-	public void setSliderStepSize(double step) {
-		slider.setStep(step);
-	}
+	
 	@Override
 	public void setColumnName(String name) {
 		columnName.setText(name);
@@ -106,10 +111,7 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultSl
 		anyRadio.setName(radioName);
 		rangeRadio.setName(radioName);
 	}
-	@Override
-	public Range getRange() {
-		return currentRange;
-	}
+	
 	@Override
 	public boolean isNotSet() {
 		return notSetRadio.getValue();
@@ -130,5 +132,57 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultSl
 	public void setIsRange() {
 		rangeRadio.setValue(true, true);
 		rangeUI.setVisible(true);
+	}
+
+	@Override
+	public String getMin() {
+		return Double.toString(currentRange.getMinValue());
+	}
+
+	@Override
+	public String getMax() {
+		return Double.toString(currentRange.getMaxValue());
+	}
+
+	@Override
+	public void setSynAlert(Widget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
+	}
+
+	@Override
+	public void setLowerBound(String lowerbound) {
+		if (lowerbound != null) {
+			currentLowerbound = Double.parseDouble(lowerbound);
+			slider.setMin(currentLowerbound);
+		}
+		updateStepSize();
+	}
+
+	@Override
+	public void setUpperBound(String upperbound) {
+		if (upperbound != null) {
+			currentUpperbound = Double.parseDouble(upperbound);
+			slider.setMax(currentUpperbound);
+		}
+		updateStepSize();
+	}
+	
+	private void updateStepSize() {
+		if (currentLowerbound != null && currentUpperbound != null) {
+			double stepSize = getStepSize(currentLowerbound, currentUpperbound);
+			slider.setStep(stepSize);
+		}
+	}
+	
+	public double getStepSize(Number min, Number max) {
+		double stepSize = 1;
+		if (min != null && max != null) {
+			stepSize = Math.round((max.doubleValue() - min.doubleValue()) / NUMBER_OF_STEPS);
+			if (stepSize < 1) {
+				stepSize = 1;
+			}
+		}
+		return stepSize;
 	}
 }
