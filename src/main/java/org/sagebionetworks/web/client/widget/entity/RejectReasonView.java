@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import com.google.gwt.user.client.ui.Widget;
-import org.sagebionetworks.web.client.utils.Callback;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -11,12 +8,13 @@ import com.google.gwt.user.client.ui.IsWidget;
  */
 public interface RejectReasonView extends IsWidget {
 
-
     /**
      * @return String representation of rejected reason
      */
     String getValue();
 
+    String getSelectedCheckboxText();
+    
     /**
      * Show an error message..
      * @param error
@@ -51,18 +49,6 @@ public interface RejectReasonView extends IsWidget {
      */
     void setPresenter (Presenter presenter);
 
-    boolean isOptionOneUsed();
-
-    boolean isOptionTwoUsed();
-
-    boolean isOptionThreeUsed();
-
-    boolean isOptionFourUsed();
-
-    boolean isOptionFiveUsed();
-
-    String getCustomTextResponse();
-
     /**
      * Presenter interface
      */
@@ -70,6 +56,4 @@ public interface RejectReasonView extends IsWidget {
         void updateResponse();
         void onSave();
     }
-
-
 }
