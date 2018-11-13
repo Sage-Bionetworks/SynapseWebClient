@@ -15,7 +15,7 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
     public static String TEMPLATE_HEADER_THANKS = ",\n\nThank you for submitting your Synapse" +
             " profile for validation. Before I can accept your request, you need to:\n";
     public static String TEMPLATE_HEADER_SIGNATURE = 
-    		"Please contact us at act@sagebionetworks.org if you have any questions.\n" + 
+    		"\nPlease contact us at act@sagebionetworks.org if you have any questions.\n" + 
     		"\n" + 
     		"Regards,\n" + 
     		"Access and Compliance Team (ACT)\n" + 

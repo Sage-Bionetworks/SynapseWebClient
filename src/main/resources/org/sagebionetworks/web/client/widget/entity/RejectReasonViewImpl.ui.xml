@@ -15,7 +15,7 @@
                     <b:CheckBox ui:field="orcIDPublicOption" text="You must set your ORCID profile to be publicly viewable. For help with this process, please see the ORCID support documentation: https://support.orcid.org/hc/en-us/articles/360006897614-Visibility-settings "/>
                     <b:CheckBox ui:field="physicallyInitialOption" text="Please print the Synapse Oath and completely fill it out by initialing each box, and then signing and dating the bottom of the sheet before scanning and uploading it. Here is the link to the Oath: https://docs.synapse.org/assets/other/oath.html "/>
                     <b:CheckBox ui:field="submitDocsOption" text="Please submit an accepted form of identity attestation documentation. A list of all acceptable forms of documentation can be found here: https://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#acceptable-documentation-for-identity-verification "/>
-                    <b:CheckBox ui:field="customTextOption"/>
+                    <b:CheckBox ui:field="customTextOption" text="Custom text"/>
                     <bh:Div >
                         <b:TextArea ui:field="customText" visibleLines="5" visible="false" placeholder="Custom text to insert"/>
                     </bh:Div>
