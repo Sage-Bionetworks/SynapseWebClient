@@ -13,7 +13,7 @@
 		<bh:Span ui:field="fileCountSpan" marginRight="20" />
 		<b:Icon type="DATABASE" marginRight="10" addStyleNames="black-25-percent font-size-17"/>
 		<bh:Span ui:field="fileSizeSpan" marginRight="20" />
-		<b:Icon type="SYN_TIMER" marginRight="10" addStyleNames="black-25-percent font-size-17"/>
+		<b:Icon type="CLOCK_O" marginRight="10" addStyleNames="black-25-percent font-size-17"/>
 		<bh:Span ui:field="estimatedTimeSpan" marginRight="20" />
 		<bh:Span ui:field="estimatedTimeLoading" marginRight="20" addStyleNames="inline-block movedown-4" visible="false">
 			<w:LoadingSpinner ui:field="spinner" size="20px"/>

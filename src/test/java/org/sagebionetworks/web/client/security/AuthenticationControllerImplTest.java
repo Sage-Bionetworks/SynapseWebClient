@@ -35,11 +35,14 @@ import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Down;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class AuthenticationControllerImplTest {
@@ -69,6 +72,10 @@ public class AuthenticationControllerImplTest {
 	Callback mockCallback;
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
+	@Mock
+	AsyncCallback<UserProfile> mockUserProfileCallback;
+	@Captor
+	ArgumentCaptor<Place> placeCaptor;
 	UserProfile profile;
 	UserSessionData usd;
 	public static final String USER_ID = "98208";
@@ -202,6 +209,23 @@ public class AuthenticationControllerImplTest {
 		verify(loginCallback).onSuccess(any(UserProfile.class));
 		verify(mockSessionDetector).initializeSessionTokenState();
 		verify(mockSynapseJSNIUtils).setAnalyticsUserId(USER_ID);
+	}
+	
+	@Test
+	public void testLoginUserNotAcceptedTermsOfUse() {
+		usd.getSession().setAcceptsTermsOfUse(false);
+		usd.setProfile(null);  //profile is not returned in this case
+		
+		authenticationController.initializeFromExistingSessionCookie(mockUserProfileCallback);
+		
+		verify(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
+		assertEquals(usd.getSession().getSessionToken(), authenticationController.getCurrentUserSessionToken());
+		assertNull(authenticationController.getCurrentUserProfile());
+		verify(mockSessionDetector).initializeSessionTokenState();
+		verify(mockPlaceChanger).goTo(placeCaptor.capture());
+		Place place = placeCaptor.getValue();
+		assertTrue(place instanceof LoginPlace);
+		assertEquals(LoginPlace.SHOW_TOU,((LoginPlace)place).toToken());
 	}
 	
 	@Test
