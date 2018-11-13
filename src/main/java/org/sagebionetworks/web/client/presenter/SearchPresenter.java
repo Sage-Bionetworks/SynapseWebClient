@@ -342,9 +342,10 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	}
 
 	private boolean isEmptyQuery() {
-		return (currentSearch.getQueryTerm() == null || currentSearch.getQueryTerm().size() == 0 
+		return (currentSearch.getQueryTerm() == null || currentSearch.getQueryTerm().size() == 0
 				|| (currentSearch.getQueryTerm().size() == 1 && "".equals(currentSearch.getQueryTerm().get(0))))
-				&& (currentSearch.getBooleanQuery() == null || currentSearch.getBooleanQuery().size() == 0);
+				&& (currentSearch.getBooleanQuery() == null || currentSearch.getBooleanQuery().size() == 0)
+				&& (currentSearch.getRangeQuery() == null || currentSearch.getRangeQuery().size() == 0);
 	}
 
 
