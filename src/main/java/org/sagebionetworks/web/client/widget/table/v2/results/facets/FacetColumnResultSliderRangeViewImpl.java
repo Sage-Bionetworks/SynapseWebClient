@@ -1,13 +1,12 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.gwtbootstrap3.extras.slider.client.ui.Range;
 import org.gwtbootstrap3.extras.slider.client.ui.RangeSlider;
-import org.gwtbootstrap3.extras.slider.client.ui.base.event.SlideStopEvent;
-import org.gwtbootstrap3.extras.slider.client.ui.base.event.SlideStopHandler;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -29,7 +28,6 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultRa
 	
 	Widget w;
 	Presenter presenter;
-	Range range;
 	
 	@UiField
 	Radio notSetRadio;
@@ -41,18 +39,19 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultRa
 	Div rangeUI;
 	@UiField
 	Div synAlertContainer;
+	@UiField
+	Button applyButton;
 	Range currentRange;
 	Double currentSelectedMin, currentSelectedMax, currentLowerbound, currentUpperbound;
 	@Inject
 	public FacetColumnResultSliderRangeViewImpl(Binder binder){
 		w = binder.createAndBindUi(this);
 		slider.setEnabled(true);
-		slider.addSlideStopHandler(new SlideStopHandler<Range>() {
-			@Override
-			public void onSlideStop(SlideStopEvent<Range> event) {
-				currentRange = event.getValue();
-				presenter.onFacetChange();
-			}
+		slider.addSlideStopHandler(event -> {
+			currentRange = event.getValue();
+		});
+		applyButton.addClickHandler(event -> {
+			presenter.onFacetChange();
 		});
 		notSetRadio.addClickHandler(event-> {
 			rangeUI.setVisible(false);
@@ -79,7 +78,7 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultRa
 	@Override
 	public void setMax(String max) {
 		if (max != null) {
-			currentSelectedMin = Double.valueOf(max);
+			currentSelectedMax = Double.valueOf(max);
 		}
 		updateRange();
 	}
@@ -87,9 +86,9 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultRa
 	private void updateRange() {
 		if (currentSelectedMin != null && currentSelectedMax != null) {
 			currentRange = new Range(currentSelectedMin, currentSelectedMax);
-			slider.setValue(range);
-			minField.setText(range.getMinValue() + "");
-			maxField.setText(range.getMaxValue() + "");
+			slider.setValue(currentRange);
+			minField.setText(currentRange.getMinValue() + "");
+			maxField.setText(currentRange.getMaxValue() + "");
 		}
 	}
 	

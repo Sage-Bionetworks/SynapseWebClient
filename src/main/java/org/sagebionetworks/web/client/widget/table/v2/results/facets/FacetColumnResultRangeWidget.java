@@ -36,6 +36,9 @@ public class FacetColumnResultRangeWidget implements IsWidget, FacetColumnResult
 		view.setColumnName(facet.getColumnName());
 		view.setLowerBound(facet.getColumnMin());
 		view.setUpperBound(facet.getColumnMax());
+		//by default, set the range to the lowerbound/upperbound
+		view.setMin(facet.getColumnMin());
+		view.setMax(facet.getColumnMax());
 		boolean isAny = facet.getSelectedMin() == null && facet.getSelectedMax() == null;
 		boolean isNotSetFilter = (facet.getSelectedMin() != null && facet.getSelectedMin().equals(TableConstants.NULL_VALUE_KEYWORD)) ||
 				(facet.getSelectedMax() != null && facet.getSelectedMax().equals(TableConstants.NULL_VALUE_KEYWORD));
