@@ -65,7 +65,7 @@
 		    		<bh:Div addStyleNames="margin-bottom-5 padding-10 light-border">
 		    			<bh:Div addStyleNames="highlight-title">
 			    			<bh:Text>Members (</bh:Text>
-			    			<bh:Text ui:field="totalMemberCountField" />
+			    			<bh:Div ui:field="memberCountContainer" addStyleNames="inline-block"/>
 			    			<bh:Text>)</bh:Text>
 			    		</bh:Div>
 			    		<g:SimplePanel ui:field="memberListPanel"/>

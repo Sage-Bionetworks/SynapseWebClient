@@ -19,10 +19,6 @@ public class TeamMemberCountWidget implements WidgetRendererPresenter {
 	SynapseClientAsync synapseClient;
 	TeamMemberCountView view;
 	SynapseAlert synAlert;
-	private String teamId;
-	
-	private static final Integer LIMIT = 1;
-	private static final Integer OFFSET = 0;
 	
 	@Inject
 	public TeamMemberCountWidget(TeamMemberCountView view,
@@ -38,22 +34,25 @@ public class TeamMemberCountWidget implements WidgetRendererPresenter {
 	@Override
 	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		synAlert.clear();
-		teamId = widgetDescriptor.get(WidgetConstants.TEAM_ID_KEY);
+		String teamId = widgetDescriptor.get(WidgetConstants.TEAM_ID_KEY);
 		if (teamId == null) {
 			synAlert.showError(WidgetConstants.TEAM_ID_KEY + " is required.");
 		} else {
-			synapseClient.getTeamMemberCount(teamId, new AsyncCallback<Long>() {
-				@Override
-				public void onSuccess(Long count) {
-					view.setCount(count.toString());
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					synAlert.handleException(caught);
-				}
-			});
+			configure(teamId);
 		}
-		
+	}
+	
+	public void configure(String teamId) {
+		synapseClient.getTeamMemberCount(teamId, new AsyncCallback<Long>() {
+			@Override
+			public void onSuccess(Long count) {
+				view.setCount(count.toString());
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		});
 	}
 	
 	@Override
