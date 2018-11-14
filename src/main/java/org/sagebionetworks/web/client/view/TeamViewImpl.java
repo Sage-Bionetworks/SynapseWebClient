@@ -7,19 +7,15 @@ import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.Linkify;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -28,6 +24,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -61,7 +58,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@UiField
 	SimplePanel memberListPanel;
 	@UiField
-	Text totalMemberCountField;
+	Div memberCountContainer;
 	@UiField
 	Span publicJoinField;
 	@UiField
@@ -271,8 +268,9 @@ public class TeamViewImpl extends Composite implements TeamView {
 	}
 
 	@Override
-	public void setMemberCountShown(String memberCount) {
-		totalMemberCountField.setText(memberCount);
+	public void setMemberCountWidget(IsWidget widget) {
+		memberCountContainer.clear();
+		memberCountContainer.add(widget);
 	}
 
 	@Override

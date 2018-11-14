@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.TeamView;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberCountWidget;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
@@ -99,11 +100,10 @@ public class TeamPresenterTest {
 	CookieProvider mockCookies;
 	@Mock
 	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
-	
+	@Mock
+	TeamMemberCountWidget mockTeamMemberCountWidget;
 	@Captor
 	ArgumentCaptor<CallbackP<Boolean>> callbackPcaptor;
-	@Captor
-	ArgumentCaptor<CallbackP<Long>> callbackPLongCaptor;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
 	
@@ -113,7 +113,7 @@ public class TeamPresenterTest {
 				mockSynClient, mockSynAlert, mockLeaveModal, mockDeleteModal, mockEditModal, 
 				mockInviteModal, mockJoinWidget, mockMemberListWidget, 
 				mockOpenMembershipRequestsWidget, mockOpenUserInvitationsWidget, mockGoogleMap, mockCookies,
-				mockIsACTMemberAsyncHandler);
+				mockIsACTMemberAsyncHandler, mockTeamMemberCountWidget);
 		when(mockTeam.getName()).thenReturn(teamName);
 		AsyncMockStubber.callSuccessWith(mockTeamBundle).when(mockSynClient).getTeamBundle(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		
@@ -170,9 +170,9 @@ public class TeamPresenterTest {
 		
 		//once
 		verify(mockView).setPublicJoinVisible(canPublicJoin);
-		verify(mockView).setMemberCountShown(totalMembershipCount.toString());
+		verify(mockTeamMemberCountWidget).configure(eq(teamId));
 		verify(mockView).setMediaObjectPanel(mockTeam);
-		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class), any(CallbackP.class));
+		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockView).showMemberMenuItems();
 		verify(mockOpenMembershipRequestsWidget).setVisible(true);
 		verify(mockView).showAdminMenuItems();
@@ -206,9 +206,8 @@ public class TeamPresenterTest {
 		
 		//once
 		verify(mockView).setPublicJoinVisible(false);
-		verify(mockView).setMemberCountShown(totalMembershipCount.toString());
 		verify(mockView).setMediaObjectPanel(mockTeam);
-		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class), any(CallbackP.class));
+		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockJoinWidget).configure(eq(teamId), anyBoolean(), eq(mockTeamMembershipStatus), 
 				any(Callback.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
 		verify(mockOpenMembershipRequestsWidget).setVisible(false);
@@ -228,9 +227,8 @@ public class TeamPresenterTest {
 		
 		//once
 		verify(mockView).setPublicJoinVisible(canPublicJoin);
-		verify(mockView).setMemberCountShown(totalMembershipCount.toString());
 		verify(mockView).setMediaObjectPanel(mockTeam);
-		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class), any(CallbackP.class));
+		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockView).showMemberMenuItems();
 		
 		//never
@@ -251,22 +249,6 @@ public class TeamPresenterTest {
 		verify(mockOpenMembershipRequestsWidget).setVisible(false);
 	}
 	
-	@Test
-	public void testUpdateMemberCount() {	
-		boolean isAdmin = false;
-		when(mockTeamBundle.isUserAdmin()).thenReturn(isAdmin);
-		when(mockTeamMembershipStatus.getIsMember()).thenReturn(true);
-		presenter.refresh(teamId);
-		
-		verify(mockView).setMemberCountShown(totalMembershipCount.toString());
-		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class), callbackPLongCaptor.capture());
-		
-		Long newCount = 22L;
-		callbackPLongCaptor.getValue().invoke(newCount);
-		
-		verify(mockView).setMemberCountShown(newCount.toString());
-	}
-
 	@Test
 	public void testGetTeamEmail() {
 		boolean canSendEmail = true;

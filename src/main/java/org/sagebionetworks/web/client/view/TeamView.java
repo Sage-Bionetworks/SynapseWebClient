@@ -39,7 +39,7 @@ public interface TeamView extends IsWidget, SynapseView {
 	void setOpenUserInvitationsWidget(Widget asWidget);
 	void setMemberListWidget(Widget asWidget);
 	void setPublicJoinVisible(Boolean canPublicJoin);
-	void setMemberCountShown(String string);
+	void setMemberCountWidget(IsWidget widget);
 	void setMediaObjectPanel(Team team);
 	void setTeamEmailAddress(String teamEmail);
 	void setMap(Widget w);

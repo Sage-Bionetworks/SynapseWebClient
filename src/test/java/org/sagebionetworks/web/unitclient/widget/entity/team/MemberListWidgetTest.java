@@ -44,8 +44,6 @@ public class MemberListWidgetTest {
 	AuthenticationController mockAuthenticationController;
 	@Mock
 	Callback mockTeamUpdatedCallback;
-	@Mock
-	CallbackP<Long> mockMemberCountUpdatedCallback;
 	boolean isAdmin;
 	@Mock
 	LoadMoreWidgetContainer mockMembersContainer;
@@ -86,25 +84,24 @@ public class MemberListWidgetTest {
 	@Test
 	public void testConfigure() {
 		//verify it tries to refresh all members
-		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback, mockMemberCountUpdatedCallback);
+		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
 		verify(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).addMembers(anyList(), anyBoolean());
 		verify(mockMembersContainer).configure(any(Callback.class));
-		verify(mockMemberCountUpdatedCallback).invoke(2L);
 	}
 	@Test
 	public void testConfigureFailure() {
 		String error = "unhandled exception";
 		Exception ex = new Exception(error);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
-		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback, mockMemberCountUpdatedCallback);
+		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
 		verify(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(error);
 	}
 
 	@Test
 	public void testRemoveMember() {
-		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback, mockMemberCountUpdatedCallback);
+		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
 		widget.removeMember("a user id");
 		verify(mockJsClient).deleteTeamMember(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString());
@@ -112,7 +109,7 @@ public class MemberListWidgetTest {
 	}
 	@Test
 	public void testRemoveMemberFailure() {
-		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback, mockMemberCountUpdatedCallback);
+		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
 		String error = "unhandled exception";
 		Exception ex = new Exception(error);
 		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).deleteTeamMember(anyString(), anyString(), any(AsyncCallback.class));
@@ -122,7 +119,7 @@ public class MemberListWidgetTest {
 	}
 	@Test
 	public void testRemoveMemberBadRequestFailure() {
-		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback, mockMemberCountUpdatedCallback);
+		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
 		String badRequestMessage = "Team must have at least one administrator.";
 		Exception ex = new BadRequestException(badRequestMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).deleteTeamMember(anyString(), anyString(), any(AsyncCallback.class));
@@ -134,7 +131,7 @@ public class MemberListWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testSetIsAdmin(){
-		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback, mockMemberCountUpdatedCallback);
+		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
 		widget.setIsAdmin("a user id", true);
 		verify(mockSynapseClient).setIsTeamAdmin(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString());
@@ -144,7 +141,7 @@ public class MemberListWidgetTest {
 	@Test
 	public void testSetIsAdminFailure() {
 		String message = "unhandled exception";
-		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback, mockMemberCountUpdatedCallback);
+		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
 		Exception ex = new Exception(message);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).setIsTeamAdmin(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		widget.setIsAdmin("a user id", true);
@@ -156,7 +153,7 @@ public class MemberListWidgetTest {
 	
 	@Test
 	public void testSearch() {
-		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback, mockMemberCountUpdatedCallback);
+		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
 		String searchTerm = "Xa";
 		Long totalNumberOfResults = 10L;
 		TeamMemberPagedResults searchResults = new TeamMemberPagedResults();
@@ -167,6 +164,5 @@ public class MemberListWidgetTest {
 		widget.search(searchTerm);
 		
 		verify(mockSynapseClient).getTeamMembers(anyString(), eq(searchTerm), anyInt(), anyInt(), any(AsyncCallback.class));
-		verify(mockMemberCountUpdatedCallback).invoke(totalNumberOfResults);
 	}
 }
