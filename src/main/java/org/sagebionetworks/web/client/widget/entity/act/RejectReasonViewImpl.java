@@ -1,8 +1,11 @@
-package org.sagebionetworks.web.client.widget.entity;
+package org.sagebionetworks.web.client.widget.entity.act;
 
-import org.gwtbootstrap3.client.ui.*;
+import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.CheckBox;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.TextArea;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.presenter.RejectReasonWidget;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -25,15 +28,18 @@ public class RejectReasonViewImpl implements RejectReasonView {
 
     // Checkboxes
     @UiField
-    CheckBox optionOne;
+    CheckBox synapseQuizOption;
     @UiField
-    CheckBox optionTwo;
+    CheckBox addInfoOption;
     @UiField
-    CheckBox optionThree;
+    CheckBox orcIDPublicOption;
     @UiField
-    CheckBox optionFour;
+    CheckBox physicallyInitialOption;
     @UiField
-    CheckBox optionFive;
+    CheckBox submitDocsOption;
+    @UiField
+    CheckBox customTextOption;
+
 
     // Generate response button
     @UiField
@@ -54,7 +60,6 @@ public class RejectReasonViewImpl implements RejectReasonView {
     Button defaultButton;
 
     Widget widget;
-    Callback callback;
 
     // Presenter
     Presenter presenter;
@@ -64,42 +69,11 @@ public class RejectReasonViewImpl implements RejectReasonView {
         widget = binder.createAndBindUi(this);
 
         defaultButton.addClickHandler(event -> modal.hide());
-        primaryButton.addClickHandler(arg0 -> callback.invoke());
         primaryButton.addClickHandler(event -> presenter.onSave());
         primaryButton.addDomHandler(DisplayUtils.getPreventTabHandler(primaryButton), KeyDownEvent.getType());
 
-        ClickHandler handler = event -> presenter.updateResponse();
-
-        generateButton.addClickHandler(handler);
-        optionOne.setText(RejectReasonWidget.REJECT_TAKE_SYNAPSE_QZ);
-        optionTwo.setText(RejectReasonWidget.REJECT_ADD_INFO);
-        optionThree.setText(RejectReasonWidget.REJECT_PHYSICALLY_INITIAL);
-        optionFour.setText(RejectReasonWidget.REJECT_SUBMIT_DOCS);
-        optionFive.setText(RejectReasonWidget.REJECT_CUSTOM_REASON);
-    }
-
-    public boolean isOptionOneUsed() {
-        return optionOne.getValue();
-    }
-
-    public boolean isOptionTwoUsed() {
-        return optionTwo.getValue();
-    }
-
-    public boolean isOptionThreeUsed() {
-        return optionThree.getValue();
-    }
-
-    public boolean isOptionFourUsed() {
-        return optionFour.getValue();
-    }
-
-    public boolean isOptionFiveUsed() {
-        return optionFive.getValue();
-    }
-
-    public String getCustomTextResponse() {
-        return customText.getText();
+        generateButton.addClickHandler(event -> presenter.updateResponse());
+        customTextOption.addClickHandler(event -> customText.setVisible(customTextOption.getValue()));
     }
 
     public void setPresenter (Presenter presenter) {
@@ -145,16 +119,35 @@ public class RejectReasonViewImpl implements RejectReasonView {
         this.defaultButton.state().reset();
         this.customText.clear();
         this.nameField.clear();
-        this.optionOne.setValue(false);
-        this.optionTwo.setValue(false);
-        this.optionThree.setValue(false);
-        this.optionFour.setValue(false);
-        this.optionFive.setValue(false);
+        this.synapseQuizOption.setValue(false);
+        this.addInfoOption.setValue(false);
+        this.orcIDPublicOption.setValue(false);
+        this.physicallyInitialOption.setValue(false);
+        this.submitDocsOption.setValue(false);
+        this.customTextOption.setValue(false);
+        this.customText.setVisible(false);
     }
 
     @Override
     public void clearError() {
         this.alert.setVisible(false);
     }
-
+    
+    @Override
+    public String getSelectedCheckboxText() {
+    	// add your textbox here if we have a new option
+    	CheckBox[] checkboxes = new CheckBox[] {synapseQuizOption, addInfoOption, orcIDPublicOption, physicallyInitialOption, submitDocsOption};
+    	
+    	String output = "";
+    	for (CheckBox checkBox : checkboxes) {
+			if (checkBox.getValue()) {
+				output += "\n" + checkBox.getText() + "\n";
+			}
+		}
+    	if (customTextOption.getValue()) {
+    		output += "\n" + customText.getText() + "\n";
+    	}
+    	
+    	return output;
+    }
 }
