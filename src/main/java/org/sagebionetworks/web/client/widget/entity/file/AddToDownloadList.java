@@ -66,6 +66,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 		this.popupUtilsView = popupUtilsView;
 		this.progress = progress;
 		inlineProgressView.showWhiteSpinner();
+		inlineProgressView.setProgressMessageVisible(false);
 		progress.setView(inlineProgressView);
 		view.setAsynchronousProgressWidget(progress);
 		this.eventBus = eventBus;
