@@ -57,37 +57,21 @@ public class FacetColumnResultRangeWidget implements IsWidget, FacetColumnResult
 		}
 	}
 	
-	public Double getColumnMin() {
-		String columnMinString = facet.getColumnMin();
-		if (DisplayUtils.isDefined(columnMinString)) {
-			return Double.parseDouble(columnMinString);
-		}
-		return null;
-	}
-	
-	public Double getColumnMax() {
-		String columnMaxString = facet.getColumnMax();
-		if (DisplayUtils.isDefined(columnMaxString)) {
-			return Double.parseDouble(columnMaxString);
-		}
-		return null;
-	}
-	
-	public Double getNewMin() {
+	public String getNewMin() {
 		String newMin = view.getMin();
 		if (!DisplayUtils.isDefined(newMin)) {
-			return getColumnMin();
+			return facet.getColumnMin();
 		} else {
-			return Double.parseDouble(newMin);
+			return newMin;
 		}
 	}
 	
-	public Double getNewMax() {
+	public String getNewMax() {
 		String newMax = view.getMax();
 		if (!DisplayUtils.isDefined(newMax)) {
-			return getColumnMax();
+			return facet.getColumnMax();
 		} else {
-			return Double.parseDouble(newMax);
+			return newMax;
 		}
 	}
 	
@@ -99,13 +83,13 @@ public class FacetColumnResultRangeWidget implements IsWidget, FacetColumnResult
 			facetColumnRangeRequest.setMin(TableConstants.NULL_VALUE_KEYWORD);
 			facetColumnRangeRequest.setMax(TableConstants.NULL_VALUE_KEYWORD);
 		} else if (!view.isAnyValue()) {
-			Double newMin = getNewMin();
+			String newMin = getNewMin();
 			if (newMin != null) {
-				facetColumnRangeRequest.setMin(Double.toString(newMin));	
+				facetColumnRangeRequest.setMin(newMin);	
 			}
-			Double newMax = getNewMax();
+			String newMax = getNewMax();
 			if (newMax != null) {
-				facetColumnRangeRequest.setMax(Double.toString(newMax));
+				facetColumnRangeRequest.setMax(newMax);
 			}
 		}
 		// note, if isAnyValue, request contains null min and null max
