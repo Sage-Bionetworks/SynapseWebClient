@@ -2,19 +2,19 @@ package org.sagebionetworks.web.unitclient.widget.accessrequirements.submission;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.presenter.RejectReasonWidget.ERROR_MESSAGE;
-import static org.sagebionetworks.web.client.presenter.RejectReasonWidget.TEMPLATE_HEADER_HELLO;
-import static org.sagebionetworks.web.client.presenter.RejectReasonWidget.TEMPLATE_HEADER_SIGNATURE;
-import static org.sagebionetworks.web.client.presenter.RejectReasonWidget.TEMPLATE_HEADER_THANKS;
+import static org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget.ERROR_MESSAGE;
+import static org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget.TEMPLATE_HEADER_HELLO;
+import static org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget.TEMPLATE_HEADER_SIGNATURE;
+import static org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget.TEMPLATE_HEADER_THANKS;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.sagebionetworks.web.client.presenter.RejectReasonWidget;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.RejectReasonView;
+import org.sagebionetworks.web.client.widget.entity.act.RejectReasonView;
+import org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RejectReasonWidgetTest {

@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.entity;
+package org.sagebionetworks.web.client.widget.entity.act;
 
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
@@ -60,7 +60,6 @@ public class RejectReasonViewImpl implements RejectReasonView {
     Button defaultButton;
 
     Widget widget;
-    Callback callback;
 
     // Presenter
     Presenter presenter;
@@ -70,16 +69,11 @@ public class RejectReasonViewImpl implements RejectReasonView {
         widget = binder.createAndBindUi(this);
 
         defaultButton.addClickHandler(event -> modal.hide());
-        primaryButton.addClickHandler(arg0 -> callback.invoke());
         primaryButton.addClickHandler(event -> presenter.onSave());
         primaryButton.addDomHandler(DisplayUtils.getPreventTabHandler(primaryButton), KeyDownEvent.getType());
 
-        ClickHandler handler = event -> presenter.updateResponse();
-
-        generateButton.addClickHandler(handler);
-        customTextOption.addClickHandler(event -> {
-        	customText.setVisible(customTextOption.getValue());
-        });
+        generateButton.addClickHandler(event -> presenter.updateResponse());
+        customTextOption.addClickHandler(event -> customText.setVisible(customTextOption.getValue()));
     }
 
     public void setPresenter (Presenter presenter) {
@@ -147,11 +141,11 @@ public class RejectReasonViewImpl implements RejectReasonView {
     	String output = "";
     	for (CheckBox checkBox : checkboxes) {
 			if (checkBox.getValue()) {
-				output += "\n\t" + checkBox.getText() + "\n";
+				output += "\n" + checkBox.getText() + "\n";
 			}
 		}
     	if (customTextOption.getValue()) {
-    		output += "\n\t" + customText.getText() + "\n";
+    		output += "\n" + customText.getText() + "\n";
     	}
     	
     	return output;

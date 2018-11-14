@@ -31,7 +31,7 @@
         </b:ModalBody>
         <b:ModalFooter>
             <b:Button ui:field="defaultButton" type="LINK" text="Cancel"></b:Button>
-            <b:Button ui:field="primaryButton" type="PRIMARY" text="Save"></b:Button>
+            <b:Button ui:field="primaryButton" type="PRIMARY" text="Send"></b:Button>
         </b:ModalFooter>
     </b:Modal>
 </ui:UiBinder>

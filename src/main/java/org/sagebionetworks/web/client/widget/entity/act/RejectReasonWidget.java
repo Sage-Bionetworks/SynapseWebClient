@@ -1,7 +1,6 @@
-package org.sagebionetworks.web.client.presenter;
+package org.sagebionetworks.web.client.widget.entity.act;
 
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.RejectReasonView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -13,7 +12,7 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
     // Template rejection format
     public static String TEMPLATE_HEADER_HELLO = "Hi ";
     public static String TEMPLATE_HEADER_THANKS = ",\n\nThank you for submitting your Synapse" +
-            " profile for validation. Before I can accept your request, you need to:\n";
+            " profile for validation. Before I can accept your request:\n";
     public static String TEMPLATE_HEADER_SIGNATURE = 
     		"\nPlease contact us at act@sagebionetworks.org if you have any questions.\n" + 
     		"\n" + 
