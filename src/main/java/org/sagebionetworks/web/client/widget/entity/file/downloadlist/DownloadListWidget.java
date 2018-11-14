@@ -65,6 +65,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 		this.packageSizeSummary = packageSizeSummary;
 		packageSizeSummary.addTextStyle("synapse-green");
 		this.progressWidget = progressWidget;
+		inlineAsyncProgressView.setProgressMessageVisible(false);
 		progressWidget.setView(inlineAsyncProgressView);
 		this.jsniUtils = jsniUtils;
 		view.setSynAlert(synAlert);

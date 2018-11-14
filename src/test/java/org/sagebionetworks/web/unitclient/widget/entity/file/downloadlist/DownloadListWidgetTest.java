@@ -97,6 +97,7 @@ public class DownloadListWidgetTest {
 		verify(mockView).setProgressTrackingWidgetVisible(false);
 		verify(mockView).setProgressTrackingWidget(mockProgressWidget);
 		verify(mockView).setPresenter(widget);
+		verify(mockInlineAsynchronousProgressView).setProgressMessageVisible(false);
 	}
 
 	@Test

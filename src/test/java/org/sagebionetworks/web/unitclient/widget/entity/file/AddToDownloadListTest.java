@@ -105,6 +105,7 @@ public class AddToDownloadListTest {
 	@Test
 	public void testAddQueryToDownloadList() {
 		verify(mockAsynchronousProgressWidget).setView(mockInlineAsynchronousProgressView);
+		verify(mockInlineAsynchronousProgressView).setProgressMessageVisible(false);
 		
 		widget.addToDownloadList(queryEntityId, mockQuery);
 		

@@ -99,4 +99,8 @@ public class InlineAsynchronousProgressViewImpl implements AsynchronousProgressV
 	public void showWhiteSpinner() {
 		spinner.setIsWhite(true);
 	}
+	@Override
+	public void setProgressMessageVisible(boolean visible) {
+		message.setVisible(visible);
+	}
 }
