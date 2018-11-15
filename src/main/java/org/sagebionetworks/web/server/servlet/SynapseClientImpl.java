@@ -651,7 +651,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			((FileEntity) entity).setDataFileHandleId(clone.getId());
 			Entity updatedEntity = synapseClient.putEntity(entity);
 			//PLFM-5265 (versionComment is not updated on the initial update if we try, so it's a second step)
-			if (versionComment != null && !versionComment.isEmpty()) {
+			if (versionComment != null && !versionComment.trim().isEmpty()) {
 				entity = synapseClient.getEntityById(entityId);
 				((FileEntity) entity).setVersionComment(versionComment);
 				updatedEntity = synapseClient.putEntity(entity);	
@@ -1461,7 +1461,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				fileEntity = synapseClient.putEntity(fileEntity);
 				
 				//PLFM-5265 (versionComment is not updated on the initial update if we try, so it's a second step)
-				if (versionComment != null && !versionComment.isEmpty()) {
+				if (versionComment != null && !versionComment.trim().isEmpty()) {
 					fileEntity = (FileEntity) synapseClient.getEntityById(entityId);
 					//update the version comment
 					fileEntity.setVersionComment(versionComment);
