@@ -97,6 +97,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	private String parentEntityId;
 	private FlowPanel formFieldsPanel;
 	private FormPanel formPanel;
+	private Div versionCommentPanel;
 	private FlowPanel uploadDestinationContainer;
 	
 	private Form externalLinkFormPanel;
@@ -181,6 +182,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		pathField = new TextBox();
 		initUploadPanel();
 		initExternalPanel();
+		initVersionCommentPanel();
 		
 		initHandlers();
 	}
@@ -464,11 +466,15 @@ public class UploaderViewImpl extends FlowPanel implements
 			
 			container.add(tabs);
 			container.add(tabContent);
+
+			// if entity, also add the optional version comment field
+			versionCommentPanel.removeFromParent();
+			container.add(versionCommentPanel);
 		} else {
 			container.add(uploadPanel);
 			configureUploadButton();
 		}
-
+		
 		if (isEntity && parentEntityId != null) {
 			//add sharing settings and data use conditions (associated to the parent)
 			sharingDataUseWidget.configure(parentEntityId, false, null);
@@ -595,12 +601,6 @@ public class UploaderViewImpl extends FlowPanel implements
 		uploadPanel.add(uploadDestinationContainer);
 		uploadPanel.add(formPanel);
 		
-		versionComment = new TextBox();
-		versionComment.setStyleName("form-control margin-bottom-5");
-		Label versionCommentLabel = new Label("Add Version Comment (Optional)");
-		uploadPanel.add(versionCommentLabel);
-		uploadPanel.add(versionComment);
-		
 		Row row = new Row();
 		Column col = new Column(ColumnSize.XS_12);
 		col.add(spinningProgressContainer);
@@ -609,6 +609,17 @@ public class UploaderViewImpl extends FlowPanel implements
 		uploadPanel.add(row);
 	}
 
+	private void initVersionCommentPanel() {
+		versionCommentPanel = new Div();
+		versionComment = new TextBox();
+		versionComment.setStyleName("form-control margin-bottom-5");
+		FormLabel versionCommentLabel = new FormLabel();
+		versionCommentLabel.setText("Add Version Comment (Optional)");
+		versionCommentLabel.setStyleName("margin-top-10");
+		versionCommentPanel.add(versionCommentLabel);
+		versionCommentPanel.add(versionComment);
+	}
+	
 	@Override
 	public void showUploadingToS3DirectStorage(String endpoint, String banner) {
 		awsLoginView.clear();
