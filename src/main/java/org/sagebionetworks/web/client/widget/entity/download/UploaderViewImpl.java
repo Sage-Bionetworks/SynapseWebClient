@@ -12,6 +12,7 @@ import org.gwtbootstrap3.client.ui.FormLabel;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Input;
+import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.NavTabs;
 import org.gwtbootstrap3.client.ui.Progress;
 import org.gwtbootstrap3.client.ui.ProgressBar;
@@ -89,7 +90,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	SynapseJSNIUtils synapseJSNIUtils;
 	private SageImageBundle sageImageBundle;
 	
-	TextBox pathField, nameField;
+	TextBox pathField, nameField, versionComment;
 	
 	// initialized in constructor
 	private boolean isEntity;
@@ -271,6 +272,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		fileUploadLabel.setText("");
 		uploadSpeedLabel.setHTML("");
 		awsLoginView.clear();
+		versionComment.setText("");
 	}
 	
 	@Override
@@ -593,6 +595,12 @@ public class UploaderViewImpl extends FlowPanel implements
 		uploadPanel.add(uploadDestinationContainer);
 		uploadPanel.add(formPanel);
 		
+		versionComment = new TextBox();
+		versionComment.setStyleName("form-control margin-bottom-5");
+		Label versionCommentLabel = new Label("Add Version Comment (Optional)");
+		uploadPanel.add(versionCommentLabel);
+		uploadPanel.add(versionComment);
+		
 		Row row = new Row();
 		Column col = new Column(ColumnSize.XS_12);
 		col.add(spinningProgressContainer);
@@ -710,5 +718,9 @@ public class UploaderViewImpl extends FlowPanel implements
 	@Override
 	public void setSelectedFilenames(String fileNames) {
 		fileUploadLabel.setText(fileNames);
+	}
+	@Override
+	public String getVersionComment() {
+		return versionComment.getText();
 	}
 }

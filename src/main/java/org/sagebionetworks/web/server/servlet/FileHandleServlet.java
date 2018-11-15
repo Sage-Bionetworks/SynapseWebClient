@@ -299,11 +299,12 @@ public class FileHandleServlet extends HttpServlet {
 		}
 	}
 	
-	public static FileEntity getNewFileEntity(String parentEntityId, String fileHandleId, String name, SynapseClient client) throws SynapseException {
+	public static FileEntity getNewFileEntity(String parentEntityId, String fileHandleId, String name, String versionComment, SynapseClient client) throws SynapseException {
 		FileEntity fileEntity = new FileEntity();
 		fileEntity.setParentId(parentEntityId);
 		if (name != null)
 			fileEntity.setName(name);
+		fileEntity.setVersionComment(versionComment);
 		fileEntity.setEntityType(FileEntity.class.getName());
 		//set data file handle id before creation
 		fileEntity.setDataFileHandleId(fileHandleId);

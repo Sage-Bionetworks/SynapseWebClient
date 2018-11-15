@@ -639,7 +639,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public Entity updateExternalFile(String entityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId) throws RestServiceException {
+	public Entity updateExternalFile(String entityId, String externalUrl, String name, String contentType, Long fileSize, String md5, String versionComment, Long storageLocationId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			Entity entity = synapseClient.getEntityById(entityId);
@@ -649,6 +649,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			}
 			ExternalFileHandle clone = createExternalFileHandle(externalUrl, name, contentType, fileSize, md5, storageLocationId, synapseClient);
 			((FileEntity) entity).setDataFileHandleId(clone.getId());
+			((FileEntity) entity).setVersionComment(versionComment);
 			Entity updatedEntity = synapseClient.putEntity(entity);
 			return updatedEntity;
 		} catch (SynapseException e) {
@@ -705,7 +706,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 
 	@Override
 	public Entity createExternalFile(String parentEntityId, String externalUrl,
-			String name, String contentType, Long fileSize, String md5, Long storageLocationId) throws RestServiceException {
+			String name, String contentType, Long fileSize, String md5, String versionComment, Long storageLocationId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			FileEntity newEntity = new FileEntity();
@@ -713,6 +714,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			newEntity.setDataFileHandleId(clone.getId());
 			newEntity.setParentId(parentEntityId);
 			newEntity.setName(clone.getFileName());
+			newEntity.setVersionComment(versionComment);
 			return synapseClient.createEntity(newEntity);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1436,20 +1438,21 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId) throws RestServiceException {
+	public String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, String versionComment) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
 			//create entity if we have to
 			FileEntity fileEntity = null;
 			FileHandle newHandle = synapseClient.getRawFileHandle(fileHandleId);
 			if (entityId == null) {
-				fileEntity = FileHandleServlet.getNewFileEntity(parentEntityId, fileHandleId, newHandle.getFileName(), synapseClient);
+				fileEntity = FileHandleServlet.getNewFileEntity(parentEntityId, fileHandleId, newHandle.getFileName(), versionComment, synapseClient);
 			}
 			else {
 				//get the file entity to update
 				fileEntity = (FileEntity) synapseClient.getEntityById(entityId);
 				//update data file handle id
 				fileEntity.setDataFileHandleId(fileHandleId);
+				fileEntity.setVersionComment(versionComment);
 				fileEntity = synapseClient.putEntity(fileEntity);
 			}
 			return fileEntity.getId();

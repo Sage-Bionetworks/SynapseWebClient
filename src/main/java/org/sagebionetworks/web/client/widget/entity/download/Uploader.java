@@ -600,7 +600,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	public void setFileEntityFileHandle(String fileHandleId) {
 		if (entityId != null || currentFileParentEntityId != null) {
-			synapseClient.setFileEntityFileHandle(fileHandleId, entityId, currentFileParentEntityId, new AsyncCallback<String>() {
+			synapseClient.setFileEntityFileHandle(fileHandleId, entityId, currentFileParentEntityId, view.getVersionComment(), new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String entityId) {
 					fileHasBeenUploaded = true;
@@ -697,14 +697,14 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	public void updateExternalFileEntity(String entityId, String path, String name, Long fileSize, String contentType, String md5, Long storageLocationId) {
 		try {
-			synapseClient.updateExternalFile(entityId, path, name, contentType, fileSize, md5, storageLocationId, getExternalFileUpdatedCallback());
+			synapseClient.updateExternalFile(entityId, path, name, contentType, fileSize, md5, view.getVersionComment(), storageLocationId, getExternalFileUpdatedCallback());
 		} catch (Throwable t) {
 			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
 		}
 	}
 	public void createNewExternalFileEntity(final String path, final String name, Long fileSize, String contentType, String md5, final Long storageLocationId) {
 		try {
-			synapseClient.createExternalFile(currentFileParentEntityId, path, name, contentType, fileSize, md5, storageLocationId, getExternalFileUpdatedCallback());
+			synapseClient.createExternalFile(currentFileParentEntityId, path, name, contentType, fileSize, md5, view.getVersionComment(), storageLocationId, getExternalFileUpdatedCallback());
 		} catch (RestServiceException e) {
 			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);	
 		}

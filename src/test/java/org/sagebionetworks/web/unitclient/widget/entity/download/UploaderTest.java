@@ -40,7 +40,6 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreUploadDestination;
@@ -158,7 +157,7 @@ public class UploaderTest {
 		status.setFileHandleId("fake handle");
 		String completedUploadDaemonStatusJson = status.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		
-		AsyncMockStubber.callSuccessWith("entityID").when(mockSynapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("entityID").when(mockSynapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(), anyString(), any(AsyncCallback.class));
 		
 		when(mockGwt.createXMLHttpRequest()).thenReturn(null);
 		
@@ -166,8 +165,8 @@ public class UploaderTest {
 		when(mockSynapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(fileNames);
 		
 		when(mockJiraURLHelper.createAccessRestrictionIssue(anyString(), anyString(), anyString())).thenReturn("http://fakeJiraRestrictionLink");
-		AsyncMockStubber.callSuccessWith(testEntity).when(mockSynapseClient).updateExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), anyString(), anyLong(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(testEntity).when(mockSynapseClient).createExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), anyString(), anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testEntity).when(mockSynapseClient).updateExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), anyString(), anyString(), anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testEntity).when(mockSynapseClient).createExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), anyString(), anyString(), anyLong(), any(AsyncCallback.class));
 		//by default, there is no name conflict
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
 		uploader = new Uploader(
@@ -212,21 +211,21 @@ public class UploaderTest {
 		//this is the full success test
 		//if entity is null, it should call synapseClient.createExternalFile() to create the FileEntity and associate the path.
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
-		verify(mockSynapseClient).createExternalFile(anyString(), anyString(), anyString(), anyString(), eq((Long)null), eq((String)null), eq(storageLocationId), any(AsyncCallback.class));
+		verify(mockSynapseClient).createExternalFile(anyString(), anyString(), anyString(), anyString(), eq((Long)null), eq((String)null), anyString(), eq(storageLocationId), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString());
 		verify(mockUploadSuccessHandler).onSuccessfulUpload();
 	}
 	
 	@Test
 	public void testSetExternalPathFailedCreate() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception("failed to create")).when(mockSynapseClient).createExternalFile(anyString(), anyString(),anyString(), anyString(), eq((Long)null), eq((String)null), anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("failed to create")).when(mockSynapseClient).createExternalFile(anyString(), anyString(),anyString(), anyString(), eq((Long)null), eq((String)null), anyString(), anyLong(), any(AsyncCallback.class));
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
 	@Test
 	public void testSetExternalPathFailedUpdateFile() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception("failed to update path")).when(mockSynapseClient).createExternalFile(anyString(), anyString(),anyString(), anyString(), eq((Long)null), eq((String)null), anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("failed to update path")).when(mockSynapseClient).createExternalFile(anyString(), anyString(),anyString(), anyString(), eq((Long)null), eq((String)null), anyString(), anyLong(), any(AsyncCallback.class));
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
 		verify(mockView).showErrorMessage(anyString());
 	}
@@ -237,7 +236,7 @@ public class UploaderTest {
 		String encodedUrl = "http://fakepath.url/a%20b/c%20d/blah.xml";
 		when(mockGwt.encode(anyString())).thenReturn(encodedUrl);
 		uploader.setExternalFilePath(url, "", storageLocationId);
-		verify(mockSynapseClient).createExternalFile(anyString(), eq(encodedUrl), anyString(), anyString(), eq((Long)null), eq((String)null), eq(storageLocationId), any(AsyncCallback.class));
+		verify(mockSynapseClient).createExternalFile(anyString(), eq(encodedUrl), anyString(), anyString(), eq((Long)null), eq((String)null), anyString(), eq(storageLocationId), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString());
 	}
 	
@@ -245,7 +244,7 @@ public class UploaderTest {
 	public void testSetExternalFileEntityPathWithFileEntity() throws Exception {
 		uploader.configure(testEntity, null, null, true);
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
-		verify(mockSynapseClient).updateExternalFile(anyString(), anyString(), anyString(), anyString(), eq((Long)null), eq((String)null), eq(storageLocationId), any(AsyncCallback.class));
+		verify(mockSynapseClient).updateExternalFile(anyString(), anyString(), anyString(), anyString(), eq((Long)null), eq((String)null), anyString(), eq(storageLocationId), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString());
 	}
 
@@ -255,7 +254,7 @@ public class UploaderTest {
 		//if entity is null, it should call synapseClient.createExternalFile() to create the FileEntity and associate the path.
 		uploader.setFileNames(new String[] {"test.txt"});
 		uploader.setSftpExternalFilePath("http://fakepath.url/blah.xml", storageLocationId);
-		verify(mockSynapseClient).createExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), eq(md5), eq(storageLocationId), any(AsyncCallback.class));
+		verify(mockSynapseClient).createExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), eq(md5), anyString(), eq(storageLocationId), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString());
 	}
 
@@ -273,14 +272,14 @@ public class UploaderTest {
 		}).when(mockSynapseJsniUtils).getFileMd5(any(JavaScriptObject.class), any(MD5Callback.class));
 		
 		uploader.setSftpExternalFilePath("http://fakepath.url/blah.xml", storageLocationId);
-		verify(mockSynapseClient, never()).createExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), eq(md5), eq(storageLocationId), any(AsyncCallback.class));
+		verify(mockSynapseClient, never()).createExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), eq(md5), anyString(), eq(storageLocationId), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(DisplayConstants.MD5_CALCULATION_ERROR);
 	}
 
 	@Test
 	public void testSetSftpExternalPathFailedCreate() throws Exception {
 		uploader.setFileNames(new String[] {"test.txt"});
-		AsyncMockStubber.callFailureWith(new Exception("failed to create")).when(mockSynapseClient).createExternalFile(anyString(), anyString(),anyString(), anyString(), anyLong(), eq(md5), anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("failed to create")).when(mockSynapseClient).createExternalFile(anyString(), anyString(),anyString(), anyString(), anyLong(), eq(md5), anyString(), anyLong(), any(AsyncCallback.class));
 		uploader.setSftpExternalFilePath("http://fakepath.url/blah.xml", storageLocationId);
 		verify(mockView).showErrorMessage(anyString());
 	}
@@ -288,7 +287,7 @@ public class UploaderTest {
 	@Test
 	public void testSetSftpExternalPathFailedUpdateFile() throws Exception {
 		uploader.setFileNames(new String[] {"test.txt"});
-		AsyncMockStubber.callFailureWith(new Exception("failed to update path")).when(mockSynapseClient).createExternalFile(anyString(), anyString(),anyString(), anyString(), anyLong(), eq(md5), anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("failed to update path")).when(mockSynapseClient).createExternalFile(anyString(), anyString(),anyString(), anyString(), anyLong(), eq(md5), anyString(), anyLong(), any(AsyncCallback.class));
 		uploader.setSftpExternalFilePath("http://fakepath.url/blah.xml", storageLocationId);
 		verify(mockView).showErrorMessage(anyString());
 	}
@@ -299,7 +298,7 @@ public class UploaderTest {
 		uploader.configure(testEntity, null, null, true);
 		uploader.setFileNames(new String[] {fileName});
 		uploader.setSftpExternalFilePath("http://fakepath.url/blah.xml", storageLocationId);
-		verify(mockSynapseClient).updateExternalFile(anyString(), anyString(), eq(fileName), anyString(), anyLong(), eq(md5), eq(storageLocationId), any(AsyncCallback.class));
+		verify(mockSynapseClient).updateExternalFile(anyString(), anyString(), eq(fileName), anyString(), anyLong(), eq(md5), anyString(), eq(storageLocationId), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString());
 	}
 	
@@ -312,7 +311,7 @@ public class UploaderTest {
 		when(mockSynapseJsniUtils.getMultipleUploadFileNames(mockFileList)).thenReturn(fileNames);
 		AsyncMockStubber.callSuccessWith(testEntity).when(mockSynapseJavascriptClient).getEntity(anyString(), any(OBJECT_TYPE.class), any(AsyncCallback.class));
 		uploader.handleUploads();
-		verify(mockSynapseClient).setFileEntityFileHandle(anyString(), anyString(),  anyString(),  any(AsyncCallback.class));
+		verify(mockSynapseClient).setFileEntityFileHandle(anyString(), anyString(),  anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).hideLoading();
 		assertEquals(UploadType.S3, uploader.getCurrentUploadType());
 		//verify upload success
@@ -413,8 +412,8 @@ public class UploaderTest {
 		callbackCaptor.getValue().invoke();
 
 		// SWC-4274: Verify the 2 rpcs.  The first adds a new file version to duplicateNameEntityId, and the second creates a new file entity.
-		verify(mockSynapseClient).setFileEntityFileHandle(anyString(), eq(duplicateNameEntityId),  eq(parentEntityId),  any(AsyncCallback.class));
-		verify(mockSynapseClient).setFileEntityFileHandle(anyString(), eq(null),  eq(parentEntityId),  any(AsyncCallback.class));
+		verify(mockSynapseClient).setFileEntityFileHandle(anyString(), eq(duplicateNameEntityId),  eq(parentEntityId), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).setFileEntityFileHandle(anyString(), eq(null),  eq(parentEntityId), anyString(), any(AsyncCallback.class));
 	}
 
 	
@@ -596,14 +595,14 @@ public class UploaderTest {
 	public void testDragAndDrop() throws RestServiceException{
 		//widget configured in @Before
 		verify(mockGlobalApplicationState).setDropZoneHandler(dragAndDropHandlerCaptor.capture());
-		verify(mockSynapseClient, never()).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  any(AsyncCallback.class));
+		verify(mockSynapseClient, never()).setFileEntityFileHandle(anyString(),  anyString(),  anyString(), anyString(), any(AsyncCallback.class));
 		
 		//simulate drop
 		String fileName = "single file.txt";
 		when(mockSynapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(new String[]{fileName});
 		dragAndDropHandlerCaptor.getValue().invoke(mockDroppedFileList);
 		
-		verify(mockSynapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  any(AsyncCallback.class));
+		verify(mockSynapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -684,7 +683,7 @@ public class UploaderTest {
 		r.setMessage(newUrl);
 		uploader.handleSubmitResult(r);
 		//should try to create a new external file
-		verify(mockSynapseClient).createExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), anyString(), anyLong(), any(AsyncCallback.class));
+		verify(mockSynapseClient).createExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), anyString(), anyString(), anyLong(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -696,7 +695,7 @@ public class UploaderTest {
 		String fileHandleId = "1234";
 		r.setMessage(fileHandleId);
 		uploader.handleSubmitResult(r);
-		verify(mockSynapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  any(AsyncCallback.class));
+		verify(mockSynapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test

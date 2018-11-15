@@ -95,9 +95,10 @@ public interface SynapseClientAsync {
 	void createAccessApproval(AccessApproval aaEW,
 			AsyncCallback<AccessApproval> callback);
 
-	void updateExternalFile(String entityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
+	void updateExternalFile(String entityId, String externalUrl, String name, String contentType, Long fileSize,
+			String md5, String versionComment, Long storageLocationId, AsyncCallback<Entity> callback);
 
-	void createExternalFile(String parentEntityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
+	void createExternalFile(String parentEntityId, String externalUrl, String name, String contentType, Long fileSize, String md5, String versionComment, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
 	void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<FileHandleResults> callback);
 	
 	void restoreV2WikiPage(String ownerId, String ownerType, String wikiId,
@@ -149,8 +150,7 @@ public interface SynapseClientAsync {
 			AsyncCallback<PassingRecord> callback);
 	
 	void getFileEntityIdWithSameName(String fileName, String parentEntityId, AsyncCallback<String> callback);
-	void setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, AsyncCallback<String> callback);
-	
+	void setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, String versionComment, AsyncCallback<String> callback);
 	
 	void getEntityDoi(String entityId, Long versionNumber,
 			AsyncCallback<Doi> callback);

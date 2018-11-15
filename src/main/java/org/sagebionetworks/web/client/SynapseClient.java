@@ -154,7 +154,7 @@ public interface SynapseClient extends RemoteService{
 
 
 	String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException, SynapseException;
-	String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId) throws RestServiceException;
+	String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, String versionComment) throws RestServiceException;
 
 	Doi getEntityDoi(String entityId, Long versionNumber) throws RestServiceException;
 	void createDoi(String entityId, Long versionNumber) throws RestServiceException;
@@ -229,9 +229,9 @@ public interface SynapseClient extends RemoteService{
 
 	AccessApproval createAccessApproval(AccessApproval aaEW) throws RestServiceException;
 
-	Entity updateExternalFile(String entityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId) throws RestServiceException;
+	Entity updateExternalFile(String entityId, String externalUrl, String name, String contentType, Long fileSize, String md5, String versionComment, Long storageLocationId) throws RestServiceException;
 
-	Entity createExternalFile(String parentEntityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId) throws RestServiceException;
+	Entity createExternalFile(String parentEntityId, String externalUrl, String name, String contentType, Long fileSize, String md5, String versionComment, Long storageLocationId) throws RestServiceException;
 
 	void putActivity(Activity update) throws RestServiceException;
 

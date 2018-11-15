@@ -264,6 +264,8 @@ public class SynapseClientImplTest {
 	@Mock
 	MembershipInvitation mockMembershipInvitation;
 	@Captor
+	ArgumentCaptor<FileEntity> fileEntityCaptor;
+	@Captor
 	ArgumentCaptor<String> stringCaptor1;
 	@Captor
 	ArgumentCaptor<String> stringCaptor2;
@@ -893,6 +895,7 @@ public class SynapseClientImplTest {
 		String testId = "myTestId";
 		String md5 = "e10e3f4491440ce7b48edc97f03307bb";
 		Long fileSize=2048L;
+		String versionComment = "version comment for update";
 		FileEntity file = new FileEntity();
 		String originalFileEntityName = "syn1223";
 		String contentType = "text/plain";
@@ -903,7 +906,7 @@ public class SynapseClientImplTest {
 		handle.setExternalURL(testUrl);
 
 		resetUpdateExternalFileHandleMocks(testId, file, handle);
-		synapseClient.updateExternalFile(testId, testUrl, myFileName, contentType, fileSize, md5, storageLocationId);
+		synapseClient.updateExternalFile(testId, testUrl, myFileName, contentType, fileSize, md5, versionComment, storageLocationId);
 
 		verify(mockSynapse).getEntityById(testId);
 		
@@ -916,7 +919,9 @@ public class SynapseClientImplTest {
 		assertEquals(myFileName, capturedValue.getFileName());
 //		assertEquals(fileSize, capturedValue.getContentSize());
 		
-		verify(mockSynapse).putEntity(any(FileEntity.class));
+		verify(mockSynapse).putEntity(fileEntityCaptor.capture());
+		
+		assertEquals(versionComment, fileEntityCaptor.getValue().getVersionComment());
 
 		// and if rename fails, verify all is well (but the FileEntity name is
 		// not updated)
@@ -928,7 +933,7 @@ public class SynapseClientImplTest {
 				.thenThrow(
 						new IllegalArgumentException(
 								"invalid name for some reason"));
-		synapseClient.updateExternalFile(testId, testUrl, myFileName, contentType, fileSize, md5, storageLocationId);
+		synapseClient.updateExternalFile(testId, testUrl, myFileName, contentType, fileSize, versionComment, md5, storageLocationId);
 
 		// called createExternalFileHandle
 		verify(mockSynapse).createExternalFileHandle(
@@ -945,14 +950,16 @@ public class SynapseClientImplTest {
 		String fileName = "testing.txt";
 		String md5 = "e10e3f4491440ce7b48edc97f03307bb";
 		String contentType = "text/plain";
+		String versionComment = "new version comment";
 		Long fileSize = 1024L;
 		when(
 				mockSynapse
 						.createExternalFileHandle(any(ExternalFileHandle.class)))
 				.thenReturn(new ExternalFileHandle());
+		
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(
 				new FileEntity());
-		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName, contentType, fileSize, md5, storageLocationId);
+		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName, contentType, fileSize, md5, versionComment, storageLocationId);
 		ArgumentCaptor<ExternalFileHandle> captor = ArgumentCaptor
 				.forClass(ExternalFileHandle.class);
 		verify(mockSynapse).createExternalFileHandle(captor.capture());
@@ -963,6 +970,8 @@ public class SynapseClientImplTest {
 		assertEquals(storageLocationId, handle.getStorageLocationId());
 		assertEquals(md5, handle.getContentMd5());
 //		assertEquals(fileSize, handle.getContentSize());
+		verify(mockSynapse).createEntity(fileEntityCaptor.capture());
+		assertEquals(versionComment, fileEntityCaptor.getValue().getVersionComment());
 	}
 	
 	@Test
@@ -981,7 +990,7 @@ public class SynapseClientImplTest {
 				.thenReturn(mockExternalFileHandle);
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(
 				new FileEntity());
-		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName, contentType, fileSize, md5, storageLocationId);
+		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName, contentType, fileSize, md5, "version comment", storageLocationId);
 		ArgumentCaptor<ExternalFileHandle> captor = ArgumentCaptor
 				.forClass(ExternalFileHandle.class);
 		verify(mockSynapse).createExternalFileHandle(captor.capture());
@@ -1047,6 +1056,7 @@ public class SynapseClientImplTest {
 	@Test
 	public void testCompleteUpload() throws JSONObjectAdapterException,
 			SynapseException, RestServiceException {
+		String versionComment = "version comment for new file upload";
 		FileEntity testFileEntity = getTestFileEntity();
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(
 				testFileEntity);
@@ -1057,11 +1067,13 @@ public class SynapseClientImplTest {
 		EntityIdList childEntities = new EntityIdList();
 		childEntities.setIdList(new ArrayList());
 
-		synapseClient.setFileEntityFileHandle(null, null, "parentEntityId");
+		synapseClient.setFileEntityFileHandle(null, null, "parentEntityId", versionComment);
 
 		// it should have tried to create a new entity (since entity id was
 		// null)
-		verify(mockSynapse).createEntity(any(FileEntity.class));
+		verify(mockSynapse).createEntity(fileEntityCaptor.capture());
+		
+		assertEquals(versionComment, fileEntityCaptor.getValue().getVersionComment());
 	}
 
 	@Test(expected = NotFoundException.class)

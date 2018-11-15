@@ -34,6 +34,7 @@ public interface UploaderView extends IsWidget, SynapseView, HasAttachHandlers {
 	void showUploadingToExternalStorage(String host, String banner);
 	void showUploadingToS3DirectStorage(String endpoint, String banner);
 	void setUploaderLinkNameVisible(boolean visible);
+	String getVersionComment();
 	/**
 	 * SFTP requires username and password, so prompt for it in the upload form.
 	 * @return
