@@ -124,7 +124,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	private HandlerRegistration messageHandler;
 	FormGroup externalNameFormGroup;
 	AwsLoginView awsLoginView;
-	TabListItem externalTab;
+	TabListItem externalTab, uploadTab;
 	
 	@Inject
 	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, 
@@ -191,14 +191,16 @@ public class UploaderViewImpl extends FlowPanel implements
 		uploadBtn.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				uploadBtn.setEnabled(false);
 				if (isExternal) {
 					String url = pathField.getValue();
 					//let the service decide what is a valid url (now supporting sftp, and perhaps others)
 					if (url == null || url.isEmpty()) {
 						externalUrlFormGroup.setValidationState(ValidationState.ERROR);
+						uploadBtn.setEnabled(true);
 						return;
 					}
-
+					uploadTab.setEnabled(false);
 					presenter.setExternalFilePath(pathField.getValue(), nameField.getValue(), presenter.getStorageLocationId());
 				} else {
 					formFieldsPanel.setVisible(false);
@@ -353,6 +355,7 @@ public class UploaderViewImpl extends FlowPanel implements
 
 		//SWC-1730: enable clicking on external tab
 		externalTab.setEnabled(true);
+		uploadTab.setEnabled(true);
 	}
 	
 	@Override
@@ -446,6 +449,7 @@ public class UploaderViewImpl extends FlowPanel implements
 					configureUploadButton();
 				}
 			});
+			uploadTab = tab;
 			
 			//External URL
 			tab = new TabListItem(DisplayConstants.LINK_TO_URL);

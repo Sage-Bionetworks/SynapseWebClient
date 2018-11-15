@@ -649,8 +649,14 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			}
 			ExternalFileHandle clone = createExternalFileHandle(externalUrl, name, contentType, fileSize, md5, storageLocationId, synapseClient);
 			((FileEntity) entity).setDataFileHandleId(clone.getId());
-			((FileEntity) entity).setVersionComment(versionComment);
 			Entity updatedEntity = synapseClient.putEntity(entity);
+			//PLFM-5265 (versionComment is not updated on the initial update if we try, so it's a second step)
+			if (versionComment != null && !versionComment.isEmpty()) {
+				entity = synapseClient.getEntityById(entityId);
+				((FileEntity) entity).setVersionComment(versionComment);
+				updatedEntity = synapseClient.putEntity(entity);	
+			}
+			
 			return updatedEntity;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1452,8 +1458,15 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				fileEntity = (FileEntity) synapseClient.getEntityById(entityId);
 				//update data file handle id
 				fileEntity.setDataFileHandleId(fileHandleId);
-				fileEntity.setVersionComment(versionComment);
 				fileEntity = synapseClient.putEntity(fileEntity);
+				
+				//PLFM-5265 (versionComment is not updated on the initial update if we try, so it's a second step)
+				if (versionComment != null && !versionComment.isEmpty()) {
+					fileEntity = (FileEntity) synapseClient.getEntityById(entityId);
+					//update the version comment
+					fileEntity.setVersionComment(versionComment);
+					fileEntity = synapseClient.putEntity(fileEntity);
+				}
 			}
 			return fileEntity.getId();
 		} catch (SynapseException e) {
