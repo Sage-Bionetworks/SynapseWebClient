@@ -908,7 +908,8 @@ public class SynapseClientImplTest {
 		resetUpdateExternalFileHandleMocks(testId, file, handle);
 		synapseClient.updateExternalFile(testId, testUrl, myFileName, contentType, fileSize, md5, versionComment, storageLocationId);
 
-		verify(mockSynapse).getEntityById(testId);
+		// twice due to PLFM-5265
+		verify(mockSynapse, times(2)).getEntityById(testId);
 		
 		ArgumentCaptor<ExternalFileHandle> captor = ArgumentCaptor.forClass(ExternalFileHandle.class);
 		verify(mockSynapse).createExternalFileHandle(captor.capture());
@@ -919,7 +920,8 @@ public class SynapseClientImplTest {
 		assertEquals(myFileName, capturedValue.getFileName());
 //		assertEquals(fileSize, capturedValue.getContentSize());
 		
-		verify(mockSynapse).putEntity(fileEntityCaptor.capture());
+		// twice due to PLFM-5265
+		verify(mockSynapse, times(2)).putEntity(fileEntityCaptor.capture());
 		
 		assertEquals(versionComment, fileEntityCaptor.getValue().getVersionComment());
 
@@ -929,7 +931,7 @@ public class SynapseClientImplTest {
 		file.setName(originalFileEntityName);
 		// first call should return file, second call to putEntity should throw
 		// an exception
-		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(file)
+		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(file).thenReturn(file)
 				.thenThrow(
 						new IllegalArgumentException(
 								"invalid name for some reason"));
@@ -939,7 +941,8 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).createExternalFileHandle(
 				any(ExternalFileHandle.class));
 		// and it should have called putEntity again
-		verify(mockSynapse).putEntity(any(FileEntity.class));
+		// twice due to PLFM-5265
+		verify(mockSynapse, times(2)).putEntity(any(FileEntity.class));
 	}
 
 	@Test
