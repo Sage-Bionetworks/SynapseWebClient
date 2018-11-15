@@ -23,7 +23,7 @@ import com.google.inject.Inject;
 
 public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResultValuesView.Presenter {
 	public static final String SHOW_ALL = "Show all ";
-	public static final String UNSPECIFIED = "(not set)";
+	public static final String UNSPECIFIED = "Not set";
 	public static final String EMPTY_STRING = "(empty string)";
 	
 	FacetColumnResultValuesView view;

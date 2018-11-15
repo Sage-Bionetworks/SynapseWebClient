@@ -8,11 +8,14 @@
 		<bh:Div addStyleNames="margin-top-15 margin-bottom-5">
 			<bh:Strong ui:field="columnName"/>
 		</bh:Div>
-		<g:HorizontalPanel verticalAlignment="ALIGN_MIDDLE">
+		<b:Radio ui:field="notSetRadio" name="facetcolumnrange">Not set</b:Radio>
+		<b:Radio ui:field="anyRadio" name="facetcolumnrange">Any</b:Radio>
+		<b:Radio ui:field="rangeRadio" name="facetcolumnrange">Range</b:Radio>
+		<g:HorizontalPanel ui:field="rangeUI" verticalAlignment="ALIGN_MIDDLE" visible="false">
 			<b:TextBox ui:field="minField" width="105px"/>
 			<bh:Span text="to" addStyleNames="margin-left-2 margin-right-2"/>
 			<b:TextBox ui:field="maxField" width="105px"/>
-			<b:Button ui:field="applyButton" type="PRIMARY" addStyleNames="margin-left-2" icon="FILTER" />
+			<b:Button ui:field="applyButton" type="LINK" addStyleNames="margin-left-2" text="Apply" />
 		</g:HorizontalPanel>
 		<bh:Div ui:field="synAlertContainer"/>
 	</bh:Div>

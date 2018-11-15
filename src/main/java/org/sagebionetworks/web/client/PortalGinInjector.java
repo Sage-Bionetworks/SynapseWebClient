@@ -62,7 +62,6 @@ import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceE
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditor;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
-import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelpView;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
@@ -228,9 +227,10 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendere
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRendererImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeWidget;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultSliderRangeWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultSliderRangeViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
@@ -502,11 +502,15 @@ public interface PortalGinInjector extends Ginjector {
 	RadioWidget createNewRadioWidget();
 	EntityListRowBadge getEntityListRowBadge();
 	CancelControlWidget getCancelControlWidget();
-	FacetColumnResultSliderRangeWidget getFacetColumnResultSliderRangeWidget();
+	
 	FacetColumnResultRangeWidget getFacetColumnResultRangeWidget();
 	FacetColumnResultValuesWidget getFacetColumnResultValuesWidget();
-	FacetColumnResultDateRangeWidget getFacetColumnResultDateRangeWidget();
-
+	
+	// facet range views
+	FacetColumnResultRangeViewImpl getFacetColumnResultRangeViewImpl();
+	FacetColumnResultDateRangeViewImpl getFacetColumnResultDateRangeViewImpl();
+	FacetColumnResultSliderRangeViewImpl getFacetColumnResultSliderRangeViewImpl();
+	
 	DiscussionTabView getDiscussionTabView();
 	ForumWidget getForumWidget();
 	DockerTabView getDockerTabView();

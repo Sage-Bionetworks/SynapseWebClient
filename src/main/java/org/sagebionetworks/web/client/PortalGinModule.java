@@ -690,12 +690,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEdi
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRendererImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeView;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeView;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultSliderRangeView;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultSliderRangeViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesView;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorView;
@@ -1379,9 +1375,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(DivView.class).to(DivViewImpl.class);
 		bind(FacetColumnResultValuesView.class).to(FacetColumnResultValuesViewImpl.class);
-		bind(FacetColumnResultSliderRangeView.class).to(FacetColumnResultSliderRangeViewImpl.class);
-		bind(FacetColumnResultRangeView.class).to(FacetColumnResultRangeViewImpl.class);
-		bind(FacetColumnResultDateRangeView.class).to(FacetColumnResultDateRangeViewImpl.class);
 		
 		bind(ViewDefaultColumns.class).in(Singleton.class);
 		bind(SubscribersWidgetView.class).to(SubscribersWidgetViewImpl.class);
