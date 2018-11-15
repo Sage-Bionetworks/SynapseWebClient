@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
@@ -22,8 +24,9 @@ import org.sagebionetworks.web.shared.WebConstants;
  * Servlet for setting the session token HttpOnly cookie.
  */
 public class InitSessionServlet extends HttpServlet {
+	static private Log log = LogFactory.getLog(InitSessionServlet.class);
 	public static final String ROOT_PATH = "/";
-	public static final String SYNAPSE_ORG = ".synapse.org";
+	public static final String SYNAPSE_ORG = "synapse.org";
 	private static final long serialVersionUID = 1L;
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 	public static final int ONE_DAY_IN_SECONDS = 60*60*24;
@@ -68,13 +71,15 @@ public class InitSessionServlet extends HttpServlet {
 			
 			String domain = request.getServerName();
 			String lowerCaseDomain = domain.toLowerCase();
-			if (lowerCaseDomain.contains(SYNAPSE_ORG)) {
+			if (lowerCaseDomain.contains("."+SYNAPSE_ORG)) {
 				cookie.setDomain(SYNAPSE_ORG);
 			}
 			response.addCookie(cookie);
 		} catch (Exception e) {
+			log.error(e);
+			e.printStackTrace();
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			response.getOutputStream().write("Invalid session token".getBytes("UTF-8"));
+			response.getOutputStream().write(("Invalid session token - " + e.getMessage()).getBytes("UTF-8"));
 			response.getOutputStream().flush();
 		}
 	}

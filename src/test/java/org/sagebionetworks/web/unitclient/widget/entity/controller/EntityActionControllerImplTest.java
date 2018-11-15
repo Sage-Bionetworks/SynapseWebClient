@@ -1,9 +1,31 @@
 package org.sagebionetworks.web.unitclient.widget.entity.controller;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ARE_YOU_SURE_YOU_WANT_TO_DELETE;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_FOLDER_EXPLANATION;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_WIKI_PREFIX;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.MOVE_PREFIX;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.RENAME_PREFIX;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.UPDATE_DOI_FOR;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WIKI;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,7 +65,6 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
-import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.v2.DoiAssociation;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.EntityView;
@@ -264,7 +285,6 @@ public class EntityActionControllerImplTest {
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(table);
 		entityBundle.setPermissions(permissions);
-		entityBundle.setDoi(new Doi());
 		entityBundle.setDoiAssociation(new DoiAssociation());
 		entityBundle.setAccessRequirements(accessReqs);
 		entityBundle.setBenefactorAcl(mockACL);
@@ -1430,67 +1450,9 @@ public class EntityActionControllerImplTest {
 		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
-	
-	@Test
-	public void testCreateDoi() throws Exception {
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		controller.onAction(Action.CREATE_DOI);
-		verify(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString());
-		//refresh page
-		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
-	}
-	
-	@Test
-	public void testCreateDoiFail() throws Exception {
-		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		controller.onAction(Action.CREATE_DOI);
-		verify(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
-	}
-	
-	@Test
-	public void testConfigureDoiNotFound() throws Exception {
-		entityBundle.setDoi(null);
-		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		//initially hide, then show
-		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, false);
-		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, true);
-	}
-	
-	@Test
-	public void testConfigureDoiView() throws Exception {
-		// Create DOI not available for Views
-		entityBundle.setDoi(null);
-		entityBundle.setEntity(new EntityView());
-		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, false);
-		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_DOI, true);
-	}
-	
-	@Test
-	public void testConfigureDoiNotFoundNonEditable() throws Exception {
-		permissions.setCanEdit(false);
-		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		//initially hide, never show
-		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, false);
-		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_DOI, true);
-	}
-	
-	@Test
-	public void testConfigureDoiFound() throws Exception {
-		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		//initially hide, never show
-		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, false);
-		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_DOI, true);
-	}
 
 	@Test
 	public void testConfigureCreateOrUpdateDoiNotFound() throws Exception {
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
-
 		entityBundle.setDoiAssociation(null);
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		//initially hide, then show
@@ -1500,8 +1462,6 @@ public class EntityActionControllerImplTest {
 
 	@Test
 	public void testConfigureCreateOrUpdateDoiView() throws Exception {
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
-
 		// Create DOI not available for Views
 		entityBundle.setDoiAssociation(null);
 		entityBundle.setEntity(new EntityView());
@@ -1512,8 +1472,6 @@ public class EntityActionControllerImplTest {
 
 	@Test
 	public void testConfigureCreateOrUpdateDoiNotFoundNonEditable() throws Exception {
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
-
 		permissions.setCanEdit(false);
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		//initially hide, never show
@@ -1523,14 +1481,21 @@ public class EntityActionControllerImplTest {
 
 	@Test
 	public void testConfigureCreateOrUpdateDoiFound() throws Exception {
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
-
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		//hide, and then show with 'update' text
 		verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
 		verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
 		verify(mockActionMenu).setActionText(Action.CREATE_OR_UPDATE_DOI, UPDATE_DOI_FOR + EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass())));
 
+	}
+
+	@Test
+	public void testConfigureCreateOrUpdateDoiFoundNonEditable() throws Exception {
+		permissions.setCanEdit(false);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
+		//hide, and then show with 'update' text
+		verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
+		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
 	}
 
 	@Test
