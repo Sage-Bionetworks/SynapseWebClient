@@ -22,7 +22,7 @@
 		</bh:Div>
 		
 		<b:Alert ui:field="tableMessage" type="INFO" visible="false"/>
-		<bh:Div ui:field="tableToolbar" height="55px">
+		<bh:Div ui:field="tableToolbar">
 			<bh:Div>
 				<b:Anchor ui:field="showSimpleSearch" text="Show simple search" visible="false"/>
 			</bh:Div>
