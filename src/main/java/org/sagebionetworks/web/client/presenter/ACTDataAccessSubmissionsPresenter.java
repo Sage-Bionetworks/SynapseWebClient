@@ -33,6 +33,7 @@ import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccess
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.subscription.DataAccessSubscribeButtonWidget;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.core.shared.GWT;
@@ -68,6 +69,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	private SubjectsWidget subjectsWidget;
 	DateTimeFormat dateFormat;
 	Callback refreshCallback;
+	DataAccessSubscribeButtonWidget subscribeWidget;
 	
 	@Inject
 	public ACTDataAccessSubmissionsPresenter(
@@ -80,11 +82,13 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 			FileHandleWidget ducTemplateFileHandleWidget,
 			DataAccessClientAsync dataAccessClient,
 			SubjectsWidget subjectsWidget,
-			GWTWrapper gwt
+			GWTWrapper gwt,
+			DataAccessSubscribeButtonWidget subscribeWidget
 			) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
+		this.subscribeWidget = subscribeWidget;
 		this.dataAccessClient = dataAccessClient;
 		fixServiceEntryPoint(dataAccessClient);
 		this.loadMoreContainer = loadMoreContainer;
@@ -117,6 +121,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		view.setLoadMoreContainer(loadMoreContainer);
 		view.setShowHideButton(showHideAccessRequirementButton);
 		view.setSubjectsWidget(subjectsWidget);
+		view.setSubscribeWidget(subscribeWidget);
 		view.setPresenter(this);
 		
 		loadMoreContainer.configure(new Callback() {

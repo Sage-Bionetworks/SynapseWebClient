@@ -22,7 +22,7 @@ public interface SubscribeButtonWidgetView extends IsWidget, SynapseView {
 	void showLoading();
 	void hideLoading();
 	void setButtonSize(ButtonSize size);
-	
+	void setVisible(boolean isVisible);
 	/**
 	 * Presenter interface
 	 */

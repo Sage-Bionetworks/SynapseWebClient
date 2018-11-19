@@ -47,6 +47,7 @@ import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccess
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.subscription.DataAccessSubscribeButtonWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -98,6 +99,8 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	GWTWrapper mockGWT;
 	@Mock
 	DateTimeFormat mockDateTimeFormat;
+	@Mock
+	DataAccessSubscribeButtonWidget mockSubscribeButton;
 	@Captor
 	ArgumentCaptor<Place> placeCaptor;
 	public static final String FILE_HANDLE_ID = "9999";
@@ -108,7 +111,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
 		when(mockGWT.getDateTimeFormat(any(PredefinedFormat.class))).thenReturn(mockDateTimeFormat);
-		presenter = new ACTDataAccessSubmissionsPresenter(mockView, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockACTAccessRequirementWidget, mockButton, mockDucTemplateFileHandleWidget, mockDataAccessClient, mockSubjectsWidget, mockGWT);
+		presenter = new ACTDataAccessSubmissionsPresenter(mockView, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockACTAccessRequirementWidget, mockButton, mockDucTemplateFileHandleWidget, mockDataAccessClient, mockSubjectsWidget, mockGWT, mockSubscribeButton);
 		AsyncMockStubber.callSuccessWith(mockACTAccessRequirement).when(mockDataAccessClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionPage).when(mockDataAccessClient).getDataAccessSubmissions(anyLong(), anyString(), any(SubmissionState.class), any(SubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
 		when(mockDataAccessSubmissionPage.getResults()).thenReturn(Collections.singletonList(mockDataAccessSubmission));

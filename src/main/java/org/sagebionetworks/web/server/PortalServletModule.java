@@ -27,7 +27,6 @@ import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
 import org.sagebionetworks.web.server.servlet.SlackServlet;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
-import org.sagebionetworks.web.server.servlet.SubscriptionClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserProfileClientImpl;
@@ -95,10 +94,6 @@ public class PortalServletModule extends ServletModule {
 		// Setup the Challenge service
 		bind(DataAccessClientImpl.class).in(Singleton.class);
 		serve("/Portal/dataaccessclient").with(DataAccessClientImpl.class);
-		
-		// Subscription service
-		bind(SubscriptionClientImpl.class).in(Singleton.class);
-		serve("/Portal/subscriptionclient").with(SubscriptionClientImpl.class);
 		
 		bind(UserProfileClientImpl.class).in(Singleton.class);
 		serve("/Portal/userprofileclient").with(UserProfileClientImpl.class);

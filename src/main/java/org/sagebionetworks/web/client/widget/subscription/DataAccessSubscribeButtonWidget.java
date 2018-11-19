@@ -1,56 +1,54 @@
 package org.sagebionetworks.web.client.widget.subscription;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.sagebionetworks.repo.model.subscription.SortByType;
+import org.sagebionetworks.repo.model.subscription.SortDirection;
 import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
 import org.sagebionetworks.repo.model.subscription.SubscriptionRequest;
-import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presenter, SynapseWidgetPresenter {
+public class DataAccessSubscribeButtonWidget implements SubscribeButtonWidgetView.Presenter, SynapseWidgetPresenter, IsWidget {
 	
 	private SubscribeButtonWidgetView view;
 	SynapseJavascriptClient jsClient;
 	SynapseAlert synAlert;
-	SubscriptionObjectType type;
-	String id;
 	Subscription currentSubscription;
 	AuthenticationController authController;
 	GlobalApplicationState globalApplicationState;
 	Callback onSubscribeCallback, onUnsubscribeCallback;
-	ActionMenuWidget actionMenu;
 	ActionMenuWidget.ActionListener subscribeActionListener, unsubscribeActionListener;
-	boolean iconOnly;
+	public static final SubscriptionObjectType DATA_ACCESS_SUBMISSION_TYPE = SubscriptionObjectType.DATA_ACCESS_SUBMISSION;
+	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
+	
 	@Inject
-	public SubscribeButtonWidget(SubscribeButtonWidgetView view, 
+	public DataAccessSubscribeButtonWidget(SubscribeButtonWidgetView view, 
 			SynapseJavascriptClient jsClient,
 			SynapseAlert synAlert,
 			AuthenticationController authController,
-			GlobalApplicationState globalApplicationState) {
+			GlobalApplicationState globalApplicationState,
+			IsACTMemberAsyncHandler isACTMemberAsyncHandler) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.jsClient = jsClient;
 		this.authController = authController;
 		this.globalApplicationState = globalApplicationState;
-		iconOnly = false;
+		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
 		subscribeActionListener = action -> {
@@ -61,40 +59,16 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 		};
 	}
 	
-	
-	public SubscribeButtonWidget showIconOnly() {
-		iconOnly = true;
-		return this;
-	}
-	
 	public void clear() {
 		view.clear();
 	}
 	
 	public void showFollowButton() {
-		if (actionMenu != null) {
-			actionMenu.setActionListener(Action.FOLLOW, subscribeActionListener);
-			actionMenu.setActionText(Action.FOLLOW, "Follow " + StringUtils.toTitleCase(type.toString()));
-		}
-
-		if (iconOnly) {
-			view.showFollowIcon();
-		} else {
-			view.showFollowButton();
-		}
+		view.showFollowButton();
 	}
 	
 	public void showUnfollowButton() {
-		if (actionMenu != null) {
-			actionMenu.setActionListener(Action.FOLLOW, unsubscribeActionListener);
-			actionMenu.setActionText(Action.FOLLOW, "Unfollow " + StringUtils.toTitleCase(type.toString()));
-		}
-
-		if (iconOnly) {
-			view.showUnfollowIcon();
-		} else {
-			view.showUnfollowButton();
-		}
+		view.showUnfollowButton();
 	}
 	
 	public void setOnSubscribeCallback(Callback c) {
@@ -104,43 +78,28 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 	public void setOnUnsubscribeCallback(Callback c) {
 		onUnsubscribeCallback = c;
 	}
-
 	
-	/**
-	 * @param type Topic subscription object type
-	 * @param id Topic subscription object id
-	 * @param actionMenu if provided, will set the follow/unfollow command, and listen for action
-	 */
-	public void configure(SubscriptionObjectType type, String id, ActionMenuWidget actionMenu) {
-		this.id = id;
-		this.type = type;
-		this.actionMenu = actionMenu;
-		if (!authController.isLoggedIn()) {
-			showFollowButton();
-		} else {
-			getSubscriptionState();	
-		}
-	}
-	
-	/**
-	 * @param subscription Can be configured with an existing subscription.  Will not look for subscription, and will render with a way to unsubscribe.
-	 */
-	public void configure(Subscription subscription) {
-		this.id = subscription.getObjectId();
-		this.type = subscription.getObjectType();
-		this.currentSubscription = subscription;
-		showUnfollowButton();
+	public void configure() {
+		view.setVisible(false);
+		isACTMemberAsyncHandler.isACTMember(isACT -> {
+			if (isACT) {
+				view.setVisible(true);
+				if (!authController.isLoggedIn()) {
+					showFollowButton();
+				} else {
+					getSubscriptionState();	
+				}
+			}
+		});
 	}
 	
 	public void getSubscriptionState() {
 		view.clear();
 		synAlert.clear();
+		// attempt to find subscription for data access type
 		SubscriptionRequest request = new SubscriptionRequest();
-		request.setObjectType(type);
-		List<String> idList = new ArrayList<String>();
-		idList.add(id);
-		request.setIdList(idList);
-		jsClient.listSubscription(request, new AsyncCallback<SubscriptionPagedResults>() {
+		request.setObjectType(DATA_ACCESS_SUBMISSION_TYPE);
+		jsClient.getAllSubscriptions(DATA_ACCESS_SUBMISSION_TYPE, 1L, 0L, SortByType.CREATED_ON, SortDirection.DESC, new AsyncCallback<SubscriptionPagedResults>() {
 			@Override
 			public void onSuccess(SubscriptionPagedResults results) {
 				if (results.getTotalNumberOfResults() > 0) {
@@ -169,10 +128,7 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		} else {
 			view.showLoading();
-			Topic topic = new Topic();
-			topic.setObjectId(id);
-			topic.setObjectType(type);
-			jsClient.subscribe(topic, new AsyncCallback<Subscription>() {
+			jsClient.subscribeToAll(DATA_ACCESS_SUBMISSION_TYPE, new AsyncCallback<Subscription>() {
 				public void onFailure(Throwable caught) {
 					view.hideLoading();
 					synAlert.handleException(caught);
@@ -217,14 +173,6 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
-	}
-	
-	/**
-	 * For testing
-	 * @return
-	 */
-	public boolean isIconOnly(){
-		return iconOnly;
 	}
 	
 	public Subscription getCurrentSubscription() {

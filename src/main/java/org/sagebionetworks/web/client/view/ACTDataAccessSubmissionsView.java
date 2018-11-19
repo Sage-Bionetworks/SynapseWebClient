@@ -25,6 +25,7 @@ public interface ACTDataAccessSubmissionsView extends IsWidget, SynapseView {
 	void setIsIRBApprovalRequired(boolean value);
 	void setIsValidatedProfileRequired(boolean value);
 	void setSubjectsWidget(IsWidget w);
+	void setSubscribeWidget(IsWidget w);
 	void setAccessRequirementUIVisible(boolean visible);
 	void setProjectedExpirationDateVisible(boolean visible);
 	void setProjectedExpirationDate(String date);

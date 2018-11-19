@@ -97,8 +97,10 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.subscription.SortByType;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
+import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
+import org.sagebionetworks.repo.model.subscription.SubscriptionRequest;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ViewType;
@@ -164,6 +166,7 @@ public class SynapseJavascriptClient {
 	public static final String URL = "/messageUrl";
 	public static final String MODERATORS = "/moderators";
 	public static final String SUBSCRIPTION = "/subscription";
+	public static final String ALL = "/all";
 	public static final String FILE_HANDLE_BATCH = "/fileHandle/batch";
 	public static final String THREAD_COUNTS = "/threadcounts";
 	public static final String ATTACHMENT_HANDLES = "attachmenthandles";
@@ -248,6 +251,8 @@ public class SynapseJavascriptClient {
 	
 	public static final String DOWNLOAD_ORDER = "/download/order";
 	public static final String DOWNLOAD_ORDER_HISTORY = DOWNLOAD_ORDER+"/history";
+	
+	
 	
 	public String repoServiceUrl,fileServiceUrl, authServiceUrl, synapseVersionInfo; 
 	@Inject
@@ -1267,6 +1272,27 @@ public class SynapseJavascriptClient {
 		s.setSessionToken(token);
 		String url = jsniUtils.getSessionCookieUrl();
 		doPost(url, s, OBJECT_TYPE.None, callback);
+	}
+	
+	public void subscribe(Topic topic, AsyncCallback<Subscription> callback) {
+		String url = getRepoServiceUrl() + SUBSCRIPTION ;
+		doPost(url, topic, OBJECT_TYPE.Subscription, callback);
+	}
+	public void unsubscribe(String subscriptionId, AsyncCallback<Void> callback) {
+		String url = getRepoServiceUrl() + SUBSCRIPTION + "/" + subscriptionId;
+		doDelete(url, callback);
+	}
+	public void subscribeToAll(SubscriptionObjectType type, AsyncCallback<Subscription> callback) {
+		String url = getRepoServiceUrl() + SUBSCRIPTION + ALL + "?objectType="+type.toString();
+		doPost(url, null, OBJECT_TYPE.Subscription, callback);
+	}
+	public void getSubscription(String subscriptionId, AsyncCallback<Subscription> callback) {
+		String url = getRepoServiceUrl() + SUBSCRIPTION + "/"+subscriptionId;
+		doGet(url, OBJECT_TYPE.Subscription, callback);
+	}
+	public void listSubscription(SubscriptionRequest request, AsyncCallback<SubscriptionPagedResults> callback) {
+		String url = getRepoServiceUrl() + SUBSCRIPTION + "/list";
+		doPost(url, request, OBJECT_TYPE.SubscriptionPagedResults, callback);
 	}
 }
 

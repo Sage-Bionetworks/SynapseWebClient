@@ -13,6 +13,7 @@
 			<bh:Text>Review requests for access: </bh:Text>
 			<bh:Div ui:field="subjectsContainer" />	 
 		</b:Heading>
+		<bh:Div ui:field="subscribeWidgetContainer"/>
 		<bh:Div ui:field="synAlertContainer" />
 		<b:Panel ui:field="accessRequirementUI" addStyleNames="margin-top-30 margin-left-35 margin-right-10 light-border padding-10">
 			<bh:Div ui:field="accessRequirementContainer" />

@@ -1,12 +1,10 @@
 package org.sagebionetworks.web.client.presenter;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SubscriptionClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.SubscriptionPlace;
 import org.sagebionetworks.web.client.view.SubscriptionView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -22,7 +20,7 @@ public class SubscriptionPresenter extends AbstractActivity implements Subscript
 	public static final String MISSING_PARAMS_MESSAGE = "Missing subscription and topic information.";
 	private SubscriptionPlace place;
 	private SubscriptionView view;
-	private SubscriptionClientAsync subscriptionClient;
+	private SynapseJavascriptClient jsClient;
 	private SynapseAlert synAlert;
 	private TopicWidget topicWidget;
 	private GlobalApplicationState globalAppState;
@@ -31,14 +29,13 @@ public class SubscriptionPresenter extends AbstractActivity implements Subscript
 	
 	@Inject
 	public SubscriptionPresenter(SubscriptionView view,
-			SubscriptionClientAsync subscriptionClient,
+			SynapseJavascriptClient jsClient,
 			SynapseAlert synAlert,
 			GlobalApplicationState globalAppState,
 			TopicWidget topicWidget
 			) {
 		this.view = view;
-		this.subscriptionClient = subscriptionClient;
-		fixServiceEntryPoint(subscriptionClient);
+		this.jsClient = jsClient;
 		this.synAlert = synAlert;
 		this.globalAppState = globalAppState;
 		this.topicWidget = topicWidget;
@@ -65,7 +62,7 @@ public class SubscriptionPresenter extends AbstractActivity implements Subscript
 		if (subscriptionIdParam != null) {
 			//assume subscribed.  look for subscription...
 			view.selectSubscribedButton();
-			subscriptionClient.getSubscription(Long.parseLong(subscriptionIdParam), new AsyncCallback<Subscription>() {
+			jsClient.getSubscription(subscriptionIdParam, new AsyncCallback<Subscription>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					synAlert.handleException(caught);
@@ -105,7 +102,7 @@ public class SubscriptionPresenter extends AbstractActivity implements Subscript
 		Topic newTopic = new Topic();
 		newTopic.setObjectId(objectId);
 		newTopic.setObjectType(objectType);
-		subscriptionClient.subscribe(newTopic, new AsyncCallback<Subscription>() {
+		jsClient.subscribe(newTopic, new AsyncCallback<Subscription>() {
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			};
@@ -124,9 +121,7 @@ public class SubscriptionPresenter extends AbstractActivity implements Subscript
 	public void onUnsubscribe() {
 		synAlert.clear();
 		String subscriptionIdParam = place.getParam(SubscriptionPlace.SUBSCRIPTION_ID_FILTER_PARAM);
-		final Long subscriptionId = Long.parseLong(subscriptionIdParam);
-		
-		subscriptionClient.unsubscribe(subscriptionId, new AsyncCallback<Void>() {
+		jsClient.unsubscribe(subscriptionIdParam, new AsyncCallback<Void>() {
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			};
