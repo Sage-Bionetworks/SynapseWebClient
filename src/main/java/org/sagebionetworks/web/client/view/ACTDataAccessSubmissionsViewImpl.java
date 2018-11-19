@@ -81,8 +81,6 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	Well expirationDateUI;
 	@UiField
 	Strong expirationDate;
-	@UiField
-	Div subscribeWidgetContainer;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -258,10 +256,5 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	@Override
 	public void setProjectedExpirationDateVisible(boolean visible) {
 		expirationDateUI.setVisible(visible);
-	}
-	@Override
-	public void setSubscribeWidget(IsWidget w) {
-		subscribeWidgetContainer.clear();
-		subscribeWidgetContainer.add(w);
 	}
 }
