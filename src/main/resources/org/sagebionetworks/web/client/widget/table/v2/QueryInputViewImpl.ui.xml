@@ -41,10 +41,6 @@
 			    </t:TableData>
 			</t:TableRow>
 		</t:Table>
-		
-		<b:Alert ui:field="queryResultsMessage" type="DANGER" visible="false">
-			<b:Button ui:field="resetButton" icon="ROTATE_LEFT" type="DEFAULT" text="Reset query"
-				size="EXTRA_SMALL" addStyleNames="margin-left-10"></b:Button>
-		</b:Alert>
+		<w:InfoAlert ui:field="queryResultsMessage" visible="false" alertType="DANGER" icon="EXCLAMATION_CIRCLE" message="" linkText="Reset query" />
 	</g:HTMLPanel>
 </ui:UiBinder>

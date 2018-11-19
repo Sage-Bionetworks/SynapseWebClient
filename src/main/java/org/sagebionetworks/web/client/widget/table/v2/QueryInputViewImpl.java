@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.InfoAlert;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -44,9 +45,7 @@ public class QueryInputViewImpl implements QueryInputView{
 	@UiField
 	Button queryButton;
 	@UiField
-	Alert queryResultsMessage;
-	@UiField
-	Button resetButton;
+	InfoAlert queryResultsMessage;
 	@UiField
 	Button editResultsButton;
 	@UiField
@@ -74,7 +73,7 @@ public class QueryInputViewImpl implements QueryInputView{
 		queryButton.addClickHandler(event -> {
 			presenter.onExecuteQuery();
 		});
-		resetButton.addClickHandler(event -> {
+		queryResultsMessage.addClickHandler(event -> {
 			presenter.onReset();
 		});
 		// Enter key should execute the query.
@@ -138,7 +137,7 @@ public class QueryInputViewImpl implements QueryInputView{
 
 	@Override
 	public void setInputErrorMessage(String string) {
-		this.queryResultsMessage.setText(string);
+		this.queryResultsMessage.setMessage(string);
 	}
 
 	@Override

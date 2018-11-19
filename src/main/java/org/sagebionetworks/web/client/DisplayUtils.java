@@ -15,7 +15,9 @@ import static org.sagebionetworks.web.client.DisplayConstants.OK;
 import static org.sagebionetworks.web.client.DisplayConstants.PRIMARY_BUTTON_STYLE;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.gwtbootstrap3.client.ui.Button;
@@ -69,6 +71,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.NodeList;
@@ -84,6 +87,7 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -258,9 +262,24 @@ public class DisplayUtils {
 		notify(message, iconType, settings);
 	}
 	
+	public static final Set<String> recentNotificationMessages = new HashSet<>();
+	
 	public static void notify(String message, IconType iconType, NotifySettings settings) {
 		try{
-			Notify.notify("", message, iconType, settings);
+			String key = message + "/" + iconType.name();
+			if (!recentNotificationMessages.contains(key)) {
+				recentNotificationMessages.add(key);
+				Notify.notify("", message, iconType, settings);
+				
+				// in 5 seconds clean up that key (to allow showing the message again)
+				Timer timer = new Timer() { 
+				    public void run() { 
+				    	recentNotificationMessages.remove(key);
+				    } 
+				};
+				timer.schedule(5000);
+			}
+			
 		} catch(Throwable t) {
 			SynapseJSNIUtilsImpl._consoleError(getStackTrace(t));
 		}
