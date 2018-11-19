@@ -11,8 +11,8 @@
 				<g:FocusPanel ui:field="pictureFocusPanel" addStyleNames="margin-right-5 imageButton displayInlineBlock">
 					<bh:Span>
 						<bh:Span ui:field="defaultUserPicture" addStyleNames="fa-stack userProfileImage">
-							<b:Icon ui:field="squareIcon" type="CIRCLE_O" addStyleNames="fa-stack-2x"/>
-							<bh:Strong ui:field="defaultUserPictureLetter" text="J" addStyleNames="fa-stack-1x"/>
+							<b:Icon ui:field="squareIcon" type="CIRCLE" addStyleNames="fa-stack-2x"/>
+							<bh:Strong ui:field="defaultUserPictureLetter" text="J" addStyleNames="fa-stack-1x color-white"/>
 						</bh:Span>
 						<g:Image ui:field="userPicture" addStyleNames="userProfileImage margin-left-2" />
 					</bh:Span>

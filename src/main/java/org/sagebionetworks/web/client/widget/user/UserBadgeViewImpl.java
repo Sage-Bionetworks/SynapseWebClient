@@ -95,7 +95,6 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	@Override
 	public void setDefaultPictureColor(String color) {
 		squareIcon.setColor(color);
-		defaultUserPictureLetter.setColor(color);
 	}
 	@Override
 	public void setDefaultPictureLetter(String letter) {
