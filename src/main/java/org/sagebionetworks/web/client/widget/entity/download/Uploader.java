@@ -166,10 +166,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public Widget asWidget() {
 		return null;
 	}
-
-	public void uploadFiles() {
-		view.triggerUpload();
-	}
 	
 	public String[] getSelectedFileNames() {
 		return synapseJsniUtils.getMultipleUploadFileNames(fileList);

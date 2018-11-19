@@ -302,11 +302,6 @@ public class UploaderViewImpl extends FlowPanel implements
 	}
 	
 	@Override
-	public void triggerUpload() {
-		uploadBtn.click();
-	}
-
-	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
@@ -415,7 +410,6 @@ public class UploaderViewImpl extends FlowPanel implements
 			chooseFileButtonGroup.setVisible(isEnabled);
 			chooseSingleFileBtn.setVisible(!isEnabled);
 		}
-		
 	}
 	
 	/*
@@ -544,12 +538,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		fileUploadInput.setName("uploads[]");
 		fileUploadInput.setVisible(false);
 		fileUploadLabel.addStyleName("displayInline margin-left-5");
-		fileUploadInput.addValueChangeHandler(new ValueChangeHandler<String>() {
-			@Override
-			public void onValueChange(ValueChangeEvent<String> event) {
-				uploadBtn.click();
-			}
-		});
+		// SWC-4202: Ljubo says we need a second click (significant action that should be confirmed)
 		chooseFilesItem.addClickHandler(event -> {
 			//click file upload input field
 			fileUploadInput.getElement().setAttribute("multiple", null);

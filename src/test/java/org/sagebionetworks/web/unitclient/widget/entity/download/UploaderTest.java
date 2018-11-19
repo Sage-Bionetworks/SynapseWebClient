@@ -716,12 +716,6 @@ public class UploaderTest {
 	}
 	
 	@Test
-	public void testUploadFiles() {
-		uploader.uploadFiles();
-		verify(mockView).triggerUpload();
-	}
-	
-	@Test
 	public void testFileSupported() {
 		when(mockSynapseJsniUtils.isFileAPISupported()).thenReturn(true);
 		assertTrue(uploader.checkFileAPISupported());
