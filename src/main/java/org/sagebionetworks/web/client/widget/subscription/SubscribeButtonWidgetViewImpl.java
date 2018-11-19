@@ -131,8 +131,4 @@ public class SubscribeButtonWidgetViewImpl implements SubscribeButtonWidgetView{
 		followButton.setSize(size);
 		unfollowButton.setSize(size);
 	}
-	@Override
-	public void setVisible(boolean isVisible) {
-		w.setVisible(isVisible);
-	}
 }
