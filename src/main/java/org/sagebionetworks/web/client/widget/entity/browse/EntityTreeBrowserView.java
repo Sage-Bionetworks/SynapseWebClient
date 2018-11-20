@@ -5,7 +5,6 @@ import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
-import org.sagebionetworks.web.client.widget.table.SortEntityChildrenDropdownButtonListener;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -26,8 +25,8 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 	/**
 	 * Presenter interface
 	 */
-	public interface Presenter extends SortEntityChildrenDropdownButtonListener {
-
+	public interface Presenter {
+		void onToggleSort(SortBy sortColumn);
 		void setSelection(String id);
 		void expandTreeItemOnOpen(final EntityTreeItem target);
 		void clearRecordsFetchedChildren();
@@ -49,4 +48,5 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 	void hideEmptyUI();
 	void setLoadingVisible(boolean isShown);
 	void setSynAlert(IsWidget w);
+	void setSortUI(SortBy sortBy, Direction dir);
 }

@@ -6,6 +6,7 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" 
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
+	xmlns:tr="urn:import:org.sagebionetworks.web.client.widget.table.v2.results"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
     
 	<bh:Div>
@@ -15,9 +16,7 @@
 	    <t:Table ui:field="entityTreeHeader" width="100%">
 			<t:TableRow>
 				<t:TableHeader width="20px" />
-				<t:TableHeader>
-					<bh:Span text="Name" />
-				</t:TableHeader>
+				<tr:SortableTableHeaderImpl ui:field="nameColumnHeader" addStyleNames="font-weight-normal" text="Name" />
 				<t:TableHeader width="310px" addStyleNames="visible-xl">
 					<bh:Span text="Modified By"/>
 				</t:TableHeader>

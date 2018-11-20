@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.table.SortEntityChildrenDropdownButton;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -32,21 +31,15 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	AnchorListItem programmaticOptionsLink;
 	@UiField
 	Div addToDownloadListContainer;
-	SortEntityChildrenDropdownButton sortEntityChildrenDropdownButton;
 	
 	@Inject
 	public FilesBrowserViewImpl(FilesBrowserViewImplUiBinder binder,
-			EntityTreeBrowser entityTreeBrowser,
-			SortEntityChildrenDropdownButton sortEntityChildrenDropdownButton) {
+			EntityTreeBrowser entityTreeBrowser) {
 		widget = binder.createAndBindUi(this);
 		this.entityTreeBrowser = entityTreeBrowser;
 		Widget etbW = entityTreeBrowser.asWidget();
 		etbW.addStyleName("margin-top-10");
 		files.add(etbW);
-		this.sortEntityChildrenDropdownButton = sortEntityChildrenDropdownButton;
-		commandsContainer.add(sortEntityChildrenDropdownButton);
-		sortEntityChildrenDropdownButton.setListener(entityTreeBrowser);
-		sortEntityChildrenDropdownButton.setSortUI(EntityTreeBrowser.DEFAULT_SORT_BY, EntityTreeBrowser.DEFAULT_DIRECTION);
 		programmaticOptionsLink.addClickHandler(event->{
 			presenter.onProgrammaticDownloadOptions();
 		});

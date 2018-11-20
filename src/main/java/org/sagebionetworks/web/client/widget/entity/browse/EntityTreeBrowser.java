@@ -90,6 +90,11 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	}
 	
 	@Override
+	public void onToggleSort(SortBy sortColumn) {
+		currentDirection = Direction.ASC.equals(currentDirection) ? Direction.DESC : Direction.ASC;
+		onSort(sortColumn, currentDirection);
+	}
+	
 	public void onSort(SortBy sortColumn, Direction sortDirection) {
 		currentSortBy = sortColumn;
 		currentDirection = sortDirection;
@@ -139,6 +144,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	public void getChildren(final String parentId,
 			final EntityTreeItem parent, String nextPageToken) {
 		EntityChildrenRequest request = createGetEntityChildrenRequest(parentId, nextPageToken);
+		view.setSortUI(request.getSortBy(), request.getSortDirection());
 		synAlert.clear();
 		// ask for the folder children, then the files
 		jsClient.getEntityChildren(request,

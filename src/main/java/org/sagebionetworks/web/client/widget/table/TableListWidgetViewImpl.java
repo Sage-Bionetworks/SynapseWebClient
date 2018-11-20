@@ -1,14 +1,15 @@
 package org.sagebionetworks.web.client.widget.table;
 
-import org.gwtbootstrap3.client.ui.ListGroup;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
+import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
+import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -29,31 +30,36 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	@UiField
 	Div loadMoreWidgetContainer;
 	@UiField
-	Div sortButtonContainer;
-	@UiField
 	Div synAlertContainer;
 	@UiField
 	Span emptyUI;
+	@UiField
+	SortableTableHeaderImpl nameColumnHeader;
 	HTMLPanel panel;
 	Presenter presenter;
 	PortalGinInjector ginInjector;
 	@UiField
 	LoadingSpinner loadingUI;
-	SortEntityChildrenDropdownButton sortEntityChildrenDropdownButton;
 	@Inject
 	public TableListWidgetViewImpl(Binder binder, 
-			PortalGinInjector ginInjector, 
-			SortEntityChildrenDropdownButton sortEntityChildrenDropdownButton) {
+			PortalGinInjector ginInjector) {
 		this.panel = binder.createAndBindUi(this);
 		this.ginInjector = ginInjector;
-		this.sortEntityChildrenDropdownButton = sortEntityChildrenDropdownButton;
-		sortButtonContainer.add(sortEntityChildrenDropdownButton);
+		nameColumnHeader.setSortingListener(header -> {
+			presenter.toggleSort(SortBy.NAME);
+		});
 	}
 
 	@Override
+	public void setSortUI(SortBy sortBy, Direction dir) {
+		if (SortBy.NAME.equals(sortBy)) {
+			SortDirection direction = Direction.ASC.equals(dir) ? SortDirection.ASC : SortDirection.DESC;
+			nameColumnHeader.setSortDirection(direction);
+		}
+	}
+	@Override
 	public void addTableListItem(final EntityHeader header) {
 		emptyUI.setVisible(false);
-		sortButtonContainer.setVisible(true);
 		TableEntityListGroupItem item = ginInjector.getTableEntityListGroupItem();
 		item.configure(header, event -> {
 			presenter.onTableClicked(header);
@@ -65,7 +71,6 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	public void clearTableWidgets() {
 		tablesList.clear();
 		emptyUI.setVisible(true);
-		sortButtonContainer.setVisible(false);
 	}
 	
 	@Override
@@ -75,14 +80,8 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	}
 	
 	@Override
-	public void setSortUI(SortBy sortBy, Direction dir) {
-		sortEntityChildrenDropdownButton.setSortUI(sortBy, dir);
-	}
-	
-	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		sortEntityChildrenDropdownButton.setListener(presenter);
 	}
 	
 	@Override

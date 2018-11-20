@@ -66,8 +66,12 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	 */
 	public void configure(EntityBundle parentBundle) {
 		this.parentBundle = parentBundle;
-		view.setSortUI(DEFAULT_SORT_BY, DEFAULT_DIRECTION);
 		loadData();
+	}
+
+	public void toggleSort(SortBy sortColumn) {
+		Direction newDirection = Direction.ASC.equals(query.getSortDirection()) ? Direction.DESC : Direction.ASC;
+		onSort(sortColumn, newDirection);
 	}
 	
 	public void onSort(SortBy sortColumn, Direction sortDirection) {
@@ -108,6 +112,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	 */
 	private void loadMore(){
 		synAlert.clear();
+		view.setSortUI(query.getSortBy(), query.getSortDirection());
 		jsClient.getEntityChildren(query, new AsyncCallback<EntityChildrenResponse>() {
 			public void onSuccess(EntityChildrenResponse result) {
 				query.setNextPageToken(result.getNextPageToken());

@@ -35,6 +35,7 @@ public class SortableTableHeaderImpl implements SortableTableHeader {
 	@Inject
 	public SortableTableHeaderImpl(){
 		widget = uiBinder.createAndBindUi(this);
+		setSortDirection(null);
 	}
 
 	@Override
