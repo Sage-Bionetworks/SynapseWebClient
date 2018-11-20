@@ -408,15 +408,15 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 				break;
 			}
 		}
-		// transition through UNSORTED (not in sort list) -> ASC -> DESC -> UNSORTED (remove from sort list)
+		// transition through UNSORTED (not in sort list) -> DESC -> ASC -> UNSORTED (remove from sort list)
 		if (targetSortItem == null) {
 			// new sort, set to default
 			targetSortItem = new SortItem();
 			targetSortItem.setColumn(header);
-			targetSortItem.setDirection(SortDirection.ASC);
-			sortItems.add(targetSortItem);
-		} else if (SortDirection.ASC.equals(targetSortItem.getDirection())) {
 			targetSortItem.setDirection(SortDirection.DESC);
+			sortItems.add(targetSortItem);
+		} else if (SortDirection.DESC.equals(targetSortItem.getDirection())) {
+			targetSortItem.setDirection(SortDirection.ASC);
 		} else {
 			sortItems.remove(targetSortItem);
 		}
