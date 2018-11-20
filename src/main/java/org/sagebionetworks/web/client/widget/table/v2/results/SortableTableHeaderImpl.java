@@ -20,7 +20,9 @@ import com.google.inject.Inject;
  */
 
 public class SortableTableHeaderImpl implements SortableTableHeader {
-	
+	public static final String UNSORTED_STYLES = "synapse-blue";
+	public static final String SORTED_STYLES = "synapse-blue-bg color-white";
+
 	public interface Binder extends UiBinder<Widget, SortableTableHeaderImpl> {}
 	
 	@UiField
@@ -55,9 +57,7 @@ public class SortableTableHeaderImpl implements SortableTableHeader {
 			sortIcon.addClickHandler(onClick);
 		}
 	}
-	public static final String UNSORTED_STYLES = "synapse-blue";
-	public static final String SORTED_STYLES = "synapse-blue-bg color-white";
-	
+
 	@Override
 	public void setSortDirection(SortDirection direction) {
 		IconType icon = IconType.SYN_SORT_DESC;

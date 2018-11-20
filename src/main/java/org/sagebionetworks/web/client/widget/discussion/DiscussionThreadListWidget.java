@@ -100,6 +100,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 		DiscussionThreadCountAlert threadCountAlert = ginInjector.getDiscussionThreadCountAlert();
 		view.setThreadCountAlert(threadCountAlert.asWidget());
 		threadCountAlert.configure(forumId);
+		view.setSorted(order, ascending);
 	}
 
 	public void configure(String entityId, CallbackP<Boolean> emptyListCallback,

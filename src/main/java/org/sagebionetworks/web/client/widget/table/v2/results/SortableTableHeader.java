@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.table.SortDirection;
 
 import com.google.gwt.user.client.ui.IsWidget;

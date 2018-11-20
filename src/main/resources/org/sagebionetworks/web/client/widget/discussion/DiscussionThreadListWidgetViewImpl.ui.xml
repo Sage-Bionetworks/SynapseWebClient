@@ -15,9 +15,8 @@
 					<t:Table width="100%">
 						<t:TableRow>
 							<t:TableHeader>
-								<g:FocusPanel ui:field="sortByTopic" addStyleNames="imageButton">
-									<bh:Span text="Topic"/>
-								</g:FocusPanel>
+								<b:Anchor ui:field="sortByTopic" text="Topic" paddingLeft="2" paddingRight="5" />
+								<b:Icon ui:field="sortByTopicIcon" type="SORT_AMOUNT_ASC" paddingTop="4" paddingRight="3" paddingBottom="4" paddingLeft="1" addStyleNames="imageButton"/>
 							</t:TableHeader>
 							<t:TableHeader width="60px" addStyleNames="visible-lg">
 								<bh:Span text="Author"/>
@@ -25,20 +24,17 @@
 							<t:TableHeader width="310px" addStyleNames="visible-lg">
 								<bh:Span text="Active Users"/>
 							</t:TableHeader>
-							<t:TableHeader width="60px" addStyleNames="visible-lg visible-md">
-								<g:FocusPanel ui:field="sortByReplies" addStyleNames="imageButton">
-									<bh:Span text="Replies" addStyleNames="margin-right-5"/>
-								</g:FocusPanel>
+							<t:TableHeader width="90px" addStyleNames="visible-lg visible-md">
+								<b:Anchor ui:field="sortByReplies" text="Replies" paddingLeft="2" paddingRight="5" />
+								<b:Icon ui:field="sortByRepliesIcon" type="SORT_AMOUNT_ASC" paddingTop="4" paddingRight="3" paddingBottom="4" paddingLeft="1" addStyleNames="imageButton"/>
 							</t:TableHeader>
-							<t:TableHeader width="60px" addStyleNames="visible-lg visible-md">
-								<g:FocusPanel ui:field="sortByViews" addStyleNames="imageButton">
-									<bh:Span text="Views" addStyleNames="margin-right-5"/>
-								</g:FocusPanel>
+							<t:TableHeader width="90px" addStyleNames="visible-lg visible-md">
+								<b:Anchor ui:field="sortByViews" text="Views" paddingLeft="2" paddingRight="5" />
+								<b:Icon ui:field="sortByViewsIcon" type="SORT_AMOUNT_ASC" paddingTop="4" paddingRight="3" paddingBottom="4" paddingLeft="1" addStyleNames="imageButton"/>
 							</t:TableHeader>
-							<t:TableHeader width="130px" addStyleNames="visible-lg visible-md">
-								<g:FocusPanel ui:field="sortByActivity" addStyleNames="imageButton">
-									<bh:Span text="Activity" addStyleNames="margin-right-5"/>
-								</g:FocusPanel>
+							<t:TableHeader width="8px" addStyleNames="visible-lg visible-md">
+								<b:Anchor ui:field="sortByActivity" text="Activity" paddingLeft="2" paddingRight="5" />
+								<b:Icon ui:field="sortByActivityIcon" type="SORT_AMOUNT_ASC" paddingTop="4" paddingRight="3" paddingBottom="4" paddingLeft="1" addStyleNames="imageButton"/>
 							</t:TableHeader>
 						</t:TableRow>
 					</t:Table>

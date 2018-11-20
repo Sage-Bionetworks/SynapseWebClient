@@ -436,5 +436,4 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		facetsVisible = visible;
 		pageViewerWidget.setFacetsVisible(visible);
 	}
-	
 }
