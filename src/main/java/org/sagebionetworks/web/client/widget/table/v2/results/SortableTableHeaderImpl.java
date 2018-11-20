@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.sagebionetworks.web.client.widget.HelpWidget;
-import org.sagebionetworks.web.client.widget.HelpWidget.Binder;
+import org.sagebionetworks.repo.model.table.SortDirection;
 
 import com.google.gwt.core.shared.GWT;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -24,7 +25,8 @@ public class SortableTableHeaderImpl implements SortableTableHeader {
 	
 	@UiField
 	Anchor tableHeaderLink;
-	
+	@UiField
+	Icon sortIcon;
 	Widget widget;
 	private static Binder uiBinder = GWT.create(Binder.class);
 	
@@ -46,14 +48,30 @@ public class SortableTableHeaderImpl implements SortableTableHeader {
 	
 	public void setSortingListener(final SortingListener handler) {
 		if(handler != null){
-			tableHeaderLink.addClickHandler(event -> {
+			ClickHandler onClick = event -> {
 				handler.onToggleSort(getText());
-			});
+			};
+			tableHeaderLink.addClickHandler(onClick);
+			sortIcon.addClickHandler(onClick);
 		}
 	}
+	public static final String UNSORTED_STYLES = "synapse-blue";
+	public static final String SORTED_STYLES = "synapse-blue-bg color-white";
+	
 	@Override
-	public void setIcon(IconType icon) {
-		tableHeaderLink.setIcon(icon);	
+	public void setSortDirection(SortDirection direction) {
+		IconType icon = IconType.SYN_SORT_DESC;
+		if (direction == null) {
+			sortIcon.removeStyleName(SORTED_STYLES);
+			sortIcon.addStyleName(UNSORTED_STYLES);
+		} else {
+			sortIcon.removeStyleName(UNSORTED_STYLES);
+			sortIcon.addStyleName(SORTED_STYLES);
+			if (SortDirection.ASC.equals(direction)) {
+				icon = IconType.SYN_SORT_ASC;
+			}
+		}
+		sortIcon.setType(icon);
 	}
 	public void setWidth(String width) {
 		widget.setWidth(width);

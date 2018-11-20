@@ -341,6 +341,34 @@
       "search": [
         "star-o"
       ]
+    },
+    {
+      "uid": "f07ef6a8be2a753d7a64838f694251f1",
+      "css": "sort-asc",
+      "code": 59441,
+      "src": "custom_icons",
+      "selected": true,
+      "svg": {
+        "path": "M485.2 452.3V572.9H941.8V452.3H485.2ZM485.2 90.5V211.1H713.5V90.5H485.2ZM485.2 814.1V934.7H1170.1V814.1H485.2ZM256.9 211.1H399.5L199.8 0 0 211.1H142.7V995H256.9V211.1Z",
+        "width": 1182
+      },
+      "search": [
+        "sort-asc"
+      ]
+    },
+    {
+      "uid": "ba8354feb78a5d5773df63e43ef7f4b5",
+      "css": "sort-desc",
+      "code": 59442,
+      "src": "custom_icons",
+      "selected": true,
+      "svg": {
+        "path": "M476 533.1V414.6H924.1V533.1H476ZM476 888.4V770H700V888.4H476ZM476 177.7V59.2H1148.1V177.7H476ZM252 770H392L196 977.3 0 770H140V0H252V770Z",
+        "width": 1182
+      },
+      "search": [
+        "sort-desc"
+      ]
     }
   ]
 }

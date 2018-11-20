@@ -85,10 +85,10 @@ public class FileHandleAssociationTableViewImpl implements FileHandleAssociation
 		// set sort icon
 		for (SortableTableHeaderImpl header : headers) {
 			if (headerName.equals(header.getText())) {
-				IconType icon = SortDirection.ASC.equals(sortDir) ? IconType.ANGLE_UP : IconType.ANGLE_DOWN; 
-				header.setIcon(icon);
+				org.sagebionetworks.repo.model.table.SortDirection direction = SortDirection.ASC.equals(sortDir) ? org.sagebionetworks.repo.model.table.SortDirection.ASC : org.sagebionetworks.repo.model.table.SortDirection.DESC; 
+				header.setSortDirection(direction);
 			} else {
-				header.setIcon(null);	
+				header.setSortDirection(null);	
 			}
 		}
 	}

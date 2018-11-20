@@ -120,11 +120,9 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 				headers.add(sth);
 				if(sortedHeaders.containsKey(headerName)) {
 					SortItem sortItem = sortedHeaders.get(headerName);
-					if(SortDirection.DESC.equals(sortItem.getDirection())){
-						sth.setIcon(IconType.SORT_DESC);
-					}else{
-						sth.setIcon(IconType.SORT_ASC);
-					}
+					sth.setSortDirection(sortItem.getDirection());
+				} else {
+					sth.setSortDirection(null);
 				}
 			}else{
 				// For the static case we just set the header name.
