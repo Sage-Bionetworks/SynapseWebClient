@@ -70,14 +70,16 @@ public class NewAccountPresenterTest {
 		AsyncMockStubber.callSuccessWith(testSessionToken).when(mockUserService).createUserStep2(anyString(), anyString(), anyString(), anyString(), any(EmailValidationSignedToken.class), any(AsyncCallback.class));
 	}
 	
-	
 	@Test
 	public void testSetPlace() {
 		reset(mockView);
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		NewAccount newPlace = Mockito.mock(NewAccount.class);
 		when(newPlace.toToken()).thenReturn("");
 		newAccountPresenter.setPlace(newPlace);
 		verify(mockView).setPresenter(newAccountPresenter);
+		verify(mockGlobalApplicationState).clearLastPlace();
+		verify(mockAuthController).logoutUser();
 	}
 	
 	@Test
