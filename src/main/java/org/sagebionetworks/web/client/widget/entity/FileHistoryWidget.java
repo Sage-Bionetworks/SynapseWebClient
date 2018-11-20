@@ -192,4 +192,13 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 			}
 		});
 	}
+	
+	public void setVisible(boolean visible) {
+		view.asWidget().setVisible(visible);
+	}
+	
+	public boolean isVisible() {
+		return view.asWidget().isVisible();
+	}
+
 }

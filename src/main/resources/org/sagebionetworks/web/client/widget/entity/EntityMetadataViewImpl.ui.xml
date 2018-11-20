@@ -40,10 +40,6 @@
 			</g:FlowPanel>
 
 		</b:Collapse>
-		<b:Collapse ui:field="fileHistoryContent" toggle="false"
-			b:id="fileHistoryContentCollapse">
-			<g:SimplePanel ui:field="fileHistoryContainer"
-				addStyleNames="highlight-box margin-bottom-15"></g:SimplePanel>
-		</b:Collapse>
+		<bh:Div ui:field="fileHistoryContainer" />
 	</g:HTMLPanel>
 </ui:UiBinder>

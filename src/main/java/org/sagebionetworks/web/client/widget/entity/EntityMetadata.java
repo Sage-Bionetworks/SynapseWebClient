@@ -38,7 +38,7 @@ public class EntityMetadata implements Presenter {
 	private SynapseJSNIUtils jsni;
 	private org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget restrictionWidgetV2;
 
-	boolean isShowingAnnotations, isShowingFileHistory;
+	boolean isShowingAnnotations;
 	@Inject
 	public EntityMetadata(EntityMetadataView view,
 						  DoiWidgetV2 doiWidgetV2,
@@ -73,13 +73,24 @@ public class EntityMetadata implements Presenter {
 		Entity en = bundle.getEntity();
 		view.setEntityId(en.getId());
 		boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
+		isShowingAnnotations = false;
+		setAnnotationsVisible(isShowingAnnotations);
+		fileHistoryWidget.setVisible(false);
+		actionMenu.setActionListener(Action.SHOW_ANNOTATIONS, action -> {
+			isShowingAnnotations = !isShowingAnnotations;
+			setAnnotationsVisible(isShowingAnnotations);
+		});
 		
+		actionMenu.setActionListener(Action.SHOW_FILE_HISTORY, action -> {
+			fileHistoryWidget.setVisible(!fileHistoryWidget.isVisible());
+		});
+
 		boolean isCurrentVersion = versionNumber == null;
 		if (bundle.getEntity() instanceof FileEntity) {
 			fileHistoryWidget.setEntityBundle(bundle, versionNumber);
-			view.setFileHistoryWidget(fileHistoryWidget);
 			view.setRestrictionPanelVisible(true);
 		} else {
+			fileHistoryWidget.setVisible(false);
 			view.setRestrictionPanelVisible(en instanceof TableEntity
 					|| en instanceof Folder || en instanceof DockerRepository);
 		}
@@ -87,19 +98,6 @@ public class EntityMetadata implements Presenter {
 		doiWidgetV2.configure(bundle.getDoiAssociation());
 		annotationsWidget.configure(bundle, canEdit, isCurrentVersion);
 		restrictionWidgetV2.configure(en, bundle.getPermissions().getCanChangePermissions());
-		isShowingAnnotations = false;
-		setAnnotationsVisible(isShowingAnnotations);
-		isShowingFileHistory = false;
-		setFileHistoryVisible(isShowingFileHistory);
-		actionMenu.setActionListener(Action.SHOW_ANNOTATIONS, action -> {
-			isShowingAnnotations = !isShowingAnnotations;
-			setAnnotationsVisible(isShowingAnnotations);
-		});
-		
-		actionMenu.setActionListener(Action.SHOW_FILE_HISTORY, action -> {
-			isShowingFileHistory = !isShowingFileHistory;
-			setFileHistoryVisible(isShowingFileHistory);
-		});
 	}
 	public void setVisible(boolean visible) {
 		view.setDetailedMetadataVisible(visible);
@@ -107,10 +105,6 @@ public class EntityMetadata implements Presenter {
 		
 	public void setAnnotationsVisible(boolean visible) {
 		view.setAnnotationsVisible(visible);
-	}
-	
-	public void setFileHistoryVisible(boolean visible) {
-		view.setFileHistoryVisible(visible);
 	}
 	
 	public void clear() {
