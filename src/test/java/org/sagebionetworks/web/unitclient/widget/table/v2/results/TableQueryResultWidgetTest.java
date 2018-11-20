@@ -439,4 +439,41 @@ public class TableQueryResultWidgetTest {
 		verify(mockJobTrackingWidget2).startAndTrackJob(eq(TableQueryResultWidget.VERIFYING_ETAG_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
 	}
 	
+	@Test
+	public void testToggleSort() {
+		String column1 = "col1", column2 = "col2";
+		// initialize with an empty sort
+		boolean isEditable = false;
+		tableType = TableType.files;
+		query.setSort(null);
+		
+		widget.configure(query, isEditable, tableType, mockListner);
+		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
+		// invoke a success
+		asyncProgressHandlerCaptor.getValue().onComplete(bundle);
+
+		widget.onToggleSort(column1);
+		
+		//should have added a SortItem (for column1)
+		assertTrue(query.getSort() != null && query.getSort().size() == 1);
+		assertEquals(column1, query.getSort().get(0).getColumn());
+		assertEquals(SortDirection.DESC, query.getSort().get(0).getDirection());
+		
+		widget.onToggleSort(column2);
+		//should have added a SortItem (for column2)
+		assertTrue(query.getSort() != null && query.getSort().size() == 2);
+		assertEquals(column2, query.getSort().get(1).getColumn());
+		assertEquals(SortDirection.DESC, query.getSort().get(1).getDirection());
+		
+		widget.onToggleSort(column1);
+		//should have toggled the existing SortItem (for column1) to ASC (was DESC))
+		assertTrue(query.getSort() != null && query.getSort().size() == 2);
+		assertEquals(column1, query.getSort().get(0).getColumn());
+		assertEquals(SortDirection.ASC, query.getSort().get(0).getDirection());
+		
+		widget.onToggleSort(column1);
+		//should have removed the SortItem for column1, left the SortItem for column2
+		assertTrue(query.getSort() != null && query.getSort().size() == 1);
+		assertEquals(column2, query.getSort().get(0).getColumn());
+	}
 }
