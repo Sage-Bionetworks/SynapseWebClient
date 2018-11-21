@@ -57,7 +57,8 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	public FileHistoryWidgetViewImpl(PortalGinInjector ginInjector, PromptTwoValuesModalView editVersionInfoDialog) {
 		this.ginInjector = ginInjector;
 		this.editVersionInfoModal = editVersionInfoDialog;
-		initWidget(uiBinder.createAndBindUi(this));		
+		initWidget(uiBinder.createAndBindUi(this));
+		getElement().setAttribute("highlight-box-title", "File History");
 		editVersionInfoModal.setPresenter(new PromptTwoValuesModalView.Presenter() {
 			@Override
 			public void onPrimary() {
@@ -80,6 +81,9 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 		clear();
 		currentVersionLink.setTargetHistoryToken(DisplayUtils.getSynapseHistoryTokenNoHash(entity.getId()));
 		currentVersionLink.setVisible(isShowingOlderVersion);
+		if (isShowingOlderVersion) {
+			setVisible(true);
+		}
 	}
 	
 	@Override
