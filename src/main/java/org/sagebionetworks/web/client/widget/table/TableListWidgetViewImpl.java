@@ -56,9 +56,13 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	}
 
 	@Override
-	public void setSortUI(SortBy sortBy, Direction dir) {
+	public void clearSortUI() {
 		nameColumnHeader.setSortDirection(null);
 		createdOnColumnHeader.setSortDirection(null);
+	}
+	@Override
+	public void setSortUI(SortBy sortBy, Direction dir) {
+		clearSortUI();
 		SortDirection direction = Direction.ASC.equals(dir) ? SortDirection.ASC : SortDirection.DESC;
 		if (SortBy.NAME.equals(sortBy)) {
 			nameColumnHeader.setSortDirection(direction);

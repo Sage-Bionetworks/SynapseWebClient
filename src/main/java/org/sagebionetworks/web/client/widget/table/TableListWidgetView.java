@@ -29,6 +29,7 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	void addTableListItem(EntityHeader header);
 	void setLoadMoreWidget(IsWidget w);
 	void setSynAlert(IsWidget w);
+	void clearSortUI();
 	void setSortUI(SortBy sortBy, Direction dir);
 	void hideLoading();
 }
