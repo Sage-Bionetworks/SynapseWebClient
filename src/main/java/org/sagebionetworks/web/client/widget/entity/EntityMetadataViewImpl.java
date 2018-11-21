@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Collapse;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -41,9 +42,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	Span restrictionPanelV2;
 	@UiField
-	Collapse fileHistoryContent;
-	@UiField
-	SimplePanel fileHistoryContainer;
+	Div fileHistoryContainer;
 	@UiField
 	Span uploadDestinationPanel;
 	@UiField
@@ -54,7 +53,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@Inject
 	public EntityMetadataViewImpl(final SynapseJSNIUtils jsniUtils) {
 		initWidget(uiBinder.createAndBindUi(this));
-		fileHistoryContainer.getElement().setAttribute("highlight-box-title", "File History");
 		idField.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -95,21 +93,12 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	
 	@Override
 	public void setFileHistoryWidget(IsWidget fileHistoryWidget) {
-		fileHistoryContainer.setWidget(fileHistoryWidget);
-	}
-	
-	@Override
-	public void setFileHistoryVisible(boolean visible) {
-		if (visible) {
-			fileHistoryContent.show();
-		} else {
-			fileHistoryContent.hide();
-		}
+		fileHistoryContainer.clear();
+		fileHistoryContainer.add(fileHistoryWidget);
 	}
 	
 	@Override
 	public void clear() {
-		fileHistoryContent.hide();
 		dataUseContainer.setVisible(false);
 		annotationsContent.hide();
 		uploadDestinationField.setText("");

@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.subscription;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +12,7 @@ import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.StringUtils;
-import org.sagebionetworks.web.client.SubscriptionClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -30,7 +28,7 @@ import com.google.inject.Inject;
 public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presenter, SynapseWidgetPresenter {
 	
 	private SubscribeButtonWidgetView view;
-	SubscriptionClientAsync subscribeClient;
+	SynapseJavascriptClient jsClient;
 	SynapseAlert synAlert;
 	SubscriptionObjectType type;
 	String id;
@@ -43,30 +41,23 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 	boolean iconOnly;
 	@Inject
 	public SubscribeButtonWidget(SubscribeButtonWidgetView view, 
-			SubscriptionClientAsync subscribeClient,
+			SynapseJavascriptClient jsClient,
 			SynapseAlert synAlert,
 			AuthenticationController authController,
 			GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		this.synAlert = synAlert;
-		this.subscribeClient = subscribeClient;
-		fixServiceEntryPoint(subscribeClient);
+		this.jsClient = jsClient;
 		this.authController = authController;
 		this.globalApplicationState = globalApplicationState;
 		iconOnly = false;
 		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
-		subscribeActionListener = new ActionMenuWidget.ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				onSubscribe();
-			}
+		subscribeActionListener = action -> {
+			onSubscribe();
 		};
-		unsubscribeActionListener = new ActionMenuWidget.ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				onUnsubscribe();
-			}
+		unsubscribeActionListener = action -> {
+			onUnsubscribe();
 		};
 	}
 	
@@ -149,7 +140,7 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 		List<String> idList = new ArrayList<String>();
 		idList.add(id);
 		request.setIdList(idList);
-		subscribeClient.listSubscription(request, new AsyncCallback<SubscriptionPagedResults>() {
+		jsClient.listSubscription(request, new AsyncCallback<SubscriptionPagedResults>() {
 			@Override
 			public void onSuccess(SubscriptionPagedResults results) {
 				if (results.getTotalNumberOfResults() > 0) {
@@ -181,7 +172,7 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 			Topic topic = new Topic();
 			topic.setObjectId(id);
 			topic.setObjectType(type);
-			subscribeClient.subscribe(topic, new AsyncCallback<Subscription>() {
+			jsClient.subscribe(topic, new AsyncCallback<Subscription>() {
 				public void onFailure(Throwable caught) {
 					view.hideLoading();
 					synAlert.handleException(caught);
@@ -203,7 +194,7 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 	public void onUnsubscribe() {
 		synAlert.clear();
 		view.showLoading();
-		subscribeClient.unsubscribe(Long.parseLong(currentSubscription.getSubscriptionId()), new AsyncCallback<Void>() {
+		jsClient.unsubscribe(currentSubscription.getSubscriptionId(), new AsyncCallback<Void>() {
 			public void onFailure(Throwable caught) {
 				view.hideLoading();
 				synAlert.handleException(caught);

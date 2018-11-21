@@ -37,7 +37,6 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
 import org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
@@ -373,7 +372,7 @@ public class VerificationSubmissionWidgetTest {
 		
 		widget.rejectVerification();
 		
-		verify(mockPromptModalWidget).show(anyString(),  promptModalPresenterCaptor.capture());
+		verify(mockPromptModalWidget).show(promptModalPresenterCaptor.capture());
 		
 		//simulate save reject
 		String rejectMessage = "wrong wrong wrong";
