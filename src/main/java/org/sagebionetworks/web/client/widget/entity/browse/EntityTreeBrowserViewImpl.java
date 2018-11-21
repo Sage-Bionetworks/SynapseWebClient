@@ -62,7 +62,8 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	Div synAlertContainer;
 	@UiField
 	SortableTableHeaderImpl nameColumnHeader;
-	
+	@UiField
+	SortableTableHeaderImpl createdOnColumnHeader;
 	Div entityTreeContainer = new Div();
 	AuthenticationController authController;
 	GlobalApplicationState globalAppState;
@@ -80,6 +81,9 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		hideEmptyUI();
 		nameColumnHeader.setSortingListener(headerName -> {
 			presenter.onToggleSort(SortBy.NAME);
+		});
+		createdOnColumnHeader.setSortingListener(headerName -> {
+			presenter.onToggleSort(SortBy.CREATED_ON);
 		});
 	}
 
@@ -324,9 +328,13 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	}
 	@Override
 	public void setSortUI(SortBy sortBy, Direction dir) {
+		nameColumnHeader.setSortDirection(null);
+		createdOnColumnHeader.setSortDirection(null);
+		SortDirection direction = Direction.ASC.equals(dir) ? SortDirection.ASC : SortDirection.DESC;
 		if (SortBy.NAME.equals(sortBy)) {
-			SortDirection direction = Direction.ASC.equals(dir) ? SortDirection.ASC : SortDirection.DESC;
 			nameColumnHeader.setSortDirection(direction);
+		} else if (SortBy.CREATED_ON.equals(sortBy)) {
+			createdOnColumnHeader.setSortDirection(direction);
 		}
 	}
 }

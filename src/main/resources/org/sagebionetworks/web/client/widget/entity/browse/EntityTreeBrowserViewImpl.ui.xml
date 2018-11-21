@@ -16,23 +16,24 @@
 	    <t:Table ui:field="entityTreeHeader" width="100%">
 			<t:TableRow>
 				<t:TableHeader width="20px" />
-				<tr:SortableTableHeaderImpl ui:field="nameColumnHeader" addStyleNames="font-weight-normal" text="Name" />
-				<t:TableHeader width="310px" addStyleNames="visible-xl">
-					<bh:Span text="Modified By"/>
+				<tr:SortableTableHeaderImpl ui:field="nameColumnHeader" text="Name" />
+				<t:TableHeader width="140px" addStyleNames="hidden-xs text-align-right">
+					<bh:Span text="Size" addStyleNames="margin-right-30"/>
 				</t:TableHeader>
 				<t:TableHeader width="165px" addStyleNames="visible-md visible-lg">
 					<bh:Span text="Modified On" />
 				</t:TableHeader>
-				<t:TableHeader width="140px" addStyleNames="visible-lg text-align-right">
-					<bh:Span text="Size" addStyleNames="margin-right-30"/>
+				<tr:SortableTableHeaderImpl ui:field="createdOnColumnHeader" width="165px" addStyleNames="visible-md visible-lg" text="Created On" />
+				<t:TableHeader width="130px" addStyleNames="visible-lg">
+					<bh:Span text="ID" />
 				</t:TableHeader>
 				<t:TableHeader width="90px" addStyleNames="visible-lg">
 					<bh:Span text="MD5"/>
 				</t:TableHeader>
-				<t:TableHeader width="130px" addStyleNames="visible-md visible-lg">
-					<bh:Span text="ID" />
+				<t:TableHeader width="310px" addStyleNames="visible-xl">
+					<bh:Span text="Modified By"/>
 				</t:TableHeader>
-				<t:TableHeader width="75px">
+				<t:TableHeader width="75px" addStyleNames="hidden-xs">
 					<bh:Span text="Download"/>
 				</t:TableHeader>
 			</t:TableRow>
