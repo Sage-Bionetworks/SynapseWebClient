@@ -312,13 +312,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	}
 	
 	private void rejectSuspendVerification() {
-		String displayName;
-		if (profile != null) {
-			displayName = DisplayUtils.getDisplayName(profile);
-		} else {
-			displayName = DisplayUtils.getDisplayName(submission.getFirstName(), submission.getLastName(), null);
-		}
-		promptModal.show(displayName, rejectionReason -> {
+		promptModal.show(rejectionReason -> {
 			updateVerificationState(actRejectState, rejectionReason);
 		});
 	}

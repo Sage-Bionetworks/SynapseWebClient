@@ -10,8 +10,7 @@ import com.google.inject.Inject;
 public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget {
 
     // Template rejection format
-    public static String TEMPLATE_HEADER_HELLO = "Hi ";
-    public static String TEMPLATE_HEADER_THANKS = ",\n\nThank you for submitting your Synapse" +
+    public static String TEMPLATE_HEADER_THANKS = "Thank you for submitting your Synapse" +
             " profile for validation. Before I can accept your request:\n";
     public static String TEMPLATE_HEADER_SIGNATURE = 
     		"\nPlease contact us at act@sagebionetworks.org if you have any questions.\n" + 
@@ -25,7 +24,6 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
 
     // Common reasons for user rejection
     
-    private String displayName;
     private RejectReasonView view;
     CallbackP<String> callback;
 
@@ -35,9 +33,8 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
         this.view.setPresenter(this);
     }
 
-    public void show(String displayName, CallbackP<String> callback) {
-    	this.displayName = displayName;
-        this.view.clear();
+    public void show(CallbackP<String> callback) {
+    	this.view.clear();
         this.callback = callback;
         view.show();
     }
@@ -45,7 +42,7 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
     @Override
     public void updateResponse() {
         String output = view.getSelectedCheckboxText();
-        view.setValue(TEMPLATE_HEADER_HELLO + displayName + TEMPLATE_HEADER_THANKS + output + TEMPLATE_HEADER_SIGNATURE);
+        view.setValue(TEMPLATE_HEADER_THANKS + output + TEMPLATE_HEADER_SIGNATURE);
     }
 
     @Override

@@ -3,7 +3,6 @@ package org.sagebionetworks.web.unitclient.widget.accessrequirements.submission;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget.ERROR_MESSAGE;
-import static org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget.TEMPLATE_HEADER_HELLO;
 import static org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget.TEMPLATE_HEADER_SIGNATURE;
 import static org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget.TEMPLATE_HEADER_THANKS;
 
@@ -27,8 +26,7 @@ public class RejectReasonWidgetTest {
     
     public static final String SELECTED_CHECKBOXES = "Must do this, and that, and the other thing.";
     public static final String CANNED_RESPONSE = "canned response";
-    public static final String DISPLAY_NAME = "Bob Jones";
-
+    
     @Before
     public void setUp() throws Exception {
         when(mockView.getSelectedCheckboxText()).thenReturn(SELECTED_CHECKBOXES);
@@ -43,7 +41,7 @@ public class RejectReasonWidgetTest {
     @Test
     public void testShowOnSuccess() {
         // call
-        widget.show(DISPLAY_NAME, getReasonCallback);
+        widget.show(getReasonCallback);
         // verify/assert
         verify(mockView).clear();
         verify(mockView).show();
@@ -59,8 +57,8 @@ public class RejectReasonWidgetTest {
 
     @Test
     public void testUpdateResponse() {
-    	widget.show(DISPLAY_NAME, getReasonCallback);
-        String exp = TEMPLATE_HEADER_HELLO  + DISPLAY_NAME +  TEMPLATE_HEADER_THANKS + SELECTED_CHECKBOXES + TEMPLATE_HEADER_SIGNATURE;
+    	widget.show(getReasonCallback);
+        String exp = TEMPLATE_HEADER_THANKS + SELECTED_CHECKBOXES + TEMPLATE_HEADER_SIGNATURE;
 
         widget.updateResponse();
 
