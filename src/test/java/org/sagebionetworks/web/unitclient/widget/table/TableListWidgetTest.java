@@ -96,7 +96,7 @@ public class TableListWidgetTest {
 	public void testConfigureUnderPageSize(){
 		widget.configure(parentBundle);
 		verify(mockView, times(2)).hideLoading();
-		verify(mockView).setSortUI(TableListWidget.DEFAULT_SORT_BY, TableListWidget.DEFAULT_DIRECTION);
+		verify(mockView).clearSortUI();
 		verify(mockLoadMoreWidgetContainer).setIsMore(false);
 	}
 	
@@ -104,8 +104,19 @@ public class TableListWidgetTest {
 	public void testConfigureOverPageSize(){
 		when(mockResults.getNextPageToken()).thenReturn("ismore");
 		widget.configure(parentBundle);
-		verify(mockView).setSortUI(TableListWidget.DEFAULT_SORT_BY, TableListWidget.DEFAULT_DIRECTION);
+		verify(mockView).clearSortUI();
 		verify(mockLoadMoreWidgetContainer).setIsMore(true);
+	}
+	
+	@Test
+	public void testOnSort(){
+		widget.configure(parentBundle);
+		
+		verify(mockView).clearSortUI();
+		
+		widget.onSort(SortBy.CREATED_ON, Direction.DESC);
+		
+		verify(mockView).setSortUI(SortBy.CREATED_ON, Direction.DESC);
 	}
 	
 	@Test
