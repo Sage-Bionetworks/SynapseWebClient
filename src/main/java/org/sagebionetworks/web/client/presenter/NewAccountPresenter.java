@@ -58,7 +58,10 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 
 	@Override
 	public void setPlace(NewAccount place) {
-		authController.logoutUser();
+		if (authController.isLoggedIn()) {
+			globalAppState.clearLastPlace();
+			authController.logoutUser();
+		}
 		view.clear();
 		this.view.setPresenter(this);
 		synapseClient.hexDecodeAndDeserializeAccountCreationToken(place.toToken(), new AsyncCallback<AccountCreationToken>() {
