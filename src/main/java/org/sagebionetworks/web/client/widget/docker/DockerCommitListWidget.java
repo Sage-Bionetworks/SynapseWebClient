@@ -68,7 +68,7 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 
 	public void loadMore() {
 		synAlert.clear();
-		jsClient.getDockerCommits(entityId, LIMIT, offset, order, ascending, new AsyncCallback<ArrayList<DockerCommit>>(){
+		jsClient.getDockerTaggedCommits(entityId, LIMIT, offset, order, ascending, new AsyncCallback<ArrayList<DockerCommit>>(){
 
 					@Override
 					public void onFailure(Throwable caught) {
