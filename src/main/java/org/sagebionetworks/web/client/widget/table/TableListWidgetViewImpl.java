@@ -35,6 +35,8 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	Span emptyUI;
 	@UiField
 	SortableTableHeaderImpl nameColumnHeader;
+	@UiField
+	SortableTableHeaderImpl createdOnColumnHeader;
 	HTMLPanel panel;
 	Presenter presenter;
 	PortalGinInjector ginInjector;
@@ -48,14 +50,22 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 		nameColumnHeader.setSortingListener(header -> {
 			presenter.toggleSort(SortBy.NAME);
 		});
+		createdOnColumnHeader.setSortingListener(header -> {
+			presenter.toggleSort(SortBy.CREATED_ON);
+		});
 	}
 
 	@Override
 	public void setSortUI(SortBy sortBy, Direction dir) {
+		nameColumnHeader.setSortDirection(null);
+		createdOnColumnHeader.setSortDirection(null);
+		SortDirection direction = Direction.ASC.equals(dir) ? SortDirection.ASC : SortDirection.DESC;
 		if (SortBy.NAME.equals(sortBy)) {
-			SortDirection direction = Direction.ASC.equals(dir) ? SortDirection.ASC : SortDirection.DESC;
 			nameColumnHeader.setSortDirection(direction);
+		} else if (SortBy.CREATED_ON.equals(sortBy)) {
+			createdOnColumnHeader.setSortDirection(direction);
 		}
+		
 	}
 	@Override
 	public void addTableListItem(final EntityHeader header) {

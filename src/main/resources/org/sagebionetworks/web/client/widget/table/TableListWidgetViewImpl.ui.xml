@@ -15,13 +15,14 @@
 			<t:Table ui:field="columnHeaders" width="100%">
 				<t:TableRow>
 					<t:TableHeader width="20px"/>
-					<tr:SortableTableHeaderImpl ui:field="nameColumnHeader" addStyleNames="font-weight-normal" text="Name" />
+					<tr:SortableTableHeaderImpl ui:field="nameColumnHeader" text="Name" />
 					<t:TableHeader width="310px" addStyleNames="visible-xl">
 						<bh:Span text="Modified By"/>
 					</t:TableHeader>
 					<t:TableHeader width="165px" addStyleNames="visible-md visible-lg">
 						<bh:Span text="Modified On" />
 					</t:TableHeader>
+					<tr:SortableTableHeaderImpl width="165px" ui:field="createdOnColumnHeader" text="CreatedOn" addStyleNames="visible-md visible-lg" />
 					<t:TableHeader width="130px" addStyleNames="visible-md visible-lg">
 						<bh:Span text="ID" />
 					</t:TableHeader>

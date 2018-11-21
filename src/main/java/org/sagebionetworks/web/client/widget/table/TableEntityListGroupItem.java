@@ -39,6 +39,8 @@ public class TableEntityListGroupItem implements IsWidget {
 	@UiField
 	Label modifiedOnField;
 	@UiField
+	Label createdOnField;
+	@UiField
 	FlowPanel entityContainer;
 	@UiField
 	Icon icon;
@@ -75,6 +77,10 @@ public class TableEntityListGroupItem implements IsWidget {
 		if (header.getModifiedOn() != null) {
 			modifiedOnField.setText(dateTimeUtils.getDateTimeString(header.getModifiedOn()));	
 		}
+		if (header.getCreatedOn() != null) {
+			createdOnField.setText(dateTimeUtils.getDateTimeString(header.getCreatedOn()));	
+		}
+
 		icon.setType(EntityTypeUtils.getIconTypeForEntityClassName(header.getType()));
 	}
 	
