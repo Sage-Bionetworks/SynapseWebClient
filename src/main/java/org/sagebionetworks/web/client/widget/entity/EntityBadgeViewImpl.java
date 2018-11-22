@@ -7,7 +7,6 @@ import org.gwtbootstrap3.client.ui.constants.Emphasis;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -56,7 +55,8 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	SimplePanel modifiedByField;
 	@UiField
 	Label modifiedOnField;
-	
+	@UiField
+	Label createdOnField;
 	@UiField
 	Label sizeField;
 	@UiField
@@ -143,6 +143,9 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			}
 			if (entityHeader.getModifiedOn() != null) {
 				modifiedOnField.setText(dateTimeUtils.getDateTimeString(entityHeader.getModifiedOn()));	
+			}
+			if (entityHeader.getCreatedOn() != null) {
+				createdOnField.setText(dateTimeUtils.getDateTimeString(entityHeader.getCreatedOn()));
 			}
 		} 		
 	}

@@ -18,16 +18,18 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	/**
 	 * Presenter interface
 	 */
-	public interface Presenter extends SortEntityChildrenDropdownButtonListener {
+	public interface Presenter {
 		/**
 		 * Report when a table is clicked
 		 */
 		void onTableClicked(EntityHeader header);
+		void toggleSort(SortBy sortByColumn);
 	}
 	void clearTableWidgets();
 	void addTableListItem(EntityHeader header);
 	void setLoadMoreWidget(IsWidget w);
 	void setSynAlert(IsWidget w);
+	void clearSortUI();
 	void setSortUI(SortBy sortBy, Direction dir);
 	void hideLoading();
 }

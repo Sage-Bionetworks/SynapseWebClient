@@ -6,6 +6,9 @@ import java.util.Map;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Hr;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.repo.model.entity.Direction;
+import org.sagebionetworks.repo.model.entity.SortBy;
+import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -15,6 +18,7 @@ import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
+import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -56,6 +60,10 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	Hr hrUnderTableHeaders;
 	@UiField
 	Div synAlertContainer;
+	@UiField
+	SortableTableHeaderImpl nameColumnHeader;
+	@UiField
+	SortableTableHeaderImpl createdOnColumnHeader;
 	Div entityTreeContainer = new Div();
 	AuthenticationController authController;
 	GlobalApplicationState globalAppState;
@@ -71,6 +79,12 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		this.widget = uiBinder.createAndBindUi(this);
 		// Make sure to show this and hide the tree on empty.
 		hideEmptyUI();
+		nameColumnHeader.setSortingListener(headerName -> {
+			presenter.onToggleSort(SortBy.NAME);
+		});
+		createdOnColumnHeader.setSortingListener(headerName -> {
+			presenter.onToggleSort(SortBy.CREATED_ON);
+		});
 	}
 
 	@Override
@@ -311,5 +325,20 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
+	}
+	@Override
+	public void clearSortUI() {
+		nameColumnHeader.setSortDirection(null);
+		createdOnColumnHeader.setSortDirection(null);
+	}
+	@Override
+	public void setSortUI(SortBy sortBy, Direction dir) {
+		clearSortUI();
+		SortDirection direction = Direction.ASC.equals(dir) ? SortDirection.ASC : SortDirection.DESC;
+		if (SortBy.NAME.equals(sortBy)) {
+			nameColumnHeader.setSortDirection(direction);
+		} else if (SortBy.CREATED_ON.equals(sortBy)) {
+			createdOnColumnHeader.setSortDirection(direction);
+		}
 	}
 }

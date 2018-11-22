@@ -1830,25 +1830,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 	
-	@Override
-	public String toggleSortOnTableQuery(String sql, String header)	throws RestServiceException {
-		try {
-			return TableSqlProcessor.toggleSort(sql, header);
-		} catch (ParseException e) {
-			throw new TableQueryParseException(e.getMessage());
-		}
-	}
-	
-	@Override
-	public List<SortItem> getSortFromTableQuery(String sql)
-			throws RestServiceException {
-		try {
-			return TableSqlProcessor.getSortingInfo(sql);
-		} catch (ParseException e) {
-			throw new TableQueryParseException(e.getMessage());
-		}
-	}
-	
 	public EntityChildrenResponse getEntityChildren(EntityChildrenRequest request) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{

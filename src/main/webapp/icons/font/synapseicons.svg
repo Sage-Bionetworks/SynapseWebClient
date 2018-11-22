@@ -53,6 +53,10 @@
 <glyph glyph-name="warning" unicode="&#xe816;" d="M541 271h-82v163h82v-163z m0-163h-82v82h82v-82z m-495-122h909l-455 773-454-773z" horiz-adv-x="1000" />
 
 <glyph glyph-name="check" unicode="&#xe817;" d="M133 363l-87-89 282-288 627 638-88 90-539-549-195 198z" horiz-adv-x="1000" />
+
+<glyph glyph-name="sort-asc" unicode="&#xe831;" d="M485 398v-121h457v121h-457z m0 362v-121h229v121h-229z m0-724v-121h685v121h-685z m-228 603h143l-200 211-200-211h143v-784h114v784z" horiz-adv-x="1182" />
+
+<glyph glyph-name="sort-desc" unicode="&#xe832;" d="M476 317v118h448v-118h-448z m0-355v118h224v-118h-224z m0 710v119h672v-119h-672z m-224-592h140l-196-207-196 207h140v770h112v-770z" horiz-adv-x="1182" />
 </font>
 </defs>
 </svg>

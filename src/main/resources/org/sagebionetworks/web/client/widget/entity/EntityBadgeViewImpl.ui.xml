@@ -18,22 +18,25 @@
 					<g:FlowPanel ui:field="entityContainer" addStyleNames="displayInline pull-left"/>
 				</bh:Div>
 			</t:TableData>
-			<t:TableData width="310px" addStyleNames="visible-xl overflow-x-hidden">
-				<g:SimplePanel ui:field="modifiedByField"/>
+			<t:TableData width="140px" addStyleNames="hidden-xs overflow-x-hidden text-align-right">
+				<g:Label ui:field="sizeField" addStyleNames="margin-right-30"/>
 			</t:TableData>
 			<t:TableData width="165px" addStyleNames="visible-md visible-lg overflow-x-hidden">
 				<g:Label ui:field="modifiedOnField"/>
 			</t:TableData>
-			<t:TableData width="140px" addStyleNames="visible-lg overflow-x-hidden text-align-right">
-				<g:Label ui:field="sizeField" addStyleNames="margin-right-30"/>
+			<t:TableData width="165px" addStyleNames="visible-md visible-lg overflow-x-hidden">
+				<g:Label ui:field="createdOnField"/>
+			</t:TableData>
+			<t:TableData width="130px" addStyleNames="visible-lg overflow-x-hidden">
+				<g:TextBox ui:field="idField" width="130px" addStyleNames="border-none noBackground font-size-14" readOnly="true" />
 			</t:TableData>
 			<t:TableData width="90px" addStyleNames="visible-lg overflow-x-hidden">
 				<g:TextBox ui:field="md5Field" width="64px" addStyleNames="border-none noBackground font-size-14 overflow-x-hidden" readOnly="true" />
 			</t:TableData>
-			<t:TableData width="130px" addStyleNames="visible-md visible-lg overflow-x-hidden">
-				<g:TextBox ui:field="idField" width="130px" addStyleNames="border-none noBackground font-size-14" readOnly="true" />
+			<t:TableData width="310px" addStyleNames="visible-xl overflow-x-hidden">
+				<g:SimplePanel ui:field="modifiedByField"/>
 			</t:TableData>
-			<t:TableData width="75px" addStyleNames="overflow-x-hidden text-align-center">
+			<t:TableData width="75px" addStyleNames="overflow-x-hidden text-align-center hidden-xs">
 				<b:Anchor ui:field="addToDownloadListLink" addStyleNames="textDecorationNone" visible="false">
 					<i class="fa syn-download moveright-5 movedown-1"></i>
 					+

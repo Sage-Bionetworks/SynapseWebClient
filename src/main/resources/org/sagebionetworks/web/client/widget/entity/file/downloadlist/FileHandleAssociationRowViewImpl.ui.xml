@@ -12,7 +12,7 @@
 		<t:TableData height="45px" addStyleNames="overflow-x-hidden" >
 			<b:Anchor ui:field="fileNameLink" addStyleNames="overflow-x-hidden"/>
 		</t:TableData>
-		<t:TableData ui:field="accessContainer" addStyleNames="min-width-70 hidden-xs" width="70px">
+		<t:TableData ui:field="accessContainer" addStyleNames="min-width-70 hidden-xs" width="90px">
 			<bh:Span ui:field="hasAccess" addStyleNames="synapse-green-bg color-white img-circle" paddingTop="2" paddingRight="1" paddingBottom="4" paddingLeft="2">
 				<b:Icon type="LOCK_OPEN"/>
 			</bh:Span>

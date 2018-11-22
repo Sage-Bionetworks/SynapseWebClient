@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -286,9 +285,9 @@ public class TablePageWidgetTest {
 			}
 			verify(sth).configure(headerName, mockPageChangeListner);
 			if(i == sortColumnIndex){
-				verify(sth).setIcon(IconType.SORT_DESC);
+				verify(sth).setSortDirection(SortDirection.DESC);
 			}else{
-				verify(sth, never()).setIcon(any(IconType.class));
+				verify(sth).setSortDirection(null);
 			}
 		}
 	}
@@ -312,9 +311,9 @@ public class TablePageWidgetTest {
 		for(int i=0; i<sortHeaders.size(); i++){
 			SortableTableHeader sth = sortHeaders.get(i);
 			if(i == sortColumnIndex){
-				verify(sth).setIcon(IconType.SORT_ASC);
+				verify(sth).setSortDirection(SortDirection.ASC);
 			}else{
-				verify(sth, never()).setIcon(any(IconType.class));
+				verify(sth).setSortDirection(null);
 			}
 		}
 	}
@@ -343,11 +342,11 @@ public class TablePageWidgetTest {
 		for(int i=0; i<sortHeaders.size(); i++){
 			SortableTableHeader sth = sortHeaders.get(i);
 			if(i == ascColumnIndex){
-				verify(sth).setIcon(IconType.SORT_ASC);
+				verify(sth).setSortDirection(SortDirection.ASC);
 			}else if(i == descColumnIndex){
-				verify(sth).setIcon(IconType.SORT_DESC);
+				verify(sth).setSortDirection(SortDirection.DESC);
 			}else {
-				verify(sth, never()).setIcon(any(IconType.class));
+				verify(sth).setSortDirection(null);
 			}
 		}
 	}
@@ -374,11 +373,7 @@ public class TablePageWidgetTest {
 		// Check each header
 		for(int i=0; i<sortHeaders.size(); i++){
 			SortableTableHeader sth = sortHeaders.get(i);
-			if(i == sortColumnIndex){
-				verify(sth).setIcon(IconType.SORT_ASC);
-			}else{
-				verify(sth, never()).setIcon(any(IconType.class));
-			}
+			verify(sth).setSortDirection(null);
 		}
 	}
 	

@@ -188,21 +188,6 @@ public interface SynapseClient extends RemoteService{
 	 * @param sql
 	 */
 	void validateTableQuery(String sql) throws RestServiceException;
-	/**
-	 * For the given table SQL toggle the sort on the given column and return the modified SQL.
-	 * @param sql
-	 * @param header
-	 * @return
-	 * @throws RestServiceException
-	 */
-	String toggleSortOnTableQuery(String sql, String header) throws RestServiceException;
-	/**
-	 * Get the sort info for this table.
-	 * @param sql
-	 * @return
-	 * @throws RestServiceException
-	 */
-	List<SortItem> getSortFromTableQuery(String sql) throws RestServiceException;
 	
 	/**
 	 * Create or update an Entity.

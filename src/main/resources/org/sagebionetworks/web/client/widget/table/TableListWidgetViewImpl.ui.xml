@@ -5,25 +5,24 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" 
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
-	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
+	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
+	xmlns:tr="urn:import:org.sagebionetworks.web.client.widget.table.v2.results">
 	<g:HTMLPanel>
 		<bh:Div ui:field="synAlertContainer" />
-		<bh:Div ui:field="sortButtonContainer"/>
 		<w:LoadingSpinner size="40px" ui:field="loadingUI" addStyleNames="center-block center" visible="false"/>
 		<bh:Span ui:field="emptyUI" text="&#8212; Empty" visible="false" marginLeft="15"/>
 		<bh:Div addStyleNames="highlight-box padding-10" marginTop="0">
 			<t:Table ui:field="columnHeaders" width="100%">
 				<t:TableRow>
 					<t:TableHeader width="20px"/>
-					<t:TableHeader>
-						<bh:Span text="Name" />
-					</t:TableHeader>
+					<tr:SortableTableHeaderImpl ui:field="nameColumnHeader" text="Name" />
 					<t:TableHeader width="310px" addStyleNames="visible-xl">
 						<bh:Span text="Modified By"/>
 					</t:TableHeader>
 					<t:TableHeader width="165px" addStyleNames="visible-md visible-lg">
 						<bh:Span text="Modified On" />
 					</t:TableHeader>
+					<tr:SortableTableHeaderImpl width="165px" ui:field="createdOnColumnHeader" text="CreatedOn" addStyleNames="visible-md visible-lg" />
 					<t:TableHeader width="130px" addStyleNames="visible-md visible-lg">
 						<bh:Span text="ID" />
 					</t:TableHeader>

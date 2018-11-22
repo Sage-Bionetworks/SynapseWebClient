@@ -49,6 +49,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	private String entityId;
 	private LoadMoreWidgetContainer loadMoreWidgetContainer;
 	private Map<String, DiscussionThreadListItemWidget> threadId2Widget = new HashMap<String, DiscussionThreadListItemWidget>();
+	
 	@Inject
 	public DiscussionThreadListWidget(
 			DiscussionThreadListWidgetView view,

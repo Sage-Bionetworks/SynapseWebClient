@@ -139,6 +139,7 @@ public class EntityTreeBrowserTest {
 		verify(mockEntityClickedCallback, never()).invoke(anyString());
 		assertEquals(EntityTreeBrowser.DEFAULT_SORT_BY, request.getSortBy());
 		assertEquals(EntityTreeBrowser.DEFAULT_DIRECTION, request.getSortDirection());
+		verify(mockView).clearSortUI();
 		
 		//verify user selecting another sorting option resets the query, and changes the request sort parameters
 		entityTreeBrowser.onSort(SortBy.CREATED_ON, Direction.DESC);
@@ -148,6 +149,8 @@ public class EntityTreeBrowserTest {
 		request = entityChildrenRequestCaptor.getValue();
 		assertEquals(SortBy.CREATED_ON, request.getSortBy());
 		assertEquals(Direction.DESC, request.getSortDirection());
+		verify(mockView).setSortUI(SortBy.CREATED_ON, Direction.DESC);
+		
 		assertNull(request.getNextPageToken());
 		assertEquals("123", request.getParentId());
 		

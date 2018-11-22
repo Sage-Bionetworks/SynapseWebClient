@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
-import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.sagebionetworks.repo.model.table.SortDirection;
 
 import com.google.gwt.user.client.ui.IsWidget;
 /**
@@ -22,6 +22,6 @@ public interface SortableTableHeader extends IsWidget {
 	 * 
 	 * @param icon
 	 */
-	public void setIcon(IconType icon);
+	public void setSortDirection(SortDirection direction);
 	
 }

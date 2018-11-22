@@ -47,6 +47,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	private String rootEntityId;
 	public static final SortBy DEFAULT_SORT_BY = SortBy.NAME;
 	public static final Direction DEFAULT_DIRECTION = Direction.ASC;
+	boolean isInitializing = false;
 	@Inject
 	public EntityTreeBrowser(PortalGinInjector ginInjector,
 			EntityTreeBrowserView view, 
@@ -75,11 +76,13 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	 * @param entityId
 	 */
 	public void configure(String entityId) {
+		isInitializing = true;
 		this.rootEntityId = entityId;
 		onSort(currentSortBy, currentDirection);
 	}
 	
 	public void configure(List<EntityHeader> headers) {
+		isInitializing = true;
 		//set existing headers.
 		rootEntityId = null;
 		view.clear();
@@ -90,6 +93,11 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	}
 	
 	@Override
+	public void onToggleSort(SortBy sortColumn) {
+		currentDirection = Direction.ASC.equals(currentDirection) ? Direction.DESC : Direction.ASC;
+		onSort(sortColumn, currentDirection);
+	}
+	
 	public void onSort(SortBy sortColumn, Direction sortDirection) {
 		currentSortBy = sortColumn;
 		currentDirection = sortDirection;
@@ -139,6 +147,12 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	public void getChildren(final String parentId,
 			final EntityTreeItem parent, String nextPageToken) {
 		EntityChildrenRequest request = createGetEntityChildrenRequest(parentId, nextPageToken);
+		if (isInitializing) {
+			view.clearSortUI();
+		} else {
+			view.setSortUI(request.getSortBy(), request.getSortDirection());	
+		}
+		
 		synAlert.clear();
 		// ask for the folder children, then the files
 		jsClient.getEntityChildren(request,
@@ -163,6 +177,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 								view.hideEmptyUI();
 							}
 						}
+						isInitializing = false;
 					}
 
 					@Override
