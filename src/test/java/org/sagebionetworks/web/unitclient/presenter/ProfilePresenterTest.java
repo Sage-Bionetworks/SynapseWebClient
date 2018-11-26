@@ -72,7 +72,6 @@ import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
-import org.sagebionetworks.web.client.presenter.SortOptionEnum;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -128,7 +127,6 @@ public class ProfilePresenterTest {
 	UserSessionData testUser = new UserSessionData();
 	UserProfile userProfile = new UserProfile();
 	String password = "password";
-	SortOptionEnum sort = SortOptionEnum.LATEST_ACTIVITY;
 	List<EntityHeader> myFavorites;
 	List<ProjectHeader> myProjects;
 	List<Challenge> testChallenges;
@@ -334,7 +332,6 @@ public class ProfilePresenterTest {
 		verify(mockView).clear();
 		verify(mockTeamListWidget, Mockito.atLeastOnce()).clear();
 		verify(mockView).showLoading();
-		verify(mockView).setSortText(SortOptionEnum.LATEST_ACTIVITY.sortText);
 		verify(mockView).setProfileEditButtonVisible(isOwner);
 		verify(mockView).setOrcIDLinkButtonVisible(isOwner);
 		verify(mockView).showTabs(isOwner);
@@ -560,7 +557,7 @@ public class ProfilePresenterTest {
 		verify(mockView).showProjectFiltersUI();
 		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.MY_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
-		verify(mockView).setProjectSortVisible(true);
+		verify(mockView).setLastActivityOnColumnVisible(true);
 		verify(mockLoadMoreContainer, never()).clear();
 		
 		// if we set the place and get projects again, verify existing project load more container is cleared (deregisters callback)
@@ -610,7 +607,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setMyProjectsFilterSelected();
 		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.MY_CREATED_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
-		verify(mockView).setProjectSortVisible(true);
+		verify(mockView).setLastActivityOnColumnVisible(true);
 	}
 
 	@Test
@@ -623,7 +620,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setFavoritesFilterSelected();
 		verify(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
-		verify(mockView).setProjectSortVisible(false);
+		verify(mockView).setLastActivityOnColumnVisible(false);
 	}
 	
 	@Test
@@ -636,7 +633,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setSharedDirectlyWithMeFilterSelected();
 		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.MY_PARTICIPATED_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
-		verify(mockView).setProjectSortVisible(true);
+		verify(mockView).setLastActivityOnColumnVisible(true);
 	}
 	
 	@Test
@@ -650,9 +647,8 @@ public class ProfilePresenterTest {
 		verify(mockView).setFavoritesHelpPanelVisible(true);
 		verify(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		verify(mockLoadMoreContainer, never()).add(any(Widget.class));
-		verify(mockView).setProjectSortVisible(false);
+		verify(mockView).setLastActivityOnColumnVisible(false);
 	}
-
 	
 	@Test
 	public void testGetProjectsByTeam() {
@@ -666,7 +662,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setTeamsFilterSelected();
 		verify(mockSynapseJavascriptClient).getProjectsForTeam(eq(teamId), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
-		verify(mockView).setProjectSortVisible(true);
+		verify(mockView).setLastActivityOnColumnVisible(true);
 	}
 	
 	@Test
@@ -694,7 +690,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.applyFilterClicked(ProjectFilterEnum.ALL, null);
 		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.MY_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView).setProjectSortVisible(true);
+		verify(mockView).setLastActivityOnColumnVisible(true);
 		verify(mockGlobalApplicationState).pushCurrentPlace(any(Place.class));
 	}
 	
@@ -705,7 +701,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setCurrentUserId("007");
 		profilePresenter.applyFilterClicked(ProjectFilterEnum.CREATED_BY_ME, null);
 		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.MY_CREATED_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView).setProjectSortVisible(true);
+		verify(mockView).setLastActivityOnColumnVisible(true);
 	}
 	
 	@Test
@@ -715,7 +711,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setCurrentUserId("007");
 		profilePresenter.applyFilterClicked(ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME, null);
 		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.MY_PARTICIPATED_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView).setProjectSortVisible(true);
+		verify(mockView).setLastActivityOnColumnVisible(true);
 	}
 	
 	@Test
@@ -725,10 +721,9 @@ public class ProfilePresenterTest {
 		profilePresenter.setCurrentUserId("007");
 		profilePresenter.applyFilterClicked(ProjectFilterEnum.ALL_MY_TEAM_PROJECTS, null);
 		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.MY_TEAM_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView).setProjectSortVisible(true);
+		verify(mockView).setLastActivityOnColumnVisible(true);
 	}
 
-	
 	@Test
 	public void testApplyFilterClickedFavorites() {
 		profilePresenter.setPlace(place);
@@ -736,7 +731,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setCurrentUserId("007");
 		profilePresenter.applyFilterClicked(ProjectFilterEnum.FAVORITES, null);
 		verify(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
-		verify(mockView).setProjectSortVisible(false);
+		verify(mockView).setLastActivityOnColumnVisible(false);
 	}
 	
 	@Test
@@ -828,51 +823,21 @@ public class ProfilePresenterTest {
 		verify(mockPromptModalView).showError(eq(DisplayConstants.WARNING_PROJECT_NAME_EXISTS));
 	}
 	
-	// Project Sorting tests
-	@Test
-	public void testOptionsAdded() {
-		for (SortOptionEnum sort: SortOptionEnum.values())
-			verify(mockView).addSortOption(sort);	
-	}
-	
-	@Test
-	public void testDefaultSortOption() throws JSONObjectAdapterException {
-		profilePresenter.updateProfileView("4443");
-		verify(mockView).setSortText(SortOptionEnum.LATEST_ACTIVITY.sortText);
-	}
-	
 	@Test
 	public void testSortedByLatestActivity() {
-		SortOptionEnum latestActivity = SortOptionEnum.LATEST_ACTIVITY;
-		profilePresenter.resort(SortOptionEnum.LATEST_ACTIVITY);
-		verify(mockView).setSortText(eq(latestActivity.sortText));
-		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyInt(), eq(latestActivity.sortBy), eq(latestActivity.sortDir), any(AsyncCallback.class));
+		profilePresenter.sort(ProjectListSortColumn.LAST_ACTIVITY);
+		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyInt(), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.ASC), any(AsyncCallback.class));
+		
+		profilePresenter.sort(ProjectListSortColumn.LAST_ACTIVITY);
+		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyInt(), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.DESC), any(AsyncCallback.class));
+
+		profilePresenter.sort(ProjectListSortColumn.PROJECT_NAME);
+		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyInt(), eq(ProjectListSortColumn.PROJECT_NAME), eq(SortDirection.ASC), any(AsyncCallback.class));
+		
+		profilePresenter.sort(ProjectListSortColumn.PROJECT_NAME);
+		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyInt(), eq(ProjectListSortColumn.PROJECT_NAME), eq(SortDirection.DESC), any(AsyncCallback.class));
 	}
-	
-	@Test
-	public void testSortedByEarliestActivity() {
-		SortOptionEnum earliestActivity = SortOptionEnum.EARLIEST_ACTIVITY;
-		profilePresenter.resort(earliestActivity);
-		verify(mockView).setSortText(eq(earliestActivity.sortText));
-		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyInt(), eq(earliestActivity.sortBy), eq(earliestActivity.sortDir), any(AsyncCallback.class));
-	}
-	
-	@Test
-	public void testSortedByNameAZ() {
-		SortOptionEnum nameAZ = SortOptionEnum.NAME_A_Z;
-		profilePresenter.resort(nameAZ);
-		verify(mockView).setSortText(eq(nameAZ.sortText));
-		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyInt(), eq(nameAZ.sortBy), eq(nameAZ.sortDir), any(AsyncCallback.class));	
-	}
-	
-	@Test
-	public void testSortedByLastNameZA() {
-		SortOptionEnum nameZA = SortOptionEnum.NAME_Z_A;
-		profilePresenter.resort(nameZA);
-		verify(mockView).setSortText(nameZA.sortText);
-		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyInt(), eq(nameZA.sortBy), eq(nameZA.sortDir), any(AsyncCallback.class));
-	}
-	
+
 	@Test
 	public void testCreateTeam() {
 		when(mockPromptModalView.getValue()).thenReturn("valid name");
