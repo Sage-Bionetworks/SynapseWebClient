@@ -218,7 +218,7 @@ public class SynapseJavascriptClient {
 	public static final String INVITEE_ID = "/inviteeId";
 	public static final String ICON = "/icon";
 	public static final String PROJECTS_URI_PATH = "/projects";
-	public static final String DOCKER_COMMIT = "/dockerCommit";
+	public static final String DOCKER_TAG = "/dockerTag";
 	public static final String OFFSET_PARAMETER = "offset=";
 	public static final String LIMIT_PARAMETER = "limit=";
 	public static final String OBJECT_TYPE_PARAMETER = "objectType=";
@@ -1105,14 +1105,14 @@ public class SynapseJavascriptClient {
 		doGet(url, OBJECT_TYPE.Activity, callback);
 	}
 
-	public void getDockerCommits(
+	public void getDockerTaggedCommits(
 			String entityId, 
 			Long limit, 
 			Long offset,
 			DockerCommitSortBy sortBy, 
 			Boolean ascending,
 			AsyncCallback<ArrayList<DockerCommit>> callback) {
-		String url = getRepoServiceUrl() + ENTITY+"/"+entityId+DOCKER_COMMIT;
+		String url = getRepoServiceUrl() + ENTITY+"/"+entityId+ DOCKER_TAG;
 		List<String> requestParams = new ArrayList<String>();
 		if (limit!=null) {
 			requestParams.add(LIMIT_PARAMETER+limit);

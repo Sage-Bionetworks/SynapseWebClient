@@ -68,7 +68,7 @@ public class DockerCommitListWidgetTest {
 		entityId = "syn123";
 		dockerCommitList = new ArrayList<DockerCommit>();
 		AsyncMockStubber.callSuccessWith(dockerCommitList)
-			.when(mockJsClient).getDockerCommits(anyString(), anyLong(), anyLong(), any(DockerCommitSortBy.class), anyBoolean(), any(AsyncCallback.class));
+			.when(mockJsClient).getDockerTaggedCommits(anyString(), anyLong(), anyLong(), any(DockerCommitSortBy.class), anyBoolean(), any(AsyncCallback.class));
 	}
 
 	@Test
@@ -81,7 +81,7 @@ public class DockerCommitListWidgetTest {
 		Callback callback = captor.getValue();
 		callback.invoke();
 		verify(mockSynAlert).clear();
-		verify(mockJsClient).getDockerCommits(anyString(), anyLong(), anyLong(), any(DockerCommitSortBy.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockJsClient).getDockerTaggedCommits(anyString(), anyLong(), anyLong(), any(DockerCommitSortBy.class), anyBoolean(), any(AsyncCallback.class));
 	}
 
 	@Test
@@ -90,7 +90,7 @@ public class DockerCommitListWidgetTest {
 		dockerCommitListWidget.configure(entityId, withRadio);
 		verify(mockCommitsContainer).clear();
 		verify(mockSynAlert).clear();
-		verify(mockJsClient).getDockerCommits(eq(entityId), anyLong(), anyLong(), any(DockerCommitSortBy.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockJsClient).getDockerTaggedCommits(eq(entityId), anyLong(), anyLong(), any(DockerCommitSortBy.class), anyBoolean(), any(AsyncCallback.class));
 	}
 
 	@Test
@@ -100,7 +100,7 @@ public class DockerCommitListWidgetTest {
 		dockerCommitListWidget.configure(entityId, withRadio);
 		verify(mockCommitsContainer).clear();
 		verify(mockSynAlert).clear();
-		verify(mockJsClient).getDockerCommits(eq(entityId),
+		verify(mockJsClient).getDockerTaggedCommits(eq(entityId),
 				anyLong(), anyLong(), any(DockerCommitSortBy.class),
 				anyBoolean(), any(AsyncCallback.class));
 		verify(mockCommitsContainer, never()).add(any(Widget.class));
@@ -117,7 +117,7 @@ public class DockerCommitListWidgetTest {
 		verify(mockCommitRow).configure(mockCommit);
 		verify(mockCommitsContainer).clear();
 		verify(mockSynAlert).clear();
-		verify(mockJsClient).getDockerCommits(eq(entityId),
+		verify(mockJsClient).getDockerTaggedCommits(eq(entityId),
 				anyLong(), anyLong(), any(DockerCommitSortBy.class),
 				anyBoolean(), any(AsyncCallback.class));
 		verify(mockCommitsContainer).add(any(Widget.class));
@@ -155,7 +155,7 @@ public class DockerCommitListWidgetTest {
 		verify(mockRadioWidget).addClickHandler(any(ClickHandler.class));
 		verify(mockCommitsContainer).clear();
 		verify(mockSynAlert).clear();
-		verify(mockJsClient).getDockerCommits(eq(entityId),
+		verify(mockJsClient).getDockerTaggedCommits(eq(entityId),
 				anyLong(), anyLong(), any(DockerCommitSortBy.class),
 				anyBoolean(), any(AsyncCallback.class));
 		verify(mockCommitsContainer).add(any(Widget.class));
@@ -167,13 +167,13 @@ public class DockerCommitListWidgetTest {
 		boolean withRadio = false;
 		Throwable exception = new Throwable();
 		AsyncMockStubber.callFailureWith(exception)
-				.when(mockJsClient).getDockerCommits(anyString(),
+				.when(mockJsClient).getDockerTaggedCommits(anyString(),
 						anyLong(), anyLong(), any(DockerCommitSortBy.class),
 						anyBoolean(), any(AsyncCallback.class));
 		dockerCommitListWidget.configure(entityId, withRadio);
 		verify(mockCommitsContainer).clear();
 		verify(mockSynAlert).clear();
-		verify(mockJsClient).getDockerCommits(eq(entityId),
+		verify(mockJsClient).getDockerTaggedCommits(eq(entityId),
 				anyLong(), anyLong(), any(DockerCommitSortBy.class),
 				anyBoolean(), any(AsyncCallback.class));
 		verify(mockCommitsContainer, never()).add(any(Widget.class));
