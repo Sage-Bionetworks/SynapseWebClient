@@ -1,15 +1,13 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Column;
-import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
+import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.SortingListener;
 
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -29,21 +27,13 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	Div threadCountAlertContainer;
 	
 	@UiField
-	Anchor sortByReplies;
+	SortableTableHeaderImpl sortByReplies;
 	@UiField
-	Icon sortByRepliesIcon;
+	SortableTableHeaderImpl sortByViews;
 	@UiField
-	Anchor sortByViews;
+	SortableTableHeaderImpl sortByActivity;
 	@UiField
-	Icon sortByViewsIcon;
-	@UiField
-	Anchor sortByActivity;
-	@UiField
-	Icon sortByActivityIcon;
-	@UiField
-	Anchor sortByTopic;
-	@UiField
-	Icon sortByTopicIcon;
+	SortableTableHeaderImpl sortByTopic;
 	@UiField
 	Div threadHeader;
 	@UiField
@@ -56,36 +46,32 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	public DiscussionThreadListWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 
-		ClickHandler onSortRepliesClick = event -> {
-			clearSortUI();
+		
+		SortingListener onSortRepliesClick = headerName -> {
+			clearSort();
 			presenter.sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
 		};
-		sortByReplies.addClickHandler(onSortRepliesClick);
-		sortByRepliesIcon.addClickHandler(onSortRepliesClick);
+		sortByReplies.setSortingListener(onSortRepliesClick);
 		
-		ClickHandler onSortViewsClick = event -> {
-			clearSortUI();
+		SortingListener onSortViewsClick = headerName -> {
+			clearSort();
 			presenter.sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
 		};
-		sortByViews.addClickHandler(onSortViewsClick);
-		sortByViewsIcon.addClickHandler(onSortViewsClick);
-
-		ClickHandler onSortActivityClick = event -> {
-			clearSortUI();
+		sortByViews.setSortingListener(onSortViewsClick);
+		
+		SortingListener onSortActivityClick = headerName -> {
+			clearSort();
 			presenter.sortBy(DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY);
 		};
-		sortByActivity.addClickHandler(onSortActivityClick);
-		sortByActivityIcon.addClickHandler(onSortActivityClick);
+		sortByActivity.setSortingListener(onSortActivityClick);
 
-
-		ClickHandler onSortThreadTitle = event -> {
-			clearSortUI();
+		SortingListener onSortThreadTitle = headerName -> {
+			clearSort();
 			presenter.sortBy(DiscussionThreadOrder.THREAD_TITLE);
 		};
-		sortByTopic.addClickHandler(onSortThreadTitle);
-		sortByTopicIcon.addClickHandler(onSortThreadTitle);
+		sortByTopic.setSortingListener(onSortThreadTitle);
 		
-		clearSortUI();
+		clearSort();
 	}
 
 	@Override
@@ -130,14 +116,11 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 		Window.scrollTo(0, w.getElement().getOffsetTop());
 	}
 	
-
-	// called whenever sort is called
-	private void clearSortUI() {
-		Icon[] icons = new Icon[] {sortByRepliesIcon, sortByViewsIcon, sortByActivityIcon, sortByTopicIcon};
-		for (Icon icon : icons) {
-			icon.setType(IconType.SYN_SORT_DESC);
-			icon.removeStyleName(SortableTableHeaderImpl.SORTED_STYLES);
-			icon.addStyleName(SortableTableHeaderImpl.UNSORTED_STYLES);
+	@Override
+	public void clearSort() {
+		SortableTableHeaderImpl[] sortableColumns = new SortableTableHeaderImpl[] {sortByReplies, sortByViews, sortByActivity, sortByTopic};
+		for (SortableTableHeaderImpl column : sortableColumns) {
+			column.setSortDirection(null);
 		}
 	}
 	
@@ -145,27 +128,24 @@ public class DiscussionThreadListWidgetViewImpl implements DiscussionThreadListW
 	public void setSorted(DiscussionThreadOrder column, boolean ascending) {
 		switch (column) {
 			case NUMBER_OF_REPLIES:
-				updateSortUI(sortByRepliesIcon, ascending);
+				updateSortUI(sortByReplies, ascending);
 				break;
 			case NUMBER_OF_VIEWS:
-				updateSortUI(sortByViewsIcon, ascending);
+				updateSortUI(sortByViews, ascending);
 				break;
 			case PINNED_AND_LAST_ACTIVITY:
-				updateSortUI(sortByActivityIcon, ascending);
+				updateSortUI(sortByActivity, ascending);
 				break;
 			case THREAD_TITLE:
-				updateSortUI(sortByTopicIcon, ascending);
+				updateSortUI(sortByTopic, ascending);
 				break;
 			default:
 				break;
 		}
 	}
 	
-	private void updateSortUI(Icon sortColumnIcon, boolean ascending) {
-		IconType newType = ascending ? IconType.SYN_SORT_ASC : IconType.SYN_SORT_DESC;
-		sortColumnIcon.setType(newType);
-		sortColumnIcon.removeStyleName(SortableTableHeaderImpl.UNSORTED_STYLES);
-		sortColumnIcon.addStyleName(SortableTableHeaderImpl.SORTED_STYLES);
+	private void updateSortUI(SortableTableHeaderImpl sortColumn, boolean ascending) {
+		SortDirection newDirection = ascending ? SortDirection.ASC : SortDirection.DESC;
+		sortColumn.setSortDirection(newDirection);
 	}
-	
 }
