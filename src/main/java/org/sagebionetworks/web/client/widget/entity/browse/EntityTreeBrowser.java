@@ -80,7 +80,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	public void configure(String entityId) {
 		view.setSortable(true);
 		isInitializing = true;
-		idList = new ArrayList<>();
+		resetSynIdList();
 		this.rootEntityId = entityId;
 		onSort(currentSortBy, currentDirection);
 	}
@@ -109,16 +109,16 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		currentDirection = sortDirection;
 		view.clear();
 		view.setLoadingVisible(true);
-		idList = new ArrayList<>();
+		resetSynIdList();
 		getChildren(rootEntityId, null, null);	
 	}
 	
 	public void addHeaders(List<EntityHeader> headers) {
 		view.setSortable(false);
-		idList = new ArrayList<>();
+		resetSynIdList();
 		headers = filter.filterForBrowsing(headers);
 		for (EntityHeader header : headers) {
-			idList.add(header.getId());
+			addSynIdToList(header.getId());
 			view.appendRootEntityTreeItem(makeTreeItemFromQueryResult(header, true,
 					isExpandable(header)));
 		}
@@ -311,16 +311,26 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		if (parent == null) {
 			for (EntityHeader header : results) {
 				boolean isExpandable = isExpandable(header);
-				idList.add(header.getId());
+				addSynIdToList(header.getId());
 				view.appendRootEntityTreeItem(makeTreeItemFromQueryResult(header, true, isExpandable));
 			}
 		} else {
 			for (EntityHeader header : results) {
 				boolean isExpandable = isExpandable(header);
-				idList.add(header.getId());
+				addSynIdToList(header.getId());
 				view.appendChildEntityTreeItem(makeTreeItemFromQueryResult(header, false, isExpandable), parent);
 			}
 		}
+	}
+	
+	public void resetSynIdList() {
+		idList = null;
+	}
+	public void addSynIdToList(String id) {
+		if (idList == null) {
+			idList = new ArrayList<>();
+		}
+		idList.add(id);
 	}
 	
 	public boolean isExpandable(EntityHeader header) {
