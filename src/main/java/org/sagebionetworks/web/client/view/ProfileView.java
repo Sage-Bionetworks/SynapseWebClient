@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.view;
 
+import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
-import org.sagebionetworks.web.client.presenter.SortOptionEnum;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 
@@ -33,7 +34,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void showChallengesLoading(boolean isVisible);
 	void setIsMoreChallengesVisible(boolean isVisible);
 	void setTeamNotificationCount(String count);
-	void setSortText(String text);
 	void clearTeamNotificationCount();
 	void setTabSelected(ProfileArea areaTab);
 	void showConfirmDialog(String title, String message, Callback yesCallback);
@@ -48,10 +48,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setFavoritesHelpPanelVisible(boolean isVisible);
 	void setProfileEditButtonVisible(boolean isVisible);
 	void setOrcIDLinkButtonVisible(boolean isVisible);
-	void setProjectSortVisible(boolean isVisible);
 	void addUserProfileModalWidget(IsWidget userProfileModalWidget);
-	void addSortOption(SortOptionEnum sort);
-	void clearSortOptions();
 	void setGetCertifiedVisible(boolean isVisible);
 	void setSynapseEmailVisible(boolean isVisible);
 	void setOrcIdVisible(boolean isVisible);
@@ -66,6 +63,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setVerificationDetailsButtonVisible(boolean isVisible);
 	void setSettingsWidget(Widget w);
 	void setDownloadListWidget(IsWidget w);
+	void setSortDirection(ProjectListSortColumn column, SortDirection direction);
 	public interface Presenter {
 		void createProject();
 		void createTeam();
@@ -78,7 +76,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void applyFilterClicked(ProjectFilterEnum filterType, Team team);
 		void onEditProfile();
 		void setGetCertifiedDismissed();
-		void resort(SortOptionEnum sortOption);
+		void sort(ProjectListSortColumn column);
 		void newVerificationSubmissionClicked();
 		void editVerificationSubmissionClicked();
 		void setVerifyDismissed();
@@ -104,4 +102,5 @@ public interface ProfileView extends IsWidget, SynapseView {
 
 	void showTabs(boolean isOwner);
 	void open(String url);
+	void setLastActivityOnColumnVisible(boolean visible);
 }

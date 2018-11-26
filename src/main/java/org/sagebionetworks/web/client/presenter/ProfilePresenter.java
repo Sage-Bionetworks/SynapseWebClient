@@ -12,9 +12,11 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.PaginatedTeamIds;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserBundle;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
@@ -102,7 +104,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public ProfileArea currentArea;
 	public ProjectFilterEnum filterType;
 	public String filterTeamId;
-	public SortOptionEnum currentProjectSort;
+	
+	public SortDirection currentSortDirection;
+	public ProjectListSortColumn currentSortColumn;
 	public TeamListWidget myTeamsWidget;
 	public LoadMoreWidgetContainer loadMoreTeamsWidgetContainer;
 	public SynapseAlert profileSynAlert;
@@ -141,14 +145,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.gwt = gwt;
 		this.myTeamsWidget = myTeamsWidget;
 		this.openInvitesWidget = openInvitesWidget;
-		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.dateTimeUtils = dateTimeUtils;
 		this.jsClient = jsClient;
-		view.clearSortOptions();
-		for (SortOptionEnum sort: SortOptionEnum.values()) {
-			view.addSortOption(sort);
-		}
 		profileSynAlert = ginInjector.getSynapseAlertWidget();
 		projectSynAlert = ginInjector.getSynapseAlertWidget();
 		teamSynAlert = ginInjector.getSynapseAlertWidget();
@@ -237,7 +236,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		
 	}
 	
-
 	@Override
 	public void setPlace(Profile place) {
 		this.place = place;
@@ -288,6 +286,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	// Configuration
 	public void updateProfileView(String userId) {
+		currentSortColumn = ProjectListSortColumn.LAST_ACTIVITY;
+		currentSortDirection = SortDirection.DESC;
 		inviteCount = 0;
 		openRequestCount = 0;
 		isOwner = authenticationController.isLoggedIn()
@@ -296,10 +296,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		if (currentArea == null || (ProfileArea.SETTINGS.equals(currentArea) && !isOwner)) {
 			currentArea = ProfileArea.PROFILE;
 		}
-		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
 		view.clear();
 		view.showLoading();
-		view.setSortText(currentProjectSort.sortText);
 		view.setProfileEditButtonVisible(isOwner);
 		view.setOrcIDLinkButtonVisible(isOwner);
 		view.showTabs(isOwner);
@@ -507,7 +505,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	public void getMoreProjects() {
 		if (isOwner) {
-			view.setProjectSortVisible(true);
+			view.setLastActivityOnColumnVisible(true);
 			view.showProjectFiltersUI();
 			//this depends on the active filter
 			switch (filterType) {
@@ -529,7 +527,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					break;
 				case FAVORITES:
 					view.setFavoritesFilterSelected();
-					view.setProjectSortVisible(false);
+					view.setLastActivityOnColumnVisible(false);
 					getFavorites();
 					break;
 				case TEAM:
@@ -544,9 +542,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	@Override
-	public void resort(SortOptionEnum sort) {
-		currentProjectSort = sort;
-		view.setSortText(sort.sortText);
+	public void sort(ProjectListSortColumn column) {
+		currentSortColumn = column;
+		currentSortDirection = SortDirection.ASC.equals(currentSortDirection) ? SortDirection.DESC : SortDirection.ASC;
+		view.setSortDirection(currentSortColumn, currentSortDirection);
 		refreshProjects();
 	}
 	
@@ -729,7 +728,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getMyProjects(ProjectListType projectListType, final ProjectFilterEnum filter, int offset) {
 		projectSynAlert.clear();
-		jsClient.getMyProjects(projectListType, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<List<ProjectHeader>>() {
+		jsClient.getMyProjects(projectListType, PROJECT_PAGE_SIZE, offset, currentSortColumn, currentSortDirection, new AsyncCallback<List<ProjectHeader>>() {
 			@Override
 			public void onSuccess(List<ProjectHeader> results) {
 				if (filterType == filter) {
@@ -746,7 +745,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getTeamProjects(int offset) {
 		projectSynAlert.clear();
-		jsClient.getProjectsForTeam(filterTeamId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<List<ProjectHeader>>(){
+		jsClient.getProjectsForTeam(filterTeamId, PROJECT_PAGE_SIZE, offset, currentSortColumn, currentSortDirection, new AsyncCallback<List<ProjectHeader>>(){
 			@Override
 			public void onSuccess(List<ProjectHeader> results) {
 				if (filterType == ProjectFilterEnum.TEAM) {
@@ -763,7 +762,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	public void getUserProjects(int offset) {
 		projectSynAlert.clear();
-		jsClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<List<ProjectHeader>>() {
+		jsClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, currentSortColumn, currentSortDirection, new AsyncCallback<List<ProjectHeader>>() {
 			@Override
 			public void onSuccess(List<ProjectHeader> results) {
 				addProjectResults(results);

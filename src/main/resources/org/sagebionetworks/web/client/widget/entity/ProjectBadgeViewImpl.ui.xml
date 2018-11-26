@@ -11,8 +11,7 @@
 			<g:Anchor ui:field="anchor" addStyleNames="displayInline font-size-1-1em"/>
 		</b:Tooltip>
 		<bh:Span ui:field="favoritesWidgetContainer"/>
-		<bh:Span ui:field="additionalTextUI" addStyleNames="margin-left-5 right">
-			<bh:Span>Last activity on: </bh:Span>
+		<bh:Span ui:field="additionalTextUI" width="140px" addStyleNames="right hidden-xs">
 			<bh:Span ui:field="additionalText" />
 		</bh:Span>
 	</bh:Div>
