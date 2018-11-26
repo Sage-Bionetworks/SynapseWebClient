@@ -24,4 +24,5 @@ public interface DiscussionThreadListWidgetView extends IsWidget{
 	void setThreadsContainer(IsWidget container);
 	void scrollIntoView(Widget w);
 	void setSorted(DiscussionThreadOrder column, boolean ascending);
+	void clearSort();
 }

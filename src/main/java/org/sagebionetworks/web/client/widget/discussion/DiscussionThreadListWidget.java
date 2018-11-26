@@ -70,8 +70,6 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 		this.jsClient = jsClient;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
-		order = DEFAULT_ORDER;
-		ascending = DEFAULT_ASCENDING;
 		this.loadMoreWidgetContainer = loadMoreWidgetContainer;
 		view.setThreadsContainer(loadMoreWidgetContainer);
 	}
@@ -79,12 +77,12 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	public void configure(String forumId, Boolean isCurrentUserModerator,
 			Set<String> moderatorIds, CallbackP<Boolean> emptyListCallback,
 			DiscussionFilter filter) {
-		clear();
-		threadId2Widget.clear();
+		order = DEFAULT_ORDER;
+		ascending = DEFAULT_ASCENDING;
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.emptyListCallback = emptyListCallback;
 		this.moderatorIds = moderatorIds;
-		offset = 0L;
+		this.entityId = null;
 		this.forumId = forumId;
 		if (filter != null) {
 			this.filter = filter;
@@ -97,18 +95,26 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 				loadMore();
 			}
 		});
-		loadMore();
+		
 		DiscussionThreadCountAlert threadCountAlert = ginInjector.getDiscussionThreadCountAlert();
 		view.setThreadCountAlert(threadCountAlert.asWidget());
 		threadCountAlert.configure(forumId);
+		loadInitialForumResults();
+	}
+	
+	private void loadInitialForumResults() {
+		clear();
+		offset = 0L;
+		loadMore();
 	}
 
 	public void configure(String entityId, CallbackP<Boolean> emptyListCallback,
 			DiscussionFilter filter) {
-		clear();
+		order = DEFAULT_ORDER;
+		ascending = DEFAULT_ASCENDING;
 		this.emptyListCallback = emptyListCallback;
-		offset = 0L;
 		this.entityId = entityId;
+		this.forumId = null;
 		if (filter != null) {
 			this.filter = filter;
 		} else {
@@ -120,6 +126,12 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 				loadMoreThreadsForEntity();
 			}
 		});
+		loadInitialEntityResults();
+	}
+
+	private void loadInitialEntityResults() {
+		clear();
+		offset = 0L;
 		loadMoreThreadsForEntity();
 	}
 
@@ -163,7 +175,9 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	}
 
 	public void clear() {
+		view.clearSort();
 		threadsContainer.clear();
+		threadId2Widget.clear();
 	}
 	
 	public void setThreadIdClickedCallback(CallbackP<DiscussionThreadBundle> threadIdClickedCallback) {
@@ -188,7 +202,12 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 			order = newOrder;
 			ascending = DEFAULT_ASCENDING;
 		}
-		configure(forumId, isCurrentUserModerator, moderatorIds, emptyListCallback, filter);
+		if (entityId != null) {
+			loadInitialEntityResults();
+		} else {
+			loadInitialForumResults();
+		}
+		view.setSorted(order, ascending);
 	}
 	
 	public void scrollToThread(String threadId) {
