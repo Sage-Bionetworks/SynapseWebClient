@@ -89,4 +89,8 @@ public class SortableTableHeaderImpl implements SortableTableHeader {
 	public String getText() {
 		return tableHeaderLink.getText();
 	}
+	
+	public void setSortIconVisible(boolean visible) {
+		sortIcon.setVisible(visible);
+	}
 }

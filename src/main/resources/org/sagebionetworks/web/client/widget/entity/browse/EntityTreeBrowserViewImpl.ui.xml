@@ -12,6 +12,7 @@
 	<bh:Div>
 		<bh:Div ui:field="synAlertContainer"/>
 	    <bh:Span ui:field="emptyUI" text="&#8212; Empty"/>
+	    <b:TextArea width="1px" ui:field="copyToClipboardTextbox" visible="false" />
 	    <!-- File browser tree "table" header -->
 	    <t:Table ui:field="entityTreeHeader" width="100%">
 			<t:TableRow>
@@ -26,6 +27,9 @@
 				<tr:SortableTableHeaderImpl ui:field="createdOnColumnHeader" width="165px" addStyleNames="visible-md visible-lg" text="Created On" />
 				<t:TableHeader width="130px" addStyleNames="visible-lg">
 					<bh:Span text="ID" />
+					<b:Tooltip title="Copy IDs to the clipboard">
+						<b:Icon ui:field="copyIDToClipboardIcon" addStyleNames="imageButton margin-left-5 link" type="CLIPBOARD" />
+					</b:Tooltip>
 				</t:TableHeader>
 				<t:TableHeader width="90px" addStyleNames="visible-lg">
 					<bh:Span text="MD5"/>
