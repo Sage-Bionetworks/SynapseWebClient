@@ -119,25 +119,23 @@ public class FilesTabViewImpl implements FilesTabView {
 	
 	@Override
 	public void setFileTitlebar(Widget w) {
-		fileTitlebarContainer.add(w);
+		fileTitlebarContainer.setWidget(w);
 	}
 	
 	@Override
 	public void setFolderTitlebar(Widget w) {
-		folderTitlebarContainer.add(w);
+		folderTitlebarContainer.setWidget(w);
 	}
-	
-	
 	
 	@Override
 	public void setBreadcrumb(Widget w) {
-		fileBreadcrumbContainer.add(w);		
+		fileBreadcrumbContainer.setWidget(w);		
 	}
 
 	
 	@Override
 	public void setFileBrowser(Widget w) {
-		fileBrowserContainer.add(w);		
+		fileBrowserContainer.setWidget(w);		
 	}
 
 	@Override
@@ -166,7 +164,7 @@ public class FilesTabViewImpl implements FilesTabView {
 
 	@Override
 	public void setMetadata(Widget w) {
-		fileMetadataContainer.add(w);		
+		fileMetadataContainer.setWidget(w);		
 	}
 	@Override
 	public void setMetadataVisible(boolean visible) {
@@ -174,7 +172,7 @@ public class FilesTabViewImpl implements FilesTabView {
 	}
 	@Override
 	public void setActionMenu(Widget w) {
-		fileActionMenuContainer.add(w);		
+		fileActionMenuContainer.setWidget(w);		
 	}
 	@Override
 	public void clearActionMenuContainer() {
@@ -188,7 +186,7 @@ public class FilesTabViewImpl implements FilesTabView {
 	
 	@Override
 	public void setWikiPage(Widget w) {
-		filesWikiPageContainer.add(w);	
+		filesWikiPageContainer.setWidget(w);	
 	}
 	
 	@Override

@@ -69,7 +69,7 @@ public class TableEntityWidgetViewImpl extends Composite implements
 		initWidget(uiBinder.createAndBindUi(this));
 		this.ginInjector = ginInjector;
 		this.columnModelsWidget = ginInjector.createNewColumnModelsWidget();
-		this.columnDetailsPanel.add(this.columnModelsWidget.asWidget());
+		this.columnDetailsPanel.setWidget(this.columnModelsWidget.asWidget());
 		this.scopeWidget = scopeWidget;
 		this.scopePanel.add(scopeWidget.asWidget());
 		scopePanel.getElement().setAttribute("highlight-box-title", "Scope");

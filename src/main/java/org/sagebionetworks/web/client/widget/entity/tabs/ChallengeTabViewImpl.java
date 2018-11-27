@@ -25,13 +25,11 @@ public class ChallengeTabViewImpl implements ChallengeTabView {
 	
 	@Override
 	public void setEvaluationList(Widget w) {
-		evaluationListContainer.clear();
-		evaluationListContainer.add(w);
+		evaluationListContainer.setWidget(w);
 	}
 	@Override
 	public void setChallengeWidget(Widget w) {
-		challengeWidgetContainer.clear();
-		challengeWidgetContainer.add(w);
+		challengeWidgetContainer.setWidget(w);
 	}
 	@Override
 	public Widget asWidget() {

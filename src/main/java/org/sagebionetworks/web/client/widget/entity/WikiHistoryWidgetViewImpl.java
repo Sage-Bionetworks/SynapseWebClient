@@ -275,7 +275,7 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 	private SimplePanel wrapWidget(Widget widget, String styleNames) {
 		SimplePanel widgetWrapper = new SimplePanel();
 		widgetWrapper.addStyleName(styleNames);
-		widgetWrapper.add(widget);
+		widgetWrapper.setWidget(widget);
 		return widgetWrapper;
 	}
 	

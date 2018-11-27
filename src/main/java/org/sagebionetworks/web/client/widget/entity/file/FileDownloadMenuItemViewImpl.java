@@ -37,6 +37,7 @@ public class FileDownloadMenuItemViewImpl implements FileDownloadMenuItemView {
 		};
 		
 		authorizedDirectDownloadClickHandler = event -> {
+			event.preventDefault();
 			presenter.onAuthorizedDirectDownloadClicked();
 		};
 		directDownloadClickHandler = event -> {

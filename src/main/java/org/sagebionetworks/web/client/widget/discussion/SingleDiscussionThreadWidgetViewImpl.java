@@ -194,8 +194,7 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 
 	@Override
 	public void setEditThreadModal(Widget widget) {
-		editThreadModalContainer.clear();
-		editThreadModalContainer.add(widget);
+		editThreadModalContainer.setWidget(widget);
 	}
 
 	@Override

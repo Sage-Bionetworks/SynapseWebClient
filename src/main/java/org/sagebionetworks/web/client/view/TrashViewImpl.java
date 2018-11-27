@@ -365,7 +365,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 		fp.add(ul);
 		paginationPanel.clear();
 		if (entries.size() > 1)
-			paginationPanel.add(fp);
+			paginationPanel.setWidget(fp);
 	}
 	
 	private Anchor createPaginationAnchor(String anchorName, final int newStart) {

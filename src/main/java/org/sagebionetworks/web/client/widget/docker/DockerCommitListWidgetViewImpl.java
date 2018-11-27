@@ -41,7 +41,6 @@ public class DockerCommitListWidgetViewImpl implements DockerCommitListWidgetVie
 
 	@Override
 	public void setSynAlert(Widget widget) {
-		synAlertContainer.clear();
-		synAlertContainer.add(widget);
+		synAlertContainer.setWidget(widget);
 	}
 }

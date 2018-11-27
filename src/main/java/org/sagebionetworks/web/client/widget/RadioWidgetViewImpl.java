@@ -48,8 +48,7 @@ public class RadioWidgetViewImpl implements RadioWidget{
 
 	@Override
 	public void add(Widget widget) {
-		item.clear();
-		item.add(widget);
+		item.setWidget(widget);
 	}
 
 	@Override

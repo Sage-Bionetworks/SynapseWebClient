@@ -59,7 +59,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 		dialogContent.removeFromParent();
 		FocusPanel panel = new FocusPanel();
 		panel.addStyleName("margin-right-20");
-		panel.add(dialogContent);
+		panel.setWidget(dialogContent);
 		panel.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

@@ -79,7 +79,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 				ListBox combo = getAccessCombo(member.getOwnerId(), teamMember.getIsTeamAdmin());
 				SimplePanel wrap = new SimplePanel();
 				wrap.addStyleName("margin-top-5");
-				wrap.add(combo);
+				wrap.setWidget(combo);
 				left.add(wrap);
 				
 				//add delete member button

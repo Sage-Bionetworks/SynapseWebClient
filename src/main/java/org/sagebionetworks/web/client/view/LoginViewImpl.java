@@ -102,9 +102,8 @@ public class LoginViewImpl extends Composite implements LoginView {
 		headerWidget.refresh();
 	  	
 		// Add the widget to the panel
-		loginWidgetPanel.clear();
 		loginWidget.asWidget().removeFromParent();
-		loginWidgetPanel.add(loginWidget.asWidget());
+		loginWidgetPanel.setWidget(loginWidget.asWidget());
 	}
 	
 	@Override

@@ -86,7 +86,7 @@ public class QuestionContainerWidgetViewImpl implements QuestionContainerWidgetV
 		answerButton.setValue(isSelected);
 		answerButton.setHTML(SimpleHtmlSanitizer.sanitizeHtml(answerPrompt));
 		answerButton.addClickHandler(clickHandler);
-		answerContainer.add(answerButton.asWidget());
+		answerContainer.setWidget(answerButton.asWidget());
 		addAnswer(answerContainer.asWidget());
 		radioButtons.add(answerButton);
 	}
@@ -99,7 +99,7 @@ public class QuestionContainerWidgetViewImpl implements QuestionContainerWidgetV
 		checkbox.setValue(isSelected);
 		checkbox.setHTML(SimpleHtmlSanitizer.sanitizeHtml(answerPrompt));
 		checkbox.addClickHandler(clickHandler);
-		answerContainer.add(checkbox);
+		answerContainer.setWidget(checkbox);
 		addAnswer(answerContainer);
 		checkBoxes.add(checkbox);
 	}

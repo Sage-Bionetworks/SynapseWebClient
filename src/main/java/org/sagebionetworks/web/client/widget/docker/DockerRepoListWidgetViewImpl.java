@@ -55,7 +55,7 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
 
 	@Override
 	public void setSynAlert(Widget widget){
-		synAlertContainer.add(widget);
+		synAlertContainer.setWidget(widget);
 	}
 
 	@Override

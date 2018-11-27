@@ -127,8 +127,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		currentEntityId = entity.getId();
 		favoriteWidget.configure(currentEntityId);
 		md5Link.clear();
-		md5LinkContainer.clear();
-		md5LinkContainer.add(md5Link);
+		md5LinkContainer.setWidget(md5Link);
 		entityIcon.setType(EntityTypeUtils.getIconTypeForEntity(entity));
 		currentVersionLink.setHref("#!Synapse:"+currentEntityId);
 	}

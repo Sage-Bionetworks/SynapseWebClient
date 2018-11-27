@@ -241,9 +241,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 
 	@Override
 	public void showRegisterTeamDialog(String challengeId) {
-		registerTeamDialogContainer.clear();
 		RegisterTeamDialog dialog = ginInjector.getRegisterTeamDialog();
-		registerTeamDialogContainer.add(dialog.asWidget());
+		registerTeamDialogContainer.setWidget(dialog.asWidget());
 		
 		dialog.configure(challengeId, new Callback() {
 			@Override
@@ -287,8 +286,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 
 	@Override
 	public void setDockerCommitList(Widget widget){
-		dockerCommitListContainer.clear();
-		dockerCommitListContainer.add(widget);
+		dockerCommitListContainer.setWidget(widget);
 	}
 
 	@Override
@@ -438,7 +436,6 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 
 	@Override
 	public void setDockerCommitSynAlert(Widget widget) {
-		this.dockerCommitListSynAlertPanel.clear();
-		this.dockerCommitListSynAlertPanel.add(widget);
+		this.dockerCommitListSynAlertPanel.setWidget(widget);
 	}
 }
