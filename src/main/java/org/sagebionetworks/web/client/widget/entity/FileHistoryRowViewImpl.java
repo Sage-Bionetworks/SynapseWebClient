@@ -54,9 +54,9 @@ public class FileHistoryRowViewImpl implements FileHistoryRowView {
 			}
 		});
 		
-		md5LinkContainer.add(md5Link.asWidget());
+		md5LinkContainer.setWidget(md5Link.asWidget());
 		this.userBadge = userBadge;
-		modifiedByContainer.add(userBadge.asWidget());
+		modifiedByContainer.setWidget(userBadge.asWidget());
 	}
 	
 	

@@ -131,7 +131,7 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 
 	@Override
 	public void setEditReplyModal(Widget widget) {
-		editReplyModalContainer.add(widget);
+		editReplyModalContainer.setWidget(widget);
 	}
 
 	@Override

@@ -415,8 +415,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void setProfileSynAlertWidget(Widget profileSynAlert) {
-		profileSynAlertPanel.clear();
-		profileSynAlertPanel.add(profileSynAlert);
+		profileSynAlertPanel.setWidget(profileSynAlert);
 	}
 	
 	@Override
@@ -433,10 +432,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void setTeamSynAlertWidget(Widget teamSynAlert) {
-		teamSynAlertPanel.clear();
-		teamSynAlertPanel.add(teamSynAlert);
+		teamSynAlertPanel.setWidget(teamSynAlert);
 	}
-	
 	
 	private void initCertificationBadge() {
 		certificationBadge.addClickHandler(new ClickHandler() {
@@ -475,8 +472,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void setProfile(UserProfile profile, boolean isOwner) {
 		viewProfilePanel.setVisible(true);
 		fillInProfileView(profile);
-		picturePanel.clear();
-		picturePanel.add(getProfilePicture(profile, synapseJSNIUtils));
+		picturePanel.setWidget(getProfilePicture(profile, synapseJSNIUtils));
 		if (!isOwner) {
 			setHighlightBoxUser(DisplayUtils.getDisplayName(profile));
 		}

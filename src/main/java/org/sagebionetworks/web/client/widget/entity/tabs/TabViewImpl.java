@@ -80,7 +80,7 @@ public class TabViewImpl implements TabView {
 		fp.addClickHandler(tabClickedHandler);
 		fp.setTabIndex(-1);
 		fp.addStyleName("margin-right-5 displayInline");
-		fp.add(anchor);
+		fp.setWidget(anchor);
 		tabItem.add(fp);
 		tabItem.add(helpWidget.asWidget());
 	}

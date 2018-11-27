@@ -103,7 +103,7 @@ public class BaseEditWidgetDescriptorViewImpl implements BaseEditWidgetDescripto
 				widgetDescriptorPresenter = result;
 				if (widgetDescriptorPresenter != null) {
 					Widget w = widgetDescriptorPresenter.asWidget();
-					paramsPanel.add(w);
+					paramsPanel.setWidget(w);
 					//finish setting up the main dialog
 					String friendlyName = widgetRegistrar.getFriendlyTypeName(contentTypeKey);
 					modal.setTitle(friendlyName);

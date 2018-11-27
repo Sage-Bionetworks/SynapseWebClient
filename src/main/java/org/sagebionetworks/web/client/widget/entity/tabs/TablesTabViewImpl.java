@@ -50,21 +50,21 @@ public class TablesTabViewImpl implements TablesTabView {
 	
 	@Override
 	public void setBreadcrumb(Widget w) {
-		tableBreadcrumbContainer.add(w);
+		tableBreadcrumbContainer.setWidget(w);
 	}
 	
 	@Override
 	public void setTableList(Widget w) {
-		tableListWidgetContainer.add(w);
+		tableListWidgetContainer.setWidget(w);
 	}
 	@Override
 	public void setTitlebar(Widget w) {
-		tableTitlebarContainer.add(w);
+		tableTitlebarContainer.setWidget(w);
 	}
 	
 	@Override
 	public void setEntityMetadata(Widget w) {
-		tableMetadataContainer.add(w);
+		tableMetadataContainer.setWidget(w);
 	}
 	@Override
 	public Widget asWidget() {
@@ -73,7 +73,7 @@ public class TablesTabViewImpl implements TablesTabView {
 	
 	@Override
 	public void setTableEntityWidget(Widget w) {
-		tableWidgetContainer.add(w);
+		tableWidgetContainer.setWidget(w);
 	}
 	@Override
 	public void clearTableEntityWidget() {
@@ -82,7 +82,7 @@ public class TablesTabViewImpl implements TablesTabView {
 	
 	@Override
 	public void setActionMenu(Widget w) {
-		tableActionMenuContainer.add(w);
+		tableActionMenuContainer.setWidget(w);
 	}
 	@Override
 	public void clearActionMenuContainer() {

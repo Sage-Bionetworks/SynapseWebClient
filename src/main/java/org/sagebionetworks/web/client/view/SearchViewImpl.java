@@ -161,8 +161,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 	
 	@Override
 	public void setLoadingMoreContainerWidget(Widget w) {
-		resultsPanel.clear();
-		resultsPanel.add(w);
+		resultsPanel.setWidget(w);
 	}
 	
 	@Override
@@ -254,8 +253,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 			facetButtons.add(btn);
 		}
 		addTimeFacets(searchResults, facetNames, currentFacets);
-		currentFacetsPanel.clear();
-		currentFacetsPanel.add(currentFacets);
+		currentFacetsPanel.setWidget(currentFacets);
 		return facetNames.toString();
 	}
 	
@@ -323,8 +321,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 				}
 			}
 		}
-		facetPanel.clear();
-		facetPanel.add(vp);
+		facetPanel.setWidget(vp);
 	}
 
 	private Panel createSearchResults(List<Hit> hits, int start) {

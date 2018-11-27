@@ -37,22 +37,22 @@ public class DockerTabViewImpl implements DockerTabView {
 
 	@Override
 	public void setDockerRepoList(Widget widget) {
-		dockerRepoListWidgetContainer.add(widget);
+		dockerRepoListWidgetContainer.setWidget(widget);
 	}
 
 	@Override
 	public void setBreadcrumb(Widget widget) {
-		dockerBreadcrumbContainer.add(widget);
+		dockerBreadcrumbContainer.setWidget(widget);
 	}
 
 	@Override
 	public void setSynapseAlert(Widget widget) {
-		synapseAlertContainer.add(widget);
+		synapseAlertContainer.setWidget(widget);
 	}
 
 	@Override
 	public void setDockerRepoWidget(Widget widget) {
-		dockerRepoWidgetContainer.add(widget);
+		dockerRepoWidgetContainer.setWidget(widget);
 	}
 
 	@Override

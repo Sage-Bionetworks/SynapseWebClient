@@ -95,6 +95,6 @@ public class ChangeUsernameViewImpl extends Composite implements ChangeUsernameV
 
 	@Override
 	public void setSynapseAlertWidget(Widget synAlert) {
-		errorContainer.add(synAlert);
+		errorContainer.setWidget(synAlert);
 	}
 }
