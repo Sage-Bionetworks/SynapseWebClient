@@ -33,6 +33,7 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 		void addMoreButton(MoreTreeItem moreItem, String parentId,
 				EntityTreeItem parent, String nextPageToken);
 		void getChildren(String parentId, EntityTreeItem parent, String nextPageToken);
+		void copyIDsToClipboard();
 	}
 	void appendRootEntityTreeItem(EntityTreeItem childToAdd);
 	void appendChildEntityTreeItem(EntityTreeItem childToAdd,
@@ -48,6 +49,8 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 	void hideEmptyUI();
 	void setLoadingVisible(boolean isShown);
 	void setSynAlert(IsWidget w);
+	void setSortable(boolean isSortable);
 	void clearSortUI();
 	void setSortUI(SortBy sortBy, Direction dir);
+	void copyToClipboard(String value);
 }

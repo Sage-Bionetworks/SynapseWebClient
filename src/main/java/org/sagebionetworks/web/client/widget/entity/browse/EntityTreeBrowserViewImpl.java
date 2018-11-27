@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Hr;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -13,6 +15,8 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
@@ -64,27 +68,42 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	SortableTableHeaderImpl nameColumnHeader;
 	@UiField
 	SortableTableHeaderImpl createdOnColumnHeader;
+	@UiField
+	Icon copyIDToClipboardIcon;
+	@UiField
+	TextArea copyToClipboardTextbox;
+	SynapseJSNIUtils jsniUtils;
 	Div entityTreeContainer = new Div();
 	AuthenticationController authController;
 	GlobalApplicationState globalAppState;
+	CookieProvider cookies;
 	private Widget widget;
+	boolean isSortable = true;
 	@Inject
 	public EntityTreeBrowserViewImpl(IconsImageBundle iconsImageBundle,
 			Binder uiBinder, 
 			AuthenticationController authController, 
-			GlobalApplicationState globalAppState) {
+			GlobalApplicationState globalAppState,
+			SynapseJSNIUtils jsniUtils, CookieProvider cookies) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.authController = authController;
 		this.globalAppState = globalAppState;
+		this.jsniUtils = jsniUtils;
+		this.cookies = cookies;
 		this.widget = uiBinder.createAndBindUi(this);
 		// Make sure to show this and hide the tree on empty.
 		hideEmptyUI();
 		nameColumnHeader.setSortingListener(headerName -> {
-			presenter.onToggleSort(SortBy.NAME);
+			if (isSortable) {
+				presenter.onToggleSort(SortBy.NAME);	
+			}
 		});
 		createdOnColumnHeader.setSortingListener(headerName -> {
-			presenter.onToggleSort(SortBy.CREATED_ON);
+			if (isSortable) {
+				presenter.onToggleSort(SortBy.CREATED_ON);
+			}
 		});
+		copyIDToClipboardIcon.addClickHandler(event -> presenter.copyIDsToClipboard());
 	}
 
 	@Override
@@ -126,6 +145,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 
 	@Override
 	public void clear() {
+		copyIDToClipboardIcon.setVisible(DisplayUtils.isInTestWebsite(cookies));
 		entityTreeContainer.clear();
 		entityTree = null;
 		treeItem2entityTreeItem = null;
@@ -340,5 +360,22 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		} else if (SortBy.CREATED_ON.equals(sortBy)) {
 			createdOnColumnHeader.setSortDirection(direction);
 		}
+	}
+	
+	@Override
+	public void setSortable(boolean isSortable) {
+		this.isSortable = isSortable;
+		nameColumnHeader.setSortIconVisible(isSortable);
+		createdOnColumnHeader.setSortIconVisible(isSortable);
+	}
+	
+	@Override
+	public void copyToClipboard(String value) {
+		copyToClipboardTextbox.setVisible(true);
+		copyToClipboardTextbox.setFocus(true);
+		copyToClipboardTextbox.setValue(value);
+		copyToClipboardTextbox.selectAll();
+		jsniUtils.copyToClipboard();
+		copyToClipboardTextbox.setVisible(false);
 	}
 }
