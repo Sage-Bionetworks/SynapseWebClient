@@ -90,6 +90,18 @@ public class InviteWidgetTest {
 		
 		// no users added, so it's a no-op
 		verifyZeroInteractions(mockSynapseClient);
+		verify(mockSynAlert).showError(InviteWidget.INVALID_EMAIL_ERROR_MESSAGE);
+	}
+	
+	@Test
+	public void testSendNoUsersAdded() {
+		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(null);
+		when(mockSuggestBox.getText()).thenReturn("");
+		
+		inviteWidget.doSendInvites(invitationMessage);
+		
+		verifyZeroInteractions(mockSynapseClient);
+		verify(mockSynAlert).showError(InviteWidget.NO_USERS_OR_EMAILS_ADDED_ERROR_MESSAGE);
 	}
 
 	@Test

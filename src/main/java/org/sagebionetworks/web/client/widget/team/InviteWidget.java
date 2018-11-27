@@ -21,6 +21,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class InviteWidget implements InviteWidgetView.Presenter {
+	public static final String NO_USERS_OR_EMAILS_ADDED_ERROR_MESSAGE = "Please add at least one user or email address to send an invitation to.";
 	public static final String INVALID_EMAIL_ERROR_MESSAGE = "Please select a suggested user or provide a valid email address.";
 	private InviteWidgetView view;
 	private SynapseClientAsync synapseClient;
@@ -125,9 +126,14 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	@Override
 	public void doSendInvites(String invitationMessage) {
 		// if anything is in the invitation field, then pick it up before processing
+		synAlert.clear();
 		if (addSuggestion()) {
+			if (inviteEmails.isEmpty() && inviteUsers.isEmpty()) {
+				synAlert.showError(NO_USERS_OR_EMAILS_ADDED_ERROR_MESSAGE);
+				return;
+			}
 			view.setLoading(true);
-			synAlert.clear();
+			
 			this.invitationMessage = invitationMessage;
 			doSendInvites();
 		}
