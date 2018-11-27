@@ -29,6 +29,8 @@ public interface UserBadgeView extends IsWidget, SynapseView {
 	void setUserId(String userId);
 	void setOpenInNewWindow();
 	void doNothingOnClick();
+	void setTooltipText(String displayName, String title, String location);
+	void noTooltip();
 	/**
 	 * Presenter interface
 	 */

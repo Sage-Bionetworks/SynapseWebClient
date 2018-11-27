@@ -99,6 +99,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		view.setUserId(profile.getOwnerId());
 		view.setHref("#!Profile:" + profile.getOwnerId());
 		useCachedImage = true;
+		view.setTooltipText(displayName, profile.getPosition(), profile.getLocation());
 		configurePicture();
 	}
 	
@@ -286,5 +287,8 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	
 	public void setDoNothingOnClick() {
 		view.doNothingOnClick();
+	}
+	public void noTooltip() {
+		view.noTooltip();
 	}
 }

@@ -8,15 +8,17 @@
 	<bh:Div addStyleNames="displayInlineBlock overflowHidden vertical-align-middle ">
 		<bh:Span addStyleNames="flexcontainer-row">
 			<bh:Span ui:field="pictureSpan" addStyleNames="flexcontainer-column flexcontainer-justify-center">
-				<g:FocusPanel ui:field="pictureFocusPanel" addStyleNames="margin-right-5 imageButton displayInlineBlock">
-					<bh:Span>
-						<bh:Span ui:field="defaultUserPicture" addStyleNames="fa-stack userProfileImage">
-							<b:Icon ui:field="squareIcon" type="CIRCLE" addStyleNames="fa-stack-2x"/>
-							<bh:Strong ui:field="defaultUserPictureLetter" text="J" addStyleNames="fa-stack-1x color-white"/>
+				<b:Tooltip ui:field="pictureTooltip" title="Profile unavailable" isHtml="true" placement="BOTTOM">
+					<g:FocusPanel ui:field="pictureFocusPanel" addStyleNames="margin-right-5 imageButton displayInlineBlock">
+						<bh:Span>
+							<bh:Span ui:field="defaultUserPicture" addStyleNames="fa-stack userProfileImage">
+								<b:Icon ui:field="squareIcon" type="CIRCLE" addStyleNames="fa-stack-2x"/>
+								<bh:Strong ui:field="defaultUserPictureLetter" text="J" addStyleNames="fa-stack-1x color-white"/>
+							</bh:Span>
+							<g:Image ui:field="userPicture" addStyleNames="userProfileImage margin-left-2" />
 						</bh:Span>
-						<g:Image ui:field="userPicture" addStyleNames="userProfileImage margin-left-2" />
-					</bh:Span>
-				</g:FocusPanel>
+					</g:FocusPanel>
+				</b:Tooltip>
 			</bh:Span>
 			<bh:Span addStyleNames="flexcontainer-column flexcontainer-justify-center">
 				<b:Anchor ui:field="usernameLink" />
