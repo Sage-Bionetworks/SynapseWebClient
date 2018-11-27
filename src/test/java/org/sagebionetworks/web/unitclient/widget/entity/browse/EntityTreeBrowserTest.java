@@ -60,6 +60,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsTreeItem;
 
 public class EntityTreeBrowserTest {
+	public static final String TEST_RESULT_ID = "testResultId";
 	@Mock
 	EntityTreeBrowserView mockView;
 	@Mock
@@ -89,6 +90,9 @@ public class EntityTreeBrowserTest {
 	EntityHeader mockEntityHeader;
 	@Mock
 	SynapseAlert mockSynAlert;
+	@Captor
+	ArgumentCaptor<String> stringCaptor;
+
 	String parentId;
 
 	@Before
@@ -233,7 +237,7 @@ public class EntityTreeBrowserTest {
 	private void setQueryResults(long totalEntries) {
 		for (int i = 0; i < totalEntries; i++) {
 			EntityHeader res = new EntityHeader();
-			res.setId("testResultId" + i);
+			res.setId(TEST_RESULT_ID + i);
 			res.setType(Folder.class.getName());
 			searchResults.add(res);
 		}
@@ -319,5 +323,22 @@ public class EntityTreeBrowserTest {
 		assertTrue(entityTreeBrowser.isExpandable(result));
 		result.setType(FileEntity.class.getName());
 		assertFalse(entityTreeBrowser.isExpandable(result));
+	}
+	
+	@Test
+	public void testCopyToClipboard() {
+		setQueryResults(10);
+		
+		String nextPageToken = "abc";
+		when(mockResults.getNextPageToken()).thenReturn(nextPageToken);
+		entityTreeBrowser.getChildren(parentId, null, null);
+		
+		entityTreeBrowser.copyIDsToClipboard();
+		
+		verify(mockView).copyToClipboard(stringCaptor.capture());
+		String clipboardValue = stringCaptor.getValue();
+		for (int i = 0; i < 10; i++) {
+			assertTrue(clipboardValue.contains(TEST_RESULT_ID+i));
+		}
 	}
 }
