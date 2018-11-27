@@ -21,8 +21,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class InviteWidget implements InviteWidgetView.Presenter {
-	public static final String NO_USERS_OR_EMAILS_ADDED_ERROR_MESSAGE = "Please add at least one user or email address to send an invitation to.";
-	public static final String INVALID_EMAIL_ERROR_MESSAGE = "Please select a suggested user or provide a valid email address.";
+	public static final String NO_USERS_OR_EMAILS_ADDED_ERROR_MESSAGE = "Please add at least one user or email address and try again.";
+	public static final String INVALID_EMAIL_ERROR_MESSAGE = "Please select a suggested user or provide a valid email address and try again.";
 	private InviteWidgetView view;
 	private SynapseClientAsync synapseClient;
 	private Team team;
