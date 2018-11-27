@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
@@ -75,6 +76,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	Div entityTreeContainer = new Div();
 	AuthenticationController authController;
 	GlobalApplicationState globalAppState;
+	CookieProvider cookies;
 	private Widget widget;
 	boolean isSortable = true;
 	@Inject
@@ -82,11 +84,12 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 			Binder uiBinder, 
 			AuthenticationController authController, 
 			GlobalApplicationState globalAppState,
-			SynapseJSNIUtils jsniUtils) {
+			SynapseJSNIUtils jsniUtils, CookieProvider cookies) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.authController = authController;
 		this.globalAppState = globalAppState;
 		this.jsniUtils = jsniUtils;
+		this.cookies = cookies;
 		this.widget = uiBinder.createAndBindUi(this);
 		// Make sure to show this and hide the tree on empty.
 		hideEmptyUI();
@@ -142,6 +145,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 
 	@Override
 	public void clear() {
+		copyIDToClipboardIcon.setVisible(DisplayUtils.isInTestWebsite(cookies));
 		entityTreeContainer.clear();
 		entityTree = null;
 		treeItem2entityTreeItem = null;
