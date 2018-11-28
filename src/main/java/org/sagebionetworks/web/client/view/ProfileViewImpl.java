@@ -16,6 +16,7 @@ import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -301,7 +302,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Div createdOnUI;
 	//View profile widgets
-	private static HTML defaultProfilePicture = new HTML(DisplayUtils.getFontAwesomeIcon("user font-size-150 lightGreyText"));
+	private static Icon defaultProfilePicture = new Icon(IconType.SYN_USER);
+	static {
+		defaultProfilePicture.addStyleName("font-size-150 lightGreyText");
+	}
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private DateTimeUtils dateTimeUtils;
 	

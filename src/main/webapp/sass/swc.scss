@@ -958,119 +958,120 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
     background: none repeat scroll 0 0 #FFFFFF;
     padding: 20px;
 }
-
-.font-italic { font-style: italic; }
-.font-size-1-1em { font-size: 1.1em; }
-.font-weight-700 {
-	font-weight: 700;
-}
-.font-weight-bolder {
-	font-weight: bolder;
-}
-.font-weight-normal {
-	font-weight: normal;
-}
-
-.font-size-32 {
-	font-size: 32px !important;
-}
-
-span.font-size-150,
-.font-size-150,
-i.font-size-150 {
-	font-size: 150px;
-}
-
-.font-size-90 {
-	font-size: 90px;
-}
-
-.font-size-67 {
-	font-size: 67px;
-}
-
-span.font-size-58,
-.font-size-58 {
-	font-size: 58px;
-}
-.font-size-36 {
-	font-size: 36px;
-}
-
-.font-size-30 {
-	font-size: 30px;
-}
-
-.font-size-24 {
-	font-size: 24px;
-}
-
-.font-size-22 {
-	font-size: 22px;
-}
-.font-size-20 {
-	font-size: 20px;
-}
-.font-size-18 {
-	font-size: 18px;
-}
-.font-size-17, #body .font-size-17 {
-	font-size: 17px;
-}
-.font-size-16 {
-	font-size: 16px;
-}
-.font-size-15 {
-	font-size: 15px;
-}
-
-/* font size 14px.  File browser input box needs more fine-tuned selector for override*/
-.font-size-14, input[type=text][readonly].font-size-14 {
-	font-size: 14px;
-}
-
-span.font-size-13,
-.font-size-13 {
-	font-size: 13px;
-}
-.font-size-12 {
-	font-size: 12px;
-}
-
-.font-size-1x,
-i.font-size-1x {
-	font-size:1em;
-}
-
-.font-size-0-9em, #body .font-size-0-9em,
-i.font-size-0-9em, #body i.font-size-0-9em {
-	font-size:0.9em;
-}
-
-.font-size-1-5x,
-i.font-size-1-5x {
-	font-size:1.5em;
-}
-.font-size-lg,
-i.font-size-lg {
-	font-size:1.33em;
-}
-.font-size-2x,
-i.font-size-2x {
-	font-size:2em;
-}
-
-.font-size-3-2x {
-	font-size:3.2em;
-}
-
-.font-size-5x,
-i.font-size-5x {
-	font-size:5em;
-}
-.font-size-12x,
-i.font-size-12x {
-	font-size:12em;
+#body {
+	.font-italic { font-style: italic; }
+	.font-size-1-1em { font-size: 1.1em; }
+	.font-weight-700 {
+		font-weight: 700;
+	}
+	.font-weight-bolder {
+		font-weight: bolder;
+	}
+	.font-weight-normal {
+		font-weight: normal;
+	}
+	
+	.font-size-32 {
+		font-size: 32px !important;
+	}
+	
+	span.font-size-150,
+	.font-size-150,
+	i.font-size-150 {
+		font-size: 150px;
+	}
+	
+	.font-size-90 {
+		font-size: 90px;
+	}
+	
+	.font-size-67 {
+		font-size: 67px;
+	}
+	
+	span.font-size-58,
+	.font-size-58 {
+		font-size: 58px;
+	}
+	.font-size-36 {
+		font-size: 36px;
+	}
+	
+	.font-size-30 {
+		font-size: 30px;
+	}
+	
+	.font-size-24 {
+		font-size: 24px;
+	}
+	
+	.font-size-22 {
+		font-size: 22px;
+	}
+	.font-size-20 {
+		font-size: 20px;
+	}
+	.font-size-18 {
+		font-size: 18px;
+	}
+	.font-size-17, #body .font-size-17 {
+		font-size: 17px;
+	}
+	.font-size-16 {
+		font-size: 16px;
+	}
+	.font-size-15 {
+		font-size: 15px;
+	}
+	
+	/* font size 14px.  File browser input box needs more fine-tuned selector for override*/
+	.font-size-14, input[type=text][readonly].font-size-14 {
+		font-size: 14px;
+	}
+	
+	span.font-size-13,
+	.font-size-13 {
+		font-size: 13px;
+	}
+	.font-size-12 {
+		font-size: 12px;
+	}
+	
+	.font-size-1x,
+	i.font-size-1x {
+		font-size:1em;
+	}
+	
+	.font-size-0-9em, #body .font-size-0-9em,
+	i.font-size-0-9em, #body i.font-size-0-9em {
+		font-size:0.9em;
+	}
+	
+	.font-size-1-5x,
+	i.font-size-1-5x {
+		font-size:1.5em;
+	}
+	.font-size-lg,
+	i.font-size-lg {
+		font-size:1.33em;
+	}
+	.font-size-2x,
+	i.font-size-2x {
+		font-size:2em;
+	}
+	
+	.font-size-3-2x {
+		font-size:3.2em;
+	}
+	
+	.font-size-5x,
+	i.font-size-5x {
+		font-size:5em;
+	}
+	.font-size-12x,
+	i.font-size-12x {
+		font-size:12em;
+	}
 }
 
 h1, h2, h3, h4, h5, h6 {
