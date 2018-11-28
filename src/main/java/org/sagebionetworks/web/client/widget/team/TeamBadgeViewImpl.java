@@ -94,7 +94,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 				profilePicture.addClickHandler(clickHandler);
 				add(profilePicture);
 			} else {
-				Icon defaultProfilePicture = new Icon(IconType.USERS);
+				Icon defaultProfilePicture = new Icon(IconType.SYN_USERS);
 				defaultProfilePicture.addStyleName("imageButton lightGreyText margin-right-4");
 				add(defaultProfilePicture);
 			}
@@ -110,7 +110,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		
 		InlineLabel nameLabel = new InlineLabel(name);
 		nameLabel.addStyleName("font-size-13 boldText");
-		Icon profilePicture = isPublic ? new Icon(IconType.GLOBE) : new Icon(IconType.USERS);
+		Icon profilePicture = isPublic ? new Icon(IconType.GLOBE) : new Icon(IconType.SYN_USERS);
 		profilePicture.addStyleName("font-size-lg imageButton lightGreyText margin-right-4 margin-left-5");
 		add(profilePicture);
 			

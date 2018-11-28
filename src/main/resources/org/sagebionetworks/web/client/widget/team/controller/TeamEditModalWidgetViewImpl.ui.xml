@@ -37,7 +37,7 @@
 		            <b:Row b:id="uploadWidget">
 		                <b:Column size="MD_4">
 		                    <bh:Div ui:field="iconContainer">
-		                        <b:Icon ui:field="defaultIcon" type="USERS"
+		                        <b:Icon ui:field="defaultIcon" type="SYN_USERS"
 								addStyleNames="font-size-150 lightGreyText" visible="true"/>
 								<g:HTMLPanel width="150px" addStyleNames="position-relative">
 								    <bh:Div addStyleNames="position-absolute topLevelZIndex">
