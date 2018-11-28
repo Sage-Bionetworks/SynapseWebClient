@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.team;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.constants.IconSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -95,6 +96,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 				add(profilePicture);
 			} else {
 				Icon defaultProfilePicture = new Icon(IconType.SYN_USERS);
+				defaultProfilePicture.setSize(IconSize.LARGE);
 				defaultProfilePicture.addStyleName("imageButton lightGreyText margin-right-4");
 				add(defaultProfilePicture);
 			}
