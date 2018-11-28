@@ -21,6 +21,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class InviteWidget implements InviteWidgetView.Presenter {
+	public static final String NO_USERS_OR_EMAILS_ADDED_ERROR_MESSAGE = "Please add at least one user or email address and try again.";
+	public static final String INVALID_EMAIL_ERROR_MESSAGE = "Please select a suggested user or provide a valid email address and try again.";
 	private InviteWidgetView view;
 	private SynapseClientAsync synapseClient;
 	private Team team;
@@ -76,7 +78,11 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 		view.setPresenter(this);
 	}
 	
-	public void addSuggestion() {
+	/**
+	 * @return true if successfully added an item (or no item was to be added), false if the input suggestion was invalid
+	 */
+	public boolean addSuggestion() {
+		synAlert.clear();
 		String input = peopleSuggestWidget.getText();
 		if (isValidEmail(input)) {
 			inviteEmails.add(input);
@@ -87,7 +93,11 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 			inviteUsers.add(userId);
 			view.addUserToInvite(userId);
 			peopleSuggestWidget.clear();
+		} else if (input != null && !input.isEmpty() && peopleSuggestWidget.getSelectedSuggestion() == null) {
+			synAlert.showError(INVALID_EMAIL_ERROR_MESSAGE);
+			return false;
 		}
+		return true;
 	}
 	
 	@Override
@@ -116,11 +126,17 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	@Override
 	public void doSendInvites(String invitationMessage) {
 		// if anything is in the invitation field, then pick it up before processing
-		addSuggestion();
-		view.setLoading(true);
 		synAlert.clear();
-		this.invitationMessage = invitationMessage;
-		doSendInvites();
+		if (addSuggestion()) {
+			if (inviteEmails.isEmpty() && inviteUsers.isEmpty()) {
+				synAlert.showError(NO_USERS_OR_EMAILS_ADDED_ERROR_MESSAGE);
+				return;
+			}
+			view.setLoading(true);
+			
+			this.invitationMessage = invitationMessage;
+			doSendInvites();
+		}
 	}
 	
 	/**

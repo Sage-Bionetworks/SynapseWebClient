@@ -90,6 +90,18 @@ public class InviteWidgetTest {
 		
 		// no users added, so it's a no-op
 		verifyZeroInteractions(mockSynapseClient);
+		verify(mockSynAlert).showError(InviteWidget.INVALID_EMAIL_ERROR_MESSAGE);
+	}
+	
+	@Test
+	public void testSendNoUsersAdded() {
+		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(null);
+		when(mockSuggestBox.getText()).thenReturn("");
+		
+		inviteWidget.doSendInvites(invitationMessage);
+		
+		verifyZeroInteractions(mockSynapseClient);
+		verify(mockSynAlert).showError(InviteWidget.NO_USERS_OR_EMAILS_ADDED_ERROR_MESSAGE);
 	}
 
 	@Test
@@ -103,6 +115,20 @@ public class InviteWidgetTest {
 		verify(mockRefreshCallback).invoke();
 		verify(mockView).hide();
 	}
+	
+	@Test
+	public void testSendToEmailAddressInvalidEmail() {
+		String emails = "test1@x.com, test2@y.edu";
+		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(null);
+		when(mockSuggestBox.getText()).thenReturn(emails);
+		inviteWidget.doSendInvites(invitationMessage);
+		
+		verify(mockSynAlert).showError(InviteWidget.INVALID_EMAIL_ERROR_MESSAGE);
+		verify(mockSynapseClient, never()).inviteNewMember(anyString(), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
+		verify(mockRefreshCallback, never()).invoke();
+		verify(mockView, never()).hide();
+	}
+
 	
 	@SuppressWarnings("unchecked")
 	@Test
