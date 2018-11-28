@@ -1064,13 +1064,16 @@ public class DisplayUtils {
  			panel.add(profilePicture);
  		} else {
  			//display default picture
- 			String iconClass = defaultPictureSinglePerson ? "user" : "users";
+ 			IconType type = defaultPictureSinglePerson ? IconType.SYN_USER : IconType.SYN_USERS;
  			String clickableButtonCssClass = clickHandler != null ? "imageButton" : "";
- 			HTML profilePicture = new HTML(DisplayUtils.getFontAwesomeIcon(iconClass + " font-size-58 padding-2 " + clickableButtonCssClass + " userProfileImage lightGreyText margin-0-imp-before"));
- 			profilePicture.addStyleName("pull-left media-object displayInline ");
+ 			Icon profilePicture = new Icon(type);
+ 			profilePicture.addStyleName(" font-size-58 padding-2 " + clickableButtonCssClass + " userProfileImage lightGreyText margin-0-imp-before");
+ 			Div profilePictureWrapper = new Div();
+ 			profilePictureWrapper.addStyleName("pull-left media-object displayInline ");
+ 			profilePictureWrapper.add(profilePicture);
  			if (clickHandler != null)
  				profilePicture.addClickHandler(clickHandler);
- 			panel.add(profilePicture);
+ 			panel.add(profilePictureWrapper);
  		}
  		FlowPanel mediaBodyPanel = new FlowPanel();
  		mediaBodyPanel.addStyleName("media-body");

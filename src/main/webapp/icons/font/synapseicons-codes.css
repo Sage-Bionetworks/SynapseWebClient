@@ -23,5 +23,7 @@
 .syn-trash-o:before { content: '\e815'; } /* '' */
 .syn-warning:before { content: '\e816'; } /* '' */
 .syn-check:before { content: '\e817'; } /* '' */
+.syn-users:before { content: '\e81b'; } /* '' */
+.syn-user:before { content: '\e81c'; } /* '' */
 .syn-sort-asc:before { content: '\e831'; } /* '' */
 .syn-sort-desc:before { content: '\e832'; } /* '' */
