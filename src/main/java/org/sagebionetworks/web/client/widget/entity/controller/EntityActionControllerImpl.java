@@ -544,21 +544,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 		return version;
 	}
-	
-	private void onCreateDOI() {
-		getSynapseClient().createDoi(entity.getId(), getVersion(), new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void v) {
-				view.showInfo(DisplayConstants.DOI_REQUEST_SENT_TITLE + DisplayConstants.DOI_REQUEST_SENT_MESSAGE);
-				fireEntityUpdatedEvent();
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage("DOI creation is under maintenance and is temporarily unavailable.");
-
-			}
-		});
-	}
 
 	private void configureCreateOrUpdateDoi() {
 		boolean canEdit = permissions.getCanEdit();
