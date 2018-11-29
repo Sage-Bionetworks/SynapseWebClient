@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
@@ -54,9 +55,9 @@ public class RowFormEditorWidget implements IsWidget, RowFormView.Presenter {
 			ColumnModel type = types.get(i);
 			Cell cell = cellFactory.createFormEditor(type);
 			this.cells.add(cell);
-			if (type.getName().toLowerCase().equals(SUBMITTER_USER_ID_COLUMN_NAME)) {
+			if (type.getName().toLowerCase().equals(SUBMITTER_USER_ID_COLUMN_NAME) && ColumnType.USERID.equals(type.getColumnType())) {
 				submitterUserIdColIndex = i;
-			} else if (type.getName().toLowerCase().equals(SUBMISSION_TIMESTAMP_COLUMN_NAME)) {
+			} else if (type.getName().toLowerCase().equals(SUBMISSION_TIMESTAMP_COLUMN_NAME) && ColumnType.DATE.equals(type.getColumnType())) {
 				submissionTimestampColIndex = i;	
 			} else {
 				this.view.addCell(type.getName(), cell);
