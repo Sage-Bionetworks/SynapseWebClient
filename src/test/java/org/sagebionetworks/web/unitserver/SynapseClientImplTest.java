@@ -27,7 +27,6 @@ import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,7 +52,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
@@ -98,8 +96,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.repo.model.doi.Doi;
-import org.sagebionetworks.repo.model.doi.DoiStatus;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyResult;
@@ -116,7 +112,6 @@ import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.repo.model.message.Settings;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
-import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalStorageLocationSetting;
@@ -999,41 +994,11 @@ public class SynapseClientImplTest {
 		assertEquals(expectedAutoFilename, entityCaptor.getValue().getName());
 	}
 
-	@Test
-	public void testGetEntityDoi() throws Exception {
-		// wiring test
-		Doi testDoi = new Doi();
-		testDoi.setDoiStatus(DoiStatus.CREATED);
-		testDoi.setId("test doi id");
-		testDoi.setCreatedBy("Test User");
-		testDoi.setCreatedOn(new Date());
-		testDoi.setObjectId("syn1234");
-		Mockito.when(mockSynapse.getEntityDoi(anyString(), anyLong()))
-				.thenReturn(testDoi);
-		synapseClient.getEntityDoi("test entity id", null);
-		verify(mockSynapse).getEntityDoi(anyString(), anyLong());
-	}
-
 	private FileEntity getTestFileEntity() {
 		FileEntity testFileEntity = new FileEntity();
 		testFileEntity.setId("5544");
 		testFileEntity.setName(testFileName);
 		return testFileEntity;
-	}
-
-	@Test(expected = NotFoundException.class)
-	public void testGetEntityDoiNotFound() throws Exception {
-		// wiring test
-		Mockito.when(mockSynapse.getEntityDoi(anyString(), anyLong()))
-				.thenThrow(new SynapseNotFoundException());
-		synapseClient.getEntityDoi("test entity id", null);
-	}
-
-	@Test
-	public void testCreateDoi() throws Exception {
-		// wiring test
-		synapseClient.createDoi("test entity id", null);
-		verify(mockSynapse).createEntityDoi(anyString(), anyLong());
 	}
 
 	/**
