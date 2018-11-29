@@ -1,10 +1,12 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
@@ -21,12 +23,19 @@ import com.google.inject.Inject;
  */
 public class RowFormEditorWidget implements IsWidget, RowFormView.Presenter {
 	
+	public static final String SUBMISSION_TIMESTAMP_COLUMN_NAME = "submissiontimestamp";
+	public static final String SUBMITTER_USER_ID_COLUMN_NAME = "submitteruserid";
 	RowFormView view;
 	List<Cell> cells;
 	CellFactory cellFactory;
-	
+	AuthenticationController authController;
+	int submitterUserIdColIndex, submissionTimestampColIndex;
 	@Inject
-	public RowFormEditorWidget(RowFormView view, CellFactory cellFactory){
+	public RowFormEditorWidget(
+			AuthenticationController authController,
+			RowFormView view, 
+			CellFactory cellFactory){
+		this.authController = authController;
 		this.view = view;
 		this.cellFactory = cellFactory;
 		view.setPresenter(this);
@@ -37,13 +46,21 @@ public class RowFormEditorWidget implements IsWidget, RowFormView.Presenter {
 	 * @param types The types determines the cells types for this row.
 	 */
 	public void configure(String tableId, List<ColumnModel> types){
+		submitterUserIdColIndex = submissionTimestampColIndex = -1;
 		this.cells = new ArrayList<Cell>(types.size());
 		// Setup each cell
-		for(ColumnModel type: types){
+		for (int i = 0; i < types.size(); i++) {
 			// Create each cell
+			ColumnModel type = types.get(i);
 			Cell cell = cellFactory.createFormEditor(type);
 			this.cells.add(cell);
-			this.view.addCell(type.getName(), cell);
+			if (type.getName().toLowerCase().equals(SUBMITTER_USER_ID_COLUMN_NAME)) {
+				submitterUserIdColIndex = i;
+			} else if (type.getName().toLowerCase().equals(SUBMISSION_TIMESTAMP_COLUMN_NAME)) {
+				submissionTimestampColIndex = i;	
+			} else {
+				this.view.addCell(type.getName(), cell);
+			}
 		}
 	}
 
@@ -62,6 +79,13 @@ public class RowFormEditorWidget implements IsWidget, RowFormView.Presenter {
 		for(Cell cell: cells){
 			values.add(cell.getValue());
 		}
+		if (submitterUserIdColIndex > 0) {
+			values.set(submitterUserIdColIndex, authController.getCurrentUserPrincipalId());
+		}
+		if (submissionTimestampColIndex > 0) {
+			values.set(submissionTimestampColIndex, Long.toString(new Date().getTime()));
+		}
+		
 		// Create the row.
 		Row row = new Row();
 		row.setValues(values);
