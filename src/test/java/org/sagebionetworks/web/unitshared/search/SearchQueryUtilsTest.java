@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.sagebionetworks.repo.model.search.query.*;
 
 public class SearchQueryUtilsTest {
-	public static final SearchFieldName[] SET_VALUES = new SearchFieldName[] { EntityType, Consortium, Disease, ModifiedOn, ModifiedBy, CreatedOn, NumSamples, Tissue, CreatedBy };
+	public static final SearchFieldName[] SET_VALUES = new SearchFieldName[] { EntityType, Consortium, ModifiedOn, ModifiedBy, CreatedOn, Tissue, CreatedBy };
 	public static final Set<SearchFieldName> EXPECTED_FACET_FIELDS = new HashSet<>(Arrays.asList(SET_VALUES));
 	
 	@Test

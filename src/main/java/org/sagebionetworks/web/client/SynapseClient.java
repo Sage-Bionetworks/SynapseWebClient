@@ -156,9 +156,6 @@ public interface SynapseClient extends RemoteService{
 	String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException, SynapseException;
 	String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId) throws RestServiceException;
 
-	Doi getEntityDoi(String entityId, Long versionNumber) throws RestServiceException;
-	void createDoi(String entityId, Long versionNumber) throws RestServiceException;
-
 	String getAPIKey() throws RestServiceException;
 
 	ResponseMessage handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL) throws RestServiceException;
