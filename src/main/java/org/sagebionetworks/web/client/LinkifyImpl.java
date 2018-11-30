@@ -15,7 +15,7 @@ public class LinkifyImpl implements Linkify {
 
 	private final static native String _linkify(String s) /*-{
 		try {
-			return $wnd.linkifyStr(s);
+			return $wnd.linkifyHtml(s);
 		} catch (err) {
 			console.error(err);
 			return s;

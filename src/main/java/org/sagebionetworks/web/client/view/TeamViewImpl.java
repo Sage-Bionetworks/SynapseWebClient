@@ -211,8 +211,8 @@ public class TeamViewImpl extends Composite implements TeamView {
 		if (team.getIcon() != null) {
 			pictureUrl = synapseJSNIUtils.getFileHandleAssociationUrl(team.getId(), FileHandleAssociateType.TeamAttachment, team.getIcon());
 		}
-		String descriptionWithoutHtml = SafeHtmlUtils.htmlEscape(team.getDescription());
-		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(team.getName(), linkify.linkify(descriptionWithoutHtml), null,  pictureUrl, false, 2);
+		String descriptionWithHtmlEntities = SafeHtmlUtils.htmlEscape(team.getDescription());
+		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(team.getName(), linkify.linkify(descriptionWithHtmlEntities), null,  pictureUrl, false, 2);
 		mediaObjectContainer.setWidget(mediaObjectPanel.asWidget());
 		mapModal.setTitle(team.getName());
 	}	
