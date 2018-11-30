@@ -483,7 +483,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		}
 	}-*/;
 
-	public final static native void _scrollIntoView(Element el) /*-{
+	private final static native void _scrollIntoView(Element el) /*-{
 		try {
 			el.scrollIntoView({behavior: 'smooth'});
 		} catch (err) {
@@ -491,6 +491,10 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		}
 	}-*/;
 	
+	@Override
+	public void scrollIntoView(Element el) {
+		_scrollIntoView(el);
+	}
 	@Override
 	public void loadCss(final String url) {
 		final LinkElement link = Document.get().createLinkElement();

@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.events.WikiSubpagesCollapseEvent;
 import org.sagebionetworks.web.client.events.WikiSubpagesExpandEvent;
@@ -33,14 +34,16 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	private WikiSubpageNavigationTree navTree;
 	private EventBus eventBus;
 	private Presenter presenter;
-	
+	private SynapseJSNIUtils jsniUtils;
 	@Inject
 	public WikiSubpagesViewImpl(WikiSubpagesOrderEditor orderEditor,
 								WikiSubpageNavigationTree navTree,
-								EventBus eventBus) {
+								EventBus eventBus,
+								SynapseJSNIUtils jsniUtils) {
 		this.orderEditor = orderEditor;
 		this.navTree = navTree;
 		this.eventBus = eventBus;
+		this.jsniUtils = jsniUtils;
 		addStyleName("wikiSubpages");
 	}
 	
@@ -87,7 +90,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 					clear();
 					presenter.clearCachedHeaderTree();
 					presenter.refreshWikiHeaderTree();
-					SynapseJSNIUtilsImpl._scrollIntoView(getElement());
+					jsniUtils.scrollIntoView(getElement());
 				});
 				DisplayUtils.scrollToTop();
 			}

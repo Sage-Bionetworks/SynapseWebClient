@@ -12,6 +12,7 @@ import org.gwtbootstrap3.client.ui.html.Italic;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.WikiDiff;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
@@ -107,10 +108,11 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-
+	SynapseJSNIUtils jsniUtils;
 	@Inject
-	public WikiPageWidgetViewImpl(Binder binder) {
+	public WikiPageWidgetViewImpl(Binder binder, SynapseJSNIUtils jsniUtils) {
 		widget = binder.createAndBindUi(this);
+		this.jsniUtils = jsniUtils;
 		restoreButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -157,7 +159,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	@Override
 	public void scrollWikiHeadingIntoView() {
 		if (wikiHeading != null && !DisplayUtils.isInViewport(wikiHeading)) {
-			SynapseJSNIUtilsImpl._scrollIntoView(wikiHeading.getElement());
+			jsniUtils.scrollIntoView(wikiHeading.getElement());
 		}
 	}
 	

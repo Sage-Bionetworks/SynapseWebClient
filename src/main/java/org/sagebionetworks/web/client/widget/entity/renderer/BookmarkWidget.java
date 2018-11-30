@@ -10,7 +10,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class BookmarkWidget implements BookmarkWidgetView.Presenter, WidgetRendererPresenter {
+public class BookmarkWidget implements WidgetRendererPresenter {
 	private BookmarkWidgetView view;
 	private Map<String, String> descriptor;
 	
@@ -22,7 +22,6 @@ public class BookmarkWidget implements BookmarkWidgetView.Presenter, WidgetRende
 	@Inject
 	public BookmarkWidget(BookmarkWidgetView view) {
 		this.view = view;
-		view.setPresenter(this);
 	}
 
 	@Override
