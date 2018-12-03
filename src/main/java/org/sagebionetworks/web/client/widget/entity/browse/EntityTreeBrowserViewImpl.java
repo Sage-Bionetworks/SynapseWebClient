@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
@@ -67,7 +68,24 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	@UiField
 	SortableTableHeaderImpl nameColumnHeader;
 	@UiField
+	TableHeader nameColumnHeaderUnsortable;
+	@UiField
 	SortableTableHeaderImpl createdOnColumnHeader;
+	@UiField
+	TableHeader createdOnColumnHeaderUnsortable;
+	@UiField
+	TableHeader sizeColumnHeader;
+	@UiField
+	TableHeader modifiedOnColumnHeader;
+	@UiField
+	TableHeader idColumnHeader;
+	@UiField
+	TableHeader modifiedByColumnHeader;
+	@UiField
+	TableHeader md5ColumnHeader;
+	@UiField
+	TableHeader downloadColumnHeader;
+	
 	@UiField
 	Icon copyIDToClipboardIcon;
 	@UiField
@@ -78,7 +96,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	GlobalApplicationState globalAppState;
 	CookieProvider cookies;
 	private Widget widget;
-	boolean isSortable = true;
+	boolean isShowingMinColumnSet = false;
 	@Inject
 	public EntityTreeBrowserViewImpl(IconsImageBundle iconsImageBundle,
 			Binder uiBinder, 
@@ -94,14 +112,10 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		// Make sure to show this and hide the tree on empty.
 		hideEmptyUI();
 		nameColumnHeader.setSortingListener(headerName -> {
-			if (isSortable) {
-				presenter.onToggleSort(SortBy.NAME);	
-			}
+			presenter.onToggleSort(SortBy.NAME);	
 		});
 		createdOnColumnHeader.setSortingListener(headerName -> {
-			if (isSortable) {
-				presenter.onToggleSort(SortBy.CREATED_ON);
-			}
+			presenter.onToggleSort(SortBy.CREATED_ON);
 		});
 		copyIDToClipboardIcon.addClickHandler(event -> presenter.copyIDsToClipboard());
 	}
@@ -208,6 +222,9 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 			childToAdd.setModifiedByUserBadgeClickHandler(selectClickHandler);
 			childToAdd.setClickHandler(selectClickHandler);
 		}
+		if (isShowingMinColumnSet) {
+			childToAdd.showMinimalColumnSet();
+		}
 		// Update fields.
 		getTreeItem2entityTreeItem().put(childToAdd.asTreeItem(), childToAdd);
 		// Add dummy item to childItem to make expandable.
@@ -216,6 +233,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		if (!childToAdd.isExpandable()) {
 			childToAdd.asTreeItem().removeItems();
 		}
+		
 	}
 
 	@Override
@@ -364,9 +382,17 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	
 	@Override
 	public void setSortable(boolean isSortable) {
-		this.isSortable = isSortable;
-		nameColumnHeader.setSortIconVisible(isSortable);
-		createdOnColumnHeader.setSortIconVisible(isSortable);
+		nameColumnHeader.setVisible(isSortable);
+		nameColumnHeaderUnsortable.setVisible(!isSortable);
+		if (!isShowingMinColumnSet) {
+			createdOnColumnHeader.setVisible(isSortable);
+			createdOnColumnHeaderUnsortable.setVisible(!isSortable);
+			if (isSortable) {
+				createdOnColumnHeaderUnsortable.setStyleName("");
+			} else {
+				createdOnColumnHeader.setStyleName("");
+			}	
+		}
 	}
 	
 	@Override
@@ -377,5 +403,26 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		copyToClipboardTextbox.selectAll();
 		jsniUtils.copyToClipboard();
 		copyToClipboardTextbox.setVisible(false);
+	}
+	
+	@Override
+	public void showMinimalColumnSet() {
+		this.isShowingMinColumnSet = true;
+		sizeColumnHeader.setVisible(false);
+		sizeColumnHeader.setStyleName("");
+		modifiedOnColumnHeader.setVisible(false);
+		modifiedOnColumnHeader.setStyleName("");
+//		idColumnHeader.setVisible(false);
+//		idColumnHeader.setStyleName("");
+		createdOnColumnHeader.setVisible(false);
+		createdOnColumnHeader.setStyleName("");
+		createdOnColumnHeaderUnsortable.setVisible(false);
+		createdOnColumnHeaderUnsortable.setStyleName("");
+//		modifiedByColumnHeader.setVisible(false);
+//		modifiedByColumnHeader.setStyleName("");
+		md5ColumnHeader.setVisible(false);
+		md5ColumnHeader.setStyleName("");
+		downloadColumnHeader.setVisible(false);
+		downloadColumnHeader.setStyleName("");
 	}
 }

@@ -83,14 +83,16 @@ public class SortableTableHeaderImpl implements SortableTableHeader {
 	public void setAddStyleNames(String styles) {
 		widget.addStyleName(styles);
 	}
+	public void setStyleName(String styles) {
+		widget.setStyleName(styles);
+	}
 	public void setText(String text) {
 		tableHeaderLink.setText(text);
 	}
 	public String getText() {
 		return tableHeaderLink.getText();
 	}
-	
-	public void setSortIconVisible(boolean visible) {
-		sortIcon.setVisible(visible);
+	public void setVisible(boolean visible) {
+		widget.setVisible(visible);
 	}
 }
