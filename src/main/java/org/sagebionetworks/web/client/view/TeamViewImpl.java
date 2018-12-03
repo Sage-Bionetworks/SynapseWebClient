@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -211,8 +212,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		if (team.getIcon() != null) {
 			pictureUrl = synapseJSNIUtils.getFileHandleAssociationUrl(team.getId(), FileHandleAssociateType.TeamAttachment, team.getIcon());
 		}
-		String descriptionWithoutHtml = SafeHtmlUtils.htmlEscape(team.getDescription());
-		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(team.getName(), linkify.linkify(descriptionWithoutHtml), null,  pictureUrl, false, 2);
+		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(team.getName(), linkify.linkify(team.getDescription()), null,  pictureUrl, false, 2);
 		mediaObjectContainer.setWidget(mediaObjectPanel.asWidget());
 		mapModal.setTitle(team.getName());
 	}	
