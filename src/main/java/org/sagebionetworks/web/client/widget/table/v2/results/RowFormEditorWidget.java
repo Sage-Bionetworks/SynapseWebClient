@@ -80,10 +80,10 @@ public class RowFormEditorWidget implements IsWidget, RowFormView.Presenter {
 		for(Cell cell: cells){
 			values.add(cell.getValue());
 		}
-		if (submitterUserIdColIndex > 0) {
+		if (submitterUserIdColIndex > -1) {
 			values.set(submitterUserIdColIndex, authController.getCurrentUserPrincipalId());
 		}
-		if (submissionTimestampColIndex > 0) {
+		if (submissionTimestampColIndex > -1) {
 			values.set(submissionTimestampColIndex, Long.toString(new Date().getTime()));
 		}
 		
