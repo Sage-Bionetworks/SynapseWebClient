@@ -264,4 +264,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			}
 		});
 	}
+	public void showMinimalColumnSet() {
+		view.showMinimalColumnSet();
+	}
 }

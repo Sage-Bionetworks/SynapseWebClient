@@ -353,4 +353,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	public EntityFilter getEntityFilter() {
 		return filter;
 	}
+	public void showMinimalColumnSet() {
+		view.showMinimalColumnSet();
+	}
 }

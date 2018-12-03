@@ -61,8 +61,11 @@ public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 			LoadMoreWidgetContainer myProjectsContainerWrapper) {
 		widget = binder.createAndBindUi(this);
 		this.myTreeBrowser = ginInjector.getEntityTreeBrowser();
+		myTreeBrowser.showMinimalColumnSet();
 		this.favoritesTreeBrowser = ginInjector.getEntityTreeBrowser();
+		favoritesTreeBrowser.showMinimalColumnSet();
 		this.currentContextTreeBrowser = ginInjector.getEntityTreeBrowser();
+		currentContextTreeBrowser.showMinimalColumnSet();
 		this.myProjectsContainerWrapper = myProjectsContainerWrapper;
 		myProjectsContainerWrapper.add(myTreeBrowser.asWidget());
 		myTreeBrowser.setLoadingVisible(false);
