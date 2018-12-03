@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -61,6 +62,20 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	Label sizeField;
 	@UiField
 	TextBox md5Field;
+	@UiField
+	TableData sizeTableData;
+	@UiField
+	TableData modifiedOnTableData;
+	@UiField
+	TableData createdOnTableData;
+	@UiField
+	TableData idTableData;
+	@UiField
+	TableData md5TableData;
+	@UiField
+	TableData modifiedByTableData;
+	@UiField
+	TableData downloadTableData;
 	@UiField
 	org.gwtbootstrap3.client.ui.Anchor addToDownloadListLink;
 	
@@ -275,5 +290,15 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@Override
 	public void setModifiedByUserBadgeClickHandler(ClickHandler handler) {
 		modifiedByBadge.setCustomClickHandler(handler);
+	}
+	@Override
+	public void showMinimalColumnSet() {
+		sizeTableData.setVisible(false);
+		modifiedOnTableData.setVisible(false);
+//		idTableData.setVisible(false);
+//		createdOnTableData.setVisible(false);
+		modifiedByTableData.setVisible(false);
+		md5TableData.setVisible(false);
+		downloadTableData.setVisible(false);
 	}
 }

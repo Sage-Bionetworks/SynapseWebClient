@@ -30,6 +30,7 @@ public interface EntityBadgeView extends IsWidget, SupportsLazyLoadInterface {
 	String getFriendlySize(Long contentSize, boolean b);
 	void setModifiedByUserBadgeClickHandler(ClickHandler handler);
 	void showDiscussionThreadIcon();
+	void showMinimalColumnSet();
 	public interface Presenter {
 		void onUnlink();
 		void onAddToDownloadList();

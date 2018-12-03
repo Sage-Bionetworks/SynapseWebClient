@@ -50,6 +50,7 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 	void setLoadingVisible(boolean isShown);
 	void setSynAlert(IsWidget w);
 	void setSortable(boolean isSortable);
+	void showMinimalColumnSet();
 	void clearSortUI();
 	void setSortUI(SortBy sortBy, Direction dir);
 	void copyToClipboard(String value);

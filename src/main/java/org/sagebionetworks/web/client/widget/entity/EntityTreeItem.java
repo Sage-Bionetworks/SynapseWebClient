@@ -61,4 +61,8 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 	public void setState(boolean open, boolean fireEvents) {
 		treeItem.setState(open, fireEvents);
 	}
+	
+	public void showMinimalColumnSet() {
+		entityBadge.showMinimalColumnSet();
+	}
 }
