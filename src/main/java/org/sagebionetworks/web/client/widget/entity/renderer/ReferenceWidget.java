@@ -10,7 +10,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ReferenceWidget implements ReferenceWidgetView.Presenter, WidgetRendererPresenter{
+public class ReferenceWidget implements WidgetRendererPresenter{
 
 	private ReferenceWidgetView view;
 	private Map<String, String> descriptor;
@@ -18,7 +18,6 @@ public class ReferenceWidget implements ReferenceWidgetView.Presenter, WidgetRen
 	@Inject
 	public ReferenceWidget(ReferenceWidgetView view) {
 		this.view = view;
-		view.setPresenter(this);
 	}
 	
 	@Override

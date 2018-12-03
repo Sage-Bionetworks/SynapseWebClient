@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
 import com.google.gwt.core.client.JsArray;
@@ -16,7 +16,6 @@ import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
@@ -36,9 +35,10 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 	private RegExp widgetParamsRegEx = RegExp.compile("(data[-]widgetparams[=]{1}[\"]{1}[^\"]*)([\"]{1})", "i");
 	// Matches any html inside of the widget span.  Used to remove any other html (for example, mentioning adds a child user/team anchor, used in notification emails).
 	private RegExp widgetInnerHtmlRegEx = RegExp.compile("(<span data[-]widgetparams[^>]*>).*(<\\/span>)", "i");
-	
+	private SynapseJSNIUtils jsniUtils;
 	@Inject
-	public TableOfContentsWidgetViewImpl() {
+	public TableOfContentsWidgetViewImpl(SynapseJSNIUtils jsniUtils) {
+		this.jsniUtils = jsniUtils;
 		//build up the tag name to css class name here
 		tagName2Style = new HashMap<String, String>();
 		for (int i = 0; i < 6; i++) {
@@ -110,7 +110,7 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 					html.addClickHandler(new ClickHandler() {
 						@Override
 						public void onClick(ClickEvent event) {
-							SynapseJSNIUtilsImpl._scrollIntoView(scrollToElement);
+							jsniUtils.scrollIntoView(scrollToElement);
 						}
 					});
 					
