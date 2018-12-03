@@ -294,11 +294,17 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@Override
 	public void showMinimalColumnSet() {
 		sizeTableData.setVisible(false);
+		sizeTableData.setStyleName("");
 		modifiedOnTableData.setVisible(false);
+		modifiedOnTableData.setStyleName("");
 //		idTableData.setVisible(false);
-//		createdOnTableData.setVisible(false);
-		modifiedByTableData.setVisible(false);
+		createdOnTableData.setVisible(false);
+		createdOnTableData.setStyleName("");
+//		modifiedByTableData.setVisible(false);
+//		modifiedByTableData.setStyleName("");
 		md5TableData.setVisible(false);
+		md5TableData.setStyleName("");
 		downloadTableData.setVisible(false);
+		downloadTableData.setStyleName("");
 	}
 }

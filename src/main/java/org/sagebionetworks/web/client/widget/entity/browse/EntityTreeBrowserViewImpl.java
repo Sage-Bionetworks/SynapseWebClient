@@ -383,9 +383,16 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	@Override
 	public void setSortable(boolean isSortable) {
 		nameColumnHeader.setVisible(isSortable);
-		createdOnColumnHeader.setVisible(isSortable);
 		nameColumnHeaderUnsortable.setVisible(!isSortable);
-		createdOnColumnHeaderUnsortable.setVisible(!isSortable);
+		if (!isShowingMinColumnSet) {
+			createdOnColumnHeader.setVisible(isSortable);
+			createdOnColumnHeaderUnsortable.setVisible(!isSortable);
+			if (isSortable) {
+				createdOnColumnHeaderUnsortable.setStyleName("");
+			} else {
+				createdOnColumnHeader.setStyleName("");
+			}	
+		}
 	}
 	
 	@Override
@@ -402,10 +409,20 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	public void showMinimalColumnSet() {
 		this.isShowingMinColumnSet = true;
 		sizeColumnHeader.setVisible(false);
+		sizeColumnHeader.setStyleName("");
 		modifiedOnColumnHeader.setVisible(false);
+		modifiedOnColumnHeader.setStyleName("");
 //		idColumnHeader.setVisible(false);
-		modifiedByColumnHeader.setVisible(false);
+//		idColumnHeader.setStyleName("");
+		createdOnColumnHeader.setVisible(false);
+		createdOnColumnHeader.setStyleName("");
+		createdOnColumnHeaderUnsortable.setVisible(false);
+		createdOnColumnHeaderUnsortable.setStyleName("");
+//		modifiedByColumnHeader.setVisible(false);
+//		modifiedByColumnHeader.setStyleName("");
 		md5ColumnHeader.setVisible(false);
+		md5ColumnHeader.setStyleName("");
 		downloadColumnHeader.setVisible(false);
+		downloadColumnHeader.setStyleName("");
 	}
 }
