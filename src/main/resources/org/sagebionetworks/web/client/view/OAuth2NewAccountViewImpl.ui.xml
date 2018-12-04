@@ -5,10 +5,10 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 		<bh:Div marginTop="15" addStyleNames="max-width-350 center-in-div">
-			<b:Heading text="Register with Synapse with your Google Account" size="H4"/>
+			<b:Heading text="Register with Synapse" size="H4" addStyleNames="margin-top-20"/>
 			<b:FormGroup>
-				<b:FormLabel>Choose a Synapse username</b:FormLabel>
-				<b:TextBox ui:field="userNameField" placeholder="Enter username" />
+				<b:FormLabel>Choose your username</b:FormLabel>
+				<b:TextBox ui:field="userNameField" placeholder="" />
 			</b:FormGroup>
 			<bh:Div ui:field="synAlertContainer"/>
 			<b:Button ui:field="registerBtn" pull="RIGHT" addStyleNames="margin-top-10" type="PRIMARY">Register</b:Button>

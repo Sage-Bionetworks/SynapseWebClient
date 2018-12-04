@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.MapPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
+import org.sagebionetworks.web.client.place.OAuth2NewAccount;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Quiz;
@@ -60,6 +61,6 @@ import com.google.gwt.place.shared.WithTokenizers;
 		SynapseForumPlace.Tokenizer.class, SubscriptionPlace.Tokenizer.class,
 		AccessRequirementsPlace.Tokenizer.class, ACTDataAccessSubmissionsPlace.Tokenizer.class,
 		ACTDataAccessSubmissionDashboardPlace.Tokenizer.class, ACTAccessApprovalsPlace.Tokenizer.class,
-		EmailInvitation.Tokenizer.class, WikiDiff.Tokenizer.class})
+		EmailInvitation.Tokenizer.class, WikiDiff.Tokenizer.class, OAuth2NewAccount.Tokenizer.class})
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {
 }

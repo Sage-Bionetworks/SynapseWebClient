@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.MapPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
+import org.sagebionetworks.web.client.place.OAuth2NewAccount;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Quiz;
@@ -97,6 +98,7 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(SynapseForumPlace.class);
 		openAccessPlaces.add(EmailInvitation.class);
 		openAccessPlaces.add(AccessRequirementsPlace.class);
+		openAccessPlaces.add(OAuth2NewAccount.class);
 		
 		excludeFromLastPlace = new ArrayList<Class>();
 		excludeFromLastPlace.add(Home.class);
@@ -111,6 +113,7 @@ public class AppActivityMapper implements ActivityMapper {
 		excludeFromLastPlace.add(Certificate.class);
 		excludeFromLastPlace.add(SignedToken.class);
 		excludeFromLastPlace.add(Down.class);
+		excludeFromLastPlace.add(OAuth2NewAccount.class);
 	}
 
 	@Override

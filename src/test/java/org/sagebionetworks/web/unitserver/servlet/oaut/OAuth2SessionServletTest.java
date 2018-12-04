@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitserver.servlet.oaut;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -89,15 +90,24 @@ public class OAuth2SessionServletTest {
 		verify(mockResponse).sendRedirect("/#!LoginPlace:sessiontoken");
 	}
 	
+//	@Test
+//	public void testValidateNotFound() throws ServletException, IOException, SynapseException{
+//		ArgumentCaptor<OAuthValidationRequest> argument = ArgumentCaptor.forClass(OAuthValidationRequest.class);
+//		when(mockClient.validateOAuthAuthenticationCode(argument.capture())).thenThrow(new SynapseNotFoundException("an error message"));
+//		when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER)).thenReturn(OAuthProvider.GOOGLE_OAUTH_2_0.name());
+//		when(mockRequest.getParameter(WebConstants.OAUTH2_CODE)).thenReturn("auth code");
+//		servlet.doGet(mockRequest, mockResponse);
+//		verify(mockResponse).sendRedirect(OAuth2SessionServlet.REGISTER_ACCOUNT);
+//	}
 	@Test
-	public void testValidateNotFound() throws ServletException, IOException, SynapseException{
+	public void testValidateNotFoundNewAccount() throws ServletException, IOException, SynapseException{
 		ArgumentCaptor<OAuthValidationRequest> argument = ArgumentCaptor.forClass(OAuthValidationRequest.class);
 		String email = "first.last@domain.com";
 		when(mockClient.validateOAuthAuthenticationCode(argument.capture())).thenThrow(new SynapseNotFoundException(email));
 		when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER)).thenReturn(OAuthProvider.GOOGLE_OAUTH_2_0.name());
 		when(mockRequest.getParameter(WebConstants.OAUTH2_CODE)).thenReturn(email);
 		servlet.doGet(mockRequest, mockResponse);
-		verify(mockResponse).sendRedirect("/#!RegisterAccount:first.last@domain.com");
+		verify(mockResponse).sendRedirect(OAuth2SessionServlet.OAUTH2_NEW_ACCOUNT);
 	}
 	
 }

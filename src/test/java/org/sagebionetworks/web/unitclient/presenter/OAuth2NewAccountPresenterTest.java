@@ -1,8 +1,9 @@
 package org.sagebionetworks.web.unitclient.presenter;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -13,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -43,11 +45,12 @@ public class OAuth2NewAccountPresenterTest {
 	PlaceChanger mockPlaceChanger;
 	@Mock
 	SynapseAlert mockSynAlert;
-	
+	@Mock
+	GWTWrapper mockGWT;
 	String testSessionToken = "1239381foobar";
 	@Before
 	public void setup() {
-		newAccountPresenter = new OAuth2NewAccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthController, mockSynAlert);
+		newAccountPresenter = new OAuth2NewAccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthController, mockSynAlert, mockGWT);
 		verify(mockView).setPresenter(newAccountPresenter);
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isAliasAvailable(anyString(), anyString(), any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -64,21 +67,17 @@ public class OAuth2NewAccountPresenterTest {
 	
 	@Test
 	public void testSetPlaceWithError() {
-		String error = "an error occurred";
+		String error = "an%20error";
+		String decodedError = "an error";
+		when(mockGWT.decodeQueryString(error)).thenReturn(decodedError);
+		
 		when(mockPlace.getParam(OAuth2NewAccountPresenter.ERROR_PLACE_PARAM)).thenReturn(error);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		newAccountPresenter.setPlace(mockPlace);
 		verify(mockView, atLeastOnce()).setPresenter(newAccountPresenter);
 		verify(mockGlobalApplicationState).clearLastPlace();
 		verify(mockAuthController).logoutUser();
-		verify(mockSynAlert).showError(error);
-	}
-	
-	@Test
-	public void testIsUsernameAvailableTooSmall() {
-		//should not check if too short
-		newAccountPresenter.checkUsernameAvailable("abc");
-		verify(mockSynapseClient, never()).isAliasAvailable(anyString(), eq(AliasType.USER_NAME.toString()), any(AsyncCallback.class));
+		verify(mockSynAlert).showError(decodedError);
 	}
 	
 	@Test

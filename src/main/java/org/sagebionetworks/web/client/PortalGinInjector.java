@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.presenter.MapPresenter;
 import org.sagebionetworks.web.client.presenter.NewAccountPresenter;
+import org.sagebionetworks.web.client.presenter.OAuth2NewAccountPresenter;
 import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.QuestionContainerWidget;
@@ -305,6 +306,7 @@ public interface PortalGinInjector extends Ginjector {
 	CertificatePresenter getCertificatePresenter();
 
 	AccountPresenter getAccountPresenter();
+	OAuth2NewAccountPresenter getOAuth2NewAccountPresenter(); 
 
 	NewAccountPresenter getNewAccountPresenter();
 

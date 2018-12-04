@@ -18,9 +18,9 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.springframework.http.HttpStatus;
 
 public class OAuth2SessionServlet extends OAuth2Servlet {
-	private static final String REGISTER_ACCOUNT = "/#!RegisterAccount:";
-	private static final String OAUTH2_NEW_ACCOUNT = "/#!OAuth2NewAccount:default";
-	private static final String LOGIN_PLACE = "/#!LoginPlace:";
+	public static final String REGISTER_ACCOUNT = "/#!RegisterAccount:0";
+	public static final String OAUTH2_NEW_ACCOUNT = "/#!OAuth2NewAccount:default";
+	public static final String LOGIN_PLACE = "/#!LoginPlace:";
 	
 	/**
 	 * 
@@ -34,13 +34,12 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
 		OAuthProvider provider = OAuthProvider.valueOf(provideString);
 		// This code will be provided after the user authenticates with a provider.
 		String athenticationCode = req.getParameter(WebConstants.OAUTH2_CODE);
-		String alphaMode = req.getParameter(WebConstants.IS_ALPHA_MODE);
 		String redirectUrl = createRedirectUrl(req, provider);
 		// If we do not have a code 
 		if(athenticationCode == null){
 			redirectToProvider(req, resp, provider, redirectUrl);
 		}else{
-			validateUser(resp, provider, athenticationCode, redirectUrl, Boolean.parseBoolean(alphaMode));
+			validateUser(resp, provider, athenticationCode, redirectUrl);
 		}
 	}
 
@@ -52,7 +51,7 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
 	 * @throws IOException
 	 */
 	public void validateUser(HttpServletResponse resp, OAuthProvider provider,
-			String athenticationCode, String redirectUrl, boolean isAlphaMode) throws IOException {
+			String athenticationCode, String redirectUrl) throws IOException {
 		try {
 			SynapseClient client = createSynapseClient();
 			OAuthValidationRequest request = new OAuthValidationRequest();
@@ -62,13 +61,10 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
 			Session token = client.validateOAuthAuthenticationCode(request);
 			resp.sendRedirect(LOGIN_PLACE+token.getSessionToken());
 		} catch (SynapseNotFoundException e) {
-			// if in alpha mode, do the new thing (Send the user to set a username for their new account)
-			if (isAlphaMode) {
-				resp.sendRedirect(OAUTH2_NEW_ACCOUNT);	
-			} else {
-				// otherwise send the user to register
-				resp.sendRedirect(REGISTER_ACCOUNT+athenticationCode);
-			}
+			// Send the user to set a username for their new account
+			resp.sendRedirect(OAUTH2_NEW_ACCOUNT);	
+			// used to send the user to register (can comment out the line above, and uncomment the line below to revert to the old behavior)
+//			resp.sendRedirect(REGISTER_ACCOUNT);
 		}catch (SynapseForbiddenException e) {
 			resp.setStatus(HttpStatus.FORBIDDEN.value());
 			resp.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");

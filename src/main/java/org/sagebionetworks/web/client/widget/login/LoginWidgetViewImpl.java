@@ -4,9 +4,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -50,8 +48,7 @@ public class LoginWidgetViewImpl extends Composite implements
 		googleSignInButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				String isInAlpha = "&" + WebConstants.IS_ALPHA_MODE + "=" + Boolean.toString(DisplayUtils.isInTestWebsite(cookies));
-				DisplayUtils.newWindow(GOOGLE_OAUTH_CALLBACK_URL + isInAlpha, "_self", "");
+				DisplayUtils.newWindow(GOOGLE_OAUTH_CALLBACK_URL, "_self", "");
 			}
 		});
 		RootPanel.detachNow(loginForm);

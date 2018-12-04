@@ -280,8 +280,7 @@ public class WebConstants {
 	
 	public static final String OAUTH2_PROVIDER = "oauth2provider";
 	public static final String OAUTH2_CODE = "code";
-	public static final String IS_ALPHA_MODE = "isInAlpha";
-
+	
 	// discussion message
 	public static final String DISCUSSION_MESSAGE_SERVLET = "/discussion/messageUrl";
 	public static final String MESSAGE_KEY_PARAM = "messageKey";

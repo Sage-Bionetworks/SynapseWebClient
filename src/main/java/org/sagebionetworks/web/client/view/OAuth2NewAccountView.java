@@ -13,6 +13,7 @@ public interface OAuth2NewAccountView extends IsWidget, SynapseView {
 	 */
 	void setPresenter(Presenter presenter);
 	void setSynAlert(SynapseAlert synAlert);
+	void setRegisterButtonEnabled(boolean enabled);
 	
 	public interface Presenter {
 		void checkUsernameAvailable(String username);

@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.MapPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
+import org.sagebionetworks.web.client.place.OAuth2NewAccount;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Quiz;
@@ -357,6 +358,19 @@ public class BulkPresenterProxy extends AbstractActivity {
 					loadError(caught);
 				}
 			});
+		} else if (place instanceof OAuth2NewAccount) {
+			GWT.runAsync(OAuth2NewAccount.class, new RunAsyncCallback() {
+				@Override
+				public void onSuccess() {
+					OAuth2NewAccountPresenter presenter = ginjector.getOAuth2NewAccountPresenter();
+					presenter.setPlace((OAuth2NewAccount) place);
+					presenter.start(panel, eventBus);
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					loadError(caught);
+				}
+			});			
 		} else if (place instanceof ChangeUsername) {
 			GWT.runAsync(ChangeUsername.class, new RunAsyncCallback() {
 				@Override

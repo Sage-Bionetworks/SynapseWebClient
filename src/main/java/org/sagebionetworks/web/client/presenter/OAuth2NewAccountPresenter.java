@@ -4,6 +4,7 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.OAuth2NewAccount;
@@ -24,19 +25,23 @@ public class OAuth2NewAccountPresenter extends AbstractActivity implements OAuth
 	private GlobalApplicationState globalAppState;
 	private AuthenticationController authController;
 	private SynapseAlert synAlert;
+	private GWTWrapper gwt;
 
 	@Inject
 	public OAuth2NewAccountPresenter(OAuth2NewAccountView view, 
 			SynapseClientAsync synapseClient, 
 			GlobalApplicationState globalAppState,
 			AuthenticationController authController,
-			SynapseAlert synAlert){
+			SynapseAlert synAlert, 
+			GWTWrapper gwt){
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
+		view.setSynAlert(synAlert);
 		fixServiceEntryPoint(synapseClient);
 		this.globalAppState = globalAppState;
 		this.authController = authController;
+		this.gwt = gwt;
 		view.setPresenter(this);
 	}
 
@@ -57,7 +62,7 @@ public class OAuth2NewAccountPresenter extends AbstractActivity implements OAuth
 		this.view.setPresenter(this);
 		String error = place.getParam(ERROR_PLACE_PARAM);
 		if (error != null && !error.isEmpty()) {
-			synAlert.showError(error);
+			synAlert.showError(gwt.decodeQueryString(error));
 		}
 	}
 
@@ -67,21 +72,21 @@ public class OAuth2NewAccountPresenter extends AbstractActivity implements OAuth
 	 */
 	public void checkUsernameAvailable(String username) {
 		synAlert.clear();
-		if (username.trim().length() > 3) {
-			synapseClient.isAliasAvailable(username, AliasType.USER_NAME.toString(), new AsyncCallback<Boolean>() {
-				@Override
-				public void onSuccess(Boolean isAvailable) {
-					if (!isAvailable) {
-						synAlert.showError(DisplayConstants.ERROR_USERNAME_ALREADY_EXISTS);
-					}
+		synapseClient.isAliasAvailable(username, AliasType.USER_NAME.toString(), new AsyncCallback<Boolean>() {
+			@Override
+			public void onSuccess(Boolean isAvailable) {
+				if (!isAvailable) {
+					synAlert.showError(DisplayConstants.ERROR_USERNAME_ALREADY_EXISTS);
+				} else {
+					view.setRegisterButtonEnabled(true);
 				}
-				
-				@Override
-				public void onFailure(Throwable e) {
-					synAlert.handleException(e);
-				}
-			});
-		}
+			}
+			
+			@Override
+			public void onFailure(Throwable e) {
+				synAlert.handleException(e);
+			}
+		});
 	}
 	
 	@Override
