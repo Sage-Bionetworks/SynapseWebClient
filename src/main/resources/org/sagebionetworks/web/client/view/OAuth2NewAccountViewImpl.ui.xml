@@ -4,31 +4,13 @@
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	<g:HTMLPanel>
-			<div class="container margin-top-15">
-			<div class="row">
-			    <div class="col-sm-10 col-sm-offset-1">
-			        <h2 class="margin-bottom-40">Register with Synapse</h2>
-			        <div class="margin-bottom-40" ui:field="contentHtml" />
-				    <div ui:field="registrationForm">
-				        <div class="form-horizontal">
-							  <div ui:field="userName" class="form-group row">
-							    <label class="col-sm-3 control-label">Username</label>
-							    <div class="col-sm-9">
-							      <b:TextBox ui:field="userNameField" placeholder="Enter username"/>
-							    </div>
-							  </div>
-						</div>
-					</div>
-				</div>
-			</div>
+		<bh:Div marginTop="15" addStyleNames="max-width-350 center-in-div">
+			<b:Heading text="Register with Synapse with your Google Account" size="H4"/>
+			<b:FormGroup>
+				<b:FormLabel>Choose a Synapse username</b:FormLabel>
+				<b:TextBox ui:field="userNameField" placeholder="Enter username" />
+			</b:FormGroup>
 			<bh:Div ui:field="synAlertContainer"/>
-			<div class="row margin-bottom-40">
-				<div class="col-sm-10 col-sm-offset-1">
-			    	<b:Button ui:field="registerBtn" addStyleNames="margin-top-10" type="PRIMARY" size="LARGE" pull="RIGHT" dataLoadingText="Register...">Register</b:Button>
-				</div>
-			</div>
-		</div>
-	</g:HTMLPanel>
-
+			<b:Button ui:field="registerBtn" pull="RIGHT" addStyleNames="margin-top-10" type="PRIMARY">Register</b:Button>
+		</bh:Div>
 </ui:UiBinder> 

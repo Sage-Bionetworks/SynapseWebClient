@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.header.Header;
 
-import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -27,10 +26,7 @@ public class OAuth2NewAccountViewImpl extends Composite implements OAuth2NewAcco
 	@UiField
 	TextBox userNameField;
 	@UiField
-	DivElement userName;
-	@UiField
 	Div synAlertContainer;
-	
 	@UiField
 	Button registerBtn;
 	

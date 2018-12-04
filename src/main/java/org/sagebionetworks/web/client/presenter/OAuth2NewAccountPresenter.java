@@ -18,6 +18,7 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class OAuth2NewAccountPresenter extends AbstractActivity implements OAuth2NewAccountView.Presenter, Presenter<OAuth2NewAccount> {
+	public static final String ERROR_PLACE_PARAM = "error";
 	private OAuth2NewAccountView view;
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalAppState;
@@ -52,8 +53,9 @@ public class OAuth2NewAccountPresenter extends AbstractActivity implements OAuth
 			authController.logoutUser();
 		}
 		view.clear();
+		synAlert.clear();
 		this.view.setPresenter(this);
-		String error = place.getParam("error");
+		String error = place.getParam(ERROR_PLACE_PARAM);
 		if (error != null && !error.isEmpty()) {
 			synAlert.showError(error);
 		}
