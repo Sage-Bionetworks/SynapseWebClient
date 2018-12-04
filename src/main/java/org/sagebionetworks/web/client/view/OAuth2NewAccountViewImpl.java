@@ -9,10 +9,12 @@ import org.sagebionetworks.web.client.GWTTimer;
 import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -23,7 +25,7 @@ import com.google.inject.Inject;
 public class OAuth2NewAccountViewImpl extends Composite implements OAuth2NewAccountView {
 	
 	public interface NewAccountViewImplUiBinder extends UiBinder<Widget, OAuth2NewAccountViewImpl> {}
-	public static final String GOOGLE_OAUTH_CALLBACK_URL = "/Portal/oauth2NewAccountCallback?oauth2provider=GOOGLE_OAUTH_2_0&username=";
+	public static final String GOOGLE_OAUTH_CALLBACK_URL = LoginWidgetViewImpl.GOOGLE_OAUTH_CALLBACK_URL + "&state=";
 
 	@UiField
 	TextBox userNameField;
@@ -66,7 +68,8 @@ public class OAuth2NewAccountViewImpl extends Composite implements OAuth2NewAcco
 		userNameField.addKeyDownHandler(register);
 		registerBtn.addClickHandler(event -> {
 			if(checkUsernameFormat()) {
-				DisplayUtils.newWindow(GOOGLE_OAUTH_CALLBACK_URL + userNameField.getValue(), "_self", "");
+				String encodedUsername = URL.encodeQueryString(userNameField.getValue());
+				DisplayUtils.newWindow(GOOGLE_OAUTH_CALLBACK_URL + encodedUsername, "_self", "");
 			}
 		});
 	}

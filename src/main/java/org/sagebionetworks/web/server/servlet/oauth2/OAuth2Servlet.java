@@ -60,7 +60,7 @@ public abstract class OAuth2Servlet extends HttpServlet {
 	 * @throws IOException
 	 */
 	public void redirectToProvider(HttpServletRequest req,
-			HttpServletResponse resp, OAuthProvider provider, String redirectUrl)
+			HttpServletResponse resp, OAuthProvider provider, String redirectUrl, String state)
 			throws IOException {
 		HttpServletRequest httpRqst = (HttpServletRequest)req;
 		URL requestURL = new URL(httpRqst.getRequestURL().toString());
@@ -70,6 +70,7 @@ public abstract class OAuth2Servlet extends HttpServlet {
 			OAuthUrlRequest request = new OAuthUrlRequest();
 			request.setProvider(provider);
 			request.setRedirectUrl(redirectUrl);
+			request.setState(state);
 			OAuthUrlResponse respone = client.getOAuth2AuthenticationUrl(request);
 			resp.sendRedirect(respone.getAuthorizationUrl());
 		} catch (SynapseServerException e) {

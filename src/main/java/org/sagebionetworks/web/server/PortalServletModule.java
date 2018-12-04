@@ -38,7 +38,6 @@ import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.RegisterAccountFilter;
 import org.sagebionetworks.web.server.servlet.filter.TimingFilter;
 import org.sagebionetworks.web.server.servlet.oauth2.OAuth2AliasServlet;
-import org.sagebionetworks.web.server.servlet.oauth2.OAuth2NewAccountServlet;
 import org.sagebionetworks.web.server.servlet.oauth2.OAuth2SessionServlet;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -158,9 +157,6 @@ public class PortalServletModule extends ServletModule {
 		
 		bind(OAuth2AliasServlet.class).in(Singleton.class);
 		serve("/Portal/oauth2AliasCallback").with(OAuth2AliasServlet.class);
-
-		bind(OAuth2NewAccountServlet.class).in(Singleton.class);
-		serve("/Portal/oauth2NewAccountCallback").with(OAuth2NewAccountServlet.class);
 
 		
 		// The Rest template provider should be a singleton.

@@ -69,7 +69,6 @@ public class WebConstants {
 	 */
 	public static final String OPEN_ID_ERROR_TOKEN = "OpenIDError";
 	public static final String OPEN_ID_UNKNOWN_USER_ERROR_TOKEN = "OpenIDUnknownUser";
-	public static final String OPEN_ID_NEW_ACCOUNT_USERNAME = "username";
 	
 	public static final String OPEN_ID_URI = "/Portal/openid";
 
@@ -280,6 +279,7 @@ public class WebConstants {
 	
 	public static final String OAUTH2_PROVIDER = "oauth2provider";
 	public static final String OAUTH2_CODE = "code";
+	public static final String OAUTH2_STATE = "state";
 	
 	// discussion message
 	public static final String DISCUSSION_MESSAGE_SERVLET = "/discussion/messageUrl";

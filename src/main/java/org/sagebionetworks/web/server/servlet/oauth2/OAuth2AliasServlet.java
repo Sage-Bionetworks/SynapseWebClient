@@ -33,7 +33,7 @@ public class OAuth2AliasServlet extends OAuth2Servlet {
  		if(athenticationCode == null){
 			// If we do not have a code
 			String redirectUrl = createRedirectUrl(req, provider);
-			redirectToProvider(req, resp, provider, redirectUrl);
+			redirectToProvider(req, resp, provider, redirectUrl, null);
 		}else{
 			bindOAuthProviderToUser(req, resp, provider, athenticationCode);
 		}
