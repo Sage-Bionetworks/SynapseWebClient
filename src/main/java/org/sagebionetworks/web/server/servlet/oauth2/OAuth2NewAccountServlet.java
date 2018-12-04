@@ -36,27 +36,28 @@ public class OAuth2NewAccountServlet extends OAuth2Servlet {
 		if(athenticationCode == null){
 			redirectToProvider(req, resp, provider, redirectUrl);
 		}else{
-			validateUser(resp, username, provider, athenticationCode, redirectUrl);
+			createAccountViaOauth(resp, username, provider, athenticationCode, redirectUrl);
 		}
 	}
 
 	/**
-	 * Step two, use the resulting authentication code to sign-in with Synapse.
+	 * Step two, use the resulting authentication code and username to create a new Synapse user account.
 	 * @param resp
 	 * @param provider
 	 * @param athenticationCode
 	 * @throws IOException
 	 */
-	public void validateUser(HttpServletResponse resp, String username, OAuthProvider provider,
+	public void createAccountViaOauth(HttpServletResponse resp, String username, OAuthProvider provider,
 			String athenticationCode, String redirectUrl) throws IOException {
 		try {
 			//TODO: use new service to validate code and set username
 			SynapseClient client = createSynapseClient();
-			OAuthValidationRequest2 request = new OAuthValidationRequest();
+			OAuthAccountCreationRequest request = new OAuthAccountCreationRequest();
 			request.setAuthenticationCode(athenticationCode);
 			request.setProvider(provider);
 			request.setRedirectUrl(redirectUrl);
-			Session token = client.validateOAuthAuthenticationCode(request);
+			request.setUsername(username);
+			Session token = client.createAccountViaOauth(request);
 			resp.sendRedirect(LOGIN_PLACE+token.getSessionToken());
 		} catch (Exception e) {
 			resp.sendRedirect(OAUTH2_NEW_ACCOUNT_ERROR + e.getMessage());
