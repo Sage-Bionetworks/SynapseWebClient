@@ -1,22 +1,17 @@
 package org.sagebionetworks.web.server.servlet.oauth2;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
-import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
-import org.sagebionetworks.client.exceptions.SynapseServerException;
-import org.sagebionetworks.client.exceptions.UnknownSynapseServerException;
 import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.repo.model.oauth.OAuthAccountCreationRequest;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
-import org.sagebionetworks.repo.model.oauth.OAuthValidationRequest;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.springframework.http.HttpStatus;
 
 public class OAuth2NewAccountServlet extends OAuth2Servlet {
 	private static final String LOGIN_PLACE = "/#!LoginPlace:";
@@ -50,17 +45,17 @@ public class OAuth2NewAccountServlet extends OAuth2Servlet {
 	public void createAccountViaOauth(HttpServletResponse resp, String username, OAuthProvider provider,
 			String athenticationCode, String redirectUrl) throws IOException {
 		try {
-			//TODO: use new service to validate code and set username
+			//use new service to validate code and create a new account using the given username (and info from Google)
 			SynapseClient client = createSynapseClient();
 			OAuthAccountCreationRequest request = new OAuthAccountCreationRequest();
 			request.setAuthenticationCode(athenticationCode);
 			request.setProvider(provider);
 			request.setRedirectUrl(redirectUrl);
-			request.setUsername(username);
-			Session token = client.createAccountViaOauth(request);
+			request.setUserName(username);
+			Session token = client.createAccountViaOAuth2(request);
 			resp.sendRedirect(LOGIN_PLACE+token.getSessionToken());
 		} catch (Exception e) {
-			resp.sendRedirect(OAUTH2_NEW_ACCOUNT_ERROR + e.getMessage());
+			resp.sendRedirect(OAUTH2_NEW_ACCOUNT_ERROR + URLEncoder.encode(e.getMessage()));
 		};
 			
 	}
