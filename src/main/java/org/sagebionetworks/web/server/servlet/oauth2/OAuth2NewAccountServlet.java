@@ -10,6 +10,7 @@ import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.client.exceptions.SynapseServerException;
 import org.sagebionetworks.client.exceptions.UnknownSynapseServerException;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
@@ -17,14 +18,9 @@ import org.sagebionetworks.repo.model.oauth.OAuthValidationRequest;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.springframework.http.HttpStatus;
 
-public class OAuth2SessionServlet extends OAuth2Servlet {
-	
-	private static final String OAUTH2_NEW_ACCOUNT = "/#!OAuth2NewAccount:default";
+public class OAuth2NewAccountServlet extends OAuth2Servlet {
 	private static final String LOGIN_PLACE = "/#!LoginPlace:";
-	
-	/**
-	 * 
-	 */
+	private static final String OAUTH2_NEW_ACCOUNT_ERROR = "/#!OAuth2NewAccount:error=";
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -34,12 +30,13 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
 		OAuthProvider provider = OAuthProvider.valueOf(provideString);
 		// This code will be provided after the user authenticates with a provider.
 		String athenticationCode = req.getParameter(WebConstants.OAUTH2_CODE);
+		String username = req.getParameter(WebConstants.OPEN_ID_NEW_ACCOUNT_USERNAME);
 		String redirectUrl = createRedirectUrl(req, provider);
 		// If we do not have a code 
 		if(athenticationCode == null){
 			redirectToProvider(req, resp, provider, redirectUrl);
 		}else{
-			validateUser(resp, provider, athenticationCode, redirectUrl);
+			validateUser(resp, username, provider, athenticationCode, redirectUrl);
 		}
 	}
 
@@ -50,29 +47,20 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
 	 * @param athenticationCode
 	 * @throws IOException
 	 */
-	public void validateUser(HttpServletResponse resp, OAuthProvider provider,
+	public void validateUser(HttpServletResponse resp, String username, OAuthProvider provider,
 			String athenticationCode, String redirectUrl) throws IOException {
 		try {
+			//TODO: use new service to validate code and set username
 			SynapseClient client = createSynapseClient();
-			OAuthValidationRequest request = new OAuthValidationRequest();
+			OAuthValidationRequest2 request = new OAuthValidationRequest();
 			request.setAuthenticationCode(athenticationCode);
 			request.setProvider(provider);
 			request.setRedirectUrl(redirectUrl);
 			Session token = client.validateOAuthAuthenticationCode(request);
 			resp.sendRedirect(LOGIN_PLACE+token.getSessionToken());
-		} catch (SynapseNotFoundException e) {
-			// Send the user to set a username for their new account
-			resp.sendRedirect(OAUTH2_NEW_ACCOUNT);
-		}catch (SynapseForbiddenException e) {
-			resp.setStatus(HttpStatus.FORBIDDEN.value());
-			resp.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
-		}catch (UnknownSynapseServerException e) {
-			resp.setStatus(e.getStatusCode());
-			resp.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
-		}catch (SynapseException e) {
-			// 400 error
-			resp.setStatus(HttpStatus.BAD_REQUEST.value());
-			resp.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
-		}
+		} catch (Exception e) {
+			resp.sendRedirect(OAUTH2_NEW_ACCOUNT_ERROR + e.getMessage());
+		};
+			
 	}
 }

@@ -61,6 +61,8 @@ import org.sagebionetworks.web.client.view.MapView;
 import org.sagebionetworks.web.client.view.MapViewImpl;
 import org.sagebionetworks.web.client.view.NewAccountView;
 import org.sagebionetworks.web.client.view.NewAccountViewImpl;
+import org.sagebionetworks.web.client.view.OAuth2NewAccountView;
+import org.sagebionetworks.web.client.view.OAuth2NewAccountViewImpl;
 import org.sagebionetworks.web.client.view.PeopleSearchView;
 import org.sagebionetworks.web.client.view.PeopleSearchViewImpl;
 import org.sagebionetworks.web.client.view.PlaceView;
@@ -842,6 +844,9 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// NewAccountView
 		bind(NewAccountView.class).to(NewAccountViewImpl.class).in(Singleton.class);
+		
+		//OAuth2NewAccountView
+		bind(OAuth2NewAccountView.class).to(OAuth2NewAccountViewImpl.class).in(Singleton.class);
 
 		// RegisterAccountView
 		bind(RegisterAccountView.class).to(RegisterAccountViewImpl.class).in(Singleton.class);
