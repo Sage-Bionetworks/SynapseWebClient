@@ -11,6 +11,7 @@ import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FormPanel;
@@ -45,12 +46,7 @@ public class LoginWidgetViewImpl extends Composite implements
 		initWidget(binder.createAndBindUi(this));
 		loginForm = FormPanel.wrap(DOM.getElementById("login_form"));
 		
-		googleSignInButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(GOOGLE_OAUTH_CALLBACK_URL, "_self", "");
-			}
-		});
+		googleSignInButton.addClickHandler(event -> Window.Location.assign(GOOGLE_OAUTH_CALLBACK_URL));
 		RootPanel.detachNow(loginForm);
 		username = TextBox.wrap(DOM.getElementById("synapse_username"));
 	    username.getElement().setAttribute("placeholder", DisplayConstants.EMAIL_ADDRESS);

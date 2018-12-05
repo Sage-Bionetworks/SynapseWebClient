@@ -69,7 +69,7 @@ public class OAuth2NewAccountViewImpl extends Composite implements OAuth2NewAcco
 		registerBtn.addClickHandler(event -> {
 			if(checkUsernameFormat()) {
 				String encodedUsername = URL.encodeQueryString(userNameField.getValue());
-				DisplayUtils.newWindow(GOOGLE_OAUTH_CALLBACK_URL + encodedUsername, "_self", "");
+				Window.Location.assign(GOOGLE_OAUTH_CALLBACK_URL + encodedUsername);
 			}
 		});
 	}

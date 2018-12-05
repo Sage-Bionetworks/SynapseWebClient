@@ -3,6 +3,7 @@ package org.sagebionetworks.web.server.servlet.oauth2;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -70,7 +71,10 @@ public abstract class OAuth2Servlet extends HttpServlet {
 			OAuthUrlRequest request = new OAuthUrlRequest();
 			request.setProvider(provider);
 			request.setRedirectUrl(redirectUrl);
-			request.setState(state);
+			if (state != null && !state.isEmpty()) {
+				state = URLDecoder.decode(state);
+//				request.setState(state);
+			}
 			OAuthUrlResponse respone = client.getOAuth2AuthenticationUrl(request);
 			resp.sendRedirect(respone.getAuthorizationUrl());
 		} catch (SynapseServerException e) {
