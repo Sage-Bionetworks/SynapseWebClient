@@ -7,7 +7,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTTimer;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.ValidationUtils;
-import org.sagebionetworks.web.client.place.OAuth2NewAccount;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl;
@@ -46,7 +45,6 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 			Header headerWidget,
 			GWTTimer timer) {		
 		initWidget(binder.createAndBindUi(this));
-		googleSignUpButton.addClickHandler(event -> globalAppState.getPlaceChanger().goTo(new OAuth2NewAccount("default")));
 		this.timer = timer;
 		this.headerWidget = headerWidget;
 		timer.configure(() -> {
