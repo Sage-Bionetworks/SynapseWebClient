@@ -42,7 +42,6 @@ import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.JoinTeamSignedToken;
-import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -1560,11 +1559,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	// org.sagebionetworks.repo.model.ServiceConstants (PLFM)
 	public static String getChallengeEndpoint(String hostPageBaseURL) {
 		return hostPageBaseURL + "#!Synapse:";
-	}
-	
-	@Override
-	public LogEntry hexDecodeLogEntry(String encodedLogEntry) {
-		return SerializationUtils.hexDecodeAndDeserialize(encodedLogEntry, LogEntry.class);
 	}
 	
 	@Override

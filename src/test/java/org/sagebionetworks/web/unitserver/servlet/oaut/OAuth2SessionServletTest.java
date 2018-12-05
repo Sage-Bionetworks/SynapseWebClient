@@ -89,24 +89,13 @@ public class OAuth2SessionServletTest {
 		verify(mockResponse).sendRedirect("/#!LoginPlace:sessiontoken");
 	}
 	
-//	@Test
-//	public void testValidateNotFound() throws ServletException, IOException, SynapseException{
-//		ArgumentCaptor<OAuthValidationRequest> argument = ArgumentCaptor.forClass(OAuthValidationRequest.class);
-//		when(mockClient.validateOAuthAuthenticationCode(argument.capture())).thenThrow(new SynapseNotFoundException("an error message"));
-//		when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER)).thenReturn(OAuthProvider.GOOGLE_OAUTH_2_0.name());
-//		when(mockRequest.getParameter(WebConstants.OAUTH2_CODE)).thenReturn("auth code");
-//		servlet.doGet(mockRequest, mockResponse);
-//		verify(mockResponse).sendRedirect(OAuth2SessionServlet.REGISTER_ACCOUNT);
-//	}
 	@Test
-	public void testValidateNotFoundNewAccount() throws ServletException, IOException, SynapseException{
+	public void testValidateNotFound() throws ServletException, IOException, SynapseException{
 		ArgumentCaptor<OAuthValidationRequest> argument = ArgumentCaptor.forClass(OAuthValidationRequest.class);
-		String email = "first.last@domain.com";
-		when(mockClient.validateOAuthAuthenticationCode(argument.capture())).thenThrow(new SynapseNotFoundException(email));
+		when(mockClient.validateOAuthAuthenticationCode(argument.capture())).thenThrow(new SynapseNotFoundException("an error message"));
 		when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER)).thenReturn(OAuthProvider.GOOGLE_OAUTH_2_0.name());
-		when(mockRequest.getParameter(WebConstants.OAUTH2_CODE)).thenReturn(email);
+		when(mockRequest.getParameter(WebConstants.OAUTH2_CODE)).thenReturn("auth code");
 		servlet.doGet(mockRequest, mockResponse);
-		verify(mockResponse).sendRedirect(OAuth2SessionServlet.OAUTH2_NEW_ACCOUNT);
+		verify(mockResponse).sendRedirect(OAuth2SessionServlet.REGISTER_ACCOUNT);
 	}
-	
 }

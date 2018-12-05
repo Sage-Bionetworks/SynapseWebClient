@@ -10,20 +10,16 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
-import org.sagebionetworks.client.exceptions.UnknownSynapseServerException;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.oauth.OAuthAccountCreationRequest;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.oauth.OAuthValidationRequest;
+import org.sagebionetworks.web.server.servlet.FileHandleAssociationServlet;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.springframework.http.HttpStatus;
 
 public class OAuth2SessionServlet extends OAuth2Servlet {
-	private static final String OAUTH2_NEW_ACCOUNT_ERROR = "/#!OAuth2NewAccount:error=";
 	public static final String REGISTER_ACCOUNT = "/#!RegisterAccount:0";
-	public static final String OAUTH2_NEW_ACCOUNT = "/#!OAuth2NewAccount:default";
 	public static final String LOGIN_PLACE = "/#!LoginPlace:";
 	
 	/**
@@ -46,9 +42,9 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
 			redirectToProvider(req, resp, provider, redirectUrl, state);
 		} else if (state != null && !state.isEmpty()) {
 			//create the new account
-			createAccountViaOauth(resp, URLDecoder.decode(state), provider, athenticationCode, redirectUrl);
+			createAccountViaOauth(req, resp, URLDecoder.decode(state), provider, athenticationCode, redirectUrl);
 		}else{
-			validateUser(resp, provider, athenticationCode, redirectUrl);
+			validateUser(req, resp, provider, athenticationCode, redirectUrl);
 		}
 	}
 
@@ -59,7 +55,7 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
 	 * @param athenticationCode
 	 * @throws IOException
 	 */
-	public void validateUser(HttpServletResponse resp, OAuthProvider provider,
+	public void validateUser(HttpServletRequest req, HttpServletResponse resp, OAuthProvider provider,
 			String athenticationCode, String redirectUrl) throws IOException {
 		try {
 			SynapseClient client = createSynapseClient();
@@ -70,20 +66,10 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
 			Session token = client.validateOAuthAuthenticationCode(request);
 			resp.sendRedirect(LOGIN_PLACE+token.getSessionToken());
 		} catch (SynapseNotFoundException e) {
-			// Send the user to set a username for their new account
-			resp.sendRedirect(OAUTH2_NEW_ACCOUNT);	
-			// used to send the user to register (can comment out the line above, and uncomment the line below to revert to the old behavior)
-//			resp.sendRedirect(REGISTER_ACCOUNT);
-		}catch (SynapseForbiddenException e) {
-			resp.setStatus(HttpStatus.FORBIDDEN.value());
-			resp.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
-		}catch (UnknownSynapseServerException e) {
-			resp.setStatus(e.getStatusCode());
-			resp.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
+			// used to send the user to register
+			resp.sendRedirect(REGISTER_ACCOUNT);
 		}catch (SynapseException e) {
-			// 400 error
-			resp.setStatus(HttpStatus.BAD_REQUEST.value());
-			resp.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
+			resp.sendRedirect(FileHandleAssociationServlet.getBaseUrl(req) + FileHandleAssociationServlet.ERROR_PLACE + URLEncoder.encode(e.getMessage()));
 		}
 	}
 	
@@ -94,7 +80,7 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
 	 * @param athenticationCode
 	 * @throws IOException
 	 */
-	public void createAccountViaOauth(HttpServletResponse resp, String username, OAuthProvider provider,
+	public void createAccountViaOauth(HttpServletRequest req, HttpServletResponse resp, String username, OAuthProvider provider,
 			String athenticationCode, String redirectUrl) throws IOException {
 		try {
 			//use new service to validate code and create a new account using the given username (and info from Google)
@@ -107,7 +93,7 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
 			Session token = client.createAccountViaOAuth2(request);
 			resp.sendRedirect(LOGIN_PLACE+token.getSessionToken());
 		} catch (Exception e) {
-			resp.sendRedirect(OAUTH2_NEW_ACCOUNT_ERROR + URLEncoder.encode(e.getMessage()));
+			resp.sendRedirect(FileHandleAssociationServlet.getBaseUrl(req) + FileHandleAssociationServlet.ERROR_PLACE + URLEncoder.encode(e.getMessage()));
 		};
 			
 	}

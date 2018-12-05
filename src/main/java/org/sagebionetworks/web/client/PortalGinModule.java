@@ -61,8 +61,6 @@ import org.sagebionetworks.web.client.view.MapView;
 import org.sagebionetworks.web.client.view.MapViewImpl;
 import org.sagebionetworks.web.client.view.NewAccountView;
 import org.sagebionetworks.web.client.view.NewAccountViewImpl;
-import org.sagebionetworks.web.client.view.OAuth2NewAccountView;
-import org.sagebionetworks.web.client.view.OAuth2NewAccountViewImpl;
 import org.sagebionetworks.web.client.view.PeopleSearchView;
 import org.sagebionetworks.web.client.view.PeopleSearchViewImpl;
 import org.sagebionetworks.web.client.view.PlaceView;
@@ -690,8 +688,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEdi
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRendererImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeView;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesView;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorView;
@@ -845,8 +841,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// NewAccountView
 		bind(NewAccountView.class).to(NewAccountViewImpl.class).in(Singleton.class);
 		
-		//OAuth2NewAccountView
-		bind(OAuth2NewAccountView.class).to(OAuth2NewAccountViewImpl.class).in(Singleton.class);
 
 		// RegisterAccountView
 		bind(RegisterAccountView.class).to(RegisterAccountViewImpl.class).in(Singleton.class);
