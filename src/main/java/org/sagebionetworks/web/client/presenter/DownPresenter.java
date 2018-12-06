@@ -80,8 +80,8 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 			}
 			
 			private void repoIsUp() {
-				// note: if last place is not set then it will go to a default place.
-				globalAppState.gotoLastPlace();
+				// note: go back in the browser history
+				globalAppState.back();
 			}
 			
 			private void reset() {

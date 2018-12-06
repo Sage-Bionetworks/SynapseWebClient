@@ -4,9 +4,11 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTTimer;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.ValidationUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl;
@@ -34,19 +36,24 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	Button googleSignUpButton;
 	@UiField
 	Div googleSynAlertContainer;
+	@UiField
+	Div googleSynapseAccountCreationUI;
 	SynapseAlert synAlert;
 	GWTTimer timer;
 	Presenter presenter;
 	private Header headerWidget;
-	
+	private CookieProvider cookies;
 	@Inject
-	public RegisterAccountViewImpl(RegisterAccountViewImplUiBinder binder, 
+	public RegisterAccountViewImpl(
+			RegisterAccountViewImplUiBinder binder, 
 			GlobalApplicationState globalAppState,
 			Header headerWidget,
-			GWTTimer timer) {		
+			GWTTimer timer,
+			CookieProvider cookies) {		
 		initWidget(binder.createAndBindUi(this));
 		this.timer = timer;
 		this.headerWidget = headerWidget;
+		this.cookies = cookies;
 		timer.configure(() -> {
 			setGoogleRegisterButtonEnabled(false);
 			if (checkUsernameFormat())
@@ -87,6 +94,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
+		googleSynapseAccountCreationUI.setVisible(DisplayUtils.isInTestWebsite(cookies));
 		headerWidget.configure();
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
@@ -94,7 +102,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 
 	@Override
 	public void setGoogleRegisterButtonEnabled(boolean enabled) {
-		googleSignUpButton.setEnabled(enabled);
+		googleSignUpButton.setEnabled(true);
 	}
 	@Override
 	public void setGoogleSynAlert(SynapseAlert w) {
