@@ -2,6 +2,7 @@ package org.sagebionetworks.web.server.servlet;
 
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -105,13 +106,8 @@ public class ProjectAliasServlet extends HttpServlet {
 			URL redirectURL = new URL(requestURL.getProtocol(), requestURL.getHost(), requestURL.getPort(), newPath);
 			response.sendRedirect(response.encodeRedirectURL(redirectURL.toString()));
 		} catch (SynapseException e) {
-			//redirect to error place with an entry
-			LogEntry entry = new LogEntry();
-			entry.setLabel("Sorry");
-			entry.setMessage(e.getMessage());
-//			entry.setStacktrace(ExceptionUtils.getStackTrace(e));
-			String entryString = SerializationUtils.serializeAndHexEncode(entry);
-			response.sendRedirect(new URL(requestURL.getProtocol(), requestURL.getHost(), requestURL.getPort(), "/#!Error:"+entryString).toString());
+			//redirect to error place
+			response.sendRedirect(FileHandleAssociationServlet.getBaseUrl(request) + FileHandleAssociationServlet.ERROR_PLACE + URLEncoder.encode(e.getMessage()));
 		}
 	}
 		

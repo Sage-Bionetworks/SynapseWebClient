@@ -2761,3 +2761,15 @@ div.border {
 	box-shadow: none;
 	padding: 7px 15px;
 }
+
+#body .centered-in-hr {
+	width: 100%; 
+	text-align: center; 
+	border-bottom: 1px solid #ccc; 
+	line-height: 0.1em;
+	margin: 10px 0 20px; 
+	span { 
+		background:#fff; 
+		padding:0 10px; 
+	}
+}

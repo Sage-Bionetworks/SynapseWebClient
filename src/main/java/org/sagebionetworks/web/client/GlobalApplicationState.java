@@ -118,4 +118,8 @@ public interface GlobalApplicationState {
 	void initializeDropZone();
 	void setDropZoneHandler(CallbackP<JavaScriptObject> fileListCallback);
 	void clearDropZoneHandler();
+	/**
+	 * Programmatic equivalent to the user pressing the browser's 'back' button.
+	 */
+	void back();
 }

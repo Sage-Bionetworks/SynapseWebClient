@@ -222,9 +222,6 @@ public interface SynapseClientAsync {
 
 	void getMyLocationSettingBanners(AsyncCallback<List<String>> callback);
 
-	void hexDecodeLogEntry(String encodedLogEntry,
-			AsyncCallback<LogEntry> callback);
-
 	void isTeamMember(String userId, Long groupPrincipalId, AsyncCallback<Boolean> callback);
 	
 	void setIsTeamAdmin(String currentUserId, String targetUserId,

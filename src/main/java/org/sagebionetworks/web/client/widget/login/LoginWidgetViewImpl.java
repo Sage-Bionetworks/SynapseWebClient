@@ -2,15 +2,12 @@ package org.sagebionetworks.web.client.widget.login;
 
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FormPanel;
@@ -25,7 +22,8 @@ public class LoginWidgetViewImpl extends Composite implements
 		LoginWidgetView {
 
 	public static final String GOOGLE_OAUTH_CALLBACK_URL = "/Portal/oauth2callback?oauth2provider=GOOGLE_OAUTH_2_0";
-
+	public static final String GOOGLE_OAUTH_WITH_STATE_CALLBACK_URL = GOOGLE_OAUTH_CALLBACK_URL + "&state=";
+	
 	public interface LoginWidgetViewImplUiBinder extends UiBinder<Widget, LoginWidgetViewImpl> {}
 	@UiField
 	Div loginFormContainer;
@@ -40,17 +38,13 @@ public class LoginWidgetViewImpl extends Composite implements
 	
 	private Presenter presenter;
 	
+	
 	@Inject
 	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder) {
 		initWidget(binder.createAndBindUi(this));
 		loginForm = FormPanel.wrap(DOM.getElementById("login_form"));
 		
-		googleSignInButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(GOOGLE_OAUTH_CALLBACK_URL, "_self", "");
-			}
-		});
+		googleSignInButton.addClickHandler(event -> Window.Location.assign(GOOGLE_OAUTH_CALLBACK_URL));
 		RootPanel.detachNow(loginForm);
 		username = TextBox.wrap(DOM.getElementById("synapse_username"));
 	    username.getElement().setAttribute("placeholder", DisplayConstants.EMAIL_ADDRESS);
