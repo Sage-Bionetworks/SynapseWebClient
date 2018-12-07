@@ -94,6 +94,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
+		//TODO: remove the next line to take this feature (Google based Synapse account creation) out of alpha mode.
 		googleSynapseAccountCreationUI.setVisible(DisplayUtils.isInTestWebsite(cookies));
 		headerWidget.configure();
 		headerWidget.refresh();

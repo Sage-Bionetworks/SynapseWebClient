@@ -54,16 +54,6 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 		panel.setWidget(view);
 	}
 	
-	public void init() {
-		view.setPresenter(this);
-		if (authController.isLoggedIn()) {
-			// SWC-4363
-			globalAppState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_TOKEN));
-		} else {
-			view.setPresenter(this);
-		}
-	}
-
 	@Override
 	public void setPlace(RegisterAccount place) {
 		this.place = place;

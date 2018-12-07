@@ -840,7 +840,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// NewAccountView
 		bind(NewAccountView.class).to(NewAccountViewImpl.class).in(Singleton.class);
-		
 
 		// RegisterAccountView
 		bind(RegisterAccountView.class).to(RegisterAccountViewImpl.class).in(Singleton.class);
