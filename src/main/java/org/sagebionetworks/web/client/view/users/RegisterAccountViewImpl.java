@@ -102,7 +102,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 
 	@Override
 	public void setGoogleRegisterButtonEnabled(boolean enabled) {
-		googleSignUpButton.setEnabled(true);
+		googleSignUpButton.setEnabled(enabled);
 	}
 	@Override
 	public void setGoogleSynAlert(SynapseAlert w) {
