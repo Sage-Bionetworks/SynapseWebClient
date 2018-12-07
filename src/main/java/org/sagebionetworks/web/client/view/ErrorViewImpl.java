@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Lead;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -24,11 +25,12 @@ public class ErrorViewImpl implements ErrorView {
 	
 	@Inject
 	public ErrorViewImpl(Binder uiBinder,
-			Header headerWidget) {
+			Header headerWidget,
+			GlobalApplicationState globalAppState) {
 		widget = uiBinder.createAndBindUi(this);
 		this.headerWidget = headerWidget;
 		headerWidget.configure();
-		goBackLink.addClickHandler(event -> History.back());
+		goBackLink.addClickHandler(event -> globalAppState.gotoLastPlace());
 	}
 
 	@Override
