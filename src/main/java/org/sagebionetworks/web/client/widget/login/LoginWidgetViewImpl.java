@@ -22,7 +22,8 @@ public class LoginWidgetViewImpl extends Composite implements
 		LoginWidgetView {
 
 	public static final String GOOGLE_OAUTH_CALLBACK_URL = "/Portal/oauth2callback?oauth2provider=GOOGLE_OAUTH_2_0";
-
+	public static final String GOOGLE_OAUTH_WITH_STATE_CALLBACK_URL = GOOGLE_OAUTH_CALLBACK_URL + "&state=";
+	
 	public interface LoginWidgetViewImplUiBinder extends UiBinder<Widget, LoginWidgetViewImpl> {}
 	@UiField
 	Div loginFormContainer;
@@ -36,6 +37,7 @@ public class LoginWidgetViewImpl extends Composite implements
 	FormPanel loginForm = null;
 	
 	private Presenter presenter;
+	
 	
 	@Inject
 	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder) {

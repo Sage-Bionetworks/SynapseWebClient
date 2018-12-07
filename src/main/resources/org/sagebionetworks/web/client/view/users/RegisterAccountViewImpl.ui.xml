@@ -7,8 +7,8 @@
 	<g:HTMLPanel>
 		<div class="container margin-top-15 min-height-400">
 			<bh:Div width="365px" addStyleNames="center-in-div">
+				<b:Heading size="H2" text="Create Synapse Account" addStyleNames="text-align-center margin-top-20"/>
 				<bh:Div width="100%" ui:field="googleSynapseAccountCreationUI">
-					<b:Heading size="H2" text="Create Synapse Account" addStyleNames="text-align-center margin-top-20"/>
 					<b:Heading size="H4" subText="Choose a username" addStyleNames="flexcontainer-justify-center margin-top-20"/>
 					<b:FormGroup>
 						<b:TextBox ui:field="userNameField" placeholder="" />

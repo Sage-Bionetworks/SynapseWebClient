@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.unitserver.servlet.oaut;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.contains;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;

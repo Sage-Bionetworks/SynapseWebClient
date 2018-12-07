@@ -25,7 +25,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class RegisterAccountViewImpl extends Composite implements RegisterAccountView {
-	public static final String GOOGLE_OAUTH_CALLBACK_URL = LoginWidgetViewImpl.GOOGLE_OAUTH_CALLBACK_URL + "&state=";
 	public interface RegisterAccountViewImplUiBinder extends UiBinder<Widget, RegisterAccountViewImpl> {}
 	
 	@UiField
@@ -71,7 +70,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 		googleSignUpButton.addClickHandler(event -> {
 			if(checkUsernameFormat()) {
 				String encodedUsername = URL.encodeQueryString(userNameField.getValue());
-				Window.Location.assign(GOOGLE_OAUTH_CALLBACK_URL + encodedUsername);
+				Window.Location.assign(LoginWidgetViewImpl.GOOGLE_OAUTH_WITH_STATE_CALLBACK_URL + encodedUsername);
 			}
 		});
 	}
