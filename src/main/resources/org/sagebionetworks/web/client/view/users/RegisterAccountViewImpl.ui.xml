@@ -8,7 +8,18 @@
 		<div class="container margin-top-15 min-height-400">
 			<bh:Div width="365px" addStyleNames="center-in-div">
 				<b:Heading size="H2" text="Create Synapse Account" addStyleNames="text-align-center margin-top-20"/>
-				<b:Heading size="H4" subText="Please enter your email address and we will send you the instructions on how to complete the registration process." addStyleNames="flexcontainer-justify-center margin-top-20"/>
+				<bh:Div width="100%" ui:field="googleSynapseAccountCreationUI">
+					<b:Heading size="H4" subText="Choose a username" addStyleNames="flexcontainer-justify-center margin-top-20"/>
+					<b:FormGroup>
+						<b:TextBox ui:field="userNameField" placeholder="" />
+					</b:FormGroup>
+					<bh:Div ui:field="googleSynAlertContainer" marginBottom="10"/>
+					<b:Button icon="GOOGLE" ui:field="googleSignUpButton" iconSize="LARGE" size="LARGE" iconFixedWidth="true" width="100%" addStyleNames="lightGreyBackground no-background" text="Sign up with Google"></b:Button>
+					<bh:Div addStyleNames="centered-in-hr" marginTop="40" marginBottom="40">
+						<bh:Span addStyleNames="lightGreyText">or</bh:Span>
+					</bh:Div>
+				</bh:Div>
+				<b:Heading size="H4" subText="Enter your email address and we will send you the instructions on how to complete the registration process." addStyleNames="flexcontainer-justify-center margin-top-20"/>
 				<bh:Div ui:field="registerWidgetContainer" addStyleNames="margin-top-20"/>
 				<b:Heading size="H5" addStyleNames="text-align-center margin-top-20">
 					<b:Anchor text="&lt; Back to Sign In" addStyleNames="synapse-green" href="#!LoginPlace:0"/>

@@ -42,8 +42,6 @@ public class DownPresenterTest {
 	PlaceChanger mockPlaceChanger;
 	@Mock
 	Down mockDownPlace;
-	@Mock
-	Place mockLastPlace;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
 	@Captor
@@ -103,9 +101,8 @@ public class DownPresenterTest {
 	@Test
 	public void testRepoUpHasLastPlace() {
 		// (note that the stack status has been set up to return READ_WRITE already
-		when(mockGlobalAppState.getLastPlace()).thenReturn(mockLastPlace);
 		presenter.checkForRepoDown();
-		verify(mockGlobalAppState).gotoLastPlace();
+		verify(mockGlobalAppState).back();
 	}
 	
 	@Test

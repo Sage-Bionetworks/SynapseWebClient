@@ -11,7 +11,9 @@
 			<b:Button icon="GOOGLE" ui:field="googleSignInButton" iconSize="LARGE" size="LARGE" iconFixedWidth="true" width="100%" addStyleNames="lightGreyBackground no-background">Sign
 				in with Google</b:Button>
 		</g:SimplePanel>
-		<b:Heading size="H4" subText="or" addStyleNames="text-align-center margin-top-20"/>
+		<bh:Div addStyleNames="centered-in-hr" marginTop="40" marginBottom="40">
+			<bh:Span addStyleNames="lightGreyText">or</bh:Span>
+		</bh:Div>
 		<b:Heading size="H4" subText="Sign in with your Synapse account" addStyleNames="text-align-center margin-top-20"/>
 		<bh:Div ui:field="loginFormContainer" />
 		<b:Row>

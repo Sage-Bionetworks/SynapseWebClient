@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -30,6 +31,7 @@ import org.sagebionetworks.web.shared.WebConstants;
  *
  */
 public class FileHandleAssociationServlet extends HttpServlet {
+	public static final String ERROR_PLACE = "#!Error:";
 	private static final long serialVersionUID = 1L;
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
@@ -114,12 +116,7 @@ public class FileHandleAssociationServlet extends HttpServlet {
 			}
 		} catch (SynapseException e) {
 			//redirect to error place with an entry
-			LogEntry entry = new LogEntry();
-			entry.setLabel("Download");
-			entry.setMessage(e.getMessage());
-//			entry.setStacktrace(ExceptionUtils.getStackTrace(e));
-			String entryString = SerializationUtils.serializeAndHexEncode(entry);
-			response.sendRedirect(getBaseUrl(request) + "#!Error:"+entryString);
+			response.sendRedirect(FileHandleAssociationServlet.getBaseUrl(request) + FileHandleAssociationServlet.ERROR_PLACE + URLEncoder.encode(e.getMessage()));
 		}
 	}
 		
@@ -147,7 +144,7 @@ public class FileHandleAssociationServlet extends HttpServlet {
 		return client;
 	}
 
-	private String getBaseUrl(HttpServletRequest request) {
+	public static final String getBaseUrl(HttpServletRequest request) {
 		StringBuffer url = request.getRequestURL();
 		String uri = request.getRequestURI();
 		String ctx = request.getContextPath();

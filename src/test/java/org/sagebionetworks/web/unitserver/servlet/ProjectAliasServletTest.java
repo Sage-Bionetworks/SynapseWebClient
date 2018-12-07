@@ -64,6 +64,8 @@ public class ProjectAliasServletTest {
 		StringBuffer sb = new StringBuffer();
 		sb.append(testAliasUrl);
 		when(mockRequest.getRequestURL()).thenReturn(sb);
+		when(mockRequest.getRequestURI()).thenReturn("");
+		when(mockRequest.getContextPath()).thenReturn("");
 		
 		EntityId id = new EntityId();
 		id.setId(testAliasSynapseId);
@@ -105,7 +107,7 @@ public class ProjectAliasServletTest {
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockResponse).sendRedirect(captor.capture());
 		String value = captor.getValue();
-		assertTrue(value.contains("/#!Error:"));
+		assertTrue(value.contains("#!Error:"));
 	}
 }	
 

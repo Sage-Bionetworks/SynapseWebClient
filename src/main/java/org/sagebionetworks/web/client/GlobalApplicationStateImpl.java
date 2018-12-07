@@ -453,4 +453,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		}
 		finalCallback.invoke();
 	}
+	@Override
+	public void back() {
+		view.back();
+	}
 }

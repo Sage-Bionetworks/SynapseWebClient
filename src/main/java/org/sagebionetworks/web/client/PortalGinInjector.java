@@ -305,7 +305,6 @@ public interface PortalGinInjector extends Ginjector {
 	CertificatePresenter getCertificatePresenter();
 
 	AccountPresenter getAccountPresenter();
-
 	NewAccountPresenter getNewAccountPresenter();
 
 	SignedTokenPresenter getSignedTokenPresenter();
