@@ -19,6 +19,7 @@ import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.repo.model.oauth.OAuthAccountCreationRequest;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.oauth.OAuthUrlRequest;
 import org.sagebionetworks.repo.model.oauth.OAuthUrlResponse;
@@ -86,6 +87,27 @@ public class OAuth2SessionServletTest {
 		assertEquals("http://127.0.0.1:8888/?oauth2provider=GOOGLE_OAUTH_2_0",request.getRedirectUrl());
 		assertEquals(OAuthProvider.GOOGLE_OAUTH_2_0, request.getProvider());
 		assertEquals(authCode, request.getAuthenticationCode());
+		verify(mockResponse).sendRedirect("/#!LoginPlace:sessiontoken");
+	}
+	
+	@Test
+	public void testCreateAccountViaOAuth() throws ServletException, IOException, SynapseException{
+		ArgumentCaptor<OAuthAccountCreationRequest> argument = ArgumentCaptor.forClass(OAuthAccountCreationRequest.class);
+		Session session = new Session();
+		String state = "my-username";
+		session.setSessionToken("sessiontoken");
+		when(mockClient.createAccountViaOAuth2(argument.capture())).thenReturn(session);
+		when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER)).thenReturn(OAuthProvider.GOOGLE_OAUTH_2_0.name());
+		when(mockRequest.getParameter(WebConstants.OAUTH2_STATE)).thenReturn(state);
+		String authCode = "authCode";
+		when(mockRequest.getParameter(WebConstants.OAUTH2_CODE)).thenReturn(authCode);
+		servlet.doGet(mockRequest, mockResponse);
+		OAuthAccountCreationRequest request = argument.getValue();
+		assertNotNull(request);
+		assertEquals("http://127.0.0.1:8888/?oauth2provider=GOOGLE_OAUTH_2_0",request.getRedirectUrl());
+		assertEquals(OAuthProvider.GOOGLE_OAUTH_2_0, request.getProvider());
+		assertEquals(authCode, request.getAuthenticationCode());
+		assertEquals(state, request.getUserName());
 		verify(mockResponse).sendRedirect("/#!LoginPlace:sessiontoken");
 	}
 	

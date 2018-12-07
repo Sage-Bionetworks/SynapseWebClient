@@ -2,11 +2,7 @@ package org.sagebionetworks.web.client.widget.login;
 
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -42,7 +38,7 @@ public class LoginWidgetViewImpl extends Composite implements
 	private Presenter presenter;
 	
 	@Inject
-	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder, CookieProvider cookies) {
+	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder) {
 		initWidget(binder.createAndBindUi(this));
 		loginForm = FormPanel.wrap(DOM.getElementById("login_form"));
 		
