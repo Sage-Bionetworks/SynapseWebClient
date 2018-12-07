@@ -1,11 +1,13 @@
 package org.sagebionetworks.web.unitserver.servlet.oaut;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.verify;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +18,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.client.SynapseClient;
+import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.repo.model.auth.Session;
@@ -47,6 +50,8 @@ public class OAuth2SessionServletTest {
 		servlet.setSynapseProvider(mockSynapseProvider);
 		url = "http://127.0.0.1:8888/";
 		when(mockRequest.getRequestURL()).thenReturn(new StringBuffer(url));
+		when(mockRequest.getRequestURI()).thenReturn("");
+		when(mockRequest.getContextPath()).thenReturn("");
 	}
 	
 	@Test
@@ -109,6 +114,21 @@ public class OAuth2SessionServletTest {
 		assertEquals(authCode, request.getAuthenticationCode());
 		assertEquals(state, request.getUserName());
 		verify(mockResponse).sendRedirect("/#!LoginPlace:sessiontoken");
+	}
+	
+	@Test
+	public void testCreateAccountViaOAuthError() throws ServletException, IOException, SynapseException{
+		String state = "my-username";
+		String errorMessage = "this be an error during oauth based account creation";
+		when(mockClient.createAccountViaOAuth2(any(OAuthAccountCreationRequest.class))).thenThrow(new SynapseBadRequestException(errorMessage));
+		when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER)).thenReturn(OAuthProvider.GOOGLE_OAUTH_2_0.name());
+		when(mockRequest.getParameter(WebConstants.OAUTH2_STATE)).thenReturn(state);
+		String authCode = "authCode";
+		when(mockRequest.getParameter(WebConstants.OAUTH2_CODE)).thenReturn(authCode);
+		
+		servlet.doGet(mockRequest, mockResponse);
+		
+		verify(mockResponse).sendRedirect(contains(URLEncoder.encode(errorMessage)));
 	}
 	
 	@Test
