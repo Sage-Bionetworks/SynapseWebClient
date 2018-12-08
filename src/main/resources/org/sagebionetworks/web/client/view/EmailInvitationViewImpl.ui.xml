@@ -10,14 +10,6 @@
 		<w:LoadingSpinner ui:field="loading" size="31px" addStyleNames="center-block margin-top-100"/>
 		<b:Column size="XS_12, MD_6" offset="MD_3">
 			<g:SimplePanel ui:field="synapseAlertContainer"/>
-			<bh:Div ui:field="notLoggedInContainer" visible="false">
-				<b:Heading ui:field="invitationTitle" size="H4" addStyleNames="margin-top-20"/>
-				<b:BlockQuote ui:field="invitationMessageWrapper" visible="false">
-					<b:Heading ui:field="invitationMessage" size="H5" addStyleNames="margin-top-10"/>
-				</b:BlockQuote>
-				<bh:Div ui:field="registerWidgetContainer" addStyleNames="margin-top-10"/>
-				<b:Button ui:field="loginButton" text="Already have an account?" size="LARGE" width="100%" addStyleNames="margin-top-10"/>
-			</bh:Div>
 		</b:Column>
 	</b:Container>
 </ui:UiBinder>
