@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.SynapseFutureClient;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.EmailInvitationPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.EmailInvitationView;
@@ -95,11 +96,13 @@ public class EmailInvitationPresenterTest {
 		when(inviterProfile.getUserName()).thenReturn("Nick");
 		
 		presenter.setPlace(place);
-		
 		verify(view).setSynapseAlertContainer(synapseAlert.asWidget());
-		ArgumentCaptor<LoginPlace> captor = ArgumentCaptor.forClass(LoginPlace.class);
+		verify(view).showNotLoggedInUI();
+		
+		presenter.onRegisterClick();
+		ArgumentCaptor<RegisterAccount> captor = ArgumentCaptor.forClass(RegisterAccount.class);
 		verify(placeChanger).goTo(captor.capture());
-		assertEquals(LoginPlace.LOGIN_TOKEN, captor.getValue().toToken());
+		assertEquals("invitee@email.com", captor.getValue().toToken());
 	}
 
 	@Test
@@ -118,5 +121,13 @@ public class EmailInvitationPresenterTest {
 		presenter.setPlace(place);
 		verify(synapseAlert).handleException(any(Throwable.class));
 		verify(jsClient, never()).updateInviteeId(any());
+	}
+
+	@Test
+	public void testOnLoginClick() {
+		presenter.onLoginClick();
+		ArgumentCaptor<LoginPlace> captor = ArgumentCaptor.forClass(LoginPlace.class);
+		verify(placeChanger).goTo(captor.capture());
+		assertEquals(LoginPlace.LOGIN_TOKEN, captor.getValue().toToken());
 	}
 }
