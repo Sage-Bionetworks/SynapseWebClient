@@ -1,5 +1,10 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.BlockQuote;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -16,14 +21,30 @@ public class EmailInvitationViewImpl extends Composite implements EmailInvitatio
 	@UiField
 	LoadingSpinner loading;
 	@UiField
+	Div notLoggedInContainer;
+	@UiField
 	SimplePanel synapseAlertContainer;
-	private Header headerWidget;
+	@UiField
+	Heading invitationTitle;
+	@UiField
+	BlockQuote invitationMessageWrapper;
+	@UiField
+	Heading invitationMessage;
+	@UiField
+	Anchor loginLink;
+	@UiField
+	Button registerButton;
 
+	private Presenter presenter;
+	private Header headerWidget;
+	
 	@Inject
 	public EmailInvitationViewImpl(EmailInvitationViewImplUiBinder binder,
 								   Header headerWidget) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
+		loginLink.addClickHandler(event -> presenter.onLoginClick());
+		registerButton.addClickHandler(event -> presenter.onRegisterClick());
 	}
 
 	@Override
@@ -32,7 +53,19 @@ public class EmailInvitationViewImpl extends Composite implements EmailInvitatio
 	}
 
 	@Override
-	public void refreshHeader() {
+	public void setInvitationTitle(String title) {
+		invitationTitle.setText(title);
+	}
+
+	@Override
+	public void setInvitationMessage(String message) {
+		invitationMessageWrapper.setVisible(true);
+		invitationMessage.setText(message);
+	}
+
+	@Override
+	public void setPresenter(final Presenter presenter) {
+		this.presenter = presenter;
 		headerWidget.configure();
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
@@ -51,6 +84,17 @@ public class EmailInvitationViewImpl extends Composite implements EmailInvitatio
 	@Override
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message);
+	}
+
+	@Override
+	public void clear() {
+		notLoggedInContainer.setVisible(false);
+		invitationMessageWrapper.setVisible(false);
+	}
+
+	@Override
+	public void showNotLoggedInUI() {
+		notLoggedInContainer.setVisible(true);
 	}
 
 	public interface EmailInvitationViewImplUiBinder extends UiBinder<Widget, EmailInvitationViewImpl> {
