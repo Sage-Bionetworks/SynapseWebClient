@@ -32,7 +32,7 @@ import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 
-public class EmailInvitationPresenter extends AbstractActivity implements EmailInvitationView.Presenter, Presenter<EmailInvitation> {
+public class EmailInvitationPresenter extends AbstractActivity implements Presenter<EmailInvitation> {
 	private String encodedMISignedToken;
 	private EmailInvitationView view;
 	private RegisterWidget registerWidget;
@@ -45,16 +45,12 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 	@Inject
 	public EmailInvitationPresenter(
 			EmailInvitationView view,
-			RegisterWidget registerWidget,
 			SynapseJavascriptClient jsClient,
 			SynapseFutureClient futureClient,
 			SynapseAlert synapseAlert,
 			AuthenticationController authController,
 			GlobalApplicationState globalApplicationState) {
 		this.view = view;
-		this.registerWidget = registerWidget;
-		this.registerWidget.enableEmailAddressField(false);
-		this.view.setRegisterWidget(this.registerWidget.asWidget());
 		this.jsClient = jsClient;
 		this.futureClient = futureClient;
 		this.synapseAlert = synapseAlert;
@@ -72,7 +68,6 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 	public void setPlace(EmailInvitation place) {
 		view.showLoading();
 		view.clear();
-		view.setPresenter(this);
 		encodedMISignedToken = place.toToken();
 
 		futureClient.hexDecodeAndDeserialize(NotificationTokenType.EmailInvitation.name(), encodedMISignedToken)
@@ -85,7 +80,7 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 						public void onSuccess(MembershipInvitation mis) {
 							teamId = mis.getTeamId();
 							if (!authController.isLoggedIn()) {
-								initializeView(mis);
+								placeChanger.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 							} else {
 								bindInvitationToAuthenticatedUser(mis.getId());
 							}
@@ -99,7 +94,6 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 					},
 					directExecutor()
 			);
-
 	}
 
 	private void bindInvitationToAuthenticatedUser(final String misId) {
@@ -122,55 +116,5 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 					},
 					directExecutor()
 			);
-	}
-
-	private void initializeView(final MembershipInvitation mis) {
-		view.showNotLoggedInUI();
-		registerWidget.setEncodedMembershipInvtnSignedToken(encodedMISignedToken);
-		registerWidget.setEmail(mis.getInviteeEmail());
-		view.hideLoading();
-
-		ListenableFuture<Team> teamFuture;
-		ListenableFuture<UserProfile> userProfileFuture;
-
-		teamFuture = jsClient.getTeam(mis.getTeamId());
-		userProfileFuture = jsClient.getUserProfile(mis.getCreatedBy());
-		FluentFuture.from(whenAllComplete(teamFuture, userProfileFuture)
-				.call(() -> {
-							// Retrieve the resolved values from the futures
-							Team team = getDone(teamFuture);
-							UserProfile userProfile = getDone(userProfileFuture);
-							// Build the message
-							String title = "You have been invited to join ";
-							if (team.getName() != null) {
-								title += " the team " + team.getName();
-							} else {
-								title += " a team";
-							}
-							String displayName = getDisplayName(userProfile);
-							if (displayName != null) {
-								title += " by " + displayName;
-							}
-							view.setInvitationTitle(title);
-							String message = mis.getMessage();
-							if (message != null) {
-								view.setInvitationMessage(mis.getMessage());
-							}
-							return null;
-						},
-						directExecutor())
-				).catching(
-						Throwable.class,
-						e -> {
-							synapseAlert.handleException(e);
-							return null;
-						},
-						directExecutor()
-				);
-	}
-
-	@Override
-	public void onLoginClick() {
-		placeChanger.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 	}
 }

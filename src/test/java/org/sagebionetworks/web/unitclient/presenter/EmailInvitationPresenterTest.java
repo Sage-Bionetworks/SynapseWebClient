@@ -40,7 +40,6 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 @RunWith(MockitoJUnitRunner.class)
 public class EmailInvitationPresenterTest {
 	@Mock private EmailInvitationView view;
-	@Mock private RegisterWidget registerWidget;
 	@Mock private SynapseJavascriptClient jsClient;
 	@Mock private SynapseFutureClient futureClient;
 	@Mock private SynapseAlert synapseAlert;
@@ -60,7 +59,7 @@ public class EmailInvitationPresenterTest {
 	public void before() {
 		when(globalApplicationState.getPlaceChanger()).thenReturn(placeChanger);
 		presenter = new EmailInvitationPresenter(
-				view, registerWidget, jsClient, futureClient, synapseAlert, authController, globalApplicationState);
+				view, jsClient, futureClient, synapseAlert, authController, globalApplicationState);
 	}
 
 	public void beforeSetPlace(boolean loggedIn) {
@@ -99,15 +98,13 @@ public class EmailInvitationPresenterTest {
 		when(inviterProfile.getFirstName()).thenReturn("First");
 		when(inviterProfile.getLastName()).thenReturn("Last");
 		when(inviterProfile.getUserName()).thenReturn("Nick");
+		
 		presenter.setPlace(place);
-		verify(view).showNotLoggedInUI();
-		verify(registerWidget).enableEmailAddressField(false);
-		verify(view).setRegisterWidget(registerWidget.asWidget());
+		
 		verify(view).setSynapseAlertContainer(synapseAlert.asWidget());
-		verify(registerWidget).setEncodedMembershipInvtnSignedToken(encodedMISignedToken);
-		verify(registerWidget).setEmail(mis.getInviteeEmail());
-		verify(view).setInvitationTitle(contains(getDisplayName(inviterProfile)));
-		verify(view).setInvitationMessage(mis.getMessage());
+		ArgumentCaptor<LoginPlace> captor = ArgumentCaptor.forClass(LoginPlace.class);
+		verify(placeChanger).goTo(captor.capture());
+		assertEquals(LoginPlace.LOGIN_TOKEN, captor.getValue().toToken());
 	}
 
 	@Test
@@ -126,13 +123,5 @@ public class EmailInvitationPresenterTest {
 		presenter.setPlace(place);
 		verify(synapseAlert).handleException(any(Throwable.class));
 		verify(jsClient, never()).updateInviteeId(any());
-	}
-
-	@Test
-	public void testOnLoginClick() {
-		presenter.onLoginClick();
-		ArgumentCaptor<LoginPlace> captor = ArgumentCaptor.forClass(LoginPlace.class);
-		verify(placeChanger).goTo(captor.capture());
-		assertEquals(LoginPlace.LOGIN_TOKEN, captor.getValue().toToken());
 	}
 }
