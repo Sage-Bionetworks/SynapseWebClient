@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.BlockQuote;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
@@ -8,8 +9,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -32,24 +31,20 @@ public class EmailInvitationViewImpl extends Composite implements EmailInvitatio
 	@UiField
 	Heading invitationMessage;
 	@UiField
-	Div registerWidgetContainer;
+	Anchor loginLink;
 	@UiField
-	Button loginButton;
+	Button registerButton;
 
 	private Presenter presenter;
 	private Header headerWidget;
-
+	
 	@Inject
 	public EmailInvitationViewImpl(EmailInvitationViewImplUiBinder binder,
 								   Header headerWidget) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
-		loginButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent clickEvent) {
-				presenter.onLoginClick();
-			}
-		});
+		loginLink.addClickHandler(event -> presenter.onLoginClick());
+		registerButton.addClickHandler(event -> presenter.onRegisterClick());
 	}
 
 	@Override
@@ -66,12 +61,6 @@ public class EmailInvitationViewImpl extends Composite implements EmailInvitatio
 	public void setInvitationMessage(String message) {
 		invitationMessageWrapper.setVisible(true);
 		invitationMessage.setText(message);
-	}
-
-	@Override
-	public void setRegisterWidget(Widget w) {
-		registerWidgetContainer.clear();
-		registerWidgetContainer.add(w);
 	}
 
 	@Override
