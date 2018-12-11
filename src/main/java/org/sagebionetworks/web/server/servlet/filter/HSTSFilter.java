@@ -26,7 +26,7 @@ public class HSTSFilter implements Filter {
 			FilterChain filterChain) throws IOException, ServletException {
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
 		//PLFM-4966: add hsts header to response.  It only has an effect if connection is https, so this will have no impact in the client dev environment.
-		httpResponse.setHeader(STRICT_TRANSPORT_SECURITY, MAX_AGE + MAX_AGE_SECONDS);
+		httpResponse.setHeader(STRICT_TRANSPORT_SECURITY, MAX_AGE + MAX_AGE_SECONDS + "; includeSubdomains; preload");
 		filterChain.doFilter(request, response);
 	}
 	
