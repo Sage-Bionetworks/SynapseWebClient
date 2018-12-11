@@ -3,28 +3,34 @@ package org.sagebionetworks.web.client.widget.header;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
+import org.sagebionetworks.web.client.events.WikiSubpagesCollapseEvent;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Trash;
-import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 
+import com.google.gwt.core.shared.GWT;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.binder.EventHandler;
 
 public class Header implements HeaderView.Presenter, IsWidget {
 
+	public static final String SYNAPSE = "SYNAPSE";
 	public static final String N_A = "n/a";
 	public static final String ANONYMOUS = "VISITOR_UNIQUE_ID";
 	public static final String SYNAPSE_ORG = "@synapse.org";
@@ -50,18 +56,21 @@ public class Header implements HeaderView.Presenter, IsWidget {
 			FavoriteWidget favWidget, 
 			SynapseJSNIUtils synapseJSNIUtils, 
 			PendoSdk pendoSdk,
-			PortalGinInjector portalGinInjector) {
+			PortalGinInjector portalGinInjector,
+			EventBus eventBus) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.jsClient = jsClient;
 		this.favWidget = favWidget;
+		favWidget.setLoadingSize(16);
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.portalGinInjector = portalGinInjector;
 		view.clear();
 		this.pendoSdk = pendoSdk;
 		view.setPresenter(this);
 		initStagingAlert();
+		view.getEventBinder().bindEventHandlers(this, eventBus);
 	}
 	
 	public void initStagingAlert() {
@@ -70,36 +79,18 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		view.setStagingAlertVisible(visible);
 	}
 	
-	public void setMenuItemActive(MenuItems menuItem) {
-		view.setMenuItemActive(menuItem);
-	}
-
-	public void removeMenuItemActive(MenuItems menuItem) {
-		view.removeMenuItemActive(menuItem);
-	}
-	
-	public void configure(boolean largeLogo) {
-		view.setProjectHeaderText("Synapse");
+	public void configure() {
+		view.setProjectHeaderText(SYNAPSE);
 		view.setProjectHeaderAnchorTarget("#");
 		view.hideProjectFavoriteWidget();
-		setLogo(largeLogo);
 	}
 	
-	public void setLogo(boolean largeLogo) {
-		if (largeLogo) {
-			view.showLargeLogo();
-		} else {
-			view.showSmallLogo();
-		}
-	}
-	
-	public void configure(boolean largeLogo, EntityHeader projectHeader) {
+	public void configure(EntityHeader projectHeader) {
 		String projectId = projectHeader.getId();
 		favWidget.configure(projectId);
 		view.setProjectHeaderAnchorTarget("#!Synapse:" + projectId);
 		view.setProjectHeaderText(projectHeader.getName());
 		view.showProjectFavoriteWidget();
-		setLogo(largeLogo);
 	}
 
 	public Widget asWidget() {
@@ -112,16 +103,19 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	}
 
 	public void refresh() {
-		UserSessionData userSessionData = authenticationController.getCurrentUserSessionData();
-		view.setUser(userSessionData);
+		UserProfile profile = authenticationController.getCurrentUserProfile();
+		view.setUser(profile);
 		view.refresh();
 		view.setSearchVisible(true);
 		view.setProjectFavoriteWidget(favWidget);
-		if (authenticationController.isLoggedIn() && userSessionData.getProfile() != null) {
-			String userName = userSessionData.getProfile().getUserName();
+		if (authenticationController.isLoggedIn() && profile != null) {
+			String userName = profile.getUserName();
 			pendoSdk.initialize(authenticationController.getCurrentUserPrincipalId(), userName + SYNAPSE_ORG);
+			refreshFavorites();
+			onDownloadListUpdatedEvent(null);
 		} else {
 			pendoSdk.initialize(ANONYMOUS, N_A);
+			view.setDownloadListUIVisible(false);
 		}
 	}
 
@@ -143,28 +137,13 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	}
 
 	@Override
-	public void onDashboardClick() {
-		if (authenticationController.isLoggedIn()) {
-			globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()));
-		} else {
-			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-		}	
-	}
-
-	@Override
 	public void onLoginClick() {
 		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));	
 	}
 
 	@Override
-	public void onRegisterClick() {
-		globalApplicationState.getPlaceChanger().goTo(new RegisterAccount(ClientProperties.DEFAULT_PLACE_TOKEN));	
-	}
-
-	@Override
-	public void onFavoriteClick() {
+	public void refreshFavorites() {
 		if(authenticationController.isLoggedIn()) {
-			view.showFavoritesLoading();
 			jsClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
 				@Override
 				public void onSuccess(List<EntityHeader> favorites) {
@@ -183,5 +162,21 @@ public class Header implements HeaderView.Presenter, IsWidget {
 				}
 			});
 		}
+	}
+	@EventHandler
+	public void onDownloadListUpdatedEvent(DownloadListUpdatedEvent event) {
+		//update Download List count, show if > 0
+		jsClient.getDownloadList(new AsyncCallback<DownloadList>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setDownloadListUIVisible(false);
+				synapseJSNIUtils.consoleError("Unable to get download list! " + caught.getMessage());
+			}
+			public void onSuccess(DownloadList downloadList) {
+				int count = downloadList.getFilesToDownload().size();
+				view.setDownloadListUIVisible(count > 0);
+				view.setDownloadListFileCount(count);
+			};
+		});
 	}
 }

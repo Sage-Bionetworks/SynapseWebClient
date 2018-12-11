@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -17,11 +15,9 @@ import org.sagebionetworks.repo.model.file.S3UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
@@ -35,34 +31,30 @@ import com.google.inject.Inject;
 public class EntityMetadata implements Presenter {
 
 	private EntityMetadataView view;
-	private EntityUpdatedHandler entityUpdatedHandler;
 	private AnnotationsRendererWidget annotationsWidget;
-	private DoiWidget doiWidget;
+	private DoiWidgetV2 doiWidgetV2;
 	private FileHistoryWidget fileHistoryWidget;
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private SynapseJSNIUtils jsni;
 	private org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget restrictionWidgetV2;
-	private CookieProvider cookies;
-	boolean isShowingAnnotations, isShowingFileHistory;
+
+	boolean isShowingAnnotations;
 	@Inject
-	public EntityMetadata(EntityMetadataView view, 
-			DoiWidget doiWidget,
+	public EntityMetadata(EntityMetadataView view,
+						  DoiWidgetV2 doiWidgetV2,
 			AnnotationsRendererWidget annotationsWidget,
 			FileHistoryWidget fileHistoryWidget, 
-			SynapseClientAsync synapseClient, 
+			SynapseJavascriptClient jsClient, 
 			SynapseJSNIUtils jsni,
-			RestrictionWidget restrictionWidgetV2,
-			CookieProvider cookies) {
+			RestrictionWidget restrictionWidgetV2) {
 		this.view = view;
-		this.doiWidget = doiWidget;
+		this.doiWidgetV2 = doiWidgetV2;
 		this.annotationsWidget = annotationsWidget;
 		this.fileHistoryWidget = fileHistoryWidget;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
+		this.jsClient = jsClient;
 		this.jsni = jsni;
 		this.restrictionWidgetV2 = restrictionWidgetV2;
-		this.cookies = cookies;
-		this.view.setDoiWidget(doiWidget);
+		this.view.setDoiWidget(doiWidgetV2);
 		this.view.setAnnotationsRendererWidget(annotationsWidget);
 		this.view.setFileHistoryWidget(fileHistoryWidget);
 		this.view.setRestrictionWidgetV2(restrictionWidgetV2);
@@ -81,58 +73,42 @@ public class EntityMetadata implements Presenter {
 		Entity en = bundle.getEntity();
 		view.setEntityId(en.getId());
 		boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
-		
-		boolean isCurrentVersion = versionNumber == null;
-		if (bundle.getEntity() instanceof FileEntity) {
-			fileHistoryWidget.setEntityBundle(bundle, versionNumber);
-			view.setFileHistoryWidget(fileHistoryWidget);
-			view.setRestrictionPanelVisible(true);
-		} else {
-			view.setRestrictionPanelVisible(en instanceof TableEntity
-					|| en instanceof Folder || en instanceof DockerRepository);
-		}
-		configureStorageLocation(en);
-		doiWidget.configure(bundle.getDoi(), en.getId());
-		annotationsWidget.configure(bundle, canEdit, isCurrentVersion);
-		restrictionWidgetV2.configure(en, bundle.getPermissions().getCanChangePermissions());
 		isShowingAnnotations = false;
 		setAnnotationsVisible(isShowingAnnotations);
-		isShowingFileHistory = false;
-		setFileHistoryVisible(isShowingFileHistory);
+		fileHistoryWidget.setVisible(false);
 		actionMenu.setActionListener(Action.SHOW_ANNOTATIONS, action -> {
 			isShowingAnnotations = !isShowingAnnotations;
 			setAnnotationsVisible(isShowingAnnotations);
 		});
 		
 		actionMenu.setActionListener(Action.SHOW_FILE_HISTORY, action -> {
-			isShowingFileHistory = !isShowingFileHistory;
-			setFileHistoryVisible(isShowingFileHistory);
+			fileHistoryWidget.setVisible(!fileHistoryWidget.isVisible());
 		});
+
+		boolean isCurrentVersion = versionNumber == null;
+		if (bundle.getEntity() instanceof FileEntity) {
+			fileHistoryWidget.setEntityBundle(bundle, versionNumber);
+			view.setRestrictionPanelVisible(true);
+		} else {
+			fileHistoryWidget.setVisible(false);
+			view.setRestrictionPanelVisible(en instanceof TableEntity
+					|| en instanceof Folder || en instanceof DockerRepository);
+		}
+		configureStorageLocation(en);
+		doiWidgetV2.configure(bundle.getDoiAssociation());
+		annotationsWidget.configure(bundle, canEdit, isCurrentVersion);
+		restrictionWidgetV2.configure(en, bundle.getPermissions().getCanChangePermissions());
 	}
 	public void setVisible(boolean visible) {
 		view.setDetailedMetadataVisible(visible);
 	}
-	@Override
-	public void fireEntityUpdatedEvent() {
-		if (entityUpdatedHandler != null)
-			entityUpdatedHandler.onPersistSuccess(new EntityUpdatedEvent());
-	}
-	
-	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		this.entityUpdatedHandler = handler;
-		this.annotationsWidget.setEntityUpdatedHandler(entityUpdatedHandler);
-	}
-
+		
 	public void setAnnotationsVisible(boolean visible) {
 		view.setAnnotationsVisible(visible);
 	}
 	
-	public void setFileHistoryVisible(boolean visible) {
-		view.setFileHistoryVisible(visible);
-	}
-	
 	public void clear() {
-		doiWidget.clear();
+		doiWidgetV2.clear();
 		view.clear();
 	}
 	
@@ -140,7 +116,7 @@ public class EntityMetadata implements Presenter {
 		 view.setUploadDestinationPanelVisible(false);
 		 if (en instanceof Folder || en instanceof Project) {
 			 String containerEntityId = en.getId();
-			 synapseClient.getUploadDestinations(containerEntityId, new AsyncCallback<List<UploadDestination>>() {
+			 jsClient.getUploadDestinations(containerEntityId, new AsyncCallback<List<UploadDestination>>() {
 				public void onSuccess(List<UploadDestination> uploadDestinations) {
 					if (uploadDestinations == null || uploadDestinations.isEmpty() || uploadDestinations.get(0) instanceof S3UploadDestination) {
 						view.setUploadDestinationText("Synapse Storage");

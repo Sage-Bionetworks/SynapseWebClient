@@ -61,13 +61,13 @@ public class WikiDiffViewImpl implements WikiDiffView {
 		w = binder.createAndBindUi(this);
 		this.headerWidget = headerWidget;
 		this.ginInjector = ginInjector;
-		headerWidget.configure(false);
+		headerWidget.configure();
 	}
 
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

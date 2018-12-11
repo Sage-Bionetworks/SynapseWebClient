@@ -173,7 +173,7 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
+	public void showInfo(String message) {
 	}
 
 	@Override

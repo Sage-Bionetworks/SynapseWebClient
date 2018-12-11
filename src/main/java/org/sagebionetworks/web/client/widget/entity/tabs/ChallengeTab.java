@@ -38,7 +38,7 @@ public class ChallengeTab implements ChallengeTabView.Presenter{
 	
 	public void configure(String entityId, String entityName) {
 		lazyInject();
-		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, null, EntityArea.ADMIN, null));
+		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, null, EntityArea.CHALLENGE, null));
 		challengeWidget.configure(entityId);
 		evaluationList.configure(entityId);
 	}

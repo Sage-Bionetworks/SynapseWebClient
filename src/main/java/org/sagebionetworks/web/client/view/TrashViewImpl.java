@@ -10,7 +10,6 @@ import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -24,6 +23,7 @@ import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -52,9 +52,6 @@ public class TrashViewImpl extends Composite implements TrashView {
 	private static final String EMPTY_TRASH_CONFIRM_MESSAGE = "You can't undo this action.";
 	
 	private static final int MAX_PAGES_IN_PAGINATION = 10;
-	
-	@UiField
-	Button deleteAllButton;
 	@UiField
 	FlowPanel trashTableAndPaginationPanel;
 	@UiField
@@ -86,25 +83,10 @@ public class TrashViewImpl extends Composite implements TrashView {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.synapseJsniUtils = synapseJsniUtils;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		trash2Row = new HashMap<TrashedEntity, Integer>();
 		selectedTrash = new HashSet<TrashedEntity>();
 		checkBoxes = new HashSet<CheckBox>();
-		
-		// Set up the delete all button.
-		deleteAllButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.showConfirmDialog(EMPTY_TRASH_CONFIRM_TITLE, EMPTY_TRASH_CONFIRM_MESSAGE, new Callback() {
-					
-					@Override
-					public void invoke() {
-						presenter.purgeAll();
-					}
-					
-				});
-			}
-		});
 		
 		// Set up delete selected button.
 		ButtonUtils.setEnabledAndType(false, deleteSelectedButton, ButtonType.DANGER);
@@ -151,7 +133,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();
 		clear();
 		Window.scrollTo(0, 0); // scroll user to top of page
@@ -190,8 +172,8 @@ public class TrashViewImpl extends Composite implements TrashView {
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override
@@ -383,7 +365,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 		fp.add(ul);
 		paginationPanel.clear();
 		if (entries.size() > 1)
-			paginationPanel.add(fp);
+			paginationPanel.setWidget(fp);
 	}
 	
 	private Anchor createPaginationAnchor(String anchorName, final int newStart) {
@@ -394,12 +376,10 @@ public class TrashViewImpl extends Composite implements TrashView {
 	}
 	
 	private void hideButtons() {
-		deleteAllButton.setVisible(false);
 		deleteSelectedButton.setVisible(false);
 	}
 	
 	private void showButtons() {
-		deleteAllButton.setVisible(true);
 		deleteSelectedButton.setVisible(true);
 	}
 

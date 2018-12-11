@@ -142,6 +142,7 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 
 	@Override
 	public void clear() {
+		editThreadModalContainer.clear();
 		threadTitle.clear();
 		createdOn.clear();
 	}
@@ -193,7 +194,7 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 
 	@Override
 	public void setEditThreadModal(Widget widget) {
-		editThreadModalContainer.add(widget);
+		editThreadModalContainer.setWidget(widget);
 	}
 
 	@Override
@@ -203,7 +204,7 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 
 	@Override
 	public void showSuccess(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

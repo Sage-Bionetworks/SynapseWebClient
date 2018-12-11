@@ -23,11 +23,14 @@ public interface UserBadgeView extends IsWidget, SynapseView {
 	void setDefaultPictureLetter(String letter);
 	void setHref(String href);
 	void setStyleNames(String style);
+	void addUsernameLinkStyle(String style);
 	void setHeight(String height);
 	void setCustomClickHandler(ClickHandler clickHandler);
 	void setUserId(String userId);
 	void setOpenInNewWindow();
 	void doNothingOnClick();
+	void setTooltipText(String displayName, String title, String location);
+	void noTooltip();
 	/**
 	 * Presenter interface
 	 */

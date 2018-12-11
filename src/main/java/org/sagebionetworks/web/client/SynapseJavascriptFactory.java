@@ -28,6 +28,7 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.asynch.AsyncJobId;
+import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBodyInstanceFactory;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
@@ -40,17 +41,26 @@ import org.sagebionetworks.repo.model.discussion.MessageURL;
 import org.sagebionetworks.repo.model.discussion.ThreadCount;
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.doi.v2.Doi;
+import org.sagebionetworks.repo.model.doi.v2.DoiResponse;
 import org.sagebionetworks.repo.model.file.AddPartResponse;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlResponse;
+import org.sagebionetworks.repo.model.file.DownloadList;
+import org.sagebionetworks.repo.model.file.DownloadOrder;
+import org.sagebionetworks.repo.model.file.DownloadOrderSummaryResponse;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
+import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.file.UploadDestinationInstanceFactory;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.subscription.SubscriberCount;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
+import org.sagebionetworks.repo.model.subscription.Subscription;
+import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -73,6 +83,8 @@ public class SynapseJavascriptFactory {
 		WikiPage,
 		ListWrapperUserProfile,
 		ListWrapperTeam,
+		ListWrapperUploadDestinations,
+		SubscriptionPagedResults,
 		UserGroupHeaderResponse,
 		UserBundle,
 		Count,
@@ -120,6 +132,11 @@ public class SynapseJavascriptFactory {
 		AddPartResponse,
 		PaginatedResultsTotalNumberOfResults,
 		PrincipalAliasResponse,
+		DownloadList,
+		DownloadOrder,
+		DownloadOrderSummaryResponse,
+		Doi,
+		Subscription,
 		None,
 		String
 	}
@@ -215,8 +232,18 @@ public class SynapseJavascriptFactory {
 			return new PrincipalAliasResponse(json);
 		case EntityId :
 			return new EntityId(json).getId();
+		case DownloadList : 
+			return new DownloadList(json);
+		case DownloadOrder : 
+			return new DownloadOrder(json);
+		case DownloadOrderSummaryResponse :
+			return new DownloadOrderSummaryResponse(json);
 		case ChallengePagedResults:
 			return new ChallengePagedResults(json).getResults();
+		case SubscriptionPagedResults :
+			return new SubscriptionPagedResults(json);
+		case Subscription : 
+			return new Subscription(json);
 		case JSON :
 			return json;
 		case PaginatedResultsEntityHeader :
@@ -281,6 +308,20 @@ public class SynapseJavascriptFactory {
 				teamList.add(new Team(jsonObject));
 			}
 			return teamList;
+		case ListWrapperUploadDestinations :
+			List<UploadDestination> uploadDestinationList = new ArrayList<>();
+			UploadDestinationInstanceFactory uploadDestinationFactory = UploadDestinationInstanceFactory.singleton();
+			JSONArrayAdapter jsonUploadDestinationsArray = json.getJSONArray("list");
+			for (int i = 0; i < jsonUploadDestinationsArray.length(); i++) {
+				JSONObjectAdapter jsonObject = jsonUploadDestinationsArray.getJSONObject(i);
+				String concreteType = jsonObject.getString("concreteType");
+				UploadDestination response = uploadDestinationFactory.newInstance(concreteType);
+				response.initializeFromJSONObject(jsonObject);
+				uploadDestinationList.add(response);
+			}
+			return uploadDestinationList;
+		case Doi:
+			return new Doi(json);
 		case MembershipInvitation:
 			return new MembershipInvitation(json);
 		case InviteeVerificationSignedToken:

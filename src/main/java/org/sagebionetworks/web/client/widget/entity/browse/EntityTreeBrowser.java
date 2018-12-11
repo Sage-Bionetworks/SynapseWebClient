@@ -17,6 +17,7 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
@@ -47,7 +48,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	private String rootEntityId;
 	public static final SortBy DEFAULT_SORT_BY = SortBy.NAME;
 	public static final Direction DEFAULT_DIRECTION = Direction.ASC;
-	
+	boolean isInitializing = false;
+	private List<String> idList;
 	@Inject
 	public EntityTreeBrowser(PortalGinInjector ginInjector,
 			EntityTreeBrowserView view, 
@@ -76,13 +78,19 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	 * @param entityId
 	 */
 	public void configure(String entityId) {
+		view.setSortable(true);
+		isInitializing = true;
+		resetSynIdList();
 		this.rootEntityId = entityId;
 		onSort(currentSortBy, currentDirection);
 	}
 	
 	public void configure(List<EntityHeader> headers) {
+		view.setSortable(false);
+		isInitializing = true;
 		//set existing headers.
 		rootEntityId = null;
+		idList = new ArrayList<>();
 		view.clear();
 		view.setLoadingVisible(true);
 		addHeaders(headers);
@@ -91,22 +99,39 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	}
 	
 	@Override
+	public void onToggleSort(SortBy sortColumn) {
+		currentDirection = Direction.ASC.equals(currentDirection) ? Direction.DESC : Direction.ASC;
+		onSort(sortColumn, currentDirection);
+	}
+	
 	public void onSort(SortBy sortColumn, Direction sortDirection) {
 		currentSortBy = sortColumn;
 		currentDirection = sortDirection;
 		view.clear();
 		view.setLoadingVisible(true);
-		getChildren(rootEntityId, null, null);
+		resetSynIdList();
+		getChildren(rootEntityId, null, null);	
 	}
 	
 	public void addHeaders(List<EntityHeader> headers) {
+		view.setSortable(false);
+		resetSynIdList();
 		headers = filter.filterForBrowsing(headers);
 		for (EntityHeader header : headers) {
+			addSynIdToList(header.getId());
 			view.appendRootEntityTreeItem(makeTreeItemFromQueryResult(header, true,
 					isExpandable(header)));
 		}
 	}
-	
+	@Override
+	public void copyIDsToClipboard() {
+		StringBuilder clipboardValue = new StringBuilder();
+		for (String synId : idList) {
+			clipboardValue.append(synId);
+			clipboardValue.append("\n");
+		}
+		view.copyToClipboard(clipboardValue.toString());
+	}
 	public void setLoadingVisible(boolean visible) {
 		view.setLoadingVisible(visible);
 	}
@@ -140,6 +165,12 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	public void getChildren(final String parentId,
 			final EntityTreeItem parent, String nextPageToken) {
 		EntityChildrenRequest request = createGetEntityChildrenRequest(parentId, nextPageToken);
+		if (isInitializing) {
+			view.clearSortUI();
+		} else {
+			view.setSortUI(request.getSortBy(), request.getSortDirection());	
+		}
+		
 		synAlert.clear();
 		// ask for the folder children, then the files
 		jsClient.getEntityChildren(request,
@@ -164,6 +195,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 								view.hideEmptyUI();
 							}
 						}
+						isInitializing = false;
 					}
 
 					@Override
@@ -279,14 +311,26 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		if (parent == null) {
 			for (EntityHeader header : results) {
 				boolean isExpandable = isExpandable(header);
+				addSynIdToList(header.getId());
 				view.appendRootEntityTreeItem(makeTreeItemFromQueryResult(header, true, isExpandable));
 			}
 		} else {
 			for (EntityHeader header : results) {
 				boolean isExpandable = isExpandable(header);
+				addSynIdToList(header.getId());
 				view.appendChildEntityTreeItem(makeTreeItemFromQueryResult(header, false, isExpandable), parent);
 			}
 		}
+	}
+	
+	public void resetSynIdList() {
+		idList = null;
+	}
+	public void addSynIdToList(String id) {
+		if (idList == null) {
+			idList = new ArrayList<>();
+		}
+		idList.add(id);
 	}
 	
 	public boolean isExpandable(EntityHeader header) {
@@ -308,5 +352,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	
 	public EntityFilter getEntityFilter() {
 		return filter;
+	}
+	public void showMinimalColumnSet() {
+		view.showMinimalColumnSet();
 	}
 }

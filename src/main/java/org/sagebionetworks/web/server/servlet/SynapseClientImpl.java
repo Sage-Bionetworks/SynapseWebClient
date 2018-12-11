@@ -42,7 +42,6 @@ import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.JoinTeamSignedToken;
-import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -60,7 +59,6 @@ import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.auth.NewUserSignedToken;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
-import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyResult;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
@@ -92,7 +90,6 @@ import org.sagebionetworks.repo.model.table.ColumnChange;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnModelPage;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
-import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
@@ -755,21 +752,11 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			org.sagebionetworks.client.SynapseClient synapseClient,
 			String ownerId, ObjectType ownerType) throws RestServiceException {
 		try {
-			WikiPageKey key= synapseClient.getRootWikiPageKey(ownerId, ownerType);
-			return key.getWikiPageId();
+			return synapseClient.getRootWikiPageKey(ownerId,
+					ownerType).getWikiPageId();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
-	}
-
-	@Override
-	public String getRootWikiId(String ownerObjectId, String ownerObjectType) throws RestServiceException{
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			// asking for the root. find the root id first
-			String rootWikiPageId = getRootWikiId(synapseClient,
-					ownerObjectId,
-					ObjectType.valueOf(ownerObjectType));
-			return rootWikiPageId;
 	}
 	
 	@Override
@@ -1098,6 +1085,9 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		try {
 			TeamMembershipStatus membershipStatus = synapseClient
 					.getTeamMembershipStatus(teamId, userGroupId);
+			if (membershipStatus.getIsMember()) {
+				return;
+			}
 			String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
 			// if we can join the team without creating the invite (like if we
 			// are a team admin, or there is an open membership request), then
@@ -1304,6 +1294,12 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			membershipInvitation.setCreatedBy(null);
 			membershipInvitation.setCreatedOn(null);
 			membershipInvitation.setId(null);
+
+			// SWC-4360: if both the principal ID and email are set, then clear out the email in the new invite to avoid a backend error.
+			if (membershipInvitation.getInviteeId() != null && membershipInvitation.getInviteeEmail() != null) {
+				membershipInvitation.setInviteeEmail(null);
+			}
+			
 			synapseClient.createMembershipInvitation(membershipInvitation, emailInvitationEndpoint, settingsEndpoint);
 			synapseClient.deleteMembershipInvitation(membershipInvitationId);
 		} catch (SynapseException e) {
@@ -1376,17 +1372,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public void deleteTeamMember(String currentUserId, String targetUserId,
-			String teamId) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			synapseClient.removeTeamMember(teamId, targetUserId);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
 	public Team updateTeam(Team team, AccessControlList teamAcl) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -1397,31 +1382,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 	
-	@Override
-	public Doi getEntityDoi(String entityId, Long versionNumber)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return synapseClient.getEntityDoi(entityId, versionNumber);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} catch (Exception e) {
-			throw ExceptionUtil
-					.convertSynapseException(new SynapseNotFoundException()); 
-		}
-	}
-
-	@Override
-	public void createDoi(String entityId, Long versionNumber)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			synapseClient.createEntityDoi(entityId, versionNumber);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
 	/**
 	 * Gets the ID of the file entity with the given name whose parent has the given ID.
 	 * 
@@ -1599,11 +1559,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	// org.sagebionetworks.repo.model.ServiceConstants (PLFM)
 	public static String getChallengeEndpoint(String hostPageBaseURL) {
 		return hostPageBaseURL + "#!Synapse:";
-	}
-	
-	@Override
-	public LogEntry hexDecodeLogEntry(String encodedLogEntry) {
-		return SerializationUtils.hexDecodeAndDeserialize(encodedLogEntry, LogEntry.class);
 	}
 	
 	@Override
@@ -1842,25 +1797,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 	
-	@Override
-	public String toggleSortOnTableQuery(String sql, String header)	throws RestServiceException {
-		try {
-			return TableSqlProcessor.toggleSort(sql, header);
-		} catch (ParseException e) {
-			throw new TableQueryParseException(e.getMessage());
-		}
-	}
-	
-	@Override
-	public List<SortItem> getSortFromTableQuery(String sql)
-			throws RestServiceException {
-		try {
-			return TableSqlProcessor.getSortingInfo(sql);
-		} catch (ParseException e) {
-			throw new TableQueryParseException(e.getMessage());
-		}
-	}
-	
 	public EntityChildrenResponse getEntityChildren(EntityChildrenRequest request) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
@@ -1902,16 +1838,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
-	}
-
-	@Override
-	public List<UploadDestination> getUploadDestinations(String parentEntityId) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try{
-			return synapseClient.getUploadDestinations(parentEntityId);
-		}catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
 	}
 	
 	public static int safeLongToInt(long l) {
@@ -2096,22 +2022,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
-	@Override
-	public boolean isWiki(String projectId) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		return isWiki(projectId, synapseClient);
-	}
-
-	private boolean isWiki(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws RestServiceException {
-		try {
-			getRootWikiId(synapseClient, projectId, ObjectType.ENTITY); 
-			return true;
-		} catch (NotFoundException ex) {
-			return false;
-		}
-	}
-	
+		
 	private boolean isChallenge(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
 		// are there any evaluations that the current user can edit?
 		try {

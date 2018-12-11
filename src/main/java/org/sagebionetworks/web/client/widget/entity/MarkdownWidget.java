@@ -110,6 +110,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 			view.setEmptyVisible(false);
 			view.setMarkdown(result);
 			synapseJSNIUtils.highlightCodeBlocks();
+			synapseJSNIUtils.loadSummaryDetailsShim();
 			loadMath(uniqueSuffix);
 			loadWidgets(wikiKey, wikiVersionInView, uniqueSuffix);	
 			loadTableSorters();
@@ -176,7 +177,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		while (el != null) {
 				el.removeAllChildren();
 				//based on the contents of the element, create the correct widget descriptor and renderer
-				String innerText = el.getAttribute("widgetParams");
+				String innerText = el.getAttribute("data-widgetParams");
 				if (innerText != null) {
 					try {
 						innerText = innerText.trim();

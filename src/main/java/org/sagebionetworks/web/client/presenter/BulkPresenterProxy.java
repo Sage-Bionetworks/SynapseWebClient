@@ -122,8 +122,6 @@ public class BulkPresenterProxy extends AbstractActivity {
 		if (panel == null && eventBus == null) return;
 		if (loading != null) loading.hide();
 		
-		footer.setSynapseSponsorsVisible(place instanceof Home);
-		
 		//NOTE:  DO NOT USE SHARED METHOD FOR runAsync().  GWT split points defined by GWT.runAsync() line (attempt to pull out into shared method results in a single fragment! 
 		if (place instanceof Home) {
 			GWT.runAsync(Home.class, new RunAsyncCallback() {

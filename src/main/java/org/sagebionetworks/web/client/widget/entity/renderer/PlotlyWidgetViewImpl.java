@@ -7,6 +7,8 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.PlotlyTraceWrapper;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
@@ -38,13 +40,13 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	@Inject
 	public PlotlyWidgetViewImpl(Binder binder) {
 		w=binder.createAndBindUi(this);
-		chartContainer.setWidth("100%");
 		w.addAttachHandler(event -> {
 			if (!event.isAttached()) {
 				//detach event, clean up react component
 				_unmountComponentAtNode(chartContainer.getElement());
 			}
 		});
+		_addPlotlyClickEventListener(chartContainer.getElement(), this);
 	}
 	
 	@Override
@@ -74,11 +76,13 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 			String yTitle, 
 			List<PlotlyTraceWrapper> xyData, 
 			String barMode, 
-			String xAxisType, 
-			String yAxisType, 
+			AxisType xAxisType, 
+			AxisType yAxisType, 
 			boolean showLegend) {
 		chartContainer.clear();
-		_showChart(chartContainer.getElement(), getPlotlyTraceArray(xyData), barMode, title, xTitle, yTitle, xAxisType, yAxisType, showLegend);
+		String xAxisTypeString = AxisType.AUTO.equals(xAxisType) ? "-" : xAxisType.toString().toLowerCase();
+		String yAxisTypeString = AxisType.AUTO.equals(yAxisType) ? "-" : yAxisType.toString().toLowerCase();
+		_showChart(chartContainer.getElement(), getPlotlyTraceArray(xyData), barMode, title, xTitle, yTitle, xAxisTypeString, yAxisTypeString, showLegend);
 	}
 	
 	public static JavaScriptObject[] getPlotlyTraceArray(List<PlotlyTraceWrapper> l) {
@@ -102,34 +106,70 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 			String xAxisType, 
 			String yAxisType, 
 			boolean showLegend) /*-{
-		var plot =  $wnd.createPlotlyComponent($wnd.Plotly);
-		var props = {
-			data: xyData,
-			fit: true,
-			layout: {
-				  xaxis: {
-				  	title: xTitle,
-				  	type: xAxisType
-				  },
-				  yaxis: { 
-				  	title: yTitle,
-				  	type: yAxisType
-				  },
-				  barmode: barMode,
-				  showlegend: showLegend
-				},
-
-			// note: we'd like to just hide the "save and edit plot in cloud" command, 
-			// but the parameter provided in the docs (showLink: false) has no effect.
-			// hide the entire bar by setting displayModeBar to false.
-			config: {displayModeBar: false}
-		};
-		$wnd.ReactDOM.render(
-				$wnd.React.createElement(plot, props), 
-				el
-			);
+		
+		try {
+						
+			var plot =  $wnd.createPlotlyComponent($wnd.Plotly);
+			
+			// SWC-3668: We must manually construct an Object from the parent window Object prototype.  This is a general GWT js integration issue.
+			// If we define the layout in the standard way, like "xaxis: {title:"mytitle"}", then  Object.getPrototypeOf(obj) === Object.prototype is false.
+			// And if this condition is false, then plotly clears our input layout params object. It instead uses defaults (based on the data).
+			
+			var xAxisLayoutObject = new $wnd.Object();
+			xAxisLayoutObject.title = xTitle;
+			xAxisLayoutObject.type = xAxisType;
+			xAxisLayoutObject.tickangle = 45;
+			
+			
+			var yAxisLayoutObject = new $wnd.Object();
+			yAxisLayoutObject.title = yTitle;
+			yAxisLayoutObject.type = yAxisType;
+			
+			var props = {
+				data: xyData,
+				fit: true,
+				layout: {
+					  title: plotTitle,
+					  xaxis: xAxisLayoutObject,
+					  yaxis: yAxisLayoutObject,
+					  barmode: barMode,
+					  showlegend: showLegend
+					},
+	
+				// note: we'd like to just hide the "save and edit plot in cloud" command, 
+				// but the parameter provided in the docs (showLink: false) has no effect.
+				// hide the entire bar by setting displayModeBar to false.
+				config: {displayModeBar: false}
+			};
+			$wnd.ReactDOM.render(
+					$wnd.React.createElement(plot, props), 
+					el
+				);
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
-
+	
+	private static native void _addPlotlyClickEventListener (
+			Element el, PlotlyWidgetViewImpl thisWidget) /*-{
+		try {
+			//after plot is drawn, add handler for click events
+			$wnd.jQuery(el).on('plotly_afterplot', function() {
+				this.children[0].on('plotly_click', function(data) {
+					data.event.stopPropagation();
+					var pnt = data.points[0];				
+					thisWidget.@org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetViewImpl::onClick(Ljava/lang/String;Ljava/lang/String;)(pnt.x, pnt.y);
+				});
+			});
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
+	
+	private void onClick(String x, String y) {
+		presenter.onClick(x, y);
+	}
+	
 	@Override
 	public void setLoadingVisible(boolean visible) {
 		loadingUI.setVisible(visible);
@@ -152,5 +192,9 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	@Override
 	public void setSourceDataLinkVisible(boolean visible) {
 		sourceDataAnchor.setVisible(visible);
+	}
+	@Override
+	public void newWindow(String url) {
+		DisplayUtils.newWindow(url, "_blank", "");
 	}
 }

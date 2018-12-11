@@ -4,7 +4,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle' />
 	<g:HTMLPanel>
-		<b:Icon ui:field="defaultIcon" type="USER"
+		<b:Icon ui:field="defaultIcon" type="SYN_USER"
 			addStyleNames="font-size-150 lightGreyText" visible="true"/>
 		<g:HTMLPanel width="150px" addStyleNames="position-relative">
 		    <bh:Div addStyleNames="position-absolute topLevelZIndex">

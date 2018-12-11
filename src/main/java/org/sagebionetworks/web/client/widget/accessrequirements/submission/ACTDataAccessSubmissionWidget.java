@@ -10,14 +10,14 @@ import org.sagebionetworks.repo.model.dataaccess.Submission;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
-import org.sagebionetworks.web.client.DataAccessClientAsync;
-import org.sagebionetworks.web.client.DateTimeUtils;
-import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.*;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ShowEmailsButton;
+import org.sagebionetworks.web.client.widget.asynch.AsyncHandlerImpl;
+import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
+import org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
@@ -42,12 +42,12 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	PortalGinInjector ginInjector;
 	DateTimeUtils dateTimeUtils;
 	ShowEmailsButton showEmailsButton;
-	
+
 	@Inject
 	public ACTDataAccessSubmissionWidget(ACTDataAccessSubmissionWidgetView view, 
 			SynapseAlert synAlert,
 			DataAccessClientAsync dataAccessClient,
-			final BigPromptModalView promptDialog,
+			BigPromptModalView promptDialog,
 			FileHandleWidget ducFileRenderer,
 			FileHandleWidget irbFileRenderer,
 			FileHandleList otherDocuments,

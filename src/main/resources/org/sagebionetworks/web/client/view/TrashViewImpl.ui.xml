@@ -9,7 +9,6 @@
 		<div class="row margin-top-left-10 margin-right-15 margin-bottom-20">
 			<div class="well col-md-offset-1 col-md-10 col-sm-offset-2 col-sm-8">
 				<h2 style="display: inline;" >Trash Can</h2>
-					<g:Button ui:field="deleteAllButton" styleName="btn btn-danger margin-bottom-5 btn-lg right">Empty Trash</g:Button>
 					<g:SimplePanel ui:field="synAlertPanel" addStyleNames="clearright clearfix"/>
 					<div class="panel panel-body margin-top-10" style="margin-bottom: 5;">
 						<g:FlowPanel ui:field="trashTableAndPaginationPanel">

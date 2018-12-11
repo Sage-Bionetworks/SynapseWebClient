@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Enumeration;
 import java.util.logging.Logger;
 
@@ -149,13 +150,8 @@ public class FileHandleServlet extends HttpServlet {
 				}				
 			}
 		} catch (SynapseException e) {
-			//redirect to error place with an entry
-			LogEntry entry = new LogEntry();
-			entry.setLabel("Download");
-			entry.setMessage(e.getMessage());
-//			entry.setStacktrace(ExceptionUtils.getStackTrace(e));
-			String entryString = SerializationUtils.serializeAndHexEncode(entry);
-			doRedirect(request, response, isProxy, new URL(getBaseUrl(request) + "#!Error:"+entryString));
+			//redirect to error place
+			response.sendRedirect(FileHandleAssociationServlet.getBaseUrl(request) + FileHandleAssociationServlet.ERROR_PLACE + URLEncoder.encode(e.getMessage()));
 		}
 	}
 

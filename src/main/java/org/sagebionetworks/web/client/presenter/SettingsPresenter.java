@@ -2,9 +2,7 @@ package org.sagebionetworks.web.client.presenter;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -108,14 +106,13 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			final String newPassword) {
 		clearPasswordErrors();
 		if (authenticationController.isLoggedIn()) {
-			if (authenticationController.getCurrentUserSessionData() != null
-					&& authenticationController.getCurrentUserSessionData().getProfile() != null
-					&& authenticationController.getCurrentUserSessionData().getProfile().getUserName() != null) {
-				final String username = authenticationController.getCurrentUserSessionData().getProfile().getUserName();
+			if (authenticationController.getCurrentUserProfile() != null
+					&& authenticationController.getCurrentUserProfile().getUserName() != null) {
+				final String username = authenticationController.getCurrentUserProfile().getUserName();
 				authenticationController.loginUser(username, existingPassword,
-						new AsyncCallback<UserSessionData>() {
+						new AsyncCallback<UserProfile>() {
 							@Override
-							public void onSuccess(UserSessionData userSessionData) {
+							public void onSuccess(UserProfile userSessionData) {
 								userService.changePassword(authenticationController.getCurrentUserSessionToken(),newPassword, new AsyncCallback<Void>() {
 									@Override
 									public void onSuccess(Void result) {
@@ -123,9 +120,9 @@ public class SettingsPresenter implements SettingsView.Presenter {
 										view.showPasswordChangeSuccess();
 										// login user as session token
 										// has changed
-										authenticationController.loginUser(username, newPassword, new AsyncCallback<UserSessionData>() {
+										authenticationController.loginUser(username, newPassword, new AsyncCallback<UserProfile>() {
 											@Override
-											public void onSuccess(UserSessionData result) {
+											public void onSuccess(UserProfile result) {
 											}
 											@Override
 											public void onFailure(Throwable caught) {
@@ -154,7 +151,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 				view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 			}
 		} else {
-			view.showInfo("Error", "Reset Password failed. Please Login again.");
+			view.showInfo("Reset Password failed. Please Login again.");
 			goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		}
 	}
@@ -188,7 +185,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 				synapseClient.updateUserProfile(myProfile, new AsyncCallback<Void>() {
 					@Override
 					public void onSuccess(Void result) {
-						view.showInfo(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS, "");
+						view.showInfo(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS);
 						authenticationController.updateCachedProfile(myProfile);
 					}
 
@@ -256,7 +253,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
-				view.showInfo(DisplayConstants.API_KEY_CHANGED, "");
+				view.showInfo(DisplayConstants.API_KEY_CHANGED);
 				view.setApiKey(result);
 			}
 

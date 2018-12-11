@@ -32,7 +32,6 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityId;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.IdList;
 import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
@@ -59,12 +58,15 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
+import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerCommitSortBy;
+import org.sagebionetworks.repo.model.doi.v2.Doi;
+import org.sagebionetworks.repo.model.doi.v2.DoiAssociation;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.EntityLookupRequest;
 import org.sagebionetworks.repo.model.entity.SortBy;
@@ -74,9 +76,17 @@ import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlRequest;
 import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlResponse;
+import org.sagebionetworks.repo.model.file.DownloadList;
+import org.sagebionetworks.repo.model.file.DownloadOrder;
+import org.sagebionetworks.repo.model.file.DownloadOrderSummaryRequest;
+import org.sagebionetworks.repo.model.file.DownloadOrderSummaryResponse;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
+import org.sagebionetworks.repo.model.file.FileHandleAssociationList;
 import org.sagebionetworks.repo.model.file.MultipartUploadRequest;
 import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
+import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.principal.AliasList;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
@@ -85,7 +95,12 @@ import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.subscription.Etag;
+import org.sagebionetworks.repo.model.subscription.SortByType;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
+import org.sagebionetworks.repo.model.subscription.Subscription;
+import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
+import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
+import org.sagebionetworks.repo.model.subscription.SubscriptionRequest;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ViewType;
@@ -151,6 +166,7 @@ public class SynapseJavascriptClient {
 	public static final String URL = "/messageUrl";
 	public static final String MODERATORS = "/moderators";
 	public static final String SUBSCRIPTION = "/subscription";
+	public static final String ALL = "/all";
 	public static final String FILE_HANDLE_BATCH = "/fileHandle/batch";
 	public static final String THREAD_COUNTS = "/threadcounts";
 	public static final String ATTACHMENT_HANDLES = "attachmenthandles";
@@ -162,7 +178,13 @@ public class SynapseJavascriptClient {
 	public static final String GENERATED_PATH = "/generated";
 	public static final String GENERATED_BY_SUFFIX = "/generatedBy";
 	public static final String OPEN_MEMBERSHIP_REQUEST = "/openRequest";
+	public static final String UPLOAD_DESTINATIONS = "/uploadDestinations";
 	public static final String PRINCIPAL = "/principal";
+	public static final String DOI = "/doi";
+	public static final String DOI_ASSOCIATION = DOI + "/association";
+	public static final String ID_PARAMETER = "id=";
+	public static final String TYPE_PARAMETER = "type=";
+	public static final String VERSION_PARAMETER = "version=";
 	public static final int INITIAL_RETRY_REQUEST_DELAY_MS = 1000;
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
 	private static final String LOG = "/log";
@@ -182,6 +204,7 @@ public class SynapseJavascriptClient {
 	public static final String APPLICATION_JSON_CHARSET_UTF8 = "application/json; charset="+SYNAPSE_ENCODING_CHARSET;
 	public static final String REPO_SUFFIX_VERSION = "/version";
 	public static final String TEAM = "/team";
+	public static final String MEMBER = "/member";
 	public static final String WIKI_VERSION_PARAMETER = "?wikiVersion=";
 	public static final String FAVORITE_URI_PATH = "/favorite";
 	public static final String USER_GROUP_HEADER_PREFIX_PATH = "/userGroupHeaders?prefix=";
@@ -195,9 +218,10 @@ public class SynapseJavascriptClient {
 	public static final String INVITEE_ID = "/inviteeId";
 	public static final String ICON = "/icon";
 	public static final String PROJECTS_URI_PATH = "/projects";
-	public static final String DOCKER_COMMIT = "/dockerCommit";
+	public static final String DOCKER_TAG = "/dockerTag";
 	public static final String OFFSET_PARAMETER = "offset=";
 	public static final String LIMIT_PARAMETER = "limit=";
+	public static final String OBJECT_TYPE_PARAMETER = "objectType=";
 	private static final String NEXT_PAGE_TOKEN_PARAM = "nextPageToken=";
 	public static final String SKIP_TRASH_CAN_PARAM = "skipTrashCan";
 	private static final String ASCENDING_PARAM = "ascending=";
@@ -220,9 +244,17 @@ public class SynapseJavascriptClient {
 	public static final String ASYNC_GET = "/async/get/";
 	public static final String AUTH_OAUTH_2 = "/oauth2";
 	public static final String AUTH_OAUTH_2_ALIAS = AUTH_OAUTH_2+"/alias";
+	public static final String DOWNLOAD_LIST = "/download/list";
+	public static final String DOWNLOAD_LIST_ADD = DOWNLOAD_LIST+"/add";
+	public static final String DOWNLOAD_LIST_REMOVE = DOWNLOAD_LIST+"/remove";
+	public static final String DOWNLOAD_LIST_CLEAR = DOWNLOAD_LIST+"/clear";
+	
+	public static final String DOWNLOAD_ORDER = "/download/order";
+	public static final String DOWNLOAD_ORDER_HISTORY = DOWNLOAD_ORDER+"/history";
+	
+	
 	
 	public String repoServiceUrl,fileServiceUrl, authServiceUrl, synapseVersionInfo; 
-	
 	@Inject
 	public SynapseJavascriptClient(
 			JSONObjectAdapter jsonObjectAdapter,
@@ -376,7 +408,7 @@ public class SynapseJavascriptClient {
 								}
 							}, retryDelay);
 						} else {
-							// getException() based on status code, 
+							// getException() based on status code,
 							// instead of using org.sagebionetworks.client.ClientUtils.throwException() and ExceptionUtil.convertSynapseException() (neither of which can be referenced here)
 							String responseText = response.getStatusText();
 							try {
@@ -465,7 +497,29 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + TEAM + "/" + teamId;
 		return getFuture(cb -> doGet(url, OBJECT_TYPE.Team, cb));
 	}
-	
+
+	public FluentFuture<DoiAssociation> getDoiAssociation(String objectId, ObjectType objectType, Long objectVersion) {
+		String url = getRepoServiceUrl() + DOI_ASSOCIATION
+				+ "?" + ID_PARAMETER + objectId
+				+ "&" + TYPE_PARAMETER + objectType;
+		if (objectVersion != null) {
+			url += "&" + VERSION_PARAMETER + objectVersion;
+		}
+		String finalUrl = url;
+		return getFuture(cb -> doGet(finalUrl, OBJECT_TYPE.Doi, cb));
+	}
+
+	public FluentFuture<Doi> getDoi(String objectId, ObjectType objectType, Long objectVersion) {
+		String url = getRepoServiceUrl() + DOI
+				+ "?" + ID_PARAMETER + objectId
+				+ "&" + TYPE_PARAMETER + objectType;
+		if (objectVersion != null) {
+			url += "&" + VERSION_PARAMETER + objectVersion;
+		}
+		String finalUrl = url;
+		return getFuture(cb -> doGet(finalUrl, OBJECT_TYPE.Doi, cb));
+	}
+
 	public void getRestrictionInformation(String subjectId, RestrictableObjectType type, final AsyncCallback<RestrictionInformationResponse> callback)  {
 		String url = getRepoServiceUrl() + RESTRICTION_INFORMATION;
 		RestrictionInformationRequest request = new RestrictionInformationRequest();
@@ -729,6 +783,23 @@ public class SynapseJavascriptClient {
 		doGet(url, type , callback);
 	}
 	
+	public void isWiki(String projectId, AsyncCallback<Boolean> callback) {
+		getRootWikiPageKey(ObjectType.ENTITY.toString(), projectId, new AsyncCallback<String>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				if (caught instanceof NotFoundException) {
+					callback.onSuccess(false);
+				} else {
+					callback.onFailure(caught);
+				}
+			}
+			@Override
+			public void onSuccess(String result) {
+				callback.onSuccess(true);
+			}
+		});
+	}
+	
 	public void isDocker(String projectId, AsyncCallback<Boolean> callback) {
 		EntityChildrenRequest request = getEntityChildrenRequest(projectId, EntityType.dockerrepo);
 		getEntityChildren(request, getEntityChildrenExistCallback(callback));
@@ -916,11 +987,15 @@ public class SynapseJavascriptClient {
 		return getFuture(cb -> doPost(url, entry, OBJECT_TYPE.None, cb));
 	}
 	
-	public FluentFuture<Void> logError(String label, Throwable ex) {
+	public FluentFuture<Void> logError(Throwable ex) {
 		LogEntry entry = new LogEntry();
-		String exceptionString = ex.getMessage();
+		String exceptionString = gwt.getCurrentHistoryToken().substring(1) + ":" + ex.getMessage();
+		String versionInfo = getSynapseVersionInfo();
+		if (versionInfo.contains("-")) {
+			versionInfo = versionInfo.substring(0, versionInfo.indexOf('-'));	
+		}
 		String outputExceptionString = exceptionString.substring(0, Math.min(exceptionString.length(), MAX_LOG_ENTRY_LABEL_SIZE));
-		entry.setLabel(getSynapseVersionInfo() + ": " + label + ": " + outputExceptionString);
+		entry.setLabel(versionInfo + ":" + outputExceptionString);
 		entry.setMessage(gwt.getCurrentURL() + " : \n" + ex.getMessage());
 		return logError(entry);
 	}
@@ -991,10 +1066,13 @@ public class SynapseJavascriptClient {
 	
 	private String getEndpoint(AsynchType type) {
 		String endpoint;
-		if (AsynchType.BulkFileDownload.equals(type)) {
-			endpoint = getFileServiceUrl();
-		} else {
-			endpoint = getRepoServiceUrl();
+		switch(type) {
+			case BulkFileDownload:
+			case AddFileToDownloadList:
+				endpoint = getFileServiceUrl();
+				break;
+			default:
+				endpoint = getRepoServiceUrl();
 		}
 		return endpoint;
 	}
@@ -1027,14 +1105,14 @@ public class SynapseJavascriptClient {
 		doGet(url, OBJECT_TYPE.Activity, callback);
 	}
 
-	public void getDockerCommits(
+	public void getDockerTaggedCommits(
 			String entityId, 
 			Long limit, 
 			Long offset,
 			DockerCommitSortBy sortBy, 
 			Boolean ascending,
 			AsyncCallback<ArrayList<DockerCommit>> callback) {
-		String url = getRepoServiceUrl() + ENTITY+"/"+entityId+DOCKER_COMMIT;
+		String url = getRepoServiceUrl() + ENTITY+"/"+entityId+ DOCKER_TAG;
 		List<String> requestParams = new ArrayList<String>();
 		if (limit!=null) {
 			requestParams.add(LIMIT_PARAMETER+limit);
@@ -1103,6 +1181,118 @@ public class SynapseJavascriptClient {
 		request.setParentId(containerEntityId);
 		String url = getRepoServiceUrl() + ENTITY+"/child";
 		doPost(url, request, OBJECT_TYPE.EntityId, callback);
+	}
+	
+	public void getUploadDestinations(String parentEntityId, AsyncCallback<List<UploadDestination>> callback) {
+		String url = getFileServiceUrl() + ENTITY + "/" + parentEntityId + UPLOAD_DESTINATIONS;
+		doGet(url, OBJECT_TYPE.ListWrapperUploadDestinations, callback);
+	}
+	
+	public void getAllSubscriptions(SubscriptionObjectType objectType, Long limit, Long offset, SortByType sortByType, org.sagebionetworks.repo.model.subscription.SortDirection sortDirection, AsyncCallback<SubscriptionPagedResults> callback) {
+		String url = getRepoServiceUrl() + SUBSCRIPTION+"/all?" + OBJECT_TYPE_PARAMETER + objectType.name() + "&" + LIMIT_PARAMETER+limit + "&" + OFFSET_PARAMETER+offset;
+		if (sortByType!=null) {
+			url += "&sortBy="+sortByType.name();
+		}
+		if (sortDirection!=null) {
+			url += "&sortDirection="+sortDirection.name();
+		}
+		doGet(url, OBJECT_TYPE.SubscriptionPagedResults, callback);
+	}
+	public void deleteTeamMember(String teamId, String memberId, AsyncCallback<Void> callback) {
+		String url = getRepoServiceUrl() + TEAM + "/" + teamId + MEMBER + "/" + memberId;
+		doDelete(url, callback);
+	}
+
+	public void addFileToDownloadList(String fileHandleId, String fileEntityId, AsyncCallback<DownloadList> callback) {
+		List<FileHandleAssociation> toAdd = new ArrayList<FileHandleAssociation>();
+		FileHandleAssociation fha = new FileHandleAssociation();
+		fha.setFileHandleId(fileHandleId);
+		fha.setAssociateObjectType(FileHandleAssociateType.FileEntity);
+		fha.setAssociateObjectId(fileEntityId);
+		toAdd.add(fha);
+		addFilesToDownloadList(toAdd, callback);
+	}
+	
+	public void addFilesToDownloadList(List<FileHandleAssociation> toAdd, AsyncCallback<DownloadList> callback) {
+		FileHandleAssociationList request = new FileHandleAssociationList();
+		request.setList(toAdd);
+		String url = getFileServiceUrl() + DOWNLOAD_LIST_ADD;
+		doPost(url, request, OBJECT_TYPE.DownloadList, callback);
+	}
+	
+	public void removeFileFromDownloadList(FileHandleAssociation fha, AsyncCallback<DownloadList> callback) {
+		List<FileHandleAssociation> toRemove = new ArrayList<FileHandleAssociation>();
+		toRemove.add(fha);
+		removeFilesFromDownloadList(toRemove, callback);
+	}
+
+	public void removeFilesFromDownloadList(List<FileHandleAssociation> toRemove, AsyncCallback<DownloadList> callback){
+		FileHandleAssociationList request = new FileHandleAssociationList();
+		request.setList(toRemove);
+		String url = getFileServiceUrl() + DOWNLOAD_LIST_REMOVE;
+		doPost(url, request, OBJECT_TYPE.DownloadList, callback);
+	}
+	
+	public void clearDownloadList(AsyncCallback<Void> callback) {
+		String url = getFileServiceUrl() + DOWNLOAD_LIST;
+		doDelete(url, callback);
+	}
+	
+	public void getDownloadList(AsyncCallback<DownloadList> callback) {
+		String url = getFileServiceUrl() + DOWNLOAD_LIST;
+		doGet(url, OBJECT_TYPE.DownloadList, callback);
+	}
+	
+	public void createDownloadOrderFromUsersDownloadList(String zipFileName, AsyncCallback<DownloadOrder> callback) {
+		String url = getFileServiceUrl() + DOWNLOAD_ORDER+"?zipFileName="+zipFileName;
+		doPost(url, null, OBJECT_TYPE.DownloadOrder, callback);
+	}
+
+	public void getDownloadOrder(String orderId, AsyncCallback<DownloadOrder> callback) {
+		String url = getFileServiceUrl() + "/download/order/"+orderId;
+		doGet(url, OBJECT_TYPE.DownloadOrder, callback);
+	}
+	
+	public void getDownloadOrderHistory(DownloadOrderSummaryRequest request, AsyncCallback<DownloadOrderSummaryResponse> callback) {
+		String url = getFileServiceUrl() + "/download/order/history";
+		doPost(url, request, OBJECT_TYPE.DownloadOrderSummaryResponse, callback);
+	}
+
+	public void initSession(String token) {
+		initSession(token, null);
+	}
+
+	/**
+	 * call to ask the server to set the session cookie
+	 * @param token
+	 * @param callback
+	 */
+	public void initSession(String token, AsyncCallback<Void> callback) {
+		Session s = new Session();
+		s.setSessionToken(token);
+		String url = jsniUtils.getSessionCookieUrl();
+		doPost(url, s, OBJECT_TYPE.None, callback);
+	}
+	
+	public void subscribe(Topic topic, AsyncCallback<Subscription> callback) {
+		String url = getRepoServiceUrl() + SUBSCRIPTION ;
+		doPost(url, topic, OBJECT_TYPE.Subscription, callback);
+	}
+	public void unsubscribe(String subscriptionId, AsyncCallback<Void> callback) {
+		String url = getRepoServiceUrl() + SUBSCRIPTION + "/" + subscriptionId;
+		doDelete(url, callback);
+	}
+	public void subscribeToAll(SubscriptionObjectType type, AsyncCallback<Subscription> callback) {
+		String url = getRepoServiceUrl() + SUBSCRIPTION + ALL + "?objectType="+type.toString();
+		doPost(url, null, OBJECT_TYPE.Subscription, callback);
+	}
+	public void getSubscription(String subscriptionId, AsyncCallback<Subscription> callback) {
+		String url = getRepoServiceUrl() + SUBSCRIPTION + "/"+subscriptionId;
+		doGet(url, OBJECT_TYPE.Subscription, callback);
+	}
+	public void listSubscription(SubscriptionRequest request, AsyncCallback<SubscriptionPagedResults> callback) {
+		String url = getRepoServiceUrl() + SUBSCRIPTION + "/list";
+		doPost(url, request, OBJECT_TYPE.SubscriptionPagedResults, callback);
 	}
 }
 

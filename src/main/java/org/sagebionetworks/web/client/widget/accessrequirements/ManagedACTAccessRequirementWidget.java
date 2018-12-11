@@ -11,7 +11,7 @@ import org.sagebionetworks.repo.model.dataaccess.SubmissionStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
@@ -31,7 +31,7 @@ import com.google.inject.Inject;
 public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequirementWidgetView.Presenter, IsWidget {
 	
 	private ManagedACTAccessRequirementWidgetView view;
-	SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	DataAccessClientAsync dataAccessClient;
 	SynapseAlert synAlert;
 	WikiPageWidget wikiPageWidget;
@@ -51,7 +51,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 	
 	@Inject
 	public ManagedACTAccessRequirementWidget(ManagedACTAccessRequirementWidgetView view, 
-			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
 			WikiPageWidget wikiPageWidget,
 			SynapseAlert synAlert,
 			PortalGinInjector ginInjector,
@@ -66,8 +66,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 			DateTimeUtils dateTimeUtils,
 			ReviewAccessorsButton manageAccessButton) {
 		this.view = view;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
+		this.jsClient = jsClient;
 		this.synAlert = synAlert;
 		this.wikiPageWidget = wikiPageWidget;
 		this.ginInjector = ginInjector;
@@ -106,7 +105,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		this.ar = ar;
 		synAlert.clear();
 		view.setWikiTermsWidgetVisible(false);
-		synapseClient.getRootWikiId(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), new AsyncCallback<String>() {
+		jsClient.getRootWikiPageKey(ObjectType.ACCESS_REQUIREMENT.toString(), ar.getId().toString(), new AsyncCallback<String>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				if (!(caught instanceof NotFoundException)) {
@@ -168,7 +167,11 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 				break;
 		}
 	}
-	
+	public void showAnonymous() {
+		view.showUnapprovedHeading();
+		view.showLoginButton();
+	}
+
 	public void showUnapproved() {
 		view.showUnapprovedHeading();
 		view.showRequestAccessButton();
@@ -182,6 +185,10 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 	
 	public void refreshApprovalState() {
 		view.resetState();
+		if (!authController.isLoggedIn()) {
+			showAnonymous();
+			return;
+		}
 		dataAccessClient.getAccessRequirementStatus(ar.getId().toString(), new AsyncCallback<AccessRequirementStatus>() {
 			@Override
 			public void onFailure(Throwable caught) {

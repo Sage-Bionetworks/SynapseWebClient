@@ -4,7 +4,9 @@ import static org.sagebionetworks.web.client.ClientProperties.PLOTLY_JS;
 import static org.sagebionetworks.web.client.ClientProperties.PLOTLY_REACT_JS;
 import static org.sagebionetworks.web.client.place.Synapse.EntityArea.TABLES;
 import static org.sagebionetworks.web.client.widget.entity.tabs.TablesTab.TABLE_QUERY_PREFIX;
-import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.*;
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_MAX_ROWS_PER_PAGE;
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_RESULTS;
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_SELECT_COLUMNS;
 import static org.sagebionetworks.web.shared.WidgetConstants.BAR_MODE;
 import static org.sagebionetworks.web.shared.WidgetConstants.FILL_COLUMN_NAME;
 import static org.sagebionetworks.web.shared.WidgetConstants.IS_HORIZONTAL;
@@ -25,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.sagebionetworks.repo.model.EntityId;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.Query;
@@ -33,6 +36,7 @@ import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.web.client.ArrayUtils;
+import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.plotly.PlotlyTraceWrapper;
@@ -44,11 +48,12 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
+import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
-import com.google.gwt.core.shared.GWT;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -60,13 +65,12 @@ import com.google.inject.Inject;
  *
  */
 public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererPresenter {
-	
 	private PlotlyWidgetView view;
 	private Map<String, String> descriptor;
 	private SynapseAlert synAlert;
 	private String sql, title, xTitle, yTitle;
 	GraphType graphType;
-	String xAxisType, yAxisType;
+	AxisType xAxisType, yAxisType;
 	BarMode barMode;
 	private AsynchronousJobTracker jobTracker;
 	Query query;
@@ -115,14 +119,14 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		title = descriptor.get(TITLE);
 		xTitle = descriptor.get(X_AXIS_TITLE);
 		yTitle = descriptor.get(Y_AXIS_TITLE);
-		graphType = GraphType.valueOf(descriptor.get(TYPE));
+		graphType = GraphType.valueOf(descriptor.get(TYPE).toUpperCase());
 		
-		xAxisType = descriptor.containsKey(X_AXIS_TYPE) ? descriptor.get(X_AXIS_TYPE) : "-"; 
-		yAxisType = descriptor.containsKey(Y_AXIS_TYPE) ? descriptor.get(Y_AXIS_TYPE) : "-";
+		xAxisType = descriptor.containsKey(X_AXIS_TYPE) ? AxisType.valueOf(descriptor.get(X_AXIS_TYPE).toUpperCase()) : AxisType.AUTO; 
+		yAxisType = descriptor.containsKey(Y_AXIS_TYPE) ? AxisType.valueOf(descriptor.get(Y_AXIS_TYPE).toUpperCase()) : AxisType.AUTO;
 		showLegend = descriptor.containsKey(SHOW_LEGEND) ? Boolean.valueOf(descriptor.get(SHOW_LEGEND)) : true;
 		isHorizontal = descriptor.containsKey(IS_HORIZONTAL) ? Boolean.valueOf(descriptor.get(IS_HORIZONTAL)) : false;
 		if (descriptor.containsKey(BAR_MODE)) {
-			barMode = BarMode.valueOf(descriptor.get(BAR_MODE));
+			barMode = BarMode.valueOf(descriptor.get(BAR_MODE).toUpperCase());
 		} else {
 			barMode = BarMode.GROUP;
 		}
@@ -273,13 +277,13 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 			trace.setIsHorizontal(isHorizontal);
 		}
 		if (isHorizontal) {
-			String temp = xAxisType;
+			AxisType temp = xAxisType;
 			xAxisType = yAxisType;
 			yAxisType = temp;
 
-			temp = xTitle;
+			String tempTitle = xTitle;
 			xTitle = yTitle;
-			yTitle = temp;
+			yTitle = tempTitle;
 		}
 	}
 	
@@ -351,5 +355,28 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+	
+	@Override
+	public void onClick(String x, String y) {
+		boolean xNameIsAlias = sql.substring(0, sql.indexOf(',')).toUpperCase().contains(" AS ");
+		if (!xNameIsAlias) {
+			String val = isHorizontal ? y : x;
+			String sql ="select * from " + qbr.getEntityId() + " where " + " \"" + xAxisColumnName + "\"='" + val + "'";
+			// Go to source data table, but modify query sql to only show data that was clicked on
+			Query query = new Query();
+			query.setIncludeEntityEtag(true);
+			query.setSql(sql);
+			query.setOffset(TableEntityWidget.DEFAULT_OFFSET);
+			query.setLimit(TableEntityWidget.DEFAULT_LIMIT);
+			query.setIsConsistent(true);
+			String queryToken = queryTokenProvider.queryToToken(query);
+			String url = "#!Synapse:" + 
+					qbr.getEntityId() + "/" + 
+					TABLES.toString().toLowerCase() + "/" + 
+					TABLE_QUERY_PREFIX + 
+					queryToken;
+			view.newWindow(url);
+		}
 	}
 }

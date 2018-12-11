@@ -6,6 +6,8 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -38,6 +40,8 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 	Button updateRequestButton;
 	@UiField
 	Button requestAccessButton;
+	@UiField
+	Button loginButton;
 	@UiField
 	Div requestDataAccessWizardContainer;
 	@UiField
@@ -76,34 +80,24 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 	Presenter presenter;
 	
 	@Inject
-	public ManagedACTAccessRequirementWidgetViewImpl(Binder binder){
+	public ManagedACTAccessRequirementWidgetViewImpl(Binder binder, GlobalApplicationState globalAppState){
 		this.w = binder.createAndBindUi(this);
-		cancelRequestButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onCancelRequest();
+		cancelRequestButton.addClickHandler(event -> {
+			presenter.onCancelRequest();
+		});
+		updateRequestButton.addClickHandler(event -> {
+			presenter.onRequestAccess();
+		});
+		requestAccessButton.addClickHandler(event -> {
+			presenter.onRequestAccess();
+		});
+		w.addAttachHandler(event -> {
+			if (event.isAttached()) {
+				onAttachCallback.invoke();
 			}
 		});
-		updateRequestButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onRequestAccess();
-			}
-		});
-		requestAccessButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onRequestAccess();
-			}
-		});
-		w.addAttachHandler(new AttachEvent.Handler() {
-			
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				if (event.isAttached()) {
-					onAttachCallback.invoke();
-				}
-			}
+		loginButton.addClickHandler(event -> {
+			globalAppState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		});
 	}
 	
@@ -182,6 +176,7 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 		requestAccessButton.setVisible(false);
 		requestSubmittedByOther.setVisible(false);
 		expirationUI.setVisible(false);
+		loginButton.setVisible(false);
 	}
 	
 	@Override
@@ -262,5 +257,9 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 	public void showExpirationDate(String dateString) {
 		expirationDateText.setText(dateString);
 		expirationUI.setVisible(true);
+	}
+	@Override
+	public void showLoginButton() {
+		loginButton.setVisible(true);	
 	}
 }

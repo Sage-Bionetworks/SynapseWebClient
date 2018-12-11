@@ -13,11 +13,13 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 public interface SynapseJSNIUtils {
 
 	public void recordPageVisit(String token);
+	void setAnalyticsUserId(String userId);
 	void sendAnalyticsEvent(String eventCategory, String eventAction);
+	void sendAnalyticsEvent(String eventCategory, String eventAction, String eventLabelValue);
 	public String getCurrentHistoryToken();
 	
 	public void highlightCodeBlocks();
-	
+	void loadSummaryDetailsShim();
 	public void loadTableSorters();
 	
 	public String getBaseFileHandleUrl();
@@ -51,6 +53,7 @@ public interface SynapseJSNIUtils {
 	String getWebkitRelativePath(JavaScriptObject fileList, int index);
 	public void consoleLog(String message);
 	public void consoleError(String message);
+	public void consoleError(Throwable t);
 	
 	public void processWithMathJax(Element element);	
 
@@ -60,8 +63,6 @@ public interface SynapseJSNIUtils {
 	 * initialize the behavior for on pop state
 	 */
 	public void initOnPopStateHandler();
-	
-	public void showTwitterFeed(String dataWidgetId, String elementId, String linkColor, String borderColor, int tweetCount);
 	
 	public String getCurrentURL();
 	public String getCurrentHostName();
@@ -84,4 +85,6 @@ public interface SynapseJSNIUtils {
 
 	Element getElementById(String elementId);
 	String getCdnEndpoint();
+	String getSessionCookieUrl();
+	void scrollIntoView(Element el);
 }

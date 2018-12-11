@@ -9,13 +9,8 @@ public interface EntityMetadataView extends IsWidget {
 	void setAnnotationsVisible(boolean visible);
 	
 	public interface Presenter {
-		
-		void fireEntityUpdatedEvent();
-		
 	}
 	
-	void setFileHistoryVisible(boolean visible);
-
 	void setFileHistoryWidget(IsWidget fileHistoryWidget);
 
 	public void setDoiWidget(IsWidget doiWidget);

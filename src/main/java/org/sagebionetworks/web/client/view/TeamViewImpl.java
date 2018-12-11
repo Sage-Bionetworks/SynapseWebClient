@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -10,19 +11,21 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.Linkify;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -56,7 +59,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@UiField
 	SimplePanel memberListPanel;
 	@UiField
-	Span totalMemberCountField;
+	Div memberCountContainer;
 	@UiField
 	Span publicJoinField;
 	@UiField
@@ -77,27 +80,39 @@ public class TeamViewImpl extends Composite implements TeamView {
 	Modal mapModal;
 	@UiField
 	Anchor showMapLink;
-	
+	@UiField
+	org.gwtbootstrap3.client.ui.TextBox memberSearchTextBox;
+	@UiField
+	Button memberSearchButton;
 	private Presenter presenter;
 	private Header headerWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private GWTWrapper gwt;
+	private Linkify linkify;
+	
 	@Inject
 	public TeamViewImpl(TeamViewImplUiBinder binder, 
 			InviteWidget inviteWidget, 
 			Header headerWidget, 
 			SynapseJSNIUtils synapseJSNIUtils,
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			Linkify linkify) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.gwt = gwt;
+		this.linkify = linkify;
 		setDropdownHandlers();
-		headerWidget.configure(false);
-		showMapLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onShowMap();
+		headerWidget.configure();
+		showMapLink.addClickHandler(event -> {
+			presenter.onShowMap();
+		});
+		memberSearchButton.addClickHandler(event -> {
+			presenter.onMemberSearch(memberSearchTextBox.getValue());
+		});
+		memberSearchTextBox.addKeyDownHandler(event -> {
+			if(KeyCodes.KEY_ENTER == event.getNativeKeyCode()){
+				memberSearchButton.click();
 			}
 		});
 	}
@@ -108,66 +123,33 @@ public class TeamViewImpl extends Composite implements TeamView {
 	}
 	
 	private void setDropdownHandlers() {
-		inviteMemberItem.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				gwt.scheduleDeferred(new Callback() {
-					@Override
-					public void invoke() {
-						presenter.showInviteModal();		
-					}
-				});
-			}
+		inviteMemberItem.addClickHandler(event ->  {
+			gwt.scheduleDeferred(() -> {
+				presenter.showInviteModal();		
+			});
 		});
-		editTeamItem.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				gwt.scheduleDeferred(new Callback() {
-					@Override
-					public void invoke() {
-						presenter.showEditModal();		
-					}
-				});
-			}
+		editTeamItem.addClickHandler(event -> {
+			gwt.scheduleDeferred(() -> {
+				presenter.showEditModal();		
+			});
 		});
-		deleteTeamItem.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				gwt.scheduleDeferred(new Callback() {
-					@Override
-					public void invoke() {
-						presenter.showDeleteModal();		
-					}
-				});
-			}
+		deleteTeamItem.addClickHandler(event -> {
+			gwt.scheduleDeferred(() -> {
+				presenter.showDeleteModal();		
+			});
 		});
-		leaveTeamItem.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				gwt.scheduleDeferred(new Callback() {
-					@Override
-					public void invoke() {
-						presenter.showLeaveModal();		
-					}
-				});
-			}
+		leaveTeamItem.addClickHandler(event -> {
+			gwt.scheduleDeferred(() -> {
+				presenter.showLeaveModal();		
+			});
 		});
-		synapseEmailField.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				synapseEmailField.selectAll();
-			}
+		synapseEmailField.addClickHandler(event -> {
+			synapseEmailField.selectAll();
 		});
-		manageAccessItem.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				gwt.scheduleDeferred(new Callback() {
-					@Override
-					public void invoke() {
-						presenter.onManageAccess();		
-					}
-				});
-			}
+		manageAccessItem.addClickHandler(event -> {
+			gwt.scheduleDeferred(() -> {
+				presenter.onManageAccess();		
+			});
 		});
 	}
 	
@@ -181,6 +163,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		leaveTeamItem.setVisible(false);
 		publicJoinField.setVisible(false);
 		synapseEmailField.setValue("");
+		memberSearchTextBox.setValue("");
 	}
 	
 	@Override
@@ -190,8 +173,8 @@ public class TeamViewImpl extends Composite implements TeamView {
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override
@@ -202,7 +185,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
@@ -229,7 +212,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		if (team.getIcon() != null) {
 			pictureUrl = synapseJSNIUtils.getFileHandleAssociationUrl(team.getId(), FileHandleAssociateType.TeamAttachment, team.getIcon());
 		}
-		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(team.getName(), team.getDescription(), null,  pictureUrl, false, 2);
+		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(team.getName(), linkify.linkify(team.getDescription()), null,  pictureUrl, false, 2);
 		mediaObjectContainer.setWidget(mediaObjectPanel.asWidget());
 		mapModal.setTitle(team.getName());
 	}	
@@ -285,8 +268,9 @@ public class TeamViewImpl extends Composite implements TeamView {
 	}
 
 	@Override
-	public void setTotalMemberCount(String memberCount) {
-		totalMemberCountField.setText(memberCount);
+	public void setMemberCountWidget(IsWidget widget) {
+		memberCountContainer.clear();
+		memberCountContainer.add(widget);
 	}
 
 	@Override

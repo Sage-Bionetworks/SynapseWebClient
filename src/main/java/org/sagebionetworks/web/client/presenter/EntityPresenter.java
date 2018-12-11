@@ -15,9 +15,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -38,54 +36,47 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.binder.EventHandler;
 
 public class EntityPresenter extends AbstractActivity implements EntityView.Presenter, Presenter<Synapse>, IsWidget {
 		
 	private Synapse place;
 	private EntityView view;
-	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private StuAlert synAlert;
 	private String entityId;
 	private Long versionNumber;
 	private Synapse.EntityArea area;
 	private String areaToken;
-	private CookieProvider cookies;
 	private Header headerWidget;
 	private EntityPageTop entityPageTop;
 	private OpenTeamInvitationsWidget openTeamInvitesWidget;
+	private GlobalApplicationState globalAppState;
 	private GWTWrapper gwt;
 	private SynapseJavascriptClient jsClient;
 	@Inject
 	public EntityPresenter(EntityView view,
+			EntityPresenterEventBinder entityPresenterEventBinder,
 			GlobalApplicationState globalAppState,
 			AuthenticationController authenticationController,
-			SynapseJavascriptClient jsClient, CookieProvider cookies,
+			SynapseJavascriptClient jsClient,
 			StuAlert synAlert,
 			EntityPageTop entityPageTop, Header headerWidget,
 			OpenTeamInvitationsWidget openTeamInvitesWidget,
-			GWTWrapper gwt
+			GWTWrapper gwt,
+			EventBus eventBus
 			) {
 		this.headerWidget = headerWidget;
 		this.entityPageTop = entityPageTop;
+		this.globalAppState = globalAppState;
 		this.openTeamInvitesWidget = openTeamInvitesWidget;
 		this.view = view;
 		this.synAlert = synAlert;
-		this.globalApplicationState = globalAppState;
 		this.authenticationController = authenticationController;
 		this.jsClient = jsClient;
-		this.cookies = cookies;
 		this.gwt = gwt;
 		clear();
-		entityPageTop.setEntityUpdatedHandler(new EntityUpdatedHandler() {			
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				//reload current window
-				//get the place based on the current url
-				globalApplicationState.refreshPage();
-			}
-		});
-		
+		entityPresenterEventBinder.getEventBinder().bindEventHandlers(this, eventBus);
 	}
 
 	@Override
@@ -145,7 +136,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		view.setSynAlertWidget(synAlert.asWidget());
 		// Hide the view panel contents until async callback completes
 		view.setLoadingVisible(true);
-		int mask = ENTITY | ENTITY_PATH;
+		int mask = EntityPageTop.ALL_PARTS_MASK;
 		final AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
@@ -169,17 +160,17 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 				if(projectHeader == null) {
 					synAlert.showError(DisplayConstants.ERROR_GENERIC_RELOAD);
 				} else {
-					entityPageTop.configure(bundle.getEntity(), versionNumber, projectHeader, area, areaToken);
+					entityPageTop.configure(bundle, versionNumber, projectHeader, area, areaToken);
 					view.setEntityPageTopWidget(entityPageTop);
 					view.setEntityPageTopVisible(true);
-					headerWidget.configure(false, projectHeader);	
+					headerWidget.configure(projectHeader);	
 				}
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setLoadingVisible(false);
-				headerWidget.configure(false);
+				headerWidget.configure();
 				if(caught instanceof NotFoundException) {
 					show404();
 				} else if(caught instanceof ForbiddenException && authenticationController.isLoggedIn()) {
@@ -247,7 +238,12 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	
+
+	@EventHandler
+	public void onEntityUpdatedEvent(EntityUpdatedEvent event) {
+		globalAppState.refreshPage();
+	}
+
 	// for testing only
 	
 	public void setEntityId(String entityId) {

@@ -218,7 +218,7 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 		String userDisplayName = "";
 		String userEmailAddress = "";
 		if (authenticationController.isLoggedIn()) {
-	    	UserProfile profile = authenticationController.getCurrentUserSessionData().getProfile();
+	    	UserProfile profile = authenticationController.getCurrentUserProfile();
 	    	principalId = authenticationController.getCurrentUserPrincipalId();
 	    	userDisplayName = DisplayUtils.getDisplayName(profile);
 	    	userEmailAddress = DisplayUtils.getPrimaryEmail(profile);
@@ -266,7 +266,7 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 		StringBuilder description = new StringBuilder(); 
 		
 	    if (authenticationController.isLoggedIn()) {
-	    	UserProfile profile = authenticationController.getCurrentUserSessionData().getProfile();
+	    	UserProfile profile = authenticationController.getCurrentUserProfile();
 	    	description.append("Submitted by " + DisplayUtils.getDisplayName(profile));
 	    }
 	    description.append("\n\n" + stepsToRepro);

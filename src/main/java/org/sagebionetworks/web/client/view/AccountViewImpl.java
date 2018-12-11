@@ -31,14 +31,14 @@ public class AccountViewImpl extends Composite implements AccountView {
 		initWidget(binder.createAndBindUi(this));
 		
 		this.headerWidget = headerWidget;
-		headerWidget.configure(false);
+		headerWidget.configure();
 	}
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		mainContainer.clear();
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
@@ -59,8 +59,8 @@ public class AccountViewImpl extends Composite implements AccountView {
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

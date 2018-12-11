@@ -1,5 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.entity.controller;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -8,6 +8,8 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -42,16 +44,17 @@ public class StuAlertTest {
 	GWTWrapper mockGWT;
 	@Mock
 	UserProfile mockProfile;
-	@Mock
-	UserSessionData mockUSD;
-	
+	@Captor
+	ArgumentCaptor<String> stringCaptor;
 	public static final String HOST_PAGE_URL="http://foobar";
+	public static final String USER_ID = "1977";
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 		widget = new StuAlert(mockView, mockSynapseClient, mockSynapseAlert, mockGWT, mockAuthenticationController);
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(mockUSD);
-		when(mockUSD.getProfile()).thenReturn(mockProfile);
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(mockProfile);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(USER_ID);
+		when(mockProfile.getOwnerId()).thenReturn(USER_ID);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).sendMessageToEntityOwner(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		
 		when(mockGWT.getHostPageBaseURL()).thenReturn(HOST_PAGE_URL);
@@ -131,8 +134,10 @@ public class StuAlertTest {
 	public void testOnRequestAccess() {
 		widget.onRequestAccess();
 		verify(mockView).showRequestAccessButtonLoading();
-		verify(mockSynapseClient).sendMessageToEntityOwner(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockSynapseClient).sendMessageToEntityOwner(anyString(), anyString(), stringCaptor.capture(), anyString(), any(AsyncCallback.class));
+		String messageBody = stringCaptor.getValue();
+		assertTrue(messageBody.contains("#!Profile:"+USER_ID));
+		verify(mockView).showInfo(anyString());
 		verify(mockView).hideRequestAccessUI();
 	}
 	@Test

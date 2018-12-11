@@ -13,8 +13,7 @@
 						<b:ButtonToolBar ui:field="buttonToolbar">
 							<b:ButtonGroup>
 								<b:Button ui:field="selectTogglebutton" icon="SQUARE_O" />
-								<b:Button ui:field="selectDropDown" dataToggle="DROPDOWN"
-									height="27px" />
+								<b:Button ui:field="selectDropDown" dataToggle="DROPDOWN"/>
 								<b:DropDownMenu>
 									<b:DropDownHeader>Select</b:DropDownHeader>
 									<b:AnchorListItem ui:field="selectAllItem">All</b:AnchorListItem>

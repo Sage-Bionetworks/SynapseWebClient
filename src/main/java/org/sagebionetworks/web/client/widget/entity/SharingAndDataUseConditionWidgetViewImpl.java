@@ -79,7 +79,7 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 			public void onSuccess(Boolean isPublic) {
 				//add the proper description into the container
 				String description = isPublic ? DisplayConstants.SHARING_PUBLIC_DESCRIPTION : DisplayConstants.SHARING_PRIVATE_DESCRIPTION;
-				sharingDescriptionContainer.add(new HTML("<p class=\"margin-left-20 nobottommargin\">"+description+"</p>"));
+				sharingDescriptionContainer.setWidget(new HTML("<p class=\"margin-left-20 nobottommargin\">"+description+"</p>"));
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -135,8 +135,8 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

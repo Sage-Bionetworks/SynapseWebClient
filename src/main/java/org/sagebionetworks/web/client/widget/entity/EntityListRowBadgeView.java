@@ -21,7 +21,7 @@ public interface EntityListRowBadgeView extends IsWidget, SelectableListItem, Su
 	
 	void setCreatedByWidget(Widget w);
 	void setIcon(IconType iconType);
-	void setFileDownloadButton(Widget w);
+	void showAddToDownloadList();
 	void setNote(String note);
 	String getNote();
 	void setDescription(String description);
@@ -36,5 +36,6 @@ public interface EntityListRowBadgeView extends IsWidget, SelectableListItem, Su
 	 * Presenter interface
 	 */
 	public interface Presenter extends SelectableListItem.Presenter {
+		void onAddToDownloadList();
 	}
 }

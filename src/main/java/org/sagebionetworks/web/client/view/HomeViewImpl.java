@@ -4,16 +4,15 @@ import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.users.RegisterWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
-import org.sagebionetworks.web.client.widget.login.UserListener;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -21,7 +20,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -29,16 +27,12 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class HomeViewImpl extends Composite implements HomeView {
 	
 	public interface HomeViewImplUiBinder extends UiBinder<Widget, HomeViewImpl> {}
-	@UiField
-	SimplePanel newsFeed;
 	@UiField
 	org.gwtbootstrap3.client.ui.Button dashboardBtn;
 	@UiField
@@ -97,6 +91,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.userBadge = userBadge;
+		userBadge.noTooltip();
 		this.loginWidget = loginWidget;
 		userBadge.setSize(BadgeSize.LARGE_PICTURE_ONLY);
 		myDashboardButtonContents = new HorizontalPanel();
@@ -107,21 +102,18 @@ public class HomeViewImpl extends Composite implements HomeView {
 		
 		addUserPicturePanel();
 		
-		headerWidget.configure(true);
+		headerWidget.configure();
 		
 		dashboardBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Profile(authController.getCurrentUserPrincipalId()));
+				globalApplicationState.getPlaceChanger().goTo(new Profile(authController.getCurrentUserPrincipalId(), ProfileArea.PROJECTS));
 			}
 		});
 		registerWidgetContainer.add(registerWidget.asWidget());
 		
-		loginWidget.setUserListener(new UserListener() {
-			@Override
-			public void userChanged(UserSessionData newUser) {
-				presenter.onUserChange();
-			}
+		loginWidget.setUserListener(() -> {
+			presenter.onUserChange();
 		});
 		// Other links
 		dreamChallengesBox.addClickHandler(new ClickHandler() {
@@ -186,22 +178,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 			}
 		});
 	}
-	@Override
-	public void prepareTwitterContainer(final String elementId, int height) {
-		newsFeed.clear();
-		final ScrollPanel newDiv = new ScrollPanel();
-		newDiv.setHeight(height + "px");
-		newDiv.addAttachHandler(new AttachEvent.Handler() {
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				if (event.isAttached()) {
-					newDiv.getElement().setId(elementId);
-					presenter.twitterContainerReady(elementId);
-				}
-			}
-		});
-		newsFeed.add(newDiv);
-	}
+	
 	/**
 	 * Clear the divider/caret from the user button, and add the picture container
 	 * @param button
@@ -217,10 +194,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 
 	
 	@Override
-	public void showLoggedInUI(UserSessionData userData) {
-		setUserProfilePicture(userData);
+	public void showLoggedInUI(UserProfile profile) {
+		setUserProfilePicture(profile);
 		dashboardUI.setVisible(true);
-		userDisplayName.setText(userData.getProfile().getUserName().toUpperCase());
+		userDisplayName.setText(profile.getUserName().toUpperCase());
 	}
 
 	@Override
@@ -241,9 +218,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 		userBadge.configurePicture();
 	}
 	
-	private void setUserProfilePicture(UserSessionData userData) {
-		if (userData != null && userData.getProfile() != null) {
-			UserProfile profile = userData.getProfile();
+	private void setUserProfilePicture(UserProfile profile) {
+		if (profile != null) {
 			userBadge.configure(profile);
 			userBadge.setDoNothingOnClick();
 		}
@@ -257,7 +233,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	
 	@Override
 	public void refresh() {
-		headerWidget.configure(true);
+		headerWidget.configure();
 		headerWidget.refresh();
 		clear();
 	}
@@ -273,8 +249,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

@@ -69,7 +69,6 @@ public class WebConstants {
 	 */
 	public static final String OPEN_ID_ERROR_TOKEN = "OpenIDError";
 	public static final String OPEN_ID_UNKNOWN_USER_ERROR_TOKEN = "OpenIDUnknownUser";
-
 	
 	public static final String OPEN_ID_URI = "/Portal/openid";
 
@@ -111,6 +110,8 @@ public class WebConstants {
 	public static final String FILE_HANDLE_ID_PARAM_KEY = "fileHandleId";
 	/** END FileHandleAssociation servlet params **/
 	
+	public static final String SESSION_TOKEN_KEY = "t";
+	public static final String EXPIRE_SESSION_TOKEN = "deleted";
 	public static final String ENTITY_PARAM_KEY = "entityId";
 	
 	public static final String TEAM_PARAM_KEY = "teamId";
@@ -185,6 +186,7 @@ public class WebConstants {
 	public static final String ALIAS_PARAM_KEY = "alias";
 	public static final String SLACK_SERVLET = "slack";
 	public static final String FILE_HANDLE_UPLOAD_SERVLET = "filehandle";
+	public static final String SESSION_COOKIE_SERVLET = "sessioncookie";
 	public static final String FILE_ENTITY_RESOLVER_SERVLET = "fileresolver";
 	public static final String JIRA_PROJECT_ID ="org.sagebionetworks.portal.jira_project_id";
 	public static final String JIRA_PROJECT_KEY ="org.sagebionetworks.portal.jira_project_key";
@@ -243,6 +245,7 @@ public class WebConstants {
 	public static final String USERNAME_SUFFIX = "_USERNAME_2_ID";
 	public static final String TEMP_IMAGE_ATTACHMENT_SUFFIX = "_TEMP_IMAGE_ATTACHMENT";
 	public static final String WIKIPAGE_SUFFIX = "_WIKI_PAGE";
+	public static final String FILE_HANDLE_SUFFIX = "_FILE_HANDLE";
 
 	public static final String TABLE_COLUMN_ID = "columnId";
 	public static final String TABLE_ROW_ID = "rowId";
@@ -276,7 +279,8 @@ public class WebConstants {
 	
 	public static final String OAUTH2_PROVIDER = "oauth2provider";
 	public static final String OAUTH2_CODE = "code";
-
+	public static final String OAUTH2_STATE = "state";
+	
 	// discussion message
 	public static final String DISCUSSION_MESSAGE_SERVLET = "/discussion/messageUrl";
 	public static final String MESSAGE_KEY_PARAM = "messageKey";
@@ -294,4 +298,7 @@ public class WebConstants {
 	public static final String FILE_SERVICE_URL_KEY = "fileServiceUrl";
 	public static final String AUTH_PUBLIC_SERVICE_URL_KEY = "authPublicServiceUrl";
 	public static final String SYNAPSE_VERSION_KEY = "synapseVersionInfo";
+	
+	//View mask constants
+	public static final int FILE = 0x01, PROJECT=0x02, TABLE=0x04, FOLDER=0x08, VIEW=0x10, DOCKER=0x20;
 }

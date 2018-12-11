@@ -245,15 +245,21 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	
 	@Override
 	public void resetWikiMarkdown(String markdown) {
-		view.setMarkdownVisible(true);
-		if(!isCurrentVersion) {
-			markdownWidget.configure(markdown, wikiKey, versionInView);
-			view.setDiffVersionAlertVisible(true);
-			if (canEdit) {
-				view.setRestoreButtonVisible(true);
+		if (DisplayUtils.isDefined(markdown)) {
+			view.setNoWikiCanEditMessageVisible(false);
+			view.setNoWikiCannotEditMessageVisible(false);
+			view.setMarkdownVisible(true);
+			if(!isCurrentVersion) {
+				markdownWidget.configure(markdown, wikiKey, versionInView);
+				view.setDiffVersionAlertVisible(true);
+				if (canEdit) {
+					view.setRestoreButtonVisible(true);
+				}
+			} else {
+				markdownWidget.configure(markdown, wikiKey, null);
 			}
 		} else {
-			markdownWidget.configure(markdown, wikiKey, null);
+			showNoWikiFoundUI();
 		}
 	}
 	
@@ -408,14 +414,19 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		view.setMarkdownVisible(false);
 		view.setWikiHistoryVisible(false);
 		if (caught instanceof NotFoundException) {
-			if (canEdit) {
-				view.setNoWikiCanEditMessageVisible(true);
-			}else {
-				view.setNoWikiCannotEditMessageVisible(true);
-			}
+			showNoWikiFoundUI();
 		} else {
 			view.setMainPanelVisible(false);
 			stuAlert.handleException(caught);
+		}
+	}
+	
+	private void showNoWikiFoundUI() {
+		view.setMarkdownVisible(false);
+		if (canEdit) {
+			view.setNoWikiCanEditMessageVisible(true);
+		}else {
+			view.setNoWikiCannotEditMessageVisible(true);
 		}
 	}
 

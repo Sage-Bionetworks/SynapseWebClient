@@ -128,20 +128,6 @@ public class AsynchronousProgressWidgetTest {
 	}
 	
 	@Test
-	public void testCancel(){
-		String title = "title";
-		start.setProgressCurrent(1l);
-		start.setProgressTotal(0l);
-		widget.startAndTrackJob(title,true, type, requestBody, mockHandler);
-		verify(mockView).setTitle(title);
-		verify(mockView).setDeterminateProgress(0.0, "0.00%", start.getProgressMessage());
-		verify(mockView).setDeterminateProgress(50.00, "50.00%", middle.getProgressMessage());
-		verify(mockView).setDeterminateProgress(100.00, "100.00%", done.getProgressMessage());
-		widget.onCancel();
-		verify(mockHandler).onCancel();
-	}
-	
-	@Test
 	public void testError(){
 		Throwable error = new Throwable("some error");
 		trackerStub = new AsynchronousJobTrackerStub(states, error, responseBody);

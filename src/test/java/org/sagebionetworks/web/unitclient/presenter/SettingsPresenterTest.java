@@ -70,7 +70,6 @@ public class SettingsPresenterTest {
 	PortalGinInjector mockInjector;
 	SynapseAlert mockSynAlert;
 	UserProfileModalWidget mockUserProfileModalWidget;
-	UserSessionData testUser = new UserSessionData();
 	UserProfile profile = new UserProfile();
 	String password = "password";
 	String newPassword = "otherpassword";
@@ -116,7 +115,7 @@ public class SettingsPresenterTest {
 		verify(mockView).setPresenter(presenter);
 		verify(mockView).setSubscriptionsListWidget(any(Widget.class));
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(testUser);
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(profile);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(APIKEY).when(mockSynapseClient).getAPIKey(any(AsyncCallback.class));
 
@@ -133,17 +132,13 @@ public class SettingsPresenterTest {
 		List<String> emails = new ArrayList<String>();
 		emails.add(email);
 		profile.setEmails(emails);
-		testUser.setProfile(profile);
-		testUser.setSession(new Session());
-		testUser.getSession().setSessionToken("token");
-		testUser.setIsSSO(false);
 	}
 	
 	@Test
 	public void testResetPassword() throws RestServiceException {
-		AsyncMockStubber.callSuccessWith(testUser).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(profile).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(testUser).when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(profile).when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
 		
 		presenter.resetPassword(password, newPassword);
 		verify(mockView).showPasswordChangeSuccess();
@@ -161,7 +156,7 @@ public class SettingsPresenterTest {
 
 	@Test
 	public void testResetPasswordFailChangePw() throws RestServiceException {		
-		AsyncMockStubber.callSuccessWith(testUser).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(profile).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
 		Exception ex = new Exception("pw change failed");
 		AsyncMockStubber.callFailureWith(ex).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
 		
@@ -172,7 +167,7 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testResetPasswordFailFinalLogin() throws RestServiceException {		
-		AsyncMockStubber.callSuccessWith(testUser).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(profile).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
 		
@@ -197,7 +192,7 @@ public class SettingsPresenterTest {
 		assertNotNull(updatedProfile.getNotificationSettings());
 		assertEquals(sendEmailNotifications, updatedProfile.getNotificationSettings().getSendEmailNotifications());
 		assertEquals(markEmailedMessagesAsRead, updatedProfile.getNotificationSettings().getMarkEmailedMessagesAsRead());
-		verify(mockView).showInfo(eq(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS), anyString());
+		verify(mockView).showInfo(eq(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS));
 	}
 	
 	@Test
@@ -220,7 +215,7 @@ public class SettingsPresenterTest {
 		UserProfile updatedProfile = argument.getValue();
 		assertEquals(sendEmailNotifications, updatedProfile.getNotificationSettings().getSendEmailNotifications());
 		assertEquals(markEmailedMessagesAsRead, updatedProfile.getNotificationSettings().getMarkEmailedMessagesAsRead());
-		verify(mockView).showInfo(eq(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS), anyString());
+		verify(mockView).showInfo(eq(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS));
 	}
 	
 	@Test
@@ -300,7 +295,7 @@ public class SettingsPresenterTest {
 	public void testConfigureAnonymousSWC2943() {
 		//used to result in NPE before fix for SWC-2943
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(null);
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(null);
 		presenter.configure();
 		verify(mockView).clear();
 	}
@@ -380,7 +375,7 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testChangePasswordPasswordSuccess() {
-		AsyncMockStubber.callSuccessWith(testUser).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(profile).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
 		when(mockView.getCurrentPasswordField()).thenReturn(password);
 		when(mockView.getPassword1Field()).thenReturn(newPassword);
 		when(mockView.getPassword2Field()).thenReturn(newPassword);

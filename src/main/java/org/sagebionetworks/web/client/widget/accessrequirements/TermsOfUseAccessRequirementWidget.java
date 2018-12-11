@@ -8,8 +8,8 @@ import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.BasicAccessRequirementStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
@@ -25,6 +25,7 @@ import com.google.inject.Inject;
 public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequirementWidgetView.Presenter, IsWidget {
 	private TermsOfUseAccessRequirementWidgetView view;
 	SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	DataAccessClientAsync dataAccessClient;
 	SynapseAlert synAlert;
 	WikiPageWidget wikiPageWidget;
@@ -41,6 +42,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			AuthenticationController authController,
 			DataAccessClientAsync dataAccessClient,
 			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
 			WikiPageWidget wikiPageWidget,
 			SynapseAlert synAlert,
 			SubjectsWidget subjectsWidget,
@@ -51,6 +53,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
+		this.jsClient = jsClient;
 		this.dataAccessClient = dataAccessClient;
 		fixServiceEntryPoint(dataAccessClient);
 		this.synAlert = synAlert;
@@ -82,7 +85,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	public void setRequirement(final TermsOfUseAccessRequirement ar, Callback refreshCallback) {
 		this.ar = ar;
 		this.refreshCallback = refreshCallback;
-		synapseClient.getRootWikiId(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), new AsyncCallback<String>() {
+		jsClient.getRootWikiPageKey(ObjectType.ACCESS_REQUIREMENT.toString(), ar.getId().toString(), new AsyncCallback<String>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setTerms(ar.getTermsOfUse());
@@ -105,7 +108,6 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	
 	public void setDataAccessSubmissionStatus(BasicAccessRequirementStatus status) {
 		// set up view based on DataAccessSubmission state
-		view.resetState();
 		if (status.getIsApproved()) {
 			view.showApprovedHeading();	
 		} else {
@@ -113,8 +115,16 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			view.showSignTermsButton();
 		}
 	}
-	
+	public void showAnonymous() {
+		view.showUnapprovedHeading();
+		view.showLoginButton();
+	}
 	public void refreshApprovalState() {
+		view.resetState();
+		if (!authController.isLoggedIn()) {
+			showAnonymous();
+			return;
+		}
 		dataAccessClient.getAccessRequirementStatus(ar.getId().toString(), new AsyncCallback<AccessRequirementStatus>() {
 			@Override
 			public void onFailure(Throwable caught) {

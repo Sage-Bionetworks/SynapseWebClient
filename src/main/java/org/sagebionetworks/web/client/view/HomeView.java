@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
-import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -15,12 +15,10 @@ public interface HomeView extends IsWidget, SynapseView {
 		
 	public void refresh();
 	
-	public void showLoggedInUI(UserSessionData userData);
+	public void showLoggedInUI(UserProfile profile);
 	public void showRegisterUI();
 	public void showLoginUI();
-	public void prepareTwitterContainer(String elementId, int height);
 	public interface Presenter {
 		void onUserChange();
-		void twitterContainerReady(String elementId);
 	}
 }

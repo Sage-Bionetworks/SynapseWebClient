@@ -11,9 +11,8 @@ public interface StuAlertView extends IsWidget {
 	/**
 	 * Show info to the user.
 	 * @param string
-	 * @param string
 	 */
-	void showInfo(String header, String message);
+	void showInfo(String message);
 	/**
 	 * Clears all state in the view (makes all components invisible).
 	 */

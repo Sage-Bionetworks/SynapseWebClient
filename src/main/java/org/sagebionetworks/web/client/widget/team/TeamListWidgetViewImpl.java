@@ -45,8 +45,8 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override
@@ -63,7 +63,7 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 		teamRenderer.configure(team);
 		team2Badge.put(team.getId(), teamRenderer);
 		Widget teamRendererWidget = teamRenderer.asWidget();
-		container.add(teamRendererWidget);
+		container.setWidget(teamRendererWidget);
 		add(container);
 	}
 	

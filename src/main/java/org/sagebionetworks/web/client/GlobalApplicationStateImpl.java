@@ -33,7 +33,6 @@ import com.google.inject.Inject;
 public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public static final String RECENTLY_CHECKED_SYNAPSE_VERSION = "org.sagebionetworks.web.client.recently-checked-synapse-version";
 	public static final String DEFAULT_REFRESH_PLACE = "!Home:0";
-	public static final String UNCAUGHT_JS_EXCEPTION = "Uncaught JS Exception:";
 	private PlaceController placeController;
 	private CookieProvider cookieProvider;
 	private AppPlaceHistoryMapper appPlaceHistoryMapper;
@@ -94,11 +93,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public void handleUncaughtException(Throwable e) {
 		try {
 			GWT.debugger();
-			jsClient.logError(UNCAUGHT_JS_EXCEPTION, unwrap(e));
+			jsClient.logError(unwrap(e));
 		} catch (Throwable t) {
 			synapseJSNIUtils.consoleError("Unable to log uncaught exception to server: " + t.getMessage());
 		} finally {
-			synapseJSNIUtils.consoleError(UNCAUGHT_JS_EXCEPTION + e.getMessage() + ": " + e.getStackTrace());	
+			synapseJSNIUtils.consoleError(e);	
 		}
 	}
 	
@@ -277,21 +276,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		this.isEditing = isEditing;
 	}
 	
-	public void initSynapseVersions(final Callback c) {
-		stackConfigService.getSynapseVersions(new AsyncCallback<String>() {			
-			@Override
-			public void onSuccess(String versions) {
-				synapseVersion = versions;
-				c.invoke();
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				c.invoke();
-			}
-		});
-	}
-	
 	@Override
 	public void pushCurrentPlace(Place targetPlace) {
 		//only push this place into the history if it is a place change
@@ -462,11 +446,15 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	}
 	
 	private void initStep2(Callback finalCallback) {
-		initSynapseVersions(finalCallback);
 		view.initGlobalViewProperties();
 		String showInUTC = cookieProvider.getCookie(SHOW_DATETIME_IN_UTC);
 		if (showInUTC != null) {
 			setShowUTCTime(Boolean.parseBoolean(showInUTC));
 		}
+		finalCallback.invoke();
+	}
+	@Override
+	public void back() {
+		view.back();
 	}
 }

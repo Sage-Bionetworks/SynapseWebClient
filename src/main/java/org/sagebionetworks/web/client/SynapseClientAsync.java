@@ -22,11 +22,9 @@ import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
-import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
@@ -38,7 +36,6 @@ import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnModelPage;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
-import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
@@ -99,8 +96,6 @@ public interface SynapseClientAsync {
 	void updateExternalFile(String entityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
 
 	void createExternalFile(String parentEntityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
-
-	void getRootWikiId(String ownerId, String ownerType, AsyncCallback<String> callback);
 	void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<FileHandleResults> callback);
 	
 	void restoreV2WikiPage(String ownerId, String ownerType, String wikiId,
@@ -134,7 +129,6 @@ public interface SynapseClientAsync {
 	void resendTeamInvitation(String membershipInvitationId, String hostPageBaseURL, AsyncCallback<Void> callback);
 	void getOpenRequests(String teamId, AsyncCallback<List<MembershipRequestBundle>> callback);
 	void updateTeam(Team team, AccessControlList teamAcl, AsyncCallback<Team> callback);
-	void deleteTeamMember(String currentUserId, String targetUserId, String teamId, AsyncCallback<Void> callback);
 	void getTeamMembers(String teamId, String fragment, Integer limit, Integer offset, AsyncCallback<TeamMemberPagedResults> callback);	
 	void getTeamMemberCount(String teamId, AsyncCallback<Long> callback);
 	void requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL, Date expiresOn, AsyncCallback<TeamMembershipStatus> callback);
@@ -154,12 +148,6 @@ public interface SynapseClientAsync {
 	
 	void getFileEntityIdWithSameName(String fileName, String parentEntityId, AsyncCallback<String> callback);
 	void setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, AsyncCallback<String> callback);
-	
-	
-	void getEntityDoi(String entityId, Long versionNumber,
-			AsyncCallback<Doi> callback);
-	void createDoi(String entityId, Long versionNumber, AsyncCallback<Void> callback);
-	
 	void handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL, AsyncCallback<ResponseMessage> callback);
 	
 	void hexDecodeAndDeserialize(String tokenTypeName, String signedTokenString, AsyncCallback<SignedTokenInterface> callback);
@@ -196,20 +184,6 @@ public interface SynapseClientAsync {
 	 * @param callback
 	 */
 	void validateTableQuery(String sql, AsyncCallback<Void> callback);
-	/**
-	 * For the given table SQL toggle the sort on the given column and return the modified SQL.
-	 * @param sql
-	 * @param header
-	 * @param callback
-	 */
-	void toggleSortOnTableQuery(String sql, String header, AsyncCallback<String> callback);
-	
-	/**
-	 * Parse the query and determine the sort columns.
-	 * @param sql
-	 * @param callback
-	 */
-	void getSortFromTableQuery(String sql, AsyncCallback<List<SortItem>> callback);
 
 	void purgeTrashForUser(AsyncCallback<Void> callback);
 
@@ -227,14 +201,6 @@ public interface SynapseClientAsync {
 
 	void createTableColumns(List<ColumnModel> value,
 			AsyncCallback<List<ColumnModel>> asyncCallback);
-	
-	/**
-	 * Return the upload destinations associated with this parent entity (container)
-	 * @param parentEntityId
-	 * @return
-	 * @throws RestServiceException
-	 */
-	void getUploadDestinations(String parentEntityId, AsyncCallback<List<UploadDestination>> callback);
 	
 	void getHost(String urlString, AsyncCallback<String> callback);
 
@@ -256,9 +222,6 @@ public interface SynapseClientAsync {
 
 	void getMyLocationSettingBanners(AsyncCallback<List<String>> callback);
 
-	void hexDecodeLogEntry(String encodedLogEntry,
-			AsyncCallback<LogEntry> callback);
-
 	void isTeamMember(String userId, Long groupPrincipalId, AsyncCallback<Boolean> callback);
 	
 	void setIsTeamAdmin(String currentUserId, String targetUserId,
@@ -278,8 +241,6 @@ public interface SynapseClientAsync {
 
 	void isUserAllowedToRenderHTML(String userId, AsyncCallback<Boolean> callback);
 	
-	void isWiki(String id, AsyncCallback<Boolean> callback);
-
 	void isChallenge(String id, AsyncCallback<Boolean> callback);
 
 	void addTeamMember(String userGroupId, String teamId, String message, String hostPageBaseURL,

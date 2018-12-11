@@ -91,8 +91,8 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 			}
 		});
 		
-		deleteButton.setHeight("34px");
-		deleteButton.addStyleName("movedown-5");
+		deleteButton.setHeight("35px");
+		deleteButton.addStyleName("movedown-10");
 		InputGroupButton deleteButtonGroup = new InputGroupButton();
 		deleteButtonGroup.add(deleteButton);
 		group.add(editor.asWidget());

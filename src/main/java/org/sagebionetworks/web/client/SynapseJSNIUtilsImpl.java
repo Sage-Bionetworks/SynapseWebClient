@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
@@ -25,24 +26,45 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	
 	private static ProgressCallback progressCallback;
-	
+
+	@Override
+	public void setAnalyticsUserId(String userID) {
+		_setAnalyticsUserId(userID);
+	}
+	private static native void _setAnalyticsUserId(String userID) /*-{
+		try {
+			$wnd.ga('set', 'userId', userID);
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
+
 	@Override
 	public void recordPageVisit(String token) {
 		_recordPageVisit(token);
 	}
 
 	private static native void _recordPageVisit(String token) /*-{
-		$wnd.ga('set', 'page', '/#'+token);
-		$wnd.ga('send', 'pageview');
+		try {
+			$wnd.ga('set', 'page', '/#'+token);
+			$wnd.ga('send', 'pageview');
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
 	
+	@Override
+	public void sendAnalyticsEvent(String eventCategory, String eventAction, String eventLabelValue) {
+		_sendAnalyticsEvent(eventCategory, eventAction, eventLabelValue);
+	}
 	@Override
 	public void sendAnalyticsEvent(String eventCategory, String eventAction) {
 		_sendAnalyticsEvent(eventCategory, eventAction, getCurrentURL());
 	}
 
 	private static native void _sendAnalyticsEvent(String eventCategoryValue, String eventActionValue, String eventLabelValue) /*-{
-		$wnd.ga('send', 
+		try {
+			$wnd.ga('send', 
 			{
 			  hitType: 'event',
 			  eventCategory: eventCategoryValue,
@@ -50,6 +72,9 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 			  eventLabel: eventLabelValue,
 			  fieldsObject: { nonInteraction: true}
 			});
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
 
 	
@@ -66,6 +91,21 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	public static native void _highlightCodeBlocks() /*-{
 		try {
 			$wnd.jQuery('pre code').each(function(i, e) {$wnd.hljs.highlightBlock(e)});
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
+	
+	@Override
+	public void loadSummaryDetailsShim() {
+		_loadSummaryDetailsShim();
+	}
+	
+	public static native void _loadSummaryDetailsShim() /*-{
+		try {
+			$wnd.jQuery('summary').each(function(i, e) {
+				$wnd.details_shim(e)
+				});
 		} catch (err) {
 			console.error(err);
 		}
@@ -108,6 +148,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				WebConstants.FILE_HANDLE_ID_PARAM_KEY + "=" + fileHandleId;
 	}
 
+	@Override
+	public String getSessionCookieUrl() {
+		return GWTWrapperImpl.getRealGWTModuleBaseURL() + WebConstants.SESSION_COOKIE_SERVLET;
+	}
+	
 	@Override
 	public int randomNextInt() {
 		return Random.nextInt();
@@ -416,9 +461,13 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	public void consoleError(String message) {
 		_consoleError(message);
 	}
+	@Override
+	public void consoleError(Throwable t) {
+		_consoleError(t);
+	}
 
-	public final static native void _consoleError(String message) /*-{
-		console.error(message);
+	public final static native void _consoleError(Object ob) /*-{
+		console.error(ob);
 	}-*/;
 	
 	@Override
@@ -434,6 +483,18 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		}
 	}-*/;
 
+	private final static native void _scrollIntoView(Element el) /*-{
+		try {
+			el.scrollIntoView({behavior: 'smooth'});
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
+	
+	@Override
+	public void scrollIntoView(Element el) {
+		_scrollIntoView(el);
+	}
 	@Override
 	public void loadCss(final String url) {
 		final LinkElement link = Document.get().createLinkElement();
@@ -466,30 +527,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
-	public void showTwitterFeed(String dataWidgetId, String elementId,
-			String linkColor, String borderColor, int tweetCount) {
-		_showTwitterFeed(dataWidgetId, elementId, linkColor, borderColor, tweetCount);		
-	}
-
-	private final static native void _showTwitterFeed(String dataWidgetId,
-			String elementId, String linkColorHex, String borderColorHex,
-			int tweetCount) /*-{
-		try {
-			if (typeof $wnd.twttr !== 'undefined') {
-				var element = $doc.getElementById(elementId);
-				$wnd.twttr.widgets.createTimeline(dataWidgetId, element, {
-					chrome : "nofooter noheader",
-					linkColor : linkColorHex,
-					borderColor : borderColorHex,
-					tweetLimit : tweetCount
-				});
-			}
-		} catch (err) {
-			console.error(err);
-		}
-	}-*/;
-	
-	@Override
 	public boolean elementSupportsAttribute(Element el, String attribute) {
 		return _elementSupportsAttribute(el.getTagName(), attribute);
 	}
@@ -504,14 +541,14 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	public String sanitizeHtml(String html) {
 		if (!isFilterXssInitialized) {
 			//init
-			initFilterXss();
-			isFilterXssInitialized = true;
+			isFilterXssInitialized = initFilterXss();
 		}
 		return _sanitizeHtml(html);
 	}
 
-	private final static native void initFilterXss() /*-{
-		var options = {
+	private final static native boolean initFilterXss() /*-{
+		try {
+			var options = {
 				whiteList: {
 				    a:      ['target', 'href', 'title'],
 				    abbr:   ['title'],
@@ -536,18 +573,18 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				    dd:     [],
 				    del:    ['datetime'],
 				    details: ['open'],
-				    div:    [],
+				    div:    ['class'],
 				    dl:     [],
 				    dt:     [],
 				    em:     [],
 				    font:   ['color', 'size', 'face'],
 				    footer: [],
-				    h1:     [],
-				    h2:     [],
-				    h3:     [],
-				    h4:     [],
-				    h5:     [],
-				    h6:     [],
+				    h1:     ['toc'],
+				    h2:     ['toc'],
+				    h3:     ['toc'],
+				    h4:     ['toc'],
+				    h5:     ['toc'],
+				    h6:     ['toc'],
 				    head:   [],
 				    header: [],
 				    hr:     [],
@@ -565,15 +602,16 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				    s:      [],
 				    section:[],
 				    small:  [],
-				    span:   [],
+				    span:   ['data-widgetparams', 'class', 'id'],
 				    sub:    [],
+				    summary: [],
 				    sup:    [],
 				    strong: [],
-				    table:  ['width', 'border', 'align', 'valign'],
+				    table:  ['width', 'border', 'align', 'valign', 'class'],
 				    tbody:  ['align', 'valign'],
 				    td:     ['width', 'rowspan', 'colspan', 'align', 'valign'],
 				    tfoot:  ['align', 'valign'],
-				    th:     ['width', 'rowspan', 'colspan', 'align', 'valign'],
+				    th:     ['width', 'rowspan', 'colspan', 'align', 'valign', 'class'],
 				    thead:  ['align', 'valign'],
 				    tr:     ['rowspan', 'align', 'valign'],
 				    tt:     [],
@@ -591,15 +629,22 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				    }
 				},
 				safeAttrValue: function (tag, name, value) {
-					// returning nothing means keep the default behavior
+					// returning nothing removes the value
 					if (tag === 'img' && name === 'src') {
-						if (value && value.startsWith('data:image/')) {
+						if (value && (value.startsWith('data:image/') || value.startsWith('http'))) {
 							return value;
 						}
+					} else {
+						return value; 
 					}
 				}
 			};
 			$wnd.xss = new $wnd.filterXSS.FilterXSS(options);
+			return true;
+		} catch (err) {
+			console.error(err);
+			return false;
+		}
 	}-*/;
 	
 	private final static native String _sanitizeHtml(String html) /*-{
@@ -690,7 +735,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 			Notify.hideAll();
 			NotifySettings settings = DisplayUtils.getDefaultSettings();
 			settings.setType(NotifyType.INFO);
-			Notify.notify("Copied to clipboard", settings);
+			Notify.notify("", "Copied to clipboard", IconType.CHECK_CIRCLE, settings);
 		} catch (Throwable t) {
 			consoleError(t.getMessage());
 		}

@@ -141,7 +141,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			@Override
 			public void onSuccess(PassingRecord passingRecord) {
 				if (passingRecord.getPassed())
-					showSuccess(authenticationController.getCurrentUserSessionData().getProfile(), passingRecord);
+					showSuccess(authenticationController.getCurrentUserProfile(), passingRecord);
 				else
 					showFailure(passingRecord);
 			}
@@ -238,7 +238,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 					//otherwise, show the quiz
 					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
 					view.hideLoading();
-					showSuccess(authenticationController.getCurrentUserSessionData().getProfile(), passingRecord);
+					showSuccess(authenticationController.getCurrentUserProfile(), passingRecord);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}

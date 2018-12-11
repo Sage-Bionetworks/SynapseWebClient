@@ -16,6 +16,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.widget.Button;
@@ -122,12 +123,12 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		}
 						
 		if (descriptor.containsKey(TYPE)) {
-			GraphType graphType = GraphType.valueOf(descriptor.get(TYPE));
+			GraphType graphType = GraphType.valueOf(descriptor.get(TYPE).toUpperCase());
 			view.setGraphType(graphType);
 		}
 
 		if (descriptor.containsKey(BAR_MODE)) {
-			BarMode barMode = BarMode.valueOf(descriptor.get(BAR_MODE));
+			BarMode barMode = BarMode.valueOf(descriptor.get(BAR_MODE).toUpperCase());
 			view.setBarMode(barMode);
 		}
 		if (descriptor.containsKey(SHOW_LEGEND)) {
@@ -138,6 +139,14 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		
 		if (descriptor.containsKey(IS_HORIZONTAL)) {
 			view.setBarOrientationHorizontal(Boolean.valueOf(descriptor.get(IS_HORIZONTAL)));
+		}
+		if (descriptor.containsKey(X_AXIS_TYPE)) {
+			AxisType axisType = AxisType.valueOf(descriptor.get(X_AXIS_TYPE).toUpperCase());
+			view.setXAxisType(axisType);
+		}
+		if (descriptor.containsKey(Y_AXIS_TYPE)) {
+			AxisType axisType = AxisType.valueOf(descriptor.get(Y_AXIS_TYPE).toUpperCase());
+			view.setYAxisType(axisType);
 		}
 	}
 	
@@ -238,6 +247,14 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 			descriptor.put(IS_HORIZONTAL, Boolean.toString(view.isBarOrientationHorizontal()));
 		}
 		descriptor.put(SHOW_LEGEND, Boolean.toString(view.isShowLegend()));
+		AxisType xAxisType = view.getXAxisType();
+		if (!AxisType.AUTO.equals(xAxisType)) {
+			descriptor.put(X_AXIS_TYPE, xAxisType.toString());
+		}
+		AxisType yAxisType = view.getYAxisType();
+		if (!AxisType.AUTO.equals(yAxisType)) {
+			descriptor.put(Y_AXIS_TYPE, yAxisType.toString());
+		}
 	}
 	
 	public String getSql() {

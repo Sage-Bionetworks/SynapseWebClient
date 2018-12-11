@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -154,7 +153,7 @@ public class TablePageWidgetTest {
 			}
 		});
 		defaultColumnModels = new ArrayList<ColumnModel>();
-		when(mockFileViewDefaultColumns.getDefaultViewColumns(any(org.sagebionetworks.repo.model.table.ViewType.class), anyBoolean())).thenReturn(defaultColumnModels);
+		when(mockFileViewDefaultColumns.getDefaultViewColumns(anyBoolean(), anyBoolean())).thenReturn(defaultColumnModels);
 		widget = new TablePageWidget(mockView, mockGinInjector, mockPaginationWidget,mockFacetsWidget);
 		
 		schema = TableModelTestUtils.createOneOfEachType();
@@ -228,7 +227,7 @@ public class TablePageWidgetTest {
 		// Static headers should be used for edits
 		assertTrue(staticHeader.isEmpty());
 		widget.configure(bundle, query, null, isEditable, tableType, null, mockPageChangeListner, mockFacetChangedHandler, mockResetFacetsHandler);
-		verify(mockView).setFacetsVisible(false);
+		verify(mockView, times(2)).setFacetsVisible(false);
 		verify(mockView, never()).setFacetsVisible(true);
 		long rowCount = rows.size();
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), rowCount, mockPageChangeListner);
@@ -241,6 +240,7 @@ public class TablePageWidgetTest {
 		boolean isEditable = false;
 		// Sortable headers should be used for views.
 		assertTrue(sortHeaders.isEmpty());
+		widget.setFacetsVisible(true);
 		widget.configure(bundle, query, null, isEditable, tableType, null, mockPageChangeListner, mockFacetChangedHandler, mockResetFacetsHandler);
 		verify(mockFacetsWidget).configure(eq(facets), eq(mockFacetChangedHandler), anyList());
 		long rowCount = rows.size();
@@ -255,7 +255,7 @@ public class TablePageWidgetTest {
 		boolean isEditable = false;
 		facets.clear();
 		widget.configure(bundle, query, null, isEditable, tableType, null, mockPageChangeListner, mockFacetChangedHandler, mockResetFacetsHandler);
-		verify(mockView).setFacetsVisible(false);
+		verify(mockView, times(2)).setFacetsVisible(false);
 		verify(mockView, never()).setFacetsVisible(true);
 	}
 	
@@ -285,9 +285,9 @@ public class TablePageWidgetTest {
 			}
 			verify(sth).configure(headerName, mockPageChangeListner);
 			if(i == sortColumnIndex){
-				verify(sth).setIcon(IconType.SORT_DESC);
+				verify(sth).setSortDirection(SortDirection.DESC);
 			}else{
-				verify(sth, never()).setIcon(any(IconType.class));
+				verify(sth).setSortDirection(null);
 			}
 		}
 	}
@@ -311,9 +311,9 @@ public class TablePageWidgetTest {
 		for(int i=0; i<sortHeaders.size(); i++){
 			SortableTableHeader sth = sortHeaders.get(i);
 			if(i == sortColumnIndex){
-				verify(sth).setIcon(IconType.SORT_ASC);
+				verify(sth).setSortDirection(SortDirection.ASC);
 			}else{
-				verify(sth, never()).setIcon(any(IconType.class));
+				verify(sth).setSortDirection(null);
 			}
 		}
 	}
@@ -342,11 +342,11 @@ public class TablePageWidgetTest {
 		for(int i=0; i<sortHeaders.size(); i++){
 			SortableTableHeader sth = sortHeaders.get(i);
 			if(i == ascColumnIndex){
-				verify(sth).setIcon(IconType.SORT_ASC);
+				verify(sth).setSortDirection(SortDirection.ASC);
 			}else if(i == descColumnIndex){
-				verify(sth).setIcon(IconType.SORT_DESC);
+				verify(sth).setSortDirection(SortDirection.DESC);
 			}else {
-				verify(sth, never()).setIcon(any(IconType.class));
+				verify(sth).setSortDirection(null);
 			}
 		}
 	}
@@ -373,11 +373,7 @@ public class TablePageWidgetTest {
 		// Check each header
 		for(int i=0; i<sortHeaders.size(); i++){
 			SortableTableHeader sth = sortHeaders.get(i);
-			if(i == sortColumnIndex){
-				verify(sth).setIcon(IconType.SORT_ASC);
-			}else{
-				verify(sth, never()).setIcon(any(IconType.class));
-			}
+			verify(sth).setSortDirection(null);
 		}
 	}
 	
@@ -471,7 +467,7 @@ public class TablePageWidgetTest {
 		//facets would have been shown, but force advanced mode.
 		widget.setFacetsVisible(false);
 		widget.configure(bundle, query, null, isEditable, tableType, null, mockPageChangeListner, mockFacetChangedHandler, mockResetFacetsHandler);
-		verify(mockFacetsWidget, never()).configure(eq(facets), eq(mockFacetChangedHandler), anyList());
+		verify(mockFacetsWidget).configure(eq(facets), eq(mockFacetChangedHandler), anyList());
 		verify(mockView, never()).setFacetsVisible(true);
 		verify(mockView, atLeastOnce()).setFacetsVisible(false);
 	}

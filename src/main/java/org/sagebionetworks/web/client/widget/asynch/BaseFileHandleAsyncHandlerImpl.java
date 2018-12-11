@@ -9,14 +9,19 @@ import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public abstract class BaseFileHandleAsyncHandlerImpl {
@@ -29,8 +34,15 @@ public abstract class BaseFileHandleAsyncHandlerImpl {
 	SynapseJavascriptClient jsClient;
 	public static final int LIMIT = 95;
 	
-	public BaseFileHandleAsyncHandlerImpl(SynapseJavascriptClient jsClient, GWTWrapper gwt) {
+	private ClientCache clientCache;
+	private AdapterFactory adapterFactory;
+	private GWTWrapper gwt;
+	
+	public BaseFileHandleAsyncHandlerImpl(SynapseJavascriptClient jsClient, GWTWrapper gwt, ClientCache clientCache, AdapterFactory adapterFactory) {
 		this.jsClient = jsClient;
+		this.clientCache = clientCache;
+		this.adapterFactory = adapterFactory;
+		this.gwt = gwt;
 		Callback callback = new Callback() {
 			@Override
 			public void invoke() {
@@ -41,6 +53,17 @@ public abstract class BaseFileHandleAsyncHandlerImpl {
 	}
 	
 	public void getFileResult(FileHandleAssociation fileHandleAssociation, AsyncCallback<FileResult> callback) {
+		if (isIncludeFileHandles() && !isIncludePreSignedURLs() && clientCache.contains(fileHandleAssociation.getFileHandleId() + WebConstants.FILE_HANDLE_SUFFIX)) {
+			FileResult fileResult = getFileResultFromCache(fileHandleAssociation.getFileHandleId(), adapterFactory, clientCache);
+			if (fileResult != null) {
+				//done!
+				gwt.scheduleDeferred(() -> {
+					callback.onSuccess(fileResult);	
+				});
+				return;
+			}
+		}
+		
 		List<AsyncCallback<FileResult>> list = reference2Callback.get(fileHandleAssociation.getFileHandleId());
 		if (list == null) {
 			list = new ArrayList<AsyncCallback<FileResult>>();
@@ -104,9 +127,12 @@ public abstract class BaseFileHandleAsyncHandlerImpl {
 									callback.onFailure(ex);	
 								}
 							} else {
+								if (isIncludeFileHandles() && !isIncludePreSignedURLs()) {
+									cacheFileResult(fileResult);
+								}
 								for (AsyncCallback<FileResult> callback : callbacks) {
 									callback.onSuccess(fileResult);	
-								}	
+								}
 							}
 						}
 					}
@@ -121,5 +147,25 @@ public abstract class BaseFileHandleAsyncHandlerImpl {
 		}
 	}
 	
+	public static FileResult getFileResultFromCache(String fileHandleId, AdapterFactory adapterFactory, ClientCache clientCache) {
+		String fileResultString = clientCache.get(fileHandleId + WebConstants.FILE_HANDLE_SUFFIX);
+		if (fileResultString != null) {
+			try {
+				return new FileResult(adapterFactory.createNew(fileResultString));
+			} catch (JSONObjectAdapterException e) {
+				//if any problems occur, try to get the file handle with a rpc
+			}	
+		}
+		return null;
+	}
 	
+	public void cacheFileResult(FileResult result) {
+		JSONObjectAdapter adapter = adapterFactory.createNew();
+		try {
+			result.writeToJSONObject(adapter);
+			clientCache.put(result.getFileHandleId() + WebConstants.FILE_HANDLE_SUFFIX, adapter.toJSONString());
+		} catch (JSONObjectAdapterException e) {
+		}
+	}
+
 }

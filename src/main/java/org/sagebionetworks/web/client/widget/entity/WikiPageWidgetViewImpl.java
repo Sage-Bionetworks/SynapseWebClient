@@ -10,7 +10,9 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Italic;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.WikiDiff;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
@@ -106,10 +108,11 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-
+	SynapseJSNIUtils jsniUtils;
 	@Inject
-	public WikiPageWidgetViewImpl(Binder binder) {
+	public WikiPageWidgetViewImpl(Binder binder, SynapseJSNIUtils jsniUtils) {
 		widget = binder.createAndBindUi(this);
+		this.jsniUtils = jsniUtils;
 		restoreButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -155,8 +158,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	@Override
 	public void scrollWikiHeadingIntoView() {
-		if (wikiHeading != null) {
-			wikiHeading.getElement().scrollIntoView();	
+		if (wikiHeading != null && !DisplayUtils.isInViewport(wikiHeading)) {
+			jsniUtils.scrollIntoView(wikiHeading.getElement());
 		}
 	}
 	
@@ -191,8 +194,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override
@@ -332,7 +335,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		wikiCompareButton.setVisible(visible);
 	}
 	
-
 	/** Event binder code **/
 	interface EBinder extends EventBinder<WikiPageWidget> {};
 	private final EBinder eventBinder = GWT.create(EBinder.class);

@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget.getTableType;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.Entity;
@@ -17,6 +16,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
@@ -87,7 +87,7 @@ public class TableEntityWidget implements IsWidget,
 	public static final String SCHEMA = " Schema";
 	String entityTypeDisplay;
 	PortalGinInjector ginInjector;
-	
+	AddToDownloadList addToDownloadList;
 	@Inject
 	public TableEntityWidget(TableEntityWidgetView view,
 			TableQueryResultWidget queryResultsWidget,
@@ -95,6 +95,7 @@ public class TableEntityWidget implements IsWidget,
 			PreflightController preflightController,
 			SynapseClientAsync synapseClient,
 			FileViewClientsHelp fileViewClientsHelp,
+			AddToDownloadList addToDownloadList,
 			PortalGinInjector ginInjector) {
 		this.view = view;
 		this.queryResultsWidget = queryResultsWidget;
@@ -103,10 +104,12 @@ public class TableEntityWidget implements IsWidget,
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.fileViewClientsHelp = fileViewClientsHelp;
+		this.addToDownloadList = addToDownloadList;
 		this.ginInjector = ginInjector;
 		this.view.setPresenter(this);
 		this.view.setQueryResultsWidget(this.queryResultsWidget);
 		this.view.setQueryInputWidget(this.queryInputWidget);
+		view.setAddToDownloadList(addToDownloadList);
 	}
 	
 	public DownloadTableQueryModalWidget getDownloadTableQueryModalWidget() {
@@ -152,8 +155,8 @@ public class TableEntityWidget implements IsWidget,
 			QueryChangeHandler qch, ActionMenuWidget actionMenu) {
 		this.entityBundle = bundle;
 		Entity table = bundle.getEntity();
-		this.tableType = getTableType(table);
-		queryInputWidget.setDownloadFilesVisible(TableType.fileview.equals(tableType));
+		this.tableType = TableType.getTableType(table);
+		queryInputWidget.setDownloadFilesVisible(tableType.isIncludeFiles());
 		this.tableId = bundle.getEntity().getId();
 		this.tableBundle = bundle.getTableBundle();
 		this.canEdit = canEdit;
@@ -162,6 +165,7 @@ public class TableEntityWidget implements IsWidget,
 		this.view.configure(bundle, this.canEdit);
 		this.actionMenu = actionMenu;
 		this.entityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass()));
+		addToDownloadList.clear();
 		configureActions();
 		checkState();
 		initSimpleAdvancedQueryState();
@@ -343,7 +347,8 @@ public class TableEntityWidget implements IsWidget,
 				Query q = getDefaultQuery();
 				q.setSql(sql);
 				showAdvancedSearchUI();
-				setQuery(q, false);	
+				// set the current query. results have not changed, so set isFromResults=true 
+				setQuery(q, true);	
 			}
 			
 			@Override
@@ -415,17 +420,13 @@ public class TableEntityWidget implements IsWidget,
 	}
 
 	@Override
-	public void onPersistSuccess(EntityUpdatedEvent event) {
-		this.queryChangeHandler.onPersistSuccess(event);
-	}
-
-	@Override
 	public void queryExecutionStarted() {
 		// Pass this along to the input widget.
 		this.queryInputWidget.queryExecutionStarted();
 		// Disabling menu items does not seem to work well so we hide the items instead.
 		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
 		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, false);
+		view.setTableToolbarVisible(false);
 	}
 
 	@Override
@@ -439,6 +440,7 @@ public class TableEntityWidget implements IsWidget,
 		if (wasSuccessful) {
 			this.queryChangeHandler.onQueryChange(this.currentQuery);
 		}
+		view.setTableToolbarVisible(true);
 	}
 
 	/**
@@ -527,11 +529,12 @@ public class TableEntityWidget implements IsWidget,
 	}
 	
 	@Override
-	public void onShowDownloadFiles() {
+	public void onShowDownloadFilesProgrammatically() {
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String sql) {
-				fileViewClientsHelp.setQuery(sql);
+				String escapedSql = sql.replace("\"", "\\\"");
+				fileViewClientsHelp.setQuery(escapedSql);
 				fileViewClientsHelp.show();
 			}
 			
@@ -541,5 +544,10 @@ public class TableEntityWidget implements IsWidget,
 			}
 		};
 		generateSqlWithFacets(callback);
+	}
+	
+	@Override
+	public void onAddToDownloadList() {
+		addToDownloadList.addToDownloadList(entityBundle.getEntity().getId(), currentQuery);
 	}
 }

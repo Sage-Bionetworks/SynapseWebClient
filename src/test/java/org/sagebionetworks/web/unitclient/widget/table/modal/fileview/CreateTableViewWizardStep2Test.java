@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
 
 import static org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyList;
@@ -31,6 +31,7 @@ import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.repo.model.table.ViewType;
+import org.sagebionetworks.repo.model.table.ViewTypeMask;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -115,8 +116,8 @@ public class CreateTableViewWizardStep2Test {
 		when(mockEditor.validate()).thenReturn(true);
 		when(mockTableSchemaChangeRequest.getChanges()).thenReturn(Collections.singletonList(mockTableUpdateRequest));
 		AsyncMockStubber.callSuccessWith(mockTableSchemaChangeRequest).when(mockSynapseClient).getTableUpdateTransactionRequest(anyString(), anyList(), anyList(), any(AsyncCallback.class));
-		when(mockFileViewDefaultColumns.getDefaultViewColumns(eq(ViewType.file), anyBoolean())).thenReturn(mockDefaultColumnModels);
-		when(mockFileViewDefaultColumns.getDefaultViewColumns(eq(ViewType.project), anyBoolean())).thenReturn(mockDefaultProjectColumnModels);
+		when(mockFileViewDefaultColumns.getDefaultViewColumns(eq(true), anyBoolean())).thenReturn(mockDefaultColumnModels);
+		when(mockFileViewDefaultColumns.getDefaultViewColumns(eq(false), anyBoolean())).thenReturn(mockDefaultProjectColumnModels);
 		when(viewEntity.getScopeIds()).thenReturn(mockViewScopeIds);
 		when(mockColumnModelPage1.getNextPageToken()).thenReturn(NEXT_PAGE_TOKEN);
 		when(mockColumnModelPage1.getResults()).thenReturn(mockAnnotationColumnsPage1);
@@ -139,8 +140,8 @@ public class CreateTableViewWizardStep2Test {
 		verify(mockView).setJobTracker(any(Widget.class));
 		verify(mockView).setEditor(any(Widget.class));
 		
-		widget.configure(viewEntity, TableType.fileview);
-		verify(mockEditor).configure(TableType.fileview, new ArrayList<ColumnModel>());
+		widget.configure(viewEntity, TableType.files);
+		verify(mockEditor).configure(TableType.files, new ArrayList<ColumnModel>());
 		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(true);
 		verify(mockEditor).setAddAnnotationColumnsButtonVisible(true);
 		verify(mockEditor).addColumns(mockDefaultColumnModels);
@@ -151,8 +152,8 @@ public class CreateTableViewWizardStep2Test {
 		verify(mockView).setJobTracker(any(Widget.class));
 		verify(mockView).setEditor(any(Widget.class));
 		
-		widget.configure(viewEntity, TableType.projectview);
-		verify(mockEditor).configure(TableType.projectview, new ArrayList<ColumnModel>());
+		widget.configure(viewEntity, TableType.projects);
+		verify(mockEditor).configure(TableType.projects, new ArrayList<ColumnModel>());
 		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(true);
 		verify(mockEditor).setAddAnnotationColumnsButtonVisible(true);
 		verify(mockEditor).addColumns(mockDefaultProjectColumnModels);
@@ -161,7 +162,7 @@ public class CreateTableViewWizardStep2Test {
 	@Test
 	public void testGetPossibleColumnModelsForViewScope() {
 		// test is set up so that rpc successfully returns 2 pages, and then stops.
-		widget.configure(viewEntity, TableType.fileview);
+		widget.configure(viewEntity, TableType.files);
 
 		String firstPageToken = null;
 		widget.getPossibleColumnModelsForViewScope(firstPageToken);
@@ -169,7 +170,8 @@ public class CreateTableViewWizardStep2Test {
 		//verify scope
 		ViewScope viewScope = viewScopeCaptor.getValue();
 		assertEquals(mockViewScopeIds, viewScope.getScope());
-		assertEquals(ViewType.file, viewScope.getViewType());
+		assertNull(viewScope.getViewType());
+		assertEquals((Long)ViewTypeMask.File.getMask(), viewScope.getViewTypeMask());
 		
 		verify(mockEditor).addColumns(mockAnnotationColumnsPage1);
 		verify(mockSynapseClient).getPossibleColumnModelsForViewScope(any(ViewScope.class), eq(NEXT_PAGE_TOKEN), any(AsyncCallback.class));
@@ -179,7 +181,7 @@ public class CreateTableViewWizardStep2Test {
 	@Test
 	public void testGetPossibleColumnModelsForProjectViewScope() {
 		// test is set up so that rpc successfully returns 2 pages, and then stops.
-		widget.configure(viewEntity, TableType.projectview);
+		widget.configure(viewEntity, TableType.projects);
 
 		String firstPageToken = null;
 		widget.getPossibleColumnModelsForViewScope(firstPageToken);
@@ -187,12 +189,13 @@ public class CreateTableViewWizardStep2Test {
 		//verify scope
 		ViewScope viewScope = viewScopeCaptor.getValue();
 		assertEquals(mockViewScopeIds, viewScope.getScope());
-		assertEquals(ViewType.project, viewScope.getViewType());
+		assertNull(viewScope.getViewType());
+		assertEquals((Long)ViewTypeMask.Project.getMask(), viewScope.getViewTypeMask());
 	}
 	
 	@Test
 	public void testGetPossibleColumnModelsForViewScopeFailure() {
-		widget.configure(viewEntity, TableType.fileview);
+		widget.configure(viewEntity, TableType.files);
 		String error = "error message getting annotation column models";
 		Exception ex = new Exception(error);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getPossibleColumnModelsForViewScope(any(ViewScope.class), anyString(), any(AsyncCallback.class));

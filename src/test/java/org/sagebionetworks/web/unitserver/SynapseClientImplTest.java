@@ -27,7 +27,6 @@ import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,7 +52,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
@@ -98,8 +96,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.repo.model.doi.Doi;
-import org.sagebionetworks.repo.model.doi.DoiStatus;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyResult;
@@ -116,7 +112,6 @@ import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.repo.model.message.Settings;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
-import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalStorageLocationSetting;
@@ -999,41 +994,11 @@ public class SynapseClientImplTest {
 		assertEquals(expectedAutoFilename, entityCaptor.getValue().getName());
 	}
 
-	@Test
-	public void testGetEntityDoi() throws Exception {
-		// wiring test
-		Doi testDoi = new Doi();
-		testDoi.setDoiStatus(DoiStatus.CREATED);
-		testDoi.setId("test doi id");
-		testDoi.setCreatedBy("Test User");
-		testDoi.setCreatedOn(new Date());
-		testDoi.setObjectId("syn1234");
-		Mockito.when(mockSynapse.getEntityDoi(anyString(), anyLong()))
-				.thenReturn(testDoi);
-		synapseClient.getEntityDoi("test entity id", null);
-		verify(mockSynapse).getEntityDoi(anyString(), anyLong());
-	}
-
 	private FileEntity getTestFileEntity() {
 		FileEntity testFileEntity = new FileEntity();
 		testFileEntity.setId("5544");
 		testFileEntity.setName(testFileName);
 		return testFileEntity;
-	}
-
-	@Test(expected = NotFoundException.class)
-	public void testGetEntityDoiNotFound() throws Exception {
-		// wiring test
-		Mockito.when(mockSynapse.getEntityDoi(anyString(), anyLong()))
-				.thenThrow(new SynapseNotFoundException());
-		synapseClient.getEntityDoi("test entity id", null);
-	}
-
-	@Test
-	public void testCreateDoi() throws Exception {
-		// wiring test
-		synapseClient.createDoi("test entity id", null);
-		verify(mockSynapse).createEntityDoi(anyString(), anyLong());
 	}
 
 	/**
@@ -1583,22 +1548,6 @@ public class SynapseClientImplTest {
 	public void testGetHostBadUrl() throws RestServiceException {
 		synapseClient.getHost("foobar");
 	}
-
-	@Test
-	public void testGetRootWikiId() throws JSONObjectAdapterException,
-			SynapseException, RestServiceException {
-		org.sagebionetworks.repo.model.dao.WikiPageKey key = new org.sagebionetworks.repo.model.dao.WikiPageKey();
-		key.setOwnerObjectId("1");
-		key.setOwnerObjectType(ObjectType.ENTITY);
-		String expectedId = "123";
-		key.setWikiPageId(expectedId);
-		when(mockSynapse.getRootWikiPageKey(anyString(), any(ObjectType.class)))
-				.thenReturn(key);
-
-		String actualId = synapseClient.getRootWikiId("1",
-				ObjectType.ENTITY.toString());
-		assertEquals(expectedId, actualId);
-	}
 		
 	@Test(expected = BadRequestException.class)
 	public void testHandleSignedTokenNull() throws RestServiceException, SynapseException{
@@ -2020,19 +1969,6 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
-	public void testIsWiki() throws RestServiceException, SynapseException {
-		org.sagebionetworks.repo.model.dao.WikiPageKey key = new org.sagebionetworks.repo.model.dao.WikiPageKey();
-		key.setOwnerObjectId("2");
-		key.setOwnerObjectType(ObjectType.ENTITY);
-		key.setWikiPageId("456");
-		when(mockSynapse.getRootWikiPageKey(anyString(), any(ObjectType.class))).thenReturn(key);
-
-		assertTrue(synapseClient.isWiki("2"));
-		when(mockSynapse.getRootWikiPageKey(anyString(), any(ObjectType.class))).thenThrow(new SynapseNotFoundException());
-		assertFalse(synapseClient.isWiki("3"));
-	}
-	
-	@Test
 	public void testIsChallenge() throws RestServiceException, SynapseException {
 		when(mockSynapse.getChallengeForProject(anyString())).thenReturn(mockChallenge);
 		when(mockSynapse.canAccess(anyString(), eq(ACCESS_TYPE.UPDATE))).thenReturn(true);
@@ -2086,6 +2022,9 @@ public class SynapseClientImplTest {
 		String membershipInvitationId = "1212";
 		String hostPageBaseURL = "http://localhost/Portal.html";
 		when(mockSynapse.getMembershipInvitation(anyString())).thenReturn(mockMembershipInvitation);
+		//SWC-4360: if the email and principal ID are set, then the email should be cleared)
+		when(mockMembershipInvitation.getInviteeEmail()).thenReturn("something@gmail.com");
+		when(mockMembershipInvitation.getInviteeId()).thenReturn("123");
 		
 		synapseClient.resendTeamInvitation(membershipInvitationId, hostPageBaseURL);
 		
@@ -2093,6 +2032,7 @@ public class SynapseClientImplTest {
 		verify(mockMembershipInvitation).setCreatedBy(null);
 		verify(mockMembershipInvitation).setCreatedOn(null);
 		verify(mockMembershipInvitation).setId(null);
+		verify(mockMembershipInvitation).setInviteeEmail(null);
 		verify(mockSynapse).createMembershipInvitation(eq(mockMembershipInvitation), stringCaptor1.capture(), stringCaptor2.capture());
 		assertTrue(stringCaptor1.getValue().startsWith(hostPageBaseURL));
 		assertTrue(stringCaptor2.getValue().startsWith(hostPageBaseURL));

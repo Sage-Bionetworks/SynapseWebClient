@@ -51,10 +51,18 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 	}
 	
 	public void setClickHandler(ClickHandler handler) {
-		entityBadge.addClickHandler(handler);
+		entityBadge.setClickHandler(handler);
+	}
+	
+	public void setModifiedByUserBadgeClickHandler(ClickHandler handler) {
+		entityBadge.setModifiedByUserBadgeClickHandler(handler);
 	}
 	
 	public void setState(boolean open, boolean fireEvents) {
 		treeItem.setState(open, fireEvents);
+	}
+	
+	public void showMinimalColumnSet() {
+		entityBadge.showMinimalColumnSet();
 	}
 }

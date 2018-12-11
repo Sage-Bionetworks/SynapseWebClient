@@ -96,7 +96,7 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 		saveCropButton.addClickHandler(event -> {
 			saveCroppedImage();
 		});
-		previewModal.getElement().setAttribute("style", "z-index: 3000");
+		previewModal.getElement().setAttribute("style", "z-index: 3000; height: 700px;");
 		previewModal.addShownHandler(event -> {
 			previewModalBody.clear();
 			Image image = new Image();
@@ -148,9 +148,13 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 	}-*/;
 
 	private static native void _getCroppedImageBlob(CroppedImageUploadViewImpl v) /*-{
-		$wnd.cropping.result({type: 'blob', format: 'jpeg', quality: 1, circle: false}).then(function(blob) {
-			v.@org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl::saveCroppedImage(Lcom/google/gwt/core/client/JavaScriptObject;)(blob);
-		});
+		try {
+			$wnd.cropping.result({type: 'blob', format: 'jpeg', quality: 1, circle: false}).then(function(blob) {
+				v.@org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl::saveCroppedImage(Lcom/google/gwt/core/client/JavaScriptObject;)(blob);
+			});
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
 	
 	public void saveCroppedImage() {

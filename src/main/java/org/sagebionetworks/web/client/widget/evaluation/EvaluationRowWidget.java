@@ -1,11 +1,17 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.FormControlStatic;
+import org.gwtbootstrap3.client.ui.Panel;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.evaluation.model.SubmissionQuota;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -14,6 +20,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 
 
 public class EvaluationRowWidget implements IsWidget {
@@ -25,13 +32,36 @@ public class EvaluationRowWidget implements IsWidget {
 	Button editButton;
 	@UiField
 	Button deleteButton;
+	@UiField
+	FormControlStatic descriptionField;
+	@UiField
+	FormControlStatic submissionInstructionsField;
+	@UiField
+	FormControlStatic submissionReceiptField;
+	@UiField
+	FormControlStatic createdOnDiv;
+	@UiField
+	Div createdByDiv;
+	
+	@UiField
+	Panel quotaUI;
+	@UiField
+	FormControlStatic roundStart;
+	@UiField
+	FormControlStatic submissionLimitField;
+	@UiField
+	FormControlStatic numberOfRoundsField;
+	@UiField
+	FormControlStatic roundDurationField;
+	
 	Widget widget;
+	UserBadge userBadge;
 	
 	public interface Binder extends UiBinder<Widget, EvaluationRowWidget> {}
 	private static Binder uiBinder = GWT.create(Binder.class);
 	private Evaluation evaluation;
 	private EvaluationActionHandler handler;
-	
+	private DateTimeUtils dateTimeUtils;
 	
 	public interface EvaluationActionHandler {
 		void onEditClicked(Evaluation evaluation);
@@ -39,7 +69,10 @@ public class EvaluationRowWidget implements IsWidget {
 		void onDeleteClicked(Evaluation evaluation);
 	}
 	
-	public EvaluationRowWidget() {
+	@Inject
+	public EvaluationRowWidget(UserBadge userBadge, DateTimeUtils dateTimeUtils) {
+		this.userBadge = userBadge;
+		this.dateTimeUtils= dateTimeUtils;
 		widget = uiBinder.createAndBindUi(this);
 		shareButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -65,6 +98,7 @@ public class EvaluationRowWidget implements IsWidget {
 					});
 			}
 		});
+		createdByDiv.add(userBadge);
 	}
 	
 	public void configure(Evaluation evaluation, EvaluationActionHandler handler) {
@@ -72,6 +106,27 @@ public class EvaluationRowWidget implements IsWidget {
 		this.handler = handler;
 		String evaluationText = evaluation.getName() + " (" + evaluation.getId() + ")";
 		evaluationNameText.setText(evaluationText);
+		userBadge.configure(evaluation.getOwnerId());
+		descriptionField.setText(evaluation.getDescription());
+		submissionInstructionsField.setText(evaluation.getSubmissionInstructionsMessage());
+		submissionReceiptField.setText(evaluation.getSubmissionReceiptMessage());
+		createdOnDiv.setText(dateTimeUtils.getDateString(evaluation.getCreatedOn()));
+		SubmissionQuota quota = evaluation.getQuota();
+		quotaUI.setVisible(quota != null);
+		if (quota != null) {
+			if (quota.getFirstRoundStart() != null ) {
+				roundStart.setText(dateTimeUtils.getDateString(quota.getFirstRoundStart()));	
+			}
+			if (quota.getSubmissionLimit() != null) {
+				submissionLimitField.setText(quota.getSubmissionLimit().toString());	
+			}
+			if (quota.getNumberOfRounds() != null) {
+				numberOfRoundsField.setText(quota.getNumberOfRounds().toString());	
+			}
+			if (quota.getRoundDurationMillis() != null) {
+				roundDurationField.setText(quota.getRoundDurationMillis().toString());	
+			}
+		}
 	}
 	
 	@Override

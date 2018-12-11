@@ -35,7 +35,6 @@ import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDa
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -289,7 +288,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 
 	@Override
 	public void onStateSelected(String selectedState) {
-		stateFilter = SubmissionState.valueOf(selectedState);
+		stateFilter = SubmissionState.valueOf(selectedState.toUpperCase());
 		place.putParam(STATE_FILTER_PARAM, selectedState);
 		view.setSelectedStateText(selectedState);
 		loadData();

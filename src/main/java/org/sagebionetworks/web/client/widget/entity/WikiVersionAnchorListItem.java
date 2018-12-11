@@ -37,7 +37,7 @@ public class WikiVersionAnchorListItem implements IsWidget {
 		p.add(new Span("v.<strong>" + version.getVersion() + "</strong> created on " + dateTime + " by "));
 		p.add(modifiedByBadge);
 		fp.getElement().setAttribute(WIKI_VERSION_ATTRIBUTE, version.getVersion());
-		fp.add(p);
+		fp.setWidget(p);
 	}
 	@Override
 	public Widget asWidget() {

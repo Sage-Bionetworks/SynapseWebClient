@@ -83,6 +83,11 @@ public class WikiSubpagesWidget implements IsWidget, WikiSubpagesView.Presenter 
 		refreshRootObject();
 	}
 	
+	@Override
+	public void clearCachedHeaderTree() {
+		currentWikiHeaders = null;	
+	}
+	
 	public void refreshRootObject() {
 		//figure out owner object name/link
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {

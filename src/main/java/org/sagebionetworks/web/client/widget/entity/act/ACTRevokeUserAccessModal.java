@@ -77,7 +77,7 @@ public class ACTRevokeUserAccessModal implements RevokeUserAccessModalView.Prese
 			public void onSuccess(Void result) {
 				view.setRevokeProcessing(false);
 				view.hide();
-				view.showInfo(REVOKED_USER, "");
+				view.showInfo(REVOKED_USER);
 			}
 		});
 	}

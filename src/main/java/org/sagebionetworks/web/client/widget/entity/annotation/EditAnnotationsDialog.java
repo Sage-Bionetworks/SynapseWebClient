@@ -10,7 +10,6 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.exceptions.DuplicateKeyException;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
@@ -28,7 +27,6 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 	PortalGinInjector ginInjector;
 	String entityId;
 	List<AnnotationEditor> annotationEditors;
-	EntityUpdatedHandler updateHandler;
 	Annotations annotationsCopy;
 	
 	@Inject
@@ -45,7 +43,7 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 	}
 
 	@Override
-	public void configure(EntityBundle bundle, EntityUpdatedHandler updateHandler) {
+	public void configure(EntityBundle bundle) {
 		view.clearAnnotationEditors();
 		entityId = bundle.getEntity().getId();
 		annotationsCopy = new Annotations();
@@ -59,7 +57,6 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 			AnnotationEditor newEditor = createAnnotationEditor(annotation);
 			view.addAnnotationEditor(newEditor.asWidget());
 		}
-		this.updateHandler = updateHandler;
 		//if there are no annotations, prepopulate with a single default annotation
 		if (annotationList.isEmpty())
 			onAddNewAnnotation();
@@ -128,11 +125,9 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 			synapseClient.updateAnnotations(entityId, annotationsCopy, new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
-					view.showInfo("Successfully updated the annotations", "");
+					view.showInfo("Successfully updated the annotations");
 					view.hideEditor();
-					if (updateHandler != null) {
-						updateHandler.onPersistSuccess(new EntityUpdatedEvent());
-					}
+					ginInjector.getEventBus().fireEvent(new EntityUpdatedEvent());
 				}
 				
 				@Override

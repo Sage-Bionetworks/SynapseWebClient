@@ -59,13 +59,15 @@ public class SynapseSuggestionDisplay extends SuggestBox.DefaultSuggestionDispla
 	public Widget getPopupContents(){	return popupContents;	}
 	
 	public void showLoading(UIObject suggestBox) {
-		popupContents = getPopupPanel().getWidget();
 		if (loadingPanel == null) {
 			loadingPanel = new Div();
 			loadingPanel.setWidth(suggestBox.getOffsetWidth() + "px");
 			loadingPanel.add(new Text("Loading..."));
 		}
-		getPopupPanel().setWidget(loadingPanel);
+		if (!getPopupPanel().getWidget().equals(loadingPanel)) {
+			popupContents = getPopupPanel().getWidget();
+			getPopupPanel().setWidget(loadingPanel);
+		}
 		//When in a bootstrap modal, the popup panel only has the correct top position when the window is scrolled up.
 		//When the modal is scrolled down in the page, the gwt PopupPanel gets confused (because the suggestBox always reports the same top position).
 		if (isInModal(suggestBox.getElement())) {

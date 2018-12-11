@@ -12,9 +12,12 @@
 		</b:FieldSet>
 		<bh:Div>
 			<b:FormGroup>
-				<b:FormLabel>Accessors</b:FormLabel>
+				<b:FormLabel>Data Requestors</b:FormLabel>
+				<bh:Div ui:field="ducDataRequestorsNote" visible="false" >
+					<bh:Italic text="This list should match those listed on your DUC." />
+				</bh:Div>
 				<bh:Div ui:field="validatedUserProfileNote" visible="false" >
-					<bh:Italic text="All accessors must have a " />
+					<bh:Italic text="All data requestors must have a " />
 					<w:HelpWidget helpMarkdown="A Synapse Qualified Researcher is a Certified User with a validated user profile." text="validated user profile"
 						href="http://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#validated-profile" addMoreInfoStyleNames="font-italic" iconStyles="hide"/>
 				</bh:Div>

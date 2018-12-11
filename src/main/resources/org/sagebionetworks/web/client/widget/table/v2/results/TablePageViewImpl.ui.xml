@@ -5,11 +5,9 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<bh:Div>
-		<bh:Div ui:field="loadingUI">
-			<bh:Span text="Loading..."/>
-		</bh:Div>
+		<bh:Div ui:field="loadingUI" pull="RIGHT" />
 		<bh:ClearFix />
-		<g:ScrollPanel ui:field="facetsWidgetContainer" addStyleNames="pull-left-unless-xs margin-right-10 panel panel-default padding-10">
+		<g:ScrollPanel ui:field="facetsWidgetContainer">
 			<bh:Div>
 				<bh:Div ui:field="facetsWidgetPanel"/>
 				<bh:ClearFix />
@@ -18,7 +16,7 @@
 				</bh:Div>
 			</bh:Div>
 		</g:ScrollPanel>
-		<bh:Div ui:field="tablePanel" addStyleNames="tablePage">
+		<bh:Div ui:field="tablePanel" addStyleNames="tablePage" visible="false">
 			<g:ScrollPanel ui:field="topScrollBar" height="18px" visible="false">
 				<bh:Div ui:field="topScrollDiv" height="18px"/>
 			</g:ScrollPanel>

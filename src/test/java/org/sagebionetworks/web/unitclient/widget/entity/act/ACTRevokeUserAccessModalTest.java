@@ -73,7 +73,7 @@ public class ACTRevokeUserAccessModalTest {
 		verify(mockSynapseClient).deleteAccessApprovals(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).setRevokeProcessing(false);
 		verify(mockView).hide();
-		verify(mockView).showInfo(ACTRevokeUserAccessModal.REVOKED_USER, "");
+		verify(mockView).showInfo(ACTRevokeUserAccessModal.REVOKED_USER);
 	}
 	@Test
 	public void testOnRevokeUserSelectedFailure() {

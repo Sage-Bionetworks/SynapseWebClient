@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -47,7 +48,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	TableType tableType;
 	FacetsWidget facetsWidget;
 	Callback resetFacetsHandler;
-	boolean facetsVisible = true;
+	boolean facetsVisible;
 	/*
 	 * This flag is used to ignore selection event while this widget is causing selection changes.
 	 */
@@ -64,6 +65,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		this.view.setPaginationWidget(paginationWidget);
 		this.facetsWidget = facetsWidget;
 		view.setFacetsWidget(facetsWidget.asWidget());
+		view.setFacetsVisible(false);
 		view.setPresenter(this);
 	}
 	
@@ -118,11 +120,9 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 				headers.add(sth);
 				if(sortedHeaders.containsKey(headerName)) {
 					SortItem sortItem = sortedHeaders.get(headerName);
-					if(SortDirection.DESC.equals(sortItem.getDirection())){
-						sth.setIcon(IconType.SORT_DESC);
-					}else{
-						sth.setIcon(IconType.SORT_ASC);
-					}
+					sth.setSortDirection(sortItem.getDirection());
+				} else {
+					sth.setSortDirection(null);
 				}
 			}else{
 				// For the static case we just set the header name.
@@ -140,18 +140,16 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			keyboardNavigationHandler = null;
 		}
 		List<FacetColumnResult> facets = bundle.getFacets();
-		
 		boolean isFacetsSupported = !isEditable && 
 				facetChangedHandler != null && 
 				facets != null && 
 				!facets.isEmpty()
 				&& facetsVisible;
-		
-		view.setFacetsVisible(isFacetsSupported);
-		
+		facetsWidget.configure(facets, facetChangedHandler, types);
 		if (isFacetsSupported) {
-			facetsWidget.configure(facets, facetChangedHandler, types);
-			view.setFacetsVisible(facetsWidget.isShowingFacets());
+			setFacetsVisible(facetsWidget.isShowingFacets());
+		} else {
+			setFacetsVisible(false);
 		}
 		view.setTableHeaders(headers);
 		rows = new ArrayList<RowWidget>(rowCount);
@@ -326,5 +324,6 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	}
 	public void setTableVisible(boolean visible) {
 		view.setTableVisible(visible);
+		view.setFacetsVisible(facetsVisible && facetsWidget.isShowingFacets());
 	}
 }

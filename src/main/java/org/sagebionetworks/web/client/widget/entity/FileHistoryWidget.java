@@ -13,7 +13,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -35,7 +34,6 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	private EntityBundle bundle;
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalApplicationState;
-	private AuthenticationController authenticationController;
 	public static final Integer VERSION_LIMIT = 100;
 	public PreflightController preflightController;
 	private SynapseAlert synAlert;
@@ -47,7 +45,6 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	public FileHistoryWidget(FileHistoryWidgetView view,
 			 SynapseClientAsync synapseClient, 
 			 GlobalApplicationState globalApplicationState, 
-			 AuthenticationController authenticationController,
 			 PreflightController preflightController,
 			 SynapseAlert synAlert) {
 		super();
@@ -55,7 +52,6 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 		fixServiceEntryPoint(synapseClient);
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
 		this.preflightController = preflightController;
 		this.view.setPresenter(this);
 		this.synAlert = synAlert;
@@ -99,7 +95,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 						@Override
 						public void onSuccess(Entity result) {
 							view.hideEditVersionInfo();
-							view.showInfo(DisplayConstants.VERSION_INFO_UPDATED, "Updated " + vb.getName());
+							view.showInfo(DisplayConstants.VERSION_INFO_UPDATED + ": " + vb.getName());
 							refreshFileHistory();
 						}
 					});
@@ -116,7 +112,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 			}
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo("Version deleted", "Version "+ versionNumber + " of " + bundle.getEntity().getId() + " " + DisplayConstants.LABEL_DELETED);
+				view.showInfo("Version "+ versionNumber + " of " + bundle.getEntity().getId() + " " + DisplayConstants.LABEL_DELETED);
 				//SWC-4002: if deleting the version that we're looking at, go to the latest version
 				if (versionNumber.equals(FileHistoryWidget.this.versionNumber)) {
 					gotoCurrentVersion();
@@ -134,6 +130,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	}
 	
 	public void refreshFileHistory() {
+		synAlert.clear();
 		view.clearVersions();
 		currentOffset = 0;
 		onMore();
@@ -195,4 +192,13 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 			}
 		});
 	}
+	
+	public void setVisible(boolean visible) {
+		view.asWidget().setVisible(visible);
+	}
+	
+	public boolean isVisible() {
+		return view.asWidget().isVisible();
+	}
+
 }

@@ -37,6 +37,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	private SynapseAlert synAlert;
 	public static final SortBy DEFAULT_SORT_BY = SortBy.CREATED_ON;
 	public static final Direction DEFAULT_DIRECTION = Direction.DESC;
+	boolean isInitializing = false;
 	@Inject
 	public TableListWidget(
 			TableListWidgetView view,
@@ -65,9 +66,14 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	 * @param showAddTable
 	 */
 	public void configure(EntityBundle parentBundle) {
+		isInitializing = true;
 		this.parentBundle = parentBundle;
-		view.setSortUI(DEFAULT_SORT_BY, DEFAULT_DIRECTION);
 		loadData();
+	}
+
+	public void toggleSort(SortBy sortColumn) {
+		Direction newDirection = Direction.ASC.equals(query.getSortDirection()) ? Direction.DESC : Direction.ASC;
+		onSort(sortColumn, newDirection);
 	}
 	
 	public void onSort(SortBy sortColumn, Direction sortDirection) {
@@ -108,11 +114,17 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	 */
 	private void loadMore(){
 		synAlert.clear();
+		if (isInitializing) {
+			view.clearSortUI();
+		} else {
+			view.setSortUI(query.getSortBy(), query.getSortDirection());	
+		}
 		jsClient.getEntityChildren(query, new AsyncCallback<EntityChildrenResponse>() {
 			public void onSuccess(EntityChildrenResponse result) {
 				query.setNextPageToken(result.getNextPageToken());
 				loadMoreWidget.setIsMore(result.getNextPageToken() != null);
 				setResults(result.getPage());
+				isInitializing = false;
 			};
 			@Override
 			public void onFailure(Throwable caught) {

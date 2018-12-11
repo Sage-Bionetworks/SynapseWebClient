@@ -29,13 +29,13 @@ public class WizardProgressWidgetViewImpl extends FlowPanel implements WizardPro
 			for (int i = 0; i < total; i++) {
 				if (i == current) {
 					//current page
-					add(new InlineHTML("<span class=\"badge margin-top-10\" style=\"color: white; background-color: #0d78b6; padding: 3px 5px; box-shadow: 0 0 0 1px #fff, 0 0 0 3px #58585a;\">"+(i+1) +"</span>"));
+					add(new InlineHTML("<span class=\"badge margin-top-10\" style=\"color: white; background-color: #0d78b6; padding: 3px 6px; box-shadow: 0 0 0 1px #fff, 0 0 0 3px #58585a;\">"+(i+1) +"</span>"));
 				} else if (i < current) {
 					//page complete
-					add(new InlineHTML("<span class=\"badge margin-top-10 movedown-2\" style=\"color: white; background-color: #06944e; padding: 3px 3px; box-shadow: 0 0 0 1px #fff, 0 0 0 3px #58585a;\">"+DisplayUtils.getIcon("glyphicon-ok moveup-2") +"</span>"));
+					add(new InlineHTML("<span class=\"badge margin-top-10\" style=\"color: white; background-color: #06944e; padding: 3px 5px; box-shadow: 0 0 0 1px #fff, 0 0 0 3px #58585a;\">✓</span>"));
 				} else {
 					//page incomplete
-					add(new InlineHTML("<span class=\"badge margin-top-10\" style=\"color: #58585a; background-color: white; padding: 3px 5px; box-shadow: 0 0 0 1px #fff, 0 0 0 3px #58585a;\">"+(i+1) +"</span>"));
+					add(new InlineHTML("<span class=\"badge margin-top-10\" style=\"color: #58585a; background-color: white; padding: 3px 6px; box-shadow: 0 0 0 1px #fff, 0 0 0 3px #58585a;\">"+(i+1) +"</span>"));
 				}
 				
 				if (i < total-1) {
@@ -57,8 +57,8 @@ public class WizardProgressWidgetViewImpl extends FlowPanel implements WizardPro
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

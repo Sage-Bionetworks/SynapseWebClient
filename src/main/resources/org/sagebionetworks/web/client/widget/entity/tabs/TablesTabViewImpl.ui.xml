@@ -30,35 +30,6 @@
 			    	</g:FlowPanel>
 				</b:Column>
 			</b:Row>
-			<b:Row>
-				<b:Column size="MD_6, XS_12">
-					<g:FlowPanel addStyleNames="help-panel">
-						<b:BlockQuote styleName="panel scroll-auto">
-							<b:Icon type="TABLE" pull="LEFT" addStyleNames="font-size-150" />
-							<b:Heading text="Synapse Tables" size="H4"></b:Heading>
-							<bh:Text text="Synapse Tables are designed to provide users the ability to create web-accessible, sharable, and queryable data where columns can have a user-specified structured schema."></bh:Text>
-							<bh:Div addStyleNames="margin-10">
-								<b:Button ui:field="tableLearnMoreButton" text="Learn More" type="PRIMARY"  />
-							</bh:Div>
-						</b:BlockQuote>
-					</g:FlowPanel>
-				</b:Column>
-				<b:Column size="MD_6, XS_12">
-					<g:FlowPanel addStyleNames="help-panel">
-						<b:BlockQuote styleName="panel scroll-auto">
-							<b:Icon type="TH_LIST" pull="LEFT" addStyleNames="font-size-150" />
-							<g:HTMLPanel>
-								<b:Heading text="Synapse File Views" size="H4" addStyleNames="displayInline"/>
-								<span class="smallerText"><span class="label label-warning label-as-badge moveup-8 margin-left-5">beta</span></span>
-							</g:HTMLPanel>
-							<bh:Text text="Synapse File Views are views of all files within one or more Projects or Folders."></bh:Text>
-							<bh:Div addStyleNames="margin-10">
-								<b:Button ui:field="viewLearnMoreButton" text="Learn More" type="PRIMARY"  />
-							</bh:Div>
-						</b:BlockQuote>
-					</g:FlowPanel>
-				</b:Column>
-			</b:Row>
 		</b:Column>
 	</b:Row>
 </ui:UiBinder>

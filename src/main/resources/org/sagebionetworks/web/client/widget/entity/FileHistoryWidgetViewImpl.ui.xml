@@ -5,7 +5,7 @@
     xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
     xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
     xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
-    <g:HTMLPanel>
+    <bh:Div addStyleNames="highlight-box margin-bottom-15">
     	<bh:Div ui:field="synAlertContainer"/>
         <g:Hyperlink ui:field="currentVersionLink" text="Go to the current version" styleName="link" visible="false" />	
 		<b:Panel ui:field="previousVersions">
@@ -30,5 +30,5 @@
 			</t:Table>
 			<b:Button ui:field="moreButton" text="More..." size="SMALL" visible="false" marginBottom="5" marginLeft="5"/>
 		</b:Panel>
-	</g:HTMLPanel>
+	</bh:Div>
 </ui:UiBinder>

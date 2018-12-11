@@ -322,8 +322,8 @@ public class UploaderViewImpl extends FlowPanel implements
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override
@@ -641,11 +641,15 @@ public class UploaderViewImpl extends FlowPanel implements
 	public void showUploadingToSynapseStorage() {
 		uploadDestinationContainer.clear();
 		uploadDestinationContainer.add(new InlineHTML(DisplayConstants.UPLOAD_DESTINATION));
-		Image icon = new Image(sageImageBundle.synapseLogo().getURL());
-		icon.setPixelSize(88, 20);
-		icon.addStyleName("displayInline margin-right-5");
-		uploadDestinationContainer.add(icon);
-		uploadDestinationContainer.add(new InlineHTML(" storage"));
+		Image logo = new Image("images/logo.svg");
+		logo.setSize("35px", "35px");
+		logo.addStyleName("displayInlineBlock margin-right-5 moveup-7");
+		uploadDestinationContainer.add(logo);
+		Heading synapse = new Heading(HeadingSize.H3);
+		synapse.addStyleName("lato notransition letter-spacing-6 displayInlineBlock");
+		synapse.setText("SYNAPSE");
+		uploadDestinationContainer.add(synapse);
+		uploadDestinationContainer.add(new InlineHTML("storage"));
 	}
 	
 	@Override

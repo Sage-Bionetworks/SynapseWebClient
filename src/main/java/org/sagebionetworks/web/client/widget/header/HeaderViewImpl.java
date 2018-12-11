@@ -6,36 +6,40 @@ import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.ButtonGroup;
+import org.gwtbootstrap3.client.ui.DropDown;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
-import org.gwtbootstrap3.client.ui.Row;
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.Label;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
+import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Search;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
+import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 
 public class HeaderViewImpl extends Composite implements HeaderView {
 	public interface Binder extends UiBinder<Widget, HeaderViewImpl> {
@@ -44,31 +48,22 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	Image synapseLogo;
 	@UiField
-	Row headerDiv;
+	Div headerDiv;
 	@UiField
 	Anchor projectHeadingAnchor;
 	@UiField
-	Div headingPanel;
+	DropDown headerFavDropdown;
 	@UiField
-	Anchor dashboardLink;
-	Button dashboardButton;
+	Anchor headerFavAnchor;
 	@UiField
-	ButtonGroup headerFavButtonGroup;
-	@UiField
-	Button headerFavButton;
-	@UiField
-	DropDownMenu headerFavList;
+	DropDownMenu headerFavDropdownMenu;
 
 	@UiField
-	SimplePanel projectFavoritePanel;
+	Div projectFavoritePanelUI;
 	@UiField
-	SimplePanel stuAnnouncementsContainer;
+	Heading projectFavoritePanel;
 	@UiField
-	SimplePanel registerLinkUI;
-	@UiField
-	SimplePanel dashboardButtonUI;
-	@UiField
-	Button registerLink;
+	Anchor dashboardDropdownAnchor;
 	@UiField
 	SimplePanel loginLinkUI;
 	@UiField
@@ -78,20 +73,49 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	Span headerButtons;
 	
 	@UiField
-	Anchor trashLink;
+	AnchorListItem trashLink;
 	@UiField
-	Button logoutLink;
+	AnchorListItem logoutLink;
+	@UiField
+	AnchorListItem myProfileLink;
+	@UiField
+	AnchorListItem myDashboardLink;
+	@UiField
+	AnchorListItem myTeamsLink;
+	@UiField
+	AnchorListItem myChallengesLink;
+	@UiField
+	AnchorListItem mySettingsLink;
+	@UiField
+	AnchorListItem myDownloadsLink;
+	@UiField
+	AnchorListItem helpForumLink;
+	@UiField
+	AnchorListItem sendFeedbackLink;
+	@UiField
+	AnchorListItem emailSynapseSupportLink;
+	@UiField
+	AnchorListItem xsFavoritesLink;
+	@UiField
+	AnchorListItem xsSearchLink;
+	
+	@UiField
+	DropDown dashboardDropdown;
+	@UiField
+	DropDownMenu dashboardDropdownMenu;
 
 	@UiField
-	FlowPanel testSitePanel;
-	@UiField
-	Anchor goToStandardSite;
-	@UiField
-	SimplePanel searchBoxContainer;
+	Div searchBoxContainer;
 	@UiField
 	Alert stagingAlert;
 	@UiField
 	AnchorListItem documentationLink;
+	@UiField
+	Div downloadListNotificationUI;
+	@UiField
+	FocusPanel downloadListLink;
+	@UiField
+	Label downloadListFileCount;
 	
 	private Presenter presenter;
 	private SearchBox searchBox;
@@ -99,8 +123,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	SageImageBundle sageImageBundle;
 	private GlobalApplicationState globalAppState;
 	UserBadge userBadge;
-	Span userBadgeText;
-	HorizontalPanel myDashboardButtonContents;
+	String userId;
+	AnchorListItem defaultItem = new AnchorListItem("Empty");
 	@Inject
 	public HeaderViewImpl(Binder binder,
 			SageImageBundle sageImageBundle,
@@ -113,36 +137,32 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		this.cookies = cookies;
 		this.sageImageBundle = sageImageBundle;
 		this.userBadge = userBadge;
+		userBadge.noTooltip();
+		userBadge.setStyleNames("padding-top-2");
 		this.globalAppState = globalAppState;
-		userBadge.setSize(BadgeSize.SMALL_PICTURE_ONLY);
+		userBadge.setSize(BadgeSize.LARGE);
+		userBadge.addUsernameLinkStyle("color-white textDecorationNone padding-left-5 hidden-xxs");
 		// add search panel first
 		searchBox.setVisible(true);
-		searchBoxContainer.setWidget(searchBox.asWidget());
-		myDashboardButtonContents = new HorizontalPanel();
-		myDashboardButtonContents.addStyleName("moveup-1");
-		myDashboardButtonContents.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-		myDashboardButtonContents.add(userBadge.asWidget());
-		userBadgeText = new Span();
-		myDashboardButtonContents.add(userBadgeText);
-		dashboardButton = new Button();
-		dashboardButton.setSize(ButtonSize.EXTRA_SMALL);
-		dashboardButton.setHeight("28px");
-		dashboardButton.addStyleName("my-dashboard-header-button");
-		dashboardLink.add(dashboardButton);
-		addUserPicturePanel();
+		searchBoxContainer.add(searchBox.asWidget());
+		dashboardDropdownAnchor.add(userBadge.asWidget());
 		initClickHandlers();
-		refreshTestSiteHeader();
 		clear();
 	}
 	
 	@Override
 	public void clear() {
 		setProjectHeaderText("");
-		showSmallLogo();
 	}
 	
 	@Override
 	public void setProjectHeaderText(String text) {
+		boolean isDefault = Header.SYNAPSE.equals(text);
+		if (isDefault) {
+			projectHeadingAnchor.addStyleName("letter-spacing-6");
+		} else {
+			projectHeadingAnchor.removeStyleName("letter-spacing-6");
+		}
 		projectHeadingAnchor.setText(text);
 	}
 	
@@ -153,91 +173,107 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	
 	@Override
 	public void setProjectFavoriteWidget(IsWidget favWidget) {
-		projectFavoritePanel.setWidget(favWidget);
+		projectFavoritePanel.clear();
+		projectFavoritePanel.add(favWidget);
 	}
 	
 	@Override
 	public void showProjectFavoriteWidget() {
-		projectFavoritePanel.setVisible(true);
+		projectFavoritePanelUI.setVisible(true);
 	}
 	
 	@Override
 	public void hideProjectFavoriteWidget() {
-		projectFavoritePanel.setVisible(false);
+		projectFavoritePanelUI.setVisible(false);
 	}
 	
-	@Override
-	public void showLargeLogo() {
-		projectHeadingAnchor.addStyleName("font-size-67");
-		synapseLogo.removeStyleName("margin-bottom-15");
-		synapseLogo.addStyleName("margin-bottom-40");
-		synapseLogo.setHeight("66px");
-		synapseLogo.setWidth("66px");
-		headerDiv.setPaddingTop(16);
-		headerButtons.setMarginTop(28);
-	}
-	
-	@Override
-	public void showSmallLogo() {
-		projectHeadingAnchor.removeStyleName("font-size-67");
-		synapseLogo.removeStyleName("margin-bottom-40");
-		synapseLogo.addStyleName("margin-bottom-15");
-		synapseLogo.setHeight("25px");
-		synapseLogo.setWidth("25px");
-		headerDiv.setPaddingTop(9);
-		headerButtons.setMarginTop(0);
-	}
-	
-	/**
-	 * Clear the divider/caret from the user button, and add the picture container
-	 * @param button
-	 */
-	public void addUserPicturePanel() {
-		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
-            @Override
-            public void execute() {
-            	dashboardButton.add(myDashboardButtonContents);
-            }
-        });
-	}
-
 	public void initClickHandlers() {
 		documentationLink.addClickHandler(event -> {
 			event.preventDefault();
 			DisplayUtils.newWindow(WebConstants.DOCS_BASE_URL, "", "");
+			hideDropdown();
 		});
-		goToStandardSite.addClickHandler(event -> {
-			DisplayUtils.setTestWebsite(false, cookies);
-			globalAppState.refreshPage();
+		emailSynapseSupportLink.addClickHandler(event -> {
+			event.preventDefault();
+			DisplayUtils.newWindow("mailto:synapseinfo@sagebionetworks.org", "", "");
+			hideDropdown();
 		});
 		trashLink.addClickHandler(event -> {
-    			presenter.onTrashClick();
+    		presenter.onTrashClick();
 		});
 		logoutLink.addClickHandler(event -> {
 			presenter.onLogoutClick();
 		});
-		dashboardLink.addClickHandler(DisplayUtils.DO_NOTHING_CLICKHANDLER);
-		dashboardButton.addClickHandler(event -> {
-			if (!DisplayUtils.isAnyModifierKeyDown(event)) {
-				event.preventDefault();
-				presenter.onDashboardClick();
-			}
-		});
 		loginLink.addClickHandler(event -> {
 			presenter.onLoginClick();
-		});
-		registerLink.addClickHandler(event -> {
-			presenter.onRegisterClick();
-		});
-		
-		headerFavButton.addClickHandler(event -> {
-			presenter.onFavoriteClick();
 		});
 		synapseLogo.addClickHandler(event -> {
 			presenter.onLogoClick();
 		});
+		
+		myProfileLink.addClickHandler(event -> {
+			Profile place = new Profile(userId, ProfileArea.PROFILE);
+			globalAppState.getPlaceChanger().goTo(place);
+			hideDropdown();
+		});
+		myDashboardLink.addClickHandler(event -> {
+			Profile place = new Profile(userId, ProfileArea.PROJECTS);
+			globalAppState.getPlaceChanger().goTo(place);
+			hideDropdown();
+		});
+		myTeamsLink.addClickHandler(event -> {
+			Profile place = new Profile(userId, ProfileArea.TEAMS);
+			globalAppState.getPlaceChanger().goTo(place);
+			hideDropdown();
+		});
+		myChallengesLink.addClickHandler(event -> {
+			Profile place = new Profile(userId, ProfileArea.CHALLENGES);
+			globalAppState.getPlaceChanger().goTo(place);
+			hideDropdown();
+		});
+		mySettingsLink.addClickHandler(event -> {
+			Profile place = new Profile(userId, ProfileArea.SETTINGS);
+			globalAppState.getPlaceChanger().goTo(place);
+			hideDropdown();
+		});
+		myDownloadsLink.addClickHandler(event -> {
+			Profile place = new Profile(userId, ProfileArea.DOWNLOADS);
+			globalAppState.getPlaceChanger().goTo(place);
+			hideDropdown();
+		});
+		helpForumLink.addClickHandler(event -> {
+			SynapseForumPlace place = new SynapseForumPlace("default");
+			globalAppState.getPlaceChanger().goTo(place);
+			hideDropdown();
+		});
+		sendFeedbackLink.addClickHandler(event -> {
+			// pendo should also listen for click event on this element
+			hideDropdown();
+		});
+		
+		xsFavoritesLink.addClickHandler(event -> {
+			Profile place = new Profile(userId + "/projects/favorites");
+			globalAppState.getPlaceChanger().goTo(place);
+			hideDropdown();
+		});
+		
+		xsSearchLink.addClickHandler(event -> {
+			Search place = new Search("");
+			globalAppState.getPlaceChanger().goTo(place);
+			hideDropdown();
+		});
+		downloadListLink.addClickHandler(event -> {
+			Profile place = new Profile(userId + "/downloads");
+			globalAppState.getPlaceChanger().goTo(place);
+		});
 	}
-
+	
+	private void hideDropdown() {
+		// since the dropdown visibility is controlled by the hover state, a js solution is to remove the hover element from the dom and add it back.
+		headerButtons.removeFromParent();
+		headerDiv.add(headerButtons);
+	}
+	
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -245,16 +281,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	}
 
 	@Override
-	public void setMenuItemActive(MenuItems menuItem) {
-	}
-
-	@Override
-	public void removeMenuItemActive(MenuItems menuItem) {
-	}
-
-	@Override
 	public void refresh() {
-		refreshTestSiteHeader();
 		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
 		trashLink.setVisible(isInTestWebsite);
 	}
@@ -270,47 +297,49 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	}
 	
 	@Override
-	public void setUser(UserSessionData userData) {
+	public void setUser(UserProfile profile) {
 		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
 	 	trashLink.setVisible(isInTestWebsite);
 	 	userBadge.clearState();
-	 	userBadge.setDoNothingOnClick();
-	 	if (userData != null && userData.getProfile() != null) {
+	 	if (profile != null) {
 			//has user data, update the user name and add user commands (and set to the current user name)
-	 		userBadge.configure(userData.getProfile());
-	 		userBadgeText.setText(DisplayUtils.getDisplayName(userData.getProfile()));
-			loginLinkUI.setVisible(false);
-			registerLinkUI.setVisible(false);
+	 		userBadge.configure(profile);
+	 		userBadge.setDoNothingOnClick();
+	 		userId = profile.getOwnerId();
+	 		loginLinkUI.setVisible(false);
 			logoutLink.setVisible(true);
-			dashboardButtonUI.setVisible(true);
-			headerFavButtonGroup.setVisible(true);
-			dashboardLink.setHref("#!Profile:" + userData.getProfile().getOwnerId());
+			dashboardDropdown.setVisible(true);
+			headerFavDropdown.setVisible(true);
 		} else {
+			userId = null;
 			loginLinkUI.setVisible(true);
-			registerLinkUI.setVisible(true);
 			logoutLink.setVisible(false);
-			dashboardButtonUI.setVisible(false);
-			headerFavButtonGroup.setVisible(false);
+			dashboardDropdown.setVisible(false);
+			headerFavDropdown.setVisible(false);
 		}
 	}
 
 	@Override
 	public void clearFavorite() {
-		headerFavList.clear();
+		headerFavDropdownMenu.clear();
 	}
 
 	@Override
 	public void setEmptyFavorite() {
-		AnchorListItem defaultItem = new AnchorListItem("Empty");
-		headerFavList.add(defaultItem);
+		headerFavDropdownMenu.add(defaultItem);
 	}
 
 	@Override
 	public void addFavorite(List<EntityHeader> headers) {
 		for (final EntityHeader header : headers) {
 			AnchorListItem favItem = new AnchorListItem(header.getName());
-			favItem.setHref(DisplayUtils.getSynapseHistoryToken(header.getId()));
-			headerFavList.add(favItem);
+			favItem.addClickHandler(event -> {
+				headerFavDropdownMenu.removeStyleName("hover");
+				Synapse place = new Synapse(header.getId());
+				globalAppState.getPlaceChanger().goTo(place);
+				hideDropdown();
+			});
+			headerFavDropdownMenu.add(favItem);
 		}
 	}
 
@@ -319,24 +348,20 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		stagingAlert.setVisible(visible);	
 	}
 	
-	/*
-	 * Private Methods
-	 */
-
-	private void refreshTestSiteHeader() {
-		testSitePanel.setVisible(DisplayUtils.isInTestWebsite(cookies));
-	}
+	/** Event binder code **/
+	interface EBinder extends EventBinder<Header> {};
+	private final EBinder eventBinder = GWT.create(EBinder.class);
 	
 	@Override
-	public void showFavoritesLoading() {
-		headerFavList.clear();
-		AnchorListItem loading = new AnchorListItem("Loading...");
-		loading.setEnabled(false);
-		headerFavList.add(loading);
+	public EventBinder<Header> getEventBinder() {
+		return eventBinder;
 	}
 	@Override
-	public void setStuAnnouncementWidget(Widget w) {
-		stuAnnouncementsContainer.clear();
-		stuAnnouncementsContainer.add(w);
+	public void setDownloadListFileCount(Integer count) {
+		downloadListFileCount.setText(count.toString());
+	}
+	@Override
+	public void setDownloadListUIVisible(boolean visible) {
+		downloadListNotificationUI.setVisible(visible);
 	}
 }

@@ -144,7 +144,6 @@ public class SingleDiscussionThreadWidgetTest {
 	PopupUtilsView mockPopupUtils;
 	@Mock
 	ClientCache mockClientCache;
-
 	Set<String> moderatorIds;
 	SingleDiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -160,10 +159,11 @@ public class SingleDiscussionThreadWidgetTest {
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		when(mockGinInjector.getReplyCountAlert()).thenReturn(mockRefreshAlert);
 		when(mockGinInjector.getSynapseProperties()).thenReturn(mockSynapseProperties);
+		when(mockGinInjector.getEditDiscussionThreadModal()).thenReturn(mockEditThreadModal);
 		discussionThreadWidget = new SingleDiscussionThreadWidget(mockView, mockSynAlert,
 				mockAuthorWidget, mockDiscussionForumClientAsync, mockGinInjector,
 				mockDateTimeUtils, mockRequestBuilder, mockAuthController,
-				mockGlobalApplicationState, mockEditThreadModal, mockMarkdownWidget,
+				mockGlobalApplicationState, mockMarkdownWidget,
 				mockRepliesContainer, mockSubscribeButtonWidget, mockNewReplyWidget,
 				mockNewReplyWidget, mockSubscribersWidget, mockSynapseJavascriptClient,
 				mockPopupUtils, mockClientCache);
@@ -177,7 +177,6 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockView).setPresenter(discussionThreadWidget);
 		verify(mockView).setAlert(any(Widget.class));
 		verify(mockView).setAuthor(any(Widget.class));
-		verify(mockView).setEditThreadModal(any(Widget.class));
 		verify(mockView).setSubscribeButtonWidget(any(Widget.class));
 		verify(mockView).setSubscribersWidget(any(Widget.class));
 		verify(mockSubscribeButtonWidget).showIconOnly();
@@ -265,14 +264,22 @@ public class SingleDiscussionThreadWidgetTest {
 		//verify delete
 		verify(mockActionMenuWidget).setActionListener(eq(Action.DELETE_THREAD), actionListenerCaptor.capture());
 		actionListener = actionListenerCaptor.getValue();
-		actionListener.onAction(Action.EDIT_THREAD);
-		verify(mockPopupUtils).showConfirmDialog(anyString(), anyString(), any(Callback.class));
-
+		actionListener.onAction(Action.DELETE_THREAD);
+		verify(mockPopupUtils).showConfirmDelete(anyString(), any(Callback.class));
+		
+		//verify restore
+		verify(mockActionMenuWidget).setActionListener(eq(Action.RESTORE_THREAD), actionListenerCaptor.capture());
+		actionListener = actionListenerCaptor.getValue();
+		actionListener.onAction(Action.RESTORE_THREAD);
+		verify(mockPopupUtils).showConfirmDialog(anyString(), anyString(), callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
+		verify(mockDiscussionForumClientAsync).restoreThread(anyString(), any(AsyncCallback.class));
+		
 		//verify pin thread
 		verify(mockActionMenuWidget).setActionText(eq(Action.PIN_THREAD), eq(PIN_THREAD_ACTION_TEXT));
 		verify(mockActionMenuWidget).setActionListener(eq(Action.PIN_THREAD), actionListenerCaptor.capture());
 		actionListener = actionListenerCaptor.getValue();
-		actionListener.onAction(Action.EDIT_THREAD);
+		actionListener.onAction(Action.PIN_THREAD);
 		verify(mockDiscussionForumClientAsync).pinThread(anyString(), any(AsyncCallback.class));
 	}
 	
@@ -427,6 +434,7 @@ public class SingleDiscussionThreadWidgetTest {
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
+		
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
 		verify(mockView).setCreatedOn(anyString());
@@ -435,7 +443,27 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockView).setEditedLabelVisible(false);
 		verify(mockView).setPinIconVisible(true);
 		verify(mockView).setUnpinIconVisible(false);
+		// thread is not deleted, so Delete action should be visible.
+		verify(mockActionMenuWidget).setActionVisible(Action.DELETE_THREAD, true);
+		verify(mockActionMenuWidget).setActionVisible(Action.RESTORE_THREAD, false);
 	}
+	
+	@Test
+	public void testConfigureDeletedWithModerator() {
+		boolean isDeleted = true;
+		boolean canModerate = true;
+		boolean isEdited = false;
+		boolean isPinned = false;
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
+				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
+				CREATED_BY, isEdited, isPinned);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
+		
+		// thread is deleted, so Restore action should be visible.
+		verify(mockActionMenuWidget).setActionVisible(Action.DELETE_THREAD, false);
+		verify(mockActionMenuWidget).setActionVisible(Action.RESTORE_THREAD, true);
+	}
+	
 	
 	@Test
 	public void testConfigurePinnedWithModerator() {
@@ -810,9 +838,14 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockSynAlert, never()).handleException(any(Throwable.class));
 		verify(mockMarkdownWidget).configure(anyString());
 		verify(mockView).setDeleteIconVisible(false);
-		verify(mockEditThreadModal).configure(anyString(), anyString(), anyString(), any(Callback.class));
+		// edit thread modal is not configured until edit
+		verify(mockEditThreadModal, never()).configure(anyString(), anyString(), anyString(), any(Callback.class));
 		verify(mockView).setLoadingMessageVisible(true);
 		verify(mockView).setLoadingMessageVisible(false);
+		
+		discussionThreadWidget.onClickEditThread();
+		verify(mockView).setEditThreadModal(any());
+		verify(mockEditThreadModal).configure(anyString(), anyString(), eq(message), any(Callback.class));
 	}
 	
 	@Test
@@ -842,7 +875,7 @@ public class SingleDiscussionThreadWidgetTest {
 	public void testOnClickDeleteThread() {
 		discussionThreadWidget.onClickDeleteThread();
 		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
-		verify(mockPopupUtils).showConfirmDialog(anyString(), anyString(), captor.capture());
+		verify(mockPopupUtils).showConfirmDelete(anyString(), captor.capture());
 		captor.getValue().invoke();
 		verify(mockSynAlert).clear();
 		verify(mockDiscussionForumClientAsync).markThreadAsDeleted(anyString(), any(AsyncCallback.class));

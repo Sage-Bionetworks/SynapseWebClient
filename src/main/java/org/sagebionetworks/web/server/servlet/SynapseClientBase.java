@@ -22,6 +22,8 @@ public class SynapseClientBase extends RemoteServiceServlet implements TokenProv
 	public static final String PORTAL_USER_AGENT = "Synapse-Web-Client/"
 			+ PortalVersionHolder.getVersionInfo();
 
+	public static final String X_FORWARDED_FOR_HEADER = "X-Forwarded-For";
+
 	private static class PortalVersionHolder {
 		private static String versionInfo = "";
 
@@ -117,9 +119,14 @@ public class SynapseClientBase extends RemoteServiceServlet implements TokenProv
 		// Append the portal's version information to the user agent.
 		synapseClient.appendUserAgent(PORTAL_USER_AGENT);
 		if (this.getThreadLocalRequest() != null) {
-			synapseClient.setUserIpAddress(this.getThreadLocalRequest().getRemoteAddr());
+			synapseClient.setUserIpAddress(getIpAddress(this.getThreadLocalRequest()));
 		}
 		return synapseClient;
+	}
+
+	public static String getIpAddress(HttpServletRequest httpServletRequest){
+		String xForwardedForHeaderVal = httpServletRequest.getHeader(X_FORWARDED_FOR_HEADER);
+		return xForwardedForHeaderVal == null ? httpServletRequest.getRemoteAddr() : xForwardedForHeaderVal;
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
@@ -23,7 +24,7 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	private MemberListWidgetView view;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
-	private TeamMemberPagedResults memberList;
+	private SynapseJavascriptClient jsClient;
 	private AuthenticationController authenticationController;
 	private Callback teamUpdatedCallback;
 	private LoadMoreWidgetContainer membersContainer;
@@ -31,7 +32,8 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	@Inject
 	public MemberListWidget(
 			MemberListWidgetView view, 
-			SynapseClientAsync synapseClient, 
+			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
 			AuthenticationController authenticationController, 
 			GlobalApplicationState globalApplicationState, 
 			LoadMoreWidgetContainer membersContainer) {
@@ -41,6 +43,7 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
+		this.jsClient = jsClient;
 		this.membersContainer = membersContainer;
 		view.setMembersContainer(membersContainer);
 		membersContainer.configure(new Callback() {
@@ -71,11 +74,10 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	public void loadMore() {
 		synapseClient.getTeamMembers(teamId, searchTerm, MEMBER_LIMIT, offset, new AsyncCallback<TeamMemberPagedResults>() {
 			@Override
-			public void onSuccess(TeamMemberPagedResults results) {
-				memberList = results;
+			public void onSuccess(TeamMemberPagedResults memberList) {
 				offset += MEMBER_LIMIT;
 				
-				long numberOfMembers = results.getTotalNumberOfResults();
+				long numberOfMembers = memberList.getTotalNumberOfResults();
 				membersContainer.setIsMore(offset < numberOfMembers);
 				view.addMembers(memberList.getResults(), isAdmin);
 			}
@@ -93,7 +95,7 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	
 	@Override
 	public void removeMember(String principalId) {
-		synapseClient.deleteTeamMember(authenticationController.getCurrentUserPrincipalId(), principalId, teamId, new AsyncCallback<Void>() {
+		jsClient.deleteTeamMember(teamId, principalId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				//success, refresh the team
@@ -124,7 +126,6 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 		});
 	}
 	
-	@Override
 	public void search(String searchTerm) {
 		//New search term, and the offset must reset
 		this.searchTerm = searchTerm;

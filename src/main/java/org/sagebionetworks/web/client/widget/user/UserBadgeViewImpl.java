@@ -6,7 +6,9 @@ import static org.sagebionetworks.web.client.DisplayUtils.newWindow;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.Emphasis;
+import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
@@ -20,6 +22,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.event.dom.client.ErrorHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -46,6 +49,9 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	Span otherWidgets;
 	@UiField
 	Span pictureSpan;
+	@UiField
+	Tooltip pictureTooltip;
+	
 	private Presenter presenter;
 	Widget widget;
 	
@@ -73,7 +79,9 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	public UserBadgeViewImpl(Binder uiBinder, GlobalApplicationState globalAppState) {
 		widget = uiBinder.createAndBindUi(this);
 		placeChanger = globalAppState.getPlaceChanger();
-		pictureSpan.setHeight((BadgeSize.LARGE.pictureHeightPx() + 4) + "px");
+		String px = (BadgeSize.LARGE.pictureHeightPx() + 4) + "px";
+		pictureSpan.setHeight(px);
+		pictureSpan.setWidth(px);
 		handlerRegistration = usernameLink.addClickHandler(STANDARD_CLICKHANDLER);
 		pictureHandlerRegistration = pictureFocusPanel.addClickHandler(STANDARD_CLICKHANDLER);
 		userPicture.addErrorHandler(new ErrorHandler() {
@@ -93,7 +101,6 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	@Override
 	public void setDefaultPictureColor(String color) {
 		squareIcon.setColor(color);
-		defaultUserPictureLetter.setColor(color);
 	}
 	@Override
 	public void setDefaultPictureLetter(String letter) {
@@ -109,6 +116,29 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	public void showAnonymousUserPicture() {
 		userPicture.setVisible(false);
 		defaultUserPicture.setVisible(true);
+	}
+	@Override
+	public void noTooltip() {
+		pictureTooltip.setTrigger(Trigger.MANUAL);
+	}
+	@Override
+	public void setTooltipText(String displayName, String title, String location) {
+		SafeHtmlBuilder html = new SafeHtmlBuilder();
+		html.appendHtmlConstant("<div style=\"line-height:120%;text-align: left;\"><p style=\"font-size: 16px;font-weight: bold; margin-top:10px;\">");
+		html.appendEscaped(displayName);
+		html.appendHtmlConstant("</p>");
+		if (title != null && !title.isEmpty()) {
+			html.appendHtmlConstant("<p style=\"font-size: 14px;\">");
+			html.appendEscaped(title);
+			html.appendHtmlConstant("</p>");
+		}
+		if (location != null && !location.isEmpty()) {
+			html.appendHtmlConstant("<p style=\"font-size: 14px;\">");
+			html.appendEscaped(location);
+			html.appendHtmlConstant("</p>");
+		}
+		html.appendHtmlConstant("</div>");
+		pictureTooltip.setHtml(html.toSafeHtml());
 	}
 	
 	public void setClickHandler(ClickHandler clickHandler) {
@@ -130,6 +160,8 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	public void doNothingOnClick() {
 		handlerRegistration.removeHandler();
 		handlerRegistration = usernameLink.addClickHandler(DO_NOTHING_CLICKHANDLER);
+		pictureHandlerRegistration.removeHandler();
+		pictureHandlerRegistration = pictureFocusPanel.addClickHandler(DO_NOTHING_CLICKHANDLER);
 	}
 	
 	@Override
@@ -152,8 +184,10 @@ public class UserBadgeViewImpl implements UserBadgeView {
 		usernameLink.setStyleName(size.textStyle());
 		int pictureHeightPx = size.pictureHeightPx();
 		userPicture.setHeight(pictureHeightPx + "px");
+		userPicture.setWidth(pictureHeightPx + "px");
 		usernameLink.setVisible(size.isTextVisible());
 		pictureSpan.setHeight((pictureHeightPx + 6) + "px");
+		pictureSpan.setWidth((pictureHeightPx + 6) + "px");
 	}
 
 	@Override
@@ -178,7 +212,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
+	public void showInfo(String message) {
 		// TODO Auto-generated method stub
 	}
 
@@ -217,5 +251,9 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	@Override
 	public void setHeight(String height) {
 		widget.setHeight(height);
+	}
+	@Override
+	public void addUsernameLinkStyle(String style) {
+		usernameLink.addStyleName(style);
 	}
 }

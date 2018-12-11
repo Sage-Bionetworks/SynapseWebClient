@@ -19,6 +19,7 @@ import org.sagebionetworks.web.server.servlet.FileEntityResolverServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleAssociationServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
 import org.sagebionetworks.web.server.servlet.FileUploaderJnlp;
+import org.sagebionetworks.web.server.servlet.InitSessionServlet;
 import org.sagebionetworks.web.server.servlet.JiraClientImpl;
 import org.sagebionetworks.web.server.servlet.JiraJavaClient;
 import org.sagebionetworks.web.server.servlet.JiraJavaClientImpl;
@@ -26,7 +27,6 @@ import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
 import org.sagebionetworks.web.server.servlet.SlackServlet;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
-import org.sagebionetworks.web.server.servlet.SubscriptionClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserProfileClientImpl;
@@ -95,10 +95,6 @@ public class PortalServletModule extends ServletModule {
 		bind(DataAccessClientImpl.class).in(Singleton.class);
 		serve("/Portal/dataaccessclient").with(DataAccessClientImpl.class);
 		
-		// Subscription service
-		bind(SubscriptionClientImpl.class).in(Singleton.class);
-		serve("/Portal/subscriptionclient").with(SubscriptionClientImpl.class);
-		
 		bind(UserProfileClientImpl.class).in(Singleton.class);
 		serve("/Portal/userprofileclient").with(UserProfileClientImpl.class);
 		
@@ -117,6 +113,10 @@ public class PortalServletModule extends ServletModule {
 		// FileHandle upload
 		bind(FileHandleServlet.class).in(Singleton.class);
 		serve("/Portal/"+WebConstants.FILE_HANDLE_UPLOAD_SERVLET).with(FileHandleServlet.class);
+		
+		// Session cookie
+		bind(InitSessionServlet.class).in(Singleton.class);
+		serve("/Portal/"+WebConstants.SESSION_COOKIE_SERVLET).with(InitSessionServlet.class);
 		
 		// FileHandleAssociation download
 		bind(FileHandleAssociationServlet.class).in(Singleton.class);

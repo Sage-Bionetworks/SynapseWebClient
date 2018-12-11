@@ -5,6 +5,8 @@ import org.gwtbootstrap3.client.ui.BlockQuote;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -51,6 +53,9 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	Div manageAccessContainer;
 	@UiField
 	Div convertAccessRequirementContainer;
+	@UiField
+	Button loginButton;
+
 	Callback onAttachCallback;
 	public interface Binder extends UiBinder<Widget, ACTAccessRequirementWidgetViewImpl> {
 	}
@@ -59,23 +64,20 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	Presenter presenter;
 	
 	@Inject
-	public ACTAccessRequirementWidgetViewImpl(Binder binder){
+	public ACTAccessRequirementWidgetViewImpl(Binder binder, GlobalApplicationState globalAppState){
 		this.w = binder.createAndBindUi(this);
-		requestAccessButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onRequestAccess();
+		requestAccessButton.addClickHandler(event -> {
+			presenter.onRequestAccess();
+		});
+		w.addAttachHandler(event -> {
+			if (event.isAttached()) {
+				onAttachCallback.invoke();
 			}
 		});
-		w.addAttachHandler(new AttachEvent.Handler() {
-			
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				if (event.isAttached()) {
-					onAttachCallback.invoke();
-				}
-			}
+		loginButton.addClickHandler(event -> {
+			globalAppState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		});
+
 	}
 	
 	@Override
@@ -128,6 +130,7 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 		unapprovedHeading.setVisible(false);
 		requestAccessButton.setVisible(false);
 		requestApprovedMessage.setVisible(false);
+		loginButton.setVisible(false);
 	}
 	
 	@Override
@@ -186,5 +189,9 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	public void setConvertAccessRequirementWidget(IsWidget w) {
 		convertAccessRequirementContainer.clear();
 		convertAccessRequirementContainer.add(w);
+	}
+	@Override
+	public void showLoginButton() {
+		loginButton.setVisible(true);
 	}
 }

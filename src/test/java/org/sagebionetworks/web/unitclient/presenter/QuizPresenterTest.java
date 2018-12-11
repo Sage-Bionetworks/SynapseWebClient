@@ -77,7 +77,7 @@ public class QuizPresenterTest {
 		mockSynAlert = mock(SynapseAlert.class);
 		presenter = new QuizPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, adapterFactory, adapter, mockInjector, mockSynAlert);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(new UserSessionData());
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(new UserProfile());
 		when(mockInjector.getQuestionContainerWidget()).thenReturn(mockQuestionContainer);
 		Quiz questionnaire = mockQuiz();
 		String questionnaireJson = questionnaire.writeToJSONObject(adapter.createNew()).toJSONString();

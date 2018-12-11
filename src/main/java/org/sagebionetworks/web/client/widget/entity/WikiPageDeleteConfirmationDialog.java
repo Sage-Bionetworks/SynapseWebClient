@@ -100,7 +100,7 @@ public class WikiPageDeleteConfirmationDialog implements WikiPageDeleteConfirmat
 		synapseClient.deleteV2WikiPage(key, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo(DELETED, THE + WIKI + WAS_SUCCESSFULLY_DELETED);
+				view.showInfo(THE + WIKI + WAS_SUCCESSFULLY_DELETED);
 				if (callback != null) {
 					callback.invoke(parentWikiPageId);
 				}

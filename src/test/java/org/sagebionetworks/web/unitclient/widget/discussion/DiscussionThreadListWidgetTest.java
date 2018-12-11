@@ -98,7 +98,7 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockThreadsContainer).clear();
 		verify(mockSynAlert).clear();
 		verify(mockDiscussionForumClient).getThreadsForEntity(eq(entityId), anyLong(),
-				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(DiscussionFilter.class),
+				anyLong(), eq(DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY), eq(false), any(DiscussionFilter.class),
 				any(AsyncCallback.class));
 		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
 		verify(mockThreadsContainer).configure(captor.capture());
@@ -106,6 +106,21 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockDiscussionForumClient, times(2)).getThreadsForEntity(eq(entityId), anyLong(),
 				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(DiscussionFilter.class),
 				any(AsyncCallback.class));
+		verify(mockView).clearSort();
+		verify(mockView, never()).setSorted(any(DiscussionThreadOrder.class), anyBoolean());
+		
+		// sort by number of replies, verify call, sort again, verify ascending is toggled.
+		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
+		verify(mockDiscussionForumClient).getThreadsForEntity(eq(entityId), anyLong(),
+				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_REPLIES), eq(false), any(DiscussionFilter.class),
+				any(AsyncCallback.class));
+		verify(mockView).setSorted(DiscussionThreadOrder.NUMBER_OF_REPLIES, false);
+		
+		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
+		verify(mockDiscussionForumClient).getThreadsForEntity(eq(entityId), anyLong(),
+				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_REPLIES), eq(true), any(DiscussionFilter.class),
+				any(AsyncCallback.class));
+		verify(mockView).setSorted(DiscussionThreadOrder.NUMBER_OF_REPLIES, true);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -117,7 +132,7 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockThreadsContainer).clear();
 		verify(mockSynAlert).clear();
 		verify(mockDiscussionForumClient).getThreadsForForum(eq(forumId), anyLong(),
-				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(DiscussionFilter.class),
+				anyLong(), eq(DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY), eq(false), any(DiscussionFilter.class),
 				any(AsyncCallback.class));
 		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
 		verify(mockThreadsContainer).configure(captor.capture());
@@ -125,6 +140,21 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockDiscussionForumClient, times(2)).getThreadsForForum(eq(forumId), anyLong(),
 				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(DiscussionFilter.class),
 				any(AsyncCallback.class));
+		verify(mockView).clearSort();
+		verify(mockView, never()).setSorted(any(DiscussionThreadOrder.class), anyBoolean());
+		
+		// sort by number of replies, verify call, sort again, verify ascending is toggled.
+		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
+		verify(mockDiscussionForumClient).getThreadsForForum(eq(forumId), anyLong(),
+				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_VIEWS), eq(false), any(DiscussionFilter.class),
+				any(AsyncCallback.class));
+		verify(mockView).setSorted(DiscussionThreadOrder.NUMBER_OF_VIEWS, false);
+		
+		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
+		verify(mockDiscussionForumClient).getThreadsForForum(eq(forumId), anyLong(),
+				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_VIEWS), eq(true), any(DiscussionFilter.class),
+				any(AsyncCallback.class));
+		verify(mockView).setSorted(DiscussionThreadOrder.NUMBER_OF_VIEWS, true);
 	}
 
 	@SuppressWarnings("unchecked")

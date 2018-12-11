@@ -6,7 +6,7 @@
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:e="urn:import:org.sagebionetworks.web.client.widget.entity">
   
-  	<bh:Div addStyleNames="margin-top-10 margin-left-15 margin-right-15">
+  	<bh:Div addStyleNames="margin-top-10">
   		<bh:Div ui:field="loginAlert">
   			<b:Alert type="INFO">
 	  			<bh:Strong text="Please login to access this resource." />
@@ -14,11 +14,15 @@
   			<bh:Div ui:field="loginWidgetContainer" />
   		</bh:Div>
   		
-  		<b:Alert ui:field="alert" type="DANGER" addStyleNames="margin-bottom-0-imp">
-  			<bh:Strong ui:field="alertText"></bh:Strong>
-  			<b:Button ui:field="reloadButton" text="Retry" visible="false" icon="REFRESH" size="EXTRA_SMALL" addStyleNames="margin-left-15"/>
+  		<b:Alert ui:field="alert" type="DANGER" addStyleNames="margin-bottom-0-imp fullWidthAlert flexcontainer-row">
+  			<bh:Div addStyleNames="flexcontainer-column">
+  			  	<b:Icon type="WARNING" size="LARGE" marginRight="10" marginLeft="5" marginTop="2"/>
+  			</bh:Div>
+  			<bh:Div addStyleNames="flexcontainer-column">
+	  			<bh:Strong ui:field="alertText"></bh:Strong>
+	  			<b:Button ui:field="reloadButton" text="Retry" visible="false" icon="REFRESH" size="EXTRA_SMALL" addStyleNames="margin-left-15"/>
+  			</bh:Div>
   		</b:Alert>
   		<bh:Div ui:field="jiraDialogContainer"/>
 	</bh:Div>
-
 </ui:UiBinder>

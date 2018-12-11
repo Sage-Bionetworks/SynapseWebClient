@@ -121,8 +121,6 @@ public class Synapse extends Place {
 		calculateToken(entityId, versionNumber, area, areaToken);
 	}
 
-
-
 	@Prefix("!Synapse")
 	public static class Tokenizer implements PlaceTokenizer<Synapse> {
         @Override
@@ -136,8 +134,8 @@ public class Synapse extends Place {
         }
     }
 
-	public static enum EntityArea { WIKI, FILES, TABLES, ADMIN, DISCUSSION, DOCKER }
-	public static enum ProfileArea { PROJECTS, CHALLENGES, TEAMS, SETTINGS }
+	public static enum EntityArea { WIKI, FILES, TABLES, CHALLENGE, DISCUSSION, DOCKER }
+	public static enum ProfileArea { PROFILE, PROJECTS, CHALLENGES, TEAMS, DOWNLOADS, SETTINGS }
 
 	@Override
 	public int hashCode() {

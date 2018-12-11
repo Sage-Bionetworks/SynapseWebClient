@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.annotation;
 
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -13,7 +12,7 @@ public interface EditAnnotationsDialogView extends IsWidget {
 		/**
 		 * Configure the dialog
 		 */
-		void configure(EntityBundle bundle, EntityUpdatedHandler updateHandler);
+		void configure(EntityBundle bundle);
 		
 		/**
 		 * Called when the save button is clicked in the dialog
@@ -68,6 +67,6 @@ public interface EditAnnotationsDialogView extends IsWidget {
 	void removeAnnotationEditor(Widget editor);
 	void clearAnnotationEditors();
 	
-	void showInfo(String title, String message);
+	void showInfo(String message);
 
 }

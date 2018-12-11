@@ -2,13 +2,10 @@ package org.sagebionetworks.web.unitclient.widget.login;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
-import org.junit.Assert;
+import static org.mockito.Mockito.when;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -16,28 +13,22 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetView;
-import org.sagebionetworks.web.client.widget.login.UserListener;
-import org.sagebionetworks.web.shared.exceptions.LockedException;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 
 public class LoginWidgetTest {
 		
@@ -53,10 +44,8 @@ public class LoginWidgetTest {
 	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	@Mock
-	UserListener mockUserListener;
+	Callback mockUserListener;
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
-	@Mock
-	Session mockSession;
 	@Captor
 	ArgumentCaptor<Place> placeCaptor;
 	@Mock
@@ -70,13 +59,9 @@ public class LoginWidgetTest {
 
 		loginWidget = new LoginWidget(mockView, mockAuthController, mockGlobalApplicationState, mockSynAlert);
 		loginWidget.setUserListener(mockUserListener);
-		UserSessionData usd = new UserSessionData();
 		UserProfile p = new UserProfile();
 		p.setOwnerId("12");
-		usd.setProfile(p);
-		usd.setSession(mockSession);
-		when(mockSession.getAcceptsTermsOfUse()).thenReturn(true);
-		AsyncMockStubber.callSuccessWith(usd).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(p).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
 		verify(mockView).setSynAlert(mockSynAlert);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}
@@ -93,24 +78,9 @@ public class LoginWidgetTest {
 		String p = "pass";
 		loginWidget.setUsernameAndPassword(u, p);
 		
-		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<UserSessionData>) any());
-		verify(mockUserListener).userChanged(any(UserSessionData.class));
+		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback) any());
 		verify(mockView).clear();
 		verify(mockView).clearUsername();
-	}
-	
-	@Test
-	public void testSetUsernameAndPasswordHaveNotAcceptedToU() {
-		when(mockSession.getAcceptsTermsOfUse()).thenReturn(false);
-		String u = "user";
-		String p = "pass";
-		loginWidget.setUsernameAndPassword(u, p);
-		
-		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<UserSessionData>) any());
-		verify(mockPlaceChanger).goTo(placeCaptor.capture());
-		Place place = placeCaptor.getValue();
-		assertTrue(place instanceof LoginPlace);
-		assertEquals(LoginPlace.SHOW_TOU, ((LoginPlace)place).toToken());
 	}
 	
 	@Test
@@ -121,8 +91,8 @@ public class LoginWidgetTest {
 		Exception ex = new Exception(unhandledExceptionMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
 		loginWidget.setUsernameAndPassword(u, p);
-		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<UserSessionData>) any());
-		verify(mockUserListener, never()).userChanged(any(UserSessionData.class));
+		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback) any());
+		verify(mockUserListener, never()).invoke();
 		verify(mockSynAlert).handleException(ex);
 		verify(mockView).clear();
 		verify(mockView, never()).clearUsername();
@@ -137,8 +107,8 @@ public class LoginWidgetTest {
 		UnauthorizedException ex = new UnauthorizedException(notFoundMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
 		loginWidget.setUsernameAndPassword(u, p);
-		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<UserSessionData>) any());
-		verify(mockUserListener, never()).userChanged(any(UserSessionData.class));
+		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback) any());
+		verify(mockUserListener, never()).invoke();
 		verify(mockView).clear();
 		verify(mockView, never()).clearUsername();
 		verify(mockSynAlert).clear();
@@ -153,8 +123,8 @@ public class LoginWidgetTest {
 		UnauthorizedException ex = new UnauthorizedException(notFoundMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
 		loginWidget.setUsernameAndPassword(u, p);
-		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<UserSessionData>) any());
-		verify(mockUserListener, never()).userChanged(any(UserSessionData.class));
+		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback) any());
+		verify(mockUserListener, never()).invoke();
 		verify(mockView).clear();
 		verify(mockView, never()).clearUsername();
 		verify(mockSynAlert).clear();

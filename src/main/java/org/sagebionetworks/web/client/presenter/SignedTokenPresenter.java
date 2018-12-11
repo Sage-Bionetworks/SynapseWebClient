@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.place.EmailInvitation;
@@ -38,6 +39,7 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 	SignedTokenInterface signedToken;
 	UserBadge unsubscribingUserBadge;
 	AuthenticationController authController;
+	PopupUtilsView popupUtils;
 	boolean isFirstTry;
 	@Inject
 	public SignedTokenPresenter(SignedTokenView view,
@@ -46,11 +48,13 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 								SynapseAlert synapseAlert,
 								GlobalApplicationState globalApplicationState,
 								UserBadge unsubscribingUserBadge,
-								AuthenticationController authController){
+								AuthenticationController authController,
+								PopupUtilsView popupUtils){
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.synapseAlert = synapseAlert;
+		this.popupUtils = popupUtils;
 		this.gwt = gwt;
 		this.globalApplicationState = globalApplicationState;
 		this.unsubscribingUserBadge = unsubscribingUserBadge;
@@ -155,7 +159,13 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 			@Override
 			public void onSuccess(ResponseMessage result) {
 				view.setLoadingVisible(false);
-				view.showSuccess(result.getMessage());
+				if (signedToken instanceof JoinTeamSignedToken) {
+					// show success message, but send user to the associated Team page.
+					popupUtils.showInfo(result.getMessage());
+					globalApplicationState.getPlaceChanger().goTo(new Team(((JoinTeamSignedToken)signedToken).getTeamId()));
+				} else {
+					view.showSuccess(result.getMessage());	
+				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {

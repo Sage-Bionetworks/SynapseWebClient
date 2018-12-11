@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.table.v2;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -14,7 +13,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  */
 public interface TableEntityWidgetView extends IsWidget {
 	
-	public interface Presenter extends EntityUpdatedHandler {
+	public interface Presenter {
 		void onShowSimpleSearch();
 		void onShowAdvancedSearch();
 	}
@@ -54,12 +53,6 @@ public interface TableEntityWidgetView extends IsWidget {
 	public void setQueryResultsVisible(boolean visible);
 
 	/**
-	 * Show or hide the Query Progress widget.
-	 * @param b
-	 */
-	public void setQueryProgressVisible(boolean visible);
-
-	/**
 	 * Set the query results widget.
 	 * @param queryResultsWidget
 	 */
@@ -76,6 +69,7 @@ public interface TableEntityWidgetView extends IsWidget {
 	 * @param b
 	 */
 	public void setQueryInputVisible(boolean visible);
+	public void setTableToolbarVisible(boolean visible);
 
 	/**
 	 * Add a modal to the page.
@@ -90,4 +84,5 @@ public interface TableEntityWidgetView extends IsWidget {
 	void showConfirmDialog(String title, String confirmationMessage, Callback yesCallback);
 	void setSimpleSearchLinkVisible(boolean visible);
 	void setAdvancedSearchLinkVisible(boolean visible);
+	void setAddToDownloadList(IsWidget w);
 }

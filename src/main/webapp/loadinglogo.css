@@ -1,0 +1,37 @@
+/*-------------------------------------------------------*/
+/* ### Loading spinner ### */
+/*-------------------------------------------------------*/
+@keyframes spinner {
+  to {transform: rotate(360deg);}
+}
+
+.spinner {
+  box-sizing: border-box;
+  margin: auto;
+  position: relative;
+  width:30px;
+  height:30px;
+  background-image:url('images/logo.svg');
+  animation: spinner 1s linear infinite;
+  background-size:30px 30px;
+  background-repeat: no-repeat;
+}
+
+@keyframes white-spinner {
+  to {transform: rotate(360deg);}
+}
+
+.white-spinner {
+  box-sizing: border-box;
+  margin: auto;
+  position: relative;
+  width:30px;
+  height:30px;
+  background-image:url('images/logo-white.svg');
+  animation: spinner 1s linear infinite;
+  background-size:30px 30px;
+  background-repeat: no-repeat;
+}
+
+
+/* End loading spinner */

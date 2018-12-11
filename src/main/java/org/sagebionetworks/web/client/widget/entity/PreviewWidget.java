@@ -285,8 +285,9 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 						}
 						public void onResponseReceived(final Request request, final Response response) {
 							//add the response text
-						int statusCode = response.getStatusCode();
-							if (statusCode == Response.SC_OK) {
+							int statusCode = response.getStatusCode();
+							// if it's a 200 level response, it's OK
+							if (statusCode > 199 && statusCode < 300) {
 								String responseText = response.getText();
 								if (responseText != null && responseText.length() > 0) {
 									if (responseText.length() > MAX_LENGTH) {
@@ -316,6 +317,9 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 										default :
 									}
 								}
+							} else {
+								view.addSynapseAlertWidget(synapseAlert.asWidget());
+								synapseAlert.showError(response.getStatusText());
 							}
 						}
 					});

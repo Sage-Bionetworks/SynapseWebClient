@@ -78,9 +78,9 @@ public class ShinySiteWidget implements WidgetRendererPresenter {
 	
 	public static boolean isIncludePrincipalId(Map<String, String> descriptor) {
 		boolean isIncludePrincipleId = false; // default
-		if(descriptor.containsKey(WidgetConstants.SHINYSITE_INCLUDE_PRINCIPAL_ID_KEY)) {
+		if(descriptor.containsKey(WidgetConstants.INCLUDE_PRINCIPAL_ID_KEY)) {
 			try {
-				isIncludePrincipleId = Boolean.parseBoolean(descriptor.get(WidgetConstants.SHINYSITE_INCLUDE_PRINCIPAL_ID_KEY));
+				isIncludePrincipleId = Boolean.parseBoolean(descriptor.get(WidgetConstants.INCLUDE_PRINCIPAL_ID_KEY));
 			} catch (Throwable e) {
 				// fall back to default
 			}

@@ -9,6 +9,7 @@ import com.google.gwt.place.shared.Prefix;
 
 public class Profile extends Place{
 	public static final String EDIT_PROFILE_TOKEN="edit";
+	public static final String VIEW_PROFILE_TOKEN="v";
 	public static final String DELIMITER = "/"; 
 	
 	private String token;
@@ -20,7 +21,7 @@ public class Profile extends Place{
 	public Profile(String token) {
 		this.token = token.toLowerCase();
 		teamId = null;
-		area = Synapse.ProfileArea.PROJECTS;
+		area = Synapse.ProfileArea.PROFILE;
 		projectFilter = ProjectFilterEnum.ALL;
 		String[] tokens = token.split(DELIMITER);
 		if (tokens.length > 1) {
@@ -42,8 +43,8 @@ public class Profile extends Place{
 			}
 		} else {
 			userId = token;
-			//and by default go to the projects tab
-			area = Synapse.ProfileArea.PROJECTS;
+			//and by default go to the profile tab
+			area = Synapse.ProfileArea.PROFILE;
 		}
 	}
 	

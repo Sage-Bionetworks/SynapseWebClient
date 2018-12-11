@@ -84,4 +84,17 @@ public class SynapseClientBaseTest {
 		verify(mockSynapseClient, never()).setUserIpAddress(userIp);
 	}
 
+	@Test
+	public void testGetIpAddressRequestHasHeader(){
+		String otherIp = "42.42.42.42";
+		when(mockRequest.getHeader(SynapseClientBase.X_FORWARDED_FOR_HEADER)).thenReturn(otherIp);
+		assertEquals(otherIp,SynapseClientBase.getIpAddress(mockRequest));
+	}
+
+	@Test
+	public void testGetIpAddressRequestDoesNotHaveHeader(){
+		when(mockRequest.getHeader(SynapseClientBase.X_FORWARDED_FOR_HEADER)).thenReturn(null);
+		assertEquals(userIp, SynapseClientBase.getIpAddress(mockRequest));
+	}
+
 }

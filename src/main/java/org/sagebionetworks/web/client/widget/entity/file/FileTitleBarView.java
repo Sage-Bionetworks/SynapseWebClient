@@ -1,12 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.CallbackP;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -14,7 +9,7 @@ import com.google.gwt.user.client.ui.Widget;
 public interface FileTitleBarView extends IsWidget, SynapseView {
 	void createTitlebar(Entity entity);
 	void setFileLocation(String location);
-	void setFileDownloadButton(Widget w);
+	void setFileDownloadMenuItem(Widget w);
 	void setFilenameContainerVisible(boolean visible);
 	void setEntityName(String name);
 	void setFilename(String fileName);
@@ -26,4 +21,13 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 	void setExternalObjectStoreInfo(String endpoint, String bucket, String fileKey);
 	void setVersion(Long version);
 	void setVersionUIVisible(boolean visible);
+	void setPresenter(Presenter p);
+	void showAddedToDownloadListAlert(String message);
+	/**
+	 * Presenter interface
+	 */
+	public interface Presenter {
+		void onProgrammaticDownloadOptions();
+		void onAddToDownloadList();
+	}
 }

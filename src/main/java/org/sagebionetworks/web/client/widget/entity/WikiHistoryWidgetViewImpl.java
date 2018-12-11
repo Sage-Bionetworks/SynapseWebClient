@@ -275,7 +275,7 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 	private SimplePanel wrapWidget(Widget widget, String styleNames) {
 		SimplePanel widgetWrapper = new SimplePanel();
 		widgetWrapper.addStyleName(styleNames);
-		widgetWrapper.add(widget);
+		widgetWrapper.setWidget(widget);
 		return widgetWrapper;
 	}
 	
@@ -288,8 +288,8 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 	public void showLoading() {}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

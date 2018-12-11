@@ -1,21 +1,27 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.presenter.TeamPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -24,6 +30,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.TeamView;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberCountWidget;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
@@ -39,24 +46,41 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class TeamPresenterTest {
 
 	TeamPresenter presenter;
+	@Mock
 	TeamView mockView;
+	@Mock
 	AuthenticationController mockAuthenticationController;
+	@Mock
 	GlobalApplicationState mockGlobalAppState;
+	@Mock
 	SynapseClientAsync mockSynClient;
+	@Mock
 	SynapseAlert mockSynAlert;
+	@Mock
 	TeamLeaveModalWidget mockLeaveModal;
+	@Mock
 	TeamDeleteModalWidget mockDeleteModal;
+	@Mock
 	TeamEditModalWidget mockEditModal;
+	@Mock
 	InviteWidget mockInviteModal;
+	@Mock
 	JoinTeamWidget mockJoinWidget;
+	@Mock
 	MemberListWidget mockMemberListWidget;
+	@Mock
 	OpenMembershipRequestsWidget mockOpenMembershipRequestsWidget;
+	@Mock
 	OpenUserInvitationsWidget mockOpenUserInvitationsWidget;
+	@Mock
 	Team mockTeam;
+	@Mock
 	TeamBundle mockTeamBundle;
+	@Mock
 	TeamMembershipStatus mockTeamMembershipStatus;
 	
 	String teamId = "123";
@@ -76,7 +100,8 @@ public class TeamPresenterTest {
 	CookieProvider mockCookies;
 	@Mock
 	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
-	
+	@Mock
+	TeamMemberCountWidget mockTeamMemberCountWidget;
 	@Captor
 	ArgumentCaptor<CallbackP<Boolean>> callbackPcaptor;
 	@Captor
@@ -84,31 +109,13 @@ public class TeamPresenterTest {
 	
 	@Before
 	public void setup() {
-		MockitoAnnotations.initMocks(this);
-		mockView = mock(TeamView.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		mockGlobalAppState = mock(GlobalApplicationState.class);
-		mockSynClient = mock(SynapseClientAsync.class);
-		mockSynAlert = mock(SynapseAlert.class);
-		mockLeaveModal = mock(TeamLeaveModalWidget.class);
-		mockDeleteModal = mock(TeamDeleteModalWidget.class);
-		mockEditModal = mock(TeamEditModalWidget.class);
-		mockInviteModal = mock(InviteWidget.class);
-		mockJoinWidget = mock(JoinTeamWidget.class);
-		mockMemberListWidget = mock(MemberListWidget.class);
-		mockOpenMembershipRequestsWidget = mock(OpenMembershipRequestsWidget.class);
-		mockOpenUserInvitationsWidget = mock(OpenUserInvitationsWidget.class);
 		presenter = new TeamPresenter(mockView, mockAuthenticationController, mockGlobalAppState, 
 				mockSynClient, mockSynAlert, mockLeaveModal, mockDeleteModal, mockEditModal, 
 				mockInviteModal, mockJoinWidget, mockMemberListWidget, 
 				mockOpenMembershipRequestsWidget, mockOpenUserInvitationsWidget, mockGoogleMap, mockCookies,
-				mockIsACTMemberAsyncHandler);
-		mockTeam = mock(Team.class);
+				mockIsACTMemberAsyncHandler, mockTeamMemberCountWidget);
 		when(mockTeam.getName()).thenReturn(teamName);
-		mockTeamBundle = mock(TeamBundle.class);
-		mockTeamMembershipStatus = mock(TeamMembershipStatus.class);
-		AsyncMockStubber.callSuccessWith(mockTeamBundle).when(mockSynClient)
-		.getTeamBundle(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockTeamBundle).when(mockSynClient).getTeamBundle(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		
 		//team bundle
 		when(mockTeamBundle.getTeam()).thenReturn(mockTeam);
@@ -163,7 +170,7 @@ public class TeamPresenterTest {
 		
 		//once
 		verify(mockView).setPublicJoinVisible(canPublicJoin);
-		verify(mockView).setTotalMemberCount(totalMembershipCount.toString());
+		verify(mockTeamMemberCountWidget).configure(eq(teamId));
 		verify(mockView).setMediaObjectPanel(mockTeam);
 		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockView).showMemberMenuItems();
@@ -199,7 +206,6 @@ public class TeamPresenterTest {
 		
 		//once
 		verify(mockView).setPublicJoinVisible(false);
-		verify(mockView).setTotalMemberCount(totalMembershipCount.toString());
 		verify(mockView).setMediaObjectPanel(mockTeam);
 		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockJoinWidget).configure(eq(teamId), anyBoolean(), eq(mockTeamMembershipStatus), 
@@ -221,7 +227,6 @@ public class TeamPresenterTest {
 		
 		//once
 		verify(mockView).setPublicJoinVisible(canPublicJoin);
-		verify(mockView).setTotalMemberCount(totalMembershipCount.toString());
 		verify(mockView).setMediaObjectPanel(mockTeam);
 		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockView).showMemberMenuItems();
@@ -243,7 +248,7 @@ public class TeamPresenterTest {
 		verify(mockView).showMapModal();
 		verify(mockOpenMembershipRequestsWidget).setVisible(false);
 	}
-
+	
 	@Test
 	public void testGetTeamEmail() {
 		boolean canSendEmail = true;

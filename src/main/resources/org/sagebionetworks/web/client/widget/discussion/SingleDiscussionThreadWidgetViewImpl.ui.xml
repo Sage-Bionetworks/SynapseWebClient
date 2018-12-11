@@ -15,7 +15,7 @@
 			<bh:Div addStyleNames="margin-top-10 padding-left-10" width="100%"  >
 				<bh:Div width="100%">
 					<bh:Span ui:field="author"></bh:Span>
-					<b:Label text="Moderator" ui:field="moderatorBadge" visible="false" addStyleNames="synapse-purple-bg margin-left-5"/>
+					<b:Label text="Moderator" ui:field="moderatorBadge" visible="false" addStyleNames="synapse-accent-primary-bg margin-left-5"/>
 				</bh:Div>
 				<bh:Div width="100%">
 					<b:Container fluid="true">

@@ -64,6 +64,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public AnchorListItem linkLink;
 	@UiField
+	public AnchorListItem detailsSummaryLink;
+	@UiField
 	public AnchorListItem provenanceGraphLink;
 	@UiField
 	public AnchorListItem queryLink;
@@ -203,6 +205,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 			imageLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_IMAGE));
 			joinTeamLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_JOIN_TEAM));
 			linkLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LINK));
+			detailsSummaryLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_DETAILS_SUMMARY));
 			provenanceGraphLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_PROV_GRAPH));
 			queryLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_QUERY_TABLE));
 			leaderboardLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LEADERBOARD));
@@ -328,8 +331,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	}
 	
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 	
 	@Override

@@ -10,38 +10,31 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.repo.model.project.ExternalObjectStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.controller.EntityRefProvEntryView;
-import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWidget;
-import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWidgetView;
-import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceURLDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+@RunWith(MockitoJUnitRunner.class)
 public class StorageLocationWidgetTest {
 
 	@Mock
@@ -55,22 +48,21 @@ public class StorageLocationWidgetTest {
 	@Mock
 	EntityBundle mockBundle;
 	Folder folder;
-	EntityUpdatedHandler mockEntityUpdatedHandler;
 	@Mock
 	CookieProvider mockCookies;
+	@Mock
+	EventBus mockEventBus;
 	@Captor
 	ArgumentCaptor<StorageLocationSetting> locationSettingCaptor;
 	@Before
 	public void setup() {
-		MockitoAnnotations.initMocks(this);
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn(null);
-		widget = new StorageLocationWidget(mockView, mockSynapseClient, mockSynAlert, mockCookies);
+		widget = new StorageLocationWidget(mockView, mockSynapseClient, mockSynAlert, mockCookies, mockEventBus);
 		folder = new Folder();
 		folder.setId("syn420");
 		when(mockBundle.getEntity()).thenReturn(folder);
 		locationSettingBanners = Arrays.asList(new String[]{"Banner 1", "Banner 2"});
-		mockEntityUpdatedHandler = mock(EntityUpdatedHandler.class);
-		widget.configure(mockBundle, mockEntityUpdatedHandler);
+		widget.configure(mockBundle);
 	}
 	
 	@Test
@@ -229,7 +221,7 @@ public class StorageLocationWidgetTest {
 		widget.onSave();
 		
 		verify(mockSynapseClient).createStorageLocationSetting(anyString(), any(StorageLocationSetting.class), any(AsyncCallback.class));
-		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 		verify(mockView).hide();
 	}
 	
@@ -255,7 +247,7 @@ public class StorageLocationWidgetTest {
 		assertEquals(endpointUrl, setting.getEndpointUrl());
 		assertEquals(bucket, setting.getBucket());
 		assertEquals(UploadType.S3, setting.getUploadType());
-		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 		verify(mockView).hide();
 	}
 

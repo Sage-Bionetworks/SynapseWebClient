@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.widget.SelectionToolbar;
 
@@ -21,7 +22,7 @@ public class UserBadgeListViewImpl implements UserBadgeListView {
 	@UiField
 	SelectionToolbar selectionToolbar;
 	@UiField
-	TBody userBadgeContainer;
+	Div userBadgeContainer;
 	@Inject
 	public UserBadgeListViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);

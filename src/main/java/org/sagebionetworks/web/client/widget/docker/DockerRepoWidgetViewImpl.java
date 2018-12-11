@@ -76,17 +76,17 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 
 	@Override
 	public void setTitlebar(Widget widget) {
-		dockerTitlebarContainer.add(widget);
+		dockerTitlebarContainer.setWidget(widget);
 	}
 
 	@Override
 	public void setEntityMetadata(Widget widget) {
-		dockerMetadataContainer.add(widget);
+		dockerMetadataContainer.setWidget(widget);
 	}
 
 	@Override
 	public void setModifiedCreatedBy(IsWidget widget) {
-		dockerModifiedAndCreatedContainer.add(widget);
+		dockerModifiedAndCreatedContainer.setWidget(widget);
 	}
 
 	@Override

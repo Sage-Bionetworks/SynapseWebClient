@@ -2,15 +2,17 @@ package org.sagebionetworks.web.unitclient.widget.entity.team.controller;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -19,15 +21,21 @@ import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidge
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-
+@RunWith(MockitoJUnitRunner.class)
 public class TeamLeaveModalWidgetTest {
 
 	TeamLeaveModalWidget presenter;
+	@Mock
 	SynapseAlert mockSynAlert;
+	@Mock
 	AuthenticationController mockAuthenticationController;
-	SynapseClientAsync mockSynapseClient;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
+	@Mock
 	TeamLeaveModalWidgetView mockView;
+	@Mock
 	Callback mockRefreshCallback;
+	@Mock
 	Team mockTeam;
 	
 	String userId = "userId";
@@ -36,15 +44,9 @@ public class TeamLeaveModalWidgetTest {
 
 	@Before
 	public void setup() {
-		mockSynAlert = mock(SynapseAlert.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockView = mock(TeamLeaveModalWidgetView.class);
-		mockRefreshCallback = mock(Callback.class);
-		mockTeam = mock(Team.class);
 		when(mockTeam.getId()).thenReturn(teamId);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
-		presenter = new TeamLeaveModalWidget(mockSynAlert, mockSynapseClient, mockAuthenticationController, mockView);
+		presenter = new TeamLeaveModalWidget(mockSynAlert, mockJsClient, mockAuthenticationController, mockView);
 		presenter.setRefreshCallback(mockRefreshCallback);
 		presenter.configure(mockTeam);
 	}
@@ -61,9 +63,9 @@ public class TeamLeaveModalWidgetTest {
 		verify(mockSynAlert).clear();
 		verify(mockAuthenticationController).getCurrentUserPrincipalId();
 		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor.forClass(AsyncCallback.class);
-		verify(mockSynapseClient).deleteTeamMember(eq(userId), eq(userId), eq(teamId), captor.capture());
+		verify(mockJsClient).deleteTeamMember(eq(teamId), eq(userId), captor.capture());
 		captor.getValue().onSuccess(null);
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		verify(mockRefreshCallback).invoke();
 	}
 	
@@ -73,7 +75,7 @@ public class TeamLeaveModalWidgetTest {
 		verify(mockSynAlert).clear();
 		verify(mockAuthenticationController).getCurrentUserPrincipalId();
 		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor.forClass(AsyncCallback.class);
-		verify(mockSynapseClient).deleteTeamMember(eq(userId), eq(userId), eq(teamId), captor.capture());
+		verify(mockJsClient).deleteTeamMember(eq(teamId), eq(userId), captor.capture());
 		captor.getValue().onFailure(caught);
 		verify(mockSynAlert).handleException(caught);
 	}

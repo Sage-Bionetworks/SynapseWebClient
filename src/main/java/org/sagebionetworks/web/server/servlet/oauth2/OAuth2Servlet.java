@@ -3,6 +3,8 @@ package org.sagebionetworks.web.server.servlet.oauth2;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -19,6 +21,7 @@ import org.sagebionetworks.repo.model.oauth.OAuthUrlRequest;
 import org.sagebionetworks.repo.model.oauth.OAuthUrlResponse;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.StackEndpoints;
+import org.sagebionetworks.web.server.servlet.FileHandleAssociationServlet;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProviderImpl;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -60,7 +63,7 @@ public abstract class OAuth2Servlet extends HttpServlet {
 	 * @throws IOException
 	 */
 	public void redirectToProvider(HttpServletRequest req,
-			HttpServletResponse resp, OAuthProvider provider, String redirectUrl)
+			HttpServletResponse resp, OAuthProvider provider, String redirectUrl, String state)
 			throws IOException {
 		HttpServletRequest httpRqst = (HttpServletRequest)req;
 		URL requestURL = new URL(httpRqst.getRequestURL().toString());
@@ -70,26 +73,26 @@ public abstract class OAuth2Servlet extends HttpServlet {
 			OAuthUrlRequest request = new OAuthUrlRequest();
 			request.setProvider(provider);
 			request.setRedirectUrl(redirectUrl);
+			if (state != null && !state.isEmpty()) {
+				state = URLDecoder.decode(state);
+				request.setState(state);
+			}
 			OAuthUrlResponse respone = client.getOAuth2AuthenticationUrl(request);
 			resp.sendRedirect(respone.getAuthorizationUrl());
 		} catch (SynapseServerException e) {
 			if (e instanceof SynapseServiceUnavailable) {
 				resp.sendRedirect(new URL(requestURL.getProtocol(), requestURL.getHost(), requestURL.getPort(), "/#!Down:0").toString());
 			} else {
-				sendRedirectToError(requestURL, e, resp);
+				sendRedirectToError(req, e, resp);
 			}
 		} catch (SynapseException e) {
 			// 400 error
-			sendRedirectToError(requestURL, e, resp);
+			sendRedirectToError(req, e, resp);
 		}
 	}
 	
-	private void sendRedirectToError(URL requestURL, Exception e, HttpServletResponse resp) throws MalformedURLException, IOException {
-		LogEntry entry = new LogEntry();
-		entry.setLabel("OAuth2");
-		entry.setMessage(e.getMessage());
-		String entryString = SerializationUtils.serializeAndHexEncode(entry);
-		resp.sendRedirect(new URL(requestURL.getProtocol(), requestURL.getHost(), requestURL.getPort(), "/#!Error:"+entryString).toString());
+	private void sendRedirectToError(HttpServletRequest request, Exception e, HttpServletResponse resp) throws MalformedURLException, IOException {
+		resp.sendRedirect(FileHandleAssociationServlet.getBaseUrl(request) + FileHandleAssociationServlet.ERROR_PLACE + URLEncoder.encode(e.getMessage()));
 	}
 
 	/**

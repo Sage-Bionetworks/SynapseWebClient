@@ -86,8 +86,8 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override
@@ -141,7 +141,8 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 			presenter.findOldVersions();
 			afterJSPlumbLoad();
 		}
-		if (startingNodeContainer != null) {
+		
+		if (startingNodeContainer != null && graph.getNodes().size() > 3 && DisplayUtils.isInViewport(startingNodeContainer)) {
 			startingNodeContainer.getElement().scrollIntoView();
 		}
 	}
@@ -183,47 +184,54 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 	private static native void beforeJSPlumbLoad(String containerId) /*-{
 		;(function() {
 			$wnd.jsPlumbDemo = {					
-				init : function() {					
-					var color = "gray";
-					jsPlumbInstance = $wnd.jsPlumb.getInstance();		
-					jsPlumbInstance.importDefaults({
-						// notice the 'curviness' argument to this Bezier curve.  the curves on this page are far smoother
-						// than the curves on the first demo, which use the default curviness value.			
-						Connector : [ "Straight" ],
-						DragOptions : { cursor: "pointer", zIndex:2000 },
-						PaintStyle : { strokeStyle:color, lineWidth:1 },
-						EndpointStyle : { radius:0.01, fillStyle:color },
-						HoverPaintStyle : {strokeStyle:"#ec9f2e" },
-						EndpointHoverStyle : {fillStyle:"#ec9f2e" },			
-						Anchors :  [ "BottomCenter", "TopCenter" ]
-					});				
-						
-					// declare some common values:
-					jsP_arrowCommon = { foldback:0.7, fillStyle:color, length:7, width:7 };
-						// use three-arg spec to create two different arrows with the common values:
-					jsP_overlays = [
-							[ "Arrow", { location:0.7, direction:1 }, jsP_arrowCommon ]
-						];					
+				init : function() {
+					try {
+						var color = "gray";
+						jsPlumbInstance = $wnd.jsPlumb.getInstance();		
+						jsPlumbInstance.importDefaults({
+							// notice the 'curviness' argument to this Bezier curve.  the curves on this page are far smoother
+							// than the curves on the first demo, which use the default curviness value.			
+							Connector : [ "Straight" ],
+							DragOptions : { cursor: "pointer", zIndex:2000 },
+							PaintStyle : { strokeStyle:color, lineWidth:1 },
+							EndpointStyle : { radius:0.01, fillStyle:color },
+							HoverPaintStyle : {strokeStyle:"#ec9f2e" },
+							EndpointHoverStyle : {fillStyle:"#ec9f2e" },			
+							Anchors :  [ "BottomCenter", "TopCenter" ]
+						});				
+							
+						// declare some common values:
+						jsP_arrowCommon = { foldback:0.7, fillStyle:color, length:7, width:7 };
+							// use three-arg spec to create two different arrows with the common values:
+						jsP_overlays = [
+								[ "Arrow", { location:0.7, direction:1 }, jsP_arrowCommon ]
+							];	
+					} catch (err) {
+						console.error(err);
+					}
 				}
 			};
 			
 		})();
 
-		//  This file contains the JS that handles the first init of each jQuery demonstration, and also switching
-		//  between render modes.
-		$wnd.jsPlumb.bind("ready", function() {
-			// chrome fix.
-			document.onselectstart = function () { return false; };
-			$wnd.jsPlumbDemo.init();
-			try {
-				jsPlumbInstance.setSuspendDrawing(true);
-				jsPlumbInstance.setContainer(containerId);
-			} catch(err) {
-				console.log(err);
-			}
-		});
-		
-		
+		try {
+			//  This file contains the JS that handles the first init of each jQuery demonstration, and also switching
+			//  between render modes.
+			$wnd.jsPlumb.bind("ready", function() {
+				// chrome fix.
+				document.onselectstart = function () { return false; };
+				$wnd.jsPlumbDemo.init();
+				try {
+					jsPlumbInstance.setSuspendDrawing(true);
+					jsPlumbInstance.setContainer(containerId);
+				} catch(err) {
+					console.log(err);
+				}
+			});
+				
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
 	
 	/**

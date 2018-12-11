@@ -37,7 +37,9 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	Div schemaCollapse;
 	@UiField
 	Div scopeCollapse;
-
+	@UiField
+	Div tableToolbar;
+	
 	@UiField
 	SimplePanel columnDetailsPanel;
 	@UiField
@@ -54,6 +56,8 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	Anchor showSimpleSearch;
 	@UiField
 	Anchor showAdvancedSearch;
+	@UiField
+	Div addToDownloadListContainer;
 	PortalGinInjector ginInjector;
 	ColumnModelsWidget columnModelsWidget;
 	ScopeWidget scopeWidget;
@@ -65,7 +69,7 @@ public class TableEntityWidgetViewImpl extends Composite implements
 		initWidget(uiBinder.createAndBindUi(this));
 		this.ginInjector = ginInjector;
 		this.columnModelsWidget = ginInjector.createNewColumnModelsWidget();
-		this.columnDetailsPanel.add(this.columnModelsWidget.asWidget());
+		this.columnDetailsPanel.setWidget(this.columnModelsWidget.asWidget());
 		this.scopeWidget = scopeWidget;
 		this.scopePanel.add(scopeWidget.asWidget());
 		scopePanel.getElement().setAttribute("highlight-box-title", "Scope");
@@ -91,8 +95,8 @@ public class TableEntityWidgetViewImpl extends Composite implements
 
 	@Override
 	public void configure(EntityBundle bundle, boolean isEditable) {
-		this.columnModelsWidget.configure(bundle, isEditable, this.presenter);
-		this.scopeWidget.configure(bundle, isEditable, this.presenter);
+		this.columnModelsWidget.configure(bundle, isEditable);
+		this.scopeWidget.configure(bundle, isEditable);
 	}
 
 	@Override
@@ -109,11 +113,6 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	@Override
 	public void setTableMessageVisible(boolean visible) {
 		this.tableMessage.setVisible(visible);
-	}
-
-	@Override
-	public void setQueryProgressVisible(boolean isVisible) {
-		this.queryResultsPanel.setVisible(isVisible);
 	}
 
 	@Override
@@ -164,5 +163,14 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	@Override
 	public void setSimpleSearchLinkVisible(boolean visible) {
 		showSimpleSearch.setVisible(visible);
+	}
+	@Override
+	public void setTableToolbarVisible(boolean visible) {
+		tableToolbar.setVisible(visible);
+	}
+	@Override
+	public void setAddToDownloadList(IsWidget w) {
+		addToDownloadListContainer.clear();
+		addToDownloadListContainer.add(w);
 	}
 }

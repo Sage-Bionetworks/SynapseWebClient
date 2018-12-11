@@ -29,14 +29,38 @@ public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizard
 	@Inject
 	public CreateTableViewWizardStep1ViewImpl(Binder binder, FileViewOptions viewOptions){
 		widget = binder.createAndBindUi(this);
+		this.viewOptions = viewOptions;
 		viewOptionsContainer.add(viewOptions);
 		viewOptions.addClickHandler(event -> {
-			if (viewOptions.isIncludeTables()) {
-				p.onSelectFilesAndTablesView();
-			} else {
-				p.onSelectFilesOnlyView();
-			}
+			p.updateViewTypeMask();
 		});
+	}
+
+	@Override
+	public boolean isFileSelected() {
+		return viewOptions.isIncludeFiles();
+	}
+	@Override
+	public void setIsFileSelected(boolean value) {
+		viewOptions.setIsIncludeFiles(value);
+	}
+	
+	@Override
+	public boolean isFolderSelected() {
+		return viewOptions.isIncludeFolders();
+	}
+	@Override
+	public void setIsFolderSelected(boolean value) {
+		viewOptions.setIsIncludeFolders(value);
+	}
+
+	@Override
+	public boolean isTableSelected() {
+		return viewOptions.isIncludeTables();
+	}
+	@Override
+	public void setIsTableSelected(boolean value) {
+		viewOptions.setIsIncludeTables(value);
 	}
 
 	@Override
@@ -66,7 +90,7 @@ public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizard
 	}
 	
 	@Override
-	public void setFileViewTypeSelectionVisible(boolean visible) {
+	public void setViewTypeOptionsVisible(boolean visible) {
 		viewOptionsContainer.setVisible(visible);
 	}
 	@Override

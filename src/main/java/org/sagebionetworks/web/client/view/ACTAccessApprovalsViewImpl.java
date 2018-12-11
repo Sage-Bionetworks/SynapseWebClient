@@ -56,7 +56,7 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 			) {
 		widget = binder.createAndBindUi(this);
 		this.headerWidget = headerWidget;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		
 		clearDateFilter.addClickHandler(new ClickHandler() {
 			@Override
@@ -88,7 +88,7 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
@@ -111,8 +111,8 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

@@ -1,10 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.header;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -26,6 +25,8 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.file.DownloadList;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -34,11 +35,10 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Trash;
-import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -46,18 +46,26 @@ import org.sagebionetworks.web.client.widget.header.HeaderView;
 import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.junit.GWTMockUtilities;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 
 public class HeaderTest {
 
 	Header header;
+	@Mock
 	HeaderView mockView;
+	@Mock
 	AuthenticationController mockAuthenticationController;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
+	@Mock
 	PlaceChanger mockPlaceChanger;
+	@Mock
 	FavoriteWidget mockFavWidget;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	List<EntityHeader> entityHeaders;
@@ -66,31 +74,38 @@ public class HeaderTest {
 	@Mock
 	PendoSdk mockPendoSdk;
 	@Mock
-	UserSessionData mockUserSessionData;
-	@Mock
 	UserProfile mockUserProfile;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
+	@Mock
+	EventBus mockEventBus;
+	@Mock
+	EventBinder<Header> mockEventBinder;
+	@Mock
+	DownloadList mockDownloadList;
+	List<FileHandleAssociation> downloadListFhas;
+	@Mock
+	FileHandleAssociation mockFha1;
+	@Mock
+	FileHandleAssociation mockFha2;
+	
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
+		when(mockView.getEventBinder()).thenReturn(mockEventBinder);
 		GWTMockUtilities.disarm();
-		mockView = Mockito.mock(HeaderView.class);		
-		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
-		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
-		mockPlaceChanger = mock(PlaceChanger.class);
-		mockFavWidget = mock(FavoriteWidget.class);
-		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		//by default, mock that we are on the production website
 		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn(Header.WWW_SYNAPSE_ORG);
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPendoSdk, mockPortalGinInjector);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPendoSdk, mockPortalGinInjector, mockEventBus);
 		entityHeaders = new ArrayList<EntityHeader>();
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);
-		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
+		downloadListFhas = new ArrayList<>();
+		when(mockDownloadList.getFilesToDownload()).thenReturn(downloadListFhas);
+		AsyncMockStubber.callSuccessWith(mockDownloadList).when(mockSynapseJavascriptClient).getDownloadList(any(AsyncCallback.class));
 	}
 	@After
 	public void tearDown() {
@@ -106,21 +121,6 @@ public class HeaderTest {
 	@Test
 	public void testAsWidget(){
 		header.asWidget();
-	}
-
-	@Test
-	public void testOnDashboardClickLoggedIn() {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn("008");
-		header.onDashboardClick();
-		verify(mockPlaceChanger).goTo(isA(Profile.class));
-	}
-
-	@Test
-	public void testOnDashboardClickAnonymous() {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		header.onDashboardClick();
-		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 
 	@Test
@@ -160,15 +160,9 @@ public class HeaderTest {
 	}
 
 	@Test
-	public void testOnRegisterClick() {
-		header.onRegisterClick();
-		verify(mockPlaceChanger).goTo(isA(RegisterAccount.class));
-	}
-
-	@Test
 	public void testOnFavoriteClickEmptyCase() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		header.onFavoriteClick();
+		header.refreshFavorites();
 		verify(mockView).clearFavorite();
 		verify(mockView).setEmptyFavorite();
 	}
@@ -182,7 +176,7 @@ public class HeaderTest {
 		entityHeader2.setId("syn012345");
 		entityHeaders.add(entityHeader1);
 		entityHeaders.add(entityHeader2);
-		header.onFavoriteClick();
+		header.refreshFavorites();
 		verify(mockView).clearFavorite();
 		verify(mockView).addFavorite(entityHeaders);
 	}
@@ -191,10 +185,8 @@ public class HeaderTest {
 	public void testFavoriteRoundTrip() {
 		// After User Logged in
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		UserSessionData userSessionData = new UserSessionData();
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(userSessionData);
-		header.onFavoriteClick();
-		verify(mockView).showFavoritesLoading();
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(mockUserProfile);
+		header.refreshFavorites();
 		verify(mockView).clearFavorite();
 		verify(mockSynapseJavascriptClient, times(1)).getFavorites(any(AsyncCallback.class));
 		//initially empty
@@ -206,8 +198,7 @@ public class HeaderTest {
 		entityHeaders.add(entityHeader1);
 		
 		// User should ask for favorites each time favorites button is clicked
-		header.onFavoriteClick();
-		verify(mockView, times(2)).showFavoritesLoading();
+		header.refreshFavorites();
 		verify(mockView, times(2)).clearFavorite();
 		verify(mockSynapseJavascriptClient, times(2)).getFavorites(any(AsyncCallback.class));
 		verify(mockView).addFavorite(entityHeaders);
@@ -218,23 +209,9 @@ public class HeaderTest {
 		// SWC-2805: User is not logged in.  This is an odd case, since the favorites menu should not be shown.
 		// in this case, do not even try to update the favorites, will show whatever we had (possibly stale, like the rest of the page).
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		header.onFavoriteClick();
-		verify(mockView, never()).showFavoritesLoading();
+		header.refreshFavorites();
 		verify(mockView, never()).clearFavorite();
 		verify(mockSynapseJavascriptClient, never()).getFavorites(any(AsyncCallback.class));
-	}
-	
-	@Test
-	public void testShowLargeLogo() {
-		header.configure(true);
-		verify(mockView).showLargeLogo();
-		verify(mockView, never()).showSmallLogo();
-	}
-	@Test
-	public void testShowSmallLogo() {
-		header.configure(false);
-		verify(mockView, never()).showLargeLogo();
-		verify(mockView).showSmallLogo();
 	}
 	
 	@Test
@@ -263,13 +240,13 @@ public class HeaderTest {
 		String userId = "10001";
 		String userName = "testuser";
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(mockUserSessionData);
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(mockUserProfile);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
 		when(mockUserProfile.getUserName()).thenReturn(userName);
 		
 		header.refresh();
 		
-		verify(mockView).setUser(mockUserSessionData);
+		verify(mockView).setUser(mockUserProfile);
 		verify(mockView).refresh();
 		verify(mockView).setSearchVisible(true);
 		
@@ -295,16 +272,47 @@ public class HeaderTest {
 		String userId = "10001";
 		String userName = "testuser";
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(mockUserSessionData);
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(null);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
 		when(mockUserProfile.getUserName()).thenReturn(userName);
-		when(mockUserSessionData.getProfile()).thenReturn(null);
 		
 		header.refresh();
 		
-		verify(mockView).setUser(mockUserSessionData);
+		verify(mockView).setUser(null);
 		verify(mockView).refresh();
 		verify(mockView).setSearchVisible(true);
 		verify(mockPendoSdk).initialize(ANONYMOUS, N_A);
+	}
+	
+	@Test
+	public void testOnDownloadListUpdatedEvent() {
+		header.onDownloadListUpdatedEvent(new DownloadListUpdatedEvent());
+
+		verify(mockSynapseJavascriptClient).getDownloadList(any(AsyncCallback.class));
+		verify(mockView).setDownloadListUIVisible(false);
+		verify(mockView).setDownloadListFileCount(0);
+		
+		//add a file to the download list, and fire an update event
+		downloadListFhas.add(mockFha1);
+		header.onDownloadListUpdatedEvent(new DownloadListUpdatedEvent());
+
+		verify(mockView).setDownloadListUIVisible(true);
+		verify(mockView).setDownloadListFileCount(1);
+
+		downloadListFhas.add(mockFha2);
+		header.onDownloadListUpdatedEvent(new DownloadListUpdatedEvent());
+
+		verify(mockView, times(2)).setDownloadListUIVisible(true);
+		verify(mockView).setDownloadListFileCount(2);
+	}
+	
+	@Test
+	public void testOnDownloadListUpdatedFailure() {
+		AsyncMockStubber.callFailureWith(new Exception("error")).when(mockSynapseJavascriptClient).getDownloadList(any(AsyncCallback.class));
+		header.onDownloadListUpdatedEvent(new DownloadListUpdatedEvent());
+
+		verify(mockSynapseJavascriptClient).getDownloadList(any(AsyncCallback.class));
+		verify(mockView).setDownloadListUIVisible(false);
+		verify(mockSynapseJSNIUtils).consoleError(anyString());
 	}
 }

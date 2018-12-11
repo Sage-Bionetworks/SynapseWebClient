@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
+
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -21,4 +23,6 @@ public interface DiscussionThreadListWidgetView extends IsWidget{
 	void setNoThreadsFoundVisible(boolean visible);
 	void setThreadsContainer(IsWidget container);
 	void scrollIntoView(Widget w);
+	void setSorted(DiscussionThreadOrder column, boolean ascending);
+	void clearSort();
 }

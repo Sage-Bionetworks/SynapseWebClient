@@ -8,8 +8,10 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.Date;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
@@ -24,17 +26,24 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DateTimeUtils;
+import org.sagebionetworks.web.client.PopupUtilsView;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadgeView;
-import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
+import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItem;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -42,6 +51,7 @@ public class EntityListRowBadgeTest {
 
 	EntityListRowBadge widget;
 	String entityId = "syn123";
+	String entityName = "an entity";
 	@Mock
 	EntityListRowBadgeView mockView;
 	@Mock
@@ -49,27 +59,37 @@ public class EntityListRowBadgeTest {
 	@Mock
 	DateTimeUtils mockDateTimeUtils;
 	@Mock
-	FileDownloadButton mockFileDownloadButton;
-	@Mock
 	LazyLoadHelper mockLazyLoadHelper;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	PopupUtilsView mockPopupUtils;
+	@Mock
+	EventBus mockEventBus;
+	@Mock
+	SynapseJSNIUtils mockSynapseJSNIUtils;
+	@Mock
+	FileEntity mockFileEntity;
+	@Mock
+	S3FileHandle mockDataFileHandle;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
 		widget = new EntityListRowBadge(mockView, mockUserBadge, mockSynapseJavascriptClient,
-				mockFileDownloadButton, mockLazyLoadHelper, mockDateTimeUtils);
+				mockLazyLoadHelper, mockDateTimeUtils, mockPopupUtils, mockEventBus, mockSynapseJSNIUtils);
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).addFileToDownloadList(anyString(), anyString(), any(AsyncCallback.class));
 	}
 	@Test
 	public void testConstruction() {
 		verify(mockView).setPresenter(widget);
 		verify(mockView).setCreatedByWidget(any(Widget.class));
-		verify(mockFileDownloadButton).setSize(ButtonSize.EXTRA_SMALL);
 	}
 	
 	private EntityBundle setupEntity(Entity entity) {
 		EntityBundle bundle = mock(EntityBundle.class);
 		when(bundle.getEntity()).thenReturn(entity);
+		when(bundle.getFileHandles()).thenReturn(Collections.singletonList(mockDataFileHandle));
+		
 		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		return bundle;
@@ -111,8 +131,7 @@ public class EntityListRowBadgeTest {
 		verify(mockUserBadge).configure(createdByUserId);
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockView).setDescription(description);
-		verify(mockFileDownloadButton, never()).configure(any(EntityBundle.class));
-		verify(mockView, never()).setFileDownloadButton(any(Widget.class));
+		verify(mockView, never()).showAddToDownloadList();
 		verify(mockView).setVersion(EntityListRowBadge.N_A);
 	}
 	
@@ -141,14 +160,12 @@ public class EntityListRowBadgeTest {
 		
 		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).showLoading();
-		verify(mockView).setIcon(IconType.FILE_O); //file icon
+		verify(mockView).setIcon(IconType.FILE); //file icon
 		verify(mockView).setEntityLink(entityName, "#!Synapse:"+entityId+"."+version);
 		verify(mockUserBadge).configure(createdByUserId);
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockView).setDescription(description);
-		verify(mockFileDownloadButton).configure(any(EntityBundle.class));
-		verify(mockFileDownloadButton).hideClientHelp();
-		verify(mockView).setFileDownloadButton(any(Widget.class));
+		verify(mockView).showAddToDownloadList();
 		verify(mockView).setVersion(version.toString());
 	}
 	
@@ -165,5 +182,50 @@ public class EntityListRowBadgeTest {
 		widget.getEntityBundle();
 		verify(mockView).showErrorIcon(errorMessage);
 		verify(mockView).setEntityLink(entityId, "#!Synapse:"+entityId);
+	}
+	
+	
+
+	@Test
+	public void testOnAddToDownloadList() {
+		String fileHandleId = "9999";
+		when(mockDataFileHandle.getId()).thenReturn(fileHandleId);
+		when(mockFileEntity.getId()).thenReturn(entityId);
+		when(mockFileEntity.getName()).thenReturn(entityName);
+		when(mockFileEntity.getVersionNumber()).thenReturn(2L);
+		setupEntity(mockFileEntity);
+		Reference ref = new Reference();
+		ref.setTargetId(entityId);
+		widget.configure(ref);
+		widget.getEntityBundle();
+		
+		widget.onAddToDownloadList();
+		
+		verify(mockSynapseJavascriptClient).addFileToDownloadList(eq(fileHandleId), eq(entityId), any(AsyncCallback.class));
+		verify(mockPopupUtils).showInfo(entityName + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
+		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
+		verify(mockSynapseJSNIUtils).sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, Integer.toString(1));
+	}
+	
+	@Test
+	public void testOnAddToDownloadListError() {
+		String errorMessage = "a simulated error";
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseJavascriptClient).addFileToDownloadList(anyString(), anyString(), any(AsyncCallback.class));
+		String fileHandleId = "9999";
+		when(mockDataFileHandle.getId()).thenReturn(fileHandleId);
+		when(mockFileEntity.getId()).thenReturn(entityId);
+		when(mockFileEntity.getName()).thenReturn(entityName);
+		when(mockFileEntity.getVersionNumber()).thenReturn(2L);
+		setupEntity(mockFileEntity);
+		Reference ref = new Reference();
+		ref.setTargetId(entityId);
+		widget.configure(ref);
+		widget.getEntityBundle();
+		
+		widget.onAddToDownloadList();
+		
+		verify(mockSynapseJavascriptClient).addFileToDownloadList(eq(fileHandleId), eq(entityId), any(AsyncCallback.class));
+		verifyZeroInteractions(mockPopupUtils, mockEventBus);
+		verify(mockView).showErrorIcon(errorMessage);
 	}
 }

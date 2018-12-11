@@ -3,11 +3,11 @@ package org.sagebionetworks.web.client.widget.header;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 
 public interface HeaderView extends IsWidget {
 	/**
@@ -15,9 +15,6 @@ public interface HeaderView extends IsWidget {
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-	public void setMenuItemActive(MenuItems menuItem);
-	public void removeMenuItemActive(MenuItems menuItem);
-	void setStuAnnouncementWidget(Widget w);
 	public void refresh();
 	/**
 	 * Sets the search box to visible or not
@@ -30,19 +27,14 @@ public interface HeaderView extends IsWidget {
 	public interface Presenter {
 		void onTrashClick();
 		void onLogoutClick();
-		void onDashboardClick();
 		void onLoginClick();
-		void onRegisterClick();
-		void onFavoriteClick();
+		void refreshFavorites();
 		void onLogoClick();
 	}
-	public void showLargeLogo();
-	public void showSmallLogo();
 	public void clearFavorite();
 	public void setEmptyFavorite();
 	public void addFavorite(List<EntityHeader> headers);
-	public void showFavoritesLoading();
-	void setUser(UserSessionData userData);
+	void setUser(UserProfile profile);
 	void setProjectHeaderText(String text);
 	void setProjectHeaderAnchorTarget(String href);
 	void setProjectFavoriteWidget(IsWidget favWidget);
@@ -51,4 +43,7 @@ public interface HeaderView extends IsWidget {
 	void setStagingAlertVisible(boolean visible);
 	void openNewWindow(String url);
 	void clear();
+	EventBinder<Header> getEventBinder();
+	void setDownloadListUIVisible(boolean visible);
+	void setDownloadListFileCount(Integer count);
 }

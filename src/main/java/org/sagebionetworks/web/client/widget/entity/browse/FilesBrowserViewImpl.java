@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.table.SortEntityChildrenDropdownButton;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -19,26 +19,33 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 
 	private EntityTreeBrowser entityTreeBrowser;
 	private Widget widget;
+	private Presenter presenter;
 
 	@UiField
 	Div files;
 	@UiField
-	Div sortButtonContainer;
-	SortEntityChildrenDropdownButton sortEntityChildrenDropdownButton;
+	Div commandsContainer;
+	@UiField
+	AnchorListItem addToDownloadListLink;
+	@UiField
+	AnchorListItem programmaticOptionsLink;
+	@UiField
+	Div addToDownloadListContainer;
 	
 	@Inject
 	public FilesBrowserViewImpl(FilesBrowserViewImplUiBinder binder,
-			EntityTreeBrowser entityTreeBrowser,
-			SortEntityChildrenDropdownButton sortEntityChildrenDropdownButton) {
+			EntityTreeBrowser entityTreeBrowser) {
 		widget = binder.createAndBindUi(this);
 		this.entityTreeBrowser = entityTreeBrowser;
 		Widget etbW = entityTreeBrowser.asWidget();
 		etbW.addStyleName("margin-top-10");
 		files.add(etbW);
-		this.sortEntityChildrenDropdownButton = sortEntityChildrenDropdownButton;
-		sortButtonContainer.add(sortEntityChildrenDropdownButton);
-		sortEntityChildrenDropdownButton.setListener(entityTreeBrowser);
-		sortEntityChildrenDropdownButton.setSortUI(EntityTreeBrowser.DEFAULT_SORT_BY, EntityTreeBrowser.DEFAULT_DIRECTION);
+		programmaticOptionsLink.addClickHandler(event->{
+			presenter.onProgrammaticDownloadOptions();
+		});
+		addToDownloadListLink.addClickHandler(event->{
+			presenter.onAddToDownloadList();
+		});
 	}
 
 	@Override
@@ -74,12 +81,21 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override
 	public void clear() {
 		entityTreeBrowser.clear();
+	}
+	@Override
+	public void setPresenter(Presenter p) {
+		this.presenter = p;
+	}
+	@Override
+	public void setAddToDownloadList(IsWidget w) {
+		addToDownloadListContainer.clear();
+		addToDownloadListContainer.add(w);
 	}
 }

@@ -1,29 +1,20 @@
 package org.sagebionetworks.web.client.widget;
 
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.Portal;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
-import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
 
 import com.google.gwt.core.shared.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public class LoadingSpinner implements IsWidget, SupportsLazyLoadInterface {
-	
+public class LoadingSpinner implements IsWidget {
 	public interface Binder extends UiBinder<Widget, LoadingSpinner> {}
 	private static Binder uiBinder = GWT.create(Binder.class);
-	Widget widget = null;
-	String size;
 	
 	@UiField
 	Div loadingSpinnerDiv;
-	Div spinnerContainer = new Div();
-	Callback onAttachCallback;
 	
 	/**
 	 * ## Usage
@@ -35,50 +26,16 @@ public class LoadingSpinner implements IsWidget, SupportsLazyLoadInterface {
 	 * ```
 	 */
 	public LoadingSpinner() {
-		Callback isInViewportCallback = () -> {
-			lazyConstruct();
-		};
-		spinnerContainer.addAttachHandler(event -> {
-			if (event.isAttached()) {
-				onAttachCallback.invoke();
-			}
-		});
-		
-		LazyLoadHelper lazyLoadHelper = Portal.getInjector().getLazyLoadHelper(); 
-		lazyLoadHelper.configure(isInViewportCallback, this);
-		lazyLoadHelper.setIsConfigured();
+		uiBinder.createAndBindUi(this);
 	}
 	
-	@Override
-	public boolean isAttached() {
-		return spinnerContainer.isAttached();
-	}
-	@Override
-	public boolean isInViewport() {
-		return DisplayUtils.isInViewport(spinnerContainer) && spinnerContainer.isVisible();
-	}
-	private void lazyConstruct() {
-		if (widget == null) {
-			widget = uiBinder.createAndBindUi(this);
-			if (size != null) {
-				widget.setSize(size, size);	
-			}
-		}
-		spinnerContainer.clear();
-		spinnerContainer.add(widget); 
-	}
-	
-	@Override
-	public void setOnAttachCallback(Callback onAttachCallback) {
-		this.onAttachCallback = onAttachCallback;
-	}
 	@Override
 	public Widget asWidget() {
-		return spinnerContainer;
+		return loadingSpinnerDiv;
 	}
 	
 	public void setVisible(boolean visible) {
-		spinnerContainer.setVisible(visible);
+		loadingSpinnerDiv.setVisible(visible);
 	}
 	
 	public void setSize(int px) {
@@ -86,16 +43,36 @@ public class LoadingSpinner implements IsWidget, SupportsLazyLoadInterface {
 	}
 	
 	public void setSize(String size) {
-		this.size = size;
-		spinnerContainer.setHeight(size);
-		spinnerContainer.setWidth(size);
+		loadingSpinnerDiv.setSize(size, size);
+		_setSize(loadingSpinnerDiv.getElement(), size);
 	}
 	
+	public static native void _setSize(Element elem, String size) /*-{
+		elem.style.width = size;
+		elem.style.height = size;
+		elem.style.backgroundSize = size + ' ' + size;
+	}-*/;
+	
 	public void setAddStyleNames(String styleNames) {
-		spinnerContainer.addStyleName(styleNames);
+		loadingSpinnerDiv.addStyleName(styleNames);
 	}
 	
 	public boolean isVisible() {
-		return spinnerContainer.isVisible();
+		return loadingSpinnerDiv.isVisible();
+	}
+	public void setMarginLeft(double margin) {
+		loadingSpinnerDiv.setMarginLeft(margin);
+	}
+	public void setMarginRight(double margin) {
+		loadingSpinnerDiv.setMarginLeft(margin);
+	}
+	public boolean isAttached() {
+		return loadingSpinnerDiv.isAttached();
+	}
+	public void setIsWhite(boolean isWhite) {
+		String spinnerStyle = isWhite ? "white-spinner" : "spinner";
+		String oldStyle = isWhite ? "spinner" : "white-spinner";
+		loadingSpinnerDiv.removeStyleName(oldStyle);
+		loadingSpinnerDiv.addStyleName(spinnerStyle);
 	}
 }

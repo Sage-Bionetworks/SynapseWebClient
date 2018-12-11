@@ -34,15 +34,15 @@ public class CreateTableViewWizard {
 	public void configure(String parentId, TableType type) {
 		this.parentId = parentId;
 		this.type = type;
-		if (TableType.fileview.equals(type)) {
-			this.modalWizardWidget.setTitle("Create File View");
-			this.modalWizardWidget.setHelp(VIEW_HELP, VIEW_URL);
-		} else if (TableType.projectview.equals(type)) {
+		if (TableType.projects.equals(type)) {
 			this.modalWizardWidget.setTitle("Create Project View");
 			this.modalWizardWidget.setHelp(PROJECT_VIEW_HELP, VIEW_URL);
-		} else {
+		} else if (TableType.table.equals(type)) {
 			this.modalWizardWidget.setTitle("Create Table");
 			this.modalWizardWidget.setHelp(TablesTab.TABLES_HELP, TablesTab.TABLES_HELP_URL);
+		} else {
+			this.modalWizardWidget.setTitle("Create View");
+			this.modalWizardWidget.setHelp(VIEW_HELP, VIEW_URL);
 		}
 	}
 

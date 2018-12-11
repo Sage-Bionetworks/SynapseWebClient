@@ -440,7 +440,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockClient).updateDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
 		verify(mockClient, never()).submitDataAccessRequest(any(CreateSubmissionRequest.class), anyLong(), any(AsyncCallback.class));
 		
-		verify(mockPopupUtils).showInfo(CreateDataAccessSubmissionStep2.SAVED_PROGRESS_MESSAGE, "");
+		verify(mockPopupUtils).showInfo(CreateDataAccessSubmissionStep2.SAVED_PROGRESS_MESSAGE);
 		InOrder order = inOrder(mockModalPresenter);
 		order.verify(mockModalPresenter).setLoading(true);
 		order.verify(mockModalPresenter).setLoading(false);

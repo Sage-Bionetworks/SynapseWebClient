@@ -21,11 +21,7 @@ public interface SearchBoxView extends IsWidget, SynapseView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-
 		void search(String value);
-
-		void setSearchAll(boolean searchAll);
-		
 	}
 
 	public void setVisible(boolean isVisible);

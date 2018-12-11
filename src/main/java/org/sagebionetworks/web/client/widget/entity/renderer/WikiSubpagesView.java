@@ -34,5 +34,6 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
 	
 	public interface Presenter {
 		void refreshWikiHeaderTree();
+		void clearCachedHeaderTree();
 	}
 }

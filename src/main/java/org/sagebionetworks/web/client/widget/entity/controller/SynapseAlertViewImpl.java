@@ -6,7 +6,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -75,11 +74,6 @@ public class SynapseAlertViewImpl implements
 	}
 	
 	@Override
-	public void showInfo(String tile, String message) {
-		DisplayUtils.showInfo(tile, message);
-	}
-
-	@Override
 	public Widget asWidget() {
 		return synapseAlertContainer;
 	}
@@ -125,7 +119,7 @@ public class SynapseAlertViewImpl implements
 	public void showError(String error) {
 		lazyConstruct();
 		synapseAlertContainer.setVisible(true);
-		alert.setText(error);
+		alertText.setText(error);
 		alert.setVisible(true);
 	}
 	

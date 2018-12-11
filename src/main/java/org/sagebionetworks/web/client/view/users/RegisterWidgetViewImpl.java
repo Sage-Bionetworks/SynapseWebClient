@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.client.view.users;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -28,7 +28,7 @@ public class RegisterWidgetViewImpl implements RegisterWidgetView {
 	@Inject
 	public RegisterWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		emailAddressField.getElement().setAttribute("placeholder", "Your email");
+		emailAddressField.getElement().setAttribute("placeholder", "Your email address");
 		initClickHandlers();
 	}
 
@@ -77,7 +77,7 @@ public class RegisterWidgetViewImpl implements RegisterWidgetView {
 	}
 	@Override
 	public void showInfo(String message) {
-		DisplayUtils.showInfo(message, "");
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

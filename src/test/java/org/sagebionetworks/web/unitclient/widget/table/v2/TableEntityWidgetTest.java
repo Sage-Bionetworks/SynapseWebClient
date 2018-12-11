@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
@@ -48,6 +47,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
@@ -95,11 +95,14 @@ public class TableEntityWidgetTest {
 	@Captor
 	ArgumentCaptor<Query> queryCaptor;
 	
-	String facetBasedSql = "select * from syn123 where x>1";
+	public static final String FACET_SQL = "select * from syn123 where \"x\" = 'a'";
+	public static final String EXPECTED_SQL_FOR_CLIENT = "select * from syn123 where \\\"x\\\" = 'a'";
 	@Mock
 	FileViewClientsHelp mockFileViewClientsHelp;
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
+	@Mock
+	AddToDownloadList mockAddToDownloadList;
 	@Captor
 	ArgumentCaptor<ActionListener> actionListenerCaptor;
 	
@@ -137,9 +140,10 @@ public class TableEntityWidgetTest {
 				mockPreflightController, 
 				mockSynapseClient, 
 				mockFileViewClientsHelp,
+				mockAddToDownloadList,
 				mockPortalGinInjector);
 		
-		AsyncMockStubber.callSuccessWith(facetBasedSql).when(mockSynapseClient).generateSqlWithFacets(anyString(), anyList(), anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(FACET_SQL).when(mockSynapseClient).generateSqlWithFacets(anyString(), anyList(), anyList(), any(AsyncCallback.class));
 		// The test bundle
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(tableEntity);
@@ -367,7 +371,7 @@ public class TableEntityWidgetTest {
 
 	@Test
 	public void testOnExecuteViewQuery(){
-		TableType tableType = TableType.projectview;
+		TableType tableType = TableType.projects;
 		configureBundleWithView(ViewType.project);
 		boolean canEdit = true;
 		// Start with a query that is not on the first page
@@ -526,17 +530,16 @@ public class TableEntityWidgetTest {
 		//show query
 		//verify facet select info sql is used
 		widget.onShowQuery();
-		verify(mockCopyTextModal).setText(facetBasedSql);
+		
+		verify(mockCopyTextModal).setText(FACET_SQL);
 		verify(mockCopyTextModal).show();
 		
 		reset(mockQueryResultsWidget);
 		// change to advanced (verify sql that has facet selection info sql used)
 		widget.onShowAdvancedSearch();
 		verifyAdvancedSearchUI();
-		verify(mockQueryResultsWidget).configure(queryCaptor.capture(), eq(canEdit), eq(TableType.fileview), eq(widget));
-		Query query = queryCaptor.getValue();
-		assertEquals(facetBasedSql, query.getSql());
-		assertNull(query.getSelectedFacets());
+		// SWC-4275: query results widget is not reconfigured when switching to advanced mode (since currently shown results are the same)
+		verify(mockQueryResultsWidget, never()).configure(any(Query.class), anyBoolean(), eq(TableType.files), eq(widget));
 	}
 	
 	@Test
@@ -585,7 +588,7 @@ public class TableEntityWidgetTest {
 		callbackCaptor.getValue().invoke();
 		verifySimpleSearchUI();
 		// reset query
-		verify(mockQueryResultsWidget).configure(startQuery, canEdit, TableType.projectview, widget);
+		verify(mockQueryResultsWidget).configure(startQuery, canEdit, TableType.projects, widget);
 	}
 	
 	@Test
@@ -631,13 +634,13 @@ public class TableEntityWidgetTest {
 	@Test
 	public void testOnShowDownloadFiles() {
 		Query startQuery = new Query();
-		startQuery.setSql(facetBasedSql);
+		startQuery.setSql(FACET_SQL);
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
 		widget.configure(entityBundle, true, mockQueryChangeHandler, mockActionMenu);
 		
-		widget.onShowDownloadFiles();
+		widget.onShowDownloadFilesProgrammatically();
 		
-		verify(mockFileViewClientsHelp).setQuery(facetBasedSql);
+		verify(mockFileViewClientsHelp).setQuery(EXPECTED_SQL_FOR_CLIENT);
 		verify(mockFileViewClientsHelp).show();
 	}
 	

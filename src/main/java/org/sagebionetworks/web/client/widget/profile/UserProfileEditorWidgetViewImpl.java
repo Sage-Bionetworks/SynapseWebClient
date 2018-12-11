@@ -63,6 +63,7 @@ public class UserProfileEditorWidgetViewImpl implements
 		widget = binder.createAndBindUi(this);
 		locationSuggestBox = new SuggestBox(locationOracle);
 		locationSuggestBox.setWidth("100%");
+		locationSuggestBox.getTextBox().addStyleName("form-control");
 		locationSuggestBox.getTextBox().getElement().setAttribute("placeholder", "Enter City, Country");
 		locationSuggestBoxContainer.add(locationSuggestBox);
 	}

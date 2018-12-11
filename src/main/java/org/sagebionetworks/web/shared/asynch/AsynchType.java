@@ -1,17 +1,12 @@
 package org.sagebionetworks.web.shared.asynch;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.ASYNC_GET;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.ASYNC_START;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.FILE_BULK;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_APPEND;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_DOWNLOAD_CSV;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_QUERY;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_QUERY_NEXTPAGE;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_TRANSACTION;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_UPLOAD_CSV;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_UPLOAD_CSV_PREVIEW;
-
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.*;
+import org.sagebionetworks.repo.model.doi.v2.*;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.doi.v2.DoiRequest;
+import org.sagebionetworks.repo.model.doi.v2.DoiResponse;
+import org.sagebionetworks.repo.model.file.AddFileToDownloadListRequest;
+import org.sagebionetworks.repo.model.file.AddFileToDownloadListResponse;
 import org.sagebionetworks.repo.model.file.BulkFileDownloadRequest;
 import org.sagebionetworks.repo.model.file.BulkFileDownloadResponse;
 import org.sagebionetworks.repo.model.table.AppendableRowSetRequest;
@@ -29,7 +24,7 @@ import org.sagebionetworks.repo.model.table.UploadToTablePreviewRequest;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewResult;
 import org.sagebionetworks.repo.model.table.UploadToTableRequest;
 import org.sagebionetworks.repo.model.table.UploadToTableResult;
-
+import org.sagebionetworks.repo.model.file.*;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
@@ -46,7 +41,9 @@ public enum AsynchType implements IsSerializable{
 	TableCSVUploadPreview(TABLE_UPLOAD_CSV_PREVIEW, UploadToTablePreviewRequest.class, UploadToTablePreviewResult.class),
 	TableCSVDownload(TABLE_DOWNLOAD_CSV, DownloadFromTableRequest.class, DownloadFromTableResult.class),
 	BulkFileDownload(FILE_BULK, BulkFileDownloadRequest.class,BulkFileDownloadResponse.class),
-	TableTransaction(TABLE_TRANSACTION, TableUpdateTransactionRequest.class, TableUpdateTransactionResponse.class);
+	TableTransaction(TABLE_TRANSACTION, TableUpdateTransactionRequest.class, TableUpdateTransactionResponse.class),
+	Doi(DOI, DoiRequest.class, DoiResponse.class),
+	AddFileToDownloadList(DOWNLOAD_LIST_ADD, AddFileToDownloadListRequest.class, AddFileToDownloadListResponse.class);
 	String prefix;
 	Class<? extends AsynchronousRequestBody> requestClass;
 	Class<? extends AsynchronousResponseBody> responseClass;
@@ -104,7 +101,7 @@ public enum AsynchType implements IsSerializable{
 	 * @return
 	 */
 	public String getResultUrl(String token, AsynchronousRequestBody request){
-		return getResultUrl(token, getEntityIdFromRequest(request));
+		return getResultUrl(token, getEntityIdFromRequest(request));	
 	}
 
 	public String getResultUrl(String token, String entityId){

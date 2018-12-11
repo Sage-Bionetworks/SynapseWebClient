@@ -391,7 +391,10 @@ public class ForumWidgetTest {
 		verify(mockActionMenuWidget).setActionVisible(Action.SHOW_DELETED_THREADS, true);
 		verify(mockActionMenuWidget).setActionVisible(Action.EDIT_THREAD, false);
 		verify(mockActionMenuWidget).setActionVisible(Action.PIN_THREAD, false);
+		// thread list, single thread commands DELETE/RESTORE should be hidden
 		verify(mockActionMenuWidget).setActionVisible(Action.DELETE_THREAD, false);
+		verify(mockActionMenuWidget).setActionVisible(Action.RESTORE_THREAD, false);
+
 	}
 
 	@Test
@@ -429,7 +432,9 @@ public class ForumWidgetTest {
 		verify(mockActionMenuWidget).setActionVisible(Action.SHOW_DELETED_THREADS, false);
 		verify(mockActionMenuWidget).setActionVisible(Action.EDIT_THREAD, true);
 		verify(mockActionMenuWidget).setActionVisible(Action.PIN_THREAD, true);
-		verify(mockActionMenuWidget).setActionVisible(Action.DELETE_THREAD, true);
+		// single thread widget determines if DELETE or RESTORE THREAD should be visible.
+		verify(mockActionMenuWidget, never()).setActionVisible(eq(Action.DELETE_THREAD), anyBoolean());
+		verify(mockActionMenuWidget, never()).setActionVisible(eq(Action.RESTORE_THREAD), anyBoolean());
 
 		verify(mockStuAlert, atLeastOnce()).clear();
 		
@@ -482,7 +487,6 @@ public class ForumWidgetTest {
 		// current user is the creator of the thread, so user can still edit thread
 		verify(mockActionMenuWidget).setActionVisible(Action.EDIT_THREAD, true);
 		verify(mockActionMenuWidget).setActionVisible(Action.PIN_THREAD, false);
-		verify(mockActionMenuWidget).setActionVisible(Action.DELETE_THREAD, false);
 	}
 
 	@SuppressWarnings("unchecked")

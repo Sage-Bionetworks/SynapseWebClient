@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Row;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
 
@@ -41,6 +42,9 @@ public class SignedTokenViewImpl implements SignedTokenView {
 	
 	@UiField
 	LoadingSpinner loadingUI;
+	@UiField
+	Div otherUI;
+	
 	private Presenter presenter;
 	private Header headerWidget;
 	
@@ -53,7 +57,7 @@ public class SignedTokenViewImpl implements SignedTokenView {
 		widget = binder.createAndBindUi(this);
 		
 		this.headerWidget = headerWidget;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		ClickHandler okClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -79,7 +83,7 @@ public class SignedTokenViewImpl implements SignedTokenView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
@@ -115,5 +119,6 @@ public class SignedTokenViewImpl implements SignedTokenView {
 	@Override
 	public void setLoadingVisible(boolean visible) {
 		loadingUI.setVisible(visible);
+		otherUI.setVisible(!visible);
 	}
 }

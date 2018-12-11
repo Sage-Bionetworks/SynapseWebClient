@@ -1,0 +1,16 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+>	
+	<b:Alert addStyleNames="fullWidthAlert" type="INFO" height="60px">
+		<bh:Span marginLeft="10">
+			<b:Icon ui:field="icon" addStyleNames="font-size-17 black-25-percent" type="CHECK_CIRCLE" marginLeft="5" marginTop="15"/>
+			<bh:Span addStyleNames="font-size-15" marginLeft="10" marginTop="13" >
+				<bh:Span ui:field="messageSpan" />
+			</bh:Span>
+		</bh:Span>
+		<b:Anchor text="link" pull="RIGHT" ui:field="link" addStyleNames="color-white font-size-15" marginTop="13" marginRight="10"/>	
+	</b:Alert>
+</ui:UiBinder>

@@ -72,7 +72,7 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 			Header headerWidget) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		init();
 	}
 	
@@ -121,7 +121,7 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
@@ -145,8 +145,8 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

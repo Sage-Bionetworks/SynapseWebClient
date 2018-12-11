@@ -21,6 +21,7 @@ import org.sagebionetworks.repo.model.dataaccess.BasicAccessRequirementStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
@@ -48,6 +49,8 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	AuthenticationController mockAuthController;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
 	@Mock
 	DataAccessClientAsync mockDataAccessClient;
 	@Mock
@@ -85,7 +88,8 @@ public class TermsOfUseAccessRequirementWidgetTest {
 		widget = new TermsOfUseAccessRequirementWidget(mockView, 
 				mockAuthController, 
 				mockDataAccessClient, 
-				mockSynapseClient, 
+				mockSynapseClient,
+				mockJsClient,
 				mockWikiPageWidget, 
 				mockSynAlert, 
 				mockSubjectsWidget, 
@@ -94,10 +98,11 @@ public class TermsOfUseAccessRequirementWidgetTest {
 				mockLazyLoadHelper,
 				mockManageAccessButton);
 		when(mockTermsOfUseAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
-		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockJsClient).getRootWikiPageKey(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockLazyLoadHelper).configure(callbackCaptor.capture(), eq(mockView));
 		lazyLoadDataCallback = callbackCaptor.getValue();
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionStatus).when(mockDataAccessClient).getAccessRequirementStatus(anyString(), any(AsyncCallback.class));
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
 	}
 
 	@Test
@@ -110,7 +115,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
 
 	@Test
 	public void testSetRequirementWithContactInfoTerms() {
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockJsClient).getRootWikiPageKey(anyString(), anyString(), any(AsyncCallback.class));
 		String tou = "must do things before access is allowed";
 		when(mockTermsOfUseAccessRequirement.getTermsOfUse()).thenReturn(tou);
 		widget.setRequirement(mockTermsOfUseAccessRequirement, mockRefreshCallback);
@@ -134,6 +139,15 @@ public class TermsOfUseAccessRequirementWidgetTest {
 		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(true);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showApprovedHeading();
+	}
+	
+	@Test
+	public void testAnonymous() {
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		widget.setRequirement(mockTermsOfUseAccessRequirement, mockRefreshCallback);
+		lazyLoadDataCallback.invoke();
+		verify(mockView).showUnapprovedHeading();
+		verify(mockView).showLoginButton();
 	}
 	
 	@Test

@@ -1,13 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -16,10 +11,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class TablesTabViewImpl implements TablesTabView {
-	@UiField
-	Button tableLearnMoreButton;
-	@UiField
-	Button viewLearnMoreButton;
 	
 	@UiField
 	SimplePanel tableTitlebarContainer;
@@ -55,38 +46,25 @@ public class TablesTabViewImpl implements TablesTabView {
 	}
 	
 	private void initClickHandlers() {		
-		tableLearnMoreButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(WebConstants.DOCS_URL + "tables.html", "", "");
-			}
-		});
-		viewLearnMoreButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(WebConstants.DOCS_URL + "views.html", "", "");
-			}
-		});
-	
 	}
 	
 	@Override
 	public void setBreadcrumb(Widget w) {
-		tableBreadcrumbContainer.add(w);
+		tableBreadcrumbContainer.setWidget(w);
 	}
 	
 	@Override
 	public void setTableList(Widget w) {
-		tableListWidgetContainer.add(w);
+		tableListWidgetContainer.setWidget(w);
 	}
 	@Override
 	public void setTitlebar(Widget w) {
-		tableTitlebarContainer.add(w);
+		tableTitlebarContainer.setWidget(w);
 	}
 	
 	@Override
 	public void setEntityMetadata(Widget w) {
-		tableMetadataContainer.add(w);
+		tableMetadataContainer.setWidget(w);
 	}
 	@Override
 	public Widget asWidget() {
@@ -95,7 +73,7 @@ public class TablesTabViewImpl implements TablesTabView {
 	
 	@Override
 	public void setTableEntityWidget(Widget w) {
-		tableWidgetContainer.add(w);
+		tableWidgetContainer.setWidget(w);
 	}
 	@Override
 	public void clearTableEntityWidget() {
@@ -104,7 +82,7 @@ public class TablesTabViewImpl implements TablesTabView {
 	
 	@Override
 	public void setActionMenu(Widget w) {
-		tableActionMenuContainer.add(w);
+		tableActionMenuContainer.setWidget(w);
 	}
 	@Override
 	public void clearActionMenuContainer() {

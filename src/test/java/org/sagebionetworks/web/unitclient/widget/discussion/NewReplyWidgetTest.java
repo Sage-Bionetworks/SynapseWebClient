@@ -89,6 +89,7 @@ public class NewReplyWidgetTest {
 		verify(mockView).setNewReplyContainerVisible(true);
 		verify(mockMarkdownEditor).setMarkdownFocus();
 		verify(mockView).scrollIntoView();
+		verify(mockGlobalApplicationState).setIsEditing(true);
 	}
 
 	@Test
@@ -112,6 +113,7 @@ public class NewReplyWidgetTest {
 		verify(mockView, times(2)).resetButton();
 		verify(mockView, times(2)).setReplyTextBoxVisible(true);
 		verify(mockView, times(2)).setNewReplyContainerVisible(false);
+		verify(mockGlobalApplicationState, times(2)).setIsEditing(false);
 	}
 	
 	@Test
@@ -128,6 +130,7 @@ public class NewReplyWidgetTest {
 		verify(mockView, times(2)).resetButton();
 		verify(mockView, times(2)).setReplyTextBoxVisible(true);
 		verify(mockView, times(2)).setNewReplyContainerVisible(false);
+		verify(mockGlobalApplicationState, times(2)).setIsEditing(false);
 	}
 
 	@Test
@@ -155,6 +158,8 @@ public class NewReplyWidgetTest {
 		verify(mockView, times(2)).setReplyTextBoxVisible(true);
 		verify(mockView, times(2)).setNewReplyContainerVisible(false);
 		verify(mockCallback).invoke();
+		// called once during configure (reset), once on reset after successful save 
+		verify(mockGlobalApplicationState, times(2)).setIsEditing(false);
 	}
 
 	@Test
@@ -171,6 +176,8 @@ public class NewReplyWidgetTest {
 		verifyZeroInteractions(mockCallback);
 		verify(mockSynAlert).handleException(exception);
 		verify(mockView, times(2)).resetButton();
+		// only called once on the initial reset (not after save)
+		verify(mockGlobalApplicationState).setIsEditing(false);
 	}
 
 	@Test

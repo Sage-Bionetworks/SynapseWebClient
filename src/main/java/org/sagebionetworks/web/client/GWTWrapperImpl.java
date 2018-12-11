@@ -115,7 +115,6 @@ public class GWTWrapperImpl implements GWTWrapper {
 	
 	@Override
 	public void scheduleDeferred(final Callback callback) {
-		
 		Scheduler.get().scheduleDeferred(new Command() {
 			@Override
 			public void execute() {

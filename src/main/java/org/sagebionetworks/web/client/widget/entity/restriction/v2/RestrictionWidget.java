@@ -10,7 +10,6 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.RestrictionLevel;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
@@ -104,8 +103,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	}
 	
 	private UserProfile getUserProfile() {
-		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
-		return (sessionData==null ? null : sessionData.getProfile());				
+		return authenticationController.getCurrentUserProfile();
 	}
 	
 	public boolean isAnonymous() {
@@ -208,7 +206,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			dataAccessClient.createLockAccessRequirement(entity.getId(), new AsyncCallback<Void>(){
 				@Override
 				public void onSuccess(Void result) {
-					view.showInfo("Successfully imposed restriction", "");
+					view.showInfo("Successfully imposed restriction");
 					loadRestrictionInformation();
 				}
 				@Override

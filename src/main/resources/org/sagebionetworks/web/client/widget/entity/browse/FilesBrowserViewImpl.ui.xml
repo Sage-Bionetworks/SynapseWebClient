@@ -5,7 +5,17 @@
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.entity.menu.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div addStyleNames="filesBrowser">
-		<bh:Div ui:field="sortButtonContainer"/>
+		<bh:Div ui:field="commandsContainer" addStyleNames="displayInlineBlock" width="100%">
+			<b:DropDown addStyleNames="displayInlineBlock right">
+				<b:Button dataToggle="DROPDOWN" type="PRIMARY" text="Download Options" marginRight="5" marginLeft="5"  />
+				<b:DropDownMenu ui:field="dropdownMenu" addStyleNames="dropdown-menu-right">
+					<b:AnchorListItem ui:field="addToDownloadListLink">Add to Download List</b:AnchorListItem>
+					<b:Divider />
+					<b:AnchorListItem ui:field="programmaticOptionsLink">Programmatic Options</b:AnchorListItem>
+				</b:DropDownMenu>
+			</b:DropDown>
+		</bh:Div>
+		<bh:Div ui:field="addToDownloadListContainer" />
 	    <bh:Div ui:field="files" styleName="highlight-box padding-top-0-imp" marginTop="0" />
 	</bh:Div>
 </ui:UiBinder>

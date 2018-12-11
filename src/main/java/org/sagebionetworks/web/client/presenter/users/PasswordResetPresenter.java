@@ -83,9 +83,9 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 			sessionToken = place.toToken();
 			// validate that session token is still valid before showing form
 			view.showLoading();
-			authenticationController.revalidateSession(sessionToken, new AsyncCallback<UserSessionData>() {
+			authenticationController.setNewSessionToken(sessionToken, new AsyncCallback<UserProfile>() {
 				@Override
-				public void onSuccess(UserSessionData result) {
+				public void onSuccess(UserProfile result) {
 					view.showResetForm();	
 				}
 				@Override
@@ -129,11 +129,11 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 		userService.changePassword(sessionToken, newPassword, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo("", DisplayConstants.PASSWORD_RESET_TEXT);
+				view.showInfo(DisplayConstants.PASSWORD_RESET_TEXT);
 				view.showPasswordResetSuccess();
-				Session session = authenticationController.getCurrentUserSessionData().getSession();
-				UserProfile profile = authenticationController.getCurrentUserSessionData().getProfile();
-				if (session.getAcceptsTermsOfUse() && profile != null && profile.getUserName() != null && !DisplayUtils.isTemporaryUsername(profile.getUserName()))
+				
+				UserProfile profile = authenticationController.getCurrentUserProfile();
+				if (profile != null && profile.getUserName() != null && !DisplayUtils.isTemporaryUsername(profile.getUserName()))
 					//re-login like we do on the Settings page (when changing the password)
 					reloginUser(profile.getUserName(), newPassword);
 				else {
@@ -153,9 +153,9 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 	
 	public void reloginUser(String username, String newPassword) {
 		// login user as session token has changed
-        authenticationController.loginUser(username, newPassword, new AsyncCallback<UserSessionData>() {
+        authenticationController.loginUser(username, newPassword, new AsyncCallback<UserProfile>() {
                 @Override
-                public void onSuccess(UserSessionData result) {
+                public void onSuccess(UserProfile result) {
                 	globalApplicationState.gotoLastPlace();
                 }
                 @Override

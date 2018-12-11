@@ -80,7 +80,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 		jsClient.deleteMembershipInvitation(invitationId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				popupUtils.showInfo(DELETED_INVITATION_MESSAGE,"");
+				popupUtils.showInfo(DELETED_INVITATION_MESSAGE);
 				refresh();
 			}
 			
@@ -176,7 +176,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 		synapseClient.resendTeamInvitation(membershipInvitationId, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				popupUtils.showInfo(RESENT_INVITATION, "");
+				popupUtils.showInfo(RESENT_INVITATION);
 				refresh();
 			}
 			

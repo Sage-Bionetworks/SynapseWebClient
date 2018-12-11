@@ -15,7 +15,9 @@ import static org.sagebionetworks.web.client.DisplayConstants.OK;
 import static org.sagebionetworks.web.client.DisplayConstants.PRIMARY_BUTTON_STYLE;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.gwtbootstrap3.client.ui.Button;
@@ -31,9 +33,13 @@ import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.gwtbootstrap3.extras.animate.client.ui.constants.Animation;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.gwtbootstrap3.extras.bootbox.client.options.DialogOptions;
+import org.gwtbootstrap3.extras.notify.client.constants.NotifyIconType;
+import org.gwtbootstrap3.extras.notify.client.constants.NotifyPlacement;
+import org.gwtbootstrap3.extras.notify.client.constants.NotifyPosition;
 import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
@@ -65,6 +71,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.NodeList;
@@ -80,6 +87,7 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -160,34 +168,58 @@ public class DisplayUtils {
 			}
 		};
 	}
-	public static NotifySettings getDefaultSettings() {
-		NotifySettings notifySettings = NotifySettings.newSettings();
-		notifySettings.setTemplate("<div data-notify=\"container\" class=\"col-xs-11 alert alert-{0}\" role=\"alert\">\n" + 
-				"  <button type=\"button\" aria-hidden=\"true\" class=\"close\" data-notify=\"dismiss\">x</button>\n" + 
-				"  <span data-notify=\"icon\"></span>\n" + 
+	
+	private static String getNotifyTemplate(String href, String buttonText) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("<div data-notify=\"container\" class=\"alert fullWidthAlert alert-{0}\" role=\"alert\" style=\"height: 50px;\">\n");
+		if (href != null && buttonText != null) {
+			sb.append("<a class=\"margin-top-5 right color-white margin-right-20\" href="+href+">"+buttonText.toUpperCase()+"</a>\n");
+		} else {
+			sb.append("<button type=\"button\" aria-hidden=\"true\" class=\"close margin-top-5\" data-notify=\"dismiss\">x</button>\n");
+		}
+		sb.append("<span data-notify=\"icon\" class=\"black-25-percent font-size-17 margin-top-8 margin-right-5 margin-left-5 \"></span>\n" + 
 				"  <strong><span data-notify=\"title\">{1}</span></strong>\n" + 
 				"  <span data-notify=\"message\">{2}</span>\n" + 
 				"  <a href=\"{3}\" target=\"{4}\" data-notify=\"url\"></a>\n" + 
 				"</div>");
+		return sb.toString();
+	}
+
+	public static NotifySettings getDefaultSettings() {
+		return getDefaultSettings(null, null);
+	}
+	public static NotifySettings getDefaultSettings(String href, String buttonText) {
+		NotifySettings notifySettings = NotifySettings.newSettings();
+		notifySettings.setTemplate(getNotifyTemplate(href, buttonText));
+		notifySettings.setPlacement(NotifyPlacement.BOTTOM_CENTER);
 		notifySettings.setNewestOnTop(true);
+		notifySettings.setAnimation(Animation.FADE_IN_UP, Animation.FADE_OUT_DOWN);
 		return notifySettings;
 	}
 	
+	private static NumberFormat fileSizeFormat = null;
+	private static NumberFormat decimalFormat = null;
+	
 	public static String getFriendlySize(double size, boolean abbreviatedUnits) {
-		NumberFormat df = NumberFormat.getDecimalFormat();
+		if (fileSizeFormat == null) {
+			fileSizeFormat = NumberFormat.getFormat("0.0");
+		}
+		if (decimalFormat == null) {
+			decimalFormat = NumberFormat.getDecimalFormat();
+		}
 		if(size >= TB) {
-            return df.format(size/TB) + (abbreviatedUnits?" TB":" Terabytes");
+            return decimalFormat.format(size/TB) + (abbreviatedUnits?" TB":" Terabytes");
         }
 		if(size >= GB) {
-            return df.format(size/GB) + (abbreviatedUnits?" GB":" Gigabytes");
+            return decimalFormat.format(size/GB) + (abbreviatedUnits?" GB":" Gigabytes");
         }
 		if(size >= MB) {
-            return df.format(size/MB) + (abbreviatedUnits?" MB":" Megabytes");
+            return fileSizeFormat.format(size/MB) + (abbreviatedUnits?" MB":" Megabytes");
         }
 		if(size >= KB) {
-            return df.format(size/KB) + (abbreviatedUnits?" KB":" Kilobytes");
+            return fileSizeFormat.format(size/KB) + (abbreviatedUnits?" KB":" Kilobytes");
         }
-        return df.format(size) + " bytes";
+        return fileSizeFormat.format(size) + " bytes";
     }
 		
 	/**
@@ -220,15 +252,34 @@ public class DisplayUtils {
 	 * @param title
 	 * @param message
 	 */
-	public static void showInfo(String title, String message) {
-		NotifySettings settings = getDefaultSettings();
+	public static void showInfo(String message) {
+		showInfo(message, null, null, IconType.INFO_CIRCLE);
+	}
+
+	public static void showInfo(String message, String href, String buttonText, IconType iconType) {
+		NotifySettings settings = getDefaultSettings(href, buttonText);
 		settings.setType(NotifyType.INFO);
-		notify(title, message, settings);
+		notify(message, iconType, settings);
 	}
 	
-	public static void notify(String title, String message, NotifySettings settings) {
+	public static final Set<String> recentNotificationMessages = new HashSet<>();
+	
+	public static void notify(String message, IconType iconType, NotifySettings settings) {
 		try{
-			Notify.notify(title, message, settings);
+			String key = message + "/" + iconType.name();
+			if (!recentNotificationMessages.contains(key)) {
+				recentNotificationMessages.add(key);
+				Notify.notify("", message, iconType, settings);
+				
+				// in 5 seconds clean up that key (to allow showing the message again)
+				Timer timer = new Timer() { 
+				    public void run() { 
+				    	recentNotificationMessages.remove(key);
+				    } 
+				};
+				timer.schedule(5000);
+			}
+			
 		} catch(Throwable t) {
 			SynapseJSNIUtilsImpl._consoleError(getStackTrace(t));
 		}
@@ -239,7 +290,7 @@ public class DisplayUtils {
 	 * @param title
 	 * @param message
 	 */
-	public static void showError(String title, String message, Integer timeout) {
+	public static void showError(String message, Integer timeout) {
 		NotifySettings settings = getDefaultSettings();
 		settings.setType(NotifyType.DANGER);
 		settings.setAllowDismiss(false);
@@ -247,7 +298,7 @@ public class DisplayUtils {
 			settings.setDelay(timeout);	
 		}
 		settings.setZIndex(2001);
-		notify(title, message, settings);
+		notify(message, IconType.EXCLAMATION_CIRCLE, settings);
 	}
 	
 	public static void showErrorMessage(String message) {
@@ -310,7 +361,7 @@ public class DisplayUtils {
 							@Override
 							public void onSuccess(String result) {
 								d.hide();
-								showInfo("Report sent", "Thank you!");
+								showInfo("Report sent. Thank you!");
 							}
 
 							@Override
@@ -415,16 +466,18 @@ public class DisplayUtils {
 	}
 	
     public static native void focusOnBootboxButton(String buttonStyle) /*-{
-    		$wnd.jQuery(".bootbox ." + buttonStyle).focus();
+		try {
+			$wnd.jQuery(".bootbox ." + buttonStyle).focus();
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
-
 	
 	public static void showPopup(String title, 
 			String message,
 			DisplayUtils.MessagePopup iconStyle,
 			final Callback primaryButtonCallback,
 			final Callback secondaryButtonCallback) {
-		
 		SafeHtml popupHtml = getPopupSafeHtml(title, message, iconStyle);
 		boolean isSecondaryButton = secondaryButtonCallback != null;
 		
@@ -1011,19 +1064,22 @@ public class DisplayUtils {
  			panel.add(profilePicture);
  		} else {
  			//display default picture
- 			String iconClass = defaultPictureSinglePerson ? "user" : "users";
+ 			IconType type = defaultPictureSinglePerson ? IconType.SYN_USER : IconType.SYN_USERS;
  			String clickableButtonCssClass = clickHandler != null ? "imageButton" : "";
- 			HTML profilePicture = new HTML(DisplayUtils.getFontAwesomeIcon(iconClass + " font-size-58 padding-2 " + clickableButtonCssClass + " userProfileImage lightGreyText margin-0-imp-before"));
- 			profilePicture.addStyleName("pull-left media-object displayInline ");
+ 			Icon profilePicture = new Icon(type);
+ 			profilePicture.addStyleName(" font-size-58 padding-2 " + clickableButtonCssClass + " userProfileImage lightGreyText margin-0-imp-before");
+ 			Div profilePictureWrapper = new Div();
+ 			profilePictureWrapper.addStyleName("pull-left media-object displayInline ");
+ 			profilePictureWrapper.add(profilePicture);
  			if (clickHandler != null)
  				profilePicture.addClickHandler(clickHandler);
- 			panel.add(profilePicture);
+ 			panel.add(profilePictureWrapper);
  		}
  		FlowPanel mediaBodyPanel = new FlowPanel();
  		mediaBodyPanel.addStyleName("media-body");
  		mediaBodyPanel.add(headingHtml);
  		if (description != null)
- 			mediaBodyPanel.add(new HTML(SafeHtmlUtils.htmlEscape(description)));
+ 			mediaBodyPanel.add(new HTML(description));
  		panel.add(mediaBodyPanel);
  		return panel;
 	}
@@ -1134,5 +1190,10 @@ public class DisplayUtils {
 	
 	public static boolean isAnyModifierKeyDown(ClickEvent event) {
 		return event.isAltKeyDown() || event.isControlKeyDown() || event.isMetaKeyDown() || event.isShiftKeyDown();
+	}
+	public static String capitalize(String s) {
+		if (s == null || s.isEmpty()) return s;
+		if (s.length() == 1) return s.toUpperCase();
+		return s.toUpperCase().charAt(0)+s.toLowerCase().substring(1,s.length());
 	}
 }

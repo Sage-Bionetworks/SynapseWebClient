@@ -2,16 +2,18 @@ package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Heading;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 
 public class EntityViewImpl implements EntityView {
 	
@@ -66,8 +68,8 @@ public class EntityViewImpl implements EntityView {
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 	
 	@Override
@@ -99,5 +101,4 @@ public class EntityViewImpl implements EntityView {
 	public void setOpenTeamInvitesVisible(boolean isVisible) {
 		openInvitesPanel.setVisible(isVisible);
 	}
-
 }

@@ -65,7 +65,7 @@ public class ChangeUsernamePresenter extends AbstractActivity implements ChangeU
 	@Override
 	public void setUsername(String newUsername) {
 		synAlert.clear();
-		UserProfile profile = authController.getCurrentUserSessionData().getProfile();
+		UserProfile profile = authController.getCurrentUserProfile();
 		if (profile != null) {
 			//quick check to see if it's valid.
 			if (ValidationUtils.isValidUsername(newUsername)) {
@@ -74,7 +74,7 @@ public class ChangeUsernamePresenter extends AbstractActivity implements ChangeU
 				AsyncCallback<Void> profileUpdatedCallback = new AsyncCallback<Void>() {
 					@Override
 					public void onSuccess(Void result) {
-						view.showInfo("Successfully updated your username", "");
+						view.showInfo("Successfully updated your username");
 						globalAppState.gotoLastPlace();
 					}
 					

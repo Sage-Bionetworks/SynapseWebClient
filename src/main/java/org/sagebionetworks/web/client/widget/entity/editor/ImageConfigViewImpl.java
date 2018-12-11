@@ -92,8 +92,8 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		this.synapseParamsPanel = synapseParamsPanel;
 		this.uploadParamsPanel = uploadParamsPanel;
 		
-		uploadParamsPanelContainer.add(uploadParamsPanel.asWidget());
-		synapseParamsPanelContainer.add(synapseParamsPanel.asWidget());
+		uploadParamsPanelContainer.setWidget(uploadParamsPanel.asWidget());
+		synapseParamsPanelContainer.setWidget(synapseParamsPanel.asWidget());
 		
 		initClickHandlers();
 	}
@@ -197,8 +197,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	}
 	@Override
 	public void setWikiAttachmentsWidget(Widget widget) {
-		wikiAttachmentsContainer.clear();
-		wikiAttachmentsContainer.add(widget);
+		wikiAttachmentsContainer.setWidget(widget);
 	}
 	
 	@Override
@@ -239,8 +238,8 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

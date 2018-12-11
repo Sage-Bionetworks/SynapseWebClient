@@ -51,7 +51,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	public static final Long LIMIT = 30L;
 	private static final DiscussionFilter DEFAULT_FILTER = DiscussionFilter.EXCLUDE_DELETED;
 
-	private static final String CONFIRM_DELETE_DIALOG_TITLE = "Confirm Deletion";
 	private static final String CONFIRM_RESTORE_DIALOG_TITLE = "Confirm Restoration";
 	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this thread?";
 	private static final String DELETE_SUCCESS_TITLE = "Thread deleted";
@@ -70,7 +69,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	RequestBuilderWrapper requestBuilder;
 	AuthenticationController authController;
 	GlobalApplicationState globalApplicationState;
-	EditDiscussionThreadModal editThreadModal;
 	MarkdownWidget markdownWidget;
 	LoadMoreWidgetContainer repliesContainer;
 	SubscribeButtonWidget subscribeButtonWidget;
@@ -93,10 +91,11 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	private SubscribersWidget threadSubscribersWidget;
 	Topic threadTopic = new Topic();
 	private ActionMenuWidget actionMenu;
-	ActionMenuWidget.ActionListener editActionListener, unpinActionListener, pinActionListener, deleteActionListener;
+	ActionMenuWidget.ActionListener editActionListener, unpinActionListener, pinActionListener, deleteActionListener, restoreActionListener;
 	Boolean isPinned;
 	PopupUtilsView popupUtils;
 	ClientCache clientCache;
+	String message;
 	
 	@Inject
 	public SingleDiscussionThreadWidget(
@@ -109,7 +108,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			RequestBuilderWrapper requestBuilder,
 			AuthenticationController authController,
 			GlobalApplicationState globalApplicationState,
-			EditDiscussionThreadModal editThreadModal,
 			MarkdownWidget markdownWidget,
 			LoadMoreWidgetContainer loadMoreWidgetContainer,
 			SubscribeButtonWidget subscribeButtonWidget,
@@ -130,7 +128,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.requestBuilder = requestBuilder;
 		this.authController = authController;
 		this.globalApplicationState = globalApplicationState;
-		this.editThreadModal = editThreadModal;
+		
 		this.markdownWidget = markdownWidget;
 		this.repliesContainer = loadMoreWidgetContainer;
 		this.subscribeButtonWidget = subscribeButtonWidget;
@@ -144,7 +142,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setAuthor(authorWidget.asWidget());
-		view.setEditThreadModal(editThreadModal.asWidget());
 		view.setMarkdownWidget(markdownWidget.asWidget());
 		view.setSubscribeButtonWidget(subscribeButtonWidget.asWidget());
 		view.setNewReplyContainer(newReplyWidget.asWidget());
@@ -174,30 +171,22 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			}
 		};
 		threadTopic.setObjectType(SubscriptionObjectType.THREAD);
-		editActionListener = new ActionMenuWidget.ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				onClickEditThread();
-			}
+		editActionListener = action -> {
+			onClickEditThread();
 		};
-		pinActionListener = new ActionMenuWidget.ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				onClickPinThread();
-			}
+		pinActionListener = action -> {
+			onClickPinThread();
 		};
-		unpinActionListener = new ActionMenuWidget.ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				onClickUnpinThread();
-			}
+		unpinActionListener = action -> {
+			onClickUnpinThread();
 		};
 		
-		deleteActionListener = new ActionMenuWidget.ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				onClickDeleteThread();
-			}
+		deleteActionListener = action -> {
+			onClickDeleteThread();
+		};
+		
+		restoreActionListener = action -> {
+			onClickRestore();
 		};
 	}
 
@@ -278,6 +267,15 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			view.setUnpinIconVisible(isCurrentUserModerator && isPinned);
 			view.setPinIconVisible(isCurrentUserModerator && !isPinned);
 			view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
+			if (actionMenu != null) {
+				actionMenu.setActionVisible(Action.RESTORE_THREAD, false);
+				actionMenu.setActionVisible(Action.DELETE_THREAD, isCurrentUserModerator);
+			}
+		} else {
+			if (actionMenu != null) {
+				actionMenu.setActionVisible(Action.RESTORE_THREAD, isCurrentUserModerator);
+				actionMenu.setActionVisible(Action.DELETE_THREAD, false);
+			}
 		}
 		configureActionMenu();
 	}
@@ -286,6 +284,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		if (actionMenu != null) {
 			actionMenu.setActionListener(Action.EDIT_THREAD, editActionListener);
 			actionMenu.setActionListener(Action.DELETE_THREAD, deleteActionListener);
+			actionMenu.setActionListener(Action.RESTORE_THREAD, restoreActionListener);
 			if (isPinned) {
 				// thread is pinned
 				actionMenu.setActionListener(Action.PIN_THREAD, unpinActionListener);
@@ -389,19 +388,9 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	}
 	
 	public void setMessage(String message) {
+		this.message = message;
 		markdownWidget.configure(message);
-		configureEditThreadModal(message);
 		clientCache.put(messageKey + WebConstants.MESSAGE_SUFFIX, message);
-	}
-
-	private void configureEditThreadModal(String message) {
-		editThreadModal.configure(threadId, title, message, new Callback(){
-
-			@Override
-			public void invoke() {
-				reconfigureThread();
-			}
-		});
 	}
 
 	public void configureReplies() {
@@ -489,11 +478,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	
 	@Override
 	public void onClickDeleteThread() {
-		popupUtils.showConfirmDialog(CONFIRM_DELETE_DIALOG_TITLE, DELETE_CONFIRM_MESSAGE, new Callback() {
-			@Override
-			public void invoke() {
-				deleteThread();
-			}
+		popupUtils.showConfirmDelete(DELETE_CONFIRM_MESSAGE, () -> {
+			deleteThread();
 		});
 	}
 
@@ -518,6 +504,11 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 	@Override
 	public void onClickEditThread() {
+		EditDiscussionThreadModal editThreadModal = ginInjector.getEditDiscussionThreadModal();
+		view.setEditThreadModal(editThreadModal.asWidget());
+		editThreadModal.configure(threadId, title, message, () -> {
+			reconfigureThread();
+		});
 		editThreadModal.show();
 	}
 

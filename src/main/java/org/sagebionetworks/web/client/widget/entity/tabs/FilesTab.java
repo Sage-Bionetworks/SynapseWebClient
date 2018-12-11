@@ -19,7 +19,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -54,7 +53,6 @@ public class FilesTab {
 	FilesBrowser filesBrowser;
 	PreviewWidget previewWidget;
 	WikiPageWidget wikiPageWidget;
-	EntityUpdatedHandler handler;
 	PortalGinInjector ginInjector;
 	StuAlert synAlert;
 	SynapseClientAsync synapseClient;
@@ -160,13 +158,9 @@ public class FilesTab {
 		this.projectBundleLoadError = projectBundleLoadError;
 	}
 	
-	public void configure(EntityBundle targetEntityBundle, EntityUpdatedHandler handler, Long versionNumber, ActionMenuWidget actionMenu) {
+	public void configure(EntityBundle targetEntityBundle, Long versionNumber, ActionMenuWidget actionMenu) {
 		lazyInject();
-		this.handler = handler;
 		this.actionMenu = actionMenu;
-		fileTitleBar.setEntityUpdatedHandler(handler);
-		metadata.setEntityUpdatedHandler(handler);
-		
 		view.showLoading(true);
 		setTargetBundle(targetEntityBundle, versionNumber);
 	}
@@ -281,7 +275,7 @@ public class FilesTab {
 			final WikiPageWidget.Callback wikiCallback = new WikiPageWidget.Callback() {
 					@Override
 					public void pageUpdated() {
-						handler.onPersistSuccess(new EntityUpdatedEvent());
+						ginInjector.getEventBus().fireEvent(new EntityUpdatedEvent());
 					}
 					@Override
 					public void noWikiFound() {

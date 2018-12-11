@@ -7,8 +7,8 @@ import org.gwtbootstrap3.client.ui.constants.Emphasis;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -17,6 +17,8 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -38,6 +40,8 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	SynapseJSNIUtils synapseJSNIUtils;
 	Widget modifiedByWidget;
 	Presenter presenter;
+	UserBadge modifiedByBadge;
+	DateTimeUtils dateTimeUtils;
 	public interface Binder extends UiBinder<Widget, EntityBadgeViewImpl> {	}
 	
 	@UiField
@@ -52,13 +56,28 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	SimplePanel modifiedByField;
 	@UiField
 	Label modifiedOnField;
-	
+	@UiField
+	Label createdOnField;
 	@UiField
 	Label sizeField;
 	@UiField
 	TextBox md5Field;
 	@UiField
-	Span fileDownloadButtonContainer;
+	TableData sizeTableData;
+	@UiField
+	TableData modifiedOnTableData;
+	@UiField
+	TableData createdOnTableData;
+	@UiField
+	TableData idTableData;
+	@UiField
+	TableData md5TableData;
+	@UiField
+	TableData modifiedByTableData;
+	@UiField
+	TableData downloadTableData;
+	@UiField
+	org.gwtbootstrap3.client.ui.Anchor addToDownloadListLink;
 	
 	@UiField
 	Div nameContainer;
@@ -82,13 +101,22 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	public EntityBadgeViewImpl(final Binder uiBinder,
 			final SynapseJSNIUtils synapseJSNIUtils,
 			PortalGinInjector ginInjector,
-			GlobalApplicationState globalAppState) {
+			GlobalApplicationState globalAppState,
+			UserBadge modifiedByBadge, 
+			DateTimeUtils dateTimeUtils) {
+		this.modifiedByBadge = modifiedByBadge;
+		this.dateTimeUtils = dateTimeUtils;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		initWidget(uiBinder.createAndBindUi(this));
-		placeChanger = globalAppState.getPlaceChanger();
+		if (EntityBadgeViewImpl.placeChanger == null) {
+			EntityBadgeViewImpl.placeChanger = ginInjector.getGlobalApplicationState().getPlaceChanger(); 
+		}
+		
 		idField.addClickHandler(TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER);
 		md5Field.addClickHandler(TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER);
-		
+		addToDownloadListLink.addClickHandler(event -> {
+			presenter.onAddToDownloadList();
+		});
 	}
 
 	@Override
@@ -124,6 +152,16 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			iconContainer.setWidget(icon);
 			entityContainer.add(entityAnchor);
 			idField.setText(entityHeader.getId());
+			if (entityHeader.getModifiedBy() != null) {
+				modifiedByBadge.configure(entityHeader.getModifiedBy());
+				modifiedByField.add(modifiedByBadge);
+			}
+			if (entityHeader.getModifiedOn() != null) {
+				modifiedOnField.setText(dateTimeUtils.getDateTimeString(entityHeader.getModifiedOn()));	
+			}
+			if (entityHeader.getCreatedOn() != null) {
+				createdOnField.setText(dateTimeUtils.getDateTimeString(entityHeader.getCreatedOn()));
+			}
 		} 		
 	}
 	@Override
@@ -155,23 +193,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		});
 	}
 	
-	@Override
-	public void setModifiedByWidget(Widget w) {
-		modifiedByField.setWidget(w);
-		this.modifiedByWidget = w;
-	}
-	
-	@Override
-	public void setModifiedOn(String modifiedOnString) {
-		modifiedOnField.setText(modifiedOnString);
-	}
-	
-	@Override
-	public void setModifiedByWidgetVisible(boolean visible) {
-		modifiedByWidget.setVisible(visible);
-	}
-
-
 	@Override
 	public String getFriendlySize(Long contentSize, boolean abbreviatedUnits) {
 		return DisplayUtils.getFriendlySize(contentSize, abbreviatedUnits);
@@ -238,12 +259,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	public boolean isInViewport() {
 		return DisplayUtils.isInViewport(this);
 	}
-	@Override
-	public void setFileDownloadButton(Widget w) {
-		fileDownloadButtonContainer.clear();
-		fileDownloadButtonContainer.add(w);
-	}
-
+	
 	@Override
 	public void showDiscussionThreadIcon(){
 		Icon icon = new Icon(IconType.COMMENT);
@@ -265,6 +281,30 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		
 		nameContainer.add(new Tooltip(icon, "Remove this link"));
 	}
-	
 
+	@Override
+	public void showAddToDownloadList() {
+		addToDownloadListLink.setVisible(true);	
+	}
+
+	@Override
+	public void setModifiedByUserBadgeClickHandler(ClickHandler handler) {
+		modifiedByBadge.setCustomClickHandler(handler);
+	}
+	@Override
+	public void showMinimalColumnSet() {
+		sizeTableData.setVisible(false);
+		sizeTableData.setStyleName("");
+		modifiedOnTableData.setVisible(false);
+		modifiedOnTableData.setStyleName("");
+//		idTableData.setVisible(false);
+		createdOnTableData.setVisible(false);
+		createdOnTableData.setStyleName("");
+//		modifiedByTableData.setVisible(false);
+//		modifiedByTableData.setStyleName("");
+		md5TableData.setVisible(false);
+		md5TableData.setStyleName("");
+		downloadTableData.setVisible(false);
+		downloadTableData.setStyleName("");
+	}
 }

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.docker;
 import org.gwtbootstrap3.client.ui.ListGroup;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
@@ -23,6 +24,8 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
 	Div membersContainer;
 	@UiField
 	LoadingSpinner loadingUI;
+	@UiField
+	Span emptyUI;
 
 	CallbackP<String> entityClickedHandler;
 	Widget widget;
@@ -40,17 +43,19 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
 
 	@Override
 	public void addRepo(DockerRepository entity) {
+		emptyUI.setVisible(false);
 		dockerList.add(new DockerRepoListGroupItem(HeadingSize.H4, entity, entityClickedHandler));
 	}
 
 	@Override
 	public void clear() {
 		dockerList.clear();
+		emptyUI.setVisible(true);
 	}
 
 	@Override
 	public void setSynAlert(Widget widget){
-		synAlertContainer.add(widget);
+		synAlertContainer.setWidget(widget);
 	}
 
 	@Override

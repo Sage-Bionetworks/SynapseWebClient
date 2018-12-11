@@ -34,7 +34,6 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.ChangeSynapsePlaceEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -60,8 +59,7 @@ import com.google.web.bindery.event.shared.binder.EventHandler;
 public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	public static final String PROJECT_SETTINGS = "Project Settings";
 	private EntityPageTopView view;
-	private EntityUpdatedHandler entityUpdateHandler;
-	private EntityBundle projectBundle, filesEntityBundle, tablesEntityBundle, dockerEntityBundle;
+	private EntityBundle currentTargetEntityBundle, projectBundle, filesEntityBundle, tablesEntityBundle, dockerEntityBundle;
 	private Throwable projectBundleLoadError;
 	private Entity entity;
 	private SynapseJavascriptClient synapseJavascriptClient;
@@ -90,7 +88,10 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	private ActionMenuWidget entityActionMenu;
 	private PlaceChanger placeChanger;
 	private CookieProvider cookies;
+	private EventBus eventBus;
 	public boolean pushTabUrlToBrowserHistory = false;
+	
+	public static final int ALL_PARTS_MASK = ENTITY | ENTITY_PATH | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME | BENEFACTOR_ACL | TABLE_DATA | ACL | BENEFACTOR_ACL;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -129,6 +130,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		this.cookies = cookies;
 		this.synapseJavascriptClient = synapseJavascriptClient;
 		this.placeChanger = globalAppState.getPlaceChanger();
+		this.eventBus = eventBus;
 		
 		initTabs();
 		view.setTabs(tabs.asWidget());
@@ -136,7 +138,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 
 		projectActionMenu.addControllerWidget(projectActionController.asWidget());
 		view.setProjectActionMenu(projectActionMenu.asWidget());
-		projectActionMenu.setToolsButtonIcon(PROJECT_SETTINGS, IconType.GEAR);
 
 		entityActionMenu.addControllerWidget(entityActionController.asWidget());
 		view.setEntityActionMenu(entityActionMenu.asWidget());
@@ -202,7 +203,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			projectMetadata.setVisible(true);
 		});
 		adminTab.setTabClickedCallback(tab -> {
-			area = EntityArea.ADMIN;
+			area = EntityArea.CHALLENGE;
 			configureAdminTab();
 			projectMetadata.setVisible(true);
 		});
@@ -257,7 +258,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	 *
 	 * @param bundle
 	 */
-	public void configure(Entity entity, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea initArea, String areaToken) {
+	public void configure(EntityBundle targetEntityBundle, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea initArea, String areaToken) {
+		this.currentTargetEntityBundle = targetEntityBundle;
 		pushTabUrlToBrowserHistory = false;
 		this.projectHeader = projectHeader;
 		this.area = initArea;
@@ -267,7 +269,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		discussionAreaToken = null;
 		dockerAreaToken = null;
 		filesVersionNumber = versionNumber;
-		this.entity = entity;
+		this.entity = targetEntityBundle.getEntity();
 
 		//note: the files/tables/wiki/discussion/docker tabs rely on the project bundle, so they are configured later
 		configureProject();
@@ -285,7 +287,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			wikiTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.WIKI, areaToken));	
 			filesTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.FILES, areaToken));
 			tablesTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.TABLES, areaToken));
-			adminTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.ADMIN, areaToken));
+			adminTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.CHALLENGE, areaToken));
 			discussionTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.DISCUSSION, areaToken));
 			dockerTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.DOCKER, areaToken));
 		}
@@ -294,7 +296,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	public void configureProject() {
 		view.setProjectLoadingVisible(true);
 		hideTabs();
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME | BENEFACTOR_ACL | TABLE_DATA | ACL | BENEFACTOR_ACL;
 		projectBundle = null;
 		projectBundleLoadError = null;
 		projectMetadata.setVisible(false);
@@ -308,30 +309,29 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				
 				initAreaToken();
 				showSelectedTabs();
-				configureEntity(entity.getId(), filesVersionNumber);
+				updateEntityBundle(currentTargetEntityBundle, filesVersionNumber);
 			}
 
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setProjectLoadingVisible(false);
 				projectBundleLoadError = caught;
-				configureEntity(entity.getId(), filesVersionNumber);
+				updateEntityBundle(currentTargetEntityBundle, filesVersionNumber);
 				showSelectedTabs();
 			}
 		};
-		synapseJavascriptClient.getEntityBundle(projectHeader.getId(), mask, callback);
+		if (projectHeader.getId().equals(currentTargetEntityBundle.getEntity().getId())) {
+			callback.onSuccess(currentTargetEntityBundle);
+		} else {
+			synapseJavascriptClient.getEntityBundle(projectHeader.getId(), ALL_PARTS_MASK, callback);	
+		}
 	}
 
 	public void configureEntity(String entityId, final Long version) {
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME | BENEFACTOR_ACL | TABLE_DATA | ACL | BENEFACTOR_ACL;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				updateEntityBundle(bundle, version);
-				boolean isCurrentVersion = version == null;
-				entityActionController.configure(entityActionMenu, bundle, isCurrentVersion, null, area, entityUpdateHandler);
-				projectMetadata.setVisible(bundle.getEntity() instanceof Project);
-				reconfigureCurrentArea();
 			}
 
 			@Override
@@ -339,7 +339,11 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				view.showErrorMessage(caught.getMessage());
 			}
 		};
-		synapseJavascriptClient.getEntityBundleForVersion(entityId, version, mask, callback);
+		if (entityId != null && projectBundle != null && entityId.equals(projectBundle.getEntity().getId())) {
+			callback.onSuccess(projectBundle);
+		} else {
+			synapseJavascriptClient.getEntityBundleForVersion(entityId, version, ALL_PARTS_MASK, callback);	
+		}
 	}
 
 	public void reconfigureCurrentArea() {
@@ -356,7 +360,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			configureTablesTab();
 			tabs.showTab(tablesTab.asTab(), pushTabUrlToBrowserHistory);
 			break;
-		case ADMIN:
+		case CHALLENGE:
 			configureAdminTab();
 			tabs.showTab(adminTab.asTab(), pushTabUrlToBrowserHistory);
 			break;
@@ -376,6 +380,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	}
 
 	public void updateEntityBundle(EntityBundle bundle, Long version) {
+		this.currentTargetEntityBundle = bundle;
 		entity = bundle.getEntity();
 		// Redirect if Entity is a Link
 		if(entity instanceof Link) {
@@ -408,6 +413,10 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				dockerChanged(bundle);
 			}
 		}
+		boolean isCurrentVersion = version == null;
+		entityActionController.configure(entityActionMenu, bundle, isCurrentVersion, null, area);
+		projectMetadata.setVisible(bundle.getEntity() instanceof Project);
+		reconfigureCurrentArea();
 	}
 
 	private void dockerChanged(EntityBundle bundle) {
@@ -442,12 +451,12 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			getTabVisibilityCallback(EntityArea.DOCKER, dockerTab.asTab()).onSuccess(true);
 		} else {
 			// otherwise only show the tabs only if content is present.
-			synapseClient.isWiki(projectHeader.getId(), getTabVisibilityCallback(EntityArea.WIKI, wikiTab.asTab())); 
+			synapseJavascriptClient.isWiki(projectHeader.getId(), getTabVisibilityCallback(EntityArea.WIKI, wikiTab.asTab())); 
 			synapseJavascriptClient.isFileOrFolder(projectHeader.getId(), getTabVisibilityCallback(EntityArea.FILES, filesTab.asTab())); 
 			synapseJavascriptClient.isTable(projectHeader.getId(), getTabVisibilityCallback(EntityArea.TABLES, tablesTab.asTab()));
 			synapseJavascriptClient.isDocker(projectHeader.getId(), getTabVisibilityCallback(EntityArea.DOCKER, dockerTab.asTab()));
 		}
-		synapseClient.isChallenge(projectHeader.getId(), getTabVisibilityCallback(EntityArea.ADMIN, adminTab.asTab()));
+		synapseClient.isChallenge(projectHeader.getId(), getTabVisibilityCallback(EntityArea.CHALLENGE, adminTab.asTab()));
 	}
 
 	public AsyncCallback<Boolean> getTabVisibilityCallback(final EntityArea entityArea, final Tab tab) {
@@ -500,7 +509,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			return EntityArea.DISCUSSION;
 		}
 		if (adminTab.asTab().isTabListItemVisible()) {
-			return EntityArea.ADMIN;
+			return EntityArea.CHALLENGE;
 		}
 		if (dockerTab.asTab().isTabListItemVisible()) {
 			return EntityArea.DOCKER;
@@ -529,7 +538,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 
 		if (projectBundle != null) {
 			String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
-			projectActionController.configure(projectActionMenu, projectBundle, true, wikiId, null, entityUpdateHandler);
+			projectActionController.configure(projectActionMenu, projectBundle, true, wikiId, null);
+			projectActionMenu.setToolsButtonIcon(PROJECT_SETTINGS, IconType.GEAR);
 		}
 
 		// set all content stale
@@ -581,22 +591,26 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	public void configureTablesTab() {
 		if (tablesTab.asTab().isContentStale()) {
 			tablesTab.setProject(projectHeader.getId(), projectBundle, projectBundleLoadError);
-			tablesTab.configure(tablesEntityBundle, entityUpdateHandler, tablesAreaToken, entityActionMenu);
+			tablesTab.configure(tablesEntityBundle, tablesAreaToken, entityActionMenu);
 			tablesTab.asTab().setContentStale(false);
 		}
-		entityActionController.configure(entityActionMenu, tablesEntityBundle, true, null, area, entityUpdateHandler);
+		entityActionController.configure(entityActionMenu, tablesEntityBundle, true, null, area);
 	}
 
 	public void configureFilesTab() {
 		if (filesTab.asTab().isContentStale()) {
 			filesTab.setProject(projectHeader.getId(), projectBundle, projectBundleLoadError);
-			filesTab.configure(filesEntityBundle, entityUpdateHandler, filesVersionNumber, entityActionMenu);
+			filesTab.configure(filesEntityBundle, filesVersionNumber, entityActionMenu);
 			filesTab.asTab().setContentStale(false);
 		}
 		boolean isCurrentVersion = filesVersionNumber == null;
-		entityActionController.configure(entityActionMenu, filesEntityBundle, isCurrentVersion, null, area, entityUpdateHandler);
+		entityActionController.configure(entityActionMenu, filesEntityBundle, isCurrentVersion, null, area);
 	}
-
+	
+	public void fireEntityUpdatedEvent() {
+		eventBus.fireEvent(new EntityUpdatedEvent());
+	}
+	
 	public void configureWikiTab() {
 		if (wikiTab.asTab().isContentStale()) {
 			final boolean isWikiTabShown = area == EntityArea.WIKI;
@@ -617,7 +631,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				public void noWikiFound() {
 					if (isWikiTabShown && projectBundle.getRootWikiId() != null && !projectBundle.getRootWikiId().equals(wikiAreaToken)) {
 						// attempted to load a wiki, but it was not found.  Show a message, and redirect to the root.
-						view.showInfo("Wiki not found (id=" + wikiAreaToken + "), loading root wiki page instead.","");
+						view.showInfo("Wiki not found (id=" + wikiAreaToken + "), loading root wiki page instead.");
 						wikiTab.asTab().setContentStale(true);
 						wikiAreaToken = projectBundle.getRootWikiId();
 						configureWikiTab();	
@@ -640,7 +654,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 					Entity project = projectBundle.getEntity();
 					wikiTab.asTab().setEntityNameAndPlace(project.getName(), new Synapse(project.getId(), null, EntityArea.WIKI, wikiPageId));
 					// also update the action menu to target the correct wiki page.
-					entityActionController.configure(entityActionMenu, projectBundle, true, wikiPageId, area, entityUpdateHandler);
+					entityActionController.configure(entityActionMenu, projectBundle, true, wikiPageId, area);
 				}
 			};
 			wikiTab.setWikiReloadHandler(wikiReloadHandler);
@@ -652,7 +666,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		if (projectBundle != null) {
 			wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
 		}
-		entityActionController.configure(entityActionMenu, projectBundle, true, wikiId, area, entityUpdateHandler);
+		entityActionController.configure(entityActionMenu, projectBundle, true, wikiId, area);
 	}
 
 	public void configureAdminTab() {
@@ -661,7 +675,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			adminTab.configure(projectId, projectHeader.getName());
 			adminTab.asTab().setContentStale(false);
 		}
-		entityActionController.configure(entityActionMenu, projectBundle, true, null, area, entityUpdateHandler);
+		entityActionController.configure(entityActionMenu, projectBundle, true, null, area);
 	}
 
 	public void configureDiscussionTab() {
@@ -674,27 +688,17 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			discussionTab.configure(projectId, projectHeader.getName(), discussionAreaToken, canModerate, entityActionMenu);
 			discussionTab.asTab().setContentStale(false);
 		}
-		entityActionController.configure(entityActionMenu, projectBundle, true, null, area, entityUpdateHandler);
+		entityActionController.configure(entityActionMenu, projectBundle, true, null, area);
 		discussionTab.updateActionMenuCommands();
 	}
 
 	public void configureDockerTab() {
 		if (dockerTab.asTab().isContentStale()) {
 			dockerTab.setProject(projectHeader.getId(), projectBundle, projectBundleLoadError);
-			dockerTab.configure(dockerEntityBundle, entityUpdateHandler, dockerAreaToken, entityActionMenu);
+			dockerTab.configure(dockerEntityBundle, dockerAreaToken, entityActionMenu);
 			dockerTab.asTab().setContentStale(false);
 		}
-		entityActionController.configure(entityActionMenu, dockerEntityBundle, true, null, area, entityUpdateHandler);
-	}
-
-	public void fireEntityUpdatedEvent() {
-		EntityUpdatedEvent event = new EntityUpdatedEvent();
-		entityUpdateHandler.onPersistSuccess(event);
-	}
-
-	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		entityUpdateHandler = handler;
-		projectMetadata.setEntityUpdatedHandler(handler);
+		entityActionController.configure(entityActionMenu, dockerEntityBundle, true, null, area);
 	}
 
 	public String getWikiPageId(String areaToken, String rootWikiId) {

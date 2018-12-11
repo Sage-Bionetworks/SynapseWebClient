@@ -3,7 +3,9 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" 
+	>
 
 	<ui:style>
 		.important {
@@ -16,6 +18,10 @@
 	</ui:style>
 
 	<g:HTMLPanel>
+		<h2>Coming Soon</h2>
+		
+		<b:Button ui:field="testDownloadSpeedButton" text="Test Download Speed" />
+		<b:Heading size="H3" ui:field="downloadSpeedResult"/>
 		<bh:Div ui:field="reactWidget" />
 		<g:FlowPanel addStyleNames="margin-bottom-60 margin-top-100">
 			<w:HelpWidget text="Optional help link text" helpMarkdown="This contains basic help." href="http://link/to/more/help" placement="BOTTOM" />
@@ -24,7 +30,6 @@
 		<bh:Div ui:field="widgetContainer" />
 		<bh:Div ui:field="chart" width="100%" height="400px" />
 		
-		<h2>Coming Soon</h2>
 		
 		This page is coming soon.
 		<div class="clear"></div>

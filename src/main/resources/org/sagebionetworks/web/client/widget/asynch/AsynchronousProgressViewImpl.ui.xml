@@ -6,30 +6,24 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	
 	<!-- progress bar -->
-	<b:Container fluid="true">
-		<b:Row>
-			<b:Column size="XS_5" offset="XS_5">
-				<bh:Text ui:field="title"/>
-			</b:Column>
-		</b:Row>
-		<b:Row>
-			<b:Column size="XS_5" offset="XS_5" ui:field="progressColumn" visible="false">
-				<b:Progress>
-					<b:ProgressBar ui:field="progressBar" type="INFO"
-						percent="0" text="0%" />
-				</b:Progress>
-			</b:Column>
-			<b:Column size="XS_1" offset="XS_5" ui:field="spinnerColumn" visible="false">
-				<w:LoadingSpinner size="40px"/>
-			</b:Column>			
-			<b:Column size="XS_1">
-				<b:Button ui:field="cancelButton" icon="BAN" type="DANGER" size="SMALL" marginTop="10" />
-			</b:Column>
-		</b:Row>
-		<b:Row>
-			<b:Column size="XS_5" offset="XS_5">
-				<bh:Text ui:field="message"/>
-			</b:Column>
-		</b:Row>
-	</b:Container>
+	<bh:Div addStyleNames="flexcontainer-column">
+		<bh:Div>
+			<bh:Div ui:field="title" addStyleNames="center"/>
+		</bh:Div>
+		<bh:Div ui:field="progressColumn" visible="false">
+			<b:Progress addStyleNames="center-in-div">
+				<b:ProgressBar ui:field="progressBar" type="INFO"
+					percent="0" text="0%" />
+			</b:Progress>
+		</bh:Div>
+		<bh:Div ui:field="spinnerColumn" visible="false">
+			<w:LoadingSpinner ui:field="spinner" size="45px" addStyleNames="center-in-div"/>
+			<bh:Div addStyleNames="margin-top-10 center">
+				<bh:Text>Loading...</bh:Text>
+			</bh:Div>
+		</bh:Div>			
+		<bh:Div>
+			<bh:Div ui:field="message" addStyleNames="center"/>
+		</bh:Div>
+	</bh:Div>
 </ui:UiBinder>

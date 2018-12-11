@@ -100,7 +100,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 		Species species = DEFAULT_SPECIES;
 		
 		if (descriptor.containsKey(WidgetConstants.BIODALLIANCE_SPECIES_KEY)){
-			species = Species.valueOf(descriptor.get(WidgetConstants.BIODALLIANCE_SPECIES_KEY));
+			species = Species.valueOf(descriptor.get(WidgetConstants.BIODALLIANCE_SPECIES_KEY).toUpperCase());
 		}
 		
 		String chr = DEFAULT_CHR;

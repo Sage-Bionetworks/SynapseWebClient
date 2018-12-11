@@ -16,24 +16,33 @@
 			<t:TableData addStyleNames="overflow-x-hidden ">
 				<bh:Div addStyleNames="margin-right-5" ui:field="nameContainer"> 
 					<g:FlowPanel ui:field="entityContainer" addStyleNames="displayInline pull-left"/>
-					<bh:Span ui:field="fileDownloadButtonContainer" addStyleNames="right margin-left-5"/>
 				</bh:Div>
 			</t:TableData>
-			<t:TableData width="310px" addStyleNames="visible-xl overflow-x-hidden">
-				<g:SimplePanel ui:field="modifiedByField"/>
-			</t:TableData>
-			<t:TableData width="165px" addStyleNames="visible-md visible-lg overflow-x-hidden">
-				<g:Label ui:field="modifiedOnField"/>
-			</t:TableData>
-			<t:TableData width="100px" addStyleNames="visible-lg overflow-x-hidden text-align-right">
+			<t:TableData ui:field="sizeTableData" width="140px" addStyleNames="hidden-xs overflow-x-hidden text-align-right">
 				<g:Label ui:field="sizeField" addStyleNames="margin-right-30"/>
 			</t:TableData>
-			<t:TableData width="65px" addStyleNames="visible-lg overflow-x-hidden">
-				<g:TextBox ui:field="md5Field" width="64px" addStyleNames="border-none noBackground font-size-14 overflow-x-hidden" readOnly="true" />
+			<t:TableData ui:field="modifiedOnTableData" width="165px" addStyleNames="visible-md visible-lg overflow-x-hidden">
+				<g:Label ui:field="modifiedOnField"/>
 			</t:TableData>
-			<t:TableData width="130px" addStyleNames="visible-md visible-lg overflow-x-hidden">
+			<t:TableData ui:field="createdOnTableData" width="165px" addStyleNames="visible-md visible-lg overflow-x-hidden">
+				<g:Label ui:field="createdOnField"/>
+			</t:TableData>
+			<t:TableData ui:field="idTableData" width="130px" addStyleNames="visible-lg overflow-x-hidden">
 				<g:TextBox ui:field="idField" width="130px" addStyleNames="border-none noBackground font-size-14" readOnly="true" />
 			</t:TableData>
+			<t:TableData ui:field="md5TableData" width="90px" addStyleNames="visible-lg overflow-x-hidden">
+				<g:TextBox ui:field="md5Field" width="64px" addStyleNames="border-none noBackground font-size-14 overflow-x-hidden" readOnly="true" />
+			</t:TableData>
+			<t:TableData ui:field="modifiedByTableData" width="310px" addStyleNames="visible-xl overflow-x-hidden">
+				<g:SimplePanel ui:field="modifiedByField"/>
+			</t:TableData>
+			<t:TableData ui:field="downloadTableData" width="75px" addStyleNames="overflow-x-hidden text-align-center hidden-xs">
+				<b:Anchor ui:field="addToDownloadListLink" addStyleNames="textDecorationNone" visible="false">
+					<i class="fa syn-download moveright-5 movedown-1"></i>
+					+
+				</b:Anchor>
+			</t:TableData>
+			
 		</t:TableRow>
 	</t:Table>    
 </ui:UiBinder>

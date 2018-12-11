@@ -7,42 +7,59 @@ import java.util.List;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
+import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class FileTitleBar implements SynapseWidgetPresenter {
+public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Presenter {
 	
 	private FileTitleBarView view;
 	private EntityBundle entityBundle;
 	private SynapseProperties synapseProperties;
-	private FileDownloadButton fileDownloadButton;
+	private FileDownloadMenuItem fileDownloadMenuItem;
 	private SynapseClientAsync synapseClient;
-	
+	private SynapseJavascriptClient jsClient;
+	private FileClientsHelp fileClientsHelp;
+	private EventBus eventBus;
+	private SynapseJSNIUtils jsniUtils;
 	@Inject
 	public FileTitleBar(FileTitleBarView view, 
 			SynapseProperties synapseProperties,
-			FileDownloadButton fileDownloadButton,
-			SynapseClientAsync synapseClient) {
+			FileDownloadMenuItem fileDownloadButton,
+			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
+			FileClientsHelp fileClientsHelp,
+			EventBus eventBus,
+			SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.synapseProperties = synapseProperties;
-		this.fileDownloadButton = fileDownloadButton;
+		this.fileDownloadMenuItem = fileDownloadButton;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
-		view.setFileDownloadButton(fileDownloadButton.asWidget());
-	}	
+		this.jsClient = jsClient;
+		this.fileClientsHelp = fileClientsHelp;
+		this.eventBus = eventBus;
+		this.jsniUtils = jsniUtils;
+		view.setFileDownloadMenuItem(fileDownloadButton.asWidget());
+		view.setPresenter(this);
+	}
 	
 	public void configure(EntityBundle bundle) {
 		this.entityBundle = bundle;
@@ -53,7 +70,7 @@ public class FileTitleBar implements SynapseWidgetPresenter {
 		view.setFileSize("");
 		
 		view.createTitlebar(bundle.getEntity());
-		fileDownloadButton.configure(bundle);
+		fileDownloadMenuItem.configure(bundle);
 		
 		FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
 		boolean isFilenamePanelVisible = fileHandle != null;
@@ -124,14 +141,11 @@ public class FileTitleBar implements SynapseWidgetPresenter {
 		return view.asWidget();
 	}
     
-	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		fileDownloadButton.setEntityUpdatedHandler(handler);
-	}
-
 	public static boolean isDataPossiblyWithin(FileEntity fileEntity) {
 		String dataFileHandleId = fileEntity.getDataFileHandleId();
 		return (dataFileHandleId != null && dataFileHandleId.length() > 0);
 	}
+
 	public void configureExternalFile(ExternalFileHandle externalFileHandle) {
 		view.setExternalUrlUIVisible(true);
 		view.setExternalUrl(externalFileHandle.getExternalURL());
@@ -158,5 +172,29 @@ public class FileTitleBar implements SynapseWidgetPresenter {
 		view.setExternalObjectStoreUIVisible(true);
 		view.setExternalObjectStoreInfo(externalFileHandle.getEndpointUrl(), externalFileHandle.getBucket(), externalFileHandle.getFileKey());
 		view.setFileLocation("| External Object Store");
+	}
+	
+	@Override
+	public void onAddToDownloadList() {
+		// TODO: add special popup to report how many items are in the current download list, and link to download list.
+		FileEntity entity = (FileEntity)entityBundle.getEntity();
+		jsClient.addFileToDownloadList(entity.getDataFileHandleId(), entity.getId(), new AsyncCallback<DownloadList>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+			@Override
+			public void onSuccess(DownloadList result) {
+				jsniUtils.sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, "1");
+				view.showAddedToDownloadListAlert(entity.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
+				eventBus.fireEvent(new DownloadListUpdatedEvent());
+			}
+		});
+	}
+	
+	@Override
+	public void onProgrammaticDownloadOptions() {
+		FileEntity entity = (FileEntity)entityBundle.getEntity();
+		fileClientsHelp.configureAndShow(entity.getId(), entity.getVersionNumber());
 	}
 }

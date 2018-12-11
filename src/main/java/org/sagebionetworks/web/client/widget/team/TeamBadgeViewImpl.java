@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.team;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.constants.IconSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -90,11 +91,12 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 				Image profilePicture = new Image();
 				profilePicture.setUrl(teamIconUrl);
 				profilePicture.setHeight("24px");
-				profilePicture.addStyleName("imageButton userProfileImage displayInline margin-right-4");
+				profilePicture.addStyleName("imageButton displayInline margin-right-4");
 				profilePicture.addClickHandler(clickHandler);
 				add(profilePicture);
 			} else {
-				Icon defaultProfilePicture = new Icon(IconType.USERS);
+				Icon defaultProfilePicture = new Icon(IconType.SYN_USERS);
+				defaultProfilePicture.setSize(IconSize.LARGE);
 				defaultProfilePicture.addStyleName("imageButton lightGreyText margin-right-4");
 				add(defaultProfilePicture);
 			}
@@ -110,7 +112,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		
 		InlineLabel nameLabel = new InlineLabel(name);
 		nameLabel.addStyleName("font-size-13 boldText");
-		Icon profilePicture = isPublic ? new Icon(IconType.GLOBE) : new Icon(IconType.USERS);
+		Icon profilePicture = isPublic ? new Icon(IconType.GLOBE) : new Icon(IconType.SYN_USERS);
 		profilePicture.addStyleName("font-size-lg imageButton lightGreyText margin-right-4 margin-left-5");
 		add(profilePicture);
 			
@@ -131,7 +133,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
+	public void showInfo(String message) {
 	}
 
 	@Override

@@ -25,6 +25,7 @@
 			<bh:Div addStyleNames="margin-top-5">
 				<bh:Div ui:field="manageAccessContainer" pull="RIGHT" addStyleNames="margin-right-5" />
 				<b:Button ui:field="signTermsButton" type="PRIMARY" text="Accept Terms of Use" pull="RIGHT" visible="false" addStyleNames="margin-right-5"/>
+				<b:Button ui:field="loginButton" type="PRIMARY" text="Accept Terms of Use" pull="RIGHT" visible="false" addStyleNames="margin-right-5"/>
 				<bh:Div ui:field="subjectsWidgetContainer" pull="LEFT" addStyleNames="margin-left-5 margin-right-5" />
 				<bh:Div ui:field="editAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5"/>
 				<bh:Div ui:field="deleteAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5" />

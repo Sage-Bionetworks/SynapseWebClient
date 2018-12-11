@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.security;
 
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.utils.Callback;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface AuthenticationController {
@@ -13,14 +13,19 @@ public interface AuthenticationController {
 	 * @param password
 	 * @return
 	 */
-	public void loginUser(String username, String password, AsyncCallback<UserSessionData> callback);
+	public void loginUser(String username, String password, AsyncCallback<UserProfile> callback);
 	
 	/**
-	 * revalidates the given session token
+	 * sets a new session token
 	 * @param token
 	 */
-	public void revalidateSession(String token, AsyncCallback<UserSessionData> callback);
+	void setNewSessionToken(String token, final AsyncCallback<UserProfile> callback);
 	
+	/**
+	 * attempts to load from an existing session cookie
+	 * @param callback
+	 */
+	void initializeFromExistingSessionCookie(final AsyncCallback<UserProfile> callback);
 	/**
 	 * Terminates the session of the current user
 	 */
@@ -46,15 +51,15 @@ public interface AuthenticationController {
 	public String getCurrentUserSessionToken();
 	
 	/**
-	 * Get the UserSessionData object 
+	 * Get the UserProfile object 
 	 * @return
 	 */
-	public UserSessionData getCurrentUserSessionData();
+	public UserProfile getCurrentUserProfile();
 
 	/**
 	 * Redownload the user's session data 
 	 */
-	void reloadUserSessionData();
+	void reloadUserSessionData(Callback afterReload);
 
 	/**
 	 * Signs the terms of use for a user

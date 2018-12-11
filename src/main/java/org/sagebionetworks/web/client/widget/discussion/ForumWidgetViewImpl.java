@@ -151,8 +151,7 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	
 	@Override
 	public void setDefaultThreadWidget(Widget w) {
-		defaultThreadContainer.clear();
-		defaultThreadContainer.add(w);
+		defaultThreadContainer.setWidget(w);
 	}
 	@Override
 	public void setDefaultThreadWidgetVisible(boolean visible) {
@@ -183,7 +182,7 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 
 	@Override
 	public void setDeletedThreadList(Widget widget) {
-		deletedThreadListContainer.add(widget);
+		deletedThreadListContainer.setWidget(widget);
 	}
 
 	@Override

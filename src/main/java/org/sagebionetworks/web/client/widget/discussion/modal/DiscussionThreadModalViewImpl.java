@@ -90,7 +90,7 @@ public class DiscussionThreadModalViewImpl implements DiscussionThreadModalView 
 
 	@Override
 	public void showSuccess(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

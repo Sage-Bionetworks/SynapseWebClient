@@ -15,16 +15,18 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.ViewType;
+import org.sagebionetworks.repo.model.table.ViewTypeMask;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -54,17 +56,21 @@ public class ScopeWidgetTest {
 	@Mock
 	Table mockTable;
 	@Mock
-	EntityUpdatedHandler mockEntityUpdatedHandler;
+	EventBus mockEventBus;
 	
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		widget = new ScopeWidget(mockView, mockSynapseClient, mockViewScopeWidget, mockEditScopeWidget, mockSynapseAlert);
+		widget = new ScopeWidget(mockView, mockSynapseClient, mockViewScopeWidget, mockEditScopeWidget, mockSynapseAlert, mockEventBus);
 		when(mockEntityView.getId()).thenReturn("syn123");
 		when(mockEntityView.getScopeIds()).thenReturn(mockScopeIds);
 		when(mockBundle.getEntity()).thenReturn(mockEntityView);
 		when(mockEntityView.getType()).thenReturn(ViewType.file);
+		when(mockEntityView.getViewTypeMask()).thenReturn(null);
 		AsyncMockStubber.callSuccessWith(mockUpdatedEntityView).when(mockSynapseClient).updateEntity(any(Table.class), any(AsyncCallback.class));
+		when(mockView.isFileSelected()).thenReturn(false);
+		when(mockView.isFolderSelected()).thenReturn(false);
+		when(mockView.isTableSelected()).thenReturn(false);
 	}
 	@Test
 	public void testConstruction() {
@@ -78,20 +84,22 @@ public class ScopeWidgetTest {
 	public void testConfigureHappyCase() {
 		// configure with an entityview, edit the scope, and save.
 		boolean isEditable = true;
-		widget.configure(mockBundle, isEditable, mockEntityUpdatedHandler);
+		widget.configure(mockBundle, isEditable);
 		
 		// The view scope widget does not allow edit of the scope.  That occurs in the modal (with the editScopeWidget)
-		verify(mockViewScopeWidget).configure(mockScopeIds, false, TableType.fileview);
+		verify(mockViewScopeWidget).configure(mockScopeIds, false, TableType.files);
 		verify(mockView).setEditButtonVisible(true);
 		verify(mockView).setVisible(true);
 		
 		// edit
 		widget.onEdit();
-		verify(mockEditScopeWidget).configure(mockScopeIds, true, TableType.fileview);
+		verify(mockEditScopeWidget).configure(mockScopeIds, true, TableType.files);
 		verify(mockView).showModal();
 		
 		//update file view to file+table view
-		widget.onSelectFilesAndTablesView();
+		when(mockView.isFileSelected()).thenReturn(true);
+		when(mockView.isTableSelected()).thenReturn(true);
+		widget.updateViewTypeMask();
 		
 		// save new scope
 		widget.onSave();
@@ -99,11 +107,26 @@ public class ScopeWidgetTest {
 		verify(mockSynapseAlert).clear();
 		verify(mockView).setLoading(true);
 		//verify view type has been updated
-		verify(mockEntityView).setType(ViewType.file_and_table);
+		// clears out old ViewType, replaced with mask
+		verify(mockEntityView).setType(null);
+		verify(mockEntityView).setViewTypeMask(ViewTypeMask.getMaskForDepricatedType(ViewType.file_and_table));
 		verify(mockSynapseClient).updateEntity(any(Table.class), any(AsyncCallback.class));
 		verify(mockView).setLoading(false);
 		verify(mockView).hideModal();
-		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
+	}
+	
+	@Test
+	public void testConfigureUnsupportedViewTypeMask() {
+		//should be editable, but it isn't because the web client does not support the view type mask
+		when(mockEntityView.getViewTypeMask()).thenReturn(new Long(WebConstants.PROJECT | WebConstants.FILE));
+		boolean isEditable = true;
+		widget.configure(mockBundle, isEditable);
+		
+		// The view scope widget does not allow edit of the scope.  That occurs in the modal (with the editScopeWidget)
+		verify(mockViewScopeWidget).configure(mockScopeIds, false, null);
+		verify(mockView).setEditButtonVisible(false);
+		verify(mockView).setVisible(true);
 	}
 	
 	@Test
@@ -111,16 +134,16 @@ public class ScopeWidgetTest {
 		when(mockEntityView.getType()).thenReturn(ViewType.project);
 		// configure with an entityview, edit the scope, and save.
 		boolean isEditable = true;
-		widget.configure(mockBundle, isEditable, mockEntityUpdatedHandler);
+		widget.configure(mockBundle, isEditable);
 		
 		// The view scope widget does not allow edit of the scope.  That occurs in the modal (with the editScopeWidget)
-		verify(mockViewScopeWidget).configure(mockScopeIds, false, TableType.projectview);
+		verify(mockViewScopeWidget).configure(mockScopeIds, false, TableType.projects);
 		
 		// edit
 		widget.onEdit();
 		// Do not show File View options for project view
-		verify(mockView).setFileViewTypeSelectionVisible(false);
-		verify(mockEditScopeWidget).configure(mockScopeIds, true, TableType.projectview);
+		verify(mockView).setViewTypeOptionsVisible(false);
+		verify(mockEditScopeWidget).configure(mockScopeIds, true, TableType.projects);
 	}
 	
 	@Test
@@ -128,12 +151,14 @@ public class ScopeWidgetTest {
 		when(mockEntityView.getType()).thenReturn(ViewType.file);
 		boolean isEditable = true;
 		
-		widget.configure(mockBundle, isEditable, mockEntityUpdatedHandler);
+		widget.configure(mockBundle, isEditable);
 		widget.onEdit();
 		
 		// Show File View options for project view
-		verify(mockView).setFileViewTypeSelectionVisible(true);
-		verify(mockView).setIsIncludeTables(false);
+		verify(mockView).setViewTypeOptionsVisible(true);
+		verify(mockView).setIsFileSelected(true);
+		verify(mockView).setIsFolderSelected(false);
+		verify(mockView).setIsTableSelected(false);
 	}
 	
 	@Test
@@ -141,25 +166,28 @@ public class ScopeWidgetTest {
 		when(mockEntityView.getType()).thenReturn(ViewType.file_and_table);
 		boolean isEditable = true;
 		
-		widget.configure(mockBundle, isEditable, mockEntityUpdatedHandler);
+		widget.configure(mockBundle, isEditable);
 		widget.onEdit();
 		
 		// Show File View options for project view
-		verify(mockView).setFileViewTypeSelectionVisible(true);
-		verify(mockView).setIsIncludeTables(true);
-		
+		verify(mockView).setViewTypeOptionsVisible(true);
+		verify(mockView).setIsFileSelected(true);
+		verify(mockView).setIsFolderSelected(false);
+		verify(mockView).setIsTableSelected(true);
+
 		//verify update view type from file+table to file
-		widget.onSelectFilesOnlyView();
+		when(mockView.isFileSelected()).thenReturn(true);
+		widget.updateViewTypeMask();
 		widget.onSave();
 		
-		verify(mockEntityView).setType(ViewType.file);
+		verify(mockEntityView).setViewTypeMask(ViewTypeMask.File.getMask());
 	}
 	
 	@Test
 	public void testConfigureNotEntityView() {
 		boolean isEditable = true;
 		when(mockBundle.getEntity()).thenReturn(mockTable);
-		widget.configure(mockBundle, isEditable, mockEntityUpdatedHandler);
+		widget.configure(mockBundle, isEditable);
 		
 		verify(mockView).setVisible(false);
 	}
@@ -167,9 +195,9 @@ public class ScopeWidgetTest {
 	@Test
 	public void testConfigureNotEditable() {
 		boolean isEditable = false;
-		widget.configure(mockBundle, isEditable, mockEntityUpdatedHandler);
+		widget.configure(mockBundle, isEditable);
 		
-		verify(mockViewScopeWidget).configure(mockScopeIds, false, TableType.fileview);
+		verify(mockViewScopeWidget).configure(mockScopeIds, false, TableType.files);
 		verify(mockView).setEditButtonVisible(false);
 		verify(mockView).setVisible(true);
 	}
@@ -180,7 +208,7 @@ public class ScopeWidgetTest {
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).updateEntity(any(Table.class), any(AsyncCallback.class));
 		boolean isEditable = true;
 		
-		widget.configure(mockBundle, isEditable, mockEntityUpdatedHandler);
+		widget.configure(mockBundle, isEditable);
 		widget.onSave();
 		
 		verify(mockSynapseAlert).clear();
@@ -189,15 +217,12 @@ public class ScopeWidgetTest {
 		verify(mockView).setLoading(false);
 		verify(mockSynapseAlert).handleException(ex);
 		verify(mockView, never()).hideModal();
-		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
+		verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
 	}
-	
-	
 
 	@Test
 	public void testAsWidget() {
 		widget.asWidget();
 		verify(mockView).asWidget();
 	}
-
 }

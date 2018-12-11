@@ -25,11 +25,14 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 
 public class FilesBrowserTest {
 
@@ -42,6 +45,10 @@ public class FilesBrowserTest {
 	String configuredEntityId = "syn123";
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	ContainerClientsHelp mockContainerClientsHelp;
+	@Mock
+	AddToDownloadList mockAddToDownloadList;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -51,14 +58,29 @@ public class FilesBrowserTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockCookies = mock(CookieProvider.class);
 		filesBrowser = new FilesBrowser(mockView,
-				mockGlobalApplicationState, mockAuthenticationController);
+				mockGlobalApplicationState, 
+				mockAuthenticationController,
+				mockContainerClientsHelp,
+				mockAddToDownloadList);
 	}
-	
+
+	@Test
+	public void testConstructor() {		
+		verify(mockView).setAddToDownloadList(any(IsWidget.class));
+		verify(mockView).setPresenter(filesBrowser);
+	}
+
 	@Test
 	public void testConfigure() {		
 		String entityId = "syn123";
 		filesBrowser.configure(entityId);
 		verify(mockView).configure(entityId);
+		
+		filesBrowser.onProgrammaticDownloadOptions();
+		verify(mockContainerClientsHelp).configureAndShow(entityId);
+		
+		filesBrowser.onAddToDownloadList();
+		verify(mockAddToDownloadList).addToDownloadList(entityId);
 	}
 }
 

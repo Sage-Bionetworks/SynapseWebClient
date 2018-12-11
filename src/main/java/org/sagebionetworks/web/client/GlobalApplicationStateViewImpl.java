@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.options.DialogOptions;
 
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Frame;
@@ -14,12 +15,12 @@ public class GlobalApplicationStateViewImpl implements
 	Frame iframe;
 	@Override
 	public void showVersionOutOfDateGlobalMessage() {
-		DisplayUtils.showError(DisplayConstants.NEW_VERSION_AVAILABLE, DisplayConstants.NEW_VERSION_INSTRUCTIONS, UNLIMITED_TIME);
+		DisplayUtils.showError(DisplayConstants.NEW_VERSION_AVAILABLE + DisplayConstants.NEW_VERSION_INSTRUCTIONS, UNLIMITED_TIME);
 		preloadNewVersion();
 	}
 	@Override
 	public void showGetVersionError(String error) {
-		DisplayUtils.showError("Unable to determine the Synapse version. Please refresh the page to get the latest version.", error, 5000);
+		DisplayUtils.showError("Unable to determine the Synapse version. Please refresh the page to get the latest version. " + error, 5000);
 		preloadNewVersion();
 	}
 	@Override
@@ -45,5 +46,9 @@ public class GlobalApplicationStateViewImpl implements
 		    } 
 		};
 		timer.schedule(1000*60*10);
+	}
+	@Override
+	public void back() {
+		History.back();
 	}
 }

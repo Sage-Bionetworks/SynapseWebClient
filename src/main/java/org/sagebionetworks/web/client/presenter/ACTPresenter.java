@@ -143,7 +143,7 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 		view.setSelectedUserBadgeVisible(false);
 		
 		if (stateFilterParam != null) {
-			stateFilter = VerificationStateEnum.valueOf(stateFilterParam);
+			stateFilter = VerificationStateEnum.valueOf(stateFilterParam.toUpperCase());
 			view.setSelectedStateText(stateFilterParam);
 		}
 		String submitterIdFilterParam =  place.getParam(ACTPlace.SUBMITTER_ID_FILTER_PARAM);
@@ -163,7 +163,7 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 	
 	@Override
 	public void onStateSelected(String selectedState) {
-		stateFilter = VerificationStateEnum.valueOf(selectedState);
+		stateFilter = VerificationStateEnum.valueOf(selectedState.toUpperCase());
 		place.putParam(ACTPlace.STATE_FILTER_PARAM, selectedState);
 		view.setSelectedStateText(selectedState);
 		loadData();

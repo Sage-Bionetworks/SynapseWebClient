@@ -16,7 +16,6 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
@@ -24,11 +23,9 @@ import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
-import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
@@ -39,7 +36,6 @@ import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnModelPage;
-import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
@@ -118,8 +114,6 @@ public interface SynapseClient extends RemoteService{
 	AccessRequirement createOrUpdateAccessRequirement(AccessRequirement arEW) throws RestServiceException;
 	
 	List<AccessRequirement> getTeamAccessRequirements(String teamId) throws RestServiceException;
-
-	String getRootWikiId(String ownerId, String ownerType) throws RestServiceException;
 	FileHandleResults getWikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
 	
 	 // V2 Wiki crud
@@ -145,7 +139,6 @@ public interface SynapseClient extends RemoteService{
 	List<MembershipRequestBundle> getOpenRequests(String teamId) throws RestServiceException;
 
 	void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin) throws RestServiceException;
-	void deleteTeamMember(String currentUserId, String targetUserId, String teamId) throws RestServiceException;
 	Team updateTeam(Team team, AccessControlList teamAcl) throws RestServiceException;
 	TeamMemberPagedResults getTeamMembers(String teamId, String fragment, Integer limit, Integer offset) throws RestServiceException;
 	TeamMembershipStatus requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL, Date expiresOn) throws RestServiceException;
@@ -159,9 +152,6 @@ public interface SynapseClient extends RemoteService{
 
 	String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException, SynapseException;
 	String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId) throws RestServiceException;
-
-	Doi getEntityDoi(String entityId, Long versionNumber) throws RestServiceException;
-	void createDoi(String entityId, Long versionNumber) throws RestServiceException;
 
 	String getAPIKey() throws RestServiceException;
 
@@ -192,21 +182,6 @@ public interface SynapseClient extends RemoteService{
 	 * @param sql
 	 */
 	void validateTableQuery(String sql) throws RestServiceException;
-	/**
-	 * For the given table SQL toggle the sort on the given column and return the modified SQL.
-	 * @param sql
-	 * @param header
-	 * @return
-	 * @throws RestServiceException
-	 */
-	String toggleSortOnTableQuery(String sql, String header) throws RestServiceException;
-	/**
-	 * Get the sort info for this table.
-	 * @param sql
-	 * @return
-	 * @throws RestServiceException
-	 */
-	List<SortItem> getSortFromTableQuery(String sql) throws RestServiceException;
 	
 	/**
 	 * Create or update an Entity.
@@ -227,16 +202,7 @@ public interface SynapseClient extends RemoteService{
 	 */
 	List<ColumnModel> createTableColumns(List<ColumnModel> value) throws RestServiceException;
 	
-	/**
-	 * Return the upload destinations associated with this parent entity (container)
-	 * @param parentEntityId
-	 * @return
-	 * @throws RestServiceException
-	 */
-	List<UploadDestination> getUploadDestinations(String parentEntityId) throws RestServiceException;
-	
 	String getHost(String urlString) throws RestServiceException;
-
 
 	void updateAnnotations(String entityId, Annotations annotations) throws RestServiceException;
 
@@ -256,8 +222,6 @@ public interface SynapseClient extends RemoteService{
 	StorageLocationSetting getStorageLocationSetting(String parentEntityId) throws RestServiceException;
 
 	List<String> getMyLocationSettingBanners() throws RestServiceException;
-
-	LogEntry hexDecodeLogEntry(String encodedLogEntry);
 
 	Boolean isTeamMember(String userId, Long groupPrincipalId)
 			throws RestServiceException;
@@ -279,8 +243,6 @@ public interface SynapseClient extends RemoteService{
 
 	long getTeamMemberCount(String teamId) throws RestServiceException;
 	
-	boolean isWiki(String projectId) throws RestServiceException;
-
 	boolean isChallenge(String projectId) throws RestServiceException;
 
 	void deleteAccessRequirement(Long accessRequirementId) throws RestServiceException;

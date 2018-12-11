@@ -120,7 +120,7 @@ public class ConvertACTAccessRequirementButtonTest {
 		assertEquals(AR_VERSION, request.getCurrentVersion());
 		assertEquals(AR_ETAG, request.getEtag());
 		
-		verify(mockPopupUtilsView).showInfo(SUCCESS_MESSAGE, "");
+		verify(mockPopupUtilsView).showInfo(SUCCESS_MESSAGE);
 		verify(mockRefreshCallback).invoke();
 	}
 	

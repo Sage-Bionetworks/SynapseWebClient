@@ -28,10 +28,9 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.callback.MD5Callback;
-import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.events.UploadSuccessHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -47,7 +46,7 @@ import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -64,7 +63,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	public static final long OLD_BROWSER_MAX_SIZE = (long)ClientProperties.MB * 5; //5MB
 	private UploaderView view;
-	private HandlerManager handlerManager;
+	private UploadSuccessHandler successHandler;
+	private CancelHandler cancelHandler;
 	private Entity entity;
 	private String parentEntityId, currentFileParentEntityId;
 	//set if we are uploading to an existing file entity
@@ -91,6 +91,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private String bucketName, endpointUrl, keyPrefixUUID;
 	private SynapseJavascriptClient jsClient;
 	private SynapseProperties synapseProperties;
+	private EventBus eventBus;
 	@Inject
 	public Uploader(
 			UploaderView view, 			
@@ -102,7 +103,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			GlobalApplicationState globalAppState,
 			S3DirectUploader s3DirectUploader,
 			SynapseJavascriptClient jsClient,
-			SynapseProperties synapseProperties
+			SynapseProperties synapseProperties,
+			EventBus eventBus
 			) {
 	
 		this.view = view;		
@@ -117,8 +119,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.s3DirectUploader = s3DirectUploader;
 		this.jsClient = jsClient;
 		this.synapseProperties = synapseProperties;
+		this.eventBus = eventBus;
 		view.setPresenter(this);
-		clearHandlers();
 	}		
 
 	public Widget configure(Entity entity, String parentEntityId, CallbackP<String> fileHandleIdCallback, boolean isEntity) {
@@ -146,7 +148,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public void clearState() {
 		view.clear();
 		// remove handlers
-		handlerManager = new HandlerManager(this);		
+		this.cancelHandler = null;
+		this.successHandler = null;
 		this.entity = null;
 		this.parentEntityId = null;
 		this.currentFileParentEntityId = null;
@@ -236,7 +239,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		} else {
 			//we have a parent entity, check to see where we are suppose to upload the file(s)
 			String uploadDestinationsEntityId = parentEntityId != null ? parentEntityId : entity.getId();
-			synapseClient.getUploadDestinations(uploadDestinationsEntityId, new AsyncCallback<List<UploadDestination>>() {
+			jsClient.getUploadDestinations(uploadDestinationsEntityId, new AsyncCallback<List<UploadDestination>>() {
 				public void onSuccess(List<UploadDestination> uploadDestinations) {
 
 					if (uploadDestinations == null || uploadDestinations.isEmpty()) {
@@ -678,12 +681,16 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			@Override
 			public void onSuccess(Entity result) {
 				entity = result;
-				view.showInfo(DisplayConstants.TEXT_LINK_FILE, DisplayConstants.TEXT_LINK_SUCCESS);
+				view.showInfo(DisplayConstants.TEXT_LINK_SUCCESS);
+				if (successHandler != null) {
+					successHandler.onSuccessfulUpload();
+				}
+
 				entityUpdated();
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
+				view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED + ": " + caught.getMessage());
 			}
 		};
 	}
@@ -715,22 +722,15 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public void setUploaderLinkNameVisible(boolean visible) {
 		view.setUploaderLinkNameVisible(visible);
 	}
-	
-	public void addCancelHandler(CancelHandler handler) {
-		handlerManager.addHandler(CancelEvent.getType(), handler);
+	public void setSuccessHandler(UploadSuccessHandler successHandler) {
+		this.successHandler = successHandler;
+	}
+	public void setCancelHandler(CancelHandler handler) {
+		this.cancelHandler = handler;
 	}
 	
-	@Override
-	public void clearHandlers() {
-		handlerManager = new HandlerManager(this);
-	}
-
-	public void addPersistSuccessHandler(EntityUpdatedHandler handler) {
-		handlerManager.addHandler(EntityUpdatedEvent.getType(), handler);
-	}
-
 	public void entityUpdated() {
-		handlerManager.fireEvent(new EntityUpdatedEvent());
+		eventBus.fireEvent(new EntityUpdatedEvent());
 	}
 	
 	/**
@@ -824,17 +824,22 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		view.hideLoading();
 		view.clear();
 		globalAppState.clearDropZoneHandler();
-		handlerManager.fireEvent(new CancelEvent());
+		if (cancelHandler != null) {
+			cancelHandler.onCancel();	
+		}
 		view.resetToInitialState();
 	}
 	
 	private void uploadSuccess() {
-		view.showInfo(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayConstants.TEXT_UPLOAD_SUCCESS);
+		view.showInfo(DisplayConstants.TEXT_UPLOAD_SUCCESS);
 		view.clear();
 		globalAppState.clearDropZoneHandler();
 		view.resetToInitialState();
 		resetUploadProgress();
-		handlerManager.fireEvent(new EntityUpdatedEvent());
+		if (successHandler != null) {
+			successHandler.onSuccessfulUpload();
+		}
+		entityUpdated();
 	}
 	
 	private void resetUploadProgress() {
@@ -867,7 +872,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	@Override
 	public void uploadFailed(String string) {
 		this.uploadError(string, new Exception(string));
-		jsClient.logError(string, new Exception(string));
+		jsClient.logError(new Exception(string));
 	}
 	
 	/**

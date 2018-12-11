@@ -1,15 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.entity.controller;
 
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -18,8 +11,11 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Reference;
@@ -30,7 +26,6 @@ import org.sagebionetworks.repo.model.provenance.UsedURL;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityRefProvEntryView;
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEditorWidget;
@@ -42,27 +37,44 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ProvenanceEditorWidgetTest {
-	
+	@Mock
 	ProvenanceEditorWidgetView mockView;
+	@Mock
 	SynapseClientAsync mockSynClient;
+	@Mock
 	SynapseAlert mockSynAlert;
+	@Mock
 	PortalGinInjector mockInjector;
+	@Mock
 	ProvenanceListWidget mockProvenanceList;
+	@Mock
 	Activity mockActivity;
+	@Mock
 	EntityFinder mockEntityFinder;
+	@Mock
 	ProvenanceURLDialogWidget mockUrlDialog;
-	EntityUpdatedHandler mockEntityUpdatedHandler;
 	ProvenanceEditorWidget presenter;
+	@Mock
 	EntityBundle mockEntityBundle;
+	@Mock
 	Entity mockEntity;
+	@Mock
 	Reference mockRef;
+	@Mock
 	UsedURL mockUsedUrl;
+	@Mock
 	UsedEntity mockUsedEntity;
+	@Mock
 	EntityRefProvEntryView mockEntityProvEntry;
+	@Mock
 	URLProvEntryView mockUrlProvEntry;
+	@Mock
+	EventBus mockEventBus;
 
 	Set<Used> usedSet = new HashSet<Used>();
 	String name = "testName";
@@ -73,25 +85,9 @@ public class ProvenanceEditorWidgetTest {
 	
 	@Before
 	public void before() {
-		mockView = mock(ProvenanceEditorWidgetView.class);
-		mockSynClient = mock(SynapseClientAsync.class);
-		mockSynAlert = mock(SynapseAlert.class);
-		mockInjector = mock(PortalGinInjector.class);
-		mockProvenanceList = mock(ProvenanceListWidget.class);
-		mockActivity = mock(Activity.class);
-		mockEntityFinder = mock(EntityFinder.class);
-		mockUrlDialog = mock(ProvenanceURLDialogWidget.class);
-		mockEntityUpdatedHandler = mock(EntityUpdatedHandler.class);
-		mockEntityBundle = mock(EntityBundle.class);
-		mockEntity = mock(Entity.class);
-		mockRef = mock(Reference.class);
-		mockUsedUrl = mock(UsedURL.class);
-		mockUrlProvEntry = mock(URLProvEntryView.class);
-		mockUsedEntity = mock(UsedEntity.class);
-		mockEntityProvEntry = mock(EntityRefProvEntryView.class);
 		when(mockInjector.getProvenanceListWidget()).thenReturn(mockProvenanceList);
 		presenter = new ProvenanceEditorWidget(mockView, mockSynClient, mockSynAlert,
-				mockInjector, mockEntityFinder, mockUrlDialog);
+				mockInjector, mockEntityFinder, mockUrlDialog, mockEventBus);
 		
 		when(mockInjector.getEntityRefEntry()).thenReturn(mockEntityProvEntry);
 		when(mockInjector.getURLEntry()).thenReturn(mockUrlProvEntry);
@@ -134,7 +130,7 @@ public class ProvenanceEditorWidgetTest {
 				.when(mockSynClient).getOrCreateActivityForEntityVersion
 				(anyString(), anyLong(), any(AsyncCallback.class));
 		when(mockProvenanceList.getEntries()).thenReturn(new LinkedList<ProvenanceEntry>());
-		presenter.configure(mockEntityBundle, mockEntityUpdatedHandler);
+		presenter.configure(mockEntityBundle);
 		verify(mockView).setName(mockActivity.getName());
 		verify(mockView).setDescription(mockActivity.getDescription());
 		verify(mockActivity).getUsed();
@@ -162,7 +158,7 @@ public class ProvenanceEditorWidgetTest {
 		AsyncMockStubber.callSuccessWith(mockActivity)
 				.when(mockSynClient).getOrCreateActivityForEntityVersion
 				(anyString(), anyLong(), any(AsyncCallback.class));
-		presenter.configure(mockEntityBundle, mockEntityUpdatedHandler);
+		presenter.configure(mockEntityBundle);
 		verify(mockView).setName(mockActivity.getName());
 		verify(mockView).setDescription(mockActivity.getDescription());
 		verify(mockActivity).getUsed();
@@ -180,7 +176,7 @@ public class ProvenanceEditorWidgetTest {
 		AsyncMockStubber.callFailureWith(caught)
 				.when(mockSynClient).getOrCreateActivityForEntityVersion
 				(anyString(), anyLong(), any(AsyncCallback.class));
-		presenter.configure(mockEntityBundle, mockEntityUpdatedHandler);
+		presenter.configure(mockEntityBundle);
 		verify(mockSynAlert).handleException(caught);
 	}
 	
@@ -189,7 +185,6 @@ public class ProvenanceEditorWidgetTest {
 		AsyncMockStubber.callSuccessWith(null)
 				.when(mockSynClient).putActivity(eq(mockActivity), any(AsyncCallback.class));
 		presenter.setActivty(mockActivity);
-		presenter.setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		presenter.onSave();
 		verify(mockUrlProvEntry, times(2)).getURL();
 		verify(mockUrlProvEntry, times(2)).getTitle();
@@ -201,7 +196,7 @@ public class ProvenanceEditorWidgetTest {
 		assertTrue(usedSet.size() == 4);
 		verify(mockSynClient).putActivity(eq(mockActivity), any(AsyncCallback.class));
 		verify(mockView).hide();
-		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 	}
 	
 	@Test
@@ -213,5 +208,4 @@ public class ProvenanceEditorWidgetTest {
 		verify(mockSynClient).putActivity(eq(mockActivity), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(caught);
 	}
-	
 }

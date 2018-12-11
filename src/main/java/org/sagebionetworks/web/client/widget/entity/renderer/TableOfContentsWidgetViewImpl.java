@@ -1,9 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX;
+
 import java.util.HashMap;
 import java.util.Map;
-import static org.sagebionetworks.markdown.constants.WidgetConstants.*;
+
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
 import com.google.gwt.core.client.JsArray;
@@ -13,7 +16,6 @@ import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
@@ -30,12 +32,13 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 	private RegExp widgetExistsRegEx = RegExp.compile("(widget[-]{1})\\d+([-]{1})", "i");
 	// Matches widget parameters.  Group 1 contains full param definition minus the end quote.  Group 2 contains end quote.
 	// Used to insert new isTOC parameter into widget definition (badge will ignore clicks).
-	private RegExp widgetParamsRegEx = RegExp.compile("(widgetparams[=]{1}[\"]{1}[^\"]*)([\"]{1})", "i");
+	private RegExp widgetParamsRegEx = RegExp.compile("(data[-]widgetparams[=]{1}[\"]{1}[^\"]*)([\"]{1})", "i");
 	// Matches any html inside of the widget span.  Used to remove any other html (for example, mentioning adds a child user/team anchor, used in notification emails).
-	private RegExp widgetInnerHtmlRegEx = RegExp.compile("(<span widgetparams[^>]*>).*(<\\/span>)", "i");
-	
+	private RegExp widgetInnerHtmlRegEx = RegExp.compile("(<span data[-]widgetparams[^>]*>).*(<\\/span>)", "i");
+	private SynapseJSNIUtils jsniUtils;
 	@Inject
-	public TableOfContentsWidgetViewImpl() {
+	public TableOfContentsWidgetViewImpl(SynapseJSNIUtils jsniUtils) {
+		this.jsniUtils = jsniUtils;
 		//build up the tag name to css class name here
 		tagName2Style = new HashMap<String, String>();
 		for (int i = 0; i < 6; i++) {
@@ -107,7 +110,7 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 					html.addClickHandler(new ClickHandler() {
 						@Override
 						public void onClick(ClickEvent event) {
-							Window.scrollTo(0, scrollToElement.getOffsetTop());
+							jsniUtils.scrollIntoView(scrollToElement);
 						}
 					});
 					
@@ -120,11 +123,15 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 	}
 	
 	private static native JsArray<Element> _localHeaderElements(Element el) /*-{
-		//find all header elements in the DOM
-		var allHeaderElements = $wnd.jQuery(":header");
-		//filter all header elements down to the collection of header elements that are descendents of the local markdown element
-		var markdownEl = $wnd.jQuery(el).closest("div.markdown");
-		return $wnd.jQuery(markdownEl).find(allHeaderElements);
+		try {
+			//find all header elements in the DOM
+			var allHeaderElements = $wnd.jQuery(":header");
+			//filter all header elements down to the collection of header elements that are descendents of the local markdown element
+			var markdownEl = $wnd.jQuery(el).closest("div.markdown");
+			return $wnd.jQuery(markdownEl).find(allHeaderElements);
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
 
 	@Override
@@ -142,10 +149,4 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-		
-	
-	/*
-	 * Private Methods
-	 */
-
 }

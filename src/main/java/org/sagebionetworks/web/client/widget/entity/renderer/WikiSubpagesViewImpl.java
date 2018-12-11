@@ -6,6 +6,8 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.events.WikiSubpagesCollapseEvent;
 import org.sagebionetworks.web.client.events.WikiSubpagesExpandEvent;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -30,19 +32,18 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	boolean isShowingSubpages;
 	
 	private WikiSubpageNavigationTree navTree;
-	private GlobalApplicationState globalAppState;
 	private EventBus eventBus;
 	private Presenter presenter;
-	
+	private SynapseJSNIUtils jsniUtils;
 	@Inject
 	public WikiSubpagesViewImpl(WikiSubpagesOrderEditor orderEditor,
 								WikiSubpageNavigationTree navTree,
-								GlobalApplicationState globalAppState,
-								EventBus eventBus) {
+								EventBus eventBus,
+								SynapseJSNIUtils jsniUtils) {
 		this.orderEditor = orderEditor;
 		this.navTree = navTree;
-		this.globalAppState = globalAppState;
 		this.eventBus = eventBus;
+		this.jsniUtils = jsniUtils;
 		addStyleName("wikiSubpages");
 	}
 	
@@ -75,7 +76,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		
 		showHideButton = DisplayUtils.createButton("");
 		editOrderButton = DisplayUtils.createButton("Edit Order");
-		editOrderButton.addStyleName("btn btn-default btn-xs left");
+		editOrderButton.addStyleName("btn btn-default btn-xs left margin-top-10");
 		final ClickHandler editOrderClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -87,7 +88,9 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 				add(finishEditingOrderButton);
 				finishEditingOrderButton.addClickHandler(e -> {
 					clear();
+					presenter.clearCachedHeaderTree();
 					presenter.refreshWikiHeaderTree();
+					jsniUtils.scrollIntoView(getElement());
 				});
 				DisplayUtils.scrollToTop();
 			}
@@ -112,9 +115,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		});
 		
 		navTreeContainer.add(navTree.asWidget());
-		
+		navTreeContainer.add(editOrderButton);
 		add(navTreeContainer);
-		add(editOrderButton);
 		add(showHideButton);
 		showSubpages();
 		clearWidths();
@@ -132,9 +134,6 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	@Override
 	public void hideSubpages() {
 		isShowingSubpages = false;
-		if (editOrderButton != null) {
-			editOrderButton.setVisible(false);
-		}
 				
 		if (showHideButton != null) {
 			showHideButton.setText("Show Pages " + DisplayConstants.RIGHT_ARROWS);
@@ -152,10 +151,6 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	public void showSubpages() {
 		isShowingSubpages = true;
 		
-		if (editOrderButton != null) {
-			editOrderButton.setVisible(true);
-		}
-				
 		if (showHideButton != null) {
 			showHideButton.setText(DisplayConstants.LEFT_ARROWS);
 			showHideButton.removeStyleName("left");
@@ -183,8 +178,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	public interface GetOrderHintCallback {

@@ -138,7 +138,7 @@ public class BiodallianceSourceEditorViewImpl implements IsWidget, BiodallianceS
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
+	public void showInfo(String message) {
 	}
 
 	@Override

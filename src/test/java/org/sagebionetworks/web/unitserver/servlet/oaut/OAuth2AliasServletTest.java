@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.startsWith;
+import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -49,6 +49,8 @@ public class OAuth2AliasServletTest {
 		servlet.setSynapseProvider(mockSynapseProvider);
 		url = "http://127.0.0.1:8888/";
 		when(mockRequest.getRequestURL()).thenReturn(new StringBuffer(url));
+		when(mockRequest.getRequestURI()).thenReturn("");
+		when(mockRequest.getContextPath()).thenReturn("");
 	}
 	
 	@Test
@@ -82,7 +84,7 @@ public class OAuth2AliasServletTest {
 		String authCode = "authCode";
 		when(mockRequest.getParameter(WebConstants.OAUTH2_CODE)).thenReturn(authCode);
 		servlet.doGet(mockRequest, mockResponse);
-		verify(mockResponse).sendRedirect(startsWith("/#!Error:"));
+		verify(mockResponse).sendRedirect(contains("/#!Error:"));
 	}
 	
 	@Test

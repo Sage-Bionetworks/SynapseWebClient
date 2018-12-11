@@ -67,7 +67,6 @@ public class GWTCacheControlFilterTest {
 		verify(mockFilterChain).doFilter(mockRequest, mockResponse);
 	}
 
-
 	@Test
 	public void testDoFilterOtherFiles() throws IOException, ServletException {
 		when(mockRequest.getRequestURI()).thenReturn("image.jpg");
@@ -78,4 +77,26 @@ public class GWTCacheControlFilterTest {
 		verify(mockResponse).setDateHeader(eq("Date"), anyLong());
 		verify(mockFilterChain).doFilter(mockRequest, mockResponse);
 	}
+	
+	@Test
+	public void testDoFilterCacheCssFiles() throws IOException, ServletException {
+		when(mockRequest.getRequestURI()).thenReturn("swc.css");
+		filter.doFilter(mockRequest, mockResponse, mockFilterChain);
+		
+		verify(mockResponse).setHeader("Cache-Control", "max-age="+GWTCacheControlFilter.ONE_HOUR_IN_SECONDS);
+		verify(mockResponse).setDateHeader(eq("Date"), anyLong());
+		verify(mockResponse).setDateHeader(eq("Expires"), anyLong());
+		verify(mockFilterChain).doFilter(mockRequest, mockResponse);
+	}
+	@Test
+	public void testDoFilterCacheFontFiles() throws IOException, ServletException {
+		when(mockRequest.getRequestURI()).thenReturn("synapseicons.woff");
+		filter.doFilter(mockRequest, mockResponse, mockFilterChain);
+		
+		verify(mockResponse).setHeader("Cache-Control", "max-age="+GWTCacheControlFilter.ONE_HOUR_IN_SECONDS);
+		verify(mockResponse).setDateHeader(eq("Date"), anyLong());
+		verify(mockResponse).setDateHeader(eq("Expires"), anyLong());
+		verify(mockFilterChain).doFilter(mockRequest, mockResponse);
+	}
+
 }

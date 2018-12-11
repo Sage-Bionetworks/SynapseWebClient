@@ -58,7 +58,10 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 
 	@Override
 	public void setPlace(NewAccount place) {
-		authController.logoutUser();
+		if (authController.isLoggedIn()) {
+			globalAppState.clearLastPlace();
+			authController.logoutUser();
+		}
 		view.clear();
 		this.view.setPresenter(this);
 		synapseClient.hexDecodeAndDeserializeAccountCreationToken(place.toToken(), new AsyncCallback<AccountCreationToken>() {
@@ -96,7 +99,7 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 			public void onSuccess(String sessionToken) {
 				view.setLoading(false);
 				//success, send to login place to continue login process (sign terms of use...)
-				view.showInfo(DisplayConstants.ACCOUNT_CREATED, "");
+				view.showInfo(DisplayConstants.ACCOUNT_CREATED);
 				if (accountCreationToken.getEncodedMembershipInvtnSignedToken() != null) {
 					globalAppState.setLastPlace(new EmailInvitation(accountCreationToken.getEncodedMembershipInvtnSignedToken()));
 				}

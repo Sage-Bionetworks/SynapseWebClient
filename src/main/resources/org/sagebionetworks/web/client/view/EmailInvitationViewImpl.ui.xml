@@ -15,8 +15,11 @@
 				<b:BlockQuote ui:field="invitationMessageWrapper" visible="false">
 					<b:Heading ui:field="invitationMessage" size="H5" addStyleNames="margin-top-10"/>
 				</b:BlockQuote>
-				<bh:Div ui:field="registerWidgetContainer" addStyleNames="margin-top-10"/>
-				<b:Button ui:field="loginButton" text="Already have an account?" size="LARGE" width="100%" addStyleNames="margin-top-10"/>
+				<b:Button ui:field="registerButton" text="Register for an account" size="LARGE" width="100%" type="SUCCESS" addStyleNames="margin-top-10"/>
+				<bh:Div addStyleNames="lightGreyBackground padding-15 center font-size-16">
+					<bh:Span text="Already have an account?" marginRight="10"/>
+					<b:Anchor text="Sign in" ui:field="loginLink"/>
+				</bh:Div>
 			</bh:Div>
 		</b:Column>
 	</b:Container>

@@ -17,7 +17,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.utils.FutureUtils.*;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -27,12 +28,13 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -60,8 +62,9 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.callback.MD5Callback;
-import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.events.UploadSuccessHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -76,9 +79,10 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.upload.MultipartUploaderStub;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-
+@RunWith(MockitoJUnitRunner.class)
 public class UploaderTest {
 	@Mock
 	S3DirectUploader mockS3DirectUploader;
@@ -96,12 +100,17 @@ public class UploaderTest {
 	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl(); // alt: GwtAdapterFactory
+	@Mock
+	EventBus mockEventBus;
 	
 	Uploader uploader;
 	@Mock
 	GWTWrapper mockGwt;
 	FileEntity testEntity;
-	CancelHandler cancelHandler;
+	@Mock
+	CancelHandler mockCancelHandler;
+	@Mock
+	UploadSuccessHandler mockUploadSuccessHandler;
 	String parentEntityId;
 	private Long storageLocationId;
 	String md5 = "e10e3f4491440ce7b48edc97f03307bb";
@@ -130,21 +139,19 @@ public class UploaderTest {
 	
 	@Before
 	public void before() throws Exception {
-		MockitoAnnotations.initMocks(this);
 		multipartUploader = new MultipartUploaderStub();
 		testEntity = new FileEntity();
 		testEntity.setName("test file");
 		testEntity.setId("syn99");
-		UserSessionData sessionData = new UserSessionData();
-		sessionData.setProfile(new UserProfile());
+		UserProfile profile = new UserProfile();
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(sessionData);
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(profile);
 		when(mockSynapseJsniUtils.getContentType(any(JavaScriptObject.class), anyInt())).thenReturn("image/png");
 		S3UploadDestination d = new S3UploadDestination();
 		d.setUploadType(UploadType.S3);
 		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
 		destinations.add(d);
-		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseJavascriptClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		
 		UploadDaemonStatus status = new UploadDaemonStatus();
 		status.setState(State.COMPLETED);
@@ -154,7 +161,6 @@ public class UploaderTest {
 		AsyncMockStubber.callSuccessWith("entityID").when(mockSynapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  any(AsyncCallback.class));
 		
 		when(mockGwt.createXMLHttpRequest()).thenReturn(null);
-		cancelHandler = mock(CancelHandler.class);
 		
 		String[] fileNames = {"newFile.txt"};
 		when(mockSynapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(fileNames);
@@ -174,8 +180,10 @@ public class UploaderTest {
 				mockGlobalApplicationState, 
 				mockS3DirectUploader,
 				mockSynapseJavascriptClient,
-				mockSynapseProperties);
-		uploader.addCancelHandler(cancelHandler);
+				mockSynapseProperties,
+				mockEventBus);
+		uploader.setCancelHandler(mockCancelHandler);
+		uploader.setSuccessHandler(mockUploadSuccessHandler);
 		parentEntityId = "syn1234";
 		uploader.configure(null, parentEntityId, null, true);
 		
@@ -205,7 +213,8 @@ public class UploaderTest {
 		//if entity is null, it should call synapseClient.createExternalFile() to create the FileEntity and associate the path.
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
 		verify(mockSynapseClient).createExternalFile(anyString(), anyString(), anyString(), anyString(), eq((Long)null), eq((String)null), eq(storageLocationId), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
+		verify(mockUploadSuccessHandler).onSuccessfulUpload();
 	}
 	
 	@Test
@@ -229,7 +238,7 @@ public class UploaderTest {
 		when(mockGwt.encode(anyString())).thenReturn(encodedUrl);
 		uploader.setExternalFilePath(url, "", storageLocationId);
 		verify(mockSynapseClient).createExternalFile(anyString(), eq(encodedUrl), anyString(), anyString(), eq((Long)null), eq((String)null), eq(storageLocationId), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 	}
 	
 	@Test
@@ -237,7 +246,7 @@ public class UploaderTest {
 		uploader.configure(testEntity, null, null, true);
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
 		verify(mockSynapseClient).updateExternalFile(anyString(), anyString(), anyString(), anyString(), eq((Long)null), eq((String)null), eq(storageLocationId), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 	}
 
 	@Test
@@ -247,7 +256,7 @@ public class UploaderTest {
 		uploader.setFileNames(new String[] {"test.txt"});
 		uploader.setSftpExternalFilePath("http://fakepath.url/blah.xml", storageLocationId);
 		verify(mockSynapseClient).createExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), eq(md5), eq(storageLocationId), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 	}
 
 	@Test
@@ -291,12 +300,11 @@ public class UploaderTest {
 		uploader.setFileNames(new String[] {fileName});
 		uploader.setSftpExternalFilePath("http://fakepath.url/blah.xml", storageLocationId);
 		verify(mockSynapseClient).updateExternalFile(anyString(), anyString(), eq(fileName), anyString(), anyLong(), eq(md5), eq(storageLocationId), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 	}
 	
 	@Test
 	public void testDirectUploadHappyCase() throws Exception {
-		uploader.addCancelHandler(cancelHandler);
 		verify(mockView).showUploadingToSynapseStorage();
 		verify(mockView).enableMultipleFileUploads(true);
 		final String file1 = "file1.txt";
@@ -308,10 +316,12 @@ public class UploaderTest {
 		verify(mockView).hideLoading();
 		assertEquals(UploadType.S3, uploader.getCurrentUploadType());
 		//verify upload success
-		verify(mockView).showInfo(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayConstants.TEXT_UPLOAD_SUCCESS);
+		verify(mockView).showInfo(DisplayConstants.TEXT_UPLOAD_SUCCESS);
 		verify(mockView).clear();
 		verify(mockGlobalApplicationState).clearDropZoneHandler();
 		verify(mockView, times(2)).resetToInitialState();
+		verify(mockUploadSuccessHandler).onSuccessfulUpload();
+		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 	}
 	
 	@Test
@@ -356,7 +366,7 @@ public class UploaderTest {
 	
 	private void verifyUploadError() {
 		verify(mockView).showErrorMessage(anyString(), anyString());
-		verify(cancelHandler).onCancel(any(CancelEvent.class));
+		verify(mockCancelHandler).onCancel();
 	}
 	
 	@Test
@@ -367,7 +377,7 @@ public class UploaderTest {
 		
 		verify(mockView).clear();
 		verify(mockGlobalApplicationState).clearDropZoneHandler();
-		verify(cancelHandler).onCancel(any(CancelEvent.class));
+		verify(mockCancelHandler).onCancel();
 		assertTrue(multipartUploader.isCanceled());
 	}
 	
@@ -462,7 +472,7 @@ public class UploaderTest {
 		d.setUploadType(UploadType.HTTPS);
 		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
 		destinations.add(d);
-		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseJavascriptClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		uploader.queryForUploadDestination();
 		assertNull(uploader.getStorageLocationId());
 		verifyUploadError();
@@ -474,7 +484,7 @@ public class UploaderTest {
 		d.setUploadType(UploadType.S3);
 		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
 		destinations.add(d);
-		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseJavascriptClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		uploader.queryForUploadDestination();
 		assertNull(uploader.getStorageLocationId());
 		verifyUploadError();
@@ -487,7 +497,7 @@ public class UploaderTest {
 		d.setStorageLocationId(storageLocationId);
 		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
 		destinations.add(d);
-		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseJavascriptClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		uploader.queryForUploadDestination();
 		assertEquals(uploader.getStorageLocationId(), storageLocationId);
 	}
@@ -498,7 +508,7 @@ public class UploaderTest {
 		//add an invalid upload destination
 		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
 		destinations.add(mock(UploadDestination.class));
-		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseJavascriptClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		uploader.queryForUploadDestination();
 		assertNull(uploader.getStorageLocationId());
 		verifyUploadError();
@@ -517,7 +527,7 @@ public class UploaderTest {
 		d.setStorageLocationId(storageLocationId);
 		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
 		destinations.add(d);
-		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseJavascriptClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("ok.net").when(mockSynapseClient).getHost(anyString(), any(AsyncCallback.class));
 		
 		uploader.queryForUploadDestination();
@@ -545,7 +555,7 @@ public class UploaderTest {
 		d.setStorageLocationId(storageLocationId);
 		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
 		destinations.add(d);
-		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseJavascriptClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		uploader.queryForUploadDestination();
 		assertEquals(uploader.getStorageLocationId(), storageLocationId);
 	}
@@ -565,7 +575,7 @@ public class UploaderTest {
 		when(mockExternalObjectStoreUploadDestination.getBucket()).thenReturn(bucket);
 		when(mockExternalObjectStoreUploadDestination.getKeyPrefixUUID()).thenReturn(keyPrefixUUID);
 		
-		AsyncMockStubber.callSuccessWith(Collections.singletonList(mockExternalObjectStoreUploadDestination)).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(Collections.singletonList(mockExternalObjectStoreUploadDestination)).when(mockSynapseJavascriptClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		uploader.queryForUploadDestination();
 		assertEquals(uploader.getStorageLocationId(), storageLocationId);
 		assertEquals(uploader.getCurrentUploadType(), uploadType);
@@ -604,12 +614,12 @@ public class UploaderTest {
 		FileEntity fileEntity = new FileEntity();
 		fileEntity.setId(entityId);
 		
-		Mockito.reset(mockSynapseClient);
+		Mockito.reset(mockSynapseJavascriptClient);
 		uploader.configure(fileEntity, null, null, true);
 		
 		assertNull(uploader.getStorageLocationId());
 		ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
-		verify(mockSynapseClient).getUploadDestinations(stringCaptor.capture(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUploadDestinations(stringCaptor.capture(), any(AsyncCallback.class));
 		assertEquals(entityId, stringCaptor.getValue());
 	}
 
@@ -762,7 +772,7 @@ public class UploaderTest {
 	public void testUploadFailed() {
 		String message = "meow there's an error.";
 		uploader.uploadFailed(message);
-		verify(mockSynapseJavascriptClient).logError(eq(message), any(Exception.class));
+		verify(mockSynapseJavascriptClient).logError(any(Exception.class));
 	}
 	
 	@Test

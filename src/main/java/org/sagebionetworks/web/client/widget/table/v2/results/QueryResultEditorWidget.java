@@ -17,12 +17,14 @@ import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionResponse;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -47,24 +49,27 @@ public class QueryResultEditorWidget implements
 	ClientCache clientCache;
 	JobTrackingWidget editJobTrackingWidget;
 	GlobalApplicationState globalApplicationState;
-	Callback callback;
 	String tableId;
 	TableType tableType;
+	EventBus eventBus;
 	
 	@Inject
 	public QueryResultEditorWidget(QueryResultEditorView view,
 			TablePageWidget pageWidget,
 			JobTrackingWidget editJobTrackingWidget,
 			GlobalApplicationState globalApplicationState, 
-			ClientCache clientCache) {
+			ClientCache clientCache,
+			EventBus eventBus) {
 		this.view = view;
 		this.pageWidget = pageWidget;
+		pageWidget.setTableVisible(true);
 		this.editJobTrackingWidget = editJobTrackingWidget;
 		this.view.setTablePageWidget(pageWidget);
 		this.view.setPresenter(this);
 		this.view.setProgressWidget(editJobTrackingWidget);
 		this.globalApplicationState = globalApplicationState;
 		this.clientCache = clientCache;
+		this.eventBus = eventBus;
 	}
 
 	@Override
@@ -77,8 +82,7 @@ public class QueryResultEditorWidget implements
 	 * 
 	 * @param bundle
 	 */
-	public void showEditor(QueryResultBundle bundle, TableType tableType, Callback callback) {
-		this.callback = callback;
+	public void showEditor(QueryResultBundle bundle, TableType tableType) {
 		this.startingBundle = bundle;
 		this.tableType = tableType;
 		this.view.setErrorMessageVisible(false);
@@ -290,16 +294,19 @@ public class QueryResultEditorWidget implements
 								clientCache.put(tableId + VIEW_RECENTLY_CHANGED_KEY, etag, now.getTime() + MESSAGE_EXPIRE_TIME);
 							}
 						}
-						doHideEditor();
-						callback.invoke();
+						fireEntityUpdatedEvent();
 					}
 
 					@Override
 					public void onCancel() {
 						// If they cancel after the job starts, treat it as a
 						// change.
+						fireEntityUpdatedEvent();
+					}
+					
+					private void fireEntityUpdatedEvent() {
 						doHideEditor();
-						callback.invoke();
+						eventBus.fireEvent(new EntityUpdatedEvent());
 					}
 				});
 	}

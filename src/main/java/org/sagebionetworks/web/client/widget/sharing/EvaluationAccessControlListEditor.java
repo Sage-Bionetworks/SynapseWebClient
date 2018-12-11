@@ -114,7 +114,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	}
 	
 	public PermissionLevel[] getPermList() {
-		return new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_SCORE_EVALUATION, PermissionLevel.CAN_SUBMIT_EVALUATION, PermissionLevel.CAN_ADMINISTER_EVALUATION};
+		return new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_SUBMIT_EVALUATION, PermissionLevel.CAN_SCORE_EVALUATION, PermissionLevel.CAN_ADMINISTER_EVALUATION};
 	}
 
 	public HashMap<PermissionLevel, String> getPermissionsToDisplay() {

@@ -49,7 +49,7 @@ public class CertificateWidgetViewImpl extends Composite implements CertificateW
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
+	public void showInfo(String message) {
 	}
 
 	@Override

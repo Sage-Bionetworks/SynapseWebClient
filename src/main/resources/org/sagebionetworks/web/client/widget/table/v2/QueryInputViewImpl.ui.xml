@@ -10,7 +10,7 @@
 		<t:Table width="100%" height="30px">
 			<t:TableRow>
 				<t:TableData>
-					<b:InputGroup ui:field="queryInputGroup" visible="true">
+					<b:InputGroup ui:field="queryInputGroup" visible="false">
 						<b:FormGroup ui:field="inputFormGroup">
 							<b:TextBox ui:field="queryInput" />
 						</b:FormGroup>
@@ -22,24 +22,25 @@
 							href="http://docs.synapse.org/articles/tables.html#table-data" placement="LEFT" addStyleNames="margin-left-5 moveup-18" />
 					</b:InputGroup>
 				</t:TableData>
-				<t:TableData width="370px" paddingRight="5">
-					<b:Button type="PRIMARY" ui:field="downloadFilesButton" icon="QUESTION_CIRCLE" height="34px" addStyleNames="margin-left-10" pull="RIGHT" text="How to Download Files" />
-					<b:Tooltip title="Download Data">
-						<b:Button ui:field="downloadResultsButton" icon="DOWNLOAD" height="34px" addStyleNames="margin-left-5" pull="RIGHT" />
-					</b:Tooltip>
+				<t:TableData paddingRight="5">
+					<b:DropDown addStyleNames="displayInlineBlock right" >
+						<b:Button dataToggle="DROPDOWN" type="PRIMARY" text="Download Options" marginRight="5" marginLeft="5" height="34px"  />
+						<b:DropDownMenu ui:field="dropdownMenu" addStyleNames="dropdown-menu-right">
+							<b:AnchorListItem ui:field="exportTableLink">Export Table</b:AnchorListItem>
+							<b:AnchorListItem ui:field="addToDownloadListLink">Add to Download List</b:AnchorListItem>
+							<b:Divider ui:field="downloadOptionsDivider" />
+							<b:AnchorListItem ui:field="programmaticOptionsLink">Programmatic Options</b:AnchorListItem>
+						</b:DropDownMenu>
+					</b:DropDown>
 					<b:Tooltip title="Edit query results">
 						<b:Button ui:field="editResultsButton" icon="EDIT" height="34px" addStyleNames="margin-left-5" pull="RIGHT"/>
 					</b:Tooltip>
 					<b:Tooltip title="Show query">
-						<b:Button ui:field="showQueryButton" icon="DATABASE" height="34px" addStyleNames="margin-left-5" pull="RIGHT"/>
+						<b:Button ui:field="showQueryButton" icon="DATABASE" height="34px" addStyleNames="margin-left-5" pull="RIGHT" visible="false"/>
 					</b:Tooltip>
 			    </t:TableData>
 			</t:TableRow>
 		</t:Table>
-		
-		<b:Alert ui:field="queryResultsMessage" type="DANGER" visible="false">
-			<b:Button ui:field="resetButton" icon="ROTATE_LEFT" type="DEFAULT" text="Reset query"
-				size="EXTRA_SMALL" addStyleNames="margin-left-10"></b:Button>
-		</b:Alert>
+		<w:InfoAlert ui:field="queryResultsMessage" visible="false" alertType="DANGER" icon="EXCLAMATION_CIRCLE" message="" linkText="Reset query" />
 	</g:HTMLPanel>
 </ui:UiBinder>
