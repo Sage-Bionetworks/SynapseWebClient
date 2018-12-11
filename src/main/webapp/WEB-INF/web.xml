@@ -82,7 +82,6 @@
 	<filter-mapping>
 		<filter-name>HttpHeaderSecurityFilter</filter-name>
 		<url-pattern>/*</url-pattern>
-		<dispatcher>REQUEST</dispatcher>
 	</filter-mapping>
 
 	
