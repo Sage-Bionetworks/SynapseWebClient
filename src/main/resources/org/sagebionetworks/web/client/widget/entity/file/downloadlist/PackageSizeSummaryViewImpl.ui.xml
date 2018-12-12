@@ -11,13 +11,22 @@
 	<bh:Span >
 		<b:Icon type="FILE" marginRight="10" addStyleNames="black-25-percent font-size-17"/>
 		<bh:Span ui:field="fileCountSpan" marginRight="20" />
-		<b:Icon type="DATABASE" marginRight="10" addStyleNames="black-25-percent font-size-17"/>
-		<bh:Span ui:field="fileSizeSpan" marginRight="20" />
-		<b:Icon type="CLOCK_O" marginRight="10" addStyleNames="black-25-percent font-size-17"/>
-		<bh:Span ui:field="estimatedTimeSpan" marginRight="20" />
-		<bh:Span ui:field="estimatedTimeLoading" marginRight="20" addStyleNames="inline-block movedown-4" visible="false">
-			<w:LoadingSpinner ui:field="spinner" size="20px"/>
-		</bh:Span>
+		<b:Tooltip text="This is the total size of all files. Zipped package(s) will likely be smaller." placement="BOTTOM">
+			<bh:Span>
+				<b:Icon type="DATABASE" marginRight="10" addStyleNames="black-25-percent font-size-17"/>
+				<bh:Span ui:field="fileSizeSpan" marginRight="20" />
+			</bh:Span>
+		</b:Tooltip>
+		<b:Tooltip text="This is an estimate of how long package download will take." placement="BOTTOM">
+			<bh:Span>
+				<b:Icon type="CLOCK_O" marginRight="10" addStyleNames="black-25-percent font-size-17"/>
+				<bh:Span ui:field="estimatedTimeSpan" marginRight="20" />
+				<bh:Span ui:field="estimatedTimeLoading" marginRight="20" addStyleNames="inline-block movedown-4" visible="false">
+					<w:LoadingSpinner ui:field="spinner" size="20px"/>
+				</bh:Span>
+			</bh:Span>
+		</b:Tooltip>
+		
 		
 	</bh:Span>
 </ui:UiBinder>
