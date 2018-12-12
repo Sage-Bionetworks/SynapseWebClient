@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.Image;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalBody;
 import org.gwtbootstrap3.client.ui.ModalFooter;
@@ -37,9 +38,7 @@ import org.gwtbootstrap3.extras.animate.client.ui.constants.Animation;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.gwtbootstrap3.extras.bootbox.client.options.DialogOptions;
-import org.gwtbootstrap3.extras.notify.client.constants.NotifyIconType;
 import org.gwtbootstrap3.extras.notify.client.constants.NotifyPlacement;
-import org.gwtbootstrap3.extras.notify.client.constants.NotifyPosition;
 import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
@@ -62,7 +61,6 @@ import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
@@ -71,7 +69,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.NodeList;
@@ -1057,11 +1054,19 @@ public class DisplayUtils {
  			headingHtml.addClickHandler(clickHandler);
  
  		if (pictureUri != null) {
- 			FitImage profilePicture = new FitImage(pictureUri, 64, 64);
- 			profilePicture.addStyleName("pull-left media-object imageButton");
+ 			Image profilePicture = new Image(pictureUri);
+ 			profilePicture.addStyleName("imageButton img-circle");
+ 			profilePicture.setWidth("100%");
+ 			profilePicture.setHeight("100%");
  			if (clickHandler != null)
  				profilePicture.addClickHandler(clickHandler);
- 			panel.add(profilePicture);
+ 			Div div = new Div();
+ 			div.setWidth("64px");
+ 			div.setHeight("64px");
+ 			div.setMarginRight(10);
+ 			div.add(profilePicture);
+ 			div.addStyleName("media-object left inline-block");
+ 			panel.add(div);
  		} else {
  			//display default picture
  			IconType type = defaultPictureSinglePerson ? IconType.SYN_USER : IconType.SYN_USERS;
