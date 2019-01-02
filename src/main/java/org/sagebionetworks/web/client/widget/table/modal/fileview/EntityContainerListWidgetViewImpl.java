@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -57,6 +58,11 @@ public class EntityContainerListWidgetViewImpl implements EntityContainerListWid
 		Anchor entityLink = new Anchor(name, DisplayUtils.getSynapseHistoryToken(id));
 		entityLink.setTarget("_blank");
 		row.add(entityLink);
+		Span entityIdSpan = new Span();
+		entityIdSpan.setMarginLeft(3);
+		entityIdSpan.setMarginRight(6);
+		entityIdSpan.add(new Text("(" + id + ")"));
+		row.add(entityIdSpan);
 		
 		if (showDeleteButton) {
 			Icon deleteButton = new Icon(IconType.TIMES);
@@ -67,7 +73,7 @@ public class EntityContainerListWidgetViewImpl implements EntityContainerListWid
 					presenter.onRemoveProject(id);
 				}
 			});
-			deleteButton.addStyleName("imageButton text-danger margin-left-5");
+			deleteButton.addStyleName("imageButton text-danger");
 			row.add(deleteButton);
 		}
 		entitiesContainer.add(row);
