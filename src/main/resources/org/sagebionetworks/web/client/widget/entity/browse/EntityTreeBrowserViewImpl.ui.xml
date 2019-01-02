@@ -17,8 +17,8 @@
 	    <t:Table ui:field="entityTreeHeader" width="100%" addStyleNames="overflow-x-hidden">
 			<t:TableRow>
 				<t:TableHeader width="42px" addStyleNames="min-width-42"/> <!-- expand/contract icon + entity icon -->
-				<tr:SortableTableHeaderImpl ui:field="nameColumnHeader" text="Name" addStyleNames="min-width-400 max-width-400" />
-				<t:TableHeader ui:field="nameColumnHeaderUnsortable" visible="false" addStyleNames="min-width-400 max-width-400" >
+				<tr:SortableTableHeaderImpl ui:field="nameColumnHeader" text="Name" width="400px" addStyleNames="min-width-400" />
+				<t:TableHeader ui:field="nameColumnHeaderUnsortable" visible="false" width="400px" addStyleNames="min-width-400" >
 					<bh:Span text="Name" />
 				</t:TableHeader>
 				<t:TableHeader addStyleNames="min-width-140" /> <!-- icons -->

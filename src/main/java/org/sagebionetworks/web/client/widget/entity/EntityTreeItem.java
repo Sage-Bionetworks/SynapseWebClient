@@ -15,6 +15,7 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 	private TreeItem treeItem;
 	private EntityBadge entityBadge;
 	private boolean isExpandable;
+	private int height = 0;
 	
 	@Inject
 	public EntityTreeItem(EntityBadge entityBadge) { 
@@ -30,6 +31,7 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 			treeItem.addStyleName("entityTreeItem padding-left-0-imp");
 		else
 			treeItem.addStyleName("entityTreeItem");
+		
 	}
 	
 	public boolean isExpandable() {
@@ -64,5 +66,15 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 	
 	public void showMinimalColumnSet() {
 		entityBadge.showMinimalColumnSet();
+	}
+	
+	public void setHeight(int height) {
+		this.height = height;
+		// set the entity badge name width based on the height
+		int entityNameWidthPx = 400 - (height * 16);
+		entityBadge.setEntityNameWidthPx(entityNameWidthPx);
+	}
+	public int getHeight() {
+		return height;
 	}
 }

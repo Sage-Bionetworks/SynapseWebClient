@@ -13,10 +13,8 @@
 					<b:Icon ui:field="icon" type="FILE"/>
 				</g:FocusPanel>
 			</t:TableData>
-			<t:TableData addStyleNames="overflow-x-hidden min-width-400 max-width-400">
-				<bh:Div addStyleNames="margin-right-5" ui:field="nameContainer"> 
-					<g:FlowPanel ui:field="entityContainer" addStyleNames="displayInline"/>
-				</bh:Div>
+			<t:TableData ui:field="entityTableData">
+				<g:FlowPanel ui:field="entityContainer" addStyleNames="displayInline margin-right-5"/>
 			</t:TableData>
 			<t:TableData addStyleNames="overflow-x-hidden min-width-140">
 				<bh:Div ui:field="iconsContainer"/>

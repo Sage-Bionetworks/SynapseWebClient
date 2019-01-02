@@ -79,10 +79,10 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@UiField
 	TableData downloadTableData;
 	@UiField
+	TableData entityTableData;
+	@UiField
 	org.gwtbootstrap3.client.ui.Anchor addToDownloadListLink;
 	
-	@UiField
-	Div nameContainer;
 	
 	Callback onAttachCallback;
 	Anchor entityAnchor;
@@ -167,6 +167,13 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			}
 		} 		
 	}
+	
+	@Override
+	public void setEntityNameWidthPx(int width) {
+		entityTableData.setWidth(width + "px");
+		entityAnchor.setWidth(width + "px");
+	}
+	
 	@Override
 	public void setIcon(IconType iconType) {
 		icon.setType(iconType);
