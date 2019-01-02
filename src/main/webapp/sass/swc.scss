@@ -594,24 +594,47 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 .min-height-48 {
 	min-height: 48px;
 }
+.min-width-19 {
+	min-width: 19px;
+}
 .min-width-25 {
 	min-width: 25px;
+}
+.min-width-42 {
+	min-width: 42px;
 }
 .min-width-70 {
 	min-width: 70px;
 }
+.min-width-90 {
+	min-width: 90px;
+}
 .min-width-100 {
 	min-width: 100px;
 }
-
+.min-width-140 {
+	min-width: 140px;
+}
 .min-width-150 {
 	min-width: 150px;
+}
+.min-width-165 {
+	min-width: 165px;
 }
 .min-width-200 {
 	min-width: 200px;
 }
 .min-width-300 {
 	min-width: 300px;
+}
+.min-width-310 {
+	min-width: 310px;
+}
+.min-width-400 {
+	min-width: 400px;
+}
+.min-width-500 {
+	min-width: 500px;
 }
 .table>thead>tr>th>p, .table>tbody>tr>th>p, .table>tfoot>tr>th>p, .table>thead>tr>td>p, .table>tbody>tr>td>p, .table>tfoot>tr>td>p {
 	min-height: 17px;
@@ -1262,18 +1285,23 @@ h1, h2, h3, h4, h5, h6 {
 .image{
 	max-width: 940px;
 }
-
-.max-width-460 {
-	max-width: 460px;
-}
-
 .max-height-200 {
 	max-height: 200px;
 }
-.max-width-350, #rootPanel .max-width-350 {
-	max-width: 350px;
+#rootPanel {
+	.max-width-310 {
+		max-width: 310px;
+	}
+	.max-width-350 {
+		max-width: 350px;
+	}
+	.max-width-400 {
+		max-width: 400px;
+	}
+	.max-width-460 {
+		max-width: 460px;
+	}
 }
-
 .max-height-100 {
 	max-height: 100px;
 }

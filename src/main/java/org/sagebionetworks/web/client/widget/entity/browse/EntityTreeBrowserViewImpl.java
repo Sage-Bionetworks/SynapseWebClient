@@ -209,6 +209,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		// Place the created child in the tree as the child of the given parent
 		// entity.
 		getTree().addItem(childToAdd.asTreeItem());
+		childToAdd.setHeight(0);
 	}
 
 	@Override
@@ -244,6 +245,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		// Place the created child in the tree as the child of the given parent
 		// entity.
 		parent.asTreeItem().addItem(childToAdd);
+		childToAdd.setHeight(parent.getHeight() + 1);
 	}
 
 	/**
