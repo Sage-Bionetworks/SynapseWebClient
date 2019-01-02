@@ -75,12 +75,14 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@UiField
 	TableData modifiedByTableData;
 	@UiField
+	Div iconsContainer;
+	@UiField
 	TableData downloadTableData;
+	@UiField
+	TableData entityTableData;
 	@UiField
 	org.gwtbootstrap3.client.ui.Anchor addToDownloadListLink;
 	
-	@UiField
-	Div nameContainer;
 	
 	Callback onAttachCallback;
 	Anchor entityAnchor;
@@ -146,7 +148,8 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			entityAnchor = new Anchor();
 			clickHandlerRegistration = entityAnchor.addClickHandler(STANDARD_CLICKHANDLER);
 			entityAnchor.setText(entityHeader.getName());
-			entityAnchor.addStyleName("link");
+			entityAnchor.setWidth("400px");
+			entityAnchor.addStyleName("link text-overflow-ellipsis inline-block whitespace-nowrap overflowHidden");
 			entityAnchor.setHref("#!Synapse:" + entityHeader.getId());
 			entityAnchor.getElement().setAttribute(ENTITY_ID_ATTRIBUTE, entityHeader.getId());
 			iconContainer.setWidget(icon);
@@ -164,6 +167,13 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			}
 		} 		
 	}
+	
+	@Override
+	public void setEntityNameWidthPx(int width) {
+		entityTableData.setWidth(width + "px");
+		entityAnchor.setWidth(width + "px");
+	}
+	
 	@Override
 	public void setIcon(IconType iconType) {
 		icon.setType(iconType);
@@ -178,6 +188,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	public void clear() {
 		iconContainer.clear();
 		entityContainer.clear();
+		iconsContainer.clear();
 	}
 	
 	@Override
@@ -205,7 +216,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		icon.setPull(Pull.RIGHT);
 		Tooltip tooltip = new Tooltip(icon);
 		tooltip.setHtml(SafeHtmlUtils.fromTrustedString(html));
-		nameContainer.add(tooltip);
+		iconsContainer.add(tooltip);
 	}
 	
 	@Override
@@ -215,7 +226,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		icon.setEmphasis(Emphasis.DANGER);
 		icon.setPull(Pull.RIGHT);
 		Tooltip tooltip = new Tooltip(icon, error);
-		nameContainer.add(tooltip);
+		iconsContainer.add(tooltip);
 	}
 	
 	@Override
@@ -232,28 +243,28 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		Icon icon = new Icon(IconType.NEWSPAPER_O);
 		icon.setFixedWidth(true);
 		icon.setPull(Pull.RIGHT);
-		nameContainer.add(new Tooltip(icon, "Has a wiki"));
+		iconsContainer.add(new Tooltip(icon, "Has a wiki"));
 	}
 	@Override
 	public void showPrivateIcon() {
 		Icon icon = new Icon(IconType.LOCK);
 		icon.setFixedWidth(true);
 		icon.setPull(Pull.RIGHT);
-		nameContainer.add(new Tooltip(icon, "Private"));
+		iconsContainer.add(new Tooltip(icon, "Private"));
 	}
 	@Override
 	public void showPublicIcon() {
 		Icon icon = new Icon(IconType.GLOBE);
 		icon.setFixedWidth(true);
 		icon.setPull(Pull.RIGHT);
-		nameContainer.add(new Tooltip(icon, "Public"));
+		iconsContainer.add(new Tooltip(icon, "Public"));
 	}
 	@Override
 	public void showSharingSetIcon() {
 		Icon icon = new Icon(IconType.CHECK);
 		icon.setFixedWidth(true);
 		icon.setPull(Pull.RIGHT);
-		nameContainer.add(new Tooltip(icon, "Sharing Settings have been set"));
+		iconsContainer.add(new Tooltip(icon, "Sharing Settings have been set"));
 	}
 	@Override
 	public boolean isInViewport() {
@@ -265,7 +276,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		Icon icon = new Icon(IconType.COMMENT);
 		icon.setFixedWidth(true);
 		icon.setPull(Pull.RIGHT);
-		nameContainer.add(new Tooltip(icon, "Has been mentioned in discussion"));
+		iconsContainer.add(new Tooltip(icon, "Has been mentioned in discussion"));
 	}
 	
 	@Override
@@ -279,7 +290,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			presenter.onUnlink();
 		});
 		
-		nameContainer.add(new Tooltip(icon, "Remove this link"));
+		iconsContainer.add(new Tooltip(icon, "Remove this link"));
 	}
 
 	@Override

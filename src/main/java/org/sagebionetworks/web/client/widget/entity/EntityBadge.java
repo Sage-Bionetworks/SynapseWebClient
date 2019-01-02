@@ -31,7 +31,6 @@ import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
@@ -266,5 +265,8 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	}
 	public void showMinimalColumnSet() {
 		view.showMinimalColumnSet();
+	}
+	public void setEntityNameWidthPx(int width) {
+		view.setEntityNameWidthPx(width);
 	}
 }
