@@ -84,8 +84,13 @@ public class VideoConfigViewImpl implements VideoConfigView {
 	
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		if ("".equals(entity.getValue()))
-			throw new IllegalArgumentException(DisplayConstants.ERROR_SELECT_VIDEO_FILE);
+		if (
+			(isSynapseEntity() && entity.getValue().trim().isEmpty()) ||
+			(isYouTubeVideo() && youtubeUrlField.getValue().trim().isEmpty()) ||
+			(isVimeoVideo() && vimeoUrlField.getValue().trim().isEmpty())
+		) {
+				throw new IllegalArgumentException(DisplayConstants.ERROR_SELECT_VIDEO_FILE);
+		}
 	}
 
 	@Override
