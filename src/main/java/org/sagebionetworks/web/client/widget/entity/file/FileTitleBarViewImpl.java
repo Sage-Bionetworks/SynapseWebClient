@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -14,6 +15,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.InfoAlert;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 
@@ -82,9 +84,9 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@UiField
 	InfoAlert addedToDownloadListAlert;
 	@UiField
-	Span hasDownloadUI;
+	HelpWidget viewOnlyHelp;
 	@UiField
-	Span hasViewOnlyUI;
+	Button downloadOptionsButton;
 	
 	interface FileTitleBarViewImplUiBinder extends UiBinder<Widget, FileTitleBarViewImpl> {
 	}
@@ -223,7 +225,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	}
 	@Override
 	public void setCanDownload(boolean canDownload) {
-		hasDownloadUI.setVisible(canDownload);
-		hasViewOnlyUI.setVisible(!canDownload);
+		downloadOptionsButton.setEnabled(canDownload);
+		viewOnlyHelp.setVisible(!canDownload);
 	}
 }
