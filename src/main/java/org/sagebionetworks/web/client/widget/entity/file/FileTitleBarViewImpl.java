@@ -81,6 +81,11 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	Div versionInfoUI;
 	@UiField
 	InfoAlert addedToDownloadListAlert;
+	@UiField
+	Span hasDownloadUI;
+	@UiField
+	Span hasViewOnlyUI;
+	
 	interface FileTitleBarViewImplUiBinder extends UiBinder<Widget, FileTitleBarViewImpl> {
 	}
 	private String currentEntityId;
@@ -215,5 +220,10 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	public void showAddedToDownloadListAlert(String message) {
 		addedToDownloadListAlert.setMessage(message);
 		addedToDownloadListAlert.setVisible(true);	
+	}
+	@Override
+	public void setCanDownload(boolean canDownload) {
+		hasDownloadUI.setVisible(canDownload);
+		hasViewOnlyUI.setVisible(!canDownload);
 	}
 }

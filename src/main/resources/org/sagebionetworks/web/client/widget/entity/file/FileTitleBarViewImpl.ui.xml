@@ -15,14 +15,24 @@
 			 	<bh:Text ui:field="entityName" />
 			 	<g:SimplePanel ui:field="favoritePanel" addStyleNames="margin-left-5 margin-right-10"/>
 			</b:Heading>
-			<b:DropDown addStyleNames="displayInlineBlock">
-				<b:Button dataToggle="DROPDOWN" type="PRIMARY" text="Download Options" addStyleNames="moveup-8"/>
-				<b:DropDownMenu ui:field="dropdownMenu">
-					<b:AnchorListItem ui:field="addToDownloadListLink">Add to Download List</b:AnchorListItem>
-					<b:Divider/>
-					<b:AnchorListItem ui:field="programmaticOptionsLink">Programmatic Options</b:AnchorListItem>
-				</b:DropDownMenu>
-			</b:DropDown>
+			<bh:Span ui:field="hasDownloadUI">
+				<b:DropDown addStyleNames="displayInlineBlock">
+					<b:Button dataToggle="DROPDOWN" type="PRIMARY" text="Download Options" addStyleNames="moveup-8"/>
+					<b:DropDownMenu ui:field="dropdownMenu">
+						<b:AnchorListItem ui:field="addToDownloadListLink">Add to Download List</b:AnchorListItem>
+						<b:Divider/>
+						<b:AnchorListItem ui:field="programmaticOptionsLink">Programmatic Options</b:AnchorListItem>
+					</b:DropDownMenu>
+				</b:DropDown>
+			</bh:Span>
+			<bh:Span ui:field="hasViewOnlyUI" visible="false">
+				<b:Tooltip title="You do not have download access for this item.">
+					<b:DropDown addStyleNames="displayInlineBlock">
+						<b:Button dataToggle="DROPDOWN" type="PRIMARY" text="Download Options" addStyleNames="moveup-8" enabled="false" />
+					</b:DropDown>
+				</b:Tooltip>
+				<w:HelpWidget helpMarkdown="You do not have download access for this item." addStyleNames="margin-left-5 moveup-5"/>
+			</bh:Span>
 			<bh:Div ui:field="versionInfoUI" visible="false">
 				<bh:Span addStyleNames="boldText" text="Version:"/>
 				<bh:Span addStyleNames="margin-left-5" ui:field="version"/>
