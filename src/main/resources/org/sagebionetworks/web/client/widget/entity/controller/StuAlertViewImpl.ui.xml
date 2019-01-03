@@ -26,12 +26,6 @@
 	  			</b:Column>
   				<b:Column size="XS_12">
   					<b:Heading size="H3" alignment="CENTER" text="You are not authorized to access the page requested." />
-  					<bh:Div ui:field="requestAccessUI" addStyleNames="margin-top-20 center">
-			  			<b:Heading size="H4" addStyleNames="displayInline" text="You can" />
-			  			<b:Anchor addStyleNames="displayInline font-size-20 margin-5" ui:field="requestAccessLink" text="request access"/>
-			  			<b:Heading addStyleNames="displayInline" size="H4" text="from the owner." />
-						<w:LoadingSpinner size="16px" ui:field="requestLoadingUI" />
-			  		</bh:Div>
   				</b:Column>
   			</b:Row>
   		</g:HTMLPanel>
