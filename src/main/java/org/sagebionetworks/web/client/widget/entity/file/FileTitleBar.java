@@ -63,7 +63,7 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 	
 	public void configure(EntityBundle bundle) {
 		this.entityBundle = bundle;
-		
+		view.setCanDownload(entityBundle.getPermissions().getCanDownload());
 		view.setVersionUIVisible(false);
 		view.setExternalUrlUIVisible(false);
 		view.setExternalObjectStoreUIVisible(false);

@@ -23,6 +23,8 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 	void setVersionUIVisible(boolean visible);
 	void setPresenter(Presenter p);
 	void showAddedToDownloadListAlert(String message);
+	void setCanDownload(boolean canDownload);
+	
 	/**
 	 * Presenter interface
 	 */
