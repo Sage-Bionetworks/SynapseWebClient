@@ -6,7 +6,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtvisualizationwrappers.client.biodalliance13.Biodalliance013dev;
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceConfigInterface;
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource;
-import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
@@ -27,6 +27,7 @@ public class BiodallianceWidgetViewImpl implements BiodallianceWidgetView {
 	Div synAlertContainer;
 	
 	Widget widget;
+	SynapseJSNIUtils jsniUtils;
 	
 	interface BiodallianceWidgetViewImplUiBinder extends UiBinder<Widget, BiodallianceWidgetViewImpl> {
 	}
@@ -35,7 +36,8 @@ public class BiodallianceWidgetViewImpl implements BiodallianceWidgetView {
 			.create(BiodallianceWidgetViewImplUiBinder.class);
 	
 	@Inject
-	public BiodallianceWidgetViewImpl() {
+	public BiodallianceWidgetViewImpl(SynapseJSNIUtils jsniUtils) {
+		this.jsniUtils = jsniUtils;
 		widget = uiBinder.createAndBindUi(this);
 		container.addAttachHandler(new AttachEvent.Handler() {
 			@Override
@@ -80,7 +82,7 @@ public class BiodallianceWidgetViewImpl implements BiodallianceWidgetView {
 			
 			@Override
 			public void onFailure(Throwable reason) {
-				SynapseJSNIUtilsImpl._consoleError(reason.getMessage());
+				jsniUtils.consoleError(reason.getMessage());
 			}
 		});
 		

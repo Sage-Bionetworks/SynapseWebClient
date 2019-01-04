@@ -87,4 +87,5 @@ public interface SynapseJSNIUtils {
 	String getCdnEndpoint();
 	String getSessionCookieUrl();
 	void scrollIntoView(Element el);
+	void unmountComponentAtNode(Element el);
 }

@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -26,22 +24,11 @@ public class StuAlertViewImpl implements
 	@UiField
 	HTMLPanel httpCode404;
 	@UiField
-	Div requestAccessUI;
-	@UiField
-	Anchor requestAccessLink;
-	@UiField
-	LoadingSpinner requestLoadingUI;
-	@UiField
 	Div synAlertContainer;
-	Presenter presenter;
 	Widget synAlertWidget;
 	Div container = new Div();
 	@Inject
 	public StuAlertViewImpl(){
-	}
-	
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
 	}
 	
 	@Override
@@ -60,8 +47,6 @@ public class StuAlertViewImpl implements
 		if (widget != null) {
 			httpCode403.setVisible(false);
 			httpCode404.setVisible(false);
-			requestAccessUI.setVisible(false);
-			requestLoadingUI.setVisible(false);
 		}
 	}
 	
@@ -69,9 +54,6 @@ public class StuAlertViewImpl implements
 		if (widget == null) {
 			Binder b = GWT.create(Binder.class);
 			widget = b.createAndBindUi(this);
-			requestAccessLink.addClickHandler(event -> {
-				presenter.onRequestAccess();
-			});
 			synAlertContainer.add(synAlertWidget);
 			container.add(widget);
 		}
@@ -89,22 +71,6 @@ public class StuAlertViewImpl implements
 		lazyConstruct();
 		container.setVisible(true);
 		httpCode404.setVisible(true);
-	}
-	@Override
-	public void showRequestAccessUI() {
-		lazyConstruct();
-		requestLoadingUI.setVisible(false);
-		requestAccessUI.setVisible(true);
-	}
-	@Override
-	public void hideRequestAccessUI() {
-		lazyConstruct();
-		requestAccessUI.setVisible(false);
-	}
-	@Override
-	public void showRequestAccessButtonLoading() {
-		lazyConstruct();
-		requestLoadingUI.setVisible(true);
 	}
 	@Override
 	public void setSynAlert(Widget w) {

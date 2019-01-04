@@ -32,7 +32,7 @@
 			</bh:Div>
 		</b:Alert>
 		<bh:Div ui:field="headerDiv" addStyleNames="notopmargin synapse-blue-bg-gradient" height="53px">
-		    <bh:Div addStyleNames="margin-left-15 inline-block maxWidth50 overflowHidden text-overflow-ellipsis whitespace-nowrap" paddingTop="13">
+		    <bh:Div addStyleNames="margin-left-15 inline-block maxWidth50 overflowHidden text-overflow-ellipsis whitespace-nowrap color-white" paddingTop="13">
 	        	<g:Image ui:field="synapseLogo" url="images/logo.svg" 
 	        	    addStyleNames="imageButton margin-right-5 moveup-5" width="35px" height="35px"/>
 	            <b:Heading size="H3" addStyleNames="displayInline color-white">

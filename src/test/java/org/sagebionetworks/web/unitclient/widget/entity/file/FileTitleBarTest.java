@@ -21,6 +21,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
@@ -75,6 +76,8 @@ public class FileTitleBarTest {
 	VersionInfo mockCurrentVersion;
 	@Mock
 	EventBus mockEventBus;
+	@Mock
+	UserEntityPermissions mockPermissions;
 	
 	public static final String DATA_FILE_HANDLE_ID = "872";
 	public static final Long FILE_VERSION = 3L;
@@ -88,6 +91,8 @@ public class FileTitleBarTest {
 		when(mockFileEntity.getDataFileHandleId()).thenReturn(DATA_FILE_HANDLE_ID);
 		when(mockFileEntity.getVersionNumber()).thenReturn(FILE_VERSION);
 		when(mockBundle.getEntity()).thenReturn(mockFileEntity);
+		when(mockBundle.getPermissions()).thenReturn(mockPermissions);
+		when(mockPermissions.getCanDownload()).thenReturn(true);
 		when(mockSynapseProperties.getSynapseProperty("org.sagebionetworks.portal.synapse_storage_id"))
 				.thenReturn(String.valueOf(synStorageLocationId));
 		List<FileHandle> fileHandles = new LinkedList<FileHandle>();
@@ -134,6 +139,16 @@ public class FileTitleBarTest {
 		fileTitleBar.configure(mockBundle);
 		verify(mockFileDownloadButton).configure(mockBundle);
 		verify(mockView).setVersion(FILE_VERSION);
+		verify(mockView).setCanDownload(true);  //set up in the Before
+	}
+	
+	@Test
+	public void testCannotDownload() {
+		when(mockPermissions.getCanDownload()).thenReturn(false);
+		
+		fileTitleBar.configure(mockBundle);
+		
+		verify(mockView).setCanDownload(false);
 	}
 	
 	@Test
