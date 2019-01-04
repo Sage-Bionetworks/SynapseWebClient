@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import static org.sagebionetworks.web.client.SynapseJSNIUtilsImpl._unmountComponentAtNode;
 
 import java.util.List;
 
@@ -8,6 +7,7 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.PlotlyTraceWrapper;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
@@ -38,12 +38,12 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	Span loadingMessage;
 	
 	@Inject
-	public PlotlyWidgetViewImpl(Binder binder) {
+	public PlotlyWidgetViewImpl(Binder binder, SynapseJSNIUtils jsniUtils) {
 		w=binder.createAndBindUi(this);
 		w.addAttachHandler(event -> {
 			if (!event.isAttached()) {
 				//detach event, clean up react component
-				_unmountComponentAtNode(chartContainer.getElement());
+				jsniUtils.unmountComponentAtNode(chartContainer.getElement());
 			}
 		});
 		_addPlotlyClickEventListener(chartContainer.getElement(), this);
