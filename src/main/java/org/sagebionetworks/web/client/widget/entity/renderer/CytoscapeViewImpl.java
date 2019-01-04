@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtvisualizationwrappers.client.cytoscape.CytoscapeGraph25;
-import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
@@ -33,9 +33,11 @@ public class CytoscapeViewImpl implements CytoscapeView {
 	Div synAlertContainer;
 	boolean isAttached, isConfigured;
 	String cyJS, styleJson;
+	SynapseJSNIUtils jsniUtils;
 	@Inject
-	public CytoscapeViewImpl(Binder binder) {
+	public CytoscapeViewImpl(Binder binder, SynapseJSNIUtils jsniUtils) {
 		widget = binder.createAndBindUi(this);
+		this.jsniUtils = jsniUtils;
 		isAttached=false;
 		isConfigured=false;
 		visualizationContainer.addAttachHandler(new AttachEvent.Handler() {
@@ -71,7 +73,7 @@ public class CytoscapeViewImpl implements CytoscapeView {
 				
 				@Override
 				public void onFailure(Throwable reason) {
-					SynapseJSNIUtilsImpl._consoleError(reason.getMessage());
+					jsniUtils.consoleError(reason.getMessage());
 				}
 			});
 		}

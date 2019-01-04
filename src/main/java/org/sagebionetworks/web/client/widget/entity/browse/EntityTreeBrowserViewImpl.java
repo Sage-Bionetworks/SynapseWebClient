@@ -184,13 +184,15 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 			
 			presenter.clearRecordsFetchedChildren();
 			
-			if (isSelectable) {
-				entityTree.addSelectionHandler(event -> {
-					final EntityTreeItem targetItem = getTreeItem2entityTreeItem()
+			entityTree.addSelectionHandler(event -> {
+				if (isSelectable) {
+					EntityTreeItem targetItem = getTreeItem2entityTreeItem()
 							.get(event.getSelectedItem());
-					selectEntity(targetItem);
-				});
-			}
+					selectEntity(targetItem);	
+				} else {
+					entityTree.setSelectedItem(null);
+				}
+			});
 			entityTreeContainer.clear();
 			entityTreeContainer.add(entityTree);
 		}

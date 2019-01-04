@@ -754,7 +754,10 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		// initialized in Portal.html
 		return $wnd.cdnEndpoint;
 	}-*/;
-	
+	@Override
+	public void unmountComponentAtNode(Element el) {
+		_unmountComponentAtNode(el);
+	}
 	public final static native void _unmountComponentAtNode(Element el) /*-{
 		return $wnd.ReactDOM.unmountComponentAtNode(el);
 	}-*/;
