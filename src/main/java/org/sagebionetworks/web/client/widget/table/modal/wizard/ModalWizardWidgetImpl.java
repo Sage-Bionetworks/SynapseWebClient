@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.ModalSize;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -21,11 +22,14 @@ public class ModalWizardWidgetImpl implements ModalWizardWidget,  ModalWizardVie
 	ModalPage currentPage;
 	ModalPage firstPage;
 	ModalWizardView view;
+	SynapseAlert synAlert;
 	
 	@Inject
-	public ModalWizardWidgetImpl(ModalWizardView view){
+	public ModalWizardWidgetImpl(ModalWizardView view, SynapseAlert synAlert){
 		this.view = view;
+		this.synAlert = synAlert;
 		this.view.setPresenter(this);
+		view.setSynAlert(synAlert);
 		callbacks = new ArrayList<WizardCallback>();
 	}
 	
@@ -61,7 +65,7 @@ public class ModalWizardWidgetImpl implements ModalWizardWidget,  ModalWizardVie
 
 	@Override
 	public void setLoading(boolean loading) {
-		view.showAlert(false);
+		synAlert.clear();
 		view.setLoading(loading);
 	}
 
@@ -76,12 +80,19 @@ public class ModalWizardWidgetImpl implements ModalWizardWidget,  ModalWizardVie
 	}
 
 	@Override
-	public void setErrorMessage(String message) {
-		view.showAlert(true);
-		view.showErrorMessage(message);
+	public void setError(Throwable error) {
+		synAlert.handleException(error);
 		view.setLoading(false);
 	}
-
+	@Override
+	public void setErrorMessage(String message) {
+		synAlert.showError(message);
+		view.setLoading(false);
+	}
+	@Override
+	public void clearErrors() {
+		synAlert.clear();
+	}
 	@Override
 	public void onFinished() {
 		for (WizardCallback callback : callbacks) {

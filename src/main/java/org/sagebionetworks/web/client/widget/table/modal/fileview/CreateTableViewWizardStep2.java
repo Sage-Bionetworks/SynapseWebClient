@@ -117,13 +117,14 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	}
 	
 	public void getPossibleColumnModelsForViewScope(String nextPageToken) {
+		presenter.clearErrors();
 		ViewScope scope = new ViewScope();
 		scope.setScope(((EntityView)entity).getScopeIds());
 		scope.setViewTypeMask(tableType.getViewTypeMask().longValue());
 		synapseClient.getPossibleColumnModelsForViewScope(scope, nextPageToken, new AsyncCallback<ColumnModelPage>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				presenter.setErrorMessage(caught.getMessage());
+				presenter.setError(caught);
 			}
 			@Override
 			public void onSuccess(ColumnModelPage columnPage) {
@@ -182,10 +183,11 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		}
 		// Get the models from the view and save them
 		List<ColumnModel> newSchema = editor.getEditedColumnModels();
+		presenter.clearErrors();
 		synapseClient.getTableUpdateTransactionRequest(entity.getId(), new ArrayList<ColumnModel>(), newSchema, new AsyncCallback<TableUpdateTransactionRequest>(){
 			@Override
 			public void onFailure(Throwable caught) {
-				presenter.setErrorMessage(caught.getMessage());
+				presenter.setError(caught);
 			}
 			
 			@Override
@@ -206,11 +208,12 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	public void startTrackingJob(TableUpdateTransactionRequest request) {
 		view.setJobTrackerVisible(true);
 		presenter.setLoading(true);
+		presenter.clearErrors();
 		this.jobTrackingWidget.startAndTrackJob(ColumnModelsWidget.UPDATING_SCHEMA, false, AsynchType.TableTransaction, request, new AsynchronousProgressHandler() {
 			@Override
 			public void onFailure(Throwable failure) {
 				view.setJobTrackerVisible(false);
-				presenter.setErrorMessage(failure.getMessage());
+				presenter.setError(failure);
 			}
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
