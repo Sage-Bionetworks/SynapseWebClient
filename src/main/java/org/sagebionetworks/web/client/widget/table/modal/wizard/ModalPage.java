@@ -42,7 +42,14 @@ public interface ModalPage extends IsWidget {
 		 * Set the error message.
 		 * @param message
 		 */
-		public void setErrorMessage(String message);
+		void setErrorMessage(String message);
+		/**
+		 * Set the error
+		 * @param message
+		 */
+		void setError(Throwable error);
+		void clearErrors();
+
 		
 		/**
 		 * Uses selected cancel.
