@@ -63,6 +63,8 @@ public interface TableQueryResultView extends IsWidget {
 	 * @param visible
 	 */
 	void setProgressWidgetVisible(boolean visible);
+	void setFacetsWidget(IsWidget w);
+	void setFacetsVisible(boolean visible);
 
 	void scrollTableIntoView();
 

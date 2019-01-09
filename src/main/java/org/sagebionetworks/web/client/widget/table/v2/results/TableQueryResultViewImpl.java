@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -17,6 +18,9 @@ import com.google.inject.Inject;
  * 
  */
 public class TableQueryResultViewImpl implements TableQueryResultView {
+
+	public static final String ACTIVE_FACET_WIDGET_STYLES = "pull-left-unless-xs margin-right-10 padding-10 facetsWidget-active";
+	public static final String INACTIVE_FACET_WIDGET_STYLES = "pull-left-unless-xs facetsWidget-inactive";
 
 	public interface Binder extends UiBinder<Widget, TableQueryResultViewImpl> {
 	}
@@ -31,6 +35,9 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	SimplePanel synapseAlertContainer;
 	@UiField
 	Div scrollTarget;
+	@UiField
+	Div facetsWidgetPanel;
+
 	Widget widget;
 
 	Presenter presenter;
@@ -83,5 +90,17 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	@Override
 	public void scrollTableIntoView() {
 		jsniUtils.scrollIntoView(scrollTarget.getElement());
+	}
+	
+	@Override
+	public void setFacetsWidget(IsWidget w) {
+		facetsWidgetPanel.clear();
+		facetsWidgetPanel.add(w);
+	}
+	
+	@Override
+	public void setFacetsVisible(boolean visible) {
+		String styles = visible ? ACTIVE_FACET_WIDGET_STYLES : INACTIVE_FACET_WIDGET_STYLES;
+		facetsWidgetPanel.setStyleName(styles);
 	}
 }

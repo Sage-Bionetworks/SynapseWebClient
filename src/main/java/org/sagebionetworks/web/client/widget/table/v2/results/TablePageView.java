@@ -13,11 +13,6 @@ import com.google.gwt.user.client.ui.Widget;
  *
  */
 public interface TablePageView extends IsWidget {
-	
-	public interface Presenter {
-		void onClearFacets();
-	}
-	
 	/**
 	 * Set the headers for this table.
 	 * This will be extended to including column sorting data.
@@ -58,10 +53,7 @@ public interface TablePageView extends IsWidget {
 	 */
 	public void setEditorBufferVisible(boolean isEditable);
 	
-	void setFacetsWidget(Widget w);
-	void setFacetsVisible(boolean visible);
 	void setTableVisible(boolean visible);
-	void setPresenter(Presenter presenter);
 	void showLoading();
 	void hideLoading();
 }

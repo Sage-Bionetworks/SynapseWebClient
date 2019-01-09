@@ -52,6 +52,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.RowSelectionListen
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultView;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -114,7 +115,9 @@ public class TableQueryResultWidgetTest {
 	SelectColumn mockSelectColumn;
 	@Mock
 	QueryResultBundle mockNewPageQueryResultBundle;
-	
+	@Mock
+	FacetsWidget mockFacetsWidget;
+
 	public static final String ENTITY_ID = "syn123";
 	@Before
 	public void before(){
@@ -122,7 +125,7 @@ public class TableQueryResultWidgetTest {
 		when(mockGinInjector.creatNewAsynchronousProgressWidget()).thenReturn(mockJobTrackingWidget, mockJobTrackingWidget2);
 		when(mockGinInjector.createNewTablePageWidget()).thenReturn(mockPageWidget);
 		when(mockGinInjector.createNewQueryResultEditorWidget()).thenReturn(mockQueryResultEditor);
-		widget = new TableQueryResultWidget(mockView, mockSynapseClient, mockGinInjector, mockSynapseAlert, mockClientCache, mockGWT);
+		widget = new TableQueryResultWidget(mockView, mockSynapseClient, mockGinInjector, mockSynapseAlert, mockClientCache, mockGWT, mockFacetsWidget);
 		query = new Query();
 		query.setSql("select * from " + ENTITY_ID);
 		query.setIsConsistent(true);

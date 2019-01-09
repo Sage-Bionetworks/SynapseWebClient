@@ -4,6 +4,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
@@ -108,5 +109,14 @@ public class SingleButtonViewImpl implements SingleButtonView {
 	@Override
 	public void clearWidgets() {
 		extraWidgetsContainer.clear();
+	}
+	
+	@Override
+	public void addStyleNames(String styles) {
+		button.addStyleName(styles);
+	}
+	@Override
+	public void setButtonIcon(IconType icon) {
+		button.setIcon(icon);
 	}
 }

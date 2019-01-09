@@ -86,8 +86,6 @@ public class TablePageWidgetTest {
 	List<CellStub> cellStubs;
 	TableType tableType;
 	@Mock
-	FacetsWidget mockFacetsWidget;
-	@Mock
 	CallbackP<FacetColumnRequest> mockFacetChangedHandler;
 	@Mock
 	Callback mockResetFacetsHandler;
@@ -154,7 +152,7 @@ public class TablePageWidgetTest {
 		});
 		defaultColumnModels = new ArrayList<ColumnModel>();
 		when(mockFileViewDefaultColumns.getDefaultViewColumns(anyBoolean(), anyBoolean())).thenReturn(defaultColumnModels);
-		widget = new TablePageWidget(mockView, mockGinInjector, mockPaginationWidget,mockFacetsWidget);
+		widget = new TablePageWidget(mockView, mockGinInjector, mockPaginationWidget);
 		
 		schema = TableModelTestUtils.createOneOfEachType();
 		headers = TableModelTestUtils.buildSelectColumns(schema);
@@ -188,7 +186,6 @@ public class TablePageWidgetTest {
 		query.setOffset(0L);
 		query.setSql("select * from " + ENTITY_ID);
 		bundle.setFacets(facets);
-		when(mockFacetsWidget.isShowingFacets()).thenReturn(true);
 		tableType = TableType.table;
 	}
 	
