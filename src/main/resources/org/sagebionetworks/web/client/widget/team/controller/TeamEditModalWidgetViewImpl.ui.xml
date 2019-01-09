@@ -43,7 +43,7 @@
 								    <bh:Div addStyleNames="position-absolute topLevelZIndex">
 						    				<b:Button ui:field="removePicture" icon="TIMES" size="EXTRA_SMALL" type="DANGER" visible="false"/>
 						       		</bh:Div>
-						       		<b:Image ui:field="previewImage" type="ROUNDED" width="150px" visible="false"/>
+						       		<b:Image ui:field="previewImage" width="150px" visible="false" addStyleNames="img-circle"/>
 								</g:HTMLPanel>
 		                    </bh:Div>
 							<w:LoadingSpinner ui:field="teamImageLoading" size="16px" visible="false"/>

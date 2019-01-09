@@ -133,7 +133,7 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 			$wnd.cropping = new $wnd.Croppie(imagePreviewEl, {
 				enableExif: true,
 				enableOrientation: true,
-			    viewport: { width: 200, height: 200 },
+			    viewport: { width: 200, height: 200, type: 'circle' },
 			    boundary: { width: 400, height: 400 }
 			});
 			$wnd.cropping.bind({
@@ -149,7 +149,7 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 
 	private static native void _getCroppedImageBlob(CroppedImageUploadViewImpl v) /*-{
 		try {
-			$wnd.cropping.result({type: 'blob', format: 'jpeg', quality: 1, circle: false}).then(function(blob) {
+			$wnd.cropping.result({type: 'blob', format: 'jpeg', quality: 1, circle: true}).then(function(blob) {
 				v.@org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl::saveCroppedImage(Lcom/google/gwt/core/client/JavaScriptObject;)(blob);
 			});
 		} catch (err) {

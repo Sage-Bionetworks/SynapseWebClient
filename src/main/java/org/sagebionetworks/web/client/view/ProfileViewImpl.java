@@ -604,6 +604,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			 //use preview
 			 String url = synapseJSNIUtils.getFileHandleAssociationUrl(profile.getOwnerId(), FileHandleAssociateType.UserProfileAttachment, profile.getProfilePicureFileHandleId());
 			 profilePicture = new FitImage(url, 150, 150);
+			 profilePicture.addStyleName("img-circle");
 		 } else {
 			 //use default picture
 			 profilePicture = defaultProfilePicture;

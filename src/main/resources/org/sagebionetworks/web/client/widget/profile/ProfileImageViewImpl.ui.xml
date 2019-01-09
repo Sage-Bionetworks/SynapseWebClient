@@ -10,7 +10,7 @@
 		    <bh:Div addStyleNames="position-absolute topLevelZIndex">
     				<b:Button ui:field="removePicture" icon="TIMES" size="EXTRA_SMALL" type="DANGER"/>
        		</bh:Div>
-       		<b:Image ui:field="image" type="ROUNDED" width="150px" visible="false"/>
+       		<b:Image ui:field="image" width="150px" visible="false" addStyleNames="img-circle" />
 		</g:HTMLPanel>
 	</g:HTMLPanel>
 </ui:UiBinder> 
