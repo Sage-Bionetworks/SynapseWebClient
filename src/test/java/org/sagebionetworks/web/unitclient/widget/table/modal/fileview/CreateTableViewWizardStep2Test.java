@@ -202,7 +202,7 @@ public class CreateTableViewWizardStep2Test {
 		String firstPageToken = null;
 		widget.getPossibleColumnModelsForViewScope(firstPageToken);
 		verify(mockSynapseClient).getPossibleColumnModelsForViewScope(any(ViewScope.class), eq(firstPageToken), any(AsyncCallback.class));
-		verify(mockWizardPresenter).setError(ex);
+		verify(mockWizardPresenter).setErrorMessage(error);
 	}
 
 	@Test
@@ -295,7 +295,7 @@ public class CreateTableViewWizardStep2Test {
 
 		verify(mockWizardPresenter, atLeastOnce()).setLoading(true);
 		verify(mockEditor).validate();
-		verify(mockWizardPresenter).setError(ex);
+		verify(mockWizardPresenter).setErrorMessage(errorMessage);
 	}
 	
 	@Test
@@ -307,6 +307,6 @@ public class CreateTableViewWizardStep2Test {
 		widget.onPrimary();
 		verify(mockWizardPresenter).setLoading(true);
 		verify(mockEditor).validate();
-		verify(mockWizardPresenter).setError(ex);
+		verify(mockWizardPresenter).setErrorMessage(error);
 	}
 }
