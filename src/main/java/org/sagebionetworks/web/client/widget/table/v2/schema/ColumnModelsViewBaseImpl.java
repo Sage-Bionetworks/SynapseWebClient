@@ -1,9 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -37,10 +36,11 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 	@UiField
 	Button cancelButton;
 	@UiField
-	Div synapseAlertContainer;
+	Alert alert;
 	Presenter presenter;
 	@UiField
 	SimplePanel jobTrackerWidgetContainer;
+	
 	@Inject
 	public ColumnModelsViewBaseImpl(final Binder uiBinder){
 		initWidget(uiBinder.createAndBindUi(this));
@@ -71,6 +71,7 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 	@Override
 	public void showEditor() {
 		saveButton.state().reset();
+		alert.setVisible(false);
 		editModal.show();
 	}
 
@@ -85,15 +86,18 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 	}
 	
 	@Override
-	public void setSynAlert(IsWidget w) {
-		synapseAlertContainer.clear();
-		synapseAlertContainer.add(w);
-	}
-	@Override
-	public void resetSaveButton() {
+	public void showError(String message) {
+		alert.setText(message);
+		alert.setVisible(true);
+		// enable the save button after an error
 		saveButton.state().reset();
 	}
 
+	@Override
+	public void hideErrors() {
+		alert.clear();
+		alert.setVisible(false);
+	}
 	@Override
 	public void setJobTrackingWidget(IsWidget jobTrackingWidget) {
 		jobTrackerWidgetContainer.clear();
