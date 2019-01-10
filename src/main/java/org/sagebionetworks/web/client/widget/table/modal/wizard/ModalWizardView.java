@@ -39,19 +39,7 @@ public interface ModalWizardView extends IsWidget {
 	 */
 	public void setBody(IsWidget body);
 
-	/**
-	 * Show/hide the error alert.
-	 * 
-	 * @param b
-	 */
-	public void showAlert(boolean visible);
-
-	/**
-	 * Show an error message.
-	 * 
-	 * @param error
-	 */
-	public void showErrorMessage(String error);
+	public void setSynAlert(IsWidget w);
 
 	/**
 	 * Set the instructions message.

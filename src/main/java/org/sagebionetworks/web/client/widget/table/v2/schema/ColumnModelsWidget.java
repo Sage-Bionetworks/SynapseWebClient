@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
@@ -46,7 +47,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	JobTrackingWidget jobTrackingWidget;
 	ViewDefaultColumns fileViewDefaultColumns;
 	TableType tableType;
-	
+	SynapseAlert synAlert;
 	public static final String UPDATING_SCHEMA = "Updating the table schema...";
 	/**
 	 * New presenter with its view.
@@ -58,11 +59,13 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 			SynapseClientAsync synapseClient, 
 			ColumnModelsEditorWidget editor, 
 			JobTrackingWidget jobTrackingWidget,
-			ViewDefaultColumns fileViewDefaultColumns){
+			ViewDefaultColumns fileViewDefaultColumns,
+			SynapseAlert synAlert){
 		this.ginInjector = ginInjector;
 		// we will always have a viewer
 		this.baseView = baseView;
 		this.jobTrackingWidget = jobTrackingWidget;
+		this.synAlert = synAlert;
 		this.baseView.setPresenter(this);
 		// We need two copies of the view, one as an editor, and the other as a viewer.
 		this.viewer = ginInjector.createNewColumnModelsView();
@@ -89,6 +92,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 				getPossibleColumnModelsForViewScope(null);
 			}
 		});
+		baseView.setSynAlert(synAlert);
 	}
 	
 	@Override
@@ -111,14 +115,14 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	}
 
 	public void getDefaultColumnsForView() {
-		baseView.hideErrors();
+		synAlert.clear();
 		boolean isClearIds = true;
 		List<ColumnModel> defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.isIncludeFiles(), isClearIds);
 		editor.addColumns(defaultColumns); 
 	}
 	
 	public void getPossibleColumnModelsForViewScope(String nextPageToken) {
-		baseView.hideErrors();
+		synAlert.clear();
 		ViewScope scope = new ViewScope();
 		scope.setScope(((EntityView)bundle.getEntity()).getScopeIds());
 		Long viewTypeMask = ((EntityView)bundle.getEntity()).getViewTypeMask();
@@ -131,7 +135,8 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		synapseClient.getPossibleColumnModelsForViewScope(scope, nextPageToken, new AsyncCallback<ColumnModelPage>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				baseView.showError(caught.getMessage());
+				synAlert.handleException(caught);
+				baseView.resetSaveButton();
 			}
 			@Override
 			public void onSuccess(ColumnModelPage columnPage) {
@@ -162,10 +167,11 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	public void onSave() {
 		// Save it the data is valid
 		if(!editor.validate()){
-			baseView.showError(SEE_THE_ERROR_S_ABOVE);
+			synAlert.showError(SEE_THE_ERROR_S_ABOVE);
+			baseView.resetSaveButton();
 			return;
 		}else{
-			baseView.hideErrors();
+			synAlert.clear();
 		}
 		// Get the models from the view and save them
 		baseView.setLoading();
@@ -174,7 +180,8 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 
 			@Override
 			public void onFailure(Throwable caught) {
-				baseView.showError(caught.getMessage());
+				synAlert.handleException(caught);
+				baseView.resetSaveButton();
 			}
 			
 			@Override
@@ -200,7 +207,8 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 			@Override
 			public void onFailure(Throwable failure) {
 				baseView.setJobTrackingWidgetVisible(false);
-				baseView.showError(failure.getMessage());
+				synAlert.handleException(failure);
+				baseView.resetSaveButton();
 			}
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {

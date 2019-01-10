@@ -45,15 +45,6 @@ public interface ColumnModelsViewBase extends IsWidget {
 	 */
 	public void setLoading();
 
-	/**
-	 * Show error message.
-	 * @param message
-	 */
-	void showError(String message);
-
-	/**
-	 * Hide the alert.
-	 */
-	public void hideErrors();
-	
+	void setSynAlert(IsWidget w);
+	void resetSaveButton();
 }
