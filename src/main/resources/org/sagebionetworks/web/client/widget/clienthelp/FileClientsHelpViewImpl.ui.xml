@@ -46,7 +46,7 @@
 										synLogin('username','password')<br/>
 										<br/>
 										# Obtain a pointer and download the data<br/>
-										<span ui:field="id5"/> &#60;- synGet(id='<span ui:field="id6"/>'<span ui:field="versionUI3">, version=<span ui:field="version3"/></span>)
+										<span ui:field="id5"/> &#60;- synGet(entity='<span ui:field="id6"/>'<span ui:field="versionUI3">, version=<span ui:field="version3"/></span>)
 									</code>
 								</pre>
 							</g:HTMLPanel>

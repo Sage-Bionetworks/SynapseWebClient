@@ -15,9 +15,9 @@ synapseLogin('username','password')
 
 # Obtain a pointer and download the data
 
-<span ui:field="synid1"/> &#60;- synGet(id='<span ui:field="synid2"/>')
+<span ui:field="synid1"/> &#60;- synGet(entity='<span ui:field="synid2"/>')
 
 # Load the data
-<span ui:field="synid3"/> &#60;- synGet(id='<span ui:field="synid4"/>', load=T)</pre>
+<span ui:field="synid3"/> &#60;- synGet(entity='<span ui:field="synid4"/>', load=T)</pre>
 	</g:HTMLPanel>
 </ui:UiBinder>
