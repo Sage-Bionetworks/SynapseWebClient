@@ -2732,14 +2732,6 @@ div.border {
 		padding: 0 10px 30px 15px;
 		margin-top: -8px;
 	}
-	.facetsWidget-inactive {
-		max-width: 0px;
-		transition: max-width 0.4s ease-in-out;
-	}
-	.facetsWidget-active {
-		max-width: 330px;
-		transition: max-width 0.4s ease-in-out;
-	}
 }
 #rootPanel {
 	summary { color:$synapse-blue; }

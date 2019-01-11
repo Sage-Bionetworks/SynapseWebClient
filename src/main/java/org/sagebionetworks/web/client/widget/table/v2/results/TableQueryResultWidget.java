@@ -5,9 +5,7 @@ import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.D
 import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.DEFAULT_OFFSET;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
@@ -33,9 +31,6 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
-import com.google.gwt.core.shared.GWT;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -82,6 +77,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	int currentJobIndex = 0;
 	QueryResultBundle cachedFullQueryResultBundle = null;
 	FacetsWidget facetsWidget;
+	boolean facetsRequireRefresh;
 	
 	@Inject
 	public TableQueryResultWidget(TableQueryResultView view, 
@@ -130,6 +126,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 				selectedFacets.add(request);
 				cachedFullQueryResultBundle = null;
 				startingQuery.setOffset(0L);
+				facetsRequireRefresh = true;
 				queryChanging();
 			}
 		};
@@ -143,6 +140,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * @param listener Listener for query start and finish events.
 	 */
 	public void configure(Query query, boolean isEditable, TableType tableType, QueryResultsListener listener){
+		facetsRequireRefresh = true;
 		this.isEditable = isEditable;
 		this.tableType = tableType;
 		this.startingQuery = query;
@@ -164,7 +162,11 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		String entityId = QueryBundleUtils.getTableId(this.startingQuery);
 		String viewEtag = clientCache.get(entityId + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY);
 		if (viewEtag == null) {
-			facetsWidget.configure(startingQuery, facetChangedHandler, resetFacetsHandler);
+			if(facetsRequireRefresh) {
+				// no need to update facets if it's just a page change or sort
+				facetsWidget.configure(startingQuery, facetChangedHandler, resetFacetsHandler);
+				facetsRequireRefresh = true;
+			}
 			
 			// run the job
 			QueryBundleRequest qbr = new QueryBundleRequest();
@@ -383,6 +385,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 
 	@Override
 	public void onPageChange(Long newOffset) {
+		facetsRequireRefresh = false;
 		this.startingQuery.setOffset(newOffset);
 		queryChanging();
 	}
@@ -401,6 +404,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 
 	@Override
 	public void onToggleSort(String header) {
+		facetsRequireRefresh = false;
 		SortItem targetSortItem = null;
 		List<SortItem> sortItems = startingQuery.getSort();
 		if (sortItems == null) {

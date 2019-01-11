@@ -19,9 +19,6 @@ import com.google.inject.Inject;
  */
 public class TableQueryResultViewImpl implements TableQueryResultView {
 
-	public static final String ACTIVE_FACET_WIDGET_STYLES = "pull-left-unless-xs margin-right-10 padding-10 facetsWidget-active";
-	public static final String INACTIVE_FACET_WIDGET_STYLES = "pull-left-unless-xs facetsWidget-inactive";
-
 	public interface Binder extends UiBinder<Widget, TableQueryResultViewImpl> {
 	}
 
@@ -46,6 +43,7 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	public TableQueryResultViewImpl(Binder binder, SynapseJSNIUtils jsniUtils) {
 		widget = binder.createAndBindUi(this);
 		this.jsniUtils = jsniUtils;
+		facetsWidgetPanel.addStyleName("pull-left-unless-xs margin-right-10 padding-10");
 	}
 
 	@Override
@@ -100,7 +98,6 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	
 	@Override
 	public void setFacetsVisible(boolean visible) {
-		String styles = visible ? ACTIVE_FACET_WIDGET_STYLES : INACTIVE_FACET_WIDGET_STYLES;
-		facetsWidgetPanel.setStyleName(styles);
+		facetsWidgetPanel.setVisible(visible);
 	}
 }
