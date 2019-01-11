@@ -165,6 +165,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			if(facetsRequireRefresh) {
 				// no need to update facets if it's just a page change or sort
 				facetsWidget.configure(startingQuery, facetChangedHandler, resetFacetsHandler);
+			} else {
+				// facet refresh unnecessary for this query execution, but reset to true for next time. 
 				facetsRequireRefresh = true;
 			}
 			
