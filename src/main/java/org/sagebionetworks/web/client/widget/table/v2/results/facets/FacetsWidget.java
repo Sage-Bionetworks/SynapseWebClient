@@ -57,7 +57,6 @@ public class FacetsWidget implements IsWidget {
 	}
 	
 	public void configure(Query query, CallbackP<FacetColumnRequest> facetChangedHandler, Callback resetFacetsHandler) {
-		this.resetFacetsHandler = resetFacetsHandler;
 		view.clear();
 		AsynchronousProgressWidget progress = ginInjector.creatNewAsynchronousProgressWidget();
 		QueryBundleRequest qbr = new QueryBundleRequest();
@@ -66,7 +65,7 @@ public class FacetsWidget implements IsWidget {
 		qbr.setQuery(query);
 		qbr.setEntityId(QueryBundleUtils.getTableId(query));
 		view.add(progress);
-		progress.startAndTrackJob("Facets", false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
+		progress.startAndTrackJob("", false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
 			@Override
 			public void onFailure(Throwable failure) {
 				view.clear();
@@ -77,9 +76,8 @@ public class FacetsWidget implements IsWidget {
 			
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
-				view.clear();
 				QueryResultBundle resultBundle = (QueryResultBundle) response;
-				configure(resultBundle.getFacets(), facetChangedHandler, resultBundle.getColumnModels());
+				configure(resultBundle.getFacets(), facetChangedHandler, resultBundle.getColumnModels(), resetFacetsHandler);
 			}
 			
 			@Override
@@ -89,7 +87,9 @@ public class FacetsWidget implements IsWidget {
 		});
 	}
 	
-	public void configure(List<FacetColumnResult> facets, CallbackP<FacetColumnRequest> facetChangedHandler, List<ColumnModel> types) {
+	public void configure(List<FacetColumnResult> facets, CallbackP<FacetColumnRequest> facetChangedHandler, List<ColumnModel> types, Callback resetFacetsHandler) {
+		view.clear();
+		this.resetFacetsHandler = resetFacetsHandler;
 		if (facets != null) {
 			Map<String, ColumnModel> columnName2ColumnModel = new HashMap<String, ColumnModel>();
 			for (ColumnModel columnModel : types) {
