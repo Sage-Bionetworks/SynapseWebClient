@@ -5,17 +5,7 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<bh:Div>
-		<bh:Div ui:field="loadingUI" pull="RIGHT" />
-		<bh:ClearFix />
-		<g:ScrollPanel ui:field="facetsWidgetContainer">
-			<bh:Div>
-				<bh:Div ui:field="facetsWidgetPanel"/>
-				<bh:ClearFix />
-				<bh:Div>
-					<b:Button addStyleNames="clearFacetsButton margin-top-20" text="Clear all" size="EXTRA_SMALL" type="DANGER" ui:field="clearFacetsButton" icon="FILTER"/>
-				</bh:Div>
-			</bh:Div>
-		</g:ScrollPanel>
+		<bh:Div ui:field="loadingUI" />
 		<bh:Div ui:field="tablePanel" addStyleNames="tablePage" visible="false">
 			<g:ScrollPanel ui:field="topScrollBar" height="18px" visible="false">
 				<bh:Div ui:field="topScrollDiv" height="18px"/>

@@ -9,7 +9,6 @@ import java.util.Map;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
-import org.sagebionetworks.repo.model.table.FacetColumnResult;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
@@ -24,7 +23,6 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -35,7 +33,7 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSelectionListener {
+public class TablePageWidget implements IsWidget, RowSelectionListener {
 
 	TablePageView view;
 	PortalGinInjector ginInjector;
@@ -46,9 +44,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	KeyboardNavigationHandler keyboardNavigationHandler;
 	String tableId;
 	TableType tableType;
-	FacetsWidget facetsWidget;
-	Callback resetFacetsHandler;
-	boolean facetsVisible;
+	
 	/*
 	 * This flag is used to ignore selection event while this widget is causing selection changes.
 	 */
@@ -57,16 +53,11 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	@Inject
 	public TablePageWidget(TablePageView view, 
 			PortalGinInjector ginInjector, 
-			BasicPaginationWidget paginationWidget, 
-			FacetsWidget facetsWidget){
+			BasicPaginationWidget paginationWidget){
 		this.ginInjector = ginInjector;
 		this.paginationWidget = paginationWidget;
 		this.view = view;
 		this.view.setPaginationWidget(paginationWidget);
-		this.facetsWidget = facetsWidget;
-		view.setFacetsWidget(facetsWidget.asWidget());
-		view.setFacetsVisible(false);
-		view.setPresenter(this);
 	}
 	
 	/**
@@ -84,11 +75,9 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			TableType tableType, 
 			RowSelectionListener rowSelectionListener, 
 			final PagingAndSortingListener pageChangeListener,
-			CallbackP<FacetColumnRequest> facetChangedHandler,
-			Callback resetFacetsHandler){
+			CallbackP<FacetColumnRequest> facetChangedHandler){
 		this.tableType = tableType;
 		this.rowSelectionListener = rowSelectionListener;
-		this.resetFacetsHandler = resetFacetsHandler;
 		view.showLoading();
 		Integer rowCount = bundle.getQueryResult().getQueryResults().getRows().size();
 		// The pagination widget is only visible if a listener was provider
@@ -139,18 +128,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		}else{
 			keyboardNavigationHandler = null;
 		}
-		List<FacetColumnResult> facets = bundle.getFacets();
-		boolean isFacetsSupported = !isEditable && 
-				facetChangedHandler != null && 
-				facets != null && 
-				!facets.isEmpty()
-				&& facetsVisible;
-		facetsWidget.configure(facets, facetChangedHandler, types);
-		if (isFacetsSupported) {
-			setFacetsVisible(facetsWidget.isShowingFacets());
-		} else {
-			setFacetsVisible(false);
-		}
+		
 		view.setTableHeaders(headers);
 		rows = new ArrayList<RowWidget>(rowCount);
 		// Build the rows for this table
@@ -312,18 +290,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		return isValid;
 	}
 	
-	public void setFacetsVisible(boolean visible) {
-		facetsVisible = visible;
-		view.setFacetsVisible(visible);
-	}
-	@Override
-	public void onClearFacets() {
-		if (resetFacetsHandler != null) {
-			resetFacetsHandler.invoke();
-		}
-	}
 	public void setTableVisible(boolean visible) {
 		view.setTableVisible(visible);
-		view.setFacetsVisible(facetsVisible && facetsWidget.isShowingFacets());
 	}
 }

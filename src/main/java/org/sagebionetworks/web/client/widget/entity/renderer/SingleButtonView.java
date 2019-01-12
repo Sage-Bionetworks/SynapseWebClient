@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -58,4 +59,6 @@ public interface SingleButtonView extends IsWidget {
 	void showConfirmDialog(String message, Callback okCallback);
 	void addWidget(Widget widget);
 	void clearWidgets();
+	void addStyleNames(String styles);
+	void setButtonIcon(IconType icon);
 }

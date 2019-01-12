@@ -10,6 +10,8 @@
 			<b:PanelBody>
 				<bh:Div ui:field="scrollTarget"/>
 				<g:SimplePanel ui:field="synapseAlertContainer"/>
+				<bh:ClearFix/>
+				<bh:Div ui:field="facetsWidgetPanel"/>
 				<g:SimplePanel ui:field="progressPanel" />
 				<g:SimplePanel ui:field="tablePanel" />
 				<g:SimplePanel ui:field="rowEditorModalPanel"/>

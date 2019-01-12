@@ -52,6 +52,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.RowSelectionListen
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultView;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -114,7 +115,9 @@ public class TableQueryResultWidgetTest {
 	SelectColumn mockSelectColumn;
 	@Mock
 	QueryResultBundle mockNewPageQueryResultBundle;
-	
+	@Mock
+	FacetsWidget mockFacetsWidget;
+
 	public static final String ENTITY_ID = "syn123";
 	@Before
 	public void before(){
@@ -122,7 +125,7 @@ public class TableQueryResultWidgetTest {
 		when(mockGinInjector.creatNewAsynchronousProgressWidget()).thenReturn(mockJobTrackingWidget, mockJobTrackingWidget2);
 		when(mockGinInjector.createNewTablePageWidget()).thenReturn(mockPageWidget);
 		when(mockGinInjector.createNewQueryResultEditorWidget()).thenReturn(mockQueryResultEditor);
-		widget = new TableQueryResultWidget(mockView, mockSynapseClient, mockGinInjector, mockSynapseAlert, mockClientCache, mockGWT);
+		widget = new TableQueryResultWidget(mockView, mockSynapseClient, mockGinInjector, mockSynapseAlert, mockClientCache, mockGWT, mockFacetsWidget);
 		query = new Query();
 		query.setSql("select * from " + ENTITY_ID);
 		query.setIsConsistent(true);
@@ -165,6 +168,7 @@ public class TableQueryResultWidgetTest {
 		
 		// Make the call that changes it all.
 		widget.configure(query, isEditable, tableType, mockListner);
+		verify(mockFacetsWidget).configure(eq(query), mockFacetChangedHandlerCaptor.capture(), callbackCaptor.capture());
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), qbrCaptor.capture(), asyncProgressHandlerCaptor.capture());
 		
 		AsynchronousProgressHandler progressHandler1 = asyncProgressHandlerCaptor.getValue();
@@ -174,7 +178,7 @@ public class TableQueryResultWidgetTest {
 		AsynchronousProgressHandler progressHandler2 = asyncProgressHandlerCaptor.getValue();
 		// verify invoking a success on the first job is a no-op
 		progressHandler1.onComplete(bundle);
-		verify(mockPageWidget, never()).configure(any(QueryResultBundle.class), any(Query.class), anyList(), anyBoolean(), any(TableType.class), any(RowSelectionListener.class), any(TableQueryResultWidget.class), any(CallbackP.class), any(Callback.class));
+		verify(mockPageWidget, never()).configure(any(QueryResultBundle.class), any(Query.class), anyList(), anyBoolean(), any(TableType.class), any(RowSelectionListener.class), any(TableQueryResultWidget.class), any(CallbackP.class));
 		
 		// invoke a success on the current job, and verify results sent to subwidgets
 		progressHandler2.onComplete(bundle);
@@ -183,7 +187,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView, times(2)).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockPageWidget, times(2)).setTableVisible(false);
-		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(tableType), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture(), callbackCaptor.capture());
+		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(tableType), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture());
 		verify(mockListner, times(2)).queryExecutionStarted();
 		// Shown on success.
 		verify(mockPageWidget).setTableVisible(true);
@@ -213,11 +217,6 @@ public class TableQueryResultWidgetTest {
 		assertEquals(2, query.getSelectedFacets().size());
 		assertTrue(query.getSelectedFacets().contains(mockFacetColumnRequest2));
 		assertTrue(query.getSelectedFacets().contains(mockFacetColumnRequest3));
-		
-		// test reset facets handler
-		Callback resetFacetsHandler = callbackCaptor.getValue();
-		resetFacetsHandler.invoke();
-		assertNull(query.getSelectedFacets());
 	}
 	
 	@Test
@@ -228,7 +227,7 @@ public class TableQueryResultWidgetTest {
 		
 		//verify all parts are initially asked for
 		Long partsMask = qbrCaptor.getValue().getPartMask();
-		Long expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_FACETS;
+		Long expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS;
 		assertEquals(expectedPartsMask, partsMask);
 		
 		//simulate complete table query async job
@@ -281,7 +280,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockPageWidget).setTableVisible(false);
-		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(tableType), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture(), any(Callback.class));
+		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(tableType), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture());
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockPageWidget).setTableVisible(true);
@@ -340,7 +339,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockPageWidget).setTableVisible(false);
-		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(tableType), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture(), any(Callback.class));
+		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(tableType), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture());
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockPageWidget).setTableVisible(true);
@@ -400,7 +399,7 @@ public class TableQueryResultWidgetTest {
 	@Test
 	public void testSetFacetsVisible() {
 		widget.setFacetsVisible(true);
-		verify(mockPageWidget).setFacetsVisible(true);
+		verify(mockView).setFacetsVisible(true);
 	}
 	
 	@Test
