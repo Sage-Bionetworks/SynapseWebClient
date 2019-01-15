@@ -23,9 +23,7 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 	public interface Binder extends UiBinder<Widget, EntityIdCellRendererViewImpl> {}
 	@UiField
 	Span loadingUI;
-	@UiField
 	Tooltip errorField;
-	@UiField
 	Icon errorIcon;
 	@UiField
 	Icon entityIcon;
@@ -59,7 +57,6 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 
 	@Override
 	public void setIcon(IconType iconType) {
-		errorIcon.setVisible(false);
 		loadingUI.setVisible(false);
 		entityIcon.setType(iconType);
 		entityIcon.setVisible(true);
@@ -90,9 +87,16 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 	
 	@Override
 	public void showErrorIcon(String error) {
+		// lazily construct error UI
+		if (errorField == null) {
+			errorIcon = new Icon(IconType.EXCLAMATION_CIRCLE);
+			errorIcon.addStyleName("text-danger");
+			errorIcon.setFixedWidth(true);
+			errorField = new Tooltip(errorIcon);
+			((Span)w).add(errorField);
+		}
 		loadingUI.setVisible(false);
 		entityIcon.setVisible(false);
-		errorIcon.setVisible(true);
 		errorField.setTitle(error);
 		errorField.reconfigure();
 	}
@@ -100,13 +104,11 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 	@Override
 	public void showLoadingIcon() {
 		entityIcon.setVisible(false);
-		errorIcon.setVisible(false);
 		loadingUI.setVisible(true);
 	}
 	@Override
 	public void hideAllIcons() {
 		entityIcon.setVisible(false);
-		errorIcon.setVisible(false);
 		loadingUI.setVisible(false);
 	}
 	

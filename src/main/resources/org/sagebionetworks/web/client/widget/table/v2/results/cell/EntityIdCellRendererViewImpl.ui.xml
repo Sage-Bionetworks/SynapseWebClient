@@ -7,9 +7,6 @@
 
 	<bh:Span>
 		<bh:Span ui:field="loadingUI" visible="false" > Loading...</bh:Span>
-		<b:Tooltip ui:field="errorField">
-		  <b:Icon  ui:field="errorIcon" visible="false" fixedWidth="true" type="EXCLAMATION_CIRCLE" addStyleNames="text-danger"/>
-		</b:Tooltip>
 		<b:Icon ui:field="entityIcon" visible="false" fixedWidth="true" type="ASTERISK"/>
 		<b:Anchor ui:field="entityLink" target="_blank"/>
 	</bh:Span>
