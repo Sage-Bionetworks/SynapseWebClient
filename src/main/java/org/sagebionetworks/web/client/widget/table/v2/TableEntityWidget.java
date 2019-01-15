@@ -59,8 +59,8 @@ public class TableEntityWidget implements IsWidget,
 	public static final long DEFAULT_LIMIT = 25;
 	public static final int MAX_SORT_COLUMNS = 3;
 	// Look for: 
-	// beginning of the line, any character, whitespace, "from", whitespace, "syn<number>", optional "dot notation", whitespace, end of line.
-	public static final RegExp SIMPLE_QUERY_REGEX = RegExp.compile("^.*(\\s+from\\s+syn([0-9]+[.]?[0-9]*)+)\\s*$", "i");
+	// beginning of the line, any character, whitespace, "from", whitespace, "syn<number>", optional "dot notation", optional whitespace, optional order by statement, end of line.
+	public static final RegExp SIMPLE_QUERY_REGEX = RegExp.compile("^.*(\\s+from\\s+syn([0-9]+[.]?[0-9]*)+)\\s*(order by .*)?$", "i");
 
 	DownloadTableQueryModalWidget downloadTableQueryModalWidget;
 	UploadTableModalWidget uploadTableModalWidget;
