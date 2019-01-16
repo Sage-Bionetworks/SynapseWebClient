@@ -263,21 +263,22 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		}
 	}
 	
+	private void onWikiPageKeyChange(WikiPageKey newKey) {
+		view.setLoadingVisible(true);
+		markdownWidget.clear();
+		view.setWikiHeadingText("");
+		
+		wikiKey = newKey;
+		reloadWikiPage();
+		if (wikiReloadHandler != null) {
+			wikiReloadHandler.invoke(wikiKey.getWikiPageId());
+		}
+	}
 	public void configureWikiSubpagesWidget(ActionMenuWidget actionMenu) {
 		//check configuration of wikiKey
-		wikiSubpages.configure(wikiKey, true, new CallbackP<WikiPageKey>() {
-			@Override
-			public void invoke(WikiPageKey param) {
-				view.setLoadingVisible(true);
-				markdownWidget.clear();
-				view.setWikiHeadingText("");
-				
-				wikiKey = param;
-				reloadWikiPage();
-				if (wikiReloadHandler != null) {
-					wikiReloadHandler.invoke(wikiKey.getWikiPageId());
-				}
-			}}, actionMenu);
+		wikiSubpages.configure(wikiKey, true, newKey -> {
+			onWikiPageKeyChange(newKey);
+		}, actionMenu);
 		view.setWikiSubpagesWidget(wikiSubpages);
 	}
 	
@@ -312,7 +313,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		view.setMainPanelVisible(true);
 		configure(wikiKey, canEdit, callback);
 	}
-
+	
 	@Override
 	public void showPreview(final Long versionToPreview, Long currentVersion) {
 		isCurrentVersion = versionToPreview.equals(currentVersion);
@@ -367,8 +368,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		synapseClient.restoreV2WikiPage(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), wikiKey.getWikiPageId(), versionInView, new AsyncCallback<V2WikiPage>() {
 			@Override
 			public void onSuccess(V2WikiPage result) {
-				refresh();
-				view.setDiffVersionAlertVisible(false);
+				onWikiPageKeyChange(wikiKey);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
