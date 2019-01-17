@@ -11,12 +11,12 @@ import com.google.gwt.event.dom.client.MouseOverHandler;
  * @author John
  *
  */
-public class StringRendererCellImpl extends Paragraph implements StringRendererCell {
+public class StringRendererCellViewImpl extends Paragraph implements StringRendererCellView {
 	public static final MouseOverHandler STRING_RENDERER_MOUSE_OVER_HANDLER = event -> {
-		StringRendererCellImpl src = (StringRendererCellImpl)event.getSource();
+		StringRendererCellViewImpl src = (StringRendererCellViewImpl)event.getSource();
 		src.removeStyleName("max-height-100 overflowHidden");
 	};
-	public StringRendererCellImpl(){
+	public StringRendererCellViewImpl(){
 		super();
 		addStyleName("max-height-100 overflowHidden");
 		addDomHandler(STRING_RENDERER_MOUSE_OVER_HANDLER, MouseOverEvent.getType());

@@ -16,7 +16,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -25,7 +25,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class EntityIdCellRendererImplTest {
 
-	EntityIdCellRendererImpl renderer;
+	EntityIdCellRenderer renderer;
 	@Mock
 	EntityIdCellRendererView mockView;
 	@Mock
@@ -41,7 +41,7 @@ public class EntityIdCellRendererImplTest {
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		renderer = new EntityIdCellRendererImpl(mockView, mockEntityHeaderAsyncHandler, mockJSNIUtils);
+		renderer = new EntityIdCellRenderer(mockView, mockEntityHeaderAsyncHandler, mockJSNIUtils);
 		AsyncMockStubber.callSuccessWith(mockProjectHeader).when(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
 		when(mockProjectHeader.getName()).thenReturn(PROJECT_NAME);
 	}

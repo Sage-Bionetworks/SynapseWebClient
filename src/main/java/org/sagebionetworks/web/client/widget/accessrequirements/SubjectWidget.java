@@ -4,7 +4,7 @@ import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -30,7 +30,7 @@ public class SubjectWidget implements SubjectWidgetView.Presenter, IsWidget {
 		this.rod = rod;
 		this.deletedCallback = deletedCallback;
 		if (rod.getType().equals(RestrictableObjectType.ENTITY)) {
-			EntityIdCellRendererImpl entityRenderer = (EntityIdCellRendererImpl)ginInjector.createEntityIdCellRenderer();
+			EntityIdCellRenderer entityRenderer = (EntityIdCellRenderer)ginInjector.createEntityIdCellRenderer();
 			entityRenderer.setValue(rod.getId(), false);
 			view.setSubjectRendererWidget(entityRenderer);
 		} else if (rod.getType().equals(RestrictableObjectType.TEAM)) {

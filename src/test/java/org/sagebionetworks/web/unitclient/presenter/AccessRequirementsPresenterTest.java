@@ -40,7 +40,7 @@ import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -60,7 +60,7 @@ public class AccessRequirementsPresenterTest {
 	@Mock
 	PortalGinInjector mockGinInjector;
 	@Mock
-	EntityIdCellRendererImpl mockEntityIdCellRenderer;
+	EntityIdCellRenderer mockEntityIdCellRenderer;
 	@Mock
 	TeamBadge mockTeamBadge;
 	

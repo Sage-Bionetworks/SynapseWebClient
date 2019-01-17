@@ -1,9 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -27,12 +32,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.TakesAddressCell;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 import org.sagebionetworks.web.shared.table.CellAddress;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * Unit tests for RowWidget business logic.
@@ -42,8 +43,11 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public class RowWidgetTest {
 	
+	@Mock
 	RowView mockView;
+	@Mock
 	CellFactory mockCellFactory;
+	@Mock
 	RowSelectionListener mockListner;
 	RowWidget rowWidget;
 	List<ColumnModel> types;
@@ -58,9 +62,6 @@ public class RowWidgetTest {
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		mockView = Mockito.mock(RowView.class);
-		mockCellFactory = Mockito.mock(CellFactory.class);
-		mockListner = Mockito.mock(RowSelectionListener.class);
 		cellStubs = new LinkedList<CellStub>();
 		tableId = "syn123";
 		// Use stubs for all cells.

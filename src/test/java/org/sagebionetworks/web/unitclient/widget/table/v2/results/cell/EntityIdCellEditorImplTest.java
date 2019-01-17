@@ -9,22 +9,22 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorView;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 
 public class EntityIdCellEditorImplTest {
 
 	CellEditorView mockView;
-	EntityIdCellEditorImpl editor;
+	EntityIdCellEditor editor;
 	
 	@Before
 	public void before(){
 		mockView = Mockito.mock(CellEditorView.class);
-		editor = new EntityIdCellEditorImpl(mockView);
+		editor = new EntityIdCellEditor(mockView);
 	}
 	
 	@Test
 	public void testPlaceHolder(){
-		verify(mockView).setPlaceholder(EntityIdCellEditorImpl.PLACE_HOLDER);
+		verify(mockView).setPlaceholder(EntityIdCellEditor.PLACE_HOLDER);
 	}
 	
 	@Test
@@ -32,7 +32,7 @@ public class EntityIdCellEditorImplTest {
 		when(mockView.getValue()).thenReturn("some junk");
 		assertFalse(editor.isValid());
 		verify(mockView).setValidationState(ValidationState.ERROR);
-		verify(mockView).setHelpText(EntityIdCellEditorImpl.MUST_BE_OF_THE_FORM_SYN123);
+		verify(mockView).setHelpText(EntityIdCellEditor.MUST_BE_OF_THE_FORM_SYN123);
 	}
 	
 	@Test

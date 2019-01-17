@@ -21,7 +21,7 @@ import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -41,7 +41,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	public static Long LIMIT = 30L;
 	Long currentOffset;
 	RestrictableObjectDescriptor subject;
-	EntityIdCellRendererImpl entityIdRenderer; 
+	EntityIdCellRenderer entityIdRenderer; 
 	TeamBadge teamBadge;
 	List<AccessRequirement> allArs;
 	CreateAccessRequirementButton createAccessRequirementButton;
@@ -55,7 +55,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 			DataAccessClientAsync dataAccessClient,
 			SynapseAlert synAlert,
 			PortalGinInjector ginInjector,
-			EntityIdCellRendererImpl entityIdRenderer, 
+			EntityIdCellRenderer entityIdRenderer, 
 			TeamBadge teamBadge,
 			CreateAccessRequirementButton createAccessRequirementButton,
 			DivView noResultsDiv,

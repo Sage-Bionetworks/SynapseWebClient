@@ -4,7 +4,7 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -34,7 +34,7 @@ public class LinkConfigViewImpl implements LinkConfigView {
 	@Override
 	public void checkParams() throws IllegalArgumentException {
 		String url = urlField.getValue();
-		if (!(ValidationUtils.isValidUrl(url, false) || EntityIdCellEditorImpl.SYN_PATTERN.test(url)))
+		if (!(ValidationUtils.isValidUrl(url, false) || EntityIdCellEditor.SYN_PATTERN.test(url)))
 			throw new IllegalArgumentException("Invalid URL or Synapse ID: " + urlField.getValue());
 		if (!ValidationUtils.isValidWidgetName(nameField.getValue()))
 			throw new IllegalArgumentException("Invalid name: " + nameField.getValue());

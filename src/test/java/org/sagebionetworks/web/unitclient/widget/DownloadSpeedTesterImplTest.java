@@ -28,7 +28,7 @@ import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.FileHandleWidgetView;
 import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.PresignedAndFileHandleURLAsyncHandler;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRenderer;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.table.CellAddress;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;

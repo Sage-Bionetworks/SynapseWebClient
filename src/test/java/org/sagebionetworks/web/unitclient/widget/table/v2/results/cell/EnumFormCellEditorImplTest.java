@@ -11,20 +11,20 @@ import javax.annotation.meta.When;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditorImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEdtiorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.RadioCellEditorView;
 
 public class EnumFormCellEditorImplTest {
 	
 	RadioCellEditorView mockView;
-	EnumFormCellEditorImpl editor;
+	EnumFormCellEditor editor;
 	
 	@Before
 	public void before(){
 		mockView = Mockito.mock(RadioCellEditorView.class);
-		editor = new EnumFormCellEditorImpl(mockView);
+		editor = new EnumFormCellEditor(mockView);
 	}
 
 	@Test
