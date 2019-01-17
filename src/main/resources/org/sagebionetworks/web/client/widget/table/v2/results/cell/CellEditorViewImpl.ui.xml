@@ -4,8 +4,8 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
-	<b:FormGroup ui:field="formGroup">
+	<b:FormGroup ui:field="formGroup" addStyleNames="margin-bottom-0-imp">
 		<b:TextBox ui:field="textBox"/>
-		<b:HelpBlock ui:field="helpBlock"/>
+		<b:HelpBlock ui:field="helpBlock" visible="false"/>
 	</b:FormGroup>
 </ui:UiBinder>

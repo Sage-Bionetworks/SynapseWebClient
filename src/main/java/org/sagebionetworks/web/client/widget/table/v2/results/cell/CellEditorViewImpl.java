@@ -106,6 +106,7 @@ public class CellEditorViewImpl implements CellEditorView {
 
 	@Override
 	public void setHelpText(String help) {
+		helpBlock.setVisible(help != null && !help.trim().isEmpty());
 		this.helpBlock.setText(help);
 	}
 
