@@ -2,29 +2,29 @@ package org.sagebionetworks.web.unitclient.widget.table.v2.results.cell;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-import static org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditorImpl.FALSE;
-import static org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditorImpl.NOTHING_SELECTED;
-import static org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditorImpl.TRUE;
+import static org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor.FALSE;
+import static org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor.NOTHING_SELECTED;
+import static org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor.TRUE;
 
 import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditorImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanFormCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanFormCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEdtiorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.RadioCellEditorView;
 
 public class BooleanFormCellEditorTest {
 
 	RadioCellEditorView mockView;
-	BooleanFormCellEditorImpl editor;
+	BooleanFormCellEditor editor;
 	
 	@Before
 	public void before(){
 		mockView = Mockito.mock(RadioCellEditorView.class);
-		editor = new BooleanFormCellEditorImpl(mockView);
+		editor = new BooleanFormCellEditor(mockView);
 	}
 
 	@Test

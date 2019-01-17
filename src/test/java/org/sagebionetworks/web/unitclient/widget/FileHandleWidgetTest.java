@@ -19,7 +19,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.FileHandleWidgetView;
 import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandler;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRenderer;
 import org.sagebionetworks.web.shared.table.CellAddress;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -75,7 +75,7 @@ public class FileHandleWidgetTest {
 		InOrder order = Mockito.inOrder(mockView);
 		order.verify(mockView).setLoadingVisible(true);
 		order.verify(mockView).setLoadingVisible(false);
-		verify(mockView).setErrorText(FileCellRendererImpl.UNABLE_TO_LOAD_FILE_DATA + ": " + FileResultFailureCode.UNAUTHORIZED.toString());
+		verify(mockView).setErrorText(FileCellRenderer.UNABLE_TO_LOAD_FILE_DATA + ": " + FileResultFailureCode.UNAUTHORIZED.toString());
 	}
 	
 	@Test
@@ -99,7 +99,7 @@ public class FileHandleWidgetTest {
 		InOrder order = Mockito.inOrder(mockView);
 		order.verify(mockView).setLoadingVisible(true);
 		order.verify(mockView).setLoadingVisible(false);
-		verify(mockView).setErrorText(FileCellRendererImpl.UNABLE_TO_LOAD_FILE_DATA + ": " + errorMessage);
+		verify(mockView).setErrorText(FileCellRenderer.UNABLE_TO_LOAD_FILE_DATA + ": " + errorMessage);
 	}
 	
 	@Test

@@ -5,6 +5,6 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
  * @author John
  *
  */
-public interface StringRendererCell extends Cell{
+public interface StringRendererCellView extends Cell{
 
 }

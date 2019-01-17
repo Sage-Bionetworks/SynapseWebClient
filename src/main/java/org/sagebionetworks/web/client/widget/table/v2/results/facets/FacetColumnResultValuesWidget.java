@@ -12,8 +12,8 @@ import org.sagebionetworks.repo.model.table.FacetColumnResultValues;
 import org.sagebionetworks.repo.model.table.FacetColumnValuesRequest;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRendererImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRenderer;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -98,13 +98,13 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 	}
 	
 	public Widget getUserBadge(String userId) {
-		UserIdCellRendererImpl userBadge = ginInjector.getUserIdCellRenderer();
+		UserIdCellRenderer userBadge = ginInjector.getUserIdCellRenderer();
 		userBadge.setValue(userId, doNothingClickHandler);
 		return userBadge.asWidget();
 	}
 	
 	public Widget getEntityBadge(String entityId) {
-		EntityIdCellRendererImpl entityBadge = ginInjector.getEntityIdCellRenderer();
+		EntityIdCellRenderer entityBadge = ginInjector.getEntityIdCellRenderer();
 		boolean hideIfLoadError = true;
 		entityBadge.setValue(entityId, doNothingClickHandler, hideIfLoadError);
 		return entityBadge.asWidget();

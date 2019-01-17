@@ -18,7 +18,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -165,7 +165,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		} else {
 			//is inherited
 			div.add(new Span("The sharing settings shown below are currently being inherited from&nbsp;"));
-			EntityIdCellRendererImpl entityRenderer = ginInjector.getEntityIdCellRenderer();
+			EntityIdCellRenderer entityRenderer = ginInjector.getEntityIdCellRenderer();
 			ClickHandler customClickHandler = event -> {
 				DisplayUtils.newWindow("#!Synapse:" + aclEntityId, "", "");
 			};

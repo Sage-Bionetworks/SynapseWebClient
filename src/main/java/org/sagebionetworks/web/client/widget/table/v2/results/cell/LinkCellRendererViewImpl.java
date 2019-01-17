@@ -4,7 +4,7 @@ import org.gwtbootstrap3.client.ui.Anchor;
 
 import com.google.gwt.user.client.ui.Widget;
 
-public class LinkCellRendererImpl extends Anchor implements LinkCellRenderer {
+public class LinkCellRendererViewImpl extends Anchor implements LinkCellRendererView {
 
 	@Override
 	public Widget asWidget() {

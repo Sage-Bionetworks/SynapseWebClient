@@ -25,7 +25,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.TableFileHandleRequest;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererView;
 import org.sagebionetworks.web.shared.table.CellAddress;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -37,7 +37,7 @@ public class FileCellRendererImplTest {
 	FileCellRendererView mockView;
 	@Mock
 	FileHandleAsyncHandler mockFileHandleAsyncHandler;
-	FileCellRendererImpl renderer;
+	FileCellRenderer renderer;
 	String tableId;
 	ColumnModel column;
 	Long rowId; 
@@ -57,7 +57,7 @@ public class FileCellRendererImplTest {
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 		mockView = Mockito.mock(FileCellRendererView.class);
-		renderer = new FileCellRendererImpl(mockView, mockAuthController, mockFileHandleAsyncHandler);
+		renderer = new FileCellRenderer(mockView, mockAuthController, mockFileHandleAsyncHandler);
 		tableId = "syn123";
 		column = new ColumnModel();
 		column.setId("456");
@@ -101,7 +101,7 @@ public class FileCellRendererImplTest {
 		renderer.setValue(fileHandleId);
 		verify(mockFileHandleAsyncHandler, never()).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		verify(mockView).setLoadingVisible(false);
-		verify(mockView).setErrorText(FileCellRendererImpl.FILE_SYNAPSE_ID_UNAVAILABLE);
+		verify(mockView).setErrorText(FileCellRenderer.FILE_SYNAPSE_ID_UNAVAILABLE);
 	}
 	
 	@Test
@@ -125,7 +125,7 @@ public class FileCellRendererImplTest {
 		verify(mockView).setLoadingVisible(true);
 		// hide loading
 		verify(mockView).setLoadingVisible(false);
-		verify(mockView).setErrorText(FileCellRendererImpl.UNABLE_TO_LOAD_FILE_DATA + ": " + FileResultFailureCode.UNAUTHORIZED.toString());
+		verify(mockView).setErrorText(FileCellRenderer.UNABLE_TO_LOAD_FILE_DATA + ": " + FileResultFailureCode.UNAUTHORIZED.toString());
 	}
 
 	@Test
@@ -154,7 +154,7 @@ public class FileCellRendererImplTest {
 		verify(mockView).setLoadingVisible(true);
 		// hide loading
 		verify(mockView).setLoadingVisible(false);
-		verify(mockView).setErrorText(FileCellRendererImpl.UNABLE_TO_LOAD_FILE_DATA + ": " + errorMessage);
+		verify(mockView).setErrorText(FileCellRenderer.UNABLE_TO_LOAD_FILE_DATA + ": " + errorMessage);
 	}
 	
 	@Test

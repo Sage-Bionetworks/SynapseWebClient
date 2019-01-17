@@ -13,7 +13,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectWidgetView;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 
 public class SubjectWidgetTest {
@@ -25,7 +25,7 @@ public class SubjectWidgetTest {
 	PortalGinInjector mockGinInjector;
 	
 	@Mock
-	EntityIdCellRendererImpl mockEntityIdCellRendererImpl;
+	EntityIdCellRenderer mockEntityIdCellRendererImpl;
 	@Mock
 	TeamBadge mockTeamBadge;
 	@Mock

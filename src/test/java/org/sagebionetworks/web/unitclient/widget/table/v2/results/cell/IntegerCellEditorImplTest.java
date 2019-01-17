@@ -10,18 +10,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorView;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.NumberCellEditorView;
 
 public class IntegerCellEditorImplTest {
 
 	NumberCellEditorView mockView;
-	IntegerCellEditorImpl editor;
+	IntegerCellEditor editor;
 	
 	@Before
 	public void before(){
 		mockView = Mockito.mock(NumberCellEditorView.class);
-		editor = new IntegerCellEditorImpl(mockView);
+		editor = new IntegerCellEditor(mockView);
 	}
 	
 	@Test
@@ -42,7 +42,7 @@ public class IntegerCellEditorImplTest {
 		when(mockView.getValue()).thenReturn("some junk");
 		assertFalse(editor.isValid());
 		verify(mockView).setValidationState(ValidationState.ERROR);
-		verify(mockView).setHelpText(IntegerCellEditorImpl.VALUE_MUST_BE_AN_INTEGER);
+		verify(mockView).setHelpText(IntegerCellEditor.VALUE_MUST_BE_AN_INTEGER);
 	}
 	
 	@Test

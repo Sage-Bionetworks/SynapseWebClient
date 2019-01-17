@@ -215,18 +215,16 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRende
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditor;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRenderer;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeWidget;
@@ -430,7 +428,7 @@ public interface PortalGinInjector extends Ginjector {
 	QueryResultEditorWidget createNewQueryResultEditorWidget();
 	
 	// TableEntity V2 cells
-	StringRendererCell createStringRendererCell();
+	StringRendererCellView createStringRendererCellView();
 	StringEditorCell createStringEditorCell();
 	EntityIdCellEditor createEntityIdCellEditor();
 	EntityIdCellRenderer createEntityIdCellRenderer();
@@ -442,7 +440,7 @@ public interface PortalGinInjector extends Ginjector {
 	DateCellRenderer createDateCellRenderer();
 	DoubleCellEditor createDoubleCellEditor();
 	IntegerCellEditor createIntegerCellEditor();
-	LinkCellRenderer createLinkCellRenderer();
+	LinkCellRendererView createLinkCellRenderer();
 	FileCellEditor createFileCellEditor();
 	FileCellRenderer createFileCellRenderer();
 	UserIdCellRenderer createUserIdCellRenderer();
@@ -545,8 +543,8 @@ public interface PortalGinInjector extends Ginjector {
 	CreateOrUpdateDoiModal getCreateOrUpdateDoiModal();
 	ApproveUserAccessModal getApproveUserAccessModal();
 	ChallengeClientAsync getChallengeClientAsync();
-	EntityIdCellRendererImpl getEntityIdCellRenderer();
-	UserIdCellRendererImpl getUserIdCellRenderer();
+	EntityIdCellRenderer getEntityIdCellRenderer();
+	UserIdCellRenderer getUserIdCellRenderer();
 
 	CreateDataAccessRequestWizard getCreateDataAccessRequestWizard();
 	ManagedACTAccessRequirementWidget getManagedACTAccessRequirementWidget();

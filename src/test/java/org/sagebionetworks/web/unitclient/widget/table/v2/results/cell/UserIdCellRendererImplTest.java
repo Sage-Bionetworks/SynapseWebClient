@@ -16,7 +16,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.asynch.UserGroupHeaderAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRendererImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRenderer;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -35,7 +35,7 @@ public class UserIdCellRendererImplTest {
 	@Mock
 	ClickHandler mockCustomClickHandler;
 	
-	UserIdCellRendererImpl renderer;
+	UserIdCellRenderer renderer;
 	@Mock
 	UserBadge mockUserBadge;
 	@Mock
@@ -49,7 +49,7 @@ public class UserIdCellRendererImplTest {
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		renderer = new UserIdCellRendererImpl(mockView, mockUserGroupHeaderAsyncHandler, mockGinInjector);
+		renderer = new UserIdCellRenderer(mockView, mockUserGroupHeaderAsyncHandler, mockGinInjector);
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		when(mockGinInjector.getTeamBadgeWidget()).thenReturn(mockTeamBadge);
 		when(mockGinInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);

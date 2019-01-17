@@ -28,8 +28,8 @@ import org.sagebionetworks.repo.model.table.FacetColumnResultValues;
 import org.sagebionetworks.repo.model.table.FacetColumnValuesRequest;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRendererImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesView;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -55,10 +55,10 @@ public class FacetColumnResultValuesWidgetTest {
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
 	@Mock
-	UserIdCellRendererImpl mockUserBadge;
+	UserIdCellRenderer mockUserBadge;
 	
 	@Mock
-	EntityIdCellRendererImpl mockEntityIdCellRenderer;
+	EntityIdCellRenderer mockEntityIdCellRenderer;
 	public static final String VALUE = "column value";
 	public static final Long DEFAULT_COUNT = 60L;
 	public static final boolean DEFAULT_SELECTED = false;

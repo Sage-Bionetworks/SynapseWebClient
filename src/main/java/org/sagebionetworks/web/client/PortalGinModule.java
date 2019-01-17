@@ -634,60 +634,28 @@ import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultVi
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidgetView;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditorImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanFormCellEditor;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanFormCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactoryImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditor;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditorViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRenderer;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRendererImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditorImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditorImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditorImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellEditor;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellEditorImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRenderer;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditor;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditorImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRenderer;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEdtiorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.NumberCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.NumberCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.RadioCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.RadioCellEditorViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCellImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditor;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRenderer;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesView;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorView;
@@ -1114,7 +1082,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TablePageView.class).to(TablePageViewImpl.class);
 		bind(TableQueryResultView.class).to(TableQueryResultViewImpl.class);
 		bind(QueryResultEditorView.class).to(QueryResultEditorViewImpl.class);
-		bind(CellFactory.class).to(CellFactoryImpl.class);
 		bind(QueryInputView.class).to(QueryInputViewImpl.class);
 		bind(JobTrackingWidget.class).to(AsynchronousProgressWidget.class);
 		bind(UploadTableModalWidget.class).to(UploadTableModalWidgetImpl.class);
@@ -1146,29 +1113,16 @@ public class PortalGinModule extends AbstractGinModule {
 		/*
 		 * TableEntity cell bindings.
 		 */
+		bind(LinkCellRendererView.class).to(LinkCellRendererViewImpl.class);
+		bind(StringRendererCellView.class).to(StringRendererCellViewImpl.class);
 		bind(CellEditorView.class).to(CellEditorViewImpl.class);
 		bind(NumberCellEditorView.class).to(NumberCellEditorViewImpl.class);
-		bind(StringEditorCell.class).to(StringEditorCellImpl.class);
-		bind(StringRendererCell.class).to(StringRendererCellImpl.class);
-		bind(EntityIdCellEditor.class).to(EntityIdCellEditorImpl.class);
-		bind(EntityIdCellRenderer.class).to(EntityIdCellRendererImpl.class);
-		bind(EnumCellEditor.class).to(EnumCellEditorImpl.class);
 		bind(ListCellEdtiorView.class).to(ListCellEditorViewImpl.class);
-		bind(BooleanCellEditor.class).to(BooleanCellEditorImpl.class);
 		bind(DateCellEditorView.class).to(DateCellEditorViewImpl.class);
 		bind(UserIdCellEditorView.class).to(UserIdCellEditorViewImpl.class);
-		bind(DateCellEditor.class).to(DateCellEditorImpl.class);
-		bind(UserIdCellEditor.class).to(UserIdCellEditorImpl.class);
-		bind(DateCellRenderer.class).to(DateCellRendererImpl.class);
-		bind(DoubleCellEditor.class).to(DoubleCellEditorImpl.class);
-		bind(IntegerCellEditor.class).to(IntegerCellEditorImpl.class);
-		bind(LinkCellRenderer.class).to(LinkCellRendererImpl.class);
 		bind(FileCellEditorView.class).to(FileCellEditorViewImpl.class);
-		bind(FileCellEditor.class).to(FileCellEditorImpl.class);
-		bind(FileCellRenderer.class).to(FileCellRendererImpl.class);
 		bind(FileCellRendererView.class).to(FileCellRendererViewImpl.class);
 		bind(EntityIdCellRendererView.class).to(EntityIdCellRendererViewImpl.class);
-		bind(UserIdCellRenderer.class).to(UserIdCellRendererImpl.class);
 		
 		/*
 		 * Teams Places
@@ -1317,8 +1271,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SynapseTableFormWidgetView.class).to(SynapseTableFormWidgetViewImpl.class);
 		bind(RowFormView.class).to(RowFormViewImpl.class);
 		bind(RadioCellEditorView.class).to(RadioCellEditorViewImpl.class);
-		bind(BooleanFormCellEditor.class).to(BooleanFormCellEditorImpl.class);
-		bind(EnumFormCellEditor.class).to(EnumFormCellEditorImpl.class);
 		
 		bind(MarkdownIt.class).to(MarkdownItImpl.class);
 		bind(SubscriptionView.class).to(SubscriptionViewImpl.class);

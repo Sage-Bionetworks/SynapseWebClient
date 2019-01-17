@@ -9,18 +9,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorView;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.NumberCellEditorView;
 
 public class DoubleCellEditorImplTest {
 
 	NumberCellEditorView mockView;
-	DoubleCellEditorImpl editor;
+	DoubleCellEditor editor;
 	
 	@Before
 	public void before(){
 		mockView = Mockito.mock(NumberCellEditorView.class);
-		editor = new DoubleCellEditorImpl(mockView);
+		editor = new DoubleCellEditor(mockView);
 	}
 	
 	@Test
@@ -41,7 +41,7 @@ public class DoubleCellEditorImplTest {
 		when(mockView.getValue()).thenReturn("some junk");
 		assertFalse(editor.isValid());
 		verify(mockView).setValidationState(ValidationState.ERROR);
-		verify(mockView).setHelpText(DoubleCellEditorImpl.VALUE_MUST_BE_A_DOUBLE);
+		verify(mockView).setHelpText(DoubleCellEditor.VALUE_MUST_BE_A_DOUBLE);
 	}
 	
 	@Test

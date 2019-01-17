@@ -13,11 +13,11 @@ import static org.mockito.Mockito.*;
 
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditorView;
 
 public class DateCellEditorImplTest {
-	DateCellEditorImpl editor;
+	DateCellEditor editor;
 	@Mock
 	DateCellEditorView mockView;
 	@Mock
@@ -26,7 +26,7 @@ public class DateCellEditorImplTest {
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 		when(mockGlobalApplicationState.isShowingUTCTime()).thenReturn(false);
-		editor = new DateCellEditorImpl(mockView,mockGlobalApplicationState);
+		editor = new DateCellEditor(mockView,mockGlobalApplicationState);
 	}
 	
 	@Test

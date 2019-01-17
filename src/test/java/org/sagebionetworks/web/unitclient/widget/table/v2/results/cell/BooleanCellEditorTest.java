@@ -2,27 +2,27 @@ package org.sagebionetworks.web.unitclient.widget.table.v2.results.cell;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-import static org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditorImpl.FALSE;
-import static org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditorImpl.NOTHING_SELECTED;
-import static org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditorImpl.TRUE;
+import static org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor.FALSE;
+import static org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor.NOTHING_SELECTED;
+import static org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor.TRUE;
 
 import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEdtiorView;
 
 public class BooleanCellEditorTest {
 
 	ListCellEdtiorView mockView;
-	BooleanCellEditorImpl editor;
+	BooleanCellEditor editor;
 	
 	@Before
 	public void before(){
 		mockView = Mockito.mock(ListCellEdtiorView.class);
-		editor = new BooleanCellEditorImpl(mockView);
+		editor = new BooleanCellEditor(mockView);
 	}
 
 	@Test

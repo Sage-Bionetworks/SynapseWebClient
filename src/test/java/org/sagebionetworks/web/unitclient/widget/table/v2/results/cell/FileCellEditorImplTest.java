@@ -14,7 +14,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.table.modal.upload.ContentTypeDelimiter;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorView;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
@@ -25,7 +25,7 @@ public class FileCellEditorImplTest {
 	FileCellEditorView mockView;
 	@Mock
 	FileHandleUploadWidget mockFileInputWidget;
-	FileCellEditorImpl editor;
+	FileCellEditor editor;
 	@Mock
 	FileUpload mockFileUpload;
 	FileMetadata[] fileMetadata;
@@ -41,7 +41,7 @@ public class FileCellEditorImplTest {
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		editor = new FileCellEditorImpl(mockView, mockGinInjector);
+		editor = new FileCellEditor(mockView, mockGinInjector);
 		when(mockGinInjector.getFileHandleUploadWidget()).thenReturn(mockFileInputWidget);
 		fileMetadata = new FileMetadata[]{new FileMetadata(testFileName, ContentTypeDelimiter.TEXT.getContentType(), fileSize)};
 		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(fileMetadata);
