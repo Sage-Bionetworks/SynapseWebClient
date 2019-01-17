@@ -185,11 +185,12 @@ end sticky footer
 	input[type="checkbox"]:checked + label::before, input[type="checkbox"]:checked + span::before {
 		content: "✓";
 		color: $synapse-blue;
-		text-align: center;
-		font-size: 20px;
+		font-size: 14px;
 		margin-left: -19px;
-		vertical-align: bottom;
-		margin-right: 4px;
+		top: 1px;
+		position: relative;
+		margin-right: 8px;
+		font-weight: bolder;
 	}
 	.radio input[type="radio"]:checked + label::before, .radio input[type="radio"]:checked + span::before,
 	.radio-inline input[type="radio"]:checked + label::before, .radio-inline input[type="radio"]:checked + span::before {
