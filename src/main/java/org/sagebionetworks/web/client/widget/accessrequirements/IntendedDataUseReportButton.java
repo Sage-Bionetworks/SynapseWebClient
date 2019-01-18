@@ -2,14 +2,12 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
@@ -19,7 +17,6 @@ import org.sagebionetworks.repo.model.dataaccess.SubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PopupUtilsView;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
@@ -31,10 +28,11 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class IntendedDataUseReportButton implements IsWidget {
+	public static final String IDU_MODAL_FIELD_NAME = "Markdown";
+	public static final String IDU_MODAL_TITLE = "Approved Intended Data Use Statements";
 	public static final String GENERATE_REPORT_BUTTON_TEXT = "Generate IDU Report";
 	public Button button;
 	public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
-	public PortalGinInjector ginInjector;
 	RestrictableObjectDescriptor subject;
 	AccessRequirement ar;
 	DataAccessClientAsync dataAccessClient;
@@ -46,12 +44,10 @@ public class IntendedDataUseReportButton implements IsWidget {
 	public IntendedDataUseReportButton(Button button, 
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
 			DataAccessClientAsync dataAccessClient,
-			final PortalGinInjector ginInjector,
 			PopupUtilsView popupUtils,
 			BigPromptModalView copyTextModal) {
 		this.button = button;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
-		this.ginInjector = ginInjector;
 		this.popupUtils = popupUtils;
 		this.copyTextModal = copyTextModal;
 		copyTextModal.addStyleToModal("modal-fullscreen");
@@ -102,7 +98,7 @@ public class IntendedDataUseReportButton implements IsWidget {
 			sb.append(currentIDU);
 			sb.append("\n\n-------------\n\n");
 		}
-		copyTextModal.configure("Approved Intended Data Use Statements", "Markdown", sb.toString());
+		copyTextModal.configure(IDU_MODAL_TITLE, IDU_MODAL_FIELD_NAME, sb.toString());
 		copyTextModal.show();
 	}
 	
@@ -127,5 +123,4 @@ public class IntendedDataUseReportButton implements IsWidget {
 	public Widget asWidget() {
 		return button.asWidget();
 	}
-	
 }
