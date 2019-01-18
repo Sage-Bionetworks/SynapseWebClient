@@ -46,5 +46,8 @@ public interface BigPromptModalView extends IsWidget {
 	 * @param isLoading
 	 */
 	public void setLoading(boolean isLoading);
+	
+	void addStyleToModal(String styles);
+	void setTextAreaHeight(String height);
 
 }

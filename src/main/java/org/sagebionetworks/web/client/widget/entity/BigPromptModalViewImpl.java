@@ -100,5 +100,12 @@ public class BigPromptModalViewImpl implements BigPromptModalView {
 		this.nameField.setText(value);
 		this.callback = callback;
 	}
-
+	@Override
+	public void addStyleToModal(String styles) {
+		modal.addStyleName(styles);
+	}
+	@Override
+	public void setTextAreaHeight(String height) {
+		nameField.setHeight(height);
+	}
 }
