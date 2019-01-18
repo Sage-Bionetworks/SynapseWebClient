@@ -1,20 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.gwtbootstrap3.client.shared.event.ModalShownEvent;
-import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormLabel;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -46,7 +41,11 @@ public class BigPromptModalViewImpl implements BigPromptModalView {
 			nameField.selectAll();
 		});
 		defaultButton.addClickHandler(event -> modal.hide());
-		primaryButton.addClickHandler(arg0 -> callback.invoke());
+		primaryButton.addClickHandler(arg0 -> {
+			if (callback != null) {
+				callback.invoke();
+			}
+		});
 		primaryButton.addDomHandler(DisplayUtils.getPreventTabHandler(primaryButton), KeyDownEvent.getType());
 	}
 	
@@ -94,11 +93,18 @@ public class BigPromptModalViewImpl implements BigPromptModalView {
 	}
 
 	@Override
+	public void configure(String title, String label, String value) {
+		configure(title, label, value, null);
+	}
+	@Override
 	public void configure(String title, String label, String value, Callback callback) {
 		this.modal.setTitle(title);
 		this.nameLabel.setText(label);
 		this.nameField.setText(value);
 		this.callback = callback;
+		primaryButton.setVisible(callback != null);
+		ButtonType cancelButtonType = callback == null ? ButtonType.DEFAULT : ButtonType.LINK;
+		defaultButton.setType(cancelButtonType);
 	}
 	@Override
 	public void addStyleToModal(String styles) {

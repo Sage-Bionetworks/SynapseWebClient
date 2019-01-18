@@ -102,7 +102,7 @@ public class IntendedDataUseReportButton implements IsWidget {
 			sb.append(currentIDU);
 			sb.append("\n\n-------------\n\n");
 		}
-		copyTextModal.configure("Approved Intended Data Use Statements", "Markdown", sb.toString(), () -> {copyTextModal.hide();});
+		copyTextModal.configure("Approved Intended Data Use Statements", "Markdown", sb.toString());
 		copyTextModal.show();
 	}
 	

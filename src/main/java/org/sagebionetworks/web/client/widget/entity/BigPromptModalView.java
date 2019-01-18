@@ -17,6 +17,7 @@ public interface BigPromptModalView extends IsWidget {
 	 * @param value The initial value.
 	 */
 	public void configure(String title, String label, String value, Callback callback);
+	public void configure(String title, String label, String value);
 	
 	public String getValue();
 	
