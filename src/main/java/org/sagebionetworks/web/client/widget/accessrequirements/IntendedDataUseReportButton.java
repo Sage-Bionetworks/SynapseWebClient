@@ -3,7 +3,9 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
@@ -38,7 +40,7 @@ public class IntendedDataUseReportButton implements IsWidget {
 	DataAccessClientAsync dataAccessClient;
 	PopupUtilsView popupUtils;
 	BigPromptModalView copyTextModal;
-	List<ResearchProject> researchProjectSnapshots;
+	Map<String, ResearchProject> id2ResearchProject;
 	
 	@Inject
 	public IntendedDataUseReportButton(Button button, 
@@ -59,7 +61,7 @@ public class IntendedDataUseReportButton implements IsWidget {
 		button.setVisible(false);
 		button.addStyleName("margin-left-10");
 		button.addClickHandler(event -> {
-			researchProjectSnapshots = new ArrayList<>();
+			id2ResearchProject = new HashMap<>();
 			gatherAllSubmissions(null);
 		});
 	}	
@@ -70,7 +72,7 @@ public class IntendedDataUseReportButton implements IsWidget {
 			public void onSuccess(SubmissionPage page) {
 				List<Submission> newSubmissions = page.getResults();
 				for (Submission submission : newSubmissions) {
-					researchProjectSnapshots.add(submission.getResearchProjectSnapshot());
+					id2ResearchProject.put(submission.getResearchProjectSnapshot().getId(), submission.getResearchProjectSnapshot());
 				}
 				if (!newSubmissions.isEmpty() && page.getNextPageToken() != null) {
 					gatherAllSubmissions(page.getNextPageToken());
@@ -88,7 +90,7 @@ public class IntendedDataUseReportButton implements IsWidget {
 	
 	public void showIDUs() {
 		StringBuilder sb = new StringBuilder();
-		for (ResearchProject rp : researchProjectSnapshots) {
+		for (ResearchProject rp : id2ResearchProject.values()) {
 			String projectLead = rp.getProjectLead();
 			String currentInstitution = rp.getInstitution();
 			String currentIDU = rp.getIntendedDataUseStatement();
