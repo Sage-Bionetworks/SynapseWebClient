@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.resources.WebResource;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -29,14 +31,17 @@ public class SRCDemoWidget implements SRCDemoWidgetView.Presenter, WidgetRendere
 	private Map<String, String> descriptor;
 	private SynapseAlert synAlert;
 	private ResourceLoader resourceLoader;
+	private SynapseJSNIUtils jsniUtils;
 	
 	@Inject
 	public SRCDemoWidget(SRCDemoWidgetView view,
 			SynapseAlert synAlert,
-			ResourceLoader resourceLoader) {
+			ResourceLoader resourceLoader,
+			SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.resourceLoader = resourceLoader;
+		this.jsniUtils = jsniUtils;
 		view.setSynAlertWidget(synAlert);
 		view.setPresenter(this);
 	}
@@ -80,6 +85,7 @@ public class SRCDemoWidget implements SRCDemoWidgetView.Presenter, WidgetRendere
 			return;
 		}
 		
+		ClientProperties.fixResourceToCdnEndpoint(SYNAPSE_REACT_COMPONENTS_JS, jsniUtils.getCdnEndpoint());
 		if (!resourceLoader.isLoaded(SYNAPSE_REACT_COMPONENTS_JS)) {
 			resourceLoader.requires(SYNAPSE_REACT_COMPONENTS_JS, initializedCallback);
 			return;
@@ -92,7 +98,6 @@ public class SRCDemoWidget implements SRCDemoWidgetView.Presenter, WidgetRendere
 			synAlert.showError("Error showing table: " + ex.getMessage());
 		}
 	}
-	
 
 	@Override
 	public Widget asWidget() {
