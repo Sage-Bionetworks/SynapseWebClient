@@ -63,12 +63,7 @@ public class SRCDemoWidget implements SRCDemoWidgetView.Presenter, WidgetRendere
 		AsyncCallback<Void> initializedCallback = new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				if (resourceLoader.isLoaded(SYNAPSE_REACT_COMPONENTS_JS) && 
-						resourceLoader.isLoaded(PROP_TYPES_JS) && 
-						resourceLoader.isLoaded(REACT_MEASURE_JS) &&
-						resourceLoader.isLoaded(REACT_TOOLTIP_JS)) {
-					showDemo();	
-				}
+				showDemo();	
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -76,13 +71,17 @@ public class SRCDemoWidget implements SRCDemoWidgetView.Presenter, WidgetRendere
 			}
 		};
 		
-		if (!resourceLoader.isLoaded(SYNAPSE_REACT_COMPONENTS_JS)) {
+		if (!resourceLoader.isLoaded(PROP_TYPES_JS)) {
 			List<WebResource> resources = new ArrayList<>();
 			resources.add(PROP_TYPES_JS);
 			resources.add(REACT_MEASURE_JS);
 			resources.add(REACT_TOOLTIP_JS);
-			resources.add(SYNAPSE_REACT_COMPONENTS_JS);
 			resourceLoader.requires(resources, initializedCallback);
+			return;
+		}
+		
+		if (!resourceLoader.isLoaded(SYNAPSE_REACT_COMPONENTS_JS)) {
+			resourceLoader.requires(SYNAPSE_REACT_COMPONENTS_JS, initializedCallback);
 			return;
 		}
 		

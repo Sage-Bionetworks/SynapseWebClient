@@ -2796,7 +2796,7 @@ div.border {
 }
 
 #body .SRC-primary-background-color-hover:hover {
-	background: #D53F77;
+	background: #D53F77 !important;
 	color: white;
 }
 #body .SRC-primary-background-color-hover.SRC-nested-color:hover > * {
