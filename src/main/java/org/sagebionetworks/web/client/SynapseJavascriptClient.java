@@ -1027,8 +1027,10 @@ public class SynapseJavascriptClient {
 	}
 	
 	public void logout() {
-		String url = getAuthServiceUrl() + "/session";
-		doDelete(url, null);
+		if (authController.isLoggedIn()) {
+			String url = getAuthServiceUrl() + "/session";
+			doDelete(url, null);	
+		}
 	}
 
 	public void getMyProjects(ProjectListType projectListType, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<List<ProjectHeader>> projectHeadersCallback) {

@@ -40,7 +40,7 @@ public class ClientProperties {
 	/*
 	 * JavaScript WebResources
 	 */
-	public static final WebResource SYNAPSE_REACT_COMPONENTS_JS = new WebResource("js/react-components/synapse-react-components.min.js", ResourceType.JAVASCRIPT);
+	
 	public static final WebResource MATHJAX_LOADER_JS = new WebResource("js/mathjax-loader.js", ResourceType.JAVASCRIPT);
 	public static final WebResource MATHJAX_JS = new WebResource("https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=default", ResourceType.JAVASCRIPT);
 	public static final WebResource PLOTLY_JS = new WebResource("https://cdn.plot.ly/plotly-1.33.1.min.js", ResourceType.JAVASCRIPT);
@@ -48,6 +48,11 @@ public class ClientProperties {
 	public static final WebResource AWS_SDK_JS = new WebResource("js/aws-sdk-2.86.0.min.js", ResourceType.JAVASCRIPT);
 	public static final String QUERY_SERVICE_PREFIX = "/query?query=";
 	public static final String EVALUATION_QUERY_SERVICE_PREFIX = "/evaluation/submission/query?query=";
+	
+	public static final WebResource SYNAPSE_REACT_COMPONENTS_JS = new WebResource("js/SRC/synapse-react-client.production.min.js", ResourceType.JAVASCRIPT);
+	public static final WebResource PROP_TYPES_JS = new WebResource("https://unpkg.com/prop-types@15.6.2/prop-types.min.js", ResourceType.JAVASCRIPT);
+	public static final WebResource REACT_MEASURE_JS = new WebResource("https://unpkg.com/react-measure@2.2.2/dist/index.umd.js", ResourceType.JAVASCRIPT);
+	public static final WebResource REACT_TOOLTIP_JS = new WebResource("https://unpkg.com/react-tooltip@3.9.2/standalone/react-tooltip.min.js", ResourceType.JAVASCRIPT);
 	
 	public static final WebResource DIFF_LIB_JS = new WebResource("js/diff/difflib.js", ResourceType.JAVASCRIPT);
 	public static final WebResource DIFF_VIEW_JS = new WebResource("js/diff/diffview.js", ResourceType.JAVASCRIPT);
