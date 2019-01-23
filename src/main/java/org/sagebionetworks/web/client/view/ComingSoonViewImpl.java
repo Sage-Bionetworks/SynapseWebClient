@@ -65,7 +65,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		headerWidget.configure();
 		widgetContainer.add(map.asWidget());
 		this.srcTableWidget = srcTableWidget;
-		widgetContainer.add(srcTableWidget);
+		reactWidget.add(srcTableWidget);
 		AsyncCallback<Double> downloadSpeedCallback = new AsyncCallback<Double>() {
 			@Override
 			public void onFailure(Throwable caught) {
