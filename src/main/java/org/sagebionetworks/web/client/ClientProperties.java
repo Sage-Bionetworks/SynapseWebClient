@@ -57,7 +57,7 @@ public class ClientProperties {
 	
 	public static void fixResourceToCdnEndpoint(WebResource resource, String cdnEndpoint) {
 		String currentUrl = resource.getUrl();
-		if (!currentUrl.startsWith(cdnEndpoint) && !currentUrl.toLowerCase().startsWith("http")) {
+		if (cdnEndpoint != null && !currentUrl.startsWith(cdnEndpoint) && !currentUrl.toLowerCase().startsWith("http")) {
 			resource.setUrl(cdnEndpoint + currentUrl);
 		}
 	}
