@@ -144,8 +144,7 @@ public class InitSessionServletTest {
 		
 		servlet.doGet(mockRequest, mockResponse);
 		
-		verify(mockResponse).setStatus(HttpServletResponse.SC_NOT_FOUND);
-		
+		verify(mockResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		verifyZeroInteractions(responseOutputStream);
 	}
 }	
