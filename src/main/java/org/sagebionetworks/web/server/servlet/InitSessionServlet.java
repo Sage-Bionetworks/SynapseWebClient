@@ -83,4 +83,42 @@ public class InitSessionServlet extends HttpServlet {
 			response.getOutputStream().flush();
 		}
 	}
+	
+	/**
+	 * Unit test uses this to provide a mock token provider
+	 *
+	 * @param tokenProvider
+	 */
+	public void setTokenProvider(TokenProvider tokenProvider) {
+		this.tokenProvider = tokenProvider;
+	}
+
+	private TokenProvider tokenProvider = new TokenProvider() {
+		@Override
+		public String getSessionToken() {
+			return UserDataProvider.getThreadLocalUserToken(InitSessionServlet.perThreadRequest.get());
+		}
+	};
+
+	public String getSessionToken(final HttpServletRequest request){
+		return tokenProvider.getSessionToken();
+	}
+	
+	@Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		//instruct not to cache
+		response.setHeader(WebConstants.CACHE_CONTROL_KEY, WebConstants.CACHE_CONTROL_VALUE_NO_CACHE); // Set standard HTTP/1.1 no-cache headers.
+		response.setHeader(WebConstants.PRAGMA_KEY, WebConstants.NO_CACHE_VALUE); // Set standard HTTP/1.0 no-cache header.
+		response.setDateHeader(WebConstants.EXPIRES_KEY, 0L); // Proxy
+
+		String token = getSessionToken(request);
+		if (token != null) {
+			response.setStatus(HttpServletResponse.SC_OK);
+			response.getOutputStream().write(token.getBytes("UTF-8"));
+			response.getOutputStream().flush();
+		} else {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		}
+	}
 }
