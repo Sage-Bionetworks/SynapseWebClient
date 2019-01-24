@@ -3,11 +3,7 @@ package org.sagebionetworks.web.unitserver.servlet;
 import static org.junit.Assert.*;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.*;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.when;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -59,6 +55,11 @@ public class InitSessionServletTest {
 	ServletOutputStream responseOutputStream;
 	@Captor
 	ArgumentCaptor<Cookie> cookieCaptor;
+	@Captor
+	ArgumentCaptor<byte[]> byteArrayCaptor;
+	@Mock
+	TokenProvider mockTokenProvider;
+	
 	InitSessionServlet servlet;
 	public static final String TEST_SESSION_TOKEN = "abc-123";
 	@Before
@@ -70,6 +71,7 @@ public class InitSessionServletTest {
 		when(mockResponse.getOutputStream()).thenReturn(responseOutputStream);
 		when(mockRequest.getScheme()).thenReturn("https");
 		when(mockRequest.getServerName()).thenReturn("www.synapse.org");
+		servlet.setTokenProvider(mockTokenProvider);
 		SynapseClientBaseTest.setupTestEndpoints();
 	}
 	
@@ -121,6 +123,30 @@ public class InitSessionServletTest {
 		assertTrue(cookie.isHttpOnly());
 		assertFalse(cookie.getSecure());
 		assertEquals(InitSessionServlet.ROOT_PATH, cookie.getPath());
+	}
+	
+	@Test
+	public void testDoGetSession() throws Exception {
+		String sessionToken = "abc123-fake";
+		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
+		
+		servlet.doGet(mockRequest, mockResponse);
+		
+		verify(mockResponse).setStatus(HttpServletResponse.SC_OK);
+		verify(responseOutputStream).write(byteArrayCaptor.capture());
+		assertEquals(sessionToken, new String(byteArrayCaptor.getValue(), "UTF-8"));
+		verify(responseOutputStream).flush();
+	}
+	
+	@Test
+	public void testDoGetSessionNull() throws Exception {
+		when(mockTokenProvider.getSessionToken()).thenReturn(null);
+		
+		servlet.doGet(mockRequest, mockResponse);
+		
+		verify(mockResponse).setStatus(HttpServletResponse.SC_NOT_FOUND);
+		
+		verifyZeroInteractions(responseOutputStream);
 	}
 }	
 
