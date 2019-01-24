@@ -5,8 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.sagebionetworks.web.client.resources.WebResource.ResourceType;
-
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.ScriptInjector;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -34,10 +32,7 @@ public class ResourceLoaderImpl implements ResourceLoader {
 			if(!loaded.contains(resource)) {
 				// Attach resources
 				Callback<Void, Exception> callback = getCallback(loadedCallback, downloading, resource);
-				if(resource.getType() == ResourceType.JAVASCRIPT) {
-					// JavaScript
-					ScriptInjector.fromUrl(resource.getUrl()).setCallback(callback).setWindow(ScriptInjector.TOP_WINDOW).inject();
-				}				
+				ScriptInjector.fromUrl(resource.getUrl()).setCallback(callback).setWindow(ScriptInjector.TOP_WINDOW).inject();
 			}
 		}
 		checkDone(loadedCallback, downloading);
@@ -47,7 +42,6 @@ public class ResourceLoaderImpl implements ResourceLoader {
 	public boolean isLoaded(WebResource resource) {
 		return loaded.contains(resource);
 	}
-	
 	
 	/*
 	 * Private Methods
