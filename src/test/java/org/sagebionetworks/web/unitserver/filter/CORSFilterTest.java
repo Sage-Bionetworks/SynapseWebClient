@@ -44,41 +44,21 @@ public class CORSFilterTest {
 	}
 	
 	@Test
-	public void testAllowOriginNoCredentials() throws ServletException, IOException{
-		//Access-Control-Allow-Credentials not set
-		filter.testFilter(mockRequest, mockResponse, mockFilterChain);
-		
-		//verify allow origin header set to *
-		verify(mockResponse).addHeader(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, DEFAULT_ALLOW_ORIGIN);
-	}
-	
-	@Test
-	public void testAllowOriginCredentialsFalse() throws ServletException, IOException{
-		//Access-Control-Allow-Credentials set to false
-		when(mockRequest.getHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER)).thenReturn(Boolean.FALSE.toString());
-		
-		filter.testFilter(mockRequest, mockResponse, mockFilterChain);
-		
-		//verify allow origin header set to *
-		verify(mockResponse).addHeader(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, DEFAULT_ALLOW_ORIGIN);
-	}
-	
-	@Test
-	public void testAllowOriginCredentialsTrueSynapseOrg() throws ServletException, IOException{
-		//Access-Control-Allow-Credentials set to true, and we are in a .synapse.org subdomain
-		when(mockRequest.getHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER)).thenReturn(Boolean.TRUE.toString());
-
+	public void testSynapseOrg() throws ServletException, IOException{
+		//we are in a .synapse.org subdomain
 		filter.testFilter(mockRequest, mockResponse, mockFilterChain);
 		
 		//verify allow origin header set to the specific origin
 		verify(mockResponse).addHeader(eq(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER), stringCaptor.capture());
 		String allowOriginHeaderValue = stringCaptor.getValue();
 		assertEquals("https://tst.synapse.org:8080", allowOriginHeaderValue);
+		// and Access-Control-Allow-Credentials is set to true
+		verify(mockResponse).addHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER, "true");
 	}
 
 	@Test
-	public void testAllowOriginCredentialsNotSynapseOrg() throws ServletException, IOException{
-		//Access-Control-Allow-Credentials set to true, and we are not in a .synapse.org subdomain
+	public void testNotSynapseOrg() throws ServletException, IOException{
+		//we are not in a .synapse.org subdomain
 		when(mockRequest.getHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER)).thenReturn(Boolean.TRUE.toString());
 		when(mockRequest.getServerName()).thenReturn("tst.notsynapse.org");
 		
@@ -86,5 +66,7 @@ public class CORSFilterTest {
 		
 		//verify allow origin header set to * (causes CORS preflight to fail browserside)
 		verify(mockResponse).addHeader(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, DEFAULT_ALLOW_ORIGIN);
+		// and Access-Control-Allow-Credentials is not added to the response
+		verify(mockResponse, never()).addHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER, "true");
 	}
 }
