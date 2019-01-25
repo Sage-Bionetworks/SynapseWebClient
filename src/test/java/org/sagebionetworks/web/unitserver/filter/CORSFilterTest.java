@@ -1,5 +1,12 @@
 package org.sagebionetworks.web.unitserver.filter;
 
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.*;
+
+import java.io.IOException;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -11,17 +18,8 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import static org.sagebionetworks.web.server.servlet.filter.CORSFilter.*;
-
-import java.io.IOException;
-
 import org.sagebionetworks.web.server.servlet.filter.CORSFilter;
-import org.sagebionetworks.web.server.servlet.filter.SSLFilter;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CORSFilterTest {
@@ -38,9 +36,7 @@ public class CORSFilterTest {
 	@Before
 	public void setUp() {
 		filter = new CORSFilter();
-		when(mockRequest.getServerName()).thenReturn("tst" + SYNAPSE_ORG_SUFFIX); //tst.synapse.org
-		when(mockRequest.getScheme()).thenReturn("https");
-		when(mockRequest.getServerPort()).thenReturn(443);
+		when(mockRequest.getHeader(ORIGIN_HEADER)).thenReturn("https://tst" + SYNAPSE_ORG_SUFFIX); //https://tst.synapse.org
 	}
 	
 	@Test
@@ -60,7 +56,7 @@ public class CORSFilterTest {
 	public void testNotSynapseOrg() throws ServletException, IOException{
 		//we are not in a .synapse.org subdomain
 		when(mockRequest.getHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER)).thenReturn(Boolean.TRUE.toString());
-		when(mockRequest.getServerName()).thenReturn("tst.notsynapse.org");
+		when(mockRequest.getHeader(ORIGIN_HEADER)).thenReturn("tst.notsynapse.org"); 
 		
 		filter.testFilter(mockRequest, mockResponse, mockFilterChain);
 		
