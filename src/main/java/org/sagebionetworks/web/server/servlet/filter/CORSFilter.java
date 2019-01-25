@@ -23,7 +23,7 @@ public class CORSFilter extends OncePerRequestFilter {
 		String allowOrigin = DEFAULT_ALLOW_ORIGIN;
 		String serverName = request.getServerName();
 		if (serverName.toLowerCase().endsWith(SYNAPSE_ORG_SUFFIX)) {
-			allowOrigin = request.getScheme() + "://" + serverName + ":" + request.getServerPort();
+			allowOrigin = request.getScheme() + "://" + serverName;
 			response.addHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER, "true");
 		}
 		

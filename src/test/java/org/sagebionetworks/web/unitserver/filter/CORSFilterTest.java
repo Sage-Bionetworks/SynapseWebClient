@@ -40,7 +40,7 @@ public class CORSFilterTest {
 		filter = new CORSFilter();
 		when(mockRequest.getServerName()).thenReturn("tst" + SYNAPSE_ORG_SUFFIX); //tst.synapse.org
 		when(mockRequest.getScheme()).thenReturn("https");
-		when(mockRequest.getServerPort()).thenReturn(8080);
+		when(mockRequest.getServerPort()).thenReturn(443);
 	}
 	
 	@Test
@@ -51,7 +51,7 @@ public class CORSFilterTest {
 		//verify allow origin header set to the specific origin
 		verify(mockResponse).addHeader(eq(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER), stringCaptor.capture());
 		String allowOriginHeaderValue = stringCaptor.getValue();
-		assertEquals("https://tst.synapse.org:8080", allowOriginHeaderValue);
+		assertEquals("https://tst.synapse.org", allowOriginHeaderValue);
 		// and Access-Control-Allow-Credentials is set to true
 		verify(mockResponse).addHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER, "true");
 	}
