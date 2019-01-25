@@ -13,6 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * CORS filter, Access-Control-Allow-Origin
  */
 public class CORSFilter extends OncePerRequestFilter {
+	public static final String ORIGIN_HEADER = "origin";
 	public static final String DEFAULT_ALLOW_ORIGIN = "*";
 	public static final String ACCESS_CONTROL_ALLOW_ORIGIN_HEADER = "Access-Control-Allow-Origin";
 	public static final String ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER = "Access-Control-Allow-Credentials";
@@ -21,9 +22,9 @@ public class CORSFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		String allowOrigin = DEFAULT_ALLOW_ORIGIN;
-		String serverName = request.getServerName();
-		if (serverName.toLowerCase().endsWith(SYNAPSE_ORG_SUFFIX)) {
-			allowOrigin = request.getScheme() + "://" + serverName;
+		String origin = request.getHeader(ORIGIN_HEADER);
+		if (origin != null && origin.toLowerCase().endsWith(SYNAPSE_ORG_SUFFIX)) {
+			allowOrigin = origin;
 			response.addHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER, "true");
 		}
 		
