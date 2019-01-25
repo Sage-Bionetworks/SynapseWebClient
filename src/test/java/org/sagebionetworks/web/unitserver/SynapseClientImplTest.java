@@ -297,7 +297,6 @@ public class SynapseClientImplTest {
 		// Setup the the entity
 		entity = new ExampleEntity();
 		entity.setId(entityId);
-		entity.setEntityType(ExampleEntity.class.getName());
 		entity.setModifiedBy(testUserId);
 		// the mock synapse should return this object
 		when(mockSynapse.getEntityById(entityId)).thenReturn(entity);
@@ -635,11 +634,9 @@ public class SynapseClientImplTest {
 		in.setName("some name");
 		in.setParentId(oldParentId);
 		in.setId(entityId);
-		in.setEntityType(ExampleEntity.class.getName());
-
+		
 		ExampleEntity out = new ExampleEntity();
 		out.setName("some name");
-		out.setEntityType(ExampleEntity.class.getName());
 		out.setId(entityId);
 		out.setParentId(newParentId);
 		out.setEtag("45");

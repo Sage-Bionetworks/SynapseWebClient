@@ -50,7 +50,6 @@ public class BaseEditWidgetDescriptorPresenterTest {
 		String entityId = "123";
 		entity = new ExampleEntity();
 		entity.setId(entityId);
-		entity.setEntityType(ExampleEntity.class.getName());
 		
 		descriptor1 = new HashMap<String, String>();
 		descriptor1.put(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY, "myVideoId");
