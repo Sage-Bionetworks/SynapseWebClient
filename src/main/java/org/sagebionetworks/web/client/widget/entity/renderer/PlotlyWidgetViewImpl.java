@@ -132,7 +132,10 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 					  yaxis: yAxisLayoutObject,
 					  barmode: barMode,
 					  showlegend: showLegend,
-					  autosize: true
+					  autosize: true,
+					  margin: {
+					  	l: 200
+					  }
 					},
 				useResizeHandler: true,
 				// note: we'd like to just hide the "save and edit plot in cloud" command, 
