@@ -21,12 +21,10 @@ public class CORSFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		String allowOrigin = DEFAULT_ALLOW_ORIGIN;
-		String allowCredentialsHeader = request.getHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER);
-		if (allowCredentialsHeader != null && Boolean.parseBoolean(allowCredentialsHeader)) {
-			String serverName = request.getServerName();
-			if (serverName.toLowerCase().endsWith(SYNAPSE_ORG_SUFFIX)) {
-				allowOrigin = request.getScheme() + "://" + serverName + ":" + request.getServerPort();
-			}
+		String serverName = request.getServerName();
+		if (serverName.toLowerCase().endsWith(SYNAPSE_ORG_SUFFIX)) {
+			allowOrigin = request.getScheme() + "://" + serverName + ":" + request.getServerPort();
+			response.addHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER, "true");
 		}
 		
 		response.addHeader(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, allowOrigin);
