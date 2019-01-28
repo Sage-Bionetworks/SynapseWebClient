@@ -28,7 +28,7 @@
 			<t:TableData ui:field="createdOnTableData" addStyleNames="visible-xl overflow-x-hidden min-width-165">
 				<g:Label ui:field="createdOnField"/>
 			</t:TableData>
-			<t:TableData ui:field="idTableData" addStyleNames="visible-xl overflow-x-hidden min-width-150">
+			<t:TableData ui:field="idTableData" addStyleNames="visible-lg overflow-x-hidden min-width-150">
 				<g:TextBox ui:field="idField" addStyleNames="border-none noBackground font-size-14" readOnly="true" />
 			</t:TableData>
 			<t:TableData ui:field="md5TableData" addStyleNames="visible-xl overflow-x-hidden min-width-150">

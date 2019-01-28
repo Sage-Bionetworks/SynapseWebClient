@@ -32,7 +32,7 @@
 				<t:TableHeader ui:field="createdOnColumnHeaderUnsortable" addStyleNames="visible-xl min-width-165" visible="false">
 					<bh:Span text="Created On" />
 				</t:TableHeader>
-				<t:TableHeader ui:field="idColumnHeader" addStyleNames="visible-xl min-width-150">
+				<t:TableHeader ui:field="idColumnHeader" addStyleNames="visible-lg min-width-150">
 					<bh:Span text="ID" />
 					<b:Tooltip title="Copy IDs to the clipboard">
 						<b:Icon ui:field="copyIDToClipboardIcon" addStyleNames="imageButton margin-left-5 link" type="CLIPBOARD" />
