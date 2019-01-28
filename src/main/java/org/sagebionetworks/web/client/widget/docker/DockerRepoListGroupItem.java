@@ -28,7 +28,7 @@ public class DockerRepoListGroupItem extends ListGroupItem {
 		addStyleName("padding-10");
 		Heading iconHeading = new Heading(HeadingSize.H3);
 		iconHeading.setPull(Pull.LEFT);
-		Icon icon = new Icon(EntityTypeUtils.getIconTypeForEntityType(entity.getEntityType()));
+		Icon icon = new Icon(EntityTypeUtils.getIconTypeForEntityType(entity.getClass().getName()));
 		icon.addStyleName("lightGreyText margin-right-10 moveup-10");
 		iconHeading.add(icon);
 

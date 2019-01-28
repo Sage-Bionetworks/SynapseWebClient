@@ -63,7 +63,6 @@ public class AddExternalRepoModal implements AddExternalRepoModalView.Presenter 
 		synAlert.clear();
 		String repoName = view.getRepoName();
 		DockerRepository dockerRepo = new DockerRepository();
-		dockerRepo.setEntityType(DockerRepository.class.getName());
 		dockerRepo.setParentId(parentId);
 		dockerRepo.setRepositoryName(repoName);
 		synapseClient.createEntity(dockerRepo, new AsyncCallback<Entity>() {
