@@ -109,4 +109,19 @@
 	  <servlet-name>jUnitHostImpl</servlet-name>
 	  <url-pattern>/Portal/remote_logging</url-pattern>
 	</servlet-mapping>
+	<error-page>
+		<!-- Missing resource -->
+		<error-code>404</error-code>
+		<location>/Error.html</location>
+	</error-page>
+	<error-page>
+	    <!-- Uncaught exception -->
+	    <error-code>500</error-code>
+	    <location>/Error.html</location>
+	</error-page>
+	<error-page>
+	    <!-- Unsupported servlet method -->
+	    <error-code>503</error-code>
+	    <location>/Error.html</location>
+	</error-page>
 </web-app>
