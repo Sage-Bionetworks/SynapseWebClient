@@ -120,26 +120,29 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 			xAxisLayoutObject.type = xAxisType;
 			xAxisLayoutObject.tickangle = 45;
 			
-			
 			var yAxisLayoutObject = new $wnd.Object();
 			yAxisLayoutObject.title = yTitle;
 			yAxisLayoutObject.type = yAxisType;
 			
 			var props = {
 				data: xyData,
-				fit: true,
 				layout: {
 					  title: plotTitle,
 					  xaxis: xAxisLayoutObject,
 					  yaxis: yAxisLayoutObject,
 					  barmode: barMode,
-					  showlegend: showLegend
+					  showlegend: showLegend,
+					  autosize: true,
+					  margin: {
+					  	l: 200
+					  }
 					},
-	
+				useResizeHandler: true,
 				// note: we'd like to just hide the "save and edit plot in cloud" command, 
 				// but the parameter provided in the docs (showLink: false) has no effect.
 				// hide the entire bar by setting displayModeBar to false.
-				config: {displayModeBar: false}
+				config: {displayModeBar: false},
+				style: {width: "100%", height: "100%"}
 			};
 			$wnd.ReactDOM.render(
 					$wnd.React.createElement(plot, props), 
@@ -155,11 +158,14 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 		try {
 			//after plot is drawn, add handler for click events
 			$wnd.jQuery(el).on('plotly_afterplot', function() {
-				this.children[0].on('plotly_click', function(data) {
-					data.event.stopPropagation();
-					var pnt = data.points[0];				
-					thisWidget.@org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetViewImpl::onClick(Ljava/lang/String;Ljava/lang/String;)(pnt.x, pnt.y);
-				});
+				if (!this.plotlyClickInitialized) {
+					this.plotlyClickInitialized = true;
+					this.children[0].on('plotly_click', function(data) {
+						data.event.stopPropagation();
+						var pnt = data.points[0];
+						thisWidget.@org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetViewImpl::onClick(Ljava/lang/String;Ljava/lang/String;)(pnt.x, pnt.y);
+					});
+				}
 			});
 		} catch (err) {
 			console.error(err);

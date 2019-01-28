@@ -20,6 +20,7 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.WikiDiff;
 import org.sagebionetworks.web.client.presenter.WikiDiffPresenter;
@@ -50,6 +51,8 @@ public class WikiDiffPresenterTest {
 	GlobalApplicationState mockGlobalAppState;
 	@Mock
 	ResourceLoader mockResourceLoader;
+	@Mock
+	SynapseJSNIUtils mockJsniUtils;
 	@Captor
 	ArgumentCaptor<WikiPageKey> wikiPageKeyCaptor;
 	@Mock
@@ -88,7 +91,7 @@ public class WikiDiffPresenterTest {
 		when(mockPlace.getParam(WIKI_ID)).thenReturn(WIKI_PAGE_ID_VALUE);
 		when(mockWikiPageV1.getMarkdown()).thenReturn(WIKI_MARKDOWN_VERSION_1);
 		when(mockWikiPageV2.getMarkdown()).thenReturn(WIKI_MARKDOWN_VERSION_2);
-		presenter = new WikiDiffPresenter(mockView, mockSynapseClient, mockJsClient, mockSynAlert, mockGlobalAppState, mockResourceLoader);
+		presenter = new WikiDiffPresenter(mockView, mockSynapseClient, mockJsClient, mockSynAlert, mockGlobalAppState, mockResourceLoader, mockJsniUtils);
 	}
 
 	@Test
@@ -101,7 +104,7 @@ public class WikiDiffPresenterTest {
 		// also verify attempt to load diff library (simulate failure, since success is a no-op).
 		Exception loadingErrorEx = new Exception();
 		AsyncMockStubber.callFailureWith(loadingErrorEx).when(mockResourceLoader).requires(anyList(), any(AsyncCallback.class));
-		presenter = new WikiDiffPresenter(mockView, mockSynapseClient, mockJsClient, mockSynAlert, mockGlobalAppState, mockResourceLoader);
+		presenter = new WikiDiffPresenter(mockView, mockSynapseClient, mockJsClient, mockSynAlert, mockGlobalAppState, mockResourceLoader, mockJsniUtils);
 		verify(mockSynAlert).handleException(loadingErrorEx);
 	}
 	
