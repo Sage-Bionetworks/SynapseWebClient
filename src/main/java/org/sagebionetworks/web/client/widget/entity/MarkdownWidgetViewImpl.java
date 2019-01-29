@@ -2,12 +2,21 @@ package org.sagebionetworks.web.client.widget.entity;
 
 
 import org.gwtbootstrap3.client.ui.html.Italic;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.AnchorElement;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.EventListener;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -28,12 +37,25 @@ public class MarkdownWidgetViewImpl implements MarkdownWidgetView {
 	
 	@UiField
 	Italic emptyPanel;
-	
+	public static GlobalApplicationState globalAppState;
+	public static final EventListener relativeLinkClickHandler = event -> {
+		event.preventDefault();
+		if (Event.ONCLICK == event.getTypeInt()) {
+			AnchorElement el = (AnchorElement)event.getCurrentTarget();
+			String href = el.getHref();
+			String placeToken = href.substring(href.indexOf('!'));
+			AppPlaceHistoryMapper appPlaceHistoryMapper = globalAppState.getAppPlaceHistoryMapper();
+			Place newPlace = appPlaceHistoryMapper.getPlace(placeToken);
+			globalAppState.getPlaceChanger().goTo(newPlace);
+		}
+	};
 	@Inject
 	public MarkdownWidgetViewImpl(final Binder uiBinder,
-			SynapseJSNIUtils jsniUtils) {
+			SynapseJSNIUtils jsniUtils,
+			GlobalApplicationState globalAppState) {
 		widget = uiBinder.createAndBindUi(this);
 		this.jsniUtils = jsniUtils;
+		MarkdownWidgetViewImpl.globalAppState = globalAppState;
 	}
 	
 	@Override
@@ -50,6 +72,20 @@ public class MarkdownWidgetViewImpl implements MarkdownWidgetView {
 	@Override
 	public void setMarkdown(final String result) {
 		contentPanel.getElement().setInnerHTML(result);
+		addPlaceChangerEventHandlerToAnchors();
+	}
+	
+	private void addPlaceChangerEventHandlerToAnchors() {
+		// Optimization. handle all anchor links via the placechanger instead of page change
+		NodeList<Element> anchors = contentPanel.getElement().getElementsByTagName("a");
+		String hostPageURL = GWT.getHostPageBaseURL();
+		for (int i = 0; i < anchors.getLength(); i++) {
+			AnchorElement anchorElement = (AnchorElement)anchors.getItem(i);
+			if (anchorElement.getHref().startsWith(hostPageURL + "#!")) {
+				DOM.sinkEvents(anchorElement, Event.ONCLICK | Event.ONMOUSEOUT | Event.ONMOUSEOVER);
+				DOM.setEventListener(anchorElement, relativeLinkClickHandler);
+			}
+		}
 	}
 	
 	@Override
