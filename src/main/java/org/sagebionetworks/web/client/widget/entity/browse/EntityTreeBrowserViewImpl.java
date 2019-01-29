@@ -183,16 +183,14 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 			});
 			
 			presenter.clearRecordsFetchedChildren();
-			
-			entityTree.addSelectionHandler(event -> {
-				if (isSelectable) {
+			if (isSelectable) {
+				entityTree.addSelectionHandler(event -> {
 					EntityTreeItem targetItem = getTreeItem2entityTreeItem()
 							.get(event.getSelectedItem());
 					selectEntity(targetItem);	
-				} else {
-					entityTree.setSelectedItem(null);
-				}
-			});
+					
+				});	
+			}
 			entityTreeContainer.clear();
 			entityTreeContainer.add(entityTree);
 		}
