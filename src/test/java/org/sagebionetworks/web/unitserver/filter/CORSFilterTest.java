@@ -37,19 +37,28 @@ public class CORSFilterTest {
 	public void setUp() {
 		filter = new CORSFilter();
 		when(mockRequest.getHeader(ORIGIN_HEADER)).thenReturn("https://tst" + SYNAPSE_ORG_SUFFIX); //https://tst.synapse.org
+		when(mockRequest.getMethod()).thenReturn(OPTIONS); //preflight
+		when(mockRequest.getHeader(ACCESS_CONTROL_REQUEST_METHOD)).thenReturn("GET");
 	}
 	
 	@Test
 	public void testSynapseOrg() throws ServletException, IOException{
 		//we are in a .synapse.org subdomain
+		// also request to allow the "credentials" header in the request
+		when(mockRequest.getHeader(ACCESS_CONTROL_REQUEST_HEADERS)).thenReturn("credentials");
+		
 		filter.testFilter(mockRequest, mockResponse, mockFilterChain);
 		
 		//verify allow origin header set to the specific origin
 		verify(mockResponse).addHeader(eq(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER), stringCaptor.capture());
 		String allowOriginHeaderValue = stringCaptor.getValue();
 		assertEquals("https://tst.synapse.org", allowOriginHeaderValue);
+		
 		// and Access-Control-Allow-Credentials is set to true
 		verify(mockResponse).addHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER, "true");
+		// verify our additional requested header is included
+		verify(mockResponse).addHeader(ACCESS_CONTROL_ALLOW_HEADERS, "Content-Type, credentials");
+		verify(mockResponse).addHeader(ACCESS_CONTROL_ALLOW_METHODS, ALL_METHODS);
 	}
 
 	@Test
@@ -57,6 +66,7 @@ public class CORSFilterTest {
 		//we are not in a .synapse.org subdomain
 		when(mockRequest.getHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER)).thenReturn(Boolean.TRUE.toString());
 		when(mockRequest.getHeader(ORIGIN_HEADER)).thenReturn("tst.notsynapse.org"); 
+		when(mockRequest.getHeader(ACCESS_CONTROL_REQUEST_HEADERS)).thenReturn("credentials");
 		
 		filter.testFilter(mockRequest, mockResponse, mockFilterChain);
 		
@@ -64,5 +74,7 @@ public class CORSFilterTest {
 		verify(mockResponse).addHeader(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, DEFAULT_ALLOW_ORIGIN);
 		// and Access-Control-Allow-Credentials is not added to the response
 		verify(mockResponse, never()).addHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS_HEADER, "true");
+		//custom requested header (credentials) not allowed
+		verify(mockResponse).addHeader(ACCESS_CONTROL_ALLOW_HEADERS, "Content-Type");
 	}
 }
