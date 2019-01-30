@@ -14,6 +14,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -2031,7 +2032,33 @@ public class SynapseClientImplTest {
 		verify(mockMembershipInvitation).setId(null);
 		verify(mockMembershipInvitation).setInviteeEmail(null);
 		verify(mockSynapse).createMembershipInvitation(eq(mockMembershipInvitation), stringCaptor1.capture(), stringCaptor2.capture());
-		assertTrue(stringCaptor1.getValue().startsWith(hostPageBaseURL));
+		String redirectUrl = stringCaptor1.getValue();
+		assertTrue(redirectUrl.startsWith(hostPageBaseURL));
+		assertTrue(redirectUrl.contains(NotificationTokenType.JoinTeam.name()));
+		assertTrue(stringCaptor2.getValue().startsWith(hostPageBaseURL));
+		verify(mockSynapse).deleteMembershipInvitation(membershipInvitationId);
+	}
+	
+	//SWC-4645
+	@Test
+	public void testResendEmailBasedTeamInvitation() throws RestServiceException, SynapseException{
+		String membershipInvitationId = "1212";
+		String hostPageBaseURL = "http://localhost/Portal.html";
+		when(mockSynapse.getMembershipInvitation(anyString())).thenReturn(mockMembershipInvitation);
+		//SWC-4360: if the email and principal ID are set, then the email should be cleared)
+		when(mockMembershipInvitation.getInviteeEmail()).thenReturn("something@gmail.com");
+		when(mockMembershipInvitation.getInviteeId()).thenReturn(null);
+		
+		synapseClient.resendTeamInvitation(membershipInvitationId, hostPageBaseURL);
+		
+		verify(mockSynapse).getMembershipInvitation(membershipInvitationId);
+		verify(mockMembershipInvitation).setCreatedBy(null);
+		verify(mockMembershipInvitation).setCreatedOn(null);
+		verify(mockMembershipInvitation, never()).setInviteeEmail(null);
+		verify(mockSynapse).createMembershipInvitation(eq(mockMembershipInvitation), stringCaptor1.capture(), stringCaptor2.capture());
+		String redirectUrl = stringCaptor1.getValue();
+		assertTrue(redirectUrl.startsWith(hostPageBaseURL));
+		assertTrue(redirectUrl.contains(NotificationTokenType.EmailInvitation.name()));
 		assertTrue(stringCaptor2.getValue().startsWith(hostPageBaseURL));
 		verify(mockSynapse).deleteMembershipInvitation(membershipInvitationId);
 	}
