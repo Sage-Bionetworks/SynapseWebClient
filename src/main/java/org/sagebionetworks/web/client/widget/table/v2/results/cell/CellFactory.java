@@ -109,6 +109,9 @@ public class CellFactory  {
 			case USERID:
 				editor = ginInjector.createUserIdCellEditor();
 				break;
+			case LARGETEXT:
+				editor = ginInjector.createLargeTextFormCellEditor();
+				break;
 			default:
 				StringEditorCell stringEditor = ginInjector.createStringEditorCell();
 				stringEditor.setMaxSize(model.getMaximumSize());
