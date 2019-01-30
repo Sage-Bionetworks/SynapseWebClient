@@ -60,7 +60,6 @@ public class BreadcrumbTest {
 	public void testAsWidgetEntity() throws Exception {
 		Entity entity = new Folder();
 		entity.setId("3");
-		entity.setUri("path/dataset/3");
 		List<EntityHeader> pathHeaders = new ArrayList<EntityHeader>();
 		
 		EntityHeader rootHeader = new EntityHeader();
