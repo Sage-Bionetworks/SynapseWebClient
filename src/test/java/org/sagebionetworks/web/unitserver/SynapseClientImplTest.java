@@ -2011,7 +2011,6 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).createMembershipInvitation(eq(mockMembershipInvitation), stringCaptor1.capture(), stringCaptor2.capture());
 		String redirectUrl = stringCaptor1.getValue();
 		assertTrue(redirectUrl.startsWith(hostPageBaseURL));
-		assertTrue(redirectUrl.contains(NotificationTokenType.JoinTeam.name()));
 		assertTrue(stringCaptor2.getValue().startsWith(hostPageBaseURL));
 		verify(mockSynapse).deleteMembershipInvitation(membershipInvitationId);
 	}
@@ -2035,7 +2034,6 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).createMembershipInvitation(eq(mockMembershipInvitation), stringCaptor1.capture(), stringCaptor2.capture());
 		String redirectUrl = stringCaptor1.getValue();
 		assertTrue(redirectUrl.startsWith(hostPageBaseURL));
-		assertTrue(redirectUrl.contains(NotificationTokenType.EmailInvitation.name()));
 		assertTrue(stringCaptor2.getValue().startsWith(hostPageBaseURL));
 		verify(mockSynapse).deleteMembershipInvitation(membershipInvitationId);
 	}
