@@ -251,8 +251,7 @@ public class SynapseJavascriptClient {
 	
 	public static final String DOWNLOAD_ORDER = "/download/order";
 	public static final String DOWNLOAD_ORDER_HISTORY = DOWNLOAD_ORDER+"/history";
-	
-	
+	public static final String STORAGE_REPORT = "/storageReport";
 	
 	public String repoServiceUrl,fileServiceUrl, authServiceUrl, synapseVersionInfo; 
 	@Inject

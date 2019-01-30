@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.shared.asynch;
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.*;
+
+import org.sagebionetworks.client.RestEndpointType;
 import org.sagebionetworks.repo.model.doi.v2.*;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
@@ -9,6 +11,8 @@ import org.sagebionetworks.repo.model.file.AddFileToDownloadListRequest;
 import org.sagebionetworks.repo.model.file.AddFileToDownloadListResponse;
 import org.sagebionetworks.repo.model.file.BulkFileDownloadRequest;
 import org.sagebionetworks.repo.model.file.BulkFileDownloadResponse;
+import org.sagebionetworks.repo.model.report.DownloadStorageReportRequest;
+import org.sagebionetworks.repo.model.report.DownloadStorageReportResponse;
 import org.sagebionetworks.repo.model.table.AppendableRowSetRequest;
 import org.sagebionetworks.repo.model.table.DownloadFromTableRequest;
 import org.sagebionetworks.repo.model.table.DownloadFromTableResult;
@@ -43,7 +47,8 @@ public enum AsynchType implements IsSerializable{
 	BulkFileDownload(FILE_BULK, BulkFileDownloadRequest.class,BulkFileDownloadResponse.class),
 	TableTransaction(TABLE_TRANSACTION, TableUpdateTransactionRequest.class, TableUpdateTransactionResponse.class),
 	Doi(DOI, DoiRequest.class, DoiResponse.class),
-	AddFileToDownloadList(DOWNLOAD_LIST_ADD, AddFileToDownloadListRequest.class, AddFileToDownloadListResponse.class);
+	AddFileToDownloadList(DOWNLOAD_LIST_ADD, AddFileToDownloadListRequest.class, AddFileToDownloadListResponse.class),
+	DownloadStorageReport(STORAGE_REPORT, DownloadStorageReportRequest.class, DownloadStorageReportResponse.class);
 	String prefix;
 	Class<? extends AsynchronousRequestBody> requestClass;
 	Class<? extends AsynchronousResponseBody> responseClass;
