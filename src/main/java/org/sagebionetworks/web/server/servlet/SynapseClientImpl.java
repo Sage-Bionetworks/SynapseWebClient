@@ -1288,19 +1288,24 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			//resend the invitation.  get the invitation, clear out system specified values, re-create the invitation, and delete the old one.
-			String emailInvitationEndpoint = NotificationTokenType.EmailInvitation.getNotificationEndpoint(hostPageBaseURL);
 			String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
 			MembershipInvitation membershipInvitation = synapseClient.getMembershipInvitation(membershipInvitationId);
 			membershipInvitation.setCreatedBy(null);
 			membershipInvitation.setCreatedOn(null);
 			membershipInvitation.setId(null);
 
-			// SWC-4360: if both the principal ID and email are set, then clear out the email in the new invite to avoid a backend error.
-			if (membershipInvitation.getInviteeId() != null && membershipInvitation.getInviteeEmail() != null) {
-				membershipInvitation.setInviteeEmail(null);
+			String invitationEndpoint = NotificationTokenType.EmailInvitation.getNotificationEndpoint(hostPageBaseURL);
+			if (membershipInvitation.getInviteeId() != null) {
+				// SWC-4645: if ID is set, then this will be a JoinTeam type token.
+				invitationEndpoint = NotificationTokenType.JoinTeam.getNotificationEndpoint(hostPageBaseURL);
+
+				// SWC-4360: if both the principal ID and email are set, then clear out the email in the new invite to avoid a backend error.
+				if (membershipInvitation.getInviteeEmail() != null) {
+					membershipInvitation.setInviteeEmail(null);	
+				}
 			}
 			
-			synapseClient.createMembershipInvitation(membershipInvitation, emailInvitationEndpoint, settingsEndpoint);
+			synapseClient.createMembershipInvitation(membershipInvitation, invitationEndpoint, settingsEndpoint);
 			synapseClient.deleteMembershipInvitation(membershipInvitationId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
