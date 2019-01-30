@@ -220,6 +220,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellE
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.LargeStringCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellView;
@@ -445,6 +446,7 @@ public interface PortalGinInjector extends Ginjector {
 	FileCellRenderer createFileCellRenderer();
 	UserIdCellRenderer createUserIdCellRenderer();
 	UserIdCellEditor createUserIdCellEditor();
+	LargeStringCellEditor createLargeTextFormCellEditor();
 
 	// Asynchronous
 	AsynchronousProgressWidget creatNewAsynchronousProgressWidget();
