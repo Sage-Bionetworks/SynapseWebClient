@@ -63,7 +63,7 @@ public class EmailInvitationPresenterTest {
 		encodedMISignedToken = "encodedToken";
 		when(place.toToken()).thenReturn(encodedMISignedToken);
 		MembershipInvtnSignedToken decodedToken = new MembershipInvtnSignedToken();
-		when(futureClient.hexDecodeAndDeserialize(anyString(), eq(encodedMISignedToken))).thenReturn(getDoneFuture(decodedToken));
+		when(futureClient.hexDecodeAndDeserialize(eq(encodedMISignedToken))).thenReturn(getDoneFuture(decodedToken));
 		when(jsClient.getMembershipInvitation(decodedToken)).thenReturn(getDoneFuture(mis));
 		when(mis.getId()).thenReturn("misId");
 		when(mis.getInviteeEmail()).thenReturn("invitee@email.com");
@@ -108,7 +108,7 @@ public class EmailInvitationPresenterTest {
 	@Test
 	public void testInvalidSignedToken() {
 		beforeSetPlace(false);
-		when(futureClient.hexDecodeAndDeserialize(anyString(), eq(encodedMISignedToken))).thenReturn(getFailedFuture());
+		when(futureClient.hexDecodeAndDeserialize(eq(encodedMISignedToken))).thenReturn(getFailedFuture());
 		presenter.setPlace(place);
 		verify(synapseAlert).handleException(any(Throwable.class));
 		verify(jsClient, never()).getMembershipInvitation(any());

@@ -21,7 +21,6 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.EmailInvitationView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.shared.NotificationTokenType;
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
@@ -68,7 +67,7 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 		view.setPresenter(this);
 		encodedMISignedToken = place.toToken();
 
-		futureClient.hexDecodeAndDeserialize(NotificationTokenType.EmailInvitation.name(), encodedMISignedToken)
+		futureClient.hexDecodeAndDeserialize(encodedMISignedToken)
 			.transformAsync(
 					token -> jsClient.getMembershipInvitation((MembershipInvtnSignedToken) token),
 					directExecutor()

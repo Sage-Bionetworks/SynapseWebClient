@@ -148,7 +148,6 @@ import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
-import org.sagebionetworks.web.shared.NotificationTokenType;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.TeamMemberBundle;
@@ -1086,7 +1085,7 @@ public class SynapseClientImplTest {
 		// verify it does not create a new request since one is already open
 		synapseClient.requestMembership("123", "a team", "let me join", TEST_HOME_PAGE_BASE, null);
 		verify(mockSynapse, Mockito.times(0)).addTeamMember(anyString(),
-				anyString(), eq(TEST_HOME_PAGE_BASE+"#!Team:"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
+				anyString(), eq(TEST_HOME_PAGE_BASE+"#!Team:"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:"));
 		ArgumentCaptor<MembershipRequest> captor = ArgumentCaptor.forClass(MembershipRequest.class);
 		verify(mockSynapse, Mockito.times(0)).createMembershipRequest(
 				captor.capture(), anyString(), anyString());
@@ -1097,7 +1096,7 @@ public class SynapseClientImplTest {
 			RestServiceException, JSONObjectAdapterException {
 		membershipStatus.setCanJoin(true);
 		synapseClient.inviteMember("123", "a team", "", TEST_HOME_PAGE_BASE);
-		verify(mockSynapse).addTeamMember(anyString(), anyString(), eq(TEST_HOME_PAGE_BASE+"#!Team:"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
+		verify(mockSynapse).addTeamMember(anyString(), anyString(), eq(TEST_HOME_PAGE_BASE+"#!Team:"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:"));
 	}
 
 	@Test
@@ -1105,7 +1104,7 @@ public class SynapseClientImplTest {
 			RestServiceException, JSONObjectAdapterException {
 		membershipStatus.setCanJoin(true);
 		synapseClient.requestMembership("123", "a team", "", TEST_HOME_PAGE_BASE, new Date());
-		verify(mockSynapse).addTeamMember(anyString(), anyString(), eq(TEST_HOME_PAGE_BASE+"#!Team:"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
+		verify(mockSynapse).addTeamMember(anyString(), anyString(), eq(TEST_HOME_PAGE_BASE+"#!Team:"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:"));
 	}
 
 	@Test
@@ -1113,7 +1112,7 @@ public class SynapseClientImplTest {
 			RestServiceException, JSONObjectAdapterException {
 		synapseClient.inviteMember("123", "a team", "", TEST_HOME_PAGE_BASE);
 		verify(mockSynapse).createMembershipInvitation(
-				any(MembershipInvitation.class), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:JoinTeam/"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
+				any(MembershipInvitation.class), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:"));
 	}
 
 	@Test
@@ -1127,7 +1126,7 @@ public class SynapseClientImplTest {
 		Date expiresOn = null;
 		synapseClient.requestMembership("123", teamId, message, TEST_HOME_PAGE_BASE, expiresOn);
 		verify(mockSynapse).createMembershipRequest(
-				captor.capture(), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:JoinTeam/"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
+				captor.capture(), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:"));
 		MembershipRequest request = captor.getValue();
 		assertEquals(expiresOn, request.getExpiresOn());
 		assertEquals(teamId, request.getTeamId());
@@ -1145,7 +1144,7 @@ public class SynapseClientImplTest {
 		Date expiresOn = new Date();
 		synapseClient.requestMembership("123", teamId, message, TEST_HOME_PAGE_BASE, expiresOn);
 		verify(mockSynapse).createMembershipRequest(
-				captor.capture(), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:JoinTeam/"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
+				captor.capture(), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:"));
 		MembershipRequest request = captor.getValue();
 		assertEquals(expiresOn, request.getExpiresOn());
 		assertEquals(teamId, request.getTeamId());
@@ -1546,50 +1545,28 @@ public class SynapseClientImplTest {
 		synapseClient.getHost("foobar");
 	}
 		
-	@Test(expected = BadRequestException.class)
-	public void testHandleSignedTokenNull() throws RestServiceException, SynapseException{
-		String tokenTypeName = null;
-		synapseClient.hexDecodeAndDeserialize(tokenTypeName, encodedJoinTeamToken);
-	}
-	
-	@Test(expected = BadRequestException.class)
-	public void testHandleSignedTokenEmpty() throws RestServiceException, SynapseException{
-		String tokenTypeName = "";
-		synapseClient.hexDecodeAndDeserialize(tokenTypeName, encodedJoinTeamToken);
-	}
-	
-	@Test(expected = BadRequestException.class)
-	public void testHandleSignedTokenUnrecognized() throws RestServiceException, SynapseException{
-		String tokenTypeName = "InvalidTokenType";
-		synapseClient.hexDecodeAndDeserialize(tokenTypeName, encodedJoinTeamToken);
-	}
-	
 	@Test
 	public void testHandleSignedTokenJoinTeam() throws RestServiceException, SynapseException{
-		String tokenTypeName = NotificationTokenType.JoinTeam.name();
-		SignedTokenInterface token = synapseClient.hexDecodeAndDeserialize(tokenTypeName, encodedJoinTeamToken);
+		SignedTokenInterface token = synapseClient.hexDecodeAndDeserialize(encodedJoinTeamToken);
 		synapseClient.handleSignedToken(token,TEST_HOME_PAGE_BASE);
-		verify(mockSynapse).addTeamMember(joinTeamToken, TEST_HOME_PAGE_BASE+"#!Team:", TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/");
+		verify(mockSynapse).addTeamMember(joinTeamToken, TEST_HOME_PAGE_BASE+"#!Team:", TEST_HOME_PAGE_BASE+"#!SignedToken:");
 	}
 	
 	@Test(expected = BadRequestException.class)
 	public void testHandleSignedTokenInvalidJoinTeam() throws RestServiceException, SynapseException{
-		String tokenTypeName = NotificationTokenType.JoinTeam.name();
-		SignedTokenInterface token = synapseClient.hexDecodeAndDeserialize(tokenTypeName, "invalid token");
+		SignedTokenInterface token = synapseClient.hexDecodeAndDeserialize("invalid token");
 	}
 	
 	@Test
 	public void testHandleSignedTokenNotificationSettings() throws RestServiceException, SynapseException{
-		String tokenTypeName = NotificationTokenType.Settings.name();
-		SignedTokenInterface token = synapseClient.hexDecodeAndDeserialize(tokenTypeName, encodedNotificationSettingsToken);
+		SignedTokenInterface token = synapseClient.hexDecodeAndDeserialize(encodedNotificationSettingsToken);
 		synapseClient.handleSignedToken(token, TEST_HOME_PAGE_BASE);
 		verify(mockSynapse).updateNotificationSettings(notificationSettingsToken);
 	}
 	
 	@Test(expected = BadRequestException.class)
 	public void testHandleSignedTokenInvalidNotificationSettings() throws RestServiceException, SynapseException{
-		String tokenTypeName = NotificationTokenType.Settings.name();
-		SignedTokenInterface token = synapseClient.hexDecodeAndDeserialize(tokenTypeName, "invalid token");
+		SignedTokenInterface token = synapseClient.hexDecodeAndDeserialize("invalid token");
 	}
 	
 	@Test
