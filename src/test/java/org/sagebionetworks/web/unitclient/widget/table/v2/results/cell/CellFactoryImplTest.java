@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellE
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.LargeStringCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellView;
@@ -74,6 +75,8 @@ public class CellFactoryImplTest {
 	UserIdCellEditor mockUserIdCellEditor;
 	@Mock
 	UserIdCellRenderer mockUserIdCellRenderer;
+	@Mock
+	LargeStringCellEditor mockLargeStringCellEditor;
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
@@ -94,6 +97,7 @@ public class CellFactoryImplTest {
 		when(mockInjector.createEnumFormCellEditor()).thenReturn(mockEnumFormCellEditor);
 		when(mockInjector.createUserIdCellEditor()).thenReturn(mockUserIdCellEditor);
 		when(mockInjector.createUserIdCellRenderer()).thenReturn(mockUserIdCellRenderer);
+		when(mockInjector.createLargeTextFormCellEditor()).thenReturn(mockLargeStringCellEditor);
 		cellFactory = new CellFactory(mockInjector);
 	}
 
@@ -294,6 +298,13 @@ public class CellFactoryImplTest {
 		assertEquals(mockFileCellEditor, cellFactory.createFormEditor(cm));
 	}
 	
+	@Test
+	public void testGetLargeStringCellEditor(){
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.LARGETEXT);
+		assertEquals(mockLargeStringCellEditor, cellFactory.createFormEditor(cm));
+	}
+
 	@Test
 	public void testGetFileCellRenderer(){
 		ColumnModel cm = new ColumnModel();
