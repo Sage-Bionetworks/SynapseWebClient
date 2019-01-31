@@ -36,7 +36,11 @@ public class Synapse extends Place {
 		String[] entityIdTokens = entityId.split(DOT_REGEX);
 		if (entityIdTokens.length > 1) {
 			entityId = entityIdTokens[0];
-			versionNumber = Long.parseLong(entityIdTokens[1]);
+			try {
+				versionNumber = Long.parseLong(entityIdTokens[1]);
+			} catch (NumberFormatException e) {
+				//invalid version, ignore
+			}
 		}
 		
 		//set the next token
@@ -45,13 +49,21 @@ public class Synapse extends Place {
 		if (nextToken != null && VERSION.equals(nextToken.toLowerCase())) {
 			nextToken = null;
 			if (!tokens.isEmpty()) {
-				versionNumber = Long.parseLong(tokens.removeFirst());
+				try {
+					versionNumber = Long.parseLong(tokens.removeFirst());
+				} catch (NumberFormatException e) {
+					//invalid version, ignore
+				}
 				nextToken = tokens.poll();
 			}
 		}
 		
 		if (nextToken != null) {
-			area = EntityArea.valueOf(nextToken.toUpperCase());
+			try {
+				area = EntityArea.valueOf(nextToken.toUpperCase());
+			} catch (Exception e) {
+				// invalid entity area, ignore
+			}
 		}
 			
 		//remaining tokens are recognized is the area token
