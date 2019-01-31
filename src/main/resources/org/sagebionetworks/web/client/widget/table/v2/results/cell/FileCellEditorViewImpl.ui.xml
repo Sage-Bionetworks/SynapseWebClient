@@ -12,7 +12,7 @@
 				<b:Button ui:field="showUploadModalButton" icon="UPLOAD"
 					height="34px" />
 			</b:InputGroup>
-			<b:HelpBlock ui:field="helpBlock" />
+			<b:HelpBlock ui:field="helpBlock" visible="false"/>
 		</b:FormGroup>
 		<b:Collapse ui:field="collapse" toggle="false">
 			<b:Panel>
