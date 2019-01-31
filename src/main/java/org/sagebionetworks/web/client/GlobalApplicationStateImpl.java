@@ -4,7 +4,9 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import static org.sagebionetworks.web.client.cookie.CookieKeys.LAST_PLACE;
 import static org.sagebionetworks.web.client.cookie.CookieKeys.SHOW_DATETIME_IN_UTC;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -53,6 +55,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private CallbackP<JavaScriptObject> fileListCallback;
 	private SynapseProperties synapseProperties;
 	boolean isDragDropInitialized = false;
+	public static final ArrayList<String> SAFE_TO_IGNORE_ERRORS = new ArrayList<String>();
+	static {
+		//Benign error thrown by VideoWidget (<video>). ResizeObserver was not able to deliver all observations within a single animation frame.
+		SAFE_TO_IGNORE_ERRORS.add("resizeobserver loop limit exceeded");
+	}
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
 			CookieProvider cookieProvider,
@@ -90,10 +97,25 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		});
 	}
 	
+	public static boolean isIgnoredErrorMessage(String error) {
+		if (error == null || error.trim().isEmpty()) {
+			return false;
+		}
+		String lowercaseError = error.toLowerCase();
+		for (String ignoredErrorPrefix : SAFE_TO_IGNORE_ERRORS) {
+			if (lowercaseError.startsWith(ignoredErrorPrefix)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public void handleUncaughtException(Throwable e) {
 		try {
 			GWT.debugger();
-			jsClient.logError(unwrap(e));
+			if (!isIgnoredErrorMessage(e.getMessage())) {
+				jsClient.logError(unwrap(e));
+			}
 		} catch (Throwable t) {
 			synapseJSNIUtils.consoleError("Unable to log uncaught exception to server: " + t.getMessage());
 		} finally {
