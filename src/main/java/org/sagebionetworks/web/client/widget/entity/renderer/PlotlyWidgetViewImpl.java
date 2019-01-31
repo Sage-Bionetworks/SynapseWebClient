@@ -134,7 +134,8 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 					  showlegend: showLegend,
 					  autosize: true,
 					  margin: {
-					  	l: 200
+					  	l: 200,
+					  	b: 200
 					  }
 					},
 				useResizeHandler: true,
