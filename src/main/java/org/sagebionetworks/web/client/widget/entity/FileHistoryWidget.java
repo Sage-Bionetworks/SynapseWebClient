@@ -96,7 +96,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 						public void onSuccess(Entity result) {
 							view.hideEditVersionInfo();
 							view.showInfo(DisplayConstants.VERSION_INFO_UPDATED + ": " + vb.getName());
-							refreshFileHistory();
+							globalApplicationState.refreshPage();
 						}
 					});
 		}
