@@ -16,6 +16,6 @@
 			autoClose="true" highlightToday="true" showTodayButton="true"
 			showMeridian="false" format="mm/dd/yyyy hh:ii:ss" minView="MONTH"
 			hasKeyboardNavigation="true" />
-		<b:HelpBlock ui:field="helpBlock"/>
+		<b:HelpBlock ui:field="helpBlock" visible="false"/>
 	</b:FormGroup>
 </ui:UiBinder>

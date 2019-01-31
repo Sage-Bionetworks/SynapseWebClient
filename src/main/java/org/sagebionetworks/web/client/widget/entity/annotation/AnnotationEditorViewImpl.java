@@ -82,7 +82,6 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 	@Override
 	public void addNewEditor(final CellEditor editor) {
 		final InputGroup group = new InputGroup();
-		group.addStyleName("moveup-10");
 		Button deleteButton = new Button("", IconType.TIMES, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -92,7 +91,6 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 		});
 		
 		deleteButton.setHeight("35px");
-		deleteButton.addStyleName("movedown-10");
 		InputGroupButton deleteButtonGroup = new InputGroupButton();
 		deleteButtonGroup.add(deleteButton);
 		group.add(editor.asWidget());

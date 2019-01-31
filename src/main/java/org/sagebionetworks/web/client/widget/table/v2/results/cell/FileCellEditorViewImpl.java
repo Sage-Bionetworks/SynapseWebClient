@@ -124,12 +124,14 @@ public class FileCellEditorViewImpl implements FileCellEditorView {
 	public void setValueError(String help) {
 		this.formGroup.setValidationState(ValidationState.ERROR);
 		this.helpBlock.setText(help);
+		helpBlock.setVisible(help != null && !help.trim().isEmpty());
 	}
 
 	@Override
 	public void clearValueError() {
 		this.formGroup.setValidationState(ValidationState.NONE);
 		this.helpBlock.setText("");
+		helpBlock.setVisible(false);
 	}
 
 	@Override
