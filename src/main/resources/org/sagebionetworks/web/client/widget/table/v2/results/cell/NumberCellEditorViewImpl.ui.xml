@@ -7,6 +7,6 @@
 
 	<b:FormGroup ui:field="formGroup">
 		<b:TextBox ui:field="textBox"/>
-		<b:HelpBlock ui:field="helpBlock"/>
+		<b:HelpBlock ui:field="helpBlock" visible="false"/>
 	</b:FormGroup>
 </ui:UiBinder>

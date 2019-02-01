@@ -101,6 +101,7 @@ public class NumberCellEditorViewImpl implements NumberCellEditorView {
 	@Override
 	public void setHelpText(String help) {
 		this.helpBlock.setText(help);
+		helpBlock.setVisible(help != null && !help.trim().isEmpty());
 	}
 
 	@Override
