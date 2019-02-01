@@ -120,6 +120,7 @@ public class FileHistoryWidgetTest {
 		when(mockPagedResults.getResults()).thenReturn(versions);
 		AsyncMockStubber.callSuccessWith(mockPagedResults).when(mockSynapseClient).getEntityVersions(anyString(), anyInt(), anyInt(),any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+		AsyncMockStubber.callSuccessWith(vb).when(mockSynapseClient).updateEntity(any(Entity.class),any(AsyncCallback.class));
 	}
 
 	@Test
@@ -167,6 +168,7 @@ public class FileHistoryWidgetTest {
 		VersionableEntity capturedEntity = (VersionableEntity)entityCaptor.getValue();
 		assertEquals(testComment, capturedEntity.getVersionComment());
 		assertEquals(testLabel, capturedEntity.getVersionLabel());
+		verify(mockGlobalApplicationState).refreshPage();
 	}
 	
 	@Test
