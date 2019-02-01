@@ -69,9 +69,7 @@ public class ProvenanceWidgetTest {
 		
 	ProvenanceWidget provenanceWidget;
 	ProvenanceWidgetView mockView;
-	AuthenticationController mockAuthController;
 	ClientCache mockClientCache;
-	GlobalApplicationState mockGlobalAppState;
 	
 	FileEntity outputEntity;
 	String entity456Id = "syn456";
@@ -97,14 +95,10 @@ public class ProvenanceWidgetTest {
 	public void setup() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		mockView = mock(ProvenanceWidgetView.class);
-		mockAuthController = mock(AuthenticationController.class);
 		jsoProvider = new JsoProviderTestImpl();
 		when(mockSynapseJSNIUtils.nChartlayout(any(NChartLayersArray.class), any(NChartCharacters.class))).thenReturn(new LayoutResultTestImpl());
 		mockClientCache = mock(ClientCache.class);
-		mockGlobalAppState = mock(GlobalApplicationState.class);
 		provenanceWidget = new ProvenanceWidget(mockView, 
-				mockGlobalAppState, 
-				mockAuthController, 
 				mockSynapseJSNIUtils, 
 				jsoProvider, 
 				mockClientCache, 
@@ -274,7 +268,7 @@ public class ProvenanceWidgetTest {
 	public void testFindOldVersionsNotFoundException() throws Exception {
 		SynapseJSNIUtils mockJsniUtils = mock(SynapseJSNIUtils.class);
 		when(mockJsniUtils.nChartlayout(any(NChartLayersArray.class), any(NChartCharacters.class))).thenReturn(new LayoutResultTestImpl());
-		provenanceWidget = new ProvenanceWidget(mockView, mockGlobalAppState, mockAuthController, mockJsniUtils, jsoProvider, mockClientCache, mockDateTimeUtils, mockSynapseJavascriptClient, mockSynAlert);
+		provenanceWidget = new ProvenanceWidget(mockView, mockJsniUtils, jsoProvider, mockClientCache, mockDateTimeUtils, mockSynapseJavascriptClient, mockSynAlert);
 		
 		String message = "entity syn999 was not found";
 		AsyncMockStubber.callFailureWith(new NotFoundException(message)).when(mockSynapseJavascriptClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));

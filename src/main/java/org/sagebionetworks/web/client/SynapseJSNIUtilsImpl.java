@@ -178,7 +178,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		var layoutResult = {};
 		try {
 		    var debug = {'features': ['nodes'], 'wireframe': true};
-			var conf = {'group_styles': {'pov': {'stroke-width': 3}},
+			var conf = {'subnode_spacing': 40, 'group_styles': {'pov': {'stroke-width': 3}},
 		        'debug': debug};	        
 			var chart = new $wnd.NChart(characters, layers, conf).calc().plot();
 				
