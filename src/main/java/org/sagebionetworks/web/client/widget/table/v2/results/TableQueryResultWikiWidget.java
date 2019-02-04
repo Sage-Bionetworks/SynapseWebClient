@@ -9,6 +9,8 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.Query;
+import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -30,7 +32,7 @@ import com.google.inject.Inject;
 
 public class TableQueryResultWikiWidget implements WidgetRendererPresenter, QueryChangeHandler {
 
-	TableEntityWidget tableEntityWidget;
+	TableEntityWidget tableEntityWidget = null;
 	SynapseJSNIUtils synapseJsniUtils;
 	TableQueryResultWikiWidgetView view;
 	SynapseJavascriptClient jsClient;
@@ -39,29 +41,46 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 	EntityActionController entityActionController;
 	Query query;
 	boolean isQueryVisible;
-	
+	PortalGinInjector ginInjector;
+	GWTWrapper gwt;
+	public static boolean isLoading = false;
 	@Inject
 	public TableQueryResultWikiWidget(TableQueryResultWikiWidgetView view, 
-			TableEntityWidget tableEntityWidget, 
 			ActionMenuWidget actionMenu,
 			EntityActionController entityActionController,
 			SynapseJSNIUtils synapseJsniUtils,
 			SynapseJavascriptClient jsClient,
-			SynapseAlert synAlert) {
+			SynapseAlert synAlert,
+			GWTWrapper gwt,
+			PortalGinInjector ginInjector) {
 		this.view = view;
-		this.tableEntityWidget = tableEntityWidget;
 		this.actionMenu = actionMenu;
 		this.entityActionController = entityActionController;
 		this.jsClient = jsClient;
 		this.synAlert = synAlert;
-		view.setTableQueryResultWidget(tableEntityWidget.asWidget());
 		this.synapseJsniUtils = synapseJsniUtils;
 		view.setSynAlert(synAlert.asWidget());
+		this.ginInjector = ginInjector;
+		this.gwt = gwt;
 		actionMenu.addControllerWidget(entityActionController.asWidget());
+	}
+	
+	private TableEntityWidget getTableEntityWidget() {
+		if (tableEntityWidget == null) {
+			tableEntityWidget = ginInjector.createNewTableEntityWidget();
+			view.setTableQueryResultWidget(tableEntityWidget.asWidget());
+		}
+		return tableEntityWidget;
 	}
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> descriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
+		if (isLoading) {
+			gwt.scheduleExecution(() -> {configure(wikiKey, descriptor, widgetRefreshRequired, wikiVersionInView);}, 2000);
+			return;
+		}
+		isLoading = true;
+
 		Long limit = TableEntityWidget.DEFAULT_LIMIT;
 		try {
 			if (descriptor.containsKey(WidgetConstants.TABLE_LIMIT_KEY))
@@ -104,13 +123,15 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 				boolean isCurrentVersion = true;
 				entityActionController.configure(actionMenu, bundle, isCurrentVersion, bundle.getRootWikiId(), EntityArea.TABLES);
 				boolean canEdit = false;
-				tableEntityWidget.configure(bundle, canEdit, TableQueryResultWikiWidget.this, actionMenu);
+				getTableEntityWidget().configure(bundle, canEdit, TableQueryResultWikiWidget.this, actionMenu);
 				hideEditActions();
+				isLoading = false;
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
+				isLoading = false;
 			}			
 		};
 		
@@ -123,7 +144,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		this.actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
 		this.actionMenu.setActionVisible(Action.SHOW_FILE_HISTORY, false);
 		if (!isQueryVisible) {
-			tableEntityWidget.hideFiltering();
+			getTableEntityWidget().hideFiltering();
 		}
 	}
 	

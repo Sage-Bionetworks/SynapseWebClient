@@ -1,15 +1,15 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 
 import java.util.HashMap;
@@ -24,6 +24,8 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.table.Query;
+import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -61,24 +63,30 @@ public class TableQueryResultWikiWidgetTest {
 	EntityActionController mockEntityActionController;
 	@Mock
 	EntityBundle mockEntityBundle;
-	
+	@Mock
+	PortalGinInjector mockGinInjector;
+	@Mock
+	GWTWrapper mockGWT;
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 		widget = new TableQueryResultWikiWidget(
 				mockView, 
-				mockTableEntityWidget,
 				mockActionMenu,
 				mockEntityActionController,
 				mockSynapseJSNIUtils, 
 				mockSynapseJavascriptClient, 
-				mockSynAlert);
+				mockSynAlert,
+				mockGWT, 
+				mockGinInjector);
 		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		when(mockGinInjector.createNewTableEntityWidget()).thenReturn(mockTableEntityWidget);
 	}
 
 	@Test
 	public void testConstruction() {
-		verify(mockView).setTableQueryResultWidget(any(Widget.class));
+		// lazily loaded table query result widget
+		verify(mockView, never()).setTableQueryResultWidget(any(Widget.class));
 		verify(mockView).setSynAlert(any(Widget.class));
 		verify(mockActionMenu).addControllerWidget(any(Widget.class));
 	}
