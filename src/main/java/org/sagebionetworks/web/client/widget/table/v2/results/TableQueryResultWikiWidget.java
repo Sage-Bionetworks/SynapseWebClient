@@ -76,7 +76,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> descriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		if (isLoading) {
-			gwt.scheduleExecution(() -> {configure(wikiKey, descriptor, widgetRefreshRequired, wikiVersionInView);}, 2000);
+			gwt.scheduleExecution(() -> {configure(wikiKey, descriptor, widgetRefreshRequired, wikiVersionInView);}, 1000);
 			return;
 		}
 		isLoading = true;
