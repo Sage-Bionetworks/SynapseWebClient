@@ -1310,11 +1310,6 @@ h1, h2, h3, h4, h5, h6 {
 
 /**********************************/
 	
-.center-in-div {
-	margin:auto; 
-	display:block;
-}
-	
 .margin-auto {
 	margin:auto; 
 }
@@ -1495,7 +1490,6 @@ ol.lowerroman {
 	.displayInline {
 		display: inline;
 	}
-
 	.displayInlineTable {
 		display: inline-table;
 	}
@@ -1507,6 +1501,10 @@ ol.lowerroman {
 	}
 	.displayBlock {
 		display: block;
+	}
+	.center-in-div {
+		margin:auto; 
+		display:block;
 	}
 	.flexcontainer-row {
 		display: -webkit-flex;
@@ -2147,18 +2145,6 @@ div.input-group > input.search-textbox {
 	text-align: left;
 }
 
-.text-danger, #rootPanel .text-danger {
-	color: #d9534f;
-}
-
-.text-primary, #rootPanel .text-primary {
-	color: $synapse-blue;
-}
-
-.text-warning, #rootPanel .text-warning {
-	color: $synapse-yellow;
-}
-
 /**Override JQuery table styles **/
 table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp, table.tablesorter thead tr .header  {
     background-color: #FAFAFA !important;
@@ -2712,6 +2698,16 @@ div.border {
 	}
 }
 #body {
+	.text-danger {
+		color: #d9534f;
+	}
+	.text-primary {
+		color: $synapse-blue;
+	}
+	.text-warning {
+		color: $synapse-yellow;
+	}
+
 	.alert a {
 		font-weight: inherit;
 		text-decoration: underline;
