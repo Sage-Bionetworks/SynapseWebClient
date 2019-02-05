@@ -17,7 +17,6 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
@@ -50,6 +49,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	public static final Direction DEFAULT_DIRECTION = Direction.ASC;
 	boolean isInitializing = false;
 	private List<String> idList;
+	CallbackP<Boolean> isEmptyCallback;
 	@Inject
 	public EntityTreeBrowser(PortalGinInjector ginInjector,
 			EntityTreeBrowserView view, 
@@ -177,6 +177,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 				new AsyncCallback<EntityChildrenResponse>() {
 					@Override
 					public void onSuccess(EntityChildrenResponse results) {
+						boolean isEmptyResults = false;
 						if (!results.getPage().isEmpty()) {
 							addResultsToParent(parent, results.getPage());
 							// More total entities than able to be displayed, so
@@ -186,6 +187,12 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 										.getMoreTreeWidget();
 								addMoreButton(moreItem, parentId, parent, results.getNextPageToken());
 							}
+						} else if (nextPageToken == null) {
+							//if this was a request for the first page (nextPageToken == null) and it was empty, then set to true.
+							isEmptyResults = true;
+						}
+						if (isEmptyCallback != null) {
+							isEmptyCallback.invoke(isEmptyResults);
 						}
 						if (parent == null) {
 							view.setLoadingVisible(false);
@@ -355,5 +362,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	}
 	public void showMinimalColumnSet() {
 		view.showMinimalColumnSet();
+	}
+	public void setIsEmptyCallback(CallbackP<Boolean> isEmptyCallback) {
+		this.isEmptyCallback = isEmptyCallback;
 	}
 }

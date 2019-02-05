@@ -1,9 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import org.gwtbootstrap3.client.ui.AnchorListItem;
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.HelpWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -31,6 +33,10 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	AnchorListItem programmaticOptionsLink;
 	@UiField
 	Div addToDownloadListContainer;
+	@UiField
+	Button downloadOptionsButton;
+	@UiField
+	HelpWidget emptyContainerHelp;
 	
 	@Inject
 	public FilesBrowserViewImpl(FilesBrowserViewImplUiBinder binder,
@@ -45,6 +51,10 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 		});
 		addToDownloadListLink.addClickHandler(event->{
 			presenter.onAddToDownloadList();
+		});
+		entityTreeBrowser.setIsEmptyCallback(isEmpty -> {
+			emptyContainerHelp.setVisible(isEmpty);
+			downloadOptionsButton.setEnabled(!isEmpty);
 		});
 	}
 
