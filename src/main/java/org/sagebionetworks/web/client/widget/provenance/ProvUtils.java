@@ -44,6 +44,7 @@ public class ProvUtils {
 		
 		// maps for local building retrieval
 		Map<Reference,EntityGraphNode> entityNodes = new HashMap<Reference,EntityGraphNode>();
+		Map<UsedURL,ExternalGraphNode> externalGraphNodes = new HashMap<UsedURL,ExternalGraphNode>();
 		Map<Activity,ActivityGraphNode> activityNodes = new HashMap<Activity,ActivityGraphNode>();
 		
 		// create ProvGraphNodes for the entities
@@ -105,11 +106,16 @@ public class ProvUtils {
 							nodeHasExpandNode.add(entityNode);
 						}
 					} else if(used instanceof UsedURL) {
-						UsedURL ue = (UsedURL)used;									
-						ExternalGraphNode externalGraphNode = new ExternalGraphNode(createUniqueNodeId(), ue.getName(), ue.getUrl(), ue.getWasExecuted());
-						idToNode.put(externalGraphNode.getId(), externalGraphNode);
-						graph.addNode(externalGraphNode);
-						graph.addEdge(new ProvGraphEdge(activityNode, externalGraphNode));						
+						UsedURL ue = (UsedURL)used;
+						ExternalGraphNode externalGraphNode = externalGraphNodes.get(ue);
+						if (externalGraphNode == null) {
+							externalGraphNode = new ExternalGraphNode(createUniqueNodeId(), ue.getName(), ue.getUrl(), ue.getWasExecuted());
+							idToNode.put(externalGraphNode.getId(), externalGraphNode);
+							graph.addNode(externalGraphNode);
+							externalGraphNodes.put(ue, externalGraphNode);
+						}
+						
+						graph.addEdge(new ProvGraphEdge(activityNode, externalGraphNode));
 					}
 				}
 				
@@ -128,7 +134,6 @@ public class ProvUtils {
 		return graph;
 	}
 
-	
 	/**
 	 * Creates a random id that is not in use yet 
 	 */

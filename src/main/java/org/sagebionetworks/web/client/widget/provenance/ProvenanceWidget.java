@@ -16,11 +16,9 @@ import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -48,8 +46,6 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	private static final String FAKE_ID_PREFIX = "fakeId";
 	private static final int DEFAULT_HEIGHT = 270;
 	private ProvenanceWidgetView view;
-	private AuthenticationController authenticationController;
-	private GlobalApplicationState globalApplicationState;	
 	SynapseJavascriptClient jsClient;
 	private Map<String, ProvGraphNode> idToNode = new HashMap<String, ProvGraphNode>();
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -78,8 +74,6 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	
 	@Inject
 	public ProvenanceWidget(ProvenanceWidgetView view, 
-			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController, 
 			SynapseJSNIUtils synapseJSNIUtils,
 			JsoProvider jsoProvider, 
 			ClientCache clientCache,
@@ -87,8 +81,6 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			SynapseJavascriptClient jsClient,
 			SynapseAlert synAlert) {
 		this.view = view;
-		this.authenticationController = authenticationController;
-		this.globalApplicationState = globalApplicationState;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.jsoProvider = jsoProvider;
 		this.clientCache = clientCache;
