@@ -613,7 +613,7 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(new Folder());
 		entityBundle.setRootWikiId("7890");
 		controller.configure(mockActionMenu, entityBundle,true, wikiPageId, currentEntityArea);
-		verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, false);
+		verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
 		verify(mockActionMenu).setActionListener(Action.VIEW_WIKI_SOURCE, controller);
 	}
 	

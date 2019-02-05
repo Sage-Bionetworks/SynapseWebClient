@@ -933,12 +933,7 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 	}
 
 	code {
-		background-clip: padding-box;
-		border-radius: 3px 3px 3px 3px;
-		padding: 0 5px 2px;
-		overflow:auto;
-		white-space:pre-wrap;
-		word-wrap: normal;
+		font-family: 'Courier New', Courier, monospace;
 	}
 
 	img {
@@ -1315,11 +1310,6 @@ h1, h2, h3, h4, h5, h6 {
 
 /**********************************/
 	
-.center-in-div {
-	margin:auto; 
-	display:block;
-}
-	
 .margin-auto {
 	margin:auto; 
 }
@@ -1500,7 +1490,6 @@ ol.lowerroman {
 	.displayInline {
 		display: inline;
 	}
-
 	.displayInlineTable {
 		display: inline-table;
 	}
@@ -1512,6 +1501,10 @@ ol.lowerroman {
 	}
 	.displayBlock {
 		display: block;
+	}
+	.center-in-div {
+		margin:auto; 
+		display:block;
 	}
 	.flexcontainer-row {
 		display: -webkit-flex;
@@ -1541,6 +1534,23 @@ ol.lowerroman {
 	}
 	.flexcontainer-column-flow-reset {
 		flex-flow: inherit;
+	}
+
+	.glyphicon {
+		display: inline-block;
+		font: normal normal normal 14px/1 FontAwesome;
+		font-size: inherit;
+		text-rendering: auto;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+	//fa-arrow-left
+	.glyphicon-arrow-left:before {
+		content: "\f060";
+	}
+	//fa-arrow-right
+	.glyphicon-arrow-right:before {
+		content: "\f061";
 	}
 }
 
@@ -2135,18 +2145,6 @@ div.input-group > input.search-textbox {
 	text-align: left;
 }
 
-.text-danger, #rootPanel .text-danger {
-	color: #d9534f;
-}
-
-.text-primary, #rootPanel .text-primary {
-	color: $synapse-blue;
-}
-
-.text-warning, #rootPanel .text-warning {
-	color: $synapse-yellow;
-}
-
 /**Override JQuery table styles **/
 table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp, table.tablesorter thead tr .header  {
     background-color: #FAFAFA !important;
@@ -2700,6 +2698,16 @@ div.border {
 	}
 }
 #body {
+	.text-danger {
+		color: #d9534f;
+	}
+	.text-primary {
+		color: $synapse-blue;
+	}
+	.text-warning {
+		color: $synapse-yellow;
+	}
+
 	.alert a {
 		font-weight: inherit;
 		text-decoration: underline;

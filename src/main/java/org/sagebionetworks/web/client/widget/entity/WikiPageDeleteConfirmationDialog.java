@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETED;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WIKI;
@@ -12,29 +11,35 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class WikiPageDeleteConfirmationDialog implements WikiPageDeleteConfirmationDialogView.Presenter, IsWidget {
+	public static final String DELETE_WIKI_PAGE_CONFIRMATION_MESSAGE = EntityActionControllerImpl.ARE_YOU_SURE_YOU_WANT_TO_DELETE + "this wiki page?";
 	public static final String ROOT_WIKI_PAGE_NAME = "(the root wiki)";
 	private WikiPageDeleteConfirmationDialogView view;
 	private SynapseClientAsync synapseClient;
 	String parentWikiPageId;
 	WikiPageKey key;
+	PopupUtilsView popupUtilsView;
 	CallbackP<String> callback;
 	@Inject
 	public WikiPageDeleteConfirmationDialog(WikiPageDeleteConfirmationDialogView view,
-			SynapseClientAsync synapseClient) {
+			SynapseClientAsync synapseClient,
+			PopupUtilsView popupUtilsView) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		this.popupUtilsView = popupUtilsView;
 		fixServiceEntryPoint(synapseClient);
 		view.setPresenter(this);
 	}		
@@ -58,12 +63,24 @@ public class WikiPageDeleteConfirmationDialog implements WikiPageDeleteConfirmat
 		synapseClient.getV2WikiHeaderTree(key.getOwnerObjectId(), key.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
+				if (caught instanceof NotFoundException) {
+					// no wiki to delete, so this is a no-op
+					view.showInfo(THE + WIKI + WAS_SUCCESSFULLY_DELETED);
+				} else {
+					view.showErrorMessage(caught.getMessage());	
+				}
 			}
 			public void onSuccess(List<V2WikiHeader> wikiHeaders) {
-				Map<String, V2WikiHeader> wikiHeaderMap = getWikiHeaderMap(wikiHeaders);
-				parentWikiPageId = wikiHeaderMap.get(key.getWikiPageId()).getParentId();
-				view.showModal(key.getWikiPageId(), wikiHeaderMap, getWikiChildrenMap(wikiHeaders));		
+				if (wikiHeaders.size() == 1) {
+					parentWikiPageId = null; 	// if there's a single wiki in the tree, then the parent wiki must be null
+					popupUtilsView.showConfirmDelete(DELETE_WIKI_PAGE_CONFIRMATION_MESSAGE, () -> {
+						onDeleteWiki();
+					});
+				} else {
+					Map<String, V2WikiHeader> wikiHeaderMap = getWikiHeaderMap(wikiHeaders);
+					parentWikiPageId = wikiHeaderMap.get(key.getWikiPageId()).getParentId();
+					view.showModal(key.getWikiPageId(), wikiHeaderMap, getWikiChildrenMap(wikiHeaders));	
+				}
 			};
 		});
 	}

@@ -658,9 +658,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureViewWikiSource(){
-		//only visible if entity may have a wiki, and user can't Edit the wiki
+		//only visible if entity may have a wiki
 		if(isWikiableConfig(entityBundle.getEntity(), currentArea)){
-			actionMenu.setActionVisible(Action.VIEW_WIKI_SOURCE, !permissions.getCanEdit());
+			actionMenu.setActionVisible(Action.VIEW_WIKI_SOURCE, true);
 			actionMenu.setActionListener(Action.VIEW_WIKI_SOURCE, this);
 		}else{
 			actionMenu.setActionVisible(Action.VIEW_WIKI_SOURCE, false);
