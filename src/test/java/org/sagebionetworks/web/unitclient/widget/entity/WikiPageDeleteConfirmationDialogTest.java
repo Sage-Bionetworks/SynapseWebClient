@@ -33,6 +33,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialog;
 import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialogView;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -201,5 +202,14 @@ public class WikiPageDeleteConfirmationDialogTest {
 		verify(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockView).showInfo(THE + WIKI + WAS_SUCCESSFULLY_DELETED);
 		verify(mockAfterDeleteCallback).invoke(null);
+	}
+	
+	@Test
+	public void testWikiHeaderTreeNotFound(){
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		
+		dialog.show(mockWikiPageKey, mockAfterDeleteCallback);
+
+		verify(mockView).showInfo(THE + WIKI + WAS_SUCCESSFULLY_DELETED);
 	}
 }

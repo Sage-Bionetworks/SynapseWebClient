@@ -16,7 +16,9 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -61,7 +63,12 @@ public class WikiPageDeleteConfirmationDialog implements WikiPageDeleteConfirmat
 		synapseClient.getV2WikiHeaderTree(key.getOwnerObjectId(), key.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
+				if (caught instanceof NotFoundException) {
+					// no wiki to delete, so this is a no-op
+					view.showInfo(THE + WIKI + WAS_SUCCESSFULLY_DELETED);
+				} else {
+					view.showErrorMessage(caught.getMessage());	
+				}
 			}
 			public void onSuccess(List<V2WikiHeader> wikiHeaders) {
 				if (wikiHeaders.size() == 1) {
