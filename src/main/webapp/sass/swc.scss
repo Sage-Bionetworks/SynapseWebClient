@@ -1537,6 +1537,23 @@ ol.lowerroman {
 	.flexcontainer-column-flow-reset {
 		flex-flow: inherit;
 	}
+
+	.glyphicon {
+		display: inline-block;
+		font: normal normal normal 14px/1 FontAwesome;
+		font-size: inherit;
+		text-rendering: auto;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+	//fa-arrow-left
+	.glyphicon-arrow-left:before {
+		content: "\f060";
+	}
+	//fa-arrow-right
+	.glyphicon-arrow-right:before {
+		content: "\f061";
+	}
 }
 
 .smallerText {
