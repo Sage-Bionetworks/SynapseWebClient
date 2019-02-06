@@ -114,8 +114,6 @@ public class ACTAccessRequirementWidgetTest {
 				mockDataAccessClient, 
 				mockLazyLoadHelper, 
 				mockAuthController, 
-				mockJiraURLHelper, 
-				mockPopupUtils, 
 				mockManageAccessButton,
 				mockConvertACTAccessRequirementButton);
 		when(mockGinInjector.getCreateDataAccessRequestWizard()).thenReturn(mockCreateDataAccessRequestWizard);
@@ -177,47 +175,47 @@ public class ACTAccessRequirementWidgetTest {
 		verify(mockView).showUnapprovedHeading();
 		verify(mockView).showLoginButton();
 	}
-	
-	@Test
-	public void testUnApprovedStateNoOpenJira() {
-		when(mockACTAccessRequirement.getOpenJiraIssue()).thenReturn(false);
-		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
-		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
-		lazyLoadDataCallback.invoke();
-		verify(mockView).showUnapprovedHeading();
-		verify(mockView, never()).showRequestAccessButton();
-	}
-
-	@Test
-	public void testUnApprovedStateNullOpenJira() {
-		when(mockACTAccessRequirement.getOpenJiraIssue()).thenReturn(null);
-		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
-		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
-		lazyLoadDataCallback.invoke();
-		verify(mockView).showUnapprovedHeading();
-		verify(mockView, never()).showRequestAccessButton();
-	}
-	
-	@Test
-	public void testUnApprovedStateNoDataAccessRequestWithOpenJiraIssue() {
-		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
-		when(mockACTAccessRequirement.getOpenJiraIssue()).thenReturn(true);
-		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
-		lazyLoadDataCallback.invoke();
-		verify(mockView).showUnapprovedHeading();
-		verify(mockView).showRequestAccessButton();
-	}
-	
-	@Test
-	public void testRequestAccess() {
-		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
-		lazyLoadDataCallback.invoke();
-		String requestAccessURLString = "requestAccessURLString";
-		when(mockJiraURLHelper.createRequestAccessIssue(any(String.class),any(String.class),any(String.class),any(String.class),any(String.class))).thenReturn(requestAccessURLString);
-		
-		widget.onRequestAccess();
-		
-		verify(mockPopupUtils).openInNewWindow(requestAccessURLString);
-	}
+//	
+//	@Test
+//	public void testUnApprovedStateNoOpenJira() {
+//		when(mockACTAccessRequirement.getOpenJiraIssue()).thenReturn(false);
+//		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
+//		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+//		lazyLoadDataCallback.invoke();
+//		verify(mockView).showUnapprovedHeading();
+//		verify(mockView, never()).showRequestAccessButton();
+//	}
+//
+//	@Test
+//	public void testUnApprovedStateNullOpenJira() {
+//		when(mockACTAccessRequirement.getOpenJiraIssue()).thenReturn(null);
+//		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
+//		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+//		lazyLoadDataCallback.invoke();
+//		verify(mockView).showUnapprovedHeading();
+//		verify(mockView, never()).showRequestAccessButton();
+//	}
+//	
+//	@Test
+//	public void testUnApprovedStateNoDataAccessRequestWithOpenJiraIssue() {
+//		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+//		when(mockACTAccessRequirement.getOpenJiraIssue()).thenReturn(true);
+//		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
+//		lazyLoadDataCallback.invoke();
+//		verify(mockView).showUnapprovedHeading();
+//		verify(mockView).showRequestAccessButton();
+//	}
+//	
+//	@Test
+//	public void testRequestAccess() {
+//		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+//		lazyLoadDataCallback.invoke();
+//		String requestAccessURLString = "requestAccessURLString";
+//		when(mockJiraURLHelper.createRequestAccessIssue(any(String.class),any(String.class),any(String.class),any(String.class),any(String.class))).thenReturn(requestAccessURLString);
+//		
+//		widget.onRequestAccess();
+//		
+//		verify(mockPopupUtils).openInNewWindow(requestAccessURLString);
+//	}
 
 }

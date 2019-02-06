@@ -3,21 +3,18 @@ package org.sagebionetworks.web.client.view;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.DownloadSpeedTester;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.SRCDemoWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.header.Header;
-import com.google.gwt.dom.client.Element;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -52,7 +49,6 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 			Header headerWidget, Footer footerWidget,
 			SynapseJSNIUtils synapseJSNIUtils,
 			PortalGinInjector ginInjector,
-			JiraURLHelper jiraErrorHelper, 
 			AuthenticationController authenticationController,
 			GoogleMap map,
 			RejectReasonWidget rejectReasonWidget,
