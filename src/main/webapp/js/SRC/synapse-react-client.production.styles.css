@@ -243,6 +243,7 @@
   color: #f0ad4e; }
 
 .markdown code {
+  font-family: 'Courier New', Courier, monospace !important;
   background-clip: padding-box;
   border-radius: 3px 3px 3px 3px;
   padding: 0 5px 2px;
@@ -823,3 +824,15 @@ checkmark styling end
 #root .SRC-paddingTopNoMargin {
   padding-top: 29px;
   margin-top: 0px; }
+
+.SRC-searchBar {
+  position: absolute;
+  left: 0px;
+  margin-left: 10px;
+  margin-top: 5px; }
+
+.SRC-arrowRight {
+  position: absolute;
+  left: 150px;
+  margin-right: 10px;
+  margin-top: 5px; }
