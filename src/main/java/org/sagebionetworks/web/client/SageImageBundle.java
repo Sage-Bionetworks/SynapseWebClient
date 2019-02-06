@@ -4,9 +4,6 @@ import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.ImageResource;
 
 public interface SageImageBundle extends ClientBundle {
-	
-	@Source("resource/images/expand.png")
-	ImageResource expand();
 
 	@Source("resource/images/logo-R.png")
 	ImageResource logoR45();
