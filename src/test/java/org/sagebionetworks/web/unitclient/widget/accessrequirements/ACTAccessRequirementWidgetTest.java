@@ -21,6 +21,7 @@ import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dataaccess.BasicAccessRequirementStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -47,6 +48,14 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ACTAccessRequirementWidgetTest {
+	public static final String SUBJECT_OBJECT_ID = "syn981612";
+	public static final Long ACCESS_REQUIREMENT_ID = 7654L;
+	public static final String USER_EMAIL = "email@email.com";
+	public static final String USER_ID = "123";
+	public static final String USERNAME = "Clue";
+	public static final String FIRST_NAME = "Professor";
+	public static final String LAST_NAME = "Plum";
+	
 	ACTAccessRequirementWidget widget;
 	@Mock
 	ACTAccessRequirementWidgetView mockView; 
@@ -83,8 +92,6 @@ public class ACTAccessRequirementWidgetTest {
 	@Mock
 	UserBadge mockSubmitterUserBadge;
 	@Mock
-	JiraURLHelper mockJiraURLHelper;
-	@Mock
 	PopupUtilsView mockPopupUtils;
 	@Mock
 	UserProfile mockProfile;
@@ -94,7 +101,8 @@ public class ACTAccessRequirementWidgetTest {
 	ConvertACTAccessRequirementButton mockConvertACTAccessRequirementButton;
 	@Mock
 	Callback mockRefreshCallback;
-	
+	@Mock
+	RestrictableObjectDescriptor mockRestrictableObjectDescriptor;
 	Callback lazyLoadDataCallback;
 	
 	public final static String ROOT_WIKI_ID = "777";
@@ -114,8 +122,6 @@ public class ACTAccessRequirementWidgetTest {
 				mockDataAccessClient, 
 				mockLazyLoadHelper, 
 				mockAuthController, 
-				mockJiraURLHelper, 
-				mockPopupUtils, 
 				mockManageAccessButton,
 				mockConvertACTAccessRequirementButton);
 		when(mockGinInjector.getCreateDataAccessRequestWizard()).thenReturn(mockCreateDataAccessRequestWizard);
@@ -126,9 +132,15 @@ public class ACTAccessRequirementWidgetTest {
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionStatus).when(mockDataAccessClient).getAccessRequirementStatus(anyString(), any(AsyncCallback.class));
 		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
 		when(mockAuthController.getCurrentUserProfile()).thenReturn(mockProfile);
-		when(mockProfile.getEmails()).thenReturn(Collections.singletonList("email@email.com"));
-		when(mockSubjectIds.get(anyInt())).thenReturn(new RestrictableObjectDescriptor());
+		when(mockProfile.getOwnerId()).thenReturn(USER_ID);
+		when(mockProfile.getEmails()).thenReturn(Collections.singletonList(USER_EMAIL));
+		when(mockProfile.getFirstName()).thenReturn(FIRST_NAME);
+		when(mockProfile.getLastName()).thenReturn(LAST_NAME);
+		when(mockProfile.getUserName()).thenReturn(USERNAME);
+		when(mockSubjectIds.get(anyInt())).thenReturn(mockRestrictableObjectDescriptor);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		when(mockACTAccessRequirement.getId()).thenReturn(ACCESS_REQUIREMENT_ID);
+		when(mockRestrictableObjectDescriptor.getId()).thenReturn(SUBJECT_OBJECT_ID);
 	}
 
 	@Test
@@ -212,12 +224,9 @@ public class ACTAccessRequirementWidgetTest {
 	public void testRequestAccess() {
 		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
 		lazyLoadDataCallback.invoke();
-		String requestAccessURLString = "requestAccessURLString";
-		when(mockJiraURLHelper.createRequestAccessIssue(any(String.class),any(String.class),any(String.class),any(String.class),any(String.class))).thenReturn(requestAccessURLString);
 		
 		widget.onRequestAccess();
 		
-		verify(mockPopupUtils).openInNewWindow(requestAccessURLString);
+		verify(mockView).showJiraIssueCollector(USER_ID, DisplayUtils.getDisplayName(FIRST_NAME, LAST_NAME, USERNAME), USER_EMAIL, SUBJECT_OBJECT_ID, ACCESS_REQUIREMENT_ID.toString());
 	}
-
 }
