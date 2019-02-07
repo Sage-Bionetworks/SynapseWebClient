@@ -18,7 +18,7 @@ public class DateTimeUtilsImpl implements DateTimeUtils {
 	public static final String SMALL_DATE_FORMAT_STRING = "MM/dd/yyyy h:mm aa";
 	private static DateTimeFormat SMALL_DATE_FORMAT;
 	private static DateTimeFormat SMALL_DATE_FORMAT_UTC;
-	public static final String LONG_DATE_FORMAT_STRING = "EEEE, MMMM d, yyyy h:mm a";
+	public static final String LONG_DATE_FORMAT_STRING = "MMMM d, yyyy h:mm a";
 	private static DateTimeFormat LONG_DATE_FORMAT;
 	private static DateTimeFormat LONG_DATE_FORMAT_UTC;
 	private DateTimeFormat iso8601Format;
