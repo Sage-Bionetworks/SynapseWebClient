@@ -301,7 +301,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		for (String facetName : presenter.getFacetDisplayOrder()) {
 			for (final Facet facet : searchResults.getFacets()) {
 				if (facet.getName().equals(facetName)) {
-					FacetTypeNames type = facet.getType();					
+					FacetTypeNames type = facet.getType();
 					if (type != null) {
 						Widget widget = null;
 						switch (type) {
@@ -309,6 +309,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 							widget = createLiteralFacet(facet); 
 							break;
 						case DATE:
+						case CONTINUOUS:
 							widget = createDateFacet(facet); 
 							break;
 						default:

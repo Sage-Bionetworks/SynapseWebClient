@@ -229,7 +229,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 
-	@Override
 	public SearchResults search(SearchQuery searchQuery)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();

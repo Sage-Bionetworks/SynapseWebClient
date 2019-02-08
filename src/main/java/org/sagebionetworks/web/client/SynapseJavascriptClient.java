@@ -94,6 +94,8 @@ import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
+import org.sagebionetworks.repo.model.search.SearchResults;
+import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.subscription.SortByType;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
@@ -252,6 +254,7 @@ public class SynapseJavascriptClient {
 	public static final String DOWNLOAD_ORDER = "/download/order";
 	public static final String DOWNLOAD_ORDER_HISTORY = DOWNLOAD_ORDER+"/history";
 	public static final String STORAGE_REPORT = "/storageReport";
+	public static final String SEARCH = "/search";
 	
 	public String repoServiceUrl,fileServiceUrl, authServiceUrl, synapseVersionInfo; 
 	@Inject
@@ -1294,6 +1297,11 @@ public class SynapseJavascriptClient {
 	public void listSubscription(SubscriptionRequest request, AsyncCallback<SubscriptionPagedResults> callback) {
 		String url = getRepoServiceUrl() + SUBSCRIPTION + "/list";
 		doPost(url, request, OBJECT_TYPE.SubscriptionPagedResults, callback);
+	}
+	
+	public void getSearchResults(SearchQuery request, AsyncCallback<SearchResults> callback) {
+		String url = getRepoServiceUrl() + SEARCH;
+		doPost(url, request, OBJECT_TYPE.SearchResults, callback);
 	}
 }
 
