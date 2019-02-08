@@ -14,12 +14,16 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBox;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxOracle;
@@ -30,32 +34,34 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SuggestOracle;
 
+@RunWith(MockitoJUnitRunner.class)
 public class EntitySearchBoxTest {
 
+	@Mock
 	EntitySearchBoxView mockView;
+	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
 	SageImageBundle mockSageImageBundle;
+	@Mock
 	AuthenticationController mockAuthenticationController;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
 	EntitySearchBox suggestBox;
+	@Mock
 	EntitySearchBoxOracle mockOracle;
-	
+	@Mock
+	SynapseJavascriptClient mockJsClient;
 	@Before
 	public void before() {
-		mockView = mock(EntitySearchBoxView.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockSageImageBundle = mock(SageImageBundle.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockOracle = mock(EntitySearchBoxOracle.class);
-		suggestBox = new EntitySearchBox(mockView, mockSynapseClient);
+		suggestBox = new EntitySearchBox(mockView, mockSynapseClient, mockJsClient);
 		suggestBox.setOracle(mockOracle);
 	}
 	
 	@Test
 	public void testGetSuggestions() throws RestServiceException {
 		SearchResults testPage = getResponsePage();
-		AsyncMockStubber.callSuccessWith(testPage).when(mockSynapseClient).search(any(SearchQuery.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testPage).when(mockJsClient).getSearchResults(any(SearchQuery.class), any(AsyncCallback.class));
 		when(mockOracle.makeEntitySuggestion(any(Hit.class), anyString())).thenReturn(null);
 		
 		SuggestOracle.Request mockRequest = mock(SuggestOracle.Request.class);
@@ -65,7 +71,7 @@ public class EntitySearchBoxTest {
 		suggestBox.getSuggestions(mockRequest, mockCallback);
 		
 		verify(mockRequest).getQuery();
-		verify(mockSynapseClient).search(any(SearchQuery.class), any(AsyncCallback.class));
+		verify(mockJsClient).getSearchResults(any(SearchQuery.class), any(AsyncCallback.class));
 		verify(mockView).updateFieldStateForSuggestions(any(SearchResults.class), anyLong());
 		verify(mockCallback).onSuggestionsReady(any(SuggestOracle.Request.class), any(SuggestOracle.Response.class));
 	}

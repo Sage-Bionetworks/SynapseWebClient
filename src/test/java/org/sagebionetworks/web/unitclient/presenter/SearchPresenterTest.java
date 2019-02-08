@@ -15,9 +15,10 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.search.query.KeyRange;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -26,7 +27,7 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
@@ -39,8 +40,8 @@ import org.sagebionetworks.web.shared.SearchQueryUtils;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+@RunWith(MockitoJUnitRunner.class)
 public class SearchPresenterTest {
-
 	SearchPresenter searchPresenter;
 	@Mock
 	SearchView mockView;
@@ -49,7 +50,7 @@ public class SearchPresenterTest {
 	@Mock
 	AuthenticationController mockAuthenticationController;
 	@Mock
-	SynapseClientAsync mockSynapseClient;
+	SynapseJavascriptClient mockJsClient;
 	JSONObjectAdapter jsonObjectAdapter;
 	@Mock
 	PlaceChanger mockPlaceChanger;
@@ -63,13 +64,12 @@ public class SearchPresenterTest {
 	SearchQuery exampleTermSearchQuery;
 	@Before
 	public void setup() throws Exception{
-		MockitoAnnotations.initMocks(this);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		jsonObjectAdapter = new JSONObjectAdapterImpl();
 		
 		searchPresenter = new SearchPresenter(mockView,
 				mockGlobalApplicationState,
-				mockSynapseClient,
+				mockJsClient,
 				new JSONObjectAdapterImpl(),
 				mockSynAlert,
 				mockLoadMoreWidgetContainer);
@@ -99,7 +99,7 @@ public class SearchPresenterTest {
 	public void testQueryTerm() throws Exception {		
 		
 		searchPresenter.setPlace(new Search(exampleTerm));
-		verify(mockSynapseClient).search(eq(exampleTermSearchQuery), any(AsyncCallback.class));
+		verify(mockJsClient).getSearchResults(eq(exampleTermSearchQuery), any(AsyncCallback.class));
 
 	}
 
@@ -108,7 +108,7 @@ public class SearchPresenterTest {
 	public void testSearchQuery() throws Exception {		
 		Search place = new Search(exampleTermSearchQueryJson);
 		searchPresenter.setPlace(place);
-		verify(mockSynapseClient).search(eq(exampleTermSearchQuery), any(AsyncCallback.class));
+		verify(mockJsClient).getSearchResults(eq(exampleTermSearchQuery), any(AsyncCallback.class));
 
 	}
 
@@ -122,7 +122,7 @@ public class SearchPresenterTest {
 		query.setQueryTerm(Arrays.asList(new String[] {term}));
 		
 		searchPresenter.setPlace(new Search(term));
-		verify(mockSynapseClient).search(eq(query), any(AsyncCallback.class));
+		verify(mockJsClient).getSearchResults(eq(query), any(AsyncCallback.class));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -178,19 +178,19 @@ public class SearchPresenterTest {
 		verify(mockLoadMoreWidgetContainer).clear(); // 2
 		verify(mockGlobalApplicationState).pushCurrentPlace(any(Search.class)); // 3
 		verify(mockLoadMoreWidgetContainer).setIsProcessing(true); // 4
-		verify(mockSynapseClient).search(any(SearchQuery.class), any(AsyncCallback.class)); // 4
+		verify(mockJsClient).getSearchResults(any(SearchQuery.class), any(AsyncCallback.class)); // 4
 		
 		//verify setting the time facet to another value clears the previous
 		facetValue = "2";
 		searchPresenter.addTimeFacet(facetName, facetValue, "Yesterday");
-		verify(mockSynapseClient, times(2)).search(any(SearchQuery.class), any(AsyncCallback.class)); // 4
+		verify(mockJsClient, times(2)).getSearchResults(any(SearchQuery.class), any(AsyncCallback.class)); // 4
 		facetValues = getTimeFacet(facetName);
 		assertEquals(1, facetValues.size());
 		assertEquals(facetValue, facetValues.get(0).getMin());
 		
 		searchPresenter.removeTimeFacetAndRefresh(facetName);
 		//optimization.  if search is empty (no search term and no facets) then a search is not performed (empty results are shown).
-		verify(mockSynapseClient, times(2)).search(any(SearchQuery.class), any(AsyncCallback.class)); // 4
+		verify(mockJsClient, times(2)).getSearchResults(any(SearchQuery.class), any(AsyncCallback.class)); // 4
 		assertTrue(getTimeFacet(facetName).isEmpty());
 	}
 }

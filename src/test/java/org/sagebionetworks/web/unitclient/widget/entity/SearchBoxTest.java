@@ -12,7 +12,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -27,8 +26,6 @@ public class SearchBoxTest {
 	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
 	@Mock
-	SynapseClientAsync mockSynapseClient;
-	@Mock
 	PlaceChanger mockPlaceChanger;
 	@Captor
 	ArgumentCaptor<Place> placeCaptor;
@@ -37,7 +34,7 @@ public class SearchBoxTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		presenter = new SearchBox(mockView, mockGlobalApplicationState, mockSynapseClient);
+		presenter = new SearchBox(mockView, mockGlobalApplicationState);
 		Mockito.when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}
 	
