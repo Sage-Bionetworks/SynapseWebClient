@@ -36,11 +36,8 @@ import com.google.gwt.user.client.ui.SuggestOracle;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EntitySearchBoxTest {
-
 	@Mock
 	EntitySearchBoxView mockView;
-	@Mock
-	SynapseClientAsync mockSynapseClient;
 	@Mock
 	SageImageBundle mockSageImageBundle;
 	@Mock
@@ -54,7 +51,7 @@ public class EntitySearchBoxTest {
 	SynapseJavascriptClient mockJsClient;
 	@Before
 	public void before() {
-		suggestBox = new EntitySearchBox(mockView, mockSynapseClient, mockJsClient);
+		suggestBox = new EntitySearchBox(mockView, mockJsClient);
 		suggestBox.setOracle(mockOracle);
 	}
 	
@@ -80,7 +77,7 @@ public class EntitySearchBoxTest {
 	public void testSetNullSuggestion() throws RestServiceException {
 		suggestBox.setSelectedSuggestion(null);
 		assertNull(suggestBox.getSelectedSuggestion());
-		verifyZeroInteractions(mockSynapseClient);
+		verifyZeroInteractions(mockJsClient);
 	}
 	
 	private SearchResults getResponsePage() {

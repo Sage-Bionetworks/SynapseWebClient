@@ -55,7 +55,6 @@ import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.auth.NewUserSignedToken;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
@@ -215,19 +214,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 	
-	@Override
-	public PaginatedResults<VersionInfo> getEntityVersions(String entityId, int offset, int limit)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return convertPaginated(synapseClient
-					.getEntityVersions(entityId, offset, limit));
-		} catch (SynapseException e) {
-			log.error(e);
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
 	public SearchResults search(SearchQuery searchQuery)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();

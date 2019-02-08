@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,7 +9,6 @@ import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxOracle.EntitySearchBoxSuggestion;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -37,7 +34,6 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 	public static final long PAGE_SIZE = 10;
 	private EntitySearchBoxView view;
 	private EntitySelectedHandler handler;
-	private SynapseClientAsync synapseClient;
 	private SynapseJavascriptClient jsClient;
 	private EntitySearchBoxOracle oracle;
 	private boolean retrieveVersions = false;
@@ -51,13 +47,10 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 	 */
 	@Inject
 	public EntitySearchBox(EntitySearchBoxView view,
-			SynapseClientAsync synapseClient,
 			SynapseJavascriptClient jsClient) {
 		super();		
 		this.view = view;
-		this.synapseClient = synapseClient;
 		this.jsClient = jsClient;
-		fixServiceEntryPoint(synapseClient);
 		oracle = view.getOracle();
 		view.setPresenter(this);
 	}
@@ -91,14 +84,11 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 	
 	public void entitySelected(final String entityId, final String name) {
 		if(handler != null) {
-			List<VersionInfo> versions = null;
 			if(retrieveVersions) {
-				synapseClient.getEntityVersions(entityId, WebConstants.ZERO_OFFSET.intValue(), 20, new AsyncCallback<PaginatedResults<VersionInfo>>() {
+				jsClient.getEntityVersions(entityId, WebConstants.ZERO_OFFSET.intValue(), 20, new AsyncCallback<List<VersionInfo>>() {
 					@Override
-					public void onSuccess(PaginatedResults<VersionInfo> result) {
-						PaginatedResults<VersionInfo> versions;
-						versions = result;
-						handler.onSelected(entityId, name, versions.getResults());
+					public void onSuccess(List<VersionInfo> results) {
+						handler.onSelected(entityId, name, results);
 					}
 					@Override
 					public void onFailure(Throwable caught) {
@@ -106,7 +96,7 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 					}
 				});
 			} else {				
-				handler.onSelected(entityId, name, versions);
+				handler.onSelected(entityId, name, null);
 			}
 		}
 	}

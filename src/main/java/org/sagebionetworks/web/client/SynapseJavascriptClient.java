@@ -53,6 +53,7 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
@@ -1312,6 +1313,11 @@ public class SynapseJavascriptClient {
 	public void getColumnModelsForTableEntity(String tableEntityId, AsyncCallback<List<ColumnModel>> callback) {
 		String url = getRepoServiceUrl() + ENTITY + "/" + tableEntityId + COLUMN;
 		doGet(url, OBJECT_TYPE.PaginatedColumnModelsResults, callback);
+	}
+	public void getEntityVersions(String entityId, int offset, int limit, AsyncCallback<List<VersionInfo>> callback) {
+		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + REPO_SUFFIX_VERSION
+				+ "?" + OFFSET_PARAMETER + offset + "&" + LIMIT_PARAMETER + limit;
+		doGet(url, OBJECT_TYPE.PaginatedResultsVersionInfo, callback);
 	}
 }
 

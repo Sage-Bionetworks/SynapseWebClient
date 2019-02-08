@@ -55,9 +55,6 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 	
 public interface SynapseClientAsync {
-	void getEntityVersions(String entityId, int offset, int limit,
-			AsyncCallback<PaginatedResults<VersionInfo>> callback);
-
 	void deleteEntityVersionById(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
 	void updateUserProfile(UserProfile userProfileJson, AsyncCallback<Void> callback);

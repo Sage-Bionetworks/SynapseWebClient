@@ -27,6 +27,7 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsyncJobId;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
@@ -141,6 +142,7 @@ public class SynapseJavascriptFactory {
 		Subscription,
 		SearchResults,
 		PaginatedColumnModelsResults,
+		PaginatedResultsVersionInfo,
 		None,
 		String
 	}
@@ -254,6 +256,15 @@ public class SynapseJavascriptFactory {
 			return new PaginatedColumnModels(json).getResults();
 		case JSON :
 			return json;
+		case PaginatedResultsVersionInfo :
+			// json really represents a PaginatedResults (cannot reference here in js)
+			List<VersionInfo> versionInfoList = new ArrayList<>();
+			JSONArrayAdapter versionInfoResultsJsonArray = json.getJSONArray("results");
+			for (int i = 0; i < versionInfoResultsJsonArray.length(); i++) {
+				JSONObjectAdapter jsonObject = versionInfoResultsJsonArray.getJSONObject(i);
+				versionInfoList.add(new VersionInfo(jsonObject));
+			}
+			return versionInfoList;
 		case PaginatedResultsEntityHeader :
 			// json really represents a PaginatedResults (cannot reference here in js)
 			List<EntityHeader> entityHeaderList = new ArrayList<>();

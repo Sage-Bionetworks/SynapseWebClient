@@ -16,16 +16,16 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
@@ -36,19 +36,16 @@ import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItem;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class FileTitleBarTest {
-		
 	public static final String ENTITY_ID = "syn123";
 	FileTitleBar fileTitleBar;
-	@Mock
-	SynapseClientAsync mockSynapseClient;
 	@Mock
 	FileTitleBarView mockView;
 	@Mock
@@ -66,8 +63,6 @@ public class FileTitleBarTest {
 	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	@Mock
-	PaginatedResults<VersionInfo> mockVersionResults;
-	@Mock
 	SynapseJavascriptClient mockJsClient;
 	@Mock
 	FileClientsHelp mockFileClientsHelp;
@@ -84,8 +79,7 @@ public class FileTitleBarTest {
 	public static final String FILE_NAME = "afile.txt";
 	@Before
 	public void setup(){
-		MockitoAnnotations.initMocks(this);
-		fileTitleBar = new FileTitleBar(mockView, mockSynapseProperties, mockFileDownloadButton, mockSynapseClient, mockJsClient, mockFileClientsHelp, mockEventBus, mockSynapseJSNIUtils);
+		fileTitleBar = new FileTitleBar(mockView, mockSynapseProperties, mockFileDownloadButton, mockJsClient, mockFileClientsHelp, mockEventBus, mockSynapseJSNIUtils);
 		when(mockFileEntity.getId()).thenReturn(ENTITY_ID);
 		when(mockFileEntity.getName()).thenReturn(FILE_NAME);
 		when(mockFileEntity.getDataFileHandleId()).thenReturn(DATA_FILE_HANDLE_ID);
@@ -105,8 +99,7 @@ public class FileTitleBarTest {
 		Mockito.when(mockBundle.getFileHandles()).thenReturn(fileHandles);
 		verify(mockView).setFileDownloadMenuItem(any(Widget.class));
 		versions = new ArrayList<>();
-		when(mockVersionResults.getResults()).thenReturn(versions);
-		AsyncMockStubber.callSuccessWith(mockVersionResults).when(mockSynapseClient).getEntityVersions(anyString(), anyInt(), anyInt(), any());
+		AsyncMockStubber.callSuccessWith(versions).when(mockJsClient).getEntityVersions(anyString(), anyInt(), anyInt(), any());
 		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).addFileToDownloadList(anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
@@ -203,7 +196,7 @@ public class FileTitleBarTest {
 		
 		fileTitleBar.configure(mockBundle);
 		
-		verify(mockSynapseClient).getEntityVersions(anyString(), anyInt(), anyInt(), any());
+		verify(mockJsClient).getEntityVersions(anyString(), anyInt(), anyInt(), any());
 		verify(mockView, times(2)).setVersionUIVisible(false);
 		verify(mockView, never()).setVersionUIVisible(true);
 	}
@@ -216,18 +209,18 @@ public class FileTitleBarTest {
 		
 		fileTitleBar.configure(mockBundle);
 		
-		verify(mockSynapseClient).getEntityVersions(anyString(), anyInt(), anyInt(), any());
+		verify(mockJsClient).getEntityVersions(anyString(), anyInt(), anyInt(), any());
 		verify(mockView).setVersionUIVisible(true);
 	}
 	
 	@Test
 	public void testGetEntityVersionsFailure() {
 		String error = "unable to get versions";
-		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseClient).getEntityVersions(anyString(), anyInt(), anyInt(), any());
+		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockJsClient).getEntityVersions(anyString(), anyInt(), anyInt(), any());
 		
 		fileTitleBar.configure(mockBundle);
 		
-		verify(mockSynapseClient).getEntityVersions(anyString(), anyInt(), anyInt(), any());
+		verify(mockJsClient).getEntityVersions(anyString(), anyInt(), anyInt(), any());
 		verify(mockView).setVersionUIVisible(false);
 		verify(mockView, never()).setVersionUIVisible(true);
 		verify(mockView).showErrorMessage(error);

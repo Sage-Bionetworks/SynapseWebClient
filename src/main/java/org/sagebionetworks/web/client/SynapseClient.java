@@ -22,7 +22,6 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
@@ -54,9 +53,6 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("synapseclient")	
 public interface SynapseClient extends RemoteService{
-
-	PaginatedResults<VersionInfo> getEntityVersions(String entityId, int offset, int limit) throws RestServiceException;
-
 	void deleteEntityVersionById(String entityId, Long versionNumber) throws RestServiceException;
 
 	void restoreFromTrash(String entityId, String newParentId) throws RestServiceException;
