@@ -22,9 +22,10 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
@@ -51,8 +52,8 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+@RunWith(MockitoJUnitRunner.class)
 public class WikiSubpagesTest {
-
 	@Mock
 	WikiSubpagesView mockView;
 	@Mock
@@ -82,7 +83,6 @@ public class WikiSubpagesTest {
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
-		MockitoAnnotations.initMocks(this);
 		adapterFactory = new AdapterFactoryImpl();
 		widget = new WikiSubpagesWidget(mockView, mockSynapseClient, mockAuthenticationController, mockSynapseJavascriptClient);
 		
@@ -106,7 +106,7 @@ public class WikiSubpagesTest {
 		mockV2WikiOrderHint = mock(V2WikiOrderHint.class);
 		when(mockV2WikiOrderHint.getIdList()).thenReturn(null);
 		AsyncMockStubber.callSuccessWith(wikiHeadersList).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(mockV2WikiOrderHint).when(mockSynapseClient).getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockV2WikiOrderHint).when(mockSynapseJavascriptClient).getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
 		reset(mockView);
 	}
 
@@ -178,7 +178,7 @@ public class WikiSubpagesTest {
 		verify(mockView).setEditOrderButtonVisible(false);
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), true, null, mockActionMenuWidget);
 		verify(mockView, Mockito.times(2)).setEditOrderButtonVisible(false);
-		AsyncMockStubber.callFailureWith(new Throwable()).when(mockSynapseClient).getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Throwable()).when(mockSynapseJavascriptClient).getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), true, null, mockActionMenuWidget);
 		verify(mockView, Mockito.times(3)).setEditOrderButtonVisible(false);
 	}
@@ -190,7 +190,7 @@ public class WikiSubpagesTest {
 		verify(mockView).setEditOrderButtonVisible(true);
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), true, null, mockActionMenuWidget);
 		verify(mockView, Mockito.times(2)).setEditOrderButtonVisible(true);
-		AsyncMockStubber.callFailureWith(new Throwable()).when(mockSynapseClient).getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Throwable()).when(mockSynapseJavascriptClient).getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), false, null, mockActionMenuWidget);
 		verify(mockView, Mockito.times(3)).setEditOrderButtonVisible(true);
 	}

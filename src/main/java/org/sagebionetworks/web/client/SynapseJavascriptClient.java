@@ -59,6 +59,7 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
@@ -963,6 +964,12 @@ public class SynapseJavascriptClient {
 			key.getOwnerObjectId() + WIKI_ORDER_HINT;
 		doPut(url, toUpdate, OBJECT_TYPE.V2WikiOrderHint, callback);
 	}
+	public void getV2WikiOrderHint(WikiPageKey key, AsyncCallback<V2WikiOrderHint> callback) {
+		String url = getRepoServiceUrl() + "/" +
+				key.getOwnerObjectType().toLowerCase() + "/" + 
+				key.getOwnerObjectId() + WIKI_ORDER_HINT;
+		doGet(url, OBJECT_TYPE.V2WikiOrderHint, callback);
+	}
 	
 	public FluentFuture<Entity> createEntity(Entity entity) {
 		String url = getRepoServiceUrl() + ENTITY;
@@ -1298,10 +1305,13 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + SUBSCRIPTION + "/list";
 		doPost(url, request, OBJECT_TYPE.SubscriptionPagedResults, callback);
 	}
-	
 	public void getSearchResults(SearchQuery request, AsyncCallback<SearchResults> callback) {
 		String url = getRepoServiceUrl() + SEARCH;
 		doPost(url, request, OBJECT_TYPE.SearchResults, callback);
+	}
+	public void getColumnModelsForTableEntity(String tableEntityId, AsyncCallback<List<ColumnModel>> callback) {
+		String url = getRepoServiceUrl() + ENTITY + "/" + tableEntityId + COLUMN;
+		doGet(url, OBJECT_TYPE.PaginatedColumnModelsResults, callback);
 	}
 }
 

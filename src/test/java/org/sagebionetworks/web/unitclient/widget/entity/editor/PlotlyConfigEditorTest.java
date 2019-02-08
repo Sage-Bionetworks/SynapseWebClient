@@ -1,9 +1,32 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import static org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigEditor.*;
-import static org.sagebionetworks.web.shared.WidgetConstants.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigEditor.HIDE;
+import static org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigEditor.SHOW;
+import static org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigEditor.getAdvancedClauseFromQuery;
+import static org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigEditor.getXColumnFromSql;
+import static org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigEditor.getYColumnsFromSql;
+import static org.sagebionetworks.web.shared.WidgetConstants.BAR_MODE;
+import static org.sagebionetworks.web.shared.WidgetConstants.IS_HORIZONTAL;
+import static org.sagebionetworks.web.shared.WidgetConstants.SHOW_LEGEND;
+import static org.sagebionetworks.web.shared.WidgetConstants.TABLE_QUERY_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.TITLE;
+import static org.sagebionetworks.web.shared.WidgetConstants.TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TITLE;
+import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TITLE;
+import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TYPE;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,9 +103,9 @@ public class PlotlyConfigEditorTest {
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
-		editor = new PlotlyConfigEditor(mockView, mockFinder, mockSynAlert, mockSynapseClient, mockShowHideAdvancedButton, mockSynapseJavascriptClient);
+		editor = new PlotlyConfigEditor(mockView, mockFinder, mockSynAlert, mockShowHideAdvancedButton, mockSynapseJavascriptClient);
 		columnModels = new ArrayList<ColumnModel>();
-		AsyncMockStubber.callSuccessWith(columnModels).when(mockSynapseClient).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(columnModels).when(mockSynapseJavascriptClient).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
 		when(mockXColumnModel.getName()).thenReturn(X_COLUMN_NAME);
 		when(mockYColumnModel.getName()).thenReturn(Y_COLUMN_NAME);
 		when(mockY2ColumnModel.getName()).thenReturn(Y2_COLUMN_NAME);
@@ -286,7 +309,7 @@ public class PlotlyConfigEditorTest {
 	@Test
 	public void testSetTableIdFailure() {
 		Exception ex = new Exception();
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
 		editor.setTableId("syn2222");
 		InOrder order = Mockito.inOrder(mockSynAlert);
 		order.verify(mockSynAlert).clear();
@@ -302,11 +325,11 @@ public class PlotlyConfigEditorTest {
 		WikiPageKey wikiKey = null;
 		DialogCallback callback = null;
 		editor.configure(wikiKey, params, callback);
-		verify(mockSynapseClient, never()).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, never()).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
 		
 		// no columns defined, so it will pick the first column from the column models as the x column, and leave the rest for the available columns
 		editor.setTableId("syn2222");
-		verify(mockSynapseClient).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
 		verify(mockView).setAvailableColumns(availableColumnNamesCaptor.capture());
 		List<String> availableColumnNames = availableColumnNamesCaptor.getValue();
 		assertEquals(2, availableColumnNames.size());

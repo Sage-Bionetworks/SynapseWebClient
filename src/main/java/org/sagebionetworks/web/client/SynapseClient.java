@@ -32,15 +32,12 @@ import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.QuizResponse;
-import org.sagebionetworks.repo.model.search.SearchResults;
-import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnModelPage;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
@@ -118,7 +115,6 @@ public interface SynapseClient extends RemoteService{
 	 V2WikiPage restoreV2WikiPage(String ownerId, String ownerType, String wikiId, Long versionToUpdate) throws RestServiceException;
 	void deleteV2WikiPage(WikiPageKey key) throws RestServiceException;
 	List<V2WikiHeader> getV2WikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
-	V2WikiOrderHint getV2WikiOrderHint(WikiPageKey key) throws RestServiceException;
 	FileHandleResults getV2WikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
 	PaginatedResults<V2WikiHistorySnapshot> getV2WikiHistory(WikiPageKey key, Long limit, Long offset) throws RestServiceException;
 
@@ -158,8 +154,6 @@ public interface SynapseClient extends RemoteService{
 	SignedTokenInterface hexDecodeAndDeserialize(String tokenTypeName, String signedTokenString) throws RestServiceException;
 
 	AccountCreationToken hexDecodeAndDeserializeAccountCreationToken(String tokenString) throws RestServiceException;
-
-	List<ColumnModel> getColumnModelsForTableEntity(String tableEntityId) throws RestServiceException;
 
 	String sendMessage(Set<String> recipients, String subject, String message, String hostPageBaseURL) throws RestServiceException;
 

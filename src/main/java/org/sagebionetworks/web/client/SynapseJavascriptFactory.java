@@ -64,6 +64,7 @@ import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.PaginatedColumnModels;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -139,6 +140,7 @@ public class SynapseJavascriptFactory {
 		Doi,
 		Subscription,
 		SearchResults,
+		PaginatedColumnModelsResults,
 		None,
 		String
 	}
@@ -248,6 +250,8 @@ public class SynapseJavascriptFactory {
 			return new Subscription(json);
 		case SearchResults : 
 			return new SearchResults(json);
+		case PaginatedColumnModelsResults :
+			return new PaginatedColumnModels(json).getResults();
 		case JSON :
 			return json;
 		case PaginatedResultsEntityHeader :

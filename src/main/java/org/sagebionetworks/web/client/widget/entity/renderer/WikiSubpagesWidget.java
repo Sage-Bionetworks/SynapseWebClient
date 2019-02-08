@@ -41,7 +41,9 @@ public class WikiSubpagesWidget implements IsWidget, WikiSubpagesView.Presenter 
 	private boolean isEmbeddedInOwnerPage;
 	private CallbackP<WikiPageKey> reloadWikiPageCallback;
 	private SynapseJavascriptClient jsClient;
-	List<V2WikiHeader> currentWikiHeaders;
+	List<V2WikiHeader> currentWikiHeaders, newWikiHeaders;
+	V2WikiOrderHint newWikiOrderHint;
+	
 	@Inject
 	public WikiSubpagesWidget(WikiSubpagesView view, SynapseClientAsync synapseClient,
 							AuthenticationController authenticationController,
@@ -127,33 +129,14 @@ public class WikiSubpagesWidget implements IsWidget, WikiSubpagesView.Presenter 
 	
 	@Override
 	public void refreshWikiHeaderTree() {
+		newWikiHeaders = null;
+		newWikiOrderHint = null;
+		// ask for the wiki header tree and order hint in parallel.
 		synapseClient.getV2WikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {
 			@Override
 			public void onSuccess(final List<V2WikiHeader> wikiHeaders) {
-				synapseClient.getV2WikiOrderHint(wikiKey, new AsyncCallback<V2WikiOrderHint>() {
-					@Override
-					public void onSuccess(V2WikiOrderHint result) {
-						// "Sort" stuff'
-						WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders, result);
-						updateWikiHeaders(wikiHeaders);
-					}
-					@Override
-					public void onFailure(Throwable caught) {
-						// Failed to get order hint. Just ignore it.
-						updateWikiHeaders(wikiHeaders);
-					}
-					
-					private void updateWikiHeaders(List<V2WikiHeader> wikiHeaders) {
-						if (currentWikiHeaders == null || !currentWikiHeaders.equals(wikiHeaders)) {
-							view.clear();
-							view.configure(wikiHeaders, ownerObjectName,
-									ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, reloadWikiPageCallback, actionMenu);
-							currentWikiHeaders = wikiHeaders;
-						}
-						
-						view.setEditOrderButtonVisible(canEdit);
-					}
-				});
+				newWikiHeaders = wikiHeaders;
+				afterGetNewHeaderTreeAndOrderHint();
 			}
 			
 			@Override
@@ -167,5 +150,33 @@ public class WikiSubpagesWidget implements IsWidget, WikiSubpagesView.Presenter 
 				}
 			}
 		});
+		
+		jsClient.getV2WikiOrderHint(wikiKey, new AsyncCallback<V2WikiOrderHint>() {
+			@Override
+			public void onSuccess(V2WikiOrderHint result) {
+				newWikiOrderHint = result;
+				afterGetNewHeaderTreeAndOrderHint();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				// Failed to get order hint. Just ignore it.
+				newWikiOrderHint = new V2WikiOrderHint();
+				afterGetNewHeaderTreeAndOrderHint();
+			}
+		});
+	}
+	
+	private void afterGetNewHeaderTreeAndOrderHint() {
+		if (newWikiHeaders != null && newWikiOrderHint != null) {
+			WikiOrderHintUtils.sortHeadersByOrderHint(newWikiHeaders, newWikiOrderHint);
+			if (currentWikiHeaders == null || !currentWikiHeaders.equals(newWikiHeaders)) {
+				view.clear();
+				view.configure(newWikiHeaders, ownerObjectName,
+						ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, reloadWikiPageCallback, actionMenu);
+				currentWikiHeaders = newWikiHeaders;
+			}
+			
+			view.setEditOrderButtonVisible(canEdit);
+		}
 	}
 }
