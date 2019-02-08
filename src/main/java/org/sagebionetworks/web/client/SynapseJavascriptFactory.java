@@ -56,6 +56,7 @@ import org.sagebionetworks.repo.model.file.UploadDestinationInstanceFactory;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
 import org.sagebionetworks.repo.model.provenance.Activity;
+import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.subscription.SubscriberCount;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
@@ -137,6 +138,7 @@ public class SynapseJavascriptFactory {
 		DownloadOrderSummaryResponse,
 		Doi,
 		Subscription,
+		SearchResults,
 		None,
 		String
 	}
@@ -244,6 +246,8 @@ public class SynapseJavascriptFactory {
 			return new SubscriptionPagedResults(json);
 		case Subscription : 
 			return new Subscription(json);
+		case SearchResults : 
+			return new SearchResults(json);
 		case JSON :
 			return json;
 		case PaginatedResultsEntityHeader :
