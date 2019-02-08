@@ -41,7 +41,7 @@ public class SearchUtil {
 		}
 		return null;
 	}
-	public static void searchForTerm(String queryTerm, final GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient) {
+	public static void searchForTerm(String queryTerm, final GlobalApplicationState globalApplicationState) {
 		final Synapse synapsePlace = willRedirect(queryTerm);
 		final Search searchPlace = new Search(queryTerm);
 		if (synapsePlace == null) {

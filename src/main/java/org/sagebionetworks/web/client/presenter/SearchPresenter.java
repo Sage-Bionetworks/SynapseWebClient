@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.presenter;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -21,7 +19,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SearchView;
@@ -39,7 +37,6 @@ import com.google.inject.Inject;
 public class SearchPresenter extends AbstractActivity implements SearchView.Presenter, Presenter<Search> {
 	private SearchView view;
 	private GlobalApplicationState globalApplicationState;
-	private SynapseClientAsync synapseClient;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private SynapseAlert synAlert;
 	
@@ -47,23 +44,23 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	private SearchResults currentResult;
 	private Map<String,String> timeValueToDisplay = new HashMap<String, String>();
 	private Date searchStartTime;
+	private SynapseJavascriptClient jsClient;
 	
 	private LoadMoreWidgetContainer loadMoreWidgetContainer;
 	
 	@Inject
 	public SearchPresenter(SearchView view,
 			GlobalApplicationState globalApplicationState,
-			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
 			JSONObjectAdapter jsonObjectAdapter,
 			SynapseAlert synAlert,
 			LoadMoreWidgetContainer loadMoreWidgetContainer) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.synAlert = synAlert;
 		this.loadMoreWidgetContainer = loadMoreWidgetContainer;
+		this.jsClient = jsClient;
 		currentSearch = getBaseSearchQuery();
 		view.setPresenter(this);
 		view.setSynAlertWidget(synAlert.asWidget());
@@ -102,7 +99,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 
 	@Override
 	public void setSearchTerm(String queryTerm) {
-		SearchUtil.searchForTerm(queryTerm, globalApplicationState, synapseClient);
+		SearchUtil.searchForTerm(queryTerm, globalApplicationState);
 	}
 
 	@Override
@@ -338,7 +335,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 			}
 		};
 		loadMoreWidgetContainer.setIsProcessing(true);
-		synapseClient.search(currentSearch, callback);
+		jsClient.getSearchResults(currentSearch, callback);
 	}
 
 	private boolean isEmptyQuery() {

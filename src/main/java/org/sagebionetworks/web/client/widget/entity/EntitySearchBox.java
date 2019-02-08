@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxOracle.EntitySearchBoxSuggestion;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
@@ -37,6 +38,7 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 	private EntitySearchBoxView view;
 	private EntitySelectedHandler handler;
 	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private EntitySearchBoxOracle oracle;
 	private boolean retrieveVersions = false;
 	private EntitySearchBoxSuggestion selectedSuggestion;
@@ -49,10 +51,12 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 	 */
 	@Inject
 	public EntitySearchBox(EntitySearchBoxView view,
-			SynapseClientAsync synapseClient) {
+			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient) {
 		super();		
 		this.view = view;
 		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		fixServiceEntryPoint(synapseClient);
 		oracle = view.getOracle();
 		view.setPresenter(this);
@@ -122,7 +126,7 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 		query.setQueryTerm(Arrays.asList(prefix.split(" ")));
 		
 		final List<Suggestion> suggestions = new LinkedList<Suggestion>();
-		synapseClient.search(query, new AsyncCallback<SearchResults>() {
+		jsClient.getSearchResults(query, new AsyncCallback<SearchResults>() {
 			@Override
 			public void onSuccess(SearchResults result) {
 				// Update view fields.
