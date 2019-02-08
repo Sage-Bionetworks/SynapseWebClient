@@ -22,10 +22,6 @@ public interface DiscussionForumClient extends RemoteService {
 	DiscussionThreadBundle createThread(CreateDiscussionThread toCreate)
 			throws RestServiceException;
 
-	PaginatedResults<DiscussionThreadBundle> getThreadsForForum(String forumId,
-			Long limit, Long offset, DiscussionThreadOrder order, Boolean ascending,
-			DiscussionFilter filter) throws RestServiceException;
-
 	DiscussionThreadBundle updateThread(String threadId, UpdateThread newThread)
 			throws RestServiceException;
 
@@ -48,10 +44,6 @@ public interface DiscussionForumClient extends RemoteService {
 	void pinThread(String threadId) throws RestServiceException;
 
 	void unpinThread(String threadId) throws RestServiceException;
-
-	PaginatedResults<DiscussionThreadBundle> getThreadsForEntity(String entityId,
-			Long limit, Long offset, DiscussionThreadOrder order, Boolean ascending,
-			DiscussionFilter filter) throws RestServiceException;
 
 	void restoreThread(String threadId) throws RestServiceException;
 }

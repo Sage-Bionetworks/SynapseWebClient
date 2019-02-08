@@ -143,6 +143,7 @@ public class SynapseJavascriptFactory {
 		SearchResults,
 		PaginatedColumnModelsResults,
 		PaginatedResultsVersionInfo,
+		PaginatedResultsDiscussionThreadBundle,
 		None,
 		String
 	}
@@ -265,6 +266,15 @@ public class SynapseJavascriptFactory {
 				versionInfoList.add(new VersionInfo(jsonObject));
 			}
 			return versionInfoList;
+		case PaginatedResultsDiscussionThreadBundle :
+			// json really represents a PaginatedResults (cannot reference here in js)
+			List<DiscussionThreadBundle> discussionThreadBundleList = new ArrayList<>();
+			JSONArrayAdapter discussionThreadBundleResultsJsonArray = json.getJSONArray("results");
+			for (int i = 0; i < discussionThreadBundleResultsJsonArray.length(); i++) {
+				JSONObjectAdapter jsonObject = discussionThreadBundleResultsJsonArray.getJSONObject(i);
+				discussionThreadBundleList.add(new DiscussionThreadBundle(jsonObject));
+			}
+			return discussionThreadBundleList;
 		case PaginatedResultsEntityHeader :
 			// json really represents a PaginatedResults (cannot reference here in js)
 			List<EntityHeader> entityHeaderList = new ArrayList<>();

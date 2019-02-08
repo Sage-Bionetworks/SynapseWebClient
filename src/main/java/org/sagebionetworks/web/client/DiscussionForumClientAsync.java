@@ -21,10 +21,6 @@ public interface DiscussionForumClientAsync{
 	void createThread(CreateDiscussionThread toCreate,
 			AsyncCallback<DiscussionThreadBundle> callback);
 
-	void getThreadsForForum(String forumId, Long limit, Long offset,
-			DiscussionThreadOrder order, Boolean ascending, DiscussionFilter filter,
-			AsyncCallback<PaginatedResults<DiscussionThreadBundle>> callback);
-
 	void updateThread(String threadId, UpdateThread newThread,
 			AsyncCallback<DiscussionThreadBundle> callback);
 
@@ -47,10 +43,6 @@ public interface DiscussionForumClientAsync{
 	void pinThread(String threadId, AsyncCallback<Void> callback);
 
 	void unpinThread(String threadId, AsyncCallback<Void> callback);
-
-	void getThreadsForEntity(String entityId, Long limit, Long offset,
-			DiscussionThreadOrder order, Boolean ascending, DiscussionFilter filter,
-			AsyncCallback<PaginatedResults<DiscussionThreadBundle>> callback);
 
 	void restoreThread(String threadId, AsyncCallback<Void> callback);
 }

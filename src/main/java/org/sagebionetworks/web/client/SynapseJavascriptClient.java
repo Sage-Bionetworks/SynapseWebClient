@@ -64,6 +64,7 @@ import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerCommitSortBy;
@@ -117,6 +118,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -164,6 +166,7 @@ public class SynapseJavascriptClient {
 	public static final String PROJECT = "/project";
 	public static final String FORUM = "/forum";
 	public static final String THREAD = "/thread";
+	public static final String THREADS = "/threads";
 	public static final String THREAD_COUNT = "/threadcount";
 	public static final String REPLY = "/reply";
 	public static final String REPLY_COUNT = "/replycount";
@@ -1318,6 +1321,32 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + REPO_SUFFIX_VERSION
 				+ "?" + OFFSET_PARAMETER + offset + "&" + LIMIT_PARAMETER + limit;
 		doGet(url, OBJECT_TYPE.PaginatedResultsVersionInfo, callback);
+	}
+	public void getThreadsForEntity(String entityId, Long limit, Long offset,
+			DiscussionThreadOrder order, Boolean ascending, DiscussionFilter filter,
+			AsyncCallback<List<DiscussionThreadBundle>> callback) {
+		String url = getThreadsURL(ENTITY, entityId, limit, offset, order, ascending, filter);
+		doGet(url, OBJECT_TYPE.PaginatedResultsDiscussionThreadBundle, callback);
+	}
+	public void getThreadsForForum(String forumId, Long limit, Long offset,
+			DiscussionThreadOrder order, Boolean ascending, DiscussionFilter filter,
+			AsyncCallback<List<DiscussionThreadBundle>> callback) {
+		String url = getThreadsURL(FORUM, forumId, limit, offset, order, ascending, filter);
+		doGet(url, OBJECT_TYPE.PaginatedResultsDiscussionThreadBundle, callback);
+	}
+	
+	private String getThreadsURL(String associatedObjectType, String objectId, Long limit, Long offset,
+			DiscussionThreadOrder order, Boolean ascending, DiscussionFilter filter) {
+		String url = getRepoServiceUrl() + associatedObjectType+"/"+objectId+THREADS
+				+"?"+LIMIT_PARAMETER+limit+"&"+OFFSET_PARAMETER+offset;
+		if (order != null) {
+			url += "&sort="+order.name();
+		}
+		if (ascending != null) {
+			url += "&ascending="+ascending;
+		}
+		url += "&filter="+filter.toString();
+		return url;
 	}
 }
 

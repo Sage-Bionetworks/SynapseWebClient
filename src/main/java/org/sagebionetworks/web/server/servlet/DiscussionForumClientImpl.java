@@ -63,7 +63,6 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 		}
 	}
 
-	@Override
 	public PaginatedResults<DiscussionThreadBundle> getThreadsForForum(
 			String forumId, Long limit, Long offset,
 			DiscussionThreadOrder order, Boolean ascending, DiscussionFilter filter)
@@ -202,19 +201,6 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			synapseClient.unpinThread(threadId);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public PaginatedResults<DiscussionThreadBundle> getThreadsForEntity(
-			String entityId, Long limit, Long offset,
-			DiscussionThreadOrder order, Boolean ascending, DiscussionFilter filter)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return convertPaginated(synapseClient.getThreadsForEntity(entityId, limit, offset, order, ascending, filter));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
