@@ -994,6 +994,7 @@ public class DisplayUtils {
  			IconType type = defaultPictureSinglePerson ? IconType.SYN_USER : IconType.SYN_USERS;
  			String clickableButtonCssClass = clickHandler != null ? "imageButton" : "";
  			Icon profilePicture = new Icon(type);
+ 			profilePicture.setWidth("64px");
  			profilePicture.addStyleName(" font-size-58 padding-2 " + clickableButtonCssClass + " userProfileImage lightGreyText margin-0-imp-before");
  			Div profilePictureWrapper = new Div();
  			profilePictureWrapper.addStyleName("pull-left media-object displayInline ");
