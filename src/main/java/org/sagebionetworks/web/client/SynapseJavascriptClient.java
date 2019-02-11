@@ -63,6 +63,7 @@ import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
+import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.discussion.Forum;
@@ -167,6 +168,7 @@ public class SynapseJavascriptClient {
 	public static final String FORUM = "/forum";
 	public static final String THREAD = "/thread";
 	public static final String THREADS = "/threads";
+	public static final String REPLIES = "/replies";
 	public static final String THREAD_COUNT = "/threadcount";
 	public static final String REPLY = "/reply";
 	public static final String REPLY_COUNT = "/replycount";
@@ -1347,6 +1349,22 @@ public class SynapseJavascriptClient {
 		}
 		url += "&filter="+filter.toString();
 		return url;
+	}
+	
+	public void getRepliesForThread(String threadId,
+			Long limit, Long offset, DiscussionReplyOrder order, Boolean ascending,
+			DiscussionFilter filter, AsyncCallback<List<DiscussionReplyBundle>> callback) {
+		
+		String url = getRepoServiceUrl() + THREAD+"/"+threadId+REPLIES
+				+"?"+LIMIT_PARAMETER+limit+"&"+OFFSET_PARAMETER+offset;
+		if (order != null) {
+			url += "&sort="+order.name();
+		}
+		if (ascending != null) {
+			url += "&ascending="+ascending;
+		}
+		url += "&filter="+filter;
+		doGet(url, OBJECT_TYPE.PaginatedResultsDiscussionReplyBundle, callback);
 	}
 }
 

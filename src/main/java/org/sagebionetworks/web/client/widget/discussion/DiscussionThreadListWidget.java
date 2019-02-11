@@ -142,7 +142,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 
 					@Override
 					public void onSuccess(List<DiscussionThreadBundle> results) {
-						boolean isEmpty = results.isEmpty() && offset == 0;
+						boolean isEmpty = results.isEmpty() && offset == 0; //no threads
 						
 						for(DiscussionThreadBundle bundle: results) {
 							DiscussionThreadListItemWidget thread = ginInjector.createThreadListItemWidget();

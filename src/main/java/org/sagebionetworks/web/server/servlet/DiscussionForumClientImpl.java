@@ -107,7 +107,6 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 		}
 	}
 
-	@Override
 	public PaginatedResults<DiscussionReplyBundle> getRepliesForThread(
 			String threadId, Long limit, Long offset,
 			DiscussionReplyOrder order, Boolean ascending, DiscussionFilter filter)

@@ -30,10 +30,6 @@ public interface DiscussionForumClient extends RemoteService {
 	DiscussionReplyBundle createReply(CreateDiscussionReply toCreate)
 			throws RestServiceException;
 
-	PaginatedResults<DiscussionReplyBundle> getRepliesForThread(String threadId,
-			Long limit, Long offset, DiscussionReplyOrder order, Boolean ascending,
-			DiscussionFilter filter) throws RestServiceException;
-
 	DiscussionReplyBundle updateReplyMessage(String replyId, UpdateReplyMessage newMessage)
 			throws RestServiceException;
 

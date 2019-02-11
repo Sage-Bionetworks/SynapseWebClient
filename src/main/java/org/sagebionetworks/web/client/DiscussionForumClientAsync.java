@@ -29,10 +29,6 @@ public interface DiscussionForumClientAsync{
 	void createReply(CreateDiscussionReply toCreate,
 			AsyncCallback<DiscussionReplyBundle> callback);
 
-	void getRepliesForThread(String threadId, Long limit, Long offset,
-			DiscussionReplyOrder order, Boolean ascending, DiscussionFilter filter,
-			AsyncCallback<PaginatedResults<DiscussionReplyBundle>> callback);
-
 	void updateReplyMessage(String replyId, UpdateReplyMessage newMessage,
 			AsyncCallback<DiscussionReplyBundle> callback);
 
