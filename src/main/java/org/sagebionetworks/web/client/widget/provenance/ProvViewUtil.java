@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
@@ -112,19 +113,18 @@ public class ProvViewUtil {
 		return container;
 	}
 	
-	public static ProvNodeContainer createExpandContainer(final ExpandGraphNode node, final SageImageBundle sageImageBundle, final Presenter presenter, final ProvenanceWidgetView view) {
-		SafeHtmlBuilder builder = new SafeHtmlBuilder();		
-		builder.appendHtmlConstant(AbstractImagePrototype.create(sageImageBundle.expand()).getHTML());
-		
+	public static ProvNodeContainer createExpandContainer(final ExpandGraphNode node, final Presenter presenter, final ProvenanceWidgetView view) {
 		final Anchor link = new Anchor();
-		link.add(new HTML(builder.toSafeHtml()));
-		link.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				link.clear();
-				link.add(DisplayUtils.getSmallLoadingWidget());
-				presenter.expand(node);
-			}
+		link.addStyleName("textDecorationNone");
+		Span sp = new Span("&#8230;"); //ellipsis
+		sp.addStyleName("moveup-8");
+		sp.setPaddingLeft(10); //expand clickable area
+		sp.setPaddingRight(10);
+		link.add(sp);
+		link.addClickHandler(event -> {
+			link.clear();
+			link.add(DisplayUtils.getSmallLoadingWidget());
+			presenter.expand(node);
 		});
 		
 		ProvNodeContainer container = new ProvNodeContainer();

@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -13,7 +11,6 @@ import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
@@ -21,7 +18,6 @@ import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
-import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -34,7 +30,6 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 	private EntityBundle entityBundle;
 	private SynapseProperties synapseProperties;
 	private FileDownloadMenuItem fileDownloadMenuItem;
-	private SynapseClientAsync synapseClient;
 	private SynapseJavascriptClient jsClient;
 	private FileClientsHelp fileClientsHelp;
 	private EventBus eventBus;
@@ -43,7 +38,6 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 	public FileTitleBar(FileTitleBarView view, 
 			SynapseProperties synapseProperties,
 			FileDownloadMenuItem fileDownloadButton,
-			SynapseClientAsync synapseClient,
 			SynapseJavascriptClient jsClient,
 			FileClientsHelp fileClientsHelp,
 			EventBus eventBus,
@@ -51,8 +45,6 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 		this.view = view;
 		this.synapseProperties = synapseProperties;
 		this.fileDownloadMenuItem = fileDownloadButton;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
 		this.jsClient = jsClient;
 		this.fileClientsHelp = fileClientsHelp;
 		this.eventBus = eventBus;
@@ -99,13 +91,12 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 	
 	public void getLatestVersion() {
 		// determine if we should show report the version (only shows if we're looking at an older version of the file).
-		synapseClient.getEntityVersions(entityBundle.getEntity().getId(), 0, 1,
-			new AsyncCallback<PaginatedResults<VersionInfo>>() {
+		jsClient.getEntityVersions(entityBundle.getEntity().getId(), 0, 1,
+			new AsyncCallback<List<VersionInfo>>() {
 				@Override
-				public void onSuccess(PaginatedResults<VersionInfo> result) {
-					List<VersionInfo> versions =  result.getResults();
-					if (!versions.isEmpty()) {
-						Long currentVersionNumber = versions.get(0).getVersionNumber();
+				public void onSuccess(List<VersionInfo> results) {
+					if (!results.isEmpty()) {
+						Long currentVersionNumber = results.get(0).getVersionNumber();
 						Long viewingVersionNumber = ((FileEntity)entityBundle.getEntity()).getVersionNumber();
 						view.setVersionUIVisible(!currentVersionNumber.equals(viewingVersionNumber));
 					}

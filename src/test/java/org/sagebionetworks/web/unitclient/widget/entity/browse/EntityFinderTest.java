@@ -1,25 +1,31 @@
 package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.Entity;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.VersionInfo;
-import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -27,7 +33,6 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -38,20 +43,20 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+@RunWith(MockitoJUnitRunner.class)
 public class EntityFinderTest {
-
+	@Mock
 	EntityFinderView mockView;
-	SynapseClientAsync mockSynapseClient;
 	AdapterFactory adapterFactory;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	AuthenticationController mockAuthenticationController;
-
 	EntityFinder entityFinder;	
 	@Mock
 	ClientCache mockClientCache;
@@ -67,14 +72,8 @@ public class EntityFinderTest {
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
-		MockitoAnnotations.initMocks(this);
-		mockView = mock(EntityFinderView.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
 		adapterFactory = new AdapterFactoryImpl();
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		
-		entityFinder = new EntityFinder(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockClientCache, mockSynAlert, mockJsClient);
+		entityFinder = new EntityFinder(mockView, mockGlobalApplicationState, mockAuthenticationController, mockClientCache, mockSynAlert, mockJsClient);
 		verify(mockView).setPresenter(entityFinder);
 		reset(mockView);
 		when(mockView.isShowing()).thenReturn(false);
@@ -183,15 +182,11 @@ public class EntityFinderTest {
 	@Test
 	public void testLoadVersions() throws Exception {
 		String id = "syn456";
-		String versionsJson = "versions";
-		PaginatedResults<VersionInfo> paginated = new PaginatedResults<VersionInfo>();		
 		List<VersionInfo> results = new ArrayList<VersionInfo>();
-		paginated.setResults(results);
-		AsyncMockStubber.callSuccessWith(paginated).when(mockSynapseClient).getEntityVersions(eq(id), anyInt(), anyInt(), any(AsyncCallback.class));		
-		AsyncCallback<Entity> mockCallback = mock(AsyncCallback.class);	
+		AsyncMockStubber.callSuccessWith(results).when(mockJsClient).getEntityVersions(eq(id), anyInt(), anyInt(), any(AsyncCallback.class));		
 		
 		entityFinder.loadVersions(id);
-		verify(mockSynapseClient).getEntityVersions(eq(id), eq(WebConstants.ZERO_OFFSET.intValue()), anyInt(), any(AsyncCallback.class));
+		verify(mockJsClient).getEntityVersions(eq(id), eq(WebConstants.ZERO_OFFSET.intValue()), anyInt(), any(AsyncCallback.class));
 		verify(mockView).setVersions(results);
 	}	
 	
@@ -203,7 +198,7 @@ public class EntityFinderTest {
 		List<VersionInfo> results = new ArrayList<VersionInfo>();
 		paginated.setResults(results);
 		Exception ex = new Exception();
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityVersions(eq(id), anyInt(), anyInt(), any(AsyncCallback.class));		
+		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).getEntityVersions(eq(id), anyInt(), anyInt(), any(AsyncCallback.class));		
 		
 		entityFinder.loadVersions(id);
 		

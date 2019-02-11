@@ -5,7 +5,11 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +27,6 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
 import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandler;
@@ -56,8 +59,6 @@ public class SynapseTableFormWidgetTest {
 	@Mock
 	AsynchronousJobTracker mockAsynchronousJobTracker;
 	@Mock
-	SynapseClientAsync mockSynapseClient;
-	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	Row mockRow;
@@ -77,8 +78,8 @@ public class SynapseTableFormWidgetTest {
 	public void setup() throws RequestException{
 		MockitoAnnotations.initMocks(this);
 		columnModels = new ArrayList<ColumnModel>();
-		widget = new SynapseTableFormWidget(mockView, mockSynAlert, mockRowFormWidget, mockAsynchronousJobTracker, mockSynapseClient, mockUserBadge, mockSynapseJavascriptClient);
-		AsyncMockStubber.callSuccessWith(columnModels).when(mockSynapseClient).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
+		widget = new SynapseTableFormWidget(mockView, mockSynAlert, mockRowFormWidget, mockAsynchronousJobTracker, mockUserBadge, mockSynapseJavascriptClient);
+		AsyncMockStubber.callSuccessWith(columnModels).when(mockSynapseJavascriptClient).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockTableEntity).when(mockSynapseJavascriptClient).getEntity(anyString(), any(AsyncCallback.class));
 		
 		when(mockTableEntity.getCreatedBy()).thenReturn(CREATED_BY);
@@ -129,7 +130,7 @@ public class SynapseTableFormWidgetTest {
 		verify(mockView).setSuccessMessageVisible(false);
 		
 		verify(mockView).setSuccessMessage(SUCCESS_MESSAGE);
-		verify(mockSynapseClient).getColumnModelsForTableEntity(eq(TABLE_ID), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getColumnModelsForTableEntity(eq(TABLE_ID), any(AsyncCallback.class));
 		verify(mockRowFormWidget).configure(TABLE_ID, columnModels);
 		verify(mockUserBadge).configure(CREATED_BY);
 		verify(mockView).setFormUIVisible(true);
@@ -138,10 +139,10 @@ public class SynapseTableFormWidgetTest {
 	@Test
 	public void testConfigureFailure() throws RequestException {
 		Exception e = new Exception("Could not retrieve column models");
-		AsyncMockStubber.callFailureWith(e).when(mockSynapseClient).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(e).when(mockSynapseJavascriptClient).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
 		widget.configure(wikiKey, descriptor, null, null);
 		
-		verify(mockSynapseClient).getColumnModelsForTableEntity(eq(TABLE_ID), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getColumnModelsForTableEntity(eq(TABLE_ID), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(e);
 	}
 	
@@ -212,7 +213,7 @@ public class SynapseTableFormWidgetTest {
 		verify(mockRowFormWidget, times(2)).clear();
 		verify(mockView, times(2)).setFormUIVisible(false);
 		verify(mockView, times(2)).setSuccessMessageVisible(false);
-		verify(mockSynapseClient, times(2)).getColumnModelsForTableEntity(eq(TABLE_ID), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, times(2)).getColumnModelsForTableEntity(eq(TABLE_ID), any(AsyncCallback.class));
 		verify(mockRowFormWidget, times(2)).configure(TABLE_ID, columnModels);
 		verify(mockUserBadge, times(2)).configure(CREATED_BY);
 		verify(mockView, times(2)).setFormUIVisible(true);

@@ -53,6 +53,7 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
@@ -61,7 +62,9 @@ import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
+import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerCommitSortBy;
@@ -106,6 +109,7 @@ import org.sagebionetworks.repo.model.subscription.SubscriptionRequest;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ViewType;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -153,6 +157,7 @@ public class SynapseJavascriptClient {
 	public static final String WIKI2 = "/wiki2/";
 	public static final String WIKIKEY = "/wikikey";
 	public static final String WIKI_ORDER_HINT = "/wiki2orderhint";
+	public static final String WIKI_HEADER_TREE = "/wikiheadertree2";
 	public static final String CHILDREN = "/children";
 	public static final String RESTRICTION_INFORMATION = "/restrictionInformation";
 	public static final String USER_PROFILE_PATH = "/userProfile";
@@ -162,6 +167,8 @@ public class SynapseJavascriptClient {
 	public static final String PROJECT = "/project";
 	public static final String FORUM = "/forum";
 	public static final String THREAD = "/thread";
+	public static final String THREADS = "/threads";
+	public static final String REPLIES = "/replies";
 	public static final String THREAD_COUNT = "/threadcount";
 	public static final String REPLY = "/reply";
 	public static final String REPLY_COUNT = "/replycount";
@@ -255,6 +262,7 @@ public class SynapseJavascriptClient {
 	public static final String DOWNLOAD_ORDER_HISTORY = DOWNLOAD_ORDER+"/history";
 	public static final String STORAGE_REPORT = "/storageReport";
 	public static final String SEARCH = "/search";
+	public static final int LIMIT_50 = 50;
 	
 	public String repoServiceUrl,fileServiceUrl, authServiceUrl, synapseVersionInfo; 
 	@Inject
@@ -963,6 +971,12 @@ public class SynapseJavascriptClient {
 			key.getOwnerObjectId() + WIKI_ORDER_HINT;
 		doPut(url, toUpdate, OBJECT_TYPE.V2WikiOrderHint, callback);
 	}
+	public void getV2WikiOrderHint(WikiPageKey key, AsyncCallback<V2WikiOrderHint> callback) {
+		String url = getRepoServiceUrl() + "/" +
+				key.getOwnerObjectType().toLowerCase() + "/" + 
+				key.getOwnerObjectId() + WIKI_ORDER_HINT;
+		doGet(url, OBJECT_TYPE.V2WikiOrderHint, callback);
+	}
 	
 	public FluentFuture<Entity> createEntity(Entity entity) {
 		String url = getRepoServiceUrl() + ENTITY;
@@ -1298,10 +1312,89 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + SUBSCRIPTION + "/list";
 		doPost(url, request, OBJECT_TYPE.SubscriptionPagedResults, callback);
 	}
-	
 	public void getSearchResults(SearchQuery request, AsyncCallback<SearchResults> callback) {
 		String url = getRepoServiceUrl() + SEARCH;
 		doPost(url, request, OBJECT_TYPE.SearchResults, callback);
 	}
+	public void getColumnModelsForTableEntity(String tableEntityId, AsyncCallback<List<ColumnModel>> callback) {
+		String url = getRepoServiceUrl() + ENTITY + "/" + tableEntityId + COLUMN;
+		doGet(url, OBJECT_TYPE.PaginatedColumnModelsResults, callback);
+	}
+	public void getEntityVersions(String entityId, int offset, int limit, AsyncCallback<List<VersionInfo>> callback) {
+		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + REPO_SUFFIX_VERSION
+				+ "?" + OFFSET_PARAMETER + offset + "&" + LIMIT_PARAMETER + limit;
+		doGet(url, OBJECT_TYPE.PaginatedResultsVersionInfo, callback);
+	}
+	public void getThreadsForEntity(String entityId, Long limit, Long offset,
+			DiscussionThreadOrder order, Boolean ascending, DiscussionFilter filter,
+			AsyncCallback<List<DiscussionThreadBundle>> callback) {
+		String url = getThreadsURL(ENTITY, entityId, limit, offset, order, ascending, filter);
+		doGet(url, OBJECT_TYPE.PaginatedResultsDiscussionThreadBundle, callback);
+	}
+	public void getThreadsForForum(String forumId, Long limit, Long offset,
+			DiscussionThreadOrder order, Boolean ascending, DiscussionFilter filter,
+			AsyncCallback<List<DiscussionThreadBundle>> callback) {
+		String url = getThreadsURL(FORUM, forumId, limit, offset, order, ascending, filter);
+		doGet(url, OBJECT_TYPE.PaginatedResultsDiscussionThreadBundle, callback);
+	}
+	
+	private String getThreadsURL(String associatedObjectType, String objectId, Long limit, Long offset,
+			DiscussionThreadOrder order, Boolean ascending, DiscussionFilter filter) {
+		String url = getRepoServiceUrl() + associatedObjectType+"/"+objectId+THREADS
+				+"?"+LIMIT_PARAMETER+limit+"&"+OFFSET_PARAMETER+offset;
+		if (order != null) {
+			url += "&sort="+order.name();
+		}
+		if (ascending != null) {
+			url += "&ascending="+ascending;
+		}
+		url += "&filter="+filter.toString();
+		return url;
+	}
+	
+	public void getRepliesForThread(String threadId,
+			Long limit, Long offset, DiscussionReplyOrder order, Boolean ascending,
+			DiscussionFilter filter, AsyncCallback<List<DiscussionReplyBundle>> callback) {
+		
+		String url = getRepoServiceUrl() + THREAD+"/"+threadId+REPLIES
+				+"?"+LIMIT_PARAMETER+limit+"&"+OFFSET_PARAMETER+offset;
+		if (order != null) {
+			url += "&sort="+order.name();
+		}
+		if (ascending != null) {
+			url += "&ascending="+ascending;
+		}
+		url += "&filter="+filter;
+		doGet(url, OBJECT_TYPE.PaginatedResultsDiscussionReplyBundle, callback);
+	}
+	
+	public void getV2WikiHeaderTree(String ownerId, String ownerType,
+			AsyncCallback<List<V2WikiHeader>> callback) {
+		getV2WikiHeaderTree(ownerId, ownerType, callback, 0, new ArrayList<V2WikiHeader>());
+	}
+	
+	private void getV2WikiHeaderTree(String ownerId, String ownerType,
+			AsyncCallback<List<V2WikiHeader>> finalCallback, int offset, List<V2WikiHeader> fullWikiHeaderList) {
+		// continue asking for v2 wiki headers until result is empty
+		String url = getRepoServiceUrl() + "/" +
+				ownerType.toLowerCase() + "/" + ownerId + WIKI_HEADER_TREE +
+				"?"+LIMIT_PARAMETER+LIMIT_50+"&"+OFFSET_PARAMETER+offset;
+		doGet(url, OBJECT_TYPE.PaginatedResultsV2WikiHeader, new AsyncCallback<List<V2WikiHeader>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				finalCallback.onFailure(caught);
+			}
+			@Override
+			public void onSuccess(List<V2WikiHeader> results) {
+				fullWikiHeaderList.addAll(results);
+				if (results.isEmpty() || results.size() < LIMIT_50) {
+					finalCallback.onSuccess(fullWikiHeaderList);
+				} else {
+					getV2WikiHeaderTree(ownerId, ownerType, finalCallback, offset+LIMIT_50, fullWikiHeaderList);
+				}
+			}
+		});
+	}
+
 }
 

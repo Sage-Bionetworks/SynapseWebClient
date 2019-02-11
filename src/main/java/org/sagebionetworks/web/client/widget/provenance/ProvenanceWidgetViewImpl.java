@@ -161,7 +161,7 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 			// create tool tip for defined activities only
 			return container;
 		} else if(node instanceof ExpandGraphNode) {
-			return ProvViewUtil.createExpandContainer((ExpandGraphNode)node, sageImageBundle, presenter, this);
+			return ProvViewUtil.createExpandContainer((ExpandGraphNode)node, presenter, this);
 		} else if(node instanceof ExternalGraphNode) {			
 			ProvNodeContainer container = ProvViewUtil.createExternalUrlContainer((ExternalGraphNode) node, iconsImageBundle);
 			return container;

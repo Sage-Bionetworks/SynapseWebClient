@@ -17,6 +17,8 @@ import org.sagebionetworks.web.client.SynapseFutureClient;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.EmailInvitationView;
@@ -27,6 +29,7 @@ import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 
@@ -38,7 +41,7 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 	private SynapseAlert synapseAlert;
 	private AuthenticationController authController;
 	private PlaceChanger placeChanger;
-	private String teamId, email;
+	private String email;
 	@Inject
 	public EmailInvitationPresenter(
 			EmailInvitationView view,
@@ -76,12 +79,22 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 					new FutureCallback<MembershipInvitation>() {
 						@Override
 						public void onSuccess(MembershipInvitation mis) {
-							teamId = mis.getTeamId();
-							if (!authController.isLoggedIn()) {
-								initializeView(mis);
-							} else {
-								bindInvitationToAuthenticatedUser(mis.getId());
+							//check to see if this invitation is associated to the current user
+							if (authController.isLoggedIn()) {
+								 if (mis.getInviteeId() != null && authController.getCurrentUserPrincipalId().equals(mis.getInviteeId())) {
+									 // user id already bound to invitation.  redirect to profile page
+									 gotoProfilePageTeamArea();
+									 return;
+								 } else if (authController.getCurrentUserProfile().getEmails().contains(mis.getInviteeEmail())) {
+									 // logged in, and current user emails contains invitation.  bind to user, and then head to the profile page.
+									 bindInvitationToAuthenticatedUser(mis.getId());
+									 return;
+								 } else {
+									 // invitation not associated to the current user, log this user out and show the default UI.
+									 authController.logoutUser();
+								 }
 							}
+							initializeView(mis);
 						}
 
 						@Override
@@ -104,7 +117,7 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 					new FutureCallback<Void>() {
 						@Override
 						public void onSuccess(Void aVoid) {
-							placeChanger.goTo(new org.sagebionetworks.web.client.place.Team(teamId));
+							gotoProfilePageTeamArea();
 						}
 
 						@Override
@@ -115,6 +128,11 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 					},
 					directExecutor()
 			);
+	}
+	
+	private void gotoProfilePageTeamArea() {
+		// SWC-4668: take the user to their profile page with the join request for them to accept (using the Join button, which handles any ARs)
+		placeChanger.goTo(new Profile(authController.getCurrentUserPrincipalId(), ProfileArea.TEAMS));
 	}
 
 	private void initializeView(final MembershipInvitation mis) {

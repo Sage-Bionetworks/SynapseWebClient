@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -11,12 +12,12 @@ import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -39,17 +40,20 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	private SynapseAlert synAlert;
 	private boolean canEdit;
 	private Long versionNumber;
+	private SynapseJavascriptClient jsClient;
 	int currentOffset;
 	
 	@Inject
 	public FileHistoryWidget(FileHistoryWidgetView view,
-			 SynapseClientAsync synapseClient, 
+			 SynapseClientAsync synapseClient,
+			 SynapseJavascriptClient jsClient,
 			 GlobalApplicationState globalApplicationState, 
 			 PreflightController preflightController,
 			 SynapseAlert synAlert) {
 		super();
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
+		this.jsClient = jsClient;
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.preflightController = preflightController;
@@ -143,24 +147,22 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	}
 	
 	public void onMore() {
-		synapseClient.getEntityVersions(bundle.getEntity().getId(), currentOffset, VERSION_LIMIT,
-			new AsyncCallback<PaginatedResults<VersionInfo>>() {
+		jsClient.getEntityVersions(bundle.getEntity().getId(), currentOffset, VERSION_LIMIT,
+			new AsyncCallback<List<VersionInfo>>() {
 				@Override
-				public void onSuccess(PaginatedResults<VersionInfo> result) {
-					PaginatedResults<VersionInfo> paginatedResults;
-					paginatedResults = result;
-					view.setMoreButtonVisible(paginatedResults.getResults().size() == VERSION_LIMIT);
+				public void onSuccess(List<VersionInfo> results) {
+					view.setMoreButtonVisible(results.size() == VERSION_LIMIT);
 					if (currentOffset == 0) {
 						//we know the current version based on this
-						Long currentVersion = paginatedResults.getResults().get(0).getVersionNumber();
+						Long currentVersion = results.get(0).getVersionNumber();
 						boolean isCurrentVersion = versionNumber == null || currentVersion.equals(versionNumber);
 						view.setEntityBundle(bundle.getEntity(), !isCurrentVersion);
 						view.setEditVersionInfoButtonVisible(isCurrentVersion && canEdit);
 					}
-					if (versionNumber == null && currentOffset == 0 && paginatedResults.getResults().size() > 0) {
-						versionNumber = paginatedResults.getResults().get(0).getVersionNumber();
+					if (versionNumber == null && currentOffset == 0 && results.size() > 0) {
+						versionNumber = results.get(0).getVersionNumber();
 					}
-					for (VersionInfo versionInfo : paginatedResults.getResults()) {
+					for (VersionInfo versionInfo : results) {
 						view.addVersion(versionInfo, canEdit, versionInfo.getVersionNumber().equals(versionNumber));
 					}
 					currentOffset += VERSION_LIMIT;

@@ -2301,14 +2301,13 @@ td.datePickerMonth {
 }
 
 .provActivityNode { 
-	border:0.1em dotted #ccc; 
+	border:0.1em solid #777; 
 	opacity:0.9; 
-	filter:alpha(opacity=80); 
 	width: 132px;
 	z-index:20; 
 	position:absolute; 
 	color:black;
-	padding-top:3px; 	
+	padding: 0px 5px 11px 0px;
 	font-size:12px;	
 
 	@include box-shadow(2px 2px 10px #aaa);
@@ -2335,15 +2334,15 @@ td.datePickerMonth {
 }
 
 .provExpandNode {
-	opacity:0.8; 
-	filter:alpha(opacity=80); 
-	width:32.4px; height:16.8px; 
-	z-index:20; 
-	position:absolute;	
+	@include border-radius(4px);
+	border:0.1em solid #777; 
+	width:32.4px; height:16.8px;
+	z-index:20;
+	position:absolute;
 	color:black;
-	padding-top:0px; 
+	padding-top:0px;
 	font-size:12px;
-	text-align:center;	
+	text-align:center;
 }
 
 .provUndefinedChange {

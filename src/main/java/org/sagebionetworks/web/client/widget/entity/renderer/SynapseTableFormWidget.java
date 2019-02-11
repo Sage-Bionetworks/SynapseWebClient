@@ -41,7 +41,6 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 	private RowFormEditorWidget rowWidget;
 	private String tableId;
 	private List<ColumnModel> headers;
-	private SynapseClientAsync synapseClient;
 	private AsynchronousJobTracker jobTracker;
 	private UserBadge ownerUserBadge;
 	public static final String DEFAULT_SUCCESS_MESSAGE = "Your response has been recorded.";
@@ -52,15 +51,12 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 			SynapseAlert synAlert,
 			RowFormEditorWidget rowWidget,
 			AsynchronousJobTracker jobTracker,
-			SynapseClientAsync synapseClient,
 			UserBadge ownerUserBadge,
 			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.rowWidget = rowWidget;
 		this.jobTracker = jobTracker;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
 		this.ownerUserBadge = ownerUserBadge;
 		this.jsClient = jsClient;
 		view.setRowFormWidget(rowWidget.asWidget());
@@ -104,7 +100,7 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 			};
 		});
 		//get the table schema and init row widget!
-		synapseClient.getColumnModelsForTableEntity(tableId, new AsyncCallback<List<ColumnModel>>() {
+		jsClient.getColumnModelsForTableEntity(tableId, new AsyncCallback<List<ColumnModel>>() {
 			@Override
 			public void onSuccess(List<ColumnModel> result) {
 				headers = result;

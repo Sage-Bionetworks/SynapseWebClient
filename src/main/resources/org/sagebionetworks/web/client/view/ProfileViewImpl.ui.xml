@@ -28,8 +28,8 @@
             </b:Alert>
 
             <div class="margin-10">
-                <div class="margin-top-5 row">
-                    <div ui:field="dashboardUI" class="inline-block col-xs-12">
+                <div class="margin-top-5">
+                    <div ui:field="dashboardUI" class="inline-block">
                         <div>
                             <div ui:field="navtabContainer">
                                 <ul class="nav nav-tabs entity-tabs margin-top-15 border-none">

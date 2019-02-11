@@ -1,11 +1,10 @@
 package org.sagebionetworks.web.client.widget.clienthelp;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+import java.util.List;
 
 import org.sagebionetworks.repo.model.VersionInfo;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -14,26 +13,25 @@ import com.google.inject.Inject;
 
 public class FileClientsHelp implements IsWidget {
 	private FileClientsHelpView view;
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private SynapseJSNIUtils jsniUtils;
 	
 	@Inject
 	public FileClientsHelp(
 			FileClientsHelpView view,
-			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
 			SynapseJSNIUtils jsniUtils) {
 		this.view = view;
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.jsniUtils = jsniUtils;
-		fixServiceEntryPoint(synapseClient);
 	}
 	
 	public void configureAndShow(String entityId, Long version) {
-		synapseClient.getEntityVersions(entityId, 0, 1, new AsyncCallback<PaginatedResults<VersionInfo>>() {
+		jsClient.getEntityVersions(entityId, 0, 1, new AsyncCallback<List<VersionInfo>>() {
 			@Override
-			public void onSuccess(PaginatedResults<VersionInfo> result) {
-				if (result.getResults().size() > 0) {
-					VersionInfo versionInfo = result.getResults().get(0);
+			public void onSuccess(List<VersionInfo> results) {
+				if (results.size() > 0) {
+					VersionInfo versionInfo = results.get(0);
 					view.setVersionVisible(!version.equals(versionInfo.getVersionNumber()));
 				} else {
 					view.setVersionVisible(false);

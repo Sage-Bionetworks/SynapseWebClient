@@ -403,7 +403,7 @@ public class EntityActionControllerImplTest {
 		page.setParentId("rootid");
 		headers.add(page);
 		
-		AsyncMockStubber.callSuccessWith(headers).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(headers).when(mockSynapseJavascriptClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		entityBundle.setEntity(new Project());
 		currentEntityArea = EntityArea.WIKI;
 		boolean canEdit = true;
@@ -414,7 +414,7 @@ public class EntityActionControllerImplTest {
 
 	@Test
 	public void testConfigureReorderWikiSubpagesNoTree(){
-		AsyncMockStubber.callSuccessWith(new ArrayList<V2WikiHeader>()).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(new ArrayList<V2WikiHeader>()).when(mockSynapseJavascriptClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		entityBundle.setEntity(new Project());
 		currentEntityArea = EntityArea.WIKI;
 		boolean canEdit = true;
