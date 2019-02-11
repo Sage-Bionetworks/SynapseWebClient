@@ -1,7 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-import static org.sagebionetworks.web.shared.WidgetConstants.*;
+import static org.sagebionetworks.web.shared.WidgetConstants.BAR_MODE;
+import static org.sagebionetworks.web.shared.WidgetConstants.IS_HORIZONTAL;
+import static org.sagebionetworks.web.shared.WidgetConstants.SHOW_LEGEND;
+import static org.sagebionetworks.web.shared.WidgetConstants.TABLE_QUERY_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.TITLE;
+import static org.sagebionetworks.web.shared.WidgetConstants.TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TITLE;
+import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TITLE;
+import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TYPE;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -14,7 +22,6 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.BarMode;
@@ -49,7 +56,6 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	String xColumnName;
 	List<String> yColumnsList = new ArrayList<>();
 	SynapseAlert synAlert;
-	SynapseClientAsync synapseClient;
 	String sql;
 	List<String> allAvailableColumnNames;
 	boolean isAdvancedVisible;
@@ -63,14 +69,11 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	public PlotlyConfigEditor(final PlotlyConfigView view, 
 			EntityFinder finder,
 			SynapseAlert synAlert,
-			SynapseClientAsync synapseClient,
 			Button showHideAdvancedButton,
 			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.finder = finder;
 		this.synAlert = synAlert;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
 		this.jsClient = jsClient;
 		this.showHideAdvancedButton = showHideAdvancedButton;
 		view.setSynAlert(synAlert);
@@ -312,7 +315,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		});
 		
 		// get the columns
-		synapseClient.getColumnModelsForTableEntity(synId, new AsyncCallback<List<ColumnModel>>() {
+		jsClient.getColumnModelsForTableEntity(synId, new AsyncCallback<List<ColumnModel>>() {
 			@Override
 			public void onSuccess(List<ColumnModel> columnModels) {
 				allAvailableColumnNames = new ArrayList<String>();

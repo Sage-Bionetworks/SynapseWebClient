@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.discussion;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
+import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
@@ -31,7 +32,6 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.http.client.Request;
@@ -415,9 +415,9 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	@Override
 	public void loadMore() {
 		synAlert.clear();
-		discussionForumClientAsync.getRepliesForThread(threadId, LIMIT, offset,
+		jsClient.getRepliesForThread(threadId, LIMIT, offset,
 				order, ascending, DEFAULT_FILTER,
-				new AsyncCallback<PaginatedResults<DiscussionReplyBundle>>(){
+				new AsyncCallback<List<DiscussionReplyBundle>>(){
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -427,17 +427,18 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 					@Override
 					public void onSuccess(
-							PaginatedResults<DiscussionReplyBundle> result) {
+							List<DiscussionReplyBundle> results) {
+						boolean isEmpty = results.isEmpty() && offset == 0; //no replies
 						offset += LIMIT;
-						if (!result.getResults().isEmpty()) {
-							for (DiscussionReplyBundle bundle : result.getResults()) {
+						if (!results.isEmpty()) {
+							for (DiscussionReplyBundle bundle : results) {
 								ReplyWidget replyWidget = ginInjector.createReplyWidget();
 								replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, refreshCallback, isThreadDeleted);
 								repliesContainer.add(replyWidget.asWidget());
 							}
 						}
-						repliesContainer.setIsMore(offset < result.getTotalNumberOfResults());
-						view.setSecondNewReplyContainerVisible(result.getTotalNumberOfResults() > 0);
+						repliesContainer.setIsMore(!results.isEmpty());
+						view.setSecondNewReplyContainerVisible(!isEmpty);
 					}
 		});
 	}

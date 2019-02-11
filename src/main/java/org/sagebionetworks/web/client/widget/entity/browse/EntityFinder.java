@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.*;
+import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.ALL;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,12 +12,10 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -28,7 +26,6 @@ import com.google.inject.Inject;
 public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	public static final String ENTITY_FINDER_AREA_KEY = "org.sagebionetworks.web.client.entityfinder.area";
 	private EntityFinderView view;
-	private SynapseClientAsync synapseClient;
 	private boolean showVersions = true;
 	private List<Reference> selectedEntities;
 	GlobalApplicationState globalApplicationState;
@@ -41,15 +38,12 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	private SynapseJavascriptClient jsClient;
 	@Inject
 	public EntityFinder(EntityFinderView view,
-			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			ClientCache cache,
 			SynapseAlert synAlert,
 			SynapseJavascriptClient jsClient) {
 		this.view = view;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.cache = cache;
@@ -202,11 +196,10 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	@Override
 	public void loadVersions(String entityId) {
 		synAlert.clear();
-		synapseClient.getEntityVersions(entityId, WebConstants.ZERO_OFFSET.intValue(), 200, new AsyncCallback<PaginatedResults<VersionInfo>>() {
+		jsClient.getEntityVersions(entityId, WebConstants.ZERO_OFFSET.intValue(), 200, new AsyncCallback<List<VersionInfo>>() {
 			@Override
-			public void onSuccess(PaginatedResults<VersionInfo> result) {
-				PaginatedResults<VersionInfo> versions = result;
-				view.setVersions(versions.getResults());
+			public void onSuccess(List<VersionInfo> results) {
+				view.setVersions(results);
 			}
 			@Override
 			public void onFailure(Throwable caught) {

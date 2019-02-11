@@ -1,12 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.List;
 
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -21,7 +19,7 @@ public class WikiSubpagesOrderEditor {
 	private WikiSubpageOrderEditorTree editorTree;
 	private String ownerObjectName;
 	private SynapseAlert synAlert;
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private WikiPageKey wikiKey;
 	private CallbackP<String> refreshCallback;
 	@Inject
@@ -29,12 +27,11 @@ public class WikiSubpagesOrderEditor {
 			WikiSubpagesOrderEditorView view, 
 			WikiSubpageOrderEditorTree editorTree,
 			SynapseAlert synAlert,
-			SynapseClientAsync synapseClient) {
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.editorTree = editorTree;
 		this.synAlert = synAlert;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
+		this.jsClient = jsClient;
 		refreshCallback = new CallbackP<String>() {
 			@Override
 			public void invoke(String selectWikiPageId) {
@@ -55,10 +52,10 @@ public class WikiSubpagesOrderEditor {
 	public void refresh(final String selectWikiPageId) {
 		synAlert.clear();
 		view.setLoadingVisible(true);
-		synapseClient.getV2WikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {
+		jsClient.getV2WikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {
 			@Override
 			public void onSuccess(final List<V2WikiHeader> wikiHeaders) {
-				synapseClient.getV2WikiOrderHint(wikiKey, new AsyncCallback<V2WikiOrderHint>() {
+				jsClient.getV2WikiOrderHint(wikiKey, new AsyncCallback<V2WikiOrderHint>() {
 					@Override
 					public void onSuccess(V2WikiOrderHint hint) {
 						// "Sort" stuff'

@@ -13,6 +13,7 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -29,6 +30,7 @@ public class WikiPageDeleteConfirmationDialog implements WikiPageDeleteConfirmat
 	public static final String ROOT_WIKI_PAGE_NAME = "(the root wiki)";
 	private WikiPageDeleteConfirmationDialogView view;
 	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	String parentWikiPageId;
 	WikiPageKey key;
 	PopupUtilsView popupUtilsView;
@@ -36,11 +38,13 @@ public class WikiPageDeleteConfirmationDialog implements WikiPageDeleteConfirmat
 	@Inject
 	public WikiPageDeleteConfirmationDialog(WikiPageDeleteConfirmationDialogView view,
 			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
 			PopupUtilsView popupUtilsView) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.popupUtilsView = popupUtilsView;
 		fixServiceEntryPoint(synapseClient);
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 	}		
 	
@@ -60,7 +64,7 @@ public class WikiPageDeleteConfirmationDialog implements WikiPageDeleteConfirmat
 	}
 	
 	public void onDeleteWikiGetHeaderTree(WikiPageKey key) {
-		synapseClient.getV2WikiHeaderTree(key.getOwnerObjectId(), key.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {
+		jsClient.getV2WikiHeaderTree(key.getOwnerObjectId(), key.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught instanceof NotFoundException) {

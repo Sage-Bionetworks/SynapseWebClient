@@ -55,9 +55,6 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 	
 public interface SynapseClientAsync {
-	void getEntityVersions(String entityId, int offset, int limit,
-			AsyncCallback<PaginatedResults<VersionInfo>> callback);
-
 	void deleteEntityVersionById(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
 	void updateUserProfile(UserProfile userProfileJson, AsyncCallback<Void> callback);
@@ -99,9 +96,6 @@ public interface SynapseClientAsync {
 	void restoreV2WikiPage(String ownerId, String ownerType, String wikiId,
 			Long versionToUpdate, AsyncCallback<V2WikiPage> callback);
 	void deleteV2WikiPage(WikiPageKey key, AsyncCallback<Void> callback);
-	void getV2WikiHeaderTree(String ownerId, String ownerType,
-			AsyncCallback<List<V2WikiHeader>> callback);
-	void getV2WikiOrderHint(WikiPageKey key, AsyncCallback<V2WikiOrderHint> callback);
 	void getV2WikiAttachmentHandles(WikiPageKey key,
 			AsyncCallback<FileHandleResults> callback);
 	void getV2WikiHistory(WikiPageKey key, Long limit, Long offset,
@@ -153,8 +147,6 @@ public interface SynapseClientAsync {
 	void hexDecodeAndDeserializeAccountCreationToken(String tokenString, AsyncCallback<AccountCreationToken> callback);
 
 	void getAPIKey(AsyncCallback<String> callback);
-
-	void getColumnModelsForTableEntity(String tableEntityId, AsyncCallback<List<ColumnModel>> asyncCallback);
 
 	void sendMessage(Set<String> recipients, String subject, String message, String hostPageBaseURL, AsyncCallback<String> callback);
 	void sendMessageToEntityOwner(String entityId, String subject, String messageBody, String hostPageBaseURL, AsyncCallback<String> callback);
