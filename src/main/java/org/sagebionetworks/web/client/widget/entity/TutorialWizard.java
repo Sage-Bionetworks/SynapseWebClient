@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -10,9 +8,7 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
-import org.sagebionetworks.repo.model.wiki.WikiHeader;
-import org.sagebionetworks.schema.adapter.JSONEntity;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -25,7 +21,7 @@ import com.google.inject.Inject;
 public class TutorialWizard implements TutorialWizardView.Presenter, WidgetRendererPresenter {
 
 	private TutorialWizardView view;
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private Callback callback;
 	private String entityId, tutorialButtonText;
 	
@@ -39,10 +35,9 @@ public class TutorialWizard implements TutorialWizardView.Presenter, WidgetRende
 	}
 
 	@Inject
-	public TutorialWizard(TutorialWizardView view, SynapseClientAsync synapseClient) {
+	public TutorialWizard(TutorialWizardView view, SynapseJavascriptClient jsClient) {
 		this.view = view;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 	}
 	
@@ -71,7 +66,7 @@ public class TutorialWizard implements TutorialWizardView.Presenter, WidgetRende
 	 */
 	public void configure(final String entityId, Callback callback) {
 		this.callback = callback;
-		synapseClient.getV2WikiHeaderTree(entityId, ObjectType.ENTITY.toString(), new AsyncCallback<List<V2WikiHeader>>() {
+		jsClient.getV2WikiHeaderTree(entityId, ObjectType.ENTITY.toString(), new AsyncCallback<List<V2WikiHeader>>() {
 			@Override
 			public void onSuccess(List<V2WikiHeader> wikiHeaders) {
 				

@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import java.util.List;
 
@@ -10,7 +9,6 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
@@ -29,7 +27,6 @@ import com.google.inject.Inject;
 public class WikiSubpagesWidget implements IsWidget, WikiSubpagesView.Presenter {
 	
 	private WikiSubpagesView view;
-	private SynapseClientAsync synapseClient;
 	private WikiPageKey wikiKey; 
 	private String ownerObjectName;
 	private Place ownerObjectLink;
@@ -45,12 +42,10 @@ public class WikiSubpagesWidget implements IsWidget, WikiSubpagesView.Presenter 
 	V2WikiOrderHint newWikiOrderHint;
 	
 	@Inject
-	public WikiSubpagesWidget(WikiSubpagesView view, SynapseClientAsync synapseClient,
+	public WikiSubpagesWidget(WikiSubpagesView view,
 							AuthenticationController authenticationController,
 							SynapseJavascriptClient jsClient) {
 		this.view = view;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
 		this.jsClient = jsClient;
 		view.setPresenter(this);
 	}
@@ -132,7 +127,7 @@ public class WikiSubpagesWidget implements IsWidget, WikiSubpagesView.Presenter 
 		newWikiHeaders = null;
 		newWikiOrderHint = null;
 		// ask for the wiki header tree and order hint in parallel.
-		synapseClient.getV2WikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {
+		jsClient.getV2WikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {
 			@Override
 			public void onSuccess(final List<V2WikiHeader> wikiHeaders) {
 				newWikiHeaders = wikiHeaders;

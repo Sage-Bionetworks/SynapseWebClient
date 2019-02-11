@@ -60,7 +60,6 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
@@ -110,6 +109,7 @@ import org.sagebionetworks.repo.model.subscription.SubscriptionRequest;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ViewType;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -119,7 +119,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -158,6 +157,7 @@ public class SynapseJavascriptClient {
 	public static final String WIKI2 = "/wiki2/";
 	public static final String WIKIKEY = "/wikikey";
 	public static final String WIKI_ORDER_HINT = "/wiki2orderhint";
+	public static final String WIKI_HEADER_TREE = "/wikiheadertree2";
 	public static final String CHILDREN = "/children";
 	public static final String RESTRICTION_INFORMATION = "/restrictionInformation";
 	public static final String USER_PROFILE_PATH = "/userProfile";
@@ -262,6 +262,7 @@ public class SynapseJavascriptClient {
 	public static final String DOWNLOAD_ORDER_HISTORY = DOWNLOAD_ORDER+"/history";
 	public static final String STORAGE_REPORT = "/storageReport";
 	public static final String SEARCH = "/search";
+	public static final int LIMIT_50 = 50;
 	
 	public String repoServiceUrl,fileServiceUrl, authServiceUrl, synapseVersionInfo; 
 	@Inject
@@ -1366,5 +1367,34 @@ public class SynapseJavascriptClient {
 		url += "&filter="+filter;
 		doGet(url, OBJECT_TYPE.PaginatedResultsDiscussionReplyBundle, callback);
 	}
+	
+	public void getV2WikiHeaderTree(String ownerId, String ownerType,
+			AsyncCallback<List<V2WikiHeader>> callback) {
+		getV2WikiHeaderTree(ownerId, ownerType, callback, 0, new ArrayList<V2WikiHeader>());
+	}
+	
+	private void getV2WikiHeaderTree(String ownerId, String ownerType,
+			AsyncCallback<List<V2WikiHeader>> finalCallback, int offset, List<V2WikiHeader> fullWikiHeaderList) {
+		// continue asking for v2 wiki headers until result is empty
+		String url = getRepoServiceUrl() + "/" +
+				ownerType.toLowerCase() + "/" + ownerId + WIKI_HEADER_TREE +
+				"?"+LIMIT_PARAMETER+LIMIT_50+"&"+OFFSET_PARAMETER+offset;
+		doGet(url, OBJECT_TYPE.PaginatedResultsV2WikiHeader, new AsyncCallback<List<V2WikiHeader>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				finalCallback.onFailure(caught);
+			}
+			@Override
+			public void onSuccess(List<V2WikiHeader> results) {
+				fullWikiHeaderList.addAll(results);
+				if (results.isEmpty() || results.size() < LIMIT_50) {
+					finalCallback.onSuccess(fullWikiHeaderList);
+				} else {
+					getV2WikiHeaderTree(ownerId, ownerType, finalCallback, offset+LIMIT_50, fullWikiHeaderList);
+				}
+			}
+		});
+	}
+
 }
 

@@ -11,11 +11,13 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizardView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -25,11 +27,14 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 /**
  * Unit test for wiki attachments widget
  */
+@RunWith(MockitoJUnitRunner.class)
 public class TutorialWizardTest {
 
 	TutorialWizard presenter;
+	@Mock
 	TutorialWizardView mockView;
-	SynapseClientAsync mockSynapseClient;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
 	List<V2WikiHeader> wikiHeadersList;
 	V2WikiHeader testRootHeader, page1, page2;
 	
@@ -44,8 +49,6 @@ public class TutorialWizardTest {
 	
 	@Before
 	public void before() throws JSONObjectAdapterException{
-		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
-		mockView = Mockito.mock(TutorialWizardView.class);
 		wikiHeadersList = new ArrayList<V2WikiHeader>();
 		testRootHeader = createWikiHeader("123",null,"my test root wiki header (page)");
 		page1 = createWikiHeader("99999", "123", "Step 1");
@@ -55,10 +58,10 @@ public class TutorialWizardTest {
 		wikiHeadersList.add(page2);
 		wikiHeadersList.add(page1);
 		
-		AsyncMockStubber.callSuccessWith(wikiHeadersList).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(wikiHeadersList).when(mockJsClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		
 		// setup the entity editor with 
-		presenter = new TutorialWizard(mockView, mockSynapseClient);
+		presenter = new TutorialWizard(mockView, mockJsClient);
 	}
 
 	@Test
@@ -74,7 +77,7 @@ public class TutorialWizardTest {
 			}
 		});
 		ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
-		verify(mockSynapseClient).getV2WikiHeaderTree(anyString(),  anyString(),  any(AsyncCallback.class));
+		verify(mockJsClient).getV2WikiHeaderTree(anyString(),  anyString(),  any(AsyncCallback.class));
 		verify(mockView).showWizard(anyString(), captor.capture());
 		List sortedHeaders = captor.getValue();
 		
@@ -87,7 +90,7 @@ public class TutorialWizardTest {
 	
 	@Test
 	public void testConfigureFail() {
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockJsClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		presenter.configure("syn1234", null);
 		verify(mockView).showErrorMessage(anyString());
 	}

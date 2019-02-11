@@ -67,6 +67,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.PaginatedColumnModels;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -145,6 +146,7 @@ public class SynapseJavascriptFactory {
 		PaginatedResultsVersionInfo,
 		PaginatedResultsDiscussionThreadBundle,
 		PaginatedResultsDiscussionReplyBundle,
+		PaginatedResultsV2WikiHeader,
 		None,
 		String
 	}
@@ -294,6 +296,15 @@ public class SynapseJavascriptFactory {
 				entityHeaderList.add(new EntityHeader(jsonObject));
 			}
 			return entityHeaderList;
+		case PaginatedResultsV2WikiHeader :
+			// json really represents a PaginatedResults (cannot reference here in js)
+			List<V2WikiHeader> v2WikiHeaders = new ArrayList<>();
+			JSONArrayAdapter v2WikiHeaderResults = json.getJSONArray("results");
+			for (int i = 0; i < v2WikiHeaderResults.length(); i++) {
+				JSONObjectAdapter jsonObject = v2WikiHeaderResults.getJSONObject(i);
+				v2WikiHeaders.add(new V2WikiHeader(jsonObject));
+			}
+			return v2WikiHeaders;
 		case PaginatedDockerCommit :
 			// json really represents a PaginatedResults (cannot reference here in js)
 			List<DockerCommit> dockerCommitList = new ArrayList<>();

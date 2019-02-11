@@ -1,21 +1,21 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -40,8 +40,6 @@ public class WikiSubpagesOrderEditorTest {
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
-	SynapseClientAsync mockSynapseClient;
-	@Mock
 	List<V2WikiHeader> mockWikiHeaders;
 	@Mock
 	V2WikiOrderHint mockHint;
@@ -55,9 +53,8 @@ public class WikiSubpagesOrderEditorTest {
 				mockView, 
 				mockEditorTree,
 				mockSynAlert,
-				mockSynapseClient,
 				mockJsClient);
-		AsyncMockStubber.callSuccessWith(mockWikiHeaders).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockWikiHeaders).when(mockJsClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockHint).when(mockJsClient).getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
 		
 	}
@@ -67,7 +64,7 @@ public class WikiSubpagesOrderEditorTest {
 		editor.configure(mockPageKey, OWNER_OBJECT_NAME);
 		verify(mockSynAlert).clear();
 		verify(mockView).setLoadingVisible(true);
-		verify(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockJsClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockJsClient).getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockEditorTree).configure(eq((String)null), eq(mockPageKey), eq(mockWikiHeaders), eq(OWNER_OBJECT_NAME), eq(mockHint), any(CallbackP.class));
 		verify(mockView).setLoadingVisible(false);
@@ -76,9 +73,9 @@ public class WikiSubpagesOrderEditorTest {
 	@Test
 	public void testConfigureGetHeaderTreeFailure() {
 		Exception ex = new Exception();
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		editor.configure(mockPageKey, OWNER_OBJECT_NAME);
-		verify(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockJsClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(ex);
 		verify(mockJsClient, never()).getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockView).setLoadingVisible(false);
@@ -89,7 +86,7 @@ public class WikiSubpagesOrderEditorTest {
 		Exception ex = new Exception();
 		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
 		editor.configure(mockPageKey, OWNER_OBJECT_NAME);
-		verify(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockJsClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockJsClient).getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(ex);
 		verify(mockView).setLoadingVisible(false);

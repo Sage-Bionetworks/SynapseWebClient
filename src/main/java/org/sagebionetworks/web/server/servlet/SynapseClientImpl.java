@@ -93,7 +93,6 @@ import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -540,19 +539,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 		return allAccessRequirements;
 	}
-	
-	private List<V2WikiHeader> getAllWikiHeaderTree(String ownerId,	ObjectType ownerType, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
-		List<V2WikiHeader> allHeaders = new ArrayList<V2WikiHeader>();
-		long offset = ZERO_OFFSET;
-		boolean isDone = false;
-		while (!isDone) {
-			List<V2WikiHeader> headers = synapseClient.getV2WikiHeaderTree(ownerId, ownerType, LIMIT_50, offset).getResults();
-			isDone = headers.size() < LIMIT_50;
-			allHeaders.addAll(headers);
-			offset += LIMIT_50;
-		}
-		return allHeaders;
-	}
 
 	@Override
 	public List<AccessRequirement> getTeamAccessRequirements(String teamId)
@@ -792,17 +778,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					ObjectType.valueOf(key.getOwnerObjectType()),
 					key.getWikiPageId());
 			synapseClient.deleteV2WikiPage(properKey);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public List<V2WikiHeader> getV2WikiHeaderTree(String ownerId, String ownerType)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return getAllWikiHeaderTree(ownerId, ObjectType.valueOf(ownerType), synapseClient);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

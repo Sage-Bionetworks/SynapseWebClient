@@ -133,7 +133,6 @@ import org.sagebionetworks.repo.model.table.FacetType;
 import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -736,40 +735,7 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).restoreV2WikiPage(anyString(),
 				any(ObjectType.class), any(String.class), anyLong());
 	}
-	@Test
-	public void testGetV2WikiHeaderTree() throws Exception {
-		PaginatedResults<V2WikiHeader> headerTreeResults = new PaginatedResults<V2WikiHeader>();
-		headerTreeResults.setResults(new ArrayList<V2WikiHeader>());
-		when(
-				mockSynapse.getV2WikiHeaderTree(anyString(),
-						any(ObjectType.class),
-						anyLong(), anyLong())).thenReturn(headerTreeResults);
-		synapseClient.getV2WikiHeaderTree("testId",
-				ObjectType.ENTITY.toString());
-		verify(mockSynapse).getV2WikiHeaderTree(anyString(),
-				any(ObjectType.class),anyLong(), anyLong());
-	}
-
-	@Test
-	public void testGetV2WikiHeaderTreeTwoPage() throws Exception {
-		PaginatedResults<V2WikiHeader> headerTreePage1 = Mockito.mock(PaginatedResults.class);
-		PaginatedResults<V2WikiHeader> headerTreePage2 = Mockito.mock(PaginatedResults.class);
-		when(mockSynapse.getV2WikiHeaderTree(anyString(), any(ObjectType.class), anyLong(), anyLong()))
-				.thenReturn(headerTreePage1, headerTreePage2);
-		List<V2WikiHeader> page1Results = new ArrayList<V2WikiHeader>();
-		for (int i = 0; i < SynapseClientImpl.LIMIT_50; i++) {
-			page1Results.add(Mockito.mock(V2WikiHeader.class));
-		}
-		when(headerTreePage1.getResults()).thenReturn(page1Results);
-		//second page has a single page
-		V2WikiHeader singleHeader = Mockito.mock(V2WikiHeader.class);
-		when(headerTreePage2.getResults()).thenReturn(Collections.singletonList(singleHeader));
-		List<V2WikiHeader> results = synapseClient.getV2WikiHeaderTree("testId", ObjectType.ENTITY.toString());
-		//1 full page of results, and 1 result on second page
-		assertEquals(SynapseClientImpl.LIMIT_50 + 1, results.size());
-		verify(mockSynapse).getV2WikiHeaderTree(anyString(), any(ObjectType.class), eq(SynapseClientImpl.LIMIT_50), eq(SynapseClientImpl.ZERO_OFFSET.longValue()));
-		verify(mockSynapse).getV2WikiHeaderTree(anyString(), any(ObjectType.class), eq(SynapseClientImpl.LIMIT_50), eq(SynapseClientImpl.LIMIT_50));
-	}
+	
 
 	@Test
 	public void testGetV2WikiHistory() throws Exception {

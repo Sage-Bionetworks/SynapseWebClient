@@ -110,7 +110,6 @@ public interface SynapseClient extends RemoteService{
 	 // V2 Wiki crud
 	 V2WikiPage restoreV2WikiPage(String ownerId, String ownerType, String wikiId, Long versionToUpdate) throws RestServiceException;
 	void deleteV2WikiPage(WikiPageKey key) throws RestServiceException;
-	List<V2WikiHeader> getV2WikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
 	FileHandleResults getV2WikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
 	PaginatedResults<V2WikiHistorySnapshot> getV2WikiHistory(WikiPageKey key, Long limit, Long offset) throws RestServiceException;
 

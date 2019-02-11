@@ -7,6 +7,7 @@ import static org.apache.http.HttpStatus.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -19,15 +20,20 @@ import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException;
+import org.sagebionetworks.reflection.model.PaginatedResults;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -54,6 +60,7 @@ import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -61,6 +68,7 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
@@ -81,6 +89,7 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+@RunWith(MockitoJUnitRunner.class)
 public class SynapseJavascriptClientTest {
 	SynapseJavascriptClient client;
 	private static SynapseJavascriptFactory synapseJsFactory = new SynapseJavascriptFactory();
@@ -118,7 +127,6 @@ public class SynapseJavascriptClientTest {
 	
 	@Before
 	public void before() {
-		MockitoAnnotations.initMocks(this);
 		when(mockSynapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY)).thenReturn(REPO_ENDPOINT);
 		when(mockSynapseProperties.getSynapseProperty(FILE_SERVICE_URL_KEY)).thenReturn(FILE_ENDPOINT);
 		when(mockGinInjector.getRequestBuilder()).thenReturn(mockRequestBuilder);
@@ -646,5 +654,17 @@ public class SynapseJavascriptClientTest {
 		QueryResultBundle newResultBundleInstance = (QueryResultBundle) synapseJsFactory.newInstance(OBJECT_TYPE.AsyncResponse, adapter);
 		
 		assertEquals(resultBundle, newResultBundleInstance);
+	}
+	
+	@Test
+	public void testGetV2WikiHeaderTree() throws Exception {
+		String ownerType = "ENTITY";
+		String ownerId = "syn387453";
+		
+		client.getV2WikiHeaderTree(ownerId, ownerType, mockAsyncCallback);
+		
+		//verify url and method
+		String url = REPO_ENDPOINT + ENTITY + "/" + ownerId + WIKI_HEADER_TREE + "?" + LIMIT_PARAMETER + LIMIT_50 + "&" + OFFSET_PARAMETER + "0";
+		verify(mockRequestBuilder).configure(GET, url);
 	}
 }

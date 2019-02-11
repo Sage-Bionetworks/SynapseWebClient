@@ -672,7 +672,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				entityBundle.getEntity() instanceof Project &&
 				permissions.getCanEdit()){
 			// shown if there's more than one page
-			getSynapseClient().getV2WikiHeaderTree(entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), new AsyncCallback<List<V2WikiHeader>>() {
+			getSynapseJavascriptClient().getV2WikiHeaderTree(entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), new AsyncCallback<List<V2WikiHeader>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					actionMenu.setActionVisible(Action.REORDER_WIKI_SUBPAGES, false);

@@ -96,8 +96,6 @@ public interface SynapseClientAsync {
 	void restoreV2WikiPage(String ownerId, String ownerType, String wikiId,
 			Long versionToUpdate, AsyncCallback<V2WikiPage> callback);
 	void deleteV2WikiPage(WikiPageKey key, AsyncCallback<Void> callback);
-	void getV2WikiHeaderTree(String ownerId, String ownerType,
-			AsyncCallback<List<V2WikiHeader>> callback);
 	void getV2WikiAttachmentHandles(WikiPageKey key,
 			AsyncCallback<FileHandleResults> callback);
 	void getV2WikiHistory(WikiPageKey key, Long limit, Long offset,

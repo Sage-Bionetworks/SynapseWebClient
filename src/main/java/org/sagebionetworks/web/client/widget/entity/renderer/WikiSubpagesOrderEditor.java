@@ -1,12 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.List;
 
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -22,7 +19,6 @@ public class WikiSubpagesOrderEditor {
 	private WikiSubpageOrderEditorTree editorTree;
 	private String ownerObjectName;
 	private SynapseAlert synAlert;
-	private SynapseClientAsync synapseClient;
 	private SynapseJavascriptClient jsClient;
 	private WikiPageKey wikiKey;
 	private CallbackP<String> refreshCallback;
@@ -31,14 +27,11 @@ public class WikiSubpagesOrderEditor {
 			WikiSubpagesOrderEditorView view, 
 			WikiSubpageOrderEditorTree editorTree,
 			SynapseAlert synAlert,
-			SynapseClientAsync synapseClient,
 			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.editorTree = editorTree;
 		this.synAlert = synAlert;
-		this.synapseClient = synapseClient;
 		this.jsClient = jsClient;
-		fixServiceEntryPoint(synapseClient);
 		refreshCallback = new CallbackP<String>() {
 			@Override
 			public void invoke(String selectWikiPageId) {
@@ -59,7 +52,7 @@ public class WikiSubpagesOrderEditor {
 	public void refresh(final String selectWikiPageId) {
 		synAlert.clear();
 		view.setLoadingVisible(true);
-		synapseClient.getV2WikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {
+		jsClient.getV2WikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {
 			@Override
 			public void onSuccess(final List<V2WikiHeader> wikiHeaders) {
 				jsClient.getV2WikiOrderHint(wikiKey, new AsyncCallback<V2WikiOrderHint>() {
