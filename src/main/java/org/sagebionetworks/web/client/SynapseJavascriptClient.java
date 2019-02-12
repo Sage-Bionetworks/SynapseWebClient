@@ -1395,6 +1395,10 @@ public class SynapseJavascriptClient {
 			}
 		});
 	}
-
+	
+	public void createEntity(Entity entity, AsyncCallback<Entity> cb) {
+		String url = getRepoServiceUrl() + ENTITY;
+		doPost(url, entity, OBJECT_TYPE.Entity, cb);
+	}
 }
 

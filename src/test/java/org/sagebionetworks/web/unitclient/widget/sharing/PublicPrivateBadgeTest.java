@@ -69,7 +69,7 @@ public class PublicPrivateBadgeTest {
 	@Test
 	public void testConfigure() {
 		publicPrivateBadge.configure(testEntity);
-		verify(mockView).configure(anyBoolean());
+		verify(mockView).setIsPublic(anyBoolean());
 	}
 	
 	@Test

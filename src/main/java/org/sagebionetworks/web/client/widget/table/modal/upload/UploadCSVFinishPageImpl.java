@@ -16,10 +16,10 @@ import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.UploadToTableRequest;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
-import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
@@ -39,6 +39,7 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 	public static final String CREATING_THE_TABLE = "Creating the table...";
 
 	UploadCSVFinishPageView view;
+	SynapseJavascriptClient jsClient;
 	SynapseClientAsync synapseClient;
 	PortalGinInjector portalGinInjector;
 	JobTrackingWidget jobTrackingWidget;
@@ -52,6 +53,7 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 	@Inject
 	public UploadCSVFinishPageImpl(UploadCSVFinishPageView view,
 			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
 			PortalGinInjector portalGinInjector,
 			JobTrackingWidget jobTrackingWidget,
 			KeyboardNavigationHandler keyboardNavigationHandler) {
@@ -59,6 +61,7 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
+		this.jsClient = jsClient;
 		this.portalGinInjector = portalGinInjector;
 		this.jobTrackingWidget = jobTrackingWidget;
 		this.keyboardNavigationHandler = keyboardNavigationHandler;
@@ -133,7 +136,7 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 		table.setParentId(this.parentId);
 		table.setName(this.view.getTableName());
 		// Create the table
-		synapseClient.createEntity(table,
+		jsClient.createEntity(table,
 				new AsyncCallback<Entity>() {
 
 					@Override

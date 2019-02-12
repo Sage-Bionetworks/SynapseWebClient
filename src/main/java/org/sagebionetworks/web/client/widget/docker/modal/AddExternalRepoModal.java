@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.client.widget.docker.modal;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
@@ -19,7 +17,7 @@ public class AddExternalRepoModal implements AddExternalRepoModalView.Presenter 
 
 	private AddExternalRepoModalView view;
 	private SynapseAlert synAlert;
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 
 	private String parentId;
 	private Callback repoAddedCallback;
@@ -28,12 +26,11 @@ public class AddExternalRepoModal implements AddExternalRepoModalView.Presenter 
 	public AddExternalRepoModal(
 			AddExternalRepoModalView view,
 			SynapseAlert synAlert,
-			SynapseClientAsync synapseClient
+			SynapseJavascriptClient jsClient
 			){
 		this.view = view;
 		this.synAlert = synAlert;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setModalTitle(ADD_EXTERNAL_REPO_MODAL_TITLE);
@@ -65,7 +62,7 @@ public class AddExternalRepoModal implements AddExternalRepoModalView.Presenter 
 		DockerRepository dockerRepo = new DockerRepository();
 		dockerRepo.setParentId(parentId);
 		dockerRepo.setRepositoryName(repoName);
-		synapseClient.createEntity(dockerRepo, new AsyncCallback<Entity>() {
+		jsClient.createEntity(dockerRepo, new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity dockerRepo) {
 				view.hideDialog();

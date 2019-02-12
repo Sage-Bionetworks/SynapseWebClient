@@ -1168,7 +1168,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		link.setLinksTo(ref); // links to this entity
 		link.setLinksToClassName(entityBundle.getEntity().getClass().getName());
 		link.setName(entityBundle.getEntity().getName()); // copy name of this entity as default
-		getSynapseClient().createEntity(link, new AsyncCallback<Entity>() {
+		getSynapseJavascriptClient().createEntity(link, new AsyncCallback<Entity>() {
 			
 			@Override
 			public void onSuccess(Entity result) {

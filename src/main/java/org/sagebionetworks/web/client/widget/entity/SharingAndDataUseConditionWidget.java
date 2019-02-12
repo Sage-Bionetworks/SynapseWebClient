@@ -5,19 +5,16 @@ import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class SharingAndDataUseConditionWidget implements SharingAndDataUseConditionWidgetView.Presenter, SynapseWidgetPresenter {
+public class SharingAndDataUseConditionWidget implements SynapseWidgetPresenter {
 	
 	private SharingAndDataUseConditionWidgetView view;
 	SynapseJavascriptClient jsClient;
-	Callback entityUpdatedCallback;
-	boolean showChangeLink;
 	
 	@Inject
 	public SharingAndDataUseConditionWidget(
@@ -25,12 +22,9 @@ public class SharingAndDataUseConditionWidget implements SharingAndDataUseCondit
 			SynapseJavascriptClient jsClient) {
 		this.jsClient = jsClient;
 		this.view = view;
-		view.setPresenter(this);
 	}
 	
-	public void configure(String entityId, boolean showChangeLink, Callback entityUpdatedCallback) {
-		this.entityUpdatedCallback = entityUpdatedCallback;
-		this.showChangeLink = showChangeLink;
+	public void configure(String entityId) {
 		setEntity(entityId);
 	}
 	
@@ -52,15 +46,9 @@ public class SharingAndDataUseConditionWidget implements SharingAndDataUseCondit
 	}
 	public void setEntity(EntityBundle bundle) {
 		if(bundle == null)  throw new IllegalArgumentException("Entity bundle is required");
-		view.configure(bundle, showChangeLink);
+		view.configure(bundle);
 	}
 
-	@Override
-	public void entityUpdated() {
-		if (entityUpdatedCallback != null)
-			entityUpdatedCallback.invoke();
-	}
-	
 	@SuppressWarnings("unchecked")
 	public void clearState() {
 	}

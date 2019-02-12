@@ -32,11 +32,6 @@ public class DisplayConstants {
 	public static final String BUTTON_PERMISSIONS_CREATE_NEW_ACL = "Create Local Sharing Settings";
 	public static final String BUTTON_PERMISSIONS_DELETE_ACL = "Delete Local Sharing Settings";
 	public static final String NOTIFY_PEOPLE_TOOLTIP = "Select to notify newly added people that this item has been shared with them";
-
-	public static final String PUBLIC_ACL_DESCRIPTION = "Anyone on the internet can access";
-	public static final String PUBLIC_ACL_ENTITY_PAGE = "Public";
-	public static final String PRIVATE_ACL_ENTITY_PAGE = "Private";
-	public static final String PRIVATE_ACL_DESCRIPTION = "Restricted to those people selected in the Share Settings window";
 	
 	public static final String MENU_PERMISSION_LEVEL_CAN_VIEW = "Can view";
 	public static final String MENU_PERMISSION_LEVEL_CAN_DOWNLOAD = "Can download";

@@ -1,37 +1,37 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class PublicPrivateBadgeViewImpl extends FlowPanel implements PublicPrivateBadgeView {
+public class PublicPrivateBadgeViewImpl implements PublicPrivateBadgeView, IsWidget {
+	public interface PublicPrivateBadgeViewImplUiBinder extends UiBinder<Widget, PublicPrivateBadgeViewImpl> {};
+	Widget widget;
+	@UiField
+	Span publicSpan;
+	@UiField
+	Span privateSpan;
 
-	private Presenter presenter;
-	private SynapseJSNIUtils synapseJSNIUtils;
 	@Inject
-	public PublicPrivateBadgeViewImpl(SynapseJSNIUtils synapseJSNIUtils) {
-		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.addStyleName("inline-block");
+	public PublicPrivateBadgeViewImpl(PublicPrivateBadgeViewImplUiBinder binder) {
+		widget = binder.createAndBindUi(this);
+		
 	}
 	
 	@Override
-	public void configure(boolean isPublic) {
-		this.clear();
-		this.add(DisplayUtils.getShareSettingsDisplay(isPublic, synapseJSNIUtils));
+	public void setIsPublic(boolean isPublic) {
+		publicSpan.setVisible(isPublic);
+		privateSpan.setVisible(!isPublic);
 	}	
 	
 	@Override
 	public Widget asWidget() {
-		return this;
-	}
-	
-
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
+		return widget;
 	}
 	
 	@Override
@@ -45,5 +45,10 @@ public class PublicPrivateBadgeViewImpl extends FlowPanel implements PublicPriva
 	
 	@Override
 	public void showLoading() {
+	}
+	@Override
+	public void clear() {
+		privateSpan.setVisible(false);
+		publicSpan.setVisible(false);
 	}
 }
