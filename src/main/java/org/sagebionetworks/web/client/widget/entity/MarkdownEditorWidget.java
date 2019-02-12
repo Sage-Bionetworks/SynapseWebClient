@@ -1,8 +1,49 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-import static org.sagebionetworks.web.shared.WebConstants.*;
-import static org.sagebionetworks.web.shared.WidgetConstants.*;
+import static org.sagebionetworks.web.shared.WebConstants.FORMATTING_GUIDE;
+import static org.sagebionetworks.web.shared.WidgetConstants.API_TABLE_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.BIODALLIANCE13_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.BUTTON_LINK_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.BUTTON_TEXT_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.CHALLENGE_ID_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.CHALLENGE_PARTICIPANTS_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.CHALLENGE_TEAMS_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.CYTOSCAPE_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.DETAILS_SUMMARY_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.ENTITYLIST_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.IMAGE_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.IMAGE_LINK_EDITOR_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.IS_IN_CHALLENGE_TEAM_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.JOIN_TEAM_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.LEADERBOARD_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.LINK_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.PLOT_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.PREVIEW_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.PROJECT_ID_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.PROVENANCE_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.QUERY_TABLE_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.REFERENCE_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.REGISTER_CHALLENGE_TEAM_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.SHINYSITE_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.SUBMIT_TO_CHALLENGE;
+import static org.sagebionetworks.web.shared.WidgetConstants.SUBMIT_TO_EVALUATION_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.SYNAPSE_FORM_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.SYNAPSE_TABLE_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.TABBED_TABLE_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.TEAM_MEMBERS_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.TEAM_MEMBER_COUNT_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.TEXT_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.TOC_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.UNAVAILABLE_MESSAGE;
+import static org.sagebionetworks.web.shared.WidgetConstants.USER_TEAM_BADGE_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.VIDEO_CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WidgetConstants.WIDGET_END_MARKDOWN;
+import static org.sagebionetworks.web.shared.WidgetConstants.WIDGET_ENTITY_ID_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.WIDGET_START_MARKDOWN;
+import static org.sagebionetworks.web.shared.WidgetConstants.WIKI_FILES_PREVIEW_CONTENT_TYPE;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +64,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamSelector;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
-import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -62,7 +102,6 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	//Optional wiki page key.  If set, wiki widgets may use.
 	private WikiPageKey wikiKey;
 	private MarkdownWidget markdownPreview;
-	private SelectTeamModal selectTeamModal;
 	MarkdownEditorAction currentAction;
 	private PortalGinInjector ginInjector;
 	
@@ -119,17 +158,6 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			view.setMarkdownPreviewWidget(markdownPreview.asWidget());
 		}
 		return markdownPreview;
-	}
-	
-	public SelectTeamModal getSelectTeamModal() {
-		if (selectTeamModal == null) {
-			selectTeamModal = ginInjector.getSelectTeamModal();
-			view.setSelectTeamModal(selectTeamModal.asWidget());
-			selectTeamModal.configure(selectedTeamId -> {
-				onSelectTeam(selectedTeamId);
-			});
-		}
-		return selectTeamModal;
 	}
 	
 	public void configure(String markdown) {
@@ -350,6 +378,12 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		case INSERT_PREVIEW:
 			insertNewWidget(PREVIEW_CONTENT_TYPE);
 			break;
+		case INSERT_TEAM_MEMBERS:
+			insertNewWidget(TEAM_MEMBERS_CONTENT_TYPE);
+			break;
+		case INSERT_TEAM_MEMBER_COUNT:
+			insertNewWidget(TEAM_MEMBER_COUNT_CONTENT_TYPE);
+			break;
 		case BOLD:
 			surroundWithTag("**");
 			break;
@@ -389,30 +423,12 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		case H6:
 			surroundWithTag("######", "", false);
 			break;
-		case INSERT_TEAM_MEMBERS:
-		case INSERT_TEAM_MEMBER_COUNT:	
-			getSelectTeamModal().show();
-			break;
 		case MARKDOWN_PREVIEW:
 			previewClicked();
 			break;
 		default:
 			throw new IllegalArgumentException(
 					"Unrecognized markdown editor action: " + action);
-		}
-	}
-	
-	private void onSelectTeam(String teamId) {
-		switch (currentAction) {
-			case INSERT_TEAM_MEMBERS:
-				insertMarkdown(WIDGET_START_MARKDOWN + TEAM_MEMBERS_CONTENT_TYPE + "?"+TEAM_ID_KEY + "=" + teamId + WIDGET_END_MARKDOWN);
-				break;
-			case INSERT_TEAM_MEMBER_COUNT:
-				insertMarkdown(WIDGET_START_MARKDOWN + TEAM_MEMBER_COUNT_CONTENT_TYPE + "?"+TEAM_ID_KEY + "=" + teamId + WIDGET_END_MARKDOWN);
-				break;
-			default:
-				throw new IllegalArgumentException(
-						"Unrecognized markdown editor team select action: " + currentAction);
 		}
 	}
 	

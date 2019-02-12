@@ -127,6 +127,9 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getPlotlyConfigEditor();
 		} else if(contentTypeKey.equals(SYNAPSE_FORM_CONTENT_TYPE)) {
 			presenter = ginInjector.getSynapseFormConfigEditor();
+		} else if(contentTypeKey.equals(TEAM_MEMBER_COUNT_CONTENT_TYPE) ||
+				contentTypeKey.equals(TEAM_MEMBERS_CONTENT_TYPE)) {
+			presenter = ginInjector.getTeamSelectEditor();
 		}//TODO: add other widget descriptors to this mapping as they become available
 		if (presenter != null)
 			presenter.configure(wikiKey, model, dialogCallback);
@@ -335,6 +338,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(CYTOSCAPE_CONTENT_TYPE, CYTOSCAPE_FRIENDLY_NAME);
 		registerWidget(SYNAPSE_FORM_CONTENT_TYPE, SYNAPSE_FORM_FRIENDLY_NAME);
 		registerWidget(PLOT_CONTENT_TYPE, PLOT_FRIENDLY_NAME);
+		registerWidget(TEAM_MEMBER_COUNT_CONTENT_TYPE, TEAM_MEMBER_COUNT_FRIENDLY_NAME);
+		registerWidget(TEAM_MEMBERS_CONTENT_TYPE, TEAM_MEMBERS_FRIENDLY_NAME);
 	}
 	
 	public static String getWidgetMarkdown(String contentType, Map<String, String> widgetDescriptor, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {

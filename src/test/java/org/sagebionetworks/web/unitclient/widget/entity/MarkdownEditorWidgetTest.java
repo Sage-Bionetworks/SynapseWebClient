@@ -45,7 +45,6 @@ import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamSelector;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
-import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -53,7 +52,6 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 
 public class MarkdownEditorWidgetTest {
 	@Mock
@@ -88,13 +86,10 @@ public class MarkdownEditorWidgetTest {
 	@Mock
 	KeyPressEvent mockKeyEvent;
 	@Mock
-	SelectTeamModal mockSelectTeamModal;
-	@Mock
 	PortalGinInjector mockGinInjector;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
-		when(mockGinInjector.getSelectTeamModal()).thenReturn(mockSelectTeamModal);
 		when(mockGinInjector.getMarkdownWidget()).thenReturn(mockMarkdownWidget);
 		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt, mockEditDescriptor, mockWidgetRegistrar, mockUserSelector, mockGinInjector);
 		wikiPageKey = new WikiPageKey("syn1111", ObjectType.ENTITY.toString(), null);
@@ -640,29 +635,14 @@ public class MarkdownEditorWidgetTest {
 	@Test
 	public void testHandleCommandTeamMemberCount(){
 		presenter.handleCommand(MarkdownEditorAction.INSERT_TEAM_MEMBER_COUNT);
-		verify(mockSelectTeamModal).show();
 		
-		//simulate team selection
-		ArgumentCaptor<CallbackP> captor = ArgumentCaptor.forClass(CallbackP.class);
-		verify(mockSelectTeamModal).configure(captor.capture());
-		String selectedTeamId = "345676543";
-		captor.getValue().invoke(selectedTeamId);
-		String expectedMarkdown =  WidgetConstants.TEAM_MEMBER_COUNT_CONTENT_TYPE + "?"+WidgetConstants.TEAM_ID_KEY + "=" + selectedTeamId;
-		assertTrue(getNewMarkdown().contains(expectedMarkdown));
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(WidgetConstants.TEAM_MEMBER_COUNT_CONTENT_TYPE));
 	}
 	
 	@Test
 	public void testHandleCommandTeamMembers(){
 		presenter.handleCommand(MarkdownEditorAction.INSERT_TEAM_MEMBERS);
-		verify(mockSelectTeamModal).show();
 		
-		//simulate team selection
-		ArgumentCaptor<CallbackP> captor = ArgumentCaptor.forClass(CallbackP.class);
-		verify(mockSelectTeamModal).configure(captor.capture());
-		String selectedTeamId = "123454321";
-		captor.getValue().invoke(selectedTeamId);
-		String expectedMarkdown =  WidgetConstants.TEAM_MEMBERS_CONTENT_TYPE + "?"+WidgetConstants.TEAM_ID_KEY + "=" + selectedTeamId;
-		assertTrue(getNewMarkdown().contains(expectedMarkdown));
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(WidgetConstants.TEAM_MEMBERS_CONTENT_TYPE));
 	}
-
 }

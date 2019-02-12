@@ -95,6 +95,7 @@ public class WidgetConstants {
 	public static final String TEAM_MEMBERS_FRIENDLY_NAME ="Team Members";
 	
 	public static final String TEAM_MEMBER_COUNT_CONTENT_TYPE = "teammembercount";
+	public static final String TEAM_MEMBER_COUNT_FRIENDLY_NAME = "Team Member Count";
 	public static final String PLOT_CONTENT_TYPE = "plot";
 	public static final String PLOT_FRIENDLY_NAME = "Plot";
 	
