@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.file.S3UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2;
@@ -36,6 +37,7 @@ public class EntityMetadata implements Presenter {
 	private FileHistoryWidget fileHistoryWidget;
 	private SynapseJavascriptClient jsClient;
 	private SynapseJSNIUtils jsni;
+	private PortalGinInjector ginInjector;
 	private org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget restrictionWidgetV2;
 
 	boolean isShowingAnnotations;
@@ -43,20 +45,19 @@ public class EntityMetadata implements Presenter {
 	public EntityMetadata(EntityMetadataView view,
 						  DoiWidgetV2 doiWidgetV2,
 			AnnotationsRendererWidget annotationsWidget,
-			FileHistoryWidget fileHistoryWidget, 
 			SynapseJavascriptClient jsClient, 
 			SynapseJSNIUtils jsni,
-			RestrictionWidget restrictionWidgetV2) {
+			RestrictionWidget restrictionWidgetV2,
+			PortalGinInjector ginInjector) {
 		this.view = view;
 		this.doiWidgetV2 = doiWidgetV2;
 		this.annotationsWidget = annotationsWidget;
-		this.fileHistoryWidget = fileHistoryWidget;
 		this.jsClient = jsClient;
 		this.jsni = jsni;
 		this.restrictionWidgetV2 = restrictionWidgetV2;
+		this.ginInjector = ginInjector;
 		this.view.setDoiWidget(doiWidgetV2);
 		this.view.setAnnotationsRendererWidget(annotationsWidget);
-		this.view.setFileHistoryWidget(fileHistoryWidget);
 		this.view.setRestrictionWidgetV2(restrictionWidgetV2);
 		restrictionWidgetV2.setShowChangeLink(true);
 		restrictionWidgetV2.setShowIfProject(false);
@@ -68,6 +69,14 @@ public class EntityMetadata implements Presenter {
 		return view.asWidget();
 	}
 	
+	public FileHistoryWidget getFileHistoryWidget() {
+		if (fileHistoryWidget == null) {
+			fileHistoryWidget = ginInjector.getFileHistoryWidget();
+			view.setFileHistoryWidget(fileHistoryWidget);
+		}
+		return fileHistoryWidget;
+	}
+	
 	public void configure(EntityBundle bundle, Long versionNumber, ActionMenuWidget actionMenu) {
 		clear();
 		Entity en = bundle.getEntity();
@@ -75,22 +84,24 @@ public class EntityMetadata implements Presenter {
 		boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
 		isShowingAnnotations = false;
 		setAnnotationsVisible(isShowingAnnotations);
-		fileHistoryWidget.setVisible(false);
 		actionMenu.setActionListener(Action.SHOW_ANNOTATIONS, action -> {
 			isShowingAnnotations = !isShowingAnnotations;
 			setAnnotationsVisible(isShowingAnnotations);
 		});
 		
 		actionMenu.setActionListener(Action.SHOW_FILE_HISTORY, action -> {
-			fileHistoryWidget.setVisible(!fileHistoryWidget.isVisible());
+			getFileHistoryWidget().setVisible(!getFileHistoryWidget().isVisible());
 		});
 
 		boolean isCurrentVersion = versionNumber == null;
 		if (bundle.getEntity() instanceof FileEntity) {
-			fileHistoryWidget.setEntityBundle(bundle, versionNumber);
+			getFileHistoryWidget().setVisible(false);
+			getFileHistoryWidget().setEntityBundle(bundle, versionNumber);
 			view.setRestrictionPanelVisible(true);
 		} else {
-			fileHistoryWidget.setVisible(false);
+			if (fileHistoryWidget != null) {
+				fileHistoryWidget.setVisible(false);
+			}
 			view.setRestrictionPanelVisible(en instanceof TableEntity
 					|| en instanceof Folder || en instanceof DockerRepository);
 		}
