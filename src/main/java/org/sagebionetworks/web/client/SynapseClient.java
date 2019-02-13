@@ -170,14 +170,6 @@ public interface SynapseClient extends RemoteService{
 	 */
 	void validateTableQuery(String sql) throws RestServiceException;
 	
-	/**
-	 * Create or update an Entity.
-	 * @param entity
-	 * @return
-	 * @throws RestServiceException 
-	 */
-	Entity createEntity(Entity entity) throws RestServiceException;
-
 	String createFileHandleURL(String fileHandleId) throws RestServiceException;
 
 	/**

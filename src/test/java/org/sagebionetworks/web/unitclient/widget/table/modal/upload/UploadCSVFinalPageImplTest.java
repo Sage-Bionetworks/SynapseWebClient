@@ -12,8 +12,11 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -24,6 +27,7 @@ import org.sagebionetworks.repo.model.table.UploadToTableRequest;
 import org.sagebionetworks.repo.model.table.UploadToTableResult;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.modal.upload.ContentTypeDelimiter;
@@ -39,15 +43,22 @@ import org.sagebionetworks.web.unitclient.widget.table.v2.schema.ColumnModelTabl
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+@RunWith(MockitoJUnitRunner.class)
 public class UploadCSVFinalPageImplTest {
 
+	@Mock
 	ColumnModelView mockEditor;
+	@Mock
 	UploadCSVFinishPageView mockView;
+	@Mock
 	PortalGinInjector mockPortalGinInjector;
 	JobTrackingWidget jobTrackingWidget;
+	@Mock
 	KeyboardNavigationHandler mockKeyboardNavigationHandler;
+	@Mock
 	SynapseClientAsync mockSynapseClient;
 	JobTrackingWidgetStub jobTrackingWidgetStub;
+	@Mock
 	ModalPresenter mockPresenter;
 	ContentTypeDelimiter type;
 	String fileName;
@@ -56,19 +67,14 @@ public class UploadCSVFinalPageImplTest {
 	UploadToTableRequest request;
 	List<ColumnModel> schema;
 	UploadCSVFinishPageImpl page;
+	@Mock
 	AsynchronousResponseBody mockAsynchResponseBody;
-
+	@Mock
+	SynapseJavascriptClient mockJsClient;
 	@Before
 	public void before() {
-		mockView = Mockito.mock(UploadCSVFinishPageView.class);
-		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
-		mockPortalGinInjector = Mockito.mock(PortalGinInjector.class);
-		mockKeyboardNavigationHandler = Mockito
-				.mock(KeyboardNavigationHandler.class);
 		jobTrackingWidgetStub = new JobTrackingWidgetStub();
-		mockPresenter = Mockito.mock(ModalPresenter.class);
-		mockAsynchResponseBody = Mockito.mock(AsynchronousResponseBody.class);
-		page = new UploadCSVFinishPageImpl(mockView, mockSynapseClient,
+		page = new UploadCSVFinishPageImpl(mockView, mockSynapseClient,mockJsClient,
 				mockPortalGinInjector, jobTrackingWidgetStub,
 				mockKeyboardNavigationHandler);
 
@@ -124,7 +130,7 @@ public class UploadCSVFinalPageImplTest {
 				.createTableColumns(any(List.class), any(AsyncCallback.class));
 		AsyncMockStubber
 				.callSuccessWith(table)
-				.when(mockSynapseClient)
+				.when(mockJsClient)
 				.createEntity(any(TableEntity.class),
 						any(AsyncCallback.class));
 		page.setModalPresenter(mockPresenter);

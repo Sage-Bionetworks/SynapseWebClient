@@ -184,9 +184,6 @@ public interface SynapseClientAsync {
 
 	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds, AsyncCallback<Void> callback);
 
-	void createEntity(Entity entity,
-			AsyncCallback<Entity> callback);
-
 	void createFileHandleURL(String fileHandleId, AsyncCallback<String> callback);
 
 	void createTableColumns(List<ColumnModel> value,

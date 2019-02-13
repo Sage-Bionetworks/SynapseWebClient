@@ -40,13 +40,13 @@ public class AddFolderDialogWidgetViewImpl implements AddFolderDialogWidgetView 
 		okNewFolderButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.updateFolderName(folderNameField.getText());
+				presenter.createFolder(folderNameField.getText());
 			}
 		});
 		ClickHandler deleteCancelledHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.deleteFolder(true);
+				hide();
 			}
 		};
 		newFolderDialog.addCloseHandler(deleteCancelledHandler);

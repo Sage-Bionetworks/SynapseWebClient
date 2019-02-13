@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModalView;
@@ -25,7 +26,7 @@ public class AddExternalRepositoryModalTest {
 	@Mock
 	private SynapseAlert mockSynAlert;
 	@Mock
-	private SynapseClientAsync mockSynapseClient;
+	private SynapseJavascriptClient mockJsClient;
 	@Mock
 	private DockerRepository mockDockerEntity;
 	@Mock
@@ -36,7 +37,7 @@ public class AddExternalRepositoryModalTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		modal = new AddExternalRepoModal(mockView, mockSynAlert, mockSynapseClient);
+		modal = new AddExternalRepoModal(mockView, mockSynAlert, mockJsClient);
 	}
 
 	@Test
@@ -51,14 +52,14 @@ public class AddExternalRepositoryModalTest {
 	public void testOnSave() {
 		modal.onSave();
 		verify(mockView).getRepoName();
-		verify(mockSynapseClient).createEntity(any(DockerRepository.class), any(AsyncCallback.class));
+		verify(mockJsClient).createEntity(any(DockerRepository.class), any(AsyncCallback.class));
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testOnSaveSuccess() {
 		AsyncMockStubber.callSuccessWith(mockDockerEntity)
-				.when(mockSynapseClient).createEntity(any(DockerRepository.class), any(AsyncCallback.class));
+				.when(mockJsClient).createEntity(any(DockerRepository.class), any(AsyncCallback.class));
 		modal.configuration("syn123", mockCallback);
 		modal.onSave();
 		verify(mockView).hideDialog();
@@ -70,7 +71,7 @@ public class AddExternalRepositoryModalTest {
 	@Test
 	public void testOnSaveFailure() {
 		AsyncMockStubber.callFailureWith(new Exception())
-				.when(mockSynapseClient).createEntity(any(DockerRepository.class), any(AsyncCallback.class));
+				.when(mockJsClient).createEntity(any(DockerRepository.class), any(AsyncCallback.class));
 		modal.onSave();
 		verify(mockView).resetButton();
 		verify(mockSynAlert).handleException(any(Throwable.class));

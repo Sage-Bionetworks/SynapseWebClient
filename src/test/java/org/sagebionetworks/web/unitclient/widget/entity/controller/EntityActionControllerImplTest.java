@@ -1181,7 +1181,7 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testCreateLinkBadRequest(){
-		AsyncMockStubber.callFailureWith(new BadRequestException("bad")).when(mockSynapseClient).createEntity(any(Entity.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new BadRequestException("bad")).when(mockSynapseJavascriptClient).createEntity(any(Entity.class), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.createLink("syn9876");
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_CANT_MOVE_HERE);
@@ -1189,7 +1189,7 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testCreateLinkNotFound(){
-		AsyncMockStubber.callFailureWith(new NotFoundException("not found")).when(mockSynapseClient).createEntity(any(Entity.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new NotFoundException("not found")).when(mockSynapseJavascriptClient).createEntity(any(Entity.class), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.createLink("syn9876");
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
@@ -1197,7 +1197,7 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testCreateLinkUnauthorizedException(){
-		AsyncMockStubber.callFailureWith(new UnauthorizedException("no way")).when(mockSynapseClient).createEntity(any(Entity.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new UnauthorizedException("no way")).when(mockSynapseJavascriptClient).createEntity(any(Entity.class), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.createLink("syn9876");
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_NOT_AUTHORIZED);
@@ -1206,7 +1206,7 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testCreateLinkUnknownException(){
 		String error = "some error";
-		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).createEntity(any(Entity.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseJavascriptClient).createEntity(any(Entity.class), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.createLink("syn9876");
 		verify(mockView).showErrorMessage(error);
@@ -1220,7 +1220,7 @@ public class EntityActionControllerImplTest {
 		Long entityVersion = 42L;
 		((Versionable)entity).setVersionNumber(entityVersion);
 		ArgumentCaptor<Entity> argument = ArgumentCaptor.forClass(Entity.class);
-		AsyncMockStubber.callSuccessWith(new Link()).when(mockSynapseClient).createEntity(argument.capture(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(new Link()).when(mockSynapseJavascriptClient).createEntity(argument.capture(), any(AsyncCallback.class));
 		boolean isCurrentVersion = false;
 		controller.configure(mockActionMenu, entityBundle, isCurrentVersion, wikiPageId, currentEntityArea);
 		controller.setIsShowingVersion(true);
@@ -1248,7 +1248,7 @@ public class EntityActionControllerImplTest {
 		Long entityVersion = 42L;
 		((Versionable)entity).setVersionNumber(entityVersion);
 		ArgumentCaptor<Entity> argument = ArgumentCaptor.forClass(Entity.class);
-		AsyncMockStubber.callSuccessWith(new Link()).when(mockSynapseClient).createEntity(argument.capture(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(new Link()).when(mockSynapseJavascriptClient).createEntity(argument.capture(), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.setIsShowingVersion(false);
 		String target = "syn9876";
@@ -1277,7 +1277,7 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testOnLink(){
-		AsyncMockStubber.callSuccessWith(new Link()).when(mockSynapseClient).createEntity(any(Entity.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(new Link()).when(mockSynapseJavascriptClient).createEntity(any(Entity.class), any(AsyncCallback.class));
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.CREATE_LINK);

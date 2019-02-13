@@ -819,25 +819,6 @@ public class DisplayUtils {
 		public void onSelected(T selected);		
 	}
 	
-	public static Widget getShareSettingsDisplay(boolean isPublic, SynapseJSNIUtils synapseJSNIUtils) {
-		final SimplePanel lc = new SimplePanel();
-		lc.addStyleName(STYLE_DISPLAY_INLINE);
-		String styleName = isPublic ? "public-acl-image" : "private-acl-image";
-		String description = isPublic ? DisplayConstants.PUBLIC_ACL_ENTITY_PAGE : DisplayConstants.PRIVATE_ACL_ENTITY_PAGE;
-		String tooltip = isPublic ? DisplayConstants.PUBLIC_ACL_DESCRIPTION : DisplayConstants.PRIVATE_ACL_DESCRIPTION;
-
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant("<div class=\"" + styleName+ "\" style=\"display:inline; position:absolute\"></div>");
-		shb.appendHtmlConstant("<span style=\"margin-left: 20px;\">"+description+"</span>");
-
-		//form the html
-		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
-		htmlPanel.addStyleName("inline-block");
-		lc.add(DisplayUtils.addTooltip(htmlPanel, tooltip, Placement.BOTTOM));
-
-		return lc;
-	}
-	
 	public static void updateWidgetSelectionState(WidgetSelectionState state, String text, int cursorPos) {
 		state.setWidgetSelected(false);
 		state.setWidgetStartIndex(-1);

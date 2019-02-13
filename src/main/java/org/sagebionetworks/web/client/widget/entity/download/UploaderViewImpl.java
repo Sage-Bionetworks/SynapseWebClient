@@ -469,7 +469,7 @@ public class UploaderViewImpl extends FlowPanel implements
 
 		if (isEntity && parentEntityId != null) {
 			//add sharing settings and data use conditions (associated to the parent)
-			sharingDataUseWidget.configure(parentEntityId, false, null);
+			sharingDataUseWidget.configure(parentEntityId);
 			container.add(sharingDataUseWidget.asWidget());
 		}
 		

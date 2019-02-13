@@ -1743,16 +1743,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public Entity createEntity(Entity entity) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try{
-			return synapseClient.createEntity(entity);
-		}catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} 
-	}
-
-	@Override
 	public String createFileHandleURL(String fileHandleId)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
