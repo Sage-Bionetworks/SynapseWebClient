@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 
@@ -36,11 +37,12 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	@UiField
 	Button downloadOptionsButton;
 	@UiField
-	HelpWidget emptyContainerHelp;
+	HelpWidget downloadHelp;
 	
 	@Inject
 	public FilesBrowserViewImpl(FilesBrowserViewImplUiBinder binder,
-			EntityTreeBrowser entityTreeBrowser) {
+			EntityTreeBrowser entityTreeBrowser,
+			AuthenticationController authController) {
 		widget = binder.createAndBindUi(this);
 		this.entityTreeBrowser = entityTreeBrowser;
 		Widget etbW = entityTreeBrowser.asWidget();
@@ -53,8 +55,18 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 			presenter.onAddToDownloadList();
 		});
 		entityTreeBrowser.setIsEmptyCallback(isEmpty -> {
-			emptyContainerHelp.setVisible(isEmpty);
-			downloadOptionsButton.setEnabled(!isEmpty);
+			if (isEmpty) {
+				downloadHelp.setHelpMarkdown("There are no downloadable items in this folder.");
+				downloadHelp.setVisible(true);
+				downloadOptionsButton.setEnabled(false);
+			} else if (!authController.isLoggedIn()) {
+				downloadHelp.setHelpMarkdown("You must be logged in to download items in this folder.");
+				downloadHelp.setVisible(true);
+				downloadOptionsButton.setEnabled(false);
+			} else {
+				downloadHelp.setVisible(false);
+				downloadOptionsButton.setEnabled(true);
+			}
 		});
 	}
 
