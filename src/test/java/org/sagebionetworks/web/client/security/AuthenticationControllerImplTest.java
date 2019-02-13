@@ -47,6 +47,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class AuthenticationControllerImplTest {
 
+	public static final String SESSION_TOKEN = "1111";
 	AuthenticationControllerImpl authenticationController;
 	@Mock
 	CookieProvider mockCookieProvider;
@@ -85,13 +86,13 @@ public class AuthenticationControllerImplTest {
 		MockitoAnnotations.initMocks(this);
 		//by default, return a valid user session data if asked
 		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).initSession(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith("1111").when(mockUserAccountService).getCurrentSessionToken(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(SESSION_TOKEN).when(mockUserAccountService).getCurrentSessionToken(any(AsyncCallback.class));
 		usd = new UserSessionData();
 		profile = new UserProfile();
 		profile.setOwnerId(USER_ID);
 		usd.setProfile(profile);
 		Session session = new Session();
-		session.setSessionToken("1111");
+		session.setSessionToken(SESSION_TOKEN);
 		session.setAcceptsTermsOfUse(true);
 		usd.setSession(session);
 		AsyncMockStubber.callSuccessWith(usd).when(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
@@ -241,6 +242,18 @@ public class AuthenticationControllerImplTest {
 		
 		verify(loginCallback).onFailure(ex);
 	}
-
+	
+	@Test
+	public void testNoUserChange() {
+		//if we invoke checkForUserChange(), if the user does not change we should update the session cookie expiration (via the initSession call).
+		authenticationController.initializeFromExistingSessionCookie(mockUserProfileCallback);
+		verify(mockJsClient, never()).initSession(anyString(), any(AsyncCallback.class));
+		
+		authenticationController.checkForUserChange();
+		
+		verify(mockUserAccountService).getCurrentSessionToken(any(AsyncCallback.class));
+		verify(mockJsClient).initSession(eq(SESSION_TOKEN), any(AsyncCallback.class));
+	}
+		
 	// Note.  If login when the stack is in READ_ONLY mode, then the widgets SynapseAlert should send user to the Down page.
 }

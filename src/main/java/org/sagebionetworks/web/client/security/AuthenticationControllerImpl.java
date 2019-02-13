@@ -97,9 +97,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	 * @param token
 	 * @param callback
 	 */
-	public void setNewSessionToken(String token, final AsyncCallback<UserProfile> callback) {
+	public void setNewSessionToken(String token, AsyncCallback<UserProfile> callback) {
 		if(token == null) {
-			callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
+			callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));	
 			return;
 		}
 		ginInjector.getSynapseJavascriptClient().initSession(token, new AsyncCallback<Void>() {
@@ -127,7 +127,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		userAccountService.getCurrentUserSessionData(new AsyncCallback<UserSessionData>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);	
+				callback.onFailure(caught);
 			}
 			@Override
 			public void onSuccess(UserSessionData newData) {
@@ -139,7 +139,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
 				} else {
 					jsniUtils.setAnalyticsUserId(getCurrentUserPrincipalId());
-					callback.onSuccess(newData.getProfile());	
+					callback.onSuccess(newData.getProfile());
 				}
 			}
 		});
@@ -224,6 +224,19 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					Window.Location.reload();
 				} else {
 					ginInjector.getHeader().refresh();
+					if (isLoggedIn()) {
+						// we've determined that the session has not changed, update the cookie expiration for the session token
+						setNewSessionToken(currentUserSessionToken, new AsyncCallback<UserProfile>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								jsniUtils.consoleError(caught);
+							}
+							@Override
+							public void onSuccess(UserProfile result) {
+								// the set-cookie response header has updated the expiration of the session token cookie
+							}
+						});
+					}
 				}
 			}
 		});
