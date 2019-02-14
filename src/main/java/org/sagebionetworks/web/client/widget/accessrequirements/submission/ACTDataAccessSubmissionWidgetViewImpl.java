@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.web.client.widget.TextBoxWithCopyToClipboardWidget;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -82,8 +83,6 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	Div submittedByContainer;
 	@UiField
 	Button moreInfoButton;
-	@UiField
-	Div showEmailsButtonContainer;
 	
 	public interface Binder extends UiBinder<Widget, ACTDataAccessSubmissionWidgetViewImpl> {
 	}
@@ -158,8 +157,17 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	}
 	
 	@Override
-	public void addAccessors(IsWidget w) {
-		accessorsContainer.add(w);
+	public void addAccessors(IsWidget w, String username) {
+		Div div = new Div();
+		div.add(w);
+		w.asWidget().addStyleName("inline-block margin-right-15");
+		div.add(new Text(":"));
+		TextBoxWithCopyToClipboardWidget emailTextBox = new TextBoxWithCopyToClipboardWidget();
+		emailTextBox.setText(username + "@synapse.org");
+		emailTextBox.setWidth("230px");
+		emailTextBox.setAddStyleNames("margin-left-15 movedown-2");
+		div.add(emailTextBox);
+		accessorsContainer.add(div);
 	}
 	@Override
 	public void clearAccessors() {
@@ -252,11 +260,6 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	public void setSubmittedBy(IsWidget w) {
 		submittedByContainer.clear();
 		submittedByContainer.add(w);
-	}
-	@Override
-	public void setShowEmailButton(IsWidget w) {
-		showEmailsButtonContainer.clear();
-		showEmailsButtonContainer.add(w);
 	}
 	@Override
 	public void setRejectedReason(String reason) {

@@ -2,8 +2,6 @@ package org.sagebionetworks.web.client.widget.accessrequirements.approval;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.UserProfile;
@@ -12,13 +10,12 @@ import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.ShowEmailsButton;
 import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;

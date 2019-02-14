@@ -2,22 +2,22 @@ package org.sagebionetworks.web.client.widget.accessrequirements.submission;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.repo.model.dataaccess.Submission;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
-import org.sagebionetworks.web.client.*;
+import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.DateTimeUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.ShowEmailsButton;
-import org.sagebionetworks.web.client.widget.asynch.AsyncHandlerImpl;
 import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
-import org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
@@ -41,8 +41,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	SynapseJSNIUtils jsniUtils;
 	PortalGinInjector ginInjector;
 	DateTimeUtils dateTimeUtils;
-	ShowEmailsButton showEmailsButton;
-
+	UserProfileAsyncHandler userProfileAsyncHandler;
 	@Inject
 	public ACTDataAccessSubmissionWidget(ACTDataAccessSubmissionWidgetView view, 
 			SynapseAlert synAlert,
@@ -54,7 +53,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 			SynapseJSNIUtils jsniUtils,
 			PortalGinInjector ginInjector,
 			DateTimeUtils dateTimeUtils,
-			ShowEmailsButton showEmailsButton) {
+			UserProfileAsyncHandler userProfileAsyncHandler) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.dataAccessClient = dataAccessClient;
@@ -63,7 +62,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		this.jsniUtils = jsniUtils;
 		this.ginInjector = ginInjector;
 		this.dateTimeUtils = dateTimeUtils;
-		this.showEmailsButton = showEmailsButton;
+		this.userProfileAsyncHandler = userProfileAsyncHandler;
 		
 		otherDocuments.configure()
 			.setCanDelete(false)
@@ -78,7 +77,6 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		view.setPromptModal(promptDialog);
 		view.setOtherAttachmentWidget(otherDocuments);
 		view.setSynAlert(synAlert);
-		view.setShowEmailButton(showEmailsButton);
 		promptDialog.configure("Reason", "Rejection reason:", "", new Callback() {
 			@Override
 			public void invoke() {
@@ -120,15 +118,11 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		UserBadge badge = ginInjector.getUserBadgeWidget();
 		badge.configure(submission.getSubmittedBy());
 		view.setSubmittedBy(badge);
-		configureShowEmailsButton(submission.getAccessorChanges());
+		addAccessorUserBadges(submission.getAccessorChanges());
 	}
 	
 	@Override
 	public void onMoreInfo() {
-		view.clearAccessors();
-		if (submission.getAccessorChanges() != null) {
-			addAccessorUserBadges(submission.getAccessorChanges());
-		}
 		otherDocuments.clear();
 		if (submission.getAttachments() != null) {
 			for (String fileHandleId : submission.getAttachments()) {
@@ -151,23 +145,23 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		view.showMoreInfoDialog();
 	}
 	
-	public void configureShowEmailsButton(List<AccessorChange> accessorChanges) {
-		List<String> userIds = new ArrayList<>();
-		if (accessorChanges != null) {
-			for (AccessorChange accessorChange : accessorChanges) {
-				userIds.add(accessorChange.getUserId());
-			}
-		}
-		showEmailsButton.configure(userIds);
-	}
-	
 	public void addAccessorUserBadges(List<AccessorChange> accessorChanges) {
+		view.clearAccessors();
 		for (AccessorChange change : accessorChanges) {
-			UserBadgeItem badge = ginInjector.getUserBadgeItem();
-			badge.configure(change);
-			badge.setSelectVisible(false);
-			badge.setAccessTypeDropdownEnabled(false);
-			view.addAccessors(badge);
+			userProfileAsyncHandler.getUserProfile(change.getUserId(), new AsyncCallback<UserProfile>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					synAlert.handleException(caught);
+				}
+				public void onSuccess(UserProfile profile) {
+					UserBadgeItem badge = ginInjector.getUserBadgeItem();
+					badge.configure(change, profile);
+					badge.setSelectVisible(false);
+					badge.setAccessTypeDropdownEnabled(false);
+					view.addAccessors(badge, profile.getUserName());
+				}; 
+			});
+			
 		}
 	}
 	
