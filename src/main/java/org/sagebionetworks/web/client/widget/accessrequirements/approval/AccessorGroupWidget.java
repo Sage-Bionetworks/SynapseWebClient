@@ -2,13 +2,17 @@ package org.sagebionetworks.web.client.widget.accessrequirements.approval;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroup;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ShowEmailsButton;
@@ -33,7 +37,7 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 	DataAccessClientAsync dataAccessClient;
 	Callback onRevokeCallback;
 	DateTimeUtils dateTimeUtils;
-	ShowEmailsButton showEmailsButton;
+	SynapseJavascriptClient jsClient;
 	
 	@Inject
 	public AccessorGroupWidget(AccessorGroupView view, 
@@ -43,7 +47,7 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 			AccessRequirementWidget accessRequirementWidget,
 			DataAccessClientAsync dataAccessClient,
 			DateTimeUtils dateTimeUtils,
-			ShowEmailsButton showEmailsButton) {
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
@@ -51,12 +55,11 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 		this.accessRequirementWidget = accessRequirementWidget;
 		this.dataAccessClient = dataAccessClient;
 		fixServiceEntryPoint(dataAccessClient);
+		this.jsClient = jsClient;
 		this.dateTimeUtils = dateTimeUtils;
-		this.showEmailsButton = showEmailsButton;
 		view.setPresenter(this);
 		view.setSynAlert(synAlert);
 		view.setAccessRequirementWidget(accessRequirementWidget);
-		view.setShowEmailsButton(showEmailsButton);
 	}
 	
 	public void configure(AccessorGroup accessorGroup) {
@@ -70,7 +73,7 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 		} else {
 			view.setExpiresOn("");
 		}
-		showEmailsButton.configure(accessorGroup.getAccessorIds());
+		
 		view.setSubmittedBy(badge);
 	}
 	
@@ -80,11 +83,27 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 	
 	public void addAccessorUserBadges(List<String> accessorIds) {
 		view.clearAccessors();
-		for (String userId : accessorIds) {
-			UserBadge badge = ginInjector.getUserBadgeWidget();
-			badge.configure(userId);
-			view.addAccessor(badge);
-		}
+		
+		//get the profiles, to get the usernames
+		jsClient.listUserProfiles(accessorIds, new AsyncCallback<List>() {
+			@Override
+			public void onSuccess(List userProfiles) {
+				List<String> usernames = new ArrayList<>();
+				for (Iterator it = userProfiles.iterator(); it.hasNext();) {
+					UserProfile profile = (UserProfile) it.next();
+					UserBadge badge = ginInjector.getUserBadgeWidget();
+					badge.configure(profile);
+					view.addAccessor(badge);
+					usernames.add(profile.getUserName());
+				}
+				view.setEmailAddressUsernames(usernames);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				popupUtils.showErrorMessage(caught.getMessage());
+			}
+		});
 	}
 	
 	public void addStyleNames(String styleNames) {

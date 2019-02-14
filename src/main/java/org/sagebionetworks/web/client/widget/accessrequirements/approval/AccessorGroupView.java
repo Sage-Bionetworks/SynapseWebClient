@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.approval;
 
+import java.util.List;
+
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface AccessorGroupView extends IsWidget {
@@ -18,7 +20,7 @@ public interface AccessorGroupView extends IsWidget {
 	void setExpiresOn(String expiresOn);
 	void setAccessRequirementWidget(IsWidget w);
 	void showAccessRequirementDialog();
-	void setShowEmailsButton(IsWidget w);
+	void setEmailAddressUsernames(List<String> usernames);
 	/**
 	 * Presenter interface
 	 */

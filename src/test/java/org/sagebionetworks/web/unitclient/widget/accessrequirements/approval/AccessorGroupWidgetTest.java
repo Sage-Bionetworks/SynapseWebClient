@@ -13,13 +13,16 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroup;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ShowEmailsButton;
@@ -31,6 +34,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+@RunWith(MockitoJUnitRunner.class)
 public class AccessorGroupWidgetTest {
 	AccessorGroupWidget widget;
 	@Mock
@@ -54,7 +58,7 @@ public class AccessorGroupWidgetTest {
 	@Mock
 	Callback onRevokeCallback;
 	@Mock
-	ShowEmailsButton mockShowEmailsButton;
+	SynapseJavascriptClient mockJsClient;
 	List<String> accessorIds;
 	public static final String ACCESSOR_USER_ID = "98888";
 	public static final String SUBMITTER_USER_ID = "77776";
@@ -73,7 +77,7 @@ public class AccessorGroupWidgetTest {
 				mockAccessRequirementWidget,
 				mockDataAccessClient,
 				mockDateTimeUtils,
-				mockShowEmailsButton);
+				mockJsClient);
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		when(mockAccessorGroup.getSubmitterId()).thenReturn(SUBMITTER_USER_ID);
 		accessorIds = Collections.singletonList(ACCESSOR_USER_ID);

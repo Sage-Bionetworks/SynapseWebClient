@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.approval;
 
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.widget.TextBoxWithCopyToClipboardWidget;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -24,7 +28,7 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 	@UiField
 	Button showAccessRequirementButton;
 	@UiField
-	Div showEmailsButtonContainer;
+	Div emailsContainer;
 	@UiField
 	Button revokeAccessButton;
 	@UiField
@@ -119,8 +123,14 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 		expiresOnField.setText(expiresOnString);
 	}
 	@Override
-	public void setShowEmailsButton(IsWidget w) {
-		showEmailsButtonContainer.clear();
-		showEmailsButtonContainer.add(w);
+	public void setEmailAddressUsernames(List<String> usernames) {
+		emailsContainer.clear();
+		for (String username : usernames) {
+			TextBoxWithCopyToClipboardWidget emailTextBox = new TextBoxWithCopyToClipboardWidget();
+			emailTextBox.setText(username + "@synapse.org");
+			emailTextBox.setAddStyleNames("displayBlock");
+			emailTextBox.setWidth("195px");
+			emailsContainer.add(emailTextBox);
+		}
 	}
 }
