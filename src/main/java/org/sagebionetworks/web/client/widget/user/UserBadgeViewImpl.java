@@ -181,6 +181,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 		if (isDefined(size.getDefaultPictureStyle())) {
 			defaultUserPicture.addStyleName(size.getDefaultPictureStyle());	
 		}
+		
 		usernameLink.setStyleName(size.textStyle());
 		int pictureHeightPx = size.pictureHeightPx();
 		userPicture.setHeight(pictureHeightPx + "px");
@@ -188,6 +189,8 @@ public class UserBadgeViewImpl implements UserBadgeView {
 		usernameLink.setVisible(size.isTextVisible());
 		pictureSpan.setHeight((pictureHeightPx + 6) + "px");
 		pictureSpan.setWidth((pictureHeightPx + 6) + "px");
+		defaultUserPicture.setWidth((pictureHeightPx+3) + "px");
+		defaultUserPicture.setHeight((pictureHeightPx+3) + "px");
 	}
 
 	@Override
