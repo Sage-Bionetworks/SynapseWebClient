@@ -149,7 +149,7 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 
 	private static native void _getCroppedImageBlob(CroppedImageUploadViewImpl v) /*-{
 		try {
-			$wnd.cropping.result({type: 'blob', format: 'jpeg', quality: 1, circle: true}).then(function(blob) {
+			$wnd.cropping.result({type: 'blob', format: 'png', quality: 1, circle: true}).then(function(blob) {
 				v.@org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl::saveCroppedImage(Lcom/google/gwt/core/client/JavaScriptObject;)(blob);
 			});
 		} catch (err) {
@@ -166,7 +166,7 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 		// get the blob from the cropper
 		loadingUI.setVisible(false);
 		previewModal.hide();
-		presenter.onFileProcessed(new JavaScriptObjectWrapper(blob), "image/jpeg");
+		presenter.onFileProcessed(new JavaScriptObjectWrapper(blob), "image/png");
 	}
 	
 	public void cancelCropImage() {
