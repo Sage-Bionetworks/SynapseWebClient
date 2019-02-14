@@ -20,7 +20,9 @@ public interface AccessorGroupView extends IsWidget {
 	void setExpiresOn(String expiresOn);
 	void setAccessRequirementWidget(IsWidget w);
 	void showAccessRequirementDialog();
-	void setEmailAddressUsernames(List<String> usernames);
+	void clearEmails();
+	void addEmail(String username);
+	
 	/**
 	 * Presenter interface
 	 */

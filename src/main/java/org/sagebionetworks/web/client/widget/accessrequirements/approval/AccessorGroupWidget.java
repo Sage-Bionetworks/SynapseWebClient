@@ -16,9 +16,9 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ShowEmailsButton;
+import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -37,7 +37,7 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 	DataAccessClientAsync dataAccessClient;
 	Callback onRevokeCallback;
 	DateTimeUtils dateTimeUtils;
-	SynapseJavascriptClient jsClient;
+	UserProfileAsyncHandler userProfileAsyncHandler;
 	
 	@Inject
 	public AccessorGroupWidget(AccessorGroupView view, 
@@ -47,7 +47,7 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 			AccessRequirementWidget accessRequirementWidget,
 			DataAccessClientAsync dataAccessClient,
 			DateTimeUtils dateTimeUtils,
-			SynapseJavascriptClient jsClient) {
+			UserProfileAsyncHandler userProfileAsyncHandler) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
@@ -55,7 +55,7 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 		this.accessRequirementWidget = accessRequirementWidget;
 		this.dataAccessClient = dataAccessClient;
 		fixServiceEntryPoint(dataAccessClient);
-		this.jsClient = jsClient;
+		this.userProfileAsyncHandler = userProfileAsyncHandler;
 		this.dateTimeUtils = dateTimeUtils;
 		view.setPresenter(this);
 		view.setSynAlert(synAlert);
@@ -83,27 +83,22 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 	
 	public void addAccessorUserBadges(List<String> accessorIds) {
 		view.clearAccessors();
-		
-		//get the profiles, to get the usernames
-		jsClient.listUserProfiles(accessorIds, new AsyncCallback<List>() {
-			@Override
-			public void onSuccess(List userProfiles) {
-				List<String> usernames = new ArrayList<>();
-				for (Iterator it = userProfiles.iterator(); it.hasNext();) {
-					UserProfile profile = (UserProfile) it.next();
+		view.clearEmails();
+		for (String userId : accessorIds) {
+			userProfileAsyncHandler.getUserProfile(userId, new AsyncCallback<UserProfile>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					popupUtils.showErrorMessage(caught.getMessage());
+				}
+				@Override
+				public void onSuccess(UserProfile profile) {
 					UserBadge badge = ginInjector.getUserBadgeWidget();
 					badge.configure(profile);
 					view.addAccessor(badge);
-					usernames.add(profile.getUserName());
+					view.addEmail(profile.getUserName());
 				}
-				view.setEmailAddressUsernames(usernames);
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				popupUtils.showErrorMessage(caught.getMessage());
-			}
-		});
+			});
+		}
 	}
 	
 	public void addStyleNames(String styleNames) {

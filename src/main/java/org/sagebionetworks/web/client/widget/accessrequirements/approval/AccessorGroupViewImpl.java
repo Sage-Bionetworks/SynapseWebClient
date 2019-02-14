@@ -1,10 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.approval;
 
-import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.widget.TextBoxWithCopyToClipboardWidget;
 
@@ -123,14 +120,15 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 		expiresOnField.setText(expiresOnString);
 	}
 	@Override
-	public void setEmailAddressUsernames(List<String> usernames) {
+	public void clearEmails() {
 		emailsContainer.clear();
-		for (String username : usernames) {
-			TextBoxWithCopyToClipboardWidget emailTextBox = new TextBoxWithCopyToClipboardWidget();
-			emailTextBox.setText(username + "@synapse.org");
-			emailTextBox.setAddStyleNames("displayBlock");
-			emailTextBox.setWidth("195px");
-			emailsContainer.add(emailTextBox);
-		}
+	}
+	@Override
+	public void addEmail(String username) {
+		TextBoxWithCopyToClipboardWidget emailTextBox = new TextBoxWithCopyToClipboardWidget();
+		emailTextBox.setText(username + "@synapse.org");
+		emailTextBox.setAddStyleNames("displayBlock");
+		emailTextBox.setWidth("195px");
+		emailsContainer.add(emailTextBox);
 	}
 }
