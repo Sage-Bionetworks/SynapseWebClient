@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroup;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtils;
@@ -57,6 +58,9 @@ public class AccessorGroupWidgetTest {
 	Callback onRevokeCallback;
 	@Mock
 	UserProfileAsyncHandler mockUserProfileAsyncHandler;
+	@Mock
+	UserProfile mockUserProfile;
+	
 	List<String> accessorIds;
 	public static final String ACCESSOR_USER_ID = "98888";
 	public static final String SUBMITTER_USER_ID = "77776";
@@ -81,6 +85,7 @@ public class AccessorGroupWidgetTest {
 		when(mockAccessorGroup.getAccessRequirementId()).thenReturn(ACCESS_REQUIREMENT_ID);
 		when(mockAccessorGroup.getExpiredOn()).thenReturn(AROUND_NOW);
 		when(mockDateTimeUtils.getDateTimeString(any(Date.class))).thenReturn(FORMATTED_DATE);
+		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockUserProfileAsyncHandler).getUserProfile(anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -94,7 +99,7 @@ public class AccessorGroupWidgetTest {
 	public void testConfigure() {
 		widget.configure(mockAccessorGroup);
 		verify(mockUserBadge).configure(SUBMITTER_USER_ID);
-		verify(mockUserBadge).configure(ACCESSOR_USER_ID);
+		verify(mockUserBadge).configure(mockUserProfile);
 		verify(mockView).setSubmittedBy(mockUserBadge);
 		verify(mockView).addAccessor(mockUserBadge);
 		verify(mockDateTimeUtils).getDateTimeString(AROUND_NOW);

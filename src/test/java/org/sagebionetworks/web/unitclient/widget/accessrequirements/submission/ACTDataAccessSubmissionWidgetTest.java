@@ -21,6 +21,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dataaccess.AccessType;
 import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
@@ -85,6 +86,8 @@ public class ACTDataAccessSubmissionWidgetTest {
 	DateTimeUtils mockDateTimeUtils;
 	@Mock
 	UserProfileAsyncHandler mockUserProfileAsyncHandler;
+	@Mock
+	UserProfile mockUserProfile;
 	public static final String SUBMISSION_ID = "9876545678987";
 	public static final String INSTITUTION = "University of Washington";
 	public static final String INTENDED_DATA_USE = "lorem ipsum";
@@ -120,6 +123,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 				mockDateTimeUtils, 
 				mockUserProfileAsyncHandler);
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmission).when(mockClient).updateDataAccessSubmissionState(anyString(), any(SubmissionState.class), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockUserProfileAsyncHandler).getUserProfile(anyString(), any(AsyncCallback.class));
 		verify(mockPromptModalWidget).configure(anyString(),  anyString(), anyString(),  promptModalPresenterCaptor.capture());
 		confirmRejectionCallback = promptModalPresenterCaptor.getValue();
 	}
@@ -172,8 +176,8 @@ public class ACTDataAccessSubmissionWidgetTest {
 		verify(mockView).clearAccessors();
 		verify(mockGinInjector, times(2)).getUserBadgeItem();
 		
-		verify(mockUserBadge).configure(change1);
-		verify(mockUserBadge).configure(change2);
+		verify(mockUserBadge).configure(change1, mockUserProfile);
+		verify(mockUserBadge).configure(change2, mockUserProfile);
 		
 		verify(mockView, times(2)).addAccessors(any(IsWidget.class), anyString());
 		// verify other documents
@@ -231,7 +235,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 		// verify accessors
 		verify(mockView).clearAccessors();
 		verify(mockGinInjector).getUserBadgeItem();
-		verify(mockUserBadge).configure(change1);
+		verify(mockUserBadge).configure(change1, mockUserProfile);
 		verify(mockView).addAccessors(any(IsWidget.class), anyString());
 		// verify view
 		verify(mockView).setIsRenewal(true);

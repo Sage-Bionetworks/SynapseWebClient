@@ -118,12 +118,15 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		UserBadge badge = ginInjector.getUserBadgeWidget();
 		badge.configure(submission.getSubmittedBy());
 		view.setSubmittedBy(badge);
-		addAccessorUserBadges(submission.getAccessorChanges());
 	}
 	
 	@Override
 	public void onMoreInfo() {
 		otherDocuments.clear();
+		view.clearAccessors();
+		if (submission.getAccessorChanges() != null) {
+			addAccessorUserBadges(submission.getAccessorChanges());
+		}
 		if (submission.getAttachments() != null) {
 			for (String fileHandleId : submission.getAttachments()) {
 				otherDocuments.addFileLink(getFileHandleAssociation(fileHandleId));
@@ -146,7 +149,6 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	}
 	
 	public void addAccessorUserBadges(List<AccessorChange> accessorChanges) {
-		view.clearAccessors();
 		for (AccessorChange change : accessorChanges) {
 			userProfileAsyncHandler.getUserProfile(change.getUserId(), new AsyncCallback<UserProfile>() {
 				@Override
