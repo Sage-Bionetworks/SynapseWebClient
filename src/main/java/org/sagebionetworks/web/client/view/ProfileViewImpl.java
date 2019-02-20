@@ -251,8 +251,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@UiField
 	FlowPanel favoritesHelpPanel;
-	@UiField
-	Alert getCertifiedAlert;
 	
 	@UiField
 	SimplePanel profileSynAlertPanel;
@@ -261,37 +259,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	SimplePanel teamSynAlertPanel;
 	@UiField
-	FocusPanel alertFocusPanel;
-	@UiField
 	FlowPanel challengeSynAlertPanel;
 	
 	@UiField
-	Alert verifyAlert;
-	@UiField
-	org.gwtbootstrap3.client.ui.Anchor requestProfileValidationLink1;
-	@UiField
-	org.gwtbootstrap3.client.ui.Anchor requestProfileValidationLink2;
-	@UiField
-	org.gwtbootstrap3.client.ui.Anchor reviewProfileLink;
-	@UiField
-	org.gwtbootstrap3.client.ui.Anchor createOrcIdLink;
-	@UiField
-	Button dismissValidationUIButton;
-	
-	@UiField
 	Button verifiedBadge;
-	@UiField
-	Button verificationSubmittedButton;
-	@UiField
-	Button verificationSuspendedButton;
-	@UiField
-	Button verificationRejectedButton;
-	@UiField
-	Button submitProfileValidationButton;
-	@UiField
-	Button resubmitProfileValidationButton;
-	@UiField
-	Button verificationApprovedButton;
 	
 	@UiField
 	Span teamNotifications;
@@ -339,12 +310,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		teamSearchButton.addClickHandler(event -> presenter.goTo(new TeamSearch(teamSearchTextBox.getValue())));
 		projectSearchButton.addClickHandler(event -> presenter.goTo(new Search(projectSearchTextBox.getValue())));
-		alertFocusPanel.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.goTo(new Quiz("Certification"));
-			}
-		});
 		ClickHandler newVerificationSubmissionCallback = event -> presenter.newVerificationSubmissionClicked();
 		ClickHandler editVerificationSubmissionCallback = event -> presenter.editVerificationSubmissionClicked();
 		
@@ -356,11 +321,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		verificationRejectedButton.addClickHandler(editVerificationSubmissionCallback);
 		resubmitProfileValidationButton.addClickHandler(newVerificationSubmissionCallback);
 		
-		submitProfileValidationButton.addClickHandler(event -> {
-			submitProfileValidationButton.setVisible(false);
-			verifyAlert.setVisible(true);
-			presenter.setVerifyUndismissed();
-		});
 		initCertificationBadge();
 		
 		moreChallengesButton.addClickHandler(event -> presenter.getMoreChallenges());
@@ -373,7 +333,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		ClickHandler editProfileClickHandler = event -> presenter.onEditProfile();
 		editProfileButton.addClickHandler(editProfileClickHandler);
 		reviewProfileLink.addClickHandler(editProfileClickHandler);
-		getCertifiedAlert.addClosedHandler(event -> presenter.setGetCertifiedDismissed());
 		synapseEmailField.addClickHandler(event -> synapseEmailField.selectAll());
 		
 		ClickHandler orcIdClickHandler = event -> presenter.linkOrcIdClicked();
@@ -715,7 +674,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		downloadsTabContent.clear();
 		challengesTabContent.clear();
 		hideTabContainers();
-		getCertifiedAlert.setVisible(false);
 		verifyAlert.setVisible(false);
 		DisplayUtils.hide(createProjectUI);
 		DisplayUtils.hide(createTeamUI);
@@ -893,10 +851,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		this.editUserProfilePanel.add(userProfileModalWidget);
 	}
 	
-	@Override
-	public void setGetCertifiedVisible(boolean isVisible) {
-		getCertifiedAlert.setVisible(isVisible);	
-	}
 	@Override
 	public void setSynapseEmailVisible(boolean isVisible) {
 		synapseEmailField.setVisible(isVisible);

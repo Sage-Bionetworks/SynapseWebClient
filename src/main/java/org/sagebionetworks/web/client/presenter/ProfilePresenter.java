@@ -71,7 +71,6 @@ import com.google.inject.Inject;
 
 public class ProfilePresenter extends AbstractActivity implements ProfileView.Presenter, Presenter<Profile> {
 	public static final int DELAY_GET_MY_TEAMS = 300;
-	public static final String USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.certification.message.visible.state";
 	public static final String USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.validation.message.visible.state";
 	
 	public static int PROFILE = 0x1;
@@ -340,8 +339,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				boolean isCertified = bundle.getIsCertified();
 				if (isCertified) {
 					view.addCertifiedBadge();
-				} else {
-					initializeShowHideCertification(isOwner);
 				}
 				initializeVerificationUI();
 				view.setProfile(bundle.getUserProfile(), isOwner);
@@ -384,25 +381,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				profileSynAlert.handleException(caught);
 			}
 		});	
-	}
-	
-	public void initializeShowHideCertification(boolean isOwner) {
-		if (isOwner) {
-			boolean isCertificationMessageVisible = false;
-			try {
-				String cookieValue = cookies.getCookie(USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + currentUserId);
-				if (cookieValue == null || !cookieValue.equalsIgnoreCase("false")) {
-					isCertificationMessageVisible = true;	
-				}
-			} catch (Exception e) {
-				//if there are any problems getting the certification message visibility state, ignore and use default (hide)
-			}
-			view.setGetCertifiedVisible(isCertificationMessageVisible);
-		} else {
-			//not the owner
-			//hide certification message
-			view.setGetCertifiedVisible(false);
-		}
 	}
 	
 	public void initializeVerificationUI() {
@@ -922,7 +900,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	private void profileUpdated() {
 		view.showInfo("Your profile has been successfully updated.");
-		editMyProfile();
+		updateProfileView(currentUserId);
 		view.refreshHeader();
 	}
 	
@@ -1168,13 +1146,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		globalApplicationState.pushCurrentPlace(place);
 	}
 	
-	@Override
-	public void setGetCertifiedDismissed() {
-		//set certification message visible=false for a year
-		Date yearFromNow = new Date();
-		CalendarUtil.addMonthsToDate(yearFromNow, 12);
-		cookies.setCookie(USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + currentUserId, Boolean.toString(false), yearFromNow);
-	}
 	@Override
 	public void setVerifyDismissed() {
 		//set verify message visible=false for a year

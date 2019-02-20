@@ -48,6 +48,8 @@ public interface SettingsView extends IsWidget, SynapseView {
 		void changePassword();
 		void passwordChanged(String password);
 		void setShowUTCTime(boolean isUTC);
+		void newVerificationSubmissionClicked();
+		void editVerificationSubmissionClicked();
 	}
 
 	public void setApiKey(String apiKey);

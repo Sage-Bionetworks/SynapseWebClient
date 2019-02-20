@@ -444,7 +444,6 @@ public class ProfilePresenterTest {
 		profilePresenter.setPlace(place);
 		verify(mockView).setTabSelected(eq(ProfileArea.PROFILE));
 		verify(mockView).addCertifiedBadge();
-		verify(mockView, never()).setGetCertifiedVisible(anyBoolean());
 	}		
 	
 	@Test
@@ -458,70 +457,15 @@ public class ProfilePresenterTest {
 	}
 	
 	@Test
-	public void testNotCertifiedAlertShownAndUserNotCertifiedCookieNull() throws JSONObjectAdapterException {
-		when(mockUserBundle.getIsCertified()).thenReturn(false);
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userProfile.getOwnerId());
-		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
-		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn(null);
-		profilePresenter.updateProfileView(userProfile.getOwnerId());
-		verify(mockView).setGetCertifiedVisible(true);
-		verify(mockView, never()).addCertifiedBadge();
-		
-		//also verify that when orc id is not set in the user bundle (for the owner), then orc id is not visible
-		verify(mockView).setOrcIdVisible(false);
-		verify(mockView).setUnbindOrcIdVisible(false);
-		verify(mockView, never()).setOrcIdVisible(true);
-		verify(mockView, never()).setUnbindOrcIdVisible(true);
-		verify(mockView).setOrcIDLinkButtonVisible(true); 
-		verify(mockView, never()).setOrcIDLinkButtonVisible(false); 
-	}
-	
-	@Test
-	public void testNotCertifiedAlertShownAndUserNotCertifiedCookieTrue() throws JSONObjectAdapterException {
-		when(mockUserBundle.getIsCertified()).thenReturn(false);
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userProfile.getOwnerId());
-		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
-		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn("true");
-		when(mockUserBundle.getORCID()).thenReturn("an orc id");
-		profilePresenter.updateProfileView(userProfile.getOwnerId());
-		verify(mockView).setGetCertifiedVisible(true);
-		verify(mockView, never()).addCertifiedBadge();
-		
-		//also verify that when orc id is set in the user bundle (for the owner), then orc id is visible (and can be unbound)
-		verify(mockView).setOrcIdVisible(false);
-		verify(mockView).setUnbindOrcIdVisible(false);
-		verify(mockView).setOrcIdVisible(true);
-		verify(mockView).setUnbindOrcIdVisible(true);
-		//link ORC ID button initially visible because this is the owner, but hidden because orc id is set
-		verify(mockView).setOrcIDLinkButtonVisible(true); 
-		verify(mockView).setOrcIDLinkButtonVisible(false); 
-	}
-	
-	@Test
 	public void testUnbindHiddenIfNotOwner() {
 		when(mockUserBundle.getIsCertified()).thenReturn(false);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userProfile.getOwnerId());
-		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn("true");
 		when(mockUserBundle.getORCID()).thenReturn("an orc id");
 		//view another user profile
 		profilePresenter.updateProfileView("12937");
 
 		verify(mockView, times(2)).setUnbindOrcIdVisible(false);
-	}
-	
-	@Test
-	public void testNotCertifiedAlertHiddenAndUserNotCertifiedCookieFalse() throws JSONObjectAdapterException {
-		when(mockUserBundle.getIsCertified()).thenReturn(false);
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userProfile.getOwnerId());
-		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
-		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn("false");
-		profilePresenter.updateProfileView(userProfile.getOwnerId());
-		verify(mockView).setGetCertifiedVisible(false);
-		verify(mockView, never()).addCertifiedBadge();
 	}
 	
 	@Test
@@ -1379,55 +1323,6 @@ public class ProfilePresenterTest {
 		verify(mockGlobalApplicationState, never()).setFavorites(anyList());
 		verify(mockCallback).invoke();
 	}	
-	
-	@Test
-	public void testInitShowHideGetCertifiedNotOwner() {
-		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
-		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn(null);
-		profilePresenter.initializeShowHideCertification(false);
-		verify(mockView).setGetCertifiedVisible(false);
-	}
-	
-	@Test
-	public void testInitShowHideGetCertifiedNullCookieValue() {
-		//return null
-		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
-		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn(null);
-		profilePresenter.initializeShowHideCertification(true);
-		verify(mockView).setGetCertifiedVisible(true);
-	}
-	
-	@Test
-	public void testInitShowHideGetCertifiedEmptyCookieValue() {
-		//return null
-		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
-		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn("");
-		profilePresenter.initializeShowHideCertification(true);
-		verify(mockView).setGetCertifiedVisible(true);
-	}
-	
-	@Test
-	public void testInitShowHideGetCertifiedTrueCookieValue() {
-		//return null
-		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
-		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn("true");
-		profilePresenter.initializeShowHideCertification(true);
-		verify(mockView).setGetCertifiedVisible(true);
-	}
-	@Test
-	public void testInitShowHideGetCertifiedFalseCookieValue() {
-		//return null
-		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
-		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn("false");
-		profilePresenter.initializeShowHideCertification(true);
-		verify(mockView).setGetCertifiedVisible(false);
-	}
-	@Test
-	public void testGetCertifiedDismissed() {
-		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
-		profilePresenter.setGetCertifiedDismissed();
-		verify(mockCookies).setCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()), eq(Boolean.FALSE.toString()), any(Date.class));
-	}
 	
 	@Test
 	public void testInitShowHideGetVerifiedNotOwner() {

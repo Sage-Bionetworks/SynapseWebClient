@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
@@ -22,7 +23,6 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -104,6 +104,18 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	AnchorListItem dateFormatUTC;
 	@UiField
 	Button dateFormatDropdown;
+	
+	// Profile Validation UI
+	@UiField
+	Div verifyAlert;
+	@UiField
+	Anchor requestProfileValidationLink1;
+	@UiField
+	Anchor requestProfileValidationLink2;
+	@UiField
+	Anchor reviewProfileLink;
+	@UiField
+	Anchor createOrcIdLink;
 	
 	private Presenter presenter;
 	

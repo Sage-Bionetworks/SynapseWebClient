@@ -49,7 +49,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setProfileEditButtonVisible(boolean isVisible);
 	void setOrcIDLinkButtonVisible(boolean isVisible);
 	void addUserProfileModalWidget(IsWidget userProfileModalWidget);
-	void setGetCertifiedVisible(boolean isVisible);
 	void setSynapseEmailVisible(boolean isVisible);
 	void setOrcIdVisible(boolean isVisible);
 	void setUnbindOrcIdVisible(boolean isVisible);
@@ -75,12 +74,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void getMoreChallenges();
 		void applyFilterClicked(ProjectFilterEnum filterType, Team team);
 		void onEditProfile();
-		void setGetCertifiedDismissed();
 		void sort(ProjectListSortColumn column);
-		void newVerificationSubmissionClicked();
-		void editVerificationSubmissionClicked();
-		void setVerifyDismissed();
-		void setVerifyUndismissed();
 		void linkOrcIdClicked();
 	}
 
