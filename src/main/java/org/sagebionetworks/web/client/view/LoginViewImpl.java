@@ -31,9 +31,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	
 	//terms of service view
 	@UiField
-	HTMLPanel termsOfServiceView;
-	@UiField
-	DivElement termsOfServiceHighlightBox;
+	Div termsOfServiceView;
 	@UiField
 	CheckBox actEthicallyCb;
 	@UiField
@@ -46,6 +44,8 @@ public class LoginViewImpl extends Composite implements LoginView {
 	CheckBox responsibilityCb;
 	@UiField
 	CheckBox lawsCb;
+	@UiField
+	CheckBox responsibleDataUseCb;
 	@UiField
 	Button takePledgeButton;
 	@UiField
@@ -71,7 +71,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 		this.headerWidget = headerWidget;
 		headerWidget.configure();
 		toUInitialized = false;
-		termsOfServiceHighlightBox.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Awareness and Ethics Pledge");
 	}
 
 	@Override
@@ -138,6 +137,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 		shareCb.setValue(false);
 		responsibilityCb.setValue(false);
 		lawsCb.setValue(false);
+		responsibleDataUseCb.setValue(false);
 
 		termsOfServiceView.setVisible(true);
 		//initialize if necessary
@@ -149,7 +149,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 					if(validatePledge()) {
 						callback.invoke();
 					} else {
-						showErrorMessage("To take the pledge, you must first agree to all of the statements.");
+						showErrorMessage("To accept these Terms and Conditions for Use, you must first agree to all of the statements.");
 					}
 				}
 			});
@@ -157,7 +157,7 @@ public class LoginViewImpl extends Composite implements LoginView {
      }
 	
 	private boolean validatePledge() {
-		return actEthicallyCb.getValue() && protectPrivacyCb.getValue() && noHackCb.getValue() && shareCb.getValue() && responsibilityCb.getValue() && lawsCb.getValue();
+		return actEthicallyCb.getValue() && protectPrivacyCb.getValue() && noHackCb.getValue() && shareCb.getValue() && responsibilityCb.getValue() && lawsCb.getValue() && responsibleDataUseCb.getValue();
 	}
 	private void hideViews() {
 		loadingUi.setVisible(false);
