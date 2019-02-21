@@ -210,9 +210,9 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	}
 	
 	public boolean isPreconditionsForNewSubmissionMet(UserProfile profile, String orcId) {
-		//new submission.  make sure orc id is set and profile is populated.
+		//new submission.  make sure orcid is set and profile is populated.
 		if (!DisplayUtils.isDefined(orcId)) {
-			view.showErrorMessage("Please link your ORC ID before requesting profile validation.");
+			view.showErrorMessage("Please link your ORCID before requesting profile validation.");
 			return false;
 		}
 		if (!DisplayUtils.isDefined(profile.getFirstName()) || !DisplayUtils.isDefined(profile.getLastName()) ||

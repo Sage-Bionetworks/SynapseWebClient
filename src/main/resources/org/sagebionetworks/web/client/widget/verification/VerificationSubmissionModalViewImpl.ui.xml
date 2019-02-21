@@ -58,7 +58,7 @@
 				<b:Row>
 					<b:Column size="SM_12">
 						<b:FormGroup>
-							<b:FormLabel>ORC ID</b:FormLabel>
+							<b:FormLabel>ORCID</b:FormLabel>
 							<bh:Div>
 								<b:Anchor ui:field="orcIdAnchor" addStyleNames="color-white" target="_blank" />
 							</bh:Div>
