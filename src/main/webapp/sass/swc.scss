@@ -2606,15 +2606,6 @@ div.border {
 	filter: blur(4px);
 }
 
-.hideRightPixelOnHover:hover {
-	margin-right: -1px;
-	padding-right: 1px;
-}
-.hideLeftPixelOnHover:hover {
-	margin-left: -1px;
-	padding-left: 1px;
-}
-
 #body .zeroOpacity {
 	opacity: 0;
 	transition: opacity 0.3s ease-in;
@@ -2685,7 +2676,7 @@ div.border {
 	}
 	.dropdown {
 		background-color: none;
-		transition: all 0.1s ease-in;
+		transition: all 0.3s ease-in;
 	}
 	.alert {
 		border-radius: 0px;
