@@ -46,8 +46,8 @@
 		  		<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-10 margin-right-10 padding-left-15" visible="false">
 					<b:Button ui:field="loginLink" text="&nbsp;&nbsp;&nbsp;Sign in&nbsp;&nbsp;&nbsp;" type="SUCCESS" marginTop="7"/>
 				</g:SimplePanel>
-				<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-left-10 padding-right-10 imageButton min-width-200-unless-xs" visible="false" height="53px" paddingTop="10">
-					<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" />
+				<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-right-10 imageButton min-width-200-unless-xs hideLeftPixelOnHover" visible="false" height="53px" paddingTop="10">
+					<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" addStyleNames="padding-left-10" />
 					<b:Icon type="ANGLE_DOWN" addStyleNames="margin-left-30 color-white"/>
 					<b:DropDownMenu ui:field="dashboardDropdownMenu" width="100%">
 						<b:AnchorListItem ui:field="myProfileLink">Profile</b:AnchorListItem>
@@ -70,14 +70,15 @@
 						<b:AnchorListItem ui:field="logoutLink" icon="SIGN_OUT" iconFixedWidth="true" iconPosition="RIGHT">Sign out</b:AnchorListItem>
 					</b:DropDownMenu>
 				</b:DropDown>
-				<b:DropDown ui:field="headerFavDropdown" pull="RIGHT" addStyleNames="imageButton hidden-xs" visible="false" height="53px" paddingTop="13" paddingRight="15" paddingLeft="0">
+				<bh:Span addStyleNames="border-left-1 right hidden-xs" height="25px" marginTop="12"/>
+				<b:DropDown ui:field="headerFavDropdown" pull="RIGHT" addStyleNames="imageButton hideRightPixelOnHover hidden-xs" visible="false" height="53px" paddingTop="13" paddingLeft="0">
 					<b:Anchor ui:field="headerFavAnchor" dataToggle="DROPDOWN" icon="STAR" iconSize="TIMES2" height="28px" addStyleNames="color-white textDecorationNone" />
-					<b:Icon type="ANGLE_DOWN" addStyleNames="color-white moveup-5"/>
+					<b:Icon type="ANGLE_DOWN" addStyleNames="color-white moveup-5 padding-right-15"/>
 					<b:DropDownMenu ui:field="headerFavDropdownMenu" addStyleNames="dropdown-menu-right">
 					</b:DropDownMenu>
 				</b:DropDown>
-				<bh:Div pull="RIGHT" addStyleNames="searchBoxContainer inactive hidden-xs" height="53px" paddingLeft="7" paddingRight="3">
-					<bh:Div ui:field="searchBoxContainer" marginTop="14"/>
+				<bh:Div pull="RIGHT" addStyleNames="searchBoxContainer hideRightPixelOnHover inactive hidden-xs" height="53px" paddingLeft="7">
+					<bh:Div ui:field="searchBoxContainer" marginTop="14" paddingRight="3"/>
 				</bh:Div>
 				<bh:Div pull="RIGHT" height="53px" paddingLeft="7" paddingRight="3" paddingTop="9" ui:field="downloadListNotificationUI" visible="false">
 					<b:Tooltip text="Click to view items in your download list." placement="BOTTOM">
