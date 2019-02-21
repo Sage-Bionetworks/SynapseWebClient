@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
+import org.sagebionetworks.web.client.widget.IndeterminateCheckBox.CheckBoxState;
+
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -16,4 +18,5 @@ public interface UserBadgeListView extends IsWidget {
 	void addUserBadge(Widget widget);
 	void clearUserBadges();
 	void setCanDelete(boolean canDelete);
+	void setSelectionState(CheckBoxState selectionState);
 }

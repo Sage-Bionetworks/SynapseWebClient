@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget;
 
+import org.sagebionetworks.web.client.widget.IndeterminateCheckBox.CheckBoxState;
+
 public interface SelectableListView {
 	//selection toolbar state
 	void setCanDelete(boolean canDelete);
@@ -7,6 +9,7 @@ public interface SelectableListView {
 	void setCanMoveDown(boolean canMoveDown);
 	void setButtonToolbarVisible(boolean visible);
 	void setSelectionToolbarHandler(Presenter selectableItemList);
+	void setSelectionState(CheckBoxState selectionState);
 	/**
 	 * Presenter interface
 	 */

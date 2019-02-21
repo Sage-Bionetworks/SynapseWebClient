@@ -1,11 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.widget.SelectionToolbar;
+import org.sagebionetworks.web.client.widget.IndeterminateCheckBox.CheckBoxState;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -29,23 +27,14 @@ public class UserBadgeListViewImpl implements UserBadgeListView {
 		
 		selectionToolbar.hideReordering();
 		
-		selectionToolbar.setDeleteClickedCallback(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.deleteSelected();
-			}
+		selectionToolbar.setDeleteClickedCallback(event -> {
+			presenter.deleteSelected();
 		});
-		selectionToolbar.setSelectAllClicked(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.selectAll();
-			}
+		selectionToolbar.setSelectAllClicked(event -> {
+			presenter.selectAll();
 		});
-		selectionToolbar.setSelectNoneClicked(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.selectNone();
-			}
+		selectionToolbar.setSelectNoneClicked(event -> {
+			presenter.selectNone();
 		});
 	}
 
@@ -77,5 +66,9 @@ public class UserBadgeListViewImpl implements UserBadgeListView {
 	@Override
 	public void setCanDelete(boolean canDelete) {
 		selectionToolbar.setCanDelete(canDelete);
+	}
+	@Override
+	public void setSelectionState(CheckBoxState selectionState) {
+		selectionToolbar.setSelectionState(selectionState);
 	}
 }

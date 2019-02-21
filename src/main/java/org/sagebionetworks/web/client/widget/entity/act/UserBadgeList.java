@@ -9,6 +9,8 @@ import java.util.Set;
 import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.IndeterminateCheckBox;
+import org.sagebionetworks.web.client.widget.IndeterminateCheckBox.CheckBoxState;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -143,6 +145,8 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 				count += item.isSelected() ? 1 : 0;
 			}
 			view.setCanDelete(count > 0);
+			CheckBoxState state = IndeterminateCheckBox.getStateFromCount(count, users.size());
+			view.setSelectionState(state);
 		}
 	}
 	

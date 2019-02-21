@@ -10,6 +10,8 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.IndeterminateCheckBox;
+import org.sagebionetworks.web.client.widget.IndeterminateCheckBox.CheckBoxState;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
@@ -75,6 +77,8 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 			}
 		}
 		view.setCanEditNote(count == 1);
+		CheckBoxState state = IndeterminateCheckBox.getStateFromCount(count, entityListWidget.getRowWidgets().size());
+		view.setSelectionState(state);
 	}
 	
 	@Override

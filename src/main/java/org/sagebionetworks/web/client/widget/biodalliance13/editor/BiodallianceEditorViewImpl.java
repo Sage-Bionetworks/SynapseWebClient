@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.widget.SelectionToolbar;
+import org.sagebionetworks.web.client.widget.IndeterminateCheckBox.CheckBoxState;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -201,5 +202,9 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 	@Override
 	public void setTrackHeaderColumnsVisible(boolean visible) {
 		trackColumnHeaders.setVisible(visible);
+	}
+	@Override
+	public void setSelectionState(CheckBoxState selectionState) {
+		selectionToolbar.setSelectionState(selectionState);
 	}
 }

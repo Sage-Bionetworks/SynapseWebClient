@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
+import org.sagebionetworks.web.client.widget.IndeterminateCheckBox.CheckBoxState;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -38,4 +39,5 @@ public interface APITableColumnManagerView extends IsWidget, SynapseView {
 	void setCanMoveUp(boolean canMoveUp);
 	void setCanMoveDown(boolean canMoveDown);
 	void setButtonToolbarVisible(boolean visible);
+	void setSelectionState(CheckBoxState selectionState);
 }

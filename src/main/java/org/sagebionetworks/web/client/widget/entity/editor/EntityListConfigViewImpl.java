@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.SelectableListView;
 import org.sagebionetworks.web.client.widget.SelectionToolbar;
+import org.sagebionetworks.web.client.widget.IndeterminateCheckBox.CheckBoxState;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -151,10 +152,8 @@ public class EntityListConfigViewImpl implements EntityListConfigView {
 	public void addWidget(Widget w) {
 		widgets.add(w);
 	}
-	
-	/*
-	 * Private Methods
-	 */
-
-
+	@Override
+	public void setSelectionState(CheckBoxState selectionState) {
+		selectionToolbar.setSelectionState(selectionState);
+	}
 }
