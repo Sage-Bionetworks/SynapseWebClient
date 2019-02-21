@@ -30,8 +30,8 @@
 				<t:TableData width="175px" >
 					<g:Label ui:field="expiresOnField"/>
 				</t:TableData>
-				<t:TableData width="100px" >
-					<bh:Div ui:field="showEmailsButtonContainer"/>
+				<t:TableData width="200px" >
+					<bh:Div ui:field="emailsContainer"/>
 				</t:TableData>
 				<t:TableData width="150px" >
 					<b:Button ui:field="showAccessRequirementButton" type="PRIMARY" size="EXTRA_SMALL" addStyleNames="margin-top-10 margin-right-2 margin-bottom-5" text="Access Requirement" />
