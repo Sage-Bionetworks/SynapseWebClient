@@ -69,8 +69,7 @@ public class LoadMoreWidgetContainer implements IsWidget, HasWidgets, LoadMoreWi
 		return view.remove(w);
 	}
 	
-	public void setIsProcessing(boolean isProcessing)
-	{
-		
+	public void setIsProcessing(boolean isProcessing) {
+		view.setIsProcessing(isProcessing);
 	}
  }
