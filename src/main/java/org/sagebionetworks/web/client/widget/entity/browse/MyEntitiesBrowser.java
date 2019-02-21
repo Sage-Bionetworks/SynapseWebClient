@@ -84,7 +84,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 			view.setIsMoreUpdatableEntities(true);
 			userUpdatableOffset = ZERO_OFFSET;
 			loadCurrentContext();
-			//note: no need to load user updateable entities manually, since the LoadMoreWidgetContainer will invoke when the loading icon is in view
+			loadMoreUserUpdateable();
 			loadFavorites();
 			updateContext();
 		}
