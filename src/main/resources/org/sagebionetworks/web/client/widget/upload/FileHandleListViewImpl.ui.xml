@@ -5,7 +5,7 @@
 	xmlns:s="urn:import:org.sagebionetworks.web.client.widget" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<bh:Div>
-		<s:SelectionToolbar ui:field="selectionToolbar" />
+		<s:SelectionToolbar ui:field="selectionToolbar" addStyleNames="border-bottom-1"/>
 		<t:Table width="100%">
 			<t:TBody ui:field="fileLinksContainer" />
 		</t:Table>

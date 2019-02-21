@@ -7,7 +7,7 @@ public enum CheckBoxState {
 
 	public static CheckBoxState getStateFromCount(int currentlySelected, int total) {
 		CheckBoxState state;
-		if (currentlySelected == 0) {
+		if (currentlySelected <= 0) {
 			state = DESELECTED;
 		} else if (currentlySelected == total) {
 			state = SELECTED;
