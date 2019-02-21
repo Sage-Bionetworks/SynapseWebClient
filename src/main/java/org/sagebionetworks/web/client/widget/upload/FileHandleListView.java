@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.upload;
 
 import java.util.List;
 
-import org.sagebionetworks.web.client.widget.IndeterminateCheckBox.CheckBoxState;
+import org.sagebionetworks.web.client.widget.CheckBoxState;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;

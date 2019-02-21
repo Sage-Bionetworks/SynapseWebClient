@@ -5,7 +5,6 @@ import org.gwtbootstrap3.client.ui.ButtonToolBar;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.web.client.view.bootstrap.ButtonUtils;
-import org.sagebionetworks.web.client.widget.IndeterminateCheckBox.CheckBoxState;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;

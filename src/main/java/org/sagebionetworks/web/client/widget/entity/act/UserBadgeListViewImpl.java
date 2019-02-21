@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.widget.CheckBoxState;
 import org.sagebionetworks.web.client.widget.SelectionToolbar;
-import org.sagebionetworks.web.client.widget.IndeterminateCheckBox.CheckBoxState;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;

@@ -6,7 +6,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
-import org.sagebionetworks.web.client.widget.IndeterminateCheckBox.CheckBoxState;
+import org.sagebionetworks.web.client.widget.CheckBoxState;
 import org.sagebionetworks.web.client.widget.SelectionToolbar;
 
 import com.google.gwt.uibinder.client.UiBinder;

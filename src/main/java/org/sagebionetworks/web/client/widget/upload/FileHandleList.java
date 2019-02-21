@@ -8,8 +8,7 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.IndeterminateCheckBox;
-import org.sagebionetworks.web.client.widget.IndeterminateCheckBox.CheckBoxState;
+import org.sagebionetworks.web.client.widget.CheckBoxState;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -166,7 +165,7 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 				}
 			}
 			view.setCanDelete(count > 0);
-			CheckBoxState state = IndeterminateCheckBox.getStateFromCount(count, links.size());
+			CheckBoxState state = CheckBoxState.getStateFromCount(count, links.size());
 			view.setSelectionState(state);
 		}
 	}

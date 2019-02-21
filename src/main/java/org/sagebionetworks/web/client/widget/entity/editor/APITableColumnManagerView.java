@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
-import org.sagebionetworks.web.client.widget.IndeterminateCheckBox.CheckBoxState;
+import org.sagebionetworks.web.client.widget.CheckBoxState;
 
 import com.google.gwt.user.client.ui.IsWidget;
 

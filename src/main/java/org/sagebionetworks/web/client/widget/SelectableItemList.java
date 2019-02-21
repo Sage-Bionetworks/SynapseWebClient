@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.IndeterminateCheckBox.CheckBoxState;
 
 public class SelectableItemList extends ArrayList<SelectableListItem> implements SelectableListView.Presenter {
 	private static final long serialVersionUID = 1L;
@@ -114,7 +113,7 @@ public class SelectableItemList extends ArrayList<SelectableListItem> implements
 			view.setCanDelete(count > 0);
 			view.setCanMoveUp(count == 1 && lastIndex > 0);
 			view.setCanMoveDown(count == 1 && lastIndex < size()-1);
-			CheckBoxState state = IndeterminateCheckBox.getStateFromCount(count, size());
+			CheckBoxState state = CheckBoxState.getStateFromCount(count, size());
 			view.setSelectionState(state);
 		}
 	}
