@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.upload;
 
 import java.util.List;
 
+import org.sagebionetworks.web.client.widget.IndeterminateCheckBox.CheckBoxState;
+
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -21,4 +23,5 @@ public interface FileHandleListView extends IsWidget {
 	void addFileLink(Widget fileLinkWidget);
 	void clearFileLinks();
 	void setCanDelete(boolean canDelete);
+	void setSelectionState(CheckBoxState selectionState);
 }
