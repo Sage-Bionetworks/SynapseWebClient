@@ -2618,13 +2618,6 @@ div.border {
 	filter: blur(4px);
 }
 
-.hideRightPixelOnHover:hover {
-	margin-right: -1px;
-}
-.hideLeftPixelOnHover:hover {
-	margin-left: -1px;
-}
-
 #body .zeroOpacity {
 	opacity: 0;
 	transition: opacity 0.3s ease-in;
