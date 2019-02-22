@@ -6,10 +6,9 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
+import org.sagebionetworks.web.client.widget.CheckBoxState;
 import org.sagebionetworks.web.client.widget.SelectionToolbar;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -46,43 +45,25 @@ public class APITableColumnManagerViewImpl implements APITableColumnManagerView 
 		widget = binder.createAndBindUi(this);
 		this.iconsImageBundle = iconsImageBundle;
 		this.portalGinInjector = portalGinInjector;
-		addColumnButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.addColumnConfig();
-			}
+		addColumnButton.addClickHandler(event -> {
+			presenter.addColumnConfig();
 		});
 		
-		selectionToolbar.setDeleteClickedCallback(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.deleteSelected();
-			}
+		selectionToolbar.setDeleteClickedCallback(event -> {
+			presenter.deleteSelected();
 		});
-		selectionToolbar.setMovedownClicked(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onMoveDown();
-			}
+		selectionToolbar.setMovedownClicked(event -> {
+			presenter.onMoveDown();
 		});
 		
-		selectionToolbar.setMoveupClicked(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onMoveUp();
-			}
+		selectionToolbar.setMoveupClicked(event -> {
+			presenter.onMoveUp();
 		});
-		selectionToolbar.setSelectAllClicked(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.selectAll();
-			}
+		selectionToolbar.setSelectAllClicked(event ->{
+			presenter.selectAll();
 		});
-		selectionToolbar.setSelectNoneClicked(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.selectNone();
-			}
+		selectionToolbar.setSelectNoneClicked(event -> {
+			presenter.selectNone();
 		});
 	}
 
@@ -148,5 +129,9 @@ public class APITableColumnManagerViewImpl implements APITableColumnManagerView 
 	@Override
 	public void setHeaderColumnsVisible(boolean visible) {
 		columnHeaders.setVisible(visible);
+	}
+	@Override
+	public void setSelectionState(CheckBoxState selectionState) {
+		selectionToolbar.setSelectionState(selectionState);
 	}
 }

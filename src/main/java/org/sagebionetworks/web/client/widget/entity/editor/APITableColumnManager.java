@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.CheckBoxState;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -165,6 +166,9 @@ public class APITableColumnManager implements APITableColumnManagerView.Presente
 			view.setCanDelete(count > 0);
 			view.setCanMoveUp(count == 1 && lastIndex > 0);
 			view.setCanMoveDown(count == 1 && lastIndex < columns.size()-1);
+			
+			CheckBoxState state = CheckBoxState.getStateFromCount(count, columns.size());
+			view.setSelectionState(state);
 		}
 	}
 	

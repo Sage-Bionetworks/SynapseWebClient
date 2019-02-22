@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.upload;
 
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
+import org.sagebionetworks.web.client.widget.CheckBoxState;
 import org.sagebionetworks.web.client.widget.SelectionToolbar;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -88,5 +89,9 @@ public class FileHandleListViewImpl implements FileHandleListView {
 	@Override
 	public void setCanDelete(boolean canDelete) {
 		selectionToolbar.setCanDelete(canDelete);
+	}
+	@Override
+	public void setSelectionState(CheckBoxState selectionState) {
+		selectionToolbar.setSelectionState(selectionState);
 	}
 }

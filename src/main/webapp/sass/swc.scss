@@ -182,6 +182,16 @@ end sticky footer
 	.radio::before {
 		border-radius: 50%;
 	}
+	.indeterminate-checkbox input[type="checkbox"] + label::before, .indeterminate-checkbox input[type="checkbox"] + span::before {
+		content: "–";
+		color: $synapse-blue;
+		font-size: 14px;
+		margin-left: -17px;
+		top: 1px;
+		position: relative;
+		margin-right: 8px;
+		font-weight: bolder;
+	}
 	input[type="checkbox"]:checked + label::before, input[type="checkbox"]:checked + span::before {
 		content: "✓";
 		color: $synapse-blue;
