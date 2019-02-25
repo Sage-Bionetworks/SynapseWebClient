@@ -22,6 +22,16 @@
 							</b:DropDownMenu>
 						</b:ButtonGroup>
 					</bh:Div>
+					<bh:Div ui:field="orcIdUI" addStyleNames="highlight-box">
+						<b:Heading size="H5" addStyleNames="boldText" text="ORCID" />
+						<b:Button ui:field="linkORCIDButton" pull="RIGHT" addStyleNames="margin-right-10">Link to ORCID</b:Button>
+						<b:Anchor ui:field="orcIdField" target="_blank" addStyleNames="margin-right-15" />
+						<bh:Span ui:field="unbindButtonUI">
+							<b:Tooltip title="Unlink this ORC ID from your Synapse profile.">
+								<b:Icon type="TIMES" ui:field="unbindButton" addStyleNames="imageButton text-danger" />
+							</b:Tooltip>
+						</bh:Span>
+					</bh:Div>
 					<bh:Div ui:field="profileValidationUI" addStyleNames="highlight-box">
 						<bh:Div addStyleNames="margin-top-5 margin-bottom-5">
 							<bh:Div>
@@ -32,7 +42,6 @@
 								<b:Button ui:field="verificationApprovedButton" type="DEFAULT" size="SMALL" addStyleNames="margin-right-5">Profile Validation Details</b:Button>
 							</bh:Div>
 						</bh:Div>
-
 						<bh:Div ui:field="verifyAlert">
 							<b:Heading size="H5" addStyleNames="boldText" text="Profile validation" />
 							<bh:Paragraph>

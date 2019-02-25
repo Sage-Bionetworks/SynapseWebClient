@@ -4,9 +4,11 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -18,8 +20,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -37,7 +37,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 
 	public interface SettingsViewImplUiBinder extends UiBinder<Widget, SettingsViewImpl> {}
 
-	
 	@UiField
 	Div changeSynapsePasswordUI;
 	@UiField
@@ -116,45 +115,51 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	Anchor reviewProfileLink;
 	@UiField
 	Anchor createOrcIdLink;
-	
+	 @UiField
+	Anchor orcIdField;
+	@UiField
+	Icon unbindButton;
+	@UiField
+	Span unbindButtonUI;
+	@UiField
+	Button linkORCIDButton;
+	@UiField
+	Button verificationSubmittedButton;
+	@UiField
+	Button verificationSuspendedButton;
+	@UiField
+	Button verificationRejectedButton;
+	@UiField
+	Button resubmitProfileValidationButton;
+	@UiField
+	Button verificationApprovedButton;
+
 	private Presenter presenter;
 	
 	@Inject
-	public SettingsViewImpl(SettingsViewImplUiBinder binder, final SynapseJSNIUtils jsniUtils) {		
+	public SettingsViewImpl(SettingsViewImplUiBinder binder, final SynapseJSNIUtils jsniUtils) {
 		initWidget(binder.createAndBindUi(this));
 		
 		ClickHandler notificationsClickHandler = getNotificationsClickHandler();
 		emailNotificationsCheckbox.addClickHandler(notificationsClickHandler);
 		
-		changePasswordBtn.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.changePassword();
-			}
+		changePasswordBtn.addClickHandler(event -> {
+			presenter.changePassword();
 		});
 		
-		changeApiKey.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.changeApiKey();
-			}
+		changeApiKey.addClickHandler(event -> {
+			presenter.changeApiKey();
 		});
 		
-		showApiKey.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.getAPIKey();
-			}
+		showApiKey.addClickHandler(event -> {
+			presenter.getAPIKey();
 		});
 		
 		forgotPasswordLink = new Anchor();
 		forgotPasswordLink.addStyleName("link movedown-4 margin-left-10");
 		forgotPasswordLink.setText(DisplayConstants.FORGOT_PASSWORD);
-		forgotPasswordLink.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.goTo(new PasswordReset(ClientProperties.DEFAULT_PLACE_TOKEN));				
-			}
+		forgotPasswordLink.addClickHandler(event-> {
+			presenter.goTo(new PasswordReset(ClientProperties.DEFAULT_PLACE_TOKEN));
 		});
 		forgotPasswordContainer.addStyleName("inline-block");
 		forgotPasswordContainer.add(forgotPasswordLink);
@@ -164,41 +169,45 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		editProfilePanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Profile");
 		dateTimeFormatPanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Date/Time Format");
 		
-		editProfileButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onEditProfile();
-			}
+		ClickHandler editProfileClickHandler = event -> {
+			presenter.onEditProfile();
+		};
+		editProfileButton.addClickHandler(editProfileClickHandler);
+		reviewProfileLink.addClickHandler(editProfileClickHandler);
+		
+		ClickHandler orcIdClickHandler = event -> presenter.linkOrcIdClicked();
+		linkORCIDButton.addClickHandler(orcIdClickHandler);
+		createOrcIdLink.addClickHandler(orcIdClickHandler);
+		
+		apiKeyContainer.addClickHandler(event -> {
+			apiKeyContainer.selectAll();
+		});
+		password1Field.addKeyUpHandler(event ->{
+			presenter.passwordChanged(password1Field.getText());
 		});
 		
-		apiKeyContainer.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				apiKeyContainer.selectAll();
-			}
+		dateFormatLocal.addClickHandler(event -> {
+			dateFormatDropdown.setText(dateFormatLocal.getText());
+			presenter.setShowUTCTime(false);
 		});
-		password1Field.addKeyUpHandler(new KeyUpHandler() {
-			@Override
-			public void onKeyUp(KeyUpEvent event) {
-				presenter.passwordChanged(password1Field.getText());
-			}
-		});
-		
-		dateFormatLocal.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				dateFormatDropdown.setText(dateFormatLocal.getText());
-				presenter.setShowUTCTime(false);
-			}
-		});
-		dateFormatUTC.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				dateFormatDropdown.setText(dateFormatUTC.getText());
-				presenter.setShowUTCTime(true);
-			}
+		dateFormatUTC.addClickHandler(event -> {
+			dateFormatDropdown.setText(dateFormatUTC.getText());
+			presenter.setShowUTCTime(true);
 		});
 
+		ClickHandler newVerificationSubmissionCallback = event -> presenter.newVerificationSubmissionClicked();
+		ClickHandler editVerificationSubmissionCallback = event -> presenter.editVerificationSubmissionClicked();
+		
+		requestProfileValidationLink1.addClickHandler(newVerificationSubmissionCallback);
+		requestProfileValidationLink2.addClickHandler(newVerificationSubmissionCallback);
+		verificationApprovedButton.addClickHandler(editVerificationSubmissionCallback);
+		verificationSubmittedButton.addClickHandler(editVerificationSubmissionCallback);
+		verificationSuspendedButton.addClickHandler(editVerificationSubmissionCallback);
+		verificationRejectedButton.addClickHandler(editVerificationSubmissionCallback);
+		resubmitProfileValidationButton.addClickHandler(newVerificationSubmissionCallback);
+		
+		unbindButton.addClickHandler(event -> presenter.unbindOrcId());
+		
 	}
 
 
@@ -302,6 +311,12 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void clear() {
 		hideAPIKey();
 		resetChangePasswordUI();
+		verificationApprovedButton.setVisible(false);
+		resubmitProfileValidationButton.setVisible(false);
+		verificationSubmittedButton.setVisible(false);
+		verificationSuspendedButton.setVisible(false);
+		verificationRejectedButton.setVisible(false);
+		verifyAlert.setVisible(false);
 	}
 	
 	@Override
@@ -386,4 +401,50 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		emailsPanel.clear();
 		emailsPanel.add(w);
 	}
+	
+
+	@Override
+	public void setOrcIdVisible(boolean isVisible) {
+		orcIdField.setVisible(isVisible);
+	}
+	
+	@Override
+	public void setUnbindOrcIdVisible(boolean isVisible) {
+		unbindButtonUI.setVisible(isVisible);
+	}
+	
+	@Override
+	public void setOrcId(String href) {
+		 orcIdField.setText(href);
+		 orcIdField.setHref(href);
+	}
+	@Override
+	public void setOrcIDLinkButtonVisible(boolean isVisible) {
+		this.linkORCIDButton.setVisible(isVisible);		
+	}
+	@Override
+	public void showNotVerified(){
+		verifyAlert.setVisible(true);
+	}
+	@Override
+	public void setResubmitVerificationButtonVisible(boolean isVisible) {
+		resubmitProfileValidationButton.setVisible(isVisible);
+	}
+	@Override
+	public void setVerificationSubmittedButtonVisible(boolean isVisible) {
+		verificationSubmittedButton.setVisible(isVisible);
+	}
+	@Override
+	public void setVerificationSuspendedButtonVisible(boolean isVisible) {
+		verificationSuspendedButton.setVisible(isVisible);
+	}
+	@Override
+	public void setVerificationRejectedButtonVisible(boolean isVisible) {
+		verificationRejectedButton.setVisible(isVisible);
+	}
+	@Override
+	public void setVerificationDetailsButtonVisible(boolean isVisible) {
+		verificationApprovedButton.setVisible(isVisible);
+	}
+
 }

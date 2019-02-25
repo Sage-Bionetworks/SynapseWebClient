@@ -88,7 +88,6 @@ public interface SettingsView extends IsWidget, SynapseView {
 	void setOrcId(String href);
 	
 	void showNotVerified();
-	void showVerifiedBadge(String firstName, String lastName, String location, String affiliation, String orcIdHref, String dateVerified);
 	void setResubmitVerificationButtonVisible(boolean isVisible);
 	void setVerificationSuspendedButtonVisible(boolean isVisible);
 	void setVerificationRejectedButtonVisible(boolean isVisible);

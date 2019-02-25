@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_VERIFIED;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.ORC_ID;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.PROFILE;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.VERIFICATION_SUBMISSION;
@@ -16,7 +15,6 @@ import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
-import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -62,7 +60,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	public Callback resubmitVerificationCallback;
 	public VerificationSubmissionWidget verificationModal;
 	public UserBundle currentUserBundle;
-	public DateTimeUtils dateTimeUtils;
 	private PopupUtilsView popupUtils;
 	
 	@Inject
@@ -76,7 +73,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			SubscriptionListWidget subscriptionListWidget,
 			PasswordStrengthWidget passwordStrengthWidget,
 			EmailAddressesWidget emailAddressesWidget,
-			DateTimeUtils dateTimeUtils,
 			PopupUtilsView popupUtils,
 			SynapseJavascriptClient jsClient) {
 		this.view = view;
@@ -91,7 +87,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		this.subscriptionListWidget = subscriptionListWidget;
 		this.passwordStrengthWidget = passwordStrengthWidget;
 		this.emailAddressesWidget = emailAddressesWidget;
-		this.dateTimeUtils = dateTimeUtils;
 		this.popupUtils = popupUtils;
 		this.jsClient = jsClient;
 		view.setSubscriptionsListWidget(subscriptionListWidget.asWidget());
@@ -262,7 +257,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	private void getUserProfile() {
 		//ask for everything in the user bundle
 		currentUserBundle = null;
-		int mask = PROFILE | ORC_ID | VERIFICATION_SUBMISSION  | IS_VERIFIED;
+		int mask = PROFILE | ORC_ID | VERIFICATION_SUBMISSION;
 		view.setOrcIdVisible(false);
 		view.setUnbindOrcIdVisible(false);
 		jsClient.getUserBundle(Long.parseLong(authenticationController.getCurrentUserPrincipalId()), mask, new AsyncCallback<UserBundle>() {
@@ -418,16 +413,8 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	}
 	
 	public void initializeVerificationUI() {
-		//verification UI is hidden by default (in view.clear())
-		boolean isVerified = currentUserBundle.getIsVerified();
 		//The UI is depends on the current state
 		VerificationSubmission submission = currentUserBundle.getVerificationSubmission();
-		if (isVerified) {
-			List<VerificationState> stateHistory = submission.getStateHistory();
-			VerificationState latestState = stateHistory.get(stateHistory.size()-1);
-			String dateVerified = dateTimeUtils.getLongFriendlyDate(latestState.getCreatedOn());
-			view.showVerifiedBadge(submission.getFirstName(), submission.getLastName(), submission.getLocation(),submission.getCompany(), submission.getOrcid(), dateVerified);
-		}
 		
 		if (submission == null) {
 			//no submission.  if the owner, provide way to submit
