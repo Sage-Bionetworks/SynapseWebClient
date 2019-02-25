@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget;
 
-import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -33,8 +31,6 @@ public class TextBoxWithCopyToClipboardWidget implements IsWidget {
 	public static final String SUCCESSFULLY_COPIED_TO_CLIPBOARD = "Successfully copied to clipboard";
 	@UiField
 	TextBox textBox;
-	@UiField
-	Icon icon;
 
 	Widget widget;
 
@@ -43,7 +39,7 @@ public class TextBoxWithCopyToClipboardWidget implements IsWidget {
 
 	public TextBoxWithCopyToClipboardWidget() {
 		widget = uiBinder.createAndBindUi(this);
-		icon.addClickHandler(event -> copyContentsToClipboard());
+		textBox.addClickHandler(event -> copyContentsToClipboard());
 	}
 
 	public void setText(String text) {
@@ -54,10 +50,6 @@ public class TextBoxWithCopyToClipboardWidget implements IsWidget {
 		textBox.setWidth(width);
 	}
 	
-	public void setIcon(IconType iconType) {
-		icon.setType(iconType);
-	}
-
 	@Override
 	public Widget asWidget() {
 		return widget;

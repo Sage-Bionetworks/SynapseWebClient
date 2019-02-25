@@ -21,6 +21,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dataaccess.AccessType;
 import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
@@ -33,13 +34,11 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.ShowEmailsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidgetView;
+import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
-import org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
@@ -86,7 +85,9 @@ public class ACTDataAccessSubmissionWidgetTest {
 	@Mock
 	DateTimeUtils mockDateTimeUtils;
 	@Mock
-	ShowEmailsButton mockShowEmailsButton;
+	UserProfileAsyncHandler mockUserProfileAsyncHandler;
+	@Mock
+	UserProfile mockUserProfile;
 	public static final String SUBMISSION_ID = "9876545678987";
 	public static final String INSTITUTION = "University of Washington";
 	public static final String INTENDED_DATA_USE = "lorem ipsum";
@@ -120,8 +121,9 @@ public class ACTDataAccessSubmissionWidgetTest {
 				mockJSNIUtils, 
 				mockGinInjector, 
 				mockDateTimeUtils, 
-				mockShowEmailsButton);
+				mockUserProfileAsyncHandler);
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmission).when(mockClient).updateDataAccessSubmissionState(anyString(), any(SubmissionState.class), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockUserProfileAsyncHandler).getUserProfile(anyString(), any(AsyncCallback.class));
 		verify(mockPromptModalWidget).configure(anyString(),  anyString(), anyString(),  promptModalPresenterCaptor.capture());
 		confirmRejectionCallback = promptModalPresenterCaptor.getValue();
 	}
@@ -174,10 +176,10 @@ public class ACTDataAccessSubmissionWidgetTest {
 		verify(mockView).clearAccessors();
 		verify(mockGinInjector, times(2)).getUserBadgeItem();
 		
-		verify(mockUserBadge).configure(change1);
-		verify(mockUserBadge).configure(change2);
+		verify(mockUserBadge).configure(change1, mockUserProfile);
+		verify(mockUserBadge).configure(change2, mockUserProfile);
 		
-		verify(mockView, times(2)).addAccessors(any(IsWidget.class));
+		verify(mockView, times(2)).addAccessors(any(IsWidget.class), anyString());
 		// verify other documents
 		verify(mockFileHandleList).clear();
 		verify(mockFileHandleList, times(2)).addFileLink(fhaCaptor.capture());
@@ -225,7 +227,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 		
 		verify(mockView, never()).clearAccessors();
 		verify(mockGinInjector, never()).getUserBadgeItem();
-		verify(mockView, never()).addAccessors(any(IsWidget.class));
+		verify(mockView, never()).addAccessors(any(IsWidget.class), anyString());
 		
 		widget.onMoreInfo();
 		
@@ -233,8 +235,8 @@ public class ACTDataAccessSubmissionWidgetTest {
 		// verify accessors
 		verify(mockView).clearAccessors();
 		verify(mockGinInjector).getUserBadgeItem();
-		verify(mockUserBadge).configure(change1);
-		verify(mockView).addAccessors(any(IsWidget.class));
+		verify(mockUserBadge).configure(change1, mockUserProfile);
+		verify(mockView).addAccessors(any(IsWidget.class), anyString());
 		// verify view
 		verify(mockView).setIsRenewal(true);
 		verify(mockView).setRenewalColumnsVisible(true);

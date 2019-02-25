@@ -59,7 +59,7 @@
 							<bh:Span text="Location" />
 						</t:TableHeader>
 						<t:TableHeader width="10%" addStyleNames="hidden-xs">
-							<bh:Span text="ORC ID" />
+							<bh:Span text="ORCID" />
 						</t:TableHeader>
 						<t:TableHeader width="10%">
 							<bh:Span text="Email(s)" />

@@ -153,9 +153,9 @@ public class MyEntitiesBrowserTest {
 		widget.refresh();
 		
 		verify(mockEntityTreeBrowser).clear();
-		verify(mockView).setIsMoreUpdatableEntities(true);
-		assertEquals(MyEntitiesBrowser.ZERO_OFFSET, widget.getUserUpdatableOffset());
-		verify(mockSynapseJavascriptClient, never()).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
+		verify(mockView, times(2)).setIsMoreUpdatableEntities(true);
+		assertEquals(MyEntitiesBrowser.PROJECT_LIMIT, widget.getUserUpdatableOffset());
+		verify(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 		
 		//test clearState() when context has changed
 		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(new Synapse("yet another different place"));

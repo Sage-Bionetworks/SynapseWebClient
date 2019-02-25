@@ -360,7 +360,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void unbindOrcId() {
-		view.showConfirmDialog("Unlink","Are you sure you want to unlink this ORC ID from your Synapse user profile?", new Callback() {
+		view.showConfirmDialog("Unlink","Are you sure you want to unlink this ORCID from your Synapse user profile?", new Callback() {
 			@Override
 			public void invoke() {
 				unbindOrcIdAfterConfirmation();
@@ -372,8 +372,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		jsClient.unbindOAuthProvidersUserId(OAuthProvider.ORCID, currentUserBundle.getORCID(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				//ORC id successfully removed.  refresh so that the user bundle and UI are up to date
-				view.showInfo("ORC ID has been successfully unbound.");
+				//ORCID successfully removed.  refresh so that the user bundle and UI are up to date
+				view.showInfo("ORCID has been successfully unbound.");
 				globalApplicationState.refreshPage();
 			}
 			@Override

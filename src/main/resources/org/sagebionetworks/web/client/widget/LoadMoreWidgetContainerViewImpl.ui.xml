@@ -8,6 +8,7 @@
 	<bh:Div>
 		<bh:Div ui:field="container" />
 		<bh:ClearFix />
-		<w:LoadingSpinner ui:field="loadMoreImage" size="31px" addStyleNames="center-block center"/>
+		<b:Button ui:field="loadMoreButton" text="Show more results"/>
+		<w:LoadingSpinner ui:field="loadMoreImage" size="31px" addStyleNames="center-block center" visible="false"/>
 	</bh:Div>
 </ui:UiBinder>

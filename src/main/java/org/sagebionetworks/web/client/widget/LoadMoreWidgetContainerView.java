@@ -6,7 +6,9 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface LoadMoreWidgetContainerView extends IsWidget, HasWidgets{
 	void clear();
 	void setLoadMoreVisibility(boolean visible);
-	boolean isLoadMoreAttached();
-	boolean isLoadMoreInViewport();
-	boolean getLoadMoreVisibility();
+	void setIsProcessing(boolean isProcessing);
+	void setPresenter(Presenter p);
+	public interface Presenter {
+		void onLoadMore();
+	}
 }

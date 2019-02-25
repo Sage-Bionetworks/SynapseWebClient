@@ -33,7 +33,6 @@
 				<b:FormGroup ui:field="accessorsUI">
 					<b:FormLabel>Data Requestors</b:FormLabel>
 					<bh:Div ui:field="accessorsContainer" />
-					<bh:Div ui:field="showEmailsButtonContainer"/>
 				</b:FormGroup>
 				<b:FormGroup ui:field="ducUI">
 					<b:FormLabel>DUC</b:FormLabel>

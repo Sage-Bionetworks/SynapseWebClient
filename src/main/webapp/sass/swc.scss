@@ -182,6 +182,16 @@ end sticky footer
 	.radio::before {
 		border-radius: 50%;
 	}
+	.indeterminate-checkbox input[type="checkbox"] + label::before, .indeterminate-checkbox input[type="checkbox"] + span::before {
+		content: "–";
+		color: $synapse-blue;
+		font-size: 14px;
+		margin-left: -17px;
+		top: 1px;
+		position: relative;
+		margin-right: 8px;
+		font-weight: bolder;
+	}
 	input[type="checkbox"]:checked + label::before, input[type="checkbox"]:checked + span::before {
 		content: "✓";
 		color: $synapse-blue;
@@ -902,6 +912,7 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 	ol { 
 		list-style-type: decimal;
 		padding-left: 15px;
+		padding-bottom: 15px;
 		li {
 			padding-top: 5px;
 			margin-left: 10px;
@@ -910,6 +921,7 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 	ul { 
 		list-style-type: square;
 		padding-left: 17px;
+		padding-bottom: 15px;
 		li {
 			padding-top: 5px;
 			margin-left: 10px;
@@ -1296,6 +1308,9 @@ h1, h2, h3, h4, h5, h6 {
 	}
 	.max-width-460 {
 		max-width: 460px;
+	}
+	.max-width-800 {
+		max-width: 800px;
 	}
 }
 .max-height-100 {
@@ -2601,13 +2616,6 @@ div.border {
 .blur {
 	-webkit-filter: blur(4px);
 	filter: blur(4px);
-}
-
-.hideRightPixelOnHover:hover {
-	margin-right: -1px;
-}
-.hideLeftPixelOnHover:hover {
-	margin-left: -1px;
 }
 
 #body .zeroOpacity {
