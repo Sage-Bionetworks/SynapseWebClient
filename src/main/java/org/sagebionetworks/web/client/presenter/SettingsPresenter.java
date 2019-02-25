@@ -274,6 +274,8 @@ public class SettingsPresenter implements SettingsView.Presenter {
 					view.setOrcIdVisible(true);
 					view.setUnbindOrcIdVisible(true);
 					view.setOrcIDLinkButtonVisible(false);
+				} else {
+					view.setOrcIDLinkButtonVisible(true);
 				}
 			}
 			@Override
