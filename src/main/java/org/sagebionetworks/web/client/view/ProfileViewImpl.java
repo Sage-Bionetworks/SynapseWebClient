@@ -61,19 +61,21 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
 	public interface ProfileViewImplUiBinder extends UiBinder<Widget, ProfileViewImpl> {}
 	@UiField
-	 Div viewProfilePanel;
-	 @UiField
-	 Heading displayNameField;
-	 @UiField
-	 Heading headlineField;
-	 @UiField
-	 Paragraph industryLocationField;
-	 @UiField
-	 Paragraph summaryField;
-	 @UiField
-	 org.gwtbootstrap3.client.ui.Anchor urlField;
-	 @UiField
-	 TextBoxWithCopyToClipboardWidget synapseEmailField;
+	Div viewProfilePanel;
+	@UiField
+	Heading displayNameField;
+	@UiField
+	Heading headlineField;
+	@UiField
+	Paragraph industryLocationField;
+	@UiField
+	Paragraph summaryField;
+	@UiField
+	org.gwtbootstrap3.client.ui.Anchor urlField;
+	@UiField
+	org.gwtbootstrap3.client.ui.Anchor orcIdLink;
+	@UiField
+	TextBoxWithCopyToClipboardWidget synapseEmailField;
 	@UiField
 	Button editProfileButton;
 	@UiField
@@ -380,6 +382,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		picturePanel.setWidget(getProfilePicture(profile, synapseJSNIUtils));
 		if (!isOwner) {
 			setHighlightBoxUser(DisplayUtils.getDisplayName(profile));
+		}
+		if (orcIdHref != null && orcIdHref.trim().length() > 0) {
+			orcIdLink.setVisible(true);
+			orcIdLink.setHref(orcIdHref);
+			orcIdLink.setText(orcIdHref);
+		} else {
+			orcIdLink.setVisible(false);
 		}
 		updateHrefs(profile.getOwnerId());
 	}

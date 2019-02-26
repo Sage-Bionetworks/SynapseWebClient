@@ -70,7 +70,7 @@
 						<div>
 							<div>
 								<div class="tab-background margin-10" ui:field="profileTabContainer">
-									<div ui:field="profileUI" class="profileUI inline-block vertical-align-top">
+									<div ui:field="profileUI" class="profileUI inline-block vertical-align-top max-width-800 light-border">
 										<div class="padding-15">
 											<w:LoadingSpinner ui:field="profilePictureLoadingUI" visible="false" size="50px" />
 											<g:SimplePanel ui:field="profileSynAlertPanel" />
@@ -89,6 +89,7 @@
 													<bh:Text ui:field="createdOnText" />
 												</bh:Div>
 												<w:TextBoxWithCopyToClipboardWidget ui:field="synapseEmailField" width="100%"/>
+												<b:Anchor ui:field="orcIdLink"/>
 											</bh:Div>
 											<b:Container fluid="true">
 												<b:Row>

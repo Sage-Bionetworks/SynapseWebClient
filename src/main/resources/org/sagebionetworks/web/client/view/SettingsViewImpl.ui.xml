@@ -32,7 +32,7 @@
 								<b:Button ui:field="verificationRejectedButton" type="WARNING" size="SMALL" addStyleNames="margin-right-5">Profile Validation Rejected</b:Button>
 								<b:Button ui:field="verificationSuspendedButton" type="WARNING" size="SMALL" addStyleNames="margin-right-5">Validated Profile Suspended</b:Button>
 								<b:Button ui:field="resubmitProfileValidationButton" type="PRIMARY" size="SMALL" addStyleNames="margin-right-5">Revalidate My Profile</b:Button>
-								<b:Button ui:field="verificationApprovedButton" type="DEFAULT" size="SMALL" addStyleNames="margin-right-5">Profile Validation Details</b:Button>
+								<b:Button ui:field="verificationApprovedButton" type="SUCCESS" size="SMALL" addStyleNames="margin-right-5">Profile Validated</b:Button>
 							</bh:Div>
 						</bh:Div>
 						<bh:Div ui:field="verifyAlert">
