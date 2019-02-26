@@ -124,7 +124,7 @@
 				    		<b:Button ui:field="linkORCIDButton" addStyleNames="margin-right-10">Link to ORCID</b:Button>
 							<b:Anchor ui:field="orcIdField" target="_blank" addStyleNames="margin-right-15" />
 							<bh:Span ui:field="unbindButtonUI">
-								<b:Tooltip title="Unlink this ORC ID from your Synapse profile.">
+								<b:Tooltip title="Unlink this ORCID from your Synapse profile.">
 									<b:Icon type="TIMES" ui:field="unbindButton" addStyleNames="imageButton text-danger" />
 								</b:Tooltip>
 							</bh:Span>
