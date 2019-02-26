@@ -135,7 +135,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@UiField
 	Button verificationApprovedButton;
 	@UiField
-	Div certificationUI;
+	Button certificationPassedButton;
 	@UiField
 	Button certificationButton;
 	private Presenter presenter;
@@ -212,6 +212,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		
 		unbindButton.addClickHandler(event -> presenter.unbindOrcId());
 		certificationButton.addClickHandler(event -> presenter.goTo(new Quiz("Certification")));
+		certificationPassedButton.addClickHandler(event -> DisplayUtils.newWindow("https://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#certified-users", "_blank", ""));
 	}
 
 	@Override
@@ -451,7 +452,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	}
 	@Override
 	public void setIsCertified(boolean isCertified) {
-		// show the "Get Certified" UI if user is not certified
-		certificationUI.setVisible(!isCertified);
+		certificationButton.setVisible(!isCertified);
+		certificationPassedButton.setVisible(isCertified);
 	}
 }
