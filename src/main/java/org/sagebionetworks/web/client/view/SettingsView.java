@@ -48,11 +48,13 @@ public interface SettingsView extends IsWidget, SynapseView {
 		void changePassword();
 		void passwordChanged(String password);
 		void setShowUTCTime(boolean isUTC);
+		void newVerificationSubmissionClicked();
+		void editVerificationSubmissionClicked();
+		void linkOrcIdClicked();
+		void unbindOrcId();
 	}
 
 	public void setApiKey(String apiKey);
-
-
 	public void setNotificationSynAlertWidget(IsWidget asWidget);
 
 	public void setAPISynAlertWidget(IsWidget synAlert);
@@ -79,4 +81,17 @@ public interface SettingsView extends IsWidget, SynapseView {
 	void resetChangePasswordUI();
 	void setShowingUTCTime();
 	void setShowingLocalTime();
+	
+	void setOrcIdVisible(boolean isVisible);
+	void setOrcIDLinkButtonVisible(boolean isVisible);
+	void setUnbindOrcIdVisible(boolean isVisible);
+	void setOrcId(String href);
+	
+	void showNotVerified();
+	void setResubmitVerificationButtonVisible(boolean isVisible);
+	void setVerificationSuspendedButtonVisible(boolean isVisible);
+	void setVerificationRejectedButtonVisible(boolean isVisible);
+	void setVerificationSubmittedButtonVisible(boolean isVisible);
+	void setVerificationDetailsButtonVisible(boolean isVisible);
+	void setIsCertified(boolean isCertified);
 }

@@ -25,7 +25,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	/**
 	 * Renders the view for a given presenter
 	 */
-	void setProfile(UserProfile profile, boolean isOwner);
+	void setProfile(UserProfile profile, boolean isOwner, String orcIdHref);
 	void refreshHeader();
 	void setProjectContainer(Widget widget);
 	void addChallengeWidget(Widget widget);
@@ -47,20 +47,8 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setSharedDirectlyWithMeFilterSelected();
 	void setFavoritesHelpPanelVisible(boolean isVisible);
 	void setProfileEditButtonVisible(boolean isVisible);
-	void setOrcIDLinkButtonVisible(boolean isVisible);
 	void addUserProfileModalWidget(IsWidget userProfileModalWidget);
-	void setGetCertifiedVisible(boolean isVisible);
 	void setSynapseEmailVisible(boolean isVisible);
-	void setOrcIdVisible(boolean isVisible);
-	void setUnbindOrcIdVisible(boolean isVisible);
-	void setOrcId(String href);
-	void setVerificationAlertVisible(boolean isVisible);
-	void setVerificationButtonVisible(boolean isVisible);
-	void setResubmitVerificationButtonVisible(boolean isVisible);
-	void setVerificationSuspendedButtonVisible(boolean isVisible);
-	void setVerificationRejectedButtonVisible(boolean isVisible);
-	void setVerificationSubmittedButtonVisible(boolean isVisible);
-	void setVerificationDetailsButtonVisible(boolean isVisible);
 	void setSettingsWidget(Widget w);
 	void setDownloadListWidget(IsWidget w);
 	void setSortDirection(ProjectListSortColumn column, SortDirection direction);
@@ -70,18 +58,11 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void goTo(Place place);
 		void refreshTeams();
 		void tabClicked(ProfileArea areaTab);
-		void unbindOrcId();
 		void certificationBadgeClicked();
 		void getMoreChallenges();
 		void applyFilterClicked(ProjectFilterEnum filterType, Team team);
 		void onEditProfile();
-		void setGetCertifiedDismissed();
 		void sort(ProjectListSortColumn column);
-		void newVerificationSubmissionClicked();
-		void editVerificationSubmissionClicked();
-		void setVerifyDismissed();
-		void setVerifyUndismissed();
-		void linkOrcIdClicked();
 	}
 
 	void addMyTeamProjectsFilter();
@@ -96,9 +77,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 
 	void setTeamSynAlertWidget(Widget profileSynAlert);
 	void setChallengeSynAlertWidget(Widget challengeSynAlert);
-
-	void addCertifiedBadge();
-	void showVerifiedBadge(String firstName, String lastName, String location, String affiliation, String orcIdHref, String dateVerified);
 
 	void showTabs(boolean isOwner);
 	void open(String url);
