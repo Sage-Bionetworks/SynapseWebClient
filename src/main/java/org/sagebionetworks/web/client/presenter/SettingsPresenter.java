@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_CERTIFIED;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.ORC_ID;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.PROFILE;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.VERIFICATION_SUBMISSION;
@@ -257,7 +258,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	private void getUserProfile() {
 		//ask for everything in the user bundle
 		currentUserBundle = null;
-		int mask = PROFILE | ORC_ID | VERIFICATION_SUBMISSION;
+		int mask = PROFILE | ORC_ID | VERIFICATION_SUBMISSION | IS_CERTIFIED;
 		view.setOrcIdVisible(false);
 		view.setUnbindOrcIdVisible(false);
 		jsClient.getUserBundle(Long.parseLong(authenticationController.getCurrentUserPrincipalId()), mask, new AsyncCallback<UserBundle>() {
@@ -277,6 +278,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 				} else {
 					view.setOrcIDLinkButtonVisible(true);
 				}
+				view.setIsCertified(bundle.getIsCertified());
 			}
 			@Override
 			public void onFailure(Throwable caught) {

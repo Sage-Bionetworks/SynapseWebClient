@@ -93,4 +93,5 @@ public interface SettingsView extends IsWidget, SynapseView {
 	void setVerificationRejectedButtonVisible(boolean isVisible);
 	void setVerificationSubmittedButtonVisible(boolean isVisible);
 	void setVerificationDetailsButtonVisible(boolean isVisible);
+	void setIsCertified(boolean isCertified);
 }

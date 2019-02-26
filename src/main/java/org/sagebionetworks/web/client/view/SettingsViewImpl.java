@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -133,7 +134,10 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	Button resubmitProfileValidationButton;
 	@UiField
 	Button verificationApprovedButton;
-
+	@UiField
+	Div certificationUI;
+	@UiField
+	Button certificationButton;
 	private Presenter presenter;
 	
 	@Inject
@@ -207,9 +211,8 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		resubmitProfileValidationButton.addClickHandler(newVerificationSubmissionCallback);
 		
 		unbindButton.addClickHandler(event -> presenter.unbindOrcId());
-		
+		certificationButton.addClickHandler(event -> presenter.goTo(new Quiz("Certification")));
 	}
-
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
@@ -446,5 +449,9 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void setVerificationDetailsButtonVisible(boolean isVisible) {
 		verificationApprovedButton.setVisible(isVisible);
 	}
-
+	@Override
+	public void setIsCertified(boolean isCertified) {
+		// show the "Get Certified" UI if user is not certified
+		certificationUI.setVisible(!isCertified);
+	}
 }
