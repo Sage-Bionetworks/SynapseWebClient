@@ -88,8 +88,7 @@
 													<bh:Text>Joined&nbsp;</bh:Text>
 													<bh:Text ui:field="createdOnText" />
 												</bh:Div>
-												<b:TextBox ui:field="synapseEmailField" width="100%" addStyleNames="border-none noBackground margin-right-15 margin-left-neg-2"
-													readOnly="true" />
+												<w:TextBoxWithCopyToClipboardWidget ui:field="synapseEmailField" width="100%"/>
 											</bh:Div>
 											<b:Container fluid="true">
 												<b:Row>

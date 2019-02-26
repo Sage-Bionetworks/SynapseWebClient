@@ -33,6 +33,7 @@ import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
+import org.sagebionetworks.web.client.widget.TextBoxWithCopyToClipboardWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
@@ -72,7 +73,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	 @UiField
 	 org.gwtbootstrap3.client.ui.Anchor urlField;
 	 @UiField
-	 TextBox synapseEmailField;
+	 TextBoxWithCopyToClipboardWidget synapseEmailField;
 	@UiField
 	Button editProfileButton;
 	@UiField
@@ -297,8 +298,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		sharedDirectlyWithMeFilter.addClickHandler(event -> presenter.applyFilterClicked(ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME, null));
 		ClickHandler editProfileClickHandler = event -> presenter.onEditProfile();
 		editProfileButton.addClickHandler(editProfileClickHandler);
-		
-		synapseEmailField.addClickHandler(event -> synapseEmailField.selectAll());
 		
 		projectNameColumnHeader.setSortingListener(headerName -> presenter.sort(ProjectListSortColumn.PROJECT_NAME));
 		lastActivityOnColumnHeader.setSortingListener(headerName -> presenter.sort(ProjectListSortColumn.LAST_ACTIVITY));
