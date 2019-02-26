@@ -16,7 +16,6 @@ import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
-import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
@@ -27,7 +26,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Certificate;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -73,7 +71,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private ProfileView view;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
-	private CookieProvider cookies;
 	private UserProfileModalWidget userProfileModalWidget;
 	private GWTWrapper gwt;
 	private OpenTeamInvitationsWidget openInvitesWidget;
@@ -114,7 +111,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public ProfilePresenter(ProfileView view,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
-			CookieProvider cookies,
 			GWTWrapper gwt,
 			TeamListWidget myTeamsWidget,
 			OpenTeamInvitationsWidget openInvitesWidget,
@@ -124,7 +120,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.ginInjector = ginInjector;
-		this.cookies = cookies;
 		this.gwt = gwt;
 		this.myTeamsWidget = myTeamsWidget;
 		this.openInvitesWidget = openInvitesWidget;

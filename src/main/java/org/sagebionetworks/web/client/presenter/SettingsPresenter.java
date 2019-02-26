@@ -422,7 +422,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			//no submission.  if the owner, provide way to submit
 			view.showNotVerified();
 		} else {
-			//there's a submission in a state other than approved.
+			//there's a submission in a state.
 			showVerificationUI(submission);
 		}
 	}
