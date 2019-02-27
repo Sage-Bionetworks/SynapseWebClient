@@ -120,7 +120,7 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 				view.hideLoading();
 				if (t instanceof ForbiddenException) {
 					// SWC-4721: fix message in the case where membership invitation email is not associated to the currently logged in user
-					view.showErrorMessage("This invitation was sent to an email address not associated to the current user!\n" + membershipInvitation.getInviteeEmail() + "\nPlease log in with the correct Synapse account, or add this email to your Synapse account.");
+					view.showErrorMessage("This invitation was sent to an email address not associated to the current user. \"" + membershipInvitation.getInviteeEmail() + "\" Please log in with the correct Synapse account, or add this email to your Synapse account.");
 					// invitation not associated to the current user, log this user out and show the default UI.
 					authController.logoutUser();
 				} else {
