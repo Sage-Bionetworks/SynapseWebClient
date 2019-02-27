@@ -16,6 +16,7 @@ import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
@@ -38,14 +39,16 @@ public class IntendedDataUseReportButton implements IsWidget {
 	DataAccessClientAsync dataAccessClient;
 	PopupUtilsView popupUtils;
 	BigPromptModalView copyTextModal;
-	Map<String, ResearchProject> id2ResearchProject;
+	Map<String, Submission> researchProjectId2Submission;
+	DateTimeUtils dateTimeUtils;
 	
 	@Inject
 	public IntendedDataUseReportButton(Button button, 
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
 			DataAccessClientAsync dataAccessClient,
 			PopupUtilsView popupUtils,
-			BigPromptModalView copyTextModal) {
+			BigPromptModalView copyTextModal,
+			DateTimeUtils dateTimeUtils) {
 		this.button = button;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.popupUtils = popupUtils;
@@ -54,10 +57,11 @@ public class IntendedDataUseReportButton implements IsWidget {
 		copyTextModal.setTextAreaHeight("450px");
 		this.dataAccessClient = dataAccessClient;
 		fixServiceEntryPoint(dataAccessClient);
+		this.dateTimeUtils = dateTimeUtils;
 		button.setVisible(false);
 		button.addStyleName("margin-left-10");
 		button.addClickHandler(event -> {
-			id2ResearchProject = new HashMap<>();
+			researchProjectId2Submission = new HashMap<>();
 			gatherAllSubmissions(null);
 		});
 	}	
@@ -68,7 +72,7 @@ public class IntendedDataUseReportButton implements IsWidget {
 			public void onSuccess(SubmissionPage page) {
 				List<Submission> newSubmissions = page.getResults();
 				for (Submission submission : newSubmissions) {
-					id2ResearchProject.put(submission.getResearchProjectSnapshot().getId(), submission.getResearchProjectSnapshot());
+					researchProjectId2Submission.put(submission.getResearchProjectSnapshot().getId(), submission);
 				}
 				if (!newSubmissions.isEmpty() && page.getNextPageToken() != null) {
 					gatherAllSubmissions(page.getNextPageToken());
@@ -86,15 +90,17 @@ public class IntendedDataUseReportButton implements IsWidget {
 	
 	public void showIDUs() {
 		StringBuilder sb = new StringBuilder();
-		for (ResearchProject rp : id2ResearchProject.values()) {
+		for (Submission submission : researchProjectId2Submission.values()) {
+			ResearchProject rp = submission.getResearchProjectSnapshot();
 			String projectLead = rp.getProjectLead();
 			String currentInstitution = rp.getInstitution();
 			String currentIDU = rp.getIntendedDataUseStatement();
-			sb.append("\n**Requestor:** ");
+			sb.append("\n**Researcher:** ");
 			sb.append(projectLead);
-			sb.append("\n**Institution:** ");
+			sb.append("\n**Affiliation:** ");
 			sb.append(currentInstitution);
-			sb.append("\n**Proposal:** ");
+			String lastModifiedOn = dateTimeUtils.getDateString(submission.getModifiedOn());
+			sb.append("\n**Intended Data Use Statement (accepted on "+lastModifiedOn+"):**\n");
 			sb.append(currentIDU);
 			sb.append("\n\n-------------\n\n");
 		}
