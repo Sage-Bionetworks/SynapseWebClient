@@ -7,6 +7,8 @@ import static org.sagebionetworks.web.client.DisplayUtils.getDisplayName;
 
 import javax.inject.Inject;
 
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
 import org.sagebionetworks.repo.model.Team;
@@ -24,12 +26,12 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.EmailInvitationView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.NotificationTokenType;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 
@@ -42,6 +44,7 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 	private AuthenticationController authController;
 	private PlaceChanger placeChanger;
 	private String email;
+	private MembershipInvitation membershipInvitation;
 	@Inject
 	public EmailInvitationPresenter(
 			EmailInvitationView view,
@@ -79,20 +82,16 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 					new FutureCallback<MembershipInvitation>() {
 						@Override
 						public void onSuccess(MembershipInvitation mis) {
+							membershipInvitation = mis;
 							//check to see if this invitation is associated to the current user
 							if (authController.isLoggedIn()) {
 								 if (mis.getInviteeId() != null && authController.getCurrentUserPrincipalId().equals(mis.getInviteeId())) {
-									 // user id already bound to invitation.  redirect to profile page
-									 gotoProfilePageTeamArea();
-									 return;
-								 } else if (authController.getCurrentUserProfile().getEmails().contains(mis.getInviteeEmail())) {
-									 // logged in, and current user emails contains invitation.  bind to user, and then head to the profile page.
-									 bindInvitationToAuthenticatedUser(mis.getId());
-									 return;
+									// user id already bound to invitation.  redirect to profile page
+									gotoProfilePageTeamArea();
+									return;
 								 } else {
-									 // invitation not associated to the current user, log this user out and show the default UI.
-									 authController.logoutUser();
-								 }
+									verifyEmailAssociatedToAuthenticatedUser();
+								}
 							}
 							initializeView(mis);
 						}
@@ -108,26 +107,42 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 
 	}
 
-	private void bindInvitationToAuthenticatedUser(final String misId) {
-		jsClient.getInviteeVerificationSignedToken(misId)
-			.transformAsync(
-					token -> jsClient.updateInviteeId(token),
-					directExecutor()
-			).addCallback(
-					new FutureCallback<Void>() {
-						@Override
-						public void onSuccess(Void aVoid) {
-							gotoProfilePageTeamArea();
-						}
+	private void verifyEmailAssociatedToAuthenticatedUser() {
+		// verify the currently logged in user is associated to the given membership invitation
+		jsClient.getInviteeVerificationSignedToken(membershipInvitation.getId()).addCallback(new FutureCallback<InviteeVerificationSignedToken>() {
+			@Override
+			public void onSuccess(@NullableDecl InviteeVerificationSignedToken token) {
+				bindInvitationToAuthenticatedUser(token);
+			}
 
-						@Override
-						public void onFailure(Throwable throwable) {
-							view.hideLoading();
-							synapseAlert.handleException(throwable);
-						}
-					},
-					directExecutor()
-			);
+			@Override
+			public void onFailure(Throwable t) {
+				view.hideLoading();
+				if (t instanceof ForbiddenException) {
+					// SWC-4721: fix message in the case where membership invitation email is not associated to the currently logged in user
+					view.showErrorMessage("This invitation was sent to an email address not associated to the current user!\n" + membershipInvitation.getInviteeEmail() + "\nPlease log in with the correct Synapse account, or add this email to your Synapse account.");
+					// invitation not associated to the current user, log this user out and show the default UI.
+					authController.logoutUser();
+				} else {
+					synapseAlert.handleException(t);	
+				}
+			}
+		}, directExecutor());
+	}
+	
+	private void bindInvitationToAuthenticatedUser(InviteeVerificationSignedToken token) {
+
+		jsClient.updateInviteeId(token).addCallback(new FutureCallback<Void>() {
+			@Override
+			public void onSuccess(Void token) {
+				gotoProfilePageTeamArea();
+			}
+			@Override
+			public void onFailure(Throwable t) {
+				view.hideLoading();
+				synapseAlert.handleException(t);
+			}
+		}, directExecutor());
 	}
 	
 	private void gotoProfilePageTeamArea() {
