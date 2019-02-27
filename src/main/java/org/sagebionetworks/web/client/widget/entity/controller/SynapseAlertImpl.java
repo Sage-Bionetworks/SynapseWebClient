@@ -2,6 +2,9 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
 
+import org.sagebionetworks.schema.adapter.JSONAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -38,6 +41,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	Throwable ex;
 	Callback reloadOnLoginListener;
 	SynapseJSNIUtils jsniUtils;
+	JSONObjectAdapter jsonObjectAdapter;
 	
 	@Inject
 	public SynapseAlertImpl(
@@ -46,13 +50,15 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 			AuthenticationController authController,
 			GWTWrapper gwt,
 			PortalGinInjector ginInjector,
-			SynapseJSNIUtils jsniUtils
+			SynapseJSNIUtils jsniUtils,
+			JSONObjectAdapter jsonObjectAdapter
 			) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authController = authController;
 		this.ginInjector = ginInjector;
 		this.jsniUtils = jsniUtils;
+		this.jsonObjectAdapter = jsonObjectAdapter;
 		view.setPresenter(this);
 		
 		reloadOnLoginListener = () -> {
@@ -110,6 +116,17 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 				message.equals("0")) {
 				message = DisplayConstants.ERROR_RESPONSE_UNAVAILABLE;
 			}
+			
+			// if this is json, report the reason value (if available)
+			try {
+				JSONObjectAdapter json = jsonObjectAdapter.createNew(message);
+				if (json.has("reason")) {
+					message = json.getString("reason");
+				}
+			} catch (JSONObjectAdapterException e) {
+				// was not json
+			}
+			
 			view.showError(message);
 		}
 	}

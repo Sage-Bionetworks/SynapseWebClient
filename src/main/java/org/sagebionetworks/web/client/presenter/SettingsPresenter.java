@@ -31,7 +31,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
 import org.sagebionetworks.web.client.widget.profile.EmailAddressesWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
@@ -55,7 +54,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	private PortalGinInjector ginInjector;
 	private UserProfileModalWidget userProfileModalWidget;
 	private SubscriptionListWidget subscriptionListWidget;
-	private PasswordStrengthWidget passwordStrengthWidget;
 	private EmailAddressesWidget emailAddressesWidget;
 	private SynapseJavascriptClient jsClient;
 	public Callback resubmitVerificationCallback;
@@ -72,7 +70,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			PortalGinInjector ginInjector,
 			UserProfileModalWidget userProfileModalWidget,
 			SubscriptionListWidget subscriptionListWidget,
-			PasswordStrengthWidget passwordStrengthWidget,
 			EmailAddressesWidget emailAddressesWidget,
 			PopupUtilsView popupUtils,
 			SynapseJavascriptClient jsClient) {
@@ -86,12 +83,10 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		this.ginInjector = ginInjector;
 		this.userProfileModalWidget = userProfileModalWidget;
 		this.subscriptionListWidget = subscriptionListWidget;
-		this.passwordStrengthWidget = passwordStrengthWidget;
 		this.emailAddressesWidget = emailAddressesWidget;
 		this.popupUtils = popupUtils;
 		this.jsClient = jsClient;
 		view.setSubscriptionsListWidget(subscriptionListWidget.asWidget());
-		view.setPasswordStrengthWidget(passwordStrengthWidget.asWidget());
 		view.setEmailAddressesWidget(emailAddressesWidget);
 		view.setPresenter(this);
 		resubmitVerificationCallback = () -> {
@@ -143,7 +138,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 								userService.changePassword(authenticationController.getCurrentUserSessionToken(),newPassword, new AsyncCallback<Void>() {
 									@Override
 									public void onSuccess(Void result) {
-										passwordStrengthWidget.setVisible(false);
 										view.showPasswordChangeSuccess();
 										// login user as session token
 										// has changed
@@ -237,7 +231,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		notificationSynAlert.clear();
 		emailAddressesWidget.clear();
 		passwordSynAlert.clear();
-		passwordStrengthWidget.setVisible(false);
 	}
 	
 	public void configure() {
@@ -361,11 +354,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		return password != null && !password.isEmpty();
 	}
 	
-	@Override
-	public void passwordChanged(String password) {
-		passwordStrengthWidget.scorePassword(password);
-	}
-
 	@Override
 	public void setShowUTCTime(boolean isUTC) {
 		globalApplicationState.setShowUTCTime(isUTC);

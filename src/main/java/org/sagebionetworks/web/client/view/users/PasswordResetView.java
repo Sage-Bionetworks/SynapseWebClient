@@ -22,15 +22,11 @@ public interface PasswordResetView extends IsWidget, SynapseView {
 	public void showRequestSentSuccess();
 		
 	public void clear();
-	void setPasswordStrengthWidget(Widget w);
 	void setSynAlertWidget(Widget w);
 	void setSubmitButtonEnabled(boolean enabled);
 	public interface Presenter {
-		
 		public void requestPasswordReset(String emailAddress);
-		
 		public void resetPassword(String newPassword);
-		public void passwordChanged(String password);
 	}
 
 	public void showExpiredRequest();

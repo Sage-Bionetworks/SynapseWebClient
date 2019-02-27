@@ -107,7 +107,6 @@ public class Portal implements EntryPoint {
 									
 									// Goes to place represented on URL or default place
 									historyHandler.handleCurrentHistory();
-									delayLoadOfZxcvbn();
 									globalApplicationState.initializeDropZone();
 								}
 							});
@@ -132,17 +131,6 @@ public class Portal implements EntryPoint {
 			panel.removeStyleName("zeroOpacity");
 			panel.addStyleName("fullOpacity");
 		}
-	}
-	
-	public void delayLoadOfZxcvbn() {
-		Timer timer = new Timer() { 
-		    public void run() {
-		    	ScriptInjector.fromUrl("//cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js")
-		    		.setWindow(ScriptInjector.TOP_WINDOW)
-		    		.inject();
-		    }
-		};
-		timer.schedule(10000);
 	}
 	
 	public void reloadApp(int delay) {

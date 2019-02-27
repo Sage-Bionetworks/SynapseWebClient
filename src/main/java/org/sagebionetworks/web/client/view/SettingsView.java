@@ -30,7 +30,6 @@ public interface SettingsView extends IsWidget, SynapseView {
 	
 	void setSubscriptionsListWidget(Widget w);
 	void setSubscriptionsVisible(boolean visible);
-	void setPasswordStrengthWidget(Widget w);
 	void setEmailAddressesWidget(IsWidget w);
 	public interface Presenter {
 
@@ -46,7 +45,6 @@ public interface SettingsView extends IsWidget, SynapseView {
 		void getAPIKey();
 
 		void changePassword();
-		void passwordChanged(String password);
 		void setShowUTCTime(boolean isUTC);
 		void newVerificationSubmissionClicked();
 		void editVerificationSubmissionClicked();

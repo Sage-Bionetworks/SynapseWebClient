@@ -54,7 +54,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
 import org.sagebionetworks.web.client.widget.profile.EmailAddressesWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
@@ -101,8 +100,6 @@ public class SettingsPresenterTest {
 	@Mock
 	SubscriptionListWidget mockSubscriptionListWidget;
 	@Mock
-	PasswordStrengthWidget mockPasswordStrengthWidget;
-	@Mock
 	EmailAddressesWidget mockEmailAddressesWidget;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
@@ -129,7 +126,6 @@ public class SettingsPresenterTest {
 				mockInjector, 
 				mockUserProfileModalWidget, 
 				mockSubscriptionListWidget,
-				mockPasswordStrengthWidget, 
 				mockEmailAddressesWidget,
 				mockPopupUtils,
 				mockSynapseJavascriptClient);	
@@ -178,7 +174,6 @@ public class SettingsPresenterTest {
 		
 		presenter.resetPassword(password, newPassword);
 		verify(mockView).showPasswordChangeSuccess();
-		verify(mockPasswordStrengthWidget).setVisible(false);
 	}
 	
 	@Test
@@ -296,7 +291,6 @@ public class SettingsPresenterTest {
 		when(mockGlobalApplicationState.isShowingUTCTime()).thenReturn(false);
 		presenter.configure();
 		verify(mockSynAlert, times(3)).clear();
-		verify(mockPasswordStrengthWidget).setVisible(false);
 		verify(mockView).clear();
 		verify(mockSubscriptionListWidget).configure();
 		verify(mockView).updateNotificationCheckbox(profile);
