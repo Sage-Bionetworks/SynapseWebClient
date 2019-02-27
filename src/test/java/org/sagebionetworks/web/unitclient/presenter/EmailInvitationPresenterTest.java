@@ -36,6 +36,7 @@ import org.sagebionetworks.web.client.presenter.EmailInvitationPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.EmailInvitationView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EmailInvitationPresenterTest {
@@ -103,14 +104,14 @@ public class EmailInvitationPresenterTest {
 	public void testLoggedInNotEmailOwner() {
 		//currently logged in user does currently own the given email address, binding Synapse account to invitation will fail
 		beforeSetPlace(true);
-		when(mockMembershipInvitation.getInviteeEmail()).thenReturn("differentUser@sagebionetworks.org");
-		when(mockJsClient.getInviteeVerificationSignedToken(mockMembershipInvitation.getId())).thenReturn(getDoneFuture(mockInviteeVerificationSignedToken));
+		when(mockJsClient.getInviteeVerificationSignedToken(mockMembershipInvitation.getId())).thenReturn(getFailedFuture(new ForbiddenException()));
 		when(mockJsClient.updateInviteeId(mockInviteeVerificationSignedToken)).thenReturn(getDoneFuture(null));
 		
 		presenter.setPlace(place);
 		
+		//uses this call to verify authenticated user is associated to the membership invitation email
+		verify(mockJsClient).getInviteeVerificationSignedToken(anyString());
 		//does not attempt to bind invitation to the current user
-		verify(mockJsClient, never()).getInviteeVerificationSignedToken(anyString());
 		verify(mockJsClient, never()).updateInviteeId(mockInviteeVerificationSignedToken);
 		//instead, in this edge case we log the current user out and show the option to log in or register.
 		verify(mockAuthController).logoutUser();
