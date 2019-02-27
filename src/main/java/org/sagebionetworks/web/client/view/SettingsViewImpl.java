@@ -95,9 +95,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	SimplePanel apiSynAlertPanel;
 	@UiField
 	Div subscriptionsContainer;
-	@UiField
-	Div passwordStrengthContainer;
-
+	
 	@UiField
 	AnchorListItem dateFormatLocal;
 	@UiField
@@ -185,9 +183,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		
 		apiKeyContainer.addClickHandler(event -> {
 			apiKeyContainer.selectAll();
-		});
-		password1Field.addKeyUpHandler(event ->{
-			presenter.passwordChanged(password1Field.getText());
 		});
 		
 		dateFormatLocal.addClickHandler(event -> {
@@ -384,12 +379,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@Override
 	public void setSubscriptionsVisible(boolean visible) {
 		subscriptionsContainer.setVisible(visible);
-	}
-	
-	@Override
-	public void setPasswordStrengthWidget(Widget w) {
-		passwordStrengthContainer.clear();
-		passwordStrengthContainer.add(w);
 	}
 	@Override
 	public void setShowingUTCTime() {

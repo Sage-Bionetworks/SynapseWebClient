@@ -17,6 +17,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.schema.adapter.JSONAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -41,6 +44,7 @@ import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.amazonaws.services.greengrass.model.BadRequestException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.StatusCodeException;
 import com.google.gwt.user.client.ui.Widget;
@@ -69,13 +73,14 @@ public class SynapseAlertImplTest {
 	SynapseJSNIUtils mockJsniUtils;
 	// a new jira odyssey
 	String newJiraKey = "SWC-2001";
+	JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl(); 
 	
 	public static final String HOST_PAGE_URL="http://foobar";
 	public static final String JIRA_ENDPOINT_URL="http://foo.bar.com/";
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		widget = new SynapseAlertImpl(mockView, mockGlobalApplicationState, mockAuthenticationController, mockGWT, mockPortalGinInjector, mockJsniUtils);
+		widget = new SynapseAlertImpl(mockView, mockGlobalApplicationState, mockAuthenticationController, mockGWT, mockPortalGinInjector, mockJsniUtils, jsonObjectAdapter);
 		UserProfile mockProfile = mock(UserProfile.class);
 		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(mockProfile);
 		
@@ -249,6 +254,16 @@ public class SynapseAlertImplTest {
 		verify(mockView).showError(DisplayConstants.ERROR_CONFLICTING_UPDATE + "\n" + errorMessage);
 	}
 	
+	@Test
+	public void testHandleBadRequestExceptionWithJsonReason() {
+		String reason = "This password is known to be a commonly used password. Please choose another password!";
+		String json = "{\"reason\":\""+reason+"\"}";
+		
+		widget.handleException(new BadRequestException(json));
+		
+		verify(mockView).showError(reason);
+	}
+
 	@Test
 	public void testIsUserLoggedIn() {
 		widget.isUserLoggedIn();

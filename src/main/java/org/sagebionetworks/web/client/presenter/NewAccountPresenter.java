@@ -14,7 +14,6 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.NewAccountView;
-import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -28,7 +27,6 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 	private GlobalApplicationState globalAppState;
 	private UserAccountServiceAsync userAccountService;
 	private AuthenticationController authController;
-	private PasswordStrengthWidget passwordStrengthWidget;
 	private AccountCreationToken accountCreationToken;
 
 	@Inject
@@ -36,8 +34,7 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 			SynapseClientAsync synapseClient, 
 			GlobalApplicationState globalAppState,
 			UserAccountServiceAsync userAccountService,
-			AuthenticationController authController,
-			PasswordStrengthWidget passwordStrengthWidget){
+			AuthenticationController authController){
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -45,8 +42,6 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 		this.userAccountService = userAccountService;
 		fixServiceEntryPoint(userAccountService);
 		this.authController = authController;
-		this.passwordStrengthWidget = passwordStrengthWidget;
-		view.setPasswordStrengthWidget(passwordStrengthWidget.asWidget());
 		view.setPresenter(this);
 	}
 
@@ -157,11 +152,6 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 				}
 			});
 		}
-	}
-	
-	@Override
-	public void passwordChanged(String password) {
-		passwordStrengthWidget.scorePassword(password);
 	}
 	
 	@Override
