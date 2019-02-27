@@ -9,10 +9,12 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -22,6 +24,7 @@ import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -47,6 +50,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class IntendedDataUseReportButtonTest {
 	public static final Long AR_ID = 8888L;
 	public static final String NEXT_PAGE_TOKEN = "28DJcDS";
@@ -58,7 +62,6 @@ public class IntendedDataUseReportButtonTest {
 	public static final String RESEARCH_PROJECT_2_LEAD = "Vader";
 	public static final String RESEARCH_PROJECT_2_INSTITUTION = "Empire";
 	public static final String RESEARCH_PROJECT_2_IDU = "This is the IDU of research project 2";
-	
 	
 	IntendedDataUseReportButton widget;
 	@Mock
@@ -94,10 +97,11 @@ public class IntendedDataUseReportButtonTest {
 	ResearchProject mockResearchProject2;
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
+	@Mock
+	DateTimeUtils mockDateTimeUtils;
 	
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
 		when(mockAccessRequirement.getId()).thenReturn(AR_ID);
 		when(mockSubmissionPage1.getNextPageToken()).thenReturn(NEXT_PAGE_TOKEN);
 		List<Submission> page1 = new ArrayList<>();
@@ -105,7 +109,7 @@ public class IntendedDataUseReportButtonTest {
 		page1.add(mockSubmission2InPage1);
 		when(mockSubmissionPage1.getResults()).thenReturn(page1);
 		when(mockSubmissionPage2.getResults()).thenReturn(Collections.singletonList(mockSubmissionInPage2));
-		widget = new IntendedDataUseReportButton(mockButton, mockIsACTMemberAsyncHandler, mockDataAccessClient, mockPopupUtils, mockBigPromptModal);
+		widget = new IntendedDataUseReportButton(mockButton, mockIsACTMemberAsyncHandler, mockDataAccessClient, mockPopupUtils, mockBigPromptModal, mockDateTimeUtils);
 		verify(mockButton).addClickHandler(clickHandlerCaptor.capture());
 		onButtonClickHandler = clickHandlerCaptor.getValue();
 		AsyncMockStubber.callSuccessWith(mockSubmissionPage1, mockSubmissionPage2).when(mockDataAccessClient).getDataAccessSubmissions(anyLong(), anyString(), any(SubmissionState.class), any(SubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
