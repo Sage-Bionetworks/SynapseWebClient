@@ -8,13 +8,12 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.DropDown;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
-import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -55,6 +54,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	DropDown headerFavDropdown;
 	@UiField
 	Anchor headerFavAnchor;
+	@UiField
+	Anchor headerFavAngleDown;
 	@UiField
 	DropDownMenu headerFavDropdownMenu;
 
@@ -103,7 +104,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	DropDown dashboardDropdown;
 	@UiField
 	DropDownMenu dashboardDropdownMenu;
-
+	@UiField
+	Anchor dashboardAngleDown;
 	@UiField
 	Div searchBoxContainer;
 	@UiField
@@ -191,12 +193,10 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		documentationLink.addClickHandler(event -> {
 			event.preventDefault();
 			DisplayUtils.newWindow(WebConstants.DOCS_BASE_URL, "", "");
-			hideDropdown();
 		});
 		emailSynapseSupportLink.addClickHandler(event -> {
 			event.preventDefault();
 			DisplayUtils.newWindow("mailto:synapseinfo@sagebionetworks.org", "", "");
-			hideDropdown();
 		});
 		trashLink.addClickHandler(event -> {
     		presenter.onTrashClick();
@@ -214,64 +214,48 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		myProfileLink.addClickHandler(event -> {
 			Profile place = new Profile(userId, ProfileArea.PROFILE);
 			globalAppState.getPlaceChanger().goTo(place);
-			hideDropdown();
 		});
 		myDashboardLink.addClickHandler(event -> {
 			Profile place = new Profile(userId, ProfileArea.PROJECTS);
 			globalAppState.getPlaceChanger().goTo(place);
-			hideDropdown();
 		});
 		myTeamsLink.addClickHandler(event -> {
 			Profile place = new Profile(userId, ProfileArea.TEAMS);
 			globalAppState.getPlaceChanger().goTo(place);
-			hideDropdown();
 		});
 		myChallengesLink.addClickHandler(event -> {
 			Profile place = new Profile(userId, ProfileArea.CHALLENGES);
 			globalAppState.getPlaceChanger().goTo(place);
-			hideDropdown();
 		});
 		mySettingsLink.addClickHandler(event -> {
 			Profile place = new Profile(userId, ProfileArea.SETTINGS);
 			globalAppState.getPlaceChanger().goTo(place);
-			hideDropdown();
 		});
 		myDownloadsLink.addClickHandler(event -> {
 			Profile place = new Profile(userId, ProfileArea.DOWNLOADS);
 			globalAppState.getPlaceChanger().goTo(place);
-			hideDropdown();
 		});
 		helpForumLink.addClickHandler(event -> {
 			SynapseForumPlace place = new SynapseForumPlace("default");
 			globalAppState.getPlaceChanger().goTo(place);
-			hideDropdown();
 		});
 		sendFeedbackLink.addClickHandler(event -> {
 			// pendo should also listen for click event on this element
-			hideDropdown();
 		});
 		
 		xsFavoritesLink.addClickHandler(event -> {
 			Profile place = new Profile(userId + "/projects/favorites");
 			globalAppState.getPlaceChanger().goTo(place);
-			hideDropdown();
 		});
 		
 		xsSearchLink.addClickHandler(event -> {
 			Search place = new Search("");
 			globalAppState.getPlaceChanger().goTo(place);
-			hideDropdown();
 		});
 		downloadListLink.addClickHandler(event -> {
 			Profile place = new Profile(userId + "/downloads");
 			globalAppState.getPlaceChanger().goTo(place);
 		});
-	}
-	
-	private void hideDropdown() {
-		// since the dropdown visibility is controlled by the hover state, a js solution is to remove the hover element from the dom and add it back.
-		headerButtons.removeFromParent();
-		headerDiv.add(headerButtons);
 	}
 	
 	@Override
@@ -337,7 +321,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				headerFavDropdownMenu.removeStyleName("hover");
 				Synapse place = new Synapse(header.getId());
 				globalAppState.getPlaceChanger().goTo(place);
-				hideDropdown();
 			});
 			headerFavDropdownMenu.add(favItem);
 		}

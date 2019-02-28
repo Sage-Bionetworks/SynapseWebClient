@@ -2673,7 +2673,7 @@ div.border {
 		border-radius: 50%;
 		background: white;
 	}
-	.dropdown:hover ul.dropdown-menu {
+	.dropdown:focus ul.dropdown-menu {
 		display: block;
 	}
 	.dropdown ul.dropdown-menu {
@@ -2683,7 +2683,10 @@ div.border {
 	a.menu:after, .dropdown-toggle:after {
 		content: none;
 	}
-	.dropdown:hover {
+	.dropdown.open {
+		background-color: $synapse-green;
+	}
+	.greenBackgroundOnHover:hover {
 		background-color: $synapse-green;
 	}
 	.dropdown {
