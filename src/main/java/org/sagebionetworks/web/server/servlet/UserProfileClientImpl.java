@@ -8,7 +8,6 @@ import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
 import org.sagebionetworks.web.client.UserProfileClient;
-import org.sagebionetworks.web.shared.NotificationTokenType;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -28,8 +27,8 @@ public class UserProfileClientImpl extends SynapseClientBase implements
 			myProfile.setCompany(verificationSubmission.getCompany());
 			synapseClient.updateMyProfile(myProfile);
 			
-			String notificationEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
-			return synapseClient.createVerificationSubmission(verificationSubmission, notificationEndpoint);
+			String signedTokenEndpoint = SynapseClientImpl.getSignedTokenEndpoint(hostPageBaseURL);
+			return synapseClient.createVerificationSubmission(verificationSubmission, signedTokenEndpoint);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -49,8 +48,8 @@ public class UserProfileClientImpl extends SynapseClientBase implements
 	public void updateVerificationState(long verificationId, VerificationState verificationState, String hostPageBaseURL) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			String notificationEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
-			synapseClient.updateVerificationState(verificationId, verificationState, notificationEndpoint);
+			String signedTokenEndpoint = SynapseClientImpl.getSignedTokenEndpoint(hostPageBaseURL);
+			synapseClient.updateVerificationState(verificationId, verificationState, signedTokenEndpoint);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

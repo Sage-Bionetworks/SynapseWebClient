@@ -16,7 +16,6 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.shared.NotificationTokenType;
 
 public class AccountPresenter extends AbstractActivity implements AccountView.Presenter, Presenter<Account> {
 		
@@ -46,7 +45,7 @@ public class AccountPresenter extends AbstractActivity implements AccountView.Pr
 	public void setPlace(Account place) {
 		this.place = place;
 		this.view.setPresenter(this);
-		synapseClient.hexDecodeAndDeserialize(NotificationTokenType.EmailValidation.name(), place.toToken(), new AsyncCallback<SignedTokenInterface>() {
+		synapseClient.hexDecodeAndDeserialize(place.toToken(), new AsyncCallback<SignedTokenInterface>() {
 			@Override
 			public void onSuccess(SignedTokenInterface result) {
 				if (result instanceof EmailValidationSignedToken) {
