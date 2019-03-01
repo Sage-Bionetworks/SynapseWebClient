@@ -14,7 +14,7 @@
 						<b:TextBox ui:field="userNameField" placeholder="" />
 					</b:FormGroup>
 					<bh:Div ui:field="googleSynAlertContainer" marginBottom="10"/>
-					<b:Button icon="GOOGLE" ui:field="googleSignUpButton" iconSize="LARGE" size="LARGE" iconFixedWidth="true" width="100%" addStyleNames="lightGreyBackground no-background" text="Sign up with Google"></b:Button>
+					<b:Button ui:field="googleSignUpButton" size="LARGE" width="100%" addStyleNames="lightGreyBackground no-background" text="" paddingTop="0" paddingBottom="0" paddingLeft="0"/>
 					<bh:Div addStyleNames="centered-in-hr" marginTop="40" marginBottom="40">
 						<bh:Span addStyleNames="lightGreyText">or</bh:Span>
 					</bh:Div>

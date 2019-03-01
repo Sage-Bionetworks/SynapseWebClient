@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.widget.login;
 
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.SageImageBundle;
 
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -11,6 +13,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -40,10 +43,18 @@ public class LoginWidgetViewImpl extends Composite implements
 	
 	
 	@Inject
-	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder) {
+	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder, SageImageBundle sageImageBundle) {
 		initWidget(binder.createAndBindUi(this));
 		loginForm = FormPanel.wrap(DOM.getElementById("login_form"));
 		
+		Image googleLogo = new Image(sageImageBundle.logoGoogle());
+		googleLogo.addStyleName("whiteBackground left padding-10 rounded");
+		googleLogo.setHeight("42px");
+		googleLogo.setWidth("42px");
+		googleSignInButton.add(googleLogo);
+		Span googleText = new Span("Sign in with Google");
+		googleText.addStyleName("movedown-9");
+		googleSignInButton.add(googleText);
 		googleSignInButton.addClickHandler(event -> Window.Location.assign(GOOGLE_OAUTH_CALLBACK_URL));
 		RootPanel.detachNow(loginForm);
 		username = TextBox.wrap(DOM.getElementById("synapse_username"));
