@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.widget.footer;
 
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -10,19 +12,20 @@ import com.google.inject.Inject;
 
 public class Footer implements FooterView.Presenter, IsWidget {
 
+	public static final String ANONYMOUS = "Anonymous";
 	public static final String UNKNOWN = "unknown";
 	private FooterView view;
 	GlobalApplicationState globalAppState;
-	JiraURLHelper jiraHelper;
+	AuthenticationController authController;
 	
 	@Inject
 	public Footer(FooterView view, 
 			GlobalApplicationState globalAppState,
-			JiraURLHelper jiraHelper
+			AuthenticationController authController
 			) {
 		this.view = view;
 		this.globalAppState = globalAppState;
-		this.jiraHelper = jiraHelper;
+		this.authController = authController;
 		view.setPresenter(this);
 		init();
 	}
@@ -59,6 +62,15 @@ public class Footer implements FooterView.Presenter, IsWidget {
 	
 	@Override
 	public void onReportAbuseClicked() {
-		view.open(jiraHelper.createReportAbuseIssueURL());
+		// report abuse via Jira issue collector
+		String userId = ANONYMOUS, email = ANONYMOUS, displayName = ANONYMOUS;
+		UserProfile userProfile = authController.getCurrentUserProfile();
+		if (userProfile != null) {
+			userId = userProfile.getOwnerId();
+			displayName = DisplayUtils.getDisplayName(userProfile);
+			email = DisplayUtils.getPrimaryEmail(userProfile);
+		}
+		
+		view.showJiraIssueCollector(userId, displayName, email);
 	}
 }

@@ -135,8 +135,8 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 				primaryEmail, 
 				ar.getSubjectIds().get(0).getId(), 
 				ar.getId().toString());	
-	
 	}
+	
 	public void showApproved() {
 		view.showApprovedHeading();
 		view.showRequestApprovedMessage();

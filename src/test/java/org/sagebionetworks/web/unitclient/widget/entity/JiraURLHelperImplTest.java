@@ -126,18 +126,6 @@ public class JiraURLHelperImplTest {
 	}
 	
 	@Test
-	public void testCreateReportAbuseIssueURL() throws MalformedURLException {
-		String urlString = helper.createReportAbuseIssueURL();
-		URL url = new URL(urlString); // this will check that the url is well formed
-	}
-	@Test
-	public void testAnonymousCreateReportAbuseIssueURL() throws MalformedURLException {
-		when(mockAuthController.isLoggedIn()).thenReturn(false);
-		String urlString = helper.createReportAbuseIssueURL();
-		URL url = new URL(urlString); // this will check that the url is well formed
-	}
-	
-	@Test
 	public void testCreateIssueOnBackend() {
 		String userSteps = "user steps to repro (optional)";
 		String rootCause = "an error in the stack trace";
