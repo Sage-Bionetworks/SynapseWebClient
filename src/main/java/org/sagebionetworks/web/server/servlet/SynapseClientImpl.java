@@ -108,7 +108,6 @@ import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
-import org.sagebionetworks.web.shared.NotificationTokenType;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -980,14 +979,14 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			String message, String hostPageBaseURL, Date expiresOn) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
+			String signedTokenEndpoint = getSignedTokenEndpoint(hostPageBaseURL);
 			TeamMembershipStatus membershipStatus = synapseClient
 					.getTeamMembershipStatus(teamId, currentUserId);
 			// if we can join the team without creating the request (like if we
 			// are a team admin, or there is an open invitation), then just do
 			// that!
-			String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
 			if (membershipStatus.getCanJoin()) {
-				synapseClient.addTeamMember(teamId, currentUserId, getTeamEndpoint(hostPageBaseURL), settingsEndpoint);
+				synapseClient.addTeamMember(teamId, currentUserId, getTeamEndpoint(hostPageBaseURL), signedTokenEndpoint);
 			} else if (!membershipStatus.getHasOpenRequest()) {
 				// otherwise, create the request
 				MembershipRequest membershipRequest = new MembershipRequest();
@@ -999,8 +998,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				}
 
 				// make new Synapse call
-				String joinTeamEndpoint = NotificationTokenType.JoinTeam.getNotificationEndpoint(hostPageBaseURL);
-				synapseClient.createMembershipRequest(membershipRequest, joinTeamEndpoint, settingsEndpoint);
+				synapseClient.createMembershipRequest(membershipRequest, signedTokenEndpoint, signedTokenEndpoint);
 			}
 			return synapseClient.getTeamMembershipStatus(teamId, currentUserId);
 		} catch (SynapseException e) {
@@ -1014,8 +1012,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
-			synapseClient.addTeamMember(teamId, userGroupId, getTeamEndpoint(hostPageBaseURL), settingsEndpoint);
+			String signedTokenEndpoint = getSignedTokenEndpoint(hostPageBaseURL);
+			synapseClient.addTeamMember(teamId, userGroupId, getTeamEndpoint(hostPageBaseURL), signedTokenEndpoint);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -1026,17 +1024,18 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
+			String signedTokenEndpoint = getSignedTokenEndpoint(hostPageBaseURL);
+
 			TeamMembershipStatus membershipStatus = synapseClient
 					.getTeamMembershipStatus(teamId, userGroupId);
 			if (membershipStatus.getIsMember()) {
 				return;
 			}
-			String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
 			// if we can join the team without creating the invite (like if we
 			// are a team admin, or there is an open membership request), then
 			// just do that!
 			if (membershipStatus.getCanJoin()) {
-				synapseClient.addTeamMember(teamId, userGroupId, getTeamEndpoint(hostPageBaseURL), settingsEndpoint);
+				synapseClient.addTeamMember(teamId, userGroupId, getTeamEndpoint(hostPageBaseURL), signedTokenEndpoint);
 			} else if (!membershipStatus.getHasOpenInvitation()) {
 				// check to see if there is already an open invite
 				MembershipInvitation membershipInvite = new MembershipInvitation();
@@ -1044,9 +1043,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				membershipInvite.setTeamId(teamId);
 				membershipInvite.setInviteeId(userGroupId);
 
-				// make new Synapse call
-				String joinTeamEndpoint = NotificationTokenType.JoinTeam.getNotificationEndpoint(hostPageBaseURL);
-				synapseClient.createMembershipInvitation(membershipInvite, joinTeamEndpoint, settingsEndpoint);
+				synapseClient.createMembershipInvitation(membershipInvite, signedTokenEndpoint, signedTokenEndpoint);
 			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1061,9 +1058,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			mis.setInviteeEmail(email);
 			mis.setTeamId(teamId);
 			mis.setMessage(message);
-			String emailInvitationEndpoint = NotificationTokenType.EmailInvitation.getNotificationEndpoint(hostPageBaseURL);
-			String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
-			synapseClient.createMembershipInvitation(mis, emailInvitationEndpoint, settingsEndpoint);
+			String signedTokenEndpoint = getSignedTokenEndpoint(hostPageBaseURL);
+			synapseClient.createMembershipInvitation(mis, signedTokenEndpoint, signedTokenEndpoint);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -1231,24 +1227,18 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			//resend the invitation.  get the invitation, clear out system specified values, re-create the invitation, and delete the old one.
-			String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
+			String signedTokenEndpoint = getSignedTokenEndpoint(hostPageBaseURL);
 			MembershipInvitation membershipInvitation = synapseClient.getMembershipInvitation(membershipInvitationId);
 			membershipInvitation.setCreatedBy(null);
 			membershipInvitation.setCreatedOn(null);
 			membershipInvitation.setId(null);
 
-			String invitationEndpoint = NotificationTokenType.EmailInvitation.getNotificationEndpoint(hostPageBaseURL);
-			if (membershipInvitation.getInviteeId() != null) {
-				// SWC-4645: if ID is set, then this will be a JoinTeam type token.
-				invitationEndpoint = NotificationTokenType.JoinTeam.getNotificationEndpoint(hostPageBaseURL);
-
-				// SWC-4360: if both the principal ID and email are set, then clear out the email in the new invite to avoid a backend error.
-				if (membershipInvitation.getInviteeEmail() != null) {
-					membershipInvitation.setInviteeEmail(null);	
-				}
+			// SWC-4360: if both the principal ID and email are set, then clear out the email in the new invite to avoid a backend error.
+			if (membershipInvitation.getInviteeId() != null && membershipInvitation.getInviteeEmail() != null) {
+				membershipInvitation.setInviteeEmail(null);
 			}
 			
-			synapseClient.createMembershipInvitation(membershipInvitation, invitationEndpoint, settingsEndpoint);
+			synapseClient.createMembershipInvitation(membershipInvitation, signedTokenEndpoint, signedTokenEndpoint);
 			synapseClient.deleteMembershipInvitation(membershipInvitationId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1437,7 +1427,9 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public static Long defaultStorageLocation = Long.parseLong(PortalPropertiesHolder.getProperty(DEFAULT_STORAGE_ID_PROPERTY_KEY));
 	public static String htmlTeamId = PortalPropertiesHolder.getProperty(HTML_TEAM_ID_PROPERTY_KEY);
 	
-	
+	public static final String getSignedTokenEndpoint(String hostPageBaseURL) {
+		return hostPageBaseURL + "#!SignedToken:";
+	}
 	@Override
 	public ResponseMessage handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -1445,8 +1437,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		try {
 			if (signedToken instanceof JoinTeamSignedToken) {
 				JoinTeamSignedToken joinTeamSignedToken = (JoinTeamSignedToken) signedToken;
-				String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
-				return synapseClient.addTeamMember(joinTeamSignedToken, getTeamEndpoint(hostPageBaseURL), settingsEndpoint);
+				return synapseClient.addTeamMember(joinTeamSignedToken, getTeamEndpoint(hostPageBaseURL), getSignedTokenEndpoint(hostPageBaseURL));
 			} else if (signedToken instanceof NotificationSettingsSignedToken) {
 				NotificationSettingsSignedToken notificationSignedToken = (NotificationSettingsSignedToken) signedToken;
 				return synapseClient.updateNotificationSettings(notificationSignedToken);
@@ -1462,14 +1453,9 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public SignedTokenInterface hexDecodeAndDeserialize(String tokenTypeName, String signedTokenString) throws RestServiceException {
-		if (!isValidEnum(NotificationTokenType.class, tokenTypeName)) {
-			//error interpreting the token type, respond with a bad request
-			throw new BadRequestException("Invalid notification token type: " + tokenTypeName);
-		}
-		NotificationTokenType tokenType = NotificationTokenType.valueOf(tokenTypeName);
+	public SignedTokenInterface hexDecodeAndDeserialize(String signedTokenString) throws RestServiceException {
 		try {
-			return SerializationUtils.hexDecodeAndDeserialize(signedTokenString, tokenType.classType);
+			return SerializationUtils.hexDecodeAndDeserialize(signedTokenString, SignedTokenInterface.class);
 		} catch (Exception e) {
 			//error decoding, respond with a bad request
 			throw new BadRequestException(e.getMessage());
@@ -1530,8 +1516,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			MessageToUser message = new MessageToUser();
 			message.setRecipients(recipients);
 			message.setSubject(subject);
-			String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
-			message.setNotificationUnsubscribeEndpoint(settingsEndpoint);
+			message.setNotificationUnsubscribeEndpoint(getSignedTokenEndpoint(hostPageBaseURL));
 			String cleanedMessageBody = Jsoup.clean(messageBody, "", Whitelist.simpleText().addTags("br"), new OutputSettings().prettyPrint(false));
 			MessageToUser sentMessage = synapseClient.sendStringMessage(message, cleanedMessageBody);
 			JSONObjectAdapter sentMessageJson = sentMessage
@@ -1554,8 +1539,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		try {
 			MessageToUser message = new MessageToUser();
 			message.setSubject(subject);
-			String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
-			message.setNotificationUnsubscribeEndpoint(settingsEndpoint);
+			message.setNotificationUnsubscribeEndpoint(getSignedTokenEndpoint(hostPageBaseURL));
 			String cleanedMessageBody = Jsoup.clean(messageBody, Whitelist.none());
 			MessageToUser sentMessage = synapseClient.sendStringMessage(message, entityId, cleanedMessageBody);
 			JSONObjectAdapter sentMessageJson = sentMessage

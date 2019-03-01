@@ -70,7 +70,7 @@ public class EmailInvitationPresenterTest {
 		encodedMISignedToken = "encodedToken";
 		when(place.toToken()).thenReturn(encodedMISignedToken);
 		MembershipInvtnSignedToken decodedToken = new MembershipInvtnSignedToken();
-		when(futureClient.hexDecodeAndDeserialize(anyString(), eq(encodedMISignedToken))).thenReturn(getDoneFuture(decodedToken));
+		when(futureClient.hexDecodeAndDeserialize(eq(encodedMISignedToken))).thenReturn(getDoneFuture(decodedToken));
 		when(mockJsClient.getMembershipInvitation(decodedToken)).thenReturn(getDoneFuture(mockMembershipInvitation));
 		when(mockMembershipInvitation.getId()).thenReturn("misId");
 		String email = "invitee@email.com";
@@ -106,9 +106,9 @@ public class EmailInvitationPresenterTest {
 		beforeSetPlace(true);
 		when(mockJsClient.getInviteeVerificationSignedToken(mockMembershipInvitation.getId())).thenReturn(getFailedFuture(new ForbiddenException()));
 		when(mockJsClient.updateInviteeId(mockInviteeVerificationSignedToken)).thenReturn(getDoneFuture(null));
-		
+
 		presenter.setPlace(place);
-		
+
 		//uses this call to verify authenticated user is associated to the membership invitation email
 		verify(mockJsClient).getInviteeVerificationSignedToken(anyString());
 		//does not attempt to bind invitation to the current user
@@ -117,7 +117,7 @@ public class EmailInvitationPresenterTest {
 		verify(mockAuthController).logoutUser();
 		verify(mockView).showNotLoggedInUI();
 	}
-	
+
 	@Test
 	public void testLoggedInInviteHasUserID() {
 		//currently logged in user has ID matching invitation (that has already been bound, so it has a user ID!)
@@ -125,9 +125,9 @@ public class EmailInvitationPresenterTest {
 		when(mockMembershipInvitation.getInviteeId()).thenReturn(CURRENT_USER_ID);
 		when(mockMembershipInvitation.getInviteeEmail()).thenReturn(null);
 		when(mockJsClient.getInviteeVerificationSignedToken(mockMembershipInvitation.getId())).thenReturn(getDoneFuture(mockInviteeVerificationSignedToken));
-		
+
 		presenter.setPlace(place);
-		
+
 		//does not attempt to bind invitation to the current user (since that's already done
 		verify(mockJsClient, never()).getInviteeVerificationSignedToken(anyString());
 		verify(mockJsClient, never()).updateInviteeId(mockInviteeVerificationSignedToken);
@@ -137,7 +137,6 @@ public class EmailInvitationPresenterTest {
 		assertEquals(CURRENT_USER_ID, profilePlace.getUserId());
 		assertEquals(ProfileArea.TEAMS, profilePlace.getArea());
 	}
-	
 	@Test
 	public void testNotLoggedIn() {
 		beforeSetPlace(false);
@@ -161,7 +160,7 @@ public class EmailInvitationPresenterTest {
 	@Test
 	public void testInvalidSignedToken() {
 		beforeSetPlace(false);
-		when(futureClient.hexDecodeAndDeserialize(anyString(), eq(encodedMISignedToken))).thenReturn(getFailedFuture());
+		when(futureClient.hexDecodeAndDeserialize(eq(encodedMISignedToken))).thenReturn(getFailedFuture());
 		presenter.setPlace(place);
 		verify(mockSynapseAlert).handleException(any(Throwable.class));
 		verify(mockJsClient, never()).getMembershipInvitation(any());

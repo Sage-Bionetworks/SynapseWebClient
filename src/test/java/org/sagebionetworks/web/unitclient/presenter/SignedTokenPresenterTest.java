@@ -1,7 +1,15 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,13 +20,11 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.JoinTeamSignedToken;
 import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
-import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -34,10 +40,9 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.SignedTokenView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.shared.NotificationTokenType;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-import com.google.gwt.core.ext.Generator.RunsLocal;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -79,7 +84,6 @@ public class SignedTokenPresenterTest {
 		presenter = new SignedTokenPresenter(mockView, mockSynapseClient, mockGWTWrapper, mockSynapseAlert, mockGlobalApplicationState, mockUserBadge, mockAuthenticationController, mockPopupUtils);
 		verify(mockView).setPresenter(presenter);
 		
-		when(testPlace.getTokenType()).thenReturn(NotificationTokenType.JoinTeam.toString());
 		when(testPlace.getSignedEncodedToken()).thenReturn(TEST_TOKEN);
 		when(mockGWTWrapper.getHostPageBaseURL()).thenReturn(TEST_HOME_PAGE_BASE);
 		ResponseMessage responseMessage = new ResponseMessage();
@@ -88,7 +92,7 @@ public class SignedTokenPresenterTest {
 		AsyncMockStubber.callSuccessWith(responseMessage).when(mockSynapseClient).handleSignedToken(any(SignedTokenInterface.class), anyString(), any(AsyncCallback.class));
 		
 		//by default, decode into a JoinTeamSignedToken
-		AsyncMockStubber.callSuccessWith(new JoinTeamSignedToken()).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(new JoinTeamSignedToken()).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
 		
 		verify(mockView).setSynapseAlert(any(Widget.class));
 		verify(mockView).setPresenter(presenter);
@@ -103,7 +107,7 @@ public class SignedTokenPresenterTest {
 	public void testSetPlaceJoinTeamSignedToken() {
 		presenter.setPlace(testPlace);
 		
-		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseClient).handleSignedToken(any(SignedTokenInterface.class), anyString(), any(AsyncCallback.class));
 		verify(mockSynapseAlert).clear();
 		verify(mockView, times(2)).clear();
@@ -114,11 +118,11 @@ public class SignedTokenPresenterTest {
 	
 	@Test
 	public void testSetPlaceEmailValidationSignedToken() {
-		AsyncMockStubber.callSuccessWith(new EmailValidationSignedToken()).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(new EmailValidationSignedToken()).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
 		
 		presenter.setPlace(testPlace);
 		
-		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseClient).handleSignedToken(any(SignedTokenInterface.class), anyString(), any(AsyncCallback.class));
 		verify(mockSynapseAlert).clear();
 		verify(mockView, times(2)).clear();
@@ -131,7 +135,7 @@ public class SignedTokenPresenterTest {
 		Exception ex = new Exception("something bad happened");
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).handleSignedToken(any(SignedTokenInterface.class), anyString(), any(AsyncCallback.class));
 		presenter.setPlace(testPlace);
-		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseClient).handleSignedToken(any(SignedTokenInterface.class), anyString(), any(AsyncCallback.class));
 		verify(mockSynapseAlert).handleException(ex);
 		verify(mockView, times(2)).clear();
@@ -143,7 +147,7 @@ public class SignedTokenPresenterTest {
 		accessRequirements.add(mockAccessRequirement);
 		presenter.setPlace(testPlace);
 		
-		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseClient, never()).handleSignedToken(any(SignedTokenInterface.class), anyString(), any(AsyncCallback.class));
 		verify(mockSynapseAlert).clear();
 		verify(mockPlaceChanger).goTo(isA(Team.class));
@@ -161,7 +165,7 @@ public class SignedTokenPresenterTest {
 	@Test
 	public void testJoinTeamExpiredSessionToken() {
 		reset(mockSynapseClient);
-		AsyncMockStubber.callSuccessWith(new JoinTeamSignedToken()).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(new JoinTeamSignedToken()).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
 		presenter.setPlace(testPlace);
 		
 		// verify rpc attempt, and simulate an UnauthorizedException		
@@ -181,7 +185,7 @@ public class SignedTokenPresenterTest {
 	@Test
 	public void testJoinTeamExpiredSessionTokenMultipleErrors() {
 		reset(mockSynapseClient);
-		AsyncMockStubber.callSuccessWith(new JoinTeamSignedToken()).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(new JoinTeamSignedToken()).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
 		presenter.setPlace(testPlace);
 		
 		// verify rpc attempt, and simulate an UnauthorizedException		
@@ -201,9 +205,9 @@ public class SignedTokenPresenterTest {
 	@Test
 	public void testSetPlaceFailureHexDecode() {
 		Exception ex = new Exception("something bad happened during hex decode");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
 		presenter.setPlace(testPlace);
-		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseClient, never()).handleSignedToken(any(SignedTokenInterface.class), anyString(), any(AsyncCallback.class));
 		verify(mockView).clear();
 		//loading shown and hidden for single async call
@@ -214,10 +218,10 @@ public class SignedTokenPresenterTest {
 	@Test
 	public void testSetPlaceUnsubscribe() {
 		//For the unsubscribe token, a special view is shown.  
-		AsyncMockStubber.callSuccessWith(new NotificationSettingsSignedToken()).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(new NotificationSettingsSignedToken()).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
 		presenter.setPlace(testPlace);
 		
-		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseClient, never()).handleSignedToken(any(SignedTokenInterface.class), anyString(), any(AsyncCallback.class));
 		verify(mockSynapseAlert).clear();
 		verify(mockView).clear();

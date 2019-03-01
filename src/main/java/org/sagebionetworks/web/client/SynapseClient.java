@@ -146,7 +146,7 @@ public interface SynapseClient extends RemoteService{
 
 	ResponseMessage handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL) throws RestServiceException;
 
-	SignedTokenInterface hexDecodeAndDeserialize(String tokenTypeName, String signedTokenString) throws RestServiceException;
+	SignedTokenInterface hexDecodeAndDeserialize(String signedTokenString) throws RestServiceException;
 
 	AccountCreationToken hexDecodeAndDeserializeAccountCreationToken(String tokenString) throws RestServiceException;
 

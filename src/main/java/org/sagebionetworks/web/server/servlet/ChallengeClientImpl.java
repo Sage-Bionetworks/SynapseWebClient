@@ -25,7 +25,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.ChallengeClient;
 import org.sagebionetworks.web.shared.ChallengeTeamBundle;
 import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
-import org.sagebionetworks.web.shared.NotificationTokenType;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.UserProfilePagedResults;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -134,9 +133,9 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
+			String signedTokenEndpoint = SynapseClientImpl.getSignedTokenEndpoint(hostPageBaseURL);
 			String challengeEndpoint = SynapseClientImpl.getChallengeEndpoint(hostPageBaseURL);
-			String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
-			return synapseClient.createTeamSubmission(submission, etag, memberStateHash, challengeEndpoint, settingsEndpoint);
+			return synapseClient.createTeamSubmission(submission, etag, memberStateHash, challengeEndpoint, signedTokenEndpoint);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -146,9 +145,9 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
+			String signedTokenEndpoint = SynapseClientImpl.getSignedTokenEndpoint(hostPageBaseURL);
 			String challengeEndpoint = SynapseClientImpl.getChallengeEndpoint(hostPageBaseURL);
-			String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
-			return synapseClient.createIndividualSubmission(submission, etag, challengeEndpoint, settingsEndpoint);
+			return synapseClient.createIndividualSubmission(submission, etag, challengeEndpoint, signedTokenEndpoint);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
