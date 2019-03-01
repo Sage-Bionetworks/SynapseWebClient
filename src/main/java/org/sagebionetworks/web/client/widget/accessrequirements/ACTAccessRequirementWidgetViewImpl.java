@@ -144,7 +144,7 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 				},
 				"fieldValues": {
 			 		summary : 'Request for ACT to grant access to data',
-					description : 'By clicking \'Submit\', below, I request that the Synapse Access and Compliance Team contact me with further information on how to access this data.',
+					description : 'By clicking \'Submit\' below, I request that the Synapse Access and Compliance Team contact me with further information on how to access this data.',
 			 		priority : '4',
 			 		customfield_10841: accessRequirementId,
 			 		customfield_10742: dataObjectId,

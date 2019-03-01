@@ -14,8 +14,6 @@ public interface JiraURLHelper {
 			String userDisplayName, String userEmailAddress,
 			String dataObjectId, String accessRequirementId);
 
-	public String createReportAbuseIssueURL();
-
 	public void createIssueOnBackend(
 			String stepsToRepro,
 			Throwable t,

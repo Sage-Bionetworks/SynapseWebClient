@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.widget.footer;
 
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -13,16 +15,16 @@ public class Footer implements FooterView.Presenter, IsWidget {
 	public static final String UNKNOWN = "unknown";
 	private FooterView view;
 	GlobalApplicationState globalAppState;
-	JiraURLHelper jiraHelper;
+	AuthenticationController authController;
 	
 	@Inject
 	public Footer(FooterView view, 
 			GlobalApplicationState globalAppState,
-			JiraURLHelper jiraHelper
+			AuthenticationController authController
 			) {
 		this.view = view;
 		this.globalAppState = globalAppState;
-		this.jiraHelper = jiraHelper;
+		this.authController = authController;
 		view.setPresenter(this);
 		init();
 	}
@@ -59,6 +61,12 @@ public class Footer implements FooterView.Presenter, IsWidget {
 	
 	@Override
 	public void onReportAbuseClicked() {
-		view.open(jiraHelper.createReportAbuseIssueURL());
+		// request access via Jira
+		UserProfile userProfile = authController.getCurrentUserProfile();
+		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
+		String primaryEmail = DisplayUtils.getPrimaryEmail(userProfile);
+		view.showJiraIssueCollector(userProfile.getOwnerId(), 
+				DisplayUtils.getDisplayName(userProfile), 
+				primaryEmail);
 	}
 }

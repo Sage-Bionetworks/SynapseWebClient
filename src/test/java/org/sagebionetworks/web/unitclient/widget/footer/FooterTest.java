@@ -1,7 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.footer;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -9,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.footer.FooterView;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
@@ -23,18 +24,17 @@ public class FooterTest {
 	FooterView mockView;
 	GlobalApplicationState mockSynapseClient;
 	@Mock
-	JiraURLHelper mockJiraHelper;
-	public static final String REPORT_ABUSE_URL = "http://jira.com/summary=harassed";
+	AuthenticationController mockAuthController;
+
 	@Before
 	public void setup(){		
 		MockitoAnnotations.initMocks(this);
 		mockView = Mockito.mock(FooterView.class);
 		mockSynapseClient = Mockito.mock(GlobalApplicationState.class);
-		footer = new Footer(mockView, mockSynapseClient, mockJiraHelper);
+		footer = new Footer(mockView, mockSynapseClient, mockAuthController);
 		VersionState versionState = new VersionState("v,v", true);
 		AsyncMockStubber.callSuccessWith(versionState).when(mockSynapseClient).checkVersionCompatibility(any(AsyncCallback.class));
 		verify(mockView).setPresenter(footer);
-		when(mockJiraHelper.createReportAbuseIssueURL()).thenReturn(REPORT_ABUSE_URL);
 	}
 
 	@Test
@@ -47,7 +47,7 @@ public class FooterTest {
 	public void testConstructionNullVersion(){
 		VersionState versionState = new VersionState(null, false);
 		AsyncMockStubber.callSuccessWith(versionState).when(mockSynapseClient).checkVersionCompatibility(any(AsyncCallback.class));
-		footer = new Footer(mockView, mockSynapseClient, mockJiraHelper);
+		footer = new Footer(mockView, mockSynapseClient, mockAuthController);
 		verify(mockView).setVersion(Footer.UNKNOWN, Footer.UNKNOWN);
 	}
 
@@ -60,6 +60,6 @@ public class FooterTest {
 	@Test
 	public void testOnReportAbuse() {
 		footer.onReportAbuseClicked();
-		verify(mockView).open(REPORT_ABUSE_URL);
+		verify(mockView).showJiraIssueCollector(anyString(), anyString(), anyString());
 	}
 }
