@@ -8,8 +8,7 @@
 	<bh:Div addStyleNames="max-width-350 center-in-div">
 		<bh:ClearFix />
 		<g:SimplePanel ui:field="googleSSOContainer">
-			<b:Button icon="GOOGLE" ui:field="googleSignInButton" iconSize="LARGE" size="LARGE" iconFixedWidth="true" width="100%" addStyleNames="lightGreyBackground no-background">Sign
-				in with Google</b:Button>
+			<b:Button ui:field="googleSignInButton" size="LARGE" width="100%" addStyleNames="lightGreyBackground no-background" text="" paddingTop="0" paddingBottom="0" paddingLeft="0"/>
 		</g:SimplePanel>
 		<bh:Div addStyleNames="centered-in-hr" marginTop="40" marginBottom="40">
 			<bh:Span addStyleNames="lightGreyText">or</bh:Span>
