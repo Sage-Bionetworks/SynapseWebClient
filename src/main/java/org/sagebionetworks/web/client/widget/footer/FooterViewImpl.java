@@ -160,8 +160,8 @@ public class FooterViewImpl implements FooterView {
 				},
 				
 				"fieldValues": {
-			 		summary : 'Request for ACT to review abusive content',
-					description : url + ' \n\nBy clicking \'Submit\' below, I wish to alert the Synapse team that this page is in violation (for example: abusive or harmful content, spam, inappropriate ads). Please provide additional information about the issue that you’re reporting.',
+			 		summary : '',
+					description : 'Reporting this page: ' + url + ' \n\nUser is reporting to the Synapse team that this page is in violation (for example: abusive or harmful content, spam, inappropriate ads).',
 			 		priority : '3',
 			 		customfield_10840: userEmailAddress,
 			 		email: userEmailAddress,

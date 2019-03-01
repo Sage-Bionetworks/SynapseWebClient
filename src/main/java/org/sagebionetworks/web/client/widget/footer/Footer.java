@@ -12,6 +12,7 @@ import com.google.inject.Inject;
 
 public class Footer implements FooterView.Presenter, IsWidget {
 
+	public static final String ANONYMOUS = "Anonymous";
 	public static final String UNKNOWN = "unknown";
 	private FooterView view;
 	GlobalApplicationState globalAppState;
@@ -61,12 +62,15 @@ public class Footer implements FooterView.Presenter, IsWidget {
 	
 	@Override
 	public void onReportAbuseClicked() {
-		// request access via Jira
+		// report abuse via Jira issue collector
+		String userId = ANONYMOUS, email = ANONYMOUS, displayName = ANONYMOUS;
 		UserProfile userProfile = authController.getCurrentUserProfile();
-		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
-		String primaryEmail = DisplayUtils.getPrimaryEmail(userProfile);
-		view.showJiraIssueCollector(userProfile.getOwnerId(), 
-				DisplayUtils.getDisplayName(userProfile), 
-				primaryEmail);
+		if (userProfile != null) {
+			userId = userProfile.getOwnerId();
+			displayName = DisplayUtils.getDisplayName(userProfile);
+			email = DisplayUtils.getPrimaryEmail(userProfile);
+		}
+		
+		view.showJiraIssueCollector(userId, displayName, email);
 	}
 }
