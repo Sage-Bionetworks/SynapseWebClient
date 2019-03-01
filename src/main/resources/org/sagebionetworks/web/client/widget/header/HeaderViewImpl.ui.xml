@@ -46,9 +46,9 @@
 		  		<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-10 margin-right-10 padding-left-15" visible="false">
 					<b:Button ui:field="loginLink" text="&nbsp;&nbsp;&nbsp;Sign in&nbsp;&nbsp;&nbsp;" type="SUCCESS" marginTop="7"/>
 				</g:SimplePanel>
-				<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-left-10 padding-right-10 imageButton min-width-200-unless-xs" visible="false" height="53px" paddingTop="10">
+				<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-left-10 padding-right-10 imageButton min-width-200-unless-xs greenBackgroundOnHover" visible="false" height="53px" paddingTop="10">
 					<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" />
-					<b:Icon type="ANGLE_DOWN" addStyleNames="margin-left-30 color-white"/>
+					<b:Anchor ui:field="dashboardAngleDown" dataToggle="DROPDOWN" icon="ANGLE_DOWN" addStyleNames="color-white textDecorationNone margin-left-10" />
 					<b:DropDownMenu ui:field="dashboardDropdownMenu" width="100%">
 						<b:AnchorListItem ui:field="myProfileLink">Profile</b:AnchorListItem>
 						<b:AnchorListItem ui:field="myDashboardLink">Projects</b:AnchorListItem>
@@ -70,18 +70,18 @@
 						<b:AnchorListItem ui:field="logoutLink" icon="SIGN_OUT" iconFixedWidth="true" iconPosition="RIGHT">Sign out</b:AnchorListItem>
 					</b:DropDownMenu>
 				</b:DropDown>
-				<b:DropDown ui:field="headerFavDropdown" pull="RIGHT" addStyleNames="imageButton hidden-xs" visible="false" height="53px" paddingTop="13" paddingRight="15" paddingLeft="0">
+				<b:DropDown ui:field="headerFavDropdown" pull="RIGHT" addStyleNames="imageButton hidden-xs greenBackgroundOnHover" visible="false" height="53px" paddingTop="13" paddingRight="15" paddingLeft="0">
 					<b:Anchor ui:field="headerFavAnchor" dataToggle="DROPDOWN" icon="STAR" iconSize="TIMES2" height="28px" addStyleNames="color-white textDecorationNone" />
-					<b:Icon type="ANGLE_DOWN" addStyleNames="color-white moveup-5"/>
+					<b:Anchor ui:field="headerFavAngleDown" dataToggle="DROPDOWN" icon="ANGLE_DOWN" height="28px" addStyleNames="color-white textDecorationNone moveup-5" />
 					<b:DropDownMenu ui:field="headerFavDropdownMenu" addStyleNames="dropdown-menu-right">
 					</b:DropDownMenu>
 				</b:DropDown>
 				<bh:Div pull="RIGHT" addStyleNames="searchBoxContainer inactive hidden-xs" height="53px" paddingLeft="7" paddingRight="3">
 					<bh:Div ui:field="searchBoxContainer" marginTop="14"/>
 				</bh:Div>
-				<bh:Div pull="RIGHT" height="53px" paddingLeft="7" paddingRight="3" paddingTop="9" ui:field="downloadListNotificationUI" visible="false">
+				<bh:Div pull="RIGHT" height="53px" paddingLeft="7" paddingRight="3" paddingTop="9" ui:field="downloadListNotificationUI" visible="false" addStyleNames="greenBackgroundOnHover">
 					<b:Tooltip text="Click to view items in your download list." placement="BOTTOM">
-						<g:FocusPanel height="35px" addStyleNames="synapse-green-bg img-circle displayInlineBlock dropshadow-on-hover" ui:field="downloadListLink">
+						<g:FocusPanel height="35px" addStyleNames="synapse-green-bg img-circle displayInlineBlock" ui:field="downloadListLink">
 							<b:Icon type="DOWNLOAD" addStyleNames="imageButton color-white" size="LARGE" marginTop="9" marginRight="5" marginBottom="5" marginLeft="5"/>
 						</g:FocusPanel>
 					</b:Tooltip>
