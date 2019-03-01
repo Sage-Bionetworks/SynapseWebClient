@@ -3,10 +3,11 @@ package org.sagebionetworks.web.client.view.users;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTTimer;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -21,6 +22,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -48,7 +50,8 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 			GlobalApplicationState globalAppState,
 			Header headerWidget,
 			GWTTimer timer,
-			CookieProvider cookies) {		
+			CookieProvider cookies,
+			SageImageBundle sageImageBundle) {		
 		initWidget(binder.createAndBindUi(this));
 		this.timer = timer;
 		this.headerWidget = headerWidget;
@@ -58,6 +61,14 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 			if (checkUsernameFormat())
 				presenter.checkUsernameAvailable(userNameField.getValue());
 		});
+		Image googleLogo = new Image(sageImageBundle.logoGoogle());
+		googleLogo.addStyleName("whiteBackground left padding-10 rounded");
+		googleLogo.setHeight("42px");
+		googleLogo.setWidth("42px");
+		googleSignUpButton.add(googleLogo);
+		Span googleText = new Span("Sign up with Google");
+		googleText.addStyleName("movedown-9");
+		googleSignUpButton.add(googleText);
 		KeyDownHandler register = event -> {
 			if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
 				googleSignUpButton.click();
