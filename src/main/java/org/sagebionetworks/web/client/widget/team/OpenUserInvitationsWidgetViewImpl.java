@@ -1,16 +1,12 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
-import org.gwtbootstrap3.client.ui.constants.ButtonType;
-import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Italic;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -28,6 +24,7 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 	@UiField Button moreButton;
 	
 	private Widget widget;
+	PortalGinInjector ginInjector;
 	private Presenter presenter;
 	private ClickHandler removeInvitationClickHandler = event -> {
 		event.preventDefault();
@@ -46,8 +43,9 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 	};
 	
 	@Inject
-	public OpenUserInvitationsWidgetViewImpl(Binder binder) {
+	public OpenUserInvitationsWidgetViewImpl(Binder binder, PortalGinInjector ginInjector) {
 		widget = binder.createAndBindUi(this);
+		this.ginInjector = ginInjector;
 		invitationsContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.PENDING_INVITATIONS);
 		moreButton.addClickHandler(event -> presenter.getNextBatch());
 	}
@@ -64,54 +62,29 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 
 	@Override
 	public void addInvitation(IsWidget badge, String inviteeEmail, String misId, String message, String createdOn) {
-		TableData invitationData = new TableData();
-		invitationData.addStyleName("padding-5");
-		invitationData.add(badge);
-
-		if (inviteeEmail != null) {
-			Div inviteeEmailDiv = new Div();
-			inviteeEmailDiv.add(new Text(inviteeEmail));
-			invitationData.add(inviteeEmailDiv);
+		OpenUserInvitationWidget openUserInvitationWidget = ginInjector.getOpenUserInvitationWidget();
+		
+		boolean isInviteeEmail = inviteeEmail != null;
+		openUserInvitationWidget.badgeTableData.setVisible(!isInviteeEmail);
+		openUserInvitationWidget.inviteeEmailTableData.setVisible(isInviteeEmail);
+		if (isInviteeEmail) {
+			openUserInvitationWidget.inviteeEmailTableData.add(new Text(inviteeEmail));
+		} else {
+			openUserInvitationWidget.badgeTableData.add(badge);
 		}
 
 		if (message != null) {
-			Div messageDiv = new Div();
-			messageDiv.add(new Text(message));
-			invitationData.add(messageDiv);
+			openUserInvitationWidget.messageTableData.add(new Text(message));
 		}
-
-		Div createdOnDiv = new Div();
-		createdOnDiv.add(new Italic(createdOn));
-		invitationData.add(createdOnDiv);
-
-		TableData removeButtonContainer = new TableData();
-		removeButtonContainer.add(createRemoveButton(misId));
-		removeButtonContainer.add(createResendButton(misId));
+		openUserInvitationWidget.createdOnTableData.add(new Italic(createdOn));
 		
-		TableRow invitation = new TableRow();
-		invitation.add(invitationData);
-		invitation.add(removeButtonContainer);
-		invitations.add(invitation);
-	}
-
-	private Button createRemoveButton(String misId) {
-		Button button = new Button("Remove");
-		button.setType(ButtonType.DANGER);
-		button.setSize(ButtonSize.LARGE);
-		button.setPull(Pull.RIGHT);
-		button.getElement().setAttribute(MEMBERSHIP_INVITATION_ID, misId);
-		button.addClickHandler(removeInvitationClickHandler);
-		return button;
-	}
-	
-	private Button createResendButton(String misId) {
-		Button button = new Button("Resend");
-		button.setSize(ButtonSize.LARGE);
-		button.setPull(Pull.RIGHT);
-		button.setMarginRight(10);
-		button.getElement().setAttribute(MEMBERSHIP_INVITATION_ID, misId);
-		button.addClickHandler(resendInvitationClickHandler);
-		return button;
+		openUserInvitationWidget.cancelButton.getElement().setAttribute(MEMBERSHIP_INVITATION_ID, misId);
+		openUserInvitationWidget.cancelButton.addClickHandler(removeInvitationClickHandler);
+		
+		openUserInvitationWidget.resendButton.getElement().setAttribute(MEMBERSHIP_INVITATION_ID, misId);
+		openUserInvitationWidget.resendButton.addClickHandler(resendInvitationClickHandler);
+		
+		invitations.add(openUserInvitationWidget);
 	}
 
 	@Override
