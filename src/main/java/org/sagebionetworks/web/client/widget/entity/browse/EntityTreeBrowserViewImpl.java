@@ -159,7 +159,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 
 	@Override
 	public void clear() {
-		copyIDToClipboardIcon.setVisible(DisplayUtils.isInTestWebsite(cookies));
 		entityTreeContainer.clear();
 		entityTree = null;
 		treeItem2entityTreeItem = null;

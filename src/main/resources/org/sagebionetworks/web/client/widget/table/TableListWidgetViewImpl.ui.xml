@@ -11,6 +11,7 @@
 		<bh:Div ui:field="synAlertContainer" />
 		<w:LoadingSpinner size="40px" ui:field="loadingUI" addStyleNames="center-block center" visible="false"/>
 		<bh:Span ui:field="emptyUI" text="&#8212; Empty" visible="false" marginLeft="15"/>
+		<b:TextArea width="1px" ui:field="copyToClipboardTextbox" visible="false" />
 		<bh:Div addStyleNames="highlight-box padding-10" marginTop="0">
 			<t:Table ui:field="columnHeaders" width="100%">
 				<t:TableRow>
@@ -25,6 +26,9 @@
 					<tr:SortableTableHeaderImpl width="165px" ui:field="createdOnColumnHeader" text="CreatedOn" addStyleNames="visible-md visible-lg" />
 					<t:TableHeader width="130px" addStyleNames="visible-md visible-lg">
 						<bh:Span text="ID" />
+						<b:Tooltip title="Copy IDs to the clipboard" placement="BOTTOM">
+							<b:Icon ui:field="copyIDToClipboardIcon" addStyleNames="imageButton margin-left-5 link" type="CLIPBOARD" />
+						</b:Tooltip>
 					</t:TableHeader>
 				</t:TableRow>
 			</t:Table>

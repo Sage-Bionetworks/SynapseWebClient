@@ -24,6 +24,7 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 		 */
 		void onTableClicked(EntityHeader header);
 		void toggleSort(SortBy sortByColumn);
+		void copyIDsToClipboard();
 	}
 	void clearTableWidgets();
 	void addTableListItem(EntityHeader header);
@@ -32,4 +33,5 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	void clearSortUI();
 	void setSortUI(SortBy sortBy, Direction dir);
 	void hideLoading();
+	void copyToClipboard(String ids);
 }
