@@ -34,7 +34,7 @@
 				</t:TableHeader>
 				<t:TableHeader ui:field="idColumnHeader" addStyleNames="visible-lg min-width-150">
 					<bh:Span text="ID" />
-					<b:Tooltip title="Copy IDs to the clipboard">
+					<b:Tooltip title="Copy IDs to the clipboard" placement="BOTTOM">
 						<b:Icon ui:field="copyIDToClipboardIcon" addStyleNames="imageButton margin-left-5 link" type="CLIPBOARD" />
 					</b:Tooltip>
 				</t:TableHeader>
