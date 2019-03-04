@@ -58,7 +58,7 @@ public class UserGroupListWidgetTest {
 		
 		List<UserGroupHeader> testUsers = getIndividualTestUsers();
 		widget.configure(testUsers);
-		widget.getBadgeWidget(testUsers.get(0).getOwnerId(), testUsers.get(0).getIsIndividual(), testUsers.get(0).getUserName());
+		widget.getBadgeWidget(testUsers.get(0).getOwnerId(), testUsers.get(0).getIsIndividual());
 		verify(mockPortalGinInjector).getUserBadgeWidget();
 	}
 	
@@ -70,7 +70,7 @@ public class UserGroupListWidgetTest {
 		
 		List<UserGroupHeader> testUsers = getIndividualTestUsers();
 		widget.configure(testUsers, false);
-		widget.getBadgeWidget(testUsers.get(0).getOwnerId(), testUsers.get(0).getIsIndividual(), testUsers.get(0).getUserName());
+		widget.getBadgeWidget(testUsers.get(0).getOwnerId(), testUsers.get(0).getIsIndividual());
 		verify(mockPortalGinInjector).getUserBadgeWidget();
 	}
 	
@@ -82,7 +82,7 @@ public class UserGroupListWidgetTest {
 		
 		List<UserGroupHeader> testUsers = getGroupTestUsers();
 		widget.configure(testUsers);
-		widget.getBadgeWidget(testUsers.get(0).getOwnerId(), testUsers.get(0).getIsIndividual(), testUsers.get(0).getUserName());
+		widget.getBadgeWidget(testUsers.get(0).getOwnerId(), testUsers.get(0).getIsIndividual());
 		verify(mockPortalGinInjector).getBigTeamBadgeWidget();
 	}
 	
@@ -94,7 +94,7 @@ public class UserGroupListWidgetTest {
 		
 		List<UserGroupHeader> testUsers = getGroupTestUsers();
 		widget.configure(testUsers, false);
-		widget.getBadgeWidget(testUsers.get(0).getOwnerId(), testUsers.get(0).getIsIndividual(), testUsers.get(0).getUserName());
+		widget.getBadgeWidget(testUsers.get(0).getOwnerId(), testUsers.get(0).getIsIndividual());
 		verify(mockPortalGinInjector).getTeamBadgeWidget();
 	}
 	

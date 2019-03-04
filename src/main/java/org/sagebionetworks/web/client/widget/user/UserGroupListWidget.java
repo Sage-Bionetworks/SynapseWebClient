@@ -68,7 +68,7 @@ public class UserGroupListWidget implements UserGroupListWidgetView.Presenter {
 		view.clear();
 	}
 	
-	public Widget getBadgeWidget(String ownerId, boolean isIndividual, String userName) {
+	public Widget getBadgeWidget(String ownerId, boolean isIndividual) {
 		if (isBig) {
 			if (isIndividual) {
 				UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
@@ -77,7 +77,7 @@ public class UserGroupListWidget implements UserGroupListWidgetView.Presenter {
 				return userBadge.asWidget();
 			} else {
 				BigTeamBadge teamBadge = portalGinInjector.getBigTeamBadgeWidget();
-				teamBadge.configure(ownerId, userName);
+				teamBadge.configure(ownerId);
 				return teamBadge.asWidget();
 			}
 		} else {

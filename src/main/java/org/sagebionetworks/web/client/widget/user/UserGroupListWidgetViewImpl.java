@@ -6,14 +6,7 @@ import org.gwtbootstrap3.client.ui.Container;
 import org.gwtbootstrap3.client.ui.Row;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.view.PeopleSearchViewImpl;
-import org.sagebionetworks.web.client.widget.entity.EntityBadgeViewImpl.Binder;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
-import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
-import org.sagebionetworks.web.client.widget.team.MemberListWidgetView;
-import org.sagebionetworks.web.client.widget.team.TeamBadge;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -68,7 +61,7 @@ public class UserGroupListWidgetViewImpl extends Composite implements UserGroupL
 	public void configure(List<UserGroupHeader> users) {
 		
 		for (UserGroupHeader user : users) {
-			Widget badge = presenter.getBadgeWidget(user.getOwnerId(), user.getIsIndividual(), user.getUserName());
+			Widget badge = presenter.getBadgeWidget(user.getOwnerId(), user.getIsIndividual());
 			styleBadgeWidget(badge, presenter.getIsBig());
 			mainRow.add(badge);
 		}
