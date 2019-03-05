@@ -89,6 +89,7 @@ import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -847,6 +848,7 @@ public class EntityActionControllerImplTest {
 		Place result =controller.createDeletePlace();
 		assertTrue(result instanceof Profile);
 		assertEquals(currentUserId, ((Profile)result).getUserId());
+		assertEquals(ProfileArea.PROJECTS, ((Profile)result).getArea());
 	}
 	
 	@Test
@@ -865,6 +867,7 @@ public class EntityActionControllerImplTest {
 		Place result = controller.createDeletePlace();
 		assertTrue(result instanceof Profile);
 		assertEquals(currentUserId, ((Profile)result).getUserId());
+		assertEquals(ProfileArea.PROJECTS, ((Profile)result).getArea());
 	}
 	
 	@Test

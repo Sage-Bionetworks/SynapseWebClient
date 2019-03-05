@@ -43,6 +43,7 @@ import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -1451,7 +1452,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			else if(entityBundle.getEntity() instanceof FileEntity || entityBundle.getEntity() instanceof Folder) gotoPlace = new Synapse(parentId, null, EntityArea.FILES, null);
 			else gotoPlace = new Synapse(parentId);
 		} else {
-			gotoPlace = new Profile(authenticationController.getCurrentUserPrincipalId());
+			gotoPlace = new Profile(authenticationController.getCurrentUserPrincipalId(), ProfileArea.PROJECTS);
 		}
 		return gotoPlace;
 	}
