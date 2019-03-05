@@ -714,8 +714,6 @@ import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadgeView;
 import org.sagebionetworks.web.client.widget.user.UserBadgeViewImpl;
-import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetView;
-import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetViewImpl;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
@@ -1160,9 +1158,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// Team List widget (link to search teams page, optionally can create team)
 		bind(TeamListWidgetView.class).to(TeamListWidgetViewImpl.class);
 		
-		// User Group List widget
-		bind(UserGroupListWidgetView.class).to(UserGroupListWidgetViewImpl.class);
-
 		// Member List widget
 		bind(MemberListWidgetView.class).to(MemberListWidgetViewImpl.class);
 		
