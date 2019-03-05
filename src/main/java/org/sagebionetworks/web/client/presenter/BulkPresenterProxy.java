@@ -17,7 +17,6 @@ import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.place.ACTPlace;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.Account;
-import org.sagebionetworks.web.client.place.Certificate;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.ComingSoon;
@@ -324,19 +323,6 @@ public class BulkPresenterProxy extends AbstractActivity {
 				public void onSuccess() {
 					QuizPresenter presenter = ginjector.getQuizPresenter();
 					presenter.setPlace((Quiz) place);
-					presenter.start(panel, eventBus);
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					loadError(caught);
-				}
-			});
-		} else if (place instanceof Certificate) {
-			GWT.runAsync(Certificate.class, new RunAsyncCallback() {
-				@Override
-				public void onSuccess() {
-					CertificatePresenter presenter = ginjector.getCertificatePresenter();
-					presenter.setPlace((Certificate) place);
 					presenter.start(panel, eventBus);
 				}
 				@Override

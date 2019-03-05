@@ -26,7 +26,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.place.Certificate;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -978,11 +977,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	 */
 	public void setIsOwner(boolean isOwner) {
 		this.isOwner = isOwner;
-	}
-	
-	@Override
-	public void certificationBadgeClicked() {
-		goTo(new Certificate(currentUserId));
 	}
 	
 	public void initUserFavorites(final Callback callback) {

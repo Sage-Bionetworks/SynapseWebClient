@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.view;
 
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Quiz;
 import org.sagebionetworks.web.client.SynapseView;
@@ -20,7 +19,7 @@ public interface QuizView extends IsWidget, SynapseView {
 	void setSubmitVisible(boolean isVisible);
 	void showScore(String scoreContainerText);
 	void hideAll();
-	void showSuccess(UserProfile profile, PassingRecord passingRecord);
+	void showSuccess(PassingRecord passingRecord);
 	void showFailure(PassingRecord passingRecord);
 
 	public interface Presenter {
@@ -28,7 +27,7 @@ public interface QuizView extends IsWidget, SynapseView {
 		void goToLastPlace();	
 		void showQuiz(Quiz quiz);
 		void submitAnswers();
-		void showSuccess(UserProfile profile, PassingRecord passingRecord);
+		void showSuccess(PassingRecord passingRecord);
 		void showFailure(PassingRecord passingRecord);
 		void submitClicked();
 		void showQuizFromPassingRecord(PassingRecord passingRecord);

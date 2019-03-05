@@ -58,7 +58,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void goTo(Place place);
 		void refreshTeams();
 		void tabClicked(ProfileArea areaTab);
-		void certificationBadgeClicked();
 		void getMoreChallenges();
 		void applyFilterClicked(ProjectFilterEnum filterType, Team team);
 		void onEditProfile();

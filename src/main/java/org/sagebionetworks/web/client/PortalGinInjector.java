@@ -8,7 +8,6 @@ import org.sagebionetworks.web.client.presenter.ACTPresenter;
 import org.sagebionetworks.web.client.presenter.AccessRequirementsPresenter;
 import org.sagebionetworks.web.client.presenter.AccountPresenter;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
-import org.sagebionetworks.web.client.presenter.CertificatePresenter;
 import org.sagebionetworks.web.client.presenter.ChallengeOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ChangeUsernamePresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
@@ -304,8 +303,6 @@ public interface PortalGinInjector extends Ginjector {
 	MapPresenter getMapPresenter();
 
 	QuizPresenter getQuizPresenter();
-
-	CertificatePresenter getCertificatePresenter();
 
 	AccountPresenter getAccountPresenter();
 	NewAccountPresenter getNewAccountPresenter();

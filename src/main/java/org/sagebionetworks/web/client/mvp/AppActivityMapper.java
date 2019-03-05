@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
-import org.sagebionetworks.web.client.place.Certificate;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.ComingSoon;
@@ -91,7 +90,6 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(PeopleSearch.class);
 		openAccessPlaces.add(Down.class);
 		openAccessPlaces.add(Profile.class);
-		openAccessPlaces.add(Certificate.class);
 		openAccessPlaces.add(StandaloneWiki.class);
 		openAccessPlaces.add(SignedToken.class);
 		openAccessPlaces.add(SynapseForumPlace.class);
@@ -108,7 +106,6 @@ public class AppActivityMapper implements ActivityMapper {
 		excludeFromLastPlace.add(Quiz.class);
 		excludeFromLastPlace.add(ChangeUsername.class);
 		excludeFromLastPlace.add(Trash.class);
-		excludeFromLastPlace.add(Certificate.class);
 		excludeFromLastPlace.add(SignedToken.class);
 		excludeFromLastPlace.add(Down.class);
 	}
