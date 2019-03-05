@@ -16,8 +16,6 @@ public class BigTeamBadge implements SynapseWidgetPresenter, HasNotificationUI {
 	SynapseJavascriptClient jsClient;
 	AuthenticationController authController;
 	
-	private String teamName;
-	
 	@Inject
 	public BigTeamBadge(BigTeamBadgeView view, SynapseJavascriptClient jsClient, AuthenticationController authController) {
 		this.view = view;
@@ -39,23 +37,10 @@ public class BigTeamBadge implements SynapseWidgetPresenter, HasNotificationUI {
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					if (teamName != null) {
-						view.setTeamWithoutLink(teamName);
-					} else {
-						view.showLoadError(teamId);
-					}
+					view.showLoadError(teamId);
 				}
 			});
 		}
-	}
-	
-	/**
-	 * If the teamId is not valid, a badge will be created
-	 * from the given teamName.
-	 */
-	public void configure(String teamId, String teamName) {
-		this.teamName = teamName;
-		configure(teamId);
 	}
 	
 	@SuppressWarnings("unchecked")

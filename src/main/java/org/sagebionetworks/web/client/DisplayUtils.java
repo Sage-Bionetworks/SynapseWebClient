@@ -946,53 +946,6 @@ public class DisplayUtils {
 		return null;
 	}
 	
-	public static FlowPanel getMediaObject(String heading, String description, ClickHandler clickHandler, String pictureUri, boolean defaultPictureSinglePerson, int headingLevel) {
-		FlowPanel panel = new FlowPanel();
-		panel.addStyleName("media");
- 		String linkStyle = "";
- 		if (clickHandler != null)
- 			linkStyle = "link";
- 		HTML headingHtml = new HTML("<h"+headingLevel+" class=\"media-heading "+linkStyle+"\">" + SafeHtmlUtils.htmlEscape(heading) + "</h"+headingLevel+">");
- 		if (clickHandler != null)
- 			headingHtml.addClickHandler(clickHandler);
- 
- 		if (pictureUri != null) {
- 			Image profilePicture = new Image(pictureUri);
- 			profilePicture.addStyleName("imageButton img-circle");
- 			profilePicture.setWidth("100%");
- 			profilePicture.setHeight("100%");
- 			if (clickHandler != null)
- 				profilePicture.addClickHandler(clickHandler);
- 			Div div = new Div();
- 			div.setWidth("64px");
- 			div.setHeight("64px");
- 			div.setMarginRight(10);
- 			div.add(profilePicture);
- 			div.addStyleName("media-object left inline-block");
- 			panel.add(div);
- 		} else {
- 			//display default picture
- 			IconType type = defaultPictureSinglePerson ? IconType.SYN_USER : IconType.SYN_USERS;
- 			String clickableButtonCssClass = clickHandler != null ? "imageButton" : "";
- 			Icon profilePicture = new Icon(type);
- 			profilePicture.setWidth("64px");
- 			profilePicture.addStyleName(" font-size-58 padding-2 " + clickableButtonCssClass + " userProfileImage lightGreyText margin-0-imp-before");
- 			Div profilePictureWrapper = new Div();
- 			profilePictureWrapper.addStyleName("pull-left media-object displayInline ");
- 			profilePictureWrapper.add(profilePicture);
- 			if (clickHandler != null)
- 				profilePicture.addClickHandler(clickHandler);
- 			panel.add(profilePictureWrapper);
- 		}
- 		FlowPanel mediaBodyPanel = new FlowPanel();
- 		mediaBodyPanel.addStyleName("media-body");
- 		mediaBodyPanel.add(headingHtml);
- 		if (description != null)
- 			mediaBodyPanel.add(new HTML(description));
- 		panel.add(mediaBodyPanel);
- 		return panel;
-	}
-	
 	public static String getShareMessage(String displayName, String entityId, String hostUrl) {
 		return displayName + DisplayConstants.SHARED_ON_SYNAPSE + ":\n"+hostUrl+"#!Synapse:"+entityId+"\n";
 	}

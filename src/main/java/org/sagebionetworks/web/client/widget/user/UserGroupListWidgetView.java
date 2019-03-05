@@ -20,7 +20,7 @@ public interface UserGroupListWidgetView extends IsWidget, SynapseView {
 	public interface Presenter {
 		void goTo(Place place);
 		void clear();
-		Widget getBadgeWidget(String ownerId, boolean isIndividual, String displayName);
+		Widget getBadgeWidget(String ownerId, boolean isIndividual);
 		boolean getIsBig();
 	}
 }
