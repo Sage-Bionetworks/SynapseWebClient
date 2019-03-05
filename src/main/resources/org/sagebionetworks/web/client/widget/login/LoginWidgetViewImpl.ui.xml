@@ -14,7 +14,12 @@
 			<bh:Span addStyleNames="lightGreyText">or</bh:Span>
 		</bh:Div>
 		<b:Heading size="H4" subText="Sign in with your Synapse account" addStyleNames="text-align-center margin-top-20"/>
-		<bh:Div ui:field="loginFormContainer" />
+		
+		<bh:Div>
+			<b:TextBox ui:field="username" placeholder="Username or Email Address" addStyleNames="margin-top-20 whiteBackground" autoComplete="false"/>
+			<b:Input ui:field="password" type="PASSWORD"  placeholder="Password" addStyleNames="margin-top-20 whiteBackground" autoComplete="false"/>
+			<b:Button ui:field="loginButton" size="LARGE" type="SUCCESS" text="Sign in" width="100%" marginTop="15"/>
+		</bh:Div>
 		<b:Row>
 				<bh:Div ui:field="synAlertContainer" />
 			</b:Row>
