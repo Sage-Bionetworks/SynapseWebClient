@@ -1433,7 +1433,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);			
+				view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE + caught.getMessage());
 			}
 		});
 	}

@@ -60,7 +60,7 @@ public class DisplayConstants {
 	public static final String ERROR_ALL_FIELDS_REQUIRED = "All fields must first be properly fill in.";
 	public static final String ERROR_ALL_QUESTIONS_REQUIRED = "Please answer all of the questions and try again.";
 	public static final String BUTTON_DOWNLOAD = "Download";
-	public static final String ERROR_ENTITY_DELETE_FAILURE = "Deletion failed. Please try again.";
+	public static final String ERROR_ENTITY_DELETE_FAILURE = "Deletion failed. ";
 	public static final String PROMPT_SURE_DELETE = "Are you sure you want to delete this";
 	public static final String PROMPT_SURE_REMOVE_MEMBER = " will lose access to resources shared with the team.  Are you sure?";
 	public static final String LABEL_NO_SEARCH_RESULTS_PART1 = "Your search for '";

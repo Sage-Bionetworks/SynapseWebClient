@@ -818,7 +818,7 @@ public class EntityActionControllerImplTest {
 		verify(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		// an attempt to delete should be made
 		verify(mockSynapseJavascriptClient).deleteEntityById(anyString(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);
+		verify(mockView).showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE + error);
 	}
 	
 	@Test
