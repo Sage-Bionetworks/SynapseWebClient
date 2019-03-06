@@ -67,8 +67,10 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
+import org.sagebionetworks.web.client.cache.EntityId2BundleCacheImpl;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -111,8 +113,6 @@ public class SynapseJavascriptClientTest {
 	SynapseJSNIUtils mockJsniUtils;
 	@Mock
 	SynapseProperties mockSynapseProperties;
-	@Mock
-	EntityId2BundleCache mockEntityId2BundleCache;
 	@Captor
 	ArgumentCaptor<RequestCallback> requestCallbackCaptor;
 	@Mock
@@ -127,9 +127,12 @@ public class SynapseJavascriptClientTest {
 	ArgumentCaptor<Callback> callbackCaptor;
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
+	// cache is tested here
+	EntityId2BundleCacheImpl entityId2BundleCache;
 	
 	@Before
 	public void before() {
+		entityId2BundleCache = new EntityId2BundleCacheImpl();
 		when(mockSynapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY)).thenReturn(REPO_ENDPOINT);
 		when(mockSynapseProperties.getSynapseProperty(FILE_SERVICE_URL_KEY)).thenReturn(FILE_ENDPOINT);
 		when(mockGinInjector.getRequestBuilder()).thenReturn(mockRequestBuilder);
@@ -141,7 +144,7 @@ public class SynapseJavascriptClientTest {
 				synapseJsFactory,
 				mockGinInjector,
 				mockJsniUtils,
-				mockEntityId2BundleCache);
+				entityId2BundleCache);
 	}
 	
 	@Test
@@ -182,6 +185,58 @@ public class SynapseJavascriptClientTest {
 		requestCallback.onResponseReceived(mockRequest, mockResponse);
 		
 		verify(mockAsyncCallback).onSuccess(testBundle);
+	}
+	
+	@Test
+	public void testGetEntityBundleFromCacheHitOldVersion() throws RequestException, JSONObjectAdapterException {
+		String entityId = "syn291";
+		EntityBundle testBundle = new EntityBundle();
+		entityId2BundleCache.put(entityId, testBundle);
+		
+		client.getEntityBundleFromCache(entityId, mockAsyncCallback);
+		
+		//verify immediate response due to cache hit
+		verify(mockAsyncCallback).onSuccess(testBundle);
+		
+		//verify url and method
+		String url = REPO_ENDPOINT + ENTITY + "/" + entityId + BUNDLE_MASK_PATH + EntityPageTop.ALL_PARTS_MASK;
+		verify(mockRequestBuilder).configure(GET, url);
+		
+		verify(mockRequestBuilder).sendRequest(eq((String)null), requestCallbackCaptor.capture());
+		RequestCallback requestCallback = requestCallbackCaptor.getValue();
+		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
+		EntityBundle testBundle2 = new EntityBundle();
+		testBundle2.setEntity(new FileEntity());
+		testBundle2.writeToJSONObject(adapter);
+		when(mockResponse.getStatusCode()).thenReturn(SC_OK);
+		when(mockResponse.getText()).thenReturn(adapter.toJSONString());
+		requestCallback.onResponseReceived(mockRequest, mockResponse);
+
+		//verify cache is updated
+		assertEquals(testBundle2, entityId2BundleCache.get(entityId));
+		//verify callback is called again with new version
+		verify(mockAsyncCallback).onSuccess(testBundle2);
+	}
+	
+
+	@Test
+	public void testGetEntityBundleFromCacheMissFailureToGet() throws RequestException, JSONObjectAdapterException {
+		String entityId = "syn291";
+		
+		client.getEntityBundleFromCache(entityId, mockAsyncCallback);
+		
+		//verify immediate response due to cache hit
+		verify(mockAsyncCallback, never()).onSuccess(any(EntityBundle.class));
+		
+		verify(mockRequestBuilder).sendRequest(eq((String)null), requestCallbackCaptor.capture());
+		RequestCallback requestCallback = requestCallbackCaptor.getValue();
+		
+		when(mockResponse.getStatusCode()).thenReturn(SC_FORBIDDEN);
+		String statusText = "user is not allowed access";
+		when(mockResponse.getStatusText()).thenReturn(statusText);
+		requestCallback.onResponseReceived(mockRequest, mockResponse);
+		
+		verify(mockAsyncCallback).onFailure(any(ForbiddenException.class));
 	}
 	
 	@Test

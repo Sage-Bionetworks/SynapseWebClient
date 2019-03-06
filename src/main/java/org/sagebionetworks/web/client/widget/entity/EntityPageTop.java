@@ -172,7 +172,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				EntityHeader projectHeader1 = DisplayUtils.getProjectHeader(bundle1.getPath());
 				EntityHeader projectHeader2 = DisplayUtils.getProjectHeader(bundle2.getPath());
 				if (projectHeader1 != null && projectHeader1.equals(projectHeader2)) {
-					// skip full reload - this is similar to clicking on an entity in the same tab under the same project
+					// skip full reload - use the same logic as clicking on an entity in the same tab (in the same project)
 					EntityArea newArea = getAreaForEntity(bundle2.getEntity());
 					getEntitySelectedCallback(newArea).invoke(place.getEntityId());
 					return;
