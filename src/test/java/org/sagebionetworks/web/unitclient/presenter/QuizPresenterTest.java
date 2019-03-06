@@ -20,7 +20,6 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.quiz.MultichoiceAnswer;
 import org.sagebionetworks.repo.model.quiz.MultichoiceQuestion;
 import org.sagebionetworks.repo.model.quiz.MultichoiceResponse;
@@ -233,7 +232,7 @@ public class QuizPresenterTest {
 		presenter.submitAnswers();
 		
 		//since we set it up to return true, it should show the success/pass UI
-		verify(mockView).showSuccess(any(UserProfile.class), eq(mockPassingRecord));
+		verify(mockView).showSuccess(mockPassingRecord);
 		
 		//let's also check the response object
 		ArgumentCaptor<QuizResponse> arg = ArgumentCaptor.forClass(QuizResponse.class);
