@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.ChangeSynapsePlaceEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -139,6 +140,8 @@ public class EntityPageTopTest {
 	ArgumentCaptor<Place> placeCaptor;
 	@Mock
 	EventBinder mockEventBinder;
+	@Mock
+	EntityId2BundleCache mockEntityId2BundleCache;
 	EntityPageTop pageTop;
 	String projectEntityId = "syn123";
 	String projectName = "fooooo";
@@ -173,6 +176,7 @@ public class EntityPageTopTest {
 				mockCookies, 
 				mockSynapseJavascriptClient,
 				mockGlobalApplicationState,
+				mockEntityId2BundleCache,
 				mockEventBus);
 		AsyncMockStubber.callSuccessWith(mockProjectBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));

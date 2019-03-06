@@ -20,6 +20,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
+import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidgetView;
@@ -36,6 +38,11 @@ public class ButtonLinkWidgetTest {
 	GWTWrapper mockGwt;
 	@Mock
 	AuthenticationController mockAuthController;
+	@Mock
+	AppPlaceHistoryMapper mockAppPlaceHistoryMapper;
+	@Mock
+	EntityId2BundleCache mockEntityId2BundleCache;
+	
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	
 	String baseUrl = "http://my.synapse.org";
@@ -48,7 +55,7 @@ public class ButtonLinkWidgetTest {
 	@Before
 	public void setup(){
 		when(mockGwt.getHostPrefix()).thenReturn(baseUrl);
-		widget = new ButtonLinkWidget(mockView, mockGwt, mockAuthController);
+		widget = new ButtonLinkWidget(mockView, mockGwt, mockAuthController, mockAppPlaceHistoryMapper, mockEntityId2BundleCache);
 		when(mockAuthController.isLoggedIn()).thenReturn(false);
 	}
 	

@@ -31,6 +31,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.ChangeSynapsePlaceEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -89,6 +90,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	private PlaceChanger placeChanger;
 	private CookieProvider cookies;
 	private EventBus eventBus;
+	private EntityId2BundleCache entityId2BundleCache;
 	public boolean pushTabUrlToBrowserHistory = false;
 	
 	public static final int ALL_PARTS_MASK = ENTITY | ENTITY_PATH | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME | BENEFACTOR_ACL | TABLE_DATA | ACL | BENEFACTOR_ACL;
@@ -111,6 +113,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			CookieProvider cookies,
 			SynapseJavascriptClient synapseJavascriptClient,
 			GlobalApplicationState globalAppState,
+			EntityId2BundleCache entityId2EntityPathMap,
 			EventBus eventBus) {
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -130,6 +133,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		this.cookies = cookies;
 		this.synapseJavascriptClient = synapseJavascriptClient;
 		this.placeChanger = globalAppState.getPlaceChanger();
+		this.entityId2BundleCache = entityId2EntityPathMap;
 		this.eventBus = eventBus;
 		
 		initTabs();
@@ -160,7 +164,19 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			pushTabUrlToBrowserHistory = true;
 			reconfigureCurrentArea();
 		} else {
-			placeChanger.goTo(place);
+			//SWC-4234: if the project has not changed, then don't change places.
+			EntityBundle bundle1 = entityId2BundleCache.get(entity.getId());
+			EntityBundle bundle2 = entityId2BundleCache.get(place.getEntityId());
+			EntityHeader projectHeader1 = DisplayUtils.getProjectHeader(bundle1.getPath());
+			EntityHeader projectHeader2 = DisplayUtils.getProjectHeader(bundle2.getPath());
+			
+			if (projectHeader1 != null && projectHeader1.equals(projectHeader2)) {
+				// skip full reload - this is similar to clicking on an entity in the same tab under the same project
+				EntityArea newArea = getAreaForEntity(bundle2.getEntity());
+				getEntitySelectedCallback(newArea).invoke(place.getEntityId());
+			} else {
+				placeChanger.goTo(place);
+			}
 		}
 	}
 	
@@ -517,6 +533,20 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		return EntityArea.WIKI;
 	}
 
+	private EntityArea getAreaForEntity(Entity entity) {
+		EntityArea area = null;
+		if (entity instanceof Project) {
+			area = getDefaultProjectArea();
+		} else if (entity instanceof Table) {
+			area = EntityArea.TABLES;
+		} else if (entity instanceof DockerRepository) {
+			area = EntityArea.DOCKER;
+		} else { //if (entity instanceof FileEntity || entity instanceof Folder, or any other entity type)
+			area = EntityArea.FILES;
+		}
+		return area;
+	}
+	
 	public void initAreaToken() {
 		if (entity instanceof Project) {
 			projectMetadata.setVisible(true);
@@ -524,15 +554,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 
 		//set area, if undefined
 		if (area == null) {
-			if (entity instanceof Project) {
-				area = getDefaultProjectArea();
-			} else if (entity instanceof Table) {
-				area = EntityArea.TABLES;
-			} else if (entity instanceof DockerRepository) {
-				area = EntityArea.DOCKER;
-			} else { //if (entity instanceof FileEntity || entity instanceof Folder, or any other entity type)
-				area = EntityArea.FILES;
-			}
+			area = getAreaForEntity(entity);
 		}
 		setCurrentAreaToken(initialAreaToken);
 

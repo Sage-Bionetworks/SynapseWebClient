@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -53,6 +54,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private OpenTeamInvitationsWidget openTeamInvitesWidget;
 	private GlobalApplicationState globalAppState;
 	private GWTWrapper gwt;
+	private EntityId2BundleCache entityId2EntityPathMap;
 	private SynapseJavascriptClient jsClient;
 	@Inject
 	public EntityPresenter(EntityView view,
@@ -64,7 +66,8 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			EntityPageTop entityPageTop, Header headerWidget,
 			OpenTeamInvitationsWidget openTeamInvitesWidget,
 			GWTWrapper gwt,
-			EventBus eventBus
+			EventBus eventBus,
+			EntityId2BundleCache entityId2EntityPathMap
 			) {
 		this.headerWidget = headerWidget;
 		this.entityPageTop = entityPageTop;
@@ -75,6 +78,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.authenticationController = authenticationController;
 		this.jsClient = jsClient;
 		this.gwt = gwt;
+		this.entityId2EntityPathMap = entityId2EntityPathMap;
 		clear();
 		entityPresenterEventBinder.getEventBinder().bindEventHandlers(this, eventBus);
 	}
@@ -156,6 +160,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 						view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
 					}
 				}
+				entityId2EntityPathMap.put(bundle.getEntity().getId(), bundle);
 				EntityHeader projectHeader = DisplayUtils.getProjectHeader(bundle.getPath());
 				if(projectHeader == null) {
 					synAlert.showError(DisplayConstants.ERROR_GENERIC_RELOAD);
