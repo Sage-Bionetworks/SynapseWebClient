@@ -51,7 +51,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private OpenTeamInvitationsWidget openTeamInvitesWidget;
 	private GlobalApplicationState globalAppState;
 	private GWTWrapper gwt;
-	private EntityId2BundleCache entityId2BundleCache;
 	private SynapseJavascriptClient jsClient;
 	@Inject
 	public EntityPresenter(EntityView view,
@@ -63,8 +62,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			EntityPageTop entityPageTop, Header headerWidget,
 			OpenTeamInvitationsWidget openTeamInvitesWidget,
 			GWTWrapper gwt,
-			EventBus eventBus,
-			EntityId2BundleCache entityId2BundleCache
+			EventBus eventBus
 			) {
 		this.headerWidget = headerWidget;
 		this.entityPageTop = entityPageTop;
@@ -75,7 +73,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.authenticationController = authenticationController;
 		this.jsClient = jsClient;
 		this.gwt = gwt;
-		this.entityId2BundleCache = entityId2BundleCache;
 		clear();
 		entityPresenterEventBinder.getEventBinder().bindEventHandlers(this, eventBus);
 	}
@@ -157,7 +154,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 						view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
 					}
 				}
-				entityId2BundleCache.put(bundle.getEntity().getId(), bundle);
 				EntityHeader projectHeader = DisplayUtils.getProjectHeader(bundle.getPath());
 				if(projectHeader == null) {
 					synAlert.showError(DisplayConstants.ERROR_GENERIC_RELOAD);
