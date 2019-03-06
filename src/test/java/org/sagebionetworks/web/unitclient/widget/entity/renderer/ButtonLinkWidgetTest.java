@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidgetView;
@@ -178,5 +179,17 @@ public class ButtonLinkWidgetTest {
 		descriptor.put(WidgetConstants.LINK_URL_KEY, originalUrl);
 		widget.configure(wikiKey, descriptor, null, null);
 		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(originalUrl + "&" + SYNAPSE_USER_ID_QUERY_PARAM + currentUserId), eq(false), eq(true));
+	}
+	
+	@Test
+	public void testPopulateEntityBundleCache() {
+		String entityId = "syn9182";
+		Map<String, String> descriptor = getDefaultDescriptor();
+		when(mockAppPlaceHistoryMapper.getPlace(anyString())).thenReturn(new Synapse(entityId));
+		descriptor.put(WidgetConstants.LINK_URL_KEY, "#!Synapse:"+entityId);
+		
+		widget.configure(wikiKey, descriptor, null, null);
+		
+		verify(mockJsClient).populateEntityBundleCache(entityId);
 	}
 }
