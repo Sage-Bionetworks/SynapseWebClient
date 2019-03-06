@@ -242,6 +242,7 @@ import org.sagebionetworks.web.client.widget.team.EmailInvitationBadge;
 import org.sagebionetworks.web.client.widget.team.JoinTeamConfigEditor;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.OpenMembershipRequestWidget;
+import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationWidget;
 import org.sagebionetworks.web.client.widget.team.OpenUserInvitationWidget;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
@@ -600,4 +601,5 @@ public interface PortalGinInjector extends Ginjector {
 	SynapseJSNIUtilsImpl getSynapseJSNIUtils();
 	OpenUserInvitationWidget getOpenUserInvitationWidget();
 	OpenMembershipRequestWidget getOpenMembershipRequestWidget();
+	OpenTeamInvitationWidget getOpenTeamInvitationWidget(); 
 }
