@@ -116,7 +116,6 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 	public void configureTableQueryResultWidget(String tableId) {
 		synAlert.clear();
 		
-		int mask = ENTITY | PERMISSIONS | TABLE_DATA | BENEFACTOR_ACL;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
@@ -135,7 +134,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 			}			
 		};
 		
-		jsClient.getEntityBundle(tableId, mask, callback);
+		jsClient.getEntityBundleFromCache(tableId, callback);
 	}
 	
 	public void hideEditActions() {
