@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -29,19 +29,19 @@ public class ButtonLinkWidget implements WidgetRendererPresenter {
 	public static final String LINK_OPENS_NEW_WINDOW = "openNewWindow";
 	public static final String WIDTH = "width";
 	AppPlaceHistoryMapper appPlaceHistoryMapper;
-	EntityId2BundleCache entityId2BundleCache;
+	SynapseJavascriptClient jsClient;
 	@Inject
 	public ButtonLinkWidget(
 			ButtonLinkWidgetView view, 
 			GWTWrapper gwt, 
 			AuthenticationController authController,
 			AppPlaceHistoryMapper appPlaceHistoryMapper,
-			EntityId2BundleCache entityId2BundleCache) {
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.gwt = gwt;
 		this.authController = authController;
 		this.appPlaceHistoryMapper = appPlaceHistoryMapper;
-		this.entityId2BundleCache = entityId2BundleCache;
+		this.jsClient = jsClient;
 	}
 	
 	@Override
@@ -53,7 +53,7 @@ public class ButtonLinkWidget implements WidgetRendererPresenter {
 		//SWC-4234: if Synapse place, add entity id to entity path cache up front
 		if (url.contains("#!Synapse:")) {
 			Synapse synapsePlace = (Synapse)appPlaceHistoryMapper.getPlace(url.substring(url.indexOf('!')));
-			entityId2BundleCache.populate(synapsePlace.getEntityId());
+			jsClient.populateEntityBundleCache(synapsePlace.getEntityId());
 		}
 		
 		if(isIncludePrincipalId(descriptor) && authController.isLoggedIn()) {

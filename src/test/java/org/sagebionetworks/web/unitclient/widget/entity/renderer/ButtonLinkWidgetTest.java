@@ -20,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -41,7 +42,7 @@ public class ButtonLinkWidgetTest {
 	@Mock
 	AppPlaceHistoryMapper mockAppPlaceHistoryMapper;
 	@Mock
-	EntityId2BundleCache mockEntityId2BundleCache;
+	SynapseJavascriptClient mockJsClient;
 	
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	
@@ -55,7 +56,7 @@ public class ButtonLinkWidgetTest {
 	@Before
 	public void setup(){
 		when(mockGwt.getHostPrefix()).thenReturn(baseUrl);
-		widget = new ButtonLinkWidget(mockView, mockGwt, mockAuthController, mockAppPlaceHistoryMapper, mockEntityId2BundleCache);
+		widget = new ButtonLinkWidget(mockView, mockGwt, mockAuthController, mockAppPlaceHistoryMapper, mockJsClient);
 		when(mockAuthController.isLoggedIn()).thenReturn(false);
 	}
 	

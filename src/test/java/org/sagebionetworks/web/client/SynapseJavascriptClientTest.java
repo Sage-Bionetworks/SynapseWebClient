@@ -66,6 +66,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
+import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
@@ -110,6 +111,8 @@ public class SynapseJavascriptClientTest {
 	SynapseJSNIUtils mockJsniUtils;
 	@Mock
 	SynapseProperties mockSynapseProperties;
+	@Mock
+	EntityId2BundleCache mockEntityId2BundleCache;
 	@Captor
 	ArgumentCaptor<RequestCallback> requestCallbackCaptor;
 	@Mock
@@ -137,7 +140,8 @@ public class SynapseJavascriptClientTest {
 				mockGwt,
 				synapseJsFactory,
 				mockGinInjector,
-				mockJsniUtils);
+				mockJsniUtils,
+				mockEntityId2BundleCache);
 	}
 	
 	@Test

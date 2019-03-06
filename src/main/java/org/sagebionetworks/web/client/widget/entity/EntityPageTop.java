@@ -10,8 +10,10 @@ import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 import static org.sagebionetworks.repo.model.EntityBundle.FILE_NAME;
 import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.RESTRICTION_INFORMATION;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
+import static org.sagebionetworks.repo.model.EntityBundle.THREAD_COUNT;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
@@ -92,8 +94,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	private EventBus eventBus;
 	private EntityId2BundleCache entityId2BundleCache;
 	public boolean pushTabUrlToBrowserHistory = false;
-	
-	public static final int ALL_PARTS_MASK = ENTITY | ENTITY_PATH | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME | BENEFACTOR_ACL | TABLE_DATA | ACL | BENEFACTOR_ACL;
+	public static final int ALL_PARTS_MASK = ENTITY | ENTITY_PATH | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME | BENEFACTOR_ACL | TABLE_DATA | ACL | BENEFACTOR_ACL | THREAD_COUNT | RESTRICTION_INFORMATION;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -320,7 +321,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
-				entityId2BundleCache.put(bundle.getEntity().getId(), bundle);
 				view.setProjectLoadingVisible(false);
 				// by default, all tab entity bundles point to the project entity bundle
 				projectBundle = filesEntityBundle = tablesEntityBundle = dockerEntityBundle = bundle;
@@ -342,7 +342,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		if (projectHeader.getId().equals(currentTargetEntityBundle.getEntity().getId())) {
 			callback.onSuccess(currentTargetEntityBundle);
 		} else {
-			synapseJavascriptClient.getEntityBundle(projectHeader.getId(), ALL_PARTS_MASK, callback);	
+			synapseJavascriptClient.getEntityBundleFromCache(projectHeader.getId(), callback);	
 		}
 	}
 
@@ -361,7 +361,11 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		if (entityId != null && projectBundle != null && entityId.equals(projectBundle.getEntity().getId())) {
 			callback.onSuccess(projectBundle);
 		} else {
-			synapseJavascriptClient.getEntityBundleForVersion(entityId, version, ALL_PARTS_MASK, callback);	
+			if (version == null) {
+				synapseJavascriptClient.getEntityBundleFromCache(entityId, callback);
+			} else {
+				synapseJavascriptClient.getEntityBundleForVersion(entityId, version, ALL_PARTS_MASK, callback);	
+			}
 		}
 	}
 
