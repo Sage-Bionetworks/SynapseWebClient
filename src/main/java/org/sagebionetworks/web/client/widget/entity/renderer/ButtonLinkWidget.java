@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget.isIncludePrincipalId;
+
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
@@ -13,9 +15,7 @@ import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import static org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget.*;
 
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -29,19 +29,19 @@ public class ButtonLinkWidget implements WidgetRendererPresenter {
 	public static final String LINK_OPENS_NEW_WINDOW = "openNewWindow";
 	public static final String WIDTH = "width";
 	AppPlaceHistoryMapper appPlaceHistoryMapper;
-	EntityId2BundleCache entityId2EntityPathMap;
+	EntityId2BundleCache entityId2BundleCache;
 	@Inject
 	public ButtonLinkWidget(
 			ButtonLinkWidgetView view, 
 			GWTWrapper gwt, 
 			AuthenticationController authController,
 			AppPlaceHistoryMapper appPlaceHistoryMapper,
-			EntityId2BundleCache entityId2EntityPathMap) {
+			EntityId2BundleCache entityId2BundleCache) {
 		this.view = view;
 		this.gwt = gwt;
 		this.authController = authController;
 		this.appPlaceHistoryMapper = appPlaceHistoryMapper;
-		this.entityId2EntityPathMap = entityId2EntityPathMap;
+		this.entityId2BundleCache = entityId2BundleCache;
 	}
 	
 	@Override
@@ -53,7 +53,7 @@ public class ButtonLinkWidget implements WidgetRendererPresenter {
 		//SWC-4234: if Synapse place, add entity id to entity path cache up front
 		if (url.contains("#!Synapse:")) {
 			Synapse synapsePlace = (Synapse)appPlaceHistoryMapper.getPlace(url.substring(url.indexOf('!')));
-			entityId2EntityPathMap.populate(synapsePlace.getEntityId());
+			entityId2BundleCache.populate(synapsePlace.getEntityId());
 		}
 		
 		if(isIncludePrincipalId(descriptor) && authController.isLoggedIn()) {

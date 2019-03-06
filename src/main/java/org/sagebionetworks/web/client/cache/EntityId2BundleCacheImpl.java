@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.cache;
 import java.util.HashMap;
 
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 

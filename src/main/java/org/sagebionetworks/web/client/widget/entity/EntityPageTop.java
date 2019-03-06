@@ -113,7 +113,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			CookieProvider cookies,
 			SynapseJavascriptClient synapseJavascriptClient,
 			GlobalApplicationState globalAppState,
-			EntityId2BundleCache entityId2EntityPathMap,
+			EntityId2BundleCache entityId2BundleCache,
 			EventBus eventBus) {
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -133,7 +133,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		this.cookies = cookies;
 		this.synapseJavascriptClient = synapseJavascriptClient;
 		this.placeChanger = globalAppState.getPlaceChanger();
-		this.entityId2BundleCache = entityId2EntityPathMap;
+		this.entityId2BundleCache = entityId2BundleCache;
 		this.eventBus = eventBus;
 		
 		initTabs();
@@ -167,16 +167,18 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			//SWC-4234: if the project has not changed, then don't change places.
 			EntityBundle bundle1 = entityId2BundleCache.get(entity.getId());
 			EntityBundle bundle2 = entityId2BundleCache.get(place.getEntityId());
-			EntityHeader projectHeader1 = DisplayUtils.getProjectHeader(bundle1.getPath());
-			EntityHeader projectHeader2 = DisplayUtils.getProjectHeader(bundle2.getPath());
-			
-			if (projectHeader1 != null && projectHeader1.equals(projectHeader2)) {
-				// skip full reload - this is similar to clicking on an entity in the same tab under the same project
-				EntityArea newArea = getAreaForEntity(bundle2.getEntity());
-				getEntitySelectedCallback(newArea).invoke(place.getEntityId());
-			} else {
-				placeChanger.goTo(place);
+			if (bundle1 != null && bundle2 != null) {
+				EntityHeader projectHeader1 = DisplayUtils.getProjectHeader(bundle1.getPath());
+				EntityHeader projectHeader2 = DisplayUtils.getProjectHeader(bundle2.getPath());
+				if (projectHeader1 != null && projectHeader1.equals(projectHeader2)) {
+					// skip full reload - this is similar to clicking on an entity in the same tab under the same project
+					EntityArea newArea = getAreaForEntity(bundle2.getEntity());
+					getEntitySelectedCallback(newArea).invoke(place.getEntityId());
+					return;
+				}
 			}
+			
+			placeChanger.goTo(place);
 		}
 	}
 	
@@ -318,6 +320,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
+				entityId2BundleCache.put(bundle.getEntity().getId(), bundle);
 				view.setProjectLoadingVisible(false);
 				// by default, all tab entity bundles point to the project entity bundle
 				projectBundle = filesEntityBundle = tablesEntityBundle = dockerEntityBundle = bundle;

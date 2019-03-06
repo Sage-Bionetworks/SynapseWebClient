@@ -1,9 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
 
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
-
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -54,7 +51,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private OpenTeamInvitationsWidget openTeamInvitesWidget;
 	private GlobalApplicationState globalAppState;
 	private GWTWrapper gwt;
-	private EntityId2BundleCache entityId2EntityPathMap;
+	private EntityId2BundleCache entityId2BundleCache;
 	private SynapseJavascriptClient jsClient;
 	@Inject
 	public EntityPresenter(EntityView view,
@@ -67,7 +64,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			OpenTeamInvitationsWidget openTeamInvitesWidget,
 			GWTWrapper gwt,
 			EventBus eventBus,
-			EntityId2BundleCache entityId2EntityPathMap
+			EntityId2BundleCache entityId2BundleCache
 			) {
 		this.headerWidget = headerWidget;
 		this.entityPageTop = entityPageTop;
@@ -78,7 +75,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.authenticationController = authenticationController;
 		this.jsClient = jsClient;
 		this.gwt = gwt;
-		this.entityId2EntityPathMap = entityId2EntityPathMap;
+		this.entityId2BundleCache = entityId2BundleCache;
 		clear();
 		entityPresenterEventBinder.getEventBinder().bindEventHandlers(this, eventBus);
 	}
@@ -160,7 +157,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 						view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
 					}
 				}
-				entityId2EntityPathMap.put(bundle.getEntity().getId(), bundle);
+				entityId2BundleCache.put(bundle.getEntity().getId(), bundle);
 				EntityHeader projectHeader = DisplayUtils.getProjectHeader(bundle.getPath());
 				if(projectHeader == null) {
 					synAlert.showError(DisplayConstants.ERROR_GENERIC_RELOAD);
