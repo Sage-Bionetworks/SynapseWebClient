@@ -8,6 +8,8 @@ import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.ClientCacheImpl;
+import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
+import org.sagebionetworks.web.client.cache.EntityId2BundleCacheImpl;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cache.SessionStorageImpl;
 import org.sagebionetworks.web.client.cache.StorageImpl;
@@ -1208,6 +1210,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EditAnnotationsDialogView.class).to(EditAnnotationsDialogViewImpl.class);
 		
 		bind(AnnotationCellFactory.class).to(AnnotationCellFactoryImpl.class).in(Singleton.class);
+		bind(EntityId2BundleCache.class).to(EntityId2BundleCacheImpl.class).in(Singleton.class);
 		
 		bind(FileHistoryRowView.class).to(FileHistoryRowViewImpl.class);
 		bind(SynapseStandaloneWikiView.class).to(SynapseStandaloneWikiViewImpl.class);

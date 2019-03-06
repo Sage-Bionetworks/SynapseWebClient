@@ -117,8 +117,10 @@ import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
+import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -204,6 +206,7 @@ public class SynapseJavascriptClient {
 	PortalGinInjector ginInjector;
 	SynapseJSNIUtils jsniUtils;
 	SynapseProperties synapseProperties;
+	EntityId2BundleCache entityIdBundleCache;
 
 	public static final String USER = "/user";
 	public static final String BUNDLE_MASK_PATH = "/bundle?mask=";
@@ -264,6 +267,7 @@ public class SynapseJavascriptClient {
 	public static final String SEARCH = "/search";
 	public static final int LIMIT_50 = 50;
 	
+	
 	public String repoServiceUrl,fileServiceUrl, authServiceUrl, synapseVersionInfo; 
 	@Inject
 	public SynapseJavascriptClient(
@@ -272,7 +276,8 @@ public class SynapseJavascriptClient {
 			GWTWrapper gwt,
 			SynapseJavascriptFactory jsFactory,
 			PortalGinInjector ginInjector,
-			SynapseJSNIUtils jsniUtils) {
+			SynapseJSNIUtils jsniUtils,
+			EntityId2BundleCache entityIdBundleCache) {
 		this.authController = ginInjector.getAuthenticationController();
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.synapseProperties = synapseProperties;
@@ -280,6 +285,7 @@ public class SynapseJavascriptClient {
 		this.jsFactory = jsFactory;
 		this.ginInjector = ginInjector;
 		this.jsniUtils = jsniUtils;
+		this.entityIdBundleCache = entityIdBundleCache;
 	}
 	private String getRepoServiceUrl() {
 		if (repoServiceUrl == null) {
@@ -478,6 +484,50 @@ public class SynapseJavascriptClient {
 	
 	public void getEntityBundle(String entityId, int partsMask, final AsyncCallback<EntityBundle> callback) {
 		getEntityBundleForVersion(entityId, null, partsMask, callback);
+	}
+	
+	public void populateEntityBundleCache(String entityId) {
+		getEntityBundleFromCache(entityId, null);
+	}
+	
+	/**
+	 * If bundle is found in local js cache, then this will immediately call onSuccess() with the cached version.
+	 * Note that the current entity bundle will still be retrieved, and onSuccess() may be called again if there's a newer version (so write your onSuccess accordingly)!
+	 * @param entityId
+	 * @param partsMask
+	 * @param callback
+	 */
+	public void getEntityBundleFromCache(String entityId, final AsyncCallback<EntityBundle> callback) {
+		EntityBundle cachedBundle = entityIdBundleCache.get(entityId);
+		if (cachedBundle != null) {
+			jsniUtils.consoleLog("Cache hit: " + entityId);
+			if (callback != null) {
+				callback.onSuccess(cachedBundle);	
+			}
+		} else {
+			jsniUtils.consoleLog("Cache miss: " + entityId);
+		}
+		getEntityBundleForVersion(entityId, null, EntityPageTop.ALL_PARTS_MASK, new AsyncCallback<EntityBundle>() {
+			@Override
+			public void onSuccess(EntityBundle latestEntityBundle) {
+				if (!latestEntityBundle.equals(cachedBundle)) {
+					if (cachedBundle != null) {
+						jsniUtils.consoleLog("Cache out of date. Updating cache and calling onSuccess() again: " + entityId);	
+					} 
+					
+					entityIdBundleCache.put(entityId, latestEntityBundle);
+					if (callback != null) {
+						callback.onSuccess(latestEntityBundle);
+					}
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if (callback != null) {
+					callback.onFailure(caught);
+				}
+			}
+		});
 	}
 
 	public void getJSON(String uri, AsyncCallback<JSONObjectAdapter> callback) {

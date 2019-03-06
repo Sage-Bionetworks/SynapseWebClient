@@ -165,7 +165,7 @@ public class EntityBadgeTest {
 		when(bundle.getRootWikiId()).thenReturn(rootWikiKeyId);
 		when(bundle.getThreadCount()).thenReturn(entityThreadCount);
 		when(bundle.getFileHandles()).thenReturn(Collections.singletonList(mockDataFileHandle));
-		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
 		
 		return bundle;
 	}
@@ -204,7 +204,7 @@ public class EntityBadgeTest {
 		verify(mockLazyLoadHelper).configure(captor.capture(), eq(mockView));
 		captor.getValue().invoke();
 		
-		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
 		verify(mockView).showPublicIcon();
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).showHasWikiIcon();
@@ -224,7 +224,7 @@ public class EntityBadgeTest {
 		configure();
 		widget.getEntityBundle();
 		
-		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
 		verify(mockView).showPublicIcon();
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).showHasWikiIcon();
@@ -238,7 +238,7 @@ public class EntityBadgeTest {
 		//test failure response from getEntityBundle
 		String errorMessage = "problem occurred while asking for entity bundle";
 		Exception ex = new Exception(errorMessage);
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
 		widget.getEntityBundle();
 		
 		verify(mockView).setError(errorMessage);

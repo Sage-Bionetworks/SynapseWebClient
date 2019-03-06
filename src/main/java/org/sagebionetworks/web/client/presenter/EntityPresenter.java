@@ -1,9 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
 
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
-
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -15,6 +12,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
