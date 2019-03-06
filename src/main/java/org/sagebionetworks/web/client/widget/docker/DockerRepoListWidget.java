@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.docker;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -12,7 +12,6 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
@@ -86,14 +85,15 @@ public class DockerRepoListWidget {
 	private void setResults(List<EntityHeader> results) {
 		synAlert.clear();
 		for (EntityHeader header: results) {
-			jsClient.getEntity(header.getId(), OBJECT_TYPE.DockerRepository, new AsyncCallback<Entity>(){
+			view.addRepo(header);
+			jsClient.getEntityBundleFromCache(header.getId(), new AsyncCallback<EntityBundle>() {
 				@Override
-				public void onSuccess(Entity dockerRepository) {
-					view.addRepo((DockerRepository)dockerRepository);
-				}
+				public void onSuccess(EntityBundle result) {
+					view.setDockerRepository((DockerRepository)result.getEntity());
+				};
 				@Override
-				public void onFailure(Throwable error) {
-					synAlert.handleException(error);
+				public void onFailure(Throwable caught) {
+					synAlert.handleException(caught);
 				}
 			});
 		}
