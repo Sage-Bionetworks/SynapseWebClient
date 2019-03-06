@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.table;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -156,6 +157,9 @@ public class TableListWidgetTest {
 		}
 		//load the data
 		widget.configure(parentBundle);
+		
+		verify(mockView, times(itemCount)).addTableListItem(any(EntityHeader.class));
+		verify(mockSynapseJavascriptClient, times(itemCount)).populateEntityBundleCache(anyString());
 		
 		widget.copyIDsToClipboard();
 		

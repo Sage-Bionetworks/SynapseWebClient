@@ -154,6 +154,9 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 			addSynIdToList(header.getId());
 			view.addTableListItem(header);
 		}
+		for (EntityHeader header : results) {
+			jsClient.populateEntityBundleCache(header.getId());
+		}
 	}
     
 	@Override

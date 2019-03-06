@@ -64,7 +64,7 @@ public class DockerRepoListWidget {
 		view.clear();
 		view.setLoadingVisible(false);
 		query.setNextPageToken(null);
-		membersContainer.setIsMore(true);
+		loadMore();
 	}
 	
 	public void loadMore() {
