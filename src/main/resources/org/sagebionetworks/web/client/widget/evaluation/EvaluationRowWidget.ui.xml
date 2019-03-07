@@ -13,6 +13,7 @@
 					<b:Button ui:field="shareButton" text="Share" pull="RIGHT" addStyleNames="margin-right-5" size="EXTRA_SMALL"/>
 					<b:Button ui:field="editButton" icon="EDIT" text="Edit" pull="RIGHT" addStyleNames="margin-right-5" size="EXTRA_SMALL"/>
 				</b:Heading>
+				<bh:Div ui:field="submitToEvaluationContainer" />
 			</b:Column>
 		</b:Row>
 		<b:Row>

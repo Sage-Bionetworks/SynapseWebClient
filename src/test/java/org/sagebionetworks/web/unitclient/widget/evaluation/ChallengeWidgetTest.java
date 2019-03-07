@@ -10,14 +10,18 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Challenge;
+import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidget;
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidgetView;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
@@ -28,11 +32,14 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ChallengeWidgetTest {
 	
 	ChallengeWidget widget;
 	@Mock
 	ChallengeWidgetView mockView;
+	@Mock
+	SubmitToEvaluationWidget submitToChallengeWidget;
 	@Mock
 	ChallengeClientAsync mockChallengeClient;
 	@Mock
@@ -50,8 +57,7 @@ public class ChallengeWidgetTest {
 	
 	@Before
 	public void setup() throws Exception{
-		MockitoAnnotations.initMocks(this);
-		widget = new ChallengeWidget(mockView, mockChallengeClient, mockSynAlert, mockTeamBadge, mockSelectTeamModal);
+		widget = new ChallengeWidget(mockView, mockChallengeClient, mockSynAlert, mockTeamBadge, mockSelectTeamModal, submitToChallengeWidget);
 		
 		AsyncMockStubber.callSuccessWith(mockChallenge).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
 		when(mockChallenge.getId()).thenReturn(CHALLENGE_ID);
@@ -76,6 +82,8 @@ public class ChallengeWidgetTest {
 		inOrder.verify(mockView).setChallengeVisible(false);
 		inOrder.verify(mockView).setChallengeVisible(true);
 		verify(mockView).setChallengeId(CHALLENGE_ID);
+		// submit to challenge widget has been configured
+		verify(submitToChallengeWidget).configure(any(), any(), any(), any());
 	}
 	
 	@Test

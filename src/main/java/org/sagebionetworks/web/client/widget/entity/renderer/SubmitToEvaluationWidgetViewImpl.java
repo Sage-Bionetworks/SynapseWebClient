@@ -28,7 +28,7 @@ public class SubmitToEvaluationWidgetViewImpl extends FlowPanel implements Submi
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, String buttonText) {
+	public void configure(String buttonText) {
 		this.clear();
 		//include the evaluation submitter widget on the page
 		add(evaluationSubmitterContainer);

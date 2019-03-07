@@ -106,7 +106,7 @@ public class SubmitToEvaluationWidgetTest {
 	public void testHappyCaseConfigure() throws Exception {
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
 		verify(mockChallengeClient).getAvailableEvaluations(eq(targetEvaluations), any(AsyncCallback.class));
-		verify(mockView).configure(any(WikiPageKey.class), anyString());
+		verify(mockView).configure(anyString());
 	}
 	
 	@Test

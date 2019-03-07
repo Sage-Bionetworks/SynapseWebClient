@@ -2,11 +2,15 @@ package org.sagebionetworks.web.client.widget.evaluation;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
+import java.util.HashMap;
+
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -23,14 +27,15 @@ public class ChallengeWidget implements ChallengeWidgetView.Presenter, IsWidget 
 	AsyncCallback<Challenge> callback;
 	private Challenge currentChallenge;
 	private SelectTeamModal selectTeamModal;
-	
+	private SubmitToEvaluationWidget submitToChallengeWidget;
 	@Inject
 	public ChallengeWidget(
 			ChallengeWidgetView view, 
 			ChallengeClientAsync challengeClient,
 			SynapseAlert synAlert,
 			BigTeamBadge teamBadge,
-			SelectTeamModal selectTeamModal
+			SelectTeamModal selectTeamModal,
+			SubmitToEvaluationWidget submitToChallengeWidget
 			) {
 		this.challengeClient = challengeClient;
 		fixServiceEntryPoint(challengeClient);
@@ -38,11 +43,13 @@ public class ChallengeWidget implements ChallengeWidgetView.Presenter, IsWidget 
 		this.synAlert = synAlert;
 		this.teamBadge = teamBadge;
 		this.selectTeamModal = selectTeamModal;
+		this.submitToChallengeWidget = submitToChallengeWidget;
 		view.setPresenter(this);
 		view.add(synAlert.asWidget());
 		view.setChallengeTeamWidget(teamBadge.asWidget());
 		callback = getConfigureCallback();
 		view.setSelectTeamModal(selectTeamModal.asWidget());
+		view.setSubmitToChallengeWidget(submitToChallengeWidget);
 		selectTeamModal.setTitle("Select Participant Team");
 		selectTeamModal.configure(selectedTeamId -> {
 			onSelectChallengeTeam(selectedTeamId);
@@ -57,6 +64,11 @@ public class ChallengeWidget implements ChallengeWidgetView.Presenter, IsWidget 
 				teamBadge.configure(challenge.getParticipantTeamId());
 				view.setChallengeVisible(true);
 				view.setChallengeId(currentChallenge.getId());
+				
+				HashMap<String, String> submitToChallengeParams = new HashMap<>();
+				submitToChallengeParams.put(WidgetConstants.CHALLENGE_ID_KEY, challenge.getId());
+				submitToChallengeParams.put(WidgetConstants.BUTTON_TEXT_KEY, "Submit");
+				submitToChallengeWidget.configure(null, submitToChallengeParams, null, null);
 			}
 			
 			@Override
