@@ -123,7 +123,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 				if (json.has("reason")) {
 					message = json.getString("reason");
 				}
-			} catch (JSONObjectAdapterException e) {
+			} catch (Throwable e) {
 				// was not json
 			}
 			
