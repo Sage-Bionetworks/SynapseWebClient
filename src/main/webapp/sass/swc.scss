@@ -152,7 +152,7 @@ end sticky footer
 	.btn-default {
 		background-color: #ebebeb;
 	}
-	.btn-default:hover, .open .dropdown-toggle.btn-default {
+	.btn-default:hover, .open .dropdown-toggle.btn-default, .btn-default:hover a {
 		color: white;
 		background-color: $synapse-blue;
 		border-color: #186292;

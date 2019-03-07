@@ -11,6 +11,7 @@ import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
@@ -279,13 +280,13 @@ public class SearchViewImpl extends Composite implements SearchView {
 			
 			facetNames.append(text);
 			facetNames.append(" ");
-			Button btn = new Button(text, IconType.TIMES, event -> {				
+			Button btn = new Button(text, IconType.TIMES, event -> {
 				// disable all buttons to allow only one click
 				for(Button facetButton : facetButtons) {
 					facetButton.setEnabled(false);
 				}
 				Window.scrollTo(0, 0);
-				presenter.removeTimeFacetAndRefresh(facet.getKey());						
+				presenter.removeTimeFacetAndRefresh(facet.getKey());
 			});
 			
 			btn.setHeight(BUTTON_HEIGHT);
