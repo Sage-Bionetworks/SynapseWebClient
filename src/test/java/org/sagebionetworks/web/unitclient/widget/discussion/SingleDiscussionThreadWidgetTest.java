@@ -681,8 +681,26 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockGinInjector, times(2)).createReplyWidget();
 		verify(mockView).setDeleteIconVisible(false);
 		verify(mockView).setSecondNewReplyContainerVisible(true);
+		verify(mockRepliesContainer).setIsMore(false);
 	}
 
+	@Test
+	public void testLoadMoreVisible() {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
+		boolean isPinned = false;
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
+				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
+				CREATED_BY, isEdited, isPinned);
+		bundleList = DiscussionTestUtils.createReplyBundleList(SingleDiscussionThreadWidget.LIMIT.intValue());
+		AsyncMockStubber.callSuccessWith(bundleList)
+				.when(mockSynapseJavascriptClient).getRepliesForThread(anyString(), anyLong(),
+						anyLong(), any(DiscussionReplyOrder.class), anyBoolean(), 
+						any(DiscussionFilter.class), any(AsyncCallback.class));
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
+		verify(mockRepliesContainer).setIsMore(true);
+	}
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testLoadmoreEmpty() {
