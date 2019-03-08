@@ -60,7 +60,7 @@
 						</bh:Div>
 					</bh:Div>
 					<bh:Div>
-						<b:Anchor styleName="link left margin-top-10" text="View complete Terms of Conditions for Use" href="https://s3.amazonaws.com/static.synapse.org/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf?v=5" target="_blank"/>
+						<b:Anchor styleName="link left margin-top-10" text="View complete Terms and Conditions for Use" href="https://s3.amazonaws.com/static.synapse.org/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf?v=5" target="_blank"/>
 						<g:Button ui:field="takePledgeButton" styleName="btn btn-lg btn-primary margin-top-10 right" text="Accept Terms and Conditions for Use"/>
 					</bh:Div>
 				</bh:Div>
