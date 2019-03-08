@@ -155,7 +155,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 						}
 						
 						offset += LIMIT;
-						loadMoreWidgetContainer.setIsMore(!results.isEmpty());
+						loadMoreWidgetContainer.setIsMore(results.size() == LIMIT);
 						
 						if (emptyListCallback != null) {
 							emptyListCallback.invoke(!isEmpty);
