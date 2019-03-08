@@ -119,7 +119,7 @@ public class LoginPresenterTest {
 		//method under test
 		loginPresenter.setPlace(mockLoginPlace);
 		
-		verify(mockView).showTermsOfUse(touCallbackCaptor.capture());
+		verify(mockView).showTermsOfUse(eq(false), touCallbackCaptor.capture());
 		Callback touCallback = touCallbackCaptor.getValue();
 		AsyncMockStubber.callSuccessWith(null).when(mockAuthenticationController).signTermsOfUse(anyBoolean(), any(AsyncCallback.class));
 		
@@ -128,9 +128,20 @@ public class LoginPresenterTest {
 		verify(mockAuthenticationController).signTermsOfUse(eq(true), any(AsyncCallback.class));
 		verify(mockAuthenticationController).initializeFromExistingSessionCookie(any(AsyncCallback.class));
 		// verify we only showed this once:
-		verify(mockView).showTermsOfUse(any(Callback.class));
+		verify(mockView).showTermsOfUse(eq(false), any(Callback.class));
 		//go to the last place (or the user dashboard Profile place if last place is not set)
 		verify(mockGlobalApplicationState).gotoLastPlace(any(Profile.class));
+	}
+	
+	@Test 
+	public void testSetPlaceShowAcceptedToU() {
+		when(mockLoginPlace.toToken()).thenReturn(LoginPlace.SHOW_SIGNED_TOU);
+		when(mockAuthenticationController.getCurrentUserSessionToken()).thenReturn("valid session token");
+
+		//method under test
+		loginPresenter.setPlace(mockLoginPlace);
+
+		verify(mockView).showTermsOfUse(eq(true), any(Callback.class));
 	}
 
 	// note: if user has already accepted Synapse ToU and they go to the ToU page, no need to block (show ToU).

@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -136,6 +137,8 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	Button certificationPassedButton;
 	@UiField
 	Button certificationButton;
+	@UiField
+	Button synapseTermsAcceptedButton;
 	private Presenter presenter;
 	
 	@Inject
@@ -208,6 +211,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		unbindButton.addClickHandler(event -> presenter.unbindOrcId());
 		certificationButton.addClickHandler(event -> presenter.goTo(new Quiz("Certification")));
 		certificationPassedButton.addClickHandler(event -> DisplayUtils.newWindow("https://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#certified-users", "_blank", ""));
+		synapseTermsAcceptedButton.addClickHandler(event -> presenter.goTo(new LoginPlace(LoginPlace.SHOW_SIGNED_TOU)));
 	}
 
 	@Override
