@@ -55,7 +55,7 @@ public class MarkdownItImpl implements MarkdownIt {
 			var footnotes = $wnd.markdownitSynapse.footnotes();
 			if (footnotes.length !== 0) {
 			  //reset footnote id and rerun on footnotes that were discovered in the first pass
-			  $wnd.markdownitSynapse.resetFootnoteId();
+			  $wnd.markdownitSynapse.resetFootnotes();
 			  var footnotesHtml = $wnd.md.render(footnotes);
 			  results += '<hr>' + footnotesHtml;
 			}
