@@ -437,7 +437,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 								repliesContainer.add(replyWidget.asWidget());
 							}
 						}
-						repliesContainer.setIsMore(!results.isEmpty());
+						repliesContainer.setIsMore(results.size() == LIMIT);
 						view.setSecondNewReplyContainerVisible(!isEmpty);
 					}
 		});

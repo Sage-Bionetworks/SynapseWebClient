@@ -217,6 +217,7 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockEmptyListCallback).invoke(anyBoolean());
 		verify(mockView).setThreadHeaderVisible(true);
 		verify(mockView).setNoThreadsFoundVisible(false);
+		verify(mockThreadsContainer).setIsMore(false);
 		
 		// test scroll to thread, rpc failure
 		String error = "unable to refresh thread data";
@@ -227,6 +228,22 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockSynapseJavascriptClient).getThread(anyString(), any(AsyncCallback.class));
 		verify(mockDiscussionThreadWidget, never()).configure(mockDiscussionThreadBundle);
 		verify(mockSynapseJSNIUtils).consoleError(error);
+	}
+	
+	@Test
+	public void testLoadMoreVisible() {
+		boolean canModerate = false;
+		AsyncMockStubber.callSuccessWith(discussionThreadBundleList)
+				.when(mockSynapseJavascriptClient).getThreadsForForum(anyString(),
+						anyLong(), anyLong(), any(DiscussionThreadOrder.class),
+						anyBoolean(), any(DiscussionFilter.class), any(AsyncCallback.class));
+		for (int i = 0; i < DiscussionThreadListWidget.LIMIT; i++) {
+			DiscussionThreadBundle threadBundle = new DiscussionThreadBundle();
+			threadBundle.setId("thread_"+i);
+			discussionThreadBundleList.add(threadBundle);
+		}
+		discussionThreadListWidget.configure("123", canModerate, moderatorIds, mockEmptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
+		verify(mockThreadsContainer).setIsMore(true);
 	}
 
 	@SuppressWarnings("unchecked")
