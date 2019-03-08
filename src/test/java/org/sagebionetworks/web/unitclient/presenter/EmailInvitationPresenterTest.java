@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
@@ -54,7 +55,7 @@ public class EmailInvitationPresenterTest {
 	@Mock private Team mockTeam;
 	@Mock private UserProfile mockInviterProfile;
 	@Mock private UserProfile mockCurrentUserProfile;
-	
+	@Captor private ArgumentCaptor<Profile> placeCaptor;
 	private EmailInvitationPresenter presenter;
 	private String encodedMISignedToken;
 
@@ -113,9 +114,11 @@ public class EmailInvitationPresenterTest {
 		verify(mockJsClient).getInviteeVerificationSignedToken(anyString());
 		//does not attempt to bind invitation to the current user
 		verify(mockJsClient, never()).updateInviteeId(mockInviteeVerificationSignedToken);
-		//instead, in this edge case we log the current user out and show the option to log in or register.
-		verify(mockAuthController).logoutUser();
-		verify(mockView).showNotLoggedInUI();
+		//instead, in this edge case we send the currently logged in user their settings place to add the new email address
+		verify(mockPlaceChanger).goTo(placeCaptor.capture());
+		Profile profilePlace = placeCaptor.getValue();
+		assertEquals(CURRENT_USER_ID, profilePlace.getUserId());
+		assertEquals(ProfileArea.SETTINGS, profilePlace.getArea());
 	}
 
 	@Test
@@ -131,9 +134,9 @@ public class EmailInvitationPresenterTest {
 		//does not attempt to bind invitation to the current user (since that's already done
 		verify(mockJsClient, never()).getInviteeVerificationSignedToken(anyString());
 		verify(mockJsClient, never()).updateInviteeId(mockInviteeVerificationSignedToken);
-		ArgumentCaptor<org.sagebionetworks.web.client.place.Profile> captor = ArgumentCaptor.forClass(org.sagebionetworks.web.client.place.Profile.class);
-		verify(mockPlaceChanger).goTo(captor.capture());
-		Profile profilePlace = captor.getValue();
+		
+		verify(mockPlaceChanger).goTo(placeCaptor.capture());
+		Profile profilePlace = placeCaptor.getValue();
 		assertEquals(CURRENT_USER_ID, profilePlace.getUserId());
 		assertEquals(ProfileArea.TEAMS, profilePlace.getArea());
 	}
