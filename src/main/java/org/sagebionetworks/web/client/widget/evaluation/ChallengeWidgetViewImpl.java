@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -22,7 +23,8 @@ public class ChallengeWidgetViewImpl implements ChallengeWidgetView {
 	Panel challengeUI;
 	@UiField
 	Heading challengeIdHeading;
-	
+	@UiField
+	Div submitToChallengeContainer;
 	@UiField
 	Div selectTeamModalContainer;
 	
@@ -72,5 +74,10 @@ public class ChallengeWidgetViewImpl implements ChallengeWidgetView {
 	@Override
 	public void add(Widget w) {
 		widgetsContainer.add(w);
+	}
+	@Override
+	public void setSubmitToChallengeWidget(IsWidget submitToChallengeWidget) {
+		submitToChallengeContainer.clear();
+		submitToChallengeContainer.add(submitToChallengeWidget);
 	}
 }
