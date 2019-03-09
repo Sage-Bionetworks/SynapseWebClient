@@ -106,7 +106,9 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			//go to the change username page
 			gotoChangeUsernamePlace();
 		} else if (LoginPlace.SHOW_TOU.equals(token) && authenticationController.getCurrentUserSessionToken() != null) {
-			showTermsOfUse(getAcceptTermsOfUseCallback());	
+			showTermsOfUse(false);
+		} else if (LoginPlace.SHOW_SIGNED_TOU.equals(token) && authenticationController.getCurrentUserSessionToken() != null) {
+			showTermsOfUse(true);
 		} else if (!ClientProperties.DEFAULT_PLACE_TOKEN.equals(token) && 
 				!LoginPlace.CHANGE_USERNAME.equals(token) && 
 				!"".equals(token) && 
@@ -153,15 +155,10 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		globalApplicationState.gotoLastPlace(defaultPlace);
 	}
 	
-	/*
-	 * Private Methods
-	 */
-	
-	
-	public void showTermsOfUse(final Callback callback) {
+	public void showTermsOfUse(boolean isSigned) {
 		synAlert.clear();
 		view.hideLoggingInLoader();
-		view.showTermsOfUse(callback);		
+		view.showTermsOfUse(isSigned, getAcceptTermsOfUseCallback());
 	}
 	
 	public void userAuthenticated() {
