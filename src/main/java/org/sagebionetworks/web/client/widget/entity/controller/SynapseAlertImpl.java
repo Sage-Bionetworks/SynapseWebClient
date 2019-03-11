@@ -71,6 +71,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 		clear();
 		this.ex = ex;
 		boolean isLoggedIn = authController.isLoggedIn();
+		String message = ex.getMessage() == null ? "" : ex.getMessage();
 		if (ex instanceof StatusCodeException) {
 			StatusCodeException sce = (StatusCodeException)ex;
 			if (sce.getStatusCode() == 0) {
@@ -93,24 +94,23 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 			if(!isLoggedIn) {
 				showLogin();
 			} else {
-				view.showError(DisplayConstants.ERROR_FAILURE_PRIVLEDGES + " " + ex.getMessage());
+				view.showError(DisplayConstants.ERROR_FAILURE_PRIVLEDGES + " " + message);
 			}
 		} else if(ex instanceof NotFoundException) {
-			view.showError(DisplayConstants.ERROR_NOT_FOUND  + " " + ex.getMessage());
+			view.showError(DisplayConstants.ERROR_NOT_FOUND  + " " + message);
 		} else if (ex instanceof TooManyRequestsException) {
-			view.showError(DisplayConstants.ERROR_TOO_MANY_REQUESTS  + "\n\n" + ex.getMessage());
+			view.showError(DisplayConstants.ERROR_TOO_MANY_REQUESTS  + "\n\n" + message);
 		} else if (ex instanceof ConflictingUpdateException) {
-			view.showError(DisplayConstants.ERROR_CONFLICTING_UPDATE + "\n" + ex.getMessage());
+			view.showError(DisplayConstants.ERROR_CONFLICTING_UPDATE + "\n" + message);
 		} else if (ex instanceof UnknownErrorException) {
 			//An unknown error occurred. 
 			//Exception handling on the backend now throws the reason into the exception message.  Easy!
-			view.showError(ex.getMessage());
+			view.showError(message);
 			if (isLoggedIn) {
-				view.showJiraDialog(ex.getMessage());
+				view.showJiraDialog(message);
 			}
 		} else {
 			//not recognized
-			String message = ex.getMessage(); 
 			if (message == null || 
 				message.isEmpty() ||
 				message.equals("0")) {
