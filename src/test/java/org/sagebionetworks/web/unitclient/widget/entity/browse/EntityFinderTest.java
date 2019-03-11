@@ -36,6 +36,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderArea;
@@ -95,11 +96,11 @@ public class EntityFinderTest {
 		when(mockHeader.getName()).thenReturn(name);
 		when(mockHeader.getType()).thenReturn(Folder.class.getName());
 		
-		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
+		CallbackP<List<EntityHeader>> mockCallback = mock(CallbackP.class);
 		AsyncMockStubber.callSuccessWith(entityHeaderResults).when(mockJsClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));		
 		entityFinder.lookupEntity(id, mockCallback);
 		
-		verify(mockCallback).onSuccess(entityHeaderResults);
+		verify(mockCallback).invoke(entityHeaderResults);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -123,11 +124,11 @@ public class EntityFinderTest {
 		
 		entityHeaderResults.add(mockHeader2);
 		
-		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
+		CallbackP<List<EntityHeader>> mockCallback = mock(CallbackP.class);
 		AsyncMockStubber.callSuccessWith(entityHeaderResults).when(mockJsClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));		
 		entityFinder.lookupEntity(searchId, mockCallback);
 		
-		verify(mockCallback).onSuccess(entityHeaderResults);
+		verify(mockCallback).invoke(entityHeaderResults);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -150,11 +151,11 @@ public class EntityFinderTest {
 		
 		entityHeaderResults.add(mockHeader2);
 		
-		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
+		CallbackP<List<EntityHeader>> mockCallback = mock(CallbackP.class);
 		AsyncMockStubber.callSuccessWith(entityHeaderResults).when(mockJsClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));		
 		entityFinder.lookupEntity(searchId, mockCallback);
 		
-		verify(mockCallback).onSuccess(entityHeaderResults);
+		verify(mockCallback).invoke(entityHeaderResults);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -170,13 +171,25 @@ public class EntityFinderTest {
 		when(mockHeader.getName()).thenReturn(name);
 		when(mockHeader.getType()).thenReturn(Folder.class.getName());
 		
-		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
+		CallbackP<List<EntityHeader>> mockCallback = mock(CallbackP.class);
 		Exception ex = new NotFoundException();
 		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
-		entityFinder.lookupEntity(id, mockCallback);		
-		verify(mockCallback).onFailure(any(Throwable.class));
-		verify(mockSynAlert).handleException(ex);		
+		entityFinder.lookupEntity(id, mockCallback);
+		verify(mockCallback, never()).invoke(any());
+		verify(mockSynAlert).handleException(ex);
 	}
+	
+	public void testLookupEntityEmptyResults() throws Exception {
+		entityFinder.configure(true, mock(SelectedHandler.class));
+		AsyncMockStubber.callSuccessWith(new ArrayList<>()).when(mockJsClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
+		CallbackP<List<EntityHeader>> mockCallback = mock(CallbackP.class);
+		
+		entityFinder.lookupEntity("syn293824", mockCallback);
+		
+		verify(mockCallback, never()).invoke(any());
+		verify(mockSynAlert).handleException(any(NotFoundException.class));
+	}
+
 	
 	@SuppressWarnings("unchecked")
 	@Test

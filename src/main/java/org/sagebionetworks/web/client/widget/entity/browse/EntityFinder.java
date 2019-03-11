@@ -15,8 +15,10 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -62,7 +64,6 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		configure(ALL, showVersions, handler);
 	}
 	
-
 	public void configure(EntityFilter filter, boolean showVersions, SelectedHandler<Reference> handler) {
 		this.filter = filter;
 		this.showVersions = showVersions;
@@ -110,17 +111,9 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 				// fetch the entity for a type check
 				ReferenceList rl = new ReferenceList();
 				rl.setReferences(selectedEntities);
-				lookupEntity(rl, new AsyncCallback<List<EntityHeader>>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						synAlert.handleException(caught);
-					}
-	
-					@Override
-					public void onSuccess(List<EntityHeader> result) {
-						if (validateEntityTypeAgainstFilter(result)) {
-							fireEntitiesSelected();
-						}
+				lookupEntity(rl, result -> {
+					if (validateEntityTypeAgainstFilter(result)) {
+						fireEntitiesSelected();
 					}
 				});
 			} else {
@@ -153,22 +146,26 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	}
 	
 	@Override
-	public void lookupEntity(ReferenceList rl, final AsyncCallback<List<EntityHeader>> callback) {
+	public void lookupEntity(ReferenceList rl, final CallbackP<List<EntityHeader>> callback) {
+		synAlert.clear();
 		jsClient.getEntityHeaderBatchFromReferences(rl.getReferences(), new AsyncCallback<ArrayList<EntityHeader>>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
-				callback.onFailure(caught);
 			}
 			@Override
 			public void onSuccess(ArrayList<EntityHeader> result) {
-				callback.onSuccess(result);
+				if (result.size() == 0) {
+					synAlert.handleException(new NotFoundException());
+				} else {
+					callback.invoke(result);	
+				}
 			}
 		});
 	}
 
 	@Override
-	public void lookupEntity(String entityId, final AsyncCallback<List<EntityHeader>> callback) {
+	public void lookupEntity(String entityId, final CallbackP<List<EntityHeader>> callback) {
 		synAlert.clear();
 		processEntities(entityId);
 		ReferenceList rl = new ReferenceList();
