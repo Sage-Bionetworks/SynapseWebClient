@@ -6,7 +6,7 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
 	<bh:Div marginTop="5">
-		<b:InlineCheckBox ui:field="select" />
+		<b:CheckBox ui:field="select" addStyleNames="inline-block"/>
 		<bh:Div ui:field="userBadgeContainer" addStyleNames="inline-block" />
 		<b:ButtonGroup>
 			<b:Button ui:field="dropdown" dataToggle="DROPDOWN" size="EXTRA_SMALL" text="Renew" addStyleNames="margin-left-10" />
