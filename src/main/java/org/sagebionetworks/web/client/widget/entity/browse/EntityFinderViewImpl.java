@@ -31,7 +31,6 @@ import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -220,7 +219,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		tree = myEntitiesBrowser.getFavoritesTreeBrowser();
 		tree.makeSelectable();
 		
-		myEntitiesBrowser.setEntitySelectedHandler(new SelectedHandler() {					
+		myEntitiesBrowser.setEntitySelectedHandler(new SelectedHandler() {
 			@Override
 			public void onSelection(String selectedEntityId) {
 				setSelectedId(selectedEntityId);
@@ -263,7 +262,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	}
 	private void createSearchBoxWidget() {
 		// Search Widget
-		entitySearchBox.setEntitySelectedHandler(new EntitySearchBox.EntitySelectedHandler() {			
+		entitySearchBox.setEntitySelectedHandler(new EntitySearchBox.EntitySelectedHandler() {
 			@Override
 			public void onSelected(String entityId, String name, List<VersionInfo> versions) {
 				setSelectedId(entityId);
@@ -297,19 +296,14 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		lookupSynapseIdButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.lookupEntity(synapseIdTextBox.getValue(), new AsyncCallback<List<EntityHeader>>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						
-					}
-					@Override
-					public void onSuccess(List<EntityHeader> result) {
-						String entityId = result.get(0).getId();
-						setSelectedId(entityId);
-						updateSelectedView();
-						createVersionChooser(entityId);
-						
-					}
+				selectedRef.clear();
+				versionUI.setVisible(false);
+
+				presenter.lookupEntity(synapseIdTextBox.getValue(), result -> {
+					String entityId = result.get(0).getId();
+					setSelectedId(result);
+					updateSelectedView();
+					createVersionChooser(entityId);	
 				});
 			}
 		});
@@ -337,16 +331,9 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		lookupSynapseMultiIdButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.lookupEntity(synapseMultiIdTextBox.getValue(), new AsyncCallback<List<EntityHeader>>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						
-					}
-					@Override
-					public void onSuccess(List<EntityHeader> result) {
-						setSelectedId(result);
-						updateSelectedView();
-					}
+				presenter.lookupEntity(synapseMultiIdTextBox.getValue(), result -> {
+					setSelectedId(result);
+					updateSelectedView();
 				});
 			}
 		});
