@@ -50,7 +50,7 @@ public class MarkdownItImpl implements MarkdownIt {
 			// load the plugin to recognize Synapse markdown widget syntax (with the uniqueSuffix parameter)
 			$wnd.md.use($wnd.markdownitSynapse, uniqueSuffix)
 				.use($wnd.markdownitMath, uniqueSuffix);
-			var results = $wnd.md.render(md);
+			var results = $wnd.md.render($wnd.markdownitSynapse.preprocessMarkdown(md));
 			// Were footnotes found (and exported)?  If so, run the processor on the footnotes, and append to the results.
 			var footnotes = $wnd.markdownitSynapse.footnotes();
 			if (footnotes.length !== 0) {
