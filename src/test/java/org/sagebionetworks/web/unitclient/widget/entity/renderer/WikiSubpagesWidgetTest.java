@@ -53,7 +53,7 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 @RunWith(MockitoJUnitRunner.class)
-public class WikiSubpagesTest {
+public class WikiSubpagesWidgetTest {
 	@Mock
 	WikiSubpagesView mockView;
 	AdapterFactory adapterFactory;
@@ -213,6 +213,8 @@ public class WikiSubpagesTest {
 		String wikiPageId = "123";
 		when(mockView.contains(eq(wikiPageId))).thenReturn(true);
 		verify(mockView).configure(anyList(), eq(projectName), any(Place.class), any(), anyBoolean(), any(CallbackP.class), any(ActionMenuWidget.class));
+		//hidden initially in configure, and called again because only a single WikiPage is in the header tree.
+		verify(mockView, times(2)).hideSubpages();
 		
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), wikiPageId), false, null, mockActionMenuWidget);
 		
