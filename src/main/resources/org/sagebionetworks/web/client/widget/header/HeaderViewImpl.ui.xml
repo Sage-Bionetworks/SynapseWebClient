@@ -39,9 +39,7 @@
 	            	<b:Anchor ui:field="projectHeadingAnchor" addStyleNames="color-white textDecorationNone lato notransition"/>
 	        	</b:Heading>
 		  	</bh:Div>
-		  	<bh:Div ui:field="projectFavoritePanelUI" addStyleNames="inline-block favoriteIcon hidden-xs vertical-align-top">
-		  		<b:Heading size="H3" addStyleNames="color-white" ui:field="projectFavoritePanel"></b:Heading>
-		  	</bh:Div>
+		  	<bh:Div ui:field="projectFavoritePanelUI" addStyleNames="inline-block favoriteIcon hidden-xs vertical-align-top color-white font-size-24 movedown-7"/>
 	  	  	<bh:Span ui:field="headerButtons" addStyleNames="right" marginRight="10">
 		  		<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-10 margin-right-10 padding-left-15" visible="false">
 					<b:Button ui:field="loginLink" text="&nbsp;&nbsp;&nbsp;Sign in&nbsp;&nbsp;&nbsp;" type="SUCCESS" marginTop="7"/>

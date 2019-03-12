@@ -8,7 +8,6 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.DropDown;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
-import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -61,8 +60,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
 	@UiField
 	Div projectFavoritePanelUI;
-	@UiField
-	Heading projectFavoritePanel;
 	@UiField
 	Anchor dashboardDropdownAnchor;
 	@UiField
@@ -175,10 +172,10 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	
 	@Override
 	public void setProjectFavoriteWidget(IsWidget favWidget) {
-		projectFavoritePanel.clear();
-		projectFavoritePanel.add(favWidget);
+		projectFavoritePanelUI.clear();
+		projectFavoritePanelUI.add(favWidget);
 	}
-	
+
 	@Override
 	public void showProjectFavoriteWidget() {
 		projectFavoritePanelUI.setVisible(true);
