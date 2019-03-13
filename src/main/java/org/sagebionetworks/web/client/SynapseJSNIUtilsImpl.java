@@ -469,15 +469,25 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	public final static native void _consoleError(Object ob) /*-{
 		console.error(ob);
 	}-*/;
-	
-	@Override
+
 	public void processWithMathJax(Element element) {
-		_processWithMathJax(element);		
+		// remove \(, \), \[, \]
+		String tex = element.getInnerText();
+		boolean isCenterDiv = tex.contains("\\[") || tex.contains("\\begin{align");
+		tex = tex.replace("\\(","").replace("\\)", "");
+		tex = tex.replace("\\[","").replace("\\]", "");
+		tex = tex.replace("{align}","{aligned}");
+		String html = _processMath(tex, isCenterDiv);
+		if (isCenterDiv) {
+			html = "<div class=\"center\">"+html+"</div>";
+		}
+		
+		element.setInnerHTML(html);
 	}
 
-	private final static native void _processWithMathJax(Element element) /*-{
+	private final static native String _processMath(String tex, boolean displayModeBoolean) /*-{
 		try {
-			$wnd.layoutMath(element);
+			return $wnd.katex.renderToString(tex, {displayMode: displayModeBoolean});
 		} catch (err) {
 			console.error(err);
 		}

@@ -148,20 +148,11 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 				}
 			};
 			
-			AsyncCallback<Void> mathjaxInitializedCallback = new AsyncCallback<Void>() {
-				@Override
-				public void onSuccess(Void result) {
-					resourceLoader.requires(ClientProperties.MATHJAX_LOADER_JS, mathjaxLoadedCallback);
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-				}
-			};
 			if (resourceLoader.isLoaded(ClientProperties.MATHJAX_JS))
 				//already loaded
 				synapseJSNIUtils.processWithMathJax(loadElement);
 			else
-				resourceLoader.requires(ClientProperties.MATHJAX_JS, mathjaxInitializedCallback);
+				resourceLoader.requires(ClientProperties.MATHJAX_JS, mathjaxLoadedCallback);
 			i++;
 			currentWidgetDiv = WidgetConstants.DIV_ID_MATHJAX_PREFIX + i + suffix;
 			el = view.getElementById(currentWidgetDiv);
