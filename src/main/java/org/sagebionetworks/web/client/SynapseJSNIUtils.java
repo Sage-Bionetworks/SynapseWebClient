@@ -55,7 +55,7 @@ public interface SynapseJSNIUtils {
 	public void consoleError(String message);
 	public void consoleError(Throwable t);
 	
-	public void processWithMathJax(Element element);	
+	public void processMath(Element element);	
 
 	public void loadCss(String url);
 

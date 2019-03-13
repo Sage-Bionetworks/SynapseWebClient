@@ -138,21 +138,21 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		ElementWrapper el = view.getElementById(currentWidgetDiv);
 		while (el != null) {
 			final Element loadElement = el.getElement();
-			final AsyncCallback<Void> mathjaxLoadedCallback = new AsyncCallback<Void>() {
+			final AsyncCallback<Void> mathProcessorLoadedCallback = new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
-					synapseJSNIUtils.processWithMathJax(loadElement);
+					synapseJSNIUtils.processMath(loadElement);
 				}
 				@Override
 				public void onFailure(Throwable caught) {
 				}
 			};
 			
-			if (resourceLoader.isLoaded(ClientProperties.MATHJAX_JS))
+			if (resourceLoader.isLoaded(ClientProperties.MATH_PROCESSOR_JS))
 				//already loaded
-				synapseJSNIUtils.processWithMathJax(loadElement);
+				synapseJSNIUtils.processMath(loadElement);
 			else
-				resourceLoader.requires(ClientProperties.MATHJAX_JS, mathjaxLoadedCallback);
+				resourceLoader.requires(ClientProperties.MATH_PROCESSOR_JS, mathProcessorLoadedCallback);
 			i++;
 			currentWidgetDiv = WidgetConstants.DIV_ID_MATHJAX_PREFIX + i + suffix;
 			el = view.getElementById(currentWidgetDiv);

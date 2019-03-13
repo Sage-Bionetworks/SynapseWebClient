@@ -470,7 +470,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		console.error(ob);
 	}-*/;
 
-	public void processWithMathJax(Element element) {
+	public void processMath(Element element) {
 		// remove \(, \), \[, \]
 		String tex = element.getInnerText();
 		boolean isCenterDiv = tex.contains("\\[") || tex.contains("\\begin{align");
