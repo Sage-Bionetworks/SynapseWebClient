@@ -132,6 +132,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	}
 	
 	public void loadMath(String suffix) {
+		ClientProperties.fixResourceToCdnEndpoint(ClientProperties.MATH_PROCESSOR_JS, synapseJSNIUtils.getCdnEndpoint());
 		//look for every element that has the right format
 		int i = 0;
 		String currentWidgetDiv = WidgetConstants.DIV_ID_MATHJAX_PREFIX + i + suffix;
@@ -147,7 +148,6 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 				public void onFailure(Throwable caught) {
 				}
 			};
-			
 			if (resourceLoader.isLoaded(ClientProperties.MATH_PROCESSOR_JS))
 				//already loaded
 				synapseJSNIUtils.processMath(loadElement);

@@ -39,8 +39,7 @@ public class ClientProperties {
 	/*
 	 * JavaScript WebResources
 	 */
-	public static final WebResource MATH_PROCESSOR_JS = new WebResource("https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.js");
-	public static final WebResource MATHJAX_LOADER_JS = new WebResource("https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/contrib/auto-render.min.js");
+	public static final WebResource MATH_PROCESSOR_JS = new WebResource("js/katex-0.10.1.min.js");
 	public static final WebResource PLOTLY_JS = new WebResource("https://cdn.plot.ly/plotly-1.44.0.min.js");
 	public static final WebResource PLOTLY_REACT_JS = new WebResource("https://unpkg.com/react-plotly.js@2.2.0/dist/create-plotly-component.min.js");
 	public static final WebResource AWS_SDK_JS = new WebResource("js/aws-sdk-2.86.0.min.js");
