@@ -10,7 +10,7 @@
 		<bh:Div>
 			<bh:Div ui:field="chartContainer" height="500px" width="100%" />
 		</bh:Div>
-		<bh:Div addStyleNames="margin-left-55 moveup-100">
+		<bh:Div addStyleNames="margin-left-55">
 			<b:Anchor ui:field="sourceDataAnchor" text="View Source Data" icon="SHARE" iconPosition="RIGHT"/>
 		</bh:Div>
 		<bh:Div ui:field="synAlertContainer"/>
