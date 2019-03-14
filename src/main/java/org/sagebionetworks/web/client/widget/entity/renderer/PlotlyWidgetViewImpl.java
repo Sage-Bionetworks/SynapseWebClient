@@ -109,7 +109,7 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 		
 		try {
 						
-			var plot =  $wnd.createPlotlyComponent($wnd.Plotly);
+			var plot = $wnd.createPlotlyComponent($wnd.Plotly);
 			
 			// SWC-3668: We must manually construct an Object from the parent window Object prototype.  This is a general GWT js integration issue.
 			// If we define the layout in the standard way, like "xaxis: {title:"mytitle"}", then  Object.getPrototypeOf(obj) === Object.prototype is false.
@@ -119,25 +119,23 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 			xAxisLayoutObject.title = xTitle;
 			xAxisLayoutObject.type = xAxisType;
 			xAxisLayoutObject.tickangle = 45;
+			xAxisLayoutObject.automargin = true;
 			
 			var yAxisLayoutObject = new $wnd.Object();
 			yAxisLayoutObject.title = yTitle;
 			yAxisLayoutObject.type = yAxisType;
+			yAxisLayoutObject.automargin = true;
 			
 			var props = {
 				data: xyData,
 				layout: {
-					  title: plotTitle,
-					  xaxis: xAxisLayoutObject,
-					  yaxis: yAxisLayoutObject,
-					  barmode: barMode,
-					  showlegend: showLegend,
-					  autosize: true,
-					  margin: {
-					  	l: 200,
-					  	b: 200
-					  }
-					},
+					title: plotTitle,
+					xaxis: xAxisLayoutObject,
+					yaxis: yAxisLayoutObject,
+					barmode: barMode,
+					showlegend: showLegend,
+					autosize: true
+				},
 				useResizeHandler: true,
 				// note: we'd like to just hide the "save and edit plot in cloud" command, 
 				// but the parameter provided in the docs (showLink: false) has no effect.
