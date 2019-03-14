@@ -17,7 +17,7 @@ import com.google.inject.Inject;
 
 public class EntitySearchSuggestOracle extends SuggestOracle {
 	public static final int DELAY = 500;	// milliseconds
-	public static final Long LIMIT = 30L;
+	public static final Long LIMIT = 15L;
 	public SuggestOracle.Request request;
 	public SuggestOracle.Callback callback;
 	public int offset;
@@ -72,19 +72,19 @@ public class EntitySearchSuggestOracle extends SuggestOracle {
 	}
 
 	public class EntitySuggestion implements SuggestOracle.Suggestion {
-		String displayString;
 		String entityId;
+		String name;
 		public EntitySuggestion(String name, String entityId) {
-			this.displayString = name + " (" + entityId + ")";
+			this.name = name;
 			this.entityId = entityId;
 		}
 		@Override
 		public String getDisplayString() {
-			return displayString;
+			return name + " (" + entityId + ")";
 		}
 		@Override
 		public String getReplacementString() {
-			return displayString;
+			return name;
 		}
 		public String getEntityId() {
 			return entityId;

@@ -146,15 +146,23 @@ public class SearchViewImpl extends Composite implements SearchView {
 	}
 
 	@Override
+	public void setSearchTerm(String searchTerm) {
+		searchField.setText(searchTerm);
+		updatePageTitle(searchTerm, "");
+	}
+	
+	private void updatePageTitle(String searchTerm, String facetNames) {
+		String pageTitleSearchTerm = searchTerm != null && searchTerm.length() > 0 ? "'"+searchTerm + "' " : "";
+		synapseJSNIUtils.setPageTitle("Search: " + pageTitleSearchTerm + facetNames);
+	}
+	
+	@Override
 	public void setSearchResults(SearchResults searchResults,
 			String searchTerm) {
-		// set searchTerm into search box
-		searchField.setText(searchTerm);
 		facetButtons = new ArrayList<Button>();
 		// show existing facets
 		String facetNames = createShownFacets(searchResults);
-		String pageTitleSearchTerm = searchTerm != null && searchTerm.length() > 0 ? "'"+searchTerm + "' " : "";
-		synapseJSNIUtils.setPageTitle("Search: " + pageTitleSearchTerm + facetNames);
+		updatePageTitle(searchTerm, facetNames);
 		narrowResultsPanel.setVisible(true);
 		currentFacetsPanel.setVisible(true);
 	}

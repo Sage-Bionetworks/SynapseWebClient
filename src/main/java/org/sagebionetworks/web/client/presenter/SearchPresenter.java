@@ -310,11 +310,12 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 			loadMoreWidgetContainer.setIsMore(false);
 			return;
 		}
+		String searchTerm = join(currentSearch.getQueryTerm(), " ");
+		view.setSearchTerm(searchTerm);
 		AsyncCallback<SearchResults> callback = new AsyncCallback<SearchResults>() {			
 			@Override
 			public void onSuccess(SearchResults result) {
 				currentResult = result;
-				String searchTerm = join(currentSearch.getQueryTerm(), " ");
 				boolean isFirstPage = currentSearch.getStart() == null || currentSearch.getStart() == 0L;
 				if (isFirstPage) {
 					view.setSearchResults(currentResult, searchTerm);

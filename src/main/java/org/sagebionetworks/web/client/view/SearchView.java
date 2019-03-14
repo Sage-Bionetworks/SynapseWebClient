@@ -65,5 +65,5 @@ public interface SearchView extends IsWidget, SynapseView {
 	public void setSynAlertWidget(Widget asWidget);
 	
 	public void setLoadingMoreContainerWidget(Widget w);
-
+	void setSearchTerm(String searchTerm);
 }
