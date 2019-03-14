@@ -1,16 +1,22 @@
 package org.sagebionetworks.web.client.widget.search;
 
 import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.widget.search.EntitySearchSuggestOracle.EntitySuggestion;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -21,47 +27,63 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	@UiField
 	Icon searchButton;
 	@UiField
-	TextBox searchField;
+	Span searchSuggestBoxContainer;
+	SuggestBox searchSuggestBox;
 	GWTWrapper gwt;
+	PlaceChanger placeChanger;
 	public static final String INACTIVE_STYLE = "inactive";
 	public static final String ACTIVE_STYLE = "active";
 	
 	@Inject
-	public SearchBoxViewImpl(Binder binder, GWTWrapper gwt) {
+	public SearchBoxViewImpl(Binder binder, 
+			EntitySearchSuggestOracle entitySearchOracle, 
+			GWTWrapper gwt, 
+			GlobalApplicationState globalAppState) {
 		widget = binder.createAndBindUi(this);
 		this.gwt = gwt;
-		searchField.getElement().setAttribute("placeholder", " Search all of Synapse");
+		
+		searchSuggestBox = new SuggestBox(entitySearchOracle);
+		searchSuggestBox.setHeight("32px");
+		searchSuggestBox.getTextBox().addStyleName("form-control");
+		searchSuggestBox.getTextBox().getElement().setAttribute("placeholder", " Search all of Synapse");
+		searchSuggestBoxContainer.add(searchSuggestBox);
+		placeChanger = globalAppState.getPlaceChanger();
 		initClickHandlers();
 	}
 
 	private void initClickHandlers() {
-	    searchField.addKeyDownHandler(new KeyDownHandler() {				
-			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					executeSearch();
-	            }					
+		searchSuggestBox.getTextBox().addKeyDownHandler(event -> {
+			if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+				executeSearch();
 			}
 		});
-	    searchField.addBlurHandler(event -> {
-	    	// delay auto-hiding the search box (on focus loss) for .4s so that the search can execute on search button click (when active).
-	    	gwt.scheduleExecution(() -> {
-	    		searchFieldInactive();	
-	    	}, 400);
-	    });
-	    searchButton.addClickHandler(event -> {
-	    	if (isSearchFieldActive()) {
-	    		executeSearch();
-	    	} else {
-	    		searchFieldActive();	
-	    	}
-	    });
+		searchSuggestBox.getTextBox().addBlurHandler(event -> {
+			// delay auto-hiding the search box (on focus loss) for .4s so that the search can execute on search button click (when active).
+			gwt.scheduleExecution(() -> {
+				searchFieldInactive();	
+			}, 400);
+		});
+		searchButton.addClickHandler(event -> {
+			if (isSearchFieldActive()) {
+				executeSearch();
+			} else {
+				searchFieldActive();	
+			}
+		});
+		searchSuggestBox.addSelectionHandler(event -> {
+			EntitySuggestion suggestion = (EntitySuggestion) event.getSelectedItem();
+			placeChanger.goTo(new Synapse(suggestion.getEntityId()));
+		});
+	}
+	
+	public void clearSearchBox() {
+		searchSuggestBox.getValueBox().setText(null);
 	}
 	
 	private void executeSearch() {
-		if (!"".equals(searchField.getValue())) {
-			presenter.search(searchField.getValue());
-			searchField.setValue("");
+		if (!"".equals(searchSuggestBox.getValueBox().getText())) {
+			presenter.search(searchSuggestBox.getValueBox().getText());
+			clearSearchBox();
 			searchFieldInactive();
 		}
 	}
@@ -97,20 +119,22 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	
 	@Override
 	public void clear() {
-		//searchField.setText("");		
+		//searchField.setText("");
 	}
 	
 	private void searchFieldInactive() {
 		Element searchBoxContainer = _getSearchBoxContainer();
 		searchBoxContainer.removeClassName(ACTIVE_STYLE);
 		searchBoxContainer.addClassName(INACTIVE_STYLE);
-		searchField.setFocus(false);
+		searchSuggestBox.hideSuggestionList();
+		searchSuggestBox.setFocus(false);
 	}
 	private void searchFieldActive() {
 		Element searchBoxContainer = _getSearchBoxContainer();
 		searchBoxContainer.addClassName(ACTIVE_STYLE);
 		searchBoxContainer.removeClassName(INACTIVE_STYLE);
-		searchField.setFocus(true);
+		searchSuggestBox.setFocus(true);
+		clearSearchBox();
 	}
 	
 	private boolean isSearchFieldActive() {

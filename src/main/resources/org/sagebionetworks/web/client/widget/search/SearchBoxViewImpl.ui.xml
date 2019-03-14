@@ -5,6 +5,6 @@
 
 	<bh:Div addStyleNames="searchBox displayInlineTable">
 		<b:Icon ui:field="searchButton" type="SEARCH" size="TIMES2" addStyleNames="color-white imageButton topLevelZIndex"/>
-		<b:TextBox ui:field="searchField" height="32px" addStyleNames="moveup-3" />
+		<bh:Span ui:field="searchSuggestBoxContainer" height="32px" addStyleNames="moveup-3" />
 	</bh:Div>
 </ui:UiBinder>
