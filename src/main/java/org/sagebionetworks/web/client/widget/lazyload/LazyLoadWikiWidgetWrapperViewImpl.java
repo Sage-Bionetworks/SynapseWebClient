@@ -75,11 +75,13 @@ public class LazyLoadWikiWidgetWrapperViewImpl implements LazyLoadWikiWidgetWrap
 	
 	@Override
 	public void showWidget(Widget w, String cssSelector) {
-		widgetContainer.clear();
-		widgetContainer.add(w);
-		loadingUI.setVisible(false);
-		widgetContainer.setVisible(true);
-		w.addStyleName(cssSelector);
+		if (widget.isAttached()) {
+			widgetContainer.clear();
+			widgetContainer.add(w);
+			loadingUI.setVisible(false);
+			widgetContainer.setVisible(true);
+			w.addStyleName(cssSelector);
+		}
 	}
 
 }
