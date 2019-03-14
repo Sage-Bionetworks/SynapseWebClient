@@ -1,7 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.upload;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,6 +16,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewResult;
+import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewView;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewWidgetImpl;
 
@@ -30,9 +34,9 @@ public class UploadPreviewWidgetImplTest {
 	
 	@Test
 	public void testTruncateString(){
-		assertEquals(null, UploadPreviewWidgetImpl.truncateValues(null));
-		assertEquals("small", UploadPreviewWidgetImpl.truncateValues("small"));
-		assertEquals("not so sm...", UploadPreviewWidgetImpl.truncateValues("not so small"));
+		assertEquals(null, StringUtils.truncateValues(null, UploadPreviewWidgetImpl.MAX_CHARS_PER_CELL));
+		assertEquals("small", StringUtils.truncateValues("small", UploadPreviewWidgetImpl.MAX_CHARS_PER_CELL));
+		assertEquals("not so sm...", StringUtils.truncateValues("not so small", UploadPreviewWidgetImpl.MAX_CHARS_PER_CELL));
 	}
 	
 	@Test

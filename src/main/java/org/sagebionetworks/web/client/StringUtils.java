@@ -57,4 +57,19 @@ public class StringUtils {
 		
 		return output.toString();
 	}
+	
+	/**
+	 * Truncate a string.
+	 * @param in
+	 * @return
+	 */
+	public static String truncateValues(String in, int maxCharacters){
+		if(in == null){
+			return null;
+		}
+		if(in.length() > maxCharacters){
+			return in.substring(0, maxCharacters-1)+"...";
+		}
+		return in;
+	}
 }

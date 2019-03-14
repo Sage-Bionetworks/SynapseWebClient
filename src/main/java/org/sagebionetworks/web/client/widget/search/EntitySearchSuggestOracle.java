@@ -2,15 +2,19 @@ package org.sagebionetworks.web.client.widget.search;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTTimer;
+import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.inject.Inject;
@@ -52,13 +56,16 @@ public class EntitySearchSuggestOracle extends SuggestOracle {
 			SearchQuery query = new SearchQuery();
 			query.setQueryTerm(Collections.singletonList(searchTerm));
 			query.setSize(LIMIT);
+			List<String> returnFields = new ArrayList<>();
+			returnFields.add("path");
+			query.setReturnFields(returnFields);
 			query.setStart(new Long(offset));
 			
 			jsClient.getSearchResults(query, new AsyncCallback<SearchResults>() {
 				@Override
 				public void onSuccess(SearchResults result) {
 					for (Hit hit : result.getHits()) {
-						addSuggestion(hit.getName(), hit.getId());
+						addSuggestion(hit);
 					}
 					onSuggestionsReady();
 				}
@@ -72,26 +79,33 @@ public class EntitySearchSuggestOracle extends SuggestOracle {
 	}
 
 	public class EntitySuggestion implements SuggestOracle.Suggestion {
-		String entityId;
-		String name;
-		public EntitySuggestion(String name, String entityId) {
-			this.name = name;
-			this.entityId = entityId;
+		Hit hit;
+		String displayString = "";
+		public EntitySuggestion(Hit hit) {
+			this.hit = hit;
+			List<EntityHeader> entityPath = hit.getPath().getPath();
+			entityPath.remove(0);
+			EntityHeader hitEntity = entityPath.remove(entityPath.size()-1);
+			for (EntityHeader header : entityPath) {
+				displayString += "/" + header.getName();
+			}
+			displayString = StringUtils.truncateValues(displayString, 25);
+			displayString += "/" + hitEntity.getName();
 		}
 		@Override
 		public String getDisplayString() {
-			return name + " (" + entityId + ")";
+			return displayString;
 		}
 		@Override
 		public String getReplacementString() {
-			return name;
+			return hit.getName();
 		}
 		public String getEntityId() {
-			return entityId;
+			return hit.getId();
 		}
 	}
-	public void addSuggestion(String name, String entityId) {
-		suggestions.add(new EntitySuggestion(name, entityId));
+	public void addSuggestion(Hit hit) {
+		suggestions.add(new EntitySuggestion(hit));
 	}
 
 	public void onSuggestionsReady() {

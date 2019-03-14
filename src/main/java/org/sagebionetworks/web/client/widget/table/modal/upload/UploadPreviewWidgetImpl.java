@@ -6,6 +6,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewResult;
+import org.sagebionetworks.web.client.StringUtils;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -74,7 +75,7 @@ public class UploadPreviewWidgetImpl implements UploadPreviewWidget {
 				for (Row row : preview.getSampleRows()) {
 					List<String> values = new ArrayList<String>(row.getValues().size());
 					for (String value : row.getValues()) {
-						values.add(truncateValues(value));
+						values.add(StringUtils.truncateValues(value, MAX_CHARS_PER_CELL));
 					}
 					view.addRow(values);
 				}
@@ -111,20 +112,5 @@ public class UploadPreviewWidgetImpl implements UploadPreviewWidget {
 			return true;
 		}
 		return false;
-	}
-	
-	/**
-	 * Truncate a string.
-	 * @param in
-	 * @return
-	 */
-	public static String truncateValues(String in){
-		if(in == null){
-			return null;
-		}
-		if(in.length() > MAX_CHARS_PER_CELL){
-			return in.substring(0, MAX_CHARS_PER_CELL-1)+"...";
-		}
-		return in;
 	}
 }
