@@ -1,17 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.search;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.isNull;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.junit.Assert.*;
-import static org.sagebionetworks.web.client.widget.search.EntitySearchSuggestOracle.EntitySuggestion.*;
+import static org.sagebionetworks.web.client.widget.search.EntitySearchSuggestOracle.EntitySuggestion.MAX_ENTITY_PATH_DISPLAY_LENGTH;
+import static org.sagebionetworks.web.client.widget.search.EntitySearchSuggestOracle.EntitySuggestion.PATH_SEPARATOR;
+
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Before;
@@ -23,8 +20,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.UserGroupHeader;
-import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -33,17 +28,11 @@ import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.search.EntitySearchSuggestOracle;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestOracle;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestionBundle;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.EntitySearchSuggestOracle.EntitySuggestion;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SuggestOracle;
-import com.google.gwt.user.client.ui.SuggestOracle.Response;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EntitySearchSuggestOracleTest {
