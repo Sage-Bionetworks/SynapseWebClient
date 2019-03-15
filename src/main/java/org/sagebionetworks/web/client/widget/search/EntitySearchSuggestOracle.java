@@ -14,7 +14,6 @@ import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.inject.Inject;
@@ -47,42 +46,48 @@ public class EntitySearchSuggestOracle extends SuggestOracle {
 	public SuggestOracle.Request getRequest()	{return request;}
 	public SuggestOracle.Callback getCallback()	{return callback;}
 
-	public void getSuggestions(final int offset) {
+	public void getSuggestions(int offset) {
 		if (!isLoading && !request.getQuery().isEmpty()) {
 			DisplayUtils.scrollToTop();
 			if (!request.getQuery().equals(searchTerm)) {
-				isLoading = true;
-				searchTerm = request.getQuery();
-				suggestions = new ArrayList<>();
-				SearchQuery query = new SearchQuery();
-				query.setQueryTerm(Collections.singletonList(searchTerm));
-				query.setSize(LIMIT);
-				List<String> returnFields = new ArrayList<>();
-				returnFields.add("path");
-				query.setReturnFields(returnFields);
-				query.setStart(new Long(offset));
-				
-				jsClient.getSearchResults(query, new AsyncCallback<SearchResults>() {
-					@Override
-					public void onSuccess(SearchResults result) {
-						for (Hit hit : result.getHits()) {
-							addSuggestion(hit);
-						}
-						onSuggestionsReady();
-					}
-					
-					@Override
-					public void onFailure(Throwable caught) {
-						jsniUtils.consoleError(caught);
-					}
-				});
+				getNewSuggestions(offset);
 			} else {
 				onSuggestionsReady();
 			}
 		}
 	}
+	
+	public void getNewSuggestions(int offset) {
+		isLoading = true;
+		searchTerm = request.getQuery();
+		suggestions = new ArrayList<>();
+		SearchQuery query = new SearchQuery();
+		query.setQueryTerm(Collections.singletonList(searchTerm));
+		query.setSize(LIMIT);
+		List<String> returnFields = new ArrayList<>();
+		returnFields.add("path");
+		query.setReturnFields(returnFields);
+		query.setStart(new Long(offset));
+		
+		jsClient.getSearchResults(query, new AsyncCallback<SearchResults>() {
+			@Override
+			public void onSuccess(SearchResults result) {
+				for (Hit hit : result.getHits()) {
+					addSuggestion(hit);
+				}
+				onSuggestionsReady();
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				jsniUtils.consoleError(caught);
+			}
+		});
+	}
 
 	public class EntitySuggestion implements SuggestOracle.Suggestion {
+		public static final String PATH_SEPARATOR = " / ";
+		public static final int MAX_ENTITY_PATH_DISPLAY_LENGTH = 25;
 		Hit hit;
 		String displayString = "";
 		public EntitySuggestion(Hit hit) {
@@ -91,10 +96,10 @@ public class EntitySearchSuggestOracle extends SuggestOracle {
 			entityPath.remove(0);
 			EntityHeader hitEntity = entityPath.remove(entityPath.size()-1);
 			for (EntityHeader header : entityPath) {
-				displayString += " / " + header.getName();
+				displayString += PATH_SEPARATOR + header.getName();
 			}
-			displayString = StringUtils.truncateValues(displayString, 25, true).trim();
-			displayString += " / " + hitEntity.getName();
+			displayString = StringUtils.truncateValues(displayString.trim(), MAX_ENTITY_PATH_DISPLAY_LENGTH, true);
+			displayString += PATH_SEPARATOR + hitEntity.getName();
 		}
 		@Override
 		public String getDisplayString() {
