@@ -4,16 +4,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.constants.Styles;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GWTTimer;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.inject.Inject;
@@ -91,15 +95,19 @@ public class EntitySearchSuggestOracle extends SuggestOracle {
 		Hit hit;
 		String displayString = "";
 		public EntitySuggestion(Hit hit) {
+			String entityPathString = "";
 			this.hit = hit;
 			List<EntityHeader> entityPath = hit.getPath().getPath();
 			entityPath.remove(0);
 			EntityHeader hitEntity = entityPath.remove(entityPath.size()-1);
 			for (EntityHeader header : entityPath) {
-				displayString += PATH_SEPARATOR + header.getName();
+				entityPathString += PATH_SEPARATOR + header.getName();
 			}
-			displayString = StringUtils.truncateValues(displayString.trim(), MAX_ENTITY_PATH_DISPLAY_LENGTH, true);
-			displayString += PATH_SEPARATOR + hitEntity.getName();
+			entityPathString = StringUtils.truncateValues(entityPathString.trim(), MAX_ENTITY_PATH_DISPLAY_LENGTH, true);
+			entityPathString += PATH_SEPARATOR + hitEntity.getName();
+			IconType icon = EntityTypeUtils.getIconTypeForEntityClassName(hitEntity.getType());
+			String iconHtml = "<i class=\"margin-right-5 " + Styles.FONT_AWESOME_BASE + " "+ icon.getCssName() + " " + Styles.ICON_FIXED_WIDTH+ "\"></i>";
+			displayString = "<div class=\"entity-search-menu-item border-bottom-1\" style=\"line-height:40px;\">"+iconHtml + entityPathString+"</div>";
 		}
 		@Override
 		public String getDisplayString() {
