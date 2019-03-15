@@ -63,12 +63,13 @@ public class StringUtils {
 	 * @param in
 	 * @return
 	 */
-	public static String truncateValues(String in, int maxCharacters){
+	public static String truncateValues(String in, int maxCharacters, boolean isHtml){
 		if(in == null){
 			return null;
 		}
 		if(in.length() > maxCharacters){
-			return in.substring(0, maxCharacters-1)+"...";
+			String ellipsis = isHtml ? "&hellip;" : "...";
+			return in.substring(0, maxCharacters-1)+ellipsis;
 		}
 		return in;
 	}

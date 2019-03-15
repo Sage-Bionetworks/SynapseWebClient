@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.upload;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
@@ -16,7 +15,6 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewResult;
-import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewView;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewWidgetImpl;
 
@@ -30,13 +28,6 @@ public class UploadPreviewWidgetImplTest {
 	public void before(){
 		mockView = Mockito.mock(UploadPreviewView.class);
 		widget = new UploadPreviewWidgetImpl(mockView);
-	}
-	
-	@Test
-	public void testTruncateString(){
-		assertEquals(null, StringUtils.truncateValues(null, UploadPreviewWidgetImpl.MAX_CHARS_PER_CELL));
-		assertEquals("small", StringUtils.truncateValues("small", UploadPreviewWidgetImpl.MAX_CHARS_PER_CELL));
-		assertEquals("not so sm...", StringUtils.truncateValues("not so small", UploadPreviewWidgetImpl.MAX_CHARS_PER_CELL));
 	}
 	
 	@Test

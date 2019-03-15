@@ -48,33 +48,37 @@ public class EntitySearchSuggestOracle extends SuggestOracle {
 	public SuggestOracle.Callback getCallback()	{return callback;}
 
 	public void getSuggestions(final int offset) {
-		if (!isLoading && !request.getQuery().equals(searchTerm) && !request.getQuery().isEmpty()) {
+		if (!isLoading && !request.getQuery().isEmpty()) {
 			DisplayUtils.scrollToTop();
-			isLoading = true;
-			searchTerm = request.getQuery();
-			suggestions = new ArrayList<>();
-			SearchQuery query = new SearchQuery();
-			query.setQueryTerm(Collections.singletonList(searchTerm));
-			query.setSize(LIMIT);
-			List<String> returnFields = new ArrayList<>();
-			returnFields.add("path");
-			query.setReturnFields(returnFields);
-			query.setStart(new Long(offset));
-			
-			jsClient.getSearchResults(query, new AsyncCallback<SearchResults>() {
-				@Override
-				public void onSuccess(SearchResults result) {
-					for (Hit hit : result.getHits()) {
-						addSuggestion(hit);
-					}
-					onSuggestionsReady();
-				}
+			if (!request.getQuery().equals(searchTerm)) {
+				isLoading = true;
+				searchTerm = request.getQuery();
+				suggestions = new ArrayList<>();
+				SearchQuery query = new SearchQuery();
+				query.setQueryTerm(Collections.singletonList(searchTerm));
+				query.setSize(LIMIT);
+				List<String> returnFields = new ArrayList<>();
+				returnFields.add("path");
+				query.setReturnFields(returnFields);
+				query.setStart(new Long(offset));
 				
-				@Override
-				public void onFailure(Throwable caught) {
-					jsniUtils.consoleError(caught);
-				}
-			});
+				jsClient.getSearchResults(query, new AsyncCallback<SearchResults>() {
+					@Override
+					public void onSuccess(SearchResults result) {
+						for (Hit hit : result.getHits()) {
+							addSuggestion(hit);
+						}
+						onSuggestionsReady();
+					}
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						jsniUtils.consoleError(caught);
+					}
+				});
+			} else {
+				onSuggestionsReady();
+			}
 		}
 	}
 
@@ -87,10 +91,10 @@ public class EntitySearchSuggestOracle extends SuggestOracle {
 			entityPath.remove(0);
 			EntityHeader hitEntity = entityPath.remove(entityPath.size()-1);
 			for (EntityHeader header : entityPath) {
-				displayString += "/" + header.getName();
+				displayString += " / " + header.getName();
 			}
-			displayString = StringUtils.truncateValues(displayString, 25);
-			displayString += "/" + hitEntity.getName();
+			displayString = StringUtils.truncateValues(displayString, 25, true).trim();
+			displayString += " / " + hitEntity.getName();
 		}
 		@Override
 		public String getDisplayString() {
@@ -123,5 +127,10 @@ public class EntitySearchSuggestOracle extends SuggestOracle {
 		this.callback = callback;
 		timer.cancel();
 		timer.schedule(DELAY);
+	}
+
+	@Override
+	public boolean isDisplayStringHTML() {
+		return true;
 	}
 }

@@ -1,10 +1,9 @@
 package org.sagebionetworks.web.client;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewWidgetImpl;
 
 public class StringUtilsTest {
 	
@@ -88,5 +87,13 @@ public class StringUtilsTest {
 		assertEquals("Hello", StringUtils.toTitleCase("hello"));
 		assertEquals("Hello World", StringUtils.toTitleCase("hello world"));
 		assertEquals("Hello World", StringUtils.toTitleCase("heLLo WORLD"));
+	}
+	
+	@Test
+	public void testTruncateString(){
+		assertEquals(null, StringUtils.truncateValues(null, UploadPreviewWidgetImpl.MAX_CHARS_PER_CELL, false));
+		assertEquals("small", StringUtils.truncateValues("small", UploadPreviewWidgetImpl.MAX_CHARS_PER_CELL, false));
+		assertEquals("not so sm...", StringUtils.truncateValues("not so small", UploadPreviewWidgetImpl.MAX_CHARS_PER_CELL, false));
+		assertEquals("not so sm&hellip;", StringUtils.truncateValues("not so small", UploadPreviewWidgetImpl.MAX_CHARS_PER_CELL, true));
 	}
 }

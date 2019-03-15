@@ -75,7 +75,7 @@ public class UploadPreviewWidgetImpl implements UploadPreviewWidget {
 				for (Row row : preview.getSampleRows()) {
 					List<String> values = new ArrayList<String>(row.getValues().size());
 					for (String value : row.getValues()) {
-						values.add(StringUtils.truncateValues(value, MAX_CHARS_PER_CELL));
+						values.add(StringUtils.truncateValues(value, MAX_CHARS_PER_CELL, false));
 					}
 					view.addRow(values);
 				}
