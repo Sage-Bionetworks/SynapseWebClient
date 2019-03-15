@@ -9,8 +9,10 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.search.EntitySearchSuggestOracle.EntitySuggestion;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -36,7 +38,7 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	public static final String INACTIVE_STYLE = "inactive";
 	public static final String ACTIVE_STYLE = "active";
 	EntitySearchSuggestOracle entitySearchOracle;
-	
+	EntitySuggestion currentlySelectedSuggestion;
 	@Inject
 	public SearchBoxViewImpl(Binder binder, 
 			EntitySearchSuggestOracle entitySearchOracle, 
@@ -45,21 +47,10 @@ public class SearchBoxViewImpl implements SearchBoxView {
 		widget = binder.createAndBindUi(this);
 		this.gwt = gwt;
 		this.entitySearchOracle = entitySearchOracle;
-		searchSuggestBox = new SuggestBox(entitySearchOracle, new TextBox() {
-			private boolean isTextBoxEventsType(Object handler) {
-				return (handler instanceof KeyDownHandler) && (handler instanceof KeyUpHandler) && (handler instanceof ValueChangeHandler<?>);
-			}
-			@Override
-			public HandlerRegistration addKeyDownHandler(KeyDownHandler handler) {
-				if (isTextBoxEventsType(handler)) {
-					// SearchBox.TextBoxEvents private type, ignore.
-					return null;
-				} else {
-					return super.addKeyDownHandler(handler);	
-				}
-			}
-		});
+		searchSuggestBox = new SuggestBox(entitySearchOracle);
+		searchSuggestBox.setAutoSelectEnabled(false);
 		searchSuggestBox.setHeight("32px");
+		searchSuggestBox.addStyleName("entity-search-menu");
 		searchSuggestBox.getTextBox().addStyleName("form-control");
 		searchSuggestBox.getTextBox().getElement().setAttribute("placeholder", " Search all of Synapse");
 		searchSuggestBoxContainer.add(searchSuggestBox);
@@ -68,8 +59,14 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	}
 
 	private void initClickHandlers() {
+		searchSuggestBox.addSelectionHandler(event -> {
+			currentlySelectedSuggestion = (EntitySuggestion) event.getSelectedItem();
+			placeChanger.goTo(new Synapse(currentlySelectedSuggestion.getEntityId()));
+			searchFieldInactive();
+		});
+
 		searchSuggestBox.getTextBox().addKeyDownHandler(event -> {
-			if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+			if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER && currentlySelectedSuggestion == null) {
 				executeSearch();
 			}
 		});
@@ -85,10 +82,6 @@ public class SearchBoxViewImpl implements SearchBoxView {
 			} else {
 				searchFieldActive();	
 			}
-		});
-		searchSuggestBox.addSelectionHandler(event -> {
-			EntitySuggestion suggestion = (EntitySuggestion) event.getSelectedItem();
-			placeChanger.goTo(new Synapse(suggestion.getEntityId()));
 		});
 	}
 	
@@ -151,6 +144,7 @@ public class SearchBoxViewImpl implements SearchBoxView {
 		searchBoxContainer.addClassName(ACTIVE_STYLE);
 		searchBoxContainer.removeClassName(INACTIVE_STYLE);
 		searchSuggestBox.setFocus(true);
+		currentlySelectedSuggestion = null;
 		clearSearchBox();
 	}
 	

@@ -2755,7 +2755,7 @@ div.border {
 		padding: 0 10px 30px 15px;
 		margin-top: -8px;
 	}
-	.entity-search-menu-item:focus, .entity-search-menu-item:hover {
+	.item-selected > .entity-search-menu-item, .entity-search-menu-item:focus, .entity-search-menu-item:hover {
 		background-color: $synapse-green;
 		color: white;
 	}
