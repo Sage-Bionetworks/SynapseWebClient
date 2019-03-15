@@ -51,7 +51,7 @@ public class EntitySearchSuggestOracle extends SuggestOracle {
 	public SuggestOracle.Callback getCallback()	{return callback;}
 
 	public void getSuggestions(int offset) {
-		if (!isLoading && !request.getQuery().isEmpty()) {
+		if (!isLoading && !request.getQuery().isEmpty() && request.getQuery().length() > 1) {
 			DisplayUtils.scrollToTop();
 			if (!request.getQuery().equals(searchTerm)) {
 				getNewSuggestions(offset);
