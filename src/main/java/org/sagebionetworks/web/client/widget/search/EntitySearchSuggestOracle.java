@@ -17,7 +17,6 @@ import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.inject.Inject;
@@ -34,6 +33,7 @@ public class EntitySearchSuggestOracle extends SuggestOracle {
 	private SynapseJSNIUtils jsniUtils;
 	String searchTerm;
 	ArrayList<EntitySuggestion> suggestions;
+	boolean ignoreResults;
 	@Inject
 	public EntitySearchSuggestOracle(
 			GWTTimer timer,
@@ -145,5 +145,9 @@ public class EntitySearchSuggestOracle extends SuggestOracle {
 	@Override
 	public boolean isDisplayStringHTML() {
 		return true;
+	}
+	
+	public void cancelRequest() {
+		timer.cancel();
 	}
 }

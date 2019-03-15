@@ -35,6 +35,7 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	PlaceChanger placeChanger;
 	public static final String INACTIVE_STYLE = "inactive";
 	public static final String ACTIVE_STYLE = "active";
+	EntitySearchSuggestOracle entitySearchOracle;
 	
 	@Inject
 	public SearchBoxViewImpl(Binder binder, 
@@ -43,7 +44,7 @@ public class SearchBoxViewImpl implements SearchBoxView {
 			GlobalApplicationState globalAppState) {
 		widget = binder.createAndBindUi(this);
 		this.gwt = gwt;
-		
+		this.entitySearchOracle = entitySearchOracle;
 		searchSuggestBox = new SuggestBox(entitySearchOracle, new TextBox() {
 			private boolean isTextBoxEventsType(Object handler) {
 				return (handler instanceof KeyDownHandler) && (handler instanceof KeyUpHandler) && (handler instanceof ValueChangeHandler<?>);
@@ -141,6 +142,7 @@ public class SearchBoxViewImpl implements SearchBoxView {
 		Element searchBoxContainer = _getSearchBoxContainer();
 		searchBoxContainer.removeClassName(ACTIVE_STYLE);
 		searchBoxContainer.addClassName(INACTIVE_STYLE);
+		entitySearchOracle.cancelRequest();
 		searchSuggestBox.hideSuggestionList();
 		searchSuggestBox.setFocus(false);
 	}
