@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 
 import com.google.inject.Inject;
@@ -21,7 +22,11 @@ public class CellFactory  {
 	}
 
 	public Cell createRenderer(ColumnModel model) {
-		switch(model.getColumnType()){
+		return createRenderer(model.getColumnType());
+	}
+	
+	public Cell createRenderer(ColumnType type) {
+		switch(type){
 		case ENTITYID:
 			return ginInjector.createEntityIdCellRenderer();
 		case DATE:
