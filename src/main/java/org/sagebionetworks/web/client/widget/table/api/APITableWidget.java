@@ -208,7 +208,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 					if (tableConfig.getColumnConfigs() == null || tableConfig.getColumnConfigs().size() == 0) {
 						tableConfig.setColumnConfigs(getDefaultColumnConfigs(columnNames, tableConfig));
 					}
-
+					
 					// Map of column index to ColumnType.  Special Set contains column indexes of CancelControl columns.
 					Map<Integer, ColumnType> columnIndex2ColumnType = new HashMap<>();
 					Set<Integer> cancelControlColumnIndex = new HashSet<>();
@@ -223,7 +223,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 					}
 					// Use CellFactory to create the right type of Cell (renderer) for every cell.
 					view.clear();
-					view.setColumnHeaderNames(columnNames);
+					view.setColumnHeaders(tableConfig.getColumnConfigs());
 					for (Row row : rows) {
 						List<IsWidget> columnWidgets = new ArrayList<>();
 						List<String> columnValues = row.getValues();
@@ -249,12 +249,9 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 						int start = tableConfig.getOffset()+1;
 						int end = start + rowCount - 1;
 						view.configurePager(start, end, total);
+					} else {
+						view.initializeTableSorter();
 					}
-					
-					//TODO: rewrite view such that it's driven by ui.xml.  ui.xml should contain a basic (Sage Bionetworks) Table (that's all).
-					//		view.clear() should remove all elements from the Table.
-					//TODO: add column headers to the view (will create SortableTableHeaders for each, and add these to a new TableRow, and add that to the Table)
-					//TODO: add each row to the view (create cell renderers for each column. Adding a row will create TableData objects for every IsWidget (usually Cell), add those to a TableRow, and add that to the Table)
 				} catch (Exception e1) {
 					onFailure(e1);
 				}
@@ -416,6 +413,8 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	public void columnClicked(int index) {
 		//usually handled by JQuery tablesorter plugin, but if this is a query service (evaluation or regular query) then we should append to the uri an appropriate order by
 		if (isQueryService(tableConfig.getUri())) {
+			//reset offset
+			tableConfig.setOffset(0);
 			//set all column sort values
 			APITableColumnConfig targetColumnConfig = tableConfig.getColumnConfigs().get(index);
 			for (APITableColumnConfig config : tableConfig.getColumnConfigs()) {

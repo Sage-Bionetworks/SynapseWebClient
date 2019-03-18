@@ -415,8 +415,6 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetView
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetView;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidgetView;
@@ -565,6 +563,8 @@ import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandlerImpl;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.api.APITableWidgetView;
+import org.sagebionetworks.web.client.widget.table.api.APITableWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.download.CreateDownloadPage;
 import org.sagebionetworks.web.client.widget.table.modal.download.CreateDownloadPageImpl;
 import org.sagebionetworks.web.client.widget.table.modal.download.CreateDownloadPageView;

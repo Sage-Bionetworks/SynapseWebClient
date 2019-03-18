@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.table.api;
 import java.util.List;
 
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -20,8 +21,10 @@ public interface APITableWidgetView extends IsWidget, SynapseView {
 	public void showError(IsWidget synAlert);
 	
 	void showTableUnavailable();
-	void setColumnHeaderNames(List<String> headers);
+	void setColumnHeaders(List<APITableColumnConfig> headers);
 	void addRow(List<IsWidget> columnWidgets);
+	void initializeTableSorter();
+	
 	/**
 	 * Presenter interface
 	 */
