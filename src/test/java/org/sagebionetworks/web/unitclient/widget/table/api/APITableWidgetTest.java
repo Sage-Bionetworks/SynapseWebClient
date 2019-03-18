@@ -1,12 +1,12 @@
 package org.sagebionetworks.web.unitclient.widget.table.api;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -30,9 +30,11 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.internal.verification.AtLeast;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.ServiceConstants;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -51,12 +53,10 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererSynapseID;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableInitializedColumnRenderer;
 import org.sagebionetworks.web.client.widget.entity.renderer.CancelControlWidget;
 import org.sagebionetworks.web.client.widget.table.api.APITableWidget;
 import org.sagebionetworks.web.client.widget.table.api.APITableWidgetView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -97,10 +97,12 @@ public class APITableWidgetTest {
 	CellFactory mockCellFactory;
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
+	@Mock
+	Cell mockCell;
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
-		
+		when(mockCellFactory.createRenderer(any(ColumnType.class))).thenReturn(mockCell);
 		testReturnJSONObject = new JSONObjectAdapterImpl();
 		testReturnJSONObject.put("totalNumberOfResults", 100);
 		//and create some results
@@ -141,8 +143,9 @@ public class APITableWidgetTest {
 	public void testConfigure() {
 		widget.configure(testWikiKey, descriptor, null, null);
 		verify(mockSynapseJavascriptClient).getJSON(anyString(), any(AsyncCallback.class));
-		verify(mockView).clear();
-		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
+		verify(mockView, times(3)).clear();
+		verify(mockView).setColumnHeaders(anyList());
+		verify(mockView).addRow(anyList());
 		verify(mockView).configurePager(anyInt(), anyInt(), anyInt());
 	}
 	
@@ -198,28 +201,11 @@ public class APITableWidgetTest {
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE);
 		
 		widget.configure(testWikiKey, descriptor, null, null);
-		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
+
+		verify(mockView).setColumnHeaders(anyList());
+		verify(mockView).addRow(anyList());
 	}
 	
-	@Test
-	public void testRendererFailure() {
-		//even if the column renderer fails to initialize, everything should still work
-		APITableColumnRendererSynapseID failColumnRenderer = new APITableColumnRendererSynapseID(){
-			@Override
-			public void init(Map<String, List<String>> columnData,
-					APITableColumnConfig config,
-					AsyncCallback<APITableInitializedColumnRenderer> callback) {
-				callback.onFailure(new Exception("Load failure"));
-			}
-		};
-		//return our renderer that always fails to initialize when asked for the Synapse ID column renderer
-		when(mockGinInjector.getAPITableColumnRendererSynapseID()).thenReturn(failColumnRenderer);
-		widget.configure(testWikiKey, descriptor, null, null);
-		
-		verify(mockSynapseJavascriptClient).getJSON(anyString(), any(AsyncCallback.class));
-		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
-		verify(mockView).configurePager(anyInt(), anyInt(), anyInt());
-	}
 	
 	@Test
 	public void testEmptyResultsEmptyColumnConfiguration() throws JSONObjectAdapterException {
@@ -228,7 +214,8 @@ public class APITableWidgetTest {
 		
 		widget.configure(testWikiKey, descriptor, null, null);
 		
-		verify(mockView, never()).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
+		verify(mockView, never()).setColumnHeaders(anyList());
+		verify(mockView, never()).addRow(anyList());
 	}
 	
 	//test removing uri causes error to be shown
@@ -262,17 +249,21 @@ public class APITableWidgetTest {
 	@Test
 	public void testNoPaging() throws JSONObjectAdapterException {
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, "false");
+		
 		widget.configure(testWikiKey, descriptor, null, null);
-		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
-		verify(mockView, Mockito.times(0)).configurePager(anyInt(), anyInt(), anyInt());
+
+		verify(mockView).setColumnHeaders(anyList());
+		verify(mockView).addRow(anyList());
+		verify(mockView, never()).configurePager(anyInt(), anyInt(), anyInt());
 	}
 	
 	@Test
 	public void testPagerNotNecessary() throws JSONObjectAdapterException {
 		testReturnJSONObject.put("totalNumberOfResults", 2);
 		widget.configure(testWikiKey, descriptor, null, null);
-		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
-		verify(mockView, Mockito.times(0)).configurePager(anyInt(), anyInt(), anyInt());
+		verify(mockView).setColumnHeaders(anyList());
+		verify(mockView).addRow(anyList());
+		verify(mockView, never()).configurePager(anyInt(), anyInt(), anyInt());
 	}
 	
 	@Test
@@ -342,7 +333,8 @@ public class APITableWidgetTest {
 		widget.configure(testWikiKey, descriptor, null, null);
 		
 		verify(mockView).clear();
-		verify(mockView, times(0)).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
+		verify(mockView, never()).setColumnHeaders(anyList());
+		verify(mockView, never()).addRow(anyList());
 	}
 	
 	private Set<String> getTestColumnNameSet() {
@@ -359,59 +351,7 @@ public class APITableWidgetTest {
 		return testColumnValues;
 	}
 	
-	private Map<String, List<String>> getTestColumnData(List<String> columnNames) {
-		Map<String, List<String>> colData = new HashMap<String, List<String>>();
-		for (String colName : columnNames) {
-			colData.put(colName, getTestColumnValues(colName));
-		}
-		return colData;
-	}
-
-	
-	@Test
-	public void testCreateColumnDataMap() throws JSONObjectAdapterException {
-		Set<String> testSet = getTestColumnNameSet();
-		Map<String, List<String>> dataMap = widget.createColumnDataMap(testSet.iterator());
-		assertEquals(2, dataMap.keySet().size());
-		assertEquals(new ArrayList<String>(), dataMap.get(col1Name));
-	}
-	
-	@Test
-	public void testCreateColumnDataMapEmptyOrNull() throws JSONObjectAdapterException {
-		Map emptyMap = new HashMap<String, String>();
-		Set<String> emptyTestSet = new HashSet<String>();
-		Map<String, List<String>> dataMap = widget.createColumnDataMap(emptyTestSet.iterator());
-		assertEquals(emptyMap, dataMap);
-		dataMap = widget.createColumnDataMap(null);
-		assertEquals(emptyMap, dataMap);
-	}
-	
-	
-	@Test
-	public void testCreateRenderersNull() throws JSONObjectAdapterException {
-		Set<String> testSet = getTestColumnNameSet();
-		Map<String, List<String>> dataMap = widget.createColumnDataMap(testSet.iterator());
-		String[] columnNames = widget.getColumnNamesArray(dataMap);
-		APITableConfig newConfig = new APITableConfig(descriptor);
-		newConfig.setColumnConfigs(null);
-		widget.createRenderers(columnNames, newConfig, mockGinInjector);
-		//should have tried to create two default renderers (NONE)
-		verify(mockGinInjector, times(2)).getAPITableColumnRendererNone();
-	}
-
-	@Test
-	public void testCreateRenderersEmpty() throws JSONObjectAdapterException {
-		Set<String> testSet = getTestColumnNameSet();
-		Map<String, List<String>> dataMap = widget.createColumnDataMap(testSet.iterator());
-		String[] columnNames = widget.getColumnNamesArray(dataMap);
-		APITableConfig newConfig = new APITableConfig(descriptor);
-		newConfig.setColumnConfigs(new ArrayList());
-		widget.createRenderers(columnNames, newConfig, mockGinInjector);
-		//should have tried to create two default renderers (NONE)
-		verify(mockGinInjector, times(2)).getAPITableColumnRendererNone();
-	}
-
-	private APITableConfig getTableConfig() {
+		private APITableConfig getTableConfig() {
 		APITableConfig tableConfig = new APITableConfig(descriptor);
 		List<APITableColumnConfig> configList = new ArrayList<APITableColumnConfig>();
 		APITableColumnConfig columnConfig = new APITableColumnConfig();
@@ -430,15 +370,6 @@ public class APITableWidgetTest {
 		
 		tableConfig.setColumnConfigs(configList);
 		return tableConfig;
-	}
-	@Test
-	public void testCreateRenderer() throws JSONObjectAdapterException {
-		String[] columnNames = new String[]{col1Name, col2Name};
-		
-		widget.createRenderers(columnNames, getTableConfig(), mockGinInjector);
-		//should have tried to create a user id renderer (based on the table configuration)
-		verify(mockGinInjector).getAPITableColumnRendererUserId();
-		verify(mockGinInjector).getAPITableColumnRendererSynapseID();
 	}
 	
 	@Test
@@ -494,12 +425,12 @@ public class APITableWidgetTest {
 		List<APITableColumnConfig> sortColumnConfigs = tableConfig.getColumnConfigs();
 		sortColumnConfigs.get(0).setSort(COLUMN_SORT_TYPE.NONE);
 		sortColumnConfigs.get(1).setSort(COLUMN_SORT_TYPE.DESC);
-		widget.columnConfigClicked(sortColumnConfigs.get(0));
+		widget.columnClicked(0);
 		inputUri = widget.getOrderedByURI(inputUri, tableConfig).toLowerCase();
 		assertTrue(inputUri.contains("order+by+"));
 		assertTrue(inputUri.contains("desc"));
 		sortColumnConfigs.get(1).setSort(COLUMN_SORT_TYPE.DESC);
-		widget.columnConfigClicked(sortColumnConfigs.get(1));
+		widget.columnClicked(1);
 		inputUri = widget.getOrderedByURI(inputUri, tableConfig).toLowerCase();
 		assertTrue(inputUri.contains("order+by+"));
 		assertTrue(inputUri.contains("asc"));
@@ -583,6 +514,13 @@ public class APITableWidgetTest {
 		
 		assertEquals("a,b", APITableWidget.getColumnValue(row, "key"));
 	}
+	private Map<String, List<String>> getTestColumnData(List<String> columnNames) {
+		Map<String, List<String>> colData = new HashMap<String, List<String>>();
+		for (String colName : columnNames) {
+			colData.put(colName, getTestColumnValues(colName));
+		}
+		return colData;
+	}
 	
 	@Test
 	public void testFixColumnNames() {
@@ -593,53 +531,13 @@ public class APITableWidgetTest {
 		colNames.add(column2);
 		Map<String, List<String>> columnData = getTestColumnData(colNames);
 		
-		APITableWidget.fixColumnNames(columnData);
+		List<String> fixedColumnNames = APITableWidget.fixColumnNames(colNames);
 		
 		//no longer contains project.id, but does contain id
-		assertFalse(columnData.containsKey(column1));
-		assertTrue(columnData.containsKey("id"));
+		assertFalse(fixedColumnNames.contains(column1));
+		assertTrue(fixedColumnNames.contains("id"));
 		//still contains name
-		assertTrue(columnData.containsKey(column2));
-	}
-	
-	@Test
-	public void testGetColumnValues() {
-		String column1 = "id";  
-		List<String> colNames = new ArrayList<String>();
-		colNames.add(column1);
-		Map<String, List<String>> columnData = getTestColumnData(colNames);
-		
-		assertNotNull(APITableWidget.getColumnValues(column1, columnData));
-		//previous table column definitions will be looking for the type. This should also work
-		assertNotNull(APITableWidget.getColumnValues("project."+column1, columnData));
-		//absent column should not be null, and should have the item count 
-		List<String> absentColumn = APITableWidget.getColumnValues("absent", columnData);
-		assertNotNull(absentColumn);
-		assertEquals(COLUMN_ROW_COUNT, absentColumn.size());
-		assertNull(absentColumn.get(0));
-	}
-	
-	@Test
-	public void testInjectWidgets() {
-		List<ElementWrapper> cancelRequestDivs = new ArrayList<ElementWrapper>();
-		cancelRequestDivs.add(cancelControlDiv);
-		when(mockView.findCancelRequestDivs()).thenReturn(cancelRequestDivs);
-		
-		List<ElementWrapper> userBadgeDivs = new ArrayList<ElementWrapper>();
-		userBadgeDivs.add(userBadgeDiv1);
-		userBadgeDivs.add(userBadgeDiv2);
-		when(mockView.findUserBadgeDivs()).thenReturn(userBadgeDivs);
-		
-		widget.injectWidgets();
-		verify(mockGinInjector, times(cancelRequestDivs.size())).getCancelControlWidget();
-		verify(mockGinInjector, times(userBadgeDivs.size())).getUserTeamBadgeWidget();
-		
-		verify(cancelControlDiv).removeAllChildren();
-		verify(userBadgeDiv1).removeAllChildren();
-		verify(userBadgeDiv2).removeAllChildren();
-		
-		verify(mockCancelControlWidget, times(cancelRequestDivs.size())).configure(anyString());
-		verify(mockUserTeamBadge, times(userBadgeDivs.size())).configure(anyString());
+		assertTrue(fixedColumnNames.contains(column2));
 	}
 	
 	@Test
