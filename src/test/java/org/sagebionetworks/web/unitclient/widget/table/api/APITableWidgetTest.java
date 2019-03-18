@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.unitclient.widget.entity.renderer;
+package org.sagebionetworks.web.unitclient.widget.table.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -24,11 +24,13 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.ServiceConstants;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
@@ -52,9 +54,10 @@ import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererSynapseID;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableInitializedColumnRenderer;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.CancelControlWidget;
+import org.sagebionetworks.web.client.widget.table.api.APITableWidget;
+import org.sagebionetworks.web.client.widget.table.api.APITableWidgetView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -65,17 +68,21 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class APITableWidgetTest {
-		
 	private static final String TESTSERVICE_PATH = "/testservice";
+	
 	APITableWidget widget;
+	
+	@Mock
 	APITableWidgetView mockView;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
 	PortalGinInjector mockGinInjector;
-	APITableColumnRendererSynapseID synapseIDColumnRenderer;
-	APITableColumnRendererNone noneColumnRenderer;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	AuthenticationController mockAuthenticationController;
 	
 	Map<String, String> descriptor;
@@ -87,31 +94,12 @@ public class APITableWidgetTest {
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
-	CancelControlWidget mockCancelControlWidget;
-	@Mock
-	UserTeamBadge mockUserTeamBadge;
-	@Mock
-	ElementWrapper cancelControlDiv;
-	@Mock
-	ElementWrapper userBadgeDiv1;
-	@Mock
-	ElementWrapper userBadgeDiv2;
-	@Mock
-	GWTWrapper mockGWT;
+	CellFactory mockCellFactory;
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
-		MockitoAnnotations.initMocks(this);
-		mockView = mock(APITableWidgetView.class);
-		mockGinInjector = mock(PortalGinInjector.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		noneColumnRenderer = new APITableColumnRendererNone();
-		synapseIDColumnRenderer = new APITableColumnRendererSynapseID();
-		when(mockGinInjector.getCancelControlWidget()).thenReturn(mockCancelControlWidget);
-		when(mockGinInjector.getUserTeamBadgeWidget()).thenReturn(mockUserTeamBadge);
 		
 		testReturnJSONObject = new JSONObjectAdapterImpl();
 		testReturnJSONObject.put("totalNumberOfResults", 100);
@@ -125,11 +113,8 @@ public class APITableWidgetTest {
 		results.put(0, result1);
 		testReturnJSONObject.put("results", results);
 		
-		when(mockGinInjector.getAPITableColumnRendererNone()).thenReturn(noneColumnRenderer);
-		when(mockGinInjector.getAPITableColumnRendererSynapseID()).thenReturn(synapseIDColumnRenderer);
-		
 		AsyncMockStubber.callSuccessWith(testReturnJSONObject).when(mockSynapseJavascriptClient).getJSON(anyString(), any(AsyncCallback.class));
-		widget = new APITableWidget(mockView, mockSynapseJavascriptClient, mockGinInjector, mockGlobalApplicationState, mockAuthenticationController, mockSynAlert, mockGWT);
+		widget = new APITableWidget(mockView, mockSynapseJavascriptClient, mockGinInjector, mockGlobalApplicationState, mockAuthenticationController, mockSynAlert, mockCellFactory);
 		descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, TESTSERVICE_PATH);
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, "true");

@@ -137,13 +137,6 @@ import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialog;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidget;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.FileHandleAssociationRow;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererCancelControl;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererEntityIdAnnotations;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererLink;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererSynapseID;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererUserId;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidget;
@@ -397,15 +390,6 @@ public interface PortalGinInjector extends Ginjector {
 
 	//////API Table Column Editor
 	APITableColumnConfigView getAPITableColumnConfigView();
-	
-	//////API Table Column Renderers
-	APITableColumnRendererNone getAPITableColumnRendererNone();
-	APITableColumnRendererUserId getAPITableColumnRendererUserId();
-	APITableColumnRendererDate getAPITableColumnRendererDate();
-	APITableColumnRendererLink getAPITableColumnRendererLink();
-	APITableColumnRendererSynapseID getAPITableColumnRendererSynapseID();
-	APITableColumnRendererEntityIdAnnotations getAPITableColumnRendererEntityAnnotations();
-	APITableColumnRendererCancelControl getAPITableColumnRendererCancelControl();
 	
 	// Other widgets
 	UserBadge getUserBadgeWidget();
