@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -10,7 +9,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.place.Synapse;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -23,7 +21,6 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 	public interface Binder extends UiBinder<Widget, EntityIdCellRendererViewImpl> {}
 	@UiField
 	Span loadingUI;
-	Tooltip errorField;
 	Icon errorIcon;
 	@UiField
 	Icon entityIcon;
@@ -88,17 +85,9 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 	@Override
 	public void showErrorIcon(String error) {
 		// lazily construct error UI
-		if (errorField == null) {
-			errorIcon = new Icon(IconType.EXCLAMATION_CIRCLE);
-			errorIcon.addStyleName("text-danger");
-			errorIcon.setFixedWidth(true);
-			errorField = new Tooltip(errorIcon);
-			((Span)w).add(errorField);
-		}
+		entityIcon.setType(IconType.EXCLAMATION_CIRCLE);
 		loadingUI.setVisible(false);
-		entityIcon.setVisible(false);
-		errorField.setTitle(error);
-		errorField.reconfigure();
+		entityIcon.setVisible(true);
 	}
 	
 	@Override

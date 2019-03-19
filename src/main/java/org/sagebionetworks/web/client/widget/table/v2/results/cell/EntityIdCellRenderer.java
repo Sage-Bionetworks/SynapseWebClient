@@ -47,12 +47,12 @@ public class EntityIdCellRenderer implements Cell {
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					jsniUtils.consoleError(caught);
 					if (hideIfLoadError) {
 						view.setVisible(false);
+						jsniUtils.consoleError(caught.getMessage());
 					} else {
-						view.hideAllIcons();
 						view.setLinkText(entityId);
+						view.showErrorIcon(caught.getMessage());
 					}
 				}
 			});
