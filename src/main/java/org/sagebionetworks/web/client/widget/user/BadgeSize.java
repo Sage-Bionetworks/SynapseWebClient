@@ -5,11 +5,9 @@ public enum BadgeSize {
     LARGER("fa-2x", "font-size-20", 60, true),
     LARGE("", "font-size-14", 28, true),
     DEFAULT("", "", 23, true),
-    SMALLER("font-size-0-9em", "font-size-13", 18, true),
-    LARGER_PICTURE_ONLY("font-size-12x", "", 124, false),
+    SMALLER("font-size-0-8em", "font-size-13", 18, true),
     LARGE_PICTURE_ONLY("", "", 28, false),
-    SMALL_PICTURE_ONLY("", "", 23, false),
-    EXTRA_SMALL("font-size-0-9em", "", 12, false);
+    SMALL_PICTURE_ONLY("", "", 23, false);
     
     private String defaultPictureStyle;
     private String textStyle;
