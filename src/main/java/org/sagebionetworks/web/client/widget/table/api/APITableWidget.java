@@ -23,7 +23,9 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
@@ -209,19 +211,11 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 						tableConfig.setColumnConfigs(getDefaultColumnConfigs(columnNames, tableConfig));
 					}
 					
-					// Map of column index to ColumnType.  Special Set contains column indexes of CancelControl columns.
-					Map<Integer, ColumnType> columnIndex2ColumnType = new HashMap<>();
-					Set<Integer> cancelControlColumnIndex = new HashSet<>();
-					for (int i = 0; i < tableConfig.getColumnConfigs().size(); i++) {
-						APITableColumnConfig config = tableConfig.getColumnConfigs().get(i);
+					List<ApiTableColumnType> columnTypes = new ArrayList<>();
+					for (APITableColumnConfig config : tableConfig.getColumnConfigs()) {
 						String rendererName = config.getRendererFriendlyName();
-						if (rendererName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_CANCEL_CONTROL)) {
-							cancelControlColumnIndex.add(i);
-						} else {
-							columnIndex2ColumnType.put(i, getColumnType(rendererName));
-						}
+						columnTypes.add(getColumnType(rendererName));
 					}
-					// Use CellFactory to create the right type of Cell (renderer) for every cell.
 					view.clear();
 					view.setColumnHeaders(tableConfig.getColumnConfigs());
 					for (Row row : rows) {
@@ -229,18 +223,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 						List<String> columnValues = row.getValues();
 						for (int i = 0; i < columnValues.size(); i++) {
 							String colValue = columnValues.get(i);
-							IsWidget newColumnWidget;
-							if (cancelControlColumnIndex.contains(i)) {
-								CancelControlWidget cancelRequestWidget = ginInjector.getCancelControlWidget();
-								cancelRequestWidget.configure(colValue);
-								newColumnWidget = cancelRequestWidget;
-							} else {
-								ColumnType colType = columnIndex2ColumnType.get(i);
-								Cell cell = cellFactory.createRenderer(colType);
-								cell.setValue(colValue);
-								newColumnWidget = cell;
-							}
-							columnWidgets.add(newColumnWidget);
+							columnWidgets.add(getNewCell(columnTypes.get(i), colValue));
 						}
 						view.addRow(columnWidgets);
 					}
@@ -267,6 +250,26 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 				}
 			}
 		});
+	}
+	
+	public IsWidget getNewCell(ApiTableColumnType type, String value) {
+		if (type.getSynapseTableColumnType() != null) {
+			Cell cell = cellFactory.createRenderer(type.getSynapseTableColumnType());
+			cell.setValue(value);
+			return cell;
+		} else if (ApiTableColumnType.CANCEL_CONTROL.equals(type)){
+			CancelControlWidget cancelRequestWidget = ginInjector.getCancelControlWidget();
+			cancelRequestWidget.configure(value);
+			return cancelRequestWidget;
+		} else if (ApiTableColumnType.MARKDOWN_LINK.equals(type)){
+			MarkdownWidget mdWidget = ginInjector.getMarkdownWidget();
+			mdWidget.configure(value);
+			return mdWidget;
+		} else {
+			DivView div = ginInjector.getDiv();
+			div.setText(value);
+			return div;
+		}
 	}
 	
 	public boolean isValidColumnNames(List<APITableColumnConfig> configs) {
@@ -476,18 +479,20 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	 * @param friendlyName
 	 * @return
 	 */
-	public static ColumnType getColumnType(String friendlyName) {
-		ColumnType type = ColumnType.STRING;
+	public static ApiTableColumnType getColumnType(String friendlyName) {
+		ApiTableColumnType type = ApiTableColumnType.STRING;
 		if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID))
-			type = ColumnType.USERID;
+			type = ApiTableColumnType.USERID;
 		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_DATE) || friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE))
-			type = ColumnType.DATE;
+			type = ApiTableColumnType.DATE;
 		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_LINK))
-			type = ColumnType.LINK;
+			type = ApiTableColumnType.MARKDOWN_LINK;
 		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID))
-			type = ColumnType.ENTITYID;
+			type = ApiTableColumnType.ENTITYID;
 		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_ANNOTATIONS))
-			type = ColumnType.LARGETEXT;
+			type = ApiTableColumnType.LARGETEXT;
+		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_CANCEL_CONTROL))
+			type = ApiTableColumnType.CANCEL_CONTROL;
 		
 		return type;
 	}

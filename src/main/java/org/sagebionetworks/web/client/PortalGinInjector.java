@@ -38,6 +38,7 @@ import org.sagebionetworks.web.client.presenter.WikiDiffPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
@@ -585,5 +586,6 @@ public interface PortalGinInjector extends Ginjector {
 	SynapseJSNIUtilsImpl getSynapseJSNIUtils();
 	OpenUserInvitationWidget getOpenUserInvitationWidget();
 	OpenMembershipRequestWidget getOpenMembershipRequestWidget();
-	OpenTeamInvitationWidget getOpenTeamInvitationWidget(); 
+	OpenTeamInvitationWidget getOpenTeamInvitationWidget();
+	DivView getDiv();
 }
