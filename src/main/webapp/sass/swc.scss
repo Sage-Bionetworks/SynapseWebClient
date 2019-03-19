@@ -1073,8 +1073,13 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 		font-size:1em;
 	}
 	
-	.font-size-0-9em, #body .font-size-0-9em,
-	i.font-size-0-9em, #body i.font-size-0-9em {
+	.font-size-0-8em,
+	i.font-size-0-8em {
+		font-size:0.8em;
+	}
+
+	.font-size-0-9em,
+	i.font-size-0-9em {
 		font-size:0.9em;
 	}
 	

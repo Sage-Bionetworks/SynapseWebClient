@@ -9,7 +9,7 @@
 		<bh:Span addStyleNames="flexcontainer-row">
 			<bh:Span ui:field="pictureSpan" addStyleNames="flexcontainer-column flexcontainer-justify-center">
 				<b:Tooltip ui:field="pictureTooltip" title="Profile unavailable" isHtml="true" placement="BOTTOM">
-					<g:FocusPanel ui:field="pictureFocusPanel" addStyleNames="margin-right-5 imageButton displayInlineBlock">
+					<g:FocusPanel ui:field="pictureFocusPanel" addStyleNames="margin-right-5 imageButton displayInlineBlock moveup-1">
 						<bh:Span>
 							<bh:Span ui:field="defaultUserPicture" addStyleNames="fa-stack">
 								<b:Icon ui:field="squareIcon" type="CIRCLE" addStyleNames="fa-stack-2x"/>
