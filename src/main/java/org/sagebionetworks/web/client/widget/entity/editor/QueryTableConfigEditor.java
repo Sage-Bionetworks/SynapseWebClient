@@ -82,7 +82,6 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, getServicePathFromView());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, view.isPaging().toString());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGESIZE_KEY, DEFAULT_PAGE_SIZE);
-		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY, view.isShowRowNumbers().toString());
 		List<APITableColumnConfig> configs = view.getConfigs();
 		APITableConfigEditor.updateDescriptorWithColumnConfigs(descriptor, configs);
 	}

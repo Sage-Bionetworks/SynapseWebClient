@@ -27,8 +27,6 @@ public class QueryTableConfigViewImpl implements QueryTableConfigView {
 	@UiField
 	CheckBox isPagingField;
 	@UiField
-	CheckBox isRowVisibleField;
-	@UiField
 	Button autoAddColumns;
 	
 	@UiField
@@ -58,7 +56,6 @@ public class QueryTableConfigViewImpl implements QueryTableConfigView {
 	public void configure(APITableConfig tableConfig) {
 		columnsManager.configure(tableConfig.getColumnConfigs());
 		queryField.setValue(tableConfig.getUri());
-		isRowVisibleField.setValue(tableConfig.isShowRowNumber());
 		isPagingField.setValue(tableConfig.isPaging());
 	}
 	
@@ -79,11 +76,6 @@ public class QueryTableConfigViewImpl implements QueryTableConfigView {
 	@Override
 	public Boolean isPaging() {
 		return isPagingField.getValue();
-	}
-	
-	@Override
-	public Boolean isShowRowNumbers() {
-		return isRowVisibleField.getValue();
 	}
 	
 	@Override
