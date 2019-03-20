@@ -38,6 +38,7 @@ import org.sagebionetworks.web.client.presenter.WikiDiffPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
@@ -137,14 +138,6 @@ import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialog;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidget;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.FileHandleAssociationRow;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererCancelControl;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererEntityIdAnnotations;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererLink;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererSynapseID;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererUserId;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidget;
@@ -198,6 +191,7 @@ import org.sagebionetworks.web.client.widget.subscription.TopicRowWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.TableEntityListGroupItem;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
+import org.sagebionetworks.web.client.widget.table.api.APITableWidget;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
@@ -398,15 +392,6 @@ public interface PortalGinInjector extends Ginjector {
 	//////API Table Column Editor
 	APITableColumnConfigView getAPITableColumnConfigView();
 	
-	//////API Table Column Renderers
-	APITableColumnRendererNone getAPITableColumnRendererNone();
-	APITableColumnRendererUserId getAPITableColumnRendererUserId();
-	APITableColumnRendererDate getAPITableColumnRendererDate();
-	APITableColumnRendererLink getAPITableColumnRendererLink();
-	APITableColumnRendererSynapseID getAPITableColumnRendererSynapseID();
-	APITableColumnRendererEntityIdAnnotations getAPITableColumnRendererEntityAnnotations();
-	APITableColumnRendererCancelControl getAPITableColumnRendererCancelControl();
-	
 	// Other widgets
 	UserBadge getUserBadgeWidget();
 	EmailInvitationBadge getEmailInvitationBadgeWidget();
@@ -601,5 +586,6 @@ public interface PortalGinInjector extends Ginjector {
 	SynapseJSNIUtilsImpl getSynapseJSNIUtils();
 	OpenUserInvitationWidget getOpenUserInvitationWidget();
 	OpenMembershipRequestWidget getOpenMembershipRequestWidget();
-	OpenTeamInvitationWidget getOpenTeamInvitationWidget(); 
+	OpenTeamInvitationWidget getOpenTeamInvitationWidget();
+	DivView getDiv();
 }

@@ -118,7 +118,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	
 	private static native void _tablesorter() /*-{
 		try {
-			$wnd.jQuery('table.markdowntable').tablesorter();
+			$wnd.jQuery('table.tablesorter').tablesorter();
 		} catch (err) {
 			console.error(err);
 		}
