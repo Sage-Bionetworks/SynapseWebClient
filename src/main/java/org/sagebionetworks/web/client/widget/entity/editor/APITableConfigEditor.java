@@ -12,7 +12,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class APITableConfigEditor implements APITableConfigView.Presenter, WidgetEditorPresenter {
+public class APITableConfigEditor implements WidgetEditorPresenter {
 	
 	private APITableConfigView view;
 	private Map<String, String> descriptor;
@@ -20,7 +20,6 @@ public class APITableConfigEditor implements APITableConfigView.Presenter, Widge
 	@Inject
 	public APITableConfigEditor(APITableConfigView view) {
 		this.view = view;
-		view.setPresenter(this);
 		view.initView();
 	}
 	
@@ -51,8 +50,6 @@ public class APITableConfigEditor implements APITableConfigView.Presenter, Widge
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_QUERY_TABLE_RESULTS, view.isQueryTableResults().toString());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_SHOW_IF_LOGGED_IN, view.isShowIfLoggedInOnly().toString());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGESIZE_KEY, view.getPageSize());
-		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY, view.isShowRowNumbers().toString());
-		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY, view.getRowNumberColumnName());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY, view.getJsonResultsKeyName());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE, view.getCssStyle());
 		List<APITableColumnConfig> configs = view.getConfigs();

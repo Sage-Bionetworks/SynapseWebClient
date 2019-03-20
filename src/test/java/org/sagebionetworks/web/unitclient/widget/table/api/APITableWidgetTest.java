@@ -124,8 +124,6 @@ public class APITableWidgetTest {
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, TESTSERVICE_PATH);
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, "true");
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGESIZE_KEY, "10");
-		descriptor.put(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY, "true");
-		descriptor.put(WidgetConstants.API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY, "Row Number");
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY, "results");
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE, "myTableStyle");
 	}
@@ -198,8 +196,6 @@ public class APITableWidgetTest {
 		
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY);
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_PAGESIZE_KEY);
-		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY);
-		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY);
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY);
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE);
 		

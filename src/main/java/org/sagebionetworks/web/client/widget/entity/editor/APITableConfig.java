@@ -16,8 +16,8 @@ import org.sagebionetworks.web.shared.WidgetConstants;
  * Is initialized from a widget descriptor map.
  */
 public class APITableConfig {
-	private String uri, jsonResultsArrayKeyName, cssStyleName, rowNumberColName;
-	private boolean isPaging, isShowRowNumber,isQueryTableResults,isShowOnlyIfLoggedIn;
+	private String uri, jsonResultsArrayKeyName, cssStyleName;
+	private boolean isPaging,isQueryTableResults,isShowOnlyIfLoggedIn;
 	private int offset, pageSize;
 	private List<APITableColumnConfig> columnConfigs;
 	public final static String COLUMN_NAMES_DELIMITER = ";";	
@@ -31,8 +31,6 @@ public class APITableConfig {
 		isPaging = true;
 		isQueryTableResults = false;
 		isShowOnlyIfLoggedIn = false;
-		isShowRowNumber = false;
-		rowNumberColName = "";
 		jsonResultsArrayKeyName = "results";
 		cssStyleName = "";
 
@@ -56,12 +54,6 @@ public class APITableConfig {
 				isShowOnlyIfLoggedIn = Boolean.parseBoolean(descriptor.get(WidgetConstants.API_TABLE_WIDGET_SHOW_IF_LOGGED_IN));
 			}
 
-			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY)){
-				isShowRowNumber = Boolean.parseBoolean(descriptor.get(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY));
-				if (isShowRowNumber && descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY))
-					rowNumberColName =descriptor.get(WidgetConstants.API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY);
-			}
-			
 			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY)){
 				jsonResultsArrayKeyName = descriptor.get(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY);
 			}
@@ -133,14 +125,6 @@ public class APITableConfig {
 		this.cssStyleName = cssStyleName;
 	}
 
-	public String getRowNumberColName() {
-		return rowNumberColName;
-	}
-
-	public void setRowNumberColName(String rowNumberColName) {
-		this.rowNumberColName = rowNumberColName;
-	}
-
 	public boolean isPaging() {
 		return isPaging;
 	}
@@ -166,14 +150,6 @@ public class APITableConfig {
 		this.isPaging = isPaging;
 	}
 
-	public boolean isShowRowNumber() {
-		return isShowRowNumber;
-	}
-
-	public void setShowRowNumber(boolean isShowRowNumber) {
-		this.isShowRowNumber = isShowRowNumber;
-	}
-
 	public int getOffset() {
 		return offset;
 	}
@@ -197,6 +173,4 @@ public class APITableConfig {
 	public void setColumnConfigs(List<APITableColumnConfig> columnConfigs) {
 		this.columnConfigs = columnConfigs;
 	}
-
-	
 }

@@ -24,7 +24,6 @@ import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
@@ -78,8 +77,6 @@ public class QueryTableConfigEditorTest {
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, ClientProperties.QUERY_SERVICE_PREFIX + testQuery);
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, "true");
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGESIZE_KEY, "10");
-		descriptor.put(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY, "true");
-		descriptor.put(WidgetConstants.API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY, "Row Number");
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY, "results");
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE, "myTableStyle");
 		
@@ -124,14 +121,11 @@ public class QueryTableConfigEditorTest {
 		when(mockView.getQueryString()).thenReturn(decodedTestQuery);
 		Boolean isPaging = true;
 		when(mockView.isPaging()).thenReturn(isPaging);
-		Boolean isShowRowNumbers = false;
-		when(mockView.isShowRowNumbers()).thenReturn(isShowRowNumbers);
 		
 		editor.updateDescriptorFromView();
 		assertEquals(ClientProperties.QUERY_SERVICE_PREFIX + newQuery,descriptor.get(WidgetConstants.API_TABLE_WIDGET_PATH_KEY));
 		assertEquals(isPaging.toString(),descriptor.get(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY));
 		assertEquals(QueryTableConfigEditor.DEFAULT_PAGE_SIZE,descriptor.get(WidgetConstants.API_TABLE_WIDGET_PAGESIZE_KEY));
-		assertEquals(isShowRowNumbers.toString(),descriptor.get(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY));
 	}
 	
 	@Test (expected=IllegalArgumentException.class)
@@ -141,8 +135,6 @@ public class QueryTableConfigEditorTest {
 		when(mockView.getQueryString()).thenReturn(decodedTestQuery);
 		Boolean isPaging = true;
 		when(mockView.isPaging()).thenReturn(isPaging);
-		Boolean isShowRowNumbers = false;
-		when(mockView.isShowRowNumbers()).thenReturn(isShowRowNumbers);
 		
 		editor.updateDescriptorFromView();
 	}

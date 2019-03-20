@@ -27,8 +27,6 @@ public class APITableConfigTest {
 	String path = "/evaluation";
 	String isPaging = Boolean.TRUE.toString();
 	String pageSize = new Integer(42).toString();
-	String showRowNumber = Boolean.TRUE.toString();
-	String rowColumnName="Rank";
 	String jsonResultsArrayKeyName = "myResultsField";
 	String cssStyleName = "myCssStyle";
 	
@@ -40,8 +38,6 @@ public class APITableConfigTest {
 		descriptor.put(API_TABLE_WIDGET_PATH_KEY, path);
 		descriptor.put(API_TABLE_WIDGET_PAGING_KEY, isPaging);
 		descriptor.put(API_TABLE_WIDGET_PAGESIZE_KEY, pageSize);
-		descriptor.put(API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY, showRowNumber);
-		descriptor.put(API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY, rowColumnName);
 		descriptor.put(API_TABLE_WIDGET_RESULTS_KEY, jsonResultsArrayKeyName);
 		descriptor.put(API_TABLE_WIDGET_CSS_STYLE, cssStyleName);
 	}
@@ -53,8 +49,6 @@ public class APITableConfigTest {
 		assertEquals(Boolean.parseBoolean(isPaging), tableconfig.isPaging());
 		
 		assertEquals(Integer.parseInt(pageSize), tableconfig.getPageSize());
-		assertEquals(Boolean.parseBoolean(showRowNumber), tableconfig.isShowRowNumber());
-		assertEquals(rowColumnName, tableconfig.getRowNumberColName());
 		assertEquals(jsonResultsArrayKeyName, tableconfig.getJsonResultsArrayKeyName());
 		assertEquals(cssStyleName, tableconfig.getCssStyleName());
 		assertTrue(tableconfig.getColumnConfigs().size()==0);
