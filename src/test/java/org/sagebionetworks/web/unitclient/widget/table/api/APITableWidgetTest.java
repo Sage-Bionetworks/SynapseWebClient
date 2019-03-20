@@ -1,12 +1,12 @@
 package org.sagebionetworks.web.unitclient.widget.table.api;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -28,9 +28,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.internal.verification.AtLeast;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.ServiceConstants;
@@ -42,13 +39,12 @@ import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
-import org.sagebionetworks.web.client.widget.entity.ElementWrapper;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
@@ -56,9 +52,9 @@ import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.renderer.CancelControlWidget;
 import org.sagebionetworks.web.client.widget.table.api.APITableWidget;
 import org.sagebionetworks.web.client.widget.table.api.APITableWidgetView;
+import org.sagebionetworks.web.client.widget.table.api.ApiTableColumnType;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
-import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -66,6 +62,7 @@ import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -84,6 +81,10 @@ public class APITableWidgetTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	@Mock
 	AuthenticationController mockAuthenticationController;
+	@Mock
+	CancelControlWidget mockCancelControlWidget;
+	@Mock
+	MarkdownWidget mockMarkdownWidget;
 	
 	Map<String, String> descriptor;
 	JSONObjectAdapter testReturnJSONObject;
@@ -103,6 +104,8 @@ public class APITableWidgetTest {
 	@Before
 	public void setup() throws JSONObjectAdapterException{
 		when(mockCellFactory.createRenderer(any(ColumnType.class))).thenReturn(mockCell);
+		when(mockGinInjector.getCancelControlWidget()).thenReturn(mockCancelControlWidget);
+		when(mockGinInjector.getMarkdownWidget()).thenReturn(mockMarkdownWidget);
 		testReturnJSONObject = new JSONObjectAdapterImpl();
 		testReturnJSONObject.put("totalNumberOfResults", 100);
 		//and create some results
@@ -514,13 +517,6 @@ public class APITableWidgetTest {
 		
 		assertEquals("a,b", APITableWidget.getColumnValue(row, "key"));
 	}
-	private Map<String, List<String>> getTestColumnData(List<String> columnNames) {
-		Map<String, List<String>> colData = new HashMap<String, List<String>>();
-		for (String colName : columnNames) {
-			colData.put(colName, getTestColumnValues(colName));
-		}
-		return colData;
-	}
 	
 	@Test
 	public void testFixColumnNames() {
@@ -529,7 +525,6 @@ public class APITableWidgetTest {
 		List<String> colNames = new ArrayList<String>();
 		colNames.add(column1);
 		colNames.add(column2);
-		Map<String, List<String>> columnData = getTestColumnData(colNames);
 		
 		List<String> fixedColumnNames = APITableWidget.fixColumnNames(colNames);
 		
@@ -545,4 +540,35 @@ public class APITableWidgetTest {
 		String selectColumns = widget.getSelectColumns(getTableConfig().getColumnConfigs());
 		assertEquals(col1Name+","+col2Name, selectColumns);
 	}
+
+	@Test
+	public void testGetColumnTypeFromRendererName() {
+		// get the ApiTableColumnType based on the friendly name
+		assertEquals(ApiTableColumnType.USERID, APITableWidget.getColumnType(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID));
+		assertEquals(ApiTableColumnType.DATE, APITableWidget.getColumnType(WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE));
+		assertEquals(ApiTableColumnType.MARKDOWN_LINK, APITableWidget.getColumnType(WidgetConstants.API_TABLE_COLUMN_RENDERER_LINK));
+		assertEquals(ApiTableColumnType.ENTITYID, APITableWidget.getColumnType(WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID));
+		assertEquals(ApiTableColumnType.LARGETEXT, APITableWidget.getColumnType(WidgetConstants.API_TABLE_COLUMN_RENDERER_ANNOTATIONS));
+		assertEquals(ApiTableColumnType.CANCEL_CONTROL, APITableWidget.getColumnType(WidgetConstants.API_TABLE_COLUMN_RENDERER_CANCEL_CONTROL));
+	}
+
+	@Test
+	public void testGetNewCellCellRenderer() {
+		// get new cell based on different api table column types
+		String value = "1";
+		IsWidget w = widget.getNewCell(ApiTableColumnType.STRING, value);
+		assertEquals(w, mockCell);
+		verify(mockCell).setValue(value);
+		
+		value = "2";
+		IsWidget cancelControlCell = widget.getNewCell(ApiTableColumnType.CANCEL_CONTROL, value);
+		assertEquals(cancelControlCell, mockCancelControlWidget);
+		verify(mockCancelControlWidget).configure(value);
+		
+		value = "3";
+		IsWidget markdownLinkCell = widget.getNewCell(ApiTableColumnType.MARKDOWN_LINK, value);
+		assertEquals(markdownLinkCell, mockMarkdownWidget);
+		verify(mockMarkdownWidget).configure(value);
+	}
+	
 }
