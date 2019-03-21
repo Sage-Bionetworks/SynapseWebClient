@@ -82,6 +82,7 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 				case ENTITYID:
 				case FILEHANDLEID:
 				case USERID:
+				case LARGETEXT:
 					return false;
 				default:
 					return true;		
