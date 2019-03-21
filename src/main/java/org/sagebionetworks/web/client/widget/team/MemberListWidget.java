@@ -17,7 +17,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class MemberListWidget implements MemberListWidgetView.Presenter {
-	public static int MEMBER_LIMIT = 20;
+	public static int MEMBER_LIMIT = 21;
 	private int offset;
 	private String searchTerm, teamId;
 	private boolean isAdmin;

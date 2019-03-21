@@ -10,45 +10,34 @@ import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class UserBadgeViewImpl extends Div implements UserBadgeView {
+	public static PlaceChanger placeChanger = null;
+	public static final CallbackP<String> STANDARD_HANDLER = userId -> {
+		placeChanger.goTo(new Profile(userId));
+	};
 	
-	HandlerRegistration handlerRegistration;
+	public static final CallbackP<String> NEW_WINDOW_HANDLER = userId -> {
+		newWindow("#!Profile:" + userId, "_blank", "");
+	};
+
 	boolean isTextHidden = false;
 	AdapterFactory adapterFactory;
 	SynapseJSNIUtils jsniUtils;
 	BadgeSize badgeSize = BadgeSize.DEFAULT;
-	public static final String USER_ID_ATTRIBUTE = "data-profile-user-id";
-	public static PlaceChanger placeChanger = null;
-	public static final ClickHandler STANDARD_CLICKHANDLER = event -> {
-		if (!DisplayUtils.isAnyModifierKeyDown(event)) {
-			event.preventDefault();
-			Widget panel = (Widget)event.getSource();
-			String userId = panel.getElement().getAttribute(USER_ID_ATTRIBUTE);
-			placeChanger.goTo(new Profile(userId));
-		}
-	};
+	CallbackP<String> currentClickHandler = STANDARD_HANDLER;
+	Div userBadgeContainer = new Div();
 	
-	public static final ClickHandler NEW_WINDOW_CLICKHANDLER = event -> {
-		event.preventDefault();
-		Widget panel = (Widget)event.getSource();
-		String userId = panel.getElement().getAttribute(USER_ID_ATTRIBUTE);
-		newWindow("#!Profile:" + userId, "_blank", "");
-	};
-	FocusPanel userBadgeContainer = new FocusPanel();
 	@Inject
 	public UserBadgeViewImpl(
 			GlobalApplicationState globalAppState, 
@@ -57,7 +46,9 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		placeChanger = globalAppState.getPlaceChanger();
 		this.adapterFactory = adapterFactory;
 		this.jsniUtils = jsniUtils;
-		handlerRegistration = userBadgeContainer.addClickHandler(STANDARD_CLICKHANDLER);
+		setMarginRight(2);
+		setMarginLeft(2);
+		currentClickHandler = STANDARD_HANDLER;
 		addAttachHandler(event -> {
 			if (!event.isAttached()) {
 				//detach event, clean up react component
@@ -65,11 +56,9 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 			}
 		});
 	}
-	
 	@Override
 	public void configure(UserProfile profile) {
 		clear();
-		userBadgeContainer.getElement().setAttribute(USER_ID_ATTRIBUTE, profile.getOwnerId());
 		add(userBadgeContainer);
 		String profileJson = "";
 		try {
@@ -79,17 +68,18 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		} catch (Throwable e) {
 			jsniUtils.consoleError(e);
 		}
-		_showBadge(userBadgeContainer.getElement(), profileJson, badgeSize.reactClientSize, isTextHidden);
+		_showBadge(userBadgeContainer.getElement(), profileJson, badgeSize.reactClientSize, isTextHidden, this);
 	}
 	
 	public void setClickHandler(ClickHandler clickHandler) {
-		handlerRegistration.removeHandler();
-		handlerRegistration = userBadgeContainer.addClickHandler(clickHandler);
+		currentClickHandler = userId -> {
+			clickHandler.onClick(null);
+		};
 	}
 	
 	@Override
 	public void setOpenInNewWindow() {
-		setClickHandler(NEW_WINDOW_CLICKHANDLER);
+		currentClickHandler = NEW_WINDOW_HANDLER;
 	}
 	
 	@Override
@@ -111,6 +101,11 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	@Override
 	public void setSize(BadgeSize size) {
 		this.badgeSize = size;
+		if (badgeSize.equals(BadgeSize.DEFAULT)) {
+			addStyleName("inline-block");
+		} else {
+			removeStyleName("inline-block");
+		}
 	}
 	
 	@Override
@@ -138,11 +133,16 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		// TODO Auto-generated method stub
 	}
 	
-	private static native void _showBadge(Element el, String userProfileJson, String reactClientSize, boolean isTextHidden) /*-{
+	public void onClick(String userId) {
+		currentClickHandler.invoke(userId);
+	}
+	
+	private static native void _showBadge(Element el, String userProfileJson, String reactClientSize, boolean isTextHidden, UserBadgeViewImpl userBadgeView) /*-{
 		
 		try {
 			function onClick(userProfile) {
-				//do nothing, parent FocusPanel will handle button click events
+				// call this onClick
+				userBadgeView.@org.sagebionetworks.web.client.widget.user.UserBadgeViewImpl::onClick(Ljava/lang/String;)(userProfile.ownerId);
 			}
 			
 			var userCardProps = {

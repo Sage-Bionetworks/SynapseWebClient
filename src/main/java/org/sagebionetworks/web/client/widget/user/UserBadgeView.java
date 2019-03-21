@@ -10,7 +10,7 @@ public interface UserBadgeView extends IsWidget, SynapseView {
 	void configure(UserProfile profile);
 	void showLoadError(String error);
 	void setSize(BadgeSize size);
-	void setStyleName(String style);
+	void addStyleName(String styles);
 	void setHeight(String height);
 	void setCustomClickHandler(ClickHandler clickHandler);
 	void doNothingOnClick();

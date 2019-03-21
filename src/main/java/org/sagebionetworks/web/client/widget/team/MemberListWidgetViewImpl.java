@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.team;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -23,7 +24,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWidgetView {
@@ -55,24 +55,21 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 	
 	@Override
 	public void addMembers(List<TeamMemberBundle> members, boolean isAdmin) {
-		FlowPanel singleRow = DisplayUtils.createRowContainerFlowPanel();
+		Div cardContainer = new Div();
+		cardContainer.addStyleName("SRC-cardContainer");
+		Div row = new Div();
+		row.addStyleName("SRC-card-grid-row");
 		
 		for (TeamMemberBundle teamMember : members) {
-			FlowPanel mediaContainer = new FlowPanel();
-			mediaContainer.addStyleName("col-xs-12 col-md-6");
-			mediaContainer.setHeight("120px");
-			FlowPanel left = new FlowPanel();
-			left.addStyleName("col-xs-9 col-sm-10 col-md-11");
-			FlowPanel right = new FlowPanel();
-			right.addStyleName("col-xs-3 col-sm-2 col-md-1");
-			mediaContainer.add(left);
-			mediaContainer.add(right);
+			Div singleGridItem = new Div();
+			singleGridItem.addStyleName("SRC-grid-item");
 			final UserProfile member = teamMember.getUserProfile();
 			UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
-			userBadge.configure(member);
 			userBadge.setSize(BadgeSize.MEDIUM);
-			Widget userBadgeView = userBadge.asWidget();
-			left.add(userBadgeView);
+			userBadge.configure(member);
+			Div userBadgeWrapper = new Div();
+			userBadgeWrapper.add(userBadge);
+			singleGridItem.add(userBadgeWrapper);
 			
 			if (isAdmin) {
 				//add simple combo
@@ -80,7 +77,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 				SimplePanel wrap = new SimplePanel();
 				wrap.addStyleName("margin-top-5");
 				wrap.setWidget(combo);
-				left.add(wrap);
+				singleGridItem.add(wrap);
 				
 				//add delete member button
 				Button leaveButton = DisplayUtils.createButton("Remove", ButtonType.DANGER);
@@ -97,18 +94,18 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 								});
 					}
 				});
-				right.add(leaveButton);
+				singleGridItem.add(leaveButton);
 			} else if (teamMember.getIsTeamAdmin()) {
 				//otherwise, indicate that this row user is an admin (via label)
-				left.add(new HTML("<span>"+ADMIN_ACCESS+"</span>"));
+				singleGridItem.add(new HTML("<span>"+ADMIN_ACCESS+"</span>"));
 			}
 			
-			singleRow.add(mediaContainer);
+			row.add(singleGridItem);
 		}
 		
-		loadMoreWidget.add(singleRow);
+		loadMoreWidget.add(row);
 		// SWC-4280: after attaching to the DOM, reference the element offset height in an attempt to force layout calculation (reflow):
-		singleRow.getOffsetHeight();
+		row.getOffsetHeight();
 	}
 	
 	@Override
