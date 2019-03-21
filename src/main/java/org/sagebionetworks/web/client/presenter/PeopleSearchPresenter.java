@@ -5,7 +5,6 @@ import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -93,8 +92,8 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 				for (UserGroupHeader header : result.getChildren()) {
 					if (header.getIsIndividual()) {
 						UserBadge badge = ginInjector.getUserBadgeWidget();
-						badge.configure(header.getOwnerId(), true);
-						badge.setSize(BadgeSize.LARGER);
+						badge.configure(header.getOwnerId());
+						badge.setSize(BadgeSize.MEDIUM);
 						badge.setStyleNames("col-sm-12 col-md-6 margin-top-15");
 						badge.setHeight("80px");
 						loadMoreWidgetContainer.add(badge.asWidget());

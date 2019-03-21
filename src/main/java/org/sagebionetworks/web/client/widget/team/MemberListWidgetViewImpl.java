@@ -70,7 +70,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 			final UserProfile member = teamMember.getUserProfile();
 			UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
 			userBadge.configure(member);
-			userBadge.setSize(BadgeSize.LARGER);
+			userBadge.setSize(BadgeSize.MEDIUM);
 			Widget userBadgeView = userBadge.asWidget();
 			left.add(userBadgeView);
 			

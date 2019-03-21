@@ -1,62 +1,36 @@
 package org.sagebionetworks.web.client.widget.user;
 
 import static org.sagebionetworks.web.client.DisplayUtils.DO_NOTHING_CLICKHANDLER;
-import static org.sagebionetworks.web.client.DisplayUtils.isDefined;
 import static org.sagebionetworks.web.client.DisplayUtils.newWindow;
 
-import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.Emphasis;
-import org.gwtbootstrap3.client.ui.constants.Trigger;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
-import org.gwtbootstrap3.client.ui.html.Span;
-import org.gwtbootstrap3.client.ui.html.Strong;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Profile;
 
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.ErrorEvent;
-import com.google.gwt.event.dom.client.ErrorHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class UserBadgeViewImpl implements UserBadgeView {
-	public interface Binder extends UiBinder<Widget, UserBadgeViewImpl> {	}
+public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	
-	@UiField
-	FocusPanel pictureFocusPanel;
-	@UiField
-	Span defaultUserPicture;
-	@UiField
-	Image userPicture;
-	@UiField
-	Anchor usernameLink;
-	@UiField
-	Strong defaultUserPictureLetter;
-	@UiField
-	Icon squareIcon;
-	@UiField
-	Span otherWidgets;
-	@UiField
-	Span pictureSpan;
-	@UiField
-	Tooltip pictureTooltip;
-	
-	private Presenter presenter;
-	Widget widget;
-	
-	HandlerRegistration handlerRegistration, pictureHandlerRegistration;
-	
+	HandlerRegistration handlerRegistration;
+	boolean isTextHidden = false;
+	AdapterFactory adapterFactory;
+	SynapseJSNIUtils jsniUtils;
+	BadgeSize badgeSize = BadgeSize.DEFAULT;
 	public static final String USER_ID_ATTRIBUTE = "data-profile-user-id";
 	public static PlaceChanger placeChanger = null;
 	public static final ClickHandler STANDARD_CLICKHANDLER = event -> {
@@ -74,78 +48,48 @@ public class UserBadgeViewImpl implements UserBadgeView {
 		String userId = panel.getElement().getAttribute(USER_ID_ATTRIBUTE);
 		newWindow("#!Profile:" + userId, "_blank", "");
 	};
-	
+	FocusPanel userBadgeContainer = new FocusPanel();
 	@Inject
-	public UserBadgeViewImpl(Binder uiBinder, GlobalApplicationState globalAppState) {
-		widget = uiBinder.createAndBindUi(this);
+	public UserBadgeViewImpl(
+			GlobalApplicationState globalAppState, 
+			SynapseJSNIUtils jsniUtils,
+			AdapterFactory adapterFactory) {
 		placeChanger = globalAppState.getPlaceChanger();
-		String px = (BadgeSize.LARGE.pictureHeightPx() + 4) + "px";
-		pictureSpan.setHeight(px);
-		pictureSpan.setWidth(px);
-		handlerRegistration = usernameLink.addClickHandler(STANDARD_CLICKHANDLER);
-		pictureHandlerRegistration = pictureFocusPanel.addClickHandler(STANDARD_CLICKHANDLER);
-		userPicture.addErrorHandler(new ErrorHandler() {
-			@Override
-			public void onError(ErrorEvent event) {
-				presenter.onImageLoadError();
+		this.adapterFactory = adapterFactory;
+		this.jsniUtils = jsniUtils;
+		handlerRegistration = userBadgeContainer.addClickHandler(STANDARD_CLICKHANDLER);
+		addAttachHandler(event -> {
+			if (!event.isAttached()) {
+				//detach event, clean up react component
+				jsniUtils.unmountComponentAtNode(userBadgeContainer.getElement());
 			}
 		});
 	}
 	
 	@Override
-	public void setUserId(String userId) {
-		pictureFocusPanel.getElement().setAttribute(USER_ID_ATTRIBUTE, userId);
-		usernameLink.getElement().setAttribute(USER_ID_ATTRIBUTE, userId);
-	}
-	
-	@Override
-	public void setDefaultPictureColor(String color) {
-		squareIcon.setColor(color);
-	}
-	@Override
-	public void setDefaultPictureLetter(String letter) {
-		defaultUserPictureLetter.setText(letter);
-	}
-	public void clear() {
-		otherWidgets.clear();
-		defaultUserPicture.setVisible(false);
-		userPicture.setVisible(false);
-	}
-	
-	@Override
-	public void showAnonymousUserPicture() {
-		userPicture.setVisible(false);
-		defaultUserPicture.setVisible(true);
-	}
-	@Override
-	public void noTooltip() {
-		pictureTooltip.setTrigger(Trigger.MANUAL);
-	}
-	@Override
-	public void setTooltipText(String displayName, String title, String location) {
-		SafeHtmlBuilder html = new SafeHtmlBuilder();
-		html.appendHtmlConstant("<div style=\"line-height:120%;text-align: left;\"><p style=\"font-size: 16px;font-weight: bold; margin-top:10px;\">");
-		html.appendEscaped(displayName);
-		html.appendHtmlConstant("</p>");
-		if (title != null && !title.isEmpty()) {
-			html.appendHtmlConstant("<p style=\"font-size: 14px;\">");
-			html.appendEscaped(title);
-			html.appendHtmlConstant("</p>");
+	public void configure(UserProfile profile) {
+		clear();
+		userBadgeContainer.getElement().setAttribute(USER_ID_ATTRIBUTE, profile.getOwnerId());
+		add(userBadgeContainer);
+		String profileJson = "";
+		try {
+			JSONObjectAdapter jsonObjectAdapter = adapterFactory.createNew();
+			profile.writeToJSONObject(jsonObjectAdapter);
+			profileJson = jsonObjectAdapter.toJSONString();
+		} catch (Throwable e) {
+			jsniUtils.consoleError(e);
 		}
-		if (location != null && !location.isEmpty()) {
-			html.appendHtmlConstant("<p style=\"font-size: 14px;\">");
-			html.appendEscaped(location);
-			html.appendHtmlConstant("</p>");
-		}
-		html.appendHtmlConstant("</div>");
-		pictureTooltip.setHtml(html.toSafeHtml());
+		_showBadge(userBadgeContainer.getElement(), profileJson, badgeSize.reactClientSize, isTextHidden);
 	}
 	
 	public void setClickHandler(ClickHandler clickHandler) {
 		handlerRegistration.removeHandler();
-		pictureHandlerRegistration.removeHandler();
-		handlerRegistration = usernameLink.addClickHandler(clickHandler);
-		pictureHandlerRegistration = pictureFocusPanel.addClickHandler(clickHandler);
+		handlerRegistration = userBadgeContainer.addClickHandler(clickHandler);
+	}
+	
+	@Override
+	public void setOpenInNewWindow() {
+		setClickHandler(NEW_WINDOW_CLICKHANDLER);
 	}
 	
 	@Override
@@ -158,60 +102,30 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	
 	@Override
 	public void doNothingOnClick() {
-		handlerRegistration.removeHandler();
-		handlerRegistration = usernameLink.addClickHandler(DO_NOTHING_CLICKHANDLER);
-		pictureHandlerRegistration.removeHandler();
-		pictureHandlerRegistration = pictureFocusPanel.addClickHandler(DO_NOTHING_CLICKHANDLER);
+		setClickHandler(DO_NOTHING_CLICKHANDLER);
 	}
-	
 	@Override
-	public void setOpenInNewWindow() {
-		setClickHandler(NEW_WINDOW_CLICKHANDLER);
+	public void setTextHidden(boolean isTextHidden) {
+		this.isTextHidden = isTextHidden;
 	}
-	
-	@Override
-	public void showCustomUserPicture(String url) {
-		defaultUserPicture.setVisible(false);
-		userPicture.setVisible(true);
-		userPicture.setUrl(url);
-	}
-	
 	@Override
 	public void setSize(BadgeSize size) {
-		if (isDefined(size.getDefaultPictureStyle())) {
-			defaultUserPicture.addStyleName(size.getDefaultPictureStyle());	
-		}
-		
-		usernameLink.setStyleName(size.textStyle());
-		int pictureHeightPx = size.pictureHeightPx();
-		userPicture.setHeight(pictureHeightPx + "px");
-		userPicture.setWidth(pictureHeightPx + "px");
-		usernameLink.setVisible(size.isTextVisible());
-		pictureSpan.setHeight((pictureHeightPx + 6) + "px");
-		pictureSpan.setWidth((pictureHeightPx + 6) + "px");
-		defaultUserPicture.setWidth((pictureHeightPx+3) + "px");
-		defaultUserPicture.setHeight((pictureHeightPx+3) + "px");
-	}
-
-	@Override
-	public void setDisplayName(String displayName, String shortDisplayName) {
-		otherWidgets.clear();
-		usernameLink.setText(shortDisplayName);
+		this.badgeSize = size;
 	}
 	
 	@Override
 	public void showLoadError(String error) {
-		otherWidgets.clear();
+		clear();
 		Paragraph errorParagraph = new Paragraph();
 		errorParagraph.setEmphasis(Emphasis.DANGER);
 		errorParagraph.setText("Error loading profile: " + error);
-		otherWidgets.add(errorParagraph);
+		add(errorParagraph);
 	}
 	
 	@Override
 	public void showLoading() {
-		otherWidgets.clear();
-		otherWidgets.add(new Text("Loading..."));
+		clear();
+		add(new Text("Loading..."));
 	}
 
 	@Override
@@ -222,41 +136,29 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	@Override
 	public void showErrorMessage(String message) {
 		// TODO Auto-generated method stub
+	}
+	
+	private static native void _showBadge(Element el, String userProfileJson, String reactClientSize, boolean isTextHidden) /*-{
 		
-	}
+		try {
+			function onClick(userProfile) {
+				//do nothing, parent FocusPanel will handle button click events
+			}
+			
+			var userCardProps = {
+				userProfile: JSON.parse(userProfileJson),
+				size: reactClientSize,
+				hideText: isTextHidden,
+				profileClickHandler: onClick
+			};
+			
+			$wnd.ReactDOM.render(
+				$wnd.React.createElement($wnd.SRC.SynapseComponents.UserCard, userCardProps, null), 
+				el
+			);
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
 	
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;		
-	}
-
-	@Override
-	public void showDescription(String descriptionText) {
-		otherWidgets.clear();
-		Paragraph descriptionParagraph = new Paragraph();
-		descriptionParagraph.setText(descriptionText);
-		otherWidgets.add(descriptionParagraph);
-	}
-
-	@Override
-	public Widget asWidget() {
-		return widget;
-	}
-	@Override
-	public void setHref(String href) {
-		usernameLink.setHref(href);
-	}
-	
-	@Override
-	public void setStyleNames(String style) {
-		widget.addStyleName(style);
-	}
-	@Override
-	public void setHeight(String height) {
-		widget.setHeight(height);
-	}
-	@Override
-	public void addUsernameLinkStyle(String style) {
-		usernameLink.addStyleName(style);
-	}
 }

@@ -16,7 +16,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView.Presenter;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -30,8 +29,6 @@ import org.sagebionetworks.web.shared.provenance.ExternalGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -84,7 +81,6 @@ public class ProvViewUtil {
 				label.add(new HTML(DisplayUtils.stubStrPartialWord(node.getActivityName(), MAX_ACT_CODE_NAME_CHAR)));
 			}
 			UserBadge badge = ginInjector.getUserBadgeWidget();
-			badge.setMaxNameLength(MAX_DISPLAY_NAME_CHAR);
 			badge.configure(node.getModifiedBy());
 			HTML time = new HTML(ginInjector.getDateTimeUtils().getLongFriendlyDate(node.getModifiedOn()));
 			time.addStyleName(PROV_ACTIVITY_TIME_STYLE);

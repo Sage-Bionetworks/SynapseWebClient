@@ -98,7 +98,6 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 		Widget theWidget;
 		if (isIndividual) {
 			UserBadge badge = ginInjector.getUserBadgeWidget();
-			badge.setSize(BadgeSize.SMALLER);
 			if (id != null) {
 				badge.configure(id);
 			} else {
@@ -109,7 +108,6 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 			}
 			
 			theWidget = badge.asWidget();
-			theWidget.addStyleName("moveup-3");
 		} else {
 			//team
 			ClickHandler customClickHandler = null;
