@@ -81,7 +81,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 				teamManagerBadge.addStyleName("lightGreyBackground border-left-1 border-bottom-1 border-right-1");
 				teamManagerBadge.setMarginLeft(2);
 				teamManagerBadge.setMarginRight(2);
-				teamManagerBadge.setPaddingLeft(5);
+				teamManagerBadge.setPaddingLeft(25);
 				teamManagerBadge.add(new Text(ADMIN_ACCESS));
 				singleGridItem.add(teamManagerBadge);
 			}

@@ -2833,7 +2833,10 @@ div.border {
 		background: $synapse-blue !important;
 		color: white;
 	}
-	.SRC-primary-background-color, .SRC-primary-background-color-hover.SRC-nested-color:hover, .SRC-primary-background-color-hover:hover > svg  {
+	.SRC-primary-background-color,
+	.SRC-primary-background-color-hover.SRC-nested-color:hover,
+	.SRC-primary-background-color-hover:hover > svg, 
+	.SRC-primary-background-color-hover:hover.SRC-nested-color:hover *  {
 		background: $synapse-blue;
 		color: white;
 	}
