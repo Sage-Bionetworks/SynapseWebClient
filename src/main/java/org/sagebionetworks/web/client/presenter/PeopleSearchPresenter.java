@@ -23,7 +23,7 @@ import com.google.inject.Inject;
 
 public class PeopleSearchPresenter extends AbstractActivity implements PeopleSearchView.Presenter, Presenter<PeopleSearch> {
 	
-	public static final int SEARCH_PEOPLE_LIMIT = 30;
+	public static final int SEARCH_PEOPLE_LIMIT = 24;
 	
 	private PeopleSearch place;
 	private PeopleSearchView view;
@@ -54,6 +54,7 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 				loadMore();
 			}
 		});
+		loadMoreWidgetContainer.addStyleName("SRC-card-grid-row");
 		view.setLoadMoreContainer(loadMoreWidgetContainer.asWidget());
 	}
 	
@@ -92,8 +93,9 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 				for (UserGroupHeader header : result.getChildren()) {
 					if (header.getIsIndividual()) {
 						UserBadge badge = ginInjector.getUserBadgeWidget();
-						badge.configure(header.getOwnerId());
 						badge.setSize(BadgeSize.MEDIUM);
+						badge.addStyleNames("SRC-grid-item");
+						badge.configure(header.getOwnerId());
 						loadMoreWidgetContainer.add(badge.asWidget());
 					}
 				}

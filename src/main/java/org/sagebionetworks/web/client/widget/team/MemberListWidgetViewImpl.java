@@ -45,6 +45,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 	@Override
 	public void setMembersContainer(LoadMoreWidgetContainer loadMoreWidget) {
 		this.loadMoreWidget = loadMoreWidget;
+		loadMoreWidget.addStyleName("SRC-card-grid-row");
 		loadMoreWidgetContainer.clear();
 		loadMoreWidgetContainer.add(loadMoreWidget);
 	}
@@ -55,11 +56,6 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 	
 	@Override
 	public void addMembers(List<TeamMemberBundle> members, boolean isAdmin) {
-		Div cardContainer = new Div();
-		cardContainer.addStyleName("SRC-cardContainer");
-		Div row = new Div();
-		row.addStyleName("SRC-card-grid-row");
-		
 		for (TeamMemberBundle teamMember : members) {
 			Div singleGridItem = new Div();
 			singleGridItem.addStyleName("SRC-grid-item");
@@ -100,12 +96,8 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 				singleGridItem.add(new HTML("<span>"+ADMIN_ACCESS+"</span>"));
 			}
 			
-			row.add(singleGridItem);
+			loadMoreWidget.add(singleGridItem);
 		}
-		
-		loadMoreWidget.add(row);
-		// SWC-4280: after attaching to the DOM, reference the element offset height in an attempt to force layout calculation (reflow):
-		row.getOffsetHeight();
 	}
 	
 	@Override

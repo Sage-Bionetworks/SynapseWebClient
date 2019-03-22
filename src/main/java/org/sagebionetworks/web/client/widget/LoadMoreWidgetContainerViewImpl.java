@@ -70,4 +70,9 @@ public class LoadMoreWidgetContainerViewImpl implements LoadMoreWidgetContainerV
 	public void setLoadMoreVisibility(boolean visible) {
 		loadMoreButton.setVisible(visible);
 	}
+	
+	@Override
+	public void addStyleName(String styles) {
+		container.addStyleName(styles);
+	}
 }
