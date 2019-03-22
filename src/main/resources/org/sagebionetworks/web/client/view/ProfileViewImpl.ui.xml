@@ -70,34 +70,15 @@
 						<div>
 							<div>
 								<div class="tab-background margin-10" ui:field="profileTabContainer">
-									<div ui:field="profileUI" class="profileUI inline-block vertical-align-top max-width-800 light-border">
+									<div ui:field="profileUI" class="profileUI inline-block vertical-align-top max-width-800">
 										<div class="padding-15">
-											<w:LoadingSpinner ui:field="profilePictureLoadingUI" visible="false" size="50px" />
 											<g:SimplePanel ui:field="profileSynAlertPanel" />
-											<g:SimplePanel ui:field="picturePanel" styleName="margin-left-10 displayInlineBlock" height="180px" width="180px" />
+											<bh:Div ui:field="userBadgeContainer" />
 											<!-- View Profile Panel -->
-											<bh:Div ui:field="viewProfilePanel" addStyleNames="margin-bottom-10">
-												<b:Heading ui:field="displayNameField" addStyleNames="displayInline" size="H2" />
-												<b:Heading ui:field="headlineField" size="H4" />
-												<bh:Paragraph ui:field="industryLocationField" addStyleNames="user-profile-industry-location" />
-												<bh:Paragraph ui:field="summaryField" addStyleNames="user-profile-summary" />
-												<bh:Div>
-													<b:Anchor ui:field="urlField" target="_blank" />
-												</bh:Div>
-												<bh:Div addStyleNames="margin-top-5" ui:field="createdOnUI">
-													<bh:Text>Joined&nbsp;</bh:Text>
-													<bh:Text ui:field="createdOnText" />
-												</bh:Div>
-												<w:TextBoxWithCopyToClipboardWidget ui:field="synapseEmailField" width="100%"/>
-												<b:Anchor ui:field="orcIdLink"/>
+											<bh:Div ui:field="userBadgeFooter" addStyleNames="lightGreyBackground dropshadow" marginLeft="1" marginRight="1" paddingLeft="34" paddingRight="5" paddingTop="3" height="40px">
+												<b:Anchor ui:field="orcIdLink" addStyleNames="movedown-3"/>
+												<b:Button ui:field="editProfileButton" icon="EDIT" type="PRIMARY" pull="RIGHT">Edit Profile</b:Button>
 											</bh:Div>
-											<b:Container fluid="true">
-												<b:Row>
-													<b:Column size="XS_12">
-														<b:Button ui:field="editProfileButton" icon="EDIT" type="PRIMARY" pull="RIGHT">Edit Profile</b:Button>
-													</b:Column>
-												</b:Row>
-											</b:Container>
 											<g:SimplePanel ui:field="editUserProfilePanel" />
 										</div>
 									</div>
