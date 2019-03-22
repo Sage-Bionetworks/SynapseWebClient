@@ -1,3 +1,150 @@
+@import url("https://fonts.googleapis.com/css?family=Lato:400,700,900");
+.SRC-font-size-base {
+  font-size: 14px; }
+
+.SRC-portalCard {
+  display: block;
+  color: #1A1C29;
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  line-height: 21px;
+  border: 1px solid #DDDDDF;
+  margin-top: 30px;
+  margin-bottom: 30px; }
+
+.SRC-portalCard a {
+  color: #C94281; }
+
+.SRC-portalCard h3 {
+  margin: 21px, 0, 10.5px, 0 !important;
+  padding: 0; }
+
+.SRC-portalCard h3 a {
+  margin: 0;
+  font-size: 18px !important;
+  font-weight: 700; }
+
+.SRC-portalCard .SRC-type, .SRC-portalCard .SRC-cardThumbnail {
+  text-transform: uppercase;
+  color: #898989; }
+
+.SRC-portalCard .SRC-cardThumbnail {
+  display: inline-block;
+  width: 15%;
+  vertical-align: top;
+  padding-top: 21px; }
+
+.SRC-portalCard .SRC-cardThumbnail img {
+  vertical-align: top;
+  width: 50%;
+  margin: auto;
+  display: block; }
+
+.SRC-portalCard .SRC-cardThumbnail img.iconImg {
+  max-width: 75px; }
+
+.SRC-portalCard .SRC-cardThumbnail > div {
+  margin-top: 10.5px;
+  text-align: center; }
+
+.SRC-portalCard .SRC-cardContent {
+  max-width: 80%;
+  display: inline-block;
+  padding-top: 21px; }
+
+.SRC-portalCard .SRC-cardContent .SRC-author {
+  font-style: italic;
+  padding-bottom: 10.5px; }
+
+.SRC-portalCard .SRC-cardContent .SRC-cardAnnotations {
+  margin: 10.5px 0; }
+
+.SRC-portalCard .SRC-cardContent .SRC-cardAnnotations span {
+  background: #3C4A63;
+  color: white;
+  display: inline-block;
+  padding: 2px 15px 4px 15px;
+  margin: 0 10px 5px 0;
+  border-radius: 15px; }
+
+.SRC-portalCard .SRC-cardAction {
+  display: inline-block; }
+
+.SRC-portalCard .SRC-cardAction button {
+  background-color: #C94281;
+  font-size: 16px;
+  color: white;
+  display: inline-block;
+  height: 40px;
+  margin-right: 10px;
+  border-radius: 20px;
+  padding: 5px 20px !important; }
+
+.SRC-portalCard .SRC-cardMetadata {
+  display: block;
+  background-color: #F9F9F9;
+  margin-top: 21px;
+  padding: 21px 21px 21px 15%; }
+
+.SRC-portalCard .SRC-cardMetadata .row {
+  margin: 5px !important; }
+
+.SRC-portalCard .SRC-cardMetadata .row > * {
+  min-width: 100px; }
+
+.SRC-portalCard .SRC-cardMetadata .row.extraWide > * {
+  min-width: 150px; }
+
+.SRC-portalCard .SRC-cardMetadata .SRC-row-label {
+  display: inline-block;
+  color: #898989;
+  text-transform: uppercase; }
+
+.SRC-portalCard .SRC-cardMetadata .SRC-row-data {
+  display: inline-block;
+  padding-left: 21px; }
+
+.SRC-portalCard .SRC-cardMetadata .SRC-row-data a {
+  font-size: 14px !important; }
+
+.SRC-portalCard.SRC-typeDataset .row {
+  display: inline-block; }
+
+.SRC-portalCard.SRC-typeDataset .row > * {
+  min-width: 0; }
+
+.SRC-portalCard.SRC-typeDataset .SRC-row-data {
+  padding-right: 42px; }
+
+.SRC-portalCard.SRC-typeDataset .SRC-cardAction {
+  margin-left: 15%; }
+
+.SRC-portalCard.SRC-typeFunder .SRC-cardThumbnail {
+  display: inline;
+  float: right; }
+
+.SRC-portalCard.SRC-typeFunder .SRC-cardThumbnail img {
+  width: 65%; }
+
+.SRC-portalCard.SRC-typeFunder .SRC-cardContent {
+  max-width: 100%;
+  width: 90% !important;
+  margin-left: 42px; }
+
+.SRC-portalCard.SRC-typeFunder .SRC-cardContent .SRC-website a {
+  display: inline-block;
+  font-size: 14px;
+  padding-bottom: 10.5px; }
+
+.SRC-portalCard.SRC-typeFunder .SRC-description {
+  padding-bottom: 0; }
+
+.SRC-portalCard.SRC-typeFunder .SRC-cardAction {
+  margin: 21px 0 21px 42px; }
+
+.SRC-portalCard.SRC-typeTool .SRC-cardAction {
+  margin: 21px 0 21px 15%; }
+
 .markdowntable {
   border: 1px solid #dddddd;
   border-collapse: separate;
@@ -368,18 +515,20 @@ table.SRC-paddingRight > tbody > tr > td {
   text-decoration: none; }
 
 .SRC-primary-text-color {
-  color: #2B688F; }
+  color: #D53F77; }
 
 .SRC-primary-background-color {
-  background-color: #2B688F; }
+  background-color: #D53F77; }
 
 .SRC-primary-background-color-hover:hover {
-  background-color: #2B688F; }
-  .SRC-primary-background-color-hover:hover > svg {
-    color: white; }
-  .SRC-primary-background-color-hover:hover.SRC-nested-color:hover * {
-    background-color: #2B688F;
-    color: white; }
+  background-color: #D53F77; }
+
+.SRC-primary-background-color-hover:hover > svg {
+  color: white; }
+
+.SRC-primary-background-color-hover:hover.SRC-nested-color:hover * {
+  background-color: #D53F77;
+  color: white; }
 
 .SRC-marginFifteen {
   margin-left: 15px;
@@ -530,8 +679,9 @@ button.SRC-roundBorder {
   font-weight: 600;
   border: none;
   background: white; }
-  .tableDropdownSelector:focus {
-    outline: none; }
+
+.tableDropdownSelector:focus {
+  outline: none; }
 
 .SRC-extraPadding {
   padding: 5px; }
@@ -557,8 +707,9 @@ button.SRC-roundBorder {
   width: 130px;
   height: 40px;
   margin: 21px; }
-  .SRC-viewMoreButton:focus {
-    outline: none; }
+
+.SRC-viewMoreButton:focus {
+  outline: none; }
 
 /*
   checkmark styling start
@@ -645,8 +796,9 @@ checkmark styling end
   width: 100vw;
   background: none;
   border: none; }
-  .SRC-menu-wall:focus {
-    outline: none; }
+
+.SRC-menu-wall:focus {
+  outline: none; }
 
 .SRC-table-dropdown-content {
   align-items: center;

@@ -33,14 +33,13 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	public static final CallbackP<String> NEW_WINDOW_HANDLER = userId -> {
 		newWindow("#!Profile:" + userId, "_blank", "");
 	};
-
 	boolean isTextHidden = false;
 	AdapterFactory adapterFactory;
 	SynapseJSNIUtils jsniUtils;
 	BadgeSize badgeSize = BadgeSize.DEFAULT;
 	CallbackP<String> currentClickHandler = STANDARD_HANDLER;
 	Div userBadgeContainer = new Div();
-	JsArray<JavaScriptObject> menuActionsArray = _initJsArray();
+	JsArray<JavaScriptObject> menuActionsArray = null;
 	
 	@Inject
 	public UserBadgeViewImpl(
@@ -148,6 +147,9 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	
 	@Override
 	public void addContextCommand(String commandName, Callback callback) {
+		if (menuActionsArray == null) {
+			menuActionsArray = _initJsArray();
+		}
 		//add to menu actions array
 		_addToMenuActionsArray(commandName, callback, menuActionsArray);
 	}
