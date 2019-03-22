@@ -2760,6 +2760,9 @@ div.border {
 		padding: 0 10px 30px 15px;
 		margin-top: -8px;
 	}
+	.SRC-grid-item {
+		height: 130px;
+	}
 }
 #rootPanel {
 	summary { color:$synapse-blue; }
@@ -2823,10 +2826,11 @@ div.border {
 }
 
 #body .SRC-primary-background-color-hover:hover {
-	background: #D53F77 !important;
+	background: $synapse-blue !important;
 	color: white;
 }
 #body .SRC-primary-background-color-hover.SRC-nested-color:hover > * {
-	background: #D53F77;
+	background: $synapse-blue;
 	color: white;
 }
+

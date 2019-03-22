@@ -15,8 +15,11 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Element;
 import com.google.inject.Inject;
@@ -37,6 +40,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	BadgeSize badgeSize = BadgeSize.DEFAULT;
 	CallbackP<String> currentClickHandler = STANDARD_HANDLER;
 	Div userBadgeContainer = new Div();
+	JsArray<JavaScriptObject> menuActionsArray = _initJsArray();
 	
 	@Inject
 	public UserBadgeViewImpl(
@@ -71,7 +75,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		String pictureUrl = profile.getProfilePicureFileHandleId() != null ? 
 				jsniUtils.getFileHandleAssociationUrl(profile.getOwnerId(), FileHandleAssociateType.UserProfileAttachment, profile.getProfilePicureFileHandleId()) : null;
 		
-		_showBadge(userBadgeContainer.getElement(), profileJson, badgeSize.reactClientSize, isTextHidden, pictureUrl, this);
+		_showBadge(userBadgeContainer.getElement(), profileJson, badgeSize.reactClientSize, isTextHidden, pictureUrl, menuActionsArray, this);
 	}
 	
 	public void setClickHandler(ClickHandler clickHandler) {
@@ -142,7 +146,13 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		currentClickHandler.invoke(userId);
 	}
 	
-	private static native void _showBadge(Element el, String userProfileJson, String reactClientSize, boolean isTextHidden, String pictureUrl, UserBadgeViewImpl userBadgeView) /*-{
+	@Override
+	public void addContextCommand(String commandName, Callback callback) {
+		//add to menu actions array
+		_addToMenuActionsArray(commandName, callback, menuActionsArray);
+	}
+	
+	private static native void _showBadge(Element el, String userProfileJson, String reactClientSize, boolean isTextHidden, String pictureUrl, JsArray<JavaScriptObject> menuActionsArray, UserBadgeViewImpl userBadgeView) /*-{
 		
 		try {
 			function onClick(userProfile) {
@@ -155,7 +165,8 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 				userProfile: userProfileObject,
 				size: reactClientSize,
 				hideText: isTextHidden,
-				profileClickHandler: onClick
+				profileClickHandler: onClick,
+				menuActions: menuActionsArray
 			};
 			
 			$wnd.ReactDOM.render(
@@ -167,4 +178,13 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		}
 	}-*/;
 	
+	private static native JsArray<JavaScriptObject> _initJsArray() /*-{
+		return [];
+	}-*/;
+	private static native void _addToMenuActionsArray(String commandName, Callback callback, JsArray<JavaScriptObject> menuActionsArray) /*-{
+		function onMenuActionClick(userProfile) {
+			callback.@org.sagebionetworks.web.client.utils.Callback::invoke()();
+		}
+		menuActionsArray.push({field:commandName, callback: onMenuActionClick});
+	}-*/;
 }

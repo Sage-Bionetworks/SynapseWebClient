@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.user;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -16,4 +17,5 @@ public interface UserBadgeView extends IsWidget, SynapseView {
 	void doNothingOnClick();
 	void setTextHidden(boolean isTextHidden);
 	void setOpenInNewWindow();
+	void addContextCommand(String commandName, Callback callback); 
 }

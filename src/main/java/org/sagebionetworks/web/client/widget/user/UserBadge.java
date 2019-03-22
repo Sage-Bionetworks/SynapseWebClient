@@ -203,4 +203,8 @@ public class UserBadge implements  SynapseWidgetPresenter, WidgetRendererPresent
 	public void setDoNothingOnClick() {
 		view.doNothingOnClick();
 	}
+	
+	public void addContextCommand(String commandName, Callback callback) {
+		view.addContextCommand(commandName, callback);
+	}
 }
