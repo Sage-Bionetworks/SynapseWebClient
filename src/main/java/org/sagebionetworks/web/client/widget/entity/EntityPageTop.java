@@ -693,6 +693,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		// on configure of wiki tab, always update the entity action controller with the correct wiki page
 		String wikiId = wikiAreaToken;
 		if (projectBundle != null) {
+			entity = projectBundle.getEntity();
 			wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
 		}
 		entityActionController.configure(entityActionMenu, projectBundle, true, wikiId, area);
