@@ -80,7 +80,6 @@ public class DiscussionThreadListItemWidgetTest {
 		verify(mockGinInjector).getUserBadgeWidget();
 		verify(mockDateTimeUtils).getRelativeTime(any(Date.class));
 		verify(mockAuthorWidget).configure(anyString());
-		verify(mockAuthorWidget).setSize(any(BadgeSize.class));
 		verify(mockView).setPinnedIconVisible(false);
 		verify(mockView).setThreadUrl(TopicUtils.buildThreadLink(PROJECT_ID, THREAD_ID));
 		reset(mockView);
