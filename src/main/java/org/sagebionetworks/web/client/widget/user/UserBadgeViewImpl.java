@@ -8,13 +8,13 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -68,7 +68,10 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		} catch (Throwable e) {
 			jsniUtils.consoleError(e);
 		}
-		_showBadge(userBadgeContainer.getElement(), profileJson, badgeSize.reactClientSize, isTextHidden, this);
+		String pictureUrl = profile.getProfilePicureFileHandleId() != null ? 
+				jsniUtils.getFileHandleAssociationUrl(profile.getOwnerId(), FileHandleAssociateType.UserProfileAttachment, profile.getProfilePicureFileHandleId()) : null;
+		
+		_showBadge(userBadgeContainer.getElement(), profileJson, badgeSize.reactClientSize, isTextHidden, pictureUrl, this);
 	}
 	
 	public void setClickHandler(ClickHandler clickHandler) {
@@ -85,7 +88,9 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	@Override
 	public void setCustomClickHandler(final ClickHandler clickHandler) {
 		setClickHandler(event -> {
-			event.preventDefault();
+			if (event != null) {
+				event.preventDefault();	
+			}
 			clickHandler.onClick(event);
 		});
 	}
@@ -137,16 +142,17 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		currentClickHandler.invoke(userId);
 	}
 	
-	private static native void _showBadge(Element el, String userProfileJson, String reactClientSize, boolean isTextHidden, UserBadgeViewImpl userBadgeView) /*-{
+	private static native void _showBadge(Element el, String userProfileJson, String reactClientSize, boolean isTextHidden, String pictureUrl, UserBadgeViewImpl userBadgeView) /*-{
 		
 		try {
 			function onClick(userProfile) {
 				// call this onClick
 				userBadgeView.@org.sagebionetworks.web.client.widget.user.UserBadgeViewImpl::onClick(Ljava/lang/String;)(userProfile.ownerId);
 			}
-			
+			var userProfileObject = JSON.parse(userProfileJson);
+			userProfileObject.preSignedURL = pictureUrl;
 			var userCardProps = {
-				userProfile: JSON.parse(userProfileJson),
+				userProfile: userProfileObject,
 				size: reactClientSize,
 				hideText: isTextHidden,
 				profileClickHandler: onClick
