@@ -110,7 +110,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	public void setSize(BadgeSize size) {
 		this.badgeSize = size;
 		if (badgeSize.equals(BadgeSize.DEFAULT)) {
-			addStyleName("inline-block");
+			addStyleName("inline-block vertical-align-middle");
 		} else {
 			removeStyleName("inline-block");
 		}

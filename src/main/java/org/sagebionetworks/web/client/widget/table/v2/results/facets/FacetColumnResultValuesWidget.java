@@ -100,7 +100,6 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 	public Widget getUserBadge(String userId) {
 		UserIdCellRenderer userBadge = ginInjector.getUserIdCellRenderer();
 		userBadge.setValue(userId, doNothingClickHandler);
-		userBadge.addStyleName("movedown-5");
 		return userBadge.asWidget();
 	}
 	
