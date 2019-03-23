@@ -107,6 +107,39 @@
 .SRC-portalCard .SRC-cardMetadata .SRC-row-data a {
   font-size: 14px !important; }
 
+.SRC-portalCard .SRC-cardMetadataColumn {
+  display: flex;
+  background-color: #F9F9F9;
+  margin-top: 21px;
+  padding: 20px 20px; }
+
+@media (max-width: 568px) {
+  .SRC-portalCard .SRC-cardMetadataColumn {
+    flex-direction: column !important; } }
+
+.SRC-portalCard .SRC-cardMetadataColumn .SRC-halfWidth {
+  flex-grow: 1; }
+
+.SRC-portalCard .SRC-cardMetadataColumn .row {
+  margin: 5px !important; }
+
+.SRC-portalCard .SRC-cardMetadataColumn .row > * {
+  min-width: 200px; }
+
+.SRC-portalCard .SRC-cardMetadataColumn .row.extraWide > * {
+  min-width: 150px; }
+
+.SRC-portalCard .SRC-cardMetadataColumn .SRC-row-label {
+  display: inline-block;
+  color: #898989;
+  text-transform: uppercase; }
+
+.SRC-portalCard .SRC-cardMetadataColumn .SRC-row-data {
+  display: inline-block; }
+
+.SRC-portalCard .SRC-cardMetadataColumn .SRC-row-data a {
+  font-size: 14px !important; }
+
 .SRC-portalCard.SRC-typeDataset .row {
   display: inline-block; }
 
@@ -814,6 +847,9 @@ checkmark styling end
   margin-left: auto;
   background: white; }
 
+.dropdown:focus ul.dropdown-menu {
+  display: block; }
+
 .SRC-centerContent {
   display: flex;
   align-items: center; }
@@ -873,8 +909,12 @@ div.SRC-logo-cursor * {
 /*
   UserCard Styling
 */
+svg.SRC-userImg {
+  overflow: visible; }
+
 .SRC-userCard {
   display: inline-flex;
+  padding-right: 10px;
   align-items: center; }
 
 .SRC-userCardMediumUp {
