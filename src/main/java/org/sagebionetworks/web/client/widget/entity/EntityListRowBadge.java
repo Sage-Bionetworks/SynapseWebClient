@@ -128,7 +128,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 		view.setEntityLink(entityName, DisplayUtils.getSynapseHistoryToken(entityId, version));
 		if (eb.getEntity().getCreatedBy() != null) {
 			createdByUserBadge.configure(eb.getEntity().getCreatedBy());
-			createdByUserBadge.setOpenNewWindow(true);
+			createdByUserBadge.setOpenInNewWindow();
 		}
 		
 		if (eb.getEntity().getCreatedOn() != null) {

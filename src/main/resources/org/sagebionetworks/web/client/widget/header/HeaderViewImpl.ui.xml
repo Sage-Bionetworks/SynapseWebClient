@@ -44,10 +44,10 @@
 		  		<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-10 margin-right-10 padding-left-15" visible="false">
 					<b:Button ui:field="loginLink" text="&nbsp;&nbsp;&nbsp;Sign in&nbsp;&nbsp;&nbsp;" type="SUCCESS" marginTop="7"/>
 				</g:SimplePanel>
-				<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-left-10 padding-right-10 imageButton min-width-200-unless-xs greenBackgroundOnHover" visible="false" height="53px" paddingTop="10">
+				<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-left-10 padding-right-10 imageButton greenBackgroundOnHover" visible="false" height="53px" paddingTop="10" width="60px">
 					<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" />
-					<b:Anchor ui:field="dashboardAngleDown" dataToggle="DROPDOWN" icon="ANGLE_DOWN" addStyleNames="color-white textDecorationNone margin-left-10" />
-					<b:DropDownMenu ui:field="dashboardDropdownMenu" width="100%">
+					<b:Anchor ui:field="dashboardAngleDown" dataToggle="DROPDOWN" icon="ANGLE_DOWN" addStyleNames="color-white textDecorationNone right" paddingTop="5" />
+					<b:DropDownMenu ui:field="dashboardDropdownMenu" addStyleNames="pull-right">
 						<b:AnchorListItem ui:field="myProfileLink">Profile</b:AnchorListItem>
 						<b:AnchorListItem ui:field="myDashboardLink">Projects</b:AnchorListItem>
 						<b:AnchorListItem ui:field="myTeamsLink">Teams</b:AnchorListItem>

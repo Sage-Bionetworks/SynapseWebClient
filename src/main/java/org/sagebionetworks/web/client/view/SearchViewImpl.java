@@ -237,7 +237,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 				String buttonText = "created_by".equalsIgnoreCase(facet.getKey()) ? "Created by " : "Last modified by ";
 				UserBadge createdByBadge = ginInjector.getUserBadgeWidget();
 				createdByBadge.configure(facet.getValue());
-				createdByBadge.setSize(BadgeSize.SMALLER);
 				createdByBadge.setCustomClickHandler(event -> {
 					btn.click();
 				});

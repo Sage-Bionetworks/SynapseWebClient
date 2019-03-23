@@ -81,7 +81,7 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 		if (aclEntry.isIndividual()) {
 			UserBadge badge = ginInjector.getUserBadgeWidget();
 			badge.configure(aclEntry.getOwnerId());
-			badge.setOpenNewWindow(true);
+			badge.setOpenInNewWindow();
 			badgeWidget = badge.asWidget();
 		} else {
 			TeamBadge badge = ginInjector.getTeamBadgeWidget();

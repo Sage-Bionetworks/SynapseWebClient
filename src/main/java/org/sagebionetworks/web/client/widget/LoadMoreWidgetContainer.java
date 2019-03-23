@@ -72,4 +72,7 @@ public class LoadMoreWidgetContainer implements IsWidget, HasWidgets, LoadMoreWi
 	public void setIsProcessing(boolean isProcessing) {
 		view.setIsProcessing(isProcessing);
 	}
+	public void addStyleName(String styles) {
+		view.addStyleName(styles);
+	}
  }

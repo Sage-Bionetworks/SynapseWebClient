@@ -2,8 +2,6 @@ package org.sagebionetworks.web.client.view;
 
 import static org.sagebionetworks.web.client.DisplayUtils.DO_NOTHING_CLICKHANDLER;
 
-import java.util.Date;
-
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
@@ -15,35 +13,29 @@ import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
-import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
-import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
-import org.sagebionetworks.web.client.widget.TextBoxWithCopyToClipboardWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
+import org.sagebionetworks.web.client.widget.user.BadgeSize;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -61,30 +53,16 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
 	public interface ProfileViewImplUiBinder extends UiBinder<Widget, ProfileViewImpl> {}
 	@UiField
-	Div viewProfilePanel;
-	@UiField
-	Heading displayNameField;
-	@UiField
-	Heading headlineField;
-	@UiField
-	Paragraph industryLocationField;
-	@UiField
-	Paragraph summaryField;
-	@UiField
-	org.gwtbootstrap3.client.ui.Anchor urlField;
-	@UiField
 	org.gwtbootstrap3.client.ui.Anchor orcIdLink;
-	@UiField
-	TextBoxWithCopyToClipboardWidget synapseEmailField;
 	@UiField
 	Button editProfileButton;
 	@UiField
 	SimplePanel editUserProfilePanel;
 	HTML noChallengesHtml = new HTML("<p>This tab shows you challenges you have registered for.</p>" + 
 			"<p><a href=\"https://docs.synapse.org/articles/challenge_participation.html#overview\" target=\"_blank\">Challenges</a> are computational contests organized through the Dream Challenges.</p>");
-	@UiField
-	SimplePanel picturePanel;
 	
+	@UiField
+	Div userBadgeFooter;
 	//////Tabs
 	@UiField
 	LIElement profileListItem;
@@ -229,8 +207,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
 	@UiField 
 	LoadingSpinner challengesLoadingUI;
-	@UiField 
-	LoadingSpinner profilePictureLoadingUI;
 	
 	@UiField
 	FlowPanel favoritesHelpPanel;
@@ -249,28 +225,24 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private Presenter presenter;
 	private Header headerWidget;
 	@UiField
-	Text createdOnText;
-	@UiField
-	Div createdOnUI;
+	Div userBadgeContainer;
 	//View profile widgets
 	private static Icon defaultProfilePicture = new Icon(IconType.SYN_USER);
 	static {
 		defaultProfilePicture.addStyleName("font-size-150 lightGreyText");
 	}
-	private SynapseJSNIUtils synapseJSNIUtils;
-	private DateTimeUtils dateTimeUtils;
+	UserBadge userBadge;
 	
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
 			Header headerWidget,
-			SynapseJSNIUtils synapseJSNIUtils,
-			DateTimeUtils dateTimeUtils) {		
+			UserBadge userBadge) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
-		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.dateTimeUtils = dateTimeUtils;
+		this.userBadge = userBadge;
+		userBadge.setSize(BadgeSize.LARGE);
+		userBadgeContainer.add(userBadge);
 		headerWidget.configure();
-		picturePanel.clear();
 		initTabs();
 		projectSearchTextBox.getElement().setAttribute("placeholder", "Project name");
 		createProjectButton.addClickHandler(event -> presenter.createProject());
@@ -376,17 +348,20 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void setProfile(UserProfile profile, boolean isOwner, String orcIdHref) {
+		userBadgeFooter.setVisible(false);
 		// TODO: use large user component to show profile.  set ORCiD
-		viewProfilePanel.setVisible(true);
-		fillInProfileView(profile);
-		picturePanel.setWidget(getProfilePicture(profile, synapseJSNIUtils));
+		userBadge.configure(profile);
+		
 		if (!isOwner) {
 			setHighlightBoxUser(DisplayUtils.getDisplayName(profile));
+		} else {
+			userBadgeFooter.setVisible(true);
 		}
 		if (orcIdHref != null && orcIdHref.trim().length() > 0) {
 			orcIdLink.setVisible(true);
 			orcIdLink.setHref(orcIdHref);
 			orcIdLink.setText(orcIdHref);
+			userBadgeFooter.setVisible(true);
 		} else {
 			orcIdLink.setVisible(false);
 		}
@@ -502,63 +477,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void setIsMoreChallengesVisible(boolean isVisible) {
 		moreChallengesButton.setVisible(isVisible);
 	}
-	
-	public static Widget getProfilePicture(UserProfile profile, SynapseJSNIUtils synapseJSNIUtils) {
-		 Widget profilePicture;
-		 if (profile.getProfilePicureFileHandleId() != null) {
-			 //use preview
-			 String url = synapseJSNIUtils.getFileHandleAssociationUrl(profile.getOwnerId(), FileHandleAssociateType.UserProfileAttachment, profile.getProfilePicureFileHandleId());
-			 profilePicture = new FitImage(url, 150, 150);
-			 profilePicture.addStyleName("img-circle");
-		 } else {
-			 //use default picture
-			 profilePicture = defaultProfilePicture;
-		 }
-		 profilePicture.addStyleName("margin-10");
-		 return profilePicture;
-	 }
-	 
-	 public void fillInProfileView(UserProfile profile) {
-		 fillInProfileView(profile.getFirstName(), profile.getLastName(), profile.getUserName(), profile.getIndustry(), profile.getLocation(), profile.getSummary(), profile.getCompany(), profile.getPosition(), profile.getUrl(), profile.getCreatedOn());
-	 }
-	 
-	 public void fillInProfileView(String fName, String lName, String userName, String industry, String location, String summary, String company, String position, String url, Date createdOn) {
-		 String name = DisplayUtils.getDisplayName(fName, lName, userName);
-		 url = DisplayUtils.replaceWithEmptyStringIfNull(url);
-		 company = DisplayUtils.replaceWithEmptyStringIfNull(company);
-		 position = DisplayUtils.replaceWithEmptyStringIfNull(position);
-		 industry = DisplayUtils.replaceWithEmptyStringIfNull(industry);
-		 location = DisplayUtils.replaceWithEmptyStringIfNull(location);
-		 summary = DisplayUtils.replaceWithEmptyStringIfNull(summary);
-		 
-		 //build profile html
-		 displayNameField.setText(name);
-		 String atString = position.length()>0 && company.length()>0 ? " at " : "";
-		 headlineField.setText(position + atString + company);
-		 SafeHtmlBuilder builder = new SafeHtmlBuilder();
-		 builder.appendEscapedLines(industry);
-		 if (location.length()>0) { 
-			 builder.appendHtmlConstant(" | ");
-	 	 }
-		 if (location.length()>0) {
-			 builder.appendEscapedLines(location);
-		 }
-		 industryLocationField.setHTML(builder.toSafeHtml().asString());
-		 builder = new SafeHtmlBuilder();
-		 builder.appendEscapedLines(summary);
-		 summaryField.setHTML(builder.toSafeHtml().asString());
-		 urlField.setText(url);
-		 urlField.setHref(url);
-		 synapseEmailField.setText(userName+"@synapse.org");
-		 if (createdOn != null) {
-			 createdOnUI.setVisible(true);
-			 createdOnText.setText(dateTimeUtils.getRelativeTime(createdOn, true));			 
-		 } else {
-			 createdOnUI.setVisible(false);
-			 createdOnText.setText("");
-		 }
-	}
-		 
+
 	@Override
 	public void refreshHeader() {
 		headerWidget.refresh();
@@ -571,12 +490,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
 	@Override
 	public void showLoading() {
-		profilePictureLoadingUI.setVisible(true);
 	}
 
 	@Override
 	public void hideLoading() {
-		profilePictureLoadingUI.setVisible(false);
 	}
 	
 	@Override
@@ -586,8 +503,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void clear() {
-		viewProfilePanel.setVisible(false);
-		picturePanel.clear();
 		DisplayUtils.hide(navtabContainer);
 		//init with loading widget
 		projectsTabContent.add(DisplayUtils.getSmallLoadingWidget());
@@ -766,11 +681,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void addUserProfileModalWidget(IsWidget userProfileModalWidget) {
 		this.editUserProfilePanel.clear();
 		this.editUserProfilePanel.add(userProfileModalWidget);
-	}
-	
-	@Override
-	public void setSynapseEmailVisible(boolean isVisible) {
-		synapseEmailField.setVisible(isVisible);
 	}
 	
 	@Override

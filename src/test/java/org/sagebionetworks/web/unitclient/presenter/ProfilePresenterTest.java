@@ -1243,25 +1243,6 @@ public class ProfilePresenterTest {
 		verify(mockCallback).invoke();
 	}	
 	
-	private void viewProfile(String targetUserId, String currentUserId) {
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
-		profilePresenter.updateProfileView(targetUserId);
-	}
-	
-	@Test
-	public void testShowEmailIfLoggedIn() {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn("123");
-		profilePresenter.updateProfileView(userProfile.getOwnerId());
-		verify(mockView).setSynapseEmailVisible(true);
-	}
-	@Test
-	public void testHideEmailIfAnonymous() {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		profilePresenter.updateProfileView(userProfile.getOwnerId());
-		verify(mockView).setSynapseEmailVisible(false);
-	}
-	
 	@Test
 	public void testMessagePlaceToken() {
 		String token = "oauth_bound";

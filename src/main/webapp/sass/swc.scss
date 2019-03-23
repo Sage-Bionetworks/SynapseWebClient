@@ -2760,6 +2760,9 @@ div.border {
 		padding: 0 10px 30px 15px;
 		margin-top: -8px;
 	}
+	.SRC-grid-item {
+		height: 130px;
+	}
 }
 #rootPanel {
 	summary { color:$synapse-blue; }
@@ -2822,11 +2825,19 @@ div.border {
 	}
 }
 
-#body .SRC-primary-background-color-hover:hover {
-	background: #D53F77 !important;
-	color: white;
-}
-#body .SRC-primary-background-color-hover.SRC-nested-color:hover > * {
-	background: #D53F77;
-	color: white;
+#body {
+	.SRC-primary-text-color {
+		color: $synapse-blue;
+	}
+	.SRC-primary-background-color-hover:hover {
+		background: $synapse-blue !important;
+		color: white;
+	}
+	.SRC-primary-background-color,
+	.SRC-primary-background-color-hover.SRC-nested-color:hover,
+	.SRC-primary-background-color-hover:hover > svg, 
+	.SRC-primary-background-color-hover:hover.SRC-nested-color:hover *  {
+		background: $synapse-blue;
+		color: white;
+	}
 }

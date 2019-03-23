@@ -13,7 +13,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.users.RegisterWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
-import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -91,9 +90,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.userBadge = userBadge;
-		userBadge.noTooltip();
 		this.loginWidget = loginWidget;
-		userBadge.setSize(BadgeSize.LARGE_PICTURE_ONLY);
+		userBadge.setTextHidden(true);
 		myDashboardButtonContents = new HorizontalPanel();
 		myDashboardButtonContents.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		myDashboardButtonContents.add(userBadge.asWidget());
@@ -213,11 +211,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 		registerUI.setVisible(true);
 	}
 	
-	private void clearUserProfilePicture() {
-		userBadge.clearState();
-		userBadge.configurePicture();
-	}
-	
 	private void setUserProfilePicture(UserProfile profile) {
 		if (profile != null) {
 			userBadge.configure(profile);
@@ -255,7 +248,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 
 	@Override
 	public void clear() {
-		clearUserProfilePicture();
+		userBadge.clearState();
 		dashboardUI.setVisible(false);
 		registerUI.setVisible(false);
 		loginUI.setVisible(false);

@@ -113,9 +113,13 @@ public class DisplayUtils {
 	};
 	public static final ClickHandler DO_NOTHING_CLICKHANDLER = event -> {
 		if (!DisplayUtils.isAnyModifierKeyDown(event)) {
-			event.preventDefault();	
+			if (event != null) {
+				event.preventDefault();	
+			}
 		} else {
-			event.stopPropagation();
+			if (event != null) {
+				event.stopPropagation();	
+			}
 		}
 	};
 	
@@ -1051,6 +1055,9 @@ public class DisplayUtils {
 	}
 	
 	public static boolean isAnyModifierKeyDown(ClickEvent event) {
+		if (event == null) {
+			return false;
+		}
 		return event.isAltKeyDown() || event.isControlKeyDown() || event.isMetaKeyDown() || event.isShiftKeyDown();
 	}
 	public static String capitalize(String s) {
