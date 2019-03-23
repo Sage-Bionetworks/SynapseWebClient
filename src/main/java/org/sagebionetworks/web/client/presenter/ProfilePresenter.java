@@ -294,7 +294,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		currentUserBundle = null;
 		int mask = PROFILE | ORC_ID | VERIFICATION_SUBMISSION | IS_VERIFIED;
 		Long currentUserIdLong = currentUserId != null ?  Long.parseLong(currentUserId)  : null;
-		view.setSynapseEmailVisible(authenticationController.isLoggedIn());
 		jsClient.getUserBundle(currentUserIdLong, mask, new AsyncCallback<UserBundle>() {
 			@Override
 			public void onSuccess(UserBundle bundle) {

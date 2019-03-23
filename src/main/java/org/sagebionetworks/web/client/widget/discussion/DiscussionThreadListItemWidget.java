@@ -3,10 +3,8 @@ package org.sagebionetworks.web.client.widget.discussion;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.TopicUtils;
-import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -46,13 +44,13 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 		this.bundle = bundle;
 		view.setTitle(bundle.getTitle());
 		view.setThreadUrl(TopicUtils.buildThreadLink(bundle.getProjectId(), bundle.getId()));
+		authorWidget.setTextHidden(true);
 		authorWidget.configure(bundle.getCreatedBy());
-		authorWidget.setSize(BadgeSize.SMALL_PICTURE_ONLY);
 		view.clearActiveAuthors();
 		for (String userId : bundle.getActiveAuthors()){
 			UserBadge user = ginInjector.getUserBadgeWidget();
+			user.setTextHidden(true);
 			user.configure(userId);
-			user.setSize(BadgeSize.SMALL_PICTURE_ONLY);
 			view.addActiveAuthor(user.asWidget());
 		}
 		Long numberOfReplies = bundle.getNumberOfReplies();

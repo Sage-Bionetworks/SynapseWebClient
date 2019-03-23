@@ -5,7 +5,6 @@ import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -24,7 +23,7 @@ import com.google.inject.Inject;
 
 public class PeopleSearchPresenter extends AbstractActivity implements PeopleSearchView.Presenter, Presenter<PeopleSearch> {
 	
-	public static final int SEARCH_PEOPLE_LIMIT = 30;
+	public static final int SEARCH_PEOPLE_LIMIT = 24;
 	
 	private PeopleSearch place;
 	private PeopleSearchView view;
@@ -55,6 +54,7 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 				loadMore();
 			}
 		});
+		loadMoreWidgetContainer.addStyleName("SRC-card-grid-row");
 		view.setLoadMoreContainer(loadMoreWidgetContainer.asWidget());
 	}
 	
@@ -93,10 +93,9 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 				for (UserGroupHeader header : result.getChildren()) {
 					if (header.getIsIndividual()) {
 						UserBadge badge = ginInjector.getUserBadgeWidget();
-						badge.configure(header.getOwnerId(), true);
-						badge.setSize(BadgeSize.LARGER);
-						badge.setStyleNames("col-sm-12 col-md-6 margin-top-15");
-						badge.setHeight("80px");
+						badge.setSize(BadgeSize.MEDIUM);
+						badge.addStyleNames("SRC-grid-item");
+						badge.configure(header.getOwnerId());
 						loadMoreWidgetContainer.add(badge.asWidget());
 					}
 				}

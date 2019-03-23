@@ -7,6 +7,7 @@ public interface LoadMoreWidgetContainerView extends IsWidget, HasWidgets{
 	void clear();
 	void setLoadMoreVisibility(boolean visible);
 	void setIsProcessing(boolean isProcessing);
+	void addStyleName(String styles);
 	void setPresenter(Presenter p);
 	public interface Presenter {
 		void onLoadMore();

@@ -35,7 +35,6 @@ public class UserIdCellRenderer implements Cell {
 		return view.asWidget();
 	}
 	
-
 	public void setValue(String value, ClickHandler customClickHandler) {
 		this.customClickHandler = customClickHandler;
 		setValue(value);
@@ -82,5 +81,8 @@ public class UserIdCellRenderer implements Cell {
 	public String getValue() {
 		return principalId;
 	}
-
+	
+	public void addStyleName(String styles) {
+		view.addStyleName(styles);
+	}
 }

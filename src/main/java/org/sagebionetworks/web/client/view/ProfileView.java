@@ -48,7 +48,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setFavoritesHelpPanelVisible(boolean isVisible);
 	void setProfileEditButtonVisible(boolean isVisible);
 	void addUserProfileModalWidget(IsWidget userProfileModalWidget);
-	void setSynapseEmailVisible(boolean isVisible);
 	void setSettingsWidget(Widget w);
 	void setDownloadListWidget(IsWidget w);
 	void setSortDirection(ProjectListSortColumn column, SortDirection direction);
