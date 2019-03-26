@@ -192,6 +192,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 			}
 			entityTreeContainer.clear();
 			entityTreeContainer.add(entityTree);
+			mainContainer.add(entityTreeContainer);
 		}
 		return entityTree;
 	}
@@ -341,17 +342,14 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 
 	@Override
 	public void setLoadingVisible(boolean isShown) {
-		mainContainer.clear();
 		if (isShown && loadingSpinner == null) {
 			loadingSpinner = new LoadingSpinner();
 			loadingSpinner.setSize(40);
 			loadingSpinner.setAddStyleNames("center-block center");
-		}
-		if (isShown) {
 			mainContainer.add(loadingSpinner);
-		} else {
-			mainContainer.add(entityTreeContainer);
 		}
+		entityTreeContainer.setVisible(!isShown);
+		loadingSpinner.setVisible(isShown);
 		entityTreeHeader.setVisible(!isShown);
 		hrUnderTableHeaders.setVisible(!isShown);
 	}

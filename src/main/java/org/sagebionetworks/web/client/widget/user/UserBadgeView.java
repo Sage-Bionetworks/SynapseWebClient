@@ -16,6 +16,7 @@ public interface UserBadgeView extends IsWidget, SynapseView {
 	void setCustomClickHandler(ClickHandler clickHandler);
 	void doNothingOnClick();
 	void setTextHidden(boolean isTextHidden);
+	void setTooltipHidden(boolean isTooltipHidden);
 	void setOpenInNewWindow();
 	void addContextCommand(String commandName, Callback callback); 
 }

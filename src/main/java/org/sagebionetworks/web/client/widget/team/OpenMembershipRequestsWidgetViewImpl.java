@@ -92,7 +92,6 @@ public class OpenMembershipRequestsWidgetViewImpl implements OpenMembershipReque
 			
 			mainContainer.setVisible(true);
 		}
-		mainContainer.add(table);
 	}
 	
 	@Override
