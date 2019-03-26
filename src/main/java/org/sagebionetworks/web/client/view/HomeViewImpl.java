@@ -91,6 +91,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		this.headerWidget = headerWidget;
 		this.userBadge = userBadge;
 		this.loginWidget = loginWidget;
+		userBadge.setTooltipHidden(true);
 		userBadge.setTextHidden(true);
 		myDashboardButtonContents = new HorizontalPanel();
 		myDashboardButtonContents.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);

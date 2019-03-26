@@ -35,6 +35,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		newWindow("#!Profile:" + userId, "_blank", "");
 	};
 	boolean isTextHidden = false;
+	boolean isTooltipHidden = false;
 	AdapterFactory adapterFactory;
 	SynapseJSNIUtils jsniUtils;
 	BadgeSize badgeSize = BadgeSize.DEFAULT;
@@ -78,7 +79,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		String pictureUrl = profile.getProfilePicureFileHandleId() != null ? 
 				jsniUtils.getFileHandleAssociationUrl(profile.getOwnerId(), FileHandleAssociateType.UserProfileAttachment, profile.getProfilePicureFileHandleId()) : null;
 		
-		_showBadge(userBadgeContainer.getElement(), profileJson, badgeSize.reactClientSize, isTextHidden, pictureUrl, !authController.isLoggedIn(), menuActionsArray, this);
+		_showBadge(userBadgeContainer.getElement(), profileJson, badgeSize.reactClientSize, isTextHidden, isTooltipHidden, pictureUrl, !authController.isLoggedIn(), menuActionsArray, this);
 	}
 	
 	public void setClickHandler(ClickHandler clickHandler) {
@@ -109,6 +110,10 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	@Override
 	public void setTextHidden(boolean isTextHidden) {
 		this.isTextHidden = isTextHidden;
+	}
+	@Override
+	public void setTooltipHidden(boolean isTooltipHidden) {
+		this.isTooltipHidden = isTooltipHidden;
 	}
 	@Override
 	public void setSize(BadgeSize size) {
@@ -158,7 +163,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		_addToMenuActionsArray(commandName, callback, menuActionsArray);
 	}
 	
-	private static native void _showBadge(Element el, String userProfileJson, String reactClientSize, boolean isTextHidden, String pictureUrl, boolean isEmailHidden, JsArray<JavaScriptObject> menuActionsArray, UserBadgeViewImpl userBadgeView) /*-{
+	private static native void _showBadge(Element el, String userProfileJson, String reactClientSize, boolean isTextHidden, boolean isTooltipHidden, String pictureUrl, boolean isEmailHidden, JsArray<JavaScriptObject> menuActionsArray, UserBadgeViewImpl userBadgeView) /*-{
 		
 		try {
 			function onClick(userProfile) {
@@ -170,6 +175,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 				userProfile: userProfileObject,
 				size: reactClientSize,
 				hideText: isTextHidden,
+				hideTooltip: isTooltipHidden,
 				profileClickHandler: onClick,
 				menuActions: menuActionsArray,
 				preSignedURL: pictureUrl,
