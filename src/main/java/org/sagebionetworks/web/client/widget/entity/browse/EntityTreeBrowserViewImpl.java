@@ -348,8 +348,10 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 			loadingSpinner.setAddStyleNames("center-block center");
 			mainContainer.add(loadingSpinner);
 		}
-		entityTreeContainer.setVisible(!isShown);
-		loadingSpinner.setVisible(isShown);
+		if (entityTreeContainer != null)
+			entityTreeContainer.setVisible(!isShown);
+		if (loadingSpinner != null)
+			loadingSpinner.setVisible(isShown);
 		entityTreeHeader.setVisible(!isShown);
 		hrUnderTableHeaders.setVisible(!isShown);
 	}
