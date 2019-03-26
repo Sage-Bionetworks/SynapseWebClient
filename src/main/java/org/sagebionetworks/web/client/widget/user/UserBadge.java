@@ -81,6 +81,10 @@ public class UserBadge implements  SynapseWidgetPresenter, WidgetRendererPresent
 		view.setTextHidden(isTextHidden);
 	}
 	
+	public void setTooltipHidden(boolean isTooltipHidden) {
+		view.setTooltipHidden(isTooltipHidden);
+	}
+	
 	public void setSize(BadgeSize size) {
 		view.setSize(size);
 	}

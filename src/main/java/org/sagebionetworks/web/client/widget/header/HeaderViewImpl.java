@@ -137,6 +137,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		this.sageImageBundle = sageImageBundle;
 		this.userBadge = userBadge;
 		this.globalAppState = globalAppState;
+		userBadge.setTooltipHidden(true);
 		userBadge.setTextHidden(true);
 		userBadge.addStyleNames("padding-top-5");
 		// add search panel first
