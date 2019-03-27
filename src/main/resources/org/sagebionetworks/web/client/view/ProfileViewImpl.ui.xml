@@ -75,7 +75,8 @@
 											<g:SimplePanel ui:field="profileSynAlertPanel" />
 											<bh:Div ui:field="userBadgeContainer" />
 											<!-- View Profile Panel -->
-											<bh:Div ui:field="userBadgeFooter" addStyleNames="dropshadow" marginLeft="1" marginRight="1" paddingLeft="34" paddingRight="18" paddingTop="18" height="70px">
+											<bh:Div ui:field="userBadgeFooter" addStyleNames="dropshadow2" marginLeft="2" marginRight="2" marginTop="0" paddingLeft="34" paddingRight="18" paddingTop="3" height="70px">
+												<bh:Div addStyleNames="border-top-1" width="100%" paddingBottom="15" />
 												<b:Anchor ui:field="orcIdLink" addStyleNames="movedown-3"/>
 												<b:Button ui:field="editProfileButton" icon="EDIT" type="PRIMARY" pull="RIGHT">Edit Profile</b:Button>
 											</bh:Div>
