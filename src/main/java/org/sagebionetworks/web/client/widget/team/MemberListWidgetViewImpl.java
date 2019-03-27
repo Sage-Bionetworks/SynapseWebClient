@@ -2,7 +2,11 @@ package org.sagebionetworks.web.client.widget.team;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -81,8 +85,12 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 				teamManagerBadge.addStyleName("lightGreyBackground border-left-1 border-bottom-1 border-right-1");
 				teamManagerBadge.setMarginLeft(2);
 				teamManagerBadge.setMarginRight(2);
-				teamManagerBadge.setPaddingLeft(25);
-				teamManagerBadge.add(new Text(ADMIN_ACCESS));
+				teamManagerBadge.setPaddingLeft(15);
+				teamManagerBadge.add(new Icon(IconType.SYN_MANAGER));
+				Span p = new Span();
+				p.add(new Text(ADMIN_ACCESS));
+				p.setMarginLeft(5);
+				teamManagerBadge.add(p);
 				singleGridItem.add(teamManagerBadge);
 			}
 			userBadge.configure(member);
