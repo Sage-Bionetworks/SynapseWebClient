@@ -2831,6 +2831,11 @@ div.border {
 }
 
 #body {
+	.SRC-primary-color-hover:hover * {
+    color: $synapse-blue;
+    fill: $synapse-blue;
+	}
+
 	.SRC-primary-text-color {
 		color: $synapse-blue;
 	}
