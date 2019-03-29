@@ -1,13 +1,12 @@
 package org.sagebionetworks.web.client.widget;
 
-import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.web.client.view.bootstrap.ButtonUtils;
 
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -25,13 +24,7 @@ public class SelectionToolbar implements IsWidget {
 	@UiField
 	ButtonToolBar buttonToolbar;
 	@UiField
-	Button selectTogglebutton;
-	@UiField
-	Button selectDropDown;
-	@UiField
-	AnchorListItem selectAllItem;
-	@UiField
-	AnchorListItem selectNoneItem;
+	IndeterminateCheckBox selectAllNoneCheckBox;
 	@UiField
 	Button moveUpButton;
 	@UiField
@@ -40,29 +33,25 @@ public class SelectionToolbar implements IsWidget {
 	Button deleteSelectedButton;
 	
 	Widget widget;
-	boolean selectAll;
 	ClickHandler selectAllClicked, selectNoneClicked;
 	
 	//empty constructor, this widget can be used directly in your ui xml
 	public SelectionToolbar() {
 		SelectionToolbarUiBinder binder = GWT.create(SelectionToolbarUiBinder.class);
 		widget = binder.createAndBindUi(this);
-		selectAll = true;
 		
-		selectTogglebutton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (selectAll) {
-					if (selectAllClicked != null) {
-						selectAllClicked.onClick(event);	
-					}
-				} else {
-					if (selectNoneClicked != null) {
-						selectNoneClicked.onClick(event);	
-					}
+		selectAllNoneCheckBox.addClickHandler(event -> {
+			//what is the new state of the checkbox after the click?
+			CheckBoxState state = selectAllNoneCheckBox.getState();
+			boolean selectAll = state.equals(CheckBoxState.SELECTED); 
+			if (selectAll) {
+				if (selectAllClicked != null) {
+					selectAllClicked.onClick(event);	
 				}
-				
-				selectAll = !selectAll;
+			} else {
+				if (selectNoneClicked != null) {
+					selectNoneClicked.onClick(event);	
+				}
 			}
 		});
 	}
@@ -80,11 +69,9 @@ public class SelectionToolbar implements IsWidget {
 	}
 	public void setSelectAllClicked(ClickHandler selectAllClicked) {
 		this.selectAllClicked = selectAllClicked;
-		selectAllItem.addClickHandler(selectAllClicked);
 	}
 	public void setSelectNoneClicked(ClickHandler selectNoneClicked) {
 		this.selectNoneClicked = selectNoneClicked;
-		selectNoneItem.addClickHandler(selectNoneClicked);
 	}
 	
 	public void setVisible(boolean isVisible) {
@@ -102,6 +89,11 @@ public class SelectionToolbar implements IsWidget {
 	public void setCanDelete(boolean canDelete) {
 		ButtonUtils.setEnabledAndType(canDelete, this.deleteSelectedButton, ButtonType.DANGER);
 	}
+	
+	public void setSelectionState(CheckBoxState state) {
+		selectAllNoneCheckBox.setState(state);
+	}
+	
 	@Override
 	public Widget asWidget() {
 		return widget;

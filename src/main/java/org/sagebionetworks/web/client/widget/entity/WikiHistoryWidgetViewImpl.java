@@ -258,16 +258,10 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 	}
 	
 	public void showRestorationWarning(final Long wikiVersion) {
-		org.sagebionetworks.web.client.utils.Callback okCallback = new org.sagebionetworks.web.client.utils.Callback() {
-			@Override
-			public void invoke() {
+		org.sagebionetworks.web.client.utils.Callback okCallback = () -> {
 				actionHandler.restoreClicked(wikiVersion);
-			}	
 		};
-		org.sagebionetworks.web.client.utils.Callback cancelCallback = new org.sagebionetworks.web.client.utils.Callback() {
-			@Override
-			public void invoke() {
-			}	
+		org.sagebionetworks.web.client.utils.Callback cancelCallback = () -> {
 		};
 		DisplayUtils.showPopup(DisplayConstants.RESTORING_WIKI_VERSION_WARNING_TITLE, DisplayConstants.RESTORING_WIKI_VERSION_WARNING_MESSAGE, MessagePopup.WARNING, okCallback, cancelCallback);
 	}

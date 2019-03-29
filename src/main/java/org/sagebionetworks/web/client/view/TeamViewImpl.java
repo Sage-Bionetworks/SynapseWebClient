@@ -8,22 +8,20 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.Linkify;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.widget.TextBoxWithCopyToClipboardWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -39,7 +37,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@UiField
 	Column commandsContainer;
 	@UiField
-	SimplePanel mediaObjectContainer;
+	Div teamBadgeContainer;
 	@UiField
 	SimplePanel inviteMemberPanel;
 	@UiField
@@ -73,7 +71,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@UiField
 	AnchorListItem manageAccessItem;
 	@UiField
-	TextBox synapseEmailField;
+	TextBoxWithCopyToClipboardWidget synapseEmailField;
 	@UiField
 	Div mapPanel;
 	@UiField
@@ -86,24 +84,23 @@ public class TeamViewImpl extends Composite implements TeamView {
 	Button memberSearchButton;
 	private Presenter presenter;
 	private Header headerWidget;
-	private SynapseJSNIUtils synapseJSNIUtils;
 	private GWTWrapper gwt;
-	private Linkify linkify;
+	private BigTeamBadge bigTeamBadge;
 	
 	@Inject
 	public TeamViewImpl(TeamViewImplUiBinder binder, 
 			InviteWidget inviteWidget, 
 			Header headerWidget, 
-			SynapseJSNIUtils synapseJSNIUtils,
 			GWTWrapper gwt,
-			Linkify linkify) {
+			BigTeamBadge bigTeamBadge) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
-		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.gwt = gwt;
-		this.linkify = linkify;
+		this.bigTeamBadge = bigTeamBadge;
 		setDropdownHandlers();
 		headerWidget.configure();
+		teamBadgeContainer.clear();
+		teamBadgeContainer.add(bigTeamBadge.asWidget());
 		showMapLink.addClickHandler(event -> {
 			presenter.onShowMap();
 		});
@@ -143,9 +140,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 				presenter.showLeaveModal();		
 			});
 		});
-		synapseEmailField.addClickHandler(event -> {
-			synapseEmailField.selectAll();
-		});
 		manageAccessItem.addClickHandler(event -> {
 			gwt.scheduleDeferred(() -> {
 				presenter.onManageAccess();		
@@ -155,14 +149,13 @@ public class TeamViewImpl extends Composite implements TeamView {
 	
 	@Override
 	public void clear() {
-		mediaObjectContainer.clear();
 		commandsContainer.setVisible(false);
 		inviteMemberItem.setVisible(false);
 		editTeamItem.setVisible(false);
 		deleteTeamItem.setVisible(false);
 		leaveTeamItem.setVisible(false);
 		publicJoinField.setVisible(false);
-		synapseEmailField.setValue("");
+		synapseEmailField.setText("");
 		memberSearchTextBox.setValue("");
 	}
 	
@@ -208,12 +201,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	
 	@Override
 	public void setMediaObjectPanel(Team team) {
-		String pictureUrl = null;
-		if (team.getIcon() != null) {
-			pictureUrl = synapseJSNIUtils.getFileHandleAssociationUrl(team.getId(), FileHandleAssociateType.TeamAttachment, team.getIcon());
-		}
-		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(team.getName(), linkify.linkify(team.getDescription()), null,  pictureUrl, false, 2);
-		mediaObjectContainer.setWidget(mediaObjectPanel.asWidget());
+		bigTeamBadge.configure(team, team.getDescription());
 		mapModal.setTitle(team.getName());
 	}	
 
@@ -275,7 +263,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 
 	@Override
 	public void setTeamEmailAddress(String teamEmail) {
-		synapseEmailField.setValue(teamEmail);
+		synapseEmailField.setText(teamEmail);
 	}
 	@Override
 	public void setMap(Widget w) {

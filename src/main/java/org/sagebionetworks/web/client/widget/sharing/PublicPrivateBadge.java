@@ -15,7 +15,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
+public class PublicPrivateBadge {
 	
 	private PublicPrivateBadgeView view;
 	private PublicPrincipalIds publicPrincipalIds;
@@ -33,7 +33,6 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 		this.jsClient = jsClient;
 		this.userAccountService = userAccountService;
 		fixServiceEntryPoint(userAccountService);
-		view.setPresenter(this);
 	}	
 
 	/**
@@ -80,7 +79,7 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 			public void onSuccess(PublicPrincipalIds result) {
 				publicPrincipalIds = result;
 				boolean isPublic = isPublic(acl, publicPrincipalIds); 
-				view.configure(isPublic);
+				view.setIsPublic(isPublic);
 				if (isPublicCallback != null)
 					isPublicCallback.onSuccess(isPublic);
 			}
@@ -131,7 +130,6 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 	}
 	
 	public Widget asWidget() {
-		view.setPresenter(this);			
 		return view.asWidget();
 	}
 		

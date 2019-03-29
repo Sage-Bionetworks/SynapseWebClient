@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'synapseicons';
-  src: url('../font/synapseicons.eot?71780786');
-  src: url('../font/synapseicons.eot?71780786#iefix') format('embedded-opentype'),
-       url('../font/synapseicons.woff2?71780786') format('woff2'),
-       url('../font/synapseicons.woff?71780786') format('woff'),
-       url('../font/synapseicons.ttf?71780786') format('truetype'),
-       url('../font/synapseicons.svg?71780786#synapseicons') format('svg');
+  src: url('../font/synapseicons.eot?37536112');
+  src: url('../font/synapseicons.eot?37536112#iefix') format('embedded-opentype'),
+       url('../font/synapseicons.woff2?37536112') format('woff2'),
+       url('../font/synapseicons.woff?37536112') format('woff'),
+       url('../font/synapseicons.ttf?37536112') format('truetype'),
+       url('../font/synapseicons.svg?37536112#synapseicons') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -15,7 +15,7 @@
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   @font-face {
     font-family: 'synapseicons';
-    src: url('../font/synapseicons.svg?71780786#synapseicons') format('svg');
+    src: url('../font/synapseicons.svg?37536112#synapseicons') format('svg');
   }
 }
 */
@@ -79,6 +79,7 @@
 .syn-trash-o:before { content: '\e815'; } /* '' */
 .syn-warning:before { content: '\e816'; } /* '' */
 .syn-check:before { content: '\e817'; } /* '' */
+.syn-manager:before { content: '\e818'; } /* '' */
 .syn-users:before { content: '\e81b'; } /* '' */
 .syn-user:before { content: '\e81c'; } /* '' */
 .syn-sort-asc:before { content: '\e831'; } /* '' */

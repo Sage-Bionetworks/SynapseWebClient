@@ -32,11 +32,6 @@ public class DisplayConstants {
 	public static final String BUTTON_PERMISSIONS_CREATE_NEW_ACL = "Create Local Sharing Settings";
 	public static final String BUTTON_PERMISSIONS_DELETE_ACL = "Delete Local Sharing Settings";
 	public static final String NOTIFY_PEOPLE_TOOLTIP = "Select to notify newly added people that this item has been shared with them";
-
-	public static final String PUBLIC_ACL_DESCRIPTION = "Anyone on the internet can access";
-	public static final String PUBLIC_ACL_ENTITY_PAGE = "Public";
-	public static final String PRIVATE_ACL_ENTITY_PAGE = "Private";
-	public static final String PRIVATE_ACL_DESCRIPTION = "Restricted to those people selected in the Share Settings window";
 	
 	public static final String MENU_PERMISSION_LEVEL_CAN_VIEW = "Can view";
 	public static final String MENU_PERMISSION_LEVEL_CAN_DOWNLOAD = "Can download";
@@ -65,7 +60,7 @@ public class DisplayConstants {
 	public static final String ERROR_ALL_FIELDS_REQUIRED = "All fields must first be properly fill in.";
 	public static final String ERROR_ALL_QUESTIONS_REQUIRED = "Please answer all of the questions and try again.";
 	public static final String BUTTON_DOWNLOAD = "Download";
-	public static final String ERROR_ENTITY_DELETE_FAILURE = "Deletion failed. Please try again.";
+	public static final String ERROR_ENTITY_DELETE_FAILURE = "Deletion failed. ";
 	public static final String PROMPT_SURE_DELETE = "Are you sure you want to delete this";
 	public static final String PROMPT_SURE_REMOVE_MEMBER = " will lose access to resources shared with the team.  Are you sure?";
 	public static final String LABEL_NO_SEARCH_RESULTS_PART1 = "Your search for '";

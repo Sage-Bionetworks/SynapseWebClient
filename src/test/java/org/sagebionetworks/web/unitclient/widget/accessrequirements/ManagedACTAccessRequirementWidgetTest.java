@@ -21,7 +21,6 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.dataaccess.ManagedACTAccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionStatus;
@@ -34,6 +33,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
+import org.sagebionetworks.web.client.widget.accessrequirements.IntendedDataUseReportButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessRequestsButton;
@@ -104,7 +104,8 @@ public class ManagedACTAccessRequirementWidgetTest {
 	Callback mockRefreshCallback;
 	@Mock
 	RestrictableObjectDescriptor mockSubject;
-	
+	@Mock
+	IntendedDataUseReportButton mockIduReportButton;
 	Callback lazyLoadDataCallback;
 	
 	public final static String ROOT_WIKI_ID = "777";
@@ -114,7 +115,7 @@ public class ManagedACTAccessRequirementWidgetTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new ManagedACTAccessRequirementWidget(mockView, mockJsClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockReviewAccessRequestsButton, mockDataAccessClient, mockLazyLoadHelper, mockAuthController, mockSubmitterUserBadge, mockDateTimeUtils, mockManageAccessButton);
+		widget = new ManagedACTAccessRequirementWidget(mockView, mockJsClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockReviewAccessRequestsButton, mockIduReportButton, mockDataAccessClient, mockLazyLoadHelper, mockAuthController, mockSubmitterUserBadge, mockDateTimeUtils, mockManageAccessButton);
 		when(mockGinInjector.getCreateDataAccessRequestWizard()).thenReturn(mockCreateDataAccessRequestWizard);
 		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockJsClient).getRootWikiPageKey(anyString(), anyString(), any(AsyncCallback.class));
@@ -136,8 +137,22 @@ public class ManagedACTAccessRequirementWidgetTest {
 		verify(mockView).setWikiTermsWidget(any(Widget.class));
 		verify(mockView).setEditAccessRequirementWidget(any(Widget.class));
 		verify(mockWikiPageWidget).setModifiedCreatedByHistoryVisible(false);
+		verify(mockView).setIDUReportButton(mockIduReportButton);
 	}
 
+	@Test
+	public void testSetRequirement() {
+		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+		
+		verify(mockCreateAccessRequirementButton).configure(eq(mockACTAccessRequirement), any(Callback.class));
+		verify(mockDeleteAccessRequirementButton).configure(eq(mockACTAccessRequirement), any(Callback.class));
+		verify(mockIduReportButton).configure(mockACTAccessRequirement);
+		verify(mockReviewAccessRequestsButton).configure(mockACTAccessRequirement);
+		verify(mockManageAccessButton).configure(mockACTAccessRequirement);
+		verify(mockSubjectsWidget).configure(mockSubjectIds);
+		verify(mockLazyLoadHelper).setIsConfigured();
+	}
+	
 	@Test
 	public void testSetRequirementWithWikiTerms() {
 		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);

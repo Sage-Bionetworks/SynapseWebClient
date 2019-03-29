@@ -44,7 +44,6 @@
 							    <div class="col-sm-9">
 							      <b:Input type="PASSWORD" ui:field="password1Field" placeholder="Enter password"/>
 								  <div ui:field="password1Error" style="display:none" class="help-block"></div>
-								  <bh:Div ui:field="passwordStrengthContainer"/>
 							    </div>
 							  </div>
 							  <div ui:field="password2" class="form-group row">

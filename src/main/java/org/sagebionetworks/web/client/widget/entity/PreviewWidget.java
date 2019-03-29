@@ -44,6 +44,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -284,6 +285,10 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 							synapseAlert.handleException(e);
 						}
 						public void onResponseReceived(final Request request, final Response response) {
+							// if this response is not for the file entity associated to this preview widget, then ignore it!
+							if (!fileEntity.equals(bundle.getEntity())) {
+								return;
+							}
 							//add the response text
 							int statusCode = response.getStatusCode();
 							// if it's a 200 level response, it's OK

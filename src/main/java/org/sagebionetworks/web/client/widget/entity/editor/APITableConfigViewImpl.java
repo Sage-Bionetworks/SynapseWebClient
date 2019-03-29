@@ -14,11 +14,8 @@ import com.google.inject.Inject;
 
 public class APITableConfigViewImpl implements APITableConfigView {
 	public interface APITableConfigViewImplUiBinder extends UiBinder<Widget, APITableConfigViewImpl> {}
-	private Presenter presenter;
 	@UiField
 	TextBox urlField;
-	@UiField
-	TextBox rowNumbersColumnNameField;
 	@UiField
 	TextBox pageSizeField;
 	@UiField
@@ -27,8 +24,6 @@ public class APITableConfigViewImpl implements APITableConfigView {
 	TextBox cssStyleNameField;
 	@UiField
 	CheckBox isPagingField;
-	@UiField
-	CheckBox isRowVisibleField;
 	@UiField
 	CheckBox isQueryTableResults;
 	@UiField
@@ -58,8 +53,6 @@ public class APITableConfigViewImpl implements APITableConfigView {
 		isPagingField.setValue(tableConfig.isPaging());
 		isQueryTableResults.setValue(tableConfig.isQueryTableResults());
 		isShowIfLoggedInOnly.setValue(tableConfig.isShowOnlyIfLoggedIn());
-		isRowVisibleField.setValue(tableConfig.isShowRowNumber());
-		rowNumbersColumnNameField.setValue(tableConfig.getRowNumberColName());
 		pageSizeField.setValue(Integer.toString(tableConfig.getPageSize()));
 		jsonResultsKeyNameField.setValue(tableConfig.getJsonResultsArrayKeyName());
 		cssStyleNameField.setValue(tableConfig.getCssStyleName());
@@ -85,11 +78,6 @@ public class APITableConfigViewImpl implements APITableConfigView {
 	}
 	
 	@Override
-	public String getRowNumberColumnName() {
-		return rowNumbersColumnNameField.getValue();
-	}
-	
-	@Override
 	public Boolean isPaging() {
 		return isPagingField.getValue();
 	}
@@ -101,11 +89,6 @@ public class APITableConfigViewImpl implements APITableConfigView {
 	@Override
 	public Boolean isShowIfLoggedInOnly() {
 		return isShowIfLoggedInOnly.getValue();
-	}
-	
-	@Override
-	public Boolean isShowRowNumbers() {
-		return isRowVisibleField.getValue();
 	}
 	
 	@Override
@@ -123,11 +106,6 @@ public class APITableConfigViewImpl implements APITableConfigView {
 		return widget;
 	}	
 	
-	@Override 
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
-		
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
@@ -145,9 +123,4 @@ public class APITableConfigViewImpl implements APITableConfigView {
 	@Override
 	public void clear() {
 	}
-	
-	/*
-	 * Private Methods
-	 */
-
 }

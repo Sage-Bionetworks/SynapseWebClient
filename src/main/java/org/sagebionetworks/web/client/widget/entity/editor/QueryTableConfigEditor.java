@@ -15,7 +15,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
+import org.sagebionetworks.web.client.widget.table.api.APITableWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -82,7 +82,6 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, getServicePathFromView());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, view.isPaging().toString());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGESIZE_KEY, DEFAULT_PAGE_SIZE);
-		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY, view.isShowRowNumbers().toString());
 		List<APITableColumnConfig> configs = view.getConfigs();
 		APITableConfigEditor.updateDescriptorWithColumnConfigs(descriptor, configs);
 	}

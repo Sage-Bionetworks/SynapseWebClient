@@ -13,16 +13,36 @@
 			<b:TabPanel>
 				<b:NavTabs>
 					<b:TabListItem active="true" ui:field="pythonTabListItem" text="Python" />
+					<b:TabListItem ui:field="rTabListItem" text="R" />
 					<b:TabListItem ui:field="cliTabListItem" text="Command Line" />
 				</b:NavTabs>
 				<b:TabContent>
 					<b:TabPane ui:field="pythonTabPane" active="true">
 						<g:HTMLPanel>
 							<pre>
-								<code class="nohighlight">import synapseclient<br/>import synapseutils<br/><br/>syn = synapseclient.Synapse()<br/>syn.login('synapse_username','password')<br/>files = synapseutils.syncFromSynapse(syn, '<span ui:field="id2"/>')<br/>
+								<code class="nohighlight">
+									import synapseclient<br/>
+									import synapseutils<br/>
+									<br/>
+									syn = synapseclient.Synapse()<br/>
+									syn.login('synapse_username','password')<br/>
+									files = synapseutils.syncFromSynapse(syn, '<span ui:field="id2"/>')<br/>
 								</code>
 							</pre>
 					    </g:HTMLPanel>
+					</b:TabPane>
+					<b:TabPane ui:field="rTabPane">
+			  			<g:HTMLPanel>
+			  				<pre>
+								<code class="nohighlight">
+									library(synapser)<br/>
+									library(synapserutils)<br/>
+									<br/>
+									synLogin('synapse_username', 'password')<br/>
+									files &#60;- synapserutils::syncFromSynapse('<span ui:field="id3"/>')<br/>
+								</code>
+							</pre>
+						</g:HTMLPanel>
 					</b:TabPane>
 					<b:TabPane ui:field="cliTabPane" >
 					  	<g:HTMLPanel>

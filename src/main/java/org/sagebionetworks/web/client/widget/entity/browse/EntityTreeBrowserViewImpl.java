@@ -159,7 +159,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 
 	@Override
 	public void clear() {
-		copyIDToClipboardIcon.setVisible(DisplayUtils.isInTestWebsite(cookies));
 		entityTreeContainer.clear();
 		entityTree = null;
 		treeItem2entityTreeItem = null;
@@ -183,16 +182,17 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 			});
 			
 			presenter.clearRecordsFetchedChildren();
-			
 			if (isSelectable) {
 				entityTree.addSelectionHandler(event -> {
-					final EntityTreeItem targetItem = getTreeItem2entityTreeItem()
+					EntityTreeItem targetItem = getTreeItem2entityTreeItem()
 							.get(event.getSelectedItem());
-					selectEntity(targetItem);
-				});
+					selectEntity(targetItem);	
+					
+				});	
 			}
 			entityTreeContainer.clear();
 			entityTreeContainer.add(entityTree);
+			mainContainer.add(entityTreeContainer);
 		}
 		return entityTree;
 	}
@@ -209,6 +209,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		// Place the created child in the tree as the child of the given parent
 		// entity.
 		getTree().addItem(childToAdd.asTreeItem());
+		childToAdd.setHeight(0);
 	}
 
 	@Override
@@ -244,6 +245,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		// Place the created child in the tree as the child of the given parent
 		// entity.
 		parent.asTreeItem().addItem(childToAdd);
+		childToAdd.setHeight(parent.getHeight() + 1);
 	}
 
 	/**
@@ -340,17 +342,16 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 
 	@Override
 	public void setLoadingVisible(boolean isShown) {
-		mainContainer.clear();
 		if (isShown && loadingSpinner == null) {
 			loadingSpinner = new LoadingSpinner();
 			loadingSpinner.setSize(40);
 			loadingSpinner.setAddStyleNames("center-block center");
-		}
-		if (isShown) {
 			mainContainer.add(loadingSpinner);
-		} else {
-			mainContainer.add(entityTreeContainer);
 		}
+		if (entityTreeContainer != null)
+			entityTreeContainer.setVisible(!isShown);
+		if (loadingSpinner != null)
+			loadingSpinner.setVisible(isShown);
 		entityTreeHeader.setVisible(!isShown);
 		hrUnderTableHeaders.setVisible(!isShown);
 	}

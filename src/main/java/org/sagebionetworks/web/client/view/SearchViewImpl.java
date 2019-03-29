@@ -237,7 +237,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 				String buttonText = "created_by".equalsIgnoreCase(facet.getKey()) ? "Created by " : "Last modified by ";
 				UserBadge createdByBadge = ginInjector.getUserBadgeWidget();
 				createdByBadge.configure(facet.getValue());
-				createdByBadge.setSize(BadgeSize.SMALLER);
 				createdByBadge.setCustomClickHandler(event -> {
 					btn.click();
 				});
@@ -279,13 +278,13 @@ public class SearchViewImpl extends Composite implements SearchView {
 			
 			facetNames.append(text);
 			facetNames.append(" ");
-			Button btn = new Button(text, IconType.TIMES, event -> {				
+			Button btn = new Button(text, IconType.TIMES, event -> {
 				// disable all buttons to allow only one click
 				for(Button facetButton : facetButtons) {
 					facetButton.setEnabled(false);
 				}
 				Window.scrollTo(0, 0);
-				presenter.removeTimeFacetAndRefresh(facet.getKey());						
+				presenter.removeTimeFacetAndRefresh(facet.getKey());
 			});
 			
 			btn.setHeight(BUTTON_HEIGHT);
@@ -301,7 +300,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		for (String facetName : presenter.getFacetDisplayOrder()) {
 			for (final Facet facet : searchResults.getFacets()) {
 				if (facet.getName().equals(facetName)) {
-					FacetTypeNames type = facet.getType();					
+					FacetTypeNames type = facet.getType();
 					if (type != null) {
 						Widget widget = null;
 						switch (type) {
@@ -309,6 +308,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 							widget = createLiteralFacet(facet); 
 							break;
 						case DATE:
+						case CONTINUOUS:
 							widget = createDateFacet(facet); 
 							break;
 						default:

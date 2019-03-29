@@ -10,6 +10,9 @@ public class LinkifyImpl implements Linkify {
 	
 	@Override
 	public String linkify(String s) {
+		if (s == null || s.isEmpty()) {
+			return s;
+		}
 		return _linkify(s);
 	}
 

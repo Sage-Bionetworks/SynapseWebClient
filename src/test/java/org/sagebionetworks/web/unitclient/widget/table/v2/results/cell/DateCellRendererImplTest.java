@@ -11,21 +11,21 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.DateTimeUtils;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRendererImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellView;
 
 public class DateCellRendererImplTest {
 	
-	DateCellRendererImpl renderer;
+	DateCellRenderer renderer;
 	@Mock
-	StringRendererCell mockStringRendererCell;
+	StringRendererCellView mockStringRendererCell;
 	@Mock
 	DateTimeUtils mockDateTimeUtils;
 	
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		renderer = new DateCellRendererImpl(mockStringRendererCell, mockDateTimeUtils);
+		renderer = new DateCellRenderer(mockStringRendererCell, mockDateTimeUtils);
 	}
 	
 	@Test

@@ -11,7 +11,8 @@
 	    <div class="margin-top-left-10 margin-right-15">
 	        <b:Row>
 	            <b:Column size="MD_9">
-	                <g:SimplePanel ui:field="mediaObjectContainer"/>
+	                <bh:Div ui:field="teamBadgeContainer"/>
+	                <bh:Span marginLeft="85"><w:TextBoxWithCopyToClipboardWidget ui:field="synapseEmailField" width="550px"/></bh:Span>
 	            </b:Column>    
 	    		<b:Column ui:field="commandsContainer" size="MD_3">
 		    		<b:ButtonToolBar addStyleNames="pull-right">
@@ -39,7 +40,6 @@
 	    	<div class="row">
 		    	<g:HTMLPanel ui:field="mainContainer" styleName="col-md-12">
 		    	    <bh:Span ui:field="publicJoinField" visible="false" addStyleNames="boldText margin-right-5" text="Can be joined without team manager authorization " />
-		    	    <g:TextBox ui:field="synapseEmailField" width="100%" addStyleNames="border-none noBackground margin-right-15" readOnly="true" />
 		    	    <b:Anchor ui:field="showMapLink" text="Show map" icon="MAP_MARKER" visible="false"/>
 		    	    <b:Modal ui:field="mapModal" closable="true" dataBackdrop="STATIC" dataKeyboard="true" addStyleNames="modal-fullscreen" >
 						<b:ModalBody>

@@ -53,6 +53,7 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
@@ -61,7 +62,9 @@ import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
+import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerCommitSortBy;
@@ -94,6 +97,8 @@ import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
+import org.sagebionetworks.repo.model.search.SearchResults;
+import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.subscription.SortByType;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
@@ -104,6 +109,7 @@ import org.sagebionetworks.repo.model.subscription.SubscriptionRequest;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ViewType;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -111,8 +117,10 @@ import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
+import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -151,6 +159,7 @@ public class SynapseJavascriptClient {
 	public static final String WIKI2 = "/wiki2/";
 	public static final String WIKIKEY = "/wikikey";
 	public static final String WIKI_ORDER_HINT = "/wiki2orderhint";
+	public static final String WIKI_HEADER_TREE = "/wikiheadertree2";
 	public static final String CHILDREN = "/children";
 	public static final String RESTRICTION_INFORMATION = "/restrictionInformation";
 	public static final String USER_PROFILE_PATH = "/userProfile";
@@ -160,6 +169,8 @@ public class SynapseJavascriptClient {
 	public static final String PROJECT = "/project";
 	public static final String FORUM = "/forum";
 	public static final String THREAD = "/thread";
+	public static final String THREADS = "/threads";
+	public static final String REPLIES = "/replies";
 	public static final String THREAD_COUNT = "/threadcount";
 	public static final String REPLY = "/reply";
 	public static final String REPLY_COUNT = "/replycount";
@@ -195,6 +206,7 @@ public class SynapseJavascriptClient {
 	PortalGinInjector ginInjector;
 	SynapseJSNIUtils jsniUtils;
 	SynapseProperties synapseProperties;
+	EntityId2BundleCache entityIdBundleCache;
 
 	public static final String USER = "/user";
 	public static final String BUNDLE_MASK_PATH = "/bundle?mask=";
@@ -251,7 +263,9 @@ public class SynapseJavascriptClient {
 	
 	public static final String DOWNLOAD_ORDER = "/download/order";
 	public static final String DOWNLOAD_ORDER_HISTORY = DOWNLOAD_ORDER+"/history";
-	
+	public static final String STORAGE_REPORT = "/storageReport";
+	public static final String SEARCH = "/search";
+	public static final int LIMIT_50 = 50;
 	
 	
 	public String repoServiceUrl,fileServiceUrl, authServiceUrl, synapseVersionInfo; 
@@ -262,7 +276,8 @@ public class SynapseJavascriptClient {
 			GWTWrapper gwt,
 			SynapseJavascriptFactory jsFactory,
 			PortalGinInjector ginInjector,
-			SynapseJSNIUtils jsniUtils) {
+			SynapseJSNIUtils jsniUtils,
+			EntityId2BundleCache entityIdBundleCache) {
 		this.authController = ginInjector.getAuthenticationController();
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.synapseProperties = synapseProperties;
@@ -270,6 +285,7 @@ public class SynapseJavascriptClient {
 		this.jsFactory = jsFactory;
 		this.ginInjector = ginInjector;
 		this.jsniUtils = jsniUtils;
+		this.entityIdBundleCache = entityIdBundleCache;
 	}
 	private String getRepoServiceUrl() {
 		if (repoServiceUrl == null) {
@@ -468,6 +484,50 @@ public class SynapseJavascriptClient {
 	
 	public void getEntityBundle(String entityId, int partsMask, final AsyncCallback<EntityBundle> callback) {
 		getEntityBundleForVersion(entityId, null, partsMask, callback);
+	}
+	
+	public void populateEntityBundleCache(String entityId) {
+		getEntityBundleFromCache(entityId, null);
+	}
+	
+	/**
+	 * If bundle is found in local js cache, then this will immediately call onSuccess() with the cached version.
+	 * Note that the current entity bundle will still be retrieved, and onSuccess() may be called again if there's a newer version (so write your onSuccess accordingly)!
+	 * @param entityId
+	 * @param partsMask
+	 * @param callback
+	 */
+	public void getEntityBundleFromCache(String entityId, final AsyncCallback<EntityBundle> callback) {
+		EntityBundle cachedBundle = entityIdBundleCache.get(entityId);
+		if (cachedBundle != null) {
+			jsniUtils.consoleLog("Cache hit: " + entityId);
+			if (callback != null) {
+				callback.onSuccess(cachedBundle);	
+			}
+		} else {
+			jsniUtils.consoleLog("Cache miss: " + entityId);
+		}
+		getEntityBundleForVersion(entityId, null, EntityPageTop.ALL_PARTS_MASK, new AsyncCallback<EntityBundle>() {
+			@Override
+			public void onSuccess(EntityBundle latestEntityBundle) {
+				if (!latestEntityBundle.equals(cachedBundle)) {
+					if (cachedBundle != null) {
+						jsniUtils.consoleLog("Cache out of date. Updating cache and calling onSuccess() again: " + entityId);	
+					} 
+					
+					entityIdBundleCache.put(entityId, latestEntityBundle);
+					if (callback != null) {
+						callback.onSuccess(latestEntityBundle);
+					}
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if (callback != null) {
+					callback.onFailure(caught);
+				}
+			}
+		});
 	}
 
 	public void getJSON(String uri, AsyncCallback<JSONObjectAdapter> callback) {
@@ -961,6 +1021,12 @@ public class SynapseJavascriptClient {
 			key.getOwnerObjectId() + WIKI_ORDER_HINT;
 		doPut(url, toUpdate, OBJECT_TYPE.V2WikiOrderHint, callback);
 	}
+	public void getV2WikiOrderHint(WikiPageKey key, AsyncCallback<V2WikiOrderHint> callback) {
+		String url = getRepoServiceUrl() + "/" +
+				key.getOwnerObjectType().toLowerCase() + "/" + 
+				key.getOwnerObjectId() + WIKI_ORDER_HINT;
+		doGet(url, OBJECT_TYPE.V2WikiOrderHint, callback);
+	}
 	
 	public FluentFuture<Entity> createEntity(Entity entity) {
 		String url = getRepoServiceUrl() + ENTITY;
@@ -1027,8 +1093,10 @@ public class SynapseJavascriptClient {
 	}
 	
 	public void logout() {
-		String url = getAuthServiceUrl() + "/session";
-		doDelete(url, null);
+		if (authController.isLoggedIn()) {
+			String url = getAuthServiceUrl() + "/session";
+			doDelete(url, null);	
+		}
 	}
 
 	public void getMyProjects(ProjectListType projectListType, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<List<ProjectHeader>> projectHeadersCallback) {
@@ -1293,6 +1361,94 @@ public class SynapseJavascriptClient {
 	public void listSubscription(SubscriptionRequest request, AsyncCallback<SubscriptionPagedResults> callback) {
 		String url = getRepoServiceUrl() + SUBSCRIPTION + "/list";
 		doPost(url, request, OBJECT_TYPE.SubscriptionPagedResults, callback);
+	}
+	public void getSearchResults(SearchQuery request, AsyncCallback<SearchResults> callback) {
+		String url = getRepoServiceUrl() + SEARCH;
+		doPost(url, request, OBJECT_TYPE.SearchResults, callback);
+	}
+	public void getColumnModelsForTableEntity(String tableEntityId, AsyncCallback<List<ColumnModel>> callback) {
+		String url = getRepoServiceUrl() + ENTITY + "/" + tableEntityId + COLUMN;
+		doGet(url, OBJECT_TYPE.PaginatedColumnModelsResults, callback);
+	}
+	public void getEntityVersions(String entityId, int offset, int limit, AsyncCallback<List<VersionInfo>> callback) {
+		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + REPO_SUFFIX_VERSION
+				+ "?" + OFFSET_PARAMETER + offset + "&" + LIMIT_PARAMETER + limit;
+		doGet(url, OBJECT_TYPE.PaginatedResultsVersionInfo, callback);
+	}
+	public void getThreadsForEntity(String entityId, Long limit, Long offset,
+			DiscussionThreadOrder order, Boolean ascending, DiscussionFilter filter,
+			AsyncCallback<List<DiscussionThreadBundle>> callback) {
+		String url = getThreadsURL(ENTITY, entityId, limit, offset, order, ascending, filter);
+		doGet(url, OBJECT_TYPE.PaginatedResultsDiscussionThreadBundle, callback);
+	}
+	public void getThreadsForForum(String forumId, Long limit, Long offset,
+			DiscussionThreadOrder order, Boolean ascending, DiscussionFilter filter,
+			AsyncCallback<List<DiscussionThreadBundle>> callback) {
+		String url = getThreadsURL(FORUM, forumId, limit, offset, order, ascending, filter);
+		doGet(url, OBJECT_TYPE.PaginatedResultsDiscussionThreadBundle, callback);
+	}
+	
+	private String getThreadsURL(String associatedObjectType, String objectId, Long limit, Long offset,
+			DiscussionThreadOrder order, Boolean ascending, DiscussionFilter filter) {
+		String url = getRepoServiceUrl() + associatedObjectType+"/"+objectId+THREADS
+				+"?"+LIMIT_PARAMETER+limit+"&"+OFFSET_PARAMETER+offset;
+		if (order != null) {
+			url += "&sort="+order.name();
+		}
+		if (ascending != null) {
+			url += "&ascending="+ascending;
+		}
+		url += "&filter="+filter.toString();
+		return url;
+	}
+	
+	public void getRepliesForThread(String threadId,
+			Long limit, Long offset, DiscussionReplyOrder order, Boolean ascending,
+			DiscussionFilter filter, AsyncCallback<List<DiscussionReplyBundle>> callback) {
+		
+		String url = getRepoServiceUrl() + THREAD+"/"+threadId+REPLIES
+				+"?"+LIMIT_PARAMETER+limit+"&"+OFFSET_PARAMETER+offset;
+		if (order != null) {
+			url += "&sort="+order.name();
+		}
+		if (ascending != null) {
+			url += "&ascending="+ascending;
+		}
+		url += "&filter="+filter;
+		doGet(url, OBJECT_TYPE.PaginatedResultsDiscussionReplyBundle, callback);
+	}
+	
+	public void getV2WikiHeaderTree(String ownerId, String ownerType,
+			AsyncCallback<List<V2WikiHeader>> callback) {
+		getV2WikiHeaderTree(ownerId, ownerType, callback, 0, new ArrayList<V2WikiHeader>());
+	}
+	
+	private void getV2WikiHeaderTree(String ownerId, String ownerType,
+			AsyncCallback<List<V2WikiHeader>> finalCallback, int offset, List<V2WikiHeader> fullWikiHeaderList) {
+		// continue asking for v2 wiki headers until result is empty
+		String url = getRepoServiceUrl() + "/" +
+				ownerType.toLowerCase() + "/" + ownerId + WIKI_HEADER_TREE +
+				"?"+LIMIT_PARAMETER+LIMIT_50+"&"+OFFSET_PARAMETER+offset;
+		doGet(url, OBJECT_TYPE.PaginatedResultsV2WikiHeader, new AsyncCallback<List<V2WikiHeader>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				finalCallback.onFailure(caught);
+			}
+			@Override
+			public void onSuccess(List<V2WikiHeader> results) {
+				fullWikiHeaderList.addAll(results);
+				if (results.isEmpty() || results.size() < LIMIT_50) {
+					finalCallback.onSuccess(fullWikiHeaderList);
+				} else {
+					getV2WikiHeaderTree(ownerId, ownerType, finalCallback, offset+LIMIT_50, fullWikiHeaderList);
+				}
+			}
+		});
+	}
+	
+	public void createEntity(Entity entity, AsyncCallback<Entity> cb) {
+		String url = getRepoServiceUrl() + ENTITY;
+		doPost(url, entity, OBJECT_TYPE.Entity, cb);
 	}
 }
 

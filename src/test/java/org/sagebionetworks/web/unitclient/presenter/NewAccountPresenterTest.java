@@ -13,7 +13,6 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.principal.AccountCreationToken;
@@ -30,7 +29,6 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.NewAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.NewAccountView;
-import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.place.shared.Place;
@@ -46,8 +44,6 @@ public class NewAccountPresenterTest {
 	SynapseClientAsync mockSynapseClient;
 	AuthenticationController mockAuthController;
 	PlaceChanger mockPlaceChanger;
-	@Mock
-	PasswordStrengthWidget mockPasswordStrengthWidget;
 
 	String testSessionToken = "1239381foobar";
 	@Before
@@ -60,7 +56,7 @@ public class NewAccountPresenterTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockAuthController = mock(AuthenticationController.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
-		newAccountPresenter = new NewAccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockUserService, mockAuthController, mockPasswordStrengthWidget);
+		newAccountPresenter = new NewAccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockUserService, mockAuthController);
 		verify(mockView).setPresenter(newAccountPresenter);
 		
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_NAME.toString()), any(AsyncCallback.class));

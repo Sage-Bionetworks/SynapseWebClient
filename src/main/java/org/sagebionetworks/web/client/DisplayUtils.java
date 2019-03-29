@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.Image;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalBody;
 import org.gwtbootstrap3.client.ui.ModalFooter;
@@ -37,9 +38,7 @@ import org.gwtbootstrap3.extras.animate.client.ui.constants.Animation;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.gwtbootstrap3.extras.bootbox.client.options.DialogOptions;
-import org.gwtbootstrap3.extras.notify.client.constants.NotifyIconType;
 import org.gwtbootstrap3.extras.notify.client.constants.NotifyPlacement;
-import org.gwtbootstrap3.extras.notify.client.constants.NotifyPosition;
 import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
@@ -62,7 +61,6 @@ import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
@@ -71,7 +69,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.NodeList;
@@ -116,9 +113,13 @@ public class DisplayUtils {
 	};
 	public static final ClickHandler DO_NOTHING_CLICKHANDLER = event -> {
 		if (!DisplayUtils.isAnyModifierKeyDown(event)) {
-			event.preventDefault();	
+			if (event != null) {
+				event.preventDefault();	
+			}
 		} else {
-			event.stopPropagation();
+			if (event != null) {
+				event.stopPropagation();	
+			}
 		}
 	};
 	
@@ -309,84 +310,6 @@ public class DisplayUtils {
 	
 	public static void showErrorMessage(String title, String message) {
 		showPopup(title, message, MessagePopup.WARNING, null, null);
-	}
-
-	/**
-	 * @param t
-	 * @param jiraHelper
-	 * @param profile
-	 * @param friendlyErrorMessage
-	 *            (optional)
-	 */
-	public static void showErrorMessage(final Throwable t,
-			final JiraURLHelper jiraHelper, boolean isLoggedIn,
-			String friendlyErrorMessage) {
-		SynapseJSNIUtilsImpl._consoleError(getStackTrace(t));
-		if (!isLoggedIn) {
-			showErrorMessage(t.getMessage());
-			return;
-		}
-		final Modal d = new Modal();
-		d.addStyleName("padding-5");
-
-		final String errorMessage = friendlyErrorMessage == null ? t.getMessage() : friendlyErrorMessage;
-		Icon errorIcon = new Icon(IconType.EXCLAMATION_CIRCLE);
-		errorIcon.setSize(org.gwtbootstrap3.client.ui.constants.IconSize.TIMES3);
-		errorIcon.setPull(Pull.LEFT);
-		errorIcon.addStyleName("margin-right-10");
-		HTML errorContent = new HTML(errorMessage);
-		ModalBody dialogContent = new ModalBody();
-		dialogContent.addStyleName("margin-10");
-		dialogContent.add(errorIcon);
-		dialogContent.add(errorContent);
-
-		// create text area for steps
-		FlowPanel formGroup = new FlowPanel();
-		formGroup.addStyleName("form-group margin-top-30");
-		formGroup.add(new HTML("<label>Describe the problem (optional)</label>"));
-		final TextArea textArea = new TextArea();
-		textArea.addStyleName("form-control");
-		textArea.getElement().setAttribute("placeholder","Steps to reproduce the error");
-		textArea.getElement().setAttribute("rows", "4");
-		formGroup.add(textArea);
-		dialogContent.add(formGroup);
-		d.add(dialogContent);
-		d.setSize(ModalSize.LARGE);
-		d.setTitle("Synapse Error");
-		Button sendBugButton = new Button(DisplayConstants.SEND_BUG_REPORT, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				jiraHelper.createIssueOnBackend(textArea.getValue(), t,
-						errorMessage, new AsyncCallback<String>() {
-							@Override
-							public void onSuccess(String result) {
-								d.hide();
-								showInfo("Report sent. Thank you!");
-							}
-
-							@Override
-							public void onFailure(Throwable caught) {
-								// failure to create issue!
-								DisplayUtils.showErrorMessage(DisplayConstants.ERROR_GENERIC_NOTIFY+"\n" 
-								+ caught.getMessage() +"\n\n"
-								+ textArea.getValue());
-							}
-						});
-			}
-		});
-		sendBugButton.setType(org.gwtbootstrap3.client.ui.constants.ButtonType.PRIMARY);
-		Button doNotSendBugButton = new Button(DisplayConstants.DO_NOT_SEND_BUG_REPORT, new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				d.hide();
-			}
-		});
-		ModalFooter footer = new ModalFooter();
-		footer.add(doNotSendBugButton);
-		footer.add(sendBugButton);
-		d.add(footer);;
-		d.show();
 	}
 	
 	public static void showInfoDialog(
@@ -900,25 +823,6 @@ public class DisplayUtils {
 		public void onSelected(T selected);		
 	}
 	
-	public static Widget getShareSettingsDisplay(boolean isPublic, SynapseJSNIUtils synapseJSNIUtils) {
-		final SimplePanel lc = new SimplePanel();
-		lc.addStyleName(STYLE_DISPLAY_INLINE);
-		String styleName = isPublic ? "public-acl-image" : "private-acl-image";
-		String description = isPublic ? DisplayConstants.PUBLIC_ACL_ENTITY_PAGE : DisplayConstants.PRIVATE_ACL_ENTITY_PAGE;
-		String tooltip = isPublic ? DisplayConstants.PUBLIC_ACL_DESCRIPTION : DisplayConstants.PRIVATE_ACL_DESCRIPTION;
-
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant("<div class=\"" + styleName+ "\" style=\"display:inline; position:absolute\"></div>");
-		shb.appendHtmlConstant("<span style=\"margin-left: 20px;\">"+description+"</span>");
-
-		//form the html
-		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
-		htmlPanel.addStyleName("inline-block");
-		lc.add(DisplayUtils.addTooltip(htmlPanel, tooltip, Placement.BOTTOM));
-
-		return lc;
-	}
-	
 	public static void updateWidgetSelectionState(WidgetSelectionState state, String text, int cursorPos) {
 		state.setWidgetSelected(false);
 		state.setWidgetStartIndex(-1);
@@ -1046,44 +950,6 @@ public class DisplayUtils {
 		return null;
 	}
 	
-	public static FlowPanel getMediaObject(String heading, String description, ClickHandler clickHandler, String pictureUri, boolean defaultPictureSinglePerson, int headingLevel) {
-		FlowPanel panel = new FlowPanel();
-		panel.addStyleName("media");
- 		String linkStyle = "";
- 		if (clickHandler != null)
- 			linkStyle = "link";
- 		HTML headingHtml = new HTML("<h"+headingLevel+" class=\"media-heading "+linkStyle+"\">" + SafeHtmlUtils.htmlEscape(heading) + "</h"+headingLevel+">");
- 		if (clickHandler != null)
- 			headingHtml.addClickHandler(clickHandler);
- 
- 		if (pictureUri != null) {
- 			FitImage profilePicture = new FitImage(pictureUri, 64, 64);
- 			profilePicture.addStyleName("pull-left media-object imageButton");
- 			if (clickHandler != null)
- 				profilePicture.addClickHandler(clickHandler);
- 			panel.add(profilePicture);
- 		} else {
- 			//display default picture
- 			IconType type = defaultPictureSinglePerson ? IconType.SYN_USER : IconType.SYN_USERS;
- 			String clickableButtonCssClass = clickHandler != null ? "imageButton" : "";
- 			Icon profilePicture = new Icon(type);
- 			profilePicture.addStyleName(" font-size-58 padding-2 " + clickableButtonCssClass + " userProfileImage lightGreyText margin-0-imp-before");
- 			Div profilePictureWrapper = new Div();
- 			profilePictureWrapper.addStyleName("pull-left media-object displayInline ");
- 			profilePictureWrapper.add(profilePicture);
- 			if (clickHandler != null)
- 				profilePicture.addClickHandler(clickHandler);
- 			panel.add(profilePictureWrapper);
- 		}
- 		FlowPanel mediaBodyPanel = new FlowPanel();
- 		mediaBodyPanel.addStyleName("media-body");
- 		mediaBodyPanel.add(headingHtml);
- 		if (description != null)
- 			mediaBodyPanel.add(new HTML(description));
- 		panel.add(mediaBodyPanel);
- 		return panel;
-	}
-	
 	public static String getShareMessage(String displayName, String entityId, String hostUrl) {
 		return displayName + DisplayConstants.SHARED_ON_SYNAPSE + ":\n"+hostUrl+"#!Synapse:"+entityId+"\n";
 	}
@@ -1189,6 +1055,9 @@ public class DisplayUtils {
 	}
 	
 	public static boolean isAnyModifierKeyDown(ClickEvent event) {
+		if (event == null) {
+			return false;
+		}
 		return event.isAltKeyDown() || event.isControlKeyDown() || event.isMetaKeyDown() || event.isShiftKeyDown();
 	}
 	public static String capitalize(String s) {

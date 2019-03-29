@@ -19,10 +19,10 @@
 
 	<g:HTMLPanel>
 		<h2>Coming Soon</h2>
-		
+		<bh:Div ui:field="reactWidget" />
 		<b:Button ui:field="testDownloadSpeedButton" text="Test Download Speed" />
 		<b:Heading size="H3" ui:field="downloadSpeedResult"/>
-		<bh:Div ui:field="reactWidget" />
+		
 		<g:FlowPanel addStyleNames="margin-bottom-60 margin-top-100">
 			<w:HelpWidget text="Optional help link text" helpMarkdown="This contains basic help." href="http://link/to/more/help" placement="BOTTOM" />
 			<w:HelpWidget helpMarkdown="This contains **very basic** markdown, perhaps with a [link](http://www.jayhodgson.com)."/>

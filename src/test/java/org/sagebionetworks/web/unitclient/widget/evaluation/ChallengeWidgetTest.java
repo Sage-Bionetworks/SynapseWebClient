@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.evaluation;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -8,31 +9,40 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.HashMap;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidget;
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidgetView;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ChallengeWidgetTest {
 	
 	ChallengeWidget widget;
 	@Mock
 	ChallengeWidgetView mockView;
+	@Mock
+	SubmitToEvaluationWidget submitToChallengeWidget;
 	@Mock
 	ChallengeClientAsync mockChallengeClient;
 	@Mock
@@ -43,6 +53,8 @@ public class ChallengeWidgetTest {
 	Challenge mockChallenge;
 	@Mock
 	SelectTeamModal mockSelectTeamModal;
+	@Captor
+	ArgumentCaptor<HashMap> hashmapCaptor;
 	
 	public static final String PARTICIPANT_TEAM_ID = "1234567890";
 	public static final String CHALLENGE_ID = "45678";
@@ -50,8 +62,7 @@ public class ChallengeWidgetTest {
 	
 	@Before
 	public void setup() throws Exception{
-		MockitoAnnotations.initMocks(this);
-		widget = new ChallengeWidget(mockView, mockChallengeClient, mockSynAlert, mockTeamBadge, mockSelectTeamModal);
+		widget = new ChallengeWidget(mockView, mockChallengeClient, mockSynAlert, mockTeamBadge, mockSelectTeamModal, submitToChallengeWidget);
 		
 		AsyncMockStubber.callSuccessWith(mockChallenge).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
 		when(mockChallenge.getId()).thenReturn(CHALLENGE_ID);
@@ -76,6 +87,9 @@ public class ChallengeWidgetTest {
 		inOrder.verify(mockView).setChallengeVisible(false);
 		inOrder.verify(mockView).setChallengeVisible(true);
 		verify(mockView).setChallengeId(CHALLENGE_ID);
+		// submit to challenge widget has been configured
+		verify(submitToChallengeWidget).configure(any(), hashmapCaptor.capture(), any(), any());
+		assertEquals(CHALLENGE_ID, hashmapCaptor.getValue().get(WidgetConstants.CHALLENGE_ID_KEY));
 	}
 	
 	@Test

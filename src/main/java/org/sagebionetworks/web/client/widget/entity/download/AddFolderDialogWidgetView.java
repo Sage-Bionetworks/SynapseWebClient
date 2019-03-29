@@ -15,7 +15,6 @@ public interface AddFolderDialogWidgetView extends IsWidget {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		void updateFolderName(String newFolderName);
-		void deleteFolder(boolean skipTrashCan);
+		void createFolder(String newFolderName);
 	}
 }

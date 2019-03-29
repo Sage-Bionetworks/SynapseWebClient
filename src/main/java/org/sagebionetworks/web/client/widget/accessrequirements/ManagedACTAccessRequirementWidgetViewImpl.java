@@ -68,6 +68,8 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 	@UiField
 	Div requestAccessButtonContainer;
 	@UiField
+	Div iduReportButtonContainer;
+	@UiField
 	Span expirationUI;
 	@UiField
 	Text expirationDateText;
@@ -261,5 +263,10 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 	@Override
 	public void showLoginButton() {
 		loginButton.setVisible(true);	
+	}
+	@Override
+	public void setIDUReportButton(IsWidget w) {
+		iduReportButtonContainer.clear();
+		iduReportButtonContainer.add(w);
 	}
 }

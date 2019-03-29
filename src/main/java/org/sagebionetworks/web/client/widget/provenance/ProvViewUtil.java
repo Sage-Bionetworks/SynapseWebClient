@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
@@ -15,7 +16,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView.Presenter;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -29,8 +29,6 @@ import org.sagebionetworks.web.shared.provenance.ExternalGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -83,7 +81,6 @@ public class ProvViewUtil {
 				label.add(new HTML(DisplayUtils.stubStrPartialWord(node.getActivityName(), MAX_ACT_CODE_NAME_CHAR)));
 			}
 			UserBadge badge = ginInjector.getUserBadgeWidget();
-			badge.setMaxNameLength(MAX_DISPLAY_NAME_CHAR);
 			badge.configure(node.getModifiedBy());
 			HTML time = new HTML(ginInjector.getDateTimeUtils().getLongFriendlyDate(node.getModifiedOn()));
 			time.addStyleName(PROV_ACTIVITY_TIME_STYLE);
@@ -112,19 +109,18 @@ public class ProvViewUtil {
 		return container;
 	}
 	
-	public static ProvNodeContainer createExpandContainer(final ExpandGraphNode node, final SageImageBundle sageImageBundle, final Presenter presenter, final ProvenanceWidgetView view) {
-		SafeHtmlBuilder builder = new SafeHtmlBuilder();		
-		builder.appendHtmlConstant(AbstractImagePrototype.create(sageImageBundle.expand()).getHTML());
-		
+	public static ProvNodeContainer createExpandContainer(final ExpandGraphNode node, final Presenter presenter, final ProvenanceWidgetView view) {
 		final Anchor link = new Anchor();
-		link.add(new HTML(builder.toSafeHtml()));
-		link.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				link.clear();
-				link.add(DisplayUtils.getSmallLoadingWidget());
-				presenter.expand(node);
-			}
+		link.addStyleName("textDecorationNone");
+		Span sp = new Span("&#8230;"); //ellipsis
+		sp.addStyleName("moveup-8");
+		sp.setPaddingLeft(10); //expand clickable area
+		sp.setPaddingRight(10);
+		link.add(sp);
+		link.addClickHandler(event -> {
+			link.clear();
+			link.add(DisplayUtils.getSmallLoadingWidget());
+			presenter.expand(node);
 		});
 		
 		ProvNodeContainer container = new ProvNodeContainer();

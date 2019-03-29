@@ -9,6 +9,6 @@
 <bh:Span>
 	    <bh:Span ui:field="synAlertContainer"/>
 	    <bh:Span ui:field="doiLabel" addStyleNames="boldText margin-right-5" text="DOI: " visible="false"/>
-		<w:TextBoxWithCopyToClipboardWidget ui:field="copyToClipboardWidget" icon="CLIPBOARD" width="170px"/>
+		<w:TextBoxWithCopyToClipboardWidget ui:field="copyToClipboardWidget" width="170px"/>
 	</bh:Span>
 </ui:UiBinder>

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
+import java.util.HashMap;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormControlStatic;
 import org.gwtbootstrap3.client.ui.Panel;
@@ -11,11 +13,11 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.WidgetConstants;
 
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -42,7 +44,8 @@ public class EvaluationRowWidget implements IsWidget {
 	FormControlStatic createdOnDiv;
 	@UiField
 	Div createdByDiv;
-	
+	@UiField
+	Div submitToEvaluationContainer;
 	@UiField
 	Panel quotaUI;
 	@UiField
@@ -61,6 +64,7 @@ public class EvaluationRowWidget implements IsWidget {
 	private static Binder uiBinder = GWT.create(Binder.class);
 	private Evaluation evaluation;
 	private EvaluationActionHandler handler;
+	SubmitToEvaluationWidget submitToEvaluationButton;
 	private DateTimeUtils dateTimeUtils;
 	
 	public interface EvaluationActionHandler {
@@ -70,35 +74,28 @@ public class EvaluationRowWidget implements IsWidget {
 	}
 	
 	@Inject
-	public EvaluationRowWidget(UserBadge userBadge, DateTimeUtils dateTimeUtils) {
+	public EvaluationRowWidget(UserBadge userBadge, DateTimeUtils dateTimeUtils, SubmitToEvaluationWidget submitToEvaluationButton) {
 		this.userBadge = userBadge;
 		this.dateTimeUtils= dateTimeUtils;
+		this.submitToEvaluationButton = submitToEvaluationButton;
 		widget = uiBinder.createAndBindUi(this);
-		shareButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				handler.onShareClicked(evaluation);
-			}
+		shareButton.addClickHandler(event -> {
+			handler.onShareClicked(evaluation);
 		});
-		editButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				handler.onEditClicked(evaluation);
-			}
+		editButton.addClickHandler(event -> {
+			handler.onEditClicked(evaluation);
 		});
-		deleteButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.showConfirmDialog("Delete Evaluation Queue?", DisplayConstants.CONFIRM_DELETE_EVAL_QUEUE + evaluation.getName(), 
-					new Callback() {
-						@Override
-						public void invoke() {
-							handler.onDeleteClicked(evaluation);
-						}
-					});
-			}
+		deleteButton.addClickHandler(event -> {
+			DisplayUtils.showConfirmDialog("Delete Evaluation Queue?", DisplayConstants.CONFIRM_DELETE_EVAL_QUEUE + evaluation.getName(), 
+				new Callback() {
+					@Override
+					public void invoke() {
+						handler.onDeleteClicked(evaluation);
+					}
+				});
 		});
 		createdByDiv.add(userBadge);
+		submitToEvaluationContainer.add(submitToEvaluationButton);
 	}
 	
 	public void configure(Evaluation evaluation, EvaluationActionHandler handler) {
@@ -127,6 +124,11 @@ public class EvaluationRowWidget implements IsWidget {
 				roundDurationField.setText(quota.getRoundDurationMillis().toString());	
 			}
 		}
+		HashMap<String, String> submitToEvaluationParams = new HashMap<>();
+		String subchallengeList = evaluation.getId();
+		submitToEvaluationParams.put(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY, subchallengeList);
+		submitToEvaluationParams.put(WidgetConstants.BUTTON_TEXT_KEY, "Submit");
+		submitToEvaluationButton.configure(null, submitToEvaluationParams, null, null);
 	}
 	
 	@Override

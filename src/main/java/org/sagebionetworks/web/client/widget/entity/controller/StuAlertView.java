@@ -18,19 +18,7 @@ public interface StuAlertView extends IsWidget {
 	 */
 	void clearState();
 	
-	void setPresenter(Presenter p);
-
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void onRequestAccess();
-	}
-
 	void show403();
-	void showRequestAccessUI();
-	void hideRequestAccessUI();
-	void showRequestAccessButtonLoading();
 	void show404();
 	
 	void setSynAlert(Widget w);

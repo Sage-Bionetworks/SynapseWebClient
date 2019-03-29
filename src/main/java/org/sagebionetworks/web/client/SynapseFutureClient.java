@@ -20,8 +20,8 @@ public class SynapseFutureClient {
 		fixServiceEntryPoint(synapseClient);
 	}
 
-	public FluentFuture<SignedTokenInterface> hexDecodeAndDeserialize(String tokenTypeName, String signedTokenString) {
-		Consumer<AsyncCallback<SignedTokenInterface>> closure = cb -> synapseClient.hexDecodeAndDeserialize(tokenTypeName, signedTokenString, cb);
+	public FluentFuture<SignedTokenInterface> hexDecodeAndDeserialize(String signedTokenString) {
+		Consumer<AsyncCallback<SignedTokenInterface>> closure = cb -> synapseClient.hexDecodeAndDeserialize(signedTokenString, cb);
 		return FutureUtils.getFuture(closure);
 	}
 }

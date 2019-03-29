@@ -2,9 +2,9 @@ package org.sagebionetworks.web.client.widget.entity.act;
 
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.InlineCheckBox;
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dataaccess.AccessType;
 import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -27,7 +27,7 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 	public interface UserBadgeItemUiBinder extends UiBinder<Widget, UserBadgeItem> {}
 	
 	@UiField
-	InlineCheckBox select;
+	CheckBox select;
 	@UiField
 	Div userBadgeContainer;
 	@UiField
@@ -84,7 +84,7 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 		userBadgeContainer.addStyleName("strikeout-links lightgrey-links");
 	}
 	
-	public UserBadgeItem configure(AccessorChange change) {
+	public UserBadgeItem configure(AccessorChange change, UserProfile profile) {
 		userId = change.getUserId();
 		accessType = change.getType();
 		boolean isGainAccess = AccessType.GAIN_ACCESS.equals(accessType);
@@ -104,7 +104,11 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 		}
 		
 		UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
-		userBadge.configure(userId);
+		if (profile != null) {
+			userBadge.configure(profile);
+		} else {
+			userBadge.configure(userId);	
+		}
 		userBadge.setSize(BadgeSize.DEFAULT);
 		userBadge.setCustomClickHandler(new ClickHandler() {
 			@Override
@@ -123,6 +127,9 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 		userBadgeContainer.add(w.asWidget());
 		
 		return this;
+	}
+	public UserBadgeItem configure(AccessorChange change) {
+		return configure(change, null);
 	}
 	
 	public UserBadgeItem setSelectionChangedCallback(Callback callback) {
@@ -143,7 +150,7 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 	public void setSelectVisible(boolean visible) {
 		select.setVisible(visible);
 		if (!visible) {
-			userBadgeContainer.setMarginLeft(20);
+			userBadgeContainer.setMarginLeft(27);
 		}
 	}
 	

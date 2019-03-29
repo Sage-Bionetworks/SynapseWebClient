@@ -10,10 +10,13 @@ import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
 
+import java.util.Collections;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
@@ -27,107 +30,159 @@ import org.sagebionetworks.web.client.SynapseFutureClient;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.EmailInvitationPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.EmailInvitationView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EmailInvitationPresenterTest {
-	@Mock private EmailInvitationView view;
-	@Mock private SynapseJavascriptClient jsClient;
+	public static final String CURRENT_USER_ID = "987387483";
+	@Mock private EmailInvitationView mockView;
+	@Mock private SynapseJavascriptClient mockJsClient;
 	@Mock private SynapseFutureClient futureClient;
-	@Mock private SynapseAlert synapseAlert;
-	@Mock private AuthenticationController authController;
-	@Mock private GlobalApplicationState globalApplicationState;
-	@Mock private PlaceChanger placeChanger;
+	@Mock private SynapseAlert mockSynapseAlert;
+	@Mock private AuthenticationController mockAuthController;
+	@Mock private GlobalApplicationState mockGlobalApplicationState;
+	@Mock private PlaceChanger mockPlaceChanger;
 	@Mock private EmailInvitation place;
-	@Mock private InviteeVerificationSignedToken inviteeVerificationSignedToken;
-	@Mock private MembershipInvitation mis;
-	@Mock private Team team;
-	@Mock private UserProfile inviterProfile;
-
+	@Mock private InviteeVerificationSignedToken mockInviteeVerificationSignedToken;
+	@Mock private MembershipInvitation mockMembershipInvitation;
+	@Mock private Team mockTeam;
+	@Mock private UserProfile mockInviterProfile;
+	@Mock private UserProfile mockCurrentUserProfile;
+	@Captor private ArgumentCaptor<Profile> placeCaptor;
 	private EmailInvitationPresenter presenter;
 	private String encodedMISignedToken;
 
 	@Before
 	public void before() {
-		when(globalApplicationState.getPlaceChanger()).thenReturn(placeChanger);
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		presenter = new EmailInvitationPresenter(
-				view, jsClient, futureClient, synapseAlert, authController, globalApplicationState);
+				mockView, mockJsClient, futureClient, mockSynapseAlert, mockAuthController, mockGlobalApplicationState);
 	}
 
 	public void beforeSetPlace(boolean loggedIn) {
-		when(authController.isLoggedIn()).thenReturn(loggedIn);
+		when(mockAuthController.isLoggedIn()).thenReturn(loggedIn);
 		encodedMISignedToken = "encodedToken";
 		when(place.toToken()).thenReturn(encodedMISignedToken);
 		MembershipInvtnSignedToken decodedToken = new MembershipInvtnSignedToken();
-		when(futureClient.hexDecodeAndDeserialize(anyString(), eq(encodedMISignedToken))).thenReturn(getDoneFuture(decodedToken));
-		when(jsClient.getMembershipInvitation(decodedToken)).thenReturn(getDoneFuture(mis));
-		when(mis.getId()).thenReturn("misId");
-		when(mis.getInviteeEmail()).thenReturn("invitee@email.com");
-		when(mis.getTeamId()).thenReturn("teamId");
-		when(mis.getCreatedBy()).thenReturn("createdBy");
-		when(mis.getMessage()).thenReturn("message");
+		when(futureClient.hexDecodeAndDeserialize(eq(encodedMISignedToken))).thenReturn(getDoneFuture(decodedToken));
+		when(mockJsClient.getMembershipInvitation(decodedToken)).thenReturn(getDoneFuture(mockMembershipInvitation));
+		when(mockMembershipInvitation.getId()).thenReturn("misId");
+		String email = "invitee@email.com";
+		when(mockMembershipInvitation.getInviteeEmail()).thenReturn(email);
+		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(CURRENT_USER_ID);
+		when(mockAuthController.getCurrentUserProfile()).thenReturn(mockCurrentUserProfile);
+		when(mockCurrentUserProfile.getEmails()).thenReturn(Collections.singletonList(email));
+		when(mockMembershipInvitation.getTeamId()).thenReturn("teamId");
+		when(mockMembershipInvitation.getCreatedBy()).thenReturn("createdBy");
+		when(mockMembershipInvitation.getMessage()).thenReturn("message");
 	}
 
 	@Test
-	public void testLoggedIn() {
+	public void testLoggedInEmailOwner() {
 		beforeSetPlace(true);
-		when(jsClient.getInviteeVerificationSignedToken(mis.getId())).thenReturn(getDoneFuture(inviteeVerificationSignedToken));
-		when(jsClient.updateInviteeId(inviteeVerificationSignedToken)).thenReturn(getDoneFuture(null));
+		when(mockJsClient.getInviteeVerificationSignedToken(mockMembershipInvitation.getId())).thenReturn(getDoneFuture(mockInviteeVerificationSignedToken));
+		when(mockJsClient.updateInviteeId(mockInviteeVerificationSignedToken)).thenReturn(getDoneFuture(null));
+		
 		presenter.setPlace(place);
-		verify(jsClient).getInviteeVerificationSignedToken(mis.getId());
-		verify(jsClient).updateInviteeId(inviteeVerificationSignedToken);
-		ArgumentCaptor<org.sagebionetworks.web.client.place.Team> captor = ArgumentCaptor.forClass(org.sagebionetworks.web.client.place.Team.class);
-		verify(placeChanger).goTo(captor.capture());
-		assertEquals(mis.getTeamId(), captor.getValue().getTeamId());
+		
+		verify(mockJsClient).getInviteeVerificationSignedToken(mockMembershipInvitation.getId());
+		verify(mockJsClient).updateInviteeId(mockInviteeVerificationSignedToken);
+		ArgumentCaptor<org.sagebionetworks.web.client.place.Profile> captor = ArgumentCaptor.forClass(org.sagebionetworks.web.client.place.Profile.class);
+		verify(mockPlaceChanger).goTo(captor.capture());
+		Profile profilePlace = captor.getValue();
+		assertEquals(CURRENT_USER_ID, profilePlace.getUserId());
+		assertEquals(ProfileArea.TEAMS, profilePlace.getArea());
 	}
 
+	@Test
+	public void testLoggedInNotEmailOwner() {
+		//currently logged in user does currently own the given email address, binding Synapse account to invitation will fail
+		beforeSetPlace(true);
+		when(mockJsClient.getInviteeVerificationSignedToken(mockMembershipInvitation.getId())).thenReturn(getFailedFuture(new ForbiddenException()));
+		when(mockJsClient.updateInviteeId(mockInviteeVerificationSignedToken)).thenReturn(getDoneFuture(null));
+
+		presenter.setPlace(place);
+
+		//uses this call to verify authenticated user is associated to the membership invitation email
+		verify(mockJsClient).getInviteeVerificationSignedToken(anyString());
+		//does not attempt to bind invitation to the current user
+		verify(mockJsClient, never()).updateInviteeId(mockInviteeVerificationSignedToken);
+		//instead, in this edge case we send the currently logged in user their settings place to add the new email address
+		verify(mockPlaceChanger).goTo(placeCaptor.capture());
+		Profile profilePlace = placeCaptor.getValue();
+		assertEquals(CURRENT_USER_ID, profilePlace.getUserId());
+		assertEquals(ProfileArea.SETTINGS, profilePlace.getArea());
+	}
+
+	@Test
+	public void testLoggedInInviteHasUserID() {
+		//currently logged in user has ID matching invitation (that has already been bound, so it has a user ID!)
+		beforeSetPlace(true);
+		when(mockMembershipInvitation.getInviteeId()).thenReturn(CURRENT_USER_ID);
+		when(mockMembershipInvitation.getInviteeEmail()).thenReturn(null);
+		when(mockJsClient.getInviteeVerificationSignedToken(mockMembershipInvitation.getId())).thenReturn(getDoneFuture(mockInviteeVerificationSignedToken));
+
+		presenter.setPlace(place);
+
+		//does not attempt to bind invitation to the current user (since that's already done
+		verify(mockJsClient, never()).getInviteeVerificationSignedToken(anyString());
+		verify(mockJsClient, never()).updateInviteeId(mockInviteeVerificationSignedToken);
+		
+		verify(mockPlaceChanger).goTo(placeCaptor.capture());
+		Profile profilePlace = placeCaptor.getValue();
+		assertEquals(CURRENT_USER_ID, profilePlace.getUserId());
+		assertEquals(ProfileArea.TEAMS, profilePlace.getArea());
+	}
 	@Test
 	public void testNotLoggedIn() {
 		beforeSetPlace(false);
-		when(jsClient.getTeam(mis.getTeamId())).thenReturn(getDoneFuture(team));
-		when(team.getName()).thenReturn("teamName");
-		when(jsClient.getUserProfile(mis.getCreatedBy())).thenReturn(getDoneFuture(inviterProfile));
-		when(inviterProfile.getFirstName()).thenReturn("First");
-		when(inviterProfile.getLastName()).thenReturn("Last");
-		when(inviterProfile.getUserName()).thenReturn("Nick");
+		when(mockJsClient.getTeam(mockMembershipInvitation.getTeamId())).thenReturn(getDoneFuture(mockTeam));
+		when(mockTeam.getName()).thenReturn("teamName");
+		when(mockJsClient.getUserProfile(mockMembershipInvitation.getCreatedBy())).thenReturn(getDoneFuture(mockInviterProfile));
+		when(mockInviterProfile.getFirstName()).thenReturn("First");
+		when(mockInviterProfile.getLastName()).thenReturn("Last");
+		when(mockInviterProfile.getUserName()).thenReturn("Nick");
 		
 		presenter.setPlace(place);
-		verify(view).setSynapseAlertContainer(synapseAlert.asWidget());
-		verify(view).showNotLoggedInUI();
+		verify(mockView).setSynapseAlertContainer(mockSynapseAlert.asWidget());
+		verify(mockView).showNotLoggedInUI();
 		
 		presenter.onRegisterClick();
 		ArgumentCaptor<RegisterAccount> captor = ArgumentCaptor.forClass(RegisterAccount.class);
-		verify(placeChanger).goTo(captor.capture());
+		verify(mockPlaceChanger).goTo(captor.capture());
 		assertEquals("invitee@email.com", captor.getValue().toToken());
 	}
 
 	@Test
 	public void testInvalidSignedToken() {
 		beforeSetPlace(false);
-		when(futureClient.hexDecodeAndDeserialize(anyString(), eq(encodedMISignedToken))).thenReturn(getFailedFuture());
+		when(futureClient.hexDecodeAndDeserialize(eq(encodedMISignedToken))).thenReturn(getFailedFuture());
 		presenter.setPlace(place);
-		verify(synapseAlert).handleException(any(Throwable.class));
-		verify(jsClient, never()).getMembershipInvitation(any());
+		verify(mockSynapseAlert).handleException(any(Throwable.class));
+		verify(mockJsClient, never()).getMembershipInvitation(any());
 	}
 
 	@Test
 	public void testLoggedInUserIsNotInvitee() {
 		beforeSetPlace(true);
-		when(jsClient.getInviteeVerificationSignedToken(mis.getId())).thenReturn(getFailedFuture());
+		when(mockJsClient.getInviteeVerificationSignedToken(mockMembershipInvitation.getId())).thenReturn(getFailedFuture());
 		presenter.setPlace(place);
-		verify(synapseAlert).handleException(any(Throwable.class));
-		verify(jsClient, never()).updateInviteeId(any());
+		verify(mockSynapseAlert).handleException(any(Throwable.class));
+		verify(mockJsClient, never()).updateInviteeId(any());
 	}
 
 	@Test
 	public void testOnLoginClick() {
 		presenter.onLoginClick();
 		ArgumentCaptor<LoginPlace> captor = ArgumentCaptor.forClass(LoginPlace.class);
-		verify(placeChanger).goTo(captor.capture());
+		verify(mockPlaceChanger).goTo(captor.capture());
 		assertEquals(LoginPlace.LOGIN_TOKEN, captor.getValue().toToken());
 	}
 }

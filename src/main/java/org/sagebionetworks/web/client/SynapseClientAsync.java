@@ -14,7 +14,6 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
@@ -55,11 +54,6 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 	
 public interface SynapseClientAsync {
-	void getEntityVersions(String entityId, int offset, int limit,
-			AsyncCallback<PaginatedResults<VersionInfo>> callback);
-
-	void search(SearchQuery searchQuery, AsyncCallback<SearchResults> callback);
- 	
 	void deleteEntityVersionById(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
 	void updateUserProfile(UserProfile userProfileJson, AsyncCallback<Void> callback);
@@ -101,9 +95,6 @@ public interface SynapseClientAsync {
 	void restoreV2WikiPage(String ownerId, String ownerType, String wikiId,
 			Long versionToUpdate, AsyncCallback<V2WikiPage> callback);
 	void deleteV2WikiPage(WikiPageKey key, AsyncCallback<Void> callback);
-	void getV2WikiHeaderTree(String ownerId, String ownerType,
-			AsyncCallback<List<V2WikiHeader>> callback);
-	void getV2WikiOrderHint(WikiPageKey key, AsyncCallback<V2WikiOrderHint> callback);
 	void getV2WikiAttachmentHandles(WikiPageKey key,
 			AsyncCallback<FileHandleResults> callback);
 	void getV2WikiHistory(WikiPageKey key, Long limit, Long offset,
@@ -150,13 +141,11 @@ public interface SynapseClientAsync {
 	void setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, AsyncCallback<String> callback);
 	void handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL, AsyncCallback<ResponseMessage> callback);
 	
-	void hexDecodeAndDeserialize(String tokenTypeName, String signedTokenString, AsyncCallback<SignedTokenInterface> callback);
+	void hexDecodeAndDeserialize(String signedTokenString, AsyncCallback<SignedTokenInterface> callback);
 
 	void hexDecodeAndDeserializeAccountCreationToken(String tokenString, AsyncCallback<AccountCreationToken> callback);
 
 	void getAPIKey(AsyncCallback<String> callback);
-
-	void getColumnModelsForTableEntity(String tableEntityId, AsyncCallback<List<ColumnModel>> asyncCallback);
 
 	void sendMessage(Set<String> recipients, String subject, String message, String hostPageBaseURL, AsyncCallback<String> callback);
 	void sendMessageToEntityOwner(String entityId, String subject, String messageBody, String hostPageBaseURL, AsyncCallback<String> callback);
@@ -193,9 +182,6 @@ public interface SynapseClientAsync {
 			AsyncCallback<PaginatedResults<TrashedEntity>> callback);
 
 	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds, AsyncCallback<Void> callback);
-
-	void createEntity(Entity entity,
-			AsyncCallback<Entity> callback);
 
 	void createFileHandleURL(String fileHandleId, AsyncCallback<String> callback);
 

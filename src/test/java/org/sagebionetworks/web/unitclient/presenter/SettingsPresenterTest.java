@@ -4,6 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -14,18 +18,23 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.repo.model.oauth.OAuthProvider;
+import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
+import org.sagebionetworks.repo.model.verification.VerificationState;
+import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
+import org.sagebionetworks.repo.model.verification.VerificationSubmission;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -33,6 +42,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -44,31 +54,41 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
 import org.sagebionetworks.web.client.widget.profile.EmailAddressesWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
-import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class SettingsPresenterTest {
-	
+	private static final String CURRENT_USER_ID = "94837";
 	private static final String APIKEY = "MYAPIKEY";
 	private static final String APIKEY2 = "MYAPIKEY2";
 	SettingsPresenter presenter;
+	@Mock
 	SettingsView mockView;
+	@Mock
 	AuthenticationController mockAuthenticationController;
+	@Mock
 	UserAccountServiceAsync mockUserService;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	PlaceChanger mockPlaceChanger;
+	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
 	GWTWrapper mockGWT;
+	@Mock
 	PortalGinInjector mockInjector;
+	@Mock
 	SynapseAlert mockSynAlert;
+	@Mock
 	UserProfileModalWidget mockUserProfileModalWidget;
 	UserProfile profile = new UserProfile();
 	String password = "password";
@@ -80,24 +100,21 @@ public class SettingsPresenterTest {
 	@Mock
 	SubscriptionListWidget mockSubscriptionListWidget;
 	@Mock
-	PasswordStrengthWidget mockPasswordStrengthWidget;
-	@Mock
 	EmailAddressesWidget mockEmailAddressesWidget;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	UserBundle mockUserBundle;
+	@Mock
+	PopupUtilsView mockPopupUtils;
+	List<VerificationState> verificationStateList;
+	@Mock
+	VerificationSubmissionWidget mockVerificationSubmissionModal;
+	@Mock
+	VerificationSubmission mockVerificationSubmission;
+	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
-		MockitoAnnotations.initMocks(this);
-		mockView = mock(SettingsView.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		mockUserService = mock(UserAccountServiceAsync.class);
-		mockPlaceChanger = mock(PlaceChanger.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockGWT = mock(GWTWrapper.class);
-		mockInjector = mock(PortalGinInjector.class);
-		mockSynAlert = mock(SynapseAlert.class);
-		mockUserProfileModalWidget = mock(UserProfileModalWidget.class);
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 		
 		presenter = new SettingsPresenter(
@@ -109,8 +126,8 @@ public class SettingsPresenterTest {
 				mockInjector, 
 				mockUserProfileModalWidget, 
 				mockSubscriptionListWidget,
-				mockPasswordStrengthWidget, 
-				mockEmailAddressesWidget, 
+				mockEmailAddressesWidget,
+				mockPopupUtils,
 				mockSynapseJavascriptClient);	
 		verify(mockView).setPresenter(presenter);
 		verify(mockView).setSubscriptionsListWidget(any(Widget.class));
@@ -118,8 +135,10 @@ public class SettingsPresenterTest {
 		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(profile);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(APIKEY).when(mockSynapseClient).getAPIKey(any(AsyncCallback.class));
-
 		AsyncMockStubber.callSuccessWith(profile).when(mockSynapseJavascriptClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).unbindOAuthProvidersUserId(any(OAuthProvider.class), anyString(), any(AsyncCallback.class));
+		when(mockUserBundle.getUserProfile()).thenReturn(profile);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(email).when(mockSynapseClient).getNotificationEmail(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setNotificationEmail(anyString(), any(AsyncCallback.class));
@@ -132,6 +151,19 @@ public class SettingsPresenterTest {
 		List<String> emails = new ArrayList<String>();
 		emails.add(email);
 		profile.setEmails(emails);
+		
+		when(mockUserBundle.getVerificationSubmission()).thenReturn(mockVerificationSubmission);
+		when(mockInjector.getVerificationSubmissionWidget()).thenReturn(mockVerificationSubmissionModal);
+		verificationStateList = new ArrayList<VerificationState>();
+		VerificationState oldState = new VerificationState();
+		oldState.setState(VerificationStateEnum.SUSPENDED);
+		oldState.setReason("numerous violations of the terms of use");
+		verificationStateList.add(oldState);
+		when(mockVerificationSubmission.getStateHistory()).thenReturn(verificationStateList);
+		when(mockVerificationSubmissionModal.setResubmitCallback(any(Callback.class))).thenReturn(mockVerificationSubmissionModal);
+		when(mockVerificationSubmissionModal.configure(any(VerificationSubmission.class), anyBoolean(), anyBoolean())).thenReturn(mockVerificationSubmissionModal);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(CURRENT_USER_ID);
 	}
 	
 	@Test
@@ -142,7 +174,6 @@ public class SettingsPresenterTest {
 		
 		presenter.resetPassword(password, newPassword);
 		verify(mockView).showPasswordChangeSuccess();
-		verify(mockPasswordStrengthWidget).setVisible(false);
 	}
 	
 	@Test
@@ -260,7 +291,6 @@ public class SettingsPresenterTest {
 		when(mockGlobalApplicationState.isShowingUTCTime()).thenReturn(false);
 		presenter.configure();
 		verify(mockSynAlert, times(3)).clear();
-		verify(mockPasswordStrengthWidget).setVisible(false);
 		verify(mockView).clear();
 		verify(mockSubscriptionListWidget).configure();
 		verify(mockView).updateNotificationCheckbox(profile);
@@ -278,7 +308,7 @@ public class SettingsPresenterTest {
 	@Test
 	public void testConfigureFailure() {
 		Exception ex = new Exception("error occurred");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		presenter.configure();
 		verify(mockView).clear();
 		verify(mockSubscriptionListWidget).configure();
@@ -400,5 +430,115 @@ public class SettingsPresenterTest {
 	public void testSetShowUTCTime() {
 		presenter.setShowUTCTime(true);
 		verify(mockGlobalApplicationState).setShowUTCTime(true);
+	}
+	
+	private void setupVerificationState(VerificationStateEnum s, String reason) {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		VerificationState state = new VerificationState();
+		state.setState(s);
+		state.setReason(reason);
+		verificationStateList.add(state);
+	}
+
+	@Test
+	public void testVerificationUIInitRejectedIsOwner() {
+		setupVerificationState(VerificationStateEnum.REJECTED, "bad behavior");
+		when(mockUserBundle.getIsVerified()).thenReturn(false);
+		
+		presenter.configure();
+		
+		verify(mockView).setVerificationRejectedButtonVisible(true);
+		verify(mockView).setResubmitVerificationButtonVisible(true);
+	}
+	
+	@Test
+	public void testVerificationUIInitSuspendedIsOwner() {
+		setupVerificationState(VerificationStateEnum.SUSPENDED, "missing documents");
+		when(mockUserBundle.getIsVerified()).thenReturn(false);
+		
+		presenter.configure();
+		
+		verify(mockView).setVerificationSuspendedButtonVisible(true);
+		verify(mockView).setResubmitVerificationButtonVisible(true);
+	}
+	
+	@Test
+	public void testVerificationUIInitApproved() {
+		setupVerificationState(VerificationStateEnum.APPROVED, null);
+		
+		String fName = "Luke";
+		String lName = "Skywalker";
+		String company = "Rebel Alliance";
+		String orcId = "http://orcid/address";
+		String location= "Jundland Wastes, Tatooine";
+		String friendlyDate= "October 2nd";
+		when(mockVerificationSubmission.getFirstName()).thenReturn(fName);
+		when(mockVerificationSubmission.getLastName()).thenReturn(lName);
+		when(mockVerificationSubmission.getCompany()).thenReturn(company);
+		when(mockVerificationSubmission.getOrcid()).thenReturn(orcId);
+		when(mockVerificationSubmission.getLocation()).thenReturn(location);
+		
+		presenter.configure();
+		
+		//user bundle reported that target user is verified
+		verify(mockView).setVerificationDetailsButtonVisible(true);
+	}
+	
+	@Test
+	public void testNewVerificationSubmissionClicked() {
+		//view my own profile.  submit a new verification submission, verify that modal is shown
+		when(mockVerificationSubmissionModal.configure(any(UserProfile.class), anyString(), anyBoolean(), anyList())).thenReturn(mockVerificationSubmissionModal);
+		presenter.configure();
+		presenter.newVerificationSubmissionClicked();
+		verify(mockVerificationSubmissionModal).configure(any(UserProfile.class), anyString(), eq(true), eq(new ArrayList()));
+		verify(mockVerificationSubmissionModal).show();
+	}
+	
+	@Test
+	public void testNewVerificationSubmissionClickedWithExistingAttachments() {
+		//view my own profile.  submit a new verification submission, verify that modal is shown
+		String currentUserId = "94837";
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
+		AttachmentMetadata attachment = mock(AttachmentMetadata.class);
+		List<AttachmentMetadata> attachmentList = Collections.singletonList(attachment);
+		when(mockVerificationSubmission.getAttachments()).thenReturn(attachmentList);
+		when(mockVerificationSubmissionModal.configure(any(UserProfile.class), anyString(), anyBoolean(), anyList())).thenReturn(mockVerificationSubmissionModal);
+		presenter.configure();
+		presenter.newVerificationSubmissionClicked();
+		verify(mockVerificationSubmissionModal).configure(any(UserProfile.class), anyString(), eq(true), eq(attachmentList));
+		verify(mockVerificationSubmissionModal).show();
+	}
+	
+	@Test
+	public void testEditVerificationSubmissionClicked() {
+		//view my own profile.  submit a new verification submission, verify that modal is shown
+		String currentUserId = "94837";
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
+		presenter.configure();
+		presenter.editVerificationSubmissionClicked();
+		verify(mockVerificationSubmissionModal).configure(eq(mockVerificationSubmission), anyBoolean(), eq(true));
+		verify(mockVerificationSubmissionModal).setResubmitCallback(any(Callback.class));
+		verify(mockVerificationSubmissionModal).show();
+	}
+
+	@Test
+	public void testUnbindOrcId() {
+		presenter.configure();
+		presenter.unbindOrcIdAfterConfirmation();
+		//success message and page refresh
+		verify(mockView).showInfo(anyString());
+		verify(mockGlobalApplicationState).refreshPage();
+	}
+	
+	@Test
+	public void testUnbindOrcIdFailure() {
+		Exception ex = new Exception("bad things happened");
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).unbindOAuthProvidersUserId(any(OAuthProvider.class), anyString(), any(AsyncCallback.class));
+		presenter.configure();
+		presenter.unbindOrcIdAfterConfirmation();
+		//error is shown
+		verify(mockSynAlert).handleException(ex);
 	}
 }

@@ -38,6 +38,8 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	public static final SortBy DEFAULT_SORT_BY = SortBy.CREATED_ON;
 	public static final Direction DEFAULT_DIRECTION = Direction.DESC;
 	boolean isInitializing = false;
+	private List<String> idList = null;
+	
 	@Inject
 	public TableListWidget(
 			TableListWidgetView view,
@@ -71,12 +73,24 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 		loadData();
 	}
 
+	public void resetSynIdList() {
+		idList = null;
+	}
+	
+	public void addSynIdToList(String id) {
+		if (idList == null) {
+			idList = new ArrayList<>();
+		}
+		idList.add(id);
+	}
+
 	public void toggleSort(SortBy sortColumn) {
 		Direction newDirection = Direction.ASC.equals(query.getSortDirection()) ? Direction.DESC : Direction.ASC;
 		onSort(sortColumn, newDirection);
 	}
 	
 	public void onSort(SortBy sortColumn, Direction sortDirection) {
+		resetSynIdList();
 		query.setSortBy(sortColumn);
 		query.setSortDirection(sortDirection);
 		query.setNextPageToken(null);
@@ -85,6 +99,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	}
 	
 	public void loadData() {
+		resetSynIdList();
 		query = createQuery(parentBundle.getEntity().getId());
 		view.clearTableWidgets();
 		view.hideLoading();
@@ -136,7 +151,11 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	private void setResults(List<EntityHeader> results) {
 		view.hideLoading();
 		for (EntityHeader header : results) {
+			addSynIdToList(header.getId());
 			view.addTableListItem(header);
+		}
+		for (EntityHeader header : results) {
+			jsClient.populateEntityBundleCache(header.getId());
 		}
 	}
     
@@ -161,6 +180,16 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 			view.clearTableWidgets();
 			onTableClickCallback.invoke(entityHeader);
 		}
+	}
+	
+	@Override
+	public void copyIDsToClipboard() {
+		StringBuilder clipboardValue = new StringBuilder();
+		for (String synId : idList) {
+			clipboardValue.append(synId);
+			clipboardValue.append("\n");
+		}
+		view.copyToClipboard(clipboardValue.toString());
 	}
 	
 }

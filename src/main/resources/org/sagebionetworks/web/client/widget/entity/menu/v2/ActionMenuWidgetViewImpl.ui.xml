@@ -28,7 +28,7 @@
 						<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_TABLE_DATA">Upload Data to Table</a:ActionMenuItem>
 						<a:ActionMenuItem icon="DOWNLOAD" iconFixedWidth="true" action="DOWNLOAD_TABLE_QUERY_RESULTS">Download Data</a:ActionMenuItem>
 						<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_TABLE_DATA">Edit Query Results</a:ActionMenuItem>
-						<a:ActionMenuItem icon="NEWSPAPER_O" iconFixedWidth="true" action="EDIT_WIKI_PAGE">Edit Wiki Page</a:ActionMenuItem>
+						<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_WIKI_PAGE">Edit Wiki Page</a:ActionMenuItem>
 						<a:ActionMenuItem icon="NEWSPAPER_O" iconFixedWidth="true" action="VIEW_WIKI_SOURCE">View Wiki Source</a:ActionMenuItem>
 						<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_WIKI_SUBPAGE">Add Wiki Subpage</a:ActionMenuItem>
 						<a:ActionMenuItem icon="ARROWS" iconFixedWidth="true" action="REORDER_WIKI_SUBPAGES">Edit Wiki Page Order</a:ActionMenuItem>

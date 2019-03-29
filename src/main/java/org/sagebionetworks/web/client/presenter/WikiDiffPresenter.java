@@ -9,8 +9,10 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.WikiDiff;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
@@ -34,6 +36,7 @@ public class WikiDiffPresenter extends AbstractActivity implements WikiDiffView.
 	private GlobalApplicationState globalAppState;
 	private SynapseClientAsync synapseClient;
 	private SynapseJavascriptClient jsClient;
+	private SynapseJSNIUtils jsniUtils;
 	WikiPageKey key;
 	String version1, version2;
 	List<V2WikiHistorySnapshot> wikiVersionHistory;
@@ -45,19 +48,23 @@ public class WikiDiffPresenter extends AbstractActivity implements WikiDiffView.
 			SynapseJavascriptClient jsClient,
 			SynapseAlert synAlert,
 			GlobalApplicationState globalAppState,
-			ResourceLoader resourceLoader) {
+			ResourceLoader resourceLoader,
+			SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.globalAppState = globalAppState;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.jsClient = jsClient;
+		this.jsniUtils = jsniUtils;
 		view.setPresenter(this);
 		view.setSynAlert(synAlert.asWidget());
 		loadDiffLibrary(resourceLoader);
 	}
 
 	private void loadDiffLibrary(ResourceLoader resourceLoader) {
+		ClientProperties.fixResourceToCdnEndpoint(DIFF_LIB_JS, jsniUtils.getCdnEndpoint());
+		ClientProperties.fixResourceToCdnEndpoint(DIFF_VIEW_JS, jsniUtils.getCdnEndpoint());
 		if (!resourceLoader.isLoaded(DIFF_LIB_JS)) {
 			List<WebResource> resources = new ArrayList<>();
 			resources.add(DIFF_LIB_JS);

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.table;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,6 +13,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -38,7 +41,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class TableListWidgetTest {
-
+	public static final String TEST_RESULT_ID = "testResultId";
 	private static final String ENTITY_ID = "syn123";
 	private TableListWidgetView mockView;
 	private TableListWidget widget;
@@ -60,6 +63,8 @@ public class TableListWidgetTest {
 	CallbackP<EntityHeader> mockTableClickedCallback;
 	@Mock
 	EntityHeader mockEntityHeader;
+	@Captor
+	ArgumentCaptor<String> stringCaptor;
 	List<EntityHeader> searchResults;
 	
 	
@@ -137,5 +142,29 @@ public class TableListWidgetTest {
 		verify(mockView).showLoading();
 		verify(mockView).clearTableWidgets();
 		verify(mockTableClickedCallback).invoke(mockEntityHeader);
+	}
+	
+	@Test
+	public void testCopyToClipboard() {
+		//add search results
+		StringBuilder expectedClipboardValue = new StringBuilder();
+		int itemCount = 50;
+		for (int i = 0; i < itemCount; i++) {
+			EntityHeader mockHeader = Mockito.mock(EntityHeader.class);
+			when(mockHeader.getId()).thenReturn(TEST_RESULT_ID+i);
+			searchResults.add(mockHeader);
+			expectedClipboardValue.append(TEST_RESULT_ID+i+"\n");
+		}
+		//load the data
+		widget.configure(parentBundle);
+		
+		verify(mockView, times(itemCount)).addTableListItem(any(EntityHeader.class));
+		verify(mockSynapseJavascriptClient, times(itemCount)).populateEntityBundleCache(anyString());
+		
+		widget.copyIDsToClipboard();
+		
+		verify(mockView).copyToClipboard(stringCaptor.capture());
+		String clipboardValue = stringCaptor.getValue();
+		assertEquals(expectedClipboardValue.toString(), clipboardValue);
 	}
 }

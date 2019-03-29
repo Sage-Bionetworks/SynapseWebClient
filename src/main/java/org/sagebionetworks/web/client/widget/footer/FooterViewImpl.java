@@ -136,4 +136,41 @@ public class FooterViewImpl implements FooterView {
 			debugLink.setVisible(!isTestMode);	
 		}
 	}
+	
+
+	@Override
+	public void showJiraIssueCollector(String principalId, String userDisplayName, String userEmailAddress) {
+		_showJiraIssueCollector(principalId, userDisplayName, userEmailAddress, Window.Location.getHref());
+	}
+	
+	private static native void _showJiraIssueCollector(
+			String principalId, String userDisplayName, String userEmailAddress, String url) /*-{
+		try {
+			// Requires jQuery!
+			$wnd.jQuery.ajax({
+			    url: "https://sagebionetworks.jira.com/s/d41d8cd98f00b204e9800998ecf8427e-T/g39zuk/b/41/e73395c53c3b10fde2303f4bf74ffbf6/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector-embededjs/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector-embededjs.js?locale=en-US&collectorId=d0abcfa9",
+			    type: "get",
+			    cache: true,
+			    dataType: "script"
+			});
+			
+			$wnd.ATL_JQ_PAGE_PROPS =  {
+				"triggerFunction": function(showCollectorDialog) {
+					showCollectorDialog();
+				},
+				
+				"fieldValues": {
+			 		summary : '',
+					description : 'Reporting this page: ' + url + ' \n\nUser is reporting to the Synapse team that this page is in violation (for example: abusive or harmful content, spam, inappropriate ads).',
+			 		priority : '3',
+			 		customfield_10840: userEmailAddress,
+			 		email: userEmailAddress,
+			 		customfield_10740: principalId,
+			 		customfield_10741: userDisplayName,
+			 		fullname: userDisplayName
+				}};
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
 }

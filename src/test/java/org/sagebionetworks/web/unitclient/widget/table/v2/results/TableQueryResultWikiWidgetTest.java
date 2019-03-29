@@ -1,15 +1,15 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 
 import java.util.HashMap;
@@ -17,16 +17,23 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.table.Query;
+import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
@@ -42,6 +49,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class TableQueryResultWikiWidgetTest {
 	TableQueryResultWikiWidget widget;
 	@Mock
@@ -61,24 +69,33 @@ public class TableQueryResultWikiWidgetTest {
 	EntityActionController mockEntityActionController;
 	@Mock
 	EntityBundle mockEntityBundle;
-	
+	@Mock
+	PortalGinInjector mockGinInjector;
+	@Mock
+	GWTWrapper mockGWT;
+	@Captor
+	ArgumentCaptor<AsyncCallback> asyncCallbackCaptor;
+	@Captor
+	ArgumentCaptor<Callback> callbackCaptor;
 	@Before
 	public void before(){
-		MockitoAnnotations.initMocks(this);
 		widget = new TableQueryResultWikiWidget(
 				mockView, 
-				mockTableEntityWidget,
 				mockActionMenu,
 				mockEntityActionController,
 				mockSynapseJSNIUtils, 
 				mockSynapseJavascriptClient, 
-				mockSynAlert);
-		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+				mockSynAlert,
+				mockGWT, 
+				mockGinInjector);
+		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
+		when(mockGinInjector.createNewTableEntityWidget()).thenReturn(mockTableEntityWidget);
 	}
 
 	@Test
 	public void testConstruction() {
-		verify(mockView).setTableQueryResultWidget(any(Widget.class));
+		// lazily loaded table query result widget
+		verify(mockView, never()).setTableQueryResultWidget(any(Widget.class));
 		verify(mockView).setSynAlert(any(Widget.class));
 		verify(mockActionMenu).addControllerWidget(any(Widget.class));
 	}
@@ -98,7 +115,9 @@ public class TableQueryResultWikiWidgetTest {
 		
 		widget.configure(wikiKey, descriptor, null, null);
 		
-		verify(mockSynapseJavascriptClient).getEntityBundle(eq(tableId), anyInt(), any(AsyncCallback.class));
+		verifyZeroInteractions(mockGWT);
+		verify(mockView).setTableQueryResultWidget(any(Widget.class));
+		verify(mockSynapseJavascriptClient).getEntityBundleFromCache(eq(tableId), any(AsyncCallback.class));
 		verify(mockSynAlert).clear();
 		Query query = widget.getQueryString();
 		assertEquals(sql, query.getSql());
@@ -121,7 +140,7 @@ public class TableQueryResultWikiWidgetTest {
 	
 	@Test
 	public void testConfigureNotFound() {
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
 		Map<String, String> descriptor = new HashMap<String, String>();
 		String sql = "my query string";
 		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
@@ -201,5 +220,57 @@ public class TableQueryResultWikiWidgetTest {
 		
 		//log both errors to the console
 		verify(mockSynapseJSNIUtils, times(2)).consoleError(anyString());
+	}
+	
+	@Test
+	public void testLoadMultipleTables() {
+		// do not typically use reset(), but other tests need mockSynapseJavascriptClient response. in this test, we do not want it to respond (until we manually invoke)
+		reset(mockSynapseJavascriptClient);
+		TableQueryResultWikiWidget widget1 = new TableQueryResultWikiWidget(
+				mockView, 
+				mockActionMenu,
+				mockEntityActionController,
+				mockSynapseJSNIUtils, 
+				mockSynapseJavascriptClient, 
+				mockSynAlert,
+				mockGWT, 
+				mockGinInjector);
+		TableQueryResultWikiWidget widget2 = new TableQueryResultWikiWidget(
+				mockView, 
+				mockActionMenu,
+				mockEntityActionController,
+				mockSynapseJSNIUtils, 
+				mockSynapseJavascriptClient, 
+				mockSynAlert,
+				mockGWT, 
+				mockGinInjector);
+		
+		
+		Map<String, String> descriptor = new HashMap<String, String>();
+		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, "select * from syn12345");
+		
+		widget1.configure(wikiKey, descriptor, null, null);
+		
+		verifyZeroInteractions(mockGWT);
+		verify(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), asyncCallbackCaptor.capture());
+		assertTrue(TableQueryResultWikiWidget.isLoading);
+		
+		widget2.configure(wikiKey, descriptor, null, null);
+		
+		verify(mockGWT).scheduleExecution(callbackCaptor.capture(), anyInt());
+		//verify that it's still only attempted to get the entity bundle once
+		verify(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
+		
+		//invoke the async callback to complete widget1 load, and verify that widget2 would begin to load (on callback execution).
+		asyncCallbackCaptor.getValue().onSuccess(mockEntityBundle);
+		assertFalse(TableQueryResultWikiWidget.isLoading);
+		
+		callbackCaptor.getValue().invoke();
+		
+		assertTrue(TableQueryResultWikiWidget.isLoading);
+		verify(mockSynapseJavascriptClient, times(2)).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
+		//verify error of call also results in load complete
+		asyncCallbackCaptor.getValue().onFailure(new Exception("failed to load second widget"));
+		assertFalse(TableQueryResultWikiWidget.isLoading);
 	}
 }

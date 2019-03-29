@@ -118,7 +118,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	
 	private static native void _tablesorter() /*-{
 		try {
-			$wnd.jQuery('table.markdowntable').tablesorter();
+			$wnd.jQuery('table.tablesorter').tablesorter();
 		} catch (err) {
 			console.error(err);
 		}
@@ -178,7 +178,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		var layoutResult = {};
 		try {
 		    var debug = {'features': ['nodes'], 'wireframe': true};
-			var conf = {'group_styles': {'pov': {'stroke-width': 3}},
+			var conf = {'subnode_spacing': 40, 'group_styles': {'pov': {'stroke-width': 3}},
 		        'debug': debug};	        
 			var chart = new $wnd.NChart(characters, layers, conf).calc().plot();
 				
@@ -469,15 +469,25 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	public final static native void _consoleError(Object ob) /*-{
 		console.error(ob);
 	}-*/;
-	
-	@Override
-	public void processWithMathJax(Element element) {
-		_processWithMathJax(element);		
+
+	public void processMath(Element element) {
+		// remove \(, \), \[, \]
+		String tex = element.getInnerText();
+		boolean isCenterDiv = tex.contains("\\[") || tex.contains("\\begin{align");
+		tex = tex.replace("\\(","").replace("\\)", "");
+		tex = tex.replace("\\[","").replace("\\]", "");
+		tex = tex.replace("{align}","{aligned}");
+		String html = _processMath(tex, isCenterDiv);
+		if (isCenterDiv) {
+			html = "<div class=\"center\">"+html+"</div>";
+		}
+		
+		element.setInnerHTML(html);
 	}
 
-	private final static native void _processWithMathJax(Element element) /*-{
+	private final static native String _processMath(String tex, boolean displayModeBoolean) /*-{
 		try {
-			$wnd.layoutMath(element);
+			return $wnd.katex.renderToString(tex, {displayMode: displayModeBoolean});
 		} catch (err) {
 			console.error(err);
 		}
@@ -754,7 +764,10 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		// initialized in Portal.html
 		return $wnd.cdnEndpoint;
 	}-*/;
-	
+	@Override
+	public void unmountComponentAtNode(Element el) {
+		_unmountComponentAtNode(el);
+	}
 	public final static native void _unmountComponentAtNode(Element el) /*-{
 		return $wnd.ReactDOM.unmountComponentAtNode(el);
 	}-*/;

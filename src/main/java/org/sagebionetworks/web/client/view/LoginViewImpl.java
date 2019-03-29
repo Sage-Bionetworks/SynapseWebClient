@@ -5,12 +5,11 @@ import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.InfoAlert;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
-import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -31,9 +30,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	
 	//terms of service view
 	@UiField
-	HTMLPanel termsOfServiceView;
-	@UiField
-	DivElement termsOfServiceHighlightBox;
+	Div termsOfServiceView;
 	@UiField
 	CheckBox actEthicallyCb;
 	@UiField
@@ -47,6 +44,8 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@UiField
 	CheckBox lawsCb;
 	@UiField
+	CheckBox responsibleDataUseCb;
+	@UiField
 	Button takePledgeButton;
 	@UiField
 	LoadingSpinner loadingUi;
@@ -54,6 +53,8 @@ public class LoginViewImpl extends Composite implements LoginView {
 	Heading loadingUiText;
 	@UiField
 	Div synAlertContainer;
+	@UiField
+	InfoAlert acceptedTermsOfUse;
 	
 	private Presenter presenter;
 	private LoginWidget loginWidget;
@@ -71,13 +72,13 @@ public class LoginViewImpl extends Composite implements LoginView {
 		this.headerWidget = headerWidget;
 		headerWidget.configure();
 		toUInitialized = false;
-		termsOfServiceHighlightBox.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Awareness and Ethics Pledge");
 	}
 
 	@Override
 	public void setPresenter(Presenter loginPresenter) {
 		this.presenter = loginPresenter;
 		headerWidget.configure();
+		headerWidget.refresh();
 		com.google.gwt.user.client.Window.scrollTo(0, 0); // scroll user to top of page
 	}
 
@@ -129,16 +130,28 @@ public class LoginViewImpl extends Composite implements LoginView {
 	}
 	
 	@Override
-	public void showTermsOfUse(final Callback callback) {
+	public void showTermsOfUse(boolean hasAccepted, Callback callback) {
 		hideViews();
+		acceptedTermsOfUse.setVisible(hasAccepted);
+		
 		//initialize checkboxes
-		actEthicallyCb.setValue(false);
-		protectPrivacyCb.setValue(false);;
-		noHackCb.setValue(false);
-		shareCb.setValue(false);
-		responsibilityCb.setValue(false);
-		lawsCb.setValue(false);
+		actEthicallyCb.setValue(hasAccepted);
+		actEthicallyCb.setEnabled(!hasAccepted);
+		protectPrivacyCb.setValue(hasAccepted);
+		protectPrivacyCb.setEnabled(!hasAccepted);
+		noHackCb.setValue(hasAccepted);
+		noHackCb.setEnabled(!hasAccepted);
+		shareCb.setValue(hasAccepted);
+		shareCb.setEnabled(!hasAccepted);
+		responsibilityCb.setValue(hasAccepted);
+		responsibilityCb.setEnabled(!hasAccepted);
+		lawsCb.setValue(hasAccepted);
+		lawsCb.setEnabled(!hasAccepted);
+		responsibleDataUseCb.setValue(hasAccepted);
+		responsibleDataUseCb.setEnabled(!hasAccepted);
 
+		takePledgeButton.setVisible(!hasAccepted);
+		
 		termsOfServiceView.setVisible(true);
 		//initialize if necessary
 		if (!toUInitialized) {
@@ -149,7 +162,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 					if(validatePledge()) {
 						callback.invoke();
 					} else {
-						showErrorMessage("To take the pledge, you must first agree to all of the statements.");
+						showErrorMessage("To accept these Terms and Conditions for Use, you must first agree to all of the statements.");
 					}
 				}
 			});
@@ -157,13 +170,14 @@ public class LoginViewImpl extends Composite implements LoginView {
      }
 	
 	private boolean validatePledge() {
-		return actEthicallyCb.getValue() && protectPrivacyCb.getValue() && noHackCb.getValue() && shareCb.getValue() && responsibilityCb.getValue() && lawsCb.getValue();
+		return actEthicallyCb.getValue() && protectPrivacyCb.getValue() && noHackCb.getValue() && shareCb.getValue() && responsibilityCb.getValue() && lawsCb.getValue() && responsibleDataUseCb.getValue();
 	}
 	private void hideViews() {
 		loadingUi.setVisible(false);
 		loadingUiText.setVisible(false);
 		loginView.setVisible(false);
 		termsOfServiceView.setVisible(false);
+		acceptedTermsOfUse.setVisible(false);
 	}
 	@Override
 	public void setSynAlert(IsWidget w) {

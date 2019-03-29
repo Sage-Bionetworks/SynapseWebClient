@@ -85,6 +85,12 @@ public class EmailInvitationViewImpl extends Composite implements EmailInvitatio
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message);
 	}
+	
+	@Override
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
+	}
+
 
 	@Override
 	public void clear() {

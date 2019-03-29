@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table;
 
+import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -42,6 +44,11 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	PortalGinInjector ginInjector;
 	@UiField
 	LoadingSpinner loadingUI;
+	@UiField
+	TextArea copyToClipboardTextbox;
+	@UiField
+	Icon copyIDToClipboardIcon;
+
 	@Inject
 	public TableListWidgetViewImpl(Binder binder, 
 			PortalGinInjector ginInjector) {
@@ -53,6 +60,7 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 		createdOnColumnHeader.setSortingListener(header -> {
 			presenter.toggleSort(SortBy.CREATED_ON);
 		});
+		copyIDToClipboardIcon.addClickHandler(event -> presenter.copyIDsToClipboard());
 	}
 
 	@Override
@@ -131,5 +139,16 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
+	}
+	
+	
+	@Override
+	public void copyToClipboard(String value) {
+		copyToClipboardTextbox.setVisible(true);
+		copyToClipboardTextbox.setFocus(true);
+		copyToClipboardTextbox.setValue(value);
+		copyToClipboardTextbox.selectAll();
+		ginInjector.getSynapseJSNIUtils().copyToClipboard();
+		copyToClipboardTextbox.setVisible(false);
 	}
 }

@@ -45,8 +45,6 @@
 			ga('send', 'pageview');
 		</script>
 		
-		
-		
 		<script>
 			// determine cdn endpoint (staging or prod, do not use a cdn for local or dev builds)
 			var cdnEndpoint = "//cdn-" + location.hostname + "/";
@@ -68,7 +66,7 @@
 				head.load("//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js");
 				head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js");
 				head.load("https://cdn.pendo.io/agent/static/f155f8f7-30b9-4cc3-671a-70f99f803504/pendo.js");
-				head.load("//cdn.jsdelivr.net/npm/moment@2.22.2/min/moment.min.js");
+				head.load(cdnEndpoint + "js/moment.min.js");
 				head.load("//cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.1.8/jsPlumb.min.js");
 				head.load("//cdnjs.cloudflare.com/ajax/libs/swfobject/2.2/swfobject.min.js");
 				head.load(cdnEndpoint + "js/jquery.tablesorter.min.js");
@@ -77,8 +75,8 @@
 				head.load("//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css");
 				head.load(cdnEndpoint + "js/highlight.pack.js");
 				head.load(cdnEndpoint + "js/init-nchart.js");
-				head.load("//cdn.jsdelivr.net/markdown-it/6.0.0/markdown-it.min.js");
-				head.load(cdnEndpoint + "js/markdown-it-plugins-15.min.js");
+				head.load(cdnEndpoint + "js/markdown-it.min.js");
+				head.load(cdnEndpoint + "js/markdown-it-plugins-17.min.js");
 				head.load(cdnEndpoint + "js/polyfill-2.js");
 				head.load(cdnEndpoint + "js/details-shim.min.js");
 				head.load(cdnEndpoint + "js/xss.min.js");
@@ -86,6 +84,11 @@
 				head.load("//www.google-analytics.com/analytics.js");
 				head.load("//unpkg.com/react@16/umd/react.production.min.js");
 				head.load("//unpkg.com/react-dom@16/umd/react-dom.production.min.js");
+				head.load("https://unpkg.com/react-transition-group@2.6.0/dist/react-transition-group.min.js");
+				head.load("https://unpkg.com/prop-types@15.6.2/prop-types.min.js");
+				head.load("https://unpkg.com/react-measure@2.2.2/dist/index.umd.js");
+				head.load("https://unpkg.com/react-tooltip@3.9.2/standalone/react-tooltip.min.js");
+				head.load("https://unpkg.com/synapse-react-client@1.11.9/dist/umd/synapse-react-client.production.min.js");
 				head.load("//cdnjs.cloudflare.com/ajax/libs/croppie/2.6.2/croppie.min.js");
 				head.load("//cdnjs.cloudflare.com/ajax/libs/spark-md5/3.0.0/spark-md5.min.js");
 				head.load(cdnEndpoint + "js/diff/diffview.css");
@@ -95,6 +98,8 @@
 				head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.css");
 				head.load(cdnEndpoint + "js/linkify.min.js");
 				head.load(cdnEndpoint + "js/linkify-string.min.js");
+				head.load("https://unpkg.com/synapse-react-client@1.11.9/dist/umd/synapse-react-client.production.styles.css");
+				head.load(cdnEndpoint + "css/katex-0.10.1.min.css");
 			};
 			script.src = cdnEndpoint + "js/head.load.min.js";
 			document.head.appendChild(script);
@@ -110,6 +115,7 @@
 	   	</script>
 	</head>
 	<body id="body">
+		
 		<div>
 			<!-- GWT history support -->
 			<iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position: absolute; width: 0; height: 0; border: 0"></iframe>
@@ -129,23 +135,13 @@
 						application crawl link</a>
 				</div>
 			</noscript>
-            
-            <div style="display:none;">
-				<form id="login_form" target="hiddeniframe" role="form" class="signin-panel margin-top-15" method="post" action="/expect_405">
-					<input id="synapse_username" type="text" name="uname">
-					<input id="synapse_password" name="psw" type="password">
-					<button id="synapse_signin_btn" type="submit">Sign in</button>
-					<iframe name='hiddeniframe' style="display:none;"></iframe>
-				</form>
-            </div>
-            
             <!-- This is the GWT-generated body -->
 			<div id="alertWrapper">
 				<div id="alertContainer"></div>
 			</div>
 			<div id="initialLoadingUI" style="padding-top: 180px">
-				<div class="spinner" style="width:80px; height:80px; background-size:80px 80px;"> </div>
-				<h4 style="color: #1e7098; margin-top: 10px; font-family: Sans-serif; text-align:center">Loading...</h4>
+				<div class="spinner" style="width:80px; height:80px; background-size:80px 80px;display: block;margin:auto;"> </div>
+				<h4 style="color: #1e7098; margin-top: 10px; font-family: Sans-serif; text-align:center">Loading&hellip;</h4>
 			</div>
 			<div id="headerPanel" class="zeroOpacity"></div>
 			<div id="rootPanel" class="zeroOpacity"></div>

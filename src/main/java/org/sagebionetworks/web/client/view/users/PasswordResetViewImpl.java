@@ -18,8 +18,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -70,8 +68,6 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	SpanElement contentHtml;
 
 	@UiField
-	Div passwordStrengthContainer;
-	@UiField
 	Div synAlertContainer;
 	
 	private Presenter presenter;
@@ -105,7 +101,6 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	}
 	
 	private boolean checkPassword1() {
-		presenter.passwordChanged(password1Field.getText());
 		DisplayUtils.hideFormError(password1, password1Error);
 		if (!DisplayUtils.isDefined(password1Field.getText())){
 			password1Error.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
@@ -177,12 +172,6 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 				checkEmail();
 			}
 		});
-		password1Field.addKeyUpHandler(new KeyUpHandler() {
-			@Override
-			public void onKeyUp(KeyUpEvent event) {
-				presenter.passwordChanged(password1Field.getText());
-			}
-		});
 		password1Field.addBlurHandler(new BlurHandler() {
 			@Override
 			public void onBlur(BlurEvent event) {
@@ -248,7 +237,6 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 		contentHtml.setInnerHTML(DisplayUtils.getInfoHtml(DisplayConstants.PASSWORD_HAS_BEEN_CHANGED));
 	}
 
-
 	@Override
 	public void showErrorMessage(String errorMessage) {
 		submitBtn.setEnabled(true);
@@ -274,18 +262,11 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 		DisplayUtils.showInfo(message);
 	}
 
-
 	@Override
 	public void showExpiredRequest() {
 		loadingPanel.setVisible(false);
 		pageTitle.setText(DisplayConstants.REQUEST_EXPIRED);
 		contentHtml.setInnerHTML(DisplayConstants.SET_PASSWORD_EXPIRED);
-	}
-	
-	@Override
-	public void setPasswordStrengthWidget(Widget w) {
-		passwordStrengthContainer.clear();
-		passwordStrengthContainer.add(w);
 	}
 	
 	public void setSynAlertWidget(Widget w) {

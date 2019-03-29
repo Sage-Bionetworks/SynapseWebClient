@@ -27,6 +27,7 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsyncJobId;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
@@ -56,6 +57,7 @@ import org.sagebionetworks.repo.model.file.UploadDestinationInstanceFactory;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
 import org.sagebionetworks.repo.model.provenance.Activity;
+import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.subscription.SubscriberCount;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
@@ -63,7 +65,9 @@ import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.PaginatedColumnModels;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -137,6 +141,12 @@ public class SynapseJavascriptFactory {
 		DownloadOrderSummaryResponse,
 		Doi,
 		Subscription,
+		SearchResults,
+		PaginatedColumnModelsResults,
+		PaginatedResultsVersionInfo,
+		PaginatedResultsDiscussionThreadBundle,
+		PaginatedResultsDiscussionReplyBundle,
+		PaginatedResultsV2WikiHeader,
 		None,
 		String
 	}
@@ -244,8 +254,39 @@ public class SynapseJavascriptFactory {
 			return new SubscriptionPagedResults(json);
 		case Subscription : 
 			return new Subscription(json);
+		case SearchResults : 
+			return new SearchResults(json);
+		case PaginatedColumnModelsResults :
+			return new PaginatedColumnModels(json).getResults();
 		case JSON :
 			return json;
+		case PaginatedResultsVersionInfo :
+			// json really represents a PaginatedResults (cannot reference here in js)
+			List<VersionInfo> versionInfoList = new ArrayList<>();
+			JSONArrayAdapter versionInfoResultsJsonArray = json.getJSONArray("results");
+			for (int i = 0; i < versionInfoResultsJsonArray.length(); i++) {
+				JSONObjectAdapter jsonObject = versionInfoResultsJsonArray.getJSONObject(i);
+				versionInfoList.add(new VersionInfo(jsonObject));
+			}
+			return versionInfoList;
+		case PaginatedResultsDiscussionThreadBundle :
+			// json really represents a PaginatedResults (cannot reference here in js)
+			List<DiscussionThreadBundle> discussionThreadBundleList = new ArrayList<>();
+			JSONArrayAdapter discussionThreadBundleResultsJsonArray = json.getJSONArray("results");
+			for (int i = 0; i < discussionThreadBundleResultsJsonArray.length(); i++) {
+				JSONObjectAdapter jsonObject = discussionThreadBundleResultsJsonArray.getJSONObject(i);
+				discussionThreadBundleList.add(new DiscussionThreadBundle(jsonObject));
+			}
+			return discussionThreadBundleList;
+		case PaginatedResultsDiscussionReplyBundle :
+			// json really represents a PaginatedResults (cannot reference here in js)
+			List<DiscussionReplyBundle> discussionReplyBundleList = new ArrayList<>();
+			JSONArrayAdapter discussionReplyBundleResultsJsonArray = json.getJSONArray("results");
+			for (int i = 0; i < discussionReplyBundleResultsJsonArray.length(); i++) {
+				JSONObjectAdapter jsonObject = discussionReplyBundleResultsJsonArray.getJSONObject(i);
+				discussionReplyBundleList.add(new DiscussionReplyBundle(jsonObject));
+			}
+			return discussionReplyBundleList;
 		case PaginatedResultsEntityHeader :
 			// json really represents a PaginatedResults (cannot reference here in js)
 			List<EntityHeader> entityHeaderList = new ArrayList<>();
@@ -255,6 +296,15 @@ public class SynapseJavascriptFactory {
 				entityHeaderList.add(new EntityHeader(jsonObject));
 			}
 			return entityHeaderList;
+		case PaginatedResultsV2WikiHeader :
+			// json really represents a PaginatedResults (cannot reference here in js)
+			List<V2WikiHeader> v2WikiHeaders = new ArrayList<>();
+			JSONArrayAdapter v2WikiHeaderResults = json.getJSONArray("results");
+			for (int i = 0; i < v2WikiHeaderResults.length(); i++) {
+				JSONObjectAdapter jsonObject = v2WikiHeaderResults.getJSONObject(i);
+				v2WikiHeaders.add(new V2WikiHeader(jsonObject));
+			}
+			return v2WikiHeaders;
 		case PaginatedDockerCommit :
 			// json really represents a PaginatedResults (cannot reference here in js)
 			List<DockerCommit> dockerCommitList = new ArrayList<>();

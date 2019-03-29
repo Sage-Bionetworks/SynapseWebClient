@@ -19,7 +19,7 @@
 			<bh:Text ui:field="instructions"></bh:Text>
 			<g:SimplePanel ui:field="bodyPanel"/>
 			<bh:Div styleName="margin-top-15" />
-			<b:Alert ui:field="alert" type="DANGER" visible="false"></b:Alert>
+			<bh:Div ui:field="synapseAlertContainer"/>
 		</b:ModalBody>
 		<b:ModalFooter>
 			<b:Button ui:field="defaultButton" type="LINK" text="Cancel"	></b:Button>

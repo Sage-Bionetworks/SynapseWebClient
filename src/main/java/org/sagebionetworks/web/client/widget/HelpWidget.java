@@ -82,14 +82,17 @@ public class HelpWidget implements IsWidget {
 
 	public void setText(String text) {
 		this.text = text;
+		updateContent();
 	}
 	
 	public void setIconStyles(String iconStyles) {
 		this.iconStyles = iconStyles;
+		updateContent();
 	}
 	
 	public void setHelpMarkdown(String md) {
 		this.basicHelpText = markdownIt.markdown2Html(md, "");
+		updateContent();
 	}
 	
 	public void setHref(String fullHelpHref) {
@@ -104,11 +107,15 @@ public class HelpWidget implements IsWidget {
 	
 	@Override
 	public Widget asWidget() {
+		updateContent();
+		return widget;
+	}
+	
+	public void updateContent() {
 		if (DisplayUtils.isDefined(iconStyles))
 			icon.setClassName(iconStyles);
 		moreInfoText.setInnerText(text);
 		helpPopover.setContent(basicHelpText + moreHelpHTML + closeHTML);
-		return widget;
 	}
 	
 	public void setVisible(boolean visible) {

@@ -16,6 +16,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -29,19 +30,27 @@ public class ButtonLinkWidgetViewImpl extends Div implements ButtonLinkWidgetVie
 	public static final ClickHandler BUTTON_LINK_CLICK_HANDLER = event -> {
 		if (!DisplayUtils.isAnyModifierKeyDown(event)) {
 			event.preventDefault();
-			Widget panel = (Widget)event.getSource();
-			String href = panel.getElement().getAttribute("href");
-			boolean openInNewWindow = panel.getElement().hasAttribute(ButtonLinkWidget.LINK_OPENS_NEW_WINDOW);
+			Button button = (Button)event.getSource();
+			button.setEnabled(false);
+			String href = button.getElement().getAttribute("href");
+			boolean openInNewWindow = button.getElement().hasAttribute(ButtonLinkWidget.LINK_OPENS_NEW_WINDOW);
 			if (openInNewWindow) {
 				newWindow(href, "_blank", "");
 			} else {
 				if (href.contains("#!Synapse:")) {
+					
 					Place newPlace = appPlaceHistoryMapper.getPlace(href.substring(href.indexOf('!')));
 					eventBus.fireEvent(new ChangeSynapsePlaceEvent((Synapse)newPlace));
 				} else {
 					Window.Location.assign(href);	
 				}
 			}
+			Timer timer = new Timer() { 
+			    public void run() { 
+			    	button.setEnabled(true);
+			    } 
+			};
+			timer.schedule(2000);
 		}
 	};
 	@Inject

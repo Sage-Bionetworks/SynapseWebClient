@@ -8,7 +8,6 @@ import org.sagebionetworks.web.client.presenter.ACTPresenter;
 import org.sagebionetworks.web.client.presenter.AccessRequirementsPresenter;
 import org.sagebionetworks.web.client.presenter.AccountPresenter;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
-import org.sagebionetworks.web.client.presenter.CertificatePresenter;
 import org.sagebionetworks.web.client.presenter.ChallengeOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ChangeUsernamePresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
@@ -39,6 +38,7 @@ import org.sagebionetworks.web.client.presenter.WikiDiffPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
@@ -79,6 +79,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryRowView;
+import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
@@ -129,6 +130,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigEditor
 import org.sagebionetworks.web.client.widget.entity.editor.SynapseFormConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.TableQueryResultWikiEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.TeamSelectEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
@@ -136,14 +138,6 @@ import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialog;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidget;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.FileHandleAssociationRow;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererCancelControl;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererEntityIdAnnotations;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererLink;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererSynapseID;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererUserId;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidget;
@@ -197,6 +191,7 @@ import org.sagebionetworks.web.client.widget.subscription.TopicRowWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.TableEntityListGroupItem;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
+import org.sagebionetworks.web.client.widget.table.api.APITableWidget;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
@@ -215,18 +210,17 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRende
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditor;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.LargeStringCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRenderer;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeWidget;
@@ -241,6 +235,9 @@ import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.EmailInvitationBadge;
 import org.sagebionetworks.web.client.widget.team.JoinTeamConfigEditor;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
+import org.sagebionetworks.web.client.widget.team.OpenMembershipRequestWidget;
+import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationWidget;
+import org.sagebionetworks.web.client.widget.team.OpenUserInvitationWidget;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
@@ -302,8 +299,6 @@ public interface PortalGinInjector extends Ginjector {
 
 	QuizPresenter getQuizPresenter();
 
-	CertificatePresenter getCertificatePresenter();
-
 	AccountPresenter getAccountPresenter();
 	NewAccountPresenter getNewAccountPresenter();
 
@@ -362,6 +357,7 @@ public interface PortalGinInjector extends Ginjector {
 	BiodallianceSourceEditor getBiodallianceSourceEditor();
 	CytoscapeConfigEditor getCytoscapeConfigEditor();
 	PlotlyConfigEditor getPlotlyConfigEditor();
+	TeamSelectEditor getTeamSelectEditor();
 	
 	////// Renderers
 	BookmarkWidget getBookmarkRenderer();
@@ -396,15 +392,6 @@ public interface PortalGinInjector extends Ginjector {
 	//////API Table Column Editor
 	APITableColumnConfigView getAPITableColumnConfigView();
 	
-	//////API Table Column Renderers
-	APITableColumnRendererNone getAPITableColumnRendererNone();
-	APITableColumnRendererUserId getAPITableColumnRendererUserId();
-	APITableColumnRendererDate getAPITableColumnRendererDate();
-	APITableColumnRendererLink getAPITableColumnRendererLink();
-	APITableColumnRendererSynapseID getAPITableColumnRendererSynapseID();
-	APITableColumnRendererEntityIdAnnotations getAPITableColumnRendererEntityAnnotations();
-	APITableColumnRendererCancelControl getAPITableColumnRendererCancelControl();
-	
 	// Other widgets
 	UserBadge getUserBadgeWidget();
 	EmailInvitationBadge getEmailInvitationBadgeWidget();
@@ -430,7 +417,7 @@ public interface PortalGinInjector extends Ginjector {
 	QueryResultEditorWidget createNewQueryResultEditorWidget();
 	
 	// TableEntity V2 cells
-	StringRendererCell createStringRendererCell();
+	StringRendererCellView createStringRendererCellView();
 	StringEditorCell createStringEditorCell();
 	EntityIdCellEditor createEntityIdCellEditor();
 	EntityIdCellRenderer createEntityIdCellRenderer();
@@ -442,11 +429,12 @@ public interface PortalGinInjector extends Ginjector {
 	DateCellRenderer createDateCellRenderer();
 	DoubleCellEditor createDoubleCellEditor();
 	IntegerCellEditor createIntegerCellEditor();
-	LinkCellRenderer createLinkCellRenderer();
+	LinkCellRendererView createLinkCellRenderer();
 	FileCellEditor createFileCellEditor();
 	FileCellRenderer createFileCellRenderer();
 	UserIdCellRenderer createUserIdCellRenderer();
 	UserIdCellEditor createUserIdCellEditor();
+	LargeStringCellEditor createLargeTextFormCellEditor();
 
 	// Asynchronous
 	AsynchronousProgressWidget creatNewAsynchronousProgressWidget();
@@ -474,6 +462,7 @@ public interface PortalGinInjector extends Ginjector {
 	RegisterTeamDialog getRegisterTeamDialog();
 	AnnotationEditor getAnnotationEditor();
 	FileHistoryRowView getFileHistoryRow();
+	FileHistoryWidget getFileHistoryWidget();
 	
 	JoinTeamConfigEditor getJoinTeamConfigEditor();
 	ModifiedCreatedByWidget getModifiedCreatedByWidget();
@@ -545,8 +534,8 @@ public interface PortalGinInjector extends Ginjector {
 	CreateOrUpdateDoiModal getCreateOrUpdateDoiModal();
 	ApproveUserAccessModal getApproveUserAccessModal();
 	ChallengeClientAsync getChallengeClientAsync();
-	EntityIdCellRendererImpl getEntityIdCellRenderer();
-	UserIdCellRendererImpl getUserIdCellRenderer();
+	EntityIdCellRenderer getEntityIdCellRenderer();
+	UserIdCellRenderer getUserIdCellRenderer();
 
 	CreateDataAccessRequestWizard getCreateDataAccessRequestWizard();
 	ManagedACTAccessRequirementWidget getManagedACTAccessRequirementWidget();
@@ -595,4 +584,8 @@ public interface PortalGinInjector extends Ginjector {
 	FileHandleAssociationRow getFileHandleAssociationRow(); 
 	TableEntityListGroupItem getTableEntityListGroupItem();
 	SynapseJSNIUtilsImpl getSynapseJSNIUtils();
+	OpenUserInvitationWidget getOpenUserInvitationWidget();
+	OpenMembershipRequestWidget getOpenMembershipRequestWidget();
+	OpenTeamInvitationWidget getOpenTeamInvitationWidget();
+	DivView getDiv();
 }

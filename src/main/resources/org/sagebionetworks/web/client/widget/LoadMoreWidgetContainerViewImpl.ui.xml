@@ -5,9 +5,10 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	
-	<bh:Div>
+	<bh:Div marginBottom="5">
 		<bh:Div ui:field="container" />
 		<bh:ClearFix />
-		<w:LoadingSpinner ui:field="loadMoreImage" size="31px" addStyleNames="center-block center"/>
+		<b:Button ui:field="loadMoreButton" text="Show more results"/>
+		<w:LoadingSpinner ui:field="loadMoreImage" size="31px" addStyleNames="center-block center" visible="false"/>
 	</bh:Div>
 </ui:UiBinder>

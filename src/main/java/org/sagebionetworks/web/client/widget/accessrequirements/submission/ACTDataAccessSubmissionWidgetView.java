@@ -18,7 +18,7 @@ public interface ACTDataAccessSubmissionWidgetView extends IsWidget {
 	void setProjectLead(String s);
 	void setIntendedDataUse(String s);
 	void clearAccessors();
-	void addAccessors(IsWidget w);
+	void addAccessors(IsWidget w, String username);
 	void setDucWidget(IsWidget w);
 	void setIrbWidget(IsWidget w);
 	void setOtherAttachmentWidget(IsWidget w);
@@ -29,7 +29,6 @@ public interface ACTDataAccessSubmissionWidgetView extends IsWidget {
 	void showRejectButton();
 	void showApproveButton();
 	void setSubmittedBy(IsWidget w);
-	void setShowEmailButton(IsWidget w);
 	void setDucColumnVisible(boolean visible);
 	void setIrbColumnVisible(boolean visible);
 	void setOtherAttachmentsColumnVisible(boolean visible);

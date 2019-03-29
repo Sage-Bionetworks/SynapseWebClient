@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.MultichoiceResponse;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Question;
@@ -75,7 +74,6 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		panel.setWidget(this.view.asWidget());
 	}
 
-	
 	@Override
 	public void goTo(Place place) {
 		globalApplicationState.getPlaceChanger().goTo(place);
@@ -141,7 +139,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			@Override
 			public void onSuccess(PassingRecord passingRecord) {
 				if (passingRecord.getPassed())
-					showSuccess(authenticationController.getCurrentUserProfile(), passingRecord);
+					showSuccess(passingRecord);
 				else
 					showFailure(passingRecord);
 			}
@@ -155,11 +153,11 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	}
 	
 	@Override
-	public void showSuccess(UserProfile profile, PassingRecord passingRecord) {
+	public void showSuccess(PassingRecord passingRecord) {
 		showQuizFromPassingRecord(passingRecord);
 		scoreQuiz(passingRecord);
 		//show success UI (certificate) and quiz
-		view.showSuccess(profile, passingRecord);
+		view.showSuccess(passingRecord);
 	}
 	
 	@Override
@@ -238,7 +236,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 					//otherwise, show the quiz
 					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
 					view.hideLoading();
-					showSuccess(authenticationController.getCurrentUserProfile(), passingRecord);
+					showSuccess(passingRecord);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}

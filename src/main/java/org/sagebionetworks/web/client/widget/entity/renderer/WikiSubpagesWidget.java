@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import java.util.List;
 
@@ -10,7 +9,6 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
@@ -29,7 +27,6 @@ import com.google.inject.Inject;
 public class WikiSubpagesWidget implements IsWidget, WikiSubpagesView.Presenter {
 	
 	private WikiSubpagesView view;
-	private SynapseClientAsync synapseClient;
 	private WikiPageKey wikiKey; 
 	private String ownerObjectName;
 	private Place ownerObjectLink;
@@ -41,14 +38,14 @@ public class WikiSubpagesWidget implements IsWidget, WikiSubpagesView.Presenter 
 	private boolean isEmbeddedInOwnerPage;
 	private CallbackP<WikiPageKey> reloadWikiPageCallback;
 	private SynapseJavascriptClient jsClient;
-	List<V2WikiHeader> currentWikiHeaders;
+	List<V2WikiHeader> currentWikiHeaders, newWikiHeaders;
+	V2WikiOrderHint newWikiOrderHint;
+	
 	@Inject
-	public WikiSubpagesWidget(WikiSubpagesView view, SynapseClientAsync synapseClient,
+	public WikiSubpagesWidget(WikiSubpagesView view,
 							AuthenticationController authenticationController,
 							SynapseJavascriptClient jsClient) {
 		this.view = view;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
 		this.jsClient = jsClient;
 		view.setPresenter(this);
 	}
@@ -127,33 +124,14 @@ public class WikiSubpagesWidget implements IsWidget, WikiSubpagesView.Presenter 
 	
 	@Override
 	public void refreshWikiHeaderTree() {
-		synapseClient.getV2WikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {
+		newWikiHeaders = null;
+		newWikiOrderHint = null;
+		// ask for the wiki header tree and order hint in parallel.
+		jsClient.getV2WikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {
 			@Override
 			public void onSuccess(final List<V2WikiHeader> wikiHeaders) {
-				synapseClient.getV2WikiOrderHint(wikiKey, new AsyncCallback<V2WikiOrderHint>() {
-					@Override
-					public void onSuccess(V2WikiOrderHint result) {
-						// "Sort" stuff'
-						WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders, result);
-						updateWikiHeaders(wikiHeaders);
-					}
-					@Override
-					public void onFailure(Throwable caught) {
-						// Failed to get order hint. Just ignore it.
-						updateWikiHeaders(wikiHeaders);
-					}
-					
-					private void updateWikiHeaders(List<V2WikiHeader> wikiHeaders) {
-						if (currentWikiHeaders == null || !currentWikiHeaders.equals(wikiHeaders)) {
-							view.clear();
-							view.configure(wikiHeaders, ownerObjectName,
-									ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, reloadWikiPageCallback, actionMenu);
-							currentWikiHeaders = wikiHeaders;
-						}
-						
-						view.setEditOrderButtonVisible(canEdit);
-					}
-				});
+				newWikiHeaders = wikiHeaders;
+				afterGetNewHeaderTreeAndOrderHint();
 			}
 			
 			@Override
@@ -167,5 +145,36 @@ public class WikiSubpagesWidget implements IsWidget, WikiSubpagesView.Presenter 
 				}
 			}
 		});
+		
+		jsClient.getV2WikiOrderHint(wikiKey, new AsyncCallback<V2WikiOrderHint>() {
+			@Override
+			public void onSuccess(V2WikiOrderHint result) {
+				newWikiOrderHint = result;
+				afterGetNewHeaderTreeAndOrderHint();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				// Failed to get order hint. Just ignore it.
+				newWikiOrderHint = new V2WikiOrderHint();
+				afterGetNewHeaderTreeAndOrderHint();
+			}
+		});
+	}
+	
+	private void afterGetNewHeaderTreeAndOrderHint() {
+		if (newWikiHeaders != null && newWikiOrderHint != null) {
+			WikiOrderHintUtils.sortHeadersByOrderHint(newWikiHeaders, newWikiOrderHint);
+			if (currentWikiHeaders == null || !currentWikiHeaders.equals(newWikiHeaders)) {
+				view.clear();
+				view.configure(newWikiHeaders, ownerObjectName,
+						ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, reloadWikiPageCallback, actionMenu);
+				currentWikiHeaders = newWikiHeaders;
+				if (newWikiHeaders.size() <= 1) {
+					view.hideSubpages();
+				}
+			}
+			
+			view.setEditOrderButtonVisible(canEdit);
+		}
 	}
 }

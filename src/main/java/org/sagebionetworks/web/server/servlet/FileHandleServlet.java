@@ -300,7 +300,6 @@ public class FileHandleServlet extends HttpServlet {
 		fileEntity.setParentId(parentEntityId);
 		if (name != null)
 			fileEntity.setName(name);
-		fileEntity.setEntityType(FileEntity.class.getName());
 		//set data file handle id before creation
 		fileEntity.setDataFileHandleId(fileHandleId);
 		fileEntity = (FileEntity)client.createEntity(fileEntity);

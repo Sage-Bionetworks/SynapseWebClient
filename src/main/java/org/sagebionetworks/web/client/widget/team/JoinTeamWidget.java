@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -461,5 +462,9 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	@Override
 	public void onRequestAccess() {
 		view.open(accessRequirementsUrl);
+	}
+	
+	public void setButtonSize(ButtonSize size) {
+		view.setButtonSize(size);
 	}
 }

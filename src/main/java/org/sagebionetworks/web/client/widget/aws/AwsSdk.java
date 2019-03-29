@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.aws;
 
 import static org.sagebionetworks.web.client.ClientProperties.AWS_SDK_JS;
 
+import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.upload.S3DirectUploadHandler;
@@ -17,13 +19,16 @@ import com.google.inject.Inject;
  */
 public class AwsSdk {
 	ResourceLoader resourceLoader;
+	SynapseJSNIUtils jsniUtils;
+	
 	@Inject
-	public AwsSdk(ResourceLoader resourceLoader) {
+	public AwsSdk(ResourceLoader resourceLoader, SynapseJSNIUtils jsniUtils) {
 		this.resourceLoader = resourceLoader;
+		this.jsniUtils = jsniUtils;
 	}
 
 	public void init(final AsyncCallback<Void> callback) {
-
+		ClientProperties.fixResourceToCdnEndpoint(AWS_SDK_JS, jsniUtils.getCdnEndpoint());
 		if (!resourceLoader.isLoaded(AWS_SDK_JS)) {
 			resourceLoader.requires(AWS_SDK_JS, callback);
 		} else {

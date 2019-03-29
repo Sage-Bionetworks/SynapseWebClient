@@ -15,7 +15,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorView;
 
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -31,13 +31,13 @@ public class UserIdCellEditorImplTest {
 	UserGroupSuggestionProvider mockUserGroupSuggestionProvider;
 	@Mock
 	UserGroupSuggestion mockSynapseSuggestion;
-	UserIdCellEditorImpl editor;
+	UserIdCellEditor editor;
 
 	public static final String SELECTED_USER_ID = "876";
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		editor = new UserIdCellEditorImpl(mockView, mockSynapseSuggestBox, mockUserGroupSuggestionProvider);
+		editor = new UserIdCellEditor(mockView, mockSynapseSuggestBox, mockUserGroupSuggestionProvider);
 		when(mockSynapseSuggestion.getId()).thenReturn(SELECTED_USER_ID);
 	}
 	

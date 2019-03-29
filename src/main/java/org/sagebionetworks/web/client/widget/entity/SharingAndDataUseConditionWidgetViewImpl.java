@@ -8,17 +8,13 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineHTML;
@@ -27,8 +23,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implements SharingAndDataUseConditionWidgetView {
-	
-	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
 	GlobalApplicationState globalApplicationState;
 	IconsImageBundle iconsImageBundle;
@@ -63,7 +57,7 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 	}
 	
 	@Override
-	public void configure(EntityBundle bundle, boolean showChangeLink) {
+	public void configure(EntityBundle bundle) {
 		container.clear();
 		
 		HelpWidget helpWidget = new HelpWidget();
@@ -88,32 +82,8 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 		});
 		
 		Widget publicPrivateBadgeWidget = publicPrivateBadge.asWidget();
-		publicPrivateBadgeWidget.addStyleName("inline-block margin-left-10 moveup-2");
+		publicPrivateBadgeWidget.addStyleName("margin-left-10");
 		container.add(publicPrivateBadgeWidget);
-		
-		if (showChangeLink && bundle.getPermissions().getCanChangePermissions()) {
-			FlowPanel changeLinkContainer = new FlowPanel();
-			changeLinkContainer.addStyleName("inline-block margin-left-5 moveup-2");
-			changeLinkContainer.add(new InlineHTML("("));
-			Anchor change = new Anchor();
-			change.setText(DisplayConstants.CHANGE);
-			change.addStyleName("link");
-			accessControlListModalWidget.configure(bundle.getEntity(), true);
-			change.addClickHandler(new ClickHandler(){
-				@Override
-				public void onClick(ClickEvent event) {
-					accessControlListModalWidget.showSharing(new Callback() {
-						@Override
-						public void invoke() {
-							presenter.entityUpdated();
-						}
-					});
-				}
-			});
-			changeLinkContainer.add(change);
-			changeLinkContainer.add(new InlineHTML(")"));
-			container.add(changeLinkContainer);
-		}
 		container.add(sharingDescriptionContainer);
 		container.add(new Br());
 		
@@ -123,7 +93,7 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 		container.add(helpWidget.asWidget());
 
 		container.add(new InlineHTML("<h5 class=\"inline-block\">"+ DisplayConstants.DATA_USE +"</h5>"));
-		restrictionWidgetV2.setShowChangeLink(showChangeLink);
+		restrictionWidgetV2.setShowChangeLink(false);
 		restrictionWidgetV2.configure(bundle.getEntity(), bundle.getPermissions().getCanChangePermissions());
 		container.add(restrictionWidgetV2);
 	}
@@ -143,15 +113,4 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
-
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;		
-	}
-
-
-	/*
-	 * Private Methods
-	 */
-
 }

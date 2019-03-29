@@ -1,8 +1,21 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
@@ -13,11 +26,11 @@ import org.mockito.Captor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
@@ -30,6 +43,8 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
+import org.sagebionetworks.web.client.cache.EntityId2BundleCacheImpl;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.ChangeSynapsePlaceEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -139,6 +154,10 @@ public class EntityPageTopTest {
 	ArgumentCaptor<Place> placeCaptor;
 	@Mock
 	EventBinder mockEventBinder;
+	@Mock
+	EntityHeader mockProjectEntityHeader;
+	
+	EntityId2BundleCache entityId2BundleCache;
 	EntityPageTop pageTop;
 	String projectEntityId = "syn123";
 	String projectName = "fooooo";
@@ -156,6 +175,7 @@ public class EntityPageTopTest {
 		when(mockDockerTab.asTab()).thenReturn(mockDockerInnerTab);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockView.getEventBinder()).thenReturn(mockEventBinder);
+		entityId2BundleCache = new EntityId2BundleCacheImpl();
 		pageTop = new EntityPageTop(mockView, 
 				mockSynapseClientAsync, 
 				mockTabs,
@@ -173,8 +193,9 @@ public class EntityPageTopTest {
 				mockCookies, 
 				mockSynapseJavascriptClient,
 				mockGlobalApplicationState,
+				entityId2BundleCache,
 				mockEventBus);
-		AsyncMockStubber.callSuccessWith(mockProjectBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockProjectBundle).when(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		
 		when(mockProjectBundle.getEntity()).thenReturn(mockProjectEntity);
@@ -187,6 +208,10 @@ public class EntityPageTopTest {
 		when(mockPermissions.getCanModerate()).thenReturn(canModerate);
 		when(mockProjectBundle.getAccessControlList()).thenReturn(mockACL);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("fake cookie");
+		EntityPath path = new EntityPath();
+		path.setPath(Collections.singletonList(mockProjectEntityHeader));
+		when(mockProjectEntityHeader.getType()).thenReturn(Project.class.getName());
+		when(mockProjectBundle.getPath()).thenReturn(path);
 		
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseJavascriptClient).isWiki(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseJavascriptClient).isFileOrFolder(anyString(), any(AsyncCallback.class));
@@ -288,7 +313,7 @@ public class EntityPageTopTest {
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class), eq(mockActionMenuWidget));
 		
 		//verify it never asks for the project bundle (SWC-4462)
-		verify(mockSynapseJavascriptClient, never()).getEntityBundle(eq(projectEntityId), eq(EntityPageTop.ALL_PARTS_MASK), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, never()).getEntityBundleFromCache(eq(projectEntityId), any(AsyncCallback.class));
 		verify(mockSynapseJavascriptClient, never()).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		
 		// entity area for the project settings doesn't apply (so it's set to null).
@@ -457,7 +482,7 @@ public class EntityPageTopTest {
 	public void testConfigureWithFileAndFailureToLoadProject(){
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
 		Exception projectLoadError = new Exception("failed to load project");
-		AsyncMockStubber.callFailureWith(projectLoadError).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(projectLoadError).when(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
 		Synapse.EntityArea area = null;
 		String areaToken = null;
 		Long versionNumber = 5L;
@@ -831,5 +856,27 @@ public class EntityPageTopTest {
 		verify(mockEntityActionController).configure(eq(mockActionMenuWidget), eq(mockProjectBundle), eq(true), eq(areaToken), eq(EntityArea.DISCUSSION));
 		//configured the discussion tab
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, areaToken, canModerate, mockActionMenuWidget);
+	}
+	
+	@Test
+	public void testOnChangeSynapsePlaceDifferentEntityIdSameProject(){
+		String entityId1 = "syn1";
+		String entityId2 = "syn2";
+		when(mockProjectEntity.getId()).thenReturn(entityId1);
+		entityId2BundleCache.put(entityId1, mockProjectBundle);
+		entityId2BundleCache.put(entityId2, mockProjectBundle);
+		
+		Synapse.EntityArea area = null;
+		String areaToken = null;
+		Long versionNumber = null;
+		when(mockEntityBundle.getEntity()).thenReturn(mockProjectEntity);
+		pageTop.configure(mockProjectBundle, versionNumber, mockProjectHeader, area, areaToken);
+		Synapse newPlace = new Synapse(entityId2);
+		
+		pageTop.onChangeSynapsePlace(new ChangeSynapsePlaceEvent(newPlace));
+		
+		//verify we did not change place, but instead reconfigured for target entity under the same project
+		verify(mockPlaceChanger, never()).goTo(newPlace);
+		verify(mockEntityActionController, times(2)).configure(eq(mockActionMenuWidget), eq(mockProjectBundle), eq(true), eq(areaToken), eq(EntityArea.WIKI));
 	}
 }

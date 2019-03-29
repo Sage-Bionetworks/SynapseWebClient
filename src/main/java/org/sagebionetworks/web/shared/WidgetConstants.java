@@ -95,6 +95,7 @@ public class WidgetConstants {
 	public static final String TEAM_MEMBERS_FRIENDLY_NAME ="Team Members";
 	
 	public static final String TEAM_MEMBER_COUNT_CONTENT_TYPE = "teammembercount";
+	public static final String TEAM_MEMBER_COUNT_FRIENDLY_NAME = "Team Member Count";
 	public static final String PLOT_CONTENT_TYPE = "plot";
 	public static final String PLOT_FRIENDLY_NAME = "Plot";
 	
@@ -165,11 +166,9 @@ public class WidgetConstants {
 	public static final String API_TABLE_WIDGET_PAGING_KEY = "paging";
 	public static final String API_TABLE_WIDGET_QUERY_TABLE_RESULTS = "queryTableResults";
 	public static final String API_TABLE_WIDGET_SHOW_IF_LOGGED_IN = "showIfLoggedInOnly";
-	public static final String API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY = "showRowNumber";
 	public static final String API_TABLE_WIDGET_RESULTS_KEY = "jsonResultsKeyName";
 	public static final String API_TABLE_WIDGET_CSS_STYLE = "cssStyle";
 	public static final String API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX = "columnConfig";
-	public static final String API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY = "rowNumberDisplayName";
 	public static final String API_TABLE_WIDGET_PAGESIZE_KEY = "pageSize";
 	public static final String ENTITYLIST_WIDGET_LIST_KEY = "list";
 	public static final String ENTITYLIST_WIDGET_SHOW_DESCRIPTION_KEY = "desc";

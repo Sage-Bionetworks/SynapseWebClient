@@ -29,7 +29,6 @@ import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -53,8 +52,6 @@ public class PasswordResetPresenterTest {
 	PasswordReset place = Mockito.mock(PasswordReset.class);
 	
 	@Mock
-	PasswordStrengthWidget mockPasswordStrengthWidget;
-	@Mock
 	SynapseAlert mockSynAlert;
 	UserProfile profile;
 	@Before
@@ -74,7 +71,7 @@ public class PasswordResetPresenterTest {
 		presenter = new PasswordResetPresenter(mockView, mockCookieProvider,
 				mockUserService, mockAuthenticationController,
 				mockSageImageBundle, mockIconsImageBundle,
-				mockGlobalApplicationState, mockPasswordStrengthWidget, mockSynAlert);			
+				mockGlobalApplicationState, mockSynAlert);			
 		verify(mockView).setPresenter(presenter);
 		when(place.toToken()).thenReturn(ClientProperties.DEFAULT_PLACE_TOKEN);
 	}

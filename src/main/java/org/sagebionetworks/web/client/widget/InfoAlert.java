@@ -76,6 +76,9 @@ public class InfoAlert implements IsWidget {
 	public void setLinkText(String text) {
 		link.setText(text.toUpperCase());
 	}
+	public void setLinkHref(String href) {
+		link.setHref(href);
+	}
 	public void setAlertType(AlertType type) {
 		w.setType(type);
 	}

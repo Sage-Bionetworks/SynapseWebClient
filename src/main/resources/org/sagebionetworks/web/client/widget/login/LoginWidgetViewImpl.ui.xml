@@ -8,14 +8,18 @@
 	<bh:Div addStyleNames="max-width-350 center-in-div">
 		<bh:ClearFix />
 		<g:SimplePanel ui:field="googleSSOContainer">
-			<b:Button icon="GOOGLE" ui:field="googleSignInButton" iconSize="LARGE" size="LARGE" iconFixedWidth="true" width="100%" addStyleNames="lightGreyBackground no-background">Sign
-				in with Google</b:Button>
+			<b:Button ui:field="googleSignInButton" size="LARGE" width="100%" addStyleNames="lightGreyBackground no-background" text="" paddingTop="0" paddingBottom="0" paddingLeft="0"/>
 		</g:SimplePanel>
 		<bh:Div addStyleNames="centered-in-hr" marginTop="40" marginBottom="40">
 			<bh:Span addStyleNames="lightGreyText">or</bh:Span>
 		</bh:Div>
 		<b:Heading size="H4" subText="Sign in with your Synapse account" addStyleNames="text-align-center margin-top-20"/>
-		<bh:Div ui:field="loginFormContainer" />
+		
+		<bh:Div>
+			<b:TextBox ui:field="username" placeholder="Username or Email Address" addStyleNames="margin-top-20 whiteBackground" autoComplete="false"/>
+			<b:Input ui:field="password" type="PASSWORD"  placeholder="Password" addStyleNames="margin-top-20 whiteBackground" autoComplete="false"/>
+			<b:Button ui:field="loginButton" size="LARGE" type="SUCCESS" text="Sign in" width="100%" marginTop="15"/>
+		</bh:Div>
 		<b:Row>
 				<bh:Div ui:field="synAlertContainer" />
 			</b:Row>

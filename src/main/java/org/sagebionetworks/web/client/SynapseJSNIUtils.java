@@ -55,7 +55,7 @@ public interface SynapseJSNIUtils {
 	public void consoleError(String message);
 	public void consoleError(Throwable t);
 	
-	public void processWithMathJax(Element element);	
+	public void processMath(Element element);	
 
 	public void loadCss(String url);
 
@@ -87,4 +87,5 @@ public interface SynapseJSNIUtils {
 	String getCdnEndpoint();
 	String getSessionCookieUrl();
 	void scrollIntoView(Element el);
+	void unmountComponentAtNode(Element el);
 }

@@ -17,6 +17,7 @@ public interface BigPromptModalView extends IsWidget {
 	 * @param value The initial value.
 	 */
 	public void configure(String title, String label, String value, Callback callback);
+	public void configure(String title, String label, String value);
 	
 	public String getValue();
 	
@@ -46,5 +47,8 @@ public interface BigPromptModalView extends IsWidget {
 	 * @param isLoading
 	 */
 	public void setLoading(boolean isLoading);
+	
+	void addStyleToModal(String styles);
+	void setTextAreaHeight(String height);
 
 }

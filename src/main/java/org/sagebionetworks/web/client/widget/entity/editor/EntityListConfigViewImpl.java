@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.CheckBoxState;
 import org.sagebionetworks.web.client.widget.SelectableListView;
 import org.sagebionetworks.web.client.widget.SelectionToolbar;
 
@@ -151,10 +152,8 @@ public class EntityListConfigViewImpl implements EntityListConfigView {
 	public void addWidget(Widget w) {
 		widgets.add(w);
 	}
-	
-	/*
-	 * Private Methods
-	 */
-
-
+	@Override
+	public void setSelectionState(CheckBoxState selectionState) {
+		selectionToolbar.setSelectionState(selectionState);
+	}
 }

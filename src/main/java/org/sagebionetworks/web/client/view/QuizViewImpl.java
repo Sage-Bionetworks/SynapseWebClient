@@ -1,19 +1,16 @@
 package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Heading;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
@@ -173,11 +170,11 @@ public class QuizViewImpl extends Composite implements QuizView {
 	}
 	
 	@Override
-	public void showSuccess(UserProfile profile, PassingRecord passingRecord) {
+	public void showSuccess(PassingRecord passingRecord) {
 		hideAll();
 		DisplayUtils.show(quizSuccessUI);
 		DisplayUtils.hide(quizFailureUI);
-		certificateWidget.configure(profile, passingRecord);
+		certificateWidget.configure(passingRecord);
 		successContainer.setVisible(true);
 		quizContainer.setVisible(true);
 		DisplayUtils.scrollToTop();

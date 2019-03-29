@@ -42,6 +42,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
@@ -109,6 +110,8 @@ public class ColumnModelsWidgetTest {
 	List<ColumnModel> mockAnnotationColumnsPage2;
 	@Mock
 	EventBus mockEventBus;
+	@Mock
+	SynapseAlert mockSynAlert;
 	public static final String NEXT_PAGE_TOKEN = "nextPageToken";
 
 	TableEntity table;
@@ -138,7 +141,7 @@ public class ColumnModelsWidgetTest {
 				return new ColumnModelTableRowViewerStub();
 			}
 		});
-		widget = new ColumnModelsWidget(mockBaseView, mockGinInjector, mockSynapseClient, mockEditor, mockJobTrackingWidget, mockFileViewDefaultColumns);
+		widget = new ColumnModelsWidget(mockBaseView, mockGinInjector, mockSynapseClient, mockEditor, mockJobTrackingWidget, mockFileViewDefaultColumns, mockSynAlert);
 		when(mockEditor.validate()).thenReturn(true);
 		when(mockTableSchemaChangeRequest.getChanges()).thenReturn(Collections.singletonList(mockTableUpdateRequest));
 		AsyncMockStubber.callSuccessWith(mockTableSchemaChangeRequest).when(mockSynapseClient).getTableUpdateTransactionRequest(anyString(), anyList(), anyList(), any(AsyncCallback.class));
@@ -275,7 +278,8 @@ public class ColumnModelsWidgetTest {
 		String firstPageToken = null;
 		widget.getPossibleColumnModelsForViewScope(firstPageToken);
 		verify(mockSynapseClient).getPossibleColumnModelsForViewScope(any(ViewScope.class), eq(firstPageToken), any(AsyncCallback.class));
-		verify(mockBaseView).showError(error);
+		verify(mockSynAlert).handleException(ex);
+		verify(mockBaseView).resetSaveButton();
 	}
 	
 	@Test
@@ -325,7 +329,7 @@ public class ColumnModelsWidgetTest {
 		
 		verify(mockBaseView).setLoading();
 		verify(mockBaseView).hideEditor();
-		verify(mockBaseView).hideErrors();
+		verify(mockSynAlert).clear();
 		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 	}
 
@@ -346,7 +350,8 @@ public class ColumnModelsWidgetTest {
 		InOrder inOrder = inOrder(mockBaseView);
 		inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(true);
 		inOrder.verify(mockBaseView).setJobTrackingWidgetVisible(false);
-		verify(mockBaseView).showError(errorMessage);
+		verify(mockSynAlert).handleException(ex);
+		verify(mockBaseView).resetSaveButton();
 	}
 	
 	@Test
@@ -362,9 +367,9 @@ public class ColumnModelsWidgetTest {
 		widget.onSave();
 		verify(mockBaseView, never()).setLoading();
 		verify(mockBaseView, never()).hideEditor();
-		verify(mockBaseView, never()).hideErrors();
+		verify(mockSynAlert, never()).clear();
 		// Save success should be called.
-		verify(mockBaseView).showError(ColumnModelsWidget.SEE_THE_ERROR_S_ABOVE);
+		verify(mockSynAlert).showError(ColumnModelsWidget.SEE_THE_ERROR_S_ABOVE);
 	}
 	
 	@Test
@@ -376,13 +381,15 @@ public class ColumnModelsWidgetTest {
 		// Show the dialog
 		widget.onEditColumns();
 		String errorMessage = "Something went wrong";
-		AsyncMockStubber.callFailureWith(new RestServiceException(errorMessage)).when(mockSynapseClient).getTableUpdateTransactionRequest(anyString(), anyList(),  anyList(), any(AsyncCallback.class));
+		RestServiceException ex = new RestServiceException(errorMessage);
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getTableUpdateTransactionRequest(anyString(), anyList(),  anyList(), any(AsyncCallback.class));
 		// Now call save
 		widget.onSave();
 		verify(mockBaseView, times(1)).setLoading();
 		// The editor must not be hidden on an error.
 		verify(mockBaseView, never()).hideEditor();
-		verify(mockBaseView).showError(errorMessage);
+		verify(mockSynAlert).handleException(ex);
+		verify(mockBaseView).resetSaveButton();
 		// only the original columns should be applied to the view.
 		verify(mockViewer, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
 	}

@@ -39,6 +39,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 	PortalGinInjector ginInjector;
 	CreateAccessRequirementButton createAccessRequirementButton;
 	DeleteAccessRequirementButton deleteAccessRequirementButton;
+	IntendedDataUseReportButton iduReportButton;
 	SubjectsWidget subjectsWidget;
 	ReviewAccessRequestsButton reviewAccessRequestsButton;
 	String submissionId;
@@ -59,6 +60,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 			CreateAccessRequirementButton createAccessRequirementButton,
 			DeleteAccessRequirementButton deleteAccessRequirementButton,
 			ReviewAccessRequestsButton reviewAccessRequestsButton,
+			IntendedDataUseReportButton iduReportButton,
 			DataAccessClientAsync dataAccessClient,
 			LazyLoadHelper lazyLoadHelper,
 			AuthenticationController authController,
@@ -74,6 +76,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		this.createAccessRequirementButton = createAccessRequirementButton;
 		this.deleteAccessRequirementButton = deleteAccessRequirementButton;
 		this.reviewAccessRequestsButton = reviewAccessRequestsButton;
+		this.iduReportButton = iduReportButton;
 		this.manageAccessButton = manageAccessButton;
 		this.dataAccessClient = dataAccessClient;
 		fixServiceEntryPoint(dataAccessClient);
@@ -90,6 +93,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		view.setReviewAccessRequestsWidget(reviewAccessRequestsButton);
 		view.setManageAccessWidget(manageAccessButton);
 		view.setSubjectsWidget(subjectsWidget);
+		view.setIDUReportButton(iduReportButton);
 		view.setSynAlert(synAlert);
 		Callback loadDataCallback = new Callback() {
 			@Override
@@ -122,6 +126,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		});
 		createAccessRequirementButton.configure(ar, refreshCallback);
 		deleteAccessRequirementButton.configure(ar, refreshCallback);
+		iduReportButton.configure(ar);
 		reviewAccessRequestsButton.configure(ar);
 		manageAccessButton.configure(ar);
 		subjectsWidget.configure(ar.getSubjectIds());

@@ -12,7 +12,6 @@ public interface BigTeamBadgeView extends IsWidget, SynapseView {
 	
 	public void setRequestCount(String count);
 	
-	void setTeamWithoutLink(String name);
 	void addStyleName(String style);
 	void setHeight(String height);
 }

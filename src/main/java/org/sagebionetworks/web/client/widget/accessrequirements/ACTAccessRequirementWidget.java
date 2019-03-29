@@ -9,12 +9,10 @@ import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.BasicAccessRequirementStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
@@ -40,8 +38,6 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	String submissionId;
 	LazyLoadHelper lazyLoadHelper;
 	AuthenticationController authController;
-	JiraURLHelper jiraURLHelper;
-	PopupUtilsView popupUtils;
 	ReviewAccessorsButton manageAccessButton;
 	ConvertACTAccessRequirementButton convertACTAccessRequirementButton;
 	
@@ -57,8 +53,6 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			DataAccessClientAsync dataAccessClient,
 			LazyLoadHelper lazyLoadHelper,
 			AuthenticationController authController,
-			JiraURLHelper jiraURLHelper,
-			PopupUtilsView popupUtils,
 			ReviewAccessorsButton manageAccessButton,
 			ConvertACTAccessRequirementButton convertACTAccessRequirementButton) {
 		this.view = view;
@@ -73,8 +67,6 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		fixServiceEntryPoint(dataAccessClient);
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.authController = authController;
-		this.jiraURLHelper = jiraURLHelper;
-		this.popupUtils = popupUtils;
 		this.manageAccessButton = manageAccessButton;
 		this.convertACTAccessRequirementButton = convertACTAccessRequirementButton;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
@@ -132,6 +124,19 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		}
 	}
 	
+	@Override
+	public void onRequestAccess() {
+		// request access via Jira
+		UserProfile userProfile = authController.getCurrentUserProfile();
+		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
+		String primaryEmail = DisplayUtils.getPrimaryEmail(userProfile);
+		view.showJiraIssueCollector(userProfile.getOwnerId(), 
+				DisplayUtils.getDisplayName(userProfile), 
+				primaryEmail, 
+				ar.getSubjectIds().get(0).getId(), 
+				ar.getId().toString());	
+	}
+	
 	public void showApproved() {
 		view.showApprovedHeading();
 		view.showRequestApprovedMessage();
@@ -156,21 +161,6 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 				}
 			}
 		});
-	}
-	
-	@Override
-	public void onRequestAccess() {
-		// request access via Jira
-		UserProfile userProfile = authController.getCurrentUserProfile();
-		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
-		String primaryEmail = DisplayUtils.getPrimaryEmail(userProfile);
-		String createJiraIssueURL = jiraURLHelper.createRequestAccessIssue(
-				userProfile.getOwnerId(), 
-				DisplayUtils.getDisplayName(userProfile), 
-				primaryEmail, 
-				ar.getSubjectIds().get(0).getId(), 
-				ar.getId().toString());
-		popupUtils.openInNewWindow(createJiraIssueURL);
 	}
 	
 	public void addStyleNames(String styleNames) {

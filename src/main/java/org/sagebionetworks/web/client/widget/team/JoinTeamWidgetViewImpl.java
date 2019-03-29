@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.team;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.TextArea;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -323,5 +324,14 @@ public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
 	@Override
 	public void setAccessRequirementsLinkVisible(boolean visible) {
 		actRequestAccessButton.setVisible(visible);
+	}
+	@Override
+	public void setButtonSize(ButtonSize size) {
+		anonUserButton.setSize(size);
+		acceptInviteButton.setSize(size);
+		simpleRequestButton.setSize(size);
+		requestButton.setSize(size);
+		sendRequestButton.setSize(size);
+		actRequestAccessButton.setSize(size);
 	}
 }

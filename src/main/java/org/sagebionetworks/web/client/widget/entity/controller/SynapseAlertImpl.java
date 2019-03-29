@@ -2,6 +2,9 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
 
+import org.sagebionetworks.schema.adapter.JSONAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -38,6 +41,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	Throwable ex;
 	Callback reloadOnLoginListener;
 	SynapseJSNIUtils jsniUtils;
+	JSONObjectAdapter jsonObjectAdapter;
 	
 	@Inject
 	public SynapseAlertImpl(
@@ -46,13 +50,15 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 			AuthenticationController authController,
 			GWTWrapper gwt,
 			PortalGinInjector ginInjector,
-			SynapseJSNIUtils jsniUtils
+			SynapseJSNIUtils jsniUtils,
+			JSONObjectAdapter jsonObjectAdapter
 			) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authController = authController;
 		this.ginInjector = ginInjector;
 		this.jsniUtils = jsniUtils;
+		this.jsonObjectAdapter = jsonObjectAdapter;
 		view.setPresenter(this);
 		
 		reloadOnLoginListener = () -> {
@@ -65,6 +71,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 		clear();
 		this.ex = ex;
 		boolean isLoggedIn = authController.isLoggedIn();
+		String message = ex.getMessage() == null ? "" : ex.getMessage();
 		if (ex instanceof StatusCodeException) {
 			StatusCodeException sce = (StatusCodeException)ex;
 			if (sce.getStatusCode() == 0) {
@@ -87,29 +94,39 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 			if(!isLoggedIn) {
 				showLogin();
 			} else {
-				view.showError(DisplayConstants.ERROR_FAILURE_PRIVLEDGES + " " + ex.getMessage());
+				view.showError(DisplayConstants.ERROR_FAILURE_PRIVLEDGES + " " + message);
 			}
 		} else if(ex instanceof NotFoundException) {
-			view.showError(DisplayConstants.ERROR_NOT_FOUND  + " " + ex.getMessage());
+			view.showError(DisplayConstants.ERROR_NOT_FOUND  + " " + message);
 		} else if (ex instanceof TooManyRequestsException) {
-			view.showError(DisplayConstants.ERROR_TOO_MANY_REQUESTS  + "\n\n" + ex.getMessage());
+			view.showError(DisplayConstants.ERROR_TOO_MANY_REQUESTS  + "\n\n" + message);
 		} else if (ex instanceof ConflictingUpdateException) {
-			view.showError(DisplayConstants.ERROR_CONFLICTING_UPDATE + "\n" + ex.getMessage());
+			view.showError(DisplayConstants.ERROR_CONFLICTING_UPDATE + "\n" + message);
 		} else if (ex instanceof UnknownErrorException) {
 			//An unknown error occurred. 
 			//Exception handling on the backend now throws the reason into the exception message.  Easy!
-			view.showError(ex.getMessage());
+			view.showError(message);
 			if (isLoggedIn) {
-				view.showJiraDialog(ex.getMessage());
+				view.showJiraDialog(message);
 			}
 		} else {
 			//not recognized
-			String message = ex.getMessage(); 
 			if (message == null || 
 				message.isEmpty() ||
 				message.equals("0")) {
 				message = DisplayConstants.ERROR_RESPONSE_UNAVAILABLE;
 			}
+			
+			// if this is json, report the reason value (if available)
+			try {
+				JSONObjectAdapter json = jsonObjectAdapter.createNew(message);
+				if (json.has("reason")) {
+					message = json.getString("reason");
+				}
+			} catch (Throwable e) {
+				// was not json
+			}
+			
 			view.showError(message);
 		}
 	}

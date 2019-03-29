@@ -30,6 +30,7 @@ import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -66,6 +67,8 @@ public class EntityMetadataTest {
 	ActionMenuWidget mockActionMenuWidget;
 	@Mock
 	CookieProvider mockCookies;
+	@Mock
+	PortalGinInjector mockGinInjector;
 	String entityId = "syn123";
 	String entityName = "testEntity";
 	Entity en = new Folder();
@@ -74,15 +77,16 @@ public class EntityMetadataTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
+		when(mockGinInjector.getFileHistoryWidget()).thenReturn(mockFileHistoryWidget);
 		widget = new EntityMetadata(mockView, mockDoiWidgetV2, mockAnnotationsWidget,
-				mockFileHistoryWidget, mockJsClient, mockJSNI, mockRestrictionWidgetV2);
+				mockJsClient, mockJSNI, mockRestrictionWidgetV2, mockGinInjector);
 	}
 	
 	@Test
 	public void testConstruction() {
 		verify(mockView).setDoiWidget(any(IsWidget.class));
 		verify(mockView).setAnnotationsRendererWidget(any(IsWidget.class));
-		verify(mockView).setFileHistoryWidget(any(IsWidget.class));
+		verify(mockView, never()).setFileHistoryWidget(any(IsWidget.class)); //lazily created
 		verify(mockView).setRestrictionWidgetV2(any(IsWidget.class));
 		verify(mockRestrictionWidgetV2).setShowChangeLink(true);
 		verify(mockRestrictionWidgetV2).setShowIfProject(false);
@@ -182,6 +186,7 @@ public class EntityMetadataTest {
 		Long versionNumber = null;
 		widget.configure(bundle, versionNumber, mockActionMenuWidget);
 		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
+		verify(mockFileHistoryWidget).setVisible(false);
 		verify(mockDoiWidgetV2).configure(mockDoiAssociation);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
 	}

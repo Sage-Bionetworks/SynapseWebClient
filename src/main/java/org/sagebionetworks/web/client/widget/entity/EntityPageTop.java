@@ -10,8 +10,10 @@ import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 import static org.sagebionetworks.repo.model.EntityBundle.FILE_NAME;
 import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.RESTRICTION_INFORMATION;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
+import static org.sagebionetworks.repo.model.EntityBundle.THREAD_COUNT;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
@@ -31,6 +33,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.ChangeSynapsePlaceEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -89,9 +92,9 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	private PlaceChanger placeChanger;
 	private CookieProvider cookies;
 	private EventBus eventBus;
+	private EntityId2BundleCache entityId2BundleCache;
 	public boolean pushTabUrlToBrowserHistory = false;
-	
-	public static final int ALL_PARTS_MASK = ENTITY | ENTITY_PATH | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME | BENEFACTOR_ACL | TABLE_DATA | ACL | BENEFACTOR_ACL;
+	public static final int ALL_PARTS_MASK = ENTITY | ENTITY_PATH | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME | BENEFACTOR_ACL | TABLE_DATA | ACL | BENEFACTOR_ACL | THREAD_COUNT | RESTRICTION_INFORMATION;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -111,6 +114,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			CookieProvider cookies,
 			SynapseJavascriptClient synapseJavascriptClient,
 			GlobalApplicationState globalAppState,
+			EntityId2BundleCache entityId2BundleCache,
 			EventBus eventBus) {
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -130,6 +134,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		this.cookies = cookies;
 		this.synapseJavascriptClient = synapseJavascriptClient;
 		this.placeChanger = globalAppState.getPlaceChanger();
+		this.entityId2BundleCache = entityId2BundleCache;
 		this.eventBus = eventBus;
 		
 		initTabs();
@@ -160,6 +165,20 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			pushTabUrlToBrowserHistory = true;
 			reconfigureCurrentArea();
 		} else {
+			//SWC-4234: if the project has not changed, then don't change places.
+			EntityBundle bundle1 = entityId2BundleCache.get(entity.getId());
+			EntityBundle bundle2 = entityId2BundleCache.get(place.getEntityId());
+			if (bundle1 != null && bundle2 != null) {
+				EntityHeader projectHeader1 = DisplayUtils.getProjectHeader(bundle1.getPath());
+				EntityHeader projectHeader2 = DisplayUtils.getProjectHeader(bundle2.getPath());
+				if (projectHeader1 != null && projectHeader1.equals(projectHeader2)) {
+					// skip full reload - use the same logic as clicking on an entity in the same tab (in the same project)
+					EntityArea newArea = getAreaForEntity(bundle2.getEntity());
+					getEntitySelectedCallback(newArea).invoke(place.getEntityId());
+					return;
+				}
+			}
+			
 			placeChanger.goTo(place);
 		}
 	}
@@ -323,7 +342,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		if (projectHeader.getId().equals(currentTargetEntityBundle.getEntity().getId())) {
 			callback.onSuccess(currentTargetEntityBundle);
 		} else {
-			synapseJavascriptClient.getEntityBundle(projectHeader.getId(), ALL_PARTS_MASK, callback);	
+			synapseJavascriptClient.getEntityBundleFromCache(projectHeader.getId(), callback);	
 		}
 	}
 
@@ -342,7 +361,11 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		if (entityId != null && projectBundle != null && entityId.equals(projectBundle.getEntity().getId())) {
 			callback.onSuccess(projectBundle);
 		} else {
-			synapseJavascriptClient.getEntityBundleForVersion(entityId, version, ALL_PARTS_MASK, callback);	
+			if (version == null) {
+				synapseJavascriptClient.getEntityBundleFromCache(entityId, callback);
+			} else {
+				synapseJavascriptClient.getEntityBundleForVersion(entityId, version, ALL_PARTS_MASK, callback);	
+			}
 		}
 	}
 
@@ -517,6 +540,20 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		return EntityArea.WIKI;
 	}
 
+	private EntityArea getAreaForEntity(Entity entity) {
+		EntityArea area = null;
+		if (entity instanceof Project) {
+			area = getDefaultProjectArea();
+		} else if (entity instanceof Table) {
+			area = EntityArea.TABLES;
+		} else if (entity instanceof DockerRepository) {
+			area = EntityArea.DOCKER;
+		} else { //if (entity instanceof FileEntity || entity instanceof Folder, or any other entity type)
+			area = EntityArea.FILES;
+		}
+		return area;
+	}
+	
 	public void initAreaToken() {
 		if (entity instanceof Project) {
 			projectMetadata.setVisible(true);
@@ -524,15 +561,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 
 		//set area, if undefined
 		if (area == null) {
-			if (entity instanceof Project) {
-				area = getDefaultProjectArea();
-			} else if (entity instanceof Table) {
-				area = EntityArea.TABLES;
-			} else if (entity instanceof DockerRepository) {
-				area = EntityArea.DOCKER;
-			} else { //if (entity instanceof FileEntity || entity instanceof Folder, or any other entity type)
-				area = EntityArea.FILES;
-			}
+			area = getAreaForEntity(entity);
 		}
 		setCurrentAreaToken(initialAreaToken);
 
@@ -664,6 +693,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		// on configure of wiki tab, always update the entity action controller with the correct wiki page
 		String wikiId = wikiAreaToken;
 		if (projectBundle != null) {
+			entity = projectBundle.getEntity();
 			wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
 		}
 		entityActionController.configure(entityActionMenu, projectBundle, true, wikiId, area);

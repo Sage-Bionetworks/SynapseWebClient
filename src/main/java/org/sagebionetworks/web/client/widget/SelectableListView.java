@@ -7,6 +7,7 @@ public interface SelectableListView {
 	void setCanMoveDown(boolean canMoveDown);
 	void setButtonToolbarVisible(boolean visible);
 	void setSelectionToolbarHandler(Presenter selectableItemList);
+	void setSelectionState(CheckBoxState selectionState);
 	/**
 	 * Presenter interface
 	 */

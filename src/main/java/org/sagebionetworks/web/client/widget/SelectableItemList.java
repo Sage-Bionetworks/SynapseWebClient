@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -114,6 +113,8 @@ public class SelectableItemList extends ArrayList<SelectableListItem> implements
 			view.setCanDelete(count > 0);
 			view.setCanMoveUp(count == 1 && lastIndex > 0);
 			view.setCanMoveDown(count == 1 && lastIndex < size()-1);
+			CheckBoxState state = CheckBoxState.getStateFromCount(count, size());
+			view.setSelectionState(state);
 		}
 	}
 }

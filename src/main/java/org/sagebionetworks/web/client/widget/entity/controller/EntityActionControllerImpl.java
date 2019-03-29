@@ -43,6 +43,7 @@ import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -658,9 +659,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureViewWikiSource(){
-		//only visible if entity may have a wiki, and user can't Edit the wiki
+		//only visible if entity may have a wiki
 		if(isWikiableConfig(entityBundle.getEntity(), currentArea)){
-			actionMenu.setActionVisible(Action.VIEW_WIKI_SOURCE, !permissions.getCanEdit());
+			actionMenu.setActionVisible(Action.VIEW_WIKI_SOURCE, true);
 			actionMenu.setActionListener(Action.VIEW_WIKI_SOURCE, this);
 		}else{
 			actionMenu.setActionVisible(Action.VIEW_WIKI_SOURCE, false);
@@ -672,7 +673,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				entityBundle.getEntity() instanceof Project &&
 				permissions.getCanEdit()){
 			// shown if there's more than one page
-			getSynapseClient().getV2WikiHeaderTree(entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), new AsyncCallback<List<V2WikiHeader>>() {
+			getSynapseJavascriptClient().getV2WikiHeaderTree(entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), new AsyncCallback<List<V2WikiHeader>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					actionMenu.setActionVisible(Action.REORDER_WIKI_SUBPAGES, false);
@@ -1166,10 +1167,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 		ref.setTargetVersionNumber(targetVersionNumber);
 		link.setLinksTo(ref); // links to this entity
-		link.setLinksToClassName(entityBundle.getEntity().getEntityType());
+		link.setLinksToClassName(entityBundle.getEntity().getClass().getName());
 		link.setName(entityBundle.getEntity().getName()); // copy name of this entity as default
-		link.setEntityType(Link.class.getName());
-		getSynapseClient().createEntity(link, new AsyncCallback<Entity>() {
+		getSynapseJavascriptClient().createEntity(link, new AsyncCallback<Entity>() {
 			
 			@Override
 			public void onSuccess(Entity result) {
@@ -1434,7 +1434,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);			
+				view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE + caught.getMessage());
 			}
 		});
 	}
@@ -1452,7 +1452,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			else if(entityBundle.getEntity() instanceof FileEntity || entityBundle.getEntity() instanceof Folder) gotoPlace = new Synapse(parentId, null, EntityArea.FILES, null);
 			else gotoPlace = new Synapse(parentId);
 		} else {
-			gotoPlace = new Profile(authenticationController.getCurrentUserPrincipalId());
+			gotoPlace = new Profile(authenticationController.getCurrentUserPrincipalId(), ProfileArea.PROJECTS);
 		}
 		return gotoPlace;
 	}

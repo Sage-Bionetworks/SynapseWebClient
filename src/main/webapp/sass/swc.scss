@@ -152,7 +152,7 @@ end sticky footer
 	.btn-default {
 		background-color: #ebebeb;
 	}
-	.btn-default:hover, .open .dropdown-toggle.btn-default {
+	.btn-default:hover, .open .dropdown-toggle.btn-default, .btn-default:hover a {
 		color: white;
 		background-color: $synapse-blue;
 		border-color: #186292;
@@ -182,14 +182,25 @@ end sticky footer
 	.radio::before {
 		border-radius: 50%;
 	}
+	.indeterminate-checkbox input[type="checkbox"] + label::before, .indeterminate-checkbox input[type="checkbox"] + span::before {
+		content: "–";
+		color: $synapse-blue;
+		font-size: 14px;
+		margin-left: -17px;
+		top: 1px;
+		position: relative;
+		margin-right: 8px;
+		font-weight: bolder;
+	}
 	input[type="checkbox"]:checked + label::before, input[type="checkbox"]:checked + span::before {
 		content: "✓";
 		color: $synapse-blue;
-		text-align: center;
-		font-size: 20px;
+		font-size: 14px;
 		margin-left: -19px;
-		vertical-align: bottom;
-		margin-right: 4px;
+		top: 1px;
+		position: relative;
+		margin-right: 8px;
+		font-weight: bolder;
 	}
 	.radio input[type="radio"]:checked + label::before, .radio input[type="radio"]:checked + span::before,
 	.radio-inline input[type="radio"]:checked + label::before, .radio-inline input[type="radio"]:checked + span::before {
@@ -451,6 +462,11 @@ end sticky footer
 	border: none;
 }
 
+.dropshadow2 {
+	box-shadow: rgba(0, 0, 0, 0.25) 0px 4px 4px;
+	background: #fff;
+}
+
 /* Rounded corners */
 .rounded {
 	@include border-radius(3px);
@@ -594,24 +610,47 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 .min-height-48 {
 	min-height: 48px;
 }
+.min-width-19 {
+	min-width: 19px;
+}
 .min-width-25 {
 	min-width: 25px;
+}
+.min-width-42 {
+	min-width: 42px;
 }
 .min-width-70 {
 	min-width: 70px;
 }
+.min-width-90 {
+	min-width: 90px;
+}
 .min-width-100 {
 	min-width: 100px;
 }
-
+.min-width-140 {
+	min-width: 140px;
+}
 .min-width-150 {
 	min-width: 150px;
+}
+.min-width-165 {
+	min-width: 165px;
 }
 .min-width-200 {
 	min-width: 200px;
 }
 .min-width-300 {
 	min-width: 300px;
+}
+.min-width-310 {
+	min-width: 310px;
+}
+.min-width-400 {
+	min-width: 400px;
+}
+.min-width-500 {
+	min-width: 500px;
 }
 .table>thead>tr>th>p, .table>tbody>tr>th>p, .table>tfoot>tr>th>p, .table>thead>tr>td>p, .table>tbody>tr>td>p, .table>tfoot>tr>td>p {
 	min-height: 17px;
@@ -878,6 +917,7 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 	ol { 
 		list-style-type: decimal;
 		padding-left: 15px;
+		padding-bottom: 15px;
 		li {
 			padding-top: 5px;
 			margin-left: 10px;
@@ -886,6 +926,7 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 	ul { 
 		list-style-type: square;
 		padding-left: 17px;
+		padding-bottom: 15px;
 		li {
 			padding-top: 5px;
 			margin-left: 10px;
@@ -909,12 +950,7 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 	}
 
 	code {
-		background-clip: padding-box;
-		border-radius: 3px 3px 3px 3px;
-		padding: 0 5px 2px;
-		overflow:auto;
-		white-space:pre-wrap;
-		word-wrap: normal;
+		font-family: 'Courier New', Courier, monospace;
 	}
 
 	img {
@@ -1042,8 +1078,13 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 		font-size:1em;
 	}
 	
-	.font-size-0-9em, #body .font-size-0-9em,
-	i.font-size-0-9em, #body i.font-size-0-9em {
+	.font-size-0-8em,
+	i.font-size-0-8em {
+		font-size:0.8em;
+	}
+
+	.font-size-0-9em,
+	i.font-size-0-9em {
 		font-size:0.9em;
 	}
 	
@@ -1262,18 +1303,26 @@ h1, h2, h3, h4, h5, h6 {
 .image{
 	max-width: 940px;
 }
-
-.max-width-460 {
-	max-width: 460px;
-}
-
 .max-height-200 {
 	max-height: 200px;
 }
-.max-width-350, #rootPanel .max-width-350 {
-	max-width: 350px;
+#rootPanel {
+	.max-width-310 {
+		max-width: 310px;
+	}
+	.max-width-350 {
+		max-width: 350px;
+	}
+	.max-width-400 {
+		max-width: 400px;
+	}
+	.max-width-460 {
+		max-width: 460px;
+	}
+	.max-width-800 {
+		max-width: 800px;
+	}
 }
-
 .max-height-100 {
 	max-height: 100px;
 }
@@ -1285,11 +1334,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /**********************************/
-	
-.center-in-div {
-	margin:auto; 
-	display:block;
-}
 	
 .margin-auto {
 	margin:auto; 
@@ -1471,7 +1515,6 @@ ol.lowerroman {
 	.displayInline {
 		display: inline;
 	}
-
 	.displayInlineTable {
 		display: inline-table;
 	}
@@ -1483,6 +1526,10 @@ ol.lowerroman {
 	}
 	.displayBlock {
 		display: block;
+	}
+	.center-in-div {
+		margin:auto; 
+		display:block;
 	}
 	.flexcontainer-row {
 		display: -webkit-flex;
@@ -1512,6 +1559,23 @@ ol.lowerroman {
 	}
 	.flexcontainer-column-flow-reset {
 		flex-flow: inherit;
+	}
+
+	.glyphicon {
+		display: inline-block;
+		font: normal normal normal 14px/1 FontAwesome;
+		font-size: inherit;
+		text-rendering: auto;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+	//fa-arrow-left
+	.glyphicon-arrow-left:before {
+		content: "\f060";
+	}
+	//fa-arrow-right
+	.glyphicon-arrow-right:before {
+		content: "\f061";
 	}
 }
 
@@ -1601,11 +1665,14 @@ ol.lowerroman {
 	position: relative;
 }
 
+.moveup-100 {
+	position: relative;
+	top: -100px;
+}
 .moveup-70 {
 	position: relative;
 	top: -70px;
 }
-
 .moveup-18 {
 	position: relative;
 	top: -18px;
@@ -2103,18 +2170,6 @@ div.input-group > input.search-textbox {
 	text-align: left;
 }
 
-.text-danger, #rootPanel .text-danger {
-	color: #d9534f;
-}
-
-.text-primary, #rootPanel .text-primary {
-	color: $synapse-blue;
-}
-
-.text-warning, #rootPanel .text-warning {
-	color: $synapse-yellow;
-}
-
 /**Override JQuery table styles **/
 table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp, table.tablesorter thead tr .header  {
     background-color: #FAFAFA !important;
@@ -2271,14 +2326,13 @@ td.datePickerMonth {
 }
 
 .provActivityNode { 
-	border:0.1em dotted #ccc; 
+	border:0.1em solid #777; 
 	opacity:0.9; 
-	filter:alpha(opacity=80); 
 	width: 132px;
 	z-index:20; 
 	position:absolute; 
 	color:black;
-	padding-top:3px; 	
+	padding: 0px 5px 11px 0px;
 	font-size:12px;	
 
 	@include box-shadow(2px 2px 10px #aaa);
@@ -2305,15 +2359,15 @@ td.datePickerMonth {
 }
 
 .provExpandNode {
-	opacity:0.8; 
-	filter:alpha(opacity=80); 
-	width:32.4px; height:16.8px; 
-	z-index:20; 
-	position:absolute;	
+	@include border-radius(4px);
+	border:0.1em solid #777; 
+	width:32.4px; height:16.8px;
+	z-index:20;
+	position:absolute;
 	color:black;
-	padding-top:0px; 
+	padding-top:0px;
 	font-size:12px;
-	text-align:center;	
+	text-align:center;
 }
 
 .provUndefinedChange {
@@ -2574,13 +2628,6 @@ div.border {
 	filter: blur(4px);
 }
 
-.hideRightPixelOnHover:hover {
-	margin-right: -1px;
-}
-.hideLeftPixelOnHover:hover {
-	margin-left: -1px;
-}
-
 #body .zeroOpacity {
 	opacity: 0;
 	transition: opacity 0.3s ease-in;
@@ -2636,7 +2683,7 @@ div.border {
 		border-radius: 50%;
 		background: white;
 	}
-	.dropdown:hover ul.dropdown-menu {
+	.dropdown:focus ul.dropdown-menu {
 		display: block;
 	}
 	.dropdown ul.dropdown-menu {
@@ -2646,7 +2693,10 @@ div.border {
 	a.menu:after, .dropdown-toggle:after {
 		content: none;
 	}
-	.dropdown:hover {
+	.dropdown.open {
+		background-color: $synapse-green;
+	}
+	.greenBackgroundOnHover:hover {
 		background-color: $synapse-green;
 	}
 	.dropdown {
@@ -2668,6 +2718,17 @@ div.border {
 	}
 }
 #body {
+	.katex { font-size: 1em; }
+	.text-danger {
+		color: #d9534f;
+	}
+	.text-primary {
+		color: $synapse-blue;
+	}
+	.text-warning {
+		color: $synapse-yellow;
+	}
+
 	.alert a {
 		font-weight: inherit;
 		text-decoration: underline;
@@ -2704,13 +2765,8 @@ div.border {
 		padding: 0 10px 30px 15px;
 		margin-top: -8px;
 	}
-	.facetsWidget-inactive {
-		max-width: 0px;
-		transition: max-width 0.4s ease-in-out;
-	}
-	.facetsWidget-active {
-		max-width: 330px;
-		transition: max-width 0.4s ease-in-out;
+	.SRC-grid-item {
+		height: 130px;
 	}
 }
 #rootPanel {
@@ -2771,5 +2827,27 @@ div.border {
 	span { 
 		background:#fff; 
 		padding:0 10px; 
+	}
+}
+
+#body {
+	.SRC-primary-color-hover:hover * {
+    color: $synapse-blue;
+    fill: $synapse-blue;
+	}
+
+	.SRC-primary-text-color {
+		color: $synapse-blue;
+	}
+	.SRC-primary-background-color-hover:hover {
+		background: $synapse-blue !important;
+		color: white;
+	}
+	.SRC-primary-background-color,
+	.SRC-primary-background-color-hover.SRC-nested-color:hover,
+	.SRC-primary-background-color-hover:hover > svg, 
+	.SRC-primary-background-color-hover:hover.SRC-nested-color:hover *  {
+		background: $synapse-blue;
+		color: white;
 	}
 }

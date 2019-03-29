@@ -60,7 +60,7 @@
 					<t:TableHeader width="175px">
 						<bh:Span text="Expires On" />
 					</t:TableHeader>
-					<t:TableHeader width="100px">
+					<t:TableHeader width="200px">
 					 	<!-- easy way to copy all (synapse.org) email addresses --> 
 						<bh:Span text="Email" />
 					</t:TableHeader>

@@ -20,11 +20,13 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -59,6 +61,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsTreeItem;
 
+@RunWith(MockitoJUnitRunner.class)
 public class EntityTreeBrowserTest {
 	public static final String TEST_RESULT_ID = "testResultId";
 	@Mock
@@ -75,6 +78,8 @@ public class EntityTreeBrowserTest {
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	CallbackP<String> mockEntityClickedCallback;
+	@Mock
+	CallbackP<Boolean> mockIsEmptyCallback;
 	List<EntityHeader> searchResults;
 	@Mock
 	EntityTreeItem mockEntityTreeItem;
@@ -97,7 +102,6 @@ public class EntityTreeBrowserTest {
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
-		MockitoAnnotations.initMocks(this);
 		adapterFactory = new AdapterFactoryImpl();
 		entityTreeBrowser = new EntityTreeBrowser(mockInjector, mockView,
 				mockSynapseJavascriptClient,
@@ -123,6 +127,7 @@ public class EntityTreeBrowserTest {
 				.when(mockSynapseJavascriptClient)
 				.getEntityChildren(any(EntityChildrenRequest.class),
 						any(AsyncCallback.class));
+		entityTreeBrowser.setIsEmptyCallback(mockIsEmptyCallback);
 	}
 
 	@Test
@@ -144,6 +149,7 @@ public class EntityTreeBrowserTest {
 		assertEquals(EntityTreeBrowser.DEFAULT_SORT_BY, request.getSortBy());
 		assertEquals(EntityTreeBrowser.DEFAULT_DIRECTION, request.getSortDirection());
 		verify(mockView).clearSortUI();
+		verify(mockIsEmptyCallback).invoke(false);
 		
 		//verify user selecting another sorting option resets the query, and changes the request sort parameters
 		entityTreeBrowser.onSort(SortBy.CREATED_ON, Direction.DESC);
@@ -160,6 +166,15 @@ public class EntityTreeBrowserTest {
 		
 		clickHandlerCaptor.getValue().onClick(null);
 		verify(mockEntityClickedCallback).invoke(childEntityId);
+	}
+	@Test
+	public void testGetChildrenEmptyResult() {
+		entityTreeBrowser.setEntityClickedHandler(mockEntityClickedCallback);
+		entityTreeBrowser.configure("123");
+		
+		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
+		
+		verify(mockIsEmptyCallback).invoke(true);
 	}
 
 	@Test

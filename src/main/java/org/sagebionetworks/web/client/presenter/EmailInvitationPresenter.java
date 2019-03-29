@@ -7,6 +7,8 @@ import static org.sagebionetworks.web.client.DisplayUtils.getDisplayName;
 
 import javax.inject.Inject;
 
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
 import org.sagebionetworks.repo.model.Team;
@@ -17,11 +19,13 @@ import org.sagebionetworks.web.client.SynapseFutureClient;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.EmailInvitationView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.shared.NotificationTokenType;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
@@ -38,7 +42,8 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 	private SynapseAlert synapseAlert;
 	private AuthenticationController authController;
 	private PlaceChanger placeChanger;
-	private String teamId, email;
+	private String email;
+	private MembershipInvitation membershipInvitation;
 	@Inject
 	public EmailInvitationPresenter(
 			EmailInvitationView view,
@@ -68,7 +73,7 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 		view.setPresenter(this);
 		encodedMISignedToken = place.toToken();
 
-		futureClient.hexDecodeAndDeserialize(NotificationTokenType.EmailInvitation.name(), encodedMISignedToken)
+		futureClient.hexDecodeAndDeserialize(encodedMISignedToken)
 			.transformAsync(
 					token -> jsClient.getMembershipInvitation((MembershipInvtnSignedToken) token),
 					directExecutor()
@@ -76,12 +81,18 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 					new FutureCallback<MembershipInvitation>() {
 						@Override
 						public void onSuccess(MembershipInvitation mis) {
-							teamId = mis.getTeamId();
-							if (!authController.isLoggedIn()) {
-								initializeView(mis);
-							} else {
-								bindInvitationToAuthenticatedUser(mis.getId());
+							membershipInvitation = mis;
+							//check to see if this invitation is associated to the current user
+							if (authController.isLoggedIn()) {
+								 if (mis.getInviteeId() != null && authController.getCurrentUserPrincipalId().equals(mis.getInviteeId())) {
+									// user id already bound to invitation.  redirect to profile page
+									gotoProfilePageTeamArea();
+									return;
+								 } else {
+									verifyEmailAssociatedToAuthenticatedUser();
+								}
 							}
+							initializeView(mis);
 						}
 
 						@Override
@@ -95,26 +106,47 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 
 	}
 
-	private void bindInvitationToAuthenticatedUser(final String misId) {
-		jsClient.getInviteeVerificationSignedToken(misId)
-			.transformAsync(
-					token -> jsClient.updateInviteeId(token),
-					directExecutor()
-			).addCallback(
-					new FutureCallback<Void>() {
-						@Override
-						public void onSuccess(Void aVoid) {
-							placeChanger.goTo(new org.sagebionetworks.web.client.place.Team(teamId));
-						}
+	private void verifyEmailAssociatedToAuthenticatedUser() {
+		// verify the currently logged in user is associated to the given membership invitation
+		jsClient.getInviteeVerificationSignedToken(membershipInvitation.getId()).addCallback(new FutureCallback<InviteeVerificationSignedToken>() {
+			@Override
+			public void onSuccess(@NullableDecl InviteeVerificationSignedToken token) {
+				bindInvitationToAuthenticatedUser(token);
+			}
 
-						@Override
-						public void onFailure(Throwable throwable) {
-							view.hideLoading();
-							synapseAlert.handleException(throwable);
-						}
-					},
-					directExecutor()
-			);
+			@Override
+			public void onFailure(Throwable t) {
+				view.hideLoading();
+				if (t instanceof ForbiddenException) {
+					// SWC-4721: fix message in the case where membership invitation email is not associated to the currently logged in user
+					view.showErrorMessage("This invitation was sent to an email address not associated to the current user. \"" + membershipInvitation.getInviteeEmail() + "\" Please add this email to your Synapse account under \"Settings\", or log in with the correct Synapse account before accepting the invitation.");
+					// SWC-4741: invitation not associated to the current user, send user to the Settings page to add the new email address
+					placeChanger.goTo(new Profile(authController.getCurrentUserPrincipalId(), ProfileArea.SETTINGS));
+				} else {
+					synapseAlert.handleException(t);	
+				}
+			}
+		}, directExecutor());
+	}
+	
+	private void bindInvitationToAuthenticatedUser(InviteeVerificationSignedToken token) {
+
+		jsClient.updateInviteeId(token).addCallback(new FutureCallback<Void>() {
+			@Override
+			public void onSuccess(Void token) {
+				gotoProfilePageTeamArea();
+			}
+			@Override
+			public void onFailure(Throwable t) {
+				view.hideLoading();
+				synapseAlert.handleException(t);
+			}
+		}, directExecutor());
+	}
+	
+	private void gotoProfilePageTeamArea() {
+		// SWC-4668: take the user to their profile page with the join request for them to accept (using the Join button, which handles any ARs)
+		placeChanger.goTo(new Profile(authController.getCurrentUserPrincipalId(), ProfileArea.TEAMS));
 	}
 
 	private void initializeView(final MembershipInvitation mis) {

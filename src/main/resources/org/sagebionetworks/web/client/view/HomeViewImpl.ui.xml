@@ -412,12 +412,13 @@
 	        		<b:Column size="SM_12" addStyleNames="margin-bottom-20">
 	        			<bh:Span text="OUR PARTNERS" addStyleNames="partnersHeading displayBlock" />
 						<g:HTMLPanel addStyleNames="center">
-							<span class="margin-bottom-5 margin-right-15"><a href="http://www.nhlbi.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/nih-heart.svg' width="15%" /></a></span>                            
-							<span class="margin-bottom-5 margin-right-15"><a href="http://www.nimh.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/nih-mental.png' width="11%" /></a></span>                                                       
-							<span class="margin-bottom-5 margin-right-15"><a href="http://www.sloan.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/sloan.svg' width="15%" /></a></span>
-							<span class="margin-bottom-5 margin-right-15"><a href="http://www.nia.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/nih-aging.svg' width="15%" /></a></span>
-							<span class="margin-bottom-5 margin-right-15"><a href="http://www.lsdfa.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/life-sciences.svg' width="15%" /></a></span>
-							<span class="margin-bottom-5 margin-right-15"><a href="http://www.ctf.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/ctf.svg' width="15%" /></a></span>
+							<span class="margin-bottom-5 margin-right-15"><a href="http://www.nhlbi.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/nih-heart.svg' width="13%" /></a></span>                            
+							<span class="margin-bottom-5 margin-right-15"><a href="http://www.nimh.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/nih-mental.png' width="10%" /></a></span>                                                       
+							<span class="margin-bottom-5 margin-right-15"><a href="http://www.sloan.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/sloan.svg' width="13%" /></a></span>
+							<span class="margin-bottom-5 margin-right-15"><a href="http://www.nia.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/nih-aging.svg' width="13%" /></a></span>
+							<span class="margin-bottom-5 margin-right-15"><a href="http://www.lsdfa.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/life-sciences.svg' width="13%" /></a></span>
+							<span class="margin-bottom-5 margin-right-15"><a href="http://www.ctf.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/ctf.svg' width="13%" /></a></span>
+							<span class="margin-bottom-5 margin-right-15"><a href="http://www.n-tap.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/ntap.png' width="8%" /></a></span>
 						</g:HTMLPanel>
 					</b:Column>
 				</bh:Div>

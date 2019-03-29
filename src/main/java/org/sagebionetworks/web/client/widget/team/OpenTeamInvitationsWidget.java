@@ -6,6 +6,7 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -113,6 +114,7 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 			}
 			String invitationId = invite.getId();
 			JoinTeamWidget joinButton = ginInjector.getJoinTeamWidget();
+			joinButton.setButtonSize(ButtonSize.DEFAULT);
 			joinButton.configure(b.getTeam().getId(), refreshCallback);
 			view.addTeamInvite(b.getTeam(), invitationMessage, createdOnString, invitationId, joinButton.asWidget());
 		}

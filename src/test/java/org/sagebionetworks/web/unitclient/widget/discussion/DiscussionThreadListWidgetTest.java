@@ -16,13 +16,14 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
-import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -34,25 +35,20 @@ import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidg
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.dev.util.collect.HashSet;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class DiscussionThreadListWidgetTest {
-
 	@Mock
 	DiscussionThreadListWidgetView mockView;
 	@Mock
 	PortalGinInjector mockGinInjector;
 	@Mock
 	DiscussionThreadListItemWidget mockDiscussionThreadWidget;
-	@Mock
-	DiscussionForumClientAsync mockDiscussionForumClient;
-	@Mock
-	PaginatedResults<DiscussionThreadBundle> mockThreadBundlePage;
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
@@ -80,7 +76,7 @@ public class DiscussionThreadListWidgetTest {
 		when(mockGinInjector.createThreadListItemWidget()).thenReturn(mockDiscussionThreadWidget);
 		when(mockGinInjector.getDiscussionThreadCountAlert()).thenReturn(mockDiscussionThreadCountAlert);
 		discussionThreadListWidget = new DiscussionThreadListWidget(mockView,
-				mockGinInjector, mockDiscussionForumClient, mockSynAlert, mockThreadsContainer,mockSynapseJSNIUtils, mockSynapseJavascriptClient);
+				mockGinInjector, mockSynAlert, mockThreadsContainer,mockSynapseJSNIUtils, mockSynapseJavascriptClient);
 		moderatorIds = new HashSet<String>();
 	}
 
@@ -97,13 +93,13 @@ public class DiscussionThreadListWidgetTest {
 		discussionThreadListWidget.configure(entityId, null, null);
 		verify(mockThreadsContainer).clear();
 		verify(mockSynAlert).clear();
-		verify(mockDiscussionForumClient).getThreadsForEntity(eq(entityId), anyLong(),
+		verify(mockSynapseJavascriptClient).getThreadsForEntity(eq(entityId), anyLong(),
 				anyLong(), eq(DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY), eq(false), any(DiscussionFilter.class),
 				any(AsyncCallback.class));
 		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
 		verify(mockThreadsContainer).configure(captor.capture());
 		captor.getValue().invoke();
-		verify(mockDiscussionForumClient, times(2)).getThreadsForEntity(eq(entityId), anyLong(),
+		verify(mockSynapseJavascriptClient, times(2)).getThreadsForEntity(eq(entityId), anyLong(),
 				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(DiscussionFilter.class),
 				any(AsyncCallback.class));
 		verify(mockView).clearSort();
@@ -111,13 +107,13 @@ public class DiscussionThreadListWidgetTest {
 		
 		// sort by number of replies, verify call, sort again, verify ascending is toggled.
 		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
-		verify(mockDiscussionForumClient).getThreadsForEntity(eq(entityId), anyLong(),
+		verify(mockSynapseJavascriptClient).getThreadsForEntity(eq(entityId), anyLong(),
 				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_REPLIES), eq(false), any(DiscussionFilter.class),
 				any(AsyncCallback.class));
 		verify(mockView).setSorted(DiscussionThreadOrder.NUMBER_OF_REPLIES, false);
 		
 		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
-		verify(mockDiscussionForumClient).getThreadsForEntity(eq(entityId), anyLong(),
+		verify(mockSynapseJavascriptClient).getThreadsForEntity(eq(entityId), anyLong(),
 				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_REPLIES), eq(true), any(DiscussionFilter.class),
 				any(AsyncCallback.class));
 		verify(mockView).setSorted(DiscussionThreadOrder.NUMBER_OF_REPLIES, true);
@@ -131,13 +127,13 @@ public class DiscussionThreadListWidgetTest {
 		discussionThreadListWidget.configure(forumId, canModerate, moderatorIds, mockEmptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 		verify(mockThreadsContainer).clear();
 		verify(mockSynAlert).clear();
-		verify(mockDiscussionForumClient).getThreadsForForum(eq(forumId), anyLong(),
+		verify(mockSynapseJavascriptClient).getThreadsForForum(eq(forumId), anyLong(),
 				anyLong(), eq(DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY), eq(false), any(DiscussionFilter.class),
 				any(AsyncCallback.class));
 		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
 		verify(mockThreadsContainer).configure(captor.capture());
 		captor.getValue().invoke();
-		verify(mockDiscussionForumClient, times(2)).getThreadsForForum(eq(forumId), anyLong(),
+		verify(mockSynapseJavascriptClient, times(2)).getThreadsForForum(eq(forumId), anyLong(),
 				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(), any(DiscussionFilter.class),
 				any(AsyncCallback.class));
 		verify(mockView).clearSort();
@@ -145,13 +141,13 @@ public class DiscussionThreadListWidgetTest {
 		
 		// sort by number of replies, verify call, sort again, verify ascending is toggled.
 		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
-		verify(mockDiscussionForumClient).getThreadsForForum(eq(forumId), anyLong(),
+		verify(mockSynapseJavascriptClient).getThreadsForForum(eq(forumId), anyLong(),
 				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_VIEWS), eq(false), any(DiscussionFilter.class),
 				any(AsyncCallback.class));
 		verify(mockView).setSorted(DiscussionThreadOrder.NUMBER_OF_VIEWS, false);
 		
 		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
-		verify(mockDiscussionForumClient).getThreadsForForum(eq(forumId), anyLong(),
+		verify(mockSynapseJavascriptClient).getThreadsForForum(eq(forumId), anyLong(),
 				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_VIEWS), eq(true), any(DiscussionFilter.class),
 				any(AsyncCallback.class));
 		verify(mockView).setSorted(DiscussionThreadOrder.NUMBER_OF_VIEWS, true);
@@ -161,21 +157,19 @@ public class DiscussionThreadListWidgetTest {
 	@Test
 	public void testConfigureWithModerator() {
 		boolean canModerate = true;
-		AsyncMockStubber.callSuccessWith(mockThreadBundlePage)
-				.when(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+		AsyncMockStubber.callSuccessWith(discussionThreadBundleList)
+				.when(mockSynapseJavascriptClient).getThreadsForForum(anyString(), anyLong(),
 						anyLong(), any(DiscussionThreadOrder.class), anyBoolean(),
 						any(DiscussionFilter.class), any(AsyncCallback.class));
-		when(mockThreadBundlePage.getTotalNumberOfResults()).thenReturn(1L);
 		DiscussionThreadBundle threadBundle = new DiscussionThreadBundle();
 		String threadId = "987654";
 		threadBundle.setId(threadId);
 		discussionThreadBundleList.add(threadBundle);
-		when(mockThreadBundlePage.getResults()).thenReturn(discussionThreadBundleList);
 		discussionThreadListWidget.setThreadIdClickedCallback(mockThreadIdClickedCallback);
 		discussionThreadListWidget.configure("123", canModerate, moderatorIds, mockEmptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 		verify(mockThreadsContainer).clear();
 		verify(mockSynAlert).clear();
-		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+		verify(mockSynapseJavascriptClient).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockDiscussionThreadWidget).configure(any(DiscussionThreadBundle.class));
@@ -203,20 +197,18 @@ public class DiscussionThreadListWidgetTest {
 	@Test
 	public void testLoadMoreSuccess() {
 		boolean canModerate = false;
-		AsyncMockStubber.callSuccessWith(mockThreadBundlePage)
-				.when(mockDiscussionForumClient).getThreadsForForum(anyString(),
+		AsyncMockStubber.callSuccessWith(discussionThreadBundleList)
+				.when(mockSynapseJavascriptClient).getThreadsForForum(anyString(),
 						anyLong(), anyLong(), any(DiscussionThreadOrder.class),
 						anyBoolean(), any(DiscussionFilter.class), any(AsyncCallback.class));
-		when(mockThreadBundlePage.getTotalNumberOfResults()).thenReturn(1L);
 		DiscussionThreadBundle threadBundle = new DiscussionThreadBundle();
 		String threadId = "987654";
 		threadBundle.setId(threadId);
 		discussionThreadBundleList.add(threadBundle);
-		when(mockThreadBundlePage.getResults()).thenReturn(discussionThreadBundleList);
 		discussionThreadListWidget.configure("123", canModerate, moderatorIds, mockEmptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 		verify(mockThreadsContainer).clear();
 		verify(mockSynAlert).clear();
-		verify(mockDiscussionForumClient).getThreadsForForum(anyString(),
+		verify(mockSynapseJavascriptClient).getThreadsForForum(anyString(),
 				anyLong(), anyLong(), any(DiscussionThreadOrder.class),
 				anyBoolean(), any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockThreadsContainer).add(any(Widget.class));
@@ -225,6 +217,7 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockEmptyListCallback).invoke(anyBoolean());
 		verify(mockView).setThreadHeaderVisible(true);
 		verify(mockView).setNoThreadsFoundVisible(false);
+		verify(mockThreadsContainer).setIsMore(false);
 		
 		// test scroll to thread, rpc failure
 		String error = "unable to refresh thread data";
@@ -236,21 +229,35 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockDiscussionThreadWidget, never()).configure(mockDiscussionThreadBundle);
 		verify(mockSynapseJSNIUtils).consoleError(error);
 	}
+	
+	@Test
+	public void testLoadMoreVisible() {
+		boolean canModerate = false;
+		AsyncMockStubber.callSuccessWith(discussionThreadBundleList)
+				.when(mockSynapseJavascriptClient).getThreadsForForum(anyString(),
+						anyLong(), anyLong(), any(DiscussionThreadOrder.class),
+						anyBoolean(), any(DiscussionFilter.class), any(AsyncCallback.class));
+		for (int i = 0; i < DiscussionThreadListWidget.LIMIT; i++) {
+			DiscussionThreadBundle threadBundle = new DiscussionThreadBundle();
+			threadBundle.setId("thread_"+i);
+			discussionThreadBundleList.add(threadBundle);
+		}
+		discussionThreadListWidget.configure("123", canModerate, moderatorIds, mockEmptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
+		verify(mockThreadsContainer).setIsMore(true);
+	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testLoadMoreZeroThreads() {
 		boolean canModerate = false;
-		AsyncMockStubber.callSuccessWith(mockThreadBundlePage)
-				.when(mockDiscussionForumClient).getThreadsForForum(anyString(),
+		AsyncMockStubber.callSuccessWith(discussionThreadBundleList)
+				.when(mockSynapseJavascriptClient).getThreadsForForum(anyString(),
 						anyLong(), anyLong(), any(DiscussionThreadOrder.class),
 						anyBoolean(), any(DiscussionFilter.class), any(AsyncCallback.class));
-		when(mockThreadBundlePage.getTotalNumberOfResults()).thenReturn(0L);
-		when(mockThreadBundlePage.getResults()).thenReturn(discussionThreadBundleList);
 		discussionThreadListWidget.configure("123", canModerate, moderatorIds, mockEmptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 		verify(mockThreadsContainer).clear();
 		verify(mockSynAlert).clear();
-		verify(mockDiscussionForumClient).getThreadsForForum(anyString(),
+		verify(mockSynapseJavascriptClient).getThreadsForForum(anyString(),
 				anyLong(), anyLong(), any(DiscussionThreadOrder.class),
 				anyBoolean(), any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockThreadsContainer, never()).add(any(Widget.class));
@@ -265,17 +272,15 @@ public class DiscussionThreadListWidgetTest {
 	@Test
 	public void testLoadmoreSuccessDisplayLoadmore() {
 		boolean canModerate = false;
-		AsyncMockStubber.callSuccessWith(mockThreadBundlePage)
-				.when(mockDiscussionForumClient).getThreadsForForum(anyString(),
+		AsyncMockStubber.callSuccessWith(discussionThreadBundleList)
+				.when(mockSynapseJavascriptClient).getThreadsForForum(anyString(),
 						anyLong(), anyLong(), any(DiscussionThreadOrder.class),
 						anyBoolean(), any(DiscussionFilter.class), any(AsyncCallback.class));
-		when(mockThreadBundlePage.getTotalNumberOfResults()).thenReturn(11L);
 		discussionThreadBundleList.add(new DiscussionThreadBundle());
-		when(mockThreadBundlePage.getResults()).thenReturn(discussionThreadBundleList);
 		discussionThreadListWidget.configure("123", canModerate, moderatorIds, mockEmptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 		verify(mockThreadsContainer).clear();
 		verify(mockSynAlert).clear();
-		verify(mockDiscussionForumClient).getThreadsForForum(anyString(),
+		verify(mockSynapseJavascriptClient).getThreadsForForum(anyString(),
 				anyLong(), anyLong(), any(DiscussionThreadOrder.class),
 				anyBoolean(), any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockThreadsContainer).add(any(Widget.class));
@@ -290,7 +295,7 @@ public class DiscussionThreadListWidgetTest {
 	public void testLoadmoreFailure() {
 		boolean canModerate = false;
 		AsyncMockStubber.callFailureWith(new Exception())
-				.when(mockDiscussionForumClient).getThreadsForForum(anyString(),
+				.when(mockSynapseJavascriptClient).getThreadsForForum(anyString(),
 						anyLong(), anyLong(), any(DiscussionThreadOrder.class),
 						anyBoolean(), any(DiscussionFilter.class), any(AsyncCallback.class));
 		discussionThreadListWidget.configure("123", canModerate, moderatorIds, mockEmptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
@@ -298,7 +303,7 @@ public class DiscussionThreadListWidgetTest {
 		verify(mockThreadsContainer, never()).add(any(Widget.class));
 		verify(mockGinInjector, never()).createThreadListItemWidget();
 		verify(mockSynAlert).clear();
-		verify(mockDiscussionForumClient).getThreadsForForum(anyString(),
+		verify(mockSynapseJavascriptClient).getThreadsForForum(anyString(),
 				anyLong(), anyLong(), any(DiscussionThreadOrder.class),
 				anyBoolean(), any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(any(Throwable.class));
@@ -310,15 +315,15 @@ public class DiscussionThreadListWidgetTest {
 		boolean canModerate = false;
 		discussionThreadListWidget.configure("123", canModerate, moderatorIds, mockEmptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
-		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+		verify(mockSynapseJavascriptClient).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_REPLIES), eq(DEFAULT_ASCENDING),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
-		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+		verify(mockSynapseJavascriptClient).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_REPLIES), eq(!DEFAULT_ASCENDING),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
-		verify(mockDiscussionForumClient, times(2)).getThreadsForForum(anyString(), anyLong(),
+		verify(mockSynapseJavascriptClient, times(2)).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_REPLIES), eq(DEFAULT_ASCENDING),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 	}
@@ -329,15 +334,15 @@ public class DiscussionThreadListWidgetTest {
 		boolean canModerate = false;
 		discussionThreadListWidget.configure("123", canModerate, moderatorIds, mockEmptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
-		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+		verify(mockSynapseJavascriptClient).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_VIEWS), eq(DEFAULT_ASCENDING),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
-		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+		verify(mockSynapseJavascriptClient).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_VIEWS), eq(!DEFAULT_ASCENDING),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
-		verify(mockDiscussionForumClient, times(2)).getThreadsForForum(anyString(), anyLong(),
+		verify(mockSynapseJavascriptClient, times(2)).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_VIEWS), eq(DEFAULT_ASCENDING),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 	}
@@ -348,11 +353,11 @@ public class DiscussionThreadListWidgetTest {
 		boolean canModerate = false;
 		discussionThreadListWidget.configure("123", canModerate, moderatorIds, mockEmptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 		discussionThreadListWidget.sortBy(DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY);
-		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+		verify(mockSynapseJavascriptClient).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), eq(DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY), eq(!DEFAULT_ASCENDING),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 		discussionThreadListWidget.sortBy(DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY);
-		verify(mockDiscussionForumClient, times(2)).getThreadsForForum(anyString(), anyLong(),
+		verify(mockSynapseJavascriptClient, times(2)).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), eq(DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY), eq(DEFAULT_ASCENDING),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 	}
@@ -363,15 +368,15 @@ public class DiscussionThreadListWidgetTest {
 		boolean canModerate = false;
 		discussionThreadListWidget.configure("123", canModerate, moderatorIds, mockEmptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 		discussionThreadListWidget.sortBy(DiscussionThreadOrder.THREAD_TITLE);
-		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+		verify(mockSynapseJavascriptClient).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), eq(DiscussionThreadOrder.THREAD_TITLE), eq(DEFAULT_ASCENDING),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 		discussionThreadListWidget.sortBy(DiscussionThreadOrder.THREAD_TITLE);
-		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+		verify(mockSynapseJavascriptClient).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), eq(DiscussionThreadOrder.THREAD_TITLE), eq(!DEFAULT_ASCENDING),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 		discussionThreadListWidget.sortBy(DiscussionThreadOrder.THREAD_TITLE);
-		verify(mockDiscussionForumClient, times(2)).getThreadsForForum(anyString(), anyLong(),
+		verify(mockSynapseJavascriptClient, times(2)).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), eq(DiscussionThreadOrder.THREAD_TITLE), eq(DEFAULT_ASCENDING),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 	}
@@ -383,17 +388,17 @@ public class DiscussionThreadListWidgetTest {
 		discussionThreadListWidget.configure("123", canModerate, moderatorIds, mockEmptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 
 		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
-		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+		verify(mockSynapseJavascriptClient).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_REPLIES), eq(DEFAULT_ASCENDING),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 
 		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_VIEWS);
-		verify(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
+		verify(mockSynapseJavascriptClient).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_VIEWS), eq(DEFAULT_ASCENDING),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 
 		discussionThreadListWidget.sortBy(DiscussionThreadOrder.NUMBER_OF_REPLIES);
-		verify(mockDiscussionForumClient, times(2)).getThreadsForForum(anyString(), anyLong(),
+		verify(mockSynapseJavascriptClient, times(2)).getThreadsForForum(anyString(), anyLong(),
 				anyLong(), eq(DiscussionThreadOrder.NUMBER_OF_REPLIES), eq(DEFAULT_ASCENDING),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 	}

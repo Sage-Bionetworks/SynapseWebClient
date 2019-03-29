@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -41,4 +42,5 @@ public interface JoinTeamWidgetView extends IsWidget {
 	void clear();
 	void open(String url);
 	void setAccessRequirementsLinkVisible(boolean visible);
+	void setButtonSize(ButtonSize size);
 }

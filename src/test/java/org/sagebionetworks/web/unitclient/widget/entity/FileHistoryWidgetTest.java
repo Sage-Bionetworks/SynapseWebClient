@@ -23,10 +23,12 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -56,10 +58,13 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+@RunWith(MockitoJUnitRunner.class)
 public class FileHistoryWidgetTest {
 	public static final Long CURRENT_FILE_VERSION = 8888L;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
@@ -81,16 +86,11 @@ public class FileHistoryWidgetTest {
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	@Captor
 	ArgumentCaptor<Place> placeCaptor;
-	public static final Long DEFAULT_MOCK_VERSION_COUNT = 2L;
-	@Mock
-	PaginatedResults<VersionInfo> mockPagedResults;
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Before
 	public void before() throws JSONObjectAdapterException {
-		MockitoAnnotations.initMocks(this);
-		
-		fileHistoryWidget = new FileHistoryWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockPreflightController, mockSynAlert);
+		fileHistoryWidget = new FileHistoryWidget(mockView, mockSynapseClient, mockJsClient, mockGlobalApplicationState, mockPreflightController, mockSynAlert);
 
 		vb = new FileEntity();
 		vb.setId(entityId);
@@ -109,7 +109,6 @@ public class FileHistoryWidgetTest {
 				
 		AsyncMockStubber.callSuccessWith(vb).when(mockSynapseJavascriptClient).getEntity(anyString(), any(AsyncCallback.class));
 		
-		when(mockPagedResults.getTotalNumberOfResults()).thenReturn(DEFAULT_MOCK_VERSION_COUNT);
 		List<VersionInfo> versions = new ArrayList<VersionInfo>();
 		VersionInfo v1 = new VersionInfo();
 		v1.setVersionNumber(CURRENT_FILE_VERSION);
@@ -117,9 +116,9 @@ public class FileHistoryWidgetTest {
 		VersionInfo v2 = new VersionInfo();
 		v2.setVersionNumber(8889L);
 		versions.add(v2);
-		when(mockPagedResults.getResults()).thenReturn(versions);
-		AsyncMockStubber.callSuccessWith(mockPagedResults).when(mockSynapseClient).getEntityVersions(anyString(), anyInt(), anyInt(),any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(versions).when(mockJsClient).getEntityVersions(anyString(), anyInt(), anyInt(),any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+		AsyncMockStubber.callSuccessWith(vb).when(mockSynapseClient).updateEntity(any(Entity.class),any(AsyncCallback.class));
 	}
 
 	@Test
@@ -132,14 +131,14 @@ public class FileHistoryWidgetTest {
 		//verify current version is set when offset is 0
 		assertEquals(CURRENT_FILE_VERSION, fileHistoryWidget.getVersionNumber());
 		
-		verify(mockSynapseClient).getEntityVersions(anyString(), eq(WebConstants.ZERO_OFFSET.intValue()), anyInt(), any(AsyncCallback.class));
+		verify(mockJsClient).getEntityVersions(anyString(), eq(WebConstants.ZERO_OFFSET.intValue()), anyInt(), any(AsyncCallback.class));
 	}
 
 	@Test
 	public void testLoadVersionsFail() throws Exception {
 		AsyncMockStubber
 				.callFailureWith(new IllegalArgumentException())
-				.when(mockSynapseClient)
+				.when(mockJsClient)
 				.getEntityVersions(anyString(), anyInt(), anyInt(),
 						any(AsyncCallback.class));
 		AsyncCallback<PaginatedResults<VersionInfo>> callback = new AsyncCallback<PaginatedResults<VersionInfo>>() {
@@ -167,6 +166,7 @@ public class FileHistoryWidgetTest {
 		VersionableEntity capturedEntity = (VersionableEntity)entityCaptor.getValue();
 		assertEquals(testComment, capturedEntity.getVersionComment());
 		assertEquals(testLabel, capturedEntity.getVersionLabel());
+		verify(mockGlobalApplicationState).refreshPage();
 	}
 	
 	@Test
@@ -198,26 +198,26 @@ public class FileHistoryWidgetTest {
 	public void testDeleteVersion() {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteEntityVersionById(anyString(), anyLong(), any(AsyncCallback.class));
 		fileHistoryWidget.setEntityBundle(bundle, 20L);
-		verify(mockSynapseClient).getEntityVersions(anyString(), eq(WebConstants.ZERO_OFFSET.intValue()), anyInt(), any(AsyncCallback.class));
+		verify(mockJsClient).getEntityVersions(anyString(), eq(WebConstants.ZERO_OFFSET.intValue()), anyInt(), any(AsyncCallback.class));
 		
 		fileHistoryWidget.deleteVersion(vb.getVersionNumber());
 		
 		verify(mockSynapseClient).deleteEntityVersionById(matches(vb.getId()), eq(vb.getVersionNumber()), (AsyncCallback<Void>) any());
 		//deleting a different version, verify file history widget is refreshed
-		verify(mockSynapseClient, times(2)).getEntityVersions(anyString(), eq(WebConstants.ZERO_OFFSET.intValue()), anyInt(), any(AsyncCallback.class));
+		verify(mockJsClient, times(2)).getEntityVersions(anyString(), eq(WebConstants.ZERO_OFFSET.intValue()), anyInt(), any(AsyncCallback.class));
 	}
 	
 	@Test
 	public void testDeleteCurrentlyViewedVersion() {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteEntityVersionById(anyString(), anyLong(), any(AsyncCallback.class));
 		fileHistoryWidget.setEntityBundle(bundle, vb.getVersionNumber());
-		verify(mockSynapseClient).getEntityVersions(anyString(), eq(WebConstants.ZERO_OFFSET.intValue()), anyInt(), any(AsyncCallback.class));
+		verify(mockJsClient).getEntityVersions(anyString(), eq(WebConstants.ZERO_OFFSET.intValue()), anyInt(), any(AsyncCallback.class));
 		
 		fileHistoryWidget.deleteVersion(vb.getVersionNumber());
 		
 		verify(mockSynapseClient).deleteEntityVersionById(matches(vb.getId()), eq(vb.getVersionNumber()), (AsyncCallback<Void>) any());
 		//deleting a different version, verify file history widget is not simply refreshed (still called only once during setEntityBundle())
-		verify(mockSynapseClient).getEntityVersions(anyString(), eq(WebConstants.ZERO_OFFSET.intValue()), anyInt(), any(AsyncCallback.class));
+		verify(mockJsClient).getEntityVersions(anyString(), eq(WebConstants.ZERO_OFFSET.intValue()), anyInt(), any(AsyncCallback.class));
 		verify(mockPlaceChanger).goTo(placeCaptor.capture());
 		//verify going to the current version after delete
 		Synapse newPlace = (Synapse)placeCaptor.getValue();
@@ -314,7 +314,7 @@ public class FileHistoryWidgetTest {
 			v.setVersionNumber(new Long(i + startVersionNumber));
 			versions.add(v);
 		}
-		when(mockPagedResults.getResults()).thenReturn(versions);
+		AsyncMockStubber.callSuccessWith(versions).when(mockJsClient).getEntityVersions(anyString(), anyInt(), anyInt(),any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -326,7 +326,7 @@ public class FileHistoryWidgetTest {
 		
 		fileHistoryWidget.setEntityBundle(bundle, 0L);
 
-		verify(mockSynapseClient).getEntityVersions(eq(entityId), eq(0), eq(FileHistoryWidget.VERSION_LIMIT), any(AsyncCallback.class));
+		verify(mockJsClient).getEntityVersions(eq(entityId), eq(0), eq(FileHistoryWidget.VERSION_LIMIT), any(AsyncCallback.class));
 		verify(mockView).clearVersions();
 		// version 0 is selected, so we should be able to edit
 		verify(mockView).setEntityBundle(vb, false);
@@ -347,7 +347,7 @@ public class FileHistoryWidgetTest {
 		
 		//add the 2 remaining results
 		verify(mockView, never()).clearVersions();
-		verify(mockSynapseClient).getEntityVersions(eq(entityId), eq(FileHistoryWidget.VERSION_LIMIT), eq(FileHistoryWidget.VERSION_LIMIT), any(AsyncCallback.class));
+		verify(mockJsClient).getEntityVersions(eq(entityId), eq(FileHistoryWidget.VERSION_LIMIT), eq(FileHistoryWidget.VERSION_LIMIT), any(AsyncCallback.class));
 		isVersionSelected = false;
 		verify(mockView, times(2)).addVersion(any(VersionInfo.class), eq(canEdit), eq(isVersionSelected));
 		verify(mockView).setMoreButtonVisible(false);

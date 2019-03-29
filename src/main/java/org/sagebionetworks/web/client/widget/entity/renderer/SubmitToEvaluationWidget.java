@@ -32,7 +32,6 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 	
 	private SubmitToEvaluationWidgetView view;
 	private Map<String,String> descriptor;
-	private WikiPageKey wikiKey;
 	private AuthenticationController authenticationController;
 	private ChallengeClientAsync challengeClient;
 	private GlobalApplicationState globalApplicationState;
@@ -55,7 +54,6 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 	
 	@Override
 	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
-		this.wikiKey = wikiKey;
 		this.descriptor = widgetDescriptor;
 		
 		evaluationUnavailableMessage  = descriptor.get(WidgetConstants.UNAVAILABLE_MESSAGE);
@@ -78,7 +76,7 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 							if (results.getTotalNumberOfResults() == 0) {
 								view.showUnavailable(evaluationUnavailableMessage);
 							} else {
-								view.configure(wikiKey, buttonText);	
+								view.configure(buttonText);	
 							}
 						}
 						@Override

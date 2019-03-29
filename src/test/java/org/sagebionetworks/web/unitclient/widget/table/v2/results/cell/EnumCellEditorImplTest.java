@@ -14,27 +14,27 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEdtiorView;
 
 public class EnumCellEditorImplTest {
 	
 	ListCellEdtiorView mockView;
-	EnumCellEditorImpl editor;
+	EnumCellEditor editor;
 	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 		mockView = Mockito.mock(ListCellEdtiorView.class);
-		editor = new EnumCellEditorImpl(mockView, mockSynapseJSNIUtils);
+		editor = new EnumCellEditor(mockView, mockSynapseJSNIUtils);
 	}
 
 	@Test
 	public void testConfigure(){
 		List<String> values = Arrays.asList("one", "two");
 		editor.configure(values);
-		verify(mockView).configure(Arrays.asList(EnumCellEditorImpl.NOTHING_SELECTED, "one", "two"));
+		verify(mockView).configure(Arrays.asList(EnumCellEditor.NOTHING_SELECTED, "one", "two"));
 	}
 	
 	@Test
