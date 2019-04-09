@@ -88,6 +88,7 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		view.clearUserBadges();
 		for (UserBadgeItem item : users) {
 			view.addUserBadge(item.asWidget());
+			item.reconfigure();
 		}
 		
 		boolean toolbarVisible = isToolbarVisible && users.size() > 0;

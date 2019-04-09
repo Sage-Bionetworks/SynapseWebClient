@@ -12,7 +12,7 @@
 	        <b:Row>
 	            <b:Column size="MD_9">
 	                <bh:Div ui:field="teamBadgeContainer"/>
-	                <bh:Span marginLeft="85"><w:TextBoxWithCopyToClipboardWidget ui:field="synapseEmailField" width="550px"/></bh:Span>
+	                <bh:Span marginLeft="85"><w:TextBoxWithCopyToClipboardWidget ui:field="synapseEmailField"/></bh:Span>
 	            </b:Column>    
 	    		<b:Column ui:field="commandsContainer" size="MD_3">
 		    		<b:ButtonToolBar addStyleNames="pull-right">

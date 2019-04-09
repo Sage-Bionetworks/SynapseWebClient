@@ -43,7 +43,8 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 	Callback selectionChangedCallback;
 	PortalGinInjector portalGinInjector;
 	AccessType accessType;
-
+	AccessorChange change;
+	UserProfile profile;
 	@Inject
 	public UserBadgeItem(UserBadgeItemUiBinder binder,
 			PortalGinInjector portalGinInjector) {
@@ -85,6 +86,9 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 	}
 	
 	public UserBadgeItem configure(AccessorChange change, UserProfile profile) {
+		this.change = change;
+		this.profile = profile;
+		userBadgeContainer.clear();
 		userId = change.getUserId();
 		accessType = change.getType();
 		boolean isGainAccess = AccessType.GAIN_ACCESS.equals(accessType);
@@ -130,6 +134,9 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 	}
 	public UserBadgeItem configure(AccessorChange change) {
 		return configure(change, null);
+	}
+	public void reconfigure() {
+		configure(change, profile);
 	}
 	
 	public UserBadgeItem setSelectionChangedCallback(Callback callback) {

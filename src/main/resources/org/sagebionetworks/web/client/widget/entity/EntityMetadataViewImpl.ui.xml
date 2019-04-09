@@ -9,7 +9,7 @@
 				<g:TextBox ui:field="idField" width="115px" addStyleNames="border-none noBackground" readOnly="true" />
 				<w:HelpWidget helpMarkdown="The Synapse ID (e.g. syn123) is a unique identifier assigned to all content." addStyleNames="margin-right-15" />
 				<bh:Br addStyleNames="visible-xs visible-sm" />
-				<bh:Span ui:field="doiPanel" />
+				<bh:Span ui:field="doiPanel" addStyleNames="margin-right-15"/>
 				<bh:Br addStyleNames="visible-xs visible-sm" />
 				<bh:Span ui:field="dataUseContainer" addStyleNames="margin-right-5">
 					<bh:Span addStyleNames="margin-right-5 boldText">Conditions for use:</bh:Span>
