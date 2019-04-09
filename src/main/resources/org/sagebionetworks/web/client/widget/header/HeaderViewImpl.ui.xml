@@ -48,6 +48,8 @@
 					<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" />
 					<b:Anchor ui:field="dashboardAngleDown" dataToggle="DROPDOWN" icon="ANGLE_DOWN" addStyleNames="color-white textDecorationNone right" paddingTop="5" />
 					<b:DropDownMenu ui:field="dashboardDropdownMenu" addStyleNames="pull-right">
+						<b:ListItem paddingTop="5" addStyleNames="whitespace-nowrap"><bh:Span paddingLeft="20" paddingRight="25" paddingTop="5">Signed in as <bh:Strong ui:field="signedInAsName"/></bh:Span></b:ListItem>
+						<b:Divider/>
 						<b:AnchorListItem ui:field="myProfileLink">Profile</b:AnchorListItem>
 						<b:AnchorListItem ui:field="myDashboardLink">Projects</b:AnchorListItem>
 						<b:AnchorListItem ui:field="myTeamsLink">Teams</b:AnchorListItem>

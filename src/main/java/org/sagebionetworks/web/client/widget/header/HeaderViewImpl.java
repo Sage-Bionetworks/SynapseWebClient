@@ -11,6 +11,7 @@ import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Strong;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -57,7 +58,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	Anchor headerFavAngleDown;
 	@UiField
 	DropDownMenu headerFavDropdownMenu;
-
+	@UiField
+	Strong signedInAsName;
 	@UiField
 	Div projectFavoritePanelUI;
 	@UiField
@@ -281,6 +283,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
 	 	trashLink.setVisible(isInTestWebsite);
 	 	userBadge.clearState();
+	 	signedInAsName.setText("");
 	 	if (profile != null) {
 			//has user data, update the user name and add user commands (and set to the current user name)
 	 		userBadge.configure(profile);
@@ -290,6 +293,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			logoutLink.setVisible(true);
 			dashboardDropdown.setVisible(true);
 			headerFavDropdown.setVisible(true);
+			signedInAsName.setText(profile.getUserName());
 		} else {
 			userId = null;
 			loginLinkUI.setVisible(true);
