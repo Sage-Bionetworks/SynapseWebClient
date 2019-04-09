@@ -124,6 +124,7 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 		Div d = new Div();
 		UserBadge badge = ginInjector.getUserBadgeWidget();
 		badge.configure(userId);
+		badge.setOpenInNewWindow();
 		d.add(badge);
 		Button button = new Button("", IconType.TIMES, event -> {
 			inviteesContainer.remove(d);
