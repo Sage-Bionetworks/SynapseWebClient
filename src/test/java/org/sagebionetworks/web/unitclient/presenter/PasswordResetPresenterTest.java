@@ -167,12 +167,13 @@ public class PasswordResetPresenterTest {
 	public void testServiceFailure() {
 		//without the registration token set, mock a failed user service call
 		resetAll();
-		Exception ex = new RestServiceException("unknown error");
+		String errorMessage = "unknown error";
+		Exception ex = new RestServiceException(errorMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).changePassword(any(ChangePasswordWithCurrentPassword.class), any(AsyncCallback.class));
 		presenter.setPlace(place);
 		presenter.resetPassword("oldPassword", "myPassword");
 		verify(mockSynAlert).clear();
 		//verify password reset failed text is shown in the view
-		verify(mockSynAlert).handleException(ex);
+		verify(mockSynAlert).showError(errorMessage);
 	}
 }

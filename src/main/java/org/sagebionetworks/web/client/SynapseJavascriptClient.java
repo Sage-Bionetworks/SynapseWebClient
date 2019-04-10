@@ -1466,7 +1466,7 @@ public class SynapseJavascriptClient {
 		String url = getAuthServiceUrl() + USER_PASSWORD_RESET;
 		Username username = new Username();
 		username.setEmail(emailAddress);
-		url += "?passwordResetEndpoint=" + gwt.getHostPageBaseURL() + "#!PasswordResetSignedToken:";
+		url += "?passwordResetEndpoint=" + gwt.encodeQueryString(gwt.getHostPageBaseURL() + "#!PasswordResetSignedToken:");
 		doPost(url, username, OBJECT_TYPE.None, cb);
 	}
 	
