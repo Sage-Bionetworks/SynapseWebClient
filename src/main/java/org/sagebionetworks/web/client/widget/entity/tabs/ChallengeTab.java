@@ -19,7 +19,7 @@ public class ChallengeTab implements ChallengeTabView.Presenter{
 	public ChallengeTab(Tab tab, PortalGinInjector ginInjector){
 		this.tab = tab;
 		this.ginInjector = ginInjector;
-		tab.configure("Challenge", "Challenges are computational contests organized through the Dream Challenges.", "http://dreamchallenges.org");
+		tab.configure("Challenge", "Challenges are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.", "http://sagebionetworks.org/platforms/");
 	}
 	
 	public void lazyInject() {

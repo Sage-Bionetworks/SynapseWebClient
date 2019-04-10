@@ -36,8 +36,8 @@
 											<g:FocusPanel ui:field="challengesFocusPanel" addStyleNames="displayInline" tabIndex="-1">
 												<b:Anchor ui:field="challengesLink" addStyleNames="textDecorationNone">Challenges</b:Anchor>
 											</g:FocusPanel>
-											<w:HelpWidget helpMarkdown="This tab shows you challenges you have registered for.&#10;Challenges are computational contests organized through the Dream Challenges."
-												href="http://dreamchallenges.org" placement="BOTTOM" />
+											<w:HelpWidget helpMarkdown="This tab shows you challenges you have registered for.&#10;Challenges are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems."
+												href="http://sagebionetworks.org/platforms/" placement="BOTTOM" />
 										</a>
 									</li>
 									<li class="entity-tab" ui:field="teamsListItem">
