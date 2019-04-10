@@ -128,7 +128,6 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 		TextBoxWithCopyToClipboardWidget emailTextBox = new TextBoxWithCopyToClipboardWidget();
 		emailTextBox.setText(username + "@synapse.org");
 		emailTextBox.setAddStyleNames("displayBlock");
-		emailTextBox.setWidth("195px");
 		emailsContainer.add(emailTextBox);
 	}
 }

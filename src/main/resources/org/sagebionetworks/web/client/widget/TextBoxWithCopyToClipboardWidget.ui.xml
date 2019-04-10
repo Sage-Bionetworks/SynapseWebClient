@@ -6,7 +6,7 @@
 >
 	<bh:Span>
 		<b:Tooltip title="Copy to clipboard">
-			<g:TextBox ui:field="textBox" text="" width="" addStyleNames="border-none noBackground padding-0 link" readOnly="true" />
+			<b:Anchor ui:field="textAnchor" text="" />
 		</b:Tooltip>
 	</bh:Span>
 </ui:UiBinder>

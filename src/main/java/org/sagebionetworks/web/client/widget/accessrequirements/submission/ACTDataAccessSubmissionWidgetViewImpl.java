@@ -164,7 +164,6 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 		div.add(new Text(":"));
 		TextBoxWithCopyToClipboardWidget emailTextBox = new TextBoxWithCopyToClipboardWidget();
 		emailTextBox.setText(username + "@synapse.org");
-		emailTextBox.setWidth("230px");
 		emailTextBox.setAddStyleNames("margin-left-15 movedown-2");
 		div.add(emailTextBox);
 		accessorsContainer.add(div);

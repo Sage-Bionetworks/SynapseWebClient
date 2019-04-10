@@ -6,9 +6,9 @@
 		xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 		xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 >
-<bh:Span>
-	    <bh:Span ui:field="synAlertContainer"/>
-	    <bh:Span ui:field="doiLabel" addStyleNames="boldText margin-right-5" text="DOI: " visible="false"/>
-		<w:TextBoxWithCopyToClipboardWidget ui:field="copyToClipboardWidget" width="170px"/>
+	<bh:Span>
+		<bh:Span ui:field="synAlertContainer"/>
+		<bh:Span ui:field="doiLabel" addStyleNames="boldText margin-right-5" text="DOI: " visible="false"/>
+		<w:TextBoxWithCopyToClipboardWidget ui:field="copyToClipboardWidget"/>
 	</bh:Span>
 </ui:UiBinder>
