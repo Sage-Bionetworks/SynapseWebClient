@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
@@ -53,6 +54,8 @@ public class InitSessionServletTest {
 	HttpServletResponse mockResponse;
 	@Mock
 	ServletOutputStream responseOutputStream;
+	@Mock
+	PrintWriter mockPrintWriter;
 	@Captor
 	ArgumentCaptor<Cookie> cookieCaptor;
 	@Captor
@@ -68,6 +71,7 @@ public class InitSessionServletTest {
 		servlet = new InitSessionServlet();
 		
 		// Setup output stream and response
+		when(mockResponse.getWriter()).thenReturn(mockPrintWriter);
 		when(mockResponse.getOutputStream()).thenReturn(responseOutputStream);
 		when(mockRequest.getScheme()).thenReturn("https");
 		when(mockRequest.getServerName()).thenReturn("www.synapse.org");
@@ -100,6 +104,10 @@ public class InitSessionServletTest {
 		assertTrue(cookie.isHttpOnly());
 		assertTrue(cookie.getSecure());
 		assertEquals(InitSessionServlet.ROOT_PATH, cookie.getPath());
+		
+		verify(mockResponse).setContentType(InitSessionServlet.JSON_CONTENT_TYPE);
+		verify(mockPrintWriter).print(InitSessionServlet.EMPTY_JSON);
+		verify(mockPrintWriter).flush();
 	}
 	
 	@Test

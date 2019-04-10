@@ -3,6 +3,7 @@ package org.sagebionetworks.web.server.servlet;
 import static org.sagebionetworks.web.client.cookie.CookieKeys.USER_LOGIN_TOKEN;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -24,6 +25,8 @@ import org.sagebionetworks.web.shared.WebConstants;
  * Servlet for setting the session token HttpOnly cookie.
  */
 public class InitSessionServlet extends HttpServlet {
+	public static final String EMPTY_JSON = "{}";
+	public static final String JSON_CONTENT_TYPE = "application/json";
 	static private Log log = LogFactory.getLog(InitSessionServlet.class);
 	public static final String ROOT_PATH = "/";
 	public static final String SYNAPSE_ORG = "synapse.org";
@@ -75,6 +78,10 @@ public class InitSessionServlet extends HttpServlet {
 				cookie.setDomain(SYNAPSE_ORG);
 			}
 			response.addCookie(cookie);
+			response.setContentType(JSON_CONTENT_TYPE);
+			PrintWriter out = response.getWriter();
+			out.print(EMPTY_JSON);
+			out.flush();
 		} catch (Exception e) {
 			log.error(e);
 			e.printStackTrace();
