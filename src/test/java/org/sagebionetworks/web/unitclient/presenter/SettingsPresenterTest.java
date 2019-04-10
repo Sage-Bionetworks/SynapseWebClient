@@ -486,6 +486,7 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testNewVerificationSubmissionClicked() {
+		when(mockUserBundle.getIsCertified()).thenReturn(true);
 		//view my own profile.  submit a new verification submission, verify that modal is shown
 		when(mockVerificationSubmissionModal.configure(any(UserProfile.class), anyString(), anyBoolean(), anyList())).thenReturn(mockVerificationSubmissionModal);
 		presenter.configure();
@@ -493,10 +494,22 @@ public class SettingsPresenterTest {
 		verify(mockVerificationSubmissionModal).configure(any(UserProfile.class), anyString(), eq(true), eq(new ArrayList()));
 		verify(mockVerificationSubmissionModal).show();
 	}
-	
+
+	@Test
+	public void testNewVerificationSubmissionClickedNotCertified() {
+		when(mockUserBundle.getIsCertified()).thenReturn(false);
+		//view my own profile.  submit a new verification submission, verify that modal is shown
+		when(mockVerificationSubmissionModal.configure(any(UserProfile.class), anyString(), anyBoolean(), anyList())).thenReturn(mockVerificationSubmissionModal);
+		presenter.configure();
+		presenter.newVerificationSubmissionClicked();
+		verify(mockView).showErrorMessage(SettingsPresenter.MUST_BE_CERTIFIED_TO_SUBMIT_PROFILE_VALIDATION_MESSAGE);
+		verify(mockVerificationSubmissionModal, never()).show();
+	}
+
 	@Test
 	public void testNewVerificationSubmissionClickedWithExistingAttachments() {
 		//view my own profile.  submit a new verification submission, verify that modal is shown
+		when(mockUserBundle.getIsCertified()).thenReturn(true);
 		String currentUserId = "94837";
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
