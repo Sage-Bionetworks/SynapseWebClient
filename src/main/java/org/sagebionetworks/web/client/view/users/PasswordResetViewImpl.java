@@ -36,6 +36,8 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	DivElement sendPasswordChangeForm;
 	
 	@UiField
+	PasswordTextBox currentPasswordField;
+	@UiField
 	PasswordTextBox password1Field;
 	@UiField
 	PasswordTextBox password2Field;
@@ -43,12 +45,16 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	TextBox emailAddressField;
 	
 	@UiField
+	DivElement currentPassword;
+	@UiField
 	DivElement password1;
 	@UiField
 	DivElement password2;
 	@UiField
 	Div emailAddress;
-	
+
+	@UiField
+	DivElement currentPasswordError;
 	@UiField
 	DivElement password1Error;
 	@UiField
@@ -99,7 +105,17 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 			return false;
 		}
 	}
-	
+
+	private boolean checkCurrentPassword() {
+		DisplayUtils.hideFormError(currentPassword, currentPasswordError);
+		if (!DisplayUtils.isDefined(currentPasswordField.getText())){
+			currentPasswordError.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+			DisplayUtils.showFormError(currentPassword, currentPasswordError);
+			return false;
+		} else
+			return true;
+	}
+
 	private boolean checkPassword1() {
 		DisplayUtils.hideFormError(password1, password1Error);
 		if (!DisplayUtils.isDefined(password1Field.getText())){
@@ -148,9 +164,9 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 			public void onClick(ClickEvent event) {
 				if (isShowingResetUI) {
 					//validate passwords are filled in and match
-					if(checkPassword1() && checkPassword2() && checkPasswordMatch()) {
+					if(checkCurrentPassword() && checkPassword1() && checkPassword2() && checkPasswordMatch()) {
 						submitBtn.setEnabled(false);
-						presenter.resetPassword(password1Field.getValue());
+						presenter.resetPassword(currentPasswordField.getValue(), password1Field.getValue());
 					}
 				} else {
 					//validate email address is filled in

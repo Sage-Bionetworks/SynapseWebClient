@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.auth.ChangePasswordWithCurrentPassword;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
 import org.sagebionetworks.repo.model.verification.VerificationState;
@@ -136,7 +137,11 @@ public class SettingsPresenter implements SettingsView.Presenter {
 						new AsyncCallback<UserProfile>() {
 							@Override
 							public void onSuccess(UserProfile userSessionData) {
-								userService.changePassword(authenticationController.getCurrentUserSessionToken(),newPassword, new AsyncCallback<Void>() {
+								ChangePasswordWithCurrentPassword changePasswordRequest = new ChangePasswordWithCurrentPassword();
+								changePasswordRequest.setCurrentPassword(existingPassword);
+								changePasswordRequest.setNewPassword(newPassword);
+								changePasswordRequest.setUsername(authenticationController.getCurrentUserProfile().getUserName());
+								jsClient.changePassword(changePasswordRequest, new AsyncCallback<Void>() {
 									@Override
 									public void onSuccess(Void result) {
 										view.showPasswordChangeSuccess();

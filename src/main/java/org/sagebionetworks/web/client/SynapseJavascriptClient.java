@@ -58,9 +58,11 @@ import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.auth.ChangePasswordWithCurrentPassword;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.repo.model.auth.Username;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
@@ -239,6 +241,9 @@ public class SynapseJavascriptClient {
 	private static final String NEXT_PAGE_TOKEN_PARAM = "nextPageToken=";
 	public static final String SKIP_TRASH_CAN_PARAM = "skipTrashCan";
 	private static final String ASCENDING_PARAM = "ascending=";
+	
+	public static final String USER_PASSWORD_RESET = "/user/password/reset";
+	public static final String USER_CHANGE_PASSWORD = "/user/changePassword";
 	
 	public static final String COLUMN = "/column";
 	public static final String COLUMN_VIEW_DEFAULT = COLUMN + "/tableview/defaults/";
@@ -1455,6 +1460,19 @@ public class SynapseJavascriptClient {
 	public void createEntity(Entity entity, AsyncCallback<Entity> cb) {
 		String url = getRepoServiceUrl() + ENTITY;
 		doPost(url, entity, OBJECT_TYPE.Entity, cb);
+	}
+	
+	public void sendPasswordResetEmail(String emailAddress, AsyncCallback<Void> cb) {
+		String url = getAuthServiceUrl() + USER_PASSWORD_RESET;
+		Username username = new Username();
+		username.setEmail(emailAddress);
+		url += "?passwordResetEndpoint=" + gwt.getHostPageBaseURL() + "#!PasswordResetSignedToken:";
+		doPost(url, username, OBJECT_TYPE.None, cb);
+	}
+	
+	public void changePassword(ChangePasswordWithCurrentPassword changePasswordRequest, AsyncCallback<Void> cb) {
+		String url = getAuthServiceUrl() + USER_CHANGE_PASSWORD;
+		doPost(url, changePasswordRequest, OBJECT_TYPE.None, cb);
 	}
 }
 

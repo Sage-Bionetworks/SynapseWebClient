@@ -30,6 +30,7 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.auth.ChangePasswordWithCurrentPassword;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
 import org.sagebionetworks.repo.model.verification.VerificationState;
@@ -169,7 +170,7 @@ public class SettingsPresenterTest {
 	@Test
 	public void testResetPassword() throws RestServiceException {
 		AsyncMockStubber.callSuccessWith(profile).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).changePassword(any(ChangePasswordWithCurrentPassword.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(profile).when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
 		
 		presenter.resetPassword(password, newPassword);
@@ -189,7 +190,7 @@ public class SettingsPresenterTest {
 	public void testResetPasswordFailChangePw() throws RestServiceException {		
 		AsyncMockStubber.callSuccessWith(profile).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
 		Exception ex = new Exception("pw change failed");
-		AsyncMockStubber.callFailureWith(ex).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).changePassword(any(ChangePasswordWithCurrentPassword.class), any(AsyncCallback.class));
 		
 		presenter.resetPassword(password, newPassword);
 		verify(mockSynAlert).clear();
@@ -199,7 +200,7 @@ public class SettingsPresenterTest {
 	@Test
 	public void testResetPasswordFailFinalLogin() throws RestServiceException {		
 		AsyncMockStubber.callSuccessWith(profile).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).changePassword(any(ChangePasswordWithCurrentPassword.class), any(AsyncCallback.class));
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
 		
 		presenter.resetPassword(password, newPassword);
@@ -414,7 +415,7 @@ public class SettingsPresenterTest {
 		verify(mockView).getPassword1Field();
 		verify(mockView).getPassword2Field();
 		verify(mockView).setChangePasswordEnabled(false);
-		verify(mockUserService).changePassword(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).changePassword(any(ChangePasswordWithCurrentPassword.class), any(AsyncCallback.class));
 	}
 	
 	@Test

@@ -3,12 +3,14 @@ package org.sagebionetworks.web.client.presenter.users;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.auth.ChangePasswordWithCurrentPassword;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -29,31 +31,22 @@ import com.google.inject.Inject;
 public class PasswordResetPresenter extends AbstractActivity implements PasswordResetView.Presenter, Presenter<PasswordReset> {
 	private PasswordReset place;	
 	private PasswordResetView view;
-	private CookieProvider cookieProvider;
-	private UserAccountServiceAsync userService;
 	private AuthenticationController authenticationController;
-	private SageImageBundle sageImageBundle;
-	private IconsImageBundle iconsImageBundle;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseAlert synAlert;
 	private String sessionToken = null;
+	private SynapseJavascriptClient jsClient;
 	
 	@Inject
 	public PasswordResetPresenter(PasswordResetView view,
-			CookieProvider cookieProvider, UserAccountServiceAsync userService,
 			AuthenticationController authenticationController,
-			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle,
 			GlobalApplicationState globalApplicationState,
+			SynapseJavascriptClient jsClient,
 			SynapseAlert synAlert) {
 		this.view = view;
-		this.userService = userService;
-		fixServiceEntryPoint(userService);
 		this.authenticationController = authenticationController;
-		this.sageImageBundle = sageImageBundle;
-		this.iconsImageBundle = iconsImageBundle;
-		// Set the presenter on the view
-		this.cookieProvider = cookieProvider;
 		this.globalApplicationState = globalApplicationState;
+		this.jsClient = jsClient;
 		this.synAlert = synAlert;
 		view.setSynAlertWidget(synAlert.asWidget());
 		view.setPresenter(this);
@@ -94,7 +87,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 	@Override
 	public void requestPasswordReset(String emailAddress) {
 		synAlert.clear();
-		userService.sendPasswordResetEmail(emailAddress, new AsyncCallback<Void>() {
+		jsClient.sendPasswordResetEmail(emailAddress, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				view.showRequestSentSuccess();
@@ -114,12 +107,16 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 	}
 
 	@Override
-	public void resetPassword(final String newPassword) {
+	public void resetPassword(String currentPassword, String newPassword) {
 		synAlert.clear();
 		if (sessionToken == null && authenticationController.isLoggedIn()) {
 			sessionToken = authenticationController.getCurrentUserSessionToken();
 		}
-		userService.changePassword(sessionToken, newPassword, new AsyncCallback<Void>() {
+		ChangePasswordWithCurrentPassword changePasswordRequest = new ChangePasswordWithCurrentPassword();
+		changePasswordRequest.setCurrentPassword(currentPassword);
+		changePasswordRequest.setNewPassword(newPassword);
+		changePasswordRequest.setUsername(authenticationController.getCurrentUserProfile().getUserName());
+		jsClient.changePassword(changePasswordRequest, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				view.showInfo(DisplayConstants.PASSWORD_RESET_TEXT);
