@@ -58,7 +58,7 @@ import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
-import org.sagebionetworks.repo.model.auth.ChangePasswordWithCurrentPassword;
+import org.sagebionetworks.repo.model.auth.ChangePasswordInterface;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.Session;
@@ -141,7 +141,6 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.common.base.Joiner;
 import com.google.common.util.concurrent.FluentFuture;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -1470,7 +1469,7 @@ public class SynapseJavascriptClient {
 		doPost(url, username, OBJECT_TYPE.None, cb);
 	}
 	
-	public void changePassword(ChangePasswordWithCurrentPassword changePasswordRequest, AsyncCallback<Void> cb) {
+	public void changePassword(ChangePasswordInterface changePasswordRequest, AsyncCallback<Void> cb) {
 		String url = getAuthServiceUrl() + USER_CHANGE_PASSWORD;
 		doPost(url, changePasswordRequest, OBJECT_TYPE.None, cb);
 	}

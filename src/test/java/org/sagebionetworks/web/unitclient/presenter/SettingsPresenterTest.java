@@ -47,7 +47,6 @@ import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
@@ -75,8 +74,6 @@ public class SettingsPresenterTest {
 	SettingsView mockView;
 	@Mock
 	AuthenticationController mockAuthenticationController;
-	@Mock
-	UserAccountServiceAsync mockUserService;
 	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
 	@Mock
@@ -121,7 +118,6 @@ public class SettingsPresenterTest {
 		presenter = new SettingsPresenter(
 				mockView, 
 				mockAuthenticationController, 
-				mockUserService, 
 				mockGlobalApplicationState, 
 				mockSynapseClient, 
 				mockInjector, 

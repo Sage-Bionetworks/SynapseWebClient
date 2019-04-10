@@ -24,7 +24,6 @@ import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
@@ -47,7 +46,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	public static final String MUST_BE_CERTIFIED_TO_SUBMIT_PROFILE_VALIDATION_MESSAGE = "Only Certified Users can apply to have their user profile validated.  Please get certified and try again.";
 	private SettingsView view;
 	private AuthenticationController authenticationController;
-	private UserAccountServiceAsync userService;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
 	private SynapseAlert apiSynAlert;
@@ -66,7 +64,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	@Inject
 	public SettingsPresenter(SettingsView view,
 			AuthenticationController authenticationController,
-			UserAccountServiceAsync userService,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
 			PortalGinInjector ginInjector,
@@ -77,8 +74,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.authenticationController = authenticationController;
-		this.userService = userService;
-		fixServiceEntryPoint(userService);
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
