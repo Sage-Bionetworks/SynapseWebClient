@@ -33,6 +33,7 @@ import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.ErrorResponseCode;
 import org.sagebionetworks.repo.model.IdList;
 import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
 import org.sagebionetworks.repo.model.LogEntry;
@@ -138,6 +139,7 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.common.base.Joiner;
 import com.google.common.util.concurrent.FluentFuture;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -427,16 +429,20 @@ public class SynapseJavascriptClient {
 							// getException() based on status code,
 							// instead of using org.sagebionetworks.client.ClientUtils.throwException() and ExceptionUtil.convertSynapseException() (neither of which can be referenced here)
 							String responseText = response.getStatusText();
+							ErrorResponseCode responseCode = null;
 							try {
 								// try to get the reason
 								JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(response.getText());
 								if (jsonObject.has("reason")) {
 									responseText = jsonObject.get("reason").toString();
 								}
+								if (jsonObject.has("errorCode")) {
+									responseCode = ErrorResponseCode.valueOf(jsonObject.get("errorCode").toString());
+								}
 							} catch (Exception e) {
-								jsniUtils.consoleError("Unable to get reason for error: " + e.getMessage());
+								jsniUtils.consoleError("Unable to get reason/code for error: " + e.getMessage());
 							}
-							onError(request, getException(statusCode, responseText));
+							onError(request, getException(statusCode, responseText, responseCode));
 						}
 					}
 				}
@@ -455,30 +461,30 @@ public class SynapseJavascriptClient {
 		}
 	}
 	
-	public static RestServiceException getException(int statusCode, String reasonStr) {
+	public static RestServiceException getException(int statusCode, String reasonStr, ErrorResponseCode code) {
 		switch (statusCode) {
 			case SC_UNAUTHORIZED :
-				return new UnauthorizedException(reasonStr);
+				return new UnauthorizedException(reasonStr, code);
 			case SC_FORBIDDEN :
-				return new ForbiddenException(reasonStr);
+				return new ForbiddenException(reasonStr, code);
 			case SC_NOT_FOUND :
-				return new NotFoundException(reasonStr);
+				return new NotFoundException(reasonStr, code);
 			case SC_BAD_REQUEST :
-				return new BadRequestException(reasonStr);
+				return new BadRequestException(reasonStr, code);
 			case SC_LOCKED :
-				return new LockedException(reasonStr);
+				return new LockedException(reasonStr, code);
 			case SC_PRECONDITION_FAILED :
-				return new ConflictingUpdateException(reasonStr);
+				return new ConflictingUpdateException(reasonStr, code);
 			case SC_GONE : 
-				return new BadRequestException(reasonStr);
+				return new BadRequestException(reasonStr, code);
 			case TOO_MANY_REQUESTS_STATUS_CODE :
-				return new TooManyRequestsException(reasonStr);
+				return new TooManyRequestsException(reasonStr, code);
 			case SC_SERVICE_UNAVAILABLE :
-				return new SynapseDownException(reasonStr);
+				return new SynapseDownException(reasonStr, code);
 			case SC_CONFLICT :
-				return new ConflictException(reasonStr);
+				return new ConflictException(reasonStr, code);
 			default :
-				return new UnknownErrorException(reasonStr);
+				return new UnknownErrorException(reasonStr, code);
 		}
 	}
 	
