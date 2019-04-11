@@ -127,48 +127,36 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		if (authenticationController.isLoggedIn()) {
 			if (authenticationController.getCurrentUserProfile() != null
 					&& authenticationController.getCurrentUserProfile().getUserName() != null) {
-				final String username = authenticationController.getCurrentUserProfile().getUserName();
-				authenticationController.loginUser(username, existingPassword,
-						new AsyncCallback<UserProfile>() {
+				String username = authenticationController.getCurrentUserProfile().getUserName();
+				ChangePasswordWithCurrentPassword changePasswordRequest = new ChangePasswordWithCurrentPassword();
+				changePasswordRequest.setCurrentPassword(existingPassword);
+				changePasswordRequest.setNewPassword(newPassword);
+				changePasswordRequest.setUsername(authenticationController.getCurrentUserProfile().getUserName());
+				jsClient.changePassword(changePasswordRequest, new AsyncCallback<Void>() {
+					@Override
+					public void onSuccess(Void result) {
+						view.showPasswordChangeSuccess();
+						// login user as session token
+						// has changed
+						authenticationController.loginUser(username, newPassword, new AsyncCallback<UserProfile>() {
 							@Override
-							public void onSuccess(UserProfile userSessionData) {
-								ChangePasswordWithCurrentPassword changePasswordRequest = new ChangePasswordWithCurrentPassword();
-								changePasswordRequest.setCurrentPassword(existingPassword);
-								changePasswordRequest.setNewPassword(newPassword);
-								changePasswordRequest.setUsername(authenticationController.getCurrentUserProfile().getUserName());
-								jsClient.changePassword(changePasswordRequest, new AsyncCallback<Void>() {
-									@Override
-									public void onSuccess(Void result) {
-										view.showPasswordChangeSuccess();
-										// login user as session token
-										// has changed
-										authenticationController.loginUser(username, newPassword, new AsyncCallback<UserProfile>() {
-											@Override
-											public void onSuccess(UserProfile result) {
-											}
-											@Override
-											public void onFailure(Throwable caught) {
-												//if login fails, simple send them to the login page to get a new session
-												globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-											}
-										});
-									}
-
-									@Override
-									public void onFailure(
-											Throwable caught) {
-										passwordSynAlert.handleException(caught);
-										view.setChangePasswordEnabled(true);
-									}
-								});
+							public void onSuccess(UserProfile result) {
 							}
 							@Override
 							public void onFailure(Throwable caught) {
-								passwordSynAlert.showError("Incorrect password. Please enter your existing Synapse password.");
-								view.setCurrentPasswordInError(true);
-								view.setChangePasswordEnabled(true);
+								//if login fails, simple send them to the login page to get a new session
+								globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 							}
 						});
+					}
+
+					@Override
+					public void onFailure(
+							Throwable caught) {
+						passwordSynAlert.showError(caught.getMessage());
+						view.setChangePasswordEnabled(true);
+					}
+				});
 			} else {
 				view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 			}

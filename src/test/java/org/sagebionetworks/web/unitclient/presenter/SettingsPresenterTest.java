@@ -174,28 +174,18 @@ public class SettingsPresenterTest {
 	}
 	
 	@Test
-	public void testResetPasswordFailInitialLogin() throws RestServiceException {		
-		AsyncMockStubber.callFailureWith(null).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
-		
-		presenter.resetPassword(password, newPassword);
-		verify(mockSynAlert).showError("Incorrect password. Please enter your existing Synapse password.");
-		verify(mockView).setCurrentPasswordInError(true);
-	}
-
-	@Test
-	public void testResetPasswordFailChangePw() throws RestServiceException {		
-		AsyncMockStubber.callSuccessWith(profile).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
-		Exception ex = new Exception("pw change failed");
+	public void testResetPasswordFailChangePw() throws RestServiceException {
+		String errorMessage = "pw change failed, could happen if user provides the incorrect current password";
+		Exception ex = new Exception(errorMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).changePassword(any(ChangePasswordWithCurrentPassword.class), any(AsyncCallback.class));
 		
 		presenter.resetPassword(password, newPassword);
 		verify(mockSynAlert).clear();
-		verify(mockSynAlert).handleException(ex);
+		verify(mockSynAlert).showError(errorMessage);
 	}
 	
 	@Test
 	public void testResetPasswordFailFinalLogin() throws RestServiceException {		
-		AsyncMockStubber.callSuccessWith(profile).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).changePassword(any(ChangePasswordWithCurrentPassword.class), any(AsyncCallback.class));
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
 		
