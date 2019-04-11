@@ -21,13 +21,16 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -57,6 +60,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	PublicPrincipalIds publicPrincipalIds;
 	GWTWrapper gwt;
 	SynapseJavascriptClient jsClient;
+	QuizInfoDialog quizInfoDialog = null;
 	
 	// Entity components
 	private Entity entity;
@@ -68,6 +72,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	HasChangesHandler hasChangesHandler;
 	private SynapseAlert synAlert;
 	private String oldAclEtag;
+	private PortalGinInjector ginInjector;
 	
 	@Inject
 	public AccessControlListEditor(AccessControlListEditorView view,
@@ -76,7 +81,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			SynapseProperties synapseProperties,
 			GWTWrapper gwt,
 			SynapseJavascriptClient jsClient,
-			SynapseAlert synAlert) {
+			SynapseAlert synAlert,
+			PortalGinInjector ginInjector) {
 		this.view = view;
 		this.synapseClient = synapseClientAsync;
 		fixServiceEntryPoint(synapseClient);
@@ -84,6 +90,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		this.gwt = gwt;
 		this.jsClient = jsClient;
 		this.synAlert = synAlert;
+		this.ginInjector = ginInjector;
 		
 		userGroupHeaders = new HashMap<String, UserGroupHeader>();
 		view.setPresenter(this);
@@ -408,8 +415,13 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-				hasChangesHandler.hasChanges(true);
+				//TODO: when PLFM-5479 is fixed, look at the ErrorResponseCode instead of the exception message.
+				if (caught instanceof ForbiddenException && caught.getMessage().contains("certified users")) {
+					getQuizInfoDialog().show();
+				} else {
+					synAlert.handleException(caught);
+					hasChangesHandler.hasChanges(true);
+				}
 			}
 		};
 		
@@ -531,4 +543,11 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		
 	}
 	
+	public QuizInfoDialog getQuizInfoDialog() {
+		if (quizInfoDialog == null) {
+			quizInfoDialog = ginInjector.getQuizInfoDialog();
+		}
+		return quizInfoDialog;
+	}
+
 }

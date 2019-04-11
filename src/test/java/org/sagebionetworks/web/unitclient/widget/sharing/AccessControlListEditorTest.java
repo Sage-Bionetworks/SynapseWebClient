@@ -23,12 +23,12 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Matchers;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Project;
@@ -38,33 +38,42 @@ import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.HasChangesHandler;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorView;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+@RunWith(MockitoJUnitRunner.class)
 public class AccessControlListEditorTest {
 	private static final String HOST_PAGE_BASE_URL="http://www.wwu.edu/";
 	// The ACLEditor
 	private AccessControlListEditor acle;
 
 	// Mock components
+	@Mock
 	private SynapseClientAsync mockSynapseClient;
+	@Mock
 	private GWTWrapper mockGwt;
 	private AuthenticationController mockAuthenticationController;
+	@Mock
 	private AccessControlListEditorView mockACLEView;
+	@Mock
 	private HasChangesHandler mockHasChangeHandler;
+	@Mock
 	private Callback mockPushToSynapseCallback;
 	
 	// Test Synapse objects
@@ -93,10 +102,13 @@ public class AccessControlListEditorTest {
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	SynapseAlert mockSynAlert;
+	@Mock
+	QuizInfoDialog mockQuizInfoDialog;
+	@Mock
+	PortalGinInjector mockPortalGinInjector;
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws JSONObjectAdapterException {
-		MockitoAnnotations.initMocks(this);
 		// set up test Synapse objects
 		project = createProject();
 		localACL = createACL(ENTITY_ID);
@@ -107,21 +119,14 @@ public class AccessControlListEditorTest {
 		entityBundleTransport_inheritedACL = createEBT(inheritedAclClone, createUEP());
 		userGroupHeaderRP = createUGHRP();
 		
-		
 		// set up mocks
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockHasChangeHandler = Mockito.mock(HasChangesHandler.class);
 		mockAuthenticationController = mock(AuthenticationController.class, RETURNS_DEEP_STUBS);
-		mockACLEView = mock(AccessControlListEditorView.class);
 		when(mockSynapseProperties.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
 		when(mockPublicPrincipalIds.getPublicAclPrincipalId()).thenReturn(TEST_PUBLIC_PRINCIPAL_ID);
-		mockGwt = mock(GWTWrapper.class);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(new Long(ADMIN_ID).toString());
 		AsyncMockStubber.callSuccessWith(userGroupHeaderRP).when(mockSynapseJavascriptClient).getUserGroupHeadersById(Matchers.<ArrayList<String>>any(), any(AsyncCallback.class));
 
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).sendMessage(anySet(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		
-		mockPushToSynapseCallback = mock(Callback.class);
 		
 		// instantiate the ACLEditor
 		acle = new AccessControlListEditor(mockACLEView,
@@ -130,11 +135,13 @@ public class AccessControlListEditorTest {
 				mockSynapseProperties, 
 				mockGwt,
 				mockSynapseJavascriptClient,
-				mockSynAlert
+				mockSynAlert,
+				mockPortalGinInjector
 		);
 		acle.configure(project, true, mockHasChangeHandler);
 		when(mockACLEView.isNotifyPeople()).thenReturn(true);
 		when(mockGwt.getHostPageBaseURL()).thenReturn(HOST_PAGE_BASE_URL);
+		when(mockPortalGinInjector.getQuizInfoDialog()).thenReturn(mockQuizInfoDialog);
 	}
 	
 	private static Project createProject() {
@@ -554,6 +561,20 @@ public class AccessControlListEditorTest {
 		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
 	}
 	
+	@Test
+	public void addDownloadAccessToAuthenticatedUsersNotCertified() throws Exception {		
+		// configure mocks
+		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		//TODO: when PLFM-5479 is fixed, set the ErrorResponseCode instead of the exception message.
+		AsyncMockStubber.callFailureWith(new ForbiddenException("Only certified users can allow authenticated users to download.")).when(mockSynapseClient).updateAcl(any(AccessControlList.class), anyBoolean(), any(AsyncCallback.class));
+		
+		acle.refresh();
+		acle.setAccess(TEST_PUBLIC_PRINCIPAL_ID, PermissionLevel.CAN_DOWNLOAD);
+		acle.pushChangesToSynapse(false,mockPushToSynapseCallback);
+		
+		verify(mockQuizInfoDialog).show();
+	}
+
 	@SuppressWarnings("unchecked")
 	@Test
 	public void removeAccessNotFoundTest() throws Exception {		
