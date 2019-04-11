@@ -11,7 +11,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -30,7 +29,6 @@ import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -78,12 +76,12 @@ public class MyEntitiesBrowserTest {
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
 		
 		entities = new ArrayList<ProjectHeader>();
-		ProjectHeader projectHeader1 = new ProjectHeader();
-		projectHeader1.setId("syn1");
-		ProjectHeader projectHeader2 = new ProjectHeader();
-		projectHeader2.setId("syn2");
-		entities.add(projectHeader1);
-		entities.add(projectHeader2);
+		//full page of results in the first response
+		for (int i = 0; i < MyEntitiesBrowser.PROJECT_LIMIT; i++) {
+			ProjectHeader projectHeader = new ProjectHeader();
+			projectHeader.setId("syn"+i);
+			entities.add(projectHeader);
+		}
 		AsyncMockStubber.callSuccessWith(entities).when(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 	}
 

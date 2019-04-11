@@ -52,9 +52,9 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		this.globalApplicationState = globalApplicationState;
 		this.jsClient = jsClient;
 		// default selection behavior is to do nothing
-		this.selectedHandler = new SelectedHandler() {			
+		this.selectedHandler = new SelectedHandler() {
 			@Override
-			public void onSelection(String selectedEntityId) {								
+			public void onSelection(String selectedEntityId) {
 			}
 		};
 		
@@ -72,7 +72,6 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	@Override
 	public Widget asWidget() {
 		view.setPresenter(this);
-		refresh();
 		return view.asWidget();
 	}
 	
@@ -171,7 +170,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 					};
 					view.addUpdatableEntities(headers);
 					userUpdatableOffset += PROJECT_LIMIT;
-					view.setIsMoreUpdatableEntities(!projectHeaders.isEmpty());
+					view.setIsMoreUpdatableEntities(projectHeaders.size() >= PROJECT_LIMIT);
 				}
 				@Override
 				public void onFailure(Throwable caught) {
