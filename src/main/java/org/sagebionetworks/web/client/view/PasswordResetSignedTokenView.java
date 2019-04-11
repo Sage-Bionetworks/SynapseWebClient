@@ -11,6 +11,6 @@ public interface PasswordResetSignedTokenView extends IsWidget {
 	String getPassword2Field();
 	void setChangePasswordEnabled(boolean isEnabled);
 	public interface Presenter {
-		void changePassword();
+		void onChangePassword();
 	}
 }

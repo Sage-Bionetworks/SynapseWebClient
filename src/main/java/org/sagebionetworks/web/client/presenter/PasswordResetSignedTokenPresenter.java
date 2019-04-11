@@ -8,7 +8,6 @@ import org.sagebionetworks.repo.model.auth.PasswordResetSignedToken;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -24,6 +23,7 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class PasswordResetSignedTokenPresenter extends AbstractActivity implements PasswordResetSignedTokenView.Presenter, Presenter<PasswordResetSignedTokenPlace> {
+	public static final String INVALID_PASSWORD_RESET_SIGNED_TOKEN = "Invalid PasswordResetSignedToken";
 	private PasswordResetSignedTokenView view;
 	private SynapseClientAsync synapseClient;
 	private SynapseJavascriptClient jsClient;
@@ -31,22 +31,18 @@ public class PasswordResetSignedTokenPresenter extends AbstractActivity implemen
 	PasswordResetSignedToken signedToken;
 	AuthenticationController authController;
 	GlobalApplicationState globalAppState;
-	PopupUtilsView popupUtils;
-	boolean isFirstTry;
 	@Inject
 	public PasswordResetSignedTokenPresenter(PasswordResetSignedTokenView view,
 			SynapseClientAsync synapseClient,
 			SynapseJavascriptClient jsClient,
 			SynapseAlert synAlert,
 			AuthenticationController authController,
-			GlobalApplicationState globalAppState,
-			PopupUtilsView popupUtils){
+			GlobalApplicationState globalAppState){
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.jsClient = jsClient;
 		this.synAlert = synAlert;
-		this.popupUtils = popupUtils;
 		this.authController = authController;
 		this.globalAppState = globalAppState;
 		view.setPresenter(this);
@@ -74,7 +70,7 @@ public class PasswordResetSignedTokenPresenter extends AbstractActivity implemen
 			@Override
 			public void onSuccess(SignedTokenInterface result) {
 				if (!(result instanceof PasswordResetSignedToken)) {
-					synAlert.showError("Invalid PasswordResetSignedToken");
+					synAlert.showError(INVALID_PASSWORD_RESET_SIGNED_TOKEN);
 					return;
 				}
 				signedToken = (PasswordResetSignedToken)result;
@@ -91,7 +87,7 @@ public class PasswordResetSignedTokenPresenter extends AbstractActivity implemen
 	}
 
 	@Override
-	public void changePassword() {
+	public void onChangePassword() {
 		synAlert.clear();
 		String password1 = view.getPassword1Field();
 		String password2 = view.getPassword2Field();
@@ -107,11 +103,13 @@ public class PasswordResetSignedTokenPresenter extends AbstractActivity implemen
 			jsClient.changePassword(changePasswordRequest, new AsyncCallback<Void>() {
 				@Override
 				public void onFailure(Throwable caught) {
+					view.setChangePasswordEnabled(true);
 					synAlert.handleException(caught);
 				}
 				@Override
 				public void onSuccess(Void result) {
 					view.showPasswordChangeSuccess();
+					view.setChangePasswordEnabled(true);
 					globalAppState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
 				}
 			});

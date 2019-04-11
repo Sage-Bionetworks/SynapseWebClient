@@ -37,7 +37,7 @@ public class PasswordResetSignedTokenViewImpl implements PasswordResetSignedToke
 		w = binder.createAndBindUi(this);
 		this.headerWidget = headerWidget;
 		changePasswordBtn.addClickHandler(event -> {
-			presenter.changePassword();
+			presenter.onChangePassword();
 		});
 		headerWidget.configure();
 	}
