@@ -5,11 +5,13 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.auth.ChangePasswordWithToken;
 import org.sagebionetworks.repo.model.auth.PasswordResetSignedToken;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.PasswordResetSignedTokenPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.PasswordResetSignedTokenView;
@@ -91,18 +93,11 @@ public class PasswordResetSignedTokenPresenter extends AbstractActivity implemen
 	@Override
 	public void changePassword() {
 		synAlert.clear();
-		view.setPassword1InError(false);
-		view.setPassword2InError(false);
 		String password1 = view.getPassword1Field();
 		String password2 = view.getPassword2Field();
-		if (!checkPasswordDefined(password1)){
-			view.setPassword1InError(true);
-			synAlert.showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
-		} else if (!checkPasswordDefined(password2)) {
-			view.setPassword2InError(true);
+		if (!checkPasswordDefined(password1) || !checkPasswordDefined(password2)){
 			synAlert.showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
 		} else if (!password1.equals(password2)) {
-			view.setPassword2InError(true);
 			synAlert.showError(DisplayConstants.PASSWORDS_MISMATCH);
 		} else {
 			view.setChangePasswordEnabled(false);
@@ -117,7 +112,7 @@ public class PasswordResetSignedTokenPresenter extends AbstractActivity implemen
 				@Override
 				public void onSuccess(Void result) {
 					view.showPasswordChangeSuccess();
-					globalAppState.gotoLastPlace();
+					globalAppState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
 				}
 			});
 		}
