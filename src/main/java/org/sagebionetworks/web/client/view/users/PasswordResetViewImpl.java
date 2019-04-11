@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.InfoAlert;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.dom.client.DivElement;
@@ -34,7 +35,8 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	DivElement resetPasswordForm;
 	@UiField
 	DivElement sendPasswordChangeForm;
-	
+	@UiField
+	InfoAlert passwordResetRequired;
 	@UiField
 	PasswordTextBox currentPasswordField;
 	@UiField
@@ -244,6 +246,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 		DisplayUtils.hideFormError(password1, password1Error);
 		DisplayUtils.hideFormError(password2, password2Error);
 		headerWidget.configure();
+		passwordResetRequired.setVisible(false);
 	}
 
 	@Override
@@ -294,5 +297,8 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	public void setSubmitButtonEnabled(boolean enabled) {
 		submitBtn.setEnabled(enabled);
 	}
-
+	@Override
+	public void showPasswordResetRequired() {
+		passwordResetRequired.setVisible(true);
+	}
 }

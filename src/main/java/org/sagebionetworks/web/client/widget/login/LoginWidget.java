@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.widget.login;
 
+import org.sagebionetworks.repo.model.ErrorResponseCode;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -59,8 +61,16 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.clear();
-				if (caught instanceof NotFoundException || caught instanceof UnauthorizedException) {
+				
+				if (caught instanceof NotFoundException) {
 					synAlert.showError(caught.getMessage() + PLEASE_TRY_AGAIN);
+				} else if (caught instanceof UnauthorizedException) {
+					ErrorResponseCode errorCode = ((UnauthorizedException) caught).getErrorResponseCode();
+					if (ErrorResponseCode.PASSWORD_RESET_VIA_EMAIL_REQUIRED.equals(errorCode)) {
+						globalApplicationState.getPlaceChanger().goTo(new PasswordReset(errorCode.toString()));
+					} else {
+						synAlert.showError(caught.getMessage() + PLEASE_TRY_AGAIN);	
+					}
 				} else {
 					synAlert.handleException(caught);	
 				}

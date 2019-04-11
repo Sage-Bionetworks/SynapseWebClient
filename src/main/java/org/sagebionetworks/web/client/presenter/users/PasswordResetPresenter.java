@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.presenter.users;
 
+import org.sagebionetworks.repo.model.ErrorResponseCode;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.auth.ChangePasswordWithCurrentPassword;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -54,11 +55,13 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 	@Override
 	public void setPlace(PasswordReset place) {
 		this.place = place;
-		view.setPresenter(this);			
+		view.setPresenter(this);
 		view.clear(); 
-		
-		// Assume all tokens other than the default are session tokens
-		if (!ClientProperties.DEFAULT_PLACE_TOKEN.equals(place.toToken())) {
+		if (ErrorResponseCode.PASSWORD_RESET_VIA_EMAIL_REQUIRED.toString().equals(place.toToken())) {
+			view.showRequestForm();
+			view.showPasswordResetRequired();
+		} else if (!ClientProperties.DEFAULT_PLACE_TOKEN.equals(place.toToken())) {
+			// Assume all tokens other than the default are session tokens
 			// validate that session token is still valid before showing form
 			view.showLoading();
 			authenticationController.setNewSessionToken(place.toToken(), new AsyncCallback<UserProfile>() {

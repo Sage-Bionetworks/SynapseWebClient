@@ -65,7 +65,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	public void loginUser(final String username, String password, final AsyncCallback<UserProfile> callback) {
 		if(username == null || password == null) callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 		LoginRequest loginRequest = getLoginRequest(username, password);
-		ginInjector.getSynapseJavascriptClient().login(loginRequest, new AsyncCallback<LoginResponse>() {		
+		ginInjector.getSynapseJavascriptClient().login(loginRequest, new AsyncCallback<LoginResponse>() {
 			@Override
 			public void onSuccess(LoginResponse session) {
 				storeAuthenticationReceipt(username, session.getAuthenticationReceipt());
