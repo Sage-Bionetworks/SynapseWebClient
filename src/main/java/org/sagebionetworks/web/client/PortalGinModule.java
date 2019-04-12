@@ -947,7 +947,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityTreeBrowserView.class).to(EntityTreeBrowserViewImpl.class);
 
 		// MyEntitiesBrowser
-		bind(MyEntitiesBrowserView.class).to(MyEntitiesBrowserViewImpl.class).in(Singleton.class);
+		bind(MyEntitiesBrowserView.class).to(MyEntitiesBrowserViewImpl.class);
 
 		// Wiki Attachments		
 		bind(WikiAttachmentsView.class).to(WikiAttachmentsViewImpl.class);
