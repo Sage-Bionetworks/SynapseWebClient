@@ -59,6 +59,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	static {
 		//Benign error thrown by VideoWidget (<video>). ResizeObserver was not able to deliver all observations within a single animation frame.
 		SAFE_TO_IGNORE_ERRORS.add("resizeobserver loop limit exceeded");
+		//Server response was not json (html-based error page from the web server)
+		SAFE_TO_IGNORE_ERRORS.add("error parsing json");
 	}
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
@@ -102,8 +104,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			return false;
 		}
 		String lowercaseError = error.toLowerCase();
-		for (String ignoredErrorPrefix : SAFE_TO_IGNORE_ERRORS) {
-			if (lowercaseError.startsWith(ignoredErrorPrefix)) {
+		for (String ignoredError : SAFE_TO_IGNORE_ERRORS) {
+			if (lowercaseError.contains(ignoredError)) {
 				return true;
 			}
 		}
