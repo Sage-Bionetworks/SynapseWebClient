@@ -7,7 +7,6 @@ import com.google.gwt.place.shared.Prefix;
 public class PasswordReset extends Place {
 	
 	private String token;
-	
 	public PasswordReset(String token) {
 		this.token = token;
 	}

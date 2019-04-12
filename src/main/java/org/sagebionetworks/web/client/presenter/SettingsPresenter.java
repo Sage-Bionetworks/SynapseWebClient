@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.auth.ChangePasswordWithCurrentPassword;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
 import org.sagebionetworks.repo.model.verification.VerificationState;
@@ -23,7 +24,6 @@ import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
@@ -46,7 +46,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	public static final String MUST_BE_CERTIFIED_TO_SUBMIT_PROFILE_VALIDATION_MESSAGE = "Only Certified Users can apply to have their user profile validated.  Please get certified and try again.";
 	private SettingsView view;
 	private AuthenticationController authenticationController;
-	private UserAccountServiceAsync userService;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
 	private SynapseAlert apiSynAlert;
@@ -65,7 +64,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	@Inject
 	public SettingsPresenter(SettingsView view,
 			AuthenticationController authenticationController,
-			UserAccountServiceAsync userService,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
 			PortalGinInjector ginInjector,
@@ -76,8 +74,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.authenticationController = authenticationController;
-		this.userService = userService;
-		fixServiceEntryPoint(userService);
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -131,44 +127,36 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		if (authenticationController.isLoggedIn()) {
 			if (authenticationController.getCurrentUserProfile() != null
 					&& authenticationController.getCurrentUserProfile().getUserName() != null) {
-				final String username = authenticationController.getCurrentUserProfile().getUserName();
-				authenticationController.loginUser(username, existingPassword,
-						new AsyncCallback<UserProfile>() {
+				String username = authenticationController.getCurrentUserProfile().getUserName();
+				ChangePasswordWithCurrentPassword changePasswordRequest = new ChangePasswordWithCurrentPassword();
+				changePasswordRequest.setCurrentPassword(existingPassword);
+				changePasswordRequest.setNewPassword(newPassword);
+				changePasswordRequest.setUsername(authenticationController.getCurrentUserProfile().getUserName());
+				jsClient.changePassword(changePasswordRequest, new AsyncCallback<Void>() {
+					@Override
+					public void onSuccess(Void result) {
+						view.showPasswordChangeSuccess();
+						// login user as session token
+						// has changed
+						authenticationController.loginUser(username, newPassword, new AsyncCallback<UserProfile>() {
 							@Override
-							public void onSuccess(UserProfile userSessionData) {
-								userService.changePassword(authenticationController.getCurrentUserSessionToken(),newPassword, new AsyncCallback<Void>() {
-									@Override
-									public void onSuccess(Void result) {
-										view.showPasswordChangeSuccess();
-										// login user as session token
-										// has changed
-										authenticationController.loginUser(username, newPassword, new AsyncCallback<UserProfile>() {
-											@Override
-											public void onSuccess(UserProfile result) {
-											}
-											@Override
-											public void onFailure(Throwable caught) {
-												//if login fails, simple send them to the login page to get a new session
-												globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-											}
-										});
-									}
-
-									@Override
-									public void onFailure(
-											Throwable caught) {
-										passwordSynAlert.handleException(caught);
-										view.setChangePasswordEnabled(true);
-									}
-								});
+							public void onSuccess(UserProfile result) {
 							}
 							@Override
 							public void onFailure(Throwable caught) {
-								passwordSynAlert.showError("Incorrect password. Please enter your existing Synapse password.");
-								view.setCurrentPasswordInError(true);
-								view.setChangePasswordEnabled(true);
+								//if login fails, simple send them to the login page to get a new session
+								globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 							}
 						});
+					}
+
+					@Override
+					public void onFailure(
+							Throwable caught) {
+						passwordSynAlert.showError(caught.getMessage());
+						view.setChangePasswordEnabled(true);
+					}
+				});
 			} else {
 				view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 			}

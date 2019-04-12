@@ -4,7 +4,7 @@ import static com.google.gwt.http.client.RequestBuilder.GET;
 import static com.google.gwt.http.client.RequestBuilder.POST;
 import static com.google.gwt.http.client.RequestBuilder.PUT;
 import static org.apache.http.HttpStatus.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
@@ -36,6 +36,7 @@ import org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException;
 import org.sagebionetworks.reflection.model.PaginatedResults;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
+import org.sagebionetworks.repo.model.ErrorResponseCode;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
@@ -150,17 +151,22 @@ public class SynapseJavascriptClientTest {
 	@Test
 	public void testGetException() {
 		String reason = "error message";
-		assertTrue(getException(SC_UNAUTHORIZED, reason) instanceof UnauthorizedException);
-		assertTrue(getException(SC_FORBIDDEN, reason) instanceof ForbiddenException);
-		assertTrue(getException(SC_NOT_FOUND, reason) instanceof NotFoundException);
-		assertTrue(getException(SC_BAD_REQUEST, reason) instanceof BadRequestException);
-		assertTrue(getException(SC_LOCKED, reason) instanceof LockedException);
-		assertTrue(getException(SC_PRECONDITION_FAILED, reason) instanceof ConflictingUpdateException);
-		assertTrue(getException(SC_GONE, reason) instanceof BadRequestException);
-		assertTrue(getException(SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE, reason) instanceof TooManyRequestsException);
-		assertTrue(getException(SC_SERVICE_UNAVAILABLE, reason) instanceof SynapseDownException);
-		assertTrue(getException(SC_CONFLICT, reason) instanceof ConflictException);
-		assertTrue(getException(-1, reason) instanceof UnknownErrorException);
+		ErrorResponseCode errorResponseCode = null;
+		assertTrue(getException(SC_UNAUTHORIZED, reason, errorResponseCode) instanceof UnauthorizedException);
+		assertTrue(getException(SC_FORBIDDEN, reason, errorResponseCode) instanceof ForbiddenException);
+		assertTrue(getException(SC_NOT_FOUND, reason, errorResponseCode) instanceof NotFoundException);
+		assertTrue(getException(SC_BAD_REQUEST, reason, errorResponseCode) instanceof BadRequestException);
+		assertTrue(getException(SC_LOCKED, reason, errorResponseCode) instanceof LockedException);
+		assertTrue(getException(SC_PRECONDITION_FAILED, reason, errorResponseCode) instanceof ConflictingUpdateException);
+		assertTrue(getException(SC_GONE, reason, errorResponseCode) instanceof BadRequestException);
+		assertTrue(getException(SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE, reason, errorResponseCode) instanceof TooManyRequestsException);
+		assertTrue(getException(SC_SERVICE_UNAVAILABLE, reason, errorResponseCode) instanceof SynapseDownException);
+		assertTrue(getException(SC_CONFLICT, reason, errorResponseCode) instanceof ConflictException);
+		assertTrue(getException(-1, reason, errorResponseCode) instanceof UnknownErrorException);
+		
+		assertNull(getException(SC_FORBIDDEN, reason, errorResponseCode).getErrorResponseCode());
+		errorResponseCode = ErrorResponseCode.PASSWORD_RESET_VIA_EMAIL_REQUIRED;
+		assertEquals(ErrorResponseCode.PASSWORD_RESET_VIA_EMAIL_REQUIRED, getException(SC_FORBIDDEN, reason, errorResponseCode).getErrorResponseCode());
 	}
 
 	@Test
