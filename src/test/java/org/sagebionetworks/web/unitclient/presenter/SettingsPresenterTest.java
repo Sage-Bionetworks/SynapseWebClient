@@ -30,6 +30,7 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.auth.ChangePasswordWithCurrentPassword;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
 import org.sagebionetworks.repo.model.verification.VerificationState;
@@ -46,7 +47,6 @@ import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
@@ -74,8 +74,6 @@ public class SettingsPresenterTest {
 	SettingsView mockView;
 	@Mock
 	AuthenticationController mockAuthenticationController;
-	@Mock
-	UserAccountServiceAsync mockUserService;
 	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
 	@Mock
@@ -120,7 +118,6 @@ public class SettingsPresenterTest {
 		presenter = new SettingsPresenter(
 				mockView, 
 				mockAuthenticationController, 
-				mockUserService, 
 				mockGlobalApplicationState, 
 				mockSynapseClient, 
 				mockInjector, 
@@ -169,7 +166,7 @@ public class SettingsPresenterTest {
 	@Test
 	public void testResetPassword() throws RestServiceException {
 		AsyncMockStubber.callSuccessWith(profile).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).changePassword(any(ChangePasswordWithCurrentPassword.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(profile).when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
 		
 		presenter.resetPassword(password, newPassword);
@@ -177,29 +174,19 @@ public class SettingsPresenterTest {
 	}
 	
 	@Test
-	public void testResetPasswordFailInitialLogin() throws RestServiceException {		
-		AsyncMockStubber.callFailureWith(null).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
-		
-		presenter.resetPassword(password, newPassword);
-		verify(mockSynAlert).showError("Incorrect password. Please enter your existing Synapse password.");
-		verify(mockView).setCurrentPasswordInError(true);
-	}
-
-	@Test
-	public void testResetPasswordFailChangePw() throws RestServiceException {		
-		AsyncMockStubber.callSuccessWith(profile).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
-		Exception ex = new Exception("pw change failed");
-		AsyncMockStubber.callFailureWith(ex).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
+	public void testResetPasswordFailChangePw() throws RestServiceException {
+		String errorMessage = "pw change failed, could happen if user provides the incorrect current password";
+		Exception ex = new Exception(errorMessage);
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).changePassword(any(ChangePasswordWithCurrentPassword.class), any(AsyncCallback.class));
 		
 		presenter.resetPassword(password, newPassword);
 		verify(mockSynAlert).clear();
-		verify(mockSynAlert).handleException(ex);
+		verify(mockSynAlert).showError(errorMessage);
 	}
 	
 	@Test
 	public void testResetPasswordFailFinalLogin() throws RestServiceException {		
-		AsyncMockStubber.callSuccessWith(profile).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).changePassword(any(ChangePasswordWithCurrentPassword.class), any(AsyncCallback.class));
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
 		
 		presenter.resetPassword(password, newPassword);
@@ -414,7 +401,7 @@ public class SettingsPresenterTest {
 		verify(mockView).getPassword1Field();
 		verify(mockView).getPassword2Field();
 		verify(mockView).setChangePasswordEnabled(false);
-		verify(mockUserService).changePassword(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).changePassword(any(ChangePasswordWithCurrentPassword.class), any(AsyncCallback.class));
 	}
 	
 	@Test

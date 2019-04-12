@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.mvp;
 
+import org.sagebionetworks.repo.model.auth.PasswordResetSignedToken;
 import org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionDashboardPlace;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
@@ -18,6 +19,7 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.MapPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
+import org.sagebionetworks.web.client.place.PasswordResetSignedTokenPlace;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Quiz;
@@ -59,6 +61,6 @@ import com.google.gwt.place.shared.WithTokenizers;
 		SynapseForumPlace.Tokenizer.class, SubscriptionPlace.Tokenizer.class,
 		AccessRequirementsPlace.Tokenizer.class, ACTDataAccessSubmissionsPlace.Tokenizer.class,
 		ACTDataAccessSubmissionDashboardPlace.Tokenizer.class, ACTAccessApprovalsPlace.Tokenizer.class,
-		EmailInvitation.Tokenizer.class, WikiDiff.Tokenizer.class})
+		EmailInvitation.Tokenizer.class, WikiDiff.Tokenizer.class, PasswordResetSignedTokenPlace.Tokenizer.class})
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {
 }

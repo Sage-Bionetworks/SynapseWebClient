@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.shared.exceptions;
 
+import org.sagebionetworks.repo.model.ErrorResponseCode;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class ConflictingUpdateException extends RestServiceException implements IsSerializable {
@@ -14,4 +16,7 @@ public class ConflictingUpdateException extends RestServiceException implements 
 		super(message);
 	}
 
+	public ConflictingUpdateException(String message, ErrorResponseCode code) {
+		super(message, code);
+	}
 }

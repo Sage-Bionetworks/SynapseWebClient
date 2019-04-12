@@ -61,6 +61,8 @@ import org.sagebionetworks.web.client.view.MapView;
 import org.sagebionetworks.web.client.view.MapViewImpl;
 import org.sagebionetworks.web.client.view.NewAccountView;
 import org.sagebionetworks.web.client.view.NewAccountViewImpl;
+import org.sagebionetworks.web.client.view.PasswordResetSignedTokenView;
+import org.sagebionetworks.web.client.view.PasswordResetSignedTokenViewImpl;
 import org.sagebionetworks.web.client.view.PeopleSearchView;
 import org.sagebionetworks.web.client.view.PeopleSearchViewImpl;
 import org.sagebionetworks.web.client.view.PlaceView;
@@ -947,7 +949,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityTreeBrowserView.class).to(EntityTreeBrowserViewImpl.class);
 
 		// MyEntitiesBrowser
-		bind(MyEntitiesBrowserView.class).to(MyEntitiesBrowserViewImpl.class).in(Singleton.class);
+		bind(MyEntitiesBrowserView.class).to(MyEntitiesBrowserViewImpl.class);
 
 		// Wiki Attachments		
 		bind(WikiAttachmentsView.class).to(WikiAttachmentsViewImpl.class);
@@ -1373,5 +1375,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AddToDownloadListView.class).to(AddToDownloadListViewImpl.class);
 		bind(EntityPresenterEventBinder.class).to(EntityPresenterEventBinderImpl.class);
 		bind(Linkify.class).to(LinkifyImpl.class);
+		bind(PasswordResetSignedTokenView.class).to(PasswordResetSignedTokenViewImpl.class);
 	}
 }

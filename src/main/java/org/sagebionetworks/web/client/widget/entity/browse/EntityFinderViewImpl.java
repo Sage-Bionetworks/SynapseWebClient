@@ -112,6 +112,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 			EntitySearchBox entitySearchBox) {
 		this.modal = (Modal)binder.createAndBindUi(this);
 		this.myEntitiesBrowser = myEntitiesBrowser;
+		myEntitiesBrowserContainer.add(myEntitiesBrowser.asWidget());
 		this.entitySearchBox = entitySearchBox;
 		selectedRef = new ArrayList<Reference>();
 		okButton.addClickHandler(new ClickHandler() {
@@ -158,6 +159,8 @@ public class EntityFinderViewImpl implements EntityFinderView {
 			createEnterIdWidget();
 			createEnterMultiIdWidget();
 			myEntitiesBrowser.setEntityFilter(filter);
+		} else {
+			myEntitiesBrowser.refresh();
 		}
 	}
 	
@@ -226,8 +229,6 @@ public class EntityFinderViewImpl implements EntityFinderView {
 				createVersionChooser(selectedEntityId);
 			}
 		});
-		myEntitiesBrowserContainer.clear();
-		myEntitiesBrowserContainer.add(myEntitiesBrowser.asWidget());
 
 		// list entry
 		Widget entry = createNewLeftEntry(DisplayConstants.BROWSE_MY_ENTITIES, new ClickHandler(){
