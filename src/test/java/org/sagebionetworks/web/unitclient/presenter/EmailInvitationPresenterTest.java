@@ -38,10 +38,14 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.EmailInvitationView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EmailInvitationPresenterTest {
 	public static final String CURRENT_USER_ID = "987387483";
+	public static final String TEAM_ID = "11102";
 	@Mock private EmailInvitationView mockView;
 	@Mock private SynapseJavascriptClient mockJsClient;
 	@Mock private SynapseFutureClient futureClient;
@@ -56,6 +60,8 @@ public class EmailInvitationPresenterTest {
 	@Mock private UserProfile mockInviterProfile;
 	@Mock private UserProfile mockCurrentUserProfile;
 	@Captor private ArgumentCaptor<Profile> placeCaptor;
+	@Captor private ArgumentCaptor<org.sagebionetworks.web.client.place.Team> teamPlaceCaptor;
+	
 	private EmailInvitationPresenter presenter;
 	private String encodedMISignedToken;
 
@@ -79,13 +85,15 @@ public class EmailInvitationPresenterTest {
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(CURRENT_USER_ID);
 		when(mockAuthController.getCurrentUserProfile()).thenReturn(mockCurrentUserProfile);
 		when(mockCurrentUserProfile.getEmails()).thenReturn(Collections.singletonList(email));
-		when(mockMembershipInvitation.getTeamId()).thenReturn("teamId");
+		when(mockMembershipInvitation.getTeamId()).thenReturn(TEAM_ID);
 		when(mockMembershipInvitation.getCreatedBy()).thenReturn("createdBy");
 		when(mockMembershipInvitation.getMessage()).thenReturn("message");
 	}
 
 	@Test
-	public void testLoggedInEmailOwner() {
+	public void testLoggedInEmailOwnerAddToTeamSuccess() {
+		// In this case the user can add themselves directly to the team (after binding the membership invitation to this user).  See SWC-4759
+		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).addTeamMember(anyString(), anyString(), any(AsyncCallback.class));
 		beforeSetPlace(true);
 		when(mockJsClient.getInviteeVerificationSignedToken(mockMembershipInvitation.getId())).thenReturn(getDoneFuture(mockInviteeVerificationSignedToken));
 		when(mockJsClient.updateInviteeId(mockInviteeVerificationSignedToken)).thenReturn(getDoneFuture(null));
@@ -94,9 +102,27 @@ public class EmailInvitationPresenterTest {
 		
 		verify(mockJsClient).getInviteeVerificationSignedToken(mockMembershipInvitation.getId());
 		verify(mockJsClient).updateInviteeId(mockInviteeVerificationSignedToken);
-		ArgumentCaptor<org.sagebionetworks.web.client.place.Profile> captor = ArgumentCaptor.forClass(org.sagebionetworks.web.client.place.Profile.class);
-		verify(mockPlaceChanger).goTo(captor.capture());
-		Profile profilePlace = captor.getValue();
+		verify(mockPlaceChanger).goTo(teamPlaceCaptor.capture());
+		org.sagebionetworks.web.client.place.Team teamPlace = teamPlaceCaptor.getValue();
+		assertEquals(TEAM_ID, teamPlace.getTeamId());
+	}
+	
+	@Test
+	public void testLoggedInEmailOwnerAddToTeamFailure() {
+		// In this case the user can't add themselves directly to the team (despite having a bound membership invitation).  This is the case when the team has access requirements, for example.  See SWC-4759
+		AsyncMockStubber.callFailureWith(new Exception("failed to add the team member after binding")).when(mockJsClient).addTeamMember(anyString(), anyString(), any(AsyncCallback.class));
+		beforeSetPlace(true);
+		when(mockJsClient.getInviteeVerificationSignedToken(mockMembershipInvitation.getId())).thenReturn(getDoneFuture(mockInviteeVerificationSignedToken));
+		when(mockJsClient.updateInviteeId(mockInviteeVerificationSignedToken)).thenReturn(getDoneFuture(null));
+		
+		presenter.setPlace(place);
+		
+		verify(mockJsClient).getInviteeVerificationSignedToken(mockMembershipInvitation.getId());
+		verify(mockJsClient).updateInviteeId(mockInviteeVerificationSignedToken);
+		
+		// sent to the profile place, Teams tab
+		verify(mockPlaceChanger).goTo(placeCaptor.capture());
+		Profile profilePlace = placeCaptor.getValue();
 		assertEquals(CURRENT_USER_ID, profilePlace.getUserId());
 		assertEquals(ProfileArea.TEAMS, profilePlace.getArea());
 	}

@@ -1473,5 +1473,12 @@ public class SynapseJavascriptClient {
 		String url = getAuthServiceUrl() + USER_CHANGE_PASSWORD;
 		doPost(url, changePasswordRequest, OBJECT_TYPE.None, cb);
 	}
+	
+	public void addTeamMember(String userId, String teamId, AsyncCallback<Void> cb) {
+		String teamEndpoint = gwt.encodeQueryString(gwt.getHostPageBaseURL() + "#!Team:");
+		String signedTokenEndpoint = gwt.encodeQueryString(gwt.getHostPageBaseURL() + "#!SignedToken:");
+		String url = getRepoServiceUrl() + TEAM + "/" + teamId + MEMBER +"/" + userId + "?teamEndpoint=" + teamEndpoint + "&notificationUnsubscribeEndpoint="+signedTokenEndpoint;
+		doPut(url, null, OBJECT_TYPE.None, cb);
+	}
 }
 
