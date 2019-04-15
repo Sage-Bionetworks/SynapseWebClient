@@ -32,6 +32,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 
 public class EmailInvitationPresenter extends AbstractActivity implements EmailInvitationView.Presenter, Presenter<EmailInvitation> {
@@ -130,11 +131,11 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 	}
 	
 	private void bindInvitationToAuthenticatedUser(InviteeVerificationSignedToken token) {
-
 		jsClient.updateInviteeId(token).addCallback(new FutureCallback<Void>() {
 			@Override
-			public void onSuccess(Void token) {
-				gotoProfilePageTeamArea();
+			public void onSuccess(Void t) {
+				// SWC-4759: attempt to Join team (user clicked on a Join button in the email to get here).
+				addTeamMember();
 			}
 			@Override
 			public void onFailure(Throwable t) {
@@ -143,6 +144,24 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 			}
 		}, directExecutor());
 	}
+	
+	private void addTeamMember() {
+		jsClient.addTeamMember(authController.getCurrentUserPrincipalId(), membershipInvitation.getTeamId(), new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				view.showInfo("Successfully joined the team.");
+				placeChanger.goTo(new org.sagebionetworks.web.client.place.Team(membershipInvitation.getTeamId()));
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				// bound to invitation, but could not add directly
+				synapseAlert.consoleError("Unable to add user directly to team, sending to team area of profile: " + caught.getMessage());
+				gotoProfilePageTeamArea();
+			}
+		});
+	}
+
 	
 	private void gotoProfilePageTeamArea() {
 		// SWC-4668: take the user to their profile page with the join request for them to accept (using the Join button, which handles any ARs)
