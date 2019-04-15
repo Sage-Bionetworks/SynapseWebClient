@@ -19,13 +19,16 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.inject.Inject;
 
 public class UserBadgeViewImpl extends Div implements UserBadgeView {
+	private String userId;
 	public static PlaceChanger placeChanger = null;
 	public static final CallbackP<String> STANDARD_HANDLER = userId -> {
 		placeChanger.goTo(new Profile(userId));
@@ -40,7 +43,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	SynapseJSNIUtils jsniUtils;
 	BadgeSize badgeSize = BadgeSize.DEFAULT;
 	CallbackP<String> currentClickHandler = STANDARD_HANDLER;
-	Div userBadgeContainer = new Div();
+	FocusPanel userBadgeContainer = new FocusPanel();
 	JsArray<JavaScriptObject> menuActionsArray = null;
 	AuthenticationController authController;
 	
@@ -63,9 +66,14 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 				jsniUtils.unmountComponentAtNode(userBadgeContainer.getElement());
 			}
 		});
+		userBadgeContainer.addClickHandler(event -> {
+			event.preventDefault();
+			currentClickHandler.invoke(userId);
+		});
 	}
 	@Override
 	public void configure(UserProfile profile) {
+		userId = profile.getOwnerId();
 		clear();
 		add(userBadgeContainer);
 		String profileJson = "";
@@ -150,10 +158,6 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		// TODO Auto-generated method stub
 	}
 	
-	public void onClick(String userId) {
-		currentClickHandler.invoke(userId);
-	}
-	
 	@Override
 	public void addContextCommand(String commandName, Callback callback) {
 		if (menuActionsArray == null) {
@@ -166,17 +170,12 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	private static native void _showBadge(Element el, String userProfileJson, String reactClientSize, boolean isTextHidden, boolean isTooltipHidden, String pictureUrl, boolean isEmailHidden, JsArray<JavaScriptObject> menuActionsArray, UserBadgeViewImpl userBadgeView) /*-{
 		
 		try {
-			function onClick(userProfile) {
-				// call this onClick
-				userBadgeView.@org.sagebionetworks.web.client.widget.user.UserBadgeViewImpl::onClick(Ljava/lang/String;)(userProfile.ownerId);
-			}
 			var userProfileObject = JSON.parse(userProfileJson);
 			var userCardProps = {
 				userProfile: userProfileObject,
 				size: reactClientSize,
 				hideText: isTextHidden,
 				hideTooltip: isTooltipHidden,
-				profileClickHandler: onClick,
 				menuActions: menuActionsArray,
 				preSignedURL: pictureUrl,
 				hideEmail: isEmailHidden
