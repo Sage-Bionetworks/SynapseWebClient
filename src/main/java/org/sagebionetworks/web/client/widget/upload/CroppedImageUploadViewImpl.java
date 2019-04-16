@@ -133,8 +133,8 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 			$wnd.cropping = new $wnd.Croppie(imagePreviewEl, {
 				enableExif: true,
 				enableOrientation: true,
-			    viewport: { width: 200, height: 200, type: 'circle' },
-			    boundary: { width: 400, height: 400 }
+			    viewport: { width: 300, height: 300, type: 'circle' },
+			    boundary: { width: 310, height: 310 }
 			});
 			$wnd.cropping.bind({
 			    url: fileUrl
