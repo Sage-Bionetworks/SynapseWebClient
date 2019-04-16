@@ -130,11 +130,11 @@ public class GoogleMapViewImpl implements GoogleMapView {
 	private static native JavaScriptObject _createMap(Element el) /*-{
 		return new google.maps.Map(el, {
 			scrollwheel : true,
-			mapTypeControlOptions : {
-				mapTypeIds : []
-			},
+			mapTypeControl: false,
 			streetViewControl: false,
-			maxZoom : 10
+			draggable: true,
+			maxZoom : 10,
+			controlSize: 22
 		});
 	}-*/;
 

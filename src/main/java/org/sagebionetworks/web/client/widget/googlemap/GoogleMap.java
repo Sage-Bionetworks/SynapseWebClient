@@ -147,6 +147,7 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 		List<Widget> userBadges = new ArrayList<Widget>();
 		for (String userId : userIds) {
 			UserBadge userBadge = ginInjector.getUserBadgeWidget();
+			userBadge.setOpenInNewWindow();
 			userBadge.configure(userId);
 			userBadges.add(userBadge.asWidget());
 		}

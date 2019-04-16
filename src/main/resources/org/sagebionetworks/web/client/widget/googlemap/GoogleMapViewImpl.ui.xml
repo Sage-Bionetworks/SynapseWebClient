@@ -10,8 +10,8 @@
 		<bh:Div ui:field="synAlertContainer"/>
 		<bh:Div visible="false">
 			<bh:Div ui:field="markerPopupContent">
-				<b:Heading size="H4" ui:field="locationTitle"/>
-				<bh:Div ui:field="userBadges"/>
+				<b:Heading size="H4" ui:field="locationTitle" />
+				<bh:Div ui:field="userBadges" />
 			</bh:Div>
 		</bh:Div>
 		<bh:Div ui:field="googleMapContainer" height="300px">
