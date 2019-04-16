@@ -2851,3 +2851,10 @@ div.border {
 		color: white;
 	}
 }
+
+// override style for Google Maps InfoWindow
+.gm-style-iw-d {
+	background-color: white;
+	border: 1px solid #dddddd;
+	padding: 10px 0px 0px 10px;
+}
