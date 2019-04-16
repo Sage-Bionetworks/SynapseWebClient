@@ -12,6 +12,7 @@
 				<b:Row>
 					<b:Column size="XS_8">
 						<bh:Strong>Profile Image</bh:Strong>
+						<bh:Paragraph>Minimum size: 300x300px</bh:Paragraph>
 					</b:Column>
 				</b:Row>
 				<b:Row>
