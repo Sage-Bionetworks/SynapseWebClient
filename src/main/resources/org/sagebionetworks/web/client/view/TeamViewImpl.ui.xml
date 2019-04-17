@@ -54,22 +54,19 @@
 						</b:ModalFooter>
 					</b:Modal>
 					<g:SimplePanel ui:field="joinTeamPanel" addStyleNames="margin-bottom-5 margin-top-10"/>
-					<g:SimplePanel ui:field="openMembershipRequestsPanel" addStyleNames="margin-bottom-5 margin-top-30"/>
-					<g:SimplePanel ui:field="openUserInvitationsPanel" addStyleNames="margin-bottom-5 margin-top-30"/>
-					
-					<bh:Div addStyleNames="flexcontainer-row">
+					<g:SimplePanel ui:field="openMembershipRequestsPanel" addStyleNames="margin-bottom-5 margin-top-60"/>
+					<g:SimplePanel ui:field="openUserInvitationsPanel" addStyleNames="margin-bottom-5 margin-top-60"/>
+					<bh:Div addStyleNames="flexcontainer-row margin-top-60">
 						<bh:Div addStyleNames="flexcontainer-column margin-bottom-5">
 							<bh:Div addStyleNames="highlight-title">
 								<bh:Text>Members</bh:Text>
 							</bh:Div>
 						</bh:Div>
 						<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width flexcontainer-align-items-flex-end" marginTop="10" marginBottom="5">
-							<b:InputGroup width="445px">
-								<b:TextBox ui:field="memberSearchTextBox" height="35px" width="300px" />
-								<b:InputGroupButton>
-									<b:Button ui:field="memberSearchButton" text="Member Search" icon="SEARCH"/>
-								</b:InputGroupButton>
-							</b:InputGroup>
+							<bh:Div>
+								<b:Icon ui:field="memberSearchButton" type="SEARCH" size="TIMES2" addStyleNames="imageButton topLevelZIndex moveright-40 movedown-5"/>
+								<b:TextBox ui:field="memberSearchTextBox" height="35px" width="300px" addStyleNames="inline-block" placeholder="Find team members"/>
+							</bh:Div>
 						</bh:Div>
 					</bh:Div>
 					<g:SimplePanel ui:field="memberListPanel"/>

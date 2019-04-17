@@ -2,16 +2,14 @@ package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.widget.TextBoxWithCopyToClipboardWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
@@ -22,7 +20,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -75,7 +72,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@UiField
 	org.gwtbootstrap3.client.ui.TextBox memberSearchTextBox;
 	@UiField
-	Button memberSearchButton;
+	Icon memberSearchButton;
 	private Presenter presenter;
 	private Header headerWidget;
 	private GWTWrapper gwt;
@@ -103,7 +100,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		});
 		memberSearchTextBox.addKeyDownHandler(event -> {
 			if(KeyCodes.KEY_ENTER == event.getNativeKeyCode()){
-				memberSearchButton.click();
+				presenter.onMemberSearch(memberSearchTextBox.getValue());
 			}
 		});
 	}
