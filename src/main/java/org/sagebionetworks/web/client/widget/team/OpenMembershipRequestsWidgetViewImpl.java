@@ -2,31 +2,17 @@ package org.sagebionetworks.web.client.widget.team;
 
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Column;
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
-import org.gwtbootstrap3.client.ui.constants.ButtonType;
-import org.gwtbootstrap3.client.ui.constants.ColumnSize;
-import org.gwtbootstrap3.client.ui.constants.Pull;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Italic;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.view.bootstrap.table.Table;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.widget.user.BadgeSize;
+import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -35,7 +21,7 @@ public class OpenMembershipRequestsWidgetViewImpl implements OpenMembershipReque
 
 	public interface Binder extends UiBinder<Widget, OpenMembershipRequestsWidgetViewImpl> {}
 	@UiField
-	Div titleDiv;
+	Heading title;
 	@UiField
 	Div mainContainer;
 	@UiField
@@ -58,13 +44,13 @@ public class OpenMembershipRequestsWidgetViewImpl implements OpenMembershipReque
 	@Override
 	public void clear() {
 		mainContainer.clear();
-		titleDiv.setVisible(false);
+		title.setVisible(false);
 	}
 	
 	@Override
 	public void configure(List<UserProfile> profiles, List<String> requestMessages, List<String> createdOnDates, List<String> requestIds) {
 		clear();
-		titleDiv.setVisible(false);
+		title.setVisible(false);
 		mainContainer.setVisible(false);
 		
 		Table table = new Table();
@@ -93,7 +79,7 @@ public class OpenMembershipRequestsWidgetViewImpl implements OpenMembershipReque
 			table.add(openMembershipRequestWidget);
 			
 			mainContainer.setVisible(true);
-			titleDiv.setVisible(true);
+			title.setVisible(true);
 		}
 	}
 	

@@ -14,4 +14,6 @@ public interface BigTeamBadgeView extends IsWidget, SynapseView {
 	
 	void addStyleName(String style);
 	void setHeight(String height);
+	void setMemberCountWidget(IsWidget widget);
+	void setTeamEmailAddress(String teamEmail);
 }

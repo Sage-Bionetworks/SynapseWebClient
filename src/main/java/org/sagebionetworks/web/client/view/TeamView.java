@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.place.shared.Place;
@@ -39,9 +40,7 @@ public interface TeamView extends IsWidget, SynapseView {
 	void setOpenUserInvitationsWidget(Widget asWidget);
 	void setMemberListWidget(Widget asWidget);
 	void setPublicJoinVisible(Boolean canPublicJoin);
-	void setMemberCountWidget(IsWidget widget);
-	void setMediaObjectPanel(Team team);
-	void setTeamEmailAddress(String teamEmail);
+	void setTeam(Team team, TeamMembershipStatus status);
 	void setMap(Widget w);
 	void showMapModal();
 	void setShowMapVisible(boolean visible);

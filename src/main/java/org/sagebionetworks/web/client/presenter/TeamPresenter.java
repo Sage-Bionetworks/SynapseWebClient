@@ -16,7 +16,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.TeamView;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberCountWidget;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
@@ -54,7 +53,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	private GoogleMap map;
 	private String currentTeamId;
 	private IsACTMemberAsyncHandler isACTMemberAsyncHandler;
-	private TeamMemberCountWidget teamMemberCountWidget;
 	
 	@Inject
 	public TeamPresenter(TeamView view,
@@ -70,8 +68,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			OpenUserInvitationsWidget openUserInvitationsWidget,
 			GoogleMap map,
 			CookieProvider cookies,
-			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
-			TeamMemberCountWidget teamMemberCountWidget) {
+			IsACTMemberAsyncHandler isACTMemberAsyncHandler) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -88,7 +85,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		this.openUserInvitationsWidget = openUserInvitationsWidget;
 		this.map = map;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
-		this.teamMemberCountWidget = teamMemberCountWidget;
 		view.setPresenter(this);
 		view.setSynAlertWidget(synAlert.asWidget());
 		view.setLeaveTeamWidget(leaveTeamWidget.asWidget());
@@ -100,7 +96,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		view.setOpenUserInvitationsWidget(openMembershipRequestsWidget.asWidget());
 		view.setMemberListWidget(memberListWidget.asWidget());
 		view.setMap(map.asWidget());
-		view.setMemberCountWidget(teamMemberCountWidget);
 		view.setShowMapVisible(DisplayUtils.isInTestWebsite(cookies));
 		Callback refreshCallback = new Callback() {
 			@Override
@@ -136,10 +131,10 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	}
 	
 	@Override
-    public String mayStop() {
-        view.clear();
-        return null;
-    }
+	public String mayStop() {
+		view.clear();
+		return null;
+	}
 	
 	@Override
 	public void goTo(Place place) {
@@ -157,7 +152,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	@Override
 	public void refresh(final String teamId) {
 		this.currentTeamId = teamId;
-		teamMemberCountWidget.configure(teamId);
 		clear();
 		synAlert.clear();
 		isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
@@ -180,9 +174,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				};
 				boolean canPublicJoin = team.getCanPublicJoin() == null ? false : team.getCanPublicJoin();
 				view.setPublicJoinVisible(canPublicJoin);
-				view.setMediaObjectPanel(team);
-				boolean canSendEmail = teamMembershipStatus != null && teamMembershipStatus.getCanSendEmail();
-				view.setTeamEmailAddress(getTeamEmail(team.getName(), canSendEmail));
+				view.setTeam(team, teamMembershipStatus);
 				memberListWidget.configure(teamId, isAdmin, refreshCallback);				
 				openMembershipRequestsWidget.setVisible(isAdmin);
 				
@@ -237,15 +229,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		map.setHeight((view.getClientHeight() - 200) + "px");
 		map.configure(currentTeamId);
 		view.showMapModal();
-	}
-	
-	public String getTeamEmail(String teamName, boolean canSendEmail) {
-		if (authenticationController.isLoggedIn() && canSendEmail) {
-			//strip out any non-word character.  Not a (letter, number, underscore)
-			return teamName.replaceAll("\\W", "") + "@synapse.org";
-		} else {
-			return "";
-		}
 	}
 	
 	private void showView(org.sagebionetworks.web.client.place.Team place) {

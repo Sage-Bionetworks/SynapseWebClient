@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.widget.TextBoxWithCopyToClipboardWidget;
@@ -54,9 +55,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@UiField
 	SimplePanel memberListPanel;
 	@UiField
-	Span memberCountContainer;
-	@UiField
-	Span publicJoinField;
+	Div publicJoinField;
 	@UiField
 	AnchorListItem leaveTeamItem;
 	@UiField
@@ -67,8 +66,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 	AnchorListItem inviteMemberItem;
 	@UiField
 	AnchorListItem manageAccessItem;
-	@UiField
-	TextBoxWithCopyToClipboardWidget synapseEmailField;
 	@UiField
 	Div mapPanel;
 	@UiField
@@ -152,7 +149,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 		deleteTeamItem.setVisible(false);
 		leaveTeamItem.setVisible(false);
 		publicJoinField.setVisible(false);
-		synapseEmailField.setText("");
 		memberSearchTextBox.setValue("");
 	}
 	
@@ -197,8 +193,8 @@ public class TeamViewImpl extends Composite implements TeamView {
 	}
 	
 	@Override
-	public void setMediaObjectPanel(Team team) {
-		bigTeamBadge.configure(team, team.getDescription());
+	public void setTeam(Team team, TeamMembershipStatus status) {
+		bigTeamBadge.configure(team, team.getDescription(), status);
 		mapModal.setTitle(team.getName());
 	}	
 
@@ -252,16 +248,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 		publicJoinField.setVisible(canPublicJoin);
 	}
 
-	@Override
-	public void setMemberCountWidget(IsWidget widget) {
-		memberCountContainer.clear();
-		memberCountContainer.add(widget);
-	}
-
-	@Override
-	public void setTeamEmailAddress(String teamEmail) {
-		synapseEmailField.setText(teamEmail);
-	}
 	@Override
 	public void setMap(Widget w) {
 		mapPanel.clear();

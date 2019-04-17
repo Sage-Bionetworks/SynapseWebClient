@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Italic;
 import org.gwtbootstrap3.client.ui.html.Text;
@@ -19,7 +20,7 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 	public interface Binder extends UiBinder<Widget, OpenUserInvitationsWidgetViewImpl> {}
 	@UiField Div synAlertContainer;
 	@UiField Div invitationsContainer;
-	@UiField Div titleDiv;
+	@UiField Heading title;
 	@UiField Table invitations;
 	@UiField Button moreButton;
 	
@@ -84,12 +85,12 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 		openUserInvitationWidget.resendButton.addClickHandler(resendInvitationClickHandler);
 		
 		invitations.add(openUserInvitationWidget);
-		titleDiv.setVisible(true);
+		title.setVisible(true);
 	}
 
 	@Override
 	public void clear() {
-		titleDiv.setVisible(false);
+		title.setVisible(false);
 		invitations.clear();
 	}
 
