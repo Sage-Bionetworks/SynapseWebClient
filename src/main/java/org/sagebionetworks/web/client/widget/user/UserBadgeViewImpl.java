@@ -19,7 +19,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -46,7 +45,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	FocusPanel userBadgeContainer = new FocusPanel();
 	JsArray<JavaScriptObject> menuActionsArray = null;
 	AuthenticationController authController;
-	
+	boolean isReactHandlingClickEvents = false;
 	@Inject
 	public UserBadgeViewImpl(
 			GlobalApplicationState globalAppState, 
@@ -67,8 +66,10 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 			}
 		});
 		userBadgeContainer.addClickHandler(event -> {
-			event.preventDefault();
-			currentClickHandler.invoke(userId);
+			if (!isReactHandlingClickEvents) {
+				event.preventDefault();	
+				currentClickHandler.invoke(userId);
+			}
 		});
 	}
 	@Override
@@ -127,8 +128,10 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	public void setSize(BadgeSize size) {
 		this.badgeSize = size;
 		if (badgeSize.equals(BadgeSize.DEFAULT)) {
+			isReactHandlingClickEvents = false;
 			addStyleName("inline-block vertical-align-middle");
 		} else {
+			isReactHandlingClickEvents = true;
 			removeStyleName("inline-block");
 		}
 	}
