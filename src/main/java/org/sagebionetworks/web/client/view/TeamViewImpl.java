@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
-import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -30,7 +29,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@UiField
 	HTMLPanel mainContainer;
 	@UiField
-	Column commandsContainer;
+	Div commandsContainer;
 	@UiField
 	Div teamBadgeContainer;
 	@UiField
@@ -95,6 +94,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		showMapLink.addClickHandler(event -> {
 			presenter.onShowMap();
 		});
+		
 		memberSearchButton.addClickHandler(event -> {
 			presenter.onMemberSearch(memberSearchTextBox.getValue());
 		});
