@@ -10,8 +10,6 @@ import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.Linkify;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.TextBoxWithCopyToClipboardWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
@@ -25,7 +23,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -57,7 +54,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@UiField
 	SimplePanel memberListPanel;
 	@UiField
-	Div memberCountContainer;
+	Span memberCountContainer;
 	@UiField
 	Span publicJoinField;
 	@UiField

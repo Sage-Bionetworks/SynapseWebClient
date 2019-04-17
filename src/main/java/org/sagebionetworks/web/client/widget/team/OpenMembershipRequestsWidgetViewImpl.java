@@ -34,7 +34,8 @@ import com.google.inject.Inject;
 public class OpenMembershipRequestsWidgetViewImpl implements OpenMembershipRequestsWidgetView {
 
 	public interface Binder extends UiBinder<Widget, OpenMembershipRequestsWidgetViewImpl> {}
-
+	@UiField
+	Div titleDiv;
 	@UiField
 	Div mainContainer;
 	@UiField
@@ -47,8 +48,6 @@ public class OpenMembershipRequestsWidgetViewImpl implements OpenMembershipReque
 	public OpenMembershipRequestsWidgetViewImpl(Binder binder, PortalGinInjector ginInjector) {
 		widget = binder.createAndBindUi(this);
 		this.ginInjector = ginInjector;
-		mainContainer.addStyleName("highlight-box");
-		mainContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.PENDING_JOIN_REQUESTS);
 	}
 	
 	@Override
@@ -59,12 +58,15 @@ public class OpenMembershipRequestsWidgetViewImpl implements OpenMembershipReque
 	@Override
 	public void clear() {
 		mainContainer.clear();
+		titleDiv.setVisible(false);
 	}
 	
 	@Override
 	public void configure(List<UserProfile> profiles, List<String> requestMessages, List<String> createdOnDates, List<String> requestIds) {
 		clear();
+		titleDiv.setVisible(false);
 		mainContainer.setVisible(false);
+		
 		Table table = new Table();
 		table.setWidth("100%");
 		mainContainer.add(table);
@@ -91,6 +93,7 @@ public class OpenMembershipRequestsWidgetViewImpl implements OpenMembershipReque
 			table.add(openMembershipRequestWidget);
 			
 			mainContainer.setVisible(true);
+			titleDiv.setVisible(true);
 		}
 	}
 	
