@@ -1542,6 +1542,10 @@ ol.lowerroman {
 		align-items: center;
 	}
 
+	.flexcontainer-align-items-flex-end {
+		align-items: flex-end;
+	}
+
 	.flexcontainer-column {
 		display: -webkit-flex;
 		display: flex;
@@ -2300,7 +2304,7 @@ td.datePickerMonth {
 }
 
 .border-top-6-synapse-blue {
-	border-top: 6px $synapse-blue;
+	border-top: 6px solid $synapse-blue;
 }
 
 .read-only-box {

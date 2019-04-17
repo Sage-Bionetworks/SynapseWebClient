@@ -54,23 +54,25 @@
 						</b:ModalFooter>
 					</b:Modal>
 					<g:SimplePanel ui:field="joinTeamPanel" addStyleNames="margin-bottom-5 margin-top-10"/>
-					<g:SimplePanel ui:field="openMembershipRequestsPanel" addStyleNames="margin-bottom-5"/>
-					<g:SimplePanel ui:field="openUserInvitationsPanel" addStyleNames="margin-bottom-5"/>
-					<bh:Div pull="RIGHT" marginTop="10" marginBottom="5" width="445px">
-						<b:InputGroup>
-							<b:TextBox ui:field="memberSearchTextBox" height="35px" width="300px" />
-							<b:InputGroupButton>
-								<b:Button ui:field="memberSearchButton" text="Member Search" icon="SEARCH"/>
-							</b:InputGroupButton>
-						</b:InputGroup>
-					</bh:Div>
-					<bh:ClearFix/>
-					<bh:Div addStyleNames="margin-bottom-5">
-						<bh:Div addStyleNames="highlight-title">
-							<bh:Text>Members</bh:Text>
+					<g:SimplePanel ui:field="openMembershipRequestsPanel" addStyleNames="margin-bottom-5 margin-top-30"/>
+					<g:SimplePanel ui:field="openUserInvitationsPanel" addStyleNames="margin-bottom-5 margin-top-30"/>
+					
+					<bh:Div addStyleNames="flexcontainer-row">
+						<bh:Div addStyleNames="flexcontainer-column margin-bottom-5">
+							<bh:Div addStyleNames="highlight-title">
+								<bh:Text>Members</bh:Text>
+							</bh:Div>
 						</bh:Div>
-						<g:SimplePanel ui:field="memberListPanel"/>
+						<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width flexcontainer-align-items-flex-end" marginTop="10" marginBottom="5">
+							<b:InputGroup width="445px">
+								<b:TextBox ui:field="memberSearchTextBox" height="35px" width="300px" />
+								<b:InputGroupButton>
+									<b:Button ui:field="memberSearchButton" text="Member Search" icon="SEARCH"/>
+								</b:InputGroupButton>
+							</b:InputGroup>
+						</bh:Div>
 					</bh:Div>
+					<g:SimplePanel ui:field="memberListPanel"/>
 				</g:HTMLPanel>
 			</div>
 			<div>

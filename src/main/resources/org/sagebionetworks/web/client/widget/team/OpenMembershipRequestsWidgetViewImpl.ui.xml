@@ -5,7 +5,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
 		<bh:Div ui:field="synAlertContainer"/>
-		<b:Heading ui:field="title" size="H3" text="Pending Join Requests"/>
+		<b:Heading ui:field="title" size="H4" text="Pending Join Requests"/>
 		<bh:Div ui:field="mainContainer" visible="false"/>
 	</bh:Div>
 </ui:UiBinder>

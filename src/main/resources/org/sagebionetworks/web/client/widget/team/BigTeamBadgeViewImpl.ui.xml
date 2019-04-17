@@ -18,7 +18,7 @@
 				</g:FocusPanel>
 			</bh:Span>
 			<bh:Span addStyleNames="flexcontainer-column flexcontainer-justify-center">
-				<b:Heading size="H3">
+				<b:Heading size="H4">
 					<b:Anchor ui:field="nameLink"/>
 				</b:Heading>
 				<bh:Div addStyleNames="strong">
