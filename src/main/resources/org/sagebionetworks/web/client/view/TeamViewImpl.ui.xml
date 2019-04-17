@@ -64,12 +64,12 @@
 						</bh:Div>
 						<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width flexcontainer-align-items-flex-end" marginTop="10" marginBottom="5">
 							<bh:Div>
-								<b:Icon ui:field="memberSearchButton" type="SEARCH" size="TIMES2" addStyleNames="imageButton topLevelZIndex moveright-40 movedown-5"/>
-								<b:TextBox ui:field="memberSearchTextBox" height="35px" width="300px" addStyleNames="inline-block" placeholder="Find team members"/>
+								<b:Icon ui:field="memberSearchButton" type="SEARCH" addStyleNames="imageButton topLevelZIndex font-size-22 moveright-32 movedown-3 synapse-green"/>
+								<b:TextBox ui:field="memberSearchTextBox" height="35px" width="300px" addStyleNames="inline-block" placeholder="         Find team members"/>
 							</bh:Div>
 						</bh:Div>
 					</bh:Div>
-					<g:SimplePanel ui:field="memberListPanel"/>
+					<g:SimplePanel ui:field="memberListPanel" addStyleNames="margin-bottom-40"/>
 				</g:HTMLPanel>
 			</div>
 			<div>
