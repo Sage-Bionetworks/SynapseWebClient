@@ -879,8 +879,8 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 }
 
 .item-selected > .userGroupSuggestion {
-	background-color: #2C5ECE;
 	color: white;
+	font-weight: bold;
 }
 
 .userGroupSuggestionPagingArea {
@@ -2768,6 +2768,9 @@ div.border {
 	.SRC-grid-item {
 		height: 130px;
 	}
+	.ignore-click-events {
+		pointer-events: none;
+	}
 }
 #rootPanel {
 	summary { color:$synapse-blue; }
@@ -2858,3 +2861,4 @@ div.border {
 	border: 1px solid #dddddd;
 	padding: 10px 0px 0px 10px;
 }
+
