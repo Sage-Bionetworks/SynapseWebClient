@@ -4,14 +4,15 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
-		<bh:Div addStyleNames="flexcontainer-row margin-top-20">
-			<bh:Div addStyleNames="flexcontainer-column" marginLeft="15" marginBottom="5">
+		<bh:Div addStyleNames="SRC-card-grid-row margin-top-20">
+			<bh:Div addStyleNames="SRC-grid-item" marginLeft="15" marginBottom="5" height="50px">
 				<b:Heading size="H3" text="Teams"/>
 			</bh:Div>
-			<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width flexcontainer-align-items-flex-end" marginTop="10" marginBottom="5" marginRight="15">
+			<bh:Div addStyleNames="SRC-grid-item" height="10px"/>
+			<bh:Div addStyleNames="SRC-grid-item flexcontainer-align-items-flex-end" marginTop="10" marginBottom="5" marginRight="15" height="50px">
 				<bh:Div>
-					<b:Icon ui:field="searchButton" type="SEARCH" addStyleNames="imageButton topLevelZIndex font-size-22 moveright-32 movedown-3 synapse-green"/>
-					<b:TextBox ui:field="searchField" height="35px" width="300px" addStyleNames="inline-block padding-left-35" placeholder="Find teams"/>
+					<b:Icon ui:field="searchButton" type="SEARCH" addStyleNames="imageButton topLevelZIndex font-size-22 movedown-28 synapse-green left"/>
+					<b:TextBox ui:field="searchField" height="35px" width="100%" addStyleNames="inline-block padding-left-35" placeholder="Find teams"/>
 				</bh:Div>
 			</bh:Div>
 		</bh:Div>

@@ -85,9 +85,9 @@ public class TeamSearchPresenter extends AbstractActivity implements TeamSearchV
 	}
 	
 	@Override
-    public String mayStop() {
-        return null;
-    }
+	public String mayStop() {
+		return null;
+	}
 	
 
 	@Override
