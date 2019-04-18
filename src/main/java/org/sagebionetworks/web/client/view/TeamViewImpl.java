@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -26,6 +27,8 @@ import com.google.inject.Inject;
 public class TeamViewImpl extends Composite implements TeamView {
 
 	public interface TeamViewImplUiBinder extends UiBinder<Widget, TeamViewImpl> {}
+	@UiField
+	Heading teamNameHeading;
 	@UiField
 	HTMLPanel mainContainer;
 	@UiField
@@ -140,6 +143,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	
 	@Override
 	public void clear() {
+		teamNameHeading.setText("");
 		commandsContainer.setVisible(false);
 		inviteMemberItem.setVisible(false);
 		editTeamItem.setVisible(false);
@@ -191,6 +195,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	
 	@Override
 	public void setTeam(Team team, TeamMembershipStatus status) {
+		teamNameHeading.setText(team.getName());
 		bigTeamBadge.configure(team, team.getDescription(), status);
 		mapModal.setTitle(team.getName());
 	}	
