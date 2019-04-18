@@ -57,10 +57,8 @@
 					<g:SimplePanel ui:field="openMembershipRequestsPanel" addStyleNames="margin-bottom-5 margin-top-60"/>
 					<g:SimplePanel ui:field="openUserInvitationsPanel" addStyleNames="margin-bottom-5 margin-top-60"/>
 					<bh:Div addStyleNames="flexcontainer-row margin-top-60">
-						<bh:Div addStyleNames="flexcontainer-column margin-bottom-5">
-							<bh:Div addStyleNames="highlight-title">
-								<bh:Text>Members</bh:Text>
-							</bh:Div>
+						<bh:Div addStyleNames="flexcontainer-column" marginBottom="5">
+							<b:Heading size="H4" text="Members"/>
 						</bh:Div>
 						<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width flexcontainer-align-items-flex-end" marginTop="10" marginBottom="5">
 							<bh:Div>
