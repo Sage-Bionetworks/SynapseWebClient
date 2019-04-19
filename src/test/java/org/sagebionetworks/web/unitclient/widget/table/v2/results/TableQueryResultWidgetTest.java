@@ -22,6 +22,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.ErrorResponseCode;
 import org.sagebionetworks.repo.model.UnauthorizedException;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
@@ -37,6 +38,7 @@ import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
@@ -54,6 +56,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultVi
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -117,7 +120,8 @@ public class TableQueryResultWidgetTest {
 	QueryResultBundle mockNewPageQueryResultBundle;
 	@Mock
 	FacetsWidget mockFacetsWidget;
-
+	@Mock
+	PopupUtilsView mockPopupUtils;
 	public static final String ENTITY_ID = "syn123";
 	@Before
 	public void before(){
@@ -125,7 +129,7 @@ public class TableQueryResultWidgetTest {
 		when(mockGinInjector.creatNewAsynchronousProgressWidget()).thenReturn(mockJobTrackingWidget, mockJobTrackingWidget2);
 		when(mockGinInjector.createNewTablePageWidget()).thenReturn(mockPageWidget);
 		when(mockGinInjector.createNewQueryResultEditorWidget()).thenReturn(mockQueryResultEditor);
-		widget = new TableQueryResultWidget(mockView, mockSynapseClient, mockGinInjector, mockSynapseAlert, mockClientCache, mockGWT, mockFacetsWidget);
+		widget = new TableQueryResultWidget(mockView, mockSynapseClient, mockGinInjector, mockSynapseAlert, mockClientCache, mockGWT, mockFacetsWidget, mockPopupUtils);
 		query = new Query();
 		query.setSql("select * from " + ENTITY_ID);
 		query.setIsConsistent(true);
@@ -251,6 +255,23 @@ public class TableQueryResultWidgetTest {
 		verify(mockNewPageQueryResultBundle).setColumnModels(bundle.getColumnModels());
 		verify(mockNewPageQueryResultBundle).setFacets(bundle.getFacets());
 		verify(mockNewPageQueryResultBundle).setSelectColumns(bundle.getSelectColumns());
+	}
+	
+	@Test
+	public void testSchemaChange(){
+		// SWC-4804: Table/View schema is changed in the background
+		boolean isEditable = true;
+		widget.configure(query, isEditable, tableType, mockListner);
+		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), qbrCaptor.capture(), asyncProgressHandlerCaptor.capture());
+		
+		// TODO: include new ErrorResponseCode if PLFM-5491 is resolved.
+		ErrorResponseCode code = null;
+		asyncProgressHandlerCaptor.getValue().onFailure(new BadRequestException(TableQueryResultWidget.FACET_COLUMNS_CHANGED_MESSAGE, code));
+		
+		verify(mockPopupUtils).showErrorMessage(TableQueryResultWidget.SCHEMA_CHANGED_MESSAGE);
+		// attempts to rerun the query
+		verify(mockJobTrackingWidget2).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), qbrCaptor.capture(), asyncProgressHandlerCaptor.capture());
+		assertNull(qbrCaptor.getValue().getQuery().getSelectedFacets());
 	}
 	
 	@Test

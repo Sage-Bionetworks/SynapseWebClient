@@ -19,6 +19,7 @@ import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
@@ -30,6 +31,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -42,6 +44,8 @@ import com.google.inject.Inject;
  *
  */
 public class TableQueryResultWidget implements TableQueryResultView.Presenter, IsWidget, PagingAndSortingListener {
+	public static final String SCHEMA_CHANGED_MESSAGE = "The underlying Table/View schema has been changed so this query must be reset.";
+	public static final String FACET_COLUMNS_CHANGED_MESSAGE = "requested facet column names must all be in the set";
 	public static final int ETAG_CHECK_DELAY_MS = 5000;
 	public static final String VERIFYING_ETAG_MESSAGE = "Verifying that the recent changes have propagated through the system...";
 	public static final String RUNNING_QUERY_MESSAGE = ""; // while running, just show loading spinner (and cancel)
@@ -78,6 +82,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	QueryResultBundle cachedFullQueryResultBundle = null;
 	FacetsWidget facetsWidget;
 	boolean facetsRequireRefresh;
+	PopupUtilsView popupUtils;
 	
 	@Inject
 	public TableQueryResultWidget(TableQueryResultView view, 
@@ -86,7 +91,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			SynapseAlert synapseAlert,
 			ClientCache clientCache,
 			GWTWrapper gwt,
-			FacetsWidget facetsWidget) {
+			FacetsWidget facetsWidget,
+			PopupUtilsView popupUtils) {
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.view = view;
@@ -96,6 +102,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.clientCache = clientCache;
 		this.gwt = gwt;
 		this.facetsWidget = facetsWidget;
+		this.popupUtils = popupUtils;
 		view.setFacetsWidget(facetsWidget);
 		this.view.setPageWidget(this.pageViewerWidget);
 		this.view.setPresenter(this);
@@ -352,7 +359,13 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 */
 	private void showError(Throwable caught){
 		setupErrorState();
-		synapseAlert.handleException(caught);
+		//TODO: use ErrorResponseCode if PLFM-5491 is resolved.
+		if (caught instanceof BadRequestException && caught.getMessage().toLowerCase().contains(FACET_COLUMNS_CHANGED_MESSAGE)) {
+			popupUtils.showErrorMessage(SCHEMA_CHANGED_MESSAGE);
+			resetFacetsHandler.invoke();
+		} else {
+			synapseAlert.handleException(caught);	
+		}
 	}
 	
 	/**
