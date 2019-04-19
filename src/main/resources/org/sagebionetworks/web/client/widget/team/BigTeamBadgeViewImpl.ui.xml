@@ -4,7 +4,7 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-	<bh:Div addStyleNames="displayInlineBlock overflowHidden vertical-align-middle ">
+	<bh:Div addStyleNames="displayInlineBlock overflowHidden vertical-align-middle padding-10">
 		<bh:Span addStyleNames="flexcontainer-row">
 			<bh:Span ui:field="notificationsSpan"/>
 			<bh:Span ui:field="pictureSpan" addStyleNames="flexcontainer-column flexcontainer-justify-center">
@@ -18,10 +18,14 @@
 				</g:FocusPanel>
 			</bh:Span>
 			<bh:Span addStyleNames="flexcontainer-column flexcontainer-justify-center">
-				<b:Heading size="H3">
+				<b:Heading size="H4">
 					<b:Anchor ui:field="nameLink"/>
 				</b:Heading>
-				<bh:Span ui:field="descriptionSpan"/>
+				<bh:Div addStyleNames="strong">
+					<bh:Span ui:field="memberCountContainer"/> <bh:Text> team members </bh:Text>
+				</bh:Div>
+				<bh:Div ui:field="descriptionContainer" marginTop="10"/>
+				<w:TextBoxWithCopyToClipboardWidget ui:field="synapseEmailField" addStyleNames="margin-top-10"/>
 			</bh:Span>
 		</bh:Span>
 	</bh:Div>

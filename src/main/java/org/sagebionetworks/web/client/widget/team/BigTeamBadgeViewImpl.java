@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -12,17 +14,15 @@ import org.sagebionetworks.web.client.Linkify;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.TextBoxWithCopyToClipboardWidget;
 
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -39,9 +39,14 @@ public class BigTeamBadgeViewImpl implements BigTeamBadgeView {
 	@UiField
 	Anchor nameLink;
 	@UiField
-	Span descriptionSpan;
+	Div descriptionContainer;
 	@UiField
 	Span notificationsSpan;
+	@UiField
+	Span memberCountContainer;
+	@UiField
+	TextBoxWithCopyToClipboardWidget synapseEmailField;
+
 	SynapseJSNIUtils synapseJSNIUtils;
 	GlobalApplicationState globalApplicationState;
 	IconsImageBundle iconsImageBundle;
@@ -82,7 +87,8 @@ public class BigTeamBadgeViewImpl implements BigTeamBadgeView {
 			defaultPicture.setVisible(true);
 		}
 		String descriptionWithoutHtml = SafeHtmlUtils.htmlEscape(description);
-		descriptionSpan.setHTML(linkify.linkify(descriptionWithoutHtml));
+		descriptionContainer.clear();
+		descriptionContainer.add(new HTML(linkify.linkify(descriptionWithoutHtml)));
 		
 		nameLink.setText(name);
 		nameLink.setHref("#!Team:"+team.getId());
@@ -91,7 +97,8 @@ public class BigTeamBadgeViewImpl implements BigTeamBadgeView {
 
 	@Override
 	public void showLoadError(String principalId) {
-		descriptionSpan.setText(DisplayConstants.ERROR_LOADING);
+		descriptionContainer.clear();
+		descriptionContainer.add(new Text(DisplayConstants.ERROR_LOADING));
 	}
 	
 	@Override
@@ -129,5 +136,15 @@ public class BigTeamBadgeViewImpl implements BigTeamBadgeView {
 	@Override
 	public void setHeight(String height) {
 		widget.setHeight(height);
+	}
+	@Override
+	public void setMemberCountWidget(IsWidget widget) {
+		memberCountContainer.clear();
+		memberCountContainer.add(widget);
+	}
+	
+	@Override
+	public void setTeamEmailAddress(String teamEmail) {
+		synapseEmailField.setText(teamEmail);
 	}
 }

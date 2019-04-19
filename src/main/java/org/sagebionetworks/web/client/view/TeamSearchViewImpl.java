@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.TeamSearch;
@@ -29,7 +30,7 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	@UiField
 	TextBox searchField;
 	@UiField
-	Button searchButton;
+	Icon searchButton;
 	@UiField
 	SimplePanel synAlertPanel;
 	
@@ -70,26 +71,25 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	}
 	
 	private void configureSearchBox() {
-		searchButton.addClickHandler(new ClickHandler() {				
+		searchButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(ClickEvent event) {					
+			public void onClick(ClickEvent event) {
 				presenter.goTo(new TeamSearch(searchField.getValue()));
 			}
 		});
 		
-		searchField.addKeyDownHandler(new KeyDownHandler() {				
+		searchField.addKeyDownHandler(new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-	                searchButton.fireEvent(new ClickEvent() {});
-	            }					
+					searchButton.fireEvent(new ClickEvent() {});
+				}
 			}
-		});				
+		});
 	}
 
 	@Override
 	public void setSynAlertWidget(Widget synAlert) {
 		synAlertPanel.setWidget(synAlert);
-	}	
-
+	}
 }

@@ -100,8 +100,6 @@ public class TeamPresenterTest {
 	CookieProvider mockCookies;
 	@Mock
 	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
-	@Mock
-	TeamMemberCountWidget mockTeamMemberCountWidget;
 	@Captor
 	ArgumentCaptor<CallbackP<Boolean>> callbackPcaptor;
 	@Captor
@@ -113,7 +111,7 @@ public class TeamPresenterTest {
 				mockSynClient, mockSynAlert, mockLeaveModal, mockDeleteModal, mockEditModal, 
 				mockInviteModal, mockJoinWidget, mockMemberListWidget, 
 				mockOpenMembershipRequestsWidget, mockOpenUserInvitationsWidget, mockGoogleMap, mockCookies,
-				mockIsACTMemberAsyncHandler, mockTeamMemberCountWidget);
+				mockIsACTMemberAsyncHandler);
 		when(mockTeam.getName()).thenReturn(teamName);
 		AsyncMockStubber.callSuccessWith(mockTeamBundle).when(mockSynClient).getTeamBundle(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		
@@ -170,13 +168,11 @@ public class TeamPresenterTest {
 		
 		//once
 		verify(mockView).setPublicJoinVisible(canPublicJoin);
-		verify(mockTeamMemberCountWidget).configure(eq(teamId));
-		verify(mockView).setMediaObjectPanel(mockTeam);
+		verify(mockView).setTeam(mockTeam, mockTeamMembershipStatus);
 		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockView).showMemberMenuItems();
 		verify(mockOpenMembershipRequestsWidget).setVisible(true);
 		verify(mockView).showAdminMenuItems();
-		verify(mockView).setTeamEmailAddress(anyString());
 		//never
 		verify(mockJoinWidget, never()).configure(eq(teamId), anyBoolean(), eq(mockTeamMembershipStatus), 
 				any(Callback.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
@@ -206,7 +202,7 @@ public class TeamPresenterTest {
 		
 		//once
 		verify(mockView).setPublicJoinVisible(false);
-		verify(mockView).setMediaObjectPanel(mockTeam);
+		verify(mockView).setTeam(mockTeam, mockTeamMembershipStatus);
 		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockJoinWidget).configure(eq(teamId), anyBoolean(), eq(mockTeamMembershipStatus), 
 				any(Callback.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
@@ -227,7 +223,7 @@ public class TeamPresenterTest {
 		
 		//once
 		verify(mockView).setPublicJoinVisible(canPublicJoin);
-		verify(mockView).setMediaObjectPanel(mockTeam);
+		verify(mockView).setTeam(mockTeam, mockTeamMembershipStatus);
 		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockView).showMemberMenuItems();
 		
@@ -249,22 +245,6 @@ public class TeamPresenterTest {
 		verify(mockOpenMembershipRequestsWidget).setVisible(false);
 	}
 	
-	@Test
-	public void testGetTeamEmail() {
-		boolean canSendEmail = true;
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		assertEquals("basic@synapse.org", presenter.getTeamEmail("basic", canSendEmail));
-		assertEquals("StandardCaseHere@synapse.org", presenter.getTeamEmail("Standard Case Here", canSendEmail));
-		assertEquals("unlikelycase@synapse.org", presenter.getTeamEmail(" \n\r unlikely\t case ", canSendEmail));
-		assertEquals("Another_UnlikelyCase@synapse.org", presenter.getTeamEmail(" %^$##* Another_Unlikely\t &*#$)(!!@~Case ", canSendEmail));
-		
-		canSendEmail = false;
-		assertEquals("", presenter.getTeamEmail("basic", canSendEmail));
-		
-		canSendEmail = true;
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		assertEquals("", presenter.getTeamEmail("basic", canSendEmail));
-	}
 	
 	@Test
 	public void testRefreshOpenMembershipRequests() {

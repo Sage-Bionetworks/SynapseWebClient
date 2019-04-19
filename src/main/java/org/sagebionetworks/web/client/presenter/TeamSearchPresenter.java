@@ -57,6 +57,7 @@ public class TeamSearchPresenter extends AbstractActivity implements TeamSearchV
 		this.ginInjector = ginInjector;
 		view.setSynAlertWidget(synAlert.asWidget());
 		view.setPresenter(this);
+		loadMoreWidgetContainer.addStyleName("SRC-card-grid-row");
 		loadMoreWidgetContainer.configure(new Callback() {
 			@Override
 			public void invoke() {
@@ -84,9 +85,9 @@ public class TeamSearchPresenter extends AbstractActivity implements TeamSearchV
 	}
 	
 	@Override
-    public String mayStop() {
-        return null;
-    }
+	public String mayStop() {
+		return null;
+	}
 	
 
 	@Override
@@ -102,9 +103,8 @@ public class TeamSearchPresenter extends AbstractActivity implements TeamSearchV
 			public void onSuccess(PaginatedResults<Team> result) {
 				for (Team team : result.getResults()) {
 					BigTeamBadge teamBadge = ginInjector.getBigTeamBadgeWidget();
-					teamBadge.configure(team, team.getDescription());
-					teamBadge.addStyleName("col-sm-12 col-md-6");
-					teamBadge.setHeight("120px");
+					teamBadge.configure(team, "");
+					teamBadge.addStyleName("light-border SRC-grid-item");
 					loadMoreWidgetContainer.add(teamBadge.asWidget());
 				}
 				offset += SEARCH_TEAM_LIMIT;

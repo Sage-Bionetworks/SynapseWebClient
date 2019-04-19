@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Italic;
 import org.gwtbootstrap3.client.ui.html.Text;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 
@@ -20,6 +20,7 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 	public interface Binder extends UiBinder<Widget, OpenUserInvitationsWidgetViewImpl> {}
 	@UiField Div synAlertContainer;
 	@UiField Div invitationsContainer;
+	@UiField Heading title;
 	@UiField Table invitations;
 	@UiField Button moreButton;
 	
@@ -46,7 +47,6 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 	public OpenUserInvitationsWidgetViewImpl(Binder binder, PortalGinInjector ginInjector) {
 		widget = binder.createAndBindUi(this);
 		this.ginInjector = ginInjector;
-		invitationsContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.PENDING_INVITATIONS);
 		moreButton.addClickHandler(event -> presenter.getNextBatch());
 	}
 	
@@ -85,10 +85,12 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 		openUserInvitationWidget.resendButton.addClickHandler(resendInvitationClickHandler);
 		
 		invitations.add(openUserInvitationWidget);
+		title.setVisible(true);
 	}
 
 	@Override
 	public void clear() {
+		title.setVisible(false);
 		invitations.clear();
 	}
 

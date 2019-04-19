@@ -1542,6 +1542,10 @@ ol.lowerroman {
 		align-items: center;
 	}
 
+	.flexcontainer-align-items-flex-end {
+		align-items: flex-end;
+	}
+
 	.flexcontainer-column {
 		display: -webkit-flex;
 		display: flex;
@@ -1753,11 +1757,14 @@ ol.lowerroman {
 	position: relative;
 	top: 10px;
 }
+.movedown-28 {
+	position: relative;
+	top: 28px;
+}
 .moveright-5 {
 	position: relative;
 	left: 5px;
 }
-
 .highlight-box {
     position: relative;
     margin-top: 15px;
@@ -1930,10 +1937,12 @@ ol.lowerroman {
 .padding-left-15 {
 	padding-left: 15px;
 }
-.padding-left-30 {
+.padding-left-30, #body .padding-left-30 {
 	padding-left: 30px;
 }
-
+.padding-left-35, #body .padding-left-35 {
+	padding-left: 35px;
+}
 .padding-left-74 {
 	padding-left:74px;
 }
@@ -2297,6 +2306,10 @@ td.datePickerMonth {
 
 .border-top-2 {
   border-top: 2px solid;
+}
+
+.border-top-6-synapse-blue {
+	border-top: 6px solid $synapse-blue;
 }
 
 .read-only-box {
