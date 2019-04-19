@@ -218,7 +218,7 @@ public class DisplayConstants {
 	public static final String WAITING = "Waiting";
 	
 	public static final String PASSWORD_HAS_BEEN_CHANGED = "Your password has been changed.";
-	public static final String PASSWORD_RESET_SENT = "Your password reset request has been sent. Please check your email.";
+	public static final String PASSWORD_RESET_SENT = "If a matching account was found, then your password reset request has been sent. Please check your email.";
 	public static final String PASSWORDS_MISMATCH = "Passwords do not match. Please re-enter your new password.";
 	
 	public static final String ACCOUNT_CREATED = "Your Synapse account has been created.";
