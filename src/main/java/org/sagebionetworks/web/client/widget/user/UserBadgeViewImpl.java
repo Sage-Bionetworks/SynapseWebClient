@@ -88,7 +88,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		String pictureUrl = profile.getProfilePicureFileHandleId() != null ? 
 				jsniUtils.getFileHandleAssociationUrl(profile.getOwnerId(), FileHandleAssociateType.UserProfileAttachment, profile.getProfilePicureFileHandleId()) : null;
 		
-		_showBadge(userBadgeContainer.getElement(), profileJson, badgeSize.reactClientSize, isTextHidden, isTooltipHidden, pictureUrl, !authController.isLoggedIn(), menuActionsArray, this);
+		_showBadge(userBadgeContainer.getElement(), profileJson, userId, badgeSize.reactClientSize, isTextHidden, isTooltipHidden, pictureUrl, !authController.isLoggedIn(), menuActionsArray, this);
 	}
 	
 	public void setClickHandler(ClickHandler clickHandler) {
@@ -170,7 +170,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		_addToMenuActionsArray(commandName, callback, menuActionsArray);
 	}
 	
-	private static native void _showBadge(Element el, String userProfileJson, String reactClientSize, boolean isTextHidden, boolean isTooltipHidden, String pictureUrl, boolean isEmailHidden, JsArray<JavaScriptObject> menuActionsArray, UserBadgeViewImpl userBadgeView) /*-{
+	private static native void _showBadge(Element el, String userProfileJson, String userId, String reactClientSize, boolean isTextHidden, boolean isTooltipHidden, String pictureUrl, boolean isEmailHidden, JsArray<JavaScriptObject> menuActionsArray, UserBadgeViewImpl userBadgeView) /*-{
 		
 		try {
 			var userProfileObject = JSON.parse(userProfileJson);
@@ -181,7 +181,8 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 				hideTooltip: isTooltipHidden,
 				menuActions: menuActionsArray,
 				preSignedURL: pictureUrl,
-				hideEmail: isEmailHidden
+				hideEmail: isEmailHidden,
+				link: '#!Profile:'+userId
 			};
 			
 			$wnd.ReactDOM.render(
