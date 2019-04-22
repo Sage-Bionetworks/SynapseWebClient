@@ -349,12 +349,14 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	public void cleanupCycles(ActivityProcessItem item, Set<Reference> references) {
 		if (item.getActivity().getUsed() != null) {
 			// SWC-3568 : avoid cycle that results in stack overflow during the creation of the graph.
+			// PLFM-4288: ignore empty references (any references in the used list that contain no target Synapse ID).
 			List<Used> previouslyProcessed = new ArrayList<Used>();
 			Set<Used> used = item.getActivity().getUsed();
 			for(Used u : used) {
 				if(u instanceof UsedEntity) { // ignore UsedUrl, nothing to process
 					UsedEntity ue = (UsedEntity) u;
-					if(ue.getReference() != null && references.contains(ue.getReference())) {
+					if(ue.getReference() != null && 
+						(references.contains(ue.getReference()) || ue.getReference().getTargetId() == null )) {
 						previouslyProcessed.add(u);
 					}
 				}

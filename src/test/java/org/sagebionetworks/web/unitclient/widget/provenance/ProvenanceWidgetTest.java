@@ -337,6 +337,7 @@ public class ProvenanceWidgetTest {
 		
 		//verify that if in references, then should be removed from the used set.
 		Reference ref = new Reference();
+		ref.setTargetId("syn123");
 		UsedEntity usedEntity = new UsedEntity();
 		usedEntity.setReference(ref);
 		usedSet.add(usedEntity);
@@ -352,6 +353,16 @@ public class ProvenanceWidgetTest {
 		usedSet.add(usedURL);
 		provenanceWidget.cleanupCycles(item, references);
 		assertTrue(usedSet.contains(usedURL));
+		
+		// PLFM-4288, clean up any reference that does not have a Target ID
+		ref = new Reference();
+		usedEntity = new UsedEntity();
+		usedEntity.setReference(ref);
+		usedSet.clear();
+		usedSet.add(usedEntity);
+		
+		provenanceWidget.cleanupCycles(item, references);
+		assertTrue(usedSet.isEmpty());
 	}
 }
 
