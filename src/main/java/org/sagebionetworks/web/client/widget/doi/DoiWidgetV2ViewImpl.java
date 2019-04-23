@@ -17,6 +17,7 @@ public class DoiWidgetV2ViewImpl implements DoiWidgetV2View {
 	Span doiLabel;
 	@UiField
 	Span synAlertContainer;
+	boolean isLabelVisible = true;
 
 	Widget widget;
 	
@@ -32,7 +33,7 @@ public class DoiWidgetV2ViewImpl implements DoiWidgetV2View {
 		widget.setVisible(true);
 		copyToClipboardWidget.setVisible(true);
 		copyToClipboardWidget.setText(doiText);
-		doiLabel.setVisible(true);
+		doiLabel.setVisible(isLabelVisible);
 	}
 
 	@Override
@@ -64,5 +65,9 @@ public class DoiWidgetV2ViewImpl implements DoiWidgetV2View {
 	@Override
 	public void hide() {
 		widget.setVisible(false);
+	}
+	@Override
+	public void setLabelVisible(boolean visible) {
+		isLabelVisible = visible;
 	}
 }

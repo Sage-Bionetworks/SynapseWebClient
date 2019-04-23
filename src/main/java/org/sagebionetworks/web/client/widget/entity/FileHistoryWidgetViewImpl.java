@@ -4,12 +4,14 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
+import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -92,8 +94,10 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	}
 	
 	@Override
-	public void addVersion(final VersionInfo version, boolean canEdit, boolean isVersionSelected) {
+	public void addVersion(String entityId, final VersionInfo version, boolean canEdit, boolean isVersionSelected) {
 		FileHistoryRowView fileHistoryRow = ginInjector.getFileHistoryRow();
+		DoiWidgetV2 doiWidget = ginInjector.getDoiWidget();
+		doiWidget.setLabelVisible(false);
 		String versionName = version.getVersionLabel();
 		String modifiedByUserId = version.getModifiedByPrincipalId();
 		String modifiedOn = shortDateFormat.format(version.getModifiedOn());
@@ -116,10 +120,11 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 		String versionHref = DisplayUtils.
 				getSynapseHistoryToken(version.getId(),
 				version.getVersionNumber());
-		fileHistoryRow.configure(versionNumber, versionHref, "Version " + versionName, modifiedByUserId, modifiedOn, size, md5, versionComment, deleteCallback);
+		fileHistoryRow.configure(versionNumber, versionHref, "Version " + versionName, modifiedByUserId, modifiedOn, size, md5, versionComment, deleteCallback, doiWidget);
 		previousVersionsTable.add(fileHistoryRow.asWidget());
 		fileHistoryRow.setCanEdit(canEdit);
 		fileHistoryRow.setIsVersionSelected(isVersionSelected);
+		doiWidget.configure(entityId, ObjectType.ENTITY, versionNumber);
 	}
 	
 	@Override

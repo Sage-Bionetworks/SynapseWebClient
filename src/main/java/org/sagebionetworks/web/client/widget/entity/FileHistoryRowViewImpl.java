@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormControlStatic;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -13,6 +14,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -34,6 +36,8 @@ public class FileHistoryRowViewImpl implements FileHistoryRowView {
 	SimplePanel md5LinkContainer;
 	@UiField
 	Button deleteButton;
+	@UiField
+	Div doiWidgetContainer;
 	Callback deleteCallback;
 	UserBadge userBadge;
 	private Widget widget;
@@ -63,7 +67,7 @@ public class FileHistoryRowViewImpl implements FileHistoryRowView {
 	@Override
 	public void configure(Long versionNumber, String versionLinkHref, String versionName,
 			String modifiedByUserId, String modifiedOn, String size,
-			String md5, String versionComment, Callback deleteCallback) {
+			String md5, String versionComment, Callback deleteCallback, IsWidget doiWidget) {
 		this.versionNameLink.setText(versionName);
 		this.modifiedOn.setText(modifiedOn);
 		this.versionComment.setText(versionComment);
@@ -72,6 +76,7 @@ public class FileHistoryRowViewImpl implements FileHistoryRowView {
 		this.deleteCallback = deleteCallback;
 		userBadge.configure(modifiedByUserId);
 		versionNameLink.setHref(versionLinkHref);
+		doiWidgetContainer.add(doiWidget);
 	}
 	
 	@Override

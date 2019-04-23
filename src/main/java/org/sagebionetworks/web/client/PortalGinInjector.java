@@ -73,6 +73,7 @@ import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.doi.CreateOrUpdateDoiModal;
+import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
@@ -590,4 +591,5 @@ public interface PortalGinInjector extends Ginjector {
 	OpenMembershipRequestWidget getOpenMembershipRequestWidget();
 	OpenTeamInvitationWidget getOpenTeamInvitationWidget();
 	DivView getDiv();
+	DoiWidgetV2 getDoiWidget();
 }
