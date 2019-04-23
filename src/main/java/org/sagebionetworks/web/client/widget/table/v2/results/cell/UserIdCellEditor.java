@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -20,15 +21,21 @@ public class UserIdCellEditor implements CellEditor{
 	UserIdCellEditorView view;
 	SynapseSuggestBox peopleSuggestWidget;
 	UserGroupSuggestionProvider provider;
+	UserIdCellRenderer userIdCellRenderer;
+	ClickHandler onUserBadgeClick;
+	String value;
 	
 	@Inject
 	public UserIdCellEditor(UserIdCellEditorView view, 
 			SynapseSuggestBox peopleSuggestWidget,
-			UserGroupSuggestionProvider provider) {
+			UserGroupSuggestionProvider provider,
+			UserIdCellRenderer userIdCellRenderer) {
 		this.view = view;
 		this.peopleSuggestWidget = peopleSuggestWidget;
 		this.provider = provider;
+		this.userIdCellRenderer = userIdCellRenderer;
 		view.setSynapseSuggestBoxWidget(peopleSuggestWidget.asWidget());
+		view.setUserIdCellRenderer(userIdCellRenderer.asWidget());
 		peopleSuggestWidget.setPlaceholderText("Enter ID or name...");
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		peopleSuggestWidget.addItemSelectedHandler(new CallbackP<UserGroupSuggestion>() {
@@ -37,6 +44,12 @@ public class UserIdCellEditor implements CellEditor{
 				onUserSelected(suggestion);
 			}
 		});
+		onUserBadgeClick = event -> {
+			view.showEditor(true);
+			peopleSuggestWidget.setFocus(true);
+			peopleSuggestWidget.selectAll();
+		};
+		view.setUserIdCellRendererClickHandler(onUserBadgeClick);
 	}
 	
 	public void onUserSelected(UserGroupSuggestion suggestion) {
@@ -97,5 +110,8 @@ public class UserIdCellEditor implements CellEditor{
 	public void setValue(String value) {
 		peopleSuggestWidget.clear();
 		peopleSuggestWidget.setText(value);
+		userIdCellRenderer.setValue(value, onUserBadgeClick);
+		boolean showEditor = value == null || value.trim().isEmpty();
+		view.showEditor(showEditor);
 	}
 }

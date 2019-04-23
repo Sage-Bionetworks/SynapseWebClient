@@ -8,20 +8,27 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRenderer;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class UserIdCellEditorImplTest {
 	@Mock
 	UserIdCellEditorView mockView;
@@ -31,19 +38,27 @@ public class UserIdCellEditorImplTest {
 	UserGroupSuggestionProvider mockUserGroupSuggestionProvider;
 	@Mock
 	UserGroupSuggestion mockSynapseSuggestion;
+	@Mock
+	UserIdCellRenderer mockUserIdCellRenderer;
+	@Captor
+	ArgumentCaptor<ClickHandler> clickHandlerCaptor;
+	ClickHandler onUserBadgeClick;
+	
 	UserIdCellEditor editor;
 
 	public static final String SELECTED_USER_ID = "876";
 	@Before
 	public void before(){
-		MockitoAnnotations.initMocks(this);
-		editor = new UserIdCellEditor(mockView, mockSynapseSuggestBox, mockUserGroupSuggestionProvider);
+		editor = new UserIdCellEditor(mockView, mockSynapseSuggestBox, mockUserGroupSuggestionProvider, mockUserIdCellRenderer);
 		when(mockSynapseSuggestion.getId()).thenReturn(SELECTED_USER_ID);
+		verify(mockView).setUserIdCellRendererClickHandler(clickHandlerCaptor.capture());
+		onUserBadgeClick = clickHandlerCaptor.getValue();
 	}
 	
 	@Test
 	public void testConstruction() {
 		verify(mockView).setSynapseSuggestBoxWidget(any(Widget.class));
+		verify(mockView).setUserIdCellRenderer(any(Widget.class));
 		verify(mockSynapseSuggestBox).setSuggestionProvider(mockUserGroupSuggestionProvider);
 		verify(mockSynapseSuggestBox).addItemSelectedHandler(any(CallbackP.class));
 	}
@@ -59,6 +74,8 @@ public class UserIdCellEditorImplTest {
 	public void testSetValueNull(){
 		editor.setValue(null);
 		verify(mockSynapseSuggestBox).setText(null);
+		verify(mockUserIdCellRenderer).setValue(null, onUserBadgeClick);
+		verify(mockView).showEditor(true);
 	}
 	
 	@Test
@@ -67,6 +84,8 @@ public class UserIdCellEditorImplTest {
 		editor.setValue(userId);
 		verify(mockSynapseSuggestBox).clear();
 		verify(mockSynapseSuggestBox).setText(userId);
+		verify(mockUserIdCellRenderer).setValue(userId, onUserBadgeClick);
+		verify(mockView).showEditor(false);
 	}
 	
 	@Test
@@ -83,14 +102,22 @@ public class UserIdCellEditorImplTest {
 		when(mockSynapseSuggestBox.getText()).thenReturn(SELECTED_USER_ID);
 		assertEquals(SELECTED_USER_ID, editor.getValue());
 	}
-	
+
+	@Test
+	public void testUserBadgeClick() {
+		// simulate user clicking on the badge or anywhere in the "textbox" (parent div with cursor: text)
+		onUserBadgeClick.onClick(null);
+		verify(mockView).showEditor(true);
+		verify(mockSynapseSuggestBox).setFocus(true);
+		verify(mockSynapseSuggestBox).selectAll();
+	}
+
 	@Test
 	public void testAddKeyDownHandler(){
 		KeyDownHandler mockKeyDownHandler = Mockito.mock(KeyDownHandler.class);
 		editor.addKeyDownHandler(mockKeyDownHandler);
 		verify(mockSynapseSuggestBox).addKeyDownHandler(mockKeyDownHandler);
 	}
-
 
 	@Test
 	public void testFireEvent() {

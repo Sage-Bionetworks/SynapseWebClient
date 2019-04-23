@@ -138,6 +138,10 @@ public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, Synap
 		view.setFocus(focused);
 	}
 	
+	public void selectAll() {
+		view.selectAll();
+	}
+	
 	@Override
 	public HandlerRegistration addKeyDownHandler(KeyDownHandler handler) {
 		return view.addKeyDownHandler(handler);
