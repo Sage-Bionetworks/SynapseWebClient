@@ -334,9 +334,9 @@ public class FileHistoryWidgetTest {
 		verify(mockView).setMoreButtonVisible(true);
 		//verify full page is added (one of which is selected)
 		boolean isVersionSelected = false;
-		verify(mockView, times(FileHistoryWidget.VERSION_LIMIT - 1)).addVersion(any(VersionInfo.class), eq(canEdit), eq(isVersionSelected));
+		verify(mockView, times(FileHistoryWidget.VERSION_LIMIT - 1)).addVersion(eq(entityId), any(VersionInfo.class), eq(canEdit), eq(isVersionSelected));
 		isVersionSelected = true;
-		verify(mockView).addVersion(any(VersionInfo.class), eq(canEdit), eq(isVersionSelected));
+		verify(mockView).addVersion(eq(entityId), any(VersionInfo.class), eq(canEdit), eq(isVersionSelected));
 		
 		// now get the second page (verify new offset).
 		// second page contains 2 versions only.
@@ -349,7 +349,7 @@ public class FileHistoryWidgetTest {
 		verify(mockView, never()).clearVersions();
 		verify(mockJsClient).getEntityVersions(eq(entityId), eq(FileHistoryWidget.VERSION_LIMIT), eq(FileHistoryWidget.VERSION_LIMIT), any(AsyncCallback.class));
 		isVersionSelected = false;
-		verify(mockView, times(2)).addVersion(any(VersionInfo.class), eq(canEdit), eq(isVersionSelected));
+		verify(mockView, times(2)).addVersion(eq(entityId), any(VersionInfo.class), eq(canEdit), eq(isVersionSelected));
 		verify(mockView).setMoreButtonVisible(false);
 	}
 	

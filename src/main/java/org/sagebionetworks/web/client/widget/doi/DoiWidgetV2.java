@@ -26,10 +26,10 @@ public class DoiWidgetV2 implements IsWidget {
 		return view.asWidget();
 	}
 	
-	public void configure(String objectType, ObjectType type, Long versionNumber) {
+	public void configure(String objectId, ObjectType objectType, Long versionNumber) {
 		clear();
 		// get the associated DOI Association
-		jsClient.getDoiAssociation(objectType, type, versionNumber).addCallback(new FutureCallback<DoiAssociation>() {
+		jsClient.getDoiAssociation(objectId, objectType, versionNumber).addCallback(new FutureCallback<DoiAssociation>() {
 			@Override
 			public void onSuccess(@NullableDecl DoiAssociation doiAssociation) {
 				configure(doiAssociation);
