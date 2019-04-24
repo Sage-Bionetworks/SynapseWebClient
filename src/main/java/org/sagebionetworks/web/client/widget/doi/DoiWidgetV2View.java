@@ -7,4 +7,5 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface DoiWidgetV2View extends IsWidget, SynapseView {
 	void showDoi(String doiText);
 	void hide();
+	void setLabelVisible(boolean visible);
 }

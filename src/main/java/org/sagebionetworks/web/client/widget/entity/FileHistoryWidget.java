@@ -163,7 +163,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 						versionNumber = results.get(0).getVersionNumber();
 					}
 					for (VersionInfo versionInfo : results) {
-						view.addVersion(versionInfo, canEdit, versionInfo.getVersionNumber().equals(versionNumber));
+						view.addVersion(bundle.getEntity().getId(), versionInfo, canEdit, versionInfo.getVersionNumber().equals(versionNumber));
 					}
 					currentOffset += VERSION_LIMIT;
 				}
