@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.asynch.UserGroupHeaderAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
+import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -50,10 +51,10 @@ public class UserIdCellRenderer implements Cell {
 				public void onSuccess(UserGroupHeader result) {
 					if (result.getIsIndividual()) {
 						UserBadge badge = ginInjector.getUserBadgeWidget();
-						badge.configure(principalId);
 						if (customClickHandler != null) {
 							badge.setCustomClickHandler(customClickHandler);	
 						}
+						badge.configure(principalId);
 						view.add(badge);
 					} else {
 						TeamBadge badge = ginInjector.getTeamBadgeWidget();

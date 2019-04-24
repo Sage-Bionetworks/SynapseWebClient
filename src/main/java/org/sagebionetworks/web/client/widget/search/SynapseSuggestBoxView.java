@@ -21,6 +21,7 @@ public interface SynapseSuggestBoxView extends IsWidget, SynapseView, Focusable,
 	void setPlaceholderText(String text);
 	int getWidth();
 	void setFocus(boolean focused);
+	void selectAll();
 	/**
 	 * Sets the displays width. This width does not include decorations
 	 * such as margin, border, or padding.

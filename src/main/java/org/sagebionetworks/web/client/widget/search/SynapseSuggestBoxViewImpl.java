@@ -68,6 +68,10 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 	public void setFocus(boolean focused) {
 		suggestBox.getValueBox().setFocus(true);
 	}
+	@Override
+	public void selectAll() {
+		suggestBox.getValueBox().selectAll();
+	}
 	
 	@Override
 	public Widget asWidget() {
