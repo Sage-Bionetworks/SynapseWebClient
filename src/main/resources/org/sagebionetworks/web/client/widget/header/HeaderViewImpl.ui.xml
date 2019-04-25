@@ -74,16 +74,18 @@
 					<b:DropDownMenu ui:field="headerFavDropdownMenu" addStyleNames="dropdown-menu-right">
 					</b:DropDownMenu>
 				</b:DropDown>
-				<bh:Div pull="RIGHT" addStyleNames="searchBoxContainer inactive hidden-xs" height="53px" paddingLeft="7" paddingRight="3">
-					<bh:Div ui:field="searchBoxContainer" marginTop="14"/>
+				<bh:Div pull="RIGHT" addStyleNames="searchBoxContainer inactive hidden-xs" height="53px" >
+					<bh:Div ui:field="searchBoxContainer"/>
 				</bh:Div>
-				<bh:Div pull="RIGHT" height="53px" paddingLeft="7" paddingRight="3" paddingTop="9" ui:field="downloadListNotificationUI" visible="false" addStyleNames="greenBackgroundOnHover">
+				<bh:Div pull="RIGHT" height="53px" ui:field="downloadListNotificationUI" visible="false" addStyleNames="greenBackgroundOnHover">
 					<b:Tooltip text="Click to view items in your download list." placement="BOTTOM">
-						<g:FocusPanel height="35px" addStyleNames="synapse-green-bg img-circle displayInlineBlock" ui:field="downloadListLink">
-							<b:Icon type="DOWNLOAD" addStyleNames="imageButton color-white" size="LARGE" marginTop="9" marginRight="5" marginBottom="5" marginLeft="5"/>
+						<g:FocusPanel addStyleNames="displayInlineBlock" ui:field="downloadListLink">
+							<bh:Div height="35px" marginLeft="7" marginTop="9" marginBottom="9" addStyleNames="synapse-green-bg img-circle ">
+								<b:Icon type="DOWNLOAD" addStyleNames="imageButton color-white" size="LARGE" marginTop="9" marginRight="5" marginBottom="5" marginLeft="5"/>
+							</bh:Div>
 						</g:FocusPanel>
 					</b:Tooltip>
-					<b:Label text="0" ui:field="downloadListFileCount" addStyleNames="vertical-align-top dropshadow" marginLeft="-5" type="INFO"/>
+					<b:Label text="0" ui:field="downloadListFileCount" addStyleNames="moveup-15 dropshadow" marginLeft="-8" type="INFO"/>
 				</bh:Div>
 				
 			</bh:Span>
