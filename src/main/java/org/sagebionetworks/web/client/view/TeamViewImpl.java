@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
@@ -27,6 +28,8 @@ import com.google.inject.Inject;
 public class TeamViewImpl extends Composite implements TeamView {
 
 	public interface TeamViewImplUiBinder extends UiBinder<Widget, TeamViewImpl> {}
+	@UiField
+	Anchor toolsMenuLink;
 	@UiField
 	Heading teamNameHeading;
 	@UiField
@@ -106,6 +109,13 @@ public class TeamViewImpl extends Composite implements TeamView {
 				presenter.onMemberSearch(memberSearchTextBox.getValue());
 			}
 		});
+		Icon icon = new Icon(IconType.ELLIPSIS_V);
+		icon.addStyleName("SRC-primary-background-color-hover");
+		icon.setPaddingTop(9);
+		icon.setPaddingBottom(9);
+		icon.setPaddingLeft(4);
+		icon.setPaddingRight(4);
+		toolsMenuLink.add(icon);
 	}
 	
 	@Override

@@ -8,7 +8,7 @@
 		<bh:Span addStyleNames="flexcontainer-row">
 			<bh:Span ui:field="notificationsSpan"/>
 			<bh:Span ui:field="pictureSpan" addStyleNames="flexcontainer-column flexcontainer-justify-center">
-				<g:FocusPanel ui:field="pictureFocusPanel" addStyleNames="margin-right-5 imageButton displayInlineBlock">
+				<g:FocusPanel ui:field="pictureFocusPanel" addStyleNames="imageButton displayInlineBlock">
 					<bh:Span>
 						<bh:Span ui:field="defaultPicture" visible="false">
 							<b:Icon type="SYN_USERS" size="TIMES4"/>
@@ -17,7 +17,7 @@
 					</bh:Span>
 				</g:FocusPanel>
 			</bh:Span>
-			<bh:Span addStyleNames="flexcontainer-column flexcontainer-justify-center">
+			<bh:Span addStyleNames="flexcontainer-column flexcontainer-justify-center" paddingLeft="17">
 				<b:Heading size="H4">
 					<b:Anchor ui:field="nameLink"/>
 				</b:Heading>

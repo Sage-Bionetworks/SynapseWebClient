@@ -14,22 +14,20 @@
 				<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width">
 					<bh:Div ui:field="teamBadgeContainer"/>
 				</bh:Div>
-				<bh:Div ui:field="commandsContainer" addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end">
+				<bh:Div ui:field="commandsContainer" addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70">
 					<bh:Div>
-						<b:ButtonToolBar addStyleNames="margin-top-15 margin-right-10 margin-bottom-10 right">
-							<b:ButtonGroup>
-								<b:Button dataToggle="DROPDOWN" text="Tools" icon="COG"/>
-								<b:DropDownMenu addStyleNames="dropdown-menu-right">
-									<b:AnchorListItem icon="PLUS_SQUARE_O" iconFixedWidth="true" ui:field="inviteMemberItem" visible="false" text="Invite User" />
-									<b:AnchorListItem icon="EDIT" iconFixedWidth="true" ui:field="editTeamItem" visible="false" text="Edit Team" />
-									<b:AnchorListItem icon="TIMES_CIRCLE" iconFixedWidth="true" ui:field="deleteTeamItem" visible="false" text="Delete Team" />
-									<b:AnchorListItem icon="ARROW_RIGHT" iconFixedWidth="true" ui:field="leaveTeamItem" visible="false" text="Leave Team" />
-									<b:AnchorListItem icon="FLAG" iconFixedWidth="true" ui:field="manageAccessItem" text="(ACT) Manage Access Requirements" visible="false"/> 
-								</b:DropDownMenu>
-							</b:ButtonGroup>
-						</b:ButtonToolBar>
 						<w:HelpWidget helpMarkdown="Teams are a way to easily manage groups of users for the purposes of project access, communication, and challenge participation." 
-							href="http://docs.synapse.org/articles/teams.html" iconStyles="lightGreyText movedown-6 font-size-18" addStyleNames="margin-right-10 margin-top-15 margin-bottom-10" pull="RIGHT" placement="LEFT" />
+							href="http://docs.synapse.org/articles/teams.html" iconStyles="lightGreyText font-size-18 displayInlineBlock" addStyleNames="margin-top-15 margin-bottom-10" placement="LEFT" />
+						<b:DropDown ui:field="dashboardDropdown" addStyleNames="imageButton SRC-primary-background-color-hover displayInlineBlock" marginTop="15" marginRight="10">
+							<b:Anchor ui:field="toolsMenuLink" dataToggle="DROPDOWN" addStyleNames="textDecorationNone" />
+							<b:DropDownMenu addStyleNames="dropdown-menu-right">
+								<b:AnchorListItem icon="PLUS_SQUARE_O" iconFixedWidth="true" ui:field="inviteMemberItem" visible="false" text="Invite User" />
+								<b:AnchorListItem icon="EDIT" iconFixedWidth="true" ui:field="editTeamItem" visible="false" text="Edit Team" />
+								<b:AnchorListItem icon="TIMES_CIRCLE" iconFixedWidth="true" ui:field="deleteTeamItem" visible="false" text="Delete Team" />
+								<b:AnchorListItem icon="ARROW_RIGHT" iconFixedWidth="true" ui:field="leaveTeamItem" visible="false" text="Leave Team" />
+								<b:AnchorListItem icon="FLAG" iconFixedWidth="true" ui:field="manageAccessItem" text="(ACT) Manage Access Requirements" visible="false"/> 
+							</b:DropDownMenu>
+						</b:DropDown>
 					</bh:Div>
 				</bh:Div>
 			</bh:Div>
