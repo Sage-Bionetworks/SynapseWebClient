@@ -69,9 +69,8 @@
 						<b:AnchorListItem ui:field="logoutLink" icon="SIGN_OUT" iconFixedWidth="true" iconPosition="RIGHT">Sign out</b:AnchorListItem>
 					</b:DropDownMenu>
 				</b:DropDown>
-				<b:DropDown ui:field="headerFavDropdown" pull="RIGHT" addStyleNames="imageButton hidden-xs greenBackgroundOnHover" visible="false" height="53px" paddingTop="13" paddingRight="15" paddingLeft="0">
-					<b:Anchor ui:field="headerFavAnchor" dataToggle="DROPDOWN" icon="STAR" iconSize="TIMES2" height="28px" addStyleNames="color-white textDecorationNone" />
-					<b:Anchor ui:field="headerFavAngleDown" dataToggle="DROPDOWN" icon="ANGLE_DOWN" height="28px" addStyleNames="color-white textDecorationNone moveup-5" />
+				<b:DropDown ui:field="headerFavDropdown" pull="RIGHT" addStyleNames="imageButton hidden-xs greenBackgroundOnHover color-white textDecorationNone" visible="false" height="53px" paddingLeft="0">
+					<b:Anchor ui:field="headerFavAnchor" dataToggle="DROPDOWN" />
 					<b:DropDownMenu ui:field="headerFavDropdownMenu" addStyleNames="dropdown-menu-right">
 					</b:DropDownMenu>
 				</b:DropDown>

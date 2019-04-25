@@ -10,6 +10,7 @@ import org.gwtbootstrap3.client.ui.DropDown;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Label;
+import org.gwtbootstrap3.client.ui.constants.IconSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -57,8 +58,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	DropDown headerFavDropdown;
 	@UiField
 	Anchor headerFavAnchor;
-	@UiField
-	Anchor headerFavAngleDown;
 	@UiField
 	DropDownMenu headerFavDropdownMenu;
 	@UiField
@@ -155,6 +154,25 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		angleDown.setPaddingLeft(5);
 		angleDown.setMarginLeft(0);
 		dashboardDropdownAnchor.add(angleDown);
+		
+		Icon starIcon = new Icon(IconType.STAR);
+		starIcon.setColor("white");
+		starIcon.setSize(IconSize.TIMES2);
+		starIcon.setPaddingTop(13);
+		starIcon.setPaddingBottom(12);
+		starIcon.setPaddingLeft(5);
+		headerFavAnchor.add(starIcon);
+		
+		angleDown = new Icon(IconType.ANGLE_DOWN);
+		angleDown.setColor("white");
+		angleDown.setPull(Pull.RIGHT);
+		angleDown.setPaddingTop(20);
+		angleDown.setPaddingRight(10);
+		angleDown.setPaddingBottom(19);
+		angleDown.setPaddingLeft(1);
+		angleDown.setMarginLeft(0);
+		headerFavAnchor.add(angleDown);
+		
 		initClickHandlers();
 		clear();
 	}
