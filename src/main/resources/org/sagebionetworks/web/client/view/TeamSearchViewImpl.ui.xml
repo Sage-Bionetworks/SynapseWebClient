@@ -11,7 +11,7 @@
 			<bh:Div addStyleNames="SRC-grid-item" height="10px"/>
 			<bh:Div addStyleNames="SRC-grid-item flexcontainer-align-items-flex-end" marginTop="10" marginBottom="5" marginRight="15" height="50px">
 				<bh:Div>
-					<b:Icon ui:field="searchButton" type="SEARCH" addStyleNames="imageButton topLevelZIndex font-size-22 movedown-28 synapse-green left"/>
+					<b:Icon ui:field="searchButton" type="SEARCH" addStyleNames="imageButton font-size-22 movedown-28 synapse-green left"/>
 					<b:TextBox ui:field="searchField" height="35px" width="100%" addStyleNames="inline-block padding-left-35" placeholder="Find teams"/>
 				</bh:Div>
 			</bh:Div>
