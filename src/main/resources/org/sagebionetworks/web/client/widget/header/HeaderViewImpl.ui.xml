@@ -44,9 +44,8 @@
 		  		<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-10 margin-right-10 padding-left-15" visible="false">
 					<b:Button ui:field="loginLink" text="&nbsp;&nbsp;&nbsp;Sign in&nbsp;&nbsp;&nbsp;" type="SUCCESS" marginTop="7"/>
 				</g:SimplePanel>
-				<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-left-10 padding-right-10 imageButton greenBackgroundOnHover" visible="false" height="53px" paddingTop="10" width="60px">
-					<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" />
-					<b:Anchor ui:field="dashboardAngleDown" dataToggle="DROPDOWN" icon="ANGLE_DOWN" addStyleNames="color-white textDecorationNone right" paddingTop="5" />
+				<b:DropDown ui:field="dashboardDropdown" addStyleNames="right imageButton greenBackgroundOnHover" visible="false" height="53px" width="62px">
+					<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" addStyleNames="color-white textDecorationNone" />
 					<b:DropDownMenu ui:field="dashboardDropdownMenu" addStyleNames="pull-right">
 						<b:ListItem paddingTop="5" addStyleNames="whitespace-nowrap"><bh:Span paddingLeft="20" paddingRight="25" paddingTop="5">Signed in as <bh:Strong ui:field="signedInAsName"/></bh:Span></b:ListItem>
 						<b:Divider/>

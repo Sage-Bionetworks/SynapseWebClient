@@ -8,7 +8,10 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.DropDown;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Label;
+import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
@@ -104,8 +107,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	DropDownMenu dashboardDropdownMenu;
 	@UiField
-	Anchor dashboardAngleDown;
-	@UiField
 	Div searchBoxContainer;
 	@UiField
 	Alert stagingAlert;
@@ -141,11 +142,19 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		this.globalAppState = globalAppState;
 		userBadge.setTooltipHidden(true);
 		userBadge.setTextHidden(true);
-		userBadge.addStyleNames("padding-top-5");
+		userBadge.addStyleNames("padding-top-15 padding-bottom-15 padding-left-10");
 		// add search panel first
 		searchBox.setVisible(true);
 		searchBoxContainer.add(searchBox.asWidget());
 		dashboardDropdownAnchor.add(userBadge.asWidget());
+		Icon angleDown = new Icon(IconType.ANGLE_DOWN);
+		angleDown.setPull(Pull.RIGHT);
+		angleDown.setPaddingTop(20);
+		angleDown.setPaddingRight(10);
+		angleDown.setPaddingBottom(19);
+		angleDown.setPaddingLeft(5);
+		angleDown.setMarginLeft(0);
+		dashboardDropdownAnchor.add(angleDown);
 		initClickHandlers();
 		clear();
 	}
