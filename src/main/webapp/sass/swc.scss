@@ -2734,6 +2734,12 @@ div.border {
 	}
 }
 #body {
+	.dropdown.SRC-primary-background-color-hover.open {
+		background-color: $synapse-blue;
+		> a {
+			color: white;
+		}
+	}
 	.katex { font-size: 1em; }
 	.text-danger {
 		color: #d9534f;
