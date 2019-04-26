@@ -35,27 +35,27 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	}
 
 	private void initClickHandlers() {
-	    searchField.addKeyDownHandler(new KeyDownHandler() {				
+		searchField.addKeyDownHandler(new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
 					executeSearch();
-	            }					
+				}
 			}
 		});
-	    searchField.addBlurHandler(event -> {
-	    	// delay auto-hiding the search box (on focus loss) for .4s so that the search can execute on search button click (when active).
-	    	gwt.scheduleExecution(() -> {
-	    		searchFieldInactive();	
-	    	}, 400);
-	    });
-	    searchButton.addClickHandler(event -> {
-	    	if (isSearchFieldActive()) {
-	    		executeSearch();
-	    	} else {
-	    		searchFieldActive();	
-	    	}
-	    });
+		searchField.addBlurHandler(event -> {
+			// delay auto-hiding the search box (on focus loss) for .4s so that the search can execute on search button click (when active).
+			gwt.scheduleExecution(() -> {
+				searchFieldInactive();	
+			}, 400);
+		});
+		searchButton.addClickHandler(event -> {
+			if (isSearchFieldActive()) {
+				executeSearch();
+			} else {
+				searchFieldActive();	
+			}
+		});
 	}
 	
 	private void executeSearch() {
@@ -67,7 +67,7 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	}
 	
 	@Override
-	public Widget asWidget() {		
+	public Widget asWidget() {
 		return widget;
 	}	
 

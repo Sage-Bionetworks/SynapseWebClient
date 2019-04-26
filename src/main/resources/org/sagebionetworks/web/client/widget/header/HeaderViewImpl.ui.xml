@@ -44,9 +44,8 @@
 		  		<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-10 margin-right-10 padding-left-15" visible="false">
 					<b:Button ui:field="loginLink" text="&nbsp;&nbsp;&nbsp;Sign in&nbsp;&nbsp;&nbsp;" type="SUCCESS" marginTop="7"/>
 				</g:SimplePanel>
-				<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-left-10 padding-right-10 imageButton greenBackgroundOnHover" visible="false" height="53px" paddingTop="10" width="60px">
-					<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" />
-					<b:Anchor ui:field="dashboardAngleDown" dataToggle="DROPDOWN" icon="ANGLE_DOWN" addStyleNames="color-white textDecorationNone right" paddingTop="5" />
+				<b:DropDown ui:field="dashboardDropdown" addStyleNames="right imageButton greenBackgroundOnHover" visible="false" height="53px" width="62px">
+					<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" addStyleNames="color-white textDecorationNone" />
 					<b:DropDownMenu ui:field="dashboardDropdownMenu" addStyleNames="pull-right">
 						<b:ListItem paddingTop="5" addStyleNames="whitespace-nowrap"><bh:Span paddingLeft="20" paddingRight="25" paddingTop="5">Signed in as <bh:Strong ui:field="signedInAsName"/></bh:Span></b:ListItem>
 						<b:Divider/>
@@ -70,22 +69,23 @@
 						<b:AnchorListItem ui:field="logoutLink" icon="SIGN_OUT" iconFixedWidth="true" iconPosition="RIGHT">Sign out</b:AnchorListItem>
 					</b:DropDownMenu>
 				</b:DropDown>
-				<b:DropDown ui:field="headerFavDropdown" pull="RIGHT" addStyleNames="imageButton hidden-xs greenBackgroundOnHover" visible="false" height="53px" paddingTop="13" paddingRight="15" paddingLeft="0">
-					<b:Anchor ui:field="headerFavAnchor" dataToggle="DROPDOWN" icon="STAR" iconSize="TIMES2" height="28px" addStyleNames="color-white textDecorationNone" />
-					<b:Anchor ui:field="headerFavAngleDown" dataToggle="DROPDOWN" icon="ANGLE_DOWN" height="28px" addStyleNames="color-white textDecorationNone moveup-5" />
+				<b:DropDown ui:field="headerFavDropdown" pull="RIGHT" addStyleNames="imageButton hidden-xs greenBackgroundOnHover color-white textDecorationNone" visible="false" height="53px" paddingLeft="0">
+					<b:Anchor ui:field="headerFavAnchor" dataToggle="DROPDOWN" />
 					<b:DropDownMenu ui:field="headerFavDropdownMenu" addStyleNames="dropdown-menu-right">
 					</b:DropDownMenu>
 				</b:DropDown>
-				<bh:Div pull="RIGHT" addStyleNames="searchBoxContainer inactive hidden-xs" height="53px" paddingLeft="7" paddingRight="3">
-					<bh:Div ui:field="searchBoxContainer" marginTop="14"/>
+				<bh:Div pull="RIGHT" addStyleNames="searchBoxContainer inactive hidden-xs" height="53px" >
+					<bh:Div ui:field="searchBoxContainer"/>
 				</bh:Div>
-				<bh:Div pull="RIGHT" height="53px" paddingLeft="7" paddingRight="3" paddingTop="9" ui:field="downloadListNotificationUI" visible="false" addStyleNames="greenBackgroundOnHover">
+				<bh:Div pull="RIGHT" height="53px" ui:field="downloadListNotificationUI" visible="false" addStyleNames="greenBackgroundOnHover">
 					<b:Tooltip text="Click to view items in your download list." placement="BOTTOM">
-						<g:FocusPanel height="35px" addStyleNames="synapse-green-bg img-circle displayInlineBlock" ui:field="downloadListLink">
-							<b:Icon type="DOWNLOAD" addStyleNames="imageButton color-white" size="LARGE" marginTop="9" marginRight="5" marginBottom="5" marginLeft="5"/>
+						<g:FocusPanel addStyleNames="displayInlineBlock" ui:field="downloadListLink">
+							<bh:Div height="35px" marginLeft="7" marginTop="9" marginBottom="9" addStyleNames="synapse-green-bg img-circle ">
+								<b:Icon type="DOWNLOAD" addStyleNames="imageButton color-white" size="LARGE" marginTop="9" marginRight="5" marginBottom="5" marginLeft="5"/>
+							</bh:Div>
 						</g:FocusPanel>
 					</b:Tooltip>
-					<b:Label text="0" ui:field="downloadListFileCount" addStyleNames="vertical-align-top dropshadow" marginLeft="-5" type="INFO"/>
+					<b:Label text="0" ui:field="downloadListFileCount" addStyleNames="moveup-15 dropshadow" marginLeft="-8" type="INFO"/>
 				</bh:Div>
 				
 			</bh:Span>
