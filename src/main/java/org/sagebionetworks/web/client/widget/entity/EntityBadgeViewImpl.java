@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.Emphasis;
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -215,6 +216,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		icon.setFixedWidth(true);
 		icon.setPull(Pull.RIGHT);
 		Tooltip tooltip = new Tooltip(icon);
+		tooltip.setPlacement(Placement.RIGHT);
 		tooltip.setHtml(SafeHtmlUtils.fromTrustedString(html));
 		iconsContainer.add(tooltip);
 	}
@@ -226,6 +228,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		icon.setEmphasis(Emphasis.DANGER);
 		icon.setPull(Pull.RIGHT);
 		Tooltip tooltip = new Tooltip(icon, error);
+		tooltip.setPlacement(Placement.RIGHT);
 		iconsContainer.add(tooltip);
 	}
 	
@@ -243,28 +246,36 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		Icon icon = new Icon(IconType.NEWSPAPER_O);
 		icon.setFixedWidth(true);
 		icon.setPull(Pull.RIGHT);
-		iconsContainer.add(new Tooltip(icon, "Has a wiki"));
+		Tooltip tooltip = new Tooltip(icon, "Has a wiki");
+		tooltip.setPlacement(Placement.RIGHT);
+		iconsContainer.add(tooltip);
 	}
 	@Override
 	public void showPrivateIcon() {
 		Icon icon = new Icon(IconType.LOCK);
 		icon.setFixedWidth(true);
 		icon.setPull(Pull.RIGHT);
-		iconsContainer.add(new Tooltip(icon, "Private"));
+		Tooltip tooltip = new Tooltip(icon, "Private");
+		tooltip.setPlacement(Placement.RIGHT);
+		iconsContainer.add(tooltip);
 	}
 	@Override
 	public void showPublicIcon() {
 		Icon icon = new Icon(IconType.GLOBE);
 		icon.setFixedWidth(true);
 		icon.setPull(Pull.RIGHT);
-		iconsContainer.add(new Tooltip(icon, "Public"));
+		Tooltip tooltip = new Tooltip(icon, "Public");
+		tooltip.setPlacement(Placement.RIGHT);
+		iconsContainer.add(tooltip);
 	}
 	@Override
 	public void showSharingSetIcon() {
 		Icon icon = new Icon(IconType.CHECK);
 		icon.setFixedWidth(true);
 		icon.setPull(Pull.RIGHT);
-		iconsContainer.add(new Tooltip(icon, "Sharing Settings have been set"));
+		Tooltip tooltip = new Tooltip(icon, "Sharing Settings have been set");
+		tooltip.setPlacement(Placement.RIGHT);
+		iconsContainer.add(tooltip);
 	}
 	@Override
 	public boolean isInViewport() {
@@ -276,7 +287,9 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		Icon icon = new Icon(IconType.COMMENT);
 		icon.setFixedWidth(true);
 		icon.setPull(Pull.RIGHT);
-		iconsContainer.add(new Tooltip(icon, "Has been mentioned in discussion"));
+		Tooltip tooltip = new Tooltip(icon, "Has been mentioned in discussion");
+		tooltip.setPlacement(Placement.RIGHT);
+		iconsContainer.add(tooltip);
 	}
 	
 	@Override
@@ -289,8 +302,9 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		icon.addClickHandler(event -> {
 			presenter.onUnlink();
 		});
-		
-		iconsContainer.add(new Tooltip(icon, "Remove this link"));
+		Tooltip tooltip = new Tooltip(icon, "Remove this link");
+		tooltip.setPlacement(Placement.RIGHT);
+		iconsContainer.add(tooltip);
 	}
 
 	@Override

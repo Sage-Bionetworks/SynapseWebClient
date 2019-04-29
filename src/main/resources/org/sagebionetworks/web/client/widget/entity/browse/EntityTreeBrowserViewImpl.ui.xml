@@ -8,13 +8,11 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:tr="urn:import:org.sagebionetworks.web.client.widget.table.v2.results"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-    
-	<bh:Div>
+	<bh:Div marginTop="12" marginBottom="12">
 		<bh:Div ui:field="synAlertContainer"/>
-	    <bh:Span ui:field="emptyUI" text="&#8212; Empty"/>
-	    <b:TextArea width="1px" ui:field="copyToClipboardTextbox" visible="false" />
-	    <!-- File browser tree "table" header -->
-	    <t:Table ui:field="entityTreeHeader" width="100%" addStyleNames="overflow-x-hidden">
+		<bh:Span ui:field="emptyUI" text="&#8212; Empty"/>
+		<!-- File browser tree "table" header -->
+		<t:Table ui:field="entityTreeHeader" width="100%" addStyleNames="overflow-x-hidden">
 			<t:TableRow>
 				<t:TableHeader width="42px" addStyleNames="min-width-42"/> <!-- expand/contract icon + entity icon -->
 				<tr:SortableTableHeaderImpl ui:field="nameColumnHeader" text="Name" width="400px" addStyleNames="min-width-400" />
@@ -52,5 +50,4 @@
 		<bh:Hr ui:field="hrUnderTableHeaders" addStyleNames="margin-top-5 margin-bottom-5" />
 		<bh:Div ui:field="mainContainer" />
 	</bh:Div>
-
 </ui:UiBinder>

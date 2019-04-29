@@ -88,8 +88,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	
 	@UiField
 	Icon copyIDToClipboardIcon;
-	@UiField
-	TextArea copyToClipboardTextbox;
 	SynapseJSNIUtils jsniUtils;
 	Div entityTreeContainer = new Div();
 	AuthenticationController authController;
@@ -398,12 +396,14 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	
 	@Override
 	public void copyToClipboard(String value) {
-		copyToClipboardTextbox.setVisible(true);
+		TextArea copyToClipboardTextbox = new TextArea();
+		((Div)widget).add(copyToClipboardTextbox);
+		copyToClipboardTextbox.setWidth("1px");
 		copyToClipboardTextbox.setFocus(true);
 		copyToClipboardTextbox.setValue(value);
 		copyToClipboardTextbox.selectAll();
 		jsniUtils.copyToClipboard();
-		copyToClipboardTextbox.setVisible(false);
+		((Div)widget).remove(copyToClipboardTextbox);
 	}
 	
 	@Override
