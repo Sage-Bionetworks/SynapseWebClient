@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -26,6 +27,7 @@ import org.sagebionetworks.repo.model.RestrictionLevel;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -37,6 +39,8 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidgetView;
+import org.sagebionetworks.web.client.widget.footer.Footer;
+import org.sagebionetworks.web.client.widget.footer.VersionState;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -45,19 +49,12 @@ import com.google.gwt.user.client.ui.IsWidget;
 public class RestrictionWidgetTest {
 
 	RestrictionWidget widget;
-	
 	@Mock
 	AuthenticationController mockAuthenticationController;
 	@Mock
-	GlobalApplicationState mockGlobalApplicationState;
-	@Mock
 	RestrictionWidgetView mockView;
 	@Mock
-	JiraURLHelper mockJiraURLHelper;
-	@Mock
 	DataAccessClientAsync mockDataAccessClient;
-	@Mock
-	PlaceChanger mockPlaceChanger;
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
@@ -70,30 +67,35 @@ public class RestrictionWidgetTest {
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Captor
 	ArgumentCaptor<CallbackP<Boolean>> callbackPCaptor;
-	public static final String ENTITY_ID = "762";
+	public static final String ENTITY_ID = "syn762";
+	@Mock
+	UserProfile mockUserProfile;
+	
+	public static final String OWNER_ID = "282711";
+	public static final String FIRST_NAME = "Bob";
+	public static final String LAST_NAME = "Vance";
+	public static final String USERNAME = "bvance";
+	public static final String EMAIL = "bob@vancerefrigeration.com";
+	
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		widget = new RestrictionWidget(
 				mockView, 
 				mockAuthenticationController, 
-				mockGlobalApplicationState, 
-				mockJiraURLHelper, 
 				mockDataAccessClient, 
 				mockSynAlert, 
 				mockIsACTMemberAsyncHandler,
 				mockSynapseJavascriptClient);
-		
-		List<String> emailAddresses = new ArrayList<String>();
-		emailAddresses.add("test@test.com");
-		UserProfile up = new UserProfile();
-		up.setOwnerId("101");
-		up.setEmails(emailAddresses);
-		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(up);
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(mockUserProfile);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(mockRestrictionInformation).when(mockSynapseJavascriptClient).getRestrictionInformation(anyString(), any(RestrictableObjectType.class), any(AsyncCallback.class));
 		when(mockEntity.getId()).thenReturn(ENTITY_ID);
+		when(mockUserProfile.getEmails()).thenReturn(Collections.singletonList(EMAIL));
+		when(mockUserProfile.getFirstName()).thenReturn(FIRST_NAME);
+		when(mockUserProfile.getLastName()).thenReturn(LAST_NAME);
+		when(mockUserProfile.getUserName()).thenReturn(USERNAME);
+		when(mockUserProfile.getOwnerId()).thenReturn(OWNER_ID);
 	}
 	
 	private void verifyIsACTMember(boolean isACT) {
@@ -106,17 +108,6 @@ public class RestrictionWidgetTest {
 		verify(mockView).setSynAlert(any(IsWidget.class));
 		verify(mockView).setPresenter(widget);
 	}
-	
-	@Test
-	public void testGetJiraFlagUrl() {
-		when(mockRestrictionInformation.getRestrictionLevel()).thenReturn(RestrictionLevel.OPEN);
-		boolean canChangePermissions = false;
-		widget.configure(mockEntity, canChangePermissions);
-		String flagURLString = "flagURLString";
-		when(mockJiraURLHelper.createFlagIssue(any(String.class),any(String.class),any(String.class))).thenReturn(flagURLString);
-		assertEquals(flagURLString, widget.getJiraFlagUrl());
-	}
-	
 	
 	@Test
 	public void testShowChangeLink() {
@@ -190,7 +181,7 @@ public class RestrictionWidgetTest {
 		verify(mockView).showUnmetRequirementsIcon();
 
 		verify(mockView).showShowUnmetLink();
-		verify(mockView).showAnonymousFlagUI();
+		verify(mockView).showFlagUI();
 	}
 	
 	@Test
@@ -238,7 +229,7 @@ public class RestrictionWidgetTest {
 		verify(mockView).showNoRestrictionsUI();
 
 		verify(mockView, never()).showChangeLink();
-		verify(mockView).showAnonymousFlagUI();
+		verify(mockView).showFlagUI();
 	}
 	
 	@Test
@@ -294,27 +285,13 @@ public class RestrictionWidgetTest {
 	}
 
 	@Test
-	public void testFlagData() {
-		widget.flagData();
-		verify(mockView).open(anyString());
-	}
-	
-	@Test
-	public void testAnonymousFlagModalOkClicked() {
-		widget.anonymousFlagModalOkClicked();
-		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
-	}
-	
-	@Test
 	public void testReportIssueClicked() {
+		when(mockRestrictionInformation.getRestrictionLevel()).thenReturn(RestrictionLevel.OPEN);
+		widget.configure(mockEntity, true);
+		
 		widget.reportIssueClicked();
-		verify(mockView).showFlagModal();
-	}
-	
-	@Test
-	public void testAnonymousReportIssueClicked() {
-		widget.anonymousReportIssueClicked();
-		verify(mockView).showAnonymousFlagModal();
+		
+		verify(mockView).showJiraIssueCollector(OWNER_ID, DisplayUtils.getDisplayName(FIRST_NAME, LAST_NAME, USERNAME), EMAIL, ENTITY_ID);
 	}
 	
 	@Test
