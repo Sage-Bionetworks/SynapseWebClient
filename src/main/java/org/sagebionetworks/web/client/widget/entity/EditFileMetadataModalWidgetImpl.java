@@ -12,13 +12,13 @@ import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 
+import com.google.common.base.Objects;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EditFileMetadataModalWidgetImpl implements EditFileMetadataModalView.Presenter, EditFileMetadataModalWidget {
 	public static final String FILE_NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER = "File name must include at least one character.";
-	public static final String CONTENT_TYPE_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER = "Content type must include at least one character.";
 	public static final String CURRENT_VERSION_ONLY_MESSAGE = "Metadata can only be modified on the most current version of the file.";
 	
 	EditFileMetadataModalView view;
@@ -90,8 +90,6 @@ public class EditFileMetadataModalWidgetImpl implements EditFileMetadataModalVie
 			view.showError(RenameEntityModalWidgetImpl.NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
 		} else if (getFileNameFromView() == null) {
 			view.showError(FILE_NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
-		} else if (getFileContentTypeFromView() == null) {
-			view.showError(CONTENT_TYPE_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
 		} else if (isFileHandleChange()) {
 			updateFileEntityFileHandle();
 		} else if (isEntityChange()) {
@@ -118,7 +116,7 @@ public class EditFileMetadataModalWidgetImpl implements EditFileMetadataModalVie
 	}
 	
 	private boolean isFileHandleChange() {
-		return !this.fileHandle.getFileName().equals(getFileNameFromView()) || !this.fileHandle.getContentType().equals(getFileContentTypeFromView());
+		return !this.fileHandle.getFileName().equals(getFileNameFromView()) || !Objects.equal(this.fileHandle.getContentType(), getFileContentTypeFromView());
 	}
 	
 	@Override

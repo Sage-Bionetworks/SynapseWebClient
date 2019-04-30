@@ -102,8 +102,9 @@ public class EditFileMetadataModalWidgetTest {
 		widget.configure(mockFileEntity, mockFileHandle, mockCallback);
 		when(mockView.getContentType()).thenReturn(null);
 		widget.onPrimary();
-		verify(mockView).showError(EditFileMetadataModalWidgetImpl.CONTENT_TYPE_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
-		verifyZeroInteractions(mockSynapseClient);
+		
+		// ok to clear out content type
+		verify(mockSynapseClient).updateFileEntity(any(FileEntity.class), any(FileHandleCopyRequest.class), any(AsyncCallback.class));
 		
 		// should only be called on success
 		verify(mockCallback, never()).invoke();
