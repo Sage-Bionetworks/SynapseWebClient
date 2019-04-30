@@ -144,7 +144,6 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			String userId = authenticationController.getCurrentUserPrincipalId();
 			fullUri = fullUri.replace(CURRENT_USER_SQL_VARIABLE, userId).replace(ENCODED_CURRENT_USER_SQL_VARIABLE, userId);
 		}
-		
 		if (isSubmissionQueryService(fullUri) && tableConfig.getColumnConfigs() != null && tableConfig.getColumnConfigs().size() > 0) {
 			// look for '*' in query.  if found, replace with columns defined in the table config
 			if (fullUri.contains("*")) {
@@ -209,18 +208,23 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 						tableConfig.setColumnConfigs(getDefaultColumnConfigs(columnNames, tableConfig));
 					}
 					
+					List<Integer> columnIndices = new ArrayList<>(); 
 					List<ApiTableColumnType> columnTypes = new ArrayList<>();
 					for (APITableColumnConfig config : tableConfig.getColumnConfigs()) {
 						String rendererName = config.getRendererFriendlyName();
 						columnTypes.add(getColumnType(rendererName));
+						String inputColumnName = config.getInputColumnNames().iterator().next();
+						columnIndices.add(columnNames.indexOf(inputColumnName));
 					}
 					view.clear();
 					view.setColumnHeaders(tableConfig.getColumnConfigs());
+
 					for (Row row : rows) {
 						List<IsWidget> columnWidgets = new ArrayList<>();
 						List<String> columnValues = row.getValues();
-						for (int i = 0; i < columnValues.size(); i++) {
-							String colValue = columnValues.get(i);
+						for (int i = 0; i < columnIndices.size(); i++) {
+							int index = columnIndices.get(i);
+							String colValue = columnValues.get(index);
 							columnWidgets.add(getNewCell(columnTypes.get(i), colValue));
 						}
 						view.addRow(columnWidgets);
