@@ -19,13 +19,11 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	
 	void showNoRestrictionsUI();
 	void showFlagUI();
-	void showAnonymousFlagUI();
 	void showChangeLink();
 	void showShowLink();
 	void showShowUnmetLink();
 	
-	void showFlagModal();
-	void showAnonymousFlagModal();
+	void showJiraIssueCollector(String principalId, String userDisplayName, String userEmailAddress, String synId);
 	void showVerifyDataSensitiveDialog();
 	
 	void setNotSensitiveHumanDataMessageVisible(boolean visible);
@@ -39,10 +37,7 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	 */
 	public interface Presenter {
 		void changeClicked();
-		void flagData();
-		void anonymousFlagModalOkClicked();
 		void reportIssueClicked();
-		void anonymousReportIssueClicked();
 		void imposeRestrictionOkClicked();
 		void imposeRestrictionCancelClicked();
 

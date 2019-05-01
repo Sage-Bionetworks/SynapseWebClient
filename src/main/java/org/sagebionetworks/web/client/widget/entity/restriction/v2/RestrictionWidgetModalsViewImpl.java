@@ -33,16 +33,6 @@ public class RestrictionWidgetModalsViewImpl implements IsWidget {
 	@UiField
 	Button imposeRestrictionCancelButton;
 	
-	@UiField
-	Modal flagModal;
-	@UiField
-	Button flagModalOkButton;
-	
-	@UiField
-	Modal anonymousFlagModal;
-	@UiField
-	Button anonymousFlagModalOkButton;
-	
 	Presenter presenter;
 	
 	Binder binder;
@@ -85,20 +75,6 @@ public class RestrictionWidgetModalsViewImpl implements IsWidget {
 				@Override
 				public void onClick(ClickEvent event) {
 					presenter.imposeRestrictionCancelClicked();
-				}
-			});
-			
-			flagModalOkButton.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.flagData();
-				}
-			});
-			
-			anonymousFlagModalOkButton.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.anonymousFlagModalOkClicked();
 				}
 			});
 		}
