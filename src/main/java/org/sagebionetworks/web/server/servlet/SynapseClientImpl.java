@@ -92,6 +92,7 @@ import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
+import org.sagebionetworks.repo.model.table.TransformSqlWithFacetsRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -103,7 +104,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.table.query.ParseException;
 import org.sagebionetworks.table.query.TableQueryParser;
-import org.sagebionetworks.table.query.util.TableSqlProcessor;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
@@ -1902,9 +1902,14 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	@Override
 	public String generateSqlWithFacets(String basicSql, List<FacetColumnRequest> selectedFacets, List<ColumnModel> schema) throws RestServiceException {
 		try {
-			return TableSqlProcessor.generateSqlWithFacets(basicSql, selectedFacets, schema);
-		} catch (Exception e) {
-			throw new BadRequestException(e.getMessage());
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			TransformSqlWithFacetsRequest request = new TransformSqlWithFacetsRequest();
+			request.setSqlToTransform(basicSql);
+			request.setSelectedFacets(selectedFacets);
+			request.setSchema(schema);
+			return synapseClient.transformSqlRequest(request);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 	
