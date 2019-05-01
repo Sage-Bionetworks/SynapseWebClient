@@ -5,21 +5,8 @@ import org.sagebionetworks.web.client.widget.WidgetEditorView;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface ShinySiteConfigView extends IsWidget, WidgetEditorView {
-
-	/**
-	 * Set the presenter.
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
-	
-	public void configure(String url, int height);
-	public String getSiteUrl();
-	public Integer getSiteHeight();
-	
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-
-	}
+	void configure(String url, int height, boolean isIncludePrincipalId);
+	String getSiteUrl();
+	Integer getSiteHeight();
+	Boolean isIncludePrincipalId();
 }
