@@ -36,12 +36,6 @@
 				<b:Anchor ui:field="reportIssueLink" text="report issue" />
 			</b:Tooltip>
 		</bh:Span>
-		<bh:Span ui:field="anonymousFlagUI">
-			<g:Image styleName="displayInline moveup-2 moveright-5" resource='{icons.flagSmall16}' />
-			<b:Tooltip placement="BOTTOM" title="Click here to learn more about flagging these data for review by the Synapse Access and Compliance Team">
-				<b:Anchor ui:field="anonymousReportIssueLink" text="report issue" />
-			</b:Tooltip>
-		</bh:Span>
 		<bh:Span ui:field="synAlertContainer" />
 		<bh:Div ui:field="folderRestrictionUI" visible="false" marginLeft="20">
 			<bh:Paragraph ui:field="folderRestrictedMessage" text="Use of the content of this folder requires agreement to additional terms." />

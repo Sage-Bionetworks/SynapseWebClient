@@ -11,19 +11,16 @@ import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.RestrictionLevel;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.footer.Footer;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -32,11 +29,8 @@ import com.google.inject.Inject;
 
 public class RestrictionWidget implements RestrictionWidgetView.Presenter, SynapseWidgetPresenter, IsWidget {
 	private AuthenticationController authenticationController;
-	private JiraURLHelper jiraURLHelper;
-	private GlobalApplicationState globalApplicationState;
 	private RestrictionWidgetView view;
 	private boolean showChangeLink, showIfProject, showFlagLink;
-	private String jiraFlagLink;
 	private Entity entity;
 	private boolean canChangePermissions;
 	private DataAccessClientAsync dataAccessClient;
@@ -47,16 +41,12 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	public RestrictionWidget(
 			RestrictionWidgetView view,
 			AuthenticationController authenticationController,
-			GlobalApplicationState globalApplicationState,
-			JiraURLHelper jiraURLHelper,
 			DataAccessClientAsync dataAccessClient,
 			SynapseAlert synAlert,
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
 			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.authenticationController = authenticationController;
-		this.globalApplicationState = globalApplicationState;
-		this.jiraURLHelper = jiraURLHelper;
 		this.dataAccessClient = dataAccessClient;
 		fixServiceEntryPoint(dataAccessClient);
 		this.synAlert = synAlert;
@@ -88,22 +78,8 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		view.showFolderRestrictionUI();
 	}
 	
-	public String getJiraFlagUrl() {
-		UserProfile userProfile = getUserProfile();
-		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
-		String primaryEmail = DisplayUtils.getPrimaryEmail(userProfile);
-		return jiraURLHelper.createFlagIssue(
-				primaryEmail, 
-				DisplayUtils.getDisplayName(userProfile), 
-				entity.getId());
-	}
-	
 	public boolean includeRestrictionWidget() {
 		return (entity instanceof FileEntity) || (entity instanceof TableEntity) || (entity instanceof Folder) || (showIfProject && entity instanceof Project);
-	}
-	
-	private UserProfile getUserProfile() {
-		return authenticationController.getCurrentUserProfile();
 	}
 	
 	public boolean isAnonymous() {
@@ -136,10 +112,8 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		boolean isAnonymous = isAnonymous();
 		boolean hasAdministrativeAccess = false;
 		
-		jiraFlagLink = null;
 		if (!isAnonymous) {
 			hasAdministrativeAccess = canChangePermissions;
-			jiraFlagLink = getJiraFlagUrl();
 		}
 		RestrictionLevel restrictionLevel = restrictionInformation.getRestrictionLevel();
 		
@@ -175,17 +149,8 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		}
 		
 		if (showFlagLink) {
-			if (isAnonymous)
-				view.showAnonymousFlagUI();
-			else
-				view.showFlagUI();
+			view.showFlagUI();
 		}
-	}
-	
-	
-	@Override
-	public void flagData() {
-		view.open(jiraFlagLink);
 	}
 	
 	@Override
@@ -221,22 +186,20 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	public void imposeRestrictionCancelClicked() {
 		view.setImposeRestrictionModalVisible(false);
 	}
-
-	@Override
-	public void anonymousFlagModalOkClicked() {
-		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
-	}
-
+	
 	@Override
 	public void reportIssueClicked() {
-		view.showFlagModal();
+		// report abuse via Jira issue collector
+		String userId = Footer.ANONYMOUS, email = Footer.ANONYMOUS, displayName = Footer.ANONYMOUS, synId = entity.getId();
+		UserProfile userProfile = authenticationController.getCurrentUserProfile();
+		if (userProfile != null) {
+			userId = userProfile.getOwnerId();
+			displayName = DisplayUtils.getDisplayName(userProfile);
+			email = DisplayUtils.getPrimaryEmail(userProfile);
+		}
+		
+		view.showJiraIssueCollector(userId, displayName, email, synId);
 	}
-	
-	@Override
-	public void anonymousReportIssueClicked() {
-		view.showAnonymousFlagModal();
-	}
-	
 	
 	@Override
 	public void notHumanDataClicked() {

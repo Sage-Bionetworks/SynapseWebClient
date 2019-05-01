@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
+import org.sagebionetworks.web.client.widget.footer.FooterViewImpl;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -52,11 +53,6 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	Anchor reportIssueLink;
 	
 	@UiField
-	Span anonymousFlagUI;
-	@UiField
-	Anchor anonymousReportIssueLink;
-	
-	@UiField
 	Div folderRestrictionUI;
 	@UiField
 	Paragraph folderRestrictedMessage;
@@ -100,13 +96,6 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.reportIssueClicked();
-			}
-		});
-		
-		anonymousReportIssueLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.anonymousReportIssueClicked();
 			}
 		});
 	}
@@ -168,10 +157,6 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	public void showFlagUI() {
 		flagUI.setVisible(true);
 	}
-	@Override
-	public void showAnonymousFlagUI() {
-		anonymousFlagUI.setVisible(true);
-	}
 	
 	@Override
 	public void showChangeLink() {
@@ -203,7 +188,6 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		noneUI.setVisible(false);
 		linkUI.setVisible(false);
 		flagUI.setVisible(false);
-		anonymousFlagUI.setVisible(false);
 		showLink.setVisible(false);
 		showUnmetLink.setVisible(false);
 		changeLink.setVisible(false);
@@ -213,17 +197,10 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	}
 	
 	@Override
-	public void showFlagModal() {
-		modals.lazyConstruct();
-		modals.flagModal.show();
+	public void showJiraIssueCollector(String principalId, String userDisplayName, String userEmailAddress, String synId) {
+		FooterViewImpl._showJiraIssueCollector(principalId, userDisplayName, userEmailAddress, synId, Window.Location.getHref());
 	}
-	
-	@Override
-	public void showAnonymousFlagModal() {
-		modals.lazyConstruct();
-		modals.anonymousFlagModal.show();
-	}
-	
+
 	@Override
 	public void setNotSensitiveHumanDataMessageVisible(boolean visible) {
 		modals.lazyConstruct();
