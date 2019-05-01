@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -14,12 +15,12 @@ import com.google.inject.Inject;
 
 public class ShinySiteConfigViewImpl implements ShinySiteConfigView {
 	public interface ShinySiteConfigViewImplUiBinder extends UiBinder<Widget, ShinySiteConfigViewImpl> {}
-	
-	private Presenter presenter;
 	@UiField
 	public TextBox urlField;
 	@UiField
 	public TextBox heightField;
+	@UiField
+	public CheckBox isIncludePrincipalIdField;
 	
 	Widget widget;
 	SynapseJSNIUtils jsniUtils;
@@ -59,9 +60,15 @@ public class ShinySiteConfigViewImpl implements ShinySiteConfigView {
 	}
 	
 	@Override
-	public void configure(String url, int height) {
+	public Boolean isIncludePrincipalId() {
+		return isIncludePrincipalIdField.getValue();
+	}
+	
+	@Override
+	public void configure(String url, int height, boolean isIncludePrincipalId) {
 		urlField.setValue(url);
 		heightField.setValue(String.valueOf(height));
+		isIncludePrincipalIdField.setValue(isIncludePrincipalId);
 	}
 	
 	@Override
@@ -69,11 +76,6 @@ public class ShinySiteConfigViewImpl implements ShinySiteConfigView {
 		return widget;
 	}	
 	
-	@Override 
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
-		
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
@@ -91,10 +93,4 @@ public class ShinySiteConfigViewImpl implements ShinySiteConfigView {
 	@Override
 	public void clear() {
 	}
-
-	
-	/*
-	 * Private Methods
-	 */
-
 }

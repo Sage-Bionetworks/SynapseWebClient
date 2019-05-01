@@ -42,7 +42,16 @@ public class ShinySiteConfigEditorTest {
 		descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, validSiteUrl);
 		descriptor.put(WidgetConstants.HEIGHT_KEY, "500");
 		editor.configure(wikiKey, descriptor, null);
-		verify(mockView).configure(validSiteUrl, 500);		
+		verify(mockView).configure(validSiteUrl, 500, false);
+	}
+	
+	@Test
+	public void testIncludePrincipalId() {
+		Map<String, String> descriptor = new HashMap<String, String>();
+		descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, validSiteUrl);
+		descriptor.put(WidgetConstants.INCLUDE_PRINCIPAL_ID_KEY, Boolean.TRUE.toString());
+		editor.configure(wikiKey, descriptor, null);
+		verify(mockView).configure(validSiteUrl, WidgetConstants.SHINYSITE_DEFAULT_HEIGHT_PX, true);
 	}
 
 	@Test
@@ -52,6 +61,7 @@ public class ShinySiteConfigEditorTest {
 		
 		when(mockView.getSiteUrl()).thenReturn(validSiteUrl);
 		when(mockView.getSiteHeight()).thenReturn(500);
+		when(mockView.isIncludePrincipalId()).thenReturn(true);
 
 		editor.updateDescriptorFromView();
 		verify(mockView).checkParams();
@@ -60,5 +70,6 @@ public class ShinySiteConfigEditorTest {
 		
 		assertEquals(validSiteUrl, descriptor.get(WidgetConstants.SHINYSITE_SITE_KEY));
 		assertEquals("500", descriptor.get(WidgetConstants.HEIGHT_KEY));
+		assertEquals(Boolean.TRUE.toString(), descriptor.get(WidgetConstants.INCLUDE_PRINCIPAL_ID_KEY));
 	}
 }

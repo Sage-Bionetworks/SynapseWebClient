@@ -11,14 +11,13 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-public class ShinySiteConfigEditor implements ShinySiteConfigView.Presenter, WidgetEditorPresenter {
+public class ShinySiteConfigEditor implements WidgetEditorPresenter {
 	
 	private ShinySiteConfigView view;
 	private Map<String, String> descriptor;
 	@Inject
 	public ShinySiteConfigEditor(ShinySiteConfigView view) {
 		this.view = view;
-		view.setPresenter(this);
 		view.initView();
 	}
 	@Override
@@ -26,8 +25,9 @@ public class ShinySiteConfigEditor implements ShinySiteConfigView.Presenter, Wid
 		descriptor = widgetDescriptor;
 		String siteUrl = descriptor.get(WidgetConstants.SHINYSITE_SITE_KEY);
 		int height = ShinySiteWidget.getHeightFromDescriptor(descriptor);
+		boolean isIncludePrincipalId = ShinySiteWidget.isIncludePrincipalId(descriptor);
 		if (siteUrl != null)
-			view.configure(siteUrl, height);
+			view.configure(siteUrl, height, isIncludePrincipalId);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -46,6 +46,7 @@ public class ShinySiteConfigEditor implements ShinySiteConfigView.Presenter, Wid
 		view.checkParams();
 		try{			
 			descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, view.getSiteUrl());
+			descriptor.put(WidgetConstants.INCLUDE_PRINCIPAL_ID_KEY, view.isIncludePrincipalId().toString());
 			if(view.getSiteHeight() != null) descriptor.put(WidgetConstants.HEIGHT_KEY, String.valueOf(view.getSiteHeight()));			
 		} catch (IllegalArgumentException e) {
 			view.showErrorMessage(e.getMessage());

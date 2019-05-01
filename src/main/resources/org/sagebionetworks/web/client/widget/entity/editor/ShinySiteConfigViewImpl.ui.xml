@@ -14,6 +14,9 @@
 				<b:FormLabel for="heightField">Display height (px)</b:FormLabel>
 				<b:TextBox ui:field="heightField" name="heightField" b:id="heightField" placeholder="400 (Default)" />
 			</b:FormGroup>
+			<b:FormGroup>
+				<b:CheckBox ui:field="isIncludePrincipalIdField" text="Pass the user's ID as a query parameter to the site?  (ie. https://sagebioapp.synapse.org/?principalId=12345)"/>
+			</b:FormGroup>
 		</b:FieldSet>
 	</bh:Div>
 </ui:UiBinder>
