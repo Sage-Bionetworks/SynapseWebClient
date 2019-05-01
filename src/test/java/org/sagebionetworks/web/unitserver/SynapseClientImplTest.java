@@ -45,14 +45,16 @@ import javax.servlet.http.HttpServletRequest;
 import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.internal.util.reflection.Whitebox;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.client.SynapseClient;
+import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
@@ -130,9 +132,11 @@ import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnValuesRequest;
 import org.sagebionetworks.repo.model.table.FacetType;
+import org.sagebionetworks.repo.model.table.SqlTransformRequest;
 import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
+import org.sagebionetworks.repo.model.table.TransformSqlWithFacetsRequest;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -167,14 +171,17 @@ import org.sagebionetworks.web.shared.users.PermissionLevel;
  * @author John
  * 
  */
+@RunWith(MockitoJUnitRunner.class)
 public class SynapseClientImplTest {
 	private static final String BANNER_2 = "Another Banner";
 	private static final String BANNER_1 = "Banner 1";
 	public static final String TEST_HOME_PAGE_BASE = "http://mysynapse.org/";
 	public static final String MY_USER_PROFILE_OWNER_ID = "MyOwnerID";
-	
+	@Mock
 	SynapseProvider mockSynapseProvider;
+	@Mock
 	TokenProvider mockTokenProvider;
+	@Mock
 	SynapseClient mockSynapse;
 	SynapseClientImpl synapseClient;
 	String entityId = "123";
@@ -196,13 +203,18 @@ public class SynapseClientImplTest {
 	WikiPage page;
 	V2WikiPage v2Page;
 	S3FileHandle handle;
+	@Mock
 	Evaluation mockEvaluation;
+	@Mock
 	UserSessionData mockUserSessionData;
+	@Mock
 	UserProfile mockUserProfile;
 	MembershipInvitation testInvitation;
 	@Mock
 	MembershipRequest mockMembershipRequest;
+	@Mock
 	PaginatedResults mockPaginatedMembershipRequest;
+	@Mock
 	Activity mockActivity;
 
 	MessageToUser sentMessage;
@@ -269,24 +281,17 @@ public class SynapseClientImplTest {
 	private static final String EVAL_ID_1 = "eval ID 1";
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	private TeamMembershipStatus membershipStatus;
-	
 	@Mock
 	ThreadLocal<HttpServletRequest> mockThreadLocal;
-	
 	@Mock 
 	HttpServletRequest mockRequest;
-	
+	@Captor
+	ArgumentCaptor<SqlTransformRequest> sqlTransformRequestCaptor;
 	String userIp = "127.0.0.1";
 
 	@Before
 	public void before() throws SynapseException, JSONObjectAdapterException {
-		MockitoAnnotations.initMocks(this);
-		mockSynapse = Mockito.mock(SynapseClient.class);
-		mockSynapseProvider = Mockito.mock(SynapseProvider.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
-		mockTokenProvider = Mockito.mock(TokenProvider.class);
-		mockPaginatedMembershipRequest = Mockito.mock(PaginatedResults.class);
-		mockActivity = Mockito.mock(Activity.class);
 		when(mockPaginatedMembershipRequest.getTotalNumberOfResults()).thenReturn(3L);
 		synapseClient = new SynapseClientImpl();
 		synapseClient.setSynapseProvider(mockSynapseProvider);
@@ -444,11 +449,8 @@ public class SynapseClientImplTest {
 						any(RestrictableObjectDescriptor.class),
 						any(ACCESS_TYPE.class), anyLong(), anyLong())).thenReturn(ars);
 
-		mockEvaluation = Mockito.mock(Evaluation.class);
 		when(mockEvaluation.getStatus()).thenReturn(EvaluationStatus.OPEN);
 		when(mockSynapse.getEvaluation(anyString())).thenReturn(mockEvaluation);
-		mockUserSessionData = Mockito.mock(UserSessionData.class);
-		mockUserProfile = Mockito.mock(UserProfile.class);
 		when(mockSynapse.getUserSessionData()).thenReturn(mockUserSessionData);
 		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
 		when(mockUserProfile.getOwnerId()).thenReturn(MY_USER_PROFILE_OWNER_ID);
@@ -1867,12 +1869,15 @@ public class SynapseClientImplTest {
 	
 	@Test(expected = BadRequestException.class)
 	public void testGenerateSqlWithFacetsError() throws RestServiceException, SynapseException {
+		when(mockSynapse.transformSqlRequest(any(SqlTransformRequest.class))).thenThrow(new SynapseBadRequestException());
 		synapseClient.generateSqlWithFacets(null, null, null);
 	}
 	
 	@Test
 	public void testGenerateSqlWithFacets() throws RestServiceException, SynapseException {
 		String sql = "select * from syn123";
+		String expectedTransformedSql = "SELECT * FROM syn123 WHERE ( ( \"col1\" = 'a' ) )";
+		when(mockSynapse.transformSqlRequest(any(SqlTransformRequest.class))).thenReturn(expectedTransformedSql);
 		FacetColumnRequest request = new FacetColumnValuesRequest();
 		String columnName = "col1";
 		String facetValue = "a";
@@ -1883,8 +1888,15 @@ public class SynapseClientImplTest {
 		((FacetColumnValuesRequest)request).setFacetValues(Collections.singleton(facetValue));
 		List<FacetColumnRequest> selectedFacets = Collections.singletonList(request);
 		List<ColumnModel> schema = Collections.singletonList(mockNewColumnModel);
+		
 		String newSql = synapseClient.generateSqlWithFacets(sql, selectedFacets, schema);
-		assertEquals("SELECT * FROM syn123 WHERE ( ( \"col1\" = 'a' ) )", newSql);
+		
+		verify(mockSynapse).transformSqlRequest(sqlTransformRequestCaptor.capture());
+		assertEquals(expectedTransformedSql, newSql);
+		TransformSqlWithFacetsRequest transformRequest = (TransformSqlWithFacetsRequest)sqlTransformRequestCaptor.getValue();
+		assertEquals(sql, transformRequest.getSqlToTransform());
+		assertEquals(selectedFacets, transformRequest.getSelectedFacets());
+		assertEquals(schema, transformRequest.getSchema());
 	}
 
 	@Test
