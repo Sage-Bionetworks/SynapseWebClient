@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import static org.sagebionetworks.web.client.DisplayUtils.trim;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import java.util.List;
@@ -91,23 +92,23 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 				//if null, then still show the default UI
 				if (location != null) {
 					//set up the view
-					String banner = location.getBanner() != null ? location.getBanner().trim() : "";
+					String banner = trim(location.getBanner());
 					if (location instanceof ExternalS3StorageLocationSetting) {
 						ExternalS3StorageLocationSetting setting = (ExternalS3StorageLocationSetting) location;
-						view.setBaseKey(setting.getBaseKey().trim());
-						view.setBucket(setting.getBucket().trim());
+						view.setBaseKey(trim(setting.getBaseKey()));
+						view.setBucket(trim(setting.getBucket()));
 						view.setExternalS3Banner(banner);
 						view.selectExternalS3Storage();
 					} else if (location instanceof ExternalObjectStorageLocationSetting) {
 						ExternalObjectStorageLocationSetting setting = (ExternalObjectStorageLocationSetting) location;
 						view.setExternalObjectStoreBanner(banner);
-						view.setExternalObjectStoreBucket(setting.getBucket().trim());
-						view.setExternalObjectStoreEndpointUrl(setting.getEndpointUrl().trim());
+						view.setExternalObjectStoreBucket(trim(setting.getBucket()));
+						view.setExternalObjectStoreEndpointUrl(trim(setting.getEndpointUrl()));
 						view.selectExternalObjectStore();
 					} else if (location instanceof ExternalStorageLocationSetting) {
 						view.setSFTPVisible(true);
 						ExternalStorageLocationSetting setting= (ExternalStorageLocationSetting) location;
-						view.setSFTPUrl(setting.getUrl().trim());
+						view.setSFTPUrl(trim(setting.getUrl()));
 						view.setSFTPBanner(banner);
 						view.selectSFTPStorage();
 					}
