@@ -56,7 +56,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ProfilePresenter extends AbstractActivity implements ProfileView.Presenter, Presenter<Profile> {
-	public static final int DELAY_GET_MY_TEAMS = 300;
+	public static final int DELAY_GET_MY_TEAMS = 10;
 	public static final String USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.validation.message.visible.state";
 	
 	public static int PROFILE = 0x1;
@@ -82,7 +82,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private boolean isOwner;
 	private int currentProjectOffset, currentChallengeOffset;
 	private String teamNextPageToken;
-	private boolean isRefreshingTeamsWidget;
+	private boolean isRefreshingTeamsTab;
 	public final static int PROJECT_PAGE_SIZE=20;
 	public final static int CHALLENGE_PAGE_SIZE=20;
 	public ProfileArea currentArea;
@@ -390,7 +390,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void refreshTeamsForFilter() {
 		updateMembershipInvitationCount();
 		updateMembershipRequestCount();
-		isRefreshingTeamsWidget = false;
+		isRefreshingTeamsTab = false;
 		view.addMyTeamProjectsFilter();
 		getTeamBundles();
 	}
@@ -400,7 +400,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		updateMembershipInvitationCount();
 		updateMembershipRequestCount();
 		refreshTeamInvites();
-		isRefreshingTeamsWidget = true;
+		isRefreshingTeamsTab = true;
 		getTeamBundles();
 	}
 	
@@ -454,7 +454,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		teamSynAlert.clear();
 		teamNextPageToken = null;
 		
-		if (isRefreshingTeamsWidget) {
+		if (isRefreshingTeamsTab) {
 			myTeamsWidget.clear();
 			loadMoreTeamsWidgetContainer = ginInjector.getLoadMoreProjectsWidgetContainer();
 			view.setTeamsContainer(loadMoreTeamsWidgetContainer.asWidget());
@@ -481,7 +481,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 						List<String> teamIds = paginatedTeamIds.getTeamIds();
 						boolean isTeams = teamIds.size() > 0;
 						
-						if (isRefreshingTeamsWidget) {
+						if (isRefreshingTeamsTab) {
 							if (isFirstPage && !isTeams) {
 								myTeamsWidget.showEmpty();
 							}
@@ -497,7 +497,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					public void onFailure(Throwable caught) {
 						view.setTeamsFilterVisible(false);
 						teamSynAlert.handleException(caught);
-						if (isRefreshingTeamsWidget) {
+						if (isRefreshingTeamsTab) {
 							loadMoreTeamsWidgetContainer.setIsMore(false);	
 						}
 					}
@@ -512,7 +512,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				new FutureCallback<List<Team>>() {
 					@Override
 					public void onSuccess(List<Team> teams) {
-						if (isRefreshingTeamsWidget) {
+						if (isRefreshingTeamsTab) {
 							for (Team team: teams) {
 								myTeamsWidget.addTeam(team);
 							}
@@ -537,7 +537,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					public void onFailure(Throwable caught) {
 						view.setTeamsFilterVisible(false);
 						teamSynAlert.handleException(caught);
-						if (isRefreshingTeamsWidget) {
+						if (isRefreshingTeamsTab) {
 							loadMoreTeamsWidgetContainer.setIsMore(false);
 						}
 					}
