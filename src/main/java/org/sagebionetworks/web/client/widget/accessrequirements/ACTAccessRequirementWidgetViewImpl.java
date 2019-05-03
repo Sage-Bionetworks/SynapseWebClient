@@ -154,7 +154,7 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 					customfield_10740: principalId,
 					customfield_10741: userDisplayName,
 					fullname: userDisplayName,
-					components: componentId // Data Access Request Component ID, a component added to the Jira Governance Project 
+					components: componentId 
 				}};
 		} catch (err) {
 			console.error(err);
