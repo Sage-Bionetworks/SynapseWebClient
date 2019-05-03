@@ -3,38 +3,19 @@ package org.sagebionetworks.web.unitclient;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.DisplayUtils.trim;
 
 import java.util.Arrays;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.place.Down;
-import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
-import org.sagebionetworks.web.shared.exceptions.BadRequestException;
-import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
-import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 
 public class DisplayUtilsTest {
 	
@@ -332,10 +313,12 @@ public class DisplayUtilsTest {
 		assertEquals("F", DisplayUtils.capitalize("f"));
 		assertEquals("Hello", DisplayUtils.capitalize("heLLO"));
 	}
+	
+	@Test
+	public void testTrim() {
+		assertEquals("", trim(null));
+		assertEquals("", trim(" \t"));
+		assertEquals("test", trim("  test     \t"));
+	}
 }
-
-
-
-
-
 
