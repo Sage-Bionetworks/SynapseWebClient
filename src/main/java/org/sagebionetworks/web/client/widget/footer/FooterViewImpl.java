@@ -24,13 +24,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class FooterViewImpl implements FooterView {
-	
-	// These IDs refer to Jira Components created in the Sage Bionetworks Jira Cloud instance in the Governance Project.
-	public static final String REVIEW_ABUSIVE_CONTENT_REQUEST_COMPONENT_ID = "14868";
-//	public static final String DATA_RESTRICTION_REQUEST_COMPONENT_ID = "14865";
-	public static final String REVIEW_DATA_REQUEST_COMPONENT_ID = "14869";
-	public static final String GRANT_ACCESS_REQUEST_COMPONENT_ID = "14866";
-
 	public interface Binder extends UiBinder<Widget, FooterViewImpl> {
 	}
 	@UiField
@@ -142,43 +135,4 @@ public class FooterViewImpl implements FooterView {
 			debugLink.setVisible(!isTestMode);	
 		}
 	}
-	
-
-	@Override
-	public void showJiraIssueCollector(String principalId, String userDisplayName, String userEmailAddress) {
-		_showJiraIssueCollector(principalId, userDisplayName, userEmailAddress, "", Window.Location.getHref(), REVIEW_ABUSIVE_CONTENT_REQUEST_COMPONENT_ID);
-	}
-	
-	public static native void _showJiraIssueCollector(
-			String principalId, String userDisplayName, String userEmailAddress, String synapseDataObjectId, String url, String componentID) /*-{
-		try {
-			// Requires jQuery!
-			$wnd.jQuery.ajax({
-				url: "https://sagebionetworks.jira.com/s/d41d8cd98f00b204e9800998ecf8427e-T/g39zuk/b/41/e73395c53c3b10fde2303f4bf74ffbf6/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector-embededjs/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector-embededjs.js?locale=en-US&collectorId=d0abcfa9",
-				type: "get",
-				cache: true,
-				dataType: "script"
-			});
-			
-			$wnd.ATL_JQ_PAGE_PROPS =  {
-				"triggerFunction": function(showCollectorDialog) {
-					showCollectorDialog();
-				},
-				
-				"fieldValues": {
-			 		summary : '',
-					description : 'Reporting this page: ' + url + ' \n\nUser is reporting to the Synapse team that this page is in violation (for example: abusive or harmful content, spam, inappropriate ads), or this data is posted inappropriately or should have different access conditions.',
-					priority : '3',
-					customfield_10840: userEmailAddress,
-					email: userEmailAddress,
-					customfield_10740: principalId,
-					customfield_10741: userDisplayName,
-					customfield_10742: synapseDataObjectId,
-					fullname: userDisplayName,
-					components: componentID // Component ID of the component added to the Jira Governance Project
-				}};
-		} catch (err) {
-			console.error(err);
-		}
-	}-*/;
 }

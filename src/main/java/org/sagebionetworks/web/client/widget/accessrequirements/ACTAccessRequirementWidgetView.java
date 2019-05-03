@@ -31,7 +31,6 @@ public interface ACTAccessRequirementWidgetView extends IsWidget, SupportsLazyLo
 	void setManageAccessWidget(IsWidget w);
 	void setConvertAccessRequirementWidget(IsWidget w);
 	void showLoginButton();
-	void showJiraIssueCollector(String principalId, String userDisplayName, String userEmailAddress, String dataObjectId, String accessRequirementId);
 	
 	/**
 	 * Presenter interface

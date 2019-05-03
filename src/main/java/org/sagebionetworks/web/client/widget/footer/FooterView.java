@@ -17,7 +17,6 @@ public interface FooterView extends IsWidget {
 	public interface Presenter {
 		void onReportAbuseClicked();
 	}
-
 	/**
 	 * 
 	 * @param portalVersion
@@ -26,5 +25,4 @@ public interface FooterView extends IsWidget {
 	void setVersion(String portalVersion, String repoVersion);
 	void open(String url);
 	void refresh();
-	void showJiraIssueCollector(String principalId, String userDisplayName, String userEmailAddress);
 }

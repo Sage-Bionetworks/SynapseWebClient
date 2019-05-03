@@ -1,6 +1,11 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+import static org.sagebionetworks.web.shared.WebConstants.GRANT_ACCESS_REQUEST_COMPONENT_ID;
+import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_ISSUE_COLLECTOR_URL;
+import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_ISSUE_DESCRIPTION;
+import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_ISSUE_SUMMARY;
+import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_PRIORITY;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -10,6 +15,7 @@ import org.sagebionetworks.repo.model.dataaccess.BasicAccessRequirementStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -40,6 +46,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	AuthenticationController authController;
 	ReviewAccessorsButton manageAccessButton;
 	ConvertACTAccessRequirementButton convertACTAccessRequirementButton;
+	SynapseJSNIUtils jsniUtils;
 	
 	@Inject
 	public ACTAccessRequirementWidget(ACTAccessRequirementWidgetView view, 
@@ -54,7 +61,8 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			LazyLoadHelper lazyLoadHelper,
 			AuthenticationController authController,
 			ReviewAccessorsButton manageAccessButton,
-			ConvertACTAccessRequirementButton convertACTAccessRequirementButton) {
+			ConvertACTAccessRequirementButton convertACTAccessRequirementButton,
+			SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.jsClient = jsClient;
 		this.synAlert = synAlert;
@@ -69,6 +77,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		this.authController = authController;
 		this.manageAccessButton = manageAccessButton;
 		this.convertACTAccessRequirementButton = convertACTAccessRequirementButton;
+		this.jsniUtils = jsniUtils;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
@@ -130,11 +139,17 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		UserProfile userProfile = authController.getCurrentUserProfile();
 		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
 		String primaryEmail = DisplayUtils.getPrimaryEmail(userProfile);
-		view.showJiraIssueCollector(userProfile.getOwnerId(), 
-				DisplayUtils.getDisplayName(userProfile), 
-				primaryEmail, 
-				ar.getSubjectIds().get(0).getId(), 
-				ar.getId().toString());	
+		jsniUtils.showJiraIssueCollector(
+				REQUEST_ACCESS_ISSUE_SUMMARY,
+				REQUEST_ACCESS_ISSUE_DESCRIPTION,
+				REQUEST_ACCESS_ISSUE_COLLECTOR_URL,
+				userProfile.getOwnerId(),
+				DisplayUtils.getDisplayName(userProfile),
+				primaryEmail,
+				ar.getSubjectIds().get(0).getId(),
+				GRANT_ACCESS_REQUEST_COMPONENT_ID,
+				ar.getId().toString(),
+				REQUEST_ACCESS_PRIORITY);
 	}
 	
 	public void showApproved() {

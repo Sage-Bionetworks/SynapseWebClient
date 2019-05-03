@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.footer.FooterView;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -86,6 +87,6 @@ public class FooterTest {
 	public void testOnReportAbuseAnonymous() {
 		//current user profile is null
 		footer.onReportAbuseClicked();
-		verify(mockView).showJiraIssueCollector(ANONYMOUS, ANONYMOUS, ANONYMOUS);
+		verify(mockView).showJiraIssueCollector(WebConstants.ANONYMOUS, WebConstants.ANONYMOUS, WebConstants.ANONYMOUS);
 	}
 }
