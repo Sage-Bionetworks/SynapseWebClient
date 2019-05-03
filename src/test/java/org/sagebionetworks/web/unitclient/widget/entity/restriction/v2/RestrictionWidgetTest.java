@@ -1,53 +1,50 @@
 package org.sagebionetworks.web.unitclient.widget.entity.restriction.v2;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_COLLECTOR_URL;
+import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_1;
+import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_PRIORITY;
+import static org.sagebionetworks.web.shared.WebConstants.REVIEW_DATA_REQUEST_COMPONENT_ID;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.RestrictionLevel;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidgetView;
-import org.sagebionetworks.web.client.widget.footer.Footer;
-import org.sagebionetworks.web.client.widget.footer.VersionState;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class RestrictionWidgetTest {
-
 	RestrictionWidget widget;
 	@Mock
 	AuthenticationController mockAuthenticationController;
@@ -70,23 +67,29 @@ public class RestrictionWidgetTest {
 	public static final String ENTITY_ID = "syn762";
 	@Mock
 	UserProfile mockUserProfile;
-	
+	@Mock
+	GWTWrapper mockGwt;
+	@Mock
+	SynapseJSNIUtils mockJsniUtils;
+
 	public static final String OWNER_ID = "282711";
 	public static final String FIRST_NAME = "Bob";
 	public static final String LAST_NAME = "Vance";
 	public static final String USERNAME = "bvance";
 	public static final String EMAIL = "bob@vancerefrigeration.com";
+	public static final String CURRENT_URL = "https://www.synapse.org/review-my-data";
 	
 	@Before
 	public void before() {
-		MockitoAnnotations.initMocks(this);
 		widget = new RestrictionWidget(
 				mockView, 
 				mockAuthenticationController, 
 				mockDataAccessClient, 
 				mockSynAlert, 
 				mockIsACTMemberAsyncHandler,
-				mockSynapseJavascriptClient);
+				mockSynapseJavascriptClient,
+				mockGwt,
+				mockJsniUtils);
 		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(mockUserProfile);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(mockRestrictionInformation).when(mockSynapseJavascriptClient).getRestrictionInformation(anyString(), any(RestrictableObjectType.class), any(AsyncCallback.class));
@@ -96,6 +99,7 @@ public class RestrictionWidgetTest {
 		when(mockUserProfile.getLastName()).thenReturn(LAST_NAME);
 		when(mockUserProfile.getUserName()).thenReturn(USERNAME);
 		when(mockUserProfile.getOwnerId()).thenReturn(OWNER_ID);
+		when(mockGwt.getCurrentURL()).thenReturn(CURRENT_URL);
 	}
 	
 	private void verifyIsACTMember(boolean isACT) {
@@ -290,8 +294,19 @@ public class RestrictionWidgetTest {
 		widget.configure(mockEntity, true);
 		
 		widget.reportIssueClicked();
-		
-		verify(mockView).showJiraIssueCollector(OWNER_ID, DisplayUtils.getDisplayName(FIRST_NAME, LAST_NAME, USERNAME), EMAIL, ENTITY_ID);
+		verify(mockJsniUtils).showJiraIssueCollector(
+				"", //summary
+				FLAG_ISSUE_DESCRIPTION_PART_1 +
+					CURRENT_URL + 
+					WebConstants.FLAG_ISSUE_DESCRIPTION_PART_2, //description
+				FLAG_ISSUE_COLLECTOR_URL,
+				OWNER_ID,
+				DisplayUtils.getDisplayName(FIRST_NAME, LAST_NAME, USERNAME),
+				EMAIL,
+				ENTITY_ID, //Synapse data object ID
+				REVIEW_DATA_REQUEST_COMPONENT_ID,
+				null, //Access requirement ID
+				FLAG_ISSUE_PRIORITY);
 	}
 	
 	@Test
