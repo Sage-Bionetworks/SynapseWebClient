@@ -301,4 +301,25 @@ public class WebConstants {
 	
 	//View mask constants
 	public static final int FILE = 0x01, PROJECT=0x02, TABLE=0x04, FOLDER=0x08, VIEW=0x10, DOCKER=0x20;
+	
+	/**
+	 * Jira Issue Creation constants
+	 */
+	// These IDs refer to Jira Components created in the Sage Bionetworks Jira Cloud instance in the Governance Project.
+	public static final String REVIEW_ABUSIVE_CONTENT_REQUEST_COMPONENT_ID = "14868";
+//	public static final String DATA_RESTRICTION_REQUEST_COMPONENT_ID = "14865";
+	public static final String REVIEW_DATA_REQUEST_COMPONENT_ID = "14869";
+	public static final String GRANT_ACCESS_REQUEST_COMPONENT_ID = "14866";
+	//flag issue
+	public static final String FLAG_ISSUE_COLLECTOR_URL = "https://sagebionetworks.jira.com/s/d41d8cd98f00b204e9800998ecf8427e-T/g39zuk/b/41/e73395c53c3b10fde2303f4bf74ffbf6/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector-embededjs/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector-embededjs.js?locale=en-US&collectorId=d0abcfa9";
+	public static final String FLAG_ISSUE_PRIORITY = "3";
+	public static final String FLAG_ISSUE_DESCRIPTION_PART_1 = "Reporting this page: ";
+	public static final String FLAG_ISSUE_DESCRIPTION_PART_2 = " \n\nUser is reporting to the Synapse team that this page is in violation (for example: abusive or harmful content, spam, inappropriate ads), or this data is posted inappropriately or should have different access conditions.";
+	//request access
+	public static final String REQUEST_ACCESS_ISSUE_COLLECTOR_URL = "https://sagebionetworks.jira.com/s/d41d8cd98f00b204e9800998ecf8427e-T/-2rg9hj/b/25/e73395c53c3b10fde2303f4bf74ffbf6/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector-embededjs/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector-embededjs.js?locale=en-US&collectorId=bd4dc1e5";
+	public static final String REQUEST_ACCESS_ISSUE_SUMMARY = "Request for ACT to grant access to data";
+	public static final String REQUEST_ACCESS_ISSUE_DESCRIPTION = "User requests that the Synapse Access and Compliance Team send them information on how to access this data.";
+	public static final String REQUEST_ACCESS_PRIORITY = "4";
+	public static final String ANONYMOUS = "Anonymous";
+
 }

@@ -6,16 +6,22 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.shared.WebConstants.GRANT_ACCESS_REQUEST_COMPONENT_ID;
+import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_ISSUE_COLLECTOR_URL;
+import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_ISSUE_DESCRIPTION;
+import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_ISSUE_SUMMARY;
+import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_PRIORITY;
 
 import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -24,6 +30,7 @@ import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -35,7 +42,6 @@ import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequ
 import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessorsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
@@ -47,6 +53,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ACTAccessRequirementWidgetTest {
 	public static final String SUBJECT_OBJECT_ID = "syn981612";
 	public static final Long ACCESS_REQUIREMENT_ID = 7654L;
@@ -103,13 +110,14 @@ public class ACTAccessRequirementWidgetTest {
 	Callback mockRefreshCallback;
 	@Mock
 	RestrictableObjectDescriptor mockRestrictableObjectDescriptor;
+	@Mock
+	SynapseJSNIUtils mockJsniUtils;
 	Callback lazyLoadDataCallback;
 	
 	public final static String ROOT_WIKI_ID = "777";
 	
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
 		widget = new ACTAccessRequirementWidget(
 				mockView, 
 				mockJsClient, 
@@ -123,7 +131,8 @@ public class ACTAccessRequirementWidgetTest {
 				mockLazyLoadHelper, 
 				mockAuthController, 
 				mockManageAccessButton,
-				mockConvertACTAccessRequirementButton);
+				mockConvertACTAccessRequirementButton,
+				mockJsniUtils);
 		when(mockGinInjector.getCreateDataAccessRequestWizard()).thenReturn(mockCreateDataAccessRequestWizard);
 		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockJsClient).getRootWikiPageKey(anyString(), anyString(), any(AsyncCallback.class));
@@ -227,6 +236,17 @@ public class ACTAccessRequirementWidgetTest {
 		
 		widget.onRequestAccess();
 		
-		verify(mockView).showJiraIssueCollector(USER_ID, DisplayUtils.getDisplayName(FIRST_NAME, LAST_NAME, USERNAME), USER_EMAIL, SUBJECT_OBJECT_ID, ACCESS_REQUIREMENT_ID.toString());
+		verify(mockJsniUtils).showJiraIssueCollector(
+				REQUEST_ACCESS_ISSUE_SUMMARY,
+				REQUEST_ACCESS_ISSUE_DESCRIPTION,
+				REQUEST_ACCESS_ISSUE_COLLECTOR_URL,
+				USER_ID,
+				DisplayUtils.getDisplayName(FIRST_NAME, LAST_NAME, USERNAME),
+				USER_EMAIL,
+				SUBJECT_OBJECT_ID,
+				GRANT_ACCESS_REQUEST_COMPONENT_ID,
+				ACCESS_REQUIREMENT_ID.toString(),
+				REQUEST_ACCESS_PRIORITY
+				);
 	}
 }

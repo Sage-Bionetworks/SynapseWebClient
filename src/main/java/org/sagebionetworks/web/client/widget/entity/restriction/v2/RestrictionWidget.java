@@ -1,6 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.restriction.v2;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_COLLECTOR_URL;
+import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_1;
+import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_2;
+import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_PRIORITY;
+import static org.sagebionetworks.web.shared.WebConstants.REVIEW_DATA_REQUEST_COMPONENT_ID;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -13,6 +18,8 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -20,7 +27,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.footer.Footer;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -37,6 +44,9 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	private SynapseAlert synAlert;
 	private IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	private SynapseJavascriptClient jsClient;
+	GWTWrapper gwt;
+	SynapseJSNIUtils jsniUtils;
+
 	@Inject
 	public RestrictionWidget(
 			RestrictionWidgetView view,
@@ -44,7 +54,10 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			DataAccessClientAsync dataAccessClient,
 			SynapseAlert synAlert,
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
-			SynapseJavascriptClient jsClient) {
+			SynapseJavascriptClient jsClient,
+			GWTWrapper gwt,
+			SynapseJSNIUtils jsniUtils
+) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.dataAccessClient = dataAccessClient;
@@ -52,6 +65,8 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		this.synAlert = synAlert;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.jsClient = jsClient;
+		this.gwt = gwt;
+		this.jsniUtils = jsniUtils;
 		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
 	}
@@ -190,7 +205,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	@Override
 	public void reportIssueClicked() {
 		// report abuse via Jira issue collector
-		String userId = Footer.ANONYMOUS, email = Footer.ANONYMOUS, displayName = Footer.ANONYMOUS, synId = entity.getId();
+		String userId = WebConstants.ANONYMOUS, email = WebConstants.ANONYMOUS, displayName = WebConstants.ANONYMOUS, synId = entity.getId();
 		UserProfile userProfile = authenticationController.getCurrentUserProfile();
 		if (userProfile != null) {
 			userId = userProfile.getOwnerId();
@@ -198,7 +213,17 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			email = DisplayUtils.getPrimaryEmail(userProfile);
 		}
 		
-		view.showJiraIssueCollector(userId, displayName, email, synId);
+		jsniUtils.showJiraIssueCollector(
+				"", // summary
+				FLAG_ISSUE_DESCRIPTION_PART_1 + gwt.getCurrentURL() + FLAG_ISSUE_DESCRIPTION_PART_2,
+				FLAG_ISSUE_COLLECTOR_URL,
+				userId,
+				displayName,
+				email,
+				synId, // Synapse data object ID 
+				REVIEW_DATA_REQUEST_COMPONENT_ID,
+				null, //AR ID
+				FLAG_ISSUE_PRIORITY);
 	}
 	
 	@Override

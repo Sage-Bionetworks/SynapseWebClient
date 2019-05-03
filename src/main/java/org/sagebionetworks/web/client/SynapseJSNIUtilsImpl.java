@@ -771,4 +771,52 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	public final static native void _unmountComponentAtNode(Element el) /*-{
 		return $wnd.ReactDOM.unmountComponentAtNode(el);
 	}-*/;
+	
+	@Override
+	public void showJiraIssueCollector(
+			String issueSummary, 
+			String issueDescription,
+			String jiraIssueCollectorURL,
+			String principalId,
+			String userDisplayName, 
+			String userEmailAddress, 
+			String synapseDataObjectId, 
+			String componentID, 
+			String accessRequirementId, 
+			String issuePriority) {
+		_showJiraIssueCollector(issueSummary, issueDescription, jiraIssueCollectorURL, principalId, userDisplayName, userEmailAddress, synapseDataObjectId, componentID, accessRequirementId, issuePriority);
+	}
+	public static native void _showJiraIssueCollector(String issueSummary, String issueDescription,
+			String jiraIssueCollectorURL, String principalId, String userDisplayName, String userEmailAddress, String synapseDataObjectId, String componentID, String accessRequirementId, String issuePriority) /*-{
+		try {
+			// Requires jQuery!
+			$wnd.jQuery.ajax({
+				url: jiraIssueCollectorURL,
+				type: "get",
+				cache: true,
+				dataType: "script"
+			});
+			
+			$wnd.ATL_JQ_PAGE_PROPS =  {
+				"triggerFunction": function(showCollectorDialog) {
+					showCollectorDialog();
+				},
+				
+				"fieldValues": {
+			 		summary : issueSummary,
+					description : issueDescription,
+					priority : issuePriority,
+					customfield_10840: userEmailAddress,
+					email: userEmailAddress,
+					customfield_10841: accessRequirementId,
+					customfield_10740: principalId,
+					customfield_10741: userDisplayName,
+					customfield_10742: synapseDataObjectId,
+					fullname: userDisplayName,
+					components: componentID // Component ID of the component added to the Jira Governance Project
+				}};
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
 }

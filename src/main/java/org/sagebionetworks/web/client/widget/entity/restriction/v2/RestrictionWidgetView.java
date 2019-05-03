@@ -23,7 +23,6 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	void showShowLink();
 	void showShowUnmetLink();
 	
-	void showJiraIssueCollector(String principalId, String userDisplayName, String userEmailAddress, String synId);
 	void showVerifyDataSensitiveDialog();
 	
 	void setNotSensitiveHumanDataMessageVisible(boolean visible);
