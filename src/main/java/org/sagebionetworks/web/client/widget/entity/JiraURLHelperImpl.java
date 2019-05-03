@@ -41,24 +41,6 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 	
 	private static final String CREATE_JIRA_ISSUE_URI = "/secure/CreateIssueDetails!init.jspa";
 	private static final String ISSUE_FIELD_DESCRIPTION = "description";
-	
-	private static final String FLAG_ISSUE_SUMMARY = "Request for ACT to review data";
-	private static final String ACCESS_RESTRCTION_ISSUE_SUMMARY = "Request for ACT to add data restriction";
-	private static final String ACCESS_REQUEST_ISSUE_SUMMARY = "Request for ACT to grant access to data";
-	private static final String ACCESS_REQUEST_REVOKE_ISSUE_SUMMARY = "Request for ACT to revoke access to data";
-	
-	private static final String DEFAULT_FLAG_DESCRIPTION = "By creating this issue, I wish to alert "+
-	"the Synapse Access and Compliance Team that this data is posted inappropriately because...";
-	private static final String DEFAULT_RESTRICTION_DESCRIPTION = "By clicking 'Create' below, I request that the Synapse ACT contact me "+
-		"to assign the appropriate access restrictions for this dataset.";
-	
-	private static final String DEFAULT_ACCESS_DESCRIPTION = "By clicking 'Create', below, I request that the Synapse Access "+
-		"and Compliance Team contact me with further information on how to access this data.";
-	
-	private static final String DEFAULT_REVOKE_ACCESS_DESCRIPTION = "By creating this issue, I request that the Synapse Access "+
-			"and Compliance Team revoke access to this dataset.\n"
-			+ "Please provide the list of Synapse users who should no longer have access:\n\n\n\n\n\n\n\n";
-	
 	/**
 	 * properties used in the interface to Jira for Governance
 	 * 
@@ -76,9 +58,6 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 	public static String MAJOR_PRIORITY = "org.sagebionetworks.jira.governance.major.priority"; 
 
 	private static String confluence_endpoint;
-	private static int flag_issue_type;
-	private static int access_restriction_type;
-	private static int access_request_issue_type;
 	private static String default_issue_reporter;
 	private static String issue_field_principal_id;
 	private static String issue_field_user_display_name;
@@ -87,7 +66,6 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 	private static String issue_field_access_requirement_object_id;
 	private static int major_priority; 
 
-	private int jiraProjectId;
 	public JiraClientAsync jiraClient;
 	public GWTWrapper gwt;
 	public AuthenticationController authenticationController;
@@ -103,11 +81,7 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 		fixServiceEntryPoint(jiraClient);
 		this.gwt = gwt;
 		this.authenticationController = authenticationController;
-		jiraProjectId = constants.jiraProjectId();
 		confluence_endpoint = constants.confluenceEndpoint();
-		flag_issue_type = constants.flagIssueType();
-		access_restriction_type = constants.accessRestrictionType();
-		access_request_issue_type = constants.accessRequestIssueType();
 		default_issue_reporter = constants.defaultIssueReporter();
 		issue_field_principal_id = constants.issueFieldPrincipalId();
 		issue_field_user_display_name = constants.issueFieldUserDisplayName();
@@ -117,8 +91,6 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 		major_priority = constants.majorPriority(); 
 	}
 	
-
-
 	public static String createIssueURL(
 			int projectId, // required
 			int issueType, // required
@@ -148,82 +120,6 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 		return sb.toString();
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.sagebionetworks.web.client.widget.entity.JiraURLHelper#createFlagIssue(java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public String createFlagIssue(String userEmailAddress,
-			String userDisplayName,
-			String dataObjectId) {
-		return createIssueURL(jiraProjectId, 
-				flag_issue_type, 
-				FLAG_ISSUE_SUMMARY, 
-				default_issue_reporter, 
-				DEFAULT_FLAG_DESCRIPTION,
-				null, 
-				userDisplayName, 
-				userEmailAddress,
-				dataObjectId,
-				null);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.sagebionetworks.web.client.widget.entity.JiraURLHelper#createAccessRestrictionIssue(java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public String createAccessRestrictionIssue(String userEmailAddress,
-			String userDisplayName,
-			String dataObjectId) {
-		return createIssueURL(jiraProjectId, 
-				access_restriction_type, 
-				ACCESS_RESTRCTION_ISSUE_SUMMARY, 
-				default_issue_reporter, 
-				DEFAULT_RESTRICTION_DESCRIPTION,
-				null, 
-				userDisplayName, 
-				userEmailAddress,
-				dataObjectId,
-				null);		
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.sagebionetworks.web.client.widget.entity.JiraURLHelper#createRequestAccessIssue(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public String createRequestAccessIssue(String principalId,
-			String userDisplayName,
-			String userEmailAddress,
-			String dataObjectId,
-			String accessRequirementId) {
-		return createIssueURL(jiraProjectId, 
-				access_request_issue_type, 
-				ACCESS_REQUEST_ISSUE_SUMMARY, 
-				default_issue_reporter, 
-				DEFAULT_ACCESS_DESCRIPTION,
-				principalId, 
-				userDisplayName, 
-				userEmailAddress,
-				dataObjectId,
-				accessRequirementId);		
-	}
-	
-	@Override
-	public String createRevokeAccessIssue(String principalId,
-			String userDisplayName,
-			String userEmailAddress,
-			String accessRequirementId) {
-		return createIssueURL(jiraProjectId, 
-				flag_issue_type, 
-				ACCESS_REQUEST_REVOKE_ISSUE_SUMMARY, 
-				default_issue_reporter, 
-				URL.encodeQueryString(DEFAULT_REVOKE_ACCESS_DESCRIPTION + "(https://www.synapse.org/#!ACTDataAccessSubmissions:AR_ID=" + accessRequirementId + ")"),
-				principalId, 
-				userDisplayName, 
-				userEmailAddress,
-				null,
-				accessRequirementId);
-	}
-	
 	@Override
 	public void createIssueOnBackend(
 			String stepsToRepro,
@@ -236,17 +132,17 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 		
 		StringBuilder description = new StringBuilder(); 
 		
-	    if (authenticationController.isLoggedIn()) {
-	    	UserProfile profile = authenticationController.getCurrentUserProfile();
-	    	description.append("Submitted by " + DisplayUtils.getDisplayName(profile));
-	    }
-	    description.append("\n\n" + stepsToRepro);
-	    description.append("\n\n" + gwt.getUserAgent());
-	    description.append("\n\n" + gwt.getAppVersion());
-	    description.append("\n\n" + gwt.getCurrentURL());
-	    description.append("\n\n" + t.getMessage());
-	    description.append("\n" + stackTrace);
-	    jiraClient.createJiraIssue(errorMessage, description.toString(), default_issue_reporter, fieldValues, callback);
+		if (authenticationController.isLoggedIn()) {
+			UserProfile profile = authenticationController.getCurrentUserProfile();
+			description.append("Submitted by " + DisplayUtils.getDisplayName(profile));
+		}
+		description.append("\n\n" + stepsToRepro);
+		description.append("\n\n" + gwt.getUserAgent());
+		description.append("\n\n" + gwt.getAppVersion());
+		description.append("\n\n" + gwt.getCurrentURL());
+		description.append("\n\n" + t.getMessage());
+		description.append("\n" + stackTrace);
+		jiraClient.createJiraIssue(errorMessage, description.toString(), default_issue_reporter, fieldValues, callback);
 	}
 
 }

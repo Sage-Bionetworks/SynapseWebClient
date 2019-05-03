@@ -25,6 +25,11 @@ import com.google.inject.Inject;
 
 public class FooterViewImpl implements FooterView {
 	
+	public static final String REVIEW_ABUSIVE_CONTENT_REQUEST_COMPONENT_ID = "14868";
+//	public static final String DATA_RESTRICTION_REQUEST_COMPONENT_ID = "14865";
+	public static final String REVIEW_DATA_REQUEST_COMPONENT_ID = "14869";
+	public static final String GRANT_ACCESS_REQUEST_COMPONENT_ID = "14866";
+
 	public interface Binder extends UiBinder<Widget, FooterViewImpl> {
 	}
 	@UiField
@@ -140,11 +145,11 @@ public class FooterViewImpl implements FooterView {
 
 	@Override
 	public void showJiraIssueCollector(String principalId, String userDisplayName, String userEmailAddress) {
-		_showJiraIssueCollector(principalId, userDisplayName, userEmailAddress, "", Window.Location.getHref());
+		_showJiraIssueCollector(principalId, userDisplayName, userEmailAddress, "", Window.Location.getHref(), REVIEW_ABUSIVE_CONTENT_REQUEST_COMPONENT_ID);
 	}
 	
 	public static native void _showJiraIssueCollector(
-			String principalId, String userDisplayName, String userEmailAddress, String synapseDataObjectId, String url) /*-{
+			String principalId, String userDisplayName, String userEmailAddress, String synapseDataObjectId, String url, String componentID) /*-{
 		try {
 			// Requires jQuery!
 			$wnd.jQuery.ajax({
@@ -161,14 +166,15 @@ public class FooterViewImpl implements FooterView {
 				
 				"fieldValues": {
 			 		summary : '',
-					description : 'Reporting this page: ' + url + ' \n\nUser is reporting to the Synapse team that this page is in violation (for example: abusive or harmful content, spam, inappropriate ads).',
+					description : 'Reporting this page: ' + url + ' \n\nUser is reporting to the Synapse team that this page is in violation (for example: abusive or harmful content, spam, inappropriate ads), or this data is posted inappropriately or should have different access conditions.',
 					priority : '3',
 					customfield_10840: userEmailAddress,
 					email: userEmailAddress,
 					customfield_10740: principalId,
 					customfield_10741: userDisplayName,
 					customfield_10742: synapseDataObjectId,
-					fullname: userDisplayName
+					fullname: userDisplayName,
+					components: componentID // Component ID of the component added to the Jira Governance Project
 				}};
 		} catch (err) {
 			console.error(err);

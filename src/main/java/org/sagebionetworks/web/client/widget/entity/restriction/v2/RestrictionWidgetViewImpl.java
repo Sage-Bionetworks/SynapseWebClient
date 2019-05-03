@@ -198,7 +198,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	
 	@Override
 	public void showJiraIssueCollector(String principalId, String userDisplayName, String userEmailAddress, String synId) {
-		FooterViewImpl._showJiraIssueCollector(principalId, userDisplayName, userEmailAddress, synId, Window.Location.getHref());
+		FooterViewImpl._showJiraIssueCollector(principalId, userDisplayName, userEmailAddress, synId, Window.Location.getHref(), FooterViewImpl.REVIEW_DATA_REQUEST_COMPONENT_ID);
 	}
 
 	@Override

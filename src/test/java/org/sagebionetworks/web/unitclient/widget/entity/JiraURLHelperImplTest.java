@@ -9,8 +9,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Collections;
 
 import org.junit.Before;
@@ -106,25 +104,6 @@ public class JiraURLHelperImplTest {
 		}, mockJiraClient, mockGWTWrapper, mockAuthController);
 	}
 
-	@Test
-	public void testCreateFlagIssue() throws MalformedURLException {
-		String urlString = helper.createFlagIssue("me@place.domain", "me me", "syn123");
-		URL url = new URL(urlString); // this will check that the url is well formed
-	}
-
-	@Test
-	public void testCreateAccessRestrictionIssue() throws MalformedURLException {
-		String urlString = helper.createAccessRestrictionIssue("me@place.domain", "me me", "syn123");
-		URL url = new URL(urlString); // this will check that the url is well formed
-	}
-
-	@Test
-	public void testCreateRequestAccessIssue() throws MalformedURLException {
-		String urlString = helper.createRequestAccessIssue("101", "me me", "me@place.domain", 
-				"syn123", "432");
-		URL url = new URL(urlString); // this will check that the url is well formed
-	}
-	
 	@Test
 	public void testCreateIssueOnBackend() {
 		String userSteps = "user steps to repro (optional)";
