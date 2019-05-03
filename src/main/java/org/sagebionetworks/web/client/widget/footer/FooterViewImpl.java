@@ -25,6 +25,7 @@ import com.google.inject.Inject;
 
 public class FooterViewImpl implements FooterView {
 	
+	// These IDs refer to Jira Components created in the Sage Bionetworks Jira Cloud instance in the Governance Project.
 	public static final String REVIEW_ABUSIVE_CONTENT_REQUEST_COMPONENT_ID = "14868";
 //	public static final String DATA_RESTRICTION_REQUEST_COMPONENT_ID = "14865";
 	public static final String REVIEW_DATA_REQUEST_COMPONENT_ID = "14869";
