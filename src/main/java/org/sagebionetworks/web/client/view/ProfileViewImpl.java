@@ -232,7 +232,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		defaultProfilePicture.addStyleName("font-size-150 lightGreyText");
 	}
 	UserBadge userBadge;
-	
+	AnchorListItem loadingTeamsListItem = new AnchorListItem("Loading...");
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
 			Header headerWidget,
@@ -417,6 +417,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void addTeamsFilterTeam(final Team team) {
+		detachLoadingTeamsListItem();
 		AnchorListItem teamFilter = new AnchorListItem(team.getName());
 		teamFilter.addClickHandler(new ClickHandler() {
 			@Override
@@ -439,9 +440,15 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		});
 		teamFiltersDropDownMenu.add(teamFilter);
 		teamFiltersDropDownMenu.add(new Divider());
-		
+		detachLoadingTeamsListItem();
+		teamFiltersDropDownMenu.add(loadingTeamsListItem);
 	}
 	
+	private void detachLoadingTeamsListItem() {
+		if (loadingTeamsListItem.getParent() != null) {
+			loadingTeamsListItem.removeFromParent();	
+		}
+	}
 	@Override
 	public void setTeamsFilterVisible(boolean isVisible) {
 		teamFilters.setVisible(isVisible);	
