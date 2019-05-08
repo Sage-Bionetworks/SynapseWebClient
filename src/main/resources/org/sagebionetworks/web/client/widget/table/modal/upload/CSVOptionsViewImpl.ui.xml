@@ -26,6 +26,21 @@
 					</b:Row>
 				</b:FormGroup>
 				<b:FormGroup>
+					<b:FormLabel>Escape Character</b:FormLabel>
+					<b:Row>
+						<b:Column size="MD_2">
+							<b:Radio name="escapeCharacter" ui:field="escapeCharacterBackslashRadio">Backslash</b:Radio>
+						</b:Column>
+						<b:Column size="MD_2">
+							<b:Radio name="escapeCharacter" ui:field="escapeCharacterOtherRadio">Other</b:Radio>
+						</b:Column>
+						
+						<b:Column size="MD_2">
+							<b:TextBox maxLength="1" ui:field="escapeCharacterOtherTextBox"></b:TextBox>
+						</b:Column>
+					</b:Row>
+				</b:FormGroup>
+				<b:FormGroup>
 					<b:CheckBox ui:field="firstLineHeader">First line is the header</b:CheckBox>
 				</b:FormGroup>
 			</bh:Div>

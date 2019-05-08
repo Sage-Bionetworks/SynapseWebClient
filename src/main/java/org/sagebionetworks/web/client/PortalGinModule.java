@@ -588,8 +588,6 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetVie
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsView;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsViewImpl;
-import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsWidget;
-import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsWidgetImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVAppendPage;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVAppendPageImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVAppendPageView;
@@ -1084,7 +1082,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(UploadTableModalWidget.class).to(UploadTableModalWidgetImpl.class);
 		bind(UploadCSVPreviewPage.class).to(UploadCSVPreviewPageImpl.class);
 		bind(CSVOptionsView.class).to(CSVOptionsViewImpl.class);
-		bind(CSVOptionsWidget.class).to(CSVOptionsWidgetImpl.class);
 		bind(UploadCSVPreviewPageView.class).to(UploadCSVPreviewPageViewImpl.class);
 		bind(UploadPreviewView.class).to(UploadPreviewViewImpl.class);
 		bind(UploadPreviewWidget.class).to(UploadPreviewWidgetImpl.class);

@@ -10,7 +10,6 @@ import org.sagebionetworks.repo.model.table.UploadToTablePreviewResult;
 import org.sagebionetworks.repo.model.table.UploadToTableRequest;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
-import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsWidget.ChangeHandler;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -97,11 +96,8 @@ public class UploadCSVPreviewPageImpl implements UploadCSVPreviewPage,
 	public void setModalPresenter(final ModalPresenter presenter) {
 		this.presenter = presenter;
 		// Setup the CSV options using what we know about the file.
-		this.csvOptionsWidget.configure(createDefaultPreviewRequest(), new ChangeHandler() {
-			@Override
-			public void optionsChanged() {
-				generatePreview();
-			}
+		this.csvOptionsWidget.configure(createDefaultPreviewRequest(), () -> {
+			generatePreview();
 		});
 		generatePreview();
 	}
