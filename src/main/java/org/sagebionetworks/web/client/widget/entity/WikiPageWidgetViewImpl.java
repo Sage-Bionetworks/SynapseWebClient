@@ -10,7 +10,6 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Italic;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.WikiDiff;
@@ -151,9 +150,11 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	@Override
 	public void setWikiHeadingText(String title) {
 		wikiHeadingContainer.clear();
-		wikiHeading = new Heading(HeadingSize.H2);
-		wikiHeading.setText(title);
-		wikiHeadingContainer.add(wikiHeading);
+		if (DisplayUtils.isDefined(title)) {
+			wikiHeading = new Heading(HeadingSize.H2);
+			wikiHeading.setText(title);
+			wikiHeadingContainer.add(wikiHeading);	
+		}
 	}
 	
 	@Override

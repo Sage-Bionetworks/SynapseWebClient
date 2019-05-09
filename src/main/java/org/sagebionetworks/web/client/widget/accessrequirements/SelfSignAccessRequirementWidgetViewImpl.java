@@ -46,7 +46,9 @@ public class SelfSignAccessRequirementWidgetViewImpl implements SelfSignAccessRe
 	Div subjectsWidgetContainer;
 	@UiField
 	Div manageAccessContainer;
-	
+	@UiField
+	Alert approvedAlert;
+
 	Callback onAttachCallback;
 	public interface Binder extends UiBinder<Widget, SelfSignAccessRequirementWidgetViewImpl> {
 	}
@@ -99,6 +101,7 @@ public class SelfSignAccessRequirementWidgetViewImpl implements SelfSignAccessRe
 	@Override
 	public void showApprovedHeading() {
 		approvedHeading.setVisible(true);
+		approvedAlert.setVisible(true);
 	}
 	@Override
 	public void showUnapprovedHeading() {
@@ -112,6 +115,7 @@ public class SelfSignAccessRequirementWidgetViewImpl implements SelfSignAccessRe
 	
 	@Override
 	public void resetState() {
+		approvedAlert.setVisible(false);
 		approvedHeading.setVisible(false);
 		unapprovedHeading.setVisible(false);
 		signTermsButton.setVisible(false);

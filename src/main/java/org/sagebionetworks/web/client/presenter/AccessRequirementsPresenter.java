@@ -77,7 +77,8 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		this.authController = authController;
 		view.addAboveBody(synAlert);
 		view.addAboveBody(createAccessRequirementButton);
-		metAccessRequirementsDiv.addStyleName("min-height-400");
+		unmetAccessRequirementsDiv.addStyleName("markdown");
+		metAccessRequirementsDiv.addStyleName("markdown min-height-400");
 		view.add(unmetAccessRequirementsDiv.asWidget());
 		view.add(metAccessRequirementsDiv.asWidget());
 		view.addTitle("All conditions for ");
@@ -209,8 +210,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	}
 	
 	@Override
-    public String mayStop() {
-        return null;
-    }
-	
+	public String mayStop() {
+		return null;
+	}
 }

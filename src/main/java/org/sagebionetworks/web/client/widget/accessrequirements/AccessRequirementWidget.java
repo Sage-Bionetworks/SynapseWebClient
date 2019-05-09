@@ -34,6 +34,7 @@ public class AccessRequirementWidget implements IsWidget{
 		this.dataAccessClient = dataAccessClient;
 		fixServiceEntryPoint(dataAccessClient);
 		this.div = div;
+		div.addStyleName("border-bottom-1 margin-bottom-15");
 	}
 	
 	public void configure(final String accessRequirementId, final RestrictableObjectDescriptor targetSubject) {
@@ -76,6 +77,7 @@ public class AccessRequirementWidget implements IsWidget{
 				w.hideButtons();
 			}
 			div.add(w);
+			w.addStyleNames("border-bottom-1");
 		} else if (requirement instanceof ACTAccessRequirement) {
 			ACTAccessRequirementWidget w = ginInjector.getACTAccessRequirementWidget();
 			w.setRequirement((ACTAccessRequirement) requirement, refreshCallback);
