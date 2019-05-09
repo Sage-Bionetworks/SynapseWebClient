@@ -30,7 +30,7 @@
 			<bh:Div>
 				<bh:Text>For more information on use conditions, please read the </bh:Text>
 				<b:Anchor text="Conditions for using Human Data in Synapse" styleName="link margin-left-5" href="http://docs.synapse.org/articles/governance.html" target="_blank" />
-				<bh:Text>.</bh:Text>
+				<bh:Text>.&nbsp;&nbsp;</bh:Text>
 				<bh:Text>If you think this data is posted inappropriately or should have different access conditions, please alert the Synapse Access and Compliance Team (ACT) to discuss at act@sagebase.org </bh:Text>
 			</bh:Div>
 			<bh:ClearFix />
