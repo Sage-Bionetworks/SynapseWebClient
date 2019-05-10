@@ -30,6 +30,7 @@ public interface HeaderView extends IsWidget {
 		void onLoginClick();
 		void refreshFavorites();
 		void onLogoClick();
+		void onCookieNotificationDismissed();
 	}
 	public void clearFavorite();
 	public void setEmptyFavorite();
@@ -46,4 +47,5 @@ public interface HeaderView extends IsWidget {
 	EventBinder<Header> getEventBinder();
 	void setDownloadListUIVisible(boolean visible);
 	void setDownloadListFileCount(Integer count);
+	void setCookieNotificationVisible(boolean visible);
 }

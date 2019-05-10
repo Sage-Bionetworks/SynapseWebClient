@@ -4,15 +4,16 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.DateTimeUtilsImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cookie.CookieKeys;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
-import org.sagebionetworks.web.client.events.WikiSubpagesCollapseEvent;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Trash;
@@ -20,13 +21,13 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.binder.EventHandler;
+
 
 public class Header implements HeaderView.Presenter, IsWidget {
 
@@ -48,6 +49,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private PendoSdk pendoSdk;
 	PortalGinInjector portalGinInjector;
+	CookieProvider cookies;
 	@Inject
 	public Header(HeaderView view, 
 			AuthenticationController authenticationController,
@@ -57,12 +59,14 @@ public class Header implements HeaderView.Presenter, IsWidget {
 			SynapseJSNIUtils synapseJSNIUtils, 
 			PendoSdk pendoSdk,
 			PortalGinInjector portalGinInjector,
-			EventBus eventBus) {
+			EventBus eventBus,
+			CookieProvider cookies) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.jsClient = jsClient;
 		this.favWidget = favWidget;
+		this.cookies = cookies;
 		favWidget.setLoadingSize(16);
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.portalGinInjector = portalGinInjector;
@@ -71,6 +75,9 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		view.setPresenter(this);
 		initStagingAlert();
 		view.getEventBinder().bindEventHandlers(this, eventBus);
+		if (cookies.getCookie(CookieKeys.COOKIES_ACCEPTED) == null) {
+			view.setCookieNotificationVisible(true);
+		}
 	}
 	
 	public void initStagingAlert() {
@@ -178,5 +185,10 @@ public class Header implements HeaderView.Presenter, IsWidget {
 				view.setDownloadListFileCount(count);
 			};
 		});
+	}
+	@Override
+	public void onCookieNotificationDismissed() {
+		view.setCookieNotificationVisible(false);
+		cookies.setCookie(CookieKeys.COOKIES_ACCEPTED, "true", DateTimeUtilsImpl.getYearFromNow());
 	}
 }

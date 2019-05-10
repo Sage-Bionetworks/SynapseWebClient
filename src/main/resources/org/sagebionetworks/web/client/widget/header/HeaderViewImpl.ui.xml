@@ -32,16 +32,16 @@
 			</bh:Div>
 		</b:Alert>
 		<bh:Div ui:field="headerDiv" addStyleNames="notopmargin synapse-blue-bg-gradient" height="53px">
-		    <bh:Div addStyleNames="margin-left-15 inline-block maxWidth50 overflowHidden text-overflow-ellipsis whitespace-nowrap color-white" paddingTop="13">
-	        	<g:Image ui:field="synapseLogo" url="images/logo.svg" 
-	        	    addStyleNames="imageButton margin-right-5 moveup-5" width="35px" height="35px"/>
-	            <b:Heading size="H3" addStyleNames="displayInline color-white">
-	            	<b:Anchor ui:field="projectHeadingAnchor" addStyleNames="color-white textDecorationNone lato notransition"/>
-	        	</b:Heading>
-		  	</bh:Div>
-		  	<bh:Div ui:field="projectFavoritePanelUI" addStyleNames="inline-block favoriteIcon hidden-xs vertical-align-top color-white font-size-24 movedown-7"/>
-	  	  	<bh:Span ui:field="headerButtons" addStyleNames="right" marginRight="10">
-		  		<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-10 margin-right-10 padding-left-15" visible="false">
+			<bh:Div addStyleNames="margin-left-15 inline-block maxWidth50 overflowHidden text-overflow-ellipsis whitespace-nowrap color-white" paddingTop="13">
+				<g:Image ui:field="synapseLogo" url="images/logo.svg" 
+					addStyleNames="imageButton margin-right-5 moveup-5" width="35px" height="35px"/>
+				<b:Heading size="H3" addStyleNames="displayInline color-white">
+					<b:Anchor ui:field="projectHeadingAnchor" addStyleNames="color-white textDecorationNone lato notransition"/>
+				</b:Heading>
+			</bh:Div>
+			<bh:Div ui:field="projectFavoritePanelUI" addStyleNames="inline-block favoriteIcon hidden-xs vertical-align-top color-white font-size-24 movedown-7"/>
+			<bh:Span ui:field="headerButtons" addStyleNames="right" marginRight="10">
+				<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-10 margin-right-10 padding-left-15" visible="false">
 					<b:Button ui:field="loginLink" text="&nbsp;&nbsp;&nbsp;Sign in&nbsp;&nbsp;&nbsp;" type="SUCCESS" marginTop="7"/>
 				</g:SimplePanel>
 				<b:DropDown ui:field="dashboardDropdown" addStyleNames="right imageButton greenBackgroundOnHover" visible="false" height="53px" width="62px">
@@ -87,8 +87,9 @@
 					</b:Tooltip>
 					<b:Label text="0" ui:field="downloadListFileCount" addStyleNames="moveup-15 dropshadow" marginLeft="-8" type="INFO"/>
 				</bh:Div>
-				
 			</bh:Span>
 		</bh:Div>
+		<w:InfoAlert ui:field="cookieNotificationAlert" visible="false" alertType="INFO" icon="INFO_CIRCLE" message="This site uses cookies to enhance your experience." linkText="Learn more" marginTop="0" marginBottom="0" paddingRight="40" />
+		
 	</bh:Div>
 </ui:UiBinder>
