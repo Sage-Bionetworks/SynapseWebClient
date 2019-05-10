@@ -484,6 +484,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 						if (isRefreshingTeamsTab) {
 							if (isFirstPage && !isTeams) {
 								myTeamsWidget.showEmpty();
+								loadMoreTeamsWidgetContainer.setIsMore(false);
 							}
 						}
 						
