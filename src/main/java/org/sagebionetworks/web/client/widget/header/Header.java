@@ -77,6 +77,8 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		view.getEventBinder().bindEventHandlers(this, eventBus);
 		if (cookies.getCookie(CookieKeys.COOKIES_ACCEPTED) == null) {
 			view.setCookieNotificationVisible(true);
+		} else {
+			view.setCookieNotificationVisible(false);
 		}
 	}
 	
@@ -189,6 +191,6 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	@Override
 	public void onCookieNotificationDismissed() {
 		view.setCookieNotificationVisible(false);
-		cookies.setCookie(CookieKeys.COOKIES_ACCEPTED, "true", DateTimeUtilsImpl.getYearFromNow());
+		cookies.setCookie(CookieKeys.COOKIES_ACCEPTED, Boolean.TRUE.toString(), DateTimeUtilsImpl.getYearFromNow());
 	}
 }
