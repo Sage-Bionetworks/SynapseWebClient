@@ -292,7 +292,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			globalAppState.getPlaceChanger().goTo(place);
 		});
 		cookieNotificationLearnMoreLink.addClickHandler(event -> {
-			DisplayUtils.newWindow(WebConstants.PRIVACY_POLICY_URL, "", "");
+			DisplayUtils.newWindow(WebConstants.PRIVACY_POLICY_URL, "_blank", "");
 		});
 	}
 	

@@ -1,13 +1,10 @@
 package org.sagebionetworks.web.client.widget;
 
-import org.gwtbootstrap3.client.shared.event.AlertCloseEvent;
-import org.gwtbootstrap3.client.shared.event.AlertCloseHandler;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 
 import com.google.gwt.core.shared.GWT;
@@ -16,7 +13,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 
 public class InfoAlert implements IsWidget {
 	public interface Binder extends UiBinder<Alert, InfoAlert> {}
@@ -87,33 +83,5 @@ public class InfoAlert implements IsWidget {
 	}
 	public void setDismissable(boolean dismissable) {
 		w.setDismissable(dismissable);
-	}
-	public HandlerRegistration addCloseHandler(final AlertCloseHandler handler) {
-		return w.addHandler(handler, AlertCloseEvent.getType());
-	}
-	
-	public void setMarginTop(double margin) {
-		w.setMarginTop(margin);
-	}
-	public void setMarginRight(double margin) {
-		w.setMarginRight(margin);
-	}
-	public void setMarginBottom(double margin) {
-		w.setMarginBottom(margin);
-	}
-	public void setMarginLeft(double margin) {
-		w.setMarginLeft(margin);
-	}
-	public void setPaddingTop(double padding) {
-		w.setPaddingTop(padding);
-	}
-	public void setPaddingRight(double padding) {
-		w.setPaddingRight(padding);
-	}
-	public void setPaddingBottom(double padding) {
-		w.setPaddingBottom(padding);
-	}
-	public void setPaddingLeft(double padding) {
-		w.setPaddingLeft(padding);
 	}
 }
