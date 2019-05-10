@@ -34,6 +34,7 @@ public class AccessRequirementWidget implements IsWidget{
 		this.dataAccessClient = dataAccessClient;
 		fixServiceEntryPoint(dataAccessClient);
 		this.div = div;
+		div.addStyleName("border-bottom-1 margin-bottom-15");
 	}
 	
 	public void configure(final String accessRequirementId, final RestrictableObjectDescriptor targetSubject) {
