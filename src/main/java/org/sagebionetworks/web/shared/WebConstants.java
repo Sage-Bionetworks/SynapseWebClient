@@ -29,7 +29,7 @@ public class WebConstants {
 	public static final String DOCS_BASE_URL = "http://docs.synapse.org/";
 	public static final String DOCS_URL = DOCS_BASE_URL + "articles/";
 	public static final String PROVENANCE_API_URL = DOCS_URL + "provenance.html";
-	public static final String COOKIE_POLICY_URL = DOCS_URL + "cookiepolicy.html";
+	public static final String PRIVACY_POLICY_URL = "https://s3.amazonaws.com/static.synapse.org/governance/SynapsePrivacyPolicy.pdf";
 	
 	public static final String PREVIEW_UNAVAILABLE_PATH = "images/blank.png";
 	

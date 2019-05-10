@@ -89,7 +89,15 @@
 				</bh:Div>
 			</bh:Span>
 		</bh:Div>
-		<w:InfoAlert ui:field="cookieNotificationAlert" visible="false" alertType="INFO" icon="INFO_CIRCLE" message="This site uses cookies to enhance your experience." linkText="Learn more" marginTop="0" marginBottom="0" paddingRight="40" />
-		
+		<b:Alert ui:field="cookieNotificationAlert" visible="false" addStyleNames="fullWidthAlert" type="INFO" height="60px" marginTop="0" marginRight="0" paddingRight="40">
+			<bh:Span marginLeft="10">
+				<b:Icon addStyleNames="font-size-17 black-25-percent" type="INFO_CIRCLE" marginLeft="5" marginTop="15"/>
+				<bh:Span addStyleNames="font-size-15" marginLeft="10" marginTop="13" >
+					<bh:Span>This site uses Cookies to enhance your experience and to analyze our traffic. Using Synapse means that you agree with our cookie policy.</bh:Span>
+				</bh:Span>
+			</bh:Span>
+			<b:Anchor text="LEARN MORE" ui:field="cookieNotificationLearnMoreLink" pull="RIGHT" addStyleNames="color-white font-size-15" marginTop="13" marginRight="10"/>
+			<b:Button ui:field="cookieNotificationAlertOkButton" text="Ok" size="SMALL" marginLeft="10" marginBottom="4"/>	
+		</b:Alert>
 	</bh:Div>
 </ui:UiBinder>

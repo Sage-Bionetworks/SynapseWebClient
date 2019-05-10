@@ -118,7 +118,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	Label downloadListFileCount;
 	@UiField
-	InfoAlert cookieNotificationAlert;
+	Alert cookieNotificationAlert;
+	@UiField
+	Anchor cookieNotificationLearnMoreLink;
+	@UiField
+	Button cookieNotificationAlertOkButton;
 	
 	private Presenter presenter;
 	private SearchBox searchBox;
@@ -175,8 +179,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		angleDown.setMarginLeft(0);
 		headerFavAnchor.add(angleDown);
 		
-		cookieNotificationAlert.setDismissable(true);
-		cookieNotificationAlert.addCloseHandler(event -> {
+		cookieNotificationAlertOkButton.addClickHandler(event -> {
 			presenter.onCookieNotificationDismissed();
 		});
 
@@ -288,9 +291,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			Profile place = new Profile(userId + "/downloads");
 			globalAppState.getPlaceChanger().goTo(place);
 		});
-		cookieNotificationAlert.addClickHandler(event -> {
-			presenter.onCookieNotificationDismissed();
-			DisplayUtils.newWindow(WebConstants.COOKIE_POLICY_URL, "", "");
+		cookieNotificationLearnMoreLink.addClickHandler(event -> {
+			DisplayUtils.newWindow(WebConstants.PRIVACY_POLICY_URL, "", "");
 		});
 	}
 	
