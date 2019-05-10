@@ -97,7 +97,7 @@
 				</bh:Span>
 			</bh:Span>
 			<b:Anchor text="LEARN MORE" ui:field="cookieNotificationLearnMoreLink" pull="RIGHT" addStyleNames="color-white font-size-15" marginTop="13" marginRight="10"/>
-			<b:Button ui:field="cookieNotificationAlertOkButton" text="Ok" size="SMALL" marginLeft="10" marginBottom="4"/>	
+			<b:Button ui:field="cookieNotificationAlertOkButton" text="OK" size="SMALL" marginLeft="10" marginBottom="4"/>	
 		</b:Alert>
 	</bh:Div>
 </ui:UiBinder>
