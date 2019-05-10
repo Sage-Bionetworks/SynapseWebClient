@@ -99,7 +99,7 @@ public class HeaderTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		//by default, mock that we are on the production website
 		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn(Header.WWW_SYNAPSE_ORG);
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPendoSdk, mockPortalGinInjector, mockEventBus);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPendoSdk, mockPortalGinInjector, mockEventBus, mockCookies);
 		entityHeaders = new ArrayList<EntityHeader>();
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);

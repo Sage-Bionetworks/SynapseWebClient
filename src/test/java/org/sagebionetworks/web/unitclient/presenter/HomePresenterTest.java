@@ -92,9 +92,7 @@ public class HomePresenterTest {
 		homePresenter = new HomePresenter(mockView, 
 				mockAuthenticationController, 
 				mockGlobalApplicationState,
-				mockCookies,
-				mockResourceLoader,
-				mockSynapseJSNIUtils
+				mockCookies
 				);
 		verify(mockView).setPresenter(homePresenter);
 		
