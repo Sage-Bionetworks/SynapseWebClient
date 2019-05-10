@@ -1128,6 +1128,7 @@ public class ProfilePresenterTest {
 		verify(mockTeamInviteWidget).configure(refreshTeamsCallback.capture(), eq((CallbackP)null));
 		verify(mockView, never()).setTeamNotificationCount(String.valueOf(totalNotifications));
 		verify(mockTeamListWidget).showEmpty();
+		verify(mockLoadMoreContainer, times(2)).setIsMore(false);
 	}
 	
 	@Test
