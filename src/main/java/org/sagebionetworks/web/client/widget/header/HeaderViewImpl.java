@@ -27,8 +27,8 @@ import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.place.SynapseForumPlace;
+import org.sagebionetworks.web.client.widget.InfoAlert;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
-import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -117,6 +117,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	FocusPanel downloadListLink;
 	@UiField
 	Label downloadListFileCount;
+	@UiField
+	Alert cookieNotificationAlert;
+	@UiField
+	Anchor cookieNotificationLearnMoreLink;
+	@UiField
+	Button cookieNotificationAlertOkButton;
 	
 	private Presenter presenter;
 	private SearchBox searchBox;
@@ -173,6 +179,10 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		angleDown.setMarginLeft(0);
 		headerFavAnchor.add(angleDown);
 		
+		cookieNotificationAlertOkButton.addClickHandler(event -> {
+			presenter.onCookieNotificationDismissed();
+		});
+
 		initClickHandlers();
 		clear();
 	}
@@ -281,6 +291,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			Profile place = new Profile(userId + "/downloads");
 			globalAppState.getPlaceChanger().goTo(place);
 		});
+		cookieNotificationLearnMoreLink.addClickHandler(event -> {
+			DisplayUtils.newWindow(WebConstants.PRIVACY_POLICY_URL, "_blank", "");
+		});
 	}
 	
 	@Override
@@ -356,6 +369,10 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@Override
 	public void setStagingAlertVisible(boolean visible) {
 		stagingAlert.setVisible(visible);	
+	}
+	@Override
+	public void setCookieNotificationVisible(boolean visible) {
+		cookieNotificationAlert.setVisible(visible);
 	}
 	
 	/** Event binder code **/

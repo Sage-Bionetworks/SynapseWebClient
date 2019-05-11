@@ -5,7 +5,6 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 
 import com.google.gwt.core.shared.GWT;
@@ -81,5 +80,8 @@ public class InfoAlert implements IsWidget {
 	}
 	public void setAlertType(AlertType type) {
 		w.setType(type);
+	}
+	public void setDismissable(boolean dismissable) {
+		w.setDismissable(dismissable);
 	}
 }

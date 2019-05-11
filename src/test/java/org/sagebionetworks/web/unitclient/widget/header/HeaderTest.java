@@ -1,10 +1,12 @@
 package org.sagebionetworks.web.unitclient.widget.header;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,6 +15,7 @@ import static org.sagebionetworks.web.client.widget.header.Header.N_A;
 import static org.sagebionetworks.web.client.widget.header.Header.SYNAPSE_ORG;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.After;
@@ -24,7 +27,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -34,6 +36,7 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.place.Home;
@@ -99,7 +102,7 @@ public class HeaderTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		//by default, mock that we are on the production website
 		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn(Header.WWW_SYNAPSE_ORG);
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPendoSdk, mockPortalGinInjector, mockEventBus);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPendoSdk, mockPortalGinInjector, mockEventBus, mockCookies);
 		entityHeaders = new ArrayList<EntityHeader>();
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);
@@ -113,9 +116,10 @@ public class HeaderTest {
 	}
 
 	@Test
-	public void testSetPresenter() {
+	public void testConstructor() {
 		verify(mockView).setPresenter(header);
 		verify(mockView).setStagingAlertVisible(false);
+		verify(mockView).setCookieNotificationVisible(true);
 	}
 
 	@Test
@@ -315,4 +319,23 @@ public class HeaderTest {
 		verify(mockView).setDownloadListUIVisible(false);
 		verify(mockSynapseJSNIUtils).consoleError(anyString());
 	}
+	
+	@Test
+	public void testInitWithAcceptCookiesCookie() {
+		when(mockCookies.getCookie(CookieKeys.COOKIES_ACCEPTED)).thenReturn("true");
+		reset(mockView);
+		when(mockView.getEventBinder()).thenReturn(mockEventBinder);
+		
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPendoSdk, mockPortalGinInjector, mockEventBus, mockCookies);
+		
+		verify(mockView).setCookieNotificationVisible(false);
+	}
+	
+	@Test
+	public void testOnCookieNotificationDismissed() {
+		header.onCookieNotificationDismissed();
+		
+		verify(mockCookies).setCookie(eq(CookieKeys.COOKIES_ACCEPTED), eq(Boolean.TRUE.toString()), any(Date.class));
+	}
+
 }

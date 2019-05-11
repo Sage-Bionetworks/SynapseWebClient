@@ -29,4 +29,6 @@ public class CookieKeys {
 	 * Showing UTC?
 	 */
 	public static String SHOW_DATETIME_IN_UTC = "org.sagebionetworks.synapse.datetime.utc";
+	public static String COOKIES_ACCEPTED = "org.sagebionetworks.security.cookies.notification.okclicked";
+
 }

@@ -1,13 +1,11 @@
 package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
-import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.HomeView;
 
@@ -22,24 +20,18 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private CookieProvider cookies;
-	private ResourceLoader resourceLoader;
-	private SynapseJSNIUtils jsniUtils;
 	public static final String SYNAPSE_BLUE = "#1e7098";
 	
 	@Inject
 	public HomePresenter(HomeView view,  
 			AuthenticationController authenticationController, 
 			GlobalApplicationState globalApplicationState,
-			CookieProvider cookies,
-			ResourceLoader resourceLoader,
-			SynapseJSNIUtils jsniUtils){
+			CookieProvider cookies){
 		this.view = view;
 		// Set the presenter on the view
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.cookies = cookies;
-		this.resourceLoader = resourceLoader;
-		this.jsniUtils = jsniUtils;
 		this.view.setPresenter(this);
 	}
 
