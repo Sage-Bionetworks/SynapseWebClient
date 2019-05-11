@@ -65,4 +65,9 @@ public class BasicPaginationViewImpl implements BasicPaginationView{
 	@Override
 	public void setCurrentPage(long currentPageNumber) {
 	}
+	
+	@Override
+	public void setVisible(boolean visible) {
+		widget.setVisible(visible);
+	}
 }

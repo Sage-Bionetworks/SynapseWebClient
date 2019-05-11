@@ -41,6 +41,7 @@ public class BasicPaginationWidget implements BasicPaginationView.Presenter, IsW
 			view.setNextVisible(currentPageItemCount >= limit);
 			view.setPreviousVisible(currentPageNumber > 1);
 			view.setCurrentPage(currentPageNumber);
+			view.setVisible(offset>0 || currentPageItemCount >= limit);
 		}
 	}
 
