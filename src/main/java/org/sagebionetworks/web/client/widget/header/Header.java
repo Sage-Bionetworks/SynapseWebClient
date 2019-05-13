@@ -80,6 +80,11 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		} else {
 			view.setCookieNotificationVisible(false);
 		}
+		
+		if (cookies.getCookie(CookieKeys.PORTAL_CONFIG) != null) {
+			view.showPortalAlert(cookies.getCookie(CookieKeys.PORTAL_CONFIG));
+			cookies.removeCookie(CookieKeys.PORTAL_CONFIG);
+		}
 	}
 	
 	public void initStagingAlert() {

@@ -8,6 +8,14 @@
 	<ui:with field='sageImages' type='org.sagebionetworks.web.client.SageImageBundle' />
 	
 	<bh:Div addStyleNames="header">
+		<b:Alert ui:field="portalAlert" visible="false" addStyleNames="fullWidthAlert" type="INFO" height="50px" marginTop="0" marginRight="0" paddingRight="40" marginBottom="0">
+			<g:FocusPanel ui:field="portalLogoFocusPanel" addStyleNames="imageButton">
+				<bh:Div>
+					<b:Icon ui:field="portalGoBackArrow" type="ARROW_LEFT" addStyleNames="movedown-2 font-size-14"/>
+					<b:Image ui:field="portalLogo" height="35px" addStyleNames="margin-left-10"/>
+				</bh:Div>
+			</g:FocusPanel>
+		</b:Alert>
 		<b:Alert ui:field="stagingAlert" type="WARNING" visible="false" marginRight="0" marginLeft="0" marginBottom="0" marginTop="0">
 			<bh:Div width="100%">
 				<bh:Span paddingRight="5" paddingLeft="10">

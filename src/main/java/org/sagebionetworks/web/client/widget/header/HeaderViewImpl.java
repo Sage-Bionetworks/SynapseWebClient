@@ -18,6 +18,8 @@ import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -27,7 +29,6 @@ import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.place.SynapseForumPlace;
-import org.sagebionetworks.web.client.widget.InfoAlert;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -35,6 +36,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -124,6 +126,15 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	Button cookieNotificationAlertOkButton;
 	
+	@UiField
+	Alert portalAlert;
+	@UiField
+	Icon portalGoBackArrow;
+	@UiField
+	Image portalLogo;
+	@UiField
+	FocusPanel portalLogoFocusPanel;
+	
 	private Presenter presenter;
 	private SearchBox searchBox;
 	private CookieProvider cookies;
@@ -132,19 +143,24 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	UserBadge userBadge;
 	String userId;
 	AnchorListItem defaultItem = new AnchorListItem("Empty");
+	JSONObjectAdapter jsonObjectAdapter;
+	String portalHref = "";
+	
 	@Inject
 	public HeaderViewImpl(Binder binder,
 			SageImageBundle sageImageBundle,
 			SearchBox searchBox,
 			CookieProvider cookies,
 			UserBadge userBadge,
-			GlobalApplicationState globalAppState) {
+			GlobalApplicationState globalAppState,
+			JSONObjectAdapter jsonObjectAdapter) {
 		this.initWidget(binder.createAndBindUi(this));
 		this.searchBox = searchBox;
 		this.cookies = cookies;
 		this.sageImageBundle = sageImageBundle;
 		this.userBadge = userBadge;
 		this.globalAppState = globalAppState;
+		this.jsonObjectAdapter = jsonObjectAdapter;
 		userBadge.setTooltipHidden(true);
 		userBadge.setTextHidden(true);
 		userBadge.addStyleNames("padding-top-15 padding-bottom-15 padding-left-10");
@@ -294,6 +310,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		cookieNotificationLearnMoreLink.addClickHandler(event -> {
 			DisplayUtils.newWindow(WebConstants.PRIVACY_POLICY_URL, "_blank", "");
 		});
+		portalLogoFocusPanel.addClickHandler(event -> {
+			if (DisplayUtils.isDefined(portalHref)) {
+				Window.Location.assign(portalHref);
+			}
+		});
 	}
 	
 	@Override
@@ -390,5 +411,32 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@Override
 	public void setDownloadListUIVisible(boolean visible) {
 		downloadListNotificationUI.setVisible(visible);
+	}
+	
+	@Override
+	public void showPortalAlert(String cookieValue) {
+		try {
+			JSONObjectAdapter json = jsonObjectAdapter.createNew(cookieValue);
+			if (json.has("backgroundColor")) {
+				String color = json.getString("backgroundColor");
+				String oldStyle = portalAlert.getElement().getAttribute("style");
+				portalAlert.getElement().setAttribute("style", oldStyle + ";background-color: "+color+";");
+			}
+			if (json.has("foregroundColor")) {
+				String color = json.getString("foregroundColor");
+				portalGoBackArrow.setColor(color);
+			}
+			if (json.has("portalUrl")) {
+				String href = json.getString("portalUrl");
+				portalHref = href;
+			}
+			if (json.has("logoUrl")) {
+				String logoUrl = json.getString("logoUrl");
+				portalLogo.setUrl(logoUrl);
+			}
+			portalAlert.setVisible(true);
+		} catch (JSONObjectAdapterException e) {
+			e.printStackTrace();
+		}
 	}
 }
