@@ -48,4 +48,5 @@ public interface HeaderView extends IsWidget {
 	void setDownloadListUIVisible(boolean visible);
 	void setDownloadListFileCount(Integer count);
 	void setCookieNotificationVisible(boolean visible);
+	void showPortalAlert(String cookieValue);
 }

@@ -30,5 +30,6 @@ public class CookieKeys {
 	 */
 	public static String SHOW_DATETIME_IN_UTC = "org.sagebionetworks.synapse.datetime.utc";
 	public static String COOKIES_ACCEPTED = "org.sagebionetworks.security.cookies.notification.okclicked";
+	public static String PORTAL_CONFIG = "org.sagebionetworks.security.cookies.portal.config";
 
 }
