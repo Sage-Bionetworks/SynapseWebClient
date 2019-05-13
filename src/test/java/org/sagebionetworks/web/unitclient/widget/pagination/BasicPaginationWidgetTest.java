@@ -36,7 +36,22 @@ public class BasicPaginationWidgetTest {
 		verify(mockView).setPreviousVisible(false);
 		long currentPageNumber = 1;
 		verify(mockView).setCurrentPage(currentPageNumber);
+		verify(mockView).setVisible(false);
 	}
+	
+	@Test
+	public void testLessThanAPage(){
+		long limit = 10;
+		long offset = 0;
+		long currentRowCount = 5;
+		widget.configure(limit, offset, currentRowCount, mockPageChangeListener);
+		verify(mockView).setNextVisible(false);
+		verify(mockView).setPreviousVisible(false);
+		long currentPageNumber = 1;
+		verify(mockView).setCurrentPage(currentPageNumber);
+		verify(mockView).setVisible(false);
+	}
+
 	
 	@Test
 	public void testOnePage(){
@@ -49,6 +64,7 @@ public class BasicPaginationWidgetTest {
 		verify(mockView).setPreviousVisible(false);
 		long currentPageNumber = 1;
 		verify(mockView).setCurrentPage(currentPageNumber);
+		verify(mockView).setVisible(true);
 	}
 	
 	@Test
@@ -61,6 +77,7 @@ public class BasicPaginationWidgetTest {
 		verify(mockView).setPreviousVisible(true);
 		long currentPageNumber = 2;
 		verify(mockView).setCurrentPage(currentPageNumber);
+		verify(mockView).setVisible(true);
 	}
 	
 	@Test
@@ -73,6 +90,7 @@ public class BasicPaginationWidgetTest {
 		verify(mockView).setPreviousVisible(true);
 		long currentPageNumber = 3;
 		verify(mockView).setCurrentPage(currentPageNumber);
+		verify(mockView).setVisible(true);
 	}
 	
 	@Test

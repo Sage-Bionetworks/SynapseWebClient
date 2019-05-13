@@ -42,4 +42,5 @@ public interface BasicPaginationView extends IsWidget{
 	 */
 	public void setPreviousVisible(boolean visible);
 	public void setCurrentPage(long currentPageNumber);
+	void setVisible(boolean visible);
 }
