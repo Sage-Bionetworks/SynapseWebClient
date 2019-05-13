@@ -426,8 +426,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				String color = json.getString("foregroundColor");
 				portalGoBackArrow.setColor(color);
 			}
-			if (json.has("portalUrl")) {
-				String href = json.getString("portalUrl");
+			if (json.has("callbackUrl")) {
+				String href = json.getString("callbackUrl");
 				portalHref = href;
 			}
 			if (json.has("logoUrl")) {
