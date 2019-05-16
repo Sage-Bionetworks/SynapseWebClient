@@ -176,7 +176,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		angleDown.setPaddingLeft(5);
 		angleDown.setMarginLeft(0);
 		dashboardDropdownAnchor.add(angleDown);
-		
 		Icon starIcon = new Icon(IconType.STAR);
 		starIcon.setColor("white");
 		starIcon.setSize(IconSize.TIMES2);
@@ -306,9 +305,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		downloadListLink.addClickHandler(event -> {
 			Profile place = new Profile(userId + "/downloads");
 			globalAppState.getPlaceChanger().goTo(place);
-		});
-		cookieNotificationLearnMoreLink.addClickHandler(event -> {
-			DisplayUtils.newWindow(WebConstants.PRIVACY_POLICY_URL, "_blank", "");
 		});
 		portalLogoFocusPanel.addClickHandler(event -> {
 			if (DisplayUtils.isDefined(portalHref)) {
