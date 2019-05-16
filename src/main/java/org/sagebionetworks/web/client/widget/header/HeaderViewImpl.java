@@ -176,7 +176,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		angleDown.setPaddingLeft(5);
 		angleDown.setMarginLeft(0);
 		dashboardDropdownAnchor.add(angleDown);
-		
 		Icon starIcon = new Icon(IconType.STAR);
 		starIcon.setColor("white");
 		starIcon.setSize(IconSize.TIMES2);
@@ -307,6 +306,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			Profile place = new Profile(userId + "/downloads");
 			globalAppState.getPlaceChanger().goTo(place);
 		});
+<<<<<<< HEAD
 		cookieNotificationLearnMoreLink.addClickHandler(event -> {
 			DisplayUtils.newWindow(WebConstants.PRIVACY_POLICY_URL, "_blank", "");
 		});
@@ -315,6 +315,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				Window.Location.assign(portalHref);
 			}
 		});
+=======
+>>>>>>> release-265
 	}
 	
 	@Override
