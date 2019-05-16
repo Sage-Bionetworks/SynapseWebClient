@@ -57,6 +57,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Button editProfileButton;
 	@UiField
+	Div certifiedValidatedContainer;
+	@UiField
 	SimplePanel editUserProfilePanel;
 	HTML noChallengesHtml = new HTML("<p>This tab shows you challenges you have registered for.</p>" + 
 			"<p><a href=\"http://sagebionetworks.org/platforms/\" target=\"_blank\">Challenges</a> are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.</p>");
@@ -530,6 +532,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		teamFiltersDropDownMenu.clear();
 		projectNameColumnHeader.setSortDirection(null);
 		lastActivityOnColumnHeader.setSortDirection(null);
+		certifiedValidatedContainer.clear();
 	}
 	
 	@Override
@@ -693,5 +696,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void open(String url) {
 		Window.open(url, "_self", "");	
+	}
+	@Override
+	public void setCertifiedValidatedWidget(IsWidget w) {
+		certifiedValidatedContainer.add(w);
 	}
 }
