@@ -306,17 +306,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			Profile place = new Profile(userId + "/downloads");
 			globalAppState.getPlaceChanger().goTo(place);
 		});
-<<<<<<< HEAD
-		cookieNotificationLearnMoreLink.addClickHandler(event -> {
-			DisplayUtils.newWindow(WebConstants.PRIVACY_POLICY_URL, "_blank", "");
-		});
 		portalLogoFocusPanel.addClickHandler(event -> {
 			if (DisplayUtils.isDefined(portalHref)) {
 				Window.Location.assign(portalHref);
 			}
 		});
-=======
->>>>>>> release-265
 	}
 	
 	@Override
