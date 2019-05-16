@@ -35,12 +35,14 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptModalView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidget;
+import org.sagebionetworks.web.client.widget.profile.ProfileCertifiedValidatedWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
@@ -106,6 +108,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public PromptModalView promptForTeamNameDialog;
 	public SynapseJavascriptClient jsClient;
 	public DownloadListWidget downloadListWidget;
+	public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	@Inject
 	public ProfilePresenter(ProfileView view,
 			AuthenticationController authenticationController,
@@ -114,7 +117,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			TeamListWidget myTeamsWidget,
 			OpenTeamInvitationsWidget openInvitesWidget,
 			PortalGinInjector ginInjector,
-			SynapseJavascriptClient jsClient) {
+			SynapseJavascriptClient jsClient,
+			IsACTMemberAsyncHandler isACTMemberAsyncHandler) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -123,6 +127,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.myTeamsWidget = myTeamsWidget;
 		this.openInvitesWidget = openInvitesWidget;
 		this.jsClient = jsClient;
+		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		profileSynAlert = ginInjector.getSynapseAlertWidget();
 		projectSynAlert = ginInjector.getSynapseAlertWidget();
 		teamSynAlert = ginInjector.getSynapseAlertWidget();
@@ -305,6 +310,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			public void onFailure(Throwable caught) {
 				view.hideLoading();
 				profileSynAlert.handleException(caught);
+			}
+		});
+		
+		isACTMemberAsyncHandler.isACTActionAvailable(isACT -> {
+			if (isACT) {
+				ProfileCertifiedValidatedWidget certifiedValidatedWidget = ginInjector.getProfileCertifiedValidatedWidget();
+				certifiedValidatedWidget.configure(currentUserIdLong);
+				view.setCertifiedValidatedWidget(certifiedValidatedWidget);
 			}
 		});
 	}

@@ -79,4 +79,5 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void showTabs(boolean isOwner);
 	void open(String url);
 	void setLastActivityOnColumnVisible(boolean visible);
+	void setCertifiedValidatedWidget(IsWidget w);
 }
