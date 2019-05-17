@@ -8,23 +8,18 @@ import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SageImageBundle;
 
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
-
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 
+	public static final String LASTPASS_IGNORE_INPUT_FIELD = "data-lpignore";
 	public static final String GOOGLE_OAUTH_CALLBACK_URL = "/Portal/oauth2callback?oauth2provider=GOOGLE_OAUTH_2_0";
 	public static final String GOOGLE_OAUTH_WITH_STATE_CALLBACK_URL = GOOGLE_OAUTH_CALLBACK_URL + "&state=";
 	
@@ -60,16 +55,18 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 			loginUser();
 		});
 		username.addKeyDownHandler(event -> {
-		if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-			loginUser();
-		}
+			if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+				loginUser();
+			}
 		});
 		username.setFocus(true);
+		username.getElement().setAttribute(LASTPASS_IGNORE_INPUT_FIELD, "true");
 		password.addKeyDownHandler(event -> {
-		if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-			loginUser();
-		}
+			if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+				loginUser();
+			}
 		});
+		password.getElement().setAttribute(LASTPASS_IGNORE_INPUT_FIELD, "true");
 	}
 	
 	@Override
