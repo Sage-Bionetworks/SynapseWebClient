@@ -1,16 +1,16 @@
 package org.sagebionetworks.web.unitclient.widget.entity.controller;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.shared.WebConstants.*;
 import static org.sagebionetworks.web.shared.WebConstants.ISSUE_PRIORITY_MINOR;
-import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_ISSUE_COLLECTOR_URL;
-import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_ISSUE_DESCRIPTION;
-import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_ISSUE_SUMMARY;
+import static org.sagebionetworks.web.shared.WebConstants.SWC_ISSUE_COLLECTOR_URL;
 
 import java.util.Collections;
 
@@ -36,6 +36,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -180,7 +181,7 @@ public class SynapseAlertImplTest {
 				eq(SWC_ISSUE_COLLECTOR_URL),
 				eq(USER_ID),
 				eq(DisplayUtils.getDisplayName(FIRST_NAME, LAST_NAME, USERNAME)),
-				eq(USER_EMAIL),
+				eq(WebConstants.ANONYMOUS), //not included
 				eq(""),
 				eq(""),
 				eq(""),

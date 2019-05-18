@@ -136,7 +136,6 @@ public class SynapseAlertImpl implements SynapseAlert {
 		if (userProfile != null) {
 			userId = userProfile.getOwnerId();
 			displayName = DisplayUtils.getDisplayName(userProfile);
-			email = DisplayUtils.getPrimaryEmail(userProfile);
 		}
 		String description = FLAG_ISSUE_DESCRIPTION_PART_1 +
 				gwt.getCurrentURL() + 
