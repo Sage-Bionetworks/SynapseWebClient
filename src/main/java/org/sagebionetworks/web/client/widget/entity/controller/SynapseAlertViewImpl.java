@@ -91,7 +91,6 @@ public class SynapseAlertViewImpl implements
 		if (jiraDialog == null) {
 			jiraDialog = new JiraDialog();
 			jiraDialog.addClickHandler(onCreateJiraIssue);
-			jiraDialogContainer.add(jiraDialog.asWidget());
 		}
 		synapseAlertContainer.setVisible(true);
 		jiraDialog.showJiraDialog(errorMessage);

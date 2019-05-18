@@ -13,6 +13,7 @@
 				<bh:Div>
 					<b:Icon ui:field="portalGoBackArrow" type="ARROW_LEFT" addStyleNames="movedown-2 font-size-14"/>
 					<b:Image ui:field="portalLogo" height="35px" addStyleNames="margin-left-10"/>
+					<bh:Span ui:field="portalName" addStyleNames="font-size-18 movedown-3" marginLeft="10"/>
 				</bh:Div>
 			</g:FocusPanel>
 		</b:Alert>

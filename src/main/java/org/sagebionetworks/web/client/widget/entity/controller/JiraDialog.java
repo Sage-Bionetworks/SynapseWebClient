@@ -25,19 +25,11 @@ public class JiraDialog {
 	TextArea userReportField;
 	@UiField
 	Button okButton;
-	@UiField
-	Button cancelButton;
 	
 	@Inject
 	public JiraDialog(){
 		Binder binder = GWT.create(Binder.class);
 		widget = binder.createAndBindUi(this);
-		cancelButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				jiraDialog.hide();
-			}
-		});
 	}
 	
 	public void addClickHandler(ClickHandler clickHandler) {
