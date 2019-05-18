@@ -1,12 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.entity.controller;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -16,8 +14,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.schema.adapter.JSONAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -30,11 +26,9 @@ import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -42,10 +36,8 @@ import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.amazonaws.services.greengrass.model.BadRequestException;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.StatusCodeException;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -59,8 +51,6 @@ public class SynapseAlertImplTest {
 	SynapseAlertImpl widget;
 	@Mock
 	PlaceChanger mockPlaceChanger;
-	@Mock
-	JiraURLHelper mockJiraClient;
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
 	@Mock
@@ -84,16 +74,11 @@ public class SynapseAlertImplTest {
 		UserProfile mockProfile = mock(UserProfile.class);
 		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(mockProfile);
 		
-		AsyncMockStubber.callSuccessWith(newJiraKey).when(mockJiraClient).createIssueOnBackend(anyString(),  any(Throwable.class),  anyString(), any(AsyncCallback.class));
-		
 		when(mockGWT.getHostPageBaseURL()).thenReturn(HOST_PAGE_URL);
 		
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		when(mockGlobalApplicationState.getJiraURLHelper()).thenReturn(mockJiraClient);
-		when(mockSynapseProperties.getSynapseProperty(WebConstants.CONFLUENCE_ENDPOINT)).thenReturn(JIRA_ENDPOINT_URL);
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		verify(mockView).setPresenter(widget);
 		when(mockPortalGinInjector.getLoginWidget()).thenReturn(mockLoginWidget);
 		when(mockPortalGinInjector.getSynapseProperties()).thenReturn(mockSynapseProperties);
 	}
@@ -175,39 +160,6 @@ public class SynapseAlertImplTest {
 	}
 	
 	@Test
-	public void testHandleServiceUnknownErrorExceptionNotLoggedIn() {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		String errorMessage= "unknown";
-		widget.handleException(new UnknownErrorException(errorMessage));
-		verify(mockView).clearState();
-		verify(mockView).showError(errorMessage);
-		verify(mockView, never()).showJiraDialog(errorMessage);
-		
-	}
-	
-	@Test
-	public void testOnCreateJiraIssue() {
-		widget.handleException(new UnknownErrorException());
-		String userReport = "clicked a button";
-		widget.onCreateJiraIssue(userReport);
-		verify(mockView).hideJiraDialog();
-		
-		// tell user that the jira has been created, and include a link to the new issue!
-		verify(mockView).showJiraIssueOpen(newJiraKey, JIRA_ENDPOINT_URL + SynapseAlertImpl.BROWSE_PATH + newJiraKey);
-	}
-	
-	@Test
-	public void testOnCreateJiraIssueFailure() {
-		widget.handleException(new UnknownErrorException());
-		
-		AsyncMockStubber.callFailureWith(new Exception("ex")).when(mockJiraClient).createIssueOnBackend(anyString(),  any(Throwable.class),  anyString(), any(AsyncCallback.class));
-		String userReport = "clicked a button";
-		widget.onCreateJiraIssue(userReport);
-		verify(mockView).hideJiraDialog();
-		verify(mockView, times(2)).showError(anyString());
-	}
-	
-	@Test
 	public void testHandleServiceUnrecognizedException() {
 		String errorMessage = "unrecognized";
 		widget.handleException(new IllegalArgumentException(errorMessage));
@@ -250,7 +202,6 @@ public class SynapseAlertImplTest {
 	public void testHandleServiceConflictingUpdateExceptionMessage() {
 		String errorMessage = "error";
 		widget.handleException(new ConflictingUpdateException(errorMessage));
-		verify(mockView, times(0)).showJiraDialog(anyString());
 		verify(mockView).showError(DisplayConstants.ERROR_CONFLICTING_UPDATE + "\n" + errorMessage);
 	}
 	

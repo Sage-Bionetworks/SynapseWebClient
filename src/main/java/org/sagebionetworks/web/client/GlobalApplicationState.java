@@ -6,7 +6,6 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
 
 import com.google.gwt.core.client.JavaScriptObject;
@@ -29,14 +28,7 @@ public interface GlobalApplicationState {
 	 * @param placeController
 	 */
 	public void setPlaceController(PlaceController placeController);
-	
-
-	/**
-	 * Gets the Jira url helper for the application
-	 * @return
-	 */	
-	public JiraURLHelper getJiraURLHelper();
-	
+		
 	/**
 	 * Holds the last visited place
 	 * @return

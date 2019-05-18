@@ -11,7 +11,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -43,7 +42,6 @@ import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -61,7 +59,6 @@ public class GlobalApplicationStateImplTest {
 	PlaceController mockPlaceController;
 	EventBus mockEventBus;
 	GlobalApplicationStateImpl globalApplicationState;
-	JiraURLHelper mockJiraURLHelper;
 	AppPlaceHistoryMapper mockAppPlaceHistoryMapper;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	GlobalApplicationStateView mockView;
@@ -83,13 +80,12 @@ public class GlobalApplicationStateImplTest {
 		mockCookieProvider = Mockito.mock(CookieProvider.class);
 		mockPlaceController = Mockito.mock(PlaceController.class);
 		mockEventBus = Mockito.mock(EventBus.class);
-		mockJiraURLHelper = Mockito.mock(JiraURLHelper.class);
 		mockAppPlaceHistoryMapper = mock(AppPlaceHistoryMapper.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockView = mock(GlobalApplicationStateView.class);
 		AsyncMockStubber.callSuccessWith("v1").when(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
 		
-		globalApplicationState = new GlobalApplicationStateImpl(mockView, mockCookieProvider,mockJiraURLHelper, mockEventBus, mockStackConfigService, mockSynapseJSNIUtils, mockLocalStorage, mockGWT, mockDateTimeUtils, mockJsClient, mockSynapseProperties);
+		globalApplicationState = new GlobalApplicationStateImpl(mockView, mockCookieProvider, mockEventBus, mockStackConfigService, mockSynapseJSNIUtils, mockLocalStorage, mockGWT, mockDateTimeUtils, mockJsClient, mockSynapseProperties);
 		globalApplicationState.setPlaceController(mockPlaceController);
 		globalApplicationState.setAppPlaceHistoryMapper(mockAppPlaceHistoryMapper);
 	}

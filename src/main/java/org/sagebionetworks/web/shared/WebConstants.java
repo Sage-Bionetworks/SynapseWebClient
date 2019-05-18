@@ -188,10 +188,6 @@ public class WebConstants {
 	public static final String FILE_HANDLE_UPLOAD_SERVLET = "filehandle";
 	public static final String SESSION_COOKIE_SERVLET = "sessioncookie";
 	public static final String FILE_ENTITY_RESOLVER_SERVLET = "fileresolver";
-	public static final String JIRA_PROJECT_ID ="org.sagebionetworks.portal.jira_project_id";
-	public static final String JIRA_PROJECT_KEY ="org.sagebionetworks.portal.jira_project_key";
-	public static final String CONFLUENCE_ENDPOINT = "org.sagebionetworks.portal.confluence_endpoint";
-	
 	public static final String SFTP_PROXY_ENDPOINT = "org.sagebionetworks.portal.sftp_proxy_endpoint";
 	
 	public static final String TEXT_COMMA_SEPARATED_VALUES = "text/csv";

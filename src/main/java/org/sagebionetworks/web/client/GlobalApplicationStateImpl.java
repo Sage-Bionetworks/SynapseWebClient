@@ -6,7 +6,6 @@ import static org.sagebionetworks.web.client.cookie.CookieKeys.SHOW_DATETIME_IN_
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -16,7 +15,6 @@ import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
 
 import com.google.gwt.core.client.GWT;
@@ -40,7 +38,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private AppPlaceHistoryMapper appPlaceHistoryMapper;
 	private StackConfigServiceAsync stackConfigService;
 	private PlaceChanger placeChanger;
-	private JiraURLHelper jiraUrlHelper;
+	
 	private EventBus eventBus;
 	private List<EntityHeader> favorites;
 	private boolean isEditing;
@@ -65,7 +63,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
 			CookieProvider cookieProvider,
-			JiraURLHelper jiraUrlHelper, 
 			EventBus eventBus, 
 			StackConfigServiceAsync stackConfigService, 
 			SynapseJSNIUtils synapseJSNIUtils, 
@@ -75,7 +72,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			SynapseJavascriptClient jsClient,
 			SynapseProperties synapseProperties) {
 		this.cookieProvider = cookieProvider;
-		this.jiraUrlHelper = jiraUrlHelper;
 		this.eventBus = eventBus;
 		this.stackConfigService = stackConfigService;
 		fixServiceEntryPoint(stackConfigService);
@@ -168,11 +164,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		this.placeController = placeController;
 	}
 	
-	@Override
-	public JiraURLHelper getJiraURLHelper() {
-		return jiraUrlHelper;
-	}
-
 	@Override
 	public Place getLastPlace() {
 		return getLastPlace(null);
