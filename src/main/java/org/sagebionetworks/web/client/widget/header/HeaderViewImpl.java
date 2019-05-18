@@ -133,6 +133,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	Image portalLogo;
 	@UiField
+	Span portalName;
+	@UiField
 	FocusPanel portalLogoFocusPanel;
 	
 	private Presenter presenter;
@@ -426,9 +428,21 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				String href = json.getString("callbackUrl");
 				portalHref = href;
 			}
+			if (json.has("portalName")) {
+				String name = json.getString("portalName");
+				if (!name.trim().isEmpty()) {
+					portalName.setText(name);
+					portalName.setVisible(true);
+					portalLogo.setVisible(false);	
+				}
+			}
 			if (json.has("logoUrl")) {
 				String logoUrl = json.getString("logoUrl");
-				portalLogo.setUrl(logoUrl);
+				if (!logoUrl.trim().isEmpty()) {
+					portalLogo.setUrl(logoUrl);
+					portalName.setVisible(false);
+					portalLogo.setVisible(true);	
+				}
 			}
 			portalAlert.setVisible(true);
 		} catch (JSONObjectAdapterException e) {

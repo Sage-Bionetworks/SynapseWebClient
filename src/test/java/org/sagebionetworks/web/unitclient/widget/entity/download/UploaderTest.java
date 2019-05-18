@@ -67,7 +67,6 @@ import org.sagebionetworks.web.client.events.UploadSuccessHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.download.S3DirectUploader;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
@@ -92,8 +91,6 @@ public class UploaderTest {
 	AuthenticationController mockAuthenticationController;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
-	@Mock
-	JiraURLHelper mockJiraURLHelper;
 	@Mock
 	SynapseJSNIUtils mockSynapseJsniUtils;
 	@Mock

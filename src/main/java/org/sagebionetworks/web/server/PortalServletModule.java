@@ -20,9 +20,6 @@ import org.sagebionetworks.web.server.servlet.FileHandleAssociationServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
 import org.sagebionetworks.web.server.servlet.FileUploaderJnlp;
 import org.sagebionetworks.web.server.servlet.InitSessionServlet;
-import org.sagebionetworks.web.server.servlet.JiraClientImpl;
-import org.sagebionetworks.web.server.servlet.JiraJavaClient;
-import org.sagebionetworks.web.server.servlet.JiraJavaClientImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
 import org.sagebionetworks.web.server.servlet.SlackServlet;
@@ -146,11 +143,6 @@ public class PortalServletModule extends ServletModule {
 		bind(DiscussionMessageServlet.class).in(Singleton.class);
 		serve("/Portal"+WebConstants.DISCUSSION_MESSAGE_SERVLET).with(DiscussionMessageServlet.class);
 
-		//Jira client service mapping
-		bind(JiraClientImpl.class).in(Singleton.class);
-		serve("/Portal/jira").with(JiraClientImpl.class);
-		bind(JiraJavaClient.class).to(JiraJavaClientImpl.class);
-		
 		// OAuth2 
 		bind(OAuth2SessionServlet.class).in(Singleton.class);
 		serve("/Portal/oauth2callback").with(OAuth2SessionServlet.class);

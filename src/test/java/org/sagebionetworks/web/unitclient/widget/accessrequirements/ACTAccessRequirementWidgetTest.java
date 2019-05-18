@@ -7,10 +7,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.shared.WebConstants.GRANT_ACCESS_REQUEST_COMPONENT_ID;
+import static org.sagebionetworks.web.shared.WebConstants.ISSUE_PRIORITY_MINOR;
 import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_ISSUE_COLLECTOR_URL;
 import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_ISSUE_DESCRIPTION;
 import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_ISSUE_SUMMARY;
-import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_PRIORITY;
 
 import java.util.Collections;
 import java.util.List;
@@ -246,7 +246,7 @@ public class ACTAccessRequirementWidgetTest {
 				SUBJECT_OBJECT_ID,
 				GRANT_ACCESS_REQUEST_COMPONENT_ID,
 				ACCESS_REQUIREMENT_ID.toString(),
-				REQUEST_ACCESS_PRIORITY
+				ISSUE_PRIORITY_MINOR
 				);
 	}
 }

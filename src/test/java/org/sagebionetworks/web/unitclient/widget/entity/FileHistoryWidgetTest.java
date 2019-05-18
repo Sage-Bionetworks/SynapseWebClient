@@ -27,7 +27,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
@@ -48,7 +47,6 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidgetView;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -73,8 +71,6 @@ public class FileHistoryWidgetTest {
 	FileHistoryWidgetView mockView;
 	@Mock
 	IconsImageBundle mockIconsImageBundle;
-	@Mock
-	JiraURLHelper mockJiraURLHelper;
 	@Mock
 	PreflightController mockPreflightController;
 	@Mock
