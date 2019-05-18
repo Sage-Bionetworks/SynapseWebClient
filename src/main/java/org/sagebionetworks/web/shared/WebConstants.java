@@ -321,5 +321,7 @@ public class WebConstants {
 	public static final String REQUEST_ACCESS_ISSUE_DESCRIPTION = "User requests that the Synapse Access and Compliance Team send them information on how to access this data.";
 	public static final String REQUEST_ACCESS_PRIORITY = "4";
 	public static final String ANONYMOUS = "Anonymous";
-
+	
+	//report Synapse error
+	public static final String SWC_ISSUE_COLLECTOR_URL = "https://sagebionetworks.jira.com/s/d41d8cd98f00b204e9800998ecf8427e-T/-bhcm7i/b/6/e73395c53c3b10fde2303f4bf74ffbf6/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector-embededjs/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector-embededjs.js?locale=en-US&collectorId=ddc881b3";
 }

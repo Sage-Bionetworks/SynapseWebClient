@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
 import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
+import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_1;
 
-import org.sagebionetworks.schema.adapter.JSONAdapter;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -15,7 +15,6 @@ import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
@@ -27,11 +26,10 @@ import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.StatusCodeException;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presenter  {
+public class SynapseAlertImpl implements SynapseAlert {
 	public static final String SERVER_STATUS_CODE_MESSAGE = "Server responded with unexpected status code: ";
 	public static final String BROWSE_PATH = "/browse/";
 	GlobalApplicationState globalApplicationState;
@@ -42,6 +40,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	Callback reloadOnLoginListener;
 	SynapseJSNIUtils jsniUtils;
 	JSONObjectAdapter jsonObjectAdapter;
+	GWTWrapper gwt;
 	
 	@Inject
 	public SynapseAlertImpl(
@@ -59,8 +58,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 		this.ginInjector = ginInjector;
 		this.jsniUtils = jsniUtils;
 		this.jsonObjectAdapter = jsonObjectAdapter;
-		view.setPresenter(this);
-		
+		this.gwt = gwt;
 		reloadOnLoginListener = () -> {
 			SynapseAlertImpl.this.view.reload();
 		};
@@ -107,7 +105,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 			//Exception handling on the backend now throws the reason into the exception message.  Easy!
 			view.showError(message);
 			if (isLoggedIn) {
-				view.showJiraDialog(message);
+				onCreateJiraIssue();
 			}
 		} else {
 			//not recognized
@@ -131,28 +129,19 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 		}
 	}
 	
-	@Override
-	public void onCreateJiraIssue(final String userReport) {
-		JiraURLHelper jiraHelper = globalApplicationState.getJiraURLHelper();
-		jiraHelper.createIssueOnBackend(userReport, ex,
-			ex.getMessage(), new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String key) {
-					view.hideJiraDialog();
-					String jiraEndpoint = ginInjector.getSynapseProperties().getSynapseProperty(WebConstants.CONFLUENCE_ENDPOINT);
-					String url = jiraEndpoint + BROWSE_PATH + key;
-					view.showJiraIssueOpen(key, url);
-				}
-
-				@Override
-				public void onFailure(Throwable caught) {
-					// failure to create issue!
-					view.hideJiraDialog();
-					view.showError(DisplayConstants.ERROR_GENERIC_NOTIFY+"\n" 
-					+ caught.getMessage() +"\n\n"
-					+ userReport);
-				}
-			});
+	public void onCreateJiraIssue() {
+		String userId = WebConstants.ANONYMOUS, email = WebConstants.ANONYMOUS, displayName = WebConstants.ANONYMOUS;
+		UserProfile userProfile = authController.getCurrentUserProfile();
+		if (userProfile != null) {
+			userId = userProfile.getOwnerId();
+			displayName = DisplayUtils.getDisplayName(userProfile);
+			email = DisplayUtils.getPrimaryEmail(userProfile);
+		}
+		String description = FLAG_ISSUE_DESCRIPTION_PART_1 +
+				gwt.getCurrentURL(); 
+				
+		String issuePriority = "4";
+		jsniUtils.showJiraIssueCollector("", description, WebConstants.SWC_ISSUE_COLLECTOR_URL, userId, displayName, email, "", "", "", issuePriority);
 	}
 	
 	@Override

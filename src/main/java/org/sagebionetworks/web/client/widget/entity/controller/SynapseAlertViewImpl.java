@@ -5,7 +5,6 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
-import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -34,19 +33,11 @@ public class SynapseAlertViewImpl implements
 	Alert alert;
 	@UiField
 	Div loginAlert;
-	Presenter presenter;
 	@UiField
 	Div loginWidgetContainer;
-	@UiField
-	Div jiraDialogContainer;
-	ClickHandler onCreateJiraIssue;
-	JiraDialog jiraDialog;
 	
 	Span synapseAlertContainer = new Span();
 	public SynapseAlertViewImpl(){
-		onCreateJiraIssue = event -> {
-			presenter.onCreateJiraIssue(jiraDialog.getText());
-		};
 	}
 	
 	private void lazyConstruct() {
@@ -69,37 +60,14 @@ public class SynapseAlertViewImpl implements
 		lazyConstruct();
 		reloadButton.setVisible(visible);
 	}
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
-	
 	@Override
 	public Widget asWidget() {
 		return synapseAlertContainer;
 	}
 	
 	@Override
-	public void hideJiraDialog() {
-		if (jiraDialog != null) {
-			jiraDialog.hideJiraDialog();	
-		}
-	}
-	
-	@Override
-	public void showJiraDialog(String errorMessage) {
-		lazyConstruct();
-		if (jiraDialog == null) {
-			jiraDialog = new JiraDialog();
-			jiraDialog.addClickHandler(onCreateJiraIssue);
-		}
-		synapseAlertContainer.setVisible(true);
-		jiraDialog.showJiraDialog(errorMessage);
-	}
-	
-	@Override
 	public void clearState() {
 		if (widget != null) {
-			hideJiraDialog();
 			alert.setVisible(false);
 			alertText.setText("");
 			loginAlert.setVisible(false);
@@ -120,11 +88,6 @@ public class SynapseAlertViewImpl implements
 		synapseAlertContainer.setVisible(true);
 		alertText.setText(error);
 		alert.setVisible(true);
-	}
-	
-	@Override
-	public void showJiraIssueOpen(String key, String url) {
-		Bootbox.alert("The new report <a target=\"_blank\" href=\"" + url + "\">"+key+"</a> has been sent. Thank you for submitting!");
 	}
 	
 	@Override
