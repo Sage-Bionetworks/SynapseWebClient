@@ -1,12 +1,18 @@
 package org.sagebionetworks.web.unitclient.widget.entity.controller;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.isA;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.shared.WebConstants.*;
+import static org.sagebionetworks.web.shared.WebConstants.ISSUE_PRIORITY_MINOR;
+import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_ISSUE_COLLECTOR_URL;
+import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_ISSUE_DESCRIPTION;
+import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_ISSUE_SUMMARY;
+
+import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +23,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -67,20 +74,30 @@ public class SynapseAlertImplTest {
 	
 	public static final String HOST_PAGE_URL="http://foobar";
 	public static final String JIRA_ENDPOINT_URL="http://foo.bar.com/";
+	
+	public static final String USER_EMAIL = "email@email.com";
+	public static final String USER_ID = "123";
+	public static final String USERNAME = "Clue";
+	public static final String FIRST_NAME = "Professor";
+	public static final String LAST_NAME = "Plum";
+
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 		widget = new SynapseAlertImpl(mockView, mockGlobalApplicationState, mockAuthenticationController, mockGWT, mockPortalGinInjector, mockJsniUtils, jsonObjectAdapter);
 		UserProfile mockProfile = mock(UserProfile.class);
 		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(mockProfile);
-		
 		when(mockGWT.getHostPageBaseURL()).thenReturn(HOST_PAGE_URL);
-		
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockPortalGinInjector.getLoginWidget()).thenReturn(mockLoginWidget);
 		when(mockPortalGinInjector.getSynapseProperties()).thenReturn(mockSynapseProperties);
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(mockProfile);
+		when(mockProfile.getOwnerId()).thenReturn(USER_ID);
+		when(mockProfile.getEmails()).thenReturn(Collections.singletonList(USER_EMAIL));
+		when(mockProfile.getFirstName()).thenReturn(FIRST_NAME);
+		when(mockProfile.getLastName()).thenReturn(LAST_NAME);
+		when(mockProfile.getUserName()).thenReturn(USERNAME);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 	}
 	
 	@Test
@@ -156,7 +173,19 @@ public class SynapseAlertImplTest {
 		widget.handleException(new UnknownErrorException(errorMessage));
 		verify(mockView).clearState();
 		verify(mockView).showError(errorMessage);
-		verify(mockView).showJiraDialog(errorMessage);
+		
+		verify(mockJsniUtils).showJiraIssueCollector(
+				eq(""),
+				anyString(),
+				eq(SWC_ISSUE_COLLECTOR_URL),
+				eq(USER_ID),
+				eq(DisplayUtils.getDisplayName(FIRST_NAME, LAST_NAME, USERNAME)),
+				eq(USER_EMAIL),
+				eq(""),
+				eq(""),
+				eq(""),
+				eq(ISSUE_PRIORITY_MINOR)
+			);
 	}
 	
 	@Test

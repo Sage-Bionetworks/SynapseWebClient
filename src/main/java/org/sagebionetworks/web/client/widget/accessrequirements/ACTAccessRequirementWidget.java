@@ -5,7 +5,7 @@ import static org.sagebionetworks.web.shared.WebConstants.GRANT_ACCESS_REQUEST_C
 import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_ISSUE_COLLECTOR_URL;
 import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_ISSUE_DESCRIPTION;
 import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_ISSUE_SUMMARY;
-import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_PRIORITY;
+import static org.sagebionetworks.web.shared.WebConstants.ISSUE_PRIORITY_MINOR;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -149,7 +149,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 				ar.getSubjectIds().get(0).getId(),
 				GRANT_ACCESS_REQUEST_COMPONENT_ID,
 				ar.getId().toString(),
-				REQUEST_ACCESS_PRIORITY);
+				ISSUE_PRIORITY_MINOR);
 	}
 	
 	public void showApproved() {

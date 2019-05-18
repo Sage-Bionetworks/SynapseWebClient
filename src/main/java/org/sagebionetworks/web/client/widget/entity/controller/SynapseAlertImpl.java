@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
 import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_1;
+import static org.sagebionetworks.web.shared.WebConstants.ISSUE_PRIORITY_MINOR;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -105,7 +106,7 @@ public class SynapseAlertImpl implements SynapseAlert {
 			//Exception handling on the backend now throws the reason into the exception message.  Easy!
 			view.showError(message);
 			if (isLoggedIn) {
-				onCreateJiraIssue();
+				onCreateJiraIssue(message);
 			}
 		} else {
 			//not recognized
@@ -129,7 +130,7 @@ public class SynapseAlertImpl implements SynapseAlert {
 		}
 	}
 	
-	public void onCreateJiraIssue() {
+	public void onCreateJiraIssue(String errorMessage) {
 		String userId = WebConstants.ANONYMOUS, email = WebConstants.ANONYMOUS, displayName = WebConstants.ANONYMOUS;
 		UserProfile userProfile = authController.getCurrentUserProfile();
 		if (userProfile != null) {
@@ -138,10 +139,10 @@ public class SynapseAlertImpl implements SynapseAlert {
 			email = DisplayUtils.getPrimaryEmail(userProfile);
 		}
 		String description = FLAG_ISSUE_DESCRIPTION_PART_1 +
-				gwt.getCurrentURL(); 
+				gwt.getCurrentURL() + 
+				"\n\n" + errorMessage;
 				
-		String issuePriority = "4";
-		jsniUtils.showJiraIssueCollector("", description, WebConstants.SWC_ISSUE_COLLECTOR_URL, userId, displayName, email, "", "", "", issuePriority);
+		jsniUtils.showJiraIssueCollector("", description, WebConstants.SWC_ISSUE_COLLECTOR_URL, userId, displayName, email, "", "", "", ISSUE_PRIORITY_MINOR);
 	}
 	
 	@Override
