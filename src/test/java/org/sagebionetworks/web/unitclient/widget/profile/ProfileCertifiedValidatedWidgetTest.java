@@ -26,34 +26,27 @@ public class ProfileCertifiedValidatedWidgetTest {
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
-	LazyLoadHelper mockLazyLoadHelper;
-	@Mock
 	UserBundle mockUserBundle;
-	@Captor
-	ArgumentCaptor<Callback> callbackCaptor;
 	
 	ProfileCertifiedValidatedWidget widget;
 	
 	@Before
 	public void setUp(){
 		MockitoAnnotations.initMocks(this);
-		widget = new ProfileCertifiedValidatedWidget(mockView, mockSynapseJavascriptClient, mockLazyLoadHelper);
+		widget = new ProfileCertifiedValidatedWidget(mockView, mockSynapseJavascriptClient);
 		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 	}
 	
 	@Test
 	public void testLoadData() {
 		Long userId = 87663L;
-		widget.configure(userId);
-		verify(mockLazyLoadHelper).setIsConfigured();
-		
 		boolean isCertified = false;
 		boolean isVerified = true;
 		when(mockUserBundle.getIsCertified()).thenReturn(isCertified);
 		when(mockUserBundle.getIsVerified()).thenReturn(isVerified);
-		verify(mockLazyLoadHelper).configure(callbackCaptor.capture(), eq(mockView));
-		verifyZeroInteractions(mockSynapseJavascriptClient);
-		callbackCaptor.getValue().invoke();
+		
+		widget.configure(userId);
+		
 		verify(mockSynapseJavascriptClient).getUserBundle(eq(userId), anyInt(), any(AsyncCallback.class));
 		verify(mockView).setCertifiedVisible(isCertified);
 		verify(mockView).setVerifiedVisible(isVerified);
