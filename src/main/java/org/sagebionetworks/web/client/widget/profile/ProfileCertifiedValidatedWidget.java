@@ -5,7 +5,6 @@ import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_VERIF
 
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -14,7 +13,6 @@ import com.google.inject.Inject;
 
 public class ProfileCertifiedValidatedWidget implements IsWidget {
 	SynapseJavascriptClient jsClient;
-	Callback inViewportCallback;
 	ProfileCertifiedValidatedView view;
 	Long userId;
 	
