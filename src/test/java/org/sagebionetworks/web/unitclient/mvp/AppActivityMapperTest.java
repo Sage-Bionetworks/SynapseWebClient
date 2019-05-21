@@ -1,24 +1,31 @@
 package org.sagebionetworks.web.unitclient.mvp;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieKeys;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.users.PasswordReset;
+import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -32,36 +39,33 @@ import com.google.gwt.place.shared.Place;
  * @author jmhill
  *
  */
+@RunWith(MockitoJUnitRunner.class)
 public class AppActivityMapperTest {
-	
+	@Mock
 	PortalGinInjector mockInjector;
-
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	AppActivityMapper appActivityMapper;
 	String historyToken = "Home:0";
+	@Mock
 	AuthenticationController mockAuthenticationController;
+	@Mock
 	BulkPresenterProxy mockBulkPresenterProxy;
-	
+	@Mock
+	CookieProvider mockCookies;
+	@Mock
+	LoginPresenter mockLoginPresenter;
 	@Before
 	public void before(){
-		// Mock the views
-		mockInjector = Mockito.mock(PortalGinInjector.class);
-		// Controller
-		mockBulkPresenterProxy = Mockito.mock(BulkPresenterProxy.class);
-		mockSynapseJSNIUtils = Mockito.mock(SynapseJSNIUtils.class);
-		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
 		when(mockInjector.getBulkPresenterProxy()).thenReturn(mockBulkPresenterProxy);
-		
-		// WHENs
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockSynapseJSNIUtils.getCurrentHistoryToken()).thenReturn(historyToken);
-		
-		// Global App State
-		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
+		when(mockInjector.getCookieProvider()).thenReturn(mockCookies);
 		when(mockInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
-		
 		when(mockInjector.getAuthenticationController()).thenReturn(mockAuthenticationController);
+		when(mockInjector.getLoginPresenter()).thenReturn(mockLoginPresenter);
 		
 		appActivityMapper = new AppActivityMapper(mockInjector, mockSynapseJSNIUtils, null);
 	}
@@ -95,9 +99,7 @@ public class AppActivityMapperTest {
 		// Part 1
 		Place entityPlace = new Synapse("token");
 		Place loginPlace1 = new LoginPlace("0");
-		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(entityPlace);		
-		LoginPresenter mockLoginPresenter = mock(LoginPresenter.class);		
-		when(mockInjector.getLoginPresenter()).thenReturn(mockLoginPresenter);
+		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(entityPlace);
 		
 		appActivityMapper.getActivity(loginPlace1);
 		verify(mockGlobalApplicationState).setLastPlace(entityPlace);
@@ -109,5 +111,21 @@ public class AppActivityMapperTest {
 		Place loginPlace2 = new LoginPlace("EXAMPLE_SSO_TOKEN");
 		appActivityMapper.getActivity(loginPlace2);		
 		verify(mockGlobalApplicationState, times(0)).setLastPlace(any(Place.class));
+	}
+	
+	@Test 
+	public void testRemovePortalPlaceCookie() {
+		when(mockCookies.getCookie(CookieKeys.PORTAL_CONFIG)).thenReturn("cookieIsSet");
+		
+		// not removed if registering
+		appActivityMapper.getActivity(new RegisterAccount("0"));
+		verify(mockCookies, never()).removeCookie(anyString());
+		// or resetting your password
+		appActivityMapper.getActivity(new PasswordReset("0"));
+		verify(mockCookies, never()).removeCookie(anyString());
+
+		//but is on visit to an entity page
+		appActivityMapper.getActivity(new Synapse("syn123"));
+		verify(mockCookies).removeCookie(CookieKeys.PORTAL_CONFIG);
 	}
 }
