@@ -264,8 +264,7 @@ public class TableQueryResultWidgetTest {
 		widget.configure(query, isEditable, tableType, mockListner);
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), qbrCaptor.capture(), asyncProgressHandlerCaptor.capture());
 		
-		// TODO: include new ErrorResponseCode if PLFM-5491 is resolved.
-		ErrorResponseCode code = null;
+		ErrorResponseCode code = ErrorResponseCode.INVALID_TABLE_QUERY_FACET_COLUMN_REQUEST;
 		asyncProgressHandlerCaptor.getValue().onFailure(new BadRequestException(TableQueryResultWidget.FACET_COLUMNS_CHANGED_MESSAGE, code));
 		
 		verify(mockPopupUtils).showErrorMessage(TableQueryResultWidget.SCHEMA_CHANGED_MESSAGE);
