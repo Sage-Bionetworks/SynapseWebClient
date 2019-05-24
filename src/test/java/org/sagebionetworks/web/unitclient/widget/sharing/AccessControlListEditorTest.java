@@ -31,6 +31,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.ErrorResponseCode;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroupHeader;
@@ -565,8 +566,7 @@ public class AccessControlListEditorTest {
 	public void addDownloadAccessToAuthenticatedUsersNotCertified() throws Exception {		
 		// configure mocks
 		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		//TODO: when PLFM-5479 is fixed, set the ErrorResponseCode instead of the exception message.
-		AsyncMockStubber.callFailureWith(new ForbiddenException("Only certified users can allow authenticated users to download.")).when(mockSynapseClient).updateAcl(any(AccessControlList.class), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new ForbiddenException("Only certified users can allow authenticated users to download.", ErrorResponseCode.USER_CERTIFICATION_REQUIRED)).when(mockSynapseClient).updateAcl(any(AccessControlList.class), anyBoolean(), any(AsyncCallback.class));
 		
 		acle.refresh();
 		acle.setAccess(TEST_PUBLIC_PRINCIPAL_ID, PermissionLevel.CAN_DOWNLOAD);

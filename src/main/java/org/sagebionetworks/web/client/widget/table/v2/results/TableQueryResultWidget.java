@@ -7,6 +7,7 @@ import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.D
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.ErrorResponseCode;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.Query;
@@ -359,8 +360,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 */
 	private void showError(Throwable caught){
 		setupErrorState();
-		//TODO: use ErrorResponseCode if PLFM-5491 is resolved.
-		if (caught instanceof BadRequestException && caught.getMessage().toLowerCase().contains(FACET_COLUMNS_CHANGED_MESSAGE)) {
+		// due to invalid column set? (see PLFM-5491)
+		if (caught instanceof BadRequestException && ErrorResponseCode.INVALID_TABLE_QUERY_FACET_COLUMN_REQUEST.equals(((BadRequestException) caught).getErrorResponseCode())) {
 			popupUtils.showErrorMessage(SCHEMA_CHANGED_MESSAGE);
 			resetFacetsHandler.invoke();
 		} else {

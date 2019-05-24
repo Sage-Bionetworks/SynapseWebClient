@@ -13,6 +13,7 @@ import java.util.Set;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.ErrorResponseCode;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroupHeader;
@@ -415,8 +416,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				//TODO: when PLFM-5479 is fixed, look at the ErrorResponseCode instead of the exception message.
-				if (caught instanceof ForbiddenException && caught.getMessage().contains("certified users")) {
+				// due to certification state? (see PLFM-5479)
+				if (caught instanceof ForbiddenException && ErrorResponseCode.USER_CERTIFICATION_REQUIRED.equals(((ForbiddenException) caught).getErrorResponseCode())) {
 					getQuizInfoDialog().show();
 				} else {
 					synAlert.handleException(caught);
