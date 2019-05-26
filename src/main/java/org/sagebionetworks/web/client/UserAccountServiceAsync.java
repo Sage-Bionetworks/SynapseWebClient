@@ -9,11 +9,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface UserAccountServiceAsync {
 	
-	void sendPasswordResetEmail(String emailAddress, AsyncCallback<Void> callback);
-
-	void changePassword(String sessionToken, String newPassword, AsyncCallback<Void> callback);
-
-	
 	void signTermsOfUse(String sessionToken, boolean acceptsTerms, AsyncCallback<Void> callback);
 
 	void createUserStep1(NewUser newUser, String portalEndpoint, AsyncCallback<Void> callback);

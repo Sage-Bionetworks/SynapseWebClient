@@ -76,7 +76,7 @@
 	<inherits name="org.sagebionetworks.web.Portal"/>
 	<inherits name="org.sagebionetworks.web.client.PortalResources"/>
 	<inherits name="com.gwtplatform.mvp.Mvp"/>
-	<inherits name="org.sagebionetworks.repo.SharedSynpaseDTOs"/>
+	<inherits name="org.sagebionetworks.repo.SharedSynapseDTOs"/>
 	<inherits name="org.sagebionetworks.gwt.JSONAdapter"/>
 	<inherits name="org.sagebionetworks.client.synpaseClientExceptions"/>
 	<inherits name="com.google.gwt.user.RemoteServiceObfuscateTypeNames" />
