@@ -54,30 +54,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 	
 	@Override
-	public void sendPasswordResetEmail(String emailAddress) throws RestServiceException {
-		validateService();
-		
-		SynapseClient client = createAnonymousSynapseClient();
-		try {
-			client.sendPasswordResetEmail(emailAddress);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public void changePassword(String sessionToken, String newPassword) throws RestServiceException {
-		validateService();
-		
-		SynapseClient client = createAnonymousSynapseClient();
-		try {
-			client.changePassword(sessionToken, newPassword);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
-	@Override
 	public String getCurrentSessionToken() throws RestServiceException {
 		validateService();
 		String sessionToken = tokenProvider.getSessionToken();
