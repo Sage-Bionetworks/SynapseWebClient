@@ -241,4 +241,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			}
 		});
 	}
+	
+	@Override
+	public void refreshSessionToken() {
+		ginInjector.getSynapseJavascriptClient().refreshSessionToken();
+	}
 }
