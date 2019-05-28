@@ -1485,12 +1485,15 @@ public class SynapseJavascriptClient {
 	/**
 	 * If logged in, refresh the current session token to render it usable for another 24 hours
 	 */
-	public void refreshSessionToken() {
+	public void refreshCurrentSessionToken() {
 		if (authController.isLoggedIn()) {
 			String url = getAuthServiceUrl() + SESSION;
 			Session session = new Session();
 			session.setSessionToken(authController.getCurrentUserSessionToken());
-			doPut(url, session, OBJECT_TYPE.None, null);	
+			doPut(url, session, OBJECT_TYPE.None, null);
+
+			// also set the session cookie (to update the expiration)
+			initSession(authController.getCurrentUserSessionToken());
 		}
 	}
 

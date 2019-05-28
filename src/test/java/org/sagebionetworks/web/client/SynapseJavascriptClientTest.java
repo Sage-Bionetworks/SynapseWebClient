@@ -103,6 +103,7 @@ public class SynapseJavascriptClientTest {
 	public static final String FILE_ENDPOINT = "http://file-endpoint/v1";
 	public static final String AUTH_ENDPOINT = "http://auth-endpoint/v1";
 	public static final String USER_SESSION_TOKEN = "abc123";
+	public static final String SESSION_COOKIE_URL = "http://session-cookie-servlet/";
 	
 	@Mock
 	PortalGinInjector mockGinInjector;
@@ -141,6 +142,8 @@ public class SynapseJavascriptClientTest {
 		when(mockSynapseProperties.getSynapseProperty(AUTH_PUBLIC_SERVICE_URL_KEY)).thenReturn(AUTH_ENDPOINT);
 		when(mockGinInjector.getRequestBuilder()).thenReturn(mockRequestBuilder);
 		when(mockGinInjector.getAuthenticationController()).thenReturn(mockAuthController);
+		when(mockJsniUtils.getSessionCookieUrl()).thenReturn(SESSION_COOKIE_URL);
+		
 		client = new SynapseJavascriptClient(
 				jsonObjectAdapter, 
 				mockSynapseProperties, 
@@ -741,31 +744,35 @@ public class SynapseJavascriptClientTest {
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
 		
-		client.refreshSessionToken();
+		client.refreshCurrentSessionToken();
 
 		//verify url and method
 		String url = AUTH_ENDPOINT + SESSION;
 		verify(mockRequestBuilder).configure(PUT, url);
-		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
-		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
-		verify(mockRequestBuilder).sendRequest(stringCaptor.capture(), requestCallbackCaptor.capture());
+		verify(mockRequestBuilder, times(2)).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
+		verify(mockRequestBuilder, times(2)).setHeader(WebConstants.CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
+		verify(mockRequestBuilder, times(2)).sendRequest(stringCaptor.capture(), requestCallbackCaptor.capture());
+		
+		verify(mockRequestBuilder).configure(POST, SESSION_COOKIE_URL);
 		
 		//verify request data
-		String json = stringCaptor.getValue();
-		Session request = new Session(jsonObjectAdapter.createNew(json));
-		assertEquals(USER_SESSION_TOKEN, request.getSessionToken());
+		List<String> jsonValues = stringCaptor.getAllValues();
+		for (String json : jsonValues) {
+			Session request = new Session(jsonObjectAdapter.createNew(json));
+			assertEquals(USER_SESSION_TOKEN, request.getSessionToken());
+		}
 	}
-	
 	
 	@Test
 	public void testRefreshSessionTokenAnonymous() throws RequestException, JSONObjectAdapterException {
 		when(mockAuthController.isLoggedIn()).thenReturn(false);
 		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
 		
-		client.refreshSessionToken();
+		client.refreshCurrentSessionToken();
 
 		String url = AUTH_ENDPOINT + SESSION;
 		verify(mockRequestBuilder, never()).configure(PUT, url);
 		verify(mockRequestBuilder, never()).sendRequest(anyString(), any(RequestCallback.class));
+		verify(mockRequestBuilder, never()).configure(POST, SESSION_COOKIE_URL);
 	}
 }
