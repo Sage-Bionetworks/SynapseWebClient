@@ -156,6 +156,7 @@ import com.google.inject.Inject;
  *
  */
 public class SynapseJavascriptClient {
+	public static final String SESSION = "/session";
 	public static final String TYPE_FILTER_PARAMETER = "&typeFilter=";
 	public static final String CHALLENGE = "/challenge";
 	public static final String WIKI = "/wiki/";
@@ -1104,7 +1105,7 @@ public class SynapseJavascriptClient {
 	
 	public void logout() {
 		if (authController.isLoggedIn()) {
-			String url = getAuthServiceUrl() + "/session";
+			String url = getAuthServiceUrl() + SESSION;
 			doDelete(url, null);	
 		}
 	}
@@ -1480,5 +1481,21 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + TEAM + "/" + teamId + MEMBER +"/" + userId + "?teamEndpoint=" + teamEndpoint + "&notificationUnsubscribeEndpoint="+signedTokenEndpoint;
 		doPut(url, null, OBJECT_TYPE.None, cb);
 	}
+	
+	/**
+	 * If logged in, refresh the current session token to render it usable for another 24 hours
+	 */
+	public void refreshCurrentSessionToken() {
+		if (authController.isLoggedIn()) {
+			String url = getAuthServiceUrl() + SESSION;
+			Session session = new Session();
+			session.setSessionToken(authController.getCurrentUserSessionToken());
+			doPut(url, session, OBJECT_TYPE.None, null);
+
+			// also set the session cookie (to update the expiration)
+			initSession(authController.getCurrentUserSessionToken());
+		}
+	}
+
 }
 

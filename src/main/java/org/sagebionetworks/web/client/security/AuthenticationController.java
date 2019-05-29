@@ -69,4 +69,7 @@ public interface AuthenticationController {
 	public void updateCachedProfile(UserProfile updatedProfile);
 	
 	void checkForUserChange();
+
+	// refreshes the session token (iff logged in)
+	void refreshSessionToken();
 }

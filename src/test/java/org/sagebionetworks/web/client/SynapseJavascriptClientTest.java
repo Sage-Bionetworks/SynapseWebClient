@@ -16,7 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE;
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.*;
-import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
+import static org.sagebionetworks.web.shared.WebConstants.*;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 
 import java.util.ArrayList;
@@ -50,6 +50,7 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.asynch.AsynchJobState;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
+import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
@@ -100,7 +101,9 @@ public class SynapseJavascriptClientTest {
 	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	public static final String REPO_ENDPOINT = "http://repo-endpoint/v1";
 	public static final String FILE_ENDPOINT = "http://file-endpoint/v1";
+	public static final String AUTH_ENDPOINT = "http://auth-endpoint/v1";
 	public static final String USER_SESSION_TOKEN = "abc123";
+	public static final String SESSION_COOKIE_URL = "http://session-cookie-servlet/";
 	
 	@Mock
 	PortalGinInjector mockGinInjector;
@@ -136,8 +139,11 @@ public class SynapseJavascriptClientTest {
 		entityId2BundleCache = new EntityId2BundleCacheImpl();
 		when(mockSynapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY)).thenReturn(REPO_ENDPOINT);
 		when(mockSynapseProperties.getSynapseProperty(FILE_SERVICE_URL_KEY)).thenReturn(FILE_ENDPOINT);
+		when(mockSynapseProperties.getSynapseProperty(AUTH_PUBLIC_SERVICE_URL_KEY)).thenReturn(AUTH_ENDPOINT);
 		when(mockGinInjector.getRequestBuilder()).thenReturn(mockRequestBuilder);
 		when(mockGinInjector.getAuthenticationController()).thenReturn(mockAuthController);
+		when(mockJsniUtils.getSessionCookieUrl()).thenReturn(SESSION_COOKIE_URL);
+		
 		client = new SynapseJavascriptClient(
 				jsonObjectAdapter, 
 				mockSynapseProperties, 
@@ -731,5 +737,42 @@ public class SynapseJavascriptClientTest {
 		//verify url and method
 		String url = REPO_ENDPOINT + ENTITY + "/" + ownerId + WIKI_HEADER_TREE + "?" + LIMIT_PARAMETER + LIMIT_50 + "&" + OFFSET_PARAMETER + "0";
 		verify(mockRequestBuilder).configure(GET, url);
+	}
+	
+	@Test
+	public void testRefreshSessionToken() throws RequestException, JSONObjectAdapterException {
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
+		
+		client.refreshCurrentSessionToken();
+
+		//verify url and method
+		String url = AUTH_ENDPOINT + SESSION;
+		verify(mockRequestBuilder).configure(PUT, url);
+		verify(mockRequestBuilder, times(2)).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
+		verify(mockRequestBuilder, times(2)).setHeader(WebConstants.CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
+		verify(mockRequestBuilder, times(2)).sendRequest(stringCaptor.capture(), requestCallbackCaptor.capture());
+		
+		verify(mockRequestBuilder).configure(POST, SESSION_COOKIE_URL);
+		
+		//verify request data
+		List<String> jsonValues = stringCaptor.getAllValues();
+		for (String json : jsonValues) {
+			Session request = new Session(jsonObjectAdapter.createNew(json));
+			assertEquals(USER_SESSION_TOKEN, request.getSessionToken());
+		}
+	}
+	
+	@Test
+	public void testRefreshSessionTokenAnonymous() throws RequestException, JSONObjectAdapterException {
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
+		
+		client.refreshCurrentSessionToken();
+
+		String url = AUTH_ENDPOINT + SESSION;
+		verify(mockRequestBuilder, never()).configure(PUT, url);
+		verify(mockRequestBuilder, never()).sendRequest(anyString(), any(RequestCallback.class));
+		verify(mockRequestBuilder, never()).configure(POST, SESSION_COOKIE_URL);
 	}
 }
