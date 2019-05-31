@@ -80,6 +80,7 @@ import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
+import org.sagebionetworks.web.shared.exceptions.DeprecatedServiceException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.LockedException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -164,7 +165,7 @@ public class SynapseJavascriptClientTest {
 		assertTrue(getException(SC_BAD_REQUEST, reason, errorResponseCode) instanceof BadRequestException);
 		assertTrue(getException(SC_LOCKED, reason, errorResponseCode) instanceof LockedException);
 		assertTrue(getException(SC_PRECONDITION_FAILED, reason, errorResponseCode) instanceof ConflictingUpdateException);
-		assertTrue(getException(SC_GONE, reason, errorResponseCode) instanceof BadRequestException);
+		assertTrue(getException(SC_GONE, reason, errorResponseCode) instanceof DeprecatedServiceException);
 		assertTrue(getException(SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE, reason, errorResponseCode) instanceof TooManyRequestsException);
 		assertTrue(getException(SC_SERVICE_UNAVAILABLE, reason, errorResponseCode) instanceof SynapseDownException);
 		assertTrue(getException(SC_CONFLICT, reason, errorResponseCode) instanceof ConflictException);

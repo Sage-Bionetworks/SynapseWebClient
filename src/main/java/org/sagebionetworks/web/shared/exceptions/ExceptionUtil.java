@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseClientException;
 import org.sagebionetworks.client.exceptions.SynapseConflictingUpdateException;
+import org.sagebionetworks.client.exceptions.SynapseDeprecatedServiceException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseLockedException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
@@ -55,6 +56,8 @@ public class ExceptionUtil {
 			return new ResultNotReadyException(((SynapseResultNotReadyException) ex).getJobStatus());
 		} else if (ex instanceof SynapseServiceUnavailable) {
 			return new SynapseDownException(ex.getMessage(), code);
+		} else if (ex instanceof SynapseDeprecatedServiceException) {
+			return new DeprecatedServiceException(ex.getMessage(), code);
 		} else if (ex instanceof UnknownSynapseServerException) {
 			UnknownSynapseServerException sse = (UnknownSynapseServerException)ex;
 			if (sse.getStatusCode()==HttpStatus.SC_CONFLICT) {

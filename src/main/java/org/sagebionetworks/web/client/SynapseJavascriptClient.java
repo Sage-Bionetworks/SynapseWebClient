@@ -129,6 +129,7 @@ import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
+import org.sagebionetworks.web.shared.exceptions.DeprecatedServiceException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.LockedException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -481,7 +482,7 @@ public class SynapseJavascriptClient {
 			case SC_PRECONDITION_FAILED :
 				return new ConflictingUpdateException(reasonStr, code);
 			case SC_GONE : 
-				return new BadRequestException(reasonStr, code);
+				return new DeprecatedServiceException(reasonStr, code);
 			case TOO_MANY_REQUESTS_STATUS_CODE :
 				return new TooManyRequestsException(reasonStr, code);
 			case SC_SERVICE_UNAVAILABLE :

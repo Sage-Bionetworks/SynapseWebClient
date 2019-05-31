@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
+import org.sagebionetworks.web.shared.exceptions.DeprecatedServiceException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
@@ -101,6 +102,8 @@ public class SynapseAlertImpl implements SynapseAlert {
 			view.showError(DisplayConstants.ERROR_TOO_MANY_REQUESTS  + "\n\n" + message);
 		} else if (ex instanceof ConflictingUpdateException) {
 			view.showError(DisplayConstants.ERROR_CONFLICTING_UPDATE + "\n" + message);
+		} else if (ex instanceof DeprecatedServiceException) {
+			view.showError(DisplayConstants.ERROR_DEPRECATED_SERVICE + "\n" + message);
 		} else if (ex instanceof UnknownErrorException) {
 			//An unknown error occurred. 
 			//Exception handling on the backend now throws the reason into the exception message.  Easy!
