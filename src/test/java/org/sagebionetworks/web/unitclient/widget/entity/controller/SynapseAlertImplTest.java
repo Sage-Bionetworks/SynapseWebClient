@@ -38,6 +38,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
+import org.sagebionetworks.web.shared.exceptions.DeprecatedServiceException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
@@ -147,6 +148,15 @@ public class SynapseAlertImplTest {
 		ArgumentCaptor<String> c = ArgumentCaptor.forClass(String.class);
 		verify(mockView).showError(c.capture());
 		assertTrue(c.getValue().startsWith(DisplayConstants.ERROR_FAILURE_PRIVLEDGES));
+	}
+	
+	@Test
+	public void testHandleServiceExceptionDeprecatedService() {
+		widget.handleException(new DeprecatedServiceException());
+		verify(mockView).clearState();
+		ArgumentCaptor<String> c = ArgumentCaptor.forClass(String.class);
+		verify(mockView).showError(c.capture());
+		assertTrue(c.getValue().startsWith(DisplayConstants.ERROR_DEPRECATED_SERVICE));
 	}
 	
 	@Test
