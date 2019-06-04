@@ -8,16 +8,16 @@
 		<meta name="msvalidate.01" content="E37AC1589F823723B64275D4BC890B1A" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-	    <!--[if lt IE 10]>
-	    	<div class="alert alert-warning" role="alert"> 
-	    		<a class="alert-link" href="http://windows.microsoft.com/en-us/internet-explorer/download-ie" target="_blank">
+		<!--[if lt IE 10]>
+			<div class="alert alert-warning" role="alert"> 
+				<a class="alert-link" href="http://windows.microsoft.com/en-us/internet-explorer/download-ie" target="_blank">
 				You are using an outdated browser. For a faster, safer browsing experience, click here to upgrade today.</a>
 			</div>
  		<![endif]-->
-	    <!--[if lt IE 9]>
-	      <script src="bootstrap-3.0/assets/js/html5shiv.js"></script>
-	      <script src="bootstrap-3.0/assets/js/respond.min.js"></script>
-	    <![endif]-->		
+		<!--[if lt IE 9]>
+			<script src="bootstrap-3.0/assets/js/html5shiv.js"></script>
+			<script src="bootstrap-3.0/assets/js/respond.min.js"></script>
+		<![endif]-->		
 
 		<!-- 
 		Adding the following meta tag should tell the crawler to try to crawl the ugly version of *this* URL.
@@ -33,7 +33,7 @@
 		<meta http-equiv="expires" content="0" />
 		<meta http-equiv="pragma" content="no-cache" />
 		<!-- end cache control -->
-		
+
 		<link rel="icon" href="favicon.png?v=4" />
 		<link href="/opensearch.xml" rel="search" title="Synapse" type="application/opensearchdescription+xml" />
 		<link rel="manifest" href="manifest.json" />
@@ -44,7 +44,7 @@
 			ga('create', 'UA-29804340-1', 'auto');
 			ga('send', 'pageview');
 		</script>
-		
+
 		<script>
 			// determine cdn endpoint (staging or prod, do not use a cdn for local or dev builds)
 			var cdnEndpoint = "//cdn-" + location.hostname + "/";
@@ -53,17 +53,34 @@
 				cdnEndpoint = "";
 			}
 			window.cdnEndpoint = cdnEndpoint;
-			
-			var link = document.createElement( "link" );
-			link.href = cdnEndpoint + "loadinglogo.css";
-			link.rel = "stylesheet";
-			document.head.appendChild(link);
+
+			function loadJs(src) {
+				// these are dynamically added, so they do not block rendering while being downloaded
+				let scriptElement = document.createElement('script');
+				scriptElement.src = src;
+				scriptElement.async = false; // in order
+				document.head.appendChild(scriptElement);
+			};
+			function loadCss(src){
+				if (document.createStyleSheet) document.createStyleSheet(src);
+				else {
+					var linkElement = document.createElement('link');
+					linkElement.href = src;
+					linkElement.rel = 'stylesheet';
+					linkElement.type = 'text/css';
+					document.head.appendChild(linkElement);
+				}
+			}
+
+			loadCss(cdnEndpoint + "loadinglogo.css");
+			loadJs(cdnEndpoint + "js/compiled-closure-lib.js");
+			loadJs(cdnEndpoint + "Portal/Portal.nocache.js");
 
 			var script = document.createElement('script');
 			script.onload = function () {
 				head.load(cdnEndpoint + "swc.css");
 				head.load(cdnEndpoint + "css/bootstrap-custom-theme.min.css?v=1");
-				head.load("//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js");
+				head.load("//ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js");
 				head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js");
 				head.load("https://cdn.pendo.io/agent/static/f155f8f7-30b9-4cc3-671a-70f99f803504/pendo.js");
 				head.load(cdnEndpoint + "js/moment.min.js");
@@ -103,19 +120,9 @@
 			};
 			script.src = cdnEndpoint + "js/head.load.min.js";
 			document.head.appendChild(script);
-			
-			script = document.createElement('script');
-			script.src = cdnEndpoint + "js/compiled-closure-lib.js";
-			document.head.appendChild(script);
-			 
-			script = document.createElement('script');
-			script.src = cdnEndpoint + "Portal/Portal.nocache.js";
-			document.head.appendChild(script);
-			
-	   	</script>
+		</script>
 	</head>
 	<body id="body">
-		
 		<div>
 			<!-- GWT history support -->
 			<iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position: absolute; width: 0; height: 0; border: 0"></iframe>
@@ -135,7 +142,7 @@
 						application crawl link</a>
 				</div>
 			</noscript>
-            <!-- This is the GWT-generated body -->
+			<!-- This is the GWT-generated body -->
 			<div id="alertWrapper">
 				<div id="alertContainer"></div>
 			</div>
