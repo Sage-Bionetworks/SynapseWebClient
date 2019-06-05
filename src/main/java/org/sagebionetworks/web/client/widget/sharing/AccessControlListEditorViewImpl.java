@@ -272,7 +272,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	@Override
 	public void showLoading() {
 		this.clear();
-		this.add(new LoadingSpinner());
+		this.add(DisplayUtils.getLoadingWidget());
 	}
 
 	@Override
