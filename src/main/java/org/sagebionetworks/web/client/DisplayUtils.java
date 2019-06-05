@@ -89,9 +89,9 @@ public class DisplayUtils {
 	private static Logger displayUtilsLogger = Logger.getLogger(DisplayUtils.class.getName());
 	public static PublicPrincipalIds publicPrincipalIds = null;
 	public static enum MessagePopup {  
-        INFO,
-        WARNING,
-        QUESTION
+		INFO,
+		WARNING,
+		QUESTION
 	}
 	
 	public static final ClickHandler TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER = event -> {
@@ -196,19 +196,19 @@ public class DisplayUtils {
 			decimalFormat = NumberFormat.getDecimalFormat();
 		}
 		if(size >= TB) {
-            return decimalFormat.format(size/TB) + (abbreviatedUnits?" TB":" Terabytes");
-        }
+			return decimalFormat.format(size/TB) + (abbreviatedUnits?" TB":" Terabytes");
+		}
 		if(size >= GB) {
-            return decimalFormat.format(size/GB) + (abbreviatedUnits?" GB":" Gigabytes");
-        }
+			return decimalFormat.format(size/GB) + (abbreviatedUnits?" GB":" Gigabytes");
+		}
 		if(size >= MB) {
-            return fileSizeFormat.format(size/MB) + (abbreviatedUnits?" MB":" Megabytes");
-        }
+			return fileSizeFormat.format(size/MB) + (abbreviatedUnits?" MB":" Megabytes");
+		}
 		if(size >= KB) {
-            return fileSizeFormat.format(size/KB) + (abbreviatedUnits?" KB":" Kilobytes");
-        }
-        return fileSizeFormat.format(size) + " bytes";
-    }
+			return fileSizeFormat.format(size/KB) + (abbreviatedUnits?" KB":" Kilobytes");
+		}
+		return fileSizeFormat.format(size) + " bytes";
+	}
 		
 	/**
 	 * Returns a panel used to show a component is loading in the view
@@ -261,9 +261,9 @@ public class DisplayUtils {
 				
 				// in 5 seconds clean up that key (to allow showing the message again)
 				Timer timer = new Timer() { 
-				    public void run() { 
-				    	recentNotificationMessages.remove(key);
-				    } 
+					public void run() { 
+						recentNotificationMessages.remove(key);
+					} 
 				};
 				timer.schedule(5000);
 			}
@@ -375,7 +375,7 @@ public class DisplayUtils {
 		focusOnBootboxButton(PRIMARY_BUTTON_STYLE);
 	}
 	
-    public static native void focusOnBootboxButton(String buttonStyle) /*-{
+	public static native void focusOnBootboxButton(String buttonStyle) /*-{
 		try {
 			$wnd.jQuery(".bootbox ." + buttonStyle).focus();
 		} catch (err) {
@@ -646,9 +646,9 @@ public class DisplayUtils {
 
 	// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
 	public static native JavaScriptObject newWindow(String url, String name, String features)/*-{
-    	try {
-	    	var window = $wnd.open(url, name, features);
-	    	return window;
+		try {
+			var window = $wnd.open(url, name, features);
+			return window;
 		}catch(err) {
 			return null;
 		}

@@ -341,8 +341,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	@Override
 	public void setLoadingVisible(boolean isShown) {
 		if (isShown && loadingSpinner == null) {
-			loadingSpinner = new LoadingSpinner();
-			loadingSpinner.setSize(40);
+			loadingSpinner = (LoadingSpinner)DisplayUtils.getLoadingWidget();
 			loadingSpinner.setAddStyleNames("center-block center");
 			mainContainer.add(loadingSpinner);
 		}
