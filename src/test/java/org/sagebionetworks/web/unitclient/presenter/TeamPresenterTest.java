@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -18,6 +17,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -30,7 +30,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.TeamView;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberCountWidget;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
@@ -145,6 +144,7 @@ public class TeamPresenterTest {
 		verify(mockView).setJoinTeamWidget(any(Widget.class));
 		verify(mockView).setOpenMembershipRequestWidget(any(Widget.class));
 		verify(mockView).setOpenUserInvitationsWidget(any(Widget.class));
+		verify(mockView).setManagerListWidget(any(Widget.class));
 		verify(mockView).setMemberListWidget(any(Widget.class));
 		verify(mockLeaveModal).setRefreshCallback(any(Callback.class));
 		verify(mockEditModal).setRefreshCallback(any(Callback.class));
@@ -171,7 +171,8 @@ public class TeamPresenterTest {
 		//once
 		verify(mockView).setPublicJoinVisible(canPublicJoin);
 		verify(mockView).setTeam(mockTeam, mockTeamMembershipStatus);
-		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
+		verify(mockManagerListWidget).configure(eq(teamId), eq(isAdmin), eq(TeamMemberTypeFilterOptions.ADMIN), any(Callback.class));
+		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), eq(TeamMemberTypeFilterOptions.MEMBER), any(Callback.class));
 		verify(mockView).showMemberMenuItems();
 		verify(mockOpenMembershipRequestsWidget).setVisible(true);
 		verify(mockView).showAdminMenuItems();
@@ -205,7 +206,8 @@ public class TeamPresenterTest {
 		//once
 		verify(mockView).setPublicJoinVisible(false);
 		verify(mockView).setTeam(mockTeam, mockTeamMembershipStatus);
-		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
+		verify(mockManagerListWidget).configure(eq(teamId), eq(isAdmin), eq(TeamMemberTypeFilterOptions.ADMIN), any(Callback.class));
+		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), eq(TeamMemberTypeFilterOptions.MEMBER), any(Callback.class));
 		verify(mockJoinWidget).configure(eq(teamId), anyBoolean(), eq(mockTeamMembershipStatus), 
 				any(Callback.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
 		verify(mockOpenMembershipRequestsWidget).setVisible(false);
@@ -226,7 +228,8 @@ public class TeamPresenterTest {
 		//once
 		verify(mockView).setPublicJoinVisible(canPublicJoin);
 		verify(mockView).setTeam(mockTeam, mockTeamMembershipStatus);
-		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
+		verify(mockManagerListWidget).configure(eq(teamId), eq(isAdmin), eq(TeamMemberTypeFilterOptions.ADMIN), any(Callback.class));
+		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), eq(TeamMemberTypeFilterOptions.MEMBER), any(Callback.class));
 		verify(mockView).showMemberMenuItems();
 		
 		//never
