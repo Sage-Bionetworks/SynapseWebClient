@@ -52,6 +52,7 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
+import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -697,7 +698,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				Activity newActivity;
 				try {
 					newActivity = synapseClient.createActivity(new Activity());
-					synapseClient.putEntity(synapseClient.getEntityById(entityId), newActivity.getId());
+					synapseClient.putEntity(synapseClient.getEntityById(entityId), newActivity.getId(), null);
 				} catch (SynapseException e) {
 					throw ExceptionUtil.convertSynapseException(e);
 				}
@@ -913,12 +914,12 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public TeamMemberPagedResults getTeamMembers(String teamId, String fragment, Integer limit,
+	public TeamMemberPagedResults getTeamMembers(String teamId, String fragment, TeamMemberTypeFilterOptions memberType, Integer limit,
 			Integer offset) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			org.sagebionetworks.reflection.model.PaginatedResults<TeamMember> members = synapseClient
-					.getTeamMembers(teamId, fragment, limit, offset);
+					.getTeamMembers(teamId, fragment, memberType, limit, offset);
 			List<TeamMember> teamMembers = members.getResults();
 			
 			//gather user ids to ask for all user profiles in bulk

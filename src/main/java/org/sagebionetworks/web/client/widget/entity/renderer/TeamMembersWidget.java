@@ -4,6 +4,7 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -67,7 +68,7 @@ public class TeamMembersWidget implements WidgetRendererPresenter, PageChangeLis
 		synAlert.clear();
 		view.clearRows();
 		view.setLoadingVisible(true);
-		synapseClient.getTeamMembers(teamId, "", DEFAULT_USER_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<TeamMemberPagedResults>() {
+		synapseClient.getTeamMembers(teamId, "", TeamMemberTypeFilterOptions.ALL, DEFAULT_USER_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<TeamMemberPagedResults>() {
 			@Override
 			public void onSuccess(TeamMemberPagedResults results) {
 				//configure the pager, and the participant list

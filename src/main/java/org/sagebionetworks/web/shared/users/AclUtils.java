@@ -37,7 +37,7 @@ public class AclUtils {
 		permToACCESS_TYPE.put(PermissionLevel.CAN_EDIT_DELETE, new TreeSet<ACCESS_TYPE>(Arrays.asList(
 				CREATE, READ, DOWNLOAD, UPDATE, DELETE)));		
 
-		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER, ModelConstants.ENITY_ADMIN_ACCESS_PERMISSIONS);
+		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER, ModelConstants.ENTITY_ADMIN_ACCESS_PERMISSIONS);
 
 		// Note, PARTICIPATE is no longer used, but to removed it would require updating all existing Evaluation ACLs
 		permToACCESS_TYPE.put(PermissionLevel.CAN_SUBMIT_EVALUATION, new TreeSet<ACCESS_TYPE>(Arrays.asList(

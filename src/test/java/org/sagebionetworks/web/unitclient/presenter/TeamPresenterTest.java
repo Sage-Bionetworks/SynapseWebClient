@@ -71,6 +71,8 @@ public class TeamPresenterTest {
 	@Mock
 	JoinTeamWidget mockJoinWidget;
 	@Mock
+	MemberListWidget mockManagerListWidget;
+	@Mock
 	MemberListWidget mockMemberListWidget;
 	@Mock
 	OpenMembershipRequestsWidget mockOpenMembershipRequestsWidget;
@@ -109,7 +111,7 @@ public class TeamPresenterTest {
 	public void setup() {
 		presenter = new TeamPresenter(mockView, mockAuthenticationController, mockGlobalAppState, 
 				mockSynClient, mockSynAlert, mockLeaveModal, mockDeleteModal, mockEditModal, 
-				mockInviteModal, mockJoinWidget, mockMemberListWidget, 
+				mockInviteModal, mockJoinWidget, mockManagerListWidget, mockMemberListWidget, 
 				mockOpenMembershipRequestsWidget, mockOpenUserInvitationsWidget, mockGoogleMap, mockCookies,
 				mockIsACTMemberAsyncHandler);
 		when(mockTeam.getName()).thenReturn(teamName);
