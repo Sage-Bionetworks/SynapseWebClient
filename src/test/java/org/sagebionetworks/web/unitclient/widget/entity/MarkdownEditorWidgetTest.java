@@ -577,7 +577,7 @@ public class MarkdownEditorWidgetTest {
 	@Test
 	public void testShowExternalImageButton() {
 		presenter.showExternalImageButton();
-		verify(mockView).setExternalImageButtonVisible(true);
+		verify(mockView).setExternalImageCommandVisible(true);
 	}
 	
 	@Test

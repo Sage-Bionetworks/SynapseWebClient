@@ -49,8 +49,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.gwtbootstrap3.client.shared.event.ModalShownEvent;
-import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -66,11 +64,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.UserTeamSelector;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -130,17 +124,11 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		widgetSelectionState = new WidgetSelectionState();
 		view.setPresenter(this);
 		view.setAttachmentCommandsVisible(true);
-		userTeamSelector.configure(new CallbackP<String>() {
-			@Override
-			public void invoke(String username) {
-				insertMarkdown(username + " ");
-			}
+		userTeamSelector.configure(username -> {
+			insertMarkdown(username + " ");
 		});
-		userTeamSelector.addModalShownHandler(new ModalShownHandler() {
-			@Override
-			public void onShown(ModalShownEvent evt) {
-				MarkdownEditorWidget.this.view.setEditorEnabled(true);
-			}
+		userTeamSelector.addModalShownHandler(event -> {
+			MarkdownEditorWidget.this.view.setEditorEnabled(true);
 		});
 	}
 	
@@ -168,12 +156,9 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		view.showEditMode();
 		if (formattingGuideWikiPageKey == null) {
 			//get the page name to wiki key map
-			getFormattingGuideWikiKey(new CallbackP<WikiPageKey>() {
-				@Override
-				public void invoke(WikiPageKey key) {
-					formattingGuideWikiPageKey = key;
-					configureStep2();
-				}
+			getFormattingGuideWikiKey(key -> {
+				formattingGuideWikiPageKey = key;
+				configureStep2();
 			});
 		} else {
 			configureStep2();
@@ -183,29 +168,23 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	public void configureStep2() {
 		getFormattingGuide().loadMarkdownFromWikiPage(formattingGuideWikiPageKey, true);
 		setMarkdownTextAreaHandlers();
-  	  	resizeMarkdownTextArea();
+		resizeMarkdownTextArea();
 		gwt.scheduleExecution(new Callback() {
 			@Override
 			public void invoke() {
-		    	  resizeMarkdownTextArea();
-		    	  if (view.isEditorAttachedAndVisible()) 
-			    	  gwt.scheduleExecution(this, 500);
-			}
+				resizeMarkdownTextArea();
+				if (view.isEditorAttachedAndVisible()) 
+					gwt.scheduleExecution(this, 500);
+				}
 		}, 500);
 	}
 	
 	private void setMarkdownTextAreaHandlers() {		
-		view.addTextAreaKeyUpHandler(new KeyUpHandler() {
-			@Override
-			public void onKeyUp(KeyUpEvent event) {
-				resizeMarkdownTextArea();
-			}
+		view.addTextAreaKeyUpHandler(event -> {
+			resizeMarkdownTextArea();
 		});
-		view.addTextAreaClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				markdownEditorClicked();
-			}
+		view.addTextAreaClickHandler(event -> {
+			markdownEditorClicked();
 		});
 	}
 	
@@ -249,12 +228,12 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	public void deleteMarkdown(String md) {
 		//replace all instances of the md with the empty string
 		StringBuilder newValue = new StringBuilder(view.getMarkdown());
-        
+
 		int idx = 0;
-        while((idx = newValue.indexOf(md, idx)) != -1) {
-            newValue.replace(idx, idx + md.length(), "");
-        }
-        view.setMarkdown(newValue.toString());
+		while((idx = newValue.indexOf(md, idx)) != -1) {
+			newValue.replace(idx, idx + md.length(), "");
+		}
+		view.setMarkdown(newValue.toString());
 	}
 
 	@Override
@@ -433,7 +412,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	}
 	
 	public void previewClicked() {
-	    //get the html for the markdown
+		//get the html for the markdown
 		getMarkdownPreview().configure(getMarkdown(), wikiKey, null);
 		view.showPreview();
 	}
@@ -460,14 +439,11 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	 * @param handler
 	 */
 	public void insertNewWidget(String contentTypeKey) {
-		WidgetDescriptorUpdatedHandler handler = new WidgetDescriptorUpdatedHandler() {
-			@Override
-			public void onUpdate(WidgetDescriptorUpdatedEvent event) {
-				if (event.getInsertValue()!=null) {
-					insertMarkdown(event.getInsertValue());
-				}
-				handleDescriptorUpdatedEvent(event);
+		WidgetDescriptorUpdatedHandler handler = event -> {
+			if (event.getInsertValue()!=null) {
+				insertMarkdown(event.getInsertValue());
 			}
+			handleDescriptorUpdatedEvent(event);
 		};
 		widgetDescriptorEditor.addWidgetDescriptorUpdatedHandler(handler);
 		widgetDescriptorEditor.editNew(wikiKey, contentTypeKey);
@@ -488,19 +464,16 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			String contentTypeKey = widgetRegistrar.getWidgetContentType(innerText);
 			Map<String, String> widgetDescriptor = widgetRegistrar.getWidgetDescriptor(innerText);
 			
-			WidgetDescriptorUpdatedHandler handler = new WidgetDescriptorUpdatedHandler() {
-				@Override
-				public void onUpdate(WidgetDescriptorUpdatedEvent event) {
-					//replace old widget text
-					String text = view.getMarkdown();
-					if (widgetStartIndex > -1 && widgetEndIndex > -1) {
-						view.setMarkdown(text.substring(0, widgetStartIndex) + text.substring(widgetEndIndex));
-						view.setCursorPos(widgetStartIndex);
-						if (event.getInsertValue()!=null) {
-							insertMarkdown(event.getInsertValue());
-						}
-						handleDescriptorUpdatedEvent(event);
+			WidgetDescriptorUpdatedHandler handler = event -> {
+				//replace old widget text
+				String text = view.getMarkdown();
+				if (widgetStartIndex > -1 && widgetEndIndex > -1) {
+					view.setMarkdown(text.substring(0, widgetStartIndex) + text.substring(widgetEndIndex));
+					view.setCursorPos(widgetStartIndex);
+					if (event.getInsertValue()!=null) {
+						insertMarkdown(event.getInsertValue());
 					}
+					handleDescriptorUpdatedEvent(event);
 				}
 			};
 			
@@ -526,15 +499,15 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	
 	public void addFileHandles(List<String> fileHandleIds) {
 		//update file handle ids if set
-        if (fileHandleIds != null && fileHandleIds.size() > 0 && filesAddedCallback != null) {
-        	filesAddedCallback.invoke(fileHandleIds);
-        }
+		if (fileHandleIds != null && fileHandleIds.size() > 0 && filesAddedCallback != null) {
+			filesAddedCallback.invoke(fileHandleIds);
+		}
 	}
 	
 	public void removeFileHandles(List<String> fileHandleIds) {
-	    if (fileHandleIds != null && fileHandleIds.size() > 0 && filesRemovedCallback != null) {
-	    	filesRemovedCallback.invoke(fileHandleIds);
-	    }	
+		if (fileHandleIds != null && fileHandleIds.size() > 0 && filesRemovedCallback != null) {
+			filesRemovedCallback.invoke(fileHandleIds);
+		}	
 	}
 	
 	/**
@@ -560,7 +533,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	}
 
 	public void showExternalImageButton() {
-		view.setExternalImageButtonVisible(true);
+		view.setExternalImageCommandVisible(true);
 	}
 	
 	@Override
