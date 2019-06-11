@@ -6,11 +6,13 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Italic;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -27,6 +29,7 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 	private Widget widget;
 	PortalGinInjector ginInjector;
 	private Presenter presenter;
+	SynapseJSNIUtils jsniUtils;
 	private ClickHandler removeInvitationClickHandler = event -> {
 		event.preventDefault();
 		Button btn = (Button)event.getSource();
@@ -47,6 +50,7 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 	public OpenUserInvitationsWidgetViewImpl(Binder binder, PortalGinInjector ginInjector) {
 		widget = binder.createAndBindUi(this);
 		this.ginInjector = ginInjector;
+		jsniUtils = ginInjector.getSynapseJSNIUtils();
 		moreButton.addClickHandler(event -> presenter.getNextBatch());
 	}
 	
@@ -72,9 +76,8 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 		} else {
 			openUserInvitationWidget.badgeTableData.add(badge);
 		}
-
 		if (message != null) {
-			openUserInvitationWidget.messageTableData.add(new Text(message));
+			openUserInvitationWidget.messageTableData.add(new HTML(jsniUtils.sanitizeHtml(message)));
 		}
 		openUserInvitationWidget.createdOnTableData.add(new Italic(createdOn));
 		
