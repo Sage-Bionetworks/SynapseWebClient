@@ -185,7 +185,6 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	
 	public void setTargetBundle(EntityBundle bundle) {
 		this.entityBundle = bundle;
-		tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(bundle.getEntity().getId(), null, EntityArea.TABLES, null));
 		Entity entity = bundle.getEntity();
 		boolean isTable = entity instanceof Table;
 		boolean isProject = entity instanceof Project;
@@ -199,6 +198,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		view.setProvenanceVisible(isTable);
 		
 		if (isTable) {
+			tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(bundle.getEntity().getId(), null, EntityArea.TABLES, areaToken));
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
 			metadata.configure(bundle, null, entityActionMenu);
 			tableTitleBar.configure(bundle);

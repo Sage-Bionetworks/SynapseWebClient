@@ -292,7 +292,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 
 		//note: the files/tables/wiki/discussion/docker tabs rely on the project bundle, so they are configured later
 		configureProject();
-		initDefaultTabPlaces();
 	}
 	
 	public void initDefaultTabPlaces() {
@@ -301,14 +300,13 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			String projectName = projectHeader.getName();
 			String projectId = projectHeader.getId();
 			Long versionNumber = null;
-			String areaToken = null;
 			
-			wikiTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.WIKI, areaToken));	
-			filesTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.FILES, areaToken));
-			tablesTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.TABLES, areaToken));
-			adminTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.CHALLENGE, areaToken));
-			discussionTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.DISCUSSION, areaToken));
-			dockerTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.DOCKER, areaToken));
+			wikiTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.WIKI, wikiAreaToken));	
+			filesTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.FILES, null));
+			tablesTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.TABLES, tablesAreaToken));
+			adminTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.CHALLENGE, null));
+			discussionTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.DISCUSSION, discussionAreaToken));
+			dockerTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.DOCKER, dockerAreaToken));
 		}
 	}
 	
@@ -571,6 +569,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			projectActionMenu.setToolsButtonIcon(PROJECT_SETTINGS, IconType.GEAR);
 		}
 
+		initDefaultTabPlaces();
+		
 		// set all content stale
 		filesTab.asTab().setContentStale(true);
 		wikiTab.asTab().setContentStale(true);
