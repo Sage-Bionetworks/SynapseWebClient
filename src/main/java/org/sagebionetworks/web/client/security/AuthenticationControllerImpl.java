@@ -36,7 +36,7 @@ import com.google.inject.Inject;
  *
  */
 public class AuthenticationControllerImpl implements AuthenticationController {
-	public static final String USER_AUTHENTICATION_RECEIPT = "_authentication_receipt";
+	public static final String USER_AUTHENTICATION_RECEIPT = "last_user_authentication_receipt";
 	private static final String AUTHENTICATION_MESSAGE = "Invalid usename or password.";
 	private static String currentUserSessionToken;
 	private static UserProfile currentUserProfile;
@@ -68,7 +68,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		ginInjector.getSynapseJavascriptClient().login(loginRequest, new AsyncCallback<LoginResponse>() {
 			@Override
 			public void onSuccess(LoginResponse session) {
-				storeAuthenticationReceipt(username, session.getAuthenticationReceipt());
+				storeAuthenticationReceipt(session.getAuthenticationReceipt());
 				setNewSessionToken(session.getSessionToken(), callback);
 			}
 			
@@ -79,15 +79,15 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		});
 	}
 	
-	public void storeAuthenticationReceipt(String username, String receipt) {
-		localStorage.put(username + USER_AUTHENTICATION_RECEIPT, receipt, DateTimeUtilsImpl.getYearFromNow().getTime());
+	public void storeAuthenticationReceipt(String receipt) {
+		localStorage.put(USER_AUTHENTICATION_RECEIPT, receipt, DateTimeUtilsImpl.getYearFromNow().getTime());
 	}
 	
 	public LoginRequest getLoginRequest(String username, String password) {
 		LoginRequest request = new LoginRequest();
 		request.setUsername(username);
 		request.setPassword(password);
-		String authenticationReceipt = localStorage.get(username + USER_AUTHENTICATION_RECEIPT);
+		String authenticationReceipt = localStorage.get(USER_AUTHENTICATION_RECEIPT);
 		request.setAuthenticationReceipt(authenticationReceipt);
 		return request;
 	}
@@ -150,7 +150,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		// terminate the session, remove the cookie
 		ginInjector.getSynapseJavascriptClient().logout();
 		jsniUtils.setAnalyticsUserId("");
+		String receipt = localStorage.get(USER_AUTHENTICATION_RECEIPT);
 		localStorage.clear();
+		storeAuthenticationReceipt(receipt);
 		currentUserSessionToken = null;
 		currentUserProfile = null;
 		ginInjector.getHeader().refresh();
