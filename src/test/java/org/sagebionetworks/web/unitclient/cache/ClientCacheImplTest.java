@@ -3,7 +3,6 @@ package org.sagebionetworks.web.unitclient.cache;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
-import static org.sagebionetworks.web.client.cache.ClientCacheImpl.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +27,6 @@ public class ClientCacheImplTest {
 		String value = "testValue";
 		when(mockStorage.getItem(eq(key))).thenReturn(value);
 		cache.put(key, value);
-		verify(mockStorage, never()).setItem(eq(PROTECTED_KEYS), anyString());
 		when(mockStorage.getItem(key + ClientCacheImpl.SUFFIX)).thenReturn(Long.toString(System.currentTimeMillis() + ClientCacheImpl.DEFAULT_CACHE_TIME_MS));
 		verify(mockStorage).setItem(eq(key), eq(value));
 		assertTrue(cache.contains(key));
@@ -73,37 +71,4 @@ public class ClientCacheImplTest {
 		assertNull(cache.get(key));
 	}
 	
-	@Test
-	public void testProtectedKeys() {
-		// verify setting a protected key updates the protected_keys entry
-		when(mockStorage.isStorageSupported()).thenReturn(true);
-		String key1 = "testkey1";
-		String key2 = "testkey2";
-		String value1 = "testValue1";
-		String value2 = "testValue2";
-		Long expireTime = System.currentTimeMillis() - 1L;
-		boolean isProtected = true;
-		
-		cache.put(key1, value1, expireTime, isProtected);
-		cache.put(key2, value2, expireTime, isProtected);
-		
-		verify(mockStorage).setItem(key1, value1);
-		verify(mockStorage).setItem(eq(PROTECTED_KEYS), contains(key1));
-		verify(mockStorage).setItem(key2, value2);
-		verify(mockStorage).setItem(eq(PROTECTED_KEYS), contains(key2));		
-		
-		when(mockStorage.getItem(PROTECTED_KEYS)).thenReturn(key1 + "," + key2);
-		when(mockStorage.getItem(key1)).thenReturn(value1);
-		when(mockStorage.getItem(key2)).thenReturn(value2);
-		
-		cache.clear();
-
-		// verify that clearing the cache causes the storage to be cleared, and protected keys re-added
-		verify(mockStorage).clear();
-		verify(mockStorage, times(2)).setItem(key1, value1);
-		verify(mockStorage, times(2)).setItem(key2, value2);
-		// and the protected keys persist
-		verify(mockStorage, times(2)).setItem(eq(PROTECTED_KEYS), contains(key1));
-		verify(mockStorage, times(2)).setItem(eq(PROTECTED_KEYS), contains(key2));
-	}
 }
