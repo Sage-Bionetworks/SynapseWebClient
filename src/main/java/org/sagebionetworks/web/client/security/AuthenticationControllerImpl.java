@@ -80,7 +80,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 	
 	public void storeAuthenticationReceipt(String username, String receipt) {
-		localStorage.put(username + USER_AUTHENTICATION_RECEIPT, receipt, DateTimeUtilsImpl.getYearFromNow().getTime(), true);
+		localStorage.put(username + USER_AUTHENTICATION_RECEIPT, receipt, DateTimeUtilsImpl.getYearFromNow().getTime());
 	}
 	
 	public LoginRequest getLoginRequest(String username, String password) {

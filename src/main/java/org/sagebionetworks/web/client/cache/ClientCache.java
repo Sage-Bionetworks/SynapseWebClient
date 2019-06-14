@@ -18,16 +18,6 @@ public interface ClientCache {
 	 */
 	void put(String key, String value);
 	void put(String key, String value, Long expireTime);
-	/**
-	 * The implementation uses web storage, and is NOT SECURE.  Do not store sensitive data here.
-	 * The given key/value pair will survive for the given expireTime.
-	 * A protected key is not removed when the local storage is cleared.
-	 * @param key
-	 * @param value
-	 * @param expireTime
-	 * @param isProtected
-	 */
-	void put(String key, String value, Long expireTime, boolean isProtected);
 	
 	void remove(String key);
 	/**
