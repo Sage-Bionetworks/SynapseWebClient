@@ -10,7 +10,7 @@ public class ClientCacheImpl implements ClientCache {
 	//default to an hour
 	public static final Long DEFAULT_CACHE_TIME_MS = 1000L*60L*60L;
 	public static final String SUFFIX = "_EXPIRE_TIME";
-	public static final String PROTECTED_KEYS = "PROTECTED_FROM_CLEAR";
+	public static final String PROTECTED_KEYS = "KEYS_PROTECTED_FROM_CLEAR";
 	
 	@Inject
 	public ClientCacheImpl(StorageWrapper storage) {
