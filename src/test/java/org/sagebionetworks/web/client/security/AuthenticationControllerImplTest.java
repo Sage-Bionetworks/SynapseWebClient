@@ -12,6 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.security.AuthenticationControllerImpl.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -78,6 +79,7 @@ public class AuthenticationControllerImplTest {
 	UserProfile profile;
 	UserSessionData usd;
 	public static final String USER_ID = "98208";
+	public static final String USER_AUTHENTICATION_RECEIPT_VALUE = "abc-def-ghi";
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -143,11 +145,15 @@ public class AuthenticationControllerImplTest {
 	
 	@Test
 	public void testLogout() {
+		when(mockClientCache.get(USER_AUTHENTICATION_RECEIPT)).thenReturn(USER_AUTHENTICATION_RECEIPT_VALUE);
+		
 		authenticationController.logoutUser();
 		
 		//sets session cookie
 		verify(mockJsClient).initSession(eq(WebConstants.EXPIRE_SESSION_TOKEN));
 		verify(mockClientCache).clear();
+		//verify that authentication receipt is restored
+		verify(mockClientCache).put(eq(USER_AUTHENTICATION_RECEIPT), eq(USER_AUTHENTICATION_RECEIPT_VALUE), anyLong());
 		verify(mockSessionDetector).initializeSessionTokenState();
 		verify(mockHeader).refresh();
 		verify(mockJsClient).logout();
@@ -158,7 +164,7 @@ public class AuthenticationControllerImplTest {
 	public void testStoreLoginReceipt() {
 		String receipt = "31416";
 		authenticationController.storeAuthenticationReceipt(receipt);
-		verify(mockClientCache).put(eq(AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT), eq(receipt), anyLong());
+		verify(mockClientCache).put(eq(USER_AUTHENTICATION_RECEIPT), eq(receipt), anyLong());
 	}
 	
 	@Test
@@ -170,7 +176,7 @@ public class AuthenticationControllerImplTest {
 		assertNull(request.getAuthenticationReceipt());
 		
 		String cachedReceipt = "12345";
-		when(mockClientCache.get(AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT)).thenReturn(cachedReceipt);
+		when(mockClientCache.get(USER_AUTHENTICATION_RECEIPT)).thenReturn(cachedReceipt);
 		request = authenticationController.getLoginRequest(username, password);
 		assertEquals(cachedReceipt, request.getAuthenticationReceipt());
 	}
@@ -182,7 +188,7 @@ public class AuthenticationControllerImplTest {
 		String oldAuthReceipt = "1234";
 		String newSessionToken = "abcdzxcvbn";
 		String newAuthReceipt = "5678";
-		when(mockClientCache.get(AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT)).thenReturn(oldAuthReceipt);
+		when(mockClientCache.get(USER_AUTHENTICATION_RECEIPT)).thenReturn(oldAuthReceipt);
 		LoginResponse loginResponse = new LoginResponse();
 		loginResponse.setAcceptsTermsOfUse(true);
 		loginResponse.setAuthenticationReceipt(newAuthReceipt);
@@ -202,7 +208,7 @@ public class AuthenticationControllerImplTest {
 		assertEquals(oldAuthReceipt, request.getAuthenticationReceipt());
 		
 		//verify the new receipt is cached
-		verify(mockClientCache).put(eq(AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT), eq(newAuthReceipt), anyLong());
+		verify(mockClientCache).put(eq(USER_AUTHENTICATION_RECEIPT), eq(newAuthReceipt), anyLong());
 		
 		verify(loginCallback).onSuccess(any(UserProfile.class));
 		verify(mockSessionDetector).initializeSessionTokenState();
