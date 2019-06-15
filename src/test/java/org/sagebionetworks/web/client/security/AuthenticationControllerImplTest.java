@@ -1,10 +1,18 @@
 package org.sagebionetworks.web.client.security;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
-import java.util.HashMap;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.security.AuthenticationControllerImpl.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,29 +25,20 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SessionDetector;
-import org.sagebionetworks.web.client.StackConfigServiceAsync;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.cache.SessionStorage;
-import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.place.shared.Place;
@@ -80,6 +79,7 @@ public class AuthenticationControllerImplTest {
 	UserProfile profile;
 	UserSessionData usd;
 	public static final String USER_ID = "98208";
+	public static final String USER_AUTHENTICATION_RECEIPT_VALUE = "abc-def-ghi";
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -145,11 +145,15 @@ public class AuthenticationControllerImplTest {
 	
 	@Test
 	public void testLogout() {
+		when(mockClientCache.get(USER_AUTHENTICATION_RECEIPT)).thenReturn(USER_AUTHENTICATION_RECEIPT_VALUE);
+		
 		authenticationController.logoutUser();
 		
 		//sets session cookie
 		verify(mockJsClient).initSession(eq(WebConstants.EXPIRE_SESSION_TOKEN));
 		verify(mockClientCache).clear();
+		//verify that authentication receipt is restored
+		verify(mockClientCache).put(eq(USER_AUTHENTICATION_RECEIPT), eq(USER_AUTHENTICATION_RECEIPT_VALUE), anyLong());
 		verify(mockSessionDetector).initializeSessionTokenState();
 		verify(mockHeader).refresh();
 		verify(mockJsClient).logout();
@@ -158,10 +162,9 @@ public class AuthenticationControllerImplTest {
 	
 	@Test
 	public void testStoreLoginReceipt() {
-		String username = "testusername";
 		String receipt = "31416";
-		authenticationController.storeAuthenticationReceipt(username, receipt);
-		verify(mockClientCache).put(eq(username + AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT), eq(receipt), anyLong());
+		authenticationController.storeAuthenticationReceipt(receipt);
+		verify(mockClientCache).put(eq(USER_AUTHENTICATION_RECEIPT), eq(receipt), anyLong());
 	}
 	
 	@Test
@@ -173,7 +176,7 @@ public class AuthenticationControllerImplTest {
 		assertNull(request.getAuthenticationReceipt());
 		
 		String cachedReceipt = "12345";
-		when(mockClientCache.get(username + AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT)).thenReturn(cachedReceipt);
+		when(mockClientCache.get(USER_AUTHENTICATION_RECEIPT)).thenReturn(cachedReceipt);
 		request = authenticationController.getLoginRequest(username, password);
 		assertEquals(cachedReceipt, request.getAuthenticationReceipt());
 	}
@@ -185,7 +188,7 @@ public class AuthenticationControllerImplTest {
 		String oldAuthReceipt = "1234";
 		String newSessionToken = "abcdzxcvbn";
 		String newAuthReceipt = "5678";
-		when(mockClientCache.get(username + AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT)).thenReturn(oldAuthReceipt);
+		when(mockClientCache.get(USER_AUTHENTICATION_RECEIPT)).thenReturn(oldAuthReceipt);
 		LoginResponse loginResponse = new LoginResponse();
 		loginResponse.setAcceptsTermsOfUse(true);
 		loginResponse.setAuthenticationReceipt(newAuthReceipt);
@@ -205,7 +208,7 @@ public class AuthenticationControllerImplTest {
 		assertEquals(oldAuthReceipt, request.getAuthenticationReceipt());
 		
 		//verify the new receipt is cached
-		verify(mockClientCache).put(eq(username + AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT), eq(newAuthReceipt), anyLong());
+		verify(mockClientCache).put(eq(USER_AUTHENTICATION_RECEIPT), eq(newAuthReceipt), anyLong());
 		
 		verify(loginCallback).onSuccess(any(UserProfile.class));
 		verify(mockSessionDetector).initializeSessionTokenState();
