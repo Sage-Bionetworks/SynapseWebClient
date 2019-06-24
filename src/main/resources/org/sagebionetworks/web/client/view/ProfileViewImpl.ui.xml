@@ -16,16 +16,16 @@
 								<ul class="nav nav-tabs entity-tabs margin-top-15 border-none">
 									<li class="entity-tab active margin-left-15" ui:field="profileListItem">
 										<a class="text-align-center link no-background">
-											<g:FocusPanel ui:field="profileFocusPanel" addStyleNames="displayInline" tabIndex="-1">
+											<w:ClickableDiv ui:field="profileTabItemDiv" addStyleNames="displayInline">
 												<b:Anchor ui:field="profileLink" addStyleNames="textDecorationNone">Profile</b:Anchor>
-											</g:FocusPanel>
+											</w:ClickableDiv>
 										</a>
 									</li>
 									<li class="entity-tab active" ui:field="projectsListItem">
 										<a class="text-align-center link no-background">
-											<g:FocusPanel ui:field="projectsFocusPanel" addStyleNames="displayInline" tabIndex="-1">
+											<w:ClickableDiv ui:field="projectsTabItemDiv" addStyleNames="displayInline">
 												<b:Anchor ui:field="projectsLink" addStyleNames="textDecorationNone">Projects</b:Anchor>
-											</g:FocusPanel>
+											</w:ClickableDiv>
 											<w:HelpWidget helpMarkdown="This tab shows you the Projects you have created, those that have been shared with you and your favorites.&#10;Start creating a project by giving it a name."
 												href="http://docs.synapse.org/articles/making_a_project.html" placement="BOTTOM"
 											/>
@@ -33,18 +33,18 @@
 									</li>
 									<li class="entity-tab" ui:field="challengesListItem">
 										<a class="text-align-center link no-background">
-											<g:FocusPanel ui:field="challengesFocusPanel" addStyleNames="displayInline" tabIndex="-1">
+											<w:ClickableDiv ui:field="challengesTabItemDiv" addStyleNames="displayInline">
 												<b:Anchor ui:field="challengesLink" addStyleNames="textDecorationNone">Challenges</b:Anchor>
-											</g:FocusPanel>
+											</w:ClickableDiv>
 											<w:HelpWidget helpMarkdown="This tab shows you challenges you have registered for.&#10;Challenges are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems."
 												href="http://sagebionetworks.org/platforms/" placement="BOTTOM" />
 										</a>
 									</li>
 									<li class="entity-tab" ui:field="teamsListItem">
 										<a class="text-align-center link no-background">
-											<g:FocusPanel ui:field="teamsFocusPanel" addStyleNames="displayInline" tabIndex="-1">
+											<w:ClickableDiv ui:field="teamsTabItemDiv" addStyleNames="displayInline">
 												<b:Anchor ui:field="teamsLink" addStyleNames="textDecorationNone">Teams</b:Anchor>
-											</g:FocusPanel>
+											</w:ClickableDiv>
 											<bh:Span ui:field="teamNotifications" />
 											<w:HelpWidget helpMarkdown="This tab lists Teams you have created and have been invited to join.&#10;Create a Team by providing a name and clicking “Create Team”."
 												href="http://docs.synapse.org/articles/teams.html" placement="BOTTOM" />
@@ -52,16 +52,16 @@
 									</li>
 									<li class="entity-tab" ui:field="downloadsListItem">
 										<a class="text-align-center link no-background">
-											<g:FocusPanel ui:field="downloadsFocusPanel" addStyleNames="displayInline" tabIndex="-1">
+											<w:ClickableDiv ui:field="downloadsTabItemDiv" addStyleNames="displayInline">
 												<b:Anchor ui:field="downloadsLink" addStyleNames="textDecorationNone">Downloads</b:Anchor>
-											</g:FocusPanel>
+											</w:ClickableDiv>
 										</a>
 									</li>
 									<li class="entity-tab" ui:field="settingsListItem">
 										<a class="text-align-center link no-background">
-											<g:FocusPanel ui:field="settingsFocusPanel" addStyleNames="displayInline" tabIndex="-1">
+											<w:ClickableDiv ui:field="settingsTabItemDiv" addStyleNames="displayInline">
 												<b:Anchor ui:field="settingsLink" addStyleNames="textDecorationNone">Settings</b:Anchor>
-											</g:FocusPanel>
+											</w:ClickableDiv>
 										</a>
 									</li>
 								</ul>
