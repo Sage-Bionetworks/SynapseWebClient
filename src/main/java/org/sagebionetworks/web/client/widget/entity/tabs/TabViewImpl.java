@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.widget.ClickableDiv;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 
 import com.google.gwt.core.shared.GWT;
@@ -14,7 +15,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -76,11 +76,10 @@ public class TabViewImpl implements TabView {
 		anchor.add(new InlineHTML(tabTitle));
 		anchor.addStyleName("textDecorationNone");
 		
-		FocusPanel fp = new FocusPanel();
+		ClickableDiv fp = new ClickableDiv();
 		fp.addClickHandler(tabClickedHandler);
-		fp.setTabIndex(-1);
 		fp.addStyleName("margin-right-5 displayInline");
-		fp.setWidget(anchor);
+		fp.add(anchor);
 		tabItem.add(fp);
 		tabItem.add(helpWidget.asWidget());
 	}
