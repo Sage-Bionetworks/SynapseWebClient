@@ -202,7 +202,7 @@ public class ProvViewUtil {
 		if(versionNumber != null) {					
 			String versionNumberStr = "v." + versionNumber;			
 			String versionDisplay; 			
-			if(versionNumber.toString().equals(versionLabel)) {
+			if(versionLabel == null || versionNumber.toString().equals(versionLabel)) {
 				versionDisplay = versionNumberStr;
 			} else {
 				versionDisplay = DisplayUtils.stubStrPartialWord(versionLabel + " (" + versionNumberStr + ")", ENTITY_LINE_NUMBER_CHARS-versionNumberStr.length());

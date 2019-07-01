@@ -512,7 +512,8 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 				// find graph nodes that should be marked as not current version
 				List<String> notCurrentNodeIds = new ArrayList<String>();
 				for(Reference ref : refToNodeId.keySet()) {
-					if(ref.getTargetVersionNumber() != null && !ref.getTargetVersionNumber().equals(entityToCurrentVersion.get(ref.getTargetId()))) {
+					Long currrentVersion = entityToCurrentVersion.get(ref.getTargetId());
+					if(ref.getTargetVersionNumber() != null && currrentVersion != null && !ref.getTargetVersionNumber().equals(currrentVersion)) {
 						notCurrentNodeIds.add(refToNodeId.get(ref));
 					}
 				}
