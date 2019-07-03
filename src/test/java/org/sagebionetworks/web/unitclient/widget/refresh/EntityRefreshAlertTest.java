@@ -14,17 +14,16 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
+import org.sagebionetworks.web.client.widget.refresh.EntityRefreshAlert;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlertView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-public class RefreshAlertTest {
+public class EntityRefreshAlertTest {
 	@Mock
 	RefreshAlertView mockView;
 	@Mock
@@ -37,32 +36,32 @@ public class RefreshAlertTest {
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	@Mock
 	Etag mockEtag;
-	RefreshAlert refreshAlert;
+	EntityRefreshAlert entityRefreshAlert;
 
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		refreshAlert = new RefreshAlert(mockView, mockJsClient, mockGWTWrapper, mockGlobalApplicationState, mockSynapseJSNIUtils);
+		entityRefreshAlert = new EntityRefreshAlert(mockView, mockJsClient, mockGWTWrapper, mockGlobalApplicationState, mockSynapseJSNIUtils);
 		when(mockView.isAttached()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(mockEtag).when(mockJsClient).getEtag(anyString(), any(ObjectType.class), any(AsyncCallback.class));
 	}
 
 	@Test
 	public void testConstructor() {
-		verify(mockView).setPresenter(refreshAlert);
+		verify(mockView).setPresenter(entityRefreshAlert);
 	}
 
 	@Test
 	public void testConfigureNotAttached() {
 		when(mockView.isAttached()).thenReturn(false);
-		refreshAlert.configure("123", ObjectType.ENTITY);
+		entityRefreshAlert.configure("123");
 		//not ready to ask for the current etag
 		verify(mockJsClient, never()).getEtag(anyString(), any(ObjectType.class), any(AsyncCallback.class));
 	}
 	@Test
 	public void testAttachedNotConfigured() {
 		when(mockView.isAttached()).thenReturn(true);
-		refreshAlert.onAttach();
+		entityRefreshAlert.onAttach();
 		//not ready to ask for the current etag
 		verify(mockJsClient, never()).getEtag(anyString(), any(ObjectType.class), any(AsyncCallback.class));
 	}
@@ -70,16 +69,16 @@ public class RefreshAlertTest {
 	@Test
 	public void testConfiguredAndAttached() {
 		when(mockView.isAttached()).thenReturn(true);
-		refreshAlert.configure("123", ObjectType.ENTITY);
+		entityRefreshAlert.configure("123");
 		
 		verify(mockJsClient).getEtag(anyString(), any(ObjectType.class), any(AsyncCallback.class));
 		//and will call this again later
-		verify(mockGWTWrapper).scheduleExecution(any(Callback.class), eq(RefreshAlert.DELAY));
+		verify(mockGWTWrapper).scheduleExecution(any(Callback.class), eq(EntityRefreshAlert.DELAY));
 	}
 	
 	@Test
 	public void testOnRefresh() {
-		refreshAlert.onRefresh();
+		entityRefreshAlert.onRefresh();
 		verify(mockGlobalApplicationState).refreshPage();
 	}
 }
