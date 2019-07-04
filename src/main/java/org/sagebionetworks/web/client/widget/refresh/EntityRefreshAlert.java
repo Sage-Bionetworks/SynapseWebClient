@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.client.widget.refresh;
 
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -22,8 +20,8 @@ public class EntityRefreshAlert implements RefreshAlertView.Presenter, SynapseWi
 	private GlobalApplicationState globalAppState;
 	private SynapseJSNIUtils utils;
 	private String etag;
-	private String objectId;
-	private Callback invokeCheckEtag;
+	private String entityId;
+	Callback invokeCheckEtag;
 	private Callback refreshCallback;
 	public static final int DELAY = 60000; // check every minute (until detached, configuration cleared, or a change has been detected)
 	@Inject
@@ -38,23 +36,18 @@ public class EntityRefreshAlert implements RefreshAlertView.Presenter, SynapseWi
 		this.globalAppState = globalAppState;
 		this.utils = utils;
 		view.setPresenter(this);
-		invokeCheckEtag = new Callback() {
-			@Override
-			public void invoke() {
-				checkEtag();
-			}
-		};
+		invokeCheckEtag = this::checkEtag;
 	}
 	
 	public void clear() {
 		view.setVisible(false);
 		etag = null;
-		objectId = null;
+		entityId = null;
 	}
 	
-	public void configure(String objectId) {
+	public void configure(String entityId) {
 		clear();
-		this.objectId = objectId;
+		this.entityId = entityId;
 		checkEtag();
 	}
 	
@@ -86,16 +79,16 @@ public class EntityRefreshAlert implements RefreshAlertView.Presenter, SynapseWi
 		checkEtag();
 	}
 	
-	private void checkEtag() {
-		if (view.isAttached() && objectId != null) {
-			jsClient.getEntity(objectId, new AsyncCallback<Entity>() {
+	void checkEtag() {
+		if (view.isAttached() && entityId != null) {
+			jsClient.getEntity(entityId, new AsyncCallback<Entity>() {
 				@Override
 				public void onSuccess(Entity result) {
 					if (etag == null) {
 						etag = result.getEtag();
 					}
 					if (!etag.equals(result.getEtag())) {
-						//etag changed!  
+						//etag changed!
 						view.setVisible(true);
 					} else {
 						//no etag change, reschedule
