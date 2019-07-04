@@ -35,7 +35,7 @@ import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
-import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
+import org.sagebionetworks.web.client.widget.refresh.EntityRefreshAlert;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -209,9 +209,9 @@ public class FilesTab {
 		boolean isFolder = currentEntity instanceof Folder;
 		boolean isProject = currentEntity instanceof Project;
 
-		RefreshAlert refreshAlert = ginInjector.getRefreshAlert();
-		view.setRefreshAlert(refreshAlert.asWidget());
-		refreshAlert.configure(currentEntity.getId(), ObjectType.ENTITY);
+		EntityRefreshAlert entityRefreshAlert = ginInjector.getEntityRefreshAlert();
+		view.setRefreshAlert(entityRefreshAlert.asWidget());
+		entityRefreshAlert.configure(currentEntity.getId());
 		
 		if (!(isFile || isFolder)) {
 			//configure based on the project bundle
