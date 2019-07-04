@@ -97,7 +97,7 @@ public class EntityRefreshAlertTest {
 	}
 
 	@Test
-	public void testCheckEtagHandler_EtagMatch(){
+	public void testCheckEtag_EtagMatch(){
 		entityRefreshAlert.configure(entityId);
 		//reset mock method call counts
 		reset(mockView, mockGWTWrapper);
@@ -111,7 +111,7 @@ public class EntityRefreshAlertTest {
 	}
 
 	@Test
-	public void testCheckEtagHandler_EtagMismatch(){
+	public void testCheckEtag_EtagMismatch(){
 		entityRefreshAlert.configure(entityId);
 		//first call remembers the old etag
 		entityRefreshAlert.checkEtag();
