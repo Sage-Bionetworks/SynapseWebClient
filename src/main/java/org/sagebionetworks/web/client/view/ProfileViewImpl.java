@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.ClickableDiv;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
@@ -41,7 +42,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -69,38 +69,38 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	LIElement profileListItem;
 	@UiField
-	FocusPanel profileFocusPanel;
+	ClickableDiv profileTabItemDiv;
 	@UiField
 	Anchor profileLink;
 
 	@UiField
-	FocusPanel projectsFocusPanel;
+	ClickableDiv projectsTabItemDiv;
 	@UiField
 	Anchor projectsLink;
 	@UiField
 	LIElement projectsListItem;
 	@UiField
-	FocusPanel teamsFocusPanel;
+	ClickableDiv teamsTabItemDiv;
 	@UiField
 	Anchor teamsLink;
 	@UiField
 	LIElement teamsListItem;
 	
 	@UiField
-	FocusPanel downloadsFocusPanel;
+	ClickableDiv downloadsTabItemDiv;
 	@UiField
 	Anchor downloadsLink;
 	@UiField
 	LIElement downloadsListItem;
 	
 	@UiField
-	FocusPanel settingsFocusPanel;
+	ClickableDiv settingsTabItemDiv;
 	@UiField
 	Anchor settingsLink;
 	@UiField
 	LIElement settingsListItem;
 	@UiField
-	FocusPanel challengesFocusPanel;
+	ClickableDiv challengesTabItemDiv;
 	@UiField
 	Anchor challengesLink;
 	@UiField
@@ -241,6 +241,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			UserBadge userBadge) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
+		
 		this.userBadge = userBadge;
 		userBadge.setSize(BadgeSize.LARGE);
 		userBadgeContainer.add(userBadge);
@@ -600,12 +601,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	private void initTabs() {
-		profileFocusPanel.addClickHandler(getTabClickHandler(Synapse.ProfileArea.PROFILE));
-		projectsFocusPanel.addClickHandler(getTabClickHandler(Synapse.ProfileArea.PROJECTS));
-		teamsFocusPanel.addClickHandler(getTabClickHandler(Synapse.ProfileArea.TEAMS));
-		downloadsFocusPanel.addClickHandler(getTabClickHandler(Synapse.ProfileArea.DOWNLOADS));
-		settingsFocusPanel.addClickHandler(getTabClickHandler(Synapse.ProfileArea.SETTINGS));
-		challengesFocusPanel.addClickHandler(getTabClickHandler(Synapse.ProfileArea.CHALLENGES));
+		profileTabItemDiv.addClickHandler(getTabClickHandler(Synapse.ProfileArea.PROFILE));
+		projectsTabItemDiv.addClickHandler(getTabClickHandler(Synapse.ProfileArea.PROJECTS));
+		teamsTabItemDiv.addClickHandler(getTabClickHandler(Synapse.ProfileArea.TEAMS));
+		downloadsTabItemDiv.addClickHandler(getTabClickHandler(Synapse.ProfileArea.DOWNLOADS));
+		settingsTabItemDiv.addClickHandler(getTabClickHandler(Synapse.ProfileArea.SETTINGS));
+		challengesTabItemDiv.addClickHandler(getTabClickHandler(Synapse.ProfileArea.CHALLENGES));
 		
 		profileLink.addClickHandler(DO_NOTHING_CLICKHANDLER);
 		projectsLink.addClickHandler(DO_NOTHING_CLICKHANDLER);

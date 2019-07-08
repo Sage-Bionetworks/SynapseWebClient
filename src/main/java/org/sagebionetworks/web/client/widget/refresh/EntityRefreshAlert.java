@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.refresh;
 
-import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.subscription.Etag;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -13,50 +12,42 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class RefreshAlert implements RefreshAlertView.Presenter, SynapseWidgetPresenter {
+public class EntityRefreshAlert implements RefreshAlertView.Presenter, SynapseWidgetPresenter {
 	
 	private RefreshAlertView view;
 	private SynapseJavascriptClient jsClient;
 	private GWTWrapper gwt;
 	private GlobalApplicationState globalAppState;
 	private SynapseJSNIUtils utils;
-	private Etag etag;
-	private String objectId;
-	private ObjectType objectType;
-	private Callback invokeCheckEtag;
+	private String etag;
+	private String entityId;
+	Callback invokeCheckEtag;
 	private Callback refreshCallback;
 	public static final int DELAY = 60000; // check every minute (until detached, configuration cleared, or a change has been detected)
 	@Inject
-	public RefreshAlert(RefreshAlertView view, 
-			SynapseJavascriptClient jsClient, 
-			GWTWrapper gwt,
-			GlobalApplicationState globalAppState,
-			SynapseJSNIUtils utils) {
+	public EntityRefreshAlert(RefreshAlertView view,
+							  SynapseJavascriptClient jsClient,
+							  GWTWrapper gwt,
+							  GlobalApplicationState globalAppState,
+							  SynapseJSNIUtils utils) {
 		this.view = view;
 		this.jsClient = jsClient;
 		this.gwt = gwt;
 		this.globalAppState = globalAppState;
 		this.utils = utils;
 		view.setPresenter(this);
-		invokeCheckEtag = new Callback() {
-			@Override
-			public void invoke() {
-				checkEtag();
-			}
-		};
+		invokeCheckEtag = this::checkEtag;
 	}
 	
 	public void clear() {
 		view.setVisible(false);
 		etag = null;
-		objectId = null;
-		objectType = null;
+		entityId = null;
 	}
 	
-	public void configure(String objectId, ObjectType objectType) {
+	public void configure(String entityId) {
 		clear();
-		this.objectId = objectId;
-		this.objectType = objectType;
+		this.entityId = entityId;
 		checkEtag();
 	}
 	
@@ -88,16 +79,16 @@ public class RefreshAlert implements RefreshAlertView.Presenter, SynapseWidgetPr
 		checkEtag();
 	}
 	
-	private void checkEtag() {
-		if (view.isAttached() && objectId != null && objectType != null) {
-			jsClient.getEtag(objectId, objectType, new AsyncCallback<Etag>() {
+	void checkEtag() {
+		if (view.isAttached() && entityId != null) {
+			jsClient.getEntity(entityId, new AsyncCallback<Entity>() {
 				@Override
-				public void onSuccess(Etag result) {
+				public void onSuccess(Entity result) {
 					if (etag == null) {
-						etag = result;
+						etag = result.getEtag();
 					}
-					if (!etag.equals(result)) {
-						//etag changed!  
+					if (!etag.equals(result.getEtag())) {
+						//etag changed!
 						view.setVisible(true);
 					} else {
 						//no etag change, reschedule

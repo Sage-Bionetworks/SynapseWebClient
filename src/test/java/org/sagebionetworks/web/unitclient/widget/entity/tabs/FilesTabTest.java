@@ -25,7 +25,6 @@ import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
@@ -53,7 +52,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
-import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
+import org.sagebionetworks.web.client.widget.refresh.EntityRefreshAlert;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.Widget;
@@ -112,7 +111,7 @@ public class FilesTabTest {
 	@Mock
 	ModifiedCreatedByWidget mockModifiedCreatedBy;
 	@Mock
-	RefreshAlert mockRefreshAlert;
+	EntityRefreshAlert mockEntityRefreshAlert;
 	@Mock
 	DiscussionThreadListWidget mockDiscussionThreadListWidget;
 	@Mock
@@ -140,7 +139,7 @@ public class FilesTabTest {
 		when(mockProjectEntity.getId()).thenReturn(projectEntityId);
 		when(mockProjectEntity.getName()).thenReturn(projectName);
 		when(mockProjectEntityBundle.getPermissions()).thenReturn(mockPermissions);
-		when(mockPortalGinInjector.getRefreshAlert()).thenReturn(mockRefreshAlert);
+		when(mockPortalGinInjector.getEntityRefreshAlert()).thenReturn(mockEntityRefreshAlert);
 		tab = new FilesTab(mockTab, mockPortalGinInjector);
 		
 		when(mockPortalGinInjector.getFilesTabView()).thenReturn(mockView);
@@ -239,7 +238,7 @@ public class FilesTabTest {
 		assertEquals(EntityArea.FILES, place.getArea());
 		assertNull(place.getAreaToken());
 		
-		verify(mockRefreshAlert).configure(anyString(), any(ObjectType.class));
+		verify(mockEntityRefreshAlert).configure(anyString());
 
 		verify(mockView, atLeastOnce()).setDiscussionThreadListWidgetVisible(false);
 	}
@@ -295,7 +294,7 @@ public class FilesTabTest {
 
 		verify(mockView).setRefreshAlert(any(Widget.class));
 		verify(mockView).setDiscussionText(fileName);
-		verify(mockRefreshAlert).configure(fileEntityId, ObjectType.ENTITY);
+		verify(mockEntityRefreshAlert).configure(fileEntityId);
 
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab).setEntityNameAndPlace(eq(fileName), captor.capture());
@@ -333,7 +332,7 @@ public class FilesTabTest {
 		verify(mockView).setWikiPageWidgetVisible(true);
 
 		verify(mockView).setRefreshAlert(any(Widget.class));
-		verify(mockRefreshAlert).configure(folderEntityId, ObjectType.ENTITY);
+		verify(mockEntityRefreshAlert).configure(folderEntityId);
 
 		verify(mockBasicTitleBar).configure(mockEntityBundle);
 		

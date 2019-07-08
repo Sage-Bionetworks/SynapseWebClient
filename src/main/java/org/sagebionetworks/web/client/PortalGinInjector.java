@@ -184,7 +184,7 @@ import org.sagebionetworks.web.client.widget.profile.ProfileCertifiedValidatedWi
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
-import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
+import org.sagebionetworks.web.client.widget.refresh.EntityRefreshAlert;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.AclAddPeoplePanel;
@@ -479,7 +479,7 @@ public interface PortalGinInjector extends Ginjector {
 	ReplyWidget createReplyWidget();
 
 	TopicRowWidget getTopicRowWidget();
-	RefreshAlert getRefreshAlert();
+	EntityRefreshAlert getEntityRefreshAlert();
 	ReplyCountAlert getReplyCountAlert();
 	DiscussionThreadCountAlert getDiscussionThreadCountAlert();
 

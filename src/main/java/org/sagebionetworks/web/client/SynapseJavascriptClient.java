@@ -1166,11 +1166,6 @@ public class SynapseJavascriptClient {
 		doPost(getEndpoint(type) + url, request, OBJECT_TYPE.AsyncJobId, callback);
 	}
 	
-	public void getEtag(String objectId, ObjectType objectType, AsyncCallback<Etag> callback) {
-		String url =  getRepoServiceUrl() + OBJECT+"/"+objectId+"/"+objectType.name()+"/"+ETAG;
-		doGet(url, OBJECT_TYPE.Etag, callback);
-	}
-	
 	public void getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset, AsyncCallback<ArrayList<Reference>> callback) {
 		String url = getRepoServiceUrl() + ACTIVITY_URI_PATH + "/" + activityId + GENERATED_PATH + "?" + OFFSET_PARAMETER + offset + "&" + LIMIT_PARAMETER + limit;
 		doGet(url, OBJECT_TYPE.PaginatedResultReference, callback);

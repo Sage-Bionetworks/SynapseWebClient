@@ -60,6 +60,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public AnchorListItem imageLink;
 	@UiField
+	public AnchorListItem imageLinkMenuItem;
+	@UiField
 	public AnchorListItem joinTeamLink;
 	@UiField
 	public AnchorListItem linkLink;
@@ -243,6 +245,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 			heading6Link.addClickHandler(getClickHandler(MarkdownEditorAction.H6));
 			attachmentButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_ATTACHMENT));
 			imageButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_IMAGE));
+			imageLinkMenuItem.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_IMAGE_LINK));
 			imageLinkButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_IMAGE_LINK));
 			videoButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIDEO));
 			linkButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LINK));
@@ -423,8 +426,9 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	}
 
 	@Override
-	public void setExternalImageButtonVisible(boolean visible) {
+	public void setExternalImageCommandVisible(boolean visible) {
 		lazyConstruct();
+		imageLinkMenuItem.setVisible(visible);
 		imageLinkButton.setVisible(visible);
 	}
 	
