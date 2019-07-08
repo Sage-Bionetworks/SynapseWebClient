@@ -1,12 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -25,7 +23,7 @@ public class TeamMembersWidget implements WidgetRendererPresenter, PageChangeLis
 	
 	private TeamMembersWidgetView view;
 	private Map<String,String> descriptor;
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private String teamId;
 	private SynapseAlert synAlert;
 	private PortalGinInjector ginInjector;
@@ -36,14 +34,13 @@ public class TeamMembersWidget implements WidgetRendererPresenter, PageChangeLis
 	@Inject
 	public TeamMembersWidget(TeamMembersWidgetView view, 
 			BasicPaginationWidget paginationWidget, 
-			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
 			SynapseAlert synAlert,
 			PortalGinInjector ginInjector
 			) {
 		this.view = view;
 		this.paginationWidget = paginationWidget;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
+		this.jsClient = jsClient;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
 		view.setPaginationWidget(paginationWidget);
@@ -68,7 +65,7 @@ public class TeamMembersWidget implements WidgetRendererPresenter, PageChangeLis
 		synAlert.clear();
 		view.clearRows();
 		view.setLoadingVisible(true);
-		synapseClient.getTeamMembers(teamId, "", TeamMemberTypeFilterOptions.ALL, DEFAULT_USER_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<TeamMemberPagedResults>() {
+		jsClient.getTeamMembers(teamId, "", TeamMemberTypeFilterOptions.ALL, DEFAULT_USER_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<TeamMemberPagedResults>() {
 			@Override
 			public void onSuccess(TeamMemberPagedResults results) {
 				//configure the pager, and the participant list

@@ -50,6 +50,8 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.TeamMember;
+import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
@@ -102,7 +104,6 @@ import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
-import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.subscription.SortByType;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.subscription.Subscription;
@@ -124,6 +125,8 @@ import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
+import org.sagebionetworks.web.shared.TeamMemberBundle;
+import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -187,8 +190,6 @@ public class SynapseJavascriptClient {
 	public static final String THREAD_COUNTS = "/threadcounts";
 	public static final String ATTACHMENT_HANDLES = "attachmenthandles";
 	private static final String PROFILE_IMAGE = "/image";
-	private static final String PROFILE_IMAGE_PREVIEW = PROFILE_IMAGE+"/preview";
-	private static final String REDIRECT_PARAMETER = "redirect=";
 	public static final String OBJECT = "/object";
 	public static final String ETAG = "etag";
 	public static final String GENERATED_PATH = "/generated";
@@ -273,6 +274,10 @@ public class SynapseJavascriptClient {
 	public static final String DOWNLOAD_ORDER_HISTORY = DOWNLOAD_ORDER+"/history";
 	public static final String STORAGE_REPORT = "/storageReport";
 	public static final String SEARCH = "/search";
+	public static final String TEAM_MEMBERS = "/teamMembers";
+	public static final String NAME_FRAGMENT_FILTER = "fragment=";
+	public static final String NAME_MEMBERTYPE_FILTER = "memberType=";
+
 	public static final int LIMIT_50 = 50;
 	
 	
@@ -1492,6 +1497,51 @@ public class SynapseJavascriptClient {
 			initSession(authController.getCurrentUserSessionToken());
 		}
 	}
-
+	public void getTeamMembers(String teamId, String fragment, TeamMemberTypeFilterOptions memberType, Integer limit, Integer offset, AsyncCallback<TeamMemberPagedResults> callback) {
+		// first gather the team members
+		String url = getRepoServiceUrl() + TEAM_MEMBERS+"/" + teamId + "?" + OFFSET_PARAMETER + offset + "&" + LIMIT_PARAMETER+limit;
+		if (fragment != null) {
+			url += "&" + NAME_FRAGMENT_FILTER + gwt.encodeQueryString(fragment);
+		}
+		if (memberType != null) {
+			url += "&" + NAME_MEMBERTYPE_FILTER + gwt.encodeQueryString(memberType.toString());
+		}
+		AsyncCallback<List<TeamMember>> paginatedResultsCallback = new AsyncCallback<List<TeamMember>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
+			public void onSuccess(List<TeamMember> teamMembers) {
+				// second step, get all user profiles (in bulk)
+				List<String> userIds = new ArrayList<>();
+				for (TeamMember member : teamMembers) {
+					userIds.add(member.getMember().getOwnerId());
+				}
+				AsyncCallback<List> profilesCallback = new AsyncCallback<List>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						callback.onFailure(caught);
+					}
+					@Override
+					public void onSuccess(List profiles) {
+						List<TeamMemberBundle> teamMemberBundles = new ArrayList<TeamMemberBundle>();
+						for (int i = 0; i < userIds.size(); i++) {
+							teamMemberBundles.add(new TeamMemberBundle((UserProfile)profiles.get(i), teamMembers.get(i).getIsAdmin(), teamMembers.get(i).getTeamId()));
+						}
+						TeamMemberPagedResults results = new TeamMemberPagedResults();
+						results.setResults(teamMemberBundles);
+						int totalNumberOfResults = offset + limit;
+						if (teamMembers.size() >= limit) {
+							totalNumberOfResults++;
+						}
+						results.setTotalNumberOfResults(new Long(totalNumberOfResults));
+						callback.onSuccess(results);
+					}
+				};
+				listUserProfiles(userIds, profilesCallback);
+			};
+		};
+		doGet(url, OBJECT_TYPE.PaginatedResultsTeamMember, paginatedResultsCallback);
+	}
 }
 

@@ -913,7 +913,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 	
-	@Override
 	public TeamMemberPagedResults getTeamMembers(String teamId, String fragment, TeamMemberTypeFilterOptions memberType, Integer limit,
 			Integer offset) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();

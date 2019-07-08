@@ -75,7 +75,7 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	}
 	
 	public void loadMore() {
-		synapseClient.getTeamMembers(teamId, searchTerm, memberType, MEMBER_LIMIT, offset, new AsyncCallback<TeamMemberPagedResults>() {
+		jsClient.getTeamMembers(teamId, searchTerm, memberType, MEMBER_LIMIT, offset, new AsyncCallback<TeamMemberPagedResults>() {
 			@Override
 			public void onSuccess(TeamMemberPagedResults memberList) {
 				offset += MEMBER_LIMIT;
