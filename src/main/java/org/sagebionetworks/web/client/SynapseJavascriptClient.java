@@ -274,7 +274,7 @@ public class SynapseJavascriptClient {
 	public static final String DOWNLOAD_ORDER_HISTORY = DOWNLOAD_ORDER+"/history";
 	public static final String STORAGE_REPORT = "/storageReport";
 	public static final String SEARCH = "/search";
-	public static final String TEAM_MEMBERS = "/teamMembers";
+	public static final String TEAM_MEMBERS = "/teamMembers/";
 	public static final String NAME_FRAGMENT_FILTER = "fragment=";
 	public static final String NAME_MEMBERTYPE_FILTER = "memberType=";
 
@@ -1499,7 +1499,7 @@ public class SynapseJavascriptClient {
 	}
 	public void getTeamMembers(String teamId, String fragment, TeamMemberTypeFilterOptions memberType, Integer limit, Integer offset, AsyncCallback<TeamMemberPagedResults> callback) {
 		// first gather the team members
-		String url = getRepoServiceUrl() + TEAM_MEMBERS+"/" + teamId + "?" + OFFSET_PARAMETER + offset + "&" + LIMIT_PARAMETER+limit;
+		String url = getRepoServiceUrl() + TEAM_MEMBERS + teamId + "?" + OFFSET_PARAMETER + offset + "&" + LIMIT_PARAMETER+limit;
 		if (fragment != null) {
 			url += "&" + NAME_FRAGMENT_FILTER + gwt.encodeQueryString(fragment);
 		}
@@ -1512,36 +1512,40 @@ public class SynapseJavascriptClient {
 				callback.onFailure(caught);
 			}
 			public void onSuccess(List<TeamMember> teamMembers) {
-				// second step, get all user profiles (in bulk)
-				List<String> userIds = new ArrayList<>();
-				for (TeamMember member : teamMembers) {
-					userIds.add(member.getMember().getOwnerId());
-				}
-				AsyncCallback<List> profilesCallback = new AsyncCallback<List>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						callback.onFailure(caught);
-					}
-					@Override
-					public void onSuccess(List profiles) {
-						List<TeamMemberBundle> teamMemberBundles = new ArrayList<TeamMemberBundle>();
-						for (int i = 0; i < userIds.size(); i++) {
-							teamMemberBundles.add(new TeamMemberBundle((UserProfile)profiles.get(i), teamMembers.get(i).getIsAdmin(), teamMembers.get(i).getTeamId()));
-						}
-						TeamMemberPagedResults results = new TeamMemberPagedResults();
-						results.setResults(teamMemberBundles);
-						int totalNumberOfResults = offset + limit;
-						if (teamMembers.size() >= limit) {
-							totalNumberOfResults++;
-						}
-						results.setTotalNumberOfResults(new Long(totalNumberOfResults));
-						callback.onSuccess(results);
-					}
-				};
-				listUserProfiles(userIds, profilesCallback);
+				getTeamMembersStep2(teamMembers, limit, offset, callback);
 			};
 		};
 		doGet(url, OBJECT_TYPE.PaginatedResultsTeamMember, paginatedResultsCallback);
+	}
+	
+	public void getTeamMembersStep2(List<TeamMember> teamMembers, Integer limit, Integer offset, AsyncCallback<TeamMemberPagedResults> callback) {
+		// second step, get all user profiles (in bulk)
+		List<String> userIds = new ArrayList<>();
+		for (TeamMember member : teamMembers) {
+			userIds.add(member.getMember().getOwnerId());
+		}
+		AsyncCallback<List> profilesCallback = new AsyncCallback<List>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
+			@Override
+			public void onSuccess(List profiles) {
+				List<TeamMemberBundle> teamMemberBundles = new ArrayList<TeamMemberBundle>();
+				for (int i = 0; i < userIds.size(); i++) {
+					teamMemberBundles.add(new TeamMemberBundle((UserProfile)profiles.get(i), teamMembers.get(i).getIsAdmin(), teamMembers.get(i).getTeamId()));
+				}
+				TeamMemberPagedResults results = new TeamMemberPagedResults();
+				results.setResults(teamMemberBundles);
+				int totalNumberOfResults = offset + limit;
+				if (teamMembers.size() >= limit) {
+					totalNumberOfResults++;
+				}
+				results.setTotalNumberOfResults(new Long(totalNumberOfResults));
+				callback.onSuccess(results);
+			}
+		};
+		listUserProfiles(userIds, profilesCallback);
 	}
 }
 
