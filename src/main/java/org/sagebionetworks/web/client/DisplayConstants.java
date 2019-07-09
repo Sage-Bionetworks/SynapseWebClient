@@ -162,7 +162,7 @@ public class DisplayConstants {
 	public static final String ERROR_ENTER_AT_LEAST_ONE_ENTITY = "Please enter at least one entity";
 	public static final String ERROR_ENTER_DEPTH = "Please enter a valid depth";
 	public static final String ERROR_SELECT_VIDEO_FILE = "Please select a video file";
-	
+	public static final String ERROR_SELECT_CHALLENGE_PROJECT = "Please select the Synapse project linked to a Challenge.";
 	public static final String ERROR_SELECT_CYTOSCAPE_FILE = "Please select a Synapse file representing the Cytoscape JS (JSON).";
 	
 	public static final String API_TABLE_MISSING_URI = "SuperTable: Endpoint path not specified.";

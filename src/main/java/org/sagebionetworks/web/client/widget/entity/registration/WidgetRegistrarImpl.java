@@ -109,6 +109,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getShinySiteConfigEditor();
 		} else if (contentTypeKey.equals(BUTTON_LINK_CONTENT_TYPE)) {
 			presenter = ginInjector.getButtonLinkConfigEditor();
+		} else if (contentTypeKey.equals(SUBMIT_TO_EVALUATION_CONTENT_TYPE) || contentTypeKey.equals(OLD_JOIN_EVALUATION_CONTENT_TYPE)) {
+			presenter = ginInjector.getEvaluationSubmissionConfigEditor();
 		} else if (contentTypeKey.equals(USER_TEAM_BADGE_CONTENT_TYPE)) {
 			presenter = ginInjector.getUserTeamConfigEditor();
 		} else if (contentTypeKey.equals(VIDEO_CONTENT_TYPE) ||
