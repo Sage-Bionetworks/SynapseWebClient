@@ -39,9 +39,14 @@ public class EvaluationSubmissionConfigEditor implements WidgetEditorPresenter {
 	public void updateDescriptorFromView() {
 		//update widget descriptor from the view
 		view.checkParams();
-		descriptor.clear();
 		descriptor.put(WidgetConstants.BUTTON_TEXT_KEY, view.getButtonText());
-		descriptor.put(WidgetConstants.PROJECT_ID_KEY, view.getChallengeProjectId());
+		if (view.isChallengeProjectIdSelected()) {
+			descriptor.put(WidgetConstants.PROJECT_ID_KEY, view.getChallengeProjectId());
+			descriptor.remove(WidgetConstants.JOIN_WIDGET_EVALUATION_ID_KEY);
+		} else {
+			descriptor.remove(WidgetConstants.PROJECT_ID_KEY);
+			descriptor.put(WidgetConstants.JOIN_WIDGET_EVALUATION_ID_KEY, view.getEvaluationQueueId());
+		}
 		descriptor.put(WidgetConstants.UNAVAILABLE_MESSAGE, view.getUnavailableMessage());
 	}
 	

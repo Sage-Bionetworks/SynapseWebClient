@@ -3,7 +3,9 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
@@ -21,10 +23,20 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 	@UiField
 	TextBox challengeProjectField;
 	@UiField
+	TextBox evaluationQueueIdField;
+	@UiField
 	TextBox unavailableMessageField;
 	@UiField
 	TextBox buttonTextField;
-
+	@UiField
+	Radio challengeRadioOption;
+	@UiField
+	Radio evaluationQueueOption;
+	@UiField
+	Div challengeProjectUi;
+	@UiField
+	Div evaluationQueueUi;
+	
 	@UiField
 	Button findProjectButton;
 	
@@ -45,6 +57,17 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 			});
 			entityFinder.show();
 		});
+		challengeRadioOption.addClickHandler(event -> {
+			setChallengeProjectUIVisible(true);
+		});
+		evaluationQueueOption.addClickHandler(event -> {
+			setChallengeProjectUIVisible(false);
+		});
+	}
+	
+	private void setChallengeProjectUIVisible(boolean visible) {
+		challengeProjectUi.setVisible(visible);
+		evaluationQueueUi.setVisible(!visible);
 	}
 	
 	@Override
@@ -58,8 +81,18 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 		if (text != null)
 			unavailableMessageField.setValue(text);
 		String projectId = descriptor.get(WidgetConstants.PROJECT_ID_KEY);
-		if (projectId != null)
+		if (projectId != null) {
 			challengeProjectField.setValue(projectId);
+			challengeRadioOption.setValue(true);
+			setChallengeProjectUIVisible(true);
+		}
+		String evalId = descriptor.get(WidgetConstants.JOIN_WIDGET_EVALUATION_ID_KEY);
+		if (evalId != null) {
+			evaluationQueueIdField.setValue(evalId);
+			evaluationQueueOption.setValue(true);
+			setChallengeProjectUIVisible(false);
+		}
+		
 		text = descriptor.get(WidgetConstants.BUTTON_TEXT_KEY);
 		if (text != null)
 			buttonTextField.setValue(text);
@@ -67,8 +100,10 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		if ("".equals(challengeProjectField.getValue()))
+		if (challengeRadioOption.getValue() && "".equals(challengeProjectField.getValue()))
 			throw new IllegalArgumentException(DisplayConstants.ERROR_SELECT_CHALLENGE_PROJECT);
+		if (evaluationQueueOption.getValue() && "".equals(evaluationQueueIdField.getValue()))
+			throw new IllegalArgumentException(DisplayConstants.ERROR_SET_EVALUATION_QUEUE_ID);
 	}
 
 	@Override
@@ -106,5 +141,13 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 	@Override
 	public String getUnavailableMessage() {
 		return unavailableMessageField.getValue();
+	}
+	@Override
+	public String getEvaluationQueueId() {
+		return evaluationQueueIdField.getValue();
+	}
+	@Override
+	public boolean isChallengeProjectIdSelected() {
+		return challengeRadioOption.getValue();
 	}
 }

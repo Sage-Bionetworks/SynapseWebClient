@@ -342,6 +342,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(PLOT_CONTENT_TYPE, PLOT_FRIENDLY_NAME);
 		registerWidget(TEAM_MEMBER_COUNT_CONTENT_TYPE, TEAM_MEMBER_COUNT_FRIENDLY_NAME);
 		registerWidget(TEAM_MEMBERS_CONTENT_TYPE, TEAM_MEMBERS_FRIENDLY_NAME);
+		registerWidget(SUBMIT_TO_EVALUATION_CONTENT_TYPE, "Submit to Evaluation Queue");
 	}
 	
 	public static String getWidgetMarkdown(String contentType, Map<String, String> widgetDescriptor, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {

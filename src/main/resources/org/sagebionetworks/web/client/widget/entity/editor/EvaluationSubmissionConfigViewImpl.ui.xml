@@ -5,33 +5,29 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	
 	<bh:Div>
-		<bh:Div addStyleNames="form-horizontal">
-			<b:Row addStyleNames="margin-10">
-				<b:FormLabel addStyleNames="col-xs-4" text="Challenge Project" />
-				<b:Column size="XS_6">
-					<b:InputGroup>
-						<b:TextBox ui:field="challengeProjectField" autoComplete="false" enabled="false" />
-						<b:InputGroupButton>
-							<b:Button text="Find Project" ui:field="findProjectButton" icon="SEARCH" width="125px"/>
-						</b:InputGroupButton>
-					</b:InputGroup>
-				</b:Column>
-				<b:Column size="XS_2" />
-			</b:Row>
-			<b:Row addStyleNames="margin-10">
-				<b:FormLabel addStyleNames="col-xs-4" text="Evaluation Queue unavailable message" />
-				<b:Column size="XS_8">
-					<b:TextBox ui:field="unavailableMessageField" value="Join the team to submit to the challenge" />
-				</b:Column>
-			</b:Row>
-			<b:Row addStyleNames="margin-10">
-				<b:FormLabel addStyleNames="col-xs-4" text="Button text" />
-				<b:Column size="XS_8">
-					<b:TextBox ui:field="buttonTextField" value="Submit to challenge" />
-				</b:Column>
-			</b:Row>
-			
+		<b:Radio ui:field="challengeRadioOption" name="evaluationQueueType" text="Challenge Queue(s)" value="true" />	
+		<bh:Div ui:field="challengeProjectUi"  marginLeft="30">
+			<b:FormLabel text="Challenge Project" />
+			<b:InputGroup>
+				<b:TextBox ui:field="challengeProjectField" autoComplete="false" enabled="false" />
+				<b:InputGroupButton>
+					<b:Button text="Find Project" ui:field="findProjectButton" icon="SEARCH" width="125px"/>
+				</b:InputGroupButton>
+			</b:InputGroup>
+		</bh:Div>
+		<b:Radio ui:field="evaluationQueueOption" name="evaluationQueueType" text="Single Evaluation Queue" />
+		<bh:Div ui:field="evaluationQueueUi" marginLeft="30" visible="false">
+			<b:FormLabel text="Evaluation Queue ID" />
+			<b:TextBox ui:field="evaluationQueueIdField" value="" placeholder="e.g. 9614271" />
+		</bh:Div>
+		<bh:Hr />
+		<bh:Div addStyleNames="margin-10">
+			<b:FormLabel text="Evaluation Queue unavailable message" />
+			<b:TextBox ui:field="unavailableMessageField" value="Join the team to submit to the challenge" />
+		</bh:Div>
+		<bh:Div addStyleNames="margin-10">
+			<b:FormLabel text="Button text" />
+			<b:TextBox ui:field="buttonTextField" value="Submit to challenge" />
 		</bh:Div>
 	</bh:Div>
-	
 </ui:UiBinder>

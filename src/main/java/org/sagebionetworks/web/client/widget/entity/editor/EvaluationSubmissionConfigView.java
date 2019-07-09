@@ -12,4 +12,6 @@ public interface EvaluationSubmissionConfigView extends IsWidget, WidgetEditorVi
 	String getUnavailableMessage();
 	String getButtonText();
 	String getChallengeProjectId();
+	boolean isChallengeProjectIdSelected();
+	String getEvaluationQueueId();
 }
