@@ -190,6 +190,11 @@ public class WidgetConstants {
 	public static final String PROJECT_ID_KEY = "projectId";
 	public static final String WIDGET_ENTITY_VERSION_KEY = "version";
 	
+	// submit form wiki widget params
+	public static final String FORM_CONTAINER_ID_KEY = "formContainerId";
+	public static final String JSON_SCHEMA_ID_KEY = "jsonSchemaId";
+	public static final String UI_SCHEMA_ID_KEY = "uiSchemaId";
+	
 	public static final String SHINYSITE_SITE_KEY = "site";	
 	public static final String INCLUDE_PRINCIPAL_ID_KEY = "includePrincipalId";
 	public static final String HEIGHT_KEY = "height";

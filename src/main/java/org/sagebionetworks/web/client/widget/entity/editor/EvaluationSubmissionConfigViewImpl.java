@@ -36,10 +36,29 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 	Div challengeProjectUi;
 	@UiField
 	Div evaluationQueueUi;
-	
 	@UiField
 	Button findProjectButton;
 	
+	// form-based submission params
+	@UiField
+	Radio submitEntityOption;
+	@UiField
+	Radio submitForm;
+	@UiField
+	Div formUi;
+	@UiField
+	TextBox formContainerId;
+	@UiField
+	Button findFormContainerButton;
+	@UiField
+	TextBox schemaFileSynIdField;
+	@UiField
+	Button findSchemaFileButton;
+	@UiField
+	TextBox uiSchemaFileSynIdField;
+	@UiField
+	Button findUiSchemaFileButton;
+
 	Widget widget;
 	
 	EntityFinder entityFinder;
@@ -57,11 +76,40 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 			});
 			entityFinder.show();
 		});
+		
+		findFormContainerButton.addClickHandler(event-> {
+			entityFinder.configure(EntityFilter.CONTAINER, false, selectedRef -> {
+				formContainerId.setValue(selectedRef.getTargetId());
+				entityFinder.hide();
+			});
+			entityFinder.show();
+		});
+		findSchemaFileButton.addClickHandler(event-> {
+			entityFinder.configure(EntityFilter.FILE, false, selectedRef -> {
+				schemaFileSynIdField.setValue(selectedRef.getTargetId());
+				entityFinder.hide();
+			});
+			entityFinder.show();
+		});
+		findUiSchemaFileButton.addClickHandler(event-> {
+			entityFinder.configure(EntityFilter.FILE, false, selectedRef -> {
+				uiSchemaFileSynIdField.setValue(selectedRef.getTargetId());
+				entityFinder.hide();
+			});
+			entityFinder.show();
+		});
+		
 		challengeRadioOption.addClickHandler(event -> {
 			setChallengeProjectUIVisible(true);
 		});
 		evaluationQueueOption.addClickHandler(event -> {
 			setChallengeProjectUIVisible(false);
+		});
+		submitForm.addClickHandler(event -> {
+			formUi.setVisible(true);
+		});
+		submitEntityOption.addClickHandler(event -> {
+			formUi.setVisible(false);
 		});
 	}
 	
