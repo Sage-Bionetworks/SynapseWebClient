@@ -40,8 +40,6 @@ public class ClientProperties {
 	 * JavaScript WebResources
 	 */
 	public static final WebResource MATH_PROCESSOR_JS = new WebResource("js/katex-0.10.1.min.js");
-	public static final WebResource PLOTLY_JS = new WebResource("https://cdn.plot.ly/plotly-1.44.0.min.js");
-	public static final WebResource PLOTLY_REACT_JS = new WebResource("https://unpkg.com/react-plotly.js@2.2.0/dist/create-plotly-component.min.js");
 	public static final WebResource AWS_SDK_JS = new WebResource("js/aws-sdk-2.86.0.min.js");
 	public static final String QUERY_SERVICE_PREFIX = "/query?query=";
 	public static final String EVALUATION_QUERY_SERVICE_PREFIX = "/evaluation/submission/query?query=";

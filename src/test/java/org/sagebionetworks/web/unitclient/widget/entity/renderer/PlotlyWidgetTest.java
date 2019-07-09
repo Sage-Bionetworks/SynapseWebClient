@@ -1,28 +1,31 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
-import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.ClientProperties.*;
-import static org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget.*;
+import static org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget.DEFAULT_LIMIT;
+import static org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget.DEFAULT_PART_MASK;
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_RESULTS;
 import static org.sagebionetworks.web.shared.WidgetConstants.BAR_MODE;
-import static org.sagebionetworks.web.shared.WidgetConstants.*;
+import static org.sagebionetworks.web.shared.WidgetConstants.IS_HORIZONTAL;
+import static org.sagebionetworks.web.shared.WidgetConstants.SHOW_LEGEND;
 import static org.sagebionetworks.web.shared.WidgetConstants.TABLE_QUERY_KEY;
 import static org.sagebionetworks.web.shared.WidgetConstants.TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TITLE;
+import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TITLE;
-import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.*;
+import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TYPE;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +47,6 @@ import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.SelectColumn;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
@@ -124,7 +126,6 @@ public class PlotlyWidgetTest {
 				mockView, 
 				mockSynAlert, 
 				mockJobTracker, 
-				mockResourceLoader, 
 				mockQueryTokenProvider);
 		params = new HashMap<>();
 		selectColumns = new ArrayList<>();
@@ -140,8 +141,6 @@ public class PlotlyWidgetTest {
 		when(mockY1Column.getName()).thenReturn(Y1_COLUMN_NAME);
 		when(mockY2Column.getName()).thenReturn(Y1_COLUMN_NAME);
 		when(mockRow.getValues()).thenReturn(rowValues);
-		when(mockResourceLoader.isLoaded(eq(PLOTLY_JS))).thenReturn(true);
-		when(mockResourceLoader.isLoaded(eq(PLOTLY_REACT_JS))).thenReturn(true);
 		
 		sql = "select x, y1, y2 from "+TABLE_ID+" where x>2";
 		params.put(TABLE_QUERY_KEY, sql);
@@ -289,64 +288,6 @@ public class PlotlyWidgetTest {
 		verify(mockView).setLoadingVisible(false);
 		verify(mockSynAlert).handleException(error);
 	}
-	
-	@Test
-	public void testLazyLoadPlotlyJS() throws JSONObjectAdapterException {
-		GraphType type = GraphType.SCATTER;
-		params.put(TYPE, type.toString());
-		boolean showLegend = true;
-		params.put(SHOW_LEGEND, Boolean.toString(showLegend));
-		WikiPageKey pageKey = null;
-		when(mockResourceLoader.isLoaded(eq(PLOTLY_JS))).thenReturn(false);
-		widget.configure(pageKey, params, null, null);
-		
-		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
-		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
-		
-		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), any(), any(), anyBoolean());
-		
-		verify(mockResourceLoader).isLoaded(eq(PLOTLY_JS));
-		verify(mockResourceLoader).requires(eq(PLOTLY_JS), webResourceLoadedCallbackCaptor.capture());
-		
-		AsyncCallback callback = webResourceLoadedCallbackCaptor.getValue();
-		Exception ex = new Exception();
-		callback.onFailure(ex);
-		verify(mockSynAlert).handleException(ex);
-		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), any(), any(), anyBoolean());
-		
-		when(mockResourceLoader.isLoaded(eq(PLOTLY_JS))).thenReturn(true);
-		callback.onSuccess(null);
-		verify(mockView).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), eq(AxisType.AUTO), eq(AxisType.AUTO), eq(showLegend));
-	}
-	
-	@Test
-	public void testLazyLoadPlotlyReactJS() throws JSONObjectAdapterException {
-		GraphType type = GraphType.SCATTER;
-		params.put(TYPE, type.toString());
-		boolean showLegend = true;
-		params.put(SHOW_LEGEND, Boolean.toString(showLegend));
-		WikiPageKey pageKey = null;
-		when(mockResourceLoader.isLoaded(eq(PLOTLY_REACT_JS))).thenReturn(false);
-		widget.configure(pageKey, params, null, null);
-		
-		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
-		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
-		
-		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), any(), any(), anyBoolean());
-		
-		verify(mockResourceLoader).isLoaded(eq(PLOTLY_REACT_JS));
-		verify(mockResourceLoader).requires(eq(PLOTLY_REACT_JS), webResourceLoadedCallbackCaptor.capture());
-		
-		AsyncCallback callback = webResourceLoadedCallbackCaptor.getValue();
-		Exception ex = new Exception();
-		callback.onFailure(ex);
-		verify(mockSynAlert).handleException(ex);
-		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), any(), any(), anyBoolean());
-		
-		when(mockResourceLoader.isLoaded(eq(PLOTLY_REACT_JS))).thenReturn(true);
-		callback.onSuccess(null);
-		verify(mockView).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), any(), any(), eq(showLegend));
-	}	
 
 	@Test
 	public void testTransformWithFill() {
