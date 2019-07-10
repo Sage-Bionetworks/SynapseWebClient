@@ -5,6 +5,7 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
+import org.gwtbootstrap3.client.ui.FormLabel;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.InlineCheckBox;
 import org.gwtbootstrap3.client.ui.Modal;
@@ -26,6 +27,7 @@ import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.FormParams;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -109,6 +111,14 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	SimplePanel dockerCommitListContainer;
 	@UiField
 	Button dockerCommitNextButton;
+	@UiField
+	FormLabel multipleEvaluationsFormLabel;
+	@UiField
+	FormLabel singleEvaluationFormLabel;
+	@UiField
+	FormGroup submissionNameUi;
+	@UiField
+	Div formDiv;
 	
 	private PortalGinInjector ginInjector;
 	@Inject
@@ -300,12 +310,20 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	}
 
 	@Override
-	public void showModal1(boolean showEntityFinder, List<Evaluation> evaluations) {
+	public void showModal1(boolean isEntitySet, FormParams formParams, List<Evaluation> evaluations) {
 		clear();
+		boolean isForm = formParams != null;
+		this.showEntityFinder = !isEntitySet && !isForm;
+		submissionNameUi.setVisible(!isForm);
 		entityFinderUI.setVisible(showEntityFinder);
 		evaluationList.configure(evaluations);
-        this.showEntityFinder = showEntityFinder;
-        modal1.show();
+		boolean isMoreThanOneEvaluation = evaluations.size() > 1;
+		multipleEvaluationsFormLabel.setVisible(isMoreThanOneEvaluation);
+		singleEvaluationFormLabel.setVisible(!isMoreThanOneEvaluation);
+		if (isForm) {
+			// TODO: here we go!  add the SRC entityform component to the formDiv (and listen for detach for cleanup)
+		}
+		modal1.show();
 	}
 	
 	

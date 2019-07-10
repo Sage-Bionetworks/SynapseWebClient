@@ -40,15 +40,17 @@
 					</b:FormGroup>
 					<b:FormGroup ui:field="evaluationListUI">
 						<b:FormGroup>
-							<b:FormLabel>Select the challenge(s) below that you would like to submit to</b:FormLabel>
+							<b:FormLabel ui:field="multipleEvaluationsFormLabel">Select the challenge(s) below that you would like to submit to</b:FormLabel>
+							<b:FormLabel ui:field="singleEvaluationFormLabel" visible="false">Submitting to the following challenge: </b:FormLabel>
 							<g:SimplePanel ui:field="evaluationListContainer" />
 						</b:FormGroup>
 					</b:FormGroup>
 					<g:SimplePanel ui:field="challengeListSynAlertPanel"/>
-					<b:FormGroup>
+					<b:FormGroup ui:field="submissionNameUi">
 						<b:FormLabel>Submission name (optional)</b:FormLabel>
 						<b:TextBox ui:field="submissionNameField" />
 					</b:FormGroup>
+					<bh:Div ui:field="formDiv" />
 				</bh:Div>
 			</b:ModalBody>
 			<b:ModalFooter>

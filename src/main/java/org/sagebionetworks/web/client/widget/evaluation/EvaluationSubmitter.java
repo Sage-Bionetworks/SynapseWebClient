@@ -187,7 +187,7 @@ public class EvaluationSubmitter implements Presenter {
 					view.showErrorMessage(DisplayConstants.NOT_PARTICIPATING_IN_ANY_EVALUATIONS);
 				} 
 				else {
-					view.showModal1(submissionEntity == null, evaluations);
+					view.showModal1(submissionEntity != null, formParams, evaluations);
 				}
 			}
 			

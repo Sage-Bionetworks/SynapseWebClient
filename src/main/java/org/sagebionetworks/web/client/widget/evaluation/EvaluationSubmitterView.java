@@ -6,6 +6,7 @@ import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.shared.FormParams;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -13,7 +14,7 @@ import com.google.gwt.user.client.ui.Widget;
 public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 
 	void setPresenter(Presenter presenter);
-	void showModal1(boolean showEntityFinder, List<Evaluation> evaluations);
+	void showModal1(boolean isEntitySet, FormParams formParams, List<Evaluation> evaluations);
 	void hideModal1();
 	void showModal2();
 	void hideModal2();

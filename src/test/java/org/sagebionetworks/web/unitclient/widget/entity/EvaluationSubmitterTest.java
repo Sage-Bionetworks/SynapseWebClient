@@ -57,6 +57,7 @@ import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterView;
+import org.sagebionetworks.web.shared.FormParams;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -238,7 +239,7 @@ public class EvaluationSubmitterTest {
 		AsyncMockStubber.callSuccessWith(availableEvaluations).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
 		submitter.configure(entity, null, null);
 		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
-		verify(mockView).showModal1(anyBoolean(), any(List.class));
+		verify(mockView).showModal1(anyBoolean(), any(FormParams.class), any(List.class));
 	}
 	@Test
 	public void testShowAvailableEvaluations() throws RestServiceException, JSONObjectAdapterException {
@@ -251,7 +252,7 @@ public class EvaluationSubmitterTest {
 		AsyncMockStubber.callSuccessWith(availableEvaluations).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
 		submitter.configure(entity, null, null);
 		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
-		verify(mockView).showModal1(anyBoolean(), any(List.class));
+		verify(mockView).showModal1(anyBoolean(), any(FormParams.class), any(List.class));
 	}
 	
 	@Test
