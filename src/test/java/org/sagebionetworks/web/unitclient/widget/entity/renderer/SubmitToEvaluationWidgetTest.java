@@ -33,6 +33,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidgetView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
+import org.sagebionetworks.web.shared.FormParams;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -203,7 +204,7 @@ public class SubmitToEvaluationWidgetTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		widget.submitToChallengeClicked();
 		verify(mockView).showAnonymousRegistrationMessage();
-		verify(mockEvaluationSubmitter, times(0)).configure(any(Entity.class), anySet());
+		verify(mockEvaluationSubmitter, times(0)).configure(any(Entity.class), anySet(), any(FormParams.class));
 	}
 	
 	@Test
@@ -212,7 +213,7 @@ public class SubmitToEvaluationWidgetTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		widget.submitToChallengeClicked();
 		verify(mockView, times(0)).showAnonymousRegistrationMessage();
-		verify(mockEvaluationSubmitter).configure(any(Entity.class), anySet());
+		verify(mockEvaluationSubmitter).configure(any(Entity.class), anySet(), any(FormParams.class));
 	}
 	
 	@Test

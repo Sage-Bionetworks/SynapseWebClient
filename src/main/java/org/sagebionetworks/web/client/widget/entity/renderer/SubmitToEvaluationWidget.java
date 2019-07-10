@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
+import org.sagebionetworks.web.shared.FormParams;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -36,6 +37,9 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 	private ChallengeClientAsync challengeClient;
 	private GlobalApplicationState globalApplicationState;
 	private Set<String> evaluationIds;
+	private String formContainerId;
+	private String formSchemaId;
+	private String formUiSchemaId;
 	PortalGinInjector ginInjector;
 	private String evaluationUnavailableMessage;
 	@Inject
@@ -55,8 +59,10 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 	@Override
 	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		this.descriptor = widgetDescriptor;
-		
-		evaluationUnavailableMessage  = descriptor.get(WidgetConstants.UNAVAILABLE_MESSAGE);
+		formContainerId = descriptor.get(WidgetConstants.FORM_CONTAINER_ID_KEY);
+		formSchemaId = descriptor.get(WidgetConstants.JSON_SCHEMA_ID_KEY);
+		formUiSchemaId = descriptor.get(WidgetConstants.UI_SCHEMA_ID_KEY);
+		evaluationUnavailableMessage = descriptor.get(WidgetConstants.UNAVAILABLE_MESSAGE);
 		
 		String evaluationId = descriptor.get(WidgetConstants.JOIN_WIDGET_EVALUATION_ID_KEY);
 		if (evaluationId != null) {
@@ -137,6 +143,8 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 				//else, look for the project id
 				String projectId = descriptor.get(WidgetConstants.PROJECT_ID_KEY);
 				challengeClient.getProjectEvaluationIds(projectId, asyncCallback);
+			} else if (!evaluationIds.isEmpty()){
+				callback.invoke(evaluationIds);
 			}
 		}
 	}
@@ -170,9 +178,13 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 	}
 	
 	public void showSubmissionDialog() {
+		FormParams formParams = null;
+		if (formContainerId != null) {
+			formParams = new FormParams(formContainerId, formSchemaId, formUiSchemaId);
+		}
 		EvaluationSubmitter submitter = ginInjector.getEvaluationSubmitter();
 		view.setEvaluationSubmitterWidget(submitter.asWidget());
-		submitter.configure(null, evaluationIds);
+		submitter.configure(null, evaluationIds, formParams);
 	}
 	
 }

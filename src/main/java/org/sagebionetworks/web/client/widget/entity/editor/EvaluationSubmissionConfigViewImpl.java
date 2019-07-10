@@ -47,7 +47,7 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 	@UiField
 	Div formUi;
 	@UiField
-	TextBox formContainerId;
+	TextBox formContainerIdField;
 	@UiField
 	Button findFormContainerButton;
 	@UiField
@@ -79,20 +79,20 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 		
 		findFormContainerButton.addClickHandler(event-> {
 			entityFinder.configure(EntityFilter.CONTAINER, false, selectedRef -> {
-				formContainerId.setValue(selectedRef.getTargetId());
+				formContainerIdField.setValue(selectedRef.getTargetId());
 				entityFinder.hide();
 			});
 			entityFinder.show();
 		});
 		findSchemaFileButton.addClickHandler(event-> {
-			entityFinder.configure(EntityFilter.FILE, false, selectedRef -> {
+			entityFinder.configure(EntityFilter.ALL_BUT_LINK, false, selectedRef -> {
 				schemaFileSynIdField.setValue(selectedRef.getTargetId());
 				entityFinder.hide();
 			});
 			entityFinder.show();
 		});
 		findUiSchemaFileButton.addClickHandler(event-> {
-			entityFinder.configure(EntityFilter.FILE, false, selectedRef -> {
+			entityFinder.configure(EntityFilter.ALL_BUT_LINK, false, selectedRef -> {
 				uiSchemaFileSynIdField.setValue(selectedRef.getTargetId());
 				entityFinder.hide();
 			});
@@ -141,6 +141,18 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 			setChallengeProjectUIVisible(false);
 		}
 		
+		String formContainerId = descriptor.get(WidgetConstants.FORM_CONTAINER_ID_KEY);
+		if (formContainerId != null) {
+			submitForm.setValue(true);
+			formUi.setVisible(true);
+			formContainerIdField.setValue(formContainerId);
+			schemaFileSynIdField.setValue(descriptor.get(WidgetConstants.JSON_SCHEMA_ID_KEY));
+			uiSchemaFileSynIdField.setValue(descriptor.get(WidgetConstants.UI_SCHEMA_ID_KEY));
+		} else {
+			submitEntityOption.setValue(true);
+			formUi.setVisible(false);
+		}
+		
 		text = descriptor.get(WidgetConstants.BUTTON_TEXT_KEY);
 		if (text != null)
 			buttonTextField.setValue(text);
@@ -152,6 +164,17 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 			throw new IllegalArgumentException(DisplayConstants.ERROR_SELECT_CHALLENGE_PROJECT);
 		if (evaluationQueueOption.getValue() && "".equals(evaluationQueueIdField.getValue()))
 			throw new IllegalArgumentException(DisplayConstants.ERROR_SET_EVALUATION_QUEUE_ID);
+		if (submitForm.getValue()) {
+			if ("".equals(formContainerIdField.getValue())) {
+				throw new IllegalArgumentException(DisplayConstants.ERROR_SELECT_FORM_CONTAINER);	
+			}
+			if ("".equals(schemaFileSynIdField.getValue())) {
+				throw new IllegalArgumentException(DisplayConstants.ERROR_SELECT_FORM_SCHEMA);	
+			}
+			if ("".equals(uiSchemaFileSynIdField.getValue())) {
+				throw new IllegalArgumentException(DisplayConstants.ERROR_SELECT_FORM_UI_SCHEMA);	
+			}
+		}
 	}
 
 	@Override
@@ -176,6 +199,9 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 	@Override
 	public void clear() {
 		challengeProjectField.setValue("");
+		formContainerIdField.setValue("");
+		schemaFileSynIdField.setValue("");
+		uiSchemaFileSynIdField.setValue("");
 	}
 
 	@Override
@@ -197,5 +223,22 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 	@Override
 	public boolean isChallengeProjectIdSelected() {
 		return challengeRadioOption.getValue();
+	}
+	
+	@Override
+	public String getFormContainerId() {
+		return formContainerIdField.getValue();
+	}
+	@Override
+	public String getFormJsonSchemaId() {
+		return schemaFileSynIdField.getValue();
+	}
+	@Override
+	public String getFormUiSchemaId() {
+		return uiSchemaFileSynIdField.getValue();
+	}
+	@Override
+	public boolean isFormSubmission() {
+		return submitForm.getValue();
 	}
 }

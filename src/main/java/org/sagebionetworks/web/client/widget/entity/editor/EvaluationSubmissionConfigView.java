@@ -14,4 +14,9 @@ public interface EvaluationSubmissionConfigView extends IsWidget, WidgetEditorVi
 	String getChallengeProjectId();
 	boolean isChallengeProjectIdSelected();
 	String getEvaluationQueueId();
+	
+	boolean isFormSubmission();
+	String getFormContainerId();
+	String getFormJsonSchemaId();
+	String getFormUiSchemaId();
 }

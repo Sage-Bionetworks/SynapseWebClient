@@ -30,10 +30,10 @@
 		</bh:Div>
 		<bh:Div ui:field="formUi" marginLeft="30" marginTop="10" visible="false">
 			<b:FormLabel text="Parent Container (Project/Folder)" marginTop="10"/>
-			<w:HelpWidget helpMarkdown="This should contain a subfolder for each submitter, where each subfolder name match the submitters user_id.
+			<w:HelpWidget helpMarkdown="This should contain a subfolder for each submitter.  The subfolder name must match the submitters user_id.
 				Submitter must have permission to create files in their folder (form data files)." addStyleNames="margin-left-5" placement="BOTTOM"/>
 			<b:InputGroup>
-				<b:TextBox ui:field="formContainerId" autoComplete="false" enabled="false" />
+				<b:TextBox ui:field="formContainerIdField" autoComplete="false" enabled="false" />
 				<b:InputGroupButton>
 					<b:Button text="Find Container" ui:field="findFormContainerButton" icon="SEARCH" width="150px"/>
 				</b:InputGroupButton>

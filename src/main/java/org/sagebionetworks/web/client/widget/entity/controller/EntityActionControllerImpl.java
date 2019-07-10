@@ -1128,7 +1128,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void postOnSubmit(){
-		getEvaluationSubmitter().configure(this.entityBundle.getEntity(), null);
+		getEvaluationSubmitter().configure(this.entityBundle.getEntity(), null, null);
 	}
 	
 	private void onLink() {

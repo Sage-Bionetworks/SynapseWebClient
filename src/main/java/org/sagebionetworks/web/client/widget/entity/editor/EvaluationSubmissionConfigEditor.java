@@ -47,6 +47,15 @@ public class EvaluationSubmissionConfigEditor implements WidgetEditorPresenter {
 			descriptor.remove(WidgetConstants.PROJECT_ID_KEY);
 			descriptor.put(WidgetConstants.JOIN_WIDGET_EVALUATION_ID_KEY, view.getEvaluationQueueId());
 		}
+		if (view.isFormSubmission()) {
+			descriptor.put(WidgetConstants.FORM_CONTAINER_ID_KEY, view.getFormContainerId());	
+			descriptor.put(WidgetConstants.JSON_SCHEMA_ID_KEY, view.getFormJsonSchemaId());
+			descriptor.put(WidgetConstants.UI_SCHEMA_ID_KEY, view.getFormUiSchemaId());
+		} else {
+			descriptor.remove(WidgetConstants.FORM_CONTAINER_ID_KEY);	
+			descriptor.remove(WidgetConstants.JSON_SCHEMA_ID_KEY);
+			descriptor.remove(WidgetConstants.UI_SCHEMA_ID_KEY);
+		}
 		descriptor.put(WidgetConstants.UNAVAILABLE_MESSAGE, view.getUnavailableMessage());
 	}
 	

@@ -119,6 +119,7 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
+import org.sagebionetworks.web.shared.FormParams;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -1294,7 +1295,7 @@ public class EntityActionControllerImplTest {
 		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.SUBMIT_TO_CHALLENGE);
-		verify(mockSubmitter, never()).configure(any(Entity.class), any(Set.class));
+		verify(mockSubmitter, never()).configure(any(Entity.class), any(Set.class), any(FormParams.class));
 	}
 	
 	@Test
@@ -1302,7 +1303,7 @@ public class EntityActionControllerImplTest {
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.SUBMIT_TO_CHALLENGE);
-		verify(mockSubmitter).configure(any(Entity.class), any(Set.class));
+		verify(mockSubmitter).configure(any(Entity.class), any(Set.class), any(FormParams.class));
 	}
 	
 	@Test
