@@ -5,7 +5,6 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -19,7 +18,6 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.TeamMemberBundle;
 
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.inject.Inject;
 
@@ -92,6 +90,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 				p.setMarginLeft(5);
 				teamManagerBadge.add(p);
 				singleGridItem.add(teamManagerBadge);
+				singleGridItem.setHeight("130px");
 			}
 			userBadge.configure(member);
 			loadMoreWidget.add(singleGridItem);

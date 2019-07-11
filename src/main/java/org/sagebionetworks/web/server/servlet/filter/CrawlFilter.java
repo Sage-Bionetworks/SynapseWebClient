@@ -40,6 +40,7 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
@@ -361,7 +362,7 @@ public class CrawlFilter implements Filter {
 		if (team.getDescription() != null) {
 			html.append("<h3>" + team.getDescription() + "</h3>");	
 		}
-		TeamMemberPagedResults teamMembers = synapseClient.getTeamMembers(team.getId(), "", 20, 0);
+		TeamMemberPagedResults teamMembers = synapseClient.getTeamMembers(team.getId(), "", TeamMemberTypeFilterOptions.ALL, 20, 0);
 		for (TeamMemberBundle teamMember : teamMembers.getResults()) {
 			try {
 				html.append(getUserProfileString(teamMember.getUserProfile()) + "<br>");

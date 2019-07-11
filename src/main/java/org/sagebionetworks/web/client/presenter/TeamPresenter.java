@@ -4,6 +4,7 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -47,7 +48,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	private TeamEditModalWidget editTeamWidget;
 	private InviteWidget inviteWidget;
 	private JoinTeamWidget joinTeamWidget;
-	private MemberListWidget memberListWidget;
+	private MemberListWidget memberListWidget, managerListWidget;
 	private OpenMembershipRequestsWidget openMembershipRequestsWidget;
 	private OpenUserInvitationsWidget openUserInvitationsWidget;
 	private GoogleMap map;
@@ -62,8 +63,9 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			SynapseAlert synAlert, TeamLeaveModalWidget leaveTeamWidget,
 			TeamDeleteModalWidget deleteTeamWidget,
 			TeamEditModalWidget editTeamWidget, InviteWidget inviteWidget,
-			JoinTeamWidget joinTeamWidget,  
-			MemberListWidget memberListWidget, 
+			JoinTeamWidget joinTeamWidget,
+			MemberListWidget managerListWidget,
+			MemberListWidget memberListWidget,
 			OpenMembershipRequestsWidget openMembershipRequestsWidget,
 			OpenUserInvitationsWidget openUserInvitationsWidget,
 			GoogleMap map,
@@ -80,6 +82,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		this.editTeamWidget = editTeamWidget;
 		this.inviteWidget = inviteWidget;
 		this.joinTeamWidget = joinTeamWidget;
+		this.managerListWidget = managerListWidget;
 		this.memberListWidget = memberListWidget;
 		this.openMembershipRequestsWidget = openMembershipRequestsWidget;
 		this.openUserInvitationsWidget = openUserInvitationsWidget;
@@ -94,6 +97,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		view.setJoinTeamWidget(joinTeamWidget.asWidget());
 		view.setOpenMembershipRequestWidget(openUserInvitationsWidget.asWidget());
 		view.setOpenUserInvitationsWidget(openMembershipRequestsWidget.asWidget());
+		view.setManagerListWidget(managerListWidget.asWidget());
 		view.setMemberListWidget(memberListWidget.asWidget());
 		view.setMap(map.asWidget());
 		view.setShowMapVisible(DisplayUtils.isInTestWebsite(cookies));
@@ -175,7 +179,8 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				boolean canPublicJoin = team.getCanPublicJoin() == null ? false : team.getCanPublicJoin();
 				view.setPublicJoinVisible(canPublicJoin);
 				view.setTeam(team, teamMembershipStatus);
-				memberListWidget.configure(teamId, isAdmin, refreshCallback);				
+				managerListWidget.configure(teamId, isAdmin, TeamMemberTypeFilterOptions.ADMIN, refreshCallback);
+				memberListWidget.configure(teamId, isAdmin, TeamMemberTypeFilterOptions.MEMBER, refreshCallback);
 				openMembershipRequestsWidget.setVisible(isAdmin);
 				
 				if (teamMembershipStatus == null || !teamMembershipStatus.getIsMember()) {

@@ -1,26 +1,15 @@
 package org.sagebionetworks.web.client;
 
-import static com.google.gwt.http.client.RequestBuilder.GET;
-import static com.google.gwt.http.client.RequestBuilder.POST;
-import static com.google.gwt.http.client.RequestBuilder.PUT;
+import static com.google.gwt.http.client.RequestBuilder.*;
 import static org.apache.http.HttpStatus.*;
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE;
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.*;
 import static org.sagebionetworks.web.shared.WebConstants.*;
-import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -29,16 +18,14 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException;
-import org.sagebionetworks.reflection.model.PaginatedResults;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.ErrorResponseCode;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.IdList;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.ListWrapper;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -47,6 +34,9 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.TeamMember;
+import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
+import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.asynch.AsynchJobState;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
@@ -62,18 +52,15 @@ import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
-import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
 import org.sagebionetworks.web.client.cache.EntityId2BundleCacheImpl;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
-import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
@@ -134,6 +121,15 @@ public class SynapseJavascriptClientTest {
 	ArgumentCaptor<String> stringCaptor;
 	// cache is tested here
 	EntityId2BundleCacheImpl entityId2BundleCache;
+
+	@Mock
+	TeamMember mockTeamMember1;
+	@Mock
+	UserGroupHeader mockUgh1;
+	@Mock
+	TeamMember mockTeamMember2;
+	@Mock
+	UserGroupHeader mockUgh2;
 	
 	@Before
 	public void before() {
@@ -144,7 +140,7 @@ public class SynapseJavascriptClientTest {
 		when(mockGinInjector.getRequestBuilder()).thenReturn(mockRequestBuilder);
 		when(mockGinInjector.getAuthenticationController()).thenReturn(mockAuthController);
 		when(mockJsniUtils.getSessionCookieUrl()).thenReturn(SESSION_COOKIE_URL);
-		
+
 		client = new SynapseJavascriptClient(
 				jsonObjectAdapter, 
 				mockSynapseProperties, 
@@ -775,5 +771,53 @@ public class SynapseJavascriptClientTest {
 		verify(mockRequestBuilder, never()).configure(PUT, url);
 		verify(mockRequestBuilder, never()).sendRequest(anyString(), any(RequestCallback.class));
 		verify(mockRequestBuilder, never()).configure(POST, SESSION_COOKIE_URL);
+	}
+	
+	@Test
+	public void testGetTeamMembersFirstStep() throws RequestException, JSONObjectAdapterException {
+		String teamId = "122234";
+		int offset = 10;
+		int limit = 100;
+		String fragment = "test";
+		TeamMemberTypeFilterOptions memberType = TeamMemberTypeFilterOptions.ALL;
+		when(mockGwt.encodeQueryString(anyString())).thenReturn(fragment, memberType.toString());
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
+		
+		client.getTeamMembers(teamId, fragment, memberType, limit, offset, mockAsyncCallback);
+		
+		//verify url and method
+		String url = REPO_ENDPOINT + TEAM_MEMBERS + teamId + "?" + OFFSET_PARAMETER + offset + "&" + LIMIT_PARAMETER + limit +
+				"&" + NAME_FRAGMENT_FILTER + fragment + "&" + NAME_MEMBERTYPE_FILTER + memberType.toString();
+		verify(mockRequestBuilder).configure(GET, url);
+	}
+	
+	@Test
+	public void testGetTeamMembersSecondStep() throws RequestException, JSONObjectAdapterException {
+		Long userId1 = 222L, userId2 = 333L;
+		
+		when(mockUgh1.getOwnerId()).thenReturn(userId1.toString());
+		when(mockUgh2.getOwnerId()).thenReturn(userId2.toString());
+		when(mockTeamMember1.getMember()).thenReturn(mockUgh1);
+		when(mockTeamMember2.getMember()).thenReturn(mockUgh2);
+		List<TeamMember> teamMembers = new ArrayList<>();
+		teamMembers.add(mockTeamMember1);
+		teamMembers.add(mockTeamMember2);
+		
+		client.getTeamMembersStep2(teamMembers, 20, 0, mockAsyncCallback);
+		
+		//get user profiles
+		String url = REPO_ENDPOINT + USER_PROFILE_PATH;
+		verify(mockRequestBuilder).configure(POST, url);
+		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
+		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
+		verify(mockRequestBuilder).sendRequest(stringCaptor.capture(), requestCallbackCaptor.capture());
+		
+		//verify request data
+		String json = stringCaptor.getValue();
+		IdList request = new IdList(jsonObjectAdapter.createNew(json));
+		List<Long> userIds = request.getList();
+		assertTrue(userIds.contains(userId1));
+		assertTrue(userIds.contains(userId2));
 	}
 }

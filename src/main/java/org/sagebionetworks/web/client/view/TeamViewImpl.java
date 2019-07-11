@@ -55,6 +55,8 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@UiField
 	SimplePanel openUserInvitationsPanel;
 	@UiField
+	SimplePanel managerListPanel;
+	@UiField
 	SimplePanel memberListPanel;
 	@UiField
 	Div publicJoinField;
@@ -249,7 +251,10 @@ public class TeamViewImpl extends Composite implements TeamView {
 	public void setOpenUserInvitationsWidget(Widget openUserInvitationsWidget) {
 		this.openUserInvitationsPanel.setWidget(openUserInvitationsWidget);
 	}
-	
+	@Override
+	public void setManagerListWidget(Widget managerListWidget) {
+		this.managerListPanel.setWidget(managerListWidget);
+	}
 	@Override
 	public void setMemberListWidget(Widget memberListWidget) {
 		this.memberListPanel.setWidget(memberListWidget);

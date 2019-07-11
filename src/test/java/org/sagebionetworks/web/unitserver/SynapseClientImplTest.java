@@ -90,6 +90,7 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
+import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserGroup;
@@ -1205,9 +1206,8 @@ public class SynapseClientImplTest {
 		members.add(member2);
 
 		allMembers.setResults(members);
-		when(
-				mockSynapse.getTeamMembers(anyString(), anyString(), anyLong(),
-						anyLong())).thenReturn(allMembers);
+		when(mockSynapse.getTeamMembers(anyString(), anyString(), any(TeamMemberTypeFilterOptions.class), anyLong(),
+			anyLong())).thenReturn(allMembers);
 
 		List<UserProfile> profiles = new ArrayList<UserProfile>();
 		UserProfile profile1 = new UserProfile();
@@ -1220,7 +1220,7 @@ public class SynapseClientImplTest {
 
 		// make the call
 		TeamMemberPagedResults results = synapseClient.getTeamMembers(
-				"myTeamId", "search term", 100, 0);
+				"myTeamId", "search term", TeamMemberTypeFilterOptions.ALL, 100, 0);
 
 		// verify it results in the two team member bundles that we expect
 		List<TeamMemberBundle> memberBundles = results.getResults();
@@ -1539,7 +1539,7 @@ public class SynapseClientImplTest {
 		synapseClient.getOrCreateActivityForEntityVersion(entityId, version);
 		verify(mockSynapse).getActivityForEntityVersion(entityId, version);
 		verify(mockSynapse).createActivity(any(Activity.class));
-		verify(mockSynapse).putEntity(mockSynapse.getEntityById(entityId), mockActivity.getId());
+		verify(mockSynapse).putEntity(mockSynapse.getEntityById(entityId), mockActivity.getId(), null);
 	}
 	
 	@Test(expected = Exception.class)

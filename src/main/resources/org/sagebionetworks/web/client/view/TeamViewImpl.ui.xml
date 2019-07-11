@@ -55,6 +55,11 @@
 					<g:SimplePanel ui:field="joinTeamPanel" addStyleNames="margin-bottom-5 margin-top-10"/>
 					<g:SimplePanel ui:field="openMembershipRequestsPanel" addStyleNames="margin-bottom-5 margin-top-60"/>
 					<g:SimplePanel ui:field="openUserInvitationsPanel" addStyleNames="margin-bottom-5 margin-top-60"/>
+					<bh:Div addStyleNames="SRC-grid-item" marginBottom="5" height="40px">
+						<b:Heading size="H3" text="Managers"/>
+					</bh:Div>
+					<g:SimplePanel ui:field="managerListPanel" addStyleNames="margin-bottom-40"/>
+					
 					<bh:Div addStyleNames="SRC-card-grid-row margin-top-60">
 						<bh:Div addStyleNames="SRC-grid-item" marginBottom="5" height="40px">
 							<b:Heading size="H3" text="Members"/>

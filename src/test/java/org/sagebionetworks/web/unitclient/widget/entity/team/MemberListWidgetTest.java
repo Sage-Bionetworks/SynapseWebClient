@@ -1,7 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.entity.team;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -18,7 +25,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.team.MemberListWidget;
 import org.sagebionetworks.web.client.widget.team.MemberListWidgetView;
@@ -55,7 +61,7 @@ public class MemberListWidgetTest {
 		widget = new MemberListWidget(mockView, mockSynapseClient, mockJsClient, mockAuthenticationController, mockGlobalApplicationState, mockMembersContainer);
 		isAdmin = true;
 		
-		AsyncMockStubber.callSuccessWith(getTestTeamMembers()).when(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(getTestTeamMembers()).when(mockJsClient).getTeamMembers(anyString(), anyString(), any(TeamMemberTypeFilterOptions.class), anyInt(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).deleteTeamMember(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setIsTeamAdmin(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 	}
@@ -84,24 +90,26 @@ public class MemberListWidgetTest {
 	@Test
 	public void testConfigure() {
 		//verify it tries to refresh all members
-		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
-		verify(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		TeamMemberTypeFilterOptions memberType = TeamMemberTypeFilterOptions.ALL;
+		widget.configure(teamId, isAdmin, memberType, mockTeamUpdatedCallback);
+		verify(mockJsClient).getTeamMembers(anyString(), anyString(), eq(memberType), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).addMembers(anyList(), anyBoolean());
 		verify(mockMembersContainer).configure(any(Callback.class));
 	}
 	@Test
 	public void testConfigureFailure() {
+		TeamMemberTypeFilterOptions memberType = TeamMemberTypeFilterOptions.MEMBER;
 		String error = "unhandled exception";
 		Exception ex = new Exception(error);
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
-		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
-		verify(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).getTeamMembers(anyString(), anyString(), any(TeamMemberTypeFilterOptions.class), anyInt(), anyInt(), any(AsyncCallback.class));
+		widget.configure(teamId, isAdmin, memberType, mockTeamUpdatedCallback);
+		verify(mockJsClient).getTeamMembers(anyString(), anyString(), eq(memberType), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(error);
 	}
 
 	@Test
 	public void testRemoveMember() {
-		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
+		widget.configure(teamId, isAdmin, TeamMemberTypeFilterOptions.ALL, mockTeamUpdatedCallback);
 		widget.removeMember("a user id");
 		verify(mockJsClient).deleteTeamMember(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString());
@@ -109,7 +117,7 @@ public class MemberListWidgetTest {
 	}
 	@Test
 	public void testRemoveMemberFailure() {
-		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
+		widget.configure(teamId, isAdmin, TeamMemberTypeFilterOptions.ALL, mockTeamUpdatedCallback);
 		String error = "unhandled exception";
 		Exception ex = new Exception(error);
 		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).deleteTeamMember(anyString(), anyString(), any(AsyncCallback.class));
@@ -119,7 +127,7 @@ public class MemberListWidgetTest {
 	}
 	@Test
 	public void testRemoveMemberBadRequestFailure() {
-		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
+		widget.configure(teamId, isAdmin, TeamMemberTypeFilterOptions.ALL, mockTeamUpdatedCallback);
 		String badRequestMessage = "Team must have at least one administrator.";
 		Exception ex = new BadRequestException(badRequestMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).deleteTeamMember(anyString(), anyString(), any(AsyncCallback.class));
@@ -131,7 +139,7 @@ public class MemberListWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testSetIsAdmin(){
-		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
+		widget.configure(teamId, isAdmin, TeamMemberTypeFilterOptions.ALL, mockTeamUpdatedCallback);
 		widget.setIsAdmin("a user id", true);
 		verify(mockSynapseClient).setIsTeamAdmin(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString());
@@ -141,28 +149,28 @@ public class MemberListWidgetTest {
 	@Test
 	public void testSetIsAdminFailure() {
 		String message = "unhandled exception";
-		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
+		widget.configure(teamId, isAdmin, TeamMemberTypeFilterOptions.ALL, mockTeamUpdatedCallback);
 		Exception ex = new Exception(message);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).setIsTeamAdmin(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		widget.setIsAdmin("a user id", true);
 		verify(mockSynapseClient).setIsTeamAdmin(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(message);;
 		//called twice.  once during configuration, and once to refresh members to get correct admin state
-		verify(mockSynapseClient, times(2)).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockJsClient, times(2)).getTeamMembers(anyString(), anyString(), any(TeamMemberTypeFilterOptions.class), anyInt(), anyInt(), any(AsyncCallback.class));
 	}
 	
 	@Test
 	public void testSearch() {
-		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
+		widget.configure(teamId, isAdmin, TeamMemberTypeFilterOptions.ALL, mockTeamUpdatedCallback);
 		String searchTerm = "Xa";
 		Long totalNumberOfResults = 10L;
 		TeamMemberPagedResults searchResults = new TeamMemberPagedResults();
 		searchResults.setResults(new ArrayList<>());
 		searchResults.setTotalNumberOfResults(totalNumberOfResults);
-		AsyncMockStubber.callSuccessWith(searchResults).when(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(searchResults).when(mockJsClient).getTeamMembers(anyString(), anyString(), any(TeamMemberTypeFilterOptions.class), anyInt(), anyInt(), any(AsyncCallback.class));
 		
 		widget.search(searchTerm);
 		
-		verify(mockSynapseClient).getTeamMembers(anyString(), eq(searchTerm), anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockJsClient).getTeamMembers(anyString(), eq(searchTerm), any(TeamMemberTypeFilterOptions.class), anyInt(), anyInt(), any(AsyncCallback.class));
 	}
 }

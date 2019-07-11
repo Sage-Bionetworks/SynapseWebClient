@@ -24,6 +24,7 @@ import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -147,6 +148,7 @@ public class SynapseJavascriptFactory {
 		PaginatedResultsDiscussionThreadBundle,
 		PaginatedResultsDiscussionReplyBundle,
 		PaginatedResultsV2WikiHeader,
+		PaginatedResultsTeamMember,
 		None,
 		String
 	}
@@ -296,6 +298,14 @@ public class SynapseJavascriptFactory {
 				entityHeaderList.add(new EntityHeader(jsonObject));
 			}
 			return entityHeaderList;
+		case PaginatedResultsTeamMember :
+			List<TeamMember> teamMemberList = new ArrayList<>();
+			JSONArrayAdapter teamMemberResults = json.getJSONArray("results");
+			for (int i = 0; i < teamMemberResults.length(); i++) {
+				JSONObjectAdapter jsonObject = teamMemberResults.getJSONObject(i);
+				teamMemberList.add(new TeamMember(jsonObject));
+			}
+			return teamMemberList;
 		case PaginatedResultsV2WikiHeader :
 			// json really represents a PaginatedResults (cannot reference here in js)
 			List<V2WikiHeader> v2WikiHeaders = new ArrayList<>();

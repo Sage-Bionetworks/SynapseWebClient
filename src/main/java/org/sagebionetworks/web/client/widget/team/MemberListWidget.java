@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.team;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
+import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -20,6 +21,7 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	public static int MEMBER_LIMIT = 24;
 	private int offset;
 	private String searchTerm, teamId;
+	private TeamMemberTypeFilterOptions memberType;
 	private boolean isAdmin;
 	private MemberListWidgetView view;
 	private GlobalApplicationState globalApplicationState;
@@ -54,9 +56,10 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 		});
 	}
 
-	public void configure(String teamId, boolean isAdmin, Callback teamUpdatedCallback) {
+	public void configure(String teamId, boolean isAdmin, TeamMemberTypeFilterOptions memberType, Callback teamUpdatedCallback) {
 		this.teamId = teamId;
 		this.isAdmin = isAdmin;
+		this.memberType = memberType;
 		this.teamUpdatedCallback = teamUpdatedCallback;
 		view.clearMembers();
 		offset = 0;
@@ -68,11 +71,11 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	}
 	
 	public void refresh() {
-		configure(teamId, isAdmin, teamUpdatedCallback);
+		configure(teamId, isAdmin, memberType, teamUpdatedCallback);
 	}
 	
 	public void loadMore() {
-		synapseClient.getTeamMembers(teamId, searchTerm, MEMBER_LIMIT, offset, new AsyncCallback<TeamMemberPagedResults>() {
+		jsClient.getTeamMembers(teamId, searchTerm, memberType, MEMBER_LIMIT, offset, new AsyncCallback<TeamMemberPagedResults>() {
 			@Override
 			public void onSuccess(TeamMemberPagedResults memberList) {
 				offset += MEMBER_LIMIT;
