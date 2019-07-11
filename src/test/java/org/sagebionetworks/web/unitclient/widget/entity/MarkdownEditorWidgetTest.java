@@ -541,9 +541,9 @@ public class MarkdownEditorWidgetTest {
 	
 	@Test
 	public void testHandleCommandSubmitToEvaluation(){
-		setupSurroundText();
+		String contentType = WidgetConstants.SUBMIT_TO_EVALUATION_CONTENT_TYPE;
 		presenter.handleCommand(MarkdownEditorAction.INSERT_SUBMIT_TO_EVALUATION);
-		assertTrue(getNewMarkdown().contains(WidgetConstants.SUBMIT_TO_EVALUATION_CONTENT_TYPE));
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
 	}
 	
 	@Test
