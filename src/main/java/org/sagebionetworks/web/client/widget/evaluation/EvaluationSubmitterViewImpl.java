@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.FormParams;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -53,6 +54,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	private Reference selectedReference;
 	AuthenticationController authController;
 	boolean isForm;
+	JavaScriptObject formRef;
 	
 	Widget widget;
 	@UiField
@@ -174,7 +176,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 				}
 				if (isForm) {
 					// ask the form to submit, and wait for the callback (to go to the next page)
-					_submitForm();
+					_submitForm(formRef);
 				} else {
 					presenter.onNextClicked(selectedReference, submissionNameField.getValue(), evaluation);	
 				}
@@ -337,14 +339,14 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		selectedReference.setTargetId(synId);
 		presenter.onNextClicked(selectedReference, submissionNameField.getValue(), evaluation);
 	}
-	private static native void _submitForm() /*-{
-		Window.currentFormRef.current.submitForm();
+	private static native void _submitForm(JavaScriptObject formRef) /*-{
+		formRef.submitForm();
 	}-*/;
 	private static native void _showForm(Element el, String sessionToken, String parentContainerSynId, String jsonSchemaSynId, String uiSchemaSynId, EvaluationSubmitterViewImpl view) /*-{
 		try {
-			$wnd.currentFormRef = $wnd.React.createRef();
+			view.@org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterViewImpl::formRef = $wnd.React.createRef();
 			function setRefFunction(form) {
-				myForm = form;
+				view.@org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterViewImpl::formRef = form;
 			};
 			function synIdCallbackFunction(synId) {
 				view.@org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterViewImpl::setFormSynId(Ljava/lang/String;)(synId);
