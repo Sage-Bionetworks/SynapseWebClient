@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
@@ -29,8 +30,6 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.FormParams;
 
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -39,6 +38,7 @@ import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -51,6 +51,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	private EntityFinder entityFinder;
 	private boolean showEntityFinder;
 	private Reference selectedReference;
+	AuthenticationController authController;
+	boolean isForm;
 	
 	Widget widget;
 	@UiField
@@ -126,14 +128,22 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 			Binder binder, 
 			EntityFinder entityFinder, 
 			EvaluationList evaluationList, 
-			PortalGinInjector ginInjector
+			PortalGinInjector ginInjector,
+			AuthenticationController authController
 			) {
 		widget = binder.createAndBindUi(this);
 		this.entityFinder = entityFinder;
 		this.evaluationList = evaluationList;
 		this.ginInjector = ginInjector;
+		this.authController = authController;
 		evaluationListContainer.setWidget(evaluationList.asWidget());
 		initClickHandlers();
+		widget.addAttachHandler(event -> {
+			if (!event.isAttached()) {
+				//detach event, clean up react component
+				ginInjector.getSynapseJSNIUtils().unmountComponentAtNode(formDiv.getElement());
+			}
+		});
 	}
 	
 	public void initClickHandlers() {
@@ -152,80 +162,64 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 				presenter.onDockerCommitNextButton();
 			}
 		});
-		nextButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				Evaluation evaluation = evaluationList.getSelectedEvaluation();
-				if (evaluation != null) {
-					if (showEntityFinder) {
-						if (selectedReference == null || selectedReference.getTargetId() == null) {
-							//invalid, return.
-							showErrorMessage(DisplayConstants.NO_ENTITY_SELECTED);
-							return;
-						}
+		nextButton.addClickHandler(event -> {
+			Evaluation evaluation = evaluationList.getSelectedEvaluation();
+			if (evaluation != null) {
+				if (showEntityFinder) {
+					if (selectedReference == null || selectedReference.getTargetId() == null) {
+						//invalid, return.
+						showErrorMessage(DisplayConstants.NO_ENTITY_SELECTED);
+						return;
 					}
-					presenter.onNextClicked(selectedReference, submissionNameField.getValue(), evaluation);
-				} else {
-					showErrorMessage(DisplayConstants.NO_EVALUATION_SELECTED);
 				}
+				if (isForm) {
+					// ask the form to submit, and wait for the callback (to go to the next page)
+					_submitForm();
+				} else {
+					presenter.onNextClicked(selectedReference, submissionNameField.getValue(), evaluation);	
+				}
+				
+			} else {
+				showErrorMessage(DisplayConstants.NO_EVALUATION_SELECTED);
 			}
 		});
 		
-		okButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onDoneClicked();
-			}
+		okButton.addClickHandler(event ->{
+			presenter.onDoneClicked();
 		});
 		
-		entityFinderButton.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				entityFinder.configure(true, new SelectedHandler<Reference>() {					
-					@Override
-					public void onSelected(Reference selected) {
-						if(selected.getTargetId() != null) {					
-							selectedReference = selected;
-							selectedText.setText(DisplayUtils.createEntityVersionString(selected));
-							entityFinder.hide();
-						} else {
-							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-						}
+		entityFinderButton.addClickHandler(event -> {
+			entityFinder.configure(true, new SelectedHandler<Reference>() {
+				@Override
+				public void onSelected(Reference selected) {
+					if(selected.getTargetId() != null) {
+						selectedReference = selected;
+						selectedText.setText(DisplayUtils.createEntityVersionString(selected));
+						entityFinder.hide();
+					} else {
+						showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
 					}
-				});
-				entityFinder.show();
-			}
+				}
+			});
+			entityFinder.show();
 		});
 		
-		ClickHandler registerTeamLink = new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onRegisterTeamClicked();
-			}
+		ClickHandler registerTeamLink = event -> {
+			presenter.onRegisterTeamClicked();
 		};
 		registerMyTeamLink.addClickHandler(registerTeamLink);
 		registerMyTeamLink2.addClickHandler(registerTeamLink);
 		
-		isIndividualRadioButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onIndividualSubmissionOptionClicked();
-			}
+		isIndividualRadioButton.addClickHandler(event -> {
+			presenter.onIndividualSubmissionOptionClicked();
 		});
 		
-		isTeamRadioButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onTeamSubmissionOptionClicked();
-			}
+		isTeamRadioButton.addClickHandler(event -> {
+			presenter.onTeamSubmissionOptionClicked();
 		});
 
-		teamComboBox.addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				presenter.onTeamSelected(teamComboBox.getSelectedIndex());
-			}
+		teamComboBox.addChangeHandler(event -> {
+			presenter.onTeamSelected(teamComboBox.getSelectedIndex());
 		});
 	}
 	
@@ -312,7 +306,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@Override
 	public void showModal1(boolean isEntitySet, FormParams formParams, List<Evaluation> evaluations) {
 		clear();
-		boolean isForm = formParams != null;
+		isForm = formParams != null;
 		this.showEntityFinder = !isEntitySet && !isForm;
 		submissionNameUi.setVisible(!isForm);
 		entityFinderUI.setVisible(showEntityFinder);
@@ -321,11 +315,58 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		multipleEvaluationsFormLabel.setVisible(isMoreThanOneEvaluation);
 		singleEvaluationFormLabel.setVisible(!isMoreThanOneEvaluation);
 		if (isForm) {
-			// TODO: here we go!  add the SRC entityform component to the formDiv (and listen for detach for cleanup)
+			// here we go!  add the SRC entityform component to the formDiv (and listen for detach for cleanup)
+			// going to need some space
+			modal1.addStyleName("modal-fullscreen");
+			String sessionToken = authController.getCurrentUserSessionToken();
+			_showForm(formDiv.getElement(),
+					sessionToken,
+					formParams.getContainerSynId(),
+					formParams.getJsonSchemaSynId(),
+					formParams.getUiSchemaSynId(),
+					this);
+		} else {
+			modal1.removeStyleName("modal-fullscreen");
 		}
 		modal1.show();
 	}
 	
+	public void setFormSynId(String synId) {
+		Evaluation evaluation = evaluationList.getSelectedEvaluation();
+		selectedReference = new Reference();
+		selectedReference.setTargetId(synId);
+		presenter.onNextClicked(selectedReference, submissionNameField.getValue(), evaluation);
+	}
+	private static native void _submitForm() /*-{
+		Window.currentFormRef.current.submitForm();
+	}-*/;
+	private static native void _showForm(Element el, String sessionToken, String parentContainerSynId, String jsonSchemaSynId, String uiSchemaSynId, EvaluationSubmitterViewImpl view) /*-{
+		try {
+			$wnd.currentFormRef = $wnd.React.createRef();
+			function setRefFunction(form) {
+				myForm = form;
+			};
+			function synIdCallbackFunction(synId) {
+				view.@org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterViewImpl::setFormSynId(Ljava/lang/String;)(synId);
+			};
+			var initializeFormData = false;
+			var props = {
+				parentContainerId: parentContainerSynId,
+				token:sessionToken,
+				formSchemaEntityId:jsonSchemaSynId,
+				formUiSchemaEntityId:uiSchemaSynId,
+				initFormData:initializeFormData,
+				ref: setRefFunction,
+				synIdCallback:synIdCallbackFunction
+			};
+			$wnd.ReactDOM.render(
+				$wnd.React.createElement($wnd.SRC.SynapseComponents.EntityForm, props, null), 
+				el
+			);
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
 	
 	@Override
 	public void hideModal1() {
