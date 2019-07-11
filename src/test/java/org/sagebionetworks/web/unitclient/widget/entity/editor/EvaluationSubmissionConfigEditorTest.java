@@ -1,24 +1,26 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-import static org.sagebionetworks.web.shared.WidgetConstants.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.shared.WidgetConstants.BUTTON_TEXT_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.EVALUATION_ID_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.FORM_CONTAINER_ID_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.JSON_SCHEMA_ID_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.PROJECT_ID_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.UI_SCHEMA_ID_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.UNAVAILABLE_MESSAGE;
+
 import java.util.HashMap;
 import java.util.Map;
-import static org.junit.Assert.*;
-import org.junit.*;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.editor.EvaluationSubmissionConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EvaluationSubmissionConfigView;
-import org.sagebionetworks.web.client.widget.entity.editor.LeaderboardConfigEditor;
-import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigEditor;
-import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 @RunWith(MockitoJUnitRunner.class)
