@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -20,6 +21,7 @@ import com.google.inject.Inject;
 
 public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionConfigView {
 	public interface EvaluationSubmissionConfigViewImplUiBinder extends UiBinder<Widget, EvaluationSubmissionConfigViewImpl> {}
+	CookieProvider cookies;
 	@UiField
 	TextBox challengeProjectField;
 	@UiField
@@ -58,17 +60,18 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 	TextBox uiSchemaFileSynIdField;
 	@UiField
 	Button findUiSchemaFileButton;
-
+	@UiField
+	Div submissionTypeOptions;
 	Widget widget;
 	
 	EntityFinder entityFinder;
 	
 	@Inject
 	public EvaluationSubmissionConfigViewImpl(EvaluationSubmissionConfigViewImplUiBinder binder,
-			EntityFinder entityFinder) {
+			EntityFinder entityFinder, CookieProvider cookies) {
 		widget = binder.createAndBindUi(this);
 		this.entityFinder = entityFinder;
-		
+		this.cookies = cookies;
 		findProjectButton.addClickHandler(event-> {
 			entityFinder.configure(EntityFilter.PROJECT, false, selectedRef -> {
 				challengeProjectField.setValue(selectedRef.getTargetId());
@@ -125,6 +128,8 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> descriptor) {
+		submissionTypeOptions.setVisible(DisplayUtils.isInTestWebsite(cookies));
+		
 		String text = descriptor.get(WidgetConstants.UNAVAILABLE_MESSAGE);
 		if (text != null)
 			unavailableMessageField.setValue(text);
@@ -202,6 +207,8 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 		formContainerIdField.setValue("");
 		schemaFileSynIdField.setValue("");
 		uiSchemaFileSynIdField.setValue("");
+		submitEntityOption.setValue(true);
+		formUi.setVisible(false);
 	}
 
 	@Override
