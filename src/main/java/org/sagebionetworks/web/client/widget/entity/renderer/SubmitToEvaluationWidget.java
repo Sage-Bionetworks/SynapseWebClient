@@ -64,7 +64,7 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 		formUiSchemaId = descriptor.get(WidgetConstants.UI_SCHEMA_ID_KEY);
 		evaluationUnavailableMessage = descriptor.get(WidgetConstants.UNAVAILABLE_MESSAGE);
 		
-		String evaluationId = descriptor.get(WidgetConstants.JOIN_WIDGET_EVALUATION_ID_KEY);
+		String evaluationId = descriptor.get(WidgetConstants.EVALUATION_ID_KEY);
 		if (evaluationId != null) {
 			evaluationIds = new HashSet<String>();
 			evaluationIds.add(evaluationId);

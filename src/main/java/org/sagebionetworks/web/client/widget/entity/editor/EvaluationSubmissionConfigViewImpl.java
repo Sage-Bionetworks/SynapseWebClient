@@ -139,7 +139,7 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 			challengeRadioOption.setValue(true);
 			setChallengeProjectUIVisible(true);
 		}
-		String evalId = descriptor.get(WidgetConstants.JOIN_WIDGET_EVALUATION_ID_KEY);
+		String evalId = descriptor.get(WidgetConstants.EVALUATION_ID_KEY);
 		if (evalId != null) {
 			evaluationQueueIdField.setValue(evalId);
 			evaluationQueueOption.setValue(true);

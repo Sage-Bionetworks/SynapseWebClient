@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.List;
 import java.util.Map;
-
+import static org.sagebionetworks.web.shared.WidgetConstants.*;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -39,24 +39,24 @@ public class EvaluationSubmissionConfigEditor implements WidgetEditorPresenter {
 	public void updateDescriptorFromView() {
 		//update widget descriptor from the view
 		view.checkParams();
-		descriptor.put(WidgetConstants.BUTTON_TEXT_KEY, view.getButtonText());
+		descriptor.put(BUTTON_TEXT_KEY, view.getButtonText());
 		if (view.isChallengeProjectIdSelected()) {
-			descriptor.put(WidgetConstants.PROJECT_ID_KEY, view.getChallengeProjectId());
-			descriptor.remove(WidgetConstants.JOIN_WIDGET_EVALUATION_ID_KEY);
+			descriptor.put(PROJECT_ID_KEY, view.getChallengeProjectId());
+			descriptor.remove(EVALUATION_ID_KEY);
 		} else {
-			descriptor.remove(WidgetConstants.PROJECT_ID_KEY);
-			descriptor.put(WidgetConstants.JOIN_WIDGET_EVALUATION_ID_KEY, view.getEvaluationQueueId());
+			descriptor.remove(PROJECT_ID_KEY);
+			descriptor.put(EVALUATION_ID_KEY, view.getEvaluationQueueId());
 		}
 		if (view.isFormSubmission()) {
-			descriptor.put(WidgetConstants.FORM_CONTAINER_ID_KEY, view.getFormContainerId());	
-			descriptor.put(WidgetConstants.JSON_SCHEMA_ID_KEY, view.getFormJsonSchemaId());
-			descriptor.put(WidgetConstants.UI_SCHEMA_ID_KEY, view.getFormUiSchemaId());
+			descriptor.put(FORM_CONTAINER_ID_KEY, view.getFormContainerId());	
+			descriptor.put(JSON_SCHEMA_ID_KEY, view.getFormJsonSchemaId());
+			descriptor.put(UI_SCHEMA_ID_KEY, view.getFormUiSchemaId());
 		} else {
-			descriptor.remove(WidgetConstants.FORM_CONTAINER_ID_KEY);	
-			descriptor.remove(WidgetConstants.JSON_SCHEMA_ID_KEY);
-			descriptor.remove(WidgetConstants.UI_SCHEMA_ID_KEY);
+			descriptor.remove(FORM_CONTAINER_ID_KEY);	
+			descriptor.remove(JSON_SCHEMA_ID_KEY);
+			descriptor.remove(UI_SCHEMA_ID_KEY);
 		}
-		descriptor.put(WidgetConstants.UNAVAILABLE_MESSAGE, view.getUnavailableMessage());
+		descriptor.put(UNAVAILABLE_MESSAGE, view.getUnavailableMessage());
 	}
 	
 	@Override
