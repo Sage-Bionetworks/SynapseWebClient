@@ -109,6 +109,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getShinySiteConfigEditor();
 		} else if (contentTypeKey.equals(BUTTON_LINK_CONTENT_TYPE)) {
 			presenter = ginInjector.getButtonLinkConfigEditor();
+		} else if (contentTypeKey.equals(SUBMIT_TO_EVALUATION_CONTENT_TYPE) || contentTypeKey.equals(OLD_JOIN_EVALUATION_CONTENT_TYPE)) {
+			presenter = ginInjector.getEvaluationSubmissionConfigEditor();
 		} else if (contentTypeKey.equals(USER_TEAM_BADGE_CONTENT_TYPE)) {
 			presenter = ginInjector.getUserTeamConfigEditor();
 		} else if (contentTypeKey.equals(VIDEO_CONTENT_TYPE) ||
@@ -340,6 +342,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(PLOT_CONTENT_TYPE, PLOT_FRIENDLY_NAME);
 		registerWidget(TEAM_MEMBER_COUNT_CONTENT_TYPE, TEAM_MEMBER_COUNT_FRIENDLY_NAME);
 		registerWidget(TEAM_MEMBERS_CONTENT_TYPE, TEAM_MEMBERS_FRIENDLY_NAME);
+		registerWidget(SUBMIT_TO_EVALUATION_CONTENT_TYPE, "Submit to Evaluation Queue");
 	}
 	
 	public static String getWidgetMarkdown(String contentType, Map<String, String> widgetDescriptor, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {

@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import static org.sagebionetworks.web.client.ClientProperties.PLOTLY_JS;
-import static org.sagebionetworks.web.client.ClientProperties.PLOTLY_REACT_JS;
 import static org.sagebionetworks.web.client.place.Synapse.EntityArea.TABLES;
 import static org.sagebionetworks.web.client.widget.entity.tabs.TablesTab.TABLE_QUERY_PREFIX;
 import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_MAX_ROWS_PER_PAGE;
@@ -27,7 +25,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import org.sagebionetworks.repo.model.EntityId;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.Query;
@@ -40,7 +37,6 @@ import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.plotly.PlotlyTraceWrapper;
-import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
@@ -53,7 +49,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -79,7 +74,6 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	public static final Long DEFAULT_LIMIT = 150L;
 	Map<String, List<String>> graphData;
 	String xAxisColumnName, fillColumnName;
-	private ResourceLoader resourceLoader;
 	QueryTokenProvider queryTokenProvider;
 	public static final String X_AXIS_CATEGORY_TYPE = "category";
 	public static final Long DEFAULT_PART_MASK = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_MAX_ROWS_PER_PAGE;
@@ -91,12 +85,10 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	public PlotlyWidget(PlotlyWidgetView view,
 			SynapseAlert synAlert,
 			AsynchronousJobTracker jobTracker,
-			ResourceLoader resourceLoader,
 			QueryTokenProvider queryTokenProvider) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.jobTracker = jobTracker;
-		this.resourceLoader = resourceLoader;
 		this.queryTokenProvider = queryTokenProvider;
 		view.setSynAlertWidget(synAlert);
 		view.setPresenter(this);
@@ -246,15 +238,6 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 				synAlert.handleException(caught);
 			}
 		};
-		
-		if (!resourceLoader.isLoaded(PLOTLY_JS)) {
-			resourceLoader.requires(PLOTLY_JS, initializedCallback);
-			return;
-		}
-		if (!resourceLoader.isLoaded(PLOTLY_REACT_JS)) {
-			resourceLoader.requires(PLOTLY_REACT_JS, initializedCallback);
-			return;
-		}
 		
 		try {
 			List<PlotlyTraceWrapper> plotlyGraphData;

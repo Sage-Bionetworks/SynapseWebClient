@@ -128,7 +128,7 @@ public class WidgetConstants {
 	public static final String VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY = "webmSynapseId";
 	public static final String VIDEO_WIDGET_WIDTH_KEY = "width";
 	
-	public static final String JOIN_WIDGET_EVALUATION_ID_KEY = "evaluationId";
+	public static final String EVALUATION_ID_KEY = "evaluationId";
 	public static final String TEAM_ID_KEY = "teamId";
 	public static final String JOIN_WIDGET_REQUEST_EXPIRES_IN_X_DAYS_KEY = "requestExpiresInXDays";
 	public static final String UNAVAILABLE_MESSAGE = "unavailableMessage";
@@ -189,6 +189,11 @@ public class WidgetConstants {
 	public static final String WIDGET_ENTITY_ID_KEY = "entityId";
 	public static final String PROJECT_ID_KEY = "projectId";
 	public static final String WIDGET_ENTITY_VERSION_KEY = "version";
+	
+	// submit form wiki widget params
+	public static final String FORM_CONTAINER_ID_KEY = "formContainerId";
+	public static final String JSON_SCHEMA_ID_KEY = "jsonSchemaId";
+	public static final String UI_SCHEMA_ID_KEY = "uiSchemaId";
 	
 	public static final String SHINYSITE_SITE_KEY = "site";	
 	public static final String INCLUDE_PRINCIPAL_ID_KEY = "includePrincipalId";

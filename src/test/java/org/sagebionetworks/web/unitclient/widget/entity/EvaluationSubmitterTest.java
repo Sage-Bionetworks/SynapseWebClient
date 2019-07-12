@@ -57,6 +57,7 @@ import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterView;
+import org.sagebionetworks.web.shared.FormParams;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -175,7 +176,7 @@ public class EvaluationSubmitterTest {
 	@Test
 	public void testSubmitToEvaluation() throws RestServiceException, JSONObjectAdapterException{
 		requirements.setTotalNumberOfResults(0);
-		submitter.configure(entity, null);
+		submitter.configure(entity, null, null);
 		verify(mockView).resetSubmitButton();
 		submitter.onNextClicked(null, null, e1);
 		//should invoke submission directly without terms of use
@@ -193,7 +194,7 @@ public class EvaluationSubmitterTest {
 	public void testSubmitToEvaluationsWithSubmissionName() throws RestServiceException, JSONObjectAdapterException{
 		String submissionName = "my custom submission name";
 		requirements.setTotalNumberOfResults(0);
-		submitter.configure(entity, null);
+		submitter.configure(entity, null, null);
 		
 		//also set contributors, and verify on individual submission that this is not set in the submission
 		//add eligible member
@@ -215,7 +216,7 @@ public class EvaluationSubmitterTest {
 	
 	@Test
 	public void testSubmitToEvaluationsFailure() throws RestServiceException, JSONObjectAdapterException{
-		submitter.configure(entity, null);
+		submitter.configure(entity, null, null);
 		reset(mockView);
 		
 		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), anyString(), any(AsyncCallback.class));
@@ -236,9 +237,9 @@ public class EvaluationSubmitterTest {
 		evaluationList.add(new Evaluation());
 		availableEvaluations.setResults(evaluationList);
 		AsyncMockStubber.callSuccessWith(availableEvaluations).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
-		submitter.configure(entity, null);
+		submitter.configure(entity, null, null);
 		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
-		verify(mockView).showModal1(anyBoolean(), any(List.class));
+		verify(mockView).showModal1(anyBoolean(), any(FormParams.class), any(List.class));
 	}
 	@Test
 	public void testShowAvailableEvaluations() throws RestServiceException, JSONObjectAdapterException {
@@ -249,9 +250,9 @@ public class EvaluationSubmitterTest {
 		evaluationList.add(new Evaluation());
 		availableEvaluations.setResults(evaluationList);
 		AsyncMockStubber.callSuccessWith(availableEvaluations).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
-		submitter.configure(entity, null);
+		submitter.configure(entity, null, null);
 		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
-		verify(mockView).showModal1(anyBoolean(), any(List.class));
+		verify(mockView).showModal1(anyBoolean(), any(FormParams.class), any(List.class));
 	}
 	
 	@Test
@@ -262,7 +263,7 @@ public class EvaluationSubmitterTest {
 		List<Evaluation> evaluationList = new ArrayList<Evaluation>();
 		availableEvaluations.setResults(evaluationList);
 		AsyncMockStubber.callSuccessWith(availableEvaluations).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
-		submitter.configure(entity, null);
+		submitter.configure(entity, null, null);
 		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
 		//no evaluations to join error message
 		verify(mockView).showErrorMessage(anyString());
@@ -272,7 +273,7 @@ public class EvaluationSubmitterTest {
 	public void testShowAvailableEvaluationsFailure1() throws RestServiceException, JSONObjectAdapterException {
 		Exception caught = new ForbiddenException("this is forbidden");
 		AsyncMockStubber.callFailureWith(caught).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
-		submitter.configure(entity, null);
+		submitter.configure(entity, null, null);
 		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
 		//no evaluations to join error message
 		verify(mockSynAlert).handleException(caught);
@@ -292,7 +293,7 @@ public class EvaluationSubmitterTest {
 	
 	@Test
 	public void testQueryForChallengeAndTeams() throws RestServiceException{
-		submitter.configure(entity, null);
+		submitter.configure(entity, null, null);
 		reset(mockView);
 		
 		Challenge testChallenge = getTestChallenge();
@@ -353,7 +354,7 @@ public class EvaluationSubmitterTest {
 	
 	
 	private void configureSubmitter() {
-		submitter.configure(entity, null);
+		submitter.configure(entity, null, null);
 		reset(mockView);
 	}
 	
@@ -476,7 +477,7 @@ public class EvaluationSubmitterTest {
 		String entityId = "syn123";
 		DockerRepository dockerEntity = new DockerRepository();
 		dockerEntity.setId(entityId);
-		submitter.configure(dockerEntity, null);
+		submitter.configure(dockerEntity, null, null);
 		// challengeListSynAlert.clear();
 		// teamSelectSynAlert.clear();
 		// contributorSynAlert.clear();
@@ -499,7 +500,7 @@ public class EvaluationSubmitterTest {
 		String entityId = "syn123";
 		DockerRepository dockerEntity = new DockerRepository();
 		dockerEntity.setId(entityId);
-		submitter.configure(dockerEntity, null);
+		submitter.configure(dockerEntity, null, null);
 		submitter.setDigest(mockCommit);
 		submitter.onDockerCommitNextButton();
 

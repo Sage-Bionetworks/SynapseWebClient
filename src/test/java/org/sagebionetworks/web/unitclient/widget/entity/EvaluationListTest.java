@@ -40,13 +40,14 @@ public class EvaluationListTest {
 	
 	@Test
 	public void testGetSingleSelectedEvaluation() throws RestServiceException {
-		//user selected none
+		//if single evaluation, then it is always returned
+		Evaluation singleEvaluation = new Evaluation();
+		singleEvaluation.setId("1");
 		List<Evaluation> evaluations = new ArrayList<Evaluation>();
-		evaluations.add(new Evaluation());
+		evaluations.add(singleEvaluation);
 		widget.configure(evaluations);
-		verify(mockView).setSelectedEvaluationIndex(0);
 		when(mockView.getSelectedEvaluationIndex()).thenReturn(null);
-		assertNull(widget.getSelectedEvaluation());
+		assertEquals(singleEvaluation, widget.getSelectedEvaluation());
 	}
 	
 	@Test

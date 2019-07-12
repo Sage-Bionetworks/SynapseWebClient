@@ -17,8 +17,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -33,6 +39,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidgetView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
+import org.sagebionetworks.web.shared.FormParams;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -41,6 +48,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+@RunWith(MockitoJUnitRunner.class)
 public class SubmitToEvaluationWidgetTest {
 	private static final String EVALUATION_2_SUBMISSION_RECEIPT_MESSAGE = "Evaluation 2 Submission Receipt Message";
 	private static final String EVALUATION_1_SUBMISSION_RECEIPT_MESSAGE = "Evaluation 1 Submission Receipt Message";
@@ -48,13 +56,20 @@ public class SubmitToEvaluationWidgetTest {
 	private static final String EVAL_ID_1 = "1";
 	private static final String EVAL_ID_2 = "2";
 	
+	@Mock
 	SubmitToEvaluationWidgetView mockView;
+	@Mock
 	ChallengeClientAsync mockChallengeClient;
-	AdapterFactory adapterFactory;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	AuthenticationController mockAuthenticationController;
+	@Mock
 	EvaluationSubmitter mockEvaluationSubmitter;
+	@Mock
 	PortalGinInjector mockPortalGinInjector;
+	@Captor
+	ArgumentCaptor<FormParams> formParamsCaptor;
 	SubmitToEvaluationWidget widget;
 	Set<String> targetEvaluations;
 	ArrayList<Evaluation> evaluationList;
@@ -63,14 +78,7 @@ public class SubmitToEvaluationWidgetTest {
 	
 	@Before
 	public void before() throws RestServiceException, JSONObjectAdapterException {
-		mockView = mock(SubmitToEvaluationWidgetView.class);
-		mockChallengeClient = mock(ChallengeClientAsync.class);
-		adapterFactory = new AdapterFactoryImpl();
-		mockEvaluationSubmitter = mock(EvaluationSubmitter.class);
-		mockPortalGinInjector = mock(PortalGinInjector.class);
 		when(mockPortalGinInjector.getEvaluationSubmitter()).thenReturn(mockEvaluationSubmitter);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
 		widget = new SubmitToEvaluationWidget(mockView, mockChallengeClient, mockAuthenticationController, mockGlobalApplicationState, mockPortalGinInjector);
 		verify(mockView).setPresenter(widget);
 		targetEvaluations = new HashSet<String>();
@@ -83,7 +91,6 @@ public class SubmitToEvaluationWidgetTest {
 		
 		targetEvaluations.add(EVAL_ID_1);
 		targetEvaluations.add(EVAL_ID_2);
-		
 
 		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
 		availableEvaluations.setTotalNumberOfResults(2);
@@ -186,7 +193,6 @@ public class SubmitToEvaluationWidgetTest {
 		verify(mockChallengeClient).getProjectEvaluationIds(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
-	
 
 	@Test
 	public void testConfigureServiceFailure() throws Exception {
@@ -196,14 +202,13 @@ public class SubmitToEvaluationWidgetTest {
 		verify(mockView).showUnavailable(anyString());
 	}
 	
-	
 	@Test
 	public void testSubmitToChallengeClickedAnonymous() throws Exception {
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		widget.submitToChallengeClicked();
 		verify(mockView).showAnonymousRegistrationMessage();
-		verify(mockEvaluationSubmitter, times(0)).configure(any(Entity.class), anySet());
+		verify(mockEvaluationSubmitter, times(0)).configure(any(Entity.class), anySet(), any(FormParams.class));
 	}
 	
 	@Test
@@ -212,23 +217,32 @@ public class SubmitToEvaluationWidgetTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		widget.submitToChallengeClicked();
 		verify(mockView, times(0)).showAnonymousRegistrationMessage();
-		verify(mockEvaluationSubmitter).configure(any(Entity.class), anySet());
+		verify(mockEvaluationSubmitter).configure(any(Entity.class), anySet(), eq(null));
 	}
 	
+	@Test
+	public void testSubmitToChallengeUsingForm() throws Exception {
+		String formContainerId = "syn1";
+		String schemaId = "syn2";
+		String uiSchemaId = "syn3";
+		descriptor.put(WidgetConstants.FORM_CONTAINER_ID_KEY, formContainerId);
+		descriptor.put(WidgetConstants.JSON_SCHEMA_ID_KEY, schemaId);
+		descriptor.put(WidgetConstants.UI_SCHEMA_ID_KEY, uiSchemaId);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		
+		widget.submitToChallengeClicked();
+		
+		verify(mockEvaluationSubmitter).configure(any(Entity.class), anySet(), formParamsCaptor.capture());
+		FormParams formParams = formParamsCaptor.getValue();
+		assertEquals(formContainerId, formParams.getContainerSynId());
+		assertEquals(schemaId, formParams.getJsonSchemaSynId());
+		assertEquals(uiSchemaId, formParams.getUiSchemaSynId());
+	}
+
 	@Test
 	public void testAsWidget() {
 		widget.asWidget();
 		verify(mockView).asWidget();
 	}
 }
-
-
-
-
-
-
-
-
-
-
-

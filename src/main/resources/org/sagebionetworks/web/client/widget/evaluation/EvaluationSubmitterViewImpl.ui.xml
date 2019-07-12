@@ -25,10 +25,10 @@
 				<b:Button ui:field="dockerCommitNextButton" type="PRIMARY" dataLoadingText="Processing...">Next</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
-		<b:Modal title="Submit to Challenge"
-				dataBackdrop="STATIC" dataKeyboard="true" ui:field="modal1">
+		<b:Modal dataBackdrop="STATIC" dataKeyboard="true" ui:field="modal1">
 			<b:ModalBody>
 				<bh:Div>
+					<bh:Div ui:field="formDiv" />
 					<b:FormGroup ui:field="entityFinderUI">
 						<b:FormGroup>
 							<b:FormLabel>Select the Entity that you would like to submit:</b:FormLabel>
@@ -40,12 +40,13 @@
 					</b:FormGroup>
 					<b:FormGroup ui:field="evaluationListUI">
 						<b:FormGroup>
-							<b:FormLabel>Select the challenge(s) below that you would like to submit to</b:FormLabel>
+							<b:FormLabel ui:field="multipleEvaluationsFormLabel">Select the challenge(s) below that you would like to submit to</b:FormLabel>
+							<b:FormLabel ui:field="singleEvaluationFormLabel" visible="false">Submitting to the following challenge </b:FormLabel>
 							<g:SimplePanel ui:field="evaluationListContainer" />
 						</b:FormGroup>
 					</b:FormGroup>
 					<g:SimplePanel ui:field="challengeListSynAlertPanel"/>
-					<b:FormGroup>
+					<b:FormGroup ui:field="submissionNameUi">
 						<b:FormLabel>Submission name (optional)</b:FormLabel>
 						<b:TextBox ui:field="submissionNameField" />
 					</b:FormGroup>
@@ -56,8 +57,7 @@
 				<b:Button ui:field="nextButton" type="PRIMARY" dataLoadingText="Processing...">Next</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
-		<b:Modal title="Submit to Challenge"
-				dataBackdrop="STATIC" dataKeyboard="true" ui:field="modal2">
+		<b:Modal dataBackdrop="STATIC" dataKeyboard="true" ui:field="modal2">
 			<b:ModalBody>
 				<bh:Div>
 					<b:ButtonGroup>

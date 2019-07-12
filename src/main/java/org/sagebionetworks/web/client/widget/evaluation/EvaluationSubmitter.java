@@ -34,6 +34,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterView.Presenter;
+import org.sagebionetworks.web.shared.FormParams;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -70,6 +71,7 @@ public class EvaluationSubmitter implements Presenter {
 	private String dockerDigest;
 	private Set<String> evaluationIds;
 	private SynapseAlert dockerCommitSynAlert;
+	private FormParams formParams;
 	
 	@Inject
 	public EvaluationSubmitter(EvaluationSubmitterView view,
@@ -104,8 +106,9 @@ public class EvaluationSubmitter implements Presenter {
 	 * 
 	 * @param submissionEntity set to null if an entity finder should be shown
 	 * @param evaluationIds set to null if we should query for all available evaluations
+	 * @param formParams set to null if entity finder should be shown
 	 */
-	public void configure(Entity submissionEntity, Set<String> evaluationIds) {
+	public void configure(Entity submissionEntity, Set<String> evaluationIds, FormParams formParams) {
 		challenge = null;
 		evaluation = null;
 		selectedTeam = null;
@@ -122,6 +125,7 @@ public class EvaluationSubmitter implements Presenter {
 		view.setContributorsLoading(false);
 		this.submissionEntity = submissionEntity;
 		this.evaluationIds = evaluationIds;
+		this.formParams = formParams;
 		if (submissionEntity instanceof DockerRepository) {
 			configureWithDockerCommit(submissionEntity);
 		} else {
@@ -183,7 +187,7 @@ public class EvaluationSubmitter implements Presenter {
 					view.showErrorMessage(DisplayConstants.NOT_PARTICIPATING_IN_ANY_EVALUATIONS);
 				} 
 				else {
-					view.showModal1(submissionEntity == null, evaluations);
+					view.showModal1(submissionEntity != null, formParams, evaluations);
 				}
 			}
 			
