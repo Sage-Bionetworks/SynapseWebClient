@@ -92,7 +92,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 	
 	@Override
-	public void setFileHistoryWidget(IsWidget fileHistoryWidget) {
+	public void setVersionHistoryWidget(IsWidget fileHistoryWidget) {
 		fileHistoryContainer.clear();
 		fileHistoryContainer.add(fileHistoryWidget);
 	}

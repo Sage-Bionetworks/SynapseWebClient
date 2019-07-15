@@ -141,7 +141,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		this.actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, false);
 		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
 		this.actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
-		this.actionMenu.setActionVisible(Action.SHOW_FILE_HISTORY, false);
+		this.actionMenu.setActionVisible(Action.SHOW_VERSION_HISTORY, false);
 		if (!isQueryVisible) {
 			getTableEntityWidget().hideFiltering();
 		}

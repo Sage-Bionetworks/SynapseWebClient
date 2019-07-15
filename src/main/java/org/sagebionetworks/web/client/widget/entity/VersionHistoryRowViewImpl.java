@@ -19,8 +19,8 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class FileHistoryRowViewImpl implements FileHistoryRowView {
-	public interface Binder extends UiBinder<Widget, FileHistoryRowViewImpl> {}
+public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
+	public interface Binder extends UiBinder<Widget, VersionHistoryRowViewImpl> {}
 	
 	@UiField
 	Anchor versionNameLink;
@@ -44,7 +44,7 @@ public class FileHistoryRowViewImpl implements FileHistoryRowView {
 	Md5Link md5Link;
 	
 	@Inject
-	public FileHistoryRowViewImpl(Binder binder, UserBadge userBadge, Md5Link md5Link) {
+	public VersionHistoryRowViewImpl(Binder binder, UserBadge userBadge, Md5Link md5Link) {
 		widget = binder.createAndBindUi(this);
 		this.md5Link = md5Link;
 		deleteButton.addClickHandler(new ClickHandler() {

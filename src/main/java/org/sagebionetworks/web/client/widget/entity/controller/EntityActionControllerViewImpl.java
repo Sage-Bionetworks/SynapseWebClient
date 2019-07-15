@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Pre;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -8,7 +10,9 @@ import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.PromptModalView;
+import org.sagebionetworks.web.client.widget.entity.PromptMultipleValuesModalView;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -35,6 +39,7 @@ public class EntityActionControllerViewImpl implements
 	Span widget = new Span();
 	Widget viewWidget = null;
 	PromptModalView promptModalView;
+	PromptMultipleValuesModalView multipleValuesView;
 	PortalGinInjector ginInjector;
 	@Inject
 	public EntityActionControllerViewImpl(Binder binder, PortalGinInjector ginInjector){
@@ -47,7 +52,9 @@ public class EntityActionControllerViewImpl implements
 			viewWidget = binder.createAndBindUi(this);
 			widget.add(viewWidget);
 			promptModalView = ginInjector.getPromptModal();
+			multipleValuesView = ginInjector.getPromptMultipleValuesModal();
 			widget.add(promptModalView);
+			widget.add(multipleValuesView);
 		}
 	}
 	
@@ -102,4 +109,11 @@ public class EntityActionControllerViewImpl implements
 		uploadDialogWidgetContainer.clear();
 		uploadDialogWidgetContainer.add(w);
 	}
+	@Override
+	public void showMultiplePromptDialog(String title, List<String> prompts, List<String> initialValues,
+			CallbackP<List<String>> newValuesCallback) {
+		lazyConstruct();
+		multipleValuesView.configureAndShow(title, prompts, initialValues, newValuesCallback);
+	}
 }
+

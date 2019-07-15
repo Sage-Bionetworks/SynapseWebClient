@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
@@ -34,7 +35,7 @@ public class EntityMetadata implements Presenter {
 	private EntityMetadataView view;
 	private AnnotationsRendererWidget annotationsWidget;
 	private DoiWidgetV2 doiWidgetV2;
-	private FileHistoryWidget fileHistoryWidget;
+	private VersionHistoryWidget versionHistoryWidget;
 	private SynapseJavascriptClient jsClient;
 	private SynapseJSNIUtils jsni;
 	private PortalGinInjector ginInjector;
@@ -69,12 +70,12 @@ public class EntityMetadata implements Presenter {
 		return view.asWidget();
 	}
 	
-	public FileHistoryWidget getFileHistoryWidget() {
-		if (fileHistoryWidget == null) {
-			fileHistoryWidget = ginInjector.getFileHistoryWidget();
-			view.setFileHistoryWidget(fileHistoryWidget);
+	public VersionHistoryWidget getVersionHistoryWidget() {
+		if (versionHistoryWidget == null) {
+			versionHistoryWidget = ginInjector.getVersionHistoryWidget();
+			view.setVersionHistoryWidget(versionHistoryWidget);
 		}
-		return fileHistoryWidget;
+		return versionHistoryWidget;
 	}
 	
 	public void configure(EntityBundle bundle, Long versionNumber, ActionMenuWidget actionMenu) {
@@ -89,18 +90,18 @@ public class EntityMetadata implements Presenter {
 			setAnnotationsVisible(isShowingAnnotations);
 		});
 		
-		actionMenu.setActionListener(Action.SHOW_FILE_HISTORY, action -> {
-			getFileHistoryWidget().setVisible(!getFileHistoryWidget().isVisible());
+		actionMenu.setActionListener(Action.SHOW_VERSION_HISTORY, action -> {
+			getVersionHistoryWidget().setVisible(!getVersionHistoryWidget().isVisible());
 		});
 
 		boolean isCurrentVersion = versionNumber == null;
-		if (bundle.getEntity() instanceof FileEntity) {
-			getFileHistoryWidget().setVisible(false);
-			getFileHistoryWidget().setEntityBundle(bundle, versionNumber);
+		if (bundle.getEntity() instanceof Versionable) {
+			getVersionHistoryWidget().setVisible(false);
+			getVersionHistoryWidget().setEntityBundle(bundle, versionNumber);
 			view.setRestrictionPanelVisible(true);
 		} else {
-			if (fileHistoryWidget != null) {
-				fileHistoryWidget.setVisible(false);
+			if (versionHistoryWidget != null) {
+				versionHistoryWidget.setVisible(false);
 			}
 			view.setRestrictionPanelVisible(en instanceof TableEntity
 					|| en instanceof Folder || en instanceof DockerRepository);

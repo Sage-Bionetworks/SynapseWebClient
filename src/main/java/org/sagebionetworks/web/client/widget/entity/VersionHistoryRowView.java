@@ -4,7 +4,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface FileHistoryRowView extends IsWidget {
+public interface VersionHistoryRowView extends IsWidget {
 
 	void configure(
 			Long versionNumber,

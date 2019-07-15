@@ -1031,7 +1031,19 @@ public class SynapseJavascriptClient {
 		
 		doPut(url, toUpdate, OBJECT_TYPE.V2WikiPage, callback);
 	}
-	
+
+	public void updateEntity(Entity toUpdate, String generatedByID, Boolean newVersion, AsyncCallback<Entity> callback){
+		String url = getRepoServiceUrl() + ENTITY + "/" + toUpdate.getId() + "?";
+		if (generatedByID != null) {
+			url += "generatedBy=" + generatedByID;
+		}
+		if (newVersion != null) {
+			url += "newVersion=" + newVersion.toString();
+		}
+
+		doPut(url, toUpdate, OBJECT_TYPE.Entity, callback);
+	}
+
 	public void updateV2WikiOrderHint(WikiPageKey key, V2WikiOrderHint toUpdate, AsyncCallback<V2WikiOrderHint> callback) {
 		String url = getRepoServiceUrl() + "/" +
 			key.getOwnerObjectType().toLowerCase() + "/" + 

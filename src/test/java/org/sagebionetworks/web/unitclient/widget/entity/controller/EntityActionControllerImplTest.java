@@ -327,7 +327,7 @@ public class EntityActionControllerImplTest {
 		// upload
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
 		// file history
-		verify(mockActionMenu).setActionVisible(Action.SHOW_FILE_HISTORY, false);
+		verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, false);
 	}
 	
 	@Test
@@ -453,7 +453,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionIcon(Action.SHARE, IconType.GLOBE);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_ANNOTATIONS, true);
 		// for a table entity, do not show file history
-		verify(mockActionMenu).setActionVisible(Action.SHOW_FILE_HISTORY, false);
+		verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, false);
 		
 		//verify other table commands.  current user canCertifiedUserEdit
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, true);
@@ -470,7 +470,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		
 		// for a table entity, do not show file history
-		verify(mockActionMenu).setActionVisible(Action.SHOW_FILE_HISTORY, false);
+		verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, false);
 		
 		//verify other table commands. the current user cannot edit
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
@@ -492,7 +492,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionIcon(Action.SHARE, IconType.GLOBE);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_ANNOTATIONS, true);
 		// for a table entity, do not show file history
-		verify(mockActionMenu).setActionVisible(Action.SHOW_FILE_HISTORY, true);
+		verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
 		
 		//table commands not shown for File
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
@@ -528,7 +528,7 @@ public class EntityActionControllerImplTest {
 		entityBundle.setAccessRequirements(accessReqs);
 		entityBundle.setBenefactorAcl(mockACL);
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		verify(mockActionMenu).setActionVisible(Action.SHOW_FILE_HISTORY, true);
+		verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
 	}
 	
 	@Test

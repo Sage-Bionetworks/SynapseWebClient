@@ -45,8 +45,8 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
-import org.sagebionetworks.web.client.widget.entity.FileHistoryWidgetView;
+import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
+import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -68,14 +68,14 @@ public class FileHistoryWidgetTest {
 	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
 	@Mock
-	FileHistoryWidgetView mockView;
+	VersionHistoryWidgetView mockView;
 	@Mock
 	IconsImageBundle mockIconsImageBundle;
 	@Mock
 	PreflightController mockPreflightController;
 	@Mock
 	PlaceChanger mockPlaceChanger;
-	FileHistoryWidget fileHistoryWidget;
+	VersionHistoryWidget fileHistoryWidget;
 	VersionableEntity vb;
 	String entityId = "syn123";
 	EntityBundle bundle;
@@ -86,7 +86,7 @@ public class FileHistoryWidgetTest {
 	SynapseAlert mockSynAlert;
 	@Before
 	public void before() throws JSONObjectAdapterException {
-		fileHistoryWidget = new FileHistoryWidget(mockView, mockSynapseClient, mockJsClient, mockGlobalApplicationState, mockPreflightController, mockSynAlert);
+		fileHistoryWidget = new VersionHistoryWidget(mockView, mockSynapseClient, mockJsClient, mockGlobalApplicationState, mockPreflightController, mockSynAlert);
 
 		vb = new FileEntity();
 		vb.setId(entityId);
@@ -316,13 +316,13 @@ public class FileHistoryWidgetTest {
 	@Test
 	public void testGetMore() {
 		//simulate service initially returns a full page.
-		setupVersionResults(FileHistoryWidget.VERSION_LIMIT, 0);
+		setupVersionResults(VersionHistoryWidget.VERSION_LIMIT, 0);
 		boolean canEdit = true;
 		when(bundle.getPermissions().getCanCertifiedUserEdit()).thenReturn(canEdit);
 		
 		fileHistoryWidget.setEntityBundle(bundle, 0L);
 
-		verify(mockJsClient).getEntityVersions(eq(entityId), eq(0), eq(FileHistoryWidget.VERSION_LIMIT), any(AsyncCallback.class));
+		verify(mockJsClient).getEntityVersions(eq(entityId), eq(0), eq(VersionHistoryWidget.VERSION_LIMIT), any(AsyncCallback.class));
 		verify(mockView).clearVersions();
 		// version 0 is selected, so we should be able to edit
 		verify(mockView).setEntityBundle(vb, false);
@@ -330,20 +330,20 @@ public class FileHistoryWidgetTest {
 		verify(mockView).setMoreButtonVisible(true);
 		//verify full page is added (one of which is selected)
 		boolean isVersionSelected = false;
-		verify(mockView, times(FileHistoryWidget.VERSION_LIMIT - 1)).addVersion(eq(entityId), any(VersionInfo.class), eq(canEdit), eq(isVersionSelected));
+		verify(mockView, times(VersionHistoryWidget.VERSION_LIMIT - 1)).addVersion(eq(entityId), any(VersionInfo.class), eq(canEdit), eq(isVersionSelected));
 		isVersionSelected = true;
 		verify(mockView).addVersion(eq(entityId), any(VersionInfo.class), eq(canEdit), eq(isVersionSelected));
 		
 		// now get the second page (verify new offset).
 		// second page contains 2 versions only.
-		setupVersionResults(2, FileHistoryWidget.VERSION_LIMIT);
+		setupVersionResults(2, VersionHistoryWidget.VERSION_LIMIT);
 		reset(mockView);
 		
 		fileHistoryWidget.onMore();
 		
 		//add the 2 remaining results
 		verify(mockView, never()).clearVersions();
-		verify(mockJsClient).getEntityVersions(eq(entityId), eq(FileHistoryWidget.VERSION_LIMIT), eq(FileHistoryWidget.VERSION_LIMIT), any(AsyncCallback.class));
+		verify(mockJsClient).getEntityVersions(eq(entityId), eq(VersionHistoryWidget.VERSION_LIMIT), eq(VersionHistoryWidget.VERSION_LIMIT), any(AsyncCallback.class));
 		isVersionSelected = false;
 		verify(mockView, times(2)).addVersion(eq(entityId), any(VersionInfo.class), eq(canEdit), eq(isVersionSelected));
 		verify(mockView).setMoreButtonVisible(false);
