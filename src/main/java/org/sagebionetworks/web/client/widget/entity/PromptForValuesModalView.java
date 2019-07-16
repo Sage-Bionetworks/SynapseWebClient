@@ -10,7 +10,9 @@ import com.google.gwt.user.client.ui.IsWidget;
  * A simple model dialog prompting for multiple string values
  *
  */
-public interface PromptMultipleValuesModalView extends IsWidget {
+public interface PromptForValuesModalView extends IsWidget {
+	
+	public void configureAndShow(String title, String prompt, String initialValue, CallbackP<String> newValueCallback);
 	/**
 	 * Configure this view with starting data.
 	 * @param title The modal title
@@ -36,5 +38,5 @@ public interface PromptMultipleValuesModalView extends IsWidget {
 	 * @param isLoading
 	 */
 	public void setLoading(boolean isLoading);
-
+	public void hide();
 }

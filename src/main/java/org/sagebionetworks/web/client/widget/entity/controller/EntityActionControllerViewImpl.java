@@ -11,8 +11,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.PromptModalView;
-import org.sagebionetworks.web.client.widget.entity.PromptMultipleValuesModalView;
+import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -38,8 +37,7 @@ public class EntityActionControllerViewImpl implements
 	
 	Span widget = new Span();
 	Widget viewWidget = null;
-	PromptModalView promptModalView;
-	PromptMultipleValuesModalView multipleValuesView;
+	PromptForValuesModalView promptForValuesDialog;
 	PortalGinInjector ginInjector;
 	@Inject
 	public EntityActionControllerViewImpl(Binder binder, PortalGinInjector ginInjector){
@@ -51,10 +49,8 @@ public class EntityActionControllerViewImpl implements
 		if (viewWidget == null) {
 			viewWidget = binder.createAndBindUi(this);
 			widget.add(viewWidget);
-			promptModalView = ginInjector.getPromptModal();
-			multipleValuesView = ginInjector.getPromptMultipleValuesModal();
-			widget.add(promptModalView);
-			widget.add(multipleValuesView);
+			promptForValuesDialog = ginInjector.getPromptForValuesModal();
+			widget.add(promptForValuesDialog);
 		}
 	}
 	
@@ -81,12 +77,10 @@ public class EntityActionControllerViewImpl implements
 	@Override
 	public void showPromptDialog(String title, PromptCallback callback) {
 		lazyConstruct();
-		promptModalView.configure(title, "", "OK", "");
-		promptModalView.setPresenter(() -> {
-			promptModalView.hide();
-			callback.callback(promptModalView.getValue());
+		promptForValuesDialog.configureAndShow(title, "", "", value -> {
+			promptForValuesDialog.hide();
+			callback.callback(value);
 		});
-		promptModalView.show();
 	}
 	
 	@Override
@@ -113,7 +107,10 @@ public class EntityActionControllerViewImpl implements
 	public void showMultiplePromptDialog(String title, List<String> prompts, List<String> initialValues,
 			CallbackP<List<String>> newValuesCallback) {
 		lazyConstruct();
-		multipleValuesView.configureAndShow(title, prompts, initialValues, newValuesCallback);
+		promptForValuesDialog.configureAndShow(title, prompts, initialValues, values-> {
+			promptForValuesDialog.hide();
+			newValuesCallback.invoke(values);
+		});
 	}
 }
 

@@ -1,12 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
 
-import org.gwtbootstrap3.client.shared.event.ModalShownEvent;
-import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
-import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.FormLabel;
@@ -16,10 +13,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -30,9 +24,9 @@ import com.google.inject.Inject;
  * A basic implementation of PromptTwoValuesModalView with zero business logic.
  *
  */
-public class PromptMultipleValuesModalViewImpl implements PromptMultipleValuesModalView {
+public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 	
-	public interface Binder extends UiBinder<Modal, PromptMultipleValuesModalViewImpl> {}
+	public interface Binder extends UiBinder<Modal, PromptForValuesModalViewImpl> {}
 	
 	Modal modal;
 	@UiField
@@ -47,7 +41,7 @@ public class PromptMultipleValuesModalViewImpl implements PromptMultipleValuesMo
 	KeyDownHandler handler;
 	
 	@Inject
-	public PromptMultipleValuesModalViewImpl(Binder binder, SynapseAlert synAlert){
+	public PromptForValuesModalViewImpl(Binder binder, SynapseAlert synAlert){
 		modal = binder.createAndBindUi(this);
 		this.synAlert = synAlert;
 		synAlertContainer.add(synAlert);
@@ -74,7 +68,6 @@ public class PromptMultipleValuesModalViewImpl implements PromptMultipleValuesMo
 		for (TextBox textBox : textBoxes) {
 			values.add(textBox.getValue());
 		}
-		modal.hide();
 		newValuesCallback.invoke(values);
 	}
 	
@@ -84,12 +77,23 @@ public class PromptMultipleValuesModalViewImpl implements PromptMultipleValuesMo
 	}
 
 	@Override
+	public void configureAndShow(String title, String prompt, String initialValue, CallbackP<String> newValueCallback) {
+		List<String> promptListWrapper = Collections.singletonList(prompt);
+		List<String> initialValueListWrapper = null;
+		if (initialValue != null) {
+			initialValueListWrapper = Collections.singletonList(initialValue);
+		}
+		CallbackP<List<String>> newValueCallbackWrapper = list -> {
+			newValueCallback.invoke(list.get(0));
+		};
+		configureAndShow(title, promptListWrapper, initialValueListWrapper, newValueCallbackWrapper);
+	}
+	@Override
 	public void configureAndShow(String title, List<String> prompts, List<String> initialValues,
 			CallbackP<List<String>> newValuesCallback) {
+		clear();
 		modal.setTitle(title);
 		this.newValuesCallback = newValuesCallback;
-		textBoxes = new ArrayList<>();
-		form.clear();
 		if (initialValues != null && prompts.size() != initialValues.size() ) {
 			throw new IllegalArgumentException("If set, initialValues size must equal prompts size.");
 		}
@@ -126,6 +130,8 @@ public class PromptMultipleValuesModalViewImpl implements PromptMultipleValuesMo
 
 	@Override
 	public void clear() {
+		form.clear();
+		textBoxes = new ArrayList<>();
 		this.primaryButton.state().reset();
 		synAlert.clear();
 	}
@@ -137,5 +143,9 @@ public class PromptMultipleValuesModalViewImpl implements PromptMultipleValuesMo
 		}else{
 			this.primaryButton.state().reset();
 		}	
+	}
+	@Override
+	public void hide() {
+		modal.hide();
 	}
 }

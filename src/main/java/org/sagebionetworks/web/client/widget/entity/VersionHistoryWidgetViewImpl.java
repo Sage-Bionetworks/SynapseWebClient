@@ -54,13 +54,13 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 	@UiField
 	Div synAlertContainer;
 	CallbackP<List<String>> versionValuesCallback; 
-	PromptMultipleValuesModalView editVersionInfoModal;
+	PromptForValuesModalView editVersionInfoModal;
 	
 	private static DateTimeFormat shortDateFormat = DateTimeFormat.getShortDateFormat();
 	private Presenter presenter;
 	
 	@Inject
-	public VersionHistoryWidgetViewImpl(PortalGinInjector ginInjector, PromptMultipleValuesModalView editVersionInfoDialog) {
+	public VersionHistoryWidgetViewImpl(PortalGinInjector ginInjector, PromptForValuesModalView editVersionInfoDialog) {
 		this.ginInjector = ginInjector;
 		this.editVersionInfoModal = editVersionInfoDialog;
 		initWidget(uiBinder.createAndBindUi(this));
@@ -181,7 +181,9 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 	
 	@Override
 	public void hideEditVersionInfo() {
+		editVersionInfoModal.hide();
 	}
+	
 	@Override
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();

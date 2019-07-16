@@ -38,7 +38,7 @@ import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
-import org.sagebionetworks.web.client.widget.entity.PromptModalView;
+import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidget;
@@ -104,8 +104,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public Callback getMoreProjectsCallback, getMoreTeamsCallback;
 	public Callback refreshTeamsCallback;
 	
-	public PromptModalView promptForProjectNameDialog;
-	public PromptModalView promptForTeamNameDialog;
+	public PromptForValuesModalView promptDialog;
 	public SynapseJavascriptClient jsClient;
 	public DownloadListWidget downloadListWidget;
 	public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
@@ -151,32 +150,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		};
 	}
 	
-	public PromptModalView getPromptForTeamNameDialog() {
-		if (promptForTeamNameDialog == null) {
-			promptForTeamNameDialog = ginInjector.getPromptModal();
-			promptForTeamNameDialog.setPresenter(new PromptModalView.Presenter() {
-				@Override
-				public void onPrimary() {
-					createTeamAfterPrompt();
-				}
-			});
+	public PromptForValuesModalView getPromptDialog() {
+		if (promptDialog == null) {
+			promptDialog = ginInjector.getPromptForValuesModal();
 		}
-		return promptForTeamNameDialog;
+		return promptDialog;
 	}
-	
-	public PromptModalView getPromptForProjectNameDialog() {
-		if (promptForProjectNameDialog == null) {
-			promptForProjectNameDialog = ginInjector.getPromptModal();
-			promptForProjectNameDialog.setPresenter(new PromptModalView.Presenter() {
-				@Override
-				public void onPrimary() {
-					createProjectAfterPrompt();
-				}
-			});
-		}
-		return promptForProjectNameDialog;
-	}
-
 	
 	public UserProfileModalWidget getUserProfileModalWidget() {
 		if (userProfileModalWidget == null) {
@@ -703,15 +682,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	@Override
 	public void createProject() {
 		//prompt for project name
-		getPromptForProjectNameDialog().configure("Create a New Project", "Project Name", "OK", "");
-		getPromptForProjectNameDialog().show();
+		getPromptDialog().configureAndShow("Create a New Project", "Project Name", null, projectName -> {
+			createProjectAfterPrompt(projectName);
+		});
 	}
 	
-	public void createProjectAfterPrompt() {
-		final String name = getPromptForProjectNameDialog().getValue();
+	public void createProjectAfterPrompt(String name) {
 		//validate project name
 		if (!DisplayUtils.isDefined(name)) {
-			getPromptForProjectNameDialog().showError(DisplayConstants.PLEASE_ENTER_PROJECT_NAME);
+			getPromptDialog().showError(DisplayConstants.PLEASE_ENTER_PROJECT_NAME);
 			return;
 		}
 		Project project = new Project();
@@ -721,7 +700,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					new FutureCallback<Entity>() {
 						@Override
 						public void onSuccess(Entity entity) {
-							getPromptForProjectNameDialog().hide();
+							getPromptDialog().hide();
 							view.showInfo(DisplayConstants.LABEL_PROJECT_CREATED + name);
 							globalApplicationState.getPlaceChanger().goTo(new Synapse(entity.getId()));	
 						}
@@ -729,9 +708,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 						@Override
 						public void onFailure(Throwable caught) {
 							if(caught instanceof ConflictException) {
-								getPromptForProjectNameDialog().showError(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
+								getPromptDialog().showError(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
 							} else {
-								getPromptForProjectNameDialog().showError(caught.getMessage());
+								getPromptDialog().showError(caught.getMessage());
 							}
 						}
 					},
@@ -742,15 +721,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	@Override
 	public void createTeam() {
 		// prompt for team name
-		getPromptForTeamNameDialog().configure("Create a New Team", "Team Name", "OK", "");
-		getPromptForTeamNameDialog().show();
+		getPromptDialog().configureAndShow("Create a New Team", "Team Name", null, teamName -> {
+			createTeamAfterPrompt(teamName);
+		});
 	}
 	
-	public void createTeamAfterPrompt() {
-		final String teamName = getPromptForTeamNameDialog().getValue();
+	public void createTeamAfterPrompt(String teamName) {
 		//validate team name
 		if (!DisplayUtils.isDefined(teamName)) {
-			getPromptForTeamNameDialog().showError(DisplayConstants.PLEASE_ENTER_TEAM_NAME);
+			getPromptDialog().showError(DisplayConstants.PLEASE_ENTER_TEAM_NAME);
 			return;
 		}
 		
@@ -760,17 +739,17 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		jsClient.createTeam(newTeam, new AsyncCallback<Team>() {
 			@Override
 			public void onSuccess(Team team) {
-				getPromptForTeamNameDialog().hide();
+				getPromptDialog().hide();
 				view.showInfo(DisplayConstants.LABEL_TEAM_CREATED + teamName);
-				globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(team.getId()));						
+				globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(team.getId()));
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				if(caught instanceof ConflictException) {
-					getPromptForTeamNameDialog().showError(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
+					getPromptDialog().showError(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
 				} else {
-					getPromptForTeamNameDialog().showError(caught.getMessage());
+					getPromptDialog().showError(caught.getMessage());
 				}
 			}
 		});		

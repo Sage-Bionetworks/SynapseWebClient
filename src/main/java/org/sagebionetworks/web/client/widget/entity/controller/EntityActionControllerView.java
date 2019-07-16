@@ -6,7 +6,7 @@ import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.web.client.ShowsErrors;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.PromptMultipleValuesModalView;
+import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 /**

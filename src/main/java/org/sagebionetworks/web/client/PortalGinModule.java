@@ -241,10 +241,6 @@ import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxView;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxViewImpl;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetView;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.VersionHistoryRowView;
-import org.sagebionetworks.web.client.widget.entity.VersionHistoryRowViewImpl;
-import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidgetView;
-import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetView;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidgetView;
@@ -257,10 +253,8 @@ import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeView;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeViewImpl;
-import org.sagebionetworks.web.client.widget.entity.PromptModalView;
-import org.sagebionetworks.web.client.widget.entity.PromptModalViewImpl;
-import org.sagebionetworks.web.client.widget.entity.PromptMultipleValuesModalView;
-import org.sagebionetworks.web.client.widget.entity.PromptMultipleValuesModalViewImpl;
+import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
+import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialogView;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
@@ -269,6 +263,10 @@ import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWi
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizardView;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizardViewImpl;
+import org.sagebionetworks.web.client.widget.entity.VersionHistoryRowView;
+import org.sagebionetworks.web.client.widget.entity.VersionHistoryRowViewImpl;
+import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidgetView;
+import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachmentsView;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachmentsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidgetView;
@@ -910,9 +908,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(PreflightController.class).to(PreflightControllerImpl.class);
 		bind(CertifiedUserController.class).to(CertifiedUserControllerImpl.class);
 		
-		bind(PromptModalView.class).to(PromptModalViewImpl.class);
 		bind(BigPromptModalView.class).to(BigPromptModalViewImpl.class);
-		bind(PromptMultipleValuesModalView.class).to(PromptMultipleValuesModalViewImpl.class);
+		bind(PromptForValuesModalView.class).to(PromptForValuesModalViewImpl.class);
 		bind(RenameEntityModalWidget.class).to(RenameEntityModalWidgetImpl.class);
 
 		// Rejected Reason

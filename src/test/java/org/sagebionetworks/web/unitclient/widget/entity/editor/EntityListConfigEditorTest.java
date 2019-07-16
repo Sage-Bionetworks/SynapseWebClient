@@ -4,64 +4,58 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SelectableItemList;
-import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
-import org.sagebionetworks.web.client.widget.entity.PromptModalView;
+import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
+@RunWith(MockitoJUnitRunner.class)
 public class EntityListConfigEditorTest {
 		
 	EntityListConfigEditor editor;
+	@Mock
 	EntityListConfigView mockView;
+	@Mock
 	AuthenticationController mockAuthenticationController;
-
 	Map<String, String> descriptor;
-	
 	@Mock
 	EntityListWidget mockEntityListWidget;
 	@Mock
 	EntityFinder mockEntityFinder;
 	@Mock
-	PromptModalView mockPromptForNoteModal;
+	PromptForValuesModalView mockPromptForNoteModal;
 	SelectableItemList entityListRowWidgets;
 	@Mock
 	EntityListRowBadge mockEntityListRowBadge;
 	@Mock
 	EntityGroupRecord mockEntityGroupRecord;
-	
+	@Captor
+	ArgumentCaptor<CallbackP<String>> promptCallbackCaptor;
 	@Before
 	public void setup() throws Exception{
-		MockitoAnnotations.initMocks(this);
-		mockView = mock(EntityListConfigView.class);
-		mockAuthenticationController = mock(AuthenticationController.class);		
-		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-
 		entityListRowWidgets = new SelectableItemList();
 		entityListRowWidgets.add(mockEntityListRowBadge);
 		when(mockEntityListRowBadge.isSelected()).thenReturn(false);
@@ -132,25 +126,10 @@ public class EntityListConfigEditorTest {
 		
 		editor.onUpdateNote();
 		
-		verify(mockPromptForNoteModal).clear();
-		verify(mockPromptForNoteModal).configure(EntityListConfigEditor.NOTE, EntityListConfigEditor.PROMPT_ENTER_NOTE, DisplayConstants.SAVE_BUTTON_LABEL, existingNote);
-		verify(mockPromptForNoteModal).show();
+		verify(mockPromptForNoteModal).configureAndShow(eq(EntityListConfigEditor.NOTE), eq(EntityListConfigEditor.PROMPT_ENTER_NOTE), eq(existingNote), promptCallbackCaptor.capture());
 		
 		String newNote = "new note";
-		when(mockPromptForNoteModal.getValue()).thenReturn(newNote);
-		editor.onUpdateNoteFromModal();
+		promptCallbackCaptor.getValue().invoke(newNote);
 		verify(s2).setNote(newNote);
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
