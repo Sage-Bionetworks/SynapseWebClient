@@ -1,10 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
-import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
-
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -110,10 +105,11 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		String sql = descriptor.get(WidgetConstants.TABLE_QUERY_KEY);
 		query.setSql(sql);
 		String tableId = QueryBundleUtils.getTableIdFromSql(query.getSql());
-		configureTableQueryResultWidget(tableId);
+		Long tableVersionNumber = QueryBundleUtils.getTableVersion(query.getSql());
+		configureTableQueryResultWidget(tableId, tableVersionNumber);
 	}
 	
-	public void configureTableQueryResultWidget(String tableId) {
+	public void configureTableQueryResultWidget(String tableId, Long tableVersionNumber) {
 		synAlert.clear();
 		
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
@@ -122,7 +118,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 				boolean isCurrentVersion = true;
 				entityActionController.configure(actionMenu, bundle, isCurrentVersion, bundle.getRootWikiId(), EntityArea.TABLES);
 				boolean canEdit = false;
-				getTableEntityWidget().configure(bundle, canEdit, TableQueryResultWikiWidget.this, actionMenu);
+				getTableEntityWidget().configure(bundle, tableVersionNumber, canEdit, TableQueryResultWikiWidget.this, actionMenu);
 				hideEditActions();
 				isLoading = false;
 			}

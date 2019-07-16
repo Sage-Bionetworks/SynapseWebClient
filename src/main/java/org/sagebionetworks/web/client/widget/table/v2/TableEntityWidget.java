@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -71,6 +72,7 @@ public class TableEntityWidget implements IsWidget,
 
 	EntityBundle entityBundle;
 	String tableId;
+	Long tableVersionNumber = null;
 	TableBundle tableBundle;
 	boolean canEdit, canEditResults;
 	TableType tableType;
@@ -152,13 +154,14 @@ public class TableEntityWidget implements IsWidget,
 	 * @param queryString
 	 * @param qch
 	 */
-	public void configure(EntityBundle bundle, boolean canEdit,
+	public void configure(EntityBundle bundle, Long versionNumber, boolean canEdit,
 			QueryChangeHandler qch, ActionMenuWidget actionMenu) {
 		this.entityBundle = bundle;
 		Entity table = bundle.getEntity();
 		this.tableType = TableType.getTableType(table);
 		queryInputWidget.setDownloadFilesVisible(tableType.isIncludeFiles());
 		this.tableId = bundle.getEntity().getId();
+		this.tableVersionNumber = versionNumber;
 		this.tableBundle = bundle.getTableBundle();
 		this.canEdit = canEdit;
 		this.canEditResults = canEdit;
@@ -394,16 +397,16 @@ public class TableEntityWidget implements IsWidget,
 	 * @return
 	 */
 	public Query getDefaultQuery() {
-		Table table = (Table)entityBundle.getEntity();
 		StringBuilder builder = new StringBuilder();
 		builder.append(SELECT_FROM);
-		builder.append(table.getId());
-		if (table.getVersionNumber() != null) {
-			builder.append("." + table.getVersionNumber());
+		builder.append(this.tableId);
+		if (this.tableVersionNumber != null) {
+			builder.append("." + this.tableVersionNumber);
 		}
 		Query query = new Query();
 		query.setIncludeEntityEtag(true);
 		query.setSql(builder.toString());
+		GWT.debugger();
 		query.setOffset(DEFAULT_OFFSET);
 		query.setLimit(DEFAULT_LIMIT);
 		query.setIsConsistent(true);

@@ -70,7 +70,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	private Synapse.EntityArea area;
 	private String initialAreaToken;
 	private String wikiAreaToken, tablesAreaToken, discussionAreaToken, dockerAreaToken;
-	private Long filesVersionNumber;
+	private Long currentTargetVersionNumber, filesVersionNumber, tablesVersionNumber;
 	private EntityHeader projectHeader;
 
 	private Tabs tabs;
@@ -287,7 +287,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		tablesAreaToken = null;
 		discussionAreaToken = null;
 		dockerAreaToken = null;
-		filesVersionNumber = versionNumber;
+		this.currentTargetVersionNumber = versionNumber;
 		this.entity = targetEntityBundle.getEntity();
 
 		//note: the files/tables/wiki/discussion/docker tabs rely on the project bundle, so they are configured later
@@ -326,14 +326,14 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				
 				initAreaToken();
 				showSelectedTabs();
-				updateEntityBundle(currentTargetEntityBundle, filesVersionNumber);
+				updateEntityBundle(currentTargetEntityBundle, currentTargetVersionNumber);
 			}
 
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setProjectLoadingVisible(false);
 				projectBundleLoadError = caught;
-				updateEntityBundle(currentTargetEntityBundle, filesVersionNumber);
+				updateEntityBundle(currentTargetEntityBundle, currentTargetVersionNumber);
 				showSelectedTabs();
 			}
 		};
@@ -402,6 +402,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 
 	public void updateEntityBundle(EntityBundle bundle, Long version) {
 		this.currentTargetEntityBundle = bundle;
+		this.currentTargetVersionNumber = version;
 		entity = bundle.getEntity();
 		// Redirect if Entity is a Link
 		if(entity instanceof Link) {
@@ -418,7 +419,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				fileChanged(bundle, version);
 				break;
 			case TABLES:
-				tableChanged(bundle);
+				tableChanged(bundle, version);
 				break;
 			case DOCKER:
 				dockerChanged(bundle);
@@ -429,7 +430,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			if (entity instanceof FileEntity || entity instanceof Folder) {
 				fileChanged(bundle, version);
 			} else if (entity instanceof Table) {
-				tableChanged(bundle);
+				tableChanged(bundle, version);
 			} else if (entity instanceof DockerRepository) {
 				dockerChanged(bundle);
 			}
@@ -446,8 +447,9 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		dockerTab.asTab().setContentStale(true);
 	}
 
-	private void tableChanged(EntityBundle bundle) {
+	private void tableChanged(EntityBundle bundle, Long version) {
 		tablesEntityBundle = bundle;
+		tablesVersionNumber = version;
 		area = EntityArea.TABLES;
 		tablesTab.asTab().setContentStale(true);
 	}
@@ -620,10 +622,11 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	public void configureTablesTab() {
 		if (tablesTab.asTab().isContentStale()) {
 			tablesTab.setProject(projectHeader.getId(), projectBundle, projectBundleLoadError);
-			tablesTab.configure(tablesEntityBundle, tablesAreaToken, entityActionMenu);
+			tablesTab.configure(tablesEntityBundle, tablesVersionNumber, tablesAreaToken, entityActionMenu);
 			tablesTab.asTab().setContentStale(false);
 		}
-		entityActionController.configure(entityActionMenu, tablesEntityBundle, true, null, area);
+		boolean isCurrentVersion = tablesVersionNumber == null;
+		entityActionController.configure(entityActionMenu, tablesEntityBundle, isCurrentVersion, null, area);
 	}
 
 	public void configureFilesTab() {

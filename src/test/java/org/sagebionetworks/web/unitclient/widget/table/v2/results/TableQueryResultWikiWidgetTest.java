@@ -69,6 +69,7 @@ public class TableQueryResultWikiWidgetTest {
 	EntityActionController mockEntityActionController;
 	@Mock
 	EntityBundle mockEntityBundle;
+	Long versionNumber;
 	@Mock
 	PortalGinInjector mockGinInjector;
 	@Mock
@@ -110,7 +111,8 @@ public class TableQueryResultWikiWidgetTest {
 	public void testConfigure() {
 		Map<String, String> descriptor = new HashMap<String, String>();
 		String tableId = "syn12345";
-		String sql = "select * from " + tableId;
+		Long tableVersionNumber = 22L;
+		String sql = "select * from " + tableId + "." + tableVersionNumber;
 		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
 		
 		widget.configure(wikiKey, descriptor, null, null);
@@ -129,7 +131,7 @@ public class TableQueryResultWikiWidgetTest {
 		String wikiPageRootId = null;
 		verify(mockEntityActionController).configure(mockActionMenu, mockEntityBundle, isCurrentVersion, wikiPageRootId, EntityArea.TABLES);
 		boolean canEdit = false;
-		verify(mockTableEntityWidget).configure(mockEntityBundle, canEdit, widget, mockActionMenu);
+		verify(mockTableEntityWidget).configure(mockEntityBundle, tableVersionNumber, canEdit, widget, mockActionMenu);
 		
 		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
 		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.EDIT_TABLE_DATA, false);

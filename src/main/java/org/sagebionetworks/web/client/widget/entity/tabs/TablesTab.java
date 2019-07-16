@@ -31,6 +31,7 @@ import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
@@ -145,12 +146,12 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		this.projectBundleLoadError = projectBundleLoadError;
 	}
 	
-	public void configure(EntityBundle entityBundle, String areaToken, ActionMenuWidget entityActionMenu) {
+	public void configure(EntityBundle entityBundle, Long versionNumber, String areaToken, ActionMenuWidget entityActionMenu) {
 		lazyInject();
 		this.areaToken = areaToken;
 		this.entityActionMenu = entityActionMenu;
 		synAlert.clear();
-		setTargetBundle(entityBundle);
+		setTargetBundle(entityBundle, versionNumber);
 	}
 	
 	public void showProjectLevelUI() {
@@ -183,7 +184,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		synAlert.handleException(error);
 	}
 	
-	public void setTargetBundle(EntityBundle bundle) {
+	public void setTargetBundle(EntityBundle bundle, Long versionNumber) {
 		this.entityBundle = bundle;
 		Entity entity = bundle.getEntity();
 		boolean isTable = entity instanceof Table;
@@ -198,14 +199,14 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		view.setProvenanceVisible(isTable);
 		
 		if (isTable) {
-			tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(bundle.getEntity().getId(), null, EntityArea.TABLES, areaToken));
+			tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(bundle.getEntity().getId(), versionNumber, EntityArea.TABLES, areaToken));
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
 			metadata.configure(bundle, null, entityActionMenu);
 			tableTitleBar.configure(bundle);
 			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
 			v2TableWidget = ginInjector.createNewTableEntityWidget();
 			view.setTableEntityWidget(v2TableWidget.asWidget());
-			v2TableWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit(), this, entityActionMenu);
+			v2TableWidget.configure(bundle, versionNumber, bundle.getPermissions().getCanCertifiedUserEdit(), this, entityActionMenu);
 			ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
 			configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(FilesTab.WIDGET_HEIGHT_PX-84));
 			configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(entity.getId(), null));
@@ -225,12 +226,14 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	public void onQueryChange(Query newQuery) {
 		if(newQuery != null && tab.isTabPaneVisible()) {
 			String token = queryTokenProvider.queryToToken(newQuery);
+			Long versionNumber = null;
 			if(token != null && !newQuery.equals(v2TableWidget.getDefaultQuery())){
 				areaToken = TABLE_QUERY_PREFIX + token;
+				versionNumber = QueryBundleUtils.getTableVersion(newQuery.getSql());
 			} else {
 				areaToken = "";
 			}
-			tab.setEntityNameAndPlace(entityBundle.getEntity().getName(), new Synapse(entityBundle.getEntity().getId(), null, EntityArea.TABLES, areaToken));
+			tab.setEntityNameAndPlace(entityBundle.getEntity().getName(), new Synapse(entityBundle.getEntity().getId(), versionNumber, EntityArea.TABLES, areaToken));
 			tab.showTab(true);
 		}
 	}
