@@ -20,8 +20,8 @@
 						<t:TableHeader text="Label" />
 						<t:TableHeader text="Modified By" />
 						<t:TableHeader text="Modified On" />
-						<t:TableHeader text="Size" />
-						<t:TableHeader text="md5" />
+						<t:TableHeader text="Size" ui:field="sizeTableHeader" />
+						<t:TableHeader text="md5" ui:field="md5TableHeader" />
 						<t:TableHeader text="Comment" />
 						<t:TableHeader text="DOI" />
 						<t:TableHeader text="" />

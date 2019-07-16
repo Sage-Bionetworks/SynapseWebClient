@@ -9,11 +9,13 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2;
 
 import com.google.gwt.core.client.GWT;
@@ -53,9 +55,13 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 	Button moreButton;
 	@UiField
 	Div synAlertContainer;
+	@UiField
+	TableHeader sizeTableHeader;
+	@UiField
+	TableHeader md5TableHeader;
 	CallbackP<List<String>> versionValuesCallback; 
 	PromptForValuesModalView editVersionInfoModal;
-	
+	boolean isTable = false;
 	private static DateTimeFormat shortDateFormat = DateTimeFormat.getShortDateFormat();
 	private Presenter presenter;
 	
@@ -82,6 +88,9 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 	@Override
 	public void setEntityBundle(Entity entity, boolean isShowingOlderVersion) {
 		clear();
+		isTable = entity instanceof Table;
+		sizeTableHeader.setVisible(!isTable);
+		md5TableHeader.setVisible(!isTable);
 		currentVersionLink.setTargetHistoryToken(DisplayUtils.getSynapseHistoryTokenNoHash(entity.getId()));
 		currentVersionLink.setVisible(isShowingOlderVersion);
 		if (isShowingOlderVersion) {
@@ -97,6 +106,8 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 	@Override
 	public void addVersion(String entityId, final VersionInfo version, boolean canEdit, boolean isVersionSelected) {
 		VersionHistoryRowView fileHistoryRow = ginInjector.getFileHistoryRow();
+		fileHistoryRow.setMd5TableDataVisible(!isTable);
+		fileHistoryRow.setSizeTableDataVisible(!isTable);
 		DoiWidgetV2 doiWidget = ginInjector.getDoiWidget();
 		doiWidget.setLabelVisible(false);
 		String versionName = version.getVersionLabel();
@@ -109,11 +120,8 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 		} catch (Throwable t) {
 		}
 		String md5 = version.getContentMd5();
-		Callback deleteCallback = new Callback() {
-			@Override
-			public void invoke() {
-				presenter.deleteVersion(version.getVersionNumber());
-			}
+		Callback deleteCallback = () -> {
+			presenter.deleteVersion(version.getVersionNumber());
 		};
 
 		String versionComment = version.getVersionComment();

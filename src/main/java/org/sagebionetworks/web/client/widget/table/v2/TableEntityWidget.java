@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Query;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -393,9 +394,13 @@ public class TableEntityWidget implements IsWidget,
 	 * @return
 	 */
 	public Query getDefaultQuery() {
+		Table table = (Table)entityBundle.getEntity();
 		StringBuilder builder = new StringBuilder();
 		builder.append(SELECT_FROM);
-		builder.append(this.tableId);
+		builder.append(table.getId());
+		if (table.getVersionNumber() != null) {
+			builder.append("." + table.getVersionNumber());
+		}
 		Query query = new Query();
 		query.setIncludeEntityEtag(true);
 		query.setSql(builder.toString());

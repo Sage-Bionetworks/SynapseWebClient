@@ -13,10 +13,10 @@
 		<t:TableData>
 			<b:FormControlStatic addStyleNames="moveup-8" ui:field="modifiedOn" />
 		</t:TableData>
-		<t:TableData>
+		<t:TableData ui:field="sizeTableData">
 			<b:FormControlStatic addStyleNames="moveup-8" ui:field="size" />
 		</t:TableData>
-		<t:TableData>
+		<t:TableData ui:field="md5TableData">
 			<g:SimplePanel ui:field="md5LinkContainer" />
 		</t:TableData>
 		<t:TableData>

@@ -399,7 +399,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureLink();
 		configureSubmit();
 		configureAnnotations();
-		configureFileHistory();
+		configureVersionHistory();
 		configureFileUpload();
 		configureProvenance();
 		configureChangeStorageLocation();
@@ -692,7 +692,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void configureCreateTableViewVersion(){
-		if(entityBundle.getEntity() instanceof Table){
+		// TODO: remove cookie check to take out of alpha mode
+		if(entityBundle.getEntity() instanceof Table && DisplayUtils.isInTestWebsite(cookies)){
 			String tableOrView = entityBundle.getEntity() instanceof TableEntity ? "Table" : "View"; 
 			actionMenu.setActionText(Action.CREATE_TABLE_VERSION, "Create a New "+tableOrView+" Version");
 			actionMenu.setActionVisible(Action.CREATE_TABLE_VERSION, permissions.getCanEdit());
@@ -741,9 +742,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 	
-	private void configureFileHistory(){
+	private void configureVersionHistory(){
 		if(entityBundle.getEntity() instanceof Versionable){
-			actionMenu.setActionVisible(Action.SHOW_VERSION_HISTORY, true);
+			// TODO: remove to expose version history for tables/views
+			// show version history if not a Table, or if we're in alpha mode
+			boolean isVersionHistoryVisible = !(entityBundle.getEntity() instanceof Table) || DisplayUtils.isInTestWebsite(cookies);
+			actionMenu.setActionVisible(Action.SHOW_VERSION_HISTORY, isVersionHistoryVisible);
 		}else{
 			actionMenu.setActionVisible(Action.SHOW_VERSION_HISTORY, false);
 		}

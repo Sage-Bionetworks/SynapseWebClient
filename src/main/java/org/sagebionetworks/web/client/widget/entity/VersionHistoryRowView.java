@@ -20,4 +20,6 @@ public interface VersionHistoryRowView extends IsWidget {
 	
 	void setCanEdit(boolean canEdit);
 	void setIsVersionSelected(boolean isVersionSelected);
+	void setSizeTableDataVisible(boolean isVisible);
+	void setMd5TableDataVisible(boolean isVisible);
 }

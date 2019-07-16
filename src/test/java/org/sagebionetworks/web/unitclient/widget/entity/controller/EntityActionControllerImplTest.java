@@ -311,6 +311,7 @@ public class EntityActionControllerImplTest {
 
 	@Test
 	public void testConfigure(){
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		verify(mockGWT).scheduleExecution(any(Callback.class), anyInt());
 		// delete
@@ -448,11 +449,11 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testConfigurePublicReadTable(){
 		setPublicCanRead();
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		
 		verify(mockActionMenu).setActionIcon(Action.SHARE, IconType.GLOBE);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_ANNOTATIONS, true);
-		// for a table entity, do not show file history
 		verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
 		
 		//verify other table commands.  current user canCertifiedUserEdit
@@ -464,12 +465,23 @@ public class EntityActionControllerImplTest {
 	}
 	
 	@Test
+	public void testTableVersionAlphaCommands(){
+		// not in test mode, table version commands should be hidden
+		setPublicCanRead();
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
+		
+		verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, false);
+		verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, false);
+	}
+	
+	@Test
 	public void testConfigureTableNoEdit(){
 		setPublicCanRead();
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		permissions.setCanCertifiedUserEdit(false);
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		
-		// for a table entity, do not show file history
+		verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, true);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
 		
 		//verify other table commands. the current user cannot edit
@@ -491,7 +503,6 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		verify(mockActionMenu).setActionIcon(Action.SHARE, IconType.GLOBE);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_ANNOTATIONS, true);
-		// for a table entity, do not show file history
 		verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
 		
 		//table commands not shown for File

@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.widget.entity.file.Md5Link;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
@@ -38,6 +39,10 @@ public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
 	Button deleteButton;
 	@UiField
 	Div doiWidgetContainer;
+	@UiField
+	TableData sizeTableData;
+	@UiField
+	TableData md5TableData;
 	Callback deleteCallback;
 	UserBadge userBadge;
 	private Widget widget;
@@ -93,5 +98,13 @@ public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
 		if (isVersionSelected) {
 			versionNameLink.addStyleName("boldText");
 		}
+	}
+	@Override
+	public void setMd5TableDataVisible(boolean isVisible) {
+		md5TableData.setVisible(isVisible);
+	}
+	@Override
+	public void setSizeTableDataVisible(boolean isVisible) {
+		sizeTableData.setVisible(isVisible);
 	}
 }
