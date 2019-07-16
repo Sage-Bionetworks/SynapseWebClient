@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.common.base.Objects;
@@ -23,6 +24,7 @@ public class EditFileMetadataModalWidgetImpl implements EditFileMetadataModalVie
 	
 	EditFileMetadataModalView view;
 	SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	FileHandle fileHandle;
 	FileEntity fileEntity;
 	String startingName;
@@ -31,11 +33,13 @@ public class EditFileMetadataModalWidgetImpl implements EditFileMetadataModalVie
 	
 	@Inject
 	public EditFileMetadataModalWidgetImpl(EditFileMetadataModalView view,
-			SynapseClientAsync synapseClient) {
+			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient) {
 		super();
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
+		this.jsClient = jsClient;
 		this.view.setPresenter(this);
 		this.entityUpdatedCallback = getEntityUpdatedCallback();
 	}
@@ -81,7 +85,7 @@ public class EditFileMetadataModalWidgetImpl implements EditFileMetadataModalVie
 	private void updateFileEntity() {
 		view.setLoading(true);
 		fileEntity.setName(getEntityNameFromView());
-		synapseClient.updateEntity(fileEntity, entityUpdatedCallback);
+		jsClient.updateEntity(fileEntity, null, null, entityUpdatedCallback);
 	}
 
 	@Override

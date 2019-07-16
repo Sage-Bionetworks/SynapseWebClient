@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -9,14 +11,16 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.table.ViewTypeMask;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidget;
@@ -30,12 +34,13 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ScopeWidgetTest {
 
 	@Mock
 	ScopeWidgetView mockView;
 	@Mock
-	SynapseClientAsync mockSynapseClient;
+	SynapseJavascriptClient mockJsClient;
 	@Mock
 	SynapseAlert mockSynapseAlert;
 	@Mock
@@ -61,13 +66,13 @@ public class ScopeWidgetTest {
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		widget = new ScopeWidget(mockView, mockSynapseClient, mockViewScopeWidget, mockEditScopeWidget, mockSynapseAlert, mockEventBus);
+		widget = new ScopeWidget(mockView, mockJsClient, mockViewScopeWidget, mockEditScopeWidget, mockSynapseAlert, mockEventBus);
 		when(mockEntityView.getId()).thenReturn("syn123");
 		when(mockEntityView.getScopeIds()).thenReturn(mockScopeIds);
 		when(mockBundle.getEntity()).thenReturn(mockEntityView);
 		when(mockEntityView.getType()).thenReturn(ViewType.file);
 		when(mockEntityView.getViewTypeMask()).thenReturn(null);
-		AsyncMockStubber.callSuccessWith(mockUpdatedEntityView).when(mockSynapseClient).updateEntity(any(Table.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockUpdatedEntityView).when(mockJsClient).updateEntity(any(Table.class), anyString(), anyBoolean(), any(AsyncCallback.class));
 		when(mockView.isFileSelected()).thenReturn(false);
 		when(mockView.isFolderSelected()).thenReturn(false);
 		when(mockView.isTableSelected()).thenReturn(false);
@@ -110,7 +115,7 @@ public class ScopeWidgetTest {
 		// clears out old ViewType, replaced with mask
 		verify(mockEntityView).setType(null);
 		verify(mockEntityView).setViewTypeMask(ViewTypeMask.getMaskForDepricatedType(ViewType.file_and_table));
-		verify(mockSynapseClient).updateEntity(any(Table.class), any(AsyncCallback.class));
+		verify(mockJsClient).updateEntity(any(Table.class), anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).setLoading(false);
 		verify(mockView).hideModal();
 		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
@@ -205,7 +210,7 @@ public class ScopeWidgetTest {
 	@Test
 	public void testOnSaveFailure() {
 		Exception ex = new Exception("error on save");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).updateEntity(any(Table.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).updateEntity(any(Table.class), anyString(), anyBoolean(), any(AsyncCallback.class));
 		boolean isEditable = true;
 		
 		widget.configure(mockBundle, isEditable);
@@ -213,7 +218,7 @@ public class ScopeWidgetTest {
 		
 		verify(mockSynapseAlert).clear();
 		verify(mockView).setLoading(true);
-		verify(mockSynapseClient).updateEntity(any(Table.class), any(AsyncCallback.class));
+		verify(mockJsClient).updateEntity(any(Table.class), anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).setLoading(false);
 		verify(mockSynapseAlert).handleException(ex);
 		verify(mockView, never()).hideModal();

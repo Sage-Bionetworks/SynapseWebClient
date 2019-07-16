@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
@@ -114,7 +115,7 @@ public class FileHistoryWidgetTest {
 		versions.add(v2);
 		AsyncMockStubber.callSuccessWith(versions).when(mockJsClient).getEntityVersions(anyString(), anyInt(), anyInt(),any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		AsyncMockStubber.callSuccessWith(vb).when(mockSynapseClient).updateEntity(any(Entity.class),any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(vb).when(mockJsClient).updateEntity(any(Entity.class), anyString(), anyBoolean(), any(AsyncCallback.class));
 	}
 
 	@Test
@@ -158,7 +159,7 @@ public class FileHistoryWidgetTest {
 		fileHistoryWidget.setEntityBundle(bundle, null);
 		fileHistoryWidget.updateVersionInfo(testLabel, testComment);
 		ArgumentCaptor<Entity> entityCaptor = ArgumentCaptor.forClass(Entity.class);
-		verify(mockSynapseClient).updateEntity(entityCaptor.capture(), (AsyncCallback<Entity>) any());
+		verify(mockJsClient).updateEntity(entityCaptor.capture(), anyString(), anyBoolean(), (AsyncCallback<Entity>) any());
 		VersionableEntity capturedEntity = (VersionableEntity)entityCaptor.getValue();
 		assertEquals(testComment, capturedEntity.getVersionComment());
 		assertEquals(testLabel, capturedEntity.getVersionLabel());
@@ -173,7 +174,7 @@ public class FileHistoryWidgetTest {
 		vb.setVersionComment(testComment);
 		fileHistoryWidget.setEntityBundle(bundle, null);
 		fileHistoryWidget.updateVersionInfo(testLabel, testComment);
-		verify(mockSynapseClient, never()).updateEntity(any(Entity.class), (AsyncCallback<Entity>) any());
+		verify(mockJsClient, never()).updateEntity(any(Entity.class), anyString(), anyBoolean(), (AsyncCallback<Entity>) any());
 		verify(mockView).hideEditVersionInfo();
 	}
 	
@@ -184,9 +185,9 @@ public class FileHistoryWidgetTest {
 		String testLabel = "testLabel";
 		String testComment = "testComment";
 		fileHistoryWidget.setEntityBundle(bundle, null);
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).updateEntity(any(Entity.class), anyString(), anyBoolean(), any(AsyncCallback.class));
 		fileHistoryWidget.updateVersionInfo(testLabel, testComment);
-		verify(mockSynapseClient).updateEntity(any(Entity.class), (AsyncCallback<Entity>) any());
+		verify(mockJsClient).updateEntity(any(Entity.class), anyString(), anyBoolean(), (AsyncCallback<Entity>) any());
 		verify(mockSynAlert).handleException(ex);
 	}
 

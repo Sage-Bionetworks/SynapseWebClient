@@ -89,7 +89,9 @@ public class VersionHistoryWidget implements VersionHistoryWidgetView.Presenter,
 			vb.setVersionLabel(versionLabel);
 			vb.setVersionComment(comment);
 			synAlert.clear();
-			synapseClient.updateEntity(vb,
+			jsClient.updateEntity(vb,
+					null,
+					null,
 					new AsyncCallback<Entity>() {
 						@Override
 						public void onFailure(Throwable caught) {
