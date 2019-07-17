@@ -26,7 +26,7 @@ public class ButtonLinkWidgetViewImpl extends Div implements ButtonLinkWidgetVie
 	private Button button;
 	private static AppPlaceHistoryMapper appPlaceHistoryMapper;
 	public static EventBus eventBus;
-	
+	public static final String SYNAPSE_PLACE_FRAGMENT = "#!Synapse:";
 	public static final ClickHandler BUTTON_LINK_CLICK_HANDLER = event -> {
 		if (!DisplayUtils.isAnyModifierKeyDown(event)) {
 			event.preventDefault();
@@ -37,8 +37,7 @@ public class ButtonLinkWidgetViewImpl extends Div implements ButtonLinkWidgetVie
 			if (openInNewWindow) {
 				newWindow(href, "_blank", "");
 			} else {
-				if (href.contains("#!Synapse:")) {
-					
+				if (href.contains(SYNAPSE_PLACE_FRAGMENT) && Window.Location.getHref().contains(SYNAPSE_PLACE_FRAGMENT)) {
 					Place newPlace = appPlaceHistoryMapper.getPlace(href.substring(href.indexOf('!')));
 					eventBus.fireEvent(new ChangeSynapsePlaceEvent((Synapse)newPlace));
 				} else {
@@ -46,9 +45,9 @@ public class ButtonLinkWidgetViewImpl extends Div implements ButtonLinkWidgetVie
 				}
 			}
 			Timer timer = new Timer() { 
-			    public void run() { 
-			    	button.setEnabled(true);
-			    } 
+				public void run() { 
+					button.setEnabled(true);
+				} 
 			};
 			timer.schedule(2000);
 		}
