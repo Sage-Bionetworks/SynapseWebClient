@@ -40,7 +40,7 @@ public class ClientProperties {
 	 * JavaScript WebResources
 	 */
 	public static final WebResource MATH_PROCESSOR_JS = new WebResource("js/katex-0.10.1.min.js");
-	public static final WebResource AWS_SDK_JS = new WebResource("js/aws-sdk-2.86.0.min.js");
+	public static final WebResource AWS_SDK_JS = new WebResource("js/aws-sdk-2.494.0.min.js");
 	public static final String QUERY_SERVICE_PREFIX = "/query?query=";
 	public static final String EVALUATION_QUERY_SERVICE_PREFIX = "/evaluation/submission/query?query=";
 	
