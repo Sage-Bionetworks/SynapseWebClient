@@ -61,24 +61,36 @@ public class AwsSdk {
 			String contentType,
 			JavaScriptObject s3,
 			S3DirectUploadHandler callback) /*-{
-		var params = {
-	        Key: key,
-	        ContentType: contentType,
-	        Body: file
-	    };
-
-		s3.upload(params).on('httpUploadProgress', function(evt) {
+		var parameters = {
+			Key: key,
+			ContentType: contentType,
+			Body: file
+		};
+		var upload = new $wnd.AWS.S3.ManagedUpload({
+//			partSize: 10 * 1024 * 1024,  //default 5MB
+//			queueSize: 1, // default 4
+			leavePartsOnError: true,
+			params: parameters,
+			service: s3
+		});
+		upload.on('httpUploadProgress', function(evt) {
 				// report progress
 				callback.@org.sagebionetworks.web.client.widget.upload.S3DirectUploadHandler::updateProgress(D)(evt.loaded/evt.total);
-			}).send(function(err, data) {
+			});
+		var listener = function(err, data) {
 				if (err) {
 					//error
-					callback.@org.sagebionetworks.web.client.widget.upload.S3DirectUploadHandler::uploadFailed(Ljava/lang/String;)(err);
+					console.log("Upload error, retrying:", err.code, err.message);
+					upload.abort();
+					setTimeout(function() {
+						upload.send(listener);
+					}, 5000);
 				} else {
 					//success
 					callback.@org.sagebionetworks.web.client.widget.upload.S3DirectUploadHandler::uploadSuccess()();
 				}
-			});
+			};
+		upload.send(listener);
 	}-*/;
 
 	public String getPresignedURL(String key,
@@ -97,10 +109,10 @@ public class AwsSdk {
 	/*-{
 		var params = {
 			Bucket: bucketName,
-	        Key: key,
-	        Expires: 20,
-	        ResponseContentDisposition: 'attachment; filename="' + fileName + '"' 
-	    };
+			Key: key,
+			Expires: 20,
+			ResponseContentDisposition: 'attachment; filename="' + fileName + '"' 
+		};
 		return s3.getSignedUrl('getObject', params);
 	}-*/;
 
@@ -131,16 +143,16 @@ public class AwsSdk {
 			String bucketName,
 			String endpoint) /*-{
 		var creds = new $wnd.AWS.Credentials(accessKeyId, secretAccessKey);
-        var ep = new $wnd.AWS.Endpoint(endpoint);
-        var s3 = new $wnd.AWS.S3({
-            endpoint: ep,
-            params: {
-                Bucket: bucketName
-            },
-            credentials: creds,
-            s3ForcePathStyle: true
-        });
-        return s3;
+		var ep = new $wnd.AWS.Endpoint(endpoint);
+		var s3 = new $wnd.AWS.S3({
+			endpoint: ep,
+			params: {
+				Bucket: bucketName
+			},
+			credentials: creds,
+			s3ForcePathStyle: true
+		});
+		return s3;
 	}-*/;
 
 }
