@@ -36,6 +36,7 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -53,6 +54,7 @@ import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
+import org.sagebionetworks.web.shared.WidgetConstants;
 
 import com.google.gwt.user.client.ui.Widget;
 
@@ -108,6 +110,8 @@ public class TablesTabTest {
 	String tableName = "test table";
 	@Mock
 	QueryTokenProvider mockQueryTokenProvider;
+	@Captor
+	ArgumentCaptor<Map<String, String>> mapCaptor;
 	
 	TablesTab tab;
 	Query query;
@@ -211,11 +215,16 @@ public class TablesTabTest {
 	private void verifyTableConfiguration(Long version) {
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.TABLES));
 		verify(mockBasicTitleBar).configure(mockTableEntityBundle);
-		verify(mockEntityMetadata).configure(mockTableEntityBundle, null, mockActionMenuWidget);
+		verify(mockEntityMetadata).configure(mockTableEntityBundle, version, mockActionMenuWidget);
 		verify(mockTableEntityWidget).configure(mockTableEntityBundle, version, true, tab, mockActionMenuWidget);
 		verify(mockView).setTableEntityWidget(any(Widget.class));
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
-		verify(mockProvenanceWidget).configure(any(Map.class));
+		verify(mockProvenanceWidget).configure(mapCaptor.capture());
+		// verify configuration
+		Map<String, String> provConfig = mapCaptor.getValue();
+		String provEntityList = provConfig.get(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY);
+		String expectedProvEntityList = DisplayUtils.createEntityVersionString(mockTableEntityBundle.getEntity().getId(), version);
+		assertEquals(expectedProvEntityList, provEntityList);
 		verify(mockView).setProvenanceVisible(true);
 		verify(mockView).setEntityMetadataVisible(true);
 		verify(mockView).setBreadcrumbVisible(true);
