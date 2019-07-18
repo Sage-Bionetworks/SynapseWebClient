@@ -199,19 +199,13 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		view.setProvenanceVisible(isTable);
 		
 		if (isTable) {
-			tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(bundle.getEntity().getId(), versionNumber, EntityArea.TABLES, areaToken));
+			reconfigure(versionNumber, areaToken);
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
-			metadata.configure(bundle, versionNumber, entityActionMenu);
 			tableTitleBar.configure(bundle);
 			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
 			v2TableWidget = ginInjector.createNewTableEntityWidget();
 			view.setTableEntityWidget(v2TableWidget.asWidget());
 			v2TableWidget.configure(bundle, versionNumber, bundle.getPermissions().getCanCertifiedUserEdit(), this, entityActionMenu);
-			ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
-			configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(FilesTab.WIDGET_HEIGHT_PX-84));
-			configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(entity.getId(), null));
-			view.setProvenance(provWidget);
-			provWidget.configure(configMap);
 		} else if (isProject) {
 			areaToken = null;
 			tableListWidget.configure(bundle);
@@ -232,9 +226,19 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			} else {
 				areaToken = "";
 			}
-			tab.setEntityNameAndPlace(entityBundle.getEntity().getName(), new Synapse(entityBundle.getEntity().getId(), versionNumber, EntityArea.TABLES, areaToken));
+			reconfigure(versionNumber, areaToken);
 			tab.showTab(true);
 		}
+	}
+	
+	private void reconfigure(Long versionNumber, String areaToken) {
+		metadata.configure(entityBundle, versionNumber, entityActionMenu);
+		tab.setEntityNameAndPlace(entityBundle.getEntity().getName(), new Synapse(entityBundle.getEntity().getId(), versionNumber, EntityArea.TABLES, areaToken));
+		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(FilesTab.WIDGET_HEIGHT_PX-84));
+		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(entityBundle.getEntity().getId(), versionNumber));
+		ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
+		view.setProvenance(provWidget);
+		provWidget.configure(configMap);
 	}
 	
 	public Query getQueryString() {
