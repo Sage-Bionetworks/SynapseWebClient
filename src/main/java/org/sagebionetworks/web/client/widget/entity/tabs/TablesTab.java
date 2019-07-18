@@ -199,7 +199,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		view.setProvenanceVisible(isTable);
 		
 		if (isTable) {
-			reconfigure(versionNumber, areaToken);
+			updateVersionAndAreaToken(versionNumber, areaToken);
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
 			tableTitleBar.configure(bundle);
 			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
@@ -226,12 +226,12 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			} else {
 				areaToken = "";
 			}
-			reconfigure(versionNumber, areaToken);
+			updateVersionAndAreaToken(versionNumber, areaToken);
 			tab.showTab(true);
 		}
 	}
 	
-	private void reconfigure(Long versionNumber, String areaToken) {
+	private void updateVersionAndAreaToken(Long versionNumber, String areaToken) {
 		metadata.configure(entityBundle, versionNumber, entityActionMenu);
 		tab.setEntityNameAndPlace(entityBundle.getEntity().getName(), new Synapse(entityBundle.getEntity().getId(), versionNumber, EntityArea.TABLES, areaToken));
 		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(FilesTab.WIDGET_HEIGHT_PX-84));
