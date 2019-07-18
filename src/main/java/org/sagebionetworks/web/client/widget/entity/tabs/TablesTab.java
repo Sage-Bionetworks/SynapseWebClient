@@ -201,7 +201,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		if (isTable) {
 			tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(bundle.getEntity().getId(), versionNumber, EntityArea.TABLES, areaToken));
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
-			metadata.configure(bundle, null, entityActionMenu);
+			metadata.configure(bundle, versionNumber, entityActionMenu);
 			tableTitleBar.configure(bundle);
 			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
 			v2TableWidget = ginInjector.createNewTableEntityWidget();
@@ -226,10 +226,9 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	public void onQueryChange(Query newQuery) {
 		if(newQuery != null && tab.isTabPaneVisible()) {
 			String token = queryTokenProvider.queryToToken(newQuery);
-			Long versionNumber = null;
+			Long versionNumber = QueryBundleUtils.getTableVersion(newQuery.getSql());
 			if(token != null && !newQuery.equals(v2TableWidget.getDefaultQuery())){
 				areaToken = TABLE_QUERY_PREFIX + token;
-				versionNumber = QueryBundleUtils.getTableVersion(newQuery.getSql());
 			} else {
 				areaToken = "";
 			}
