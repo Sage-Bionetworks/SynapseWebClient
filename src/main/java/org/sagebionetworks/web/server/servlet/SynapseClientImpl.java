@@ -1712,7 +1712,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public void validateTableQuery(String sql) throws RestServiceException {
 		try {
 			TableQueryParser.parserQuery(sql);
-		} catch (ParseException e) {
+		} catch (Throwable e) {
 			throw new TableQueryParseException(e.getMessage());
 		}
 	}
