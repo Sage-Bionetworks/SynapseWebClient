@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -14,7 +13,7 @@ import org.sagebionetworks.web.client.widget.CheckBoxState;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
-import org.sagebionetworks.web.client.widget.entity.PromptModalView;
+import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
@@ -36,13 +35,13 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 	EntityFinder entityFinder;
 	EntityListWidget entityListWidget;
 	WikiPageKey wikiKey;
-	PromptModalView promptForNoteModal;
+	PromptForValuesModalView promptForNoteModal;
 	@Inject
 	public EntityListConfigEditor(EntityListConfigView view,
 			AuthenticationController authenticationController,
 			EntityListWidget entityListWidget,
 			EntityFinder entityFinder,
-			PromptModalView promptForNoteModal) {
+			PromptForValuesModalView promptForNoteModal) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.entityFinder = entityFinder;
@@ -53,12 +52,6 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 		view.setPresenter(this);
 		view.addWidget(promptForNoteModal.asWidget());
 		view.initView();
-		promptForNoteModal.setPresenter(new PromptModalView.Presenter() {
-			@Override
-			public void onPrimary() {
-				onUpdateNoteFromModal();
-			}
-		});
 		entityListWidget.setSelectable(view);
 		entityListWidget.setSelectionChangedCallback(new Callback() {
 			@Override
@@ -174,16 +167,11 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 		editor.setNote(newNote);
 	}
 
-
 	@Override
 	public void onUpdateNote() {
-		promptForNoteModal.clear();
-		promptForNoteModal.configure(NOTE, PROMPT_ENTER_NOTE, DisplayConstants.SAVE_BUTTON_LABEL, getSelectedNote());
-		promptForNoteModal.show();
-	}
-	
-	public void onUpdateNoteFromModal() {
-		promptForNoteModal.hide();
-		setSelectedNote(promptForNoteModal.getValue());
+		promptForNoteModal.configureAndShow(NOTE, PROMPT_ENTER_NOTE, getSelectedNote(), newValue -> {
+			promptForNoteModal.hide();
+			setSelectedNote(newValue);
+		});
 	}
 }

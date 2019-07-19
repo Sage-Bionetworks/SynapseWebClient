@@ -11,7 +11,7 @@ public interface EntityMetadataView extends IsWidget {
 	public interface Presenter {
 	}
 	
-	void setFileHistoryWidget(IsWidget fileHistoryWidget);
+	void setVersionHistoryWidget(IsWidget fileHistoryWidget);
 
 	public void setDoiWidget(IsWidget doiWidget);
 

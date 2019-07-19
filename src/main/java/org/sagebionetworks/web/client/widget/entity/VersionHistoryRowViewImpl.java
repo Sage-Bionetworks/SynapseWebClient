@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.widget.entity.file.Md5Link;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
@@ -19,8 +20,8 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class FileHistoryRowViewImpl implements FileHistoryRowView {
-	public interface Binder extends UiBinder<Widget, FileHistoryRowViewImpl> {}
+public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
+	public interface Binder extends UiBinder<Widget, VersionHistoryRowViewImpl> {}
 	
 	@UiField
 	Anchor versionNameLink;
@@ -38,13 +39,17 @@ public class FileHistoryRowViewImpl implements FileHistoryRowView {
 	Button deleteButton;
 	@UiField
 	Div doiWidgetContainer;
+	@UiField
+	TableData sizeTableData;
+	@UiField
+	TableData md5TableData;
 	Callback deleteCallback;
 	UserBadge userBadge;
 	private Widget widget;
 	Md5Link md5Link;
 	
 	@Inject
-	public FileHistoryRowViewImpl(Binder binder, UserBadge userBadge, Md5Link md5Link) {
+	public VersionHistoryRowViewImpl(Binder binder, UserBadge userBadge, Md5Link md5Link) {
 		widget = binder.createAndBindUi(this);
 		this.md5Link = md5Link;
 		deleteButton.addClickHandler(new ClickHandler() {
@@ -93,5 +98,13 @@ public class FileHistoryRowViewImpl implements FileHistoryRowView {
 		if (isVersionSelected) {
 			versionNameLink.addStyleName("boldText");
 		}
+	}
+	@Override
+	public void setMd5TableDataVisible(boolean isVisible) {
+		md5TableData.setVisible(isVisible);
+	}
+	@Override
+	public void setSizeTableDataVisible(boolean isVisible) {
+		sizeTableData.setVisible(isVisible);
 	}
 }

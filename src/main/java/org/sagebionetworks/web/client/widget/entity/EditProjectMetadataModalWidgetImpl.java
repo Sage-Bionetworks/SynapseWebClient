@@ -1,11 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.web.client.StringUtils;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -14,18 +12,17 @@ import com.google.inject.Inject;
 
 public class EditProjectMetadataModalWidgetImpl implements EditProjectMetadataModalView.Presenter, EditProjectMetadataModalWidget {
 	EditProjectMetadataModalView view;
-	SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	Project project;
 	String startingName, startingAlias;
 	Callback handler;
 	
 	@Inject
 	public EditProjectMetadataModalWidgetImpl(EditProjectMetadataModalView view,
-			SynapseClientAsync synapseClient) {
+			SynapseJavascriptClient jsClient) {
 		super();
 		this.view = view;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
+		this.jsClient = jsClient;
 		this.view.setPresenter(this);
 	}
 	
@@ -34,7 +31,7 @@ public class EditProjectMetadataModalWidgetImpl implements EditProjectMetadataMo
 		project.setName(name);
 		project.setAlias(alias);
 		
-		synapseClient.updateEntity(project, new AsyncCallback<Entity>() {
+		jsClient.updateEntity(project, null, null, new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity result) {
 				view.hide();

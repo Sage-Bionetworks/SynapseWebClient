@@ -1,16 +1,21 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.VersionInfo;
-import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2;
 
 import com.google.gwt.core.client.GWT;
@@ -28,13 +33,13 @@ import com.google.inject.Inject;
 /**
  * @author jayhodgson
  */
-public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryWidgetView, IsWidget {
+public class VersionHistoryWidgetViewImpl extends Composite implements VersionHistoryWidgetView, IsWidget {
 	
-	interface FileHistoryWidgetViewImplUiBinder extends UiBinder<Widget, FileHistoryWidgetViewImpl> {
+	interface VersionHistoryWidgetViewImplUiBinder extends UiBinder<Widget, VersionHistoryWidgetViewImpl> {
 	}
 	
-	private static FileHistoryWidgetViewImplUiBinder uiBinder = GWT
-			.create(FileHistoryWidgetViewImplUiBinder.class);
+	private static VersionHistoryWidgetViewImplUiBinder uiBinder = GWT
+			.create(VersionHistoryWidgetViewImplUiBinder.class);
 	
 	private PortalGinInjector ginInjector;
 
@@ -50,23 +55,25 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	Button moreButton;
 	@UiField
 	Div synAlertContainer;
-	PromptTwoValuesModalView editVersionInfoModal;
-	
+	@UiField
+	TableHeader sizeTableHeader;
+	@UiField
+	TableHeader md5TableHeader;
+	CallbackP<List<String>> versionValuesCallback; 
+	PromptForValuesModalView editVersionInfoModal;
+	boolean isTable = false;
 	private static DateTimeFormat shortDateFormat = DateTimeFormat.getShortDateFormat();
 	private Presenter presenter;
 	
 	@Inject
-	public FileHistoryWidgetViewImpl(PortalGinInjector ginInjector, PromptTwoValuesModalView editVersionInfoDialog) {
+	public VersionHistoryWidgetViewImpl(PortalGinInjector ginInjector, PromptForValuesModalView editVersionInfoDialog) {
 		this.ginInjector = ginInjector;
 		this.editVersionInfoModal = editVersionInfoDialog;
 		initWidget(uiBinder.createAndBindUi(this));
-		getElement().setAttribute("highlight-box-title", "File History");
-		editVersionInfoModal.setPresenter(new PromptTwoValuesModalView.Presenter() {
-			@Override
-			public void onPrimary() {
-				presenter.updateVersionInfo(editVersionInfoModal.getValue1(), editVersionInfoModal.getValue2());
-			}
-		});
+		getElement().setAttribute("highlight-box-title", "Version History");
+		versionValuesCallback = values -> {
+			presenter.updateVersionInfo(values.get(0), values.get(1));
+		};
 		editInfoButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -81,6 +88,9 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	@Override
 	public void setEntityBundle(Entity entity, boolean isShowingOlderVersion) {
 		clear();
+		isTable = entity instanceof Table;
+		sizeTableHeader.setVisible(!isTable);
+		md5TableHeader.setVisible(!isTable);
 		currentVersionLink.setTargetHistoryToken(DisplayUtils.getSynapseHistoryTokenNoHash(entity.getId()));
 		currentVersionLink.setVisible(isShowingOlderVersion);
 		if (isShowingOlderVersion) {
@@ -95,7 +105,9 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	
 	@Override
 	public void addVersion(String entityId, final VersionInfo version, boolean canEdit, boolean isVersionSelected) {
-		FileHistoryRowView fileHistoryRow = ginInjector.getFileHistoryRow();
+		VersionHistoryRowView fileHistoryRow = ginInjector.getFileHistoryRow();
+		fileHistoryRow.setMd5TableDataVisible(!isTable);
+		fileHistoryRow.setSizeTableDataVisible(!isTable);
 		DoiWidgetV2 doiWidget = ginInjector.getDoiWidget();
 		doiWidget.setLabelVisible(false);
 		String versionName = version.getVersionLabel();
@@ -108,11 +120,8 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 		} catch (Throwable t) {
 		}
 		String md5 = version.getContentMd5();
-		Callback deleteCallback = new Callback() {
-			@Override
-			public void invoke() {
-				presenter.deleteVersion(version.getVersionNumber());
-			}
+		Callback deleteCallback = () -> {
+			presenter.deleteVersion(version.getVersionNumber());
 		};
 
 		String versionComment = version.getVersionComment();
@@ -164,8 +173,13 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	
 	@Override
 	public void showEditVersionInfo(String oldLabel, String oldComment) {
-		editVersionInfoModal.configure("Edit Version Info", "Version label", oldLabel, "Version comment", oldComment, DisplayConstants.OK);
-		editVersionInfoModal.show();
+		List<String> prompts = new ArrayList<>();
+		prompts.add("Version label");
+		prompts.add("Version comment");
+		List<String> initialValues = new ArrayList<>();
+		initialValues.add(oldLabel);
+		initialValues.add(oldComment);
+		editVersionInfoModal.configureAndShow("Edit Version Info", prompts, initialValues, versionValuesCallback);
 	}
 	
 	@Override
@@ -177,6 +191,7 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	public void hideEditVersionInfo() {
 		editVersionInfoModal.hide();
 	}
+	
 	@Override
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();

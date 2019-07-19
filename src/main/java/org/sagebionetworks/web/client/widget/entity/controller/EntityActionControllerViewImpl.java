@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Pre;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -8,7 +10,8 @@ import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.entity.PromptModalView;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -34,7 +37,7 @@ public class EntityActionControllerViewImpl implements
 	
 	Span widget = new Span();
 	Widget viewWidget = null;
-	PromptModalView promptModalView;
+	PromptForValuesModalView promptForValuesDialog;
 	PortalGinInjector ginInjector;
 	@Inject
 	public EntityActionControllerViewImpl(Binder binder, PortalGinInjector ginInjector){
@@ -46,8 +49,8 @@ public class EntityActionControllerViewImpl implements
 		if (viewWidget == null) {
 			viewWidget = binder.createAndBindUi(this);
 			widget.add(viewWidget);
-			promptModalView = ginInjector.getPromptModal();
-			widget.add(promptModalView);
+			promptForValuesDialog = ginInjector.getPromptForValuesModal();
+			widget.add(promptForValuesDialog);
 		}
 	}
 	
@@ -74,12 +77,10 @@ public class EntityActionControllerViewImpl implements
 	@Override
 	public void showPromptDialog(String title, PromptCallback callback) {
 		lazyConstruct();
-		promptModalView.configure(title, "", "OK", "");
-		promptModalView.setPresenter(() -> {
-			promptModalView.hide();
-			callback.callback(promptModalView.getValue());
+		promptForValuesDialog.configureAndShow(title, "", "", value -> {
+			promptForValuesDialog.hide();
+			callback.callback(value);
 		});
-		promptModalView.show();
 	}
 	
 	@Override
@@ -102,4 +103,14 @@ public class EntityActionControllerViewImpl implements
 		uploadDialogWidgetContainer.clear();
 		uploadDialogWidgetContainer.add(w);
 	}
+	@Override
+	public void showMultiplePromptDialog(String title, List<String> prompts, List<String> initialValues,
+			CallbackP<List<String>> newValuesCallback) {
+		lazyConstruct();
+		promptForValuesDialog.configureAndShow(title, prompts, initialValues, values-> {
+			promptForValuesDialog.hide();
+			newValuesCallback.invoke(values);
+		});
+	}
 }
+

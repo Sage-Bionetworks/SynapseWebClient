@@ -1,17 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.web.client.StringUtils;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.repo.model.EntityType;
-import org.sagebionetworks.repo.model.EntityTypeUtils;
 
 /**
  * A simple modal dialog for renaming an entity.
@@ -19,7 +16,7 @@ import org.sagebionetworks.repo.model.EntityTypeUtils;
  * @author John
  *
  */
-public class RenameEntityModalWidgetImpl implements PromptModalView.Presenter, RenameEntityModalWidget {
+public class RenameEntityModalWidgetImpl implements RenameEntityModalWidget {
 
 	public static final String BUTTON_TEXT = "Rename";
 	public static final String LABLE_SUFFIX = " name";
@@ -27,21 +24,19 @@ public class RenameEntityModalWidgetImpl implements PromptModalView.Presenter, R
 
 	public static final String NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER = "Name must include at least one character.";
 	
-	PromptModalView view;
-	SynapseClientAsync synapseClient;
+	PromptForValuesModalView view;
+	SynapseJavascriptClient jsClient;
 	String parentId;
 	Entity toRename;
 	String startingName;
 	Callback handler;
 	
 	@Inject
-	public RenameEntityModalWidgetImpl(PromptModalView view,
-			SynapseClientAsync synapseClient) {
+	public RenameEntityModalWidgetImpl(PromptForValuesModalView view,
+			SynapseJavascriptClient jsClient) {
 		super();
 		this.view = view;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
-		this.view.setPresenter(this);
+		this.jsClient = jsClient;
 	}
 	
 	
@@ -52,7 +47,7 @@ public class RenameEntityModalWidgetImpl implements PromptModalView.Presenter, R
 	private void updateEntity(final String name) {
 		view.setLoading(true);
 		toRename.setName(name);
-		synapseClient.updateEntity(toRename, new AsyncCallback<Entity>() {
+		jsClient.updateEntity(toRename, null, null, new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity result) {
 				view.hide();
@@ -71,9 +66,8 @@ public class RenameEntityModalWidgetImpl implements PromptModalView.Presenter, R
 	/**
 	 * Should be Called when the rename button is clicked on the dialog.
 	 */
-	@Override
-	public void onPrimary() {
-		String name = StringUtils.emptyAsNull(view.getValue());
+	public void onRename(String newName) {
+		String name = StringUtils.emptyAsNull(newName);
 		if(name == null){
 			view.showError(NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
 		}else if(this.startingName.equals(name)){
@@ -98,8 +92,9 @@ public class RenameEntityModalWidgetImpl implements PromptModalView.Presenter, R
 		this.toRename = toRename;
 		this.startingName = toRename.getName();
 		this.view.clear();
-		this.view.configure(TITLE_PREFIX+typeName, typeName+LABLE_SUFFIX, BUTTON_TEXT, toRename.getName());
-		this.view.show();
+		this.view.configureAndShow(TITLE_PREFIX+typeName, typeName+LABLE_SUFFIX, toRename.getName(), newName -> {
+			onRename(newName);
+		});
 	}
 
 

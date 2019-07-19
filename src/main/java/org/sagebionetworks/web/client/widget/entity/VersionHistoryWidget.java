@@ -29,9 +29,9 @@ import com.google.inject.Inject;
  *
  * @author jayhodgson
  */
-public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWidget {
+public class VersionHistoryWidget implements VersionHistoryWidgetView.Presenter, IsWidget {
 	
-	private FileHistoryWidgetView view;
+	private VersionHistoryWidgetView view;
 	private EntityBundle bundle;
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalApplicationState;
@@ -44,7 +44,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	int currentOffset;
 	
 	@Inject
-	public FileHistoryWidget(FileHistoryWidgetView view,
+	public VersionHistoryWidget(VersionHistoryWidgetView view,
 			 SynapseClientAsync synapseClient,
 			 SynapseJavascriptClient jsClient,
 			 GlobalApplicationState globalApplicationState, 
@@ -89,7 +89,9 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 			vb.setVersionLabel(versionLabel);
 			vb.setVersionComment(comment);
 			synAlert.clear();
-			synapseClient.updateEntity(vb,
+			jsClient.updateEntity(vb,
+					null,
+					null,
 					new AsyncCallback<Entity>() {
 						@Override
 						public void onFailure(Throwable caught) {
@@ -118,7 +120,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 			public void onSuccess(Void result) {
 				view.showInfo("Version "+ versionNumber + " of " + bundle.getEntity().getId() + " " + DisplayConstants.LABEL_DELETED);
 				//SWC-4002: if deleting the version that we're looking at, go to the latest version
-				if (versionNumber.equals(FileHistoryWidget.this.versionNumber)) {
+				if (versionNumber.equals(VersionHistoryWidget.this.versionNumber)) {
 					gotoCurrentVersion();
 				} else {
 					refreshFileHistory();

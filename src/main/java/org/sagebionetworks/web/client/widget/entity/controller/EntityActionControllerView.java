@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import java.util.List;
+
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.web.client.ShowsErrors;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 /**
@@ -40,4 +44,5 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	void showPromptDialog(String title, PromptCallback callback);
 	void setUploadDialogWidget(IsWidget w);
 	void addWidget(IsWidget asWidget);
+	void showMultiplePromptDialog(String title, List<String> prompts, List<String> initialValues, CallbackP<List<String>> newValuesCallback);
 }

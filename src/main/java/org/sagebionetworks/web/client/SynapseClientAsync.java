@@ -183,7 +183,6 @@ public interface SynapseClientAsync {
 	
 	void getHost(String urlString, AsyncCallback<String> callback);
 
-	void updateEntity(Entity toUpdate, AsyncCallback<Entity> callback);
 	void updateFileEntity(FileEntity toUpdate, FileHandleCopyRequest copyRequest, AsyncCallback<Entity> callback);
 	
 	void moveEntity(String entityId, String newParentEntityId, AsyncCallback<Entity> callback);

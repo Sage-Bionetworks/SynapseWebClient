@@ -4,6 +4,7 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.CONTAINER;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.PROJECT;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
@@ -20,6 +21,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.file.FileHandle;
@@ -390,13 +392,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureEditWiki();
 		configureViewWikiSource();
 		configureAddWikiSubpage();
+		configureCreateTableViewSnapshot();
 		configureReorderWikiSubpages();
 		configureDeleteWikiAction();
 		configureMove();
 		configureLink();
 		configureSubmit();
 		configureAnnotations();
-		configureFileHistory();
+		configureVersionHistory();
 		configureFileUpload();
 		configureProvenance();
 		configureChangeStorageLocation();
@@ -687,7 +690,19 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.REORDER_WIKI_SUBPAGES, false);
 		}
 	}
-	
+
+	private void configureCreateTableViewSnapshot(){
+		if(entityBundle.getEntity() instanceof Table && EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity(), cookies)){
+			String tableOrView = entityBundle.getEntity() instanceof TableEntity ? "Table" : "View"; 
+			actionMenu.setActionText(Action.CREATE_TABLE_VERSION, "Create a New "+tableOrView+" Version");
+			actionMenu.setActionVisible(Action.CREATE_TABLE_VERSION, permissions.getCanEdit());
+			actionMenu.setActionListener(Action.CREATE_TABLE_VERSION, this);
+			
+		}else{
+			actionMenu.setActionVisible(Action.CREATE_TABLE_VERSION, false);
+		}
+	}
+
 	private void configureAddWikiSubpage(){
 		if(entityBundle.getEntity() instanceof Project && isWikiableConfig(entityBundle.getEntity(), currentArea) && wikiPageId != null){
 			actionMenu.setActionVisible(Action.ADD_WIKI_SUBPAGE, permissions.getCanEdit());
@@ -726,12 +741,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 	
-	private void configureFileHistory(){
-		if(entityBundle.getEntity() instanceof FileEntity){
-			actionMenu.setActionVisible(Action.SHOW_FILE_HISTORY, true);
-		}else{
-			actionMenu.setActionVisible(Action.SHOW_FILE_HISTORY, false);
-		}
+	private void configureVersionHistory(){
+		boolean isVersionHistoryAvailable = EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity(), cookies);
+		actionMenu.setActionVisible(Action.SHOW_VERSION_HISTORY, isVersionHistoryAvailable);
 	}
 	
 	private void configureSubmit(){
@@ -814,7 +826,16 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			}	
 		}
 	}
-	
+
+	public static boolean isVersionSupported(Entity entity, CookieProvider cookies) {
+		// TODO: remove check for TableEntity once Table versions are released from alpha mode.
+		if (entity instanceof TableEntity) {
+			return DisplayUtils.isInTestWebsite(cookies);
+		}
+		// TODO: remove the EntityView check once View versions are supported (PLFM-4247 is resolved)
+		return entity instanceof Versionable && !(entity instanceof EntityView);
+	}
+
 	public boolean isTopLevelProjectToolsMenu(Entity entity, EntityArea area) {
 		return entity instanceof Project && area != null;
 	}
@@ -924,6 +945,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case ADD_WIKI_SUBPAGE:
 			onAddWikiSubpage();
 			break;
+		case CREATE_TABLE_VERSION :
+			onCreateTableViewSnapshot();
+			break;
 		case MOVE_ENTITY:
 			onMove();
 			break;
@@ -1007,6 +1031,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			postCheckUploadTable();
 		});
 	}
+	
 	private void postCheckUploadTable(){
 		getUploadTableModalWidget().configure(entityBundle.getEntity().getId(), null);
 		getUploadTableModalWidget().showModal(entityUpdatedWizardCallback);
@@ -1036,25 +1061,19 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void onUploadNewFileEntity() {
-		preflightController.checkUploadToEntity(this.entityBundle, new Callback() {
-			@Override
-			public void invoke() {
-				UploadDialogWidget uploader = getNewUploadDialogWidget();
-				uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, null,
-						entityBundle.getEntity().getId(), null, true);
-				uploader.setUploaderLinkNameVisible(true);
-				uploader.show();		
-			}
+		checkUploadEntity(() -> {
+			UploadDialogWidget uploader = getNewUploadDialogWidget();
+			uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, null,
+					entityBundle.getEntity().getId(), null, true);
+			uploader.setUploaderLinkNameVisible(true);
+			uploader.show();		
 		});
 	}
 	
 	private void onCreateFolder() {
-		preflightController.checkUploadToEntity(this.entityBundle, new Callback() {
-			@Override
-			public void invoke() {
-				AddFolderDialogWidget w = getAddFolderDialogWidget();
-				w.show(entityBundle.getEntity().getId());
-			}
+		checkUploadEntity(() -> {
+			AddFolderDialogWidget w = getAddFolderDialogWidget();
+			w.show(entityBundle.getEntity().getId());
 		});
 
 	}
@@ -1081,11 +1100,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void onChangeStorageLocation() {
-		preflightController.checkUploadToEntity(this.entityBundle, new Callback() {
-			@Override
-			public void invoke() {
-				postChangeStorageLocation();
-			}
+		checkUploadEntity(() -> {
+			postChangeStorageLocation();
 		});
 	}
 	
@@ -1100,12 +1116,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void onUploadFile() {
-		// Validate the user can upload to this entity.
-		preflightController.checkUploadToEntity(this.entityBundle, new Callback() {
-			@Override
-			public void invoke() {
-				postCheckUploadFile();
-			}
+		checkUploadEntity(() -> {
+			postCheckUploadFile();
 		});
 	}
 	
@@ -1118,12 +1130,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void onSubmit() {
-		// Validate the user can update this entity.
-		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
-			@Override
-			public void invoke() {
-				postOnSubmit();
-			}
+		checkUpdateEntity(() -> {
+			postOnSubmit();
 		});
 	}
 	
@@ -1132,12 +1140,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void onLink() {
-		// Validate the user can update this entity.
-		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
-			@Override
-			public void invoke() {
-				postCheckLink();
-			}
+		checkUpdateEntity(() -> {
+			postCheckLink();
 		});
 	}
 	
@@ -1252,13 +1256,17 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		});	
 	}
 	
+	private void checkUploadEntity(Callback cb) {
+		preflightController.checkUploadToEntity(this.entityBundle, cb);
+	}
+
+	private void checkUpdateEntity(Callback cb) {
+		preflightController.checkUpdateEntity(this.entityBundle, cb);
+	}
+	
 	private void onEditWiki() {
-		// Validate the user can update this entity.
-		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
-			@Override
-			public void invoke() {
-				postCheckEditWiki();
-			}
+		checkUpdateEntity(() -> {
+			postCheckEditWiki();
 		});
 	}
 	
@@ -1270,13 +1278,45 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		});
 	}
 
+	private void onCreateTableViewSnapshot() {
+		if (isCurrentVersion) {
+			checkUpdateEntity(() -> {
+				postCheckCreateTableViewSnapshot();
+			});
+		} else {
+			view.showErrorMessage("Can only create a new version from the current table, not an old version.");
+		}
+	}
+	
+	private void postCheckCreateTableViewSnapshot() {
+		// prompt for new version label and comment
+		List<String> prompts = new ArrayList<>();
+		prompts.add("Label");
+		prompts.add("Comment");
+		view.showMultiplePromptDialog("New Version", prompts, null, values -> {
+			String label = values.get(0);
+			String comment = values.get(0);
+			VersionableEntity entity = (VersionableEntity)entityBundle.getEntity();
+			entity.setVersionLabel(label);
+			entity.setVersionComment(comment);
+			boolean newVersion = true;
+			// TODO: change this to use the new "create table snapshot" service when it's available.
+			getSynapseJavascriptClient().updateEntity(entity, null, newVersion, new AsyncCallback<Entity>() {
+				@Override
+				public void onSuccess(Entity result) {
+					fireEntityUpdatedEvent();
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(caught.getMessage());
+				}
+			});
+		});
+	}
+	
 	private void onAddWikiSubpage() {
-		// Validate the user can update this entity.
-		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
-			@Override
-			public void invoke() {
-				postCheckAddWikiSubpage();
-			}
+		checkUpdateEntity(() -> {
+			postCheckAddWikiSubpage();
 		});
 	}
 	
@@ -1299,27 +1339,23 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			page.setParentWikiId(wikiPageId);
 			page.setTitle(name);
 			getSynapseClient().createV2WikiPageWithV1(entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), page, new AsyncCallback<WikiPage>() {
-	            @Override
-	            public void onSuccess(WikiPage result) {
-	                view.showInfo("'" + name + "' Page Added");
-	                Synapse newPlace = new Synapse(entityBundle.getEntity().getId(), getVersion(), EntityArea.WIKI, result.getId());
-	                getGlobalApplicationState().getPlaceChanger().goTo(newPlace);
-	            }
-	            @Override
-	            public void onFailure(Throwable caught) {
-	            	view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED + ": " + caught.getMessage());
-	            }
-	        });
+				@Override
+				public void onSuccess(WikiPage result) {
+					view.showInfo("'" + name + "' Page Added");
+					Synapse newPlace = new Synapse(entityBundle.getEntity().getId(), getVersion(), EntityArea.WIKI, result.getId());
+					getGlobalApplicationState().getPlaceChanger().goTo(newPlace);
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED + ": " + caught.getMessage());
+				}
+			});
 		}
 	}
 	
 	private void onRename() {
-		// Validate the user can update this entity.
-		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
-			@Override
-			public void invoke() {
-				postCheckRename();
-			}
+		checkUpdateEntity(() -> {
+			postCheckRename();
 		});
 	}
 	
@@ -1336,11 +1372,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		// Can only edit file metadata of the current file version
 		if (isCurrentVersion) {
 			// Validate the user can update this entity.
-			preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
-				@Override
-				public void invoke() {
-					postCheckEditFileMetadata();
-				}
+			checkUpdateEntity(() -> {
+				postCheckEditFileMetadata();
 			});
 		} else {
 			view.showErrorMessage("Can only edit the metadata of the most recent file version.");
@@ -1359,12 +1392,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void onEditProjectMetadata() {
-		// Validate the user can update this entity.
-		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
-			@Override
-			public void invoke() {
-				postCheckEditProjectMetadata();
-			}
+		checkUpdateEntity(() -> {
+			postCheckEditProjectMetadata();
 		});
 	}
 	

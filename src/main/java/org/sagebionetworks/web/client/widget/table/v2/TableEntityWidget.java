@@ -11,7 +11,6 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
@@ -19,7 +18,6 @@ import org.sagebionetworks.web.client.widget.entity.controller.PreflightControll
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
@@ -70,6 +68,8 @@ public class TableEntityWidget implements IsWidget,
 
 	EntityBundle entityBundle;
 	String tableId;
+	Long tableVersionNumber = null;
+	boolean isCurrentVersion = true;
 	TableBundle tableBundle;
 	boolean canEdit, canEditResults;
 	TableType tableType;
@@ -151,18 +151,20 @@ public class TableEntityWidget implements IsWidget,
 	 * @param queryString
 	 * @param qch
 	 */
-	public void configure(EntityBundle bundle, boolean canEdit,
+	public void configure(EntityBundle bundle, Long versionNumber, boolean canEdit,
 			QueryChangeHandler qch, ActionMenuWidget actionMenu) {
 		this.entityBundle = bundle;
 		Entity table = bundle.getEntity();
 		this.tableType = TableType.getTableType(table);
 		queryInputWidget.setDownloadFilesVisible(tableType.isIncludeFiles());
 		this.tableId = bundle.getEntity().getId();
+		this.tableVersionNumber = versionNumber;
+		this.isCurrentVersion = tableVersionNumber == null;
 		this.tableBundle = bundle.getTableBundle();
 		this.canEdit = canEdit;
 		this.canEditResults = canEdit;
 		this.queryChangeHandler = qch;
-		this.view.configure(bundle, this.canEdit);
+		this.view.configure(bundle, this.canEdit && isCurrentVersion);
 		this.actionMenu = actionMenu;
 		this.entityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass()));
 		addToDownloadList.clear();
@@ -182,42 +184,27 @@ public class TableEntityWidget implements IsWidget,
 		view.setSchemaVisible(false);
 		actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, SHOW+entityTypeDisplay+SCHEMA);
 		actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, SHOW + SCOPE + entityTypeDisplay);
-		this.actionMenu.setActionListener(Action.UPLOAD_TABLE_DATA, new ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				onUploadTableData();
-			}
+		this.actionMenu.setActionListener(Action.UPLOAD_TABLE_DATA, action -> {
+			onUploadTableData();
 		});
-		this.actionMenu.setActionListener(Action.DOWNLOAD_TABLE_QUERY_RESULTS, new ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				onDownloadResults();
-			}
+		this.actionMenu.setActionListener(Action.DOWNLOAD_TABLE_QUERY_RESULTS, action -> {
+			onDownloadResults();
 		});
-		this.actionMenu.setActionListener(Action.EDIT_TABLE_DATA, new ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				onEditResults();
-			}
+		this.actionMenu.setActionListener(Action.EDIT_TABLE_DATA, action -> {
+			onEditResults();
 		});
-		this.actionMenu.setActionListener(Action.SHOW_TABLE_SCHEMA, new ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				isShowingSchema = !isShowingSchema;
-				view.setSchemaVisible(isShowingSchema);
-				String showHide = isShowingSchema ? HIDE : SHOW;
-				actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, showHide+entityTypeDisplay+SCHEMA);
-			}
+		this.actionMenu.setActionListener(Action.SHOW_TABLE_SCHEMA, action -> {
+			isShowingSchema = !isShowingSchema;
+			view.setSchemaVisible(isShowingSchema);
+			String showHide = isShowingSchema ? HIDE : SHOW;
+			actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, showHide+entityTypeDisplay+SCHEMA);
 		});
 		
-		this.actionMenu.setActionListener(Action.SHOW_VIEW_SCOPE, new ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				isShowingScope = !isShowingScope;
-				view.setScopeVisible(isShowingScope);
-				String showHide = isShowingScope ? HIDE : SHOW;
-				actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, showHide + SCOPE + entityTypeDisplay);
-			}
+		this.actionMenu.setActionListener(Action.SHOW_VIEW_SCOPE, action -> {
+			isShowingScope = !isShowingScope;
+			view.setScopeVisible(isShowingScope);
+			String showHide = isShowingScope ? HIDE : SHOW;
+			actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, showHide + SCOPE + entityTypeDisplay);
 		});
 	}
 
@@ -396,6 +383,9 @@ public class TableEntityWidget implements IsWidget,
 		StringBuilder builder = new StringBuilder();
 		builder.append(SELECT_FROM);
 		builder.append(this.tableId);
+		if (!isCurrentVersion) {
+			builder.append("." + this.tableVersionNumber);
+		}
 		Query query = new Query();
 		query.setIncludeEntityEtag(true);
 		query.setSql(builder.toString());
@@ -457,12 +447,16 @@ public class TableEntityWidget implements IsWidget,
 
 	@Override
 	public void onEditResults() {
-		preflightController.checkUploadToEntity(this.entityBundle, new Callback() {
-			@Override
-			public void invoke() {
-				postCheckEditResults();
-			}
-		});
+		if (isCurrentVersion) {
+			preflightController.checkUploadToEntity(this.entityBundle, new Callback() {
+				@Override
+				public void invoke() {
+					postCheckEditResults();
+				}
+			});
+		} else {
+			view.showErrorMessage("Can only edit data in the most recent table/view version.");
+		}
 	}
 	
 	/**
@@ -479,12 +473,17 @@ public class TableEntityWidget implements IsWidget,
 	}
 	
 	public void onUploadTableData(){
-		// proceed as long as the user has meet all upload pre-flight checks
-		this.preflightController.checkUploadToEntity(this.entityBundle, new Callback(){
-			@Override
-			public void invoke() {
-				postCheckonUploadTableData();
-			}});
+		if (isCurrentVersion) {
+			// proceed as long as the user has meet all upload pre-flight checks
+			this.preflightController.checkUploadToEntity(this.entityBundle, new Callback(){
+				@Override
+				public void invoke() {
+					postCheckonUploadTableData();
+				}});
+		} else {
+			view.showErrorMessage("Can only upload data to the most recent table/view version.");
+		}
+
 	}
 	
 	/**

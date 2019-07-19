@@ -10,7 +10,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author jayhodgson
  *
  */
-public interface FileHistoryWidgetView extends IsWidget, SynapseView{
+public interface VersionHistoryWidgetView extends IsWidget, SynapseView{
 	
 	interface Presenter {
 		void updateVersionInfo(String newLabel, String newComment);

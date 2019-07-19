@@ -37,7 +37,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
-import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
+import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
@@ -56,7 +56,7 @@ public class EntityMetadataTest {
 	@Mock
 	RestrictionWidget mockRestrictionWidgetV2;
 	@Mock
-	FileHistoryWidget mockFileHistoryWidget;
+	VersionHistoryWidget mockFileHistoryWidget;
 	@Mock
 	DoiAssociation mockDoiAssociation;
 	@Mock
@@ -77,7 +77,7 @@ public class EntityMetadataTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		when(mockGinInjector.getFileHistoryWidget()).thenReturn(mockFileHistoryWidget);
+		when(mockGinInjector.getVersionHistoryWidget()).thenReturn(mockFileHistoryWidget);
 		widget = new EntityMetadata(mockView, mockDoiWidgetV2, mockAnnotationsWidget,
 				mockJsClient, mockJSNI, mockRestrictionWidgetV2, mockGinInjector);
 	}
@@ -86,7 +86,7 @@ public class EntityMetadataTest {
 	public void testConstruction() {
 		verify(mockView).setDoiWidget(any(IsWidget.class));
 		verify(mockView).setAnnotationsRendererWidget(any(IsWidget.class));
-		verify(mockView, never()).setFileHistoryWidget(any(IsWidget.class)); //lazily created
+		verify(mockView, never()).setVersionHistoryWidget(any(IsWidget.class)); //lazily created
 		verify(mockView).setRestrictionWidgetV2(any(IsWidget.class));
 		verify(mockRestrictionWidgetV2).setShowChangeLink(true);
 		verify(mockRestrictionWidgetV2).setShowIfProject(false);

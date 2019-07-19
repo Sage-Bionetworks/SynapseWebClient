@@ -1,11 +1,9 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.EntityView;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -51,7 +49,7 @@ Scope Widget - these are the UI output elements in this widget:
 public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Presenter {
 	boolean isEditable;
 	ScopeWidgetView view;
-	SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	EntityBundle bundle;
 	EntityContainerListWidget viewScopeWidget, editScopeWidget;
 	SynapseAlert synAlert;
@@ -65,13 +63,12 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 	 */
 	@Inject
 	public ScopeWidget(ScopeWidgetView view, 
-			SynapseClientAsync synapseClient, 
+			SynapseJavascriptClient jsClient,
 			EntityContainerListWidget viewScopeWidget, 
 			EntityContainerListWidget editScopeWidget,
 			SynapseAlert synAlert,
 			EventBus eventBus){
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
+		this.jsClient = jsClient;
 		this.view = view;
 		this.viewScopeWidget = viewScopeWidget;
 		this.editScopeWidget = editScopeWidget;
@@ -118,7 +115,7 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 		currentView.setScopeIds(editScopeWidget.getEntityIds());
 		currentView.setViewTypeMask(tableType.getViewTypeMask().longValue());
 		currentView.setType(null);
-		synapseClient.updateEntity(currentView, new AsyncCallback<Entity>() {
+		jsClient.updateEntity(currentView, null, null, new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity entity) {
 				view.setLoading(false);

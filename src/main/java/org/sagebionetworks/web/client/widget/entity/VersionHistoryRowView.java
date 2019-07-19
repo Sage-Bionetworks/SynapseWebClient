@@ -4,7 +4,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface FileHistoryRowView extends IsWidget {
+public interface VersionHistoryRowView extends IsWidget {
 
 	void configure(
 			Long versionNumber,
@@ -20,4 +20,6 @@ public interface FileHistoryRowView extends IsWidget {
 	
 	void setCanEdit(boolean canEdit);
 	void setIsVersionSelected(boolean isVersionSelected);
+	void setSizeTableDataVisible(boolean isVisible);
+	void setMd5TableDataVisible(boolean isVisible);
 }

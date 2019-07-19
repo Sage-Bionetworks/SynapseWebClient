@@ -234,18 +234,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		return  new PaginatedResults<T>(in.getResults(), in.getTotalNumberOfResults());
 	}
 	
-	/**
-	 * Update an entity.
-	 */
-	public Entity updateEntity(Entity toUpdate) throws RestServiceException{
-		try {
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			return synapseClient.putEntity(toUpdate);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
 	@Override
 	public Entity moveEntity(String entityId, String newParentEntityId) throws RestServiceException{
 		try {

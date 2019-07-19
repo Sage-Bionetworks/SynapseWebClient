@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static junit.framework.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -10,9 +10,11 @@ import static org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidg
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.file.FileHandle;
@@ -20,6 +22,7 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalView;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidgetImpl;
@@ -27,11 +30,14 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+@RunWith(MockitoJUnitRunner.class)
 public class EditFileMetadataModalWidgetTest {
 	@Mock
 	EditFileMetadataModalView mockView;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
 	@Mock
 	Callback mockCallback;
 	String parentId;
@@ -53,7 +59,6 @@ public class EditFileMetadataModalWidgetTest {
 			
 	@Before
 	public void before(){
-		MockitoAnnotations.initMocks(this);
 		when(mockFileEntity.getName()).thenReturn(OLD_NAME);
 		when(mockFileEntity.getDataFileHandleId()).thenReturn(OLD_DATA_FILE_HANDLE_ID);
 		when(mockFileHandle.getContentType()).thenReturn(OLD_CONTENT_TYPE);
@@ -61,7 +66,7 @@ public class EditFileMetadataModalWidgetTest {
 		when(mockFileHandle.getId()).thenReturn(OLD_DATA_FILE_HANDLE_ID);
 		when(mockFileEntity.getId()).thenReturn(ENTITY_ID);
 		
-		widget = new EditFileMetadataModalWidgetImpl(mockView, mockSynapseClient);
+		widget = new EditFileMetadataModalWidgetImpl(mockView, mockSynapseClient, mockJsClient);
 		when(mockView.getEntityName()).thenReturn(NEW_NAME);
 		when(mockView.getFileName()).thenReturn(NEW_FILENAME);
 		when(mockView.getContentType()).thenReturn(NEW_CONTENT_TYPE);
@@ -122,7 +127,7 @@ public class EditFileMetadataModalWidgetTest {
 		widget.onPrimary();
 		verify(mockView, never()).setLoading(true);
 		verify(mockView).hide();
-		verify(mockSynapseClient, never()).updateEntity(any(Entity.class), any(AsyncCallback.class));
+		verify(mockJsClient, never()).updateEntity(any(Entity.class), anyString(), anyBoolean(), any(AsyncCallback.class));
 		// should only be called on success
 		verify(mockCallback, never()).invoke();
 	}
@@ -134,14 +139,14 @@ public class EditFileMetadataModalWidgetTest {
 		when(mockView.getContentType()).thenReturn(OLD_CONTENT_TYPE);
 		
 		widget.configure(mockFileEntity, mockFileHandle, mockCallback);
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).updateEntity(any(Entity.class), anyString(), anyBoolean(), any(AsyncCallback.class));
 		
 		// save button
 		widget.onPrimary();
 		verify(mockView).setLoading(true);
 		verify(mockView).hide();
 		verify(mockCallback).invoke();
-		verify(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
+		verify(mockJsClient).updateEntity(any(Entity.class), anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockFileEntity).setName(NEW_NAME);
 	}
 	
@@ -176,7 +181,7 @@ public class EditFileMetadataModalWidgetTest {
 		
 		Exception error = new Exception("an object already exists with that name");
 		widget.configure(mockFileEntity, mockFileHandle, mockCallback);
-		AsyncMockStubber.callFailureWith(error).when(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(error).when(mockJsClient).updateEntity(any(Entity.class), anyString(), anyBoolean(), any(AsyncCallback.class));
 		// save button
 		widget.onPrimary();
 		verify(mockView).setLoading(true);

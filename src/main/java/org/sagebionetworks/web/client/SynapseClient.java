@@ -62,14 +62,6 @@ public interface SynapseClient extends RemoteService{
 	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds) throws RestServiceException;
 	
 	/**
-	 * Update an entity.
-	 * @param toUpdate
-	 * @return
-	 * @throws RestServiceException
-	 */
-	Entity updateEntity(Entity toUpdate) throws RestServiceException;
-	
-	/**
 	 * Updates the user's profile json object 
 	 * @param userProfile json object of the user's profile
 	 * @throws RestServiceException

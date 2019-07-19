@@ -24,11 +24,12 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -70,7 +71,7 @@ import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
-import org.sagebionetworks.web.client.widget.entity.PromptModalView;
+import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidget;
 import org.sagebionetworks.web.client.widget.profile.ProfileCertifiedValidatedWidget;
@@ -89,8 +90,8 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ProfilePresenterTest {
-	
 	ProfilePresenter profilePresenter;
 	@Mock
 	ProfileView mockView;
@@ -130,6 +131,7 @@ public class ProfilePresenterTest {
 	OpenTeamInvitationsWidget mockTeamInviteWidget;
 	@Captor
 	ArgumentCaptor<PrincipalAliasRequest> principalAliasRequestCaptor;
+
 	Long targetUserIdLong = 12345L;
 	String targetUserId = targetUserIdLong.toString();
 	String targetUsername = "jediknight";
@@ -145,7 +147,7 @@ public class ProfilePresenterTest {
 	@Mock
 	LoadMoreWidgetContainer mockLoadMoreContainer;
 	@Mock
-	PromptModalView mockPromptModalView;
+	PromptForValuesModalView mockPromptModalView;
 	@Captor
 	ArgumentCaptor<CallbackP> callbackPCaptor;
 	@Captor
@@ -172,7 +174,6 @@ public class ProfilePresenterTest {
 	public static final String NEXT_PAGE_TOKEN = "19282";
 	@Before
 	public void setup() throws JSONObjectAdapterException {
-		MockitoAnnotations.initMocks(this);
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 		profilePresenter = new ProfilePresenter(mockView, 
 				mockAuthenticationController, 
@@ -186,7 +187,7 @@ public class ProfilePresenterTest {
 				);
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		when(mockInjector.getPromptModal()).thenReturn(mockPromptModalView);
+		when(mockInjector.getPromptForValuesModal()).thenReturn(mockPromptModalView);
 		when(mockInjector.getUserProfileModalWidget()).thenReturn(mockUserProfileModalWidget);
 		when(mockInjector.getProfileCertifiedValidatedWidget()).thenReturn(mockProfileCertifiedValidatedWidget);
 		when(mockInjector.getProjectBadgeWidget()).thenReturn(mockProjectBadge);
@@ -676,8 +677,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testCreateProject() {
-		when(mockPromptModalView.getValue()).thenReturn("valid name");
-		profilePresenter.createProjectAfterPrompt();
+		profilePresenter.createProjectAfterPrompt("valid name");
 		verify(mockSynapseJavascriptClient).createEntity(any(Entity.class));
 		//inform user of success, and go to new project page
 		verify(mockView).showInfo(anyString());
@@ -686,14 +686,12 @@ public class ProfilePresenterTest {
 
 	@Test
 	public void testCreateProjectEmptyName() {
-		when(mockPromptModalView.getValue()).thenReturn("");
-		profilePresenter.createProjectAfterPrompt();
+		profilePresenter.createProjectAfterPrompt("");
 		verify(mockSynapseJavascriptClient, never()).createEntity(any(Entity.class));
 		verify(mockPromptModalView).showError(anyString());
 		reset(mockPromptModalView);
 		
-		when(mockPromptModalView.getValue()).thenReturn(null);
-		profilePresenter.createProjectAfterPrompt();
+		profilePresenter.createProjectAfterPrompt(null);
 
 		verify(mockSynapseJavascriptClient, never()).createEntity(any(Entity.class));
 		verify(mockPromptModalView).showError(anyString());
@@ -701,20 +699,17 @@ public class ProfilePresenterTest {
 
 	@Test
 	public void testCreateProjectError() {
-		when(mockPromptModalView.getValue()).thenReturn("valid name");
-		profilePresenter.createProjectAfterPrompt();
 		String errorMessage = "unhandled";
 		when(mockSynapseJavascriptClient.createEntity(any(Entity.class))).thenReturn(getFailedFuture(new Exception(errorMessage)));
 		
-		profilePresenter.createProjectAfterPrompt();
+		profilePresenter.createProjectAfterPrompt("valid name");
 		verify(mockPromptModalView).showError(errorMessage);
 	}
 	
 	@Test
 	public void testCreateProjectNameConflictError() {
 		when(mockSynapseJavascriptClient.createEntity(any(Entity.class))).thenReturn(getFailedFuture(new ConflictException("special handled exception type")));
-		when(mockPromptModalView.getValue()).thenReturn("valid name");
-		profilePresenter.createProjectAfterPrompt();
+		profilePresenter.createProjectAfterPrompt("valid name");
 		verify(mockPromptModalView).showError(eq(DisplayConstants.WARNING_PROJECT_NAME_EXISTS));
 	}
 	
@@ -735,8 +730,7 @@ public class ProfilePresenterTest {
 
 	@Test
 	public void testCreateTeam() {
-		when(mockPromptModalView.getValue()).thenReturn("valid name");
-		profilePresenter.createTeamAfterPrompt();
+		profilePresenter.createTeamAfterPrompt("valid name");
 		verify(mockSynapseJavascriptClient).createTeam(any(Team.class), any(AsyncCallback.class));
 		//inform user of success, and go to new team page
 		verify(mockView).showInfo(anyString());
@@ -745,13 +739,11 @@ public class ProfilePresenterTest {
 
 	@Test
 	public void testCreateTeamEmptyName() {
-		when(mockPromptModalView.getValue()).thenReturn("");
-		profilePresenter.createTeamAfterPrompt();
+		profilePresenter.createTeamAfterPrompt("");
 		verify(mockSynapseJavascriptClient, never()).createTeam(any(Team.class), any(AsyncCallback.class));
 		verify(mockPromptModalView).showError(anyString());
 		reset(mockPromptModalView);
-		when(mockPromptModalView.getValue()).thenReturn(null);
-		profilePresenter.createTeamAfterPrompt();
+		profilePresenter.createTeamAfterPrompt(null);
 		verify(mockSynapseJavascriptClient, never()).createTeam(any(Team.class), any(AsyncCallback.class));
 		verify(mockPromptModalView).showError(anyString());
 	}
@@ -760,19 +752,16 @@ public class ProfilePresenterTest {
 	public void testCreateTeamError() {
 		String errorMessage = "unhandled";
 		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseJavascriptClient).createTeam(any(Team.class), any(AsyncCallback.class));
-		when(mockPromptModalView.getValue()).thenReturn("valid name");
-		profilePresenter.createTeamAfterPrompt();
+		profilePresenter.createTeamAfterPrompt("valid name");
 		verify(mockPromptModalView).showError(errorMessage);
 	}
 	
 	@Test
 	public void testCreateTeamNameConflictError() {
 		AsyncMockStubber.callFailureWith(new ConflictException("special handled exception type")).when(mockSynapseJavascriptClient).createTeam(any(Team.class), any(AsyncCallback.class));
-		when(mockPromptModalView.getValue()).thenReturn("valid name");
-		profilePresenter.createTeamAfterPrompt();
+		profilePresenter.createTeamAfterPrompt("valid name");
 		verify(mockPromptModalView).showError(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
 	}
-	
 	
 	//Challenge tests
 	

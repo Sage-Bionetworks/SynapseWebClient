@@ -23,7 +23,8 @@
 						<a:ActionMenuItem icon="HDD_O" iconFixedWidth="true" action="SHOW_VIEW_SCOPE">Scope</a:ActionMenuItem>
 						<a:ActionMenuItem icon="DATABASE" iconFixedWidth="true" action="CHANGE_STORAGE_LOCATION">Change Storage Location</a:ActionMenuItem>
 						<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_NEW_FILE">Upload a New Version of File</a:ActionMenuItem>
-						<a:ActionMenuItem icon="HISTORY" iconFixedWidth="true" action="SHOW_FILE_HISTORY">File Version History</a:ActionMenuItem>
+						<a:ActionMenuItem icon="HISTORY" iconFixedWidth="true" action="CREATE_TABLE_VERSION">Create a New Table/View Version</a:ActionMenuItem>
+						<a:ActionMenuItem icon="HISTORY" iconFixedWidth="true" action="SHOW_VERSION_HISTORY">Version History</a:ActionMenuItem>
 						<a:ActionMenuItem icon="TELEVISION" iconFixedWidth="true" action="PROJECT_DISPLAY">Project Display Settings</a:ActionMenuItem>
 						<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_TABLE_DATA">Upload Data to Table</a:ActionMenuItem>
 						<a:ActionMenuItem icon="DOWNLOAD" iconFixedWidth="true" action="DOWNLOAD_TABLE_QUERY_RESULTS">Download Data</a:ActionMenuItem>

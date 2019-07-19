@@ -80,17 +80,17 @@ import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidg
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
-import org.sagebionetworks.web.client.widget.entity.FileHistoryRowView;
-import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
-import org.sagebionetworks.web.client.widget.entity.PromptModalView;
+import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
+import org.sagebionetworks.web.client.widget.entity.VersionHistoryRowView;
+import org.sagebionetworks.web.client.widget.entity.VersionHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialog;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
@@ -466,8 +466,8 @@ public interface PortalGinInjector extends Ginjector {
 	EvaluationSubmitter getEvaluationSubmitter();
 	RegisterTeamDialog getRegisterTeamDialog();
 	AnnotationEditor getAnnotationEditor();
-	FileHistoryRowView getFileHistoryRow();
-	FileHistoryWidget getFileHistoryWidget();
+	VersionHistoryRowView getFileHistoryRow();
+	VersionHistoryWidget getVersionHistoryWidget();
 	
 	JoinTeamConfigEditor getJoinTeamConfigEditor();
 	ModifiedCreatedByWidget getModifiedCreatedByWidget();
@@ -571,7 +571,7 @@ public interface PortalGinInjector extends Ginjector {
 	DownloadTableQueryModalWidget getDownloadTableQueryModalWidget();
 	CopyTextModal getCopyTextModal();
 	UserProfileModalWidget getUserProfileModalWidget();
-	PromptModalView getPromptModal();
+	PromptForValuesModalView getPromptForValuesModal();
 	CroppedImageUploadViewImpl getCroppedImageUploadView();
 	ImageUploadView getImageUploadView();
 	LazyLoadHelper getLazyLoadHelper();
