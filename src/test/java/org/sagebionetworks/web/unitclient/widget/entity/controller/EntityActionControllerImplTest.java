@@ -310,7 +310,7 @@ public class EntityActionControllerImplTest {
 	}
 
 	@Test
-	public void testConfigure(){
+	public void testConfigureWithTableEntity(){
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		verify(mockGWT).scheduleExecution(any(Callback.class), anyInt());
@@ -327,8 +327,11 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionListener(Action.CHANGE_ENTITY_NAME, controller);
 		// upload
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
-		// file history
+		// version history
 		verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
+		// create table version (snapshot)
+		verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, true);
+		verify(mockActionMenu).setActionListener(Action.CREATE_TABLE_VERSION, controller);
 	}
 	
 	@Test
@@ -521,7 +524,7 @@ public class EntityActionControllerImplTest {
 	}
 	
 	@Test
-	public void testConfigureFileHistory() {
+	public void testConfigureVersionHistory() {
 		Entity file = new FileEntity();
 		file.setId(entityId);
 		file.setParentId(parentId);
@@ -618,6 +621,7 @@ public class EntityActionControllerImplTest {
 		entityBundle.setRootWikiId(null);
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, false);
+		verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, false);
 	}
 	
 

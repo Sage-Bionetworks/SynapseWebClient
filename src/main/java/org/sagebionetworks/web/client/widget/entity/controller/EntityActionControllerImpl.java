@@ -692,7 +692,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void configureCreateTableViewSnapshot(){
-		// TODO: remove cookie check to take out of alpha mode
 		if(entityBundle.getEntity() instanceof Table && EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity(), cookies)){
 			String tableOrView = entityBundle.getEntity() instanceof TableEntity ? "Table" : "View"; 
 			actionMenu.setActionText(Action.CREATE_TABLE_VERSION, "Create a New "+tableOrView+" Version");
