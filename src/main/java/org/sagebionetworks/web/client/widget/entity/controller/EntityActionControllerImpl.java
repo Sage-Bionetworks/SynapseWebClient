@@ -392,7 +392,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureEditWiki();
 		configureViewWikiSource();
 		configureAddWikiSubpage();
-		configureCreateTableViewVersion();
+		configureCreateTableViewSnapshot();
 		configureReorderWikiSubpages();
 		configureDeleteWikiAction();
 		configureMove();
@@ -691,9 +691,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 
-	private void configureCreateTableViewVersion(){
+	private void configureCreateTableViewSnapshot(){
 		// TODO: remove cookie check to take out of alpha mode
-		if(entityBundle.getEntity() instanceof Table && DisplayUtils.isInTestWebsite(cookies)){
+		if(entityBundle.getEntity() instanceof Table && EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity(), cookies)){
 			String tableOrView = entityBundle.getEntity() instanceof TableEntity ? "Table" : "View"; 
 			actionMenu.setActionText(Action.CREATE_TABLE_VERSION, "Create a New "+tableOrView+" Version");
 			actionMenu.setActionVisible(Action.CREATE_TABLE_VERSION, permissions.getCanEdit());
@@ -743,14 +743,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureVersionHistory(){
-		if(entityBundle.getEntity() instanceof Versionable){
-			// TODO: remove to expose version history for tables/views
-			// show version history if not a Table, or if we're in alpha mode
-			boolean isVersionHistoryVisible = !(entityBundle.getEntity() instanceof Table) || DisplayUtils.isInTestWebsite(cookies);
-			actionMenu.setActionVisible(Action.SHOW_VERSION_HISTORY, isVersionHistoryVisible);
-		}else{
-			actionMenu.setActionVisible(Action.SHOW_VERSION_HISTORY, false);
-		}
+		boolean isVersionHistoryAvailable = EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity(), cookies);
+		actionMenu.setActionVisible(Action.SHOW_VERSION_HISTORY, isVersionHistoryAvailable);
 	}
 	
 	private void configureSubmit(){
@@ -833,7 +827,16 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			}	
 		}
 	}
-	
+
+	public static boolean isVersionSupported(Entity entity, CookieProvider cookies) {
+		// TODO: remove check for TableEntity once Table versions are released from alpha mode.
+		if (entity instanceof TableEntity) {
+			return DisplayUtils.isInTestWebsite(cookies);
+		}
+		// TODO: remove the EntityView check once View versions are supported (PLFM-4247 is resolved)
+		return entity instanceof Versionable && !(entity instanceof EntityView);
+	}
+
 	public boolean isTopLevelProjectToolsMenu(Entity entity, EntityArea area) {
 		return entity instanceof Project && area != null;
 	}
@@ -944,7 +947,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			onAddWikiSubpage();
 			break;
 		case CREATE_TABLE_VERSION :
-			onCreateTableVersion();
+			onCreateTableViewSnapshot();
 			break;
 		case MOVE_ENTITY:
 			onMove();
@@ -1276,17 +1279,17 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		});
 	}
 
-	private void onCreateTableVersion() {
+	private void onCreateTableViewSnapshot() {
 		if (isCurrentVersion) {
 			checkUpdateEntity(() -> {
-				postCheckCreateTableVersion();
+				postCheckCreateTableViewSnapshot();
 			});
 		} else {
-			view.showErrorMessage("Can only create a new version from the latest table/view state.");
+			view.showErrorMessage("Can only create a new version from the current table, not an old version.");
 		}
 	}
 	
-	private void postCheckCreateTableVersion() {
+	private void postCheckCreateTableViewSnapshot() {
 		// prompt for new version label and comment
 		List<String> prompts = new ArrayList<>();
 		prompts.add("Label");
@@ -1298,6 +1301,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			entity.setVersionLabel(label);
 			entity.setVersionComment(comment);
 			boolean newVersion = true;
+			// TODO: change this to use the new "create table snapshot" service when it's available.
 			getSynapseJavascriptClient().updateEntity(entity, null, newVersion, new AsyncCallback<Entity>() {
 				@Override
 				public void onSuccess(Entity result) {

@@ -38,6 +38,7 @@ import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -104,6 +105,8 @@ public class TablesTabTest {
 	ArgumentCaptor<CallbackP> callbackPCaptor;
 	@Mock
 	EntityHeader mockEntityHeader;
+	@Mock
+	CookieProvider mockCookies;
 	String projectEntityId = "syn666666";
 	String projectName = "a test project";
 	String tableEntityId = "syn22";
@@ -120,7 +123,8 @@ public class TablesTabTest {
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		tab = new TablesTab(mockTab, mockPortalGinInjector);
-		
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		when(mockPortalGinInjector.getCookieProvider()).thenReturn(mockCookies);
 		when(mockPortalGinInjector.getTablesTabView()).thenReturn(mockView);
 		when(mockPortalGinInjector.getTableListWidget()).thenReturn(mockTableListWidget);
 		when(mockPortalGinInjector.getBasicTitleBar()).thenReturn(mockBasicTitleBar);
@@ -199,6 +203,7 @@ public class TablesTabTest {
 	@Test
 	public void testConfigureUsingFileView() {
 		Long version = 29L;
+		Long expectedVersion = null; // EntityView is not supported, so we expect to configure all subcomponents with a null version for this type.
 		when(mockTableEntityBundle.getEntity()).thenReturn(mockFileViewEntity);
 		String areaToken = null;
 		boolean canCertifiedUserEdit = true;
@@ -209,7 +214,7 @@ public class TablesTabTest {
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockTableEntityBundle, version, areaToken, mockActionMenuWidget);
 		
-		verifyTableConfiguration(version);
+		verifyTableConfiguration(expectedVersion);
 	}
 	
 	private void verifyTableConfiguration(Long version) {

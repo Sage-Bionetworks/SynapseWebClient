@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -199,13 +200,15 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		view.setProvenanceVisible(isTable);
 		
 		if (isTable) {
-			updateVersionAndAreaToken(versionNumber, areaToken);
+			boolean isVersionSupported = EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity(), ginInjector.getCookieProvider());
+			Long version = isVersionSupported ? versionNumber : null;
+			updateVersionAndAreaToken(version, areaToken);
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
 			tableTitleBar.configure(bundle);
 			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
 			v2TableWidget = ginInjector.createNewTableEntityWidget();
 			view.setTableEntityWidget(v2TableWidget.asWidget());
-			v2TableWidget.configure(bundle, versionNumber, bundle.getPermissions().getCanCertifiedUserEdit(), this, entityActionMenu);
+			v2TableWidget.configure(bundle, version, bundle.getPermissions().getCanCertifiedUserEdit(), this, entityActionMenu);
 		} else if (isProject) {
 			areaToken = null;
 			tableListWidget.configure(bundle);
@@ -232,10 +235,12 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	}
 	
 	private void updateVersionAndAreaToken(Long versionNumber, String areaToken) {
-		metadata.configure(entityBundle, versionNumber, entityActionMenu);
-		tab.setEntityNameAndPlace(entityBundle.getEntity().getName(), new Synapse(entityBundle.getEntity().getId(), versionNumber, EntityArea.TABLES, areaToken));
+		boolean isVersionSupported = EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity(), ginInjector.getCookieProvider());
+		Long version = isVersionSupported ? versionNumber : null;
+		metadata.configure(entityBundle, version, entityActionMenu);
+		tab.setEntityNameAndPlace(entityBundle.getEntity().getName(), new Synapse(entityBundle.getEntity().getId(), version, EntityArea.TABLES, areaToken));
 		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(FilesTab.WIDGET_HEIGHT_PX-84));
-		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(entityBundle.getEntity().getId(), versionNumber));
+		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(entityBundle.getEntity().getId(), version));
 		ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
 		view.setProvenance(provWidget);
 		provWidget.configure(configMap);

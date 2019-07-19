@@ -42,6 +42,7 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab;
@@ -287,11 +288,19 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		tablesAreaToken = null;
 		discussionAreaToken = null;
 		dockerAreaToken = null;
-		this.currentTargetVersionNumber = versionNumber;
 		this.entity = targetEntityBundle.getEntity();
+		setTargetVersion(versionNumber);
 
 		//note: the files/tables/wiki/discussion/docker tabs rely on the project bundle, so they are configured later
 		configureProject();
+	}
+	
+	private void setTargetVersion(Long versionNumber) {
+		if (EntityActionControllerImpl.isVersionSupported(entity, cookies)) {
+			this.currentTargetVersionNumber = versionNumber;	
+		} else {
+			this.currentTargetVersionNumber = null;
+		}
 	}
 	
 	public void initDefaultTabPlaces() {
@@ -402,8 +411,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 
 	public void updateEntityBundle(EntityBundle bundle, Long version) {
 		this.currentTargetEntityBundle = bundle;
-		this.currentTargetVersionNumber = version;
 		entity = bundle.getEntity();
+		setTargetVersion(version);
 		// Redirect if Entity is a Link
 		if(entity instanceof Link) {
 			Reference ref = ((Link)bundle.getEntity()).getLinksTo();
@@ -416,10 +425,10 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		} else if (entity instanceof Project) {
 			switch (area) {
 			case FILES:
-				fileChanged(bundle, version);
+				fileChanged(bundle, currentTargetVersionNumber);
 				break;
 			case TABLES:
-				tableChanged(bundle, version);
+				tableChanged(bundle, currentTargetVersionNumber);
 				break;
 			case DOCKER:
 				dockerChanged(bundle);
@@ -428,14 +437,14 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			}
 		} else {
 			if (entity instanceof FileEntity || entity instanceof Folder) {
-				fileChanged(bundle, version);
+				fileChanged(bundle, currentTargetVersionNumber);
 			} else if (entity instanceof Table) {
-				tableChanged(bundle, version);
+				tableChanged(bundle, currentTargetVersionNumber);
 			} else if (entity instanceof DockerRepository) {
 				dockerChanged(bundle);
 			}
 		}
-		boolean isCurrentVersion = version == null;
+		boolean isCurrentVersion = currentTargetVersionNumber == null;
 		entityActionController.configure(entityActionMenu, bundle, isCurrentVersion, null, area);
 		projectMetadata.setVisible(bundle.getEntity() instanceof Project);
 		reconfigureCurrentArea();

@@ -4,10 +4,8 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
@@ -22,6 +20,7 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
@@ -95,7 +94,7 @@ public class EntityMetadata implements Presenter {
 		});
 
 		boolean isCurrentVersion = versionNumber == null;
-		if (bundle.getEntity() instanceof Versionable) {
+		if (EntityActionControllerImpl.isVersionSupported(bundle.getEntity(), ginInjector.getCookieProvider())) {
 			getVersionHistoryWidget().setVisible(false);
 			getVersionHistoryWidget().setEntityBundle(bundle, versionNumber);
 			view.setRestrictionPanelVisible(true);
