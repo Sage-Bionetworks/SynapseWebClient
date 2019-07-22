@@ -560,7 +560,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		try {
 			var options = {
 				whiteList: {
-				    a:      ['target', 'href', 'title'],
+				    a:      ['target', 'href', 'title', 'ref'],
 				    abbr:   ['title'],
 				    address: [],
 				    area:   ['shape', 'coords', 'href', 'alt'],
