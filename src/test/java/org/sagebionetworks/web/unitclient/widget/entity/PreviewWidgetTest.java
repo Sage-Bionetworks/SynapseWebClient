@@ -3,16 +3,17 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyChar;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.repo.model.util.ContentTypeUtils.*;
+import static org.sagebionetworks.repo.model.util.ContentTypeUtils.APPLICATION_OCTET_STREAM;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -31,7 +32,6 @@ import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -106,7 +106,7 @@ public class PreviewWidgetTest {
 	@Mock
 	MarkdownWidget mockMarkdownWidget;
 	
-	FileHandle mainFileHandle;
+	S3FileHandle mainFileHandle;
 	String fileContent = "base.jar\ntarget/\ntarget/directory/\ntarget/directory/test.txt\n";
 	Map<String, String> descriptor;
 	public static final String TEST_ENTITY_ID = "syn20923";
@@ -122,6 +122,7 @@ public class PreviewWidgetTest {
 		String mainFileId = "MAIN_FILE";
 		mainFileHandle.setId(mainFileId);
 		mainFileHandle.setCreatedBy(TEST_ENTITY_MAIN_FILE_CREATED_BY);
+		mainFileHandle.setIsPreview(false);
 		testFileHandleList.add(mainFileHandle);
 		testEntity.setDataFileHandleId(mainFileId);
 		testBundle = new EntityBundle();
@@ -165,6 +166,7 @@ public class PreviewWidgetTest {
 		fh.setId("previewFileId");
 		fh.setContentType("image/png");
 		fh.setFileName("preview.png");
+		fh.setIsPreview(false);
 		testFileHandleList.add(fh);
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
@@ -175,10 +177,11 @@ public class PreviewWidgetTest {
 	
 	@Test
 	public void testPreviewImageContentType(){
-		PreviewFileHandle fh = new PreviewFileHandle();
+		S3FileHandle fh = new S3FileHandle();
 		fh.setId("previewFileId");
 		fh.setFileName("preview.png");
 		fh.setContentType("image/png");
+		fh.setIsPreview(true);
 		testFileHandleList.add(fh);
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
@@ -190,10 +193,11 @@ public class PreviewWidgetTest {
 		String statusText = "Not found";
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_NOT_FOUND);
 		when(mockResponse.getStatusText()).thenReturn(statusText);
-		PreviewFileHandle fh = new PreviewFileHandle();
+		S3FileHandle fh = new S3FileHandle();
 		fh.setId("previewFileId");
 		fh.setFileName("preview.txt");
 		fh.setContentType("txt/plain");
+		fh.setIsPreview(true);
 		testFileHandleList.add(fh);
 		
 		previewWidget.configure(testBundle);
@@ -204,9 +208,10 @@ public class PreviewWidgetTest {
 	
 	@Test
 	public void testPreviewHtmlContentType(){
-		PreviewFileHandle fh = new PreviewFileHandle();
+		S3FileHandle fh = new S3FileHandle();
 		fh.setId("previewFileId");
 		fh.setContentType("text/plain");
+		fh.setIsPreview(true);
 		mainFileHandle.setContentType("text/html");
 		assertEquals(PreviewFileType.HTML, previewWidget.getOriginalFileType(mainFileHandle));
 	}
@@ -250,9 +255,10 @@ public class PreviewWidgetTest {
 	@Test
 	public void testPreviewFilePdfContentType(){
 		mainFileHandle.setContentType("doc");
-		PreviewFileHandle fh = new PreviewFileHandle();
+		S3FileHandle fh = new S3FileHandle();
 		fh.setId("previewFileId");
 		fh.setContentType("application/pdf");
+		fh.setIsPreview(true);
 		testFileHandleList.add(fh);
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
@@ -262,10 +268,11 @@ public class PreviewWidgetTest {
 	@Test
 	public void testPreviewCodeContentType(){
 		mainFileHandle.setFileName("codeFile.R");
-		PreviewFileHandle fh = new PreviewFileHandle();
+		S3FileHandle fh = new S3FileHandle();
 		fh.setId("previewFileId");
 		fh.setContentType(ContentTypeUtils.PLAIN_TEXT);
 		fh.setFileName("preview.txt");
+		fh.setIsPreview(true);
 		testFileHandleList.add(fh);
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
@@ -274,10 +281,11 @@ public class PreviewWidgetTest {
 
 	@Test
 	public void testPreviewOtherTextContentType(){
-		PreviewFileHandle fh = new PreviewFileHandle();
+		S3FileHandle fh = new S3FileHandle();
 		fh.setId("previewFileId");
 		String invalidContentType = "text/other";
 		fh.setContentType(invalidContentType);
+		fh.setIsPreview(true);
 		testFileHandleList.add(fh);
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
@@ -287,9 +295,10 @@ public class PreviewWidgetTest {
 	@Test
 	public void testZipContentType(){
 		mainFileHandle.setContentType(PreviewWidget.APPLICATION_ZIP);
-		PreviewFileHandle fh = new PreviewFileHandle();
+		S3FileHandle fh = new S3FileHandle();
 		fh.setId("previewFileId");
 		fh.setContentType("text/csv");
+		fh.setIsPreview(true);
 		testFileHandleList.add(fh);
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
@@ -308,9 +317,10 @@ public class PreviewWidgetTest {
 	@Test
 	public void testLongContent(){
 		mainFileHandle.setContentType(PreviewWidget.APPLICATION_ZIP);
-		PreviewFileHandle fh = new PreviewFileHandle();
+		S3FileHandle fh = new S3FileHandle();
 		fh.setId("previewFileId");
 		fh.setContentType("text/plain");
+		fh.setIsPreview(true);
 		char[] charArray = new char[PreviewWidget.MAX_LENGTH + 100];
 	    Arrays.fill(charArray, 'a');
 	    when(mockResponse.getText()).thenReturn(new String(charArray));
@@ -326,10 +336,11 @@ public class PreviewWidgetTest {
 	@Test
 	public void testPreviewVideoContentType(){
 		mainFileHandle.setFileName("preview.mp4");
-		PreviewFileHandle fh = new PreviewFileHandle();
+		S3FileHandle fh = new S3FileHandle();
 		fh.setId("previewFileId");
 		fh.setContentType("video/mp4");
 		fh.setFileName("preview.mp4");
+		fh.setIsPreview(true);
 		testFileHandleList.add(fh);
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
@@ -437,9 +448,10 @@ public class PreviewWidgetTest {
 	
 	@Test
 	public void testGetPreviewFileContents() {
-		PreviewFileHandle fh = new PreviewFileHandle();
+		S3FileHandle fh = new S3FileHandle();
 		fh.setId("previewFileId");
 		fh.setContentType("text/plain");
+		fh.setIsPreview(true);
 		testFileHandleList.add(fh);
 		
 		mainFileHandle.setContentType("text/plain");

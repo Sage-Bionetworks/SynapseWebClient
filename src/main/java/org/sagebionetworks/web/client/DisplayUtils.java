@@ -43,8 +43,8 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionableEntity;
+import org.sagebionetworks.repo.model.file.CloudProviderFileHandleInterface;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Search;
@@ -773,12 +773,12 @@ public class DisplayUtils {
 	 * @param bundle
 	 * @return
 	 */
-	public static PreviewFileHandle getPreviewFileHandle(EntityBundle bundle) {
-		PreviewFileHandle fileHandle = null;
+	public static CloudProviderFileHandleInterface getPreviewFileHandle(EntityBundle bundle) {
+		CloudProviderFileHandleInterface fileHandle = null;
 		if (bundle.getFileHandles() != null) {
 			for (FileHandle fh : bundle.getFileHandles()) {
-				if (fh instanceof PreviewFileHandle) {
-					fileHandle = (PreviewFileHandle) fh;
+				if (fh instanceof CloudProviderFileHandleInterface && ((CloudProviderFileHandleInterface) fh).getIsPreview()) {
+					fileHandle = (CloudProviderFileHandleInterface) fh;
 					break;
 				}
 			}

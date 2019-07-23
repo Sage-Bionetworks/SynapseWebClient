@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 import static org.sagebionetworks.repo.model.util.ContentTypeUtils.isRecognizedCodeFileName;
+import static org.sagebionetworks.web.client.ClientProperties.MB;
 import static org.sagebionetworks.web.client.ContentTypeUtils.isCSV;
 import static org.sagebionetworks.web.client.ContentTypeUtils.isHTML;
 import static org.sagebionetworks.web.client.ContentTypeUtils.isPDF;
@@ -11,7 +12,7 @@ import static org.sagebionetworks.web.client.ContentTypeUtils.isTAB;
 import static org.sagebionetworks.web.client.ContentTypeUtils.isTextType;
 import static org.sagebionetworks.web.client.ContentTypeUtils.isWebRecognizedCodeFileName;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-import static org.sagebionetworks.web.client.ClientProperties.MB;
+
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -20,8 +21,8 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.file.CloudProviderFileHandleInterface;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.web.client.ContentTypeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -44,7 +45,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -95,7 +95,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		this.jsClient = jsClient;
 	}
 	
-	public PreviewFileType getPreviewFileType(PreviewFileHandle previewHandle, FileHandle originalFileHandle) {
+	public PreviewFileType getPreviewFileType(CloudProviderFileHandleInterface previewHandle, FileHandle originalFileHandle) {
 		PreviewFileType previewFileType = PreviewFileType.NONE;
 		if (previewHandle != null && originalFileHandle != null) {
 			String contentType = previewHandle.getContentType();
@@ -220,7 +220,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	}
 	
 	private void renderFilePreview(EntityBundle bundle) {
-		PreviewFileHandle previewFileHandle = DisplayUtils.getPreviewFileHandle(bundle);
+		CloudProviderFileHandleInterface previewFileHandle = DisplayUtils.getPreviewFileHandle(bundle);
 		FileHandle originalFileHandle = DisplayUtils.getFileHandle(bundle);
 		PreviewFileType originalFileHandlePreviewType = getOriginalFileType(originalFileHandle);
 		if (originalFileHandlePreviewType != PreviewFileType.NONE) {
