@@ -37,14 +37,13 @@
 		<link rel="icon" href="favicon.png?v=4" />
 		<link href="/opensearch.xml" rel="search" title="Synapse" type="application/opensearchdescription+xml" />
 		<link rel="manifest" href="manifest.json" />
-		<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Lato" />
 		<!-- Google Analytics -->
 		<script>
 			window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
 			ga('create', 'UA-29804340-1', 'auto');
 			ga('send', 'pageview');
 		</script>
-
+		
 		<script>
 			// determine cdn endpoint (staging or prod, do not use a cdn for local or dev builds)
 			var cdnEndpoint = "//cdn-" + location.hostname + "/";
@@ -54,11 +53,17 @@
 			}
 			window.cdnEndpoint = cdnEndpoint;
 
-			function loadJs(src) {
+			function loadJs(src, async, defer) {
 				// these are dynamically added, so they do not block rendering while being downloaded
 				let scriptElement = document.createElement('script');
 				scriptElement.src = src;
-				scriptElement.async = false; // in order
+				// if defer, fetch asynchronously and execute AFTER the HTML parsing is complete
+				if (defer) {
+					scriptElement.defer = defer;
+				} else {
+					// if async, fetch asynchronously and execute the script asap  (pause HTML parsing while executing script).
+					scriptElement.async = async;
+				}
 				document.head.appendChild(scriptElement);
 			};
 			function loadCss(src){
@@ -73,56 +78,81 @@
 			}
 
 			loadCss(cdnEndpoint + "loadinglogo.css");
-			loadJs(cdnEndpoint + "js/compiled-closure-lib.js");
-			loadJs(cdnEndpoint + "Portal/Portal.nocache.js");
+			
+			[
+				cdnEndpoint + 'js/compiled-closure-lib.js',
+				cdnEndpoint + 'Portal/Portal.nocache.js'
+			].forEach(function(src) {
+				loadJs(src, false);
+			});
+			
+			window.setTimeout(() => {
+				[
+					'//ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js',
+					'//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js',
+					cdnEndpoint + 'js/jquery.tablesorter.min.js',
+					cdnEndpoint + 'js/jquery.tablesorter.scinot.js',
+					'//cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.11.1/js/jsplumb.min.js',
+					cdnEndpoint + 'js/init-nchart.js',
+					cdnEndpoint + 'js/xss.min.js'
+				].forEach(function(src) {
+					loadJs(src, false);
+				});});
 
-			var script = document.createElement('script');
-			script.onload = function () {
-				head.load(cdnEndpoint + "swc.css");
-				head.load(cdnEndpoint + "css/bootstrap-custom-theme.min.css?v=1");
-				head.load("//ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js");
-				head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js");
-				head.load("https://cdn.pendo.io/agent/static/f155f8f7-30b9-4cc3-671a-70f99f803504/pendo.js");
-				head.load(cdnEndpoint + "js/moment.min.js");
-				head.load("//cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.1.8/jsPlumb.min.js");
-				head.load(cdnEndpoint + "js/jquery.tablesorter.min.js");
-				head.load(cdnEndpoint + "js/jquery.tablesorter.scinot.js");
-				head.load(cdnEndpoint + "icons/font/synapseicons.css?v=1");
-				head.load("//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css");
-				head.load(cdnEndpoint + "js/highlight.pack.js");
-				head.load(cdnEndpoint + "js/init-nchart.js");
-				head.load(cdnEndpoint + "js/markdown-it.min.js");
-				head.load(cdnEndpoint + "js/markdown-it-plugins-18.min.js");
-				head.load(cdnEndpoint + "js/polyfill-2.js");
-				head.load(cdnEndpoint + "js/details-shim.min.js");
-				head.load(cdnEndpoint + "js/xss.min.js");
-				head.load("//cdnjs.cloudflare.com/ajax/libs/pica/4.1.1/pica.min.js");
-				head.load("//www.google-analytics.com/analytics.js");
-				head.load("//unpkg.com/react@16/umd/react.production.min.js");
-				head.load("//unpkg.com/react-dom@16/umd/react-dom.production.min.js");
-				head.load("https://unpkg.com/react-transition-group@2.6.0/dist/react-transition-group.min.js");
-				head.load("https://unpkg.com/prop-types@15.6.2/prop-types.min.js");
-				head.load("https://unpkg.com/react-measure@2.2.2/dist/index.umd.js");
-				head.load("https://unpkg.com/react-tooltip@3.9.2/standalone/react-tooltip.min.js");
-				head.load("https://cdn.plot.ly/plotly-1.44.0.min.js");
-				head.load("https://unpkg.com/react-plotly.js@2.2.0/dist/create-plotly-component.min.js");
-				head.load("https://unpkg.com/react-jsonschema-form/dist/react-jsonschema-form.js");
-				head.load("https://unpkg.com/synapse-react-client@1.12.22/dist/umd/synapse-react-client.production.min.js");
-				head.load("//cdnjs.cloudflare.com/ajax/libs/croppie/2.6.2/croppie.min.js");
-				head.load("//cdnjs.cloudflare.com/ajax/libs/spark-md5/3.0.0/spark-md5.min.js");
-				head.load(cdnEndpoint + "js/diff/diffview.css");
-				head.load(cdnEndpoint + "css/details-shim.min.css");
-				head.load("//cdnjs.cloudflare.com/ajax/libs/croppie/2.6.2/croppie.min.css");
-				head.load("//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css");
-				head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.css");
-				head.load(cdnEndpoint + "js/linkify.min.js");
-				head.load(cdnEndpoint + "js/linkify-string.min.js");
-				head.load("https://unpkg.com/synapse-react-client@1.12.22/dist/umd/synapse-react-client.production.styles.css");
-				head.load(cdnEndpoint + "css/katex-0.10.1.min.css");
-				head.load("//kh896k90gyvg.statuspage.io/embed/script.js");
-			};
-			script.src = cdnEndpoint + "js/head.load.min.js";
-			document.head.appendChild(script);
+			window.setTimeout(() => {
+				[
+					cdnEndpoint + 'js/markdown-it.min.js',
+					cdnEndpoint + 'js/markdown-it-plugins-18.min.js',
+					cdnEndpoint + 'js/linkify.min.js',
+					cdnEndpoint + 'js/linkify-string.min.js',
+					'//unpkg.com/react@16/umd/react.production.min.js',
+					'//unpkg.com/react-dom@16/umd/react-dom.production.min.js',
+					'//unpkg.com/react-transition-group@2.6.0/dist/react-transition-group.min.js',
+					'//unpkg.com/prop-types@15.6.2/prop-types.min.js',
+					'//unpkg.com/react-measure@2.2.2/dist/index.umd.js',
+					'//unpkg.com/react-tooltip@3.9.2/standalone/react-tooltip.min.js',
+					'//cdn.plot.ly/plotly-1.44.0.min.js',
+					'//unpkg.com/react-plotly.js@2.2.0/dist/create-plotly-component.min.js',
+					'//unpkg.com/react-jsonschema-form/dist/react-jsonschema-form.js',
+					'//unpkg.com/synapse-react-client@1.12.22/dist/umd/synapse-react-client.production.min.js'
+				].forEach(function(src) {
+					loadJs(src, false);
+				});});
+			
+			// defered load js resources (do not need to be available on initial page load)
+			window.setTimeout(() => {
+				[
+					cdnEndpoint + 'js/moment.min.js',
+					cdnEndpoint + 'js/highlight.pack.js',
+					'//cdnjs.cloudflare.com/ajax/libs/pica/5.1.0/pica.min.js',
+					'//www.google-analytics.com/analytics.js',
+					'//cdnjs.cloudflare.com/ajax/libs/croppie/2.6.4/croppie.min.js',
+					'//kh896k90gyvg.statuspage.io/embed/script.js',
+					'//cdn.pendo.io/agent/static/f155f8f7-30b9-4cc3-671a-70f99f803504/pendo.js',
+					'//cdnjs.cloudflare.com/ajax/libs/spark-md5/3.0.0/spark-md5.min.js',
+					cdnEndpoint + 'js/polyfill-2.js',
+					cdnEndpoint + 'js/details-shim.min.js'
+				].forEach(function(src) {
+					loadJs(src, true, true);
+				});});
+
+			window.setTimeout(() => {
+				[
+					'//fonts.googleapis.com/css?family=Lato',
+					cdnEndpoint + 'swc.css',
+					cdnEndpoint + 'css/bootstrap-custom-theme.min.css?v=1',
+					cdnEndpoint + 'icons/font/synapseicons.css?v=1',
+					'//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css',
+					'//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/default.min.css',
+					cdnEndpoint + 'js/diff/diffview.css',
+					cdnEndpoint + 'css/details-shim.min.css',
+					'//cdnjs.cloudflare.com/ajax/libs/croppie/2.6.4/croppie.min.css',
+					'//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.css',
+					'//unpkg.com/synapse-react-client@1.12.22/dist/umd/synapse-react-client.production.styles.css',
+					cdnEndpoint + 'css/katex-0.10.1.min.css',
+				].forEach(function(src) {
+					loadCss(src);
+				});});
 		</script>
 	</head>
 	<body id="body">

@@ -18,12 +18,10 @@ import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -123,11 +121,11 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	 * Session cookie should be set before this call 
 	 * @param callback
 	 */
-	public void initializeFromExistingSessionCookie(final AsyncCallback<UserProfile> callback) {
+	public void initializeFromExistingSessionCookie(AsyncCallback<UserProfile> callback) {
 		userAccountService.getCurrentUserSessionData(new AsyncCallback<UserSessionData>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
+				callback.onFailure(caught);	
 			}
 			@Override
 			public void onSuccess(UserSessionData newData) {
@@ -139,7 +137,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
 				} else {
 					jsniUtils.setAnalyticsUserId(getCurrentUserPrincipalId());
-					callback.onSuccess(newData.getProfile());
+					callback.onSuccess(newData.getProfile());	
 				}
 			}
 		});
@@ -155,9 +153,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		storeAuthenticationReceipt(receipt);
 		currentUserSessionToken = null;
 		currentUserProfile = null;
-		ginInjector.getHeader().refresh();
 		ginInjector.getSessionDetector().initializeSessionTokenState();
 		ginInjector.getSynapseJavascriptClient().initSession(WebConstants.EXPIRE_SESSION_TOKEN);
+		ginInjector.getGlobalApplicationState().refreshPage();
 	}
 	
 	@Override
@@ -173,28 +171,11 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	@Override
 	public String getCurrentUserPrincipalId() {
 		if(currentUserProfile != null) {
-			return currentUserProfile.getOwnerId();						
+			return currentUserProfile.getOwnerId();
 		} 
 		return null;
 	}
 	
-	@Override
-	public void reloadUserSessionData(Callback afterReload) {
-		// attempt to get session token from existing cookie (if there is one)
-		initializeFromExistingSessionCookie(new AsyncCallback<UserProfile>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				logoutUser();
-				jsniUtils.consoleError(caught);
-				afterReload.invoke();
-			}
-			@Override
-			public void onSuccess(UserProfile result) {
-				afterReload.invoke();
-			}
-		});
-	}
-
 	@Override
 	public UserProfile getCurrentUserProfile() {
 		return currentUserProfile;
@@ -223,7 +204,22 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				String localSession = getCurrentUserSessionToken();
 				// if the local session does not match the actual session, reload the app
 				if (!Objects.equals(token, localSession)) {
-					Window.Location.reload();
+					// reinit
+					if (token == null) {
+						logoutUser();
+					} else {
+						initializeFromExistingSessionCookie(new AsyncCallback<UserProfile>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								jsniUtils.consoleError(caught);
+							}
+							@Override
+							public void onSuccess(UserProfile result) {
+								// we've reinitialized the app with the correct session, refresh the page (do not get rid of js state)!
+								ginInjector.getGlobalApplicationState().refreshPage();
+							}
+						});
+					}
 				} else {
 					ginInjector.getHeader().refresh();
 					if (isLoggedIn()) {

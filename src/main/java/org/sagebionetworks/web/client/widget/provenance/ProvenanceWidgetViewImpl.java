@@ -208,10 +208,6 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 								cursor : "pointer",
 								zIndex : 2000
 							},
-							PaintStyle : {
-								strokeStyle : color,
-								lineWidth : 1
-							},
 							EndpointStyle : {
 								radius : 0.01,
 								fillStyle : color

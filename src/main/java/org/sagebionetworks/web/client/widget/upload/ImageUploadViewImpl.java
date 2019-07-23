@@ -21,7 +21,6 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -119,8 +118,8 @@ public class ImageUploadViewImpl implements ImageUploadView {
 			// Copy the image contents to the canvas
 			var ctx = originalCanvas.getContext("2d");
 			ctx.drawImage(imgElement, 0, 0);
-			var maxWidth = 1632;
-			var maxHeight = 1632;
+			var maxWidth = 2048;
+			var maxHeight = 2048;
 			if (imgElement.width > maxWidth) {
 				// continue resize based on width
 				var ratio = maxWidth / imgElement.width; // get ratio for scaling image
@@ -135,13 +134,13 @@ public class ImageUploadViewImpl implements ImageUploadView {
 
 			// Resize & convert to blob
 			$wnd.resizer.resize(originalCanvas, resizedCanvas)
-			  .then (
-			  	function(result) {
-			  		$wnd.resizer.toBlob(result, 'image/jpeg', 90)
-			  			.then(
-				  			function(blob) {
-				  				v.@org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl::resizeComplete(Lcom/google/gwt/core/client/JavaScriptObject;)(blob);
-				  			});
+				.then (
+				function(result) {
+					$wnd.resizer.toBlob(result, 'image/jpeg', 90)
+						.then(
+							function(blob) {
+								v.@org.sagebionetworks.web.client.widget.upload.ImageUploadViewImpl::resizeComplete(Lcom/google/gwt/core/client/JavaScriptObject;)(blob);
+							});
 				});
 		};
 		imgElement.addEventListener('load', onImageLoad, false);
