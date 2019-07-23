@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.security;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -12,7 +11,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.security.AuthenticationControllerImpl.*;
+import static org.sagebionetworks.web.client.security.AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -105,45 +104,6 @@ public class AuthenticationControllerImplTest {
 	}
 	
 	@Test
-	public void testReloadUserSessionData() {
-		authenticationController.reloadUserSessionData(mockCallback);
-		
-		// attempt to get the current session
-		verify(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
-		assertTrue(authenticationController.isLoggedIn());
-		verify(mockCallback).invoke();
-		assertEquals(USER_ID, authenticationController.getCurrentUserPrincipalId());
-		
-		//and if we log out, then our full session has been lost and isLoggedIn always reports false
-		authenticationController.logoutUser();
-		
-		assertNull(authenticationController.getCurrentUserPrincipalId());
-	}
-	
-	@Test
-	public void testReloadUserSessionDataNullToken() {
-		// when there is a null token, getting the current user session data will fail
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
-		
-		authenticationController.reloadUserSessionData(mockCallback);
-		
-		assertFalse(authenticationController.isLoggedIn());
-		assertNull(authenticationController.getCurrentUserPrincipalId());
-		verify(mockCallback).invoke();
-	}
-		
-	@Test
-	public void testGetCurrentUserPrincipalIdNullProfile() throws Exception {
-		usd.setProfile(null);
-		
-		authenticationController.reloadUserSessionData(mockCallback);
-		
-		assertFalse(authenticationController.isLoggedIn());
-		assertNull(authenticationController.getCurrentUserPrincipalId());
-		verify(mockCallback).invoke();
-	}
-	
-	@Test
 	public void testLogout() {
 		when(mockClientCache.get(USER_AUTHENTICATION_RECEIPT)).thenReturn(USER_AUTHENTICATION_RECEIPT_VALUE);
 		
@@ -155,7 +115,7 @@ public class AuthenticationControllerImplTest {
 		//verify that authentication receipt is restored
 		verify(mockClientCache).put(eq(USER_AUTHENTICATION_RECEIPT), eq(USER_AUTHENTICATION_RECEIPT_VALUE), anyLong());
 		verify(mockSessionDetector).initializeSessionTokenState();
-		verify(mockHeader).refresh();
+		verify(mockGlobalApplicationState).refreshPage();
 		verify(mockJsClient).logout();
 		verify(mockSynapseJSNIUtils).setAnalyticsUserId("");
 	}
