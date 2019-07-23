@@ -53,11 +53,17 @@
 			}
 			window.cdnEndpoint = cdnEndpoint;
 
-			function loadJs(src, async) {
+			function loadJs(src, async, defer) {
 				// these are dynamically added, so they do not block rendering while being downloaded
 				let scriptElement = document.createElement('script');
 				scriptElement.src = src;
-				scriptElement.async = async;
+				// if defer, fetch asynchronously and execute AFTER the HTML parsing is complete
+				if (defer) {
+					scriptElement.defer = defer;
+				} else {
+					// if async, fetch asynchronously and execute the script asap  (pause HTML parsing while executing script).
+					scriptElement.async = async;
+				}
 				document.head.appendChild(scriptElement);
 			};
 			function loadCss(src){
@@ -113,7 +119,7 @@
 					loadJs(src, false);
 				});});
 			
-			// load async js resources (order does not matter)
+			// defered load js resources (do not need to be available on initial page load)
 			window.setTimeout(() => {
 				[
 					cdnEndpoint + 'js/moment.min.js',
@@ -127,7 +133,7 @@
 					cdnEndpoint + 'js/polyfill-2.js',
 					cdnEndpoint + 'js/details-shim.min.js'
 				].forEach(function(src) {
-					loadJs(src, true);
+					loadJs(src, true, true);
 				});});
 
 			window.setTimeout(() => {
