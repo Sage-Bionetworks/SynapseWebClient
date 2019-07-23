@@ -66,11 +66,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		try {
 			$wnd.ga('send', 
 			{
-			  hitType: 'event',
-			  eventCategory: eventCategoryValue,
-			  eventAction: eventActionValue,
-			  eventLabel: eventLabelValue,
-			  fieldsObject: { nonInteraction: true}
+				hitType: 'event',
+				eventCategory: eventCategoryValue,
+				eventAction: eventActionValue,
+				eventLabel: eventLabelValue,
+				fieldsObject: { nonInteraction: true}
 			});
 		} catch (err) {
 			console.error(err);
@@ -177,14 +177,14 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private final static native LayoutResultJso _nChartlayout(NChartLayersArray layers, NChartCharacters characters) /*-{
 		var layoutResult = {};
 		try {
-		    var debug = {'features': ['nodes'], 'wireframe': true};
+			var debug = {'features': ['nodes'], 'wireframe': true};
 			var conf = {'subnode_spacing': 40, 'group_styles': {'pov': {'stroke-width': 3}},
-		        'debug': debug};	        
+				'debug': debug};
 			var chart = new $wnd.NChart(characters, layers, conf).calc().plot();
 				
 			// convert graph into LayoutResult
 			var ncGraph = chart.graph;
-			for(var i=0; i<ncGraph.layers.length; i++) {		
+			for(var i=0; i<ncGraph.layers.length; i++) {
 				var ncLayer = ncGraph.layers[i];
 				for(var j=0; j<ncLayer.nodes.length; j++) {
 					var ncNode = ncLayer.nodes[j];
@@ -193,7 +193,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 					if(!(provGraphNodeId in layoutResult)) { 
 						layoutResult[provGraphNodeId] = [];
 					}
-					layoutResult[provGraphNodeId].push(xypoint);				
+					layoutResult[provGraphNodeId].push(xypoint);
 				}
 			}
 		} catch (err) {
@@ -204,22 +204,22 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 
 	@Override
 	public void setPageTitle(String newTitle) {
-	    if (Document.get() != null) {
-	        Document.get().setTitle (newTitle);
-	    }
+		if (Document.get() != null) {
+			Document.get().setTitle (newTitle);
+		}
 	}
 	
 	@Override
 	public void setPageDescription(String newDescription) {
 		if (Document.get() != null) {
 			NodeList<com.google.gwt.dom.client.Element> tags = Document.get().getElementsByTagName("meta");
-		    for (int i = 0; i < tags.getLength(); i++) {
-		        MetaElement metaTag = ((MetaElement) tags.getItem(i));
-		        if (metaTag.getName().equals("description")) {
-		            metaTag.setContent(newDescription);	//doesn't seem to work
-		            break;
-		        }
-		    }
+			for (int i = 0; i < tags.getLength(); i++) {
+				MetaElement metaTag = ((MetaElement) tags.getItem(i));
+				if (metaTag.getName().equals("description")) {
+					metaTag.setContent(newDescription);	//doesn't seem to work
+					break;
+				}
+			}
 		}
 	}
 	
@@ -257,19 +257,19 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		var fileSliceToUpload;
 		//in versions later than Firefox 13 and Chrome 21, Blob.slice() is not prefixed (and the vendor prefixed methods are deprecated)
 		if (fileToUpload.slice) {
-        	fileSliceToUpload = fileToUpload.slice(start, end+1, contentType);
-	    }else if (fileToUpload.mozSlice) {
-        	fileSliceToUpload = fileToUpload.mozSlice(start, end+1, contentType);
-	    } else if (fileToUpload.webkitSlice) {
-	        fileSliceToUpload = fileToUpload.webkitSlice(start, end+1, contentType);
-	    } else {
-	        throw new Error("Unable to slice file.");
-	    }
+			fileSliceToUpload = fileToUpload.slice(start, end+1, contentType);
+		}else if (fileToUpload.mozSlice) {
+			fileSliceToUpload = fileToUpload.mozSlice(start, end+1, contentType);
+		} else if (fileToUpload.webkitSlice) {
+			fileSliceToUpload = fileToUpload.webkitSlice(start, end+1, contentType);
+		} else {
+			throw new Error("Unable to slice file.");
+		}
 		xhr.upload.onprogress = $entry(@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::updateProgress(Lcom/google/gwt/core/client/JavaScriptObject;));
-  		xhr.open('PUT', url, true);
-  		//explicitly set content type
-  		xhr.setRequestHeader('Content-type', contentType);
-  		xhr.send(fileSliceToUpload);
+		xhr.open('PUT', url, true);
+		//explicitly set content type
+		xhr.setRequestHeader('Content-type', contentType);
+		xhr.send(fileSliceToUpload);
 	}-*/;
 	
 	
@@ -328,11 +328,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	
 	private static native String _getFilesSelected(JavaScriptObject fileList) /*-{
 		var out = "";
-	    for (i = 0; i < fileList.length; i++) {
-	        var file =fileList[i];
-	        out += file.name + ';';
-	    }
-	    return out;
+		for (i = 0; i < fileList.length; i++) {
+			var file =fileList[i];
+			out += file.name + ';';
+		}
+		return out;
 	}-*/;
 	
 	public boolean isElementExists(String elementId) {
@@ -354,39 +354,39 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private final static native void _getFileMd5(JavaScriptObject file, MD5Callback md5Callback) /*-{
 		var blobSlice = file.slice || file.mozSlice || file.webkitSlice;
 		chunkSize = 2097152; // read in chunks of 2MB
-        chunks = Math.ceil(file.size / chunkSize);
-        currentChunk = 0;
-        spark = new $wnd.SparkMD5.ArrayBuffer();
-        $wnd.frOnload = function(e) {
-            console.log("read chunk nr", currentChunk + 1, "of", chunks);
-            spark.append(e.target.result);                 // append array buffer
-            currentChunk++;
+		chunks = Math.ceil(file.size / chunkSize);
+		currentChunk = 0;
+		spark = new $wnd.SparkMD5.ArrayBuffer();
+		$wnd.frOnload = function(e) {
+			console.log("read chunk nr", currentChunk + 1, "of", chunks);
+			spark.append(e.target.result);	// append array buffer
+			currentChunk++;
 
-            if (currentChunk < chunks) {
-                $wnd.loadNext();
-            }
-            else {
-               console.log("finished loading file (to calculate md5)");
-               // Call instance method setMD5() on md5Callback with the final md5
-    			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(spark.end());
-            }
-        };
-        $wnd.frOnerror = function () {
-        	console.warn("unable to calculate md5");
-            md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(null);
-        };
-        
-        $wnd.loadNext = function() { 
-            var fileReader = new FileReader();
-	        fileReader.onload = $wnd.frOnload;
-	        fileReader.onerror = $wnd.frOnerror;
-	
-	        var start = currentChunk * chunkSize,
-	            end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
-			console.log("MD5 full file: loading next chunk: start=", start, " end=", end);
-	        fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
+			if (currentChunk < chunks) {
+				$wnd.loadNext();
+			}
+			else {
+				console.log("finished loading file (to calculate md5)");
+				// Call instance method setMD5() on md5Callback with the final md5
+				md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(spark.end());
+			}
 		};
-       $wnd.loadNext();
+		$wnd.frOnerror = function () {
+			console.warn("unable to calculate md5");
+			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(null);
+		};
+
+		$wnd.loadNext = function() { 
+			var fileReader = new FileReader();
+			fileReader.onload = $wnd.frOnload;
+			fileReader.onerror = $wnd.frOnerror;
+
+			var start = currentChunk * chunkSize,
+				end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
+			console.log("MD5 full file: loading next chunk: start=", start, " end=", end);
+			fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
+		};
+		$wnd.loadNext();
 	}-*/;
 
 	/**
@@ -399,27 +399,27 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private final static native void _getFilePartMd5(JavaScriptObject file, int currentChunk, double chunkSize, MD5Callback md5Callback) /*-{
 		var blobSlice = file.slice || file.mozSlice || file.webkitSlice;
 		spark = new $wnd.SparkMD5.ArrayBuffer();
-        $wnd.frOnload = function(e) {
-            spark.append(e.target.result); // append array buffer
-           // Call instance method setMD5() on md5Callback with the final md5
+		$wnd.frOnload = function(e) {
+			spark.append(e.target.result); // append array buffer
+			// Call instance method setMD5() on md5Callback with the final md5
 			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(spark.end());
-        };
-        $wnd.frOnerror = function () {
-        	console.warn("unable to calculate file part md5");
-            md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(null);
-        };
-        
-        $wnd.loadPart = function() { 
-            var fileReader = new FileReader();
-	        fileReader.onload = $wnd.frOnload;
-	        fileReader.onerror = $wnd.frOnerror;
-			var start = currentChunk * chunkSize,
-	            end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
-	        
-	        console.log("MD5 file part: loading chunk: start=", start, " end=", end);
-	        fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
 		};
-       $wnd.loadPart();
+		$wnd.frOnerror = function () {
+			console.warn("unable to calculate file part md5");
+			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(null);
+		};
+		
+		$wnd.loadPart = function() { 
+			var fileReader = new FileReader();
+			fileReader.onload = $wnd.frOnload;
+			fileReader.onerror = $wnd.frOnerror;
+			var start = currentChunk * chunkSize,
+				end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
+			
+			console.log("MD5 file part: loading chunk: start=", start, " end=", end);
+			fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
+		};
+		$wnd.loadPart();
 	}-*/;
 	
 	@Override
@@ -517,7 +517,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	 * Attach element to head
 	 */
 	protected static native void _nativeAttachToHead(JavaScriptObject scriptElement) /*-{
-	    $doc.getElementsByTagName("head")[0].appendChild(scriptElement);
+		$doc.getElementsByTagName("head")[0].appendChild(scriptElement);
 	}-*/;
 	
 	@Override
@@ -542,7 +542,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	private final static native boolean _elementSupportsAttribute(String tagName, String attribute) /*-{
-	    return attribute in $doc.createElement(tagName);
+		return attribute in $doc.createElement(tagName);
 	}-*/;
 	
 	boolean isFilterXssInitialized = false;
@@ -560,83 +560,83 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		try {
 			var options = {
 				whiteList: {
-				    a:      ['target', 'href', 'title', 'ref'],
-				    abbr:   ['title'],
-				    address: [],
-				    area:   ['shape', 'coords', 'href', 'alt'],
-				    article: [],
-				    aside:  [],
-				    audio:  ['autoplay', 'controls', 'loop', 'preload', 'src'],
-				    b:      [],
-				    bdi:    ['dir'],
-				    bdo:    ['dir'],
-				    big:    [],
-				    blockquote: ['cite'],
-				    body:   [],
-				    br:     [],
-				    caption: [],
-				    center: [],
-				    cite:   [],
-				    code:   [],
-				    col:    ['align', 'valign', 'span', 'width'],
-				    colgroup: ['align', 'valign', 'span', 'width'],
-				    dd:     [],
-				    del:    ['datetime'],
-				    details: ['open'],
-				    div:    ['class'],
-				    dl:     [],
-				    dt:     [],
-				    em:     [],
-				    font:   ['color', 'size', 'face'],
-				    footer: [],
-				    h1:     ['toc'],
-				    h2:     ['toc'],
-				    h3:     ['toc'],
-				    h4:     ['toc'],
-				    h5:     ['toc'],
-				    h6:     ['toc'],
-				    head:   [],
-				    header: [],
-				    hr:     [],
-				    html:   [],
-				    i:      [],
-				    img:    ['src', 'alt', 'title', 'width', 'height'],
-				    ins:    ['datetime'],
-				    li:     [],
-				    mark:   [],
-				    nav:    [],
-				    noscript: [],
-				    ol:     [],
-				    p:      [],
-				    pre:    [],
-				    s:      [],
-				    section:[],
-				    small:  [],
-				    span:   ['data-widgetparams', 'class', 'id'],
-				    sub:    [],
-				    summary: [],
-				    sup:    [],
-				    strong: [],
-				    table:  ['width', 'border', 'align', 'valign', 'class'],
-				    tbody:  ['align', 'valign'],
-				    td:     ['width', 'rowspan', 'colspan', 'align', 'valign'],
-				    tfoot:  ['align', 'valign'],
-				    th:     ['width', 'rowspan', 'colspan', 'align', 'valign', 'class'],
-				    thead:  ['align', 'valign'],
-				    tr:     ['rowspan', 'align', 'valign'],
-				    tt:     [],
-				    u:      [],
-				    ul:     [],
-				    video:  ['autoplay', 'controls', 'loop', 'preload', 'src', 'height', 'width']
+					a:      ['target', 'href', 'title', 'ref'],
+					abbr:   ['title'],
+					address: [],
+					area:   ['shape', 'coords', 'href', 'alt'],
+					article: [],
+					aside:  [],
+					audio:  ['autoplay', 'controls', 'loop', 'preload', 'src'],
+					b:      [],
+					bdi:    ['dir'],
+					bdo:    ['dir'],
+					big:    [],
+					blockquote: ['cite'],
+					body:   [],
+					br:     [],
+					caption: [],
+					center: [],
+					cite:   [],
+					code:   [],
+					col:    ['align', 'valign', 'span', 'width'],
+					colgroup: ['align', 'valign', 'span', 'width'],
+					dd:     [],
+					del:    ['datetime'],
+					details: ['open'],
+					div:    ['class'],
+					dl:     [],
+					dt:     [],
+					em:     [],
+					font:   ['color', 'size', 'face'],
+					footer: [],
+					h1:     ['toc'],
+					h2:     ['toc'],
+					h3:     ['toc'],
+					h4:     ['toc'],
+					h5:     ['toc'],
+					h6:     ['toc'],
+					head:   [],
+					header: [],
+					hr:     [],
+					html:   [],
+					i:      [],
+					img:    ['src', 'alt', 'title', 'width', 'height'],
+					ins:    ['datetime'],
+					li:     [],
+					mark:   [],
+					nav:    [],
+					noscript: [],
+					ol:     [],
+					p:      [],
+					pre:    [],
+					s:      [],
+					section:[],
+					small:  [],
+					span:   ['data-widgetparams', 'class', 'id'],
+					sub:    [],
+					summary: [],
+					sup:    [],
+					strong: [],
+					table:  ['width', 'border', 'align', 'valign', 'class'],
+					tbody:  ['align', 'valign'],
+					td:     ['width', 'rowspan', 'colspan', 'align', 'valign'],
+					tfoot:  ['align', 'valign'],
+					th:     ['width', 'rowspan', 'colspan', 'align', 'valign', 'class'],
+					thead:  ['align', 'valign'],
+					tr:     ['rowspan', 'align', 'valign'],
+					tt:     [],
+					u:      [],
+					ul:     [],
+					video:  ['autoplay', 'controls', 'loop', 'preload', 'src', 'height', 'width']
 				},
 				stripIgnoreTagBody: true,  // filter out all tags not in the whitelist
 				allowCommentTag: false,
 				css: false,
 				onIgnoreTag: function (tag, html, options) {
 					if (tag === '!doctype') {
-				      // do not filter doctype
-				      return html;
-				    }
+						// do not filter doctype
+						return html;
+					}
 				},
 				safeAttrValue: function (tag, name, value) {
 					// returning nothing removes the value
@@ -695,7 +695,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private final static native String _getHost(String url) /*-{
 		var parser = $doc.createElement('a');
 		parser.href = url;
-		var v = parser.host;     // for example, "test.com:8080"
+		var v = parser.host;	// for example, "test.com:8080"
 		parser = null; 
 		return v;
 	}-*/;
@@ -720,7 +720,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private final static native String _getPort(String url) /*-{
 		var parser = $doc.createElement('a');
 		parser.href = url;
-		var v = parser.port;     // for example, "8080"
+		var v = parser.port;	// for example, "8080"
 		parser = null; 
 		return v;
 	}-*/;
@@ -769,7 +769,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		_unmountComponentAtNode(el);
 	}
 	public final static native void _unmountComponentAtNode(Element el) /*-{
-		$wnd.ReactDOM.unmountComponentAtNode(el);
+		try {
+			$wnd.ReactDOM.unmountComponentAtNode(el);
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
 	
 	@Override
