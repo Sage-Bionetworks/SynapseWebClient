@@ -57,11 +57,6 @@ public interface AuthenticationController {
 	public UserProfile getCurrentUserProfile();
 
 	/**
-	 * Redownload the user's session data 
-	 */
-	void reloadUserSessionData(Callback afterReload);
-
-	/**
 	 * Signs the terms of use for a user
 	 */
 	public void signTermsOfUse(boolean accepted, AsyncCallback<Void> callback);

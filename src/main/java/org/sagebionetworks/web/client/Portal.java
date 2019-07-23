@@ -9,7 +9,6 @@ import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
-import com.google.gwt.core.client.ScriptInjector;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
@@ -62,54 +61,52 @@ public class Portal implements EntryPoint {
 				@Override
 				public void onSuccess() {
 					try {
-						// load the previous session, if there is one
-						ginjector.getAuthenticationController().reloadUserSessionData(() -> {
-							// make sure jsni utils code is available to the client
-							ginjector.getSynapseJSNIUtils();
-							EventBus eventBus = ginjector.getEventBus();
-							PlaceController placeController = new PlaceController(eventBus);
+						// previous session will be detected on place change (if there is one).  do not block app load to check.
+						// make sure jsni utils code is available to the client
+						ginjector.getSynapseJSNIUtils();
+						EventBus eventBus = ginjector.getEventBus();
+						PlaceController placeController = new PlaceController(eventBus);
 
-							// Start ActivityManager for the main widget with our ActivityMapper
-							AppActivityMapper activityMapper = new AppActivityMapper(ginjector, new SynapseJSNIUtilsImpl(), null);
-							ActivityManager activityManager = new ActivityManager(activityMapper, eventBus);
-							activityManager.setDisplay(appWidget);
-							
-							// All pages get added to the root panel
-							appWidget.addStyleName("rootPanel");
+						// Start ActivityManager for the main widget with our ActivityMapper
+						AppActivityMapper activityMapper = new AppActivityMapper(ginjector, new SynapseJSNIUtilsImpl(), null);
+						ActivityManager activityManager = new ActivityManager(activityMapper, eventBus);
+						activityManager.setDisplay(appWidget);
+						
+						// All pages get added to the root panel
+						appWidget.addStyleName("rootPanel");
 
-							// Start PlaceHistoryHandler with our PlaceHistoryMapper
-							AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);
-							final PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);		
-							historyHandler.register(placeController, eventBus, AppActivityMapper.getDefaultPlace());						
-							Header header = ginjector.getHeader();
-							RootPanel.get("headerPanel").add(header);
-							Footer footer = ginjector.getFooter();
-							RootPanel.get("footerPanel").add(footer);
+						// Start PlaceHistoryHandler with our PlaceHistoryMapper
+						AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);
+						final PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);
+						historyHandler.register(placeController, eventBus, AppActivityMapper.getDefaultPlace());
+						Header header = ginjector.getHeader();
+						RootPanel.get("headerPanel").add(header);
+						Footer footer = ginjector.getFooter();
+						RootPanel.get("footerPanel").add(footer);
+						
+						RootPanel.get("rootPanel").add(appWidget);
+						RootPanel.get("initialLoadingUI").setVisible(false);
+						fullOpacity(RootPanel.get("headerPanel"), RootPanel.get("rootPanel"));
+						final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
+						globalApplicationState.setPlaceController(placeController);
+						globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
+						globalApplicationState.init(new Callback() {
 							
-							RootPanel.get("rootPanel").add(appWidget);
-							RootPanel.get("initialLoadingUI").setVisible(false);
-							fullOpacity(RootPanel.get("headerPanel"), RootPanel.get("rootPanel"));
-							final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
-							globalApplicationState.setPlaceController(placeController);
-							globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
-							globalApplicationState.init(new Callback() {
+							@Override
+							public void invoke() {
+								//listen for window close (or navigating away)
+								registerWindowClosingHandler(globalApplicationState);
+								registerOnPopStateHandler(globalApplicationState);
 								
-								@Override
-								public void invoke() {
-									//listen for window close (or navigating away)
-									registerWindowClosingHandler(globalApplicationState);
-									registerOnPopStateHandler(globalApplicationState);
-									
-									// start version timer
-									ginjector.getVersionTimer().start();
-									// start timer to check for user session state change (session expired, or user explicitly logged out)
-									ginjector.getSessionDetector().start();
-									
-									// Goes to place represented on URL or default place
-									historyHandler.handleCurrentHistory();
-									globalApplicationState.initializeDropZone();
-								}
-							});
+								// start version timer
+								ginjector.getVersionTimer().start();
+								// start timer to check for user session state change (session expired, or user explicitly logged out)
+								ginjector.getSessionDetector().start();
+								
+								// Goes to place represented on URL or default place
+								historyHandler.handleCurrentHistory();
+								globalApplicationState.initializeDropZone();
+							}
 						});
 					} catch (Throwable e) {
 						onFailure(e);

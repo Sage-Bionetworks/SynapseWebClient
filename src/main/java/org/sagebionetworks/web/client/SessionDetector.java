@@ -39,7 +39,7 @@ public class SessionDetector {
 			String currentSessionUserId = getSessionMarker();
 			if (!Objects.equals(authController.getCurrentUserPrincipalId(), currentSessionUserId)) {
 				// session token state mismatch, update the app state by reloading (refresh leads to auth controller detecting app reload)
-				Window.Location.reload();
+				authController.checkForUserChange();
 			}
 		}, INTERVAL_MS);
 	}
