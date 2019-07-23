@@ -769,7 +769,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		_unmountComponentAtNode(el);
 	}
 	public final static native void _unmountComponentAtNode(Element el) /*-{
-		return $wnd.ReactDOM.unmountComponentAtNode(el);
+		$wnd.ReactDOM.unmountComponentAtNode(el);
 	}-*/;
 	
 	@Override
