@@ -9,6 +9,7 @@ import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -50,13 +51,15 @@ public class WikiAttachmentsTest {
 		testHandle.setFileName(testFileName1);
 		testHandle.setId("12");
 		testHandle.setIsPreview(false);
+		handles = new ArrayList<>();
+		handles.add(testHandle);
 
 		S3FileHandle testHandle2 = new S3FileHandle();
 		testHandle2.setFileName(testFileName2);
 		testHandle2.setId(testFileId);
-
 		testHandle2.setIsPreview(false);
-		handles = Arrays.asList(testHandle, testHandle2);
+		handles.add(testHandle2);
+
 		testResults.setList(handles);
 		
 		// setup the entity editor with 
