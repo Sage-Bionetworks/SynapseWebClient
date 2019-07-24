@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.FileHandleUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -35,7 +36,7 @@ public class WikiFilesPreviewWidgetViewImpl extends FlowPanel implements WikiFil
 		
 		for (Iterator iterator = list.iterator(); iterator.hasNext();) {
 			FileHandle fileHandle = (FileHandle) iterator.next();
-			if (!(fileHandle instanceof CloudProviderFileHandleInterface) || !((CloudProviderFileHandleInterface)fileHandle).getIsPreview()){
+			if (!FileHandleUtils.isPreviewFileHandle(fileHandle)){
 				String style = "span-5 left";
 				if(col == 3 || col == list.size()-1 ){
 				style = style+" last";

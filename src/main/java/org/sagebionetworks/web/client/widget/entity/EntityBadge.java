@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.FileHandleUtils;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
@@ -156,7 +157,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	public static FileHandle getDataFileHandle(List<FileHandle> handles) {
 		if (handles != null) {
 			for (FileHandle handle: handles) {
-				if (!(handle instanceof CloudProviderFileHandleInterface) || !((CloudProviderFileHandleInterface) handle).getIsPreview()) {
+				if (!FileHandleUtils.isPreviewFileHandle(handle)) {
 					return handle;
 				}
 			}
