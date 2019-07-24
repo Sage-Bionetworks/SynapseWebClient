@@ -43,8 +43,8 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionableEntity;
+import org.sagebionetworks.repo.model.file.CloudProviderFileHandleInterface;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Search;
@@ -53,6 +53,7 @@ import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.FileHandleUtils;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -773,12 +774,12 @@ public class DisplayUtils {
 	 * @param bundle
 	 * @return
 	 */
-	public static PreviewFileHandle getPreviewFileHandle(EntityBundle bundle) {
-		PreviewFileHandle fileHandle = null;
+	public static CloudProviderFileHandleInterface getPreviewFileHandle(EntityBundle bundle) {
+		CloudProviderFileHandleInterface fileHandle = null;
 		if (bundle.getFileHandles() != null) {
 			for (FileHandle fh : bundle.getFileHandles()) {
-				if (fh instanceof PreviewFileHandle) {
-					fileHandle = (PreviewFileHandle) fh;
+				if (FileHandleUtils.isPreviewFileHandle(fh)) {
+					fileHandle = (CloudProviderFileHandleInterface) fh;
 					break;
 				}
 			}

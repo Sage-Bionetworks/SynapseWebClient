@@ -9,7 +9,7 @@ import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -81,8 +81,8 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 			//don't ask for the size if it's external, just display that this is external data
 			if (fileHandle instanceof ExternalFileHandle) {
 				configureExternalFile((ExternalFileHandle)fileHandle);
-			} else if (fileHandle instanceof S3FileHandleInterface){
-				configureS3File((S3FileHandleInterface)fileHandle);
+			} else if (fileHandle instanceof S3FileHandle){
+				configureS3File((S3FileHandle) fileHandle);
 			} else if (fileHandle instanceof ExternalObjectStoreFileHandle) {
 				configureExternalObjectStore((ExternalObjectStoreFileHandle)fileHandle);
 			}
@@ -143,7 +143,7 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 		view.setFileLocation("| External Storage");
 	}
 
-	public void configureS3File(S3FileHandleInterface s3FileHandle) {
+	public void configureS3File(S3FileHandle s3FileHandle) {
 		Long synapseStorageLocationId = Long.valueOf(synapseProperties.getSynapseProperty("org.sagebionetworks.portal.synapse_storage_id"));
 		// Uploads to Synapse Storage often do not get their storage location field back-filled,
 		// so null also indicates a Synapse-Stored file

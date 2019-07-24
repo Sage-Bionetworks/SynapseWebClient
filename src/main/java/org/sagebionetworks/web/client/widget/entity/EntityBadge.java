@@ -8,9 +8,9 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.file.CloudProviderFileHandleInterface;
 import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.FileHandleUtils;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
@@ -156,7 +157,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	public static FileHandle getDataFileHandle(List<FileHandle> handles) {
 		if (handles != null) {
 			for (FileHandle handle: handles) {
-				if (!(handle instanceof PreviewFileHandle)) {
+				if (!FileHandleUtils.isPreviewFileHandle(handle)) {
 					return handle;
 				}
 			}

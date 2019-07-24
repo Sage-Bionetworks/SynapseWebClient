@@ -16,7 +16,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
@@ -48,15 +47,19 @@ public class WikiAttachmentsTest {
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockView = Mockito.mock(WikiAttachmentsView.class);
 		FileHandleResults testResults = new FileHandleResults();
-		FileHandle testHandle = new S3FileHandle();
+		S3FileHandle testHandle = new S3FileHandle();
 		testHandle.setFileName(testFileName1);
 		testHandle.setId("12");
-		handles = new ArrayList<FileHandle>();
+		testHandle.setIsPreview(false);
+		handles = new ArrayList<>();
 		handles.add(testHandle);
-		FileHandle testHandle2 = new S3FileHandle();
+
+		S3FileHandle testHandle2 = new S3FileHandle();
 		testHandle2.setFileName(testFileName2);
 		testHandle2.setId(testFileId);
+		testHandle2.setIsPreview(false);
 		handles.add(testHandle2);
+
 		testResults.setList(handles);
 		
 		// setup the entity editor with 

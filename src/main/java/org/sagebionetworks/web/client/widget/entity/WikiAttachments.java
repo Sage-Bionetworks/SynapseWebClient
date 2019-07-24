@@ -5,11 +5,12 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.file.CloudProviderFileHandleInterface;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.utils.FileHandleUtils;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -78,7 +79,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 		//only include non-preview file handles
 		List<FileHandle> workingSet = new ArrayList<FileHandle>();
 		for (FileHandle fileHandle : allFileHandles) {
-			if (!(fileHandle instanceof PreviewFileHandle)){
+			if (!FileHandleUtils.isPreviewFileHandle(fileHandle)) {
 				workingSet.add(fileHandle);
 			}
 		}

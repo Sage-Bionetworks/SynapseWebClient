@@ -59,7 +59,6 @@ import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.search.SearchResults;
-import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.subscription.SubscriberCount;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.subscription.Subscription;
@@ -392,8 +391,6 @@ public class SynapseJavascriptFactory {
 			return new AsyncJobId(json).getToken();
 		case LoginResponse:
 			return new LoginResponse(json);
-		case Etag:
-			return new Etag(json);
 		case Activity:
 			return new Activity(json);
 		case MultipartUploadStatus : 
