@@ -21,6 +21,7 @@ import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.presenter.TeamPresenter;
@@ -86,6 +87,8 @@ public class TeamPresenterTest {
 	TeamMembershipStatus mockTeamMembershipStatus;
 	@Mock
 	TeamProjectsModalWidget mockTeamProjectsModalWidget;
+	@Mock
+	PortalGinInjector mockGinInjector;
 	
 	String teamId = "123";
 	String teamName = "testTeam";
@@ -111,11 +114,15 @@ public class TeamPresenterTest {
 	
 	@Before
 	public void setup() {
+		when(mockGinInjector.getTeamDeleteModalWidget()).thenReturn(mockDeleteModal);
+		when(mockGinInjector.getTeamEditModalWidget()).thenReturn(mockEditModal);
+		when(mockGinInjector.getTeamLeaveModalWidget()).thenReturn(mockLeaveModal);
+		when(mockGinInjector.getTeamProjectsModalWidget()).thenReturn(mockTeamProjectsModalWidget);
+		
 		presenter = new TeamPresenter(mockView, mockAuthenticationController, mockGlobalAppState, 
-				mockSynClient, mockSynAlert, mockLeaveModal, mockDeleteModal, mockEditModal, 
-				mockInviteModal, mockJoinWidget, mockManagerListWidget, mockMemberListWidget, 
+				mockSynClient, mockSynAlert, mockInviteModal, mockJoinWidget, mockManagerListWidget, mockMemberListWidget, 
 				mockOpenMembershipRequestsWidget, mockOpenUserInvitationsWidget, mockGoogleMap, mockCookies,
-				mockTeamProjectsModalWidget, mockIsACTMemberAsyncHandler);
+				mockIsACTMemberAsyncHandler, mockGinInjector);
 		when(mockTeam.getName()).thenReturn(teamName);
 		AsyncMockStubber.callSuccessWith(mockTeamBundle).when(mockSynClient).getTeamBundle(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		
@@ -140,17 +147,12 @@ public class TeamPresenterTest {
 	public void testConstruction() {
 		verify(mockView).setPresenter(presenter);
 		verify(mockView).setSynAlertWidget(any(Widget.class));
-		verify(mockView).addWidgets(any(Widget.class), any(Widget.class), any(Widget.class), any(Widget.class));
 		verify(mockView).setInviteMemberWidget(any(Widget.class));
 		verify(mockView).setJoinTeamWidget(any(Widget.class));
 		verify(mockView).setOpenMembershipRequestWidget(any(Widget.class));
 		verify(mockView).setOpenUserInvitationsWidget(any(Widget.class));
 		verify(mockView).setManagerListWidget(any(Widget.class));
 		verify(mockView).setMemberListWidget(any(Widget.class));
-		verify(mockLeaveModal).setRefreshCallback(any(Callback.class));
-		verify(mockEditModal).setRefreshCallback(any(Callback.class));
-		verify(mockDeleteModal).setRefreshCallback(any(Callback.class));
-		verify(mockInviteModal).setRefreshCallback(any(Callback.class));
 		verify(mockView).setMap(any(Widget.class));
 	}
 	
@@ -280,4 +282,47 @@ public class TeamPresenterTest {
 		verify(mockOpenMembershipRequestsWidget, never()).configure(anyString(), eq(callback));
 	}
 
+	@Test
+	public void testShowDeleteModal() {
+		presenter.refresh(teamId);
+		
+		presenter.showDeleteModal();
+		
+		verify(mockDeleteModal).setRefreshCallback(any(Callback.class));
+		verify(mockView).addWidgets(any(Widget.class));
+		verify(mockDeleteModal).configure(mockTeam);
+		verify(mockDeleteModal).showDialog();
+	}
+	
+	@Test
+	public void testShowEditModal() {
+		presenter.refresh(teamId);
+		
+		presenter.showEditModal();
+		
+		verify(mockEditModal).setRefreshCallback(any(Callback.class));
+		verify(mockView).addWidgets(any(Widget.class));
+		verify(mockEditModal).configureAndShow(mockTeam);
+	}
+	
+	@Test
+	public void testShowLeaveModal() {
+		presenter.refresh(teamId);
+		
+		presenter.showLeaveModal();
+		
+		verify(mockLeaveModal).setRefreshCallback(any(Callback.class));
+		verify(mockView).addWidgets(any(Widget.class));
+		verify(mockLeaveModal).configure(mockTeam);
+		verify(mockLeaveModal).showDialog();
+	}
+	@Test
+	public void testShowTeamProjectsModal() {
+		presenter.refresh(teamId);
+		
+		presenter.showTeamProjectsModal();
+		
+		verify(mockView).addWidgets(any(Widget.class));
+		verify(mockTeamProjectsModalWidget).configureAndShow(mockTeam);
+	}
 }

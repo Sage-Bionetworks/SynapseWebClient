@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
@@ -56,15 +57,18 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	private String currentTeamId;
 	private IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	private TeamProjectsModalWidget teamProjectsModalWidget;
-	
+	private PortalGinInjector ginInjector;
+	Callback refreshCallback = () -> {
+		refresh();
+	};
+
 	@Inject
 	public TeamPresenter(TeamView view,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
-			SynapseAlert synAlert, TeamLeaveModalWidget leaveTeamWidget,
-			TeamDeleteModalWidget deleteTeamWidget,
-			TeamEditModalWidget editTeamWidget, InviteWidget inviteWidget,
+			SynapseAlert synAlert,
+			InviteWidget inviteWidget,
 			JoinTeamWidget joinTeamWidget,
 			MemberListWidget managerListWidget,
 			MemberListWidget memberListWidget,
@@ -72,29 +76,25 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			OpenUserInvitationsWidget openUserInvitationsWidget,
 			GoogleMap map,
 			CookieProvider cookies,
-			TeamProjectsModalWidget teamProjectsModalWidget,
-			IsACTMemberAsyncHandler isACTMemberAsyncHandler) {
+			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
+			PortalGinInjector ginInjector) {
 		this.view = view;
+		this.ginInjector = ginInjector;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.synAlert = synAlert;
-		this.leaveTeamWidget = leaveTeamWidget;
-		this.deleteTeamWidget = deleteTeamWidget;
-		this.editTeamWidget = editTeamWidget;
 		this.inviteWidget = inviteWidget;
 		this.joinTeamWidget = joinTeamWidget;
 		this.managerListWidget = managerListWidget;
 		this.memberListWidget = memberListWidget;
 		this.openMembershipRequestsWidget = openMembershipRequestsWidget;
-		this.teamProjectsModalWidget = teamProjectsModalWidget;
 		this.openUserInvitationsWidget = openUserInvitationsWidget;
 		this.map = map;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		view.setPresenter(this);
 		view.setSynAlertWidget(synAlert.asWidget());
-		view.addWidgets(leaveTeamWidget.asWidget(), deleteTeamWidget.asWidget(), editTeamWidget.asWidget(), teamProjectsModalWidget.asWidget());
 		view.setInviteMemberWidget(inviteWidget.asWidget());
 		view.setJoinTeamWidget(joinTeamWidget.asWidget());
 		view.setOpenMembershipRequestWidget(openUserInvitationsWidget.asWidget());
@@ -103,16 +103,42 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		view.setMemberListWidget(memberListWidget.asWidget());
 		view.setMap(map.asWidget());
 		view.setShowMapVisible(DisplayUtils.isInTestWebsite(cookies));
-		Callback refreshCallback = new Callback() {
-			@Override
-			public void invoke() {
-				refresh();
-			}
-		};
-		leaveTeamWidget.setRefreshCallback(refreshCallback);
-		editTeamWidget.setRefreshCallback(refreshCallback);
-		deleteTeamWidget.setRefreshCallback(refreshCallback);
 		inviteWidget.setRefreshCallback(refreshCallback);
+	}
+	
+	private TeamDeleteModalWidget getTeamDeleteModalWidget() {
+		if (deleteTeamWidget == null) {
+			deleteTeamWidget = ginInjector.getTeamDeleteModalWidget();
+			deleteTeamWidget.setRefreshCallback(refreshCallback);
+			view.addWidgets(deleteTeamWidget.asWidget());
+		}
+		return deleteTeamWidget;
+	}
+	
+	private TeamLeaveModalWidget getTeamLeaveModalWidget() {
+		if (leaveTeamWidget == null) {
+			leaveTeamWidget = ginInjector.getTeamLeaveModalWidget();
+			leaveTeamWidget.setRefreshCallback(refreshCallback);
+			view.addWidgets(leaveTeamWidget.asWidget());
+		}
+		return leaveTeamWidget;
+	}
+
+	private TeamEditModalWidget getTeamEditModalWidget() {
+		if (editTeamWidget == null) {
+			editTeamWidget = ginInjector.getTeamEditModalWidget();
+			editTeamWidget.setRefreshCallback(refreshCallback);
+			view.addWidgets(editTeamWidget.asWidget());
+		}
+		return editTeamWidget;
+	}
+
+	private TeamProjectsModalWidget getTeamProjectsModalWidget() {
+		if (teamProjectsModalWidget == null) {
+			teamProjectsModalWidget = ginInjector.getTeamProjectsModalWidget();
+			view.addWidgets(teamProjectsModalWidget.asWidget());
+		}
+		return teamProjectsModalWidget;
 	}
 
 	@Override
@@ -254,21 +280,21 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	@Override
 	public void showEditModal() {
 		synAlert.clear();
-		editTeamWidget.configureAndShow(team);
+		getTeamEditModalWidget().configureAndShow(team);
 	}
 
 	@Override
 	public void showDeleteModal() {
 		synAlert.clear();
-		deleteTeamWidget.configure(team);
-		deleteTeamWidget.showDialog();
+		getTeamDeleteModalWidget().configure(team);
+		getTeamDeleteModalWidget().showDialog();
 	}
 
 	@Override
 	public void showLeaveModal() {
 		synAlert.clear();
-		leaveTeamWidget.configure(team);
-		leaveTeamWidget.showDialog();		
+		getTeamLeaveModalWidget().configure(team);
+		getTeamLeaveModalWidget().showDialog();		
 	}
 	
 	//testing only
@@ -287,7 +313,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	
 	@Override
 	public void showTeamProjectsModal() {
-		teamProjectsModalWidget.configureAndShow(team);
+		getTeamProjectsModalWidget().configureAndShow(team);
 	}
 }
 
