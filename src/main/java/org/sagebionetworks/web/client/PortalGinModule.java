@@ -698,6 +698,8 @@ import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidget
 import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidgetView;
 import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.team.controller.TeamProjectsModalWidgetView;
+import org.sagebionetworks.web.client.widget.team.controller.TeamProjectsModalWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.upload.FileHandleListView;
 import org.sagebionetworks.web.client.widget.upload.FileHandleListViewImpl;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadView;
@@ -1367,5 +1369,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityPresenterEventBinder.class).to(EntityPresenterEventBinderImpl.class);
 		bind(Linkify.class).to(LinkifyImpl.class);
 		bind(PasswordResetSignedTokenView.class).to(PasswordResetSignedTokenViewImpl.class);
+		bind(TeamProjectsModalWidgetView.class).to(TeamProjectsModalWidgetViewImpl.class);
 	}
 }

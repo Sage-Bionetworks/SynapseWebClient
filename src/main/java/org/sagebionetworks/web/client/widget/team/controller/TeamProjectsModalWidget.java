@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.team.controller;
 
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.ModalSize;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.Team;
@@ -14,7 +13,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.modal.Dialog;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -22,38 +20,42 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class TeamProjectsModalWidget implements IsWidget {
+public class TeamProjectsModalWidget implements IsWidget, TeamProjectsModalWidgetView.Presenter {
 
 	SynapseAlert synAlert;
 	SynapseJavascriptClient jsClient;
-	Dialog modal;
+	TeamProjectsModalWidgetView view;
 	LoadMoreWidgetContainer loadMoreWidgetContainer;
 	Team team;
 	PortalGinInjector ginInjector;
 	int currentOffset;
 	Callback loadMoreCallback;
 	ClickHandler projectBadgeClickHandler = event -> {
-		modal.hide();
+		view.hide();
 	};
+	ProjectListSortColumn currentSortColumn;
+	SortDirection currentSortDirection;
 	
 	@Inject
 	public TeamProjectsModalWidget(
 			SynapseAlert synAlert,
 			SynapseJavascriptClient jsClient,
 			PortalGinInjector ginInjector,
-			Dialog modal) {
+			TeamProjectsModalWidgetView view) {
 		this.synAlert = synAlert;
 		this.jsClient = jsClient;
 		this.ginInjector = ginInjector;
-		this.modal = modal;
+		this.view = view;
 		loadMoreCallback = () -> {
 			getMoreTeamProjects();
 		};
+		view.setPresenter(this);
+		view.setSynAlertWidget(synAlert.asWidget());
 	}
 	
 	@Override
 	public Widget asWidget() {
-		return modal.asWidget();
+		return view.asWidget();
 	}
 
 	public void clear() {
@@ -61,24 +63,23 @@ public class TeamProjectsModalWidget implements IsWidget {
 		loadMoreWidgetContainer = ginInjector.getLoadMoreProjectsWidgetContainer();
 		loadMoreWidgetContainer.configure(loadMoreCallback);
 		currentOffset = 0;
+		view.setProjectsContent(loadMoreWidgetContainer);
 	}
 	
 	public void configureAndShow(Team team) {
 		clear();
+		currentSortColumn = ProjectListSortColumn.LAST_ACTIVITY;
+		currentSortDirection = SortDirection.DESC;
 		this.team = team;
-		boolean autoHide = true;
 		String title = team.getName() + " Projects";
-		String defaultButtonText = "Close";
-		String primaryButtonText = null;
-		Dialog.Callback callback = null;
-		modal.configure(title, loadMoreWidgetContainer.asWidget(), primaryButtonText, defaultButtonText, callback, autoHide);
-		modal.setSize(ModalSize.LARGE);
-		modal.show();
+		view.setTitle(title);
+		view.show();
 		getMoreTeamProjects();
 	}
 	
 	public void getMoreTeamProjects() {
-		jsClient.getProjectsForTeam(team.getId(), ProfilePresenter.PROJECT_PAGE_SIZE, currentOffset, ProjectListSortColumn.LAST_ACTIVITY, SortDirection.DESC, new AsyncCallback<List<ProjectHeader>>(){
+		synAlert.clear();
+		jsClient.getProjectsForTeam(team.getId(), ProfilePresenter.PROJECT_PAGE_SIZE, currentOffset, currentSortColumn, currentSortDirection, new AsyncCallback<List<ProjectHeader>>(){
 			@Override
 			public void onSuccess(List<ProjectHeader> projectHeaders) {
 				for (int i = 0; i < projectHeaders.size(); i++) {
@@ -94,8 +95,17 @@ public class TeamProjectsModalWidget implements IsWidget {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				// TODO: show error
+				synAlert.handleException(caught);
 			}
 		});
+	}
+	
+	@Override
+	public void sort(ProjectListSortColumn column) {
+		clear();
+		currentSortColumn = column;
+		currentSortDirection = SortDirection.ASC.equals(currentSortDirection) ? SortDirection.DESC : SortDirection.ASC;
+		view.setSortDirection(currentSortColumn, currentSortDirection);
+		getMoreTeamProjects();
 	}
 }
