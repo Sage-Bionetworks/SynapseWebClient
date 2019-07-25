@@ -1116,7 +1116,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				postEditProvenance();
 			});
 		} else {
-			view.showErrorMessage("Can only edit the provenance of the current version in the web.");
+			view.showErrorMessage("Can only edit the provenance of the most recent version.");
 		}
 	}
 	
