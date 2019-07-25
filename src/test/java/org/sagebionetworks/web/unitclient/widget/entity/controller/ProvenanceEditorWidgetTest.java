@@ -36,6 +36,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWid
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceURLDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryView;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.shared.EventBus;
@@ -182,7 +183,7 @@ public class ProvenanceEditorWidgetTest {
 	public void onSaveSuccess() {
 		AsyncMockStubber.callSuccessWith(null)
 				.when(mockJsClient).updateActivity(eq(mockActivity), any(AsyncCallback.class));
-		presenter.setActivty(mockActivity);
+		presenter.setActivity(mockActivity);
 		presenter.onSave();
 		verify(mockUrlProvEntry, times(2)).getURL();
 		verify(mockUrlProvEntry, times(2)).getTitle();
@@ -198,10 +199,23 @@ public class ProvenanceEditorWidgetTest {
 	}
 	
 	@Test
+	public void onSaveNewActivitySuccess() {
+		AsyncMockStubber.callFailureWith(new NotFoundException())
+			.when(mockJsClient).getActivityForEntityVersion(anyString(), anyLong(), any(AsyncCallback.class));
+		presenter.configure(mockEntityBundle);
+		AsyncMockStubber.callSuccessWith(null)
+				.when(mockJsClient).createActivityAndLinkToEntity(any(Activity.class), eq(mockEntity), any(AsyncCallback.class));
+		presenter.onSave();
+		verify(mockJsClient).createActivityAndLinkToEntity(any(Activity.class), eq(mockEntity), any(AsyncCallback.class));
+		verify(mockView).hide();
+		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
+	}
+	
+	@Test
 	public void onSaveFailure() {
 		AsyncMockStubber.callFailureWith(caught)
 				.when(mockJsClient).updateActivity(eq(mockActivity), any(AsyncCallback.class));
-		presenter.setActivty(mockActivity);
+		presenter.setActivity(mockActivity);
 		presenter.onSave();
 		verify(mockJsClient).updateActivity(eq(mockActivity), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(caught);

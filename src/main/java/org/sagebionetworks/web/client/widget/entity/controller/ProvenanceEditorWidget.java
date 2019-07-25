@@ -223,7 +223,7 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 	/*
 	 * Testing purposes only
 	 */
-	public void setActivty(Activity act) {
+	public void setActivity(Activity act) {
 		this.activity = act;
 	}
 }
