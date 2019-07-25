@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
@@ -71,6 +72,8 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@UiField
 	AnchorListItem manageAccessItem;
 	@UiField
+	AnchorListItem teamProjectsItem;
+	@UiField
 	Div mapPanel;
 	@UiField
 	Modal mapModal;
@@ -84,17 +87,20 @@ public class TeamViewImpl extends Composite implements TeamView {
 	private Header headerWidget;
 	private GWTWrapper gwt;
 	private BigTeamBadge bigTeamBadge;
-	
+	private CookieProvider cookieProvider;
 	@Inject
 	public TeamViewImpl(TeamViewImplUiBinder binder, 
 			InviteWidget inviteWidget, 
 			Header headerWidget, 
 			GWTWrapper gwt,
-			BigTeamBadge bigTeamBadge) {
+			BigTeamBadge bigTeamBadge,
+			CookieProvider cookieProvider
+			) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.gwt = gwt;
 		this.bigTeamBadge = bigTeamBadge;
+		this.cookieProvider = cookieProvider;
 		setDropdownHandlers();
 		headerWidget.configure();
 		teamBadgeContainer.clear();
@@ -128,27 +134,32 @@ public class TeamViewImpl extends Composite implements TeamView {
 	private void setDropdownHandlers() {
 		inviteMemberItem.addClickHandler(event ->  {
 			gwt.scheduleDeferred(() -> {
-				presenter.showInviteModal();		
+				presenter.showInviteModal();
 			});
 		});
 		editTeamItem.addClickHandler(event -> {
 			gwt.scheduleDeferred(() -> {
-				presenter.showEditModal();		
+				presenter.showEditModal();
 			});
 		});
 		deleteTeamItem.addClickHandler(event -> {
 			gwt.scheduleDeferred(() -> {
-				presenter.showDeleteModal();		
+				presenter.showDeleteModal();
 			});
 		});
 		leaveTeamItem.addClickHandler(event -> {
 			gwt.scheduleDeferred(() -> {
-				presenter.showLeaveModal();		
+				presenter.showLeaveModal();
 			});
 		});
 		manageAccessItem.addClickHandler(event -> {
 			gwt.scheduleDeferred(() -> {
-				presenter.onManageAccess();		
+				presenter.onManageAccess();
+			});
+		});
+		teamProjectsItem.addClickHandler(event -> {
+			gwt.scheduleDeferred(() -> {
+				presenter.showTeamProjectsModal();
 			});
 		});
 	}
@@ -210,6 +221,9 @@ public class TeamViewImpl extends Composite implements TeamView {
 		teamNameHeading.setText(team.getName());
 		bigTeamBadge.configure(team, team.getDescription(), status);
 		mapModal.setTitle(team.getName());
+
+		// TODO: remove next line to take out of alpha mode
+		teamProjectsItem.setVisible(DisplayUtils.isInTestWebsite(cookieProvider));
 	}	
 
 	@Override

@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.widget.team.OpenUserInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.controller.TeamDeleteModalWidget;
 import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidget;
 import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidget;
+import org.sagebionetworks.web.client.widget.team.controller.TeamProjectsModalWidget;
 import org.sagebionetworks.web.shared.TeamBundle;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -54,6 +55,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	private GoogleMap map;
 	private String currentTeamId;
 	private IsACTMemberAsyncHandler isACTMemberAsyncHandler;
+	private TeamProjectsModalWidget teamProjectsModalWidget;
 	
 	@Inject
 	public TeamPresenter(TeamView view,
@@ -70,6 +72,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			OpenUserInvitationsWidget openUserInvitationsWidget,
 			GoogleMap map,
 			CookieProvider cookies,
+			TeamProjectsModalWidget teamProjectsModalWidget,
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler) {
 		this.view = view;
 		this.authenticationController = authenticationController;
@@ -85,6 +88,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		this.managerListWidget = managerListWidget;
 		this.memberListWidget = memberListWidget;
 		this.openMembershipRequestsWidget = openMembershipRequestsWidget;
+		this.teamProjectsModalWidget = teamProjectsModalWidget;
 		this.openUserInvitationsWidget = openUserInvitationsWidget;
 		this.map = map;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
@@ -281,6 +285,11 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	@Override
 	public void onMemberSearch(String searchTerm) {
 		memberListWidget.search(searchTerm);
+	}
+	
+	@Override
+	public void showTeamProjectsModal() {
+		teamProjectsModalWidget.configureAndShow(team);
 	}
 }
 

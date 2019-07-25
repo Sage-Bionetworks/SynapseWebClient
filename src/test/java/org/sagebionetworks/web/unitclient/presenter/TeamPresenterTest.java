@@ -39,6 +39,7 @@ import org.sagebionetworks.web.client.widget.team.OpenUserInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.controller.TeamDeleteModalWidget;
 import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidget;
 import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidget;
+import org.sagebionetworks.web.client.widget.team.controller.TeamProjectsModalWidget;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -83,6 +84,8 @@ public class TeamPresenterTest {
 	TeamBundle mockTeamBundle;
 	@Mock
 	TeamMembershipStatus mockTeamMembershipStatus;
+	@Mock
+	TeamProjectsModalWidget mockTeamProjectsModalWidget;
 	
 	String teamId = "123";
 	String teamName = "testTeam";
@@ -112,7 +115,7 @@ public class TeamPresenterTest {
 				mockSynClient, mockSynAlert, mockLeaveModal, mockDeleteModal, mockEditModal, 
 				mockInviteModal, mockJoinWidget, mockManagerListWidget, mockMemberListWidget, 
 				mockOpenMembershipRequestsWidget, mockOpenUserInvitationsWidget, mockGoogleMap, mockCookies,
-				mockIsACTMemberAsyncHandler);
+				mockTeamProjectsModalWidget, mockIsACTMemberAsyncHandler);
 		when(mockTeam.getName()).thenReturn(teamName);
 		AsyncMockStubber.callSuccessWith(mockTeamBundle).when(mockSynClient).getTeamBundle(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		

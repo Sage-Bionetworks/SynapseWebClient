@@ -26,6 +26,7 @@ public interface TeamView extends IsWidget, SynapseView {
 		void onShowMap();
 		void onManageAccess();
 		void onMemberSearch(String searchTerm);
+		void showTeamProjectsModal();
 	}
 
 	void setSynAlertWidget(Widget asWidget);
