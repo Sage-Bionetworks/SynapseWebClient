@@ -1188,6 +1188,25 @@ public class SynapseJavascriptClient {
 		doGet(url, OBJECT_TYPE.PaginatedResultReference, callback);
 	}
 	
+	public void createActivityAndLinkToEntity(Activity activity, Entity entity, AsyncCallback<Entity> callback) {
+		String url = getRepoServiceUrl() + ACTIVITY_URI_PATH;
+		doPost(url, activity, OBJECT_TYPE.Activity, new AsyncCallback<Activity>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
+			@Override
+			public void onSuccess(Activity result) {
+				updateEntity(entity, activity.getId(), false, callback);
+			}
+		});
+	}
+
+	public void updateActivity(Activity activity, AsyncCallback<Activity> callback) {
+		String url = getRepoServiceUrl() + ACTIVITY_URI_PATH + "/" + activity.getId();
+		doPut(url, activity, OBJECT_TYPE.Activity, callback);
+	}
+
 	public void getActivityForEntityVersion(String entityId, Long versionNumber, AsyncCallback<Activity> callback) {
 		String url = getRepoServiceUrl() + ENTITY + "/" + entityId;
 		if (versionNumber != null) {

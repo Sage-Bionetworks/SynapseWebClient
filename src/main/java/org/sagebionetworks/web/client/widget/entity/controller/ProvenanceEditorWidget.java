@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,9 +14,10 @@ import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.repo.model.provenance.UsedURL;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -28,7 +27,7 @@ import com.google.inject.Inject;
 public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presenter {
 
 	ProvenanceEditorWidgetView view;
-	SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	SynapseAlert synAlert;
 	PortalGinInjector ginInjector;
 	ProvenanceListWidget usedProvenanceList;
@@ -37,16 +36,17 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 	EntityFinder entityFinder;
 	ProvenanceURLDialogWidget urlDialog;
 	EventBus eventBus;
+	Entity entity;
+	boolean isNewActivity;
 	
 	@Inject
 	public ProvenanceEditorWidget(ProvenanceEditorWidgetView view,
-			SynapseClientAsync synapseClient, SynapseAlert synAlert,
+			SynapseJavascriptClient jsClient, SynapseAlert synAlert,
 			PortalGinInjector ginInjector, EntityFinder entityFinder,
 			ProvenanceURLDialogWidget urlDialog,
 			EventBus eventBus) {
 		this.view = view;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
+		this.jsClient = jsClient;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
 		this.entityFinder = entityFinder;
@@ -67,12 +67,19 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 	
 	public void configure(EntityBundle entityBundle) {
 		clear();
-		Entity entity = entityBundle.getEntity();
-		synapseClient.getOrCreateActivityForEntityVersion(entity.getId(), null, new AsyncCallback<Activity>() {
+		entity = entityBundle.getEntity();
+		isNewActivity = false;
+		jsClient.getActivityForEntityVersion(entity.getId(), null, new AsyncCallback<Activity>() {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
+				if (caught instanceof NotFoundException) {
+					isNewActivity = true;
+					usedProvenanceList.configure(new LinkedList<ProvenanceEntry>());
+					executedProvenanceList.configure(new LinkedList<ProvenanceEntry>());
+				} else {
+					synAlert.handleException(caught);	
+				}
 			}
 			
 			@Override
@@ -84,7 +91,7 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 				if (allProvenance != null) {
 					List<ProvenanceEntry> usedEntries = new LinkedList<ProvenanceEntry>();
 					List<ProvenanceEntry> executedEntries = new LinkedList<ProvenanceEntry>();
-					for (Used provEntry: allProvenance) {    
+					for (Used provEntry: allProvenance) {
 						ProvenanceEntry toAdd;
 						if (provEntry instanceof UsedEntity) {
 							Reference ref = ((UsedEntity)provEntry).getReference();
@@ -154,19 +161,34 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 		usedSet.addAll(provEntryListToUsedSet(usedEntries, false));
 		usedSet.addAll(provEntryListToUsedSet(executedEntries, true));
 		activity.setUsed(usedSet);
-		synapseClient.putActivity(activity, new AsyncCallback<Void>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
-
-			@Override
-			public void onSuccess(Void result) {
-				view.hide();
-				eventBus.fireEvent(new EntityUpdatedEvent());
-			}
-		});
 		
+		if (isNewActivity) {
+			// create new activity, and link to entity!
+			jsClient.createActivityAndLinkToEntity(activity, entity, new AsyncCallback<Entity>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					synAlert.handleException(caught);
+				}
+				@Override
+				public void onSuccess(Entity result) {
+					view.hide();
+					eventBus.fireEvent(new EntityUpdatedEvent());
+				}
+			});
+		} else {
+			// otherwise, just update the existing activity
+			jsClient.updateActivity(activity, new AsyncCallback<Activity>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					synAlert.handleException(caught);
+				}
+				@Override
+				public void onSuccess(Activity result) {
+					view.hide();
+					eventBus.fireEvent(new EntityUpdatedEvent());
+				}
+			});
+		}
 	}
 	
 	private Set<Used> provEntryListToUsedSet(List<ProvenanceEntry> entries, boolean wasExecuted) {
