@@ -140,9 +140,7 @@ public class TeamPresenterTest {
 	public void testConstruction() {
 		verify(mockView).setPresenter(presenter);
 		verify(mockView).setSynAlertWidget(any(Widget.class));
-		verify(mockView).setLeaveTeamWidget(any(Widget.class));
-		verify(mockView).setDeleteTeamWidget(any(Widget.class));
-		verify(mockView).setEditTeamWidget(any(Widget.class));
+		verify(mockView).addWidgets(any(Widget.class), any(Widget.class), any(Widget.class), any(Widget.class));
 		verify(mockView).setInviteMemberWidget(any(Widget.class));
 		verify(mockView).setJoinTeamWidget(any(Widget.class));
 		verify(mockView).setOpenMembershipRequestWidget(any(Widget.class));

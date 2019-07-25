@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
 import org.sagebionetworks.web.client.widget.provenance.ProvViewUtil;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -102,6 +103,10 @@ public class ProjectBadge implements SynapseWidgetPresenter {
 	
 	public ProjectHeader getHeader() {
 		return header;
+	}
+	
+	public void addClickHandler(ClickHandler clickHandler) {
+		view.addClickHandler(clickHandler);
 	}
 }
 ;

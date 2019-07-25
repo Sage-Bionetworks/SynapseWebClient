@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -31,6 +32,10 @@ public class TeamProjectsModalWidget implements IsWidget {
 	PortalGinInjector ginInjector;
 	int currentOffset;
 	Callback loadMoreCallback;
+	ClickHandler projectBadgeClickHandler = event -> {
+		modal.hide();
+	};
+	
 	@Inject
 	public TeamProjectsModalWidget(
 			SynapseAlert synAlert,
@@ -44,7 +49,6 @@ public class TeamProjectsModalWidget implements IsWidget {
 		loadMoreCallback = () -> {
 			getMoreTeamProjects();
 		};
-
 	}
 	
 	@Override
@@ -80,6 +84,7 @@ public class TeamProjectsModalWidget implements IsWidget {
 				for (int i = 0; i < projectHeaders.size(); i++) {
 					ProjectBadge badge = ginInjector.getProjectBadgeWidget();
 					badge.configure(projectHeaders.get(i));
+					badge.addClickHandler(projectBadgeClickHandler);
 					Widget widget = badge.asWidget();
 					loadMoreWidgetContainer.add(widget);
 				}

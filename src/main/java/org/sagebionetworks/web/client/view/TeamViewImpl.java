@@ -42,12 +42,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@UiField
 	SimplePanel inviteMemberPanel;
 	@UiField
-	SimplePanel teamEditPanel;
-	@UiField
-	SimplePanel teamLeavePanel;
-	@UiField
-	SimplePanel teamDeletePanel;
-	@UiField
 	SimplePanel synAlertPanel;
 	@UiField
 	SimplePanel joinTeamPanel;
@@ -83,6 +77,8 @@ public class TeamViewImpl extends Composite implements TeamView {
 	org.gwtbootstrap3.client.ui.TextBox memberSearchTextBox;
 	@UiField
 	Icon memberSearchButton;
+	@UiField
+	Div widgetsContainer;
 	private Presenter presenter;
 	private Header headerWidget;
 	private GWTWrapper gwt;
@@ -230,21 +226,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 	public void setSynAlertWidget(Widget synAlert) {
 		this.synAlertPanel.setWidget(synAlert);
 	}
-
-	@Override
-	public void setLeaveTeamWidget(Widget leaveWidget) {
-		this.teamLeavePanel.setWidget(leaveWidget);
-	}
-
-	@Override
-	public void setDeleteTeamWidget(Widget deleteWidget) {
-		this.teamDeletePanel.setWidget(deleteWidget);
-	}
-
-	@Override
-	public void setEditTeamWidget(Widget editWidget) {
-		this.teamEditPanel.setWidget(editWidget);
-	}
 	
 	@Override
 	public void setInviteMemberWidget(Widget inviteWidget) {
@@ -254,6 +235,13 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@Override
 	public void setJoinTeamWidget(Widget joinWidget) {
 		this.joinTeamPanel.setWidget(joinWidget);
+	}
+	
+	@Override
+	public void addWidgets(Widget... widgets) {
+		for (Widget widget : widgets) {
+			widgetsContainer.add(widget);
+		}
 	}
 	
 	@Override

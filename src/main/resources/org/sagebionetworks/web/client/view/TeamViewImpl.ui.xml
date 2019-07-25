@@ -32,9 +32,7 @@
 					</bh:Div>
 				</bh:Div>
 			</bh:Div>
-			<g:SimplePanel ui:field="teamEditPanel"/>
-			<g:SimplePanel ui:field="teamDeletePanel"/>
-			<g:SimplePanel ui:field="teamLeavePanel"/>
+			<bh:Div ui:field="widgetsContainer" />
 			<g:SimplePanel ui:field="inviteMemberPanel"/>
 
 			<g:SimplePanel ui:field="synAlertPanel"/>

@@ -94,9 +94,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		view.setPresenter(this);
 		view.setSynAlertWidget(synAlert.asWidget());
-		view.setLeaveTeamWidget(leaveTeamWidget.asWidget());
-		view.setDeleteTeamWidget(deleteTeamWidget.asWidget());
-		view.setEditTeamWidget(editTeamWidget.asWidget());
+		view.addWidgets(leaveTeamWidget.asWidget(), deleteTeamWidget.asWidget(), editTeamWidget.asWidget(), teamProjectsModalWidget.asWidget());
 		view.setInviteMemberWidget(inviteWidget.asWidget());
 		view.setJoinTeamWidget(joinTeamWidget.asWidget());
 		view.setOpenMembershipRequestWidget(openUserInvitationsWidget.asWidget());
