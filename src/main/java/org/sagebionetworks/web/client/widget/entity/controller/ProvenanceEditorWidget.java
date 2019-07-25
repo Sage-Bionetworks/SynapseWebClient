@@ -75,6 +75,7 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 			public void onFailure(Throwable caught) {
 				if (caught instanceof NotFoundException) {
 					isNewActivity = true;
+					activity = new Activity();
 					usedProvenanceList.configure(new LinkedList<ProvenanceEntry>());
 					executedProvenanceList.configure(new LinkedList<ProvenanceEntry>());
 				} else {

@@ -1038,6 +1038,9 @@ public class SynapseJavascriptClient {
 			url += "generatedBy=" + generatedByID;
 		}
 		if (newVersion != null) {
+			if (!url.endsWith("?")) {
+				url += "&";
+			}
 			url += "newVersion=" + newVersion.toString();
 		}
 
@@ -1196,8 +1199,8 @@ public class SynapseJavascriptClient {
 				callback.onFailure(caught);
 			}
 			@Override
-			public void onSuccess(Activity result) {
-				updateEntity(entity, activity.getId(), false, callback);
+			public void onSuccess(Activity newActivity) {
+				updateEntity(entity, newActivity.getId(), false, callback);
 			}
 		});
 	}
