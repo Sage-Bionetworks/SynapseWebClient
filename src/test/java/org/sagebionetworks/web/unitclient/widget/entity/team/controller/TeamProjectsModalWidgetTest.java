@@ -1,7 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.entity.team.controller;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -9,24 +13,18 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
-import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
-import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidget;
-import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidgetView;
 import org.sagebionetworks.web.client.widget.team.controller.TeamProjectsModalWidget;
 import org.sagebionetworks.web.client.widget.team.controller.TeamProjectsModalWidgetView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
