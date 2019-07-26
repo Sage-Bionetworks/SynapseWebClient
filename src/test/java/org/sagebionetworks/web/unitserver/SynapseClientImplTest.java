@@ -1525,29 +1525,7 @@ public class SynapseClientImplTest {
 		SignedTokenInterface token = synapseClient.hexDecodeAndDeserialize("invalid token");
 	}
 	
-	@Test
-	public void testGetOrCreateActivityForEntityVersionGet() throws SynapseException, RestServiceException {
-		when(mockSynapse.getActivityForEntityVersion(anyString(), anyLong())).thenReturn(new Activity());
-		synapseClient.getOrCreateActivityForEntityVersion(entityId, version);
-		verify(mockSynapse).getActivityForEntityVersion(entityId, version);
-	}
-	
-	@Test
-	public void testGetOrCreateActivityForEntityVersionCreate() throws SynapseException, RestServiceException {
-		when(mockSynapse.getActivityForEntityVersion(anyString(), anyLong())).thenThrow(new SynapseNotFoundException());
-		when(mockSynapse.createActivity(any(Activity.class))).thenReturn(mockActivity);
-		synapseClient.getOrCreateActivityForEntityVersion(entityId, version);
-		verify(mockSynapse).getActivityForEntityVersion(entityId, version);
-		verify(mockSynapse).createActivity(any(Activity.class));
-		verify(mockSynapse).putEntity(mockSynapse.getEntityById(entityId), mockActivity.getId(), null);
-	}
-	
-	@Test(expected = Exception.class)
-	public void testGetOrCreateActivityForEntityVersionFailure() throws SynapseException, RestServiceException {
-		when(mockSynapse.getActivityForEntityVersion(anyString(), anyLong())).thenThrow(new Exception());
-		synapseClient.getOrCreateActivityForEntityVersion(entityId, version);
-	}
-	
+
 	private void setupGetMyLocationSettings() throws SynapseException, RestServiceException{
 		List<StorageLocationSetting> existingStorageLocations = new ArrayList<StorageLocationSetting>();
 		StorageLocationSetting storageLocation = new ExternalS3StorageLocationSetting();

@@ -57,17 +57,11 @@ public class ProvenanceEditorWidgetViewImpl implements ProvenanceEditorWidgetVie
 	@Inject
 	public ProvenanceEditorWidgetViewImpl(ProvenanceEditorWidgetViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
-		saveButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onSave();
-			}
+		saveButton.addClickHandler(event -> {
+			presenter.onSave();
 		});
-		cancelButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				modal.hide();
-			}
+		cancelButton.addClickHandler(event -> {
+			modal.hide();
 		});
 	}
 	

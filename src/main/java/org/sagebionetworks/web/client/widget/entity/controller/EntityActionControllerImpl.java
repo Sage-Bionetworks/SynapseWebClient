@@ -1111,6 +1111,16 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void onEditProvenance() {
+		if (isCurrentVersion) {
+			checkUpdateEntity(() -> {
+				postEditProvenance();
+			});
+		} else {
+			view.showErrorMessage("Can only edit the provenance of the most recent version.");
+		}
+	}
+	
+	private void postEditProvenance() {
 		getProvenanceEditorWidget().configure(this.entityBundle);
 		getProvenanceEditorWidget().show();
 	}

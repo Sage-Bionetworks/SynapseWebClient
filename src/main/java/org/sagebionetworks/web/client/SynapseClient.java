@@ -28,7 +28,6 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
-import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -179,11 +178,6 @@ public interface SynapseClient extends RemoteService{
 	Entity updateExternalFile(String entityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId) throws RestServiceException;
 
 	Entity createExternalFile(String parentEntityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId) throws RestServiceException;
-
-	void putActivity(Activity update) throws RestServiceException;
-
-	Activity getOrCreateActivityForEntityVersion(String entityId,
-			Long versionNumber) throws RestServiceException;
 
 	void createStorageLocationSetting(String parentEntityId, StorageLocationSetting setting) throws RestServiceException;
 

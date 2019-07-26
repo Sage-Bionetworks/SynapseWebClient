@@ -26,7 +26,6 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
-import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -188,11 +187,6 @@ public interface SynapseClientAsync {
 	void moveEntity(String entityId, String newParentEntityId, AsyncCallback<Entity> callback);
 	
 	void updateAnnotations(String entityId, Annotations annotations, AsyncCallback<Void> callback);
-
-	void getOrCreateActivityForEntityVersion(String entityId,
-			Long versionNumber, AsyncCallback<Activity> callback);
-
-	void putActivity(Activity update, AsyncCallback<Void> callback);
 
 	void createStorageLocationSetting(String parentEntityId, StorageLocationSetting setting, AsyncCallback<Void> callback);
 

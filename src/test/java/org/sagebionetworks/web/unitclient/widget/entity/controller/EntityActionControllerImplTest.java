@@ -782,6 +782,7 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testOnEditProvenance(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.EDIT_PROVENANCE);
 		verify(mockProvenanceEditorWidget).configure(entityBundle);
