@@ -26,14 +26,13 @@
 								<b:AnchorListItem icon="TIMES_CIRCLE" iconFixedWidth="true" ui:field="deleteTeamItem" visible="false" text="Delete Team" />
 								<b:AnchorListItem icon="ARROW_RIGHT" iconFixedWidth="true" ui:field="leaveTeamItem" visible="false" text="Leave Team" />
 								<b:AnchorListItem icon="FLAG" iconFixedWidth="true" ui:field="manageAccessItem" text="(ACT) Manage Access Requirements" visible="false"/> 
+								<b:AnchorListItem icon="LIST_ALT" iconFixedWidth="true" ui:field="teamProjectsItem" text="View Associated Projects" visible="false"/>
 							</b:DropDownMenu>
 						</b:DropDown>
 					</bh:Div>
 				</bh:Div>
 			</bh:Div>
-			<g:SimplePanel ui:field="teamEditPanel"/>
-			<g:SimplePanel ui:field="teamDeletePanel"/>
-			<g:SimplePanel ui:field="teamLeavePanel"/>
+			<bh:Div ui:field="widgetsContainer" />
 			<g:SimplePanel ui:field="inviteMemberPanel"/>
 
 			<g:SimplePanel ui:field="synAlertPanel"/>

@@ -26,12 +26,10 @@ public interface TeamView extends IsWidget, SynapseView {
 		void onShowMap();
 		void onManageAccess();
 		void onMemberSearch(String searchTerm);
+		void showTeamProjectsModal();
 	}
 
 	void setSynAlertWidget(Widget asWidget);
-	void setLeaveTeamWidget(Widget asWidget);
-	void setDeleteTeamWidget(Widget asWidget);
-	void setEditTeamWidget(Widget asWidget);
 	void setInviteMemberWidget(Widget inviteWidget);
 	void setJoinTeamWidget(Widget asWidget);
 	void showMemberMenuItems();
@@ -48,4 +46,5 @@ public interface TeamView extends IsWidget, SynapseView {
 	void setManageAccessVisible(boolean visible);
 	void setCommandsVisible(boolean visible);
 	int getClientHeight();
+	void addWidgets(Widget... widgets);
 }

@@ -111,5 +111,8 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 	public void addStyleName(String style) {
 		widget.addStyleName(style);
 	}
-
+	@Override
+	public void addClickHandler(ClickHandler clickHandler) {
+		anchor.addClickHandler(clickHandler);
+	}
 }

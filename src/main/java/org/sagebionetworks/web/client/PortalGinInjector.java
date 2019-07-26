@@ -244,6 +244,10 @@ import org.sagebionetworks.web.client.widget.team.OpenUserInvitationWidget;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
+import org.sagebionetworks.web.client.widget.team.controller.TeamDeleteModalWidget;
+import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidget;
+import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidget;
+import org.sagebionetworks.web.client.widget.team.controller.TeamProjectsModalWidget;
 import org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl;
 import org.sagebionetworks.web.client.widget.upload.FileHandleLink;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
@@ -594,4 +598,8 @@ public interface PortalGinInjector extends Ginjector {
 	OpenTeamInvitationWidget getOpenTeamInvitationWidget();
 	DivView getDiv();
 	DoiWidgetV2 getDoiWidget();
+	TeamDeleteModalWidget getTeamDeleteModalWidget();
+	TeamLeaveModalWidget getTeamLeaveModalWidget();
+	TeamEditModalWidget getTeamEditModalWidget();
+	TeamProjectsModalWidget getTeamProjectsModalWidget();
 }

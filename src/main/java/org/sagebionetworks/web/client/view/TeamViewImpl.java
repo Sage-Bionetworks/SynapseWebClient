@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
@@ -41,12 +42,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@UiField
 	SimplePanel inviteMemberPanel;
 	@UiField
-	SimplePanel teamEditPanel;
-	@UiField
-	SimplePanel teamLeavePanel;
-	@UiField
-	SimplePanel teamDeletePanel;
-	@UiField
 	SimplePanel synAlertPanel;
 	@UiField
 	SimplePanel joinTeamPanel;
@@ -71,6 +66,8 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@UiField
 	AnchorListItem manageAccessItem;
 	@UiField
+	AnchorListItem teamProjectsItem;
+	@UiField
 	Div mapPanel;
 	@UiField
 	Modal mapModal;
@@ -80,21 +77,26 @@ public class TeamViewImpl extends Composite implements TeamView {
 	org.gwtbootstrap3.client.ui.TextBox memberSearchTextBox;
 	@UiField
 	Icon memberSearchButton;
+	@UiField
+	Div widgetsContainer;
 	private Presenter presenter;
 	private Header headerWidget;
 	private GWTWrapper gwt;
 	private BigTeamBadge bigTeamBadge;
-	
+	private CookieProvider cookieProvider;
 	@Inject
 	public TeamViewImpl(TeamViewImplUiBinder binder, 
 			InviteWidget inviteWidget, 
 			Header headerWidget, 
 			GWTWrapper gwt,
-			BigTeamBadge bigTeamBadge) {
+			BigTeamBadge bigTeamBadge,
+			CookieProvider cookieProvider
+			) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.gwt = gwt;
 		this.bigTeamBadge = bigTeamBadge;
+		this.cookieProvider = cookieProvider;
 		setDropdownHandlers();
 		headerWidget.configure();
 		teamBadgeContainer.clear();
@@ -128,27 +130,32 @@ public class TeamViewImpl extends Composite implements TeamView {
 	private void setDropdownHandlers() {
 		inviteMemberItem.addClickHandler(event ->  {
 			gwt.scheduleDeferred(() -> {
-				presenter.showInviteModal();		
+				presenter.showInviteModal();
 			});
 		});
 		editTeamItem.addClickHandler(event -> {
 			gwt.scheduleDeferred(() -> {
-				presenter.showEditModal();		
+				presenter.showEditModal();
 			});
 		});
 		deleteTeamItem.addClickHandler(event -> {
 			gwt.scheduleDeferred(() -> {
-				presenter.showDeleteModal();		
+				presenter.showDeleteModal();
 			});
 		});
 		leaveTeamItem.addClickHandler(event -> {
 			gwt.scheduleDeferred(() -> {
-				presenter.showLeaveModal();		
+				presenter.showLeaveModal();
 			});
 		});
 		manageAccessItem.addClickHandler(event -> {
 			gwt.scheduleDeferred(() -> {
-				presenter.onManageAccess();		
+				presenter.onManageAccess();
+			});
+		});
+		teamProjectsItem.addClickHandler(event -> {
+			gwt.scheduleDeferred(() -> {
+				presenter.showTeamProjectsModal();
 			});
 		});
 	}
@@ -210,26 +217,14 @@ public class TeamViewImpl extends Composite implements TeamView {
 		teamNameHeading.setText(team.getName());
 		bigTeamBadge.configure(team, team.getDescription(), status);
 		mapModal.setTitle(team.getName());
+
+		// TODO: remove next line to take out of alpha mode
+		teamProjectsItem.setVisible(DisplayUtils.isInTestWebsite(cookieProvider));
 	}	
 
 	@Override
 	public void setSynAlertWidget(Widget synAlert) {
 		this.synAlertPanel.setWidget(synAlert);
-	}
-
-	@Override
-	public void setLeaveTeamWidget(Widget leaveWidget) {
-		this.teamLeavePanel.setWidget(leaveWidget);
-	}
-
-	@Override
-	public void setDeleteTeamWidget(Widget deleteWidget) {
-		this.teamDeletePanel.setWidget(deleteWidget);
-	}
-
-	@Override
-	public void setEditTeamWidget(Widget editWidget) {
-		this.teamEditPanel.setWidget(editWidget);
 	}
 	
 	@Override
@@ -240,6 +235,13 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@Override
 	public void setJoinTeamWidget(Widget joinWidget) {
 		this.joinTeamPanel.setWidget(joinWidget);
+	}
+	
+	@Override
+	public void addWidgets(Widget... widgets) {
+		for (Widget widget : widgets) {
+			widgetsContainer.add(widget);
+		}
 	}
 	
 	@Override
