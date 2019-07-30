@@ -30,7 +30,6 @@ import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsyncJobId;
-import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBodyInstanceFactory;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
@@ -44,7 +43,6 @@ import org.sagebionetworks.repo.model.discussion.ThreadCount;
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.v2.Doi;
-import org.sagebionetworks.repo.model.doi.v2.DoiResponse;
 import org.sagebionetworks.repo.model.file.AddPartResponse;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlResponse;
@@ -66,6 +64,7 @@ import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.PaginatedColumnModels;
+import org.sagebionetworks.repo.model.table.SnapshotResponse;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
@@ -142,6 +141,7 @@ public class SynapseJavascriptFactory {
 		Doi,
 		Subscription,
 		SearchResults,
+		SnapshotResponse,
 		PaginatedColumnModelsResults,
 		PaginatedResultsVersionInfo,
 		PaginatedResultsDiscussionThreadBundle,
@@ -257,6 +257,8 @@ public class SynapseJavascriptFactory {
 			return new Subscription(json);
 		case SearchResults : 
 			return new SearchResults(json);
+		case SnapshotResponse : 
+			return new SnapshotResponse(json);
 		case PaginatedColumnModelsResults :
 			return new PaginatedColumnModels(json).getResults();
 		case JSON :
