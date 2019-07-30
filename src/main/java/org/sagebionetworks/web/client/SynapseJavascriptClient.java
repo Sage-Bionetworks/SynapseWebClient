@@ -112,6 +112,8 @@ import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
 import org.sagebionetworks.repo.model.subscription.SubscriptionRequest;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.SnapshotRequest;
+import org.sagebionetworks.repo.model.table.SnapshotResponse;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
@@ -160,6 +162,7 @@ import com.google.inject.Inject;
  *
  */
 public class SynapseJavascriptClient {
+	public static final String TABLE_SNAPSHOT = "/table/snapshot";
 	public static final String SESSION = "/session";
 	public static final String TYPE_FILTER_PARAMETER = "&typeFilter=";
 	public static final String CHALLENGE = "/challenge";
@@ -776,10 +779,10 @@ public class SynapseJavascriptClient {
 			public void onSuccess(List<EntityHeader> results) {
 				//sort by name
 				Collections.sort(results, new Comparator<EntityHeader>() {
-			        @Override
-			        public int compare(EntityHeader o1, EntityHeader o2) {
-			        	return o1.getName().compareToIgnoreCase(o2.getName());
-			        }
+					@Override
+					public int compare(EntityHeader o1, EntityHeader o2) {
+						return o1.getName().compareToIgnoreCase(o2.getName());
+					}
 				});
 				callback.onSuccess(results);
 			};
@@ -1045,6 +1048,16 @@ public class SynapseJavascriptClient {
 		}
 
 		doPut(url, toUpdate, OBJECT_TYPE.Entity, callback);
+	}
+	
+	public void createSnapshot(String entityId, String comment, String label, String activityId, AsyncCallback<SnapshotResponse> callback){
+		// POST /entity/{id}/table/snapshot
+		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + TABLE_SNAPSHOT;
+		SnapshotRequest request = new SnapshotRequest();
+		request.setSnapshotComment(comment);
+		request.setSnapshotLabel(label);
+		request.setSnapshotActivityId(activityId);
+		doPost(url, request, OBJECT_TYPE.SnapshotResponse, callback);
 	}
 
 	public void updateV2WikiOrderHint(WikiPageKey key, V2WikiOrderHint toUpdate, AsyncCallback<V2WikiOrderHint> callback) {
