@@ -21,11 +21,11 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.SnapshotResponse;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
@@ -1304,16 +1304,13 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		prompts.add("Label");
 		prompts.add("Comment");
 		view.showMultiplePromptDialog("New Version", prompts, null, values -> {
+			String entityId = entityBundle.getEntity().getId();
 			String label = values.get(0);
 			String comment = values.get(0);
-			VersionableEntity entity = (VersionableEntity)entityBundle.getEntity();
-			entity.setVersionLabel(label);
-			entity.setVersionComment(comment);
-			boolean newVersion = true;
-			// TODO: change this to use the new "create table snapshot" service when it's available.
-			getSynapseJavascriptClient().updateEntity(entity, null, newVersion, new AsyncCallback<Entity>() {
+			String activityId = null;
+			getSynapseJavascriptClient().createSnapshot(entityId, comment, label, activityId, new AsyncCallback<SnapshotResponse>() {
 				@Override
-				public void onSuccess(Entity result) {
+				public void onSuccess(SnapshotResponse result) {
 					fireEntityUpdatedEvent();
 				}
 				@Override
