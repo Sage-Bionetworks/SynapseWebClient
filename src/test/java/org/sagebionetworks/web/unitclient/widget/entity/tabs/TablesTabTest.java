@@ -20,11 +20,13 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -37,6 +39,8 @@ import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -57,8 +61,10 @@ import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class TablesTabTest {
 	@Mock
 	Tab mockTab;
@@ -107,6 +113,10 @@ public class TablesTabTest {
 	EntityHeader mockEntityHeader;
 	@Mock
 	CookieProvider mockCookies;
+	@Mock
+	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
+	PlaceChanger mockPlaceChanger;
 	String projectEntityId = "syn666666";
 	String projectName = "a test project";
 	String tableEntityId = "syn22";
@@ -115,13 +125,13 @@ public class TablesTabTest {
 	QueryTokenProvider mockQueryTokenProvider;
 	@Captor
 	ArgumentCaptor<Map<String, String>> mapCaptor;
-	
+	@Captor
+	ArgumentCaptor<Place> placeCaptor;
 	TablesTab tab;
 	Query query;
 	
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
 		tab = new TablesTab(mockTab, mockPortalGinInjector);
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		when(mockPortalGinInjector.getCookieProvider()).thenReturn(mockCookies);
@@ -134,7 +144,9 @@ public class TablesTabTest {
 		when(mockPortalGinInjector.getStuAlert()).thenReturn(mockSynapseAlert);
 		when(mockPortalGinInjector.getModifiedCreatedByWidget()).thenReturn(mockModifiedCreatedBy);
 		when(mockPortalGinInjector.getProvenanceRenderer()).thenReturn(mockProvenanceWidget);
-		
+		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
+
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		tab.setEntitySelectedCallback(mockEntitySelectedCallback);
 		when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);
 		when(mockProjectEntity.getId()).thenReturn(projectEntityId);
@@ -322,6 +334,26 @@ public class TablesTabTest {
 		
 		verify(mockTab, never()).setEntityNameAndPlace(anyString(), any(Synapse.class));
 		verify(mockTab, never()).showTab(anyBoolean());
+	}
+	
+	@Test
+	public void testSetTableQueryChangeVersion() {
+		Long version = 9229L;
+		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+		tab.configure(mockTableEntityBundle, version, null, mockActionMenuWidget);
+		
+		reset(mockTab);
+		when(mockTab.isTabPaneVisible()).thenReturn(true);
+		when(mockTableEntityWidget.getDefaultQuery()).thenReturn(query);
+		
+		query.setSql("select * from syn1234.88888888 where x=1");
+		tab.onQueryChange(query);
+		
+		verify(mockPlaceChanger).goTo(placeCaptor.capture());
+		Synapse place = (Synapse)placeCaptor.getValue();
+		assertEquals(EntityArea.TABLES, place.getArea());
+		assertTrue(place.getAreaToken().isEmpty());
+		assertEquals(new Long(88888888), place.getVersionNumber());
 	}
 	
 	@Test
