@@ -204,7 +204,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		view.setProvenanceVisible(isTable);
 		
 		if (isTable) {
-			updateVersionAndAreaToken(version, areaToken);
+			updateVersionAndAreaToken(entity.getId(), version, areaToken);
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
 			tableTitleBar.configure(bundle);
 			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
@@ -226,30 +226,31 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		if(newQuery != null && tab.isTabPaneVisible()) {
 			String token = queryTokenProvider.queryToToken(newQuery);
 			Long versionNumber = QueryBundleUtils.getTableVersion(newQuery.getSql());
+			String synId = QueryBundleUtils.getTableIdFromSql(newQuery.getSql());
 			if(token != null && !newQuery.equals(v2TableWidget.getDefaultQuery())){
 				areaToken = TABLE_QUERY_PREFIX + token;
 			} else {
 				areaToken = "";
 			}
-			updateVersionAndAreaToken(versionNumber, areaToken);
+			updateVersionAndAreaToken(synId, versionNumber, areaToken);
 			tab.showTab(true);
 		}
 	}
 	
-	private void updateVersionAndAreaToken(Long versionNumber, String areaToken) {
+	private void updateVersionAndAreaToken(String entityId, Long versionNumber, String areaToken) {
 		boolean isVersionSupported = EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity(), ginInjector.getCookieProvider());
 		Long newVersion = isVersionSupported ? versionNumber : null;
-		Synapse newPlace = new Synapse(entityBundle.getEntity().getId(), newVersion, EntityArea.TABLES, areaToken);
+		Synapse newPlace = new Synapse(entityId, newVersion, EntityArea.TABLES, areaToken);
 		// SWC-4942: if versions are supported, and the version has changed (the version in the query does not match the entity bundle, for example),
 		// then reload the entity bundle (to reconfigure the tools menu and other widgets on the page) by doing a place change to the correct version of the bundle.
-		if (isVersionSupported && !Objects.equals(newVersion, version)) {
+		if ((isVersionSupported && !Objects.equals(newVersion, version)) || !entityId.equals(entityBundle.getEntity().getId())) {
 			ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(newPlace);
 			return;
 		}
 		metadata.configure(entityBundle, newVersion, entityActionMenu);
 		tab.setEntityNameAndPlace(entityBundle.getEntity().getName(), newPlace);
 		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(FilesTab.WIDGET_HEIGHT_PX-84));
-		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(entityBundle.getEntity().getId(), newVersion));
+		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(entityId, newVersion));
 		ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
 		view.setProvenance(provWidget);
 		provWidget.configure(configMap);

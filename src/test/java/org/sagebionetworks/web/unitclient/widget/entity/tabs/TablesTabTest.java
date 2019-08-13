@@ -165,7 +165,7 @@ public class TablesTabTest {
 		
 		// setup a complex query.
 		query = new Query();
-		query.setSql("select one, two, three from syn123 where name=\"bar\" and type in('one','two','three'");
+		query.setSql("select one, two, three from syn22 where name=\"bar\" and type in('one','two','three'");
 		query.setLimit(101L);
 		query.setOffset(33L);
 		query.setIsConsistent(true);
@@ -354,6 +354,26 @@ public class TablesTabTest {
 		assertEquals(EntityArea.TABLES, place.getArea());
 		assertTrue(place.getAreaToken().isEmpty());
 		assertEquals(new Long(88888888), place.getVersionNumber());
+	}
+	@Test
+	public void testSetTableQueryChangeTableId() {
+		Long version = null;
+		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+		tab.configure(mockTableEntityBundle, version, null, mockActionMenuWidget);
+		
+		reset(mockTab);
+		when(mockTab.isTabPaneVisible()).thenReturn(true);
+		when(mockTableEntityWidget.getDefaultQuery()).thenReturn(query);
+		
+		query.setSql("select * from syn837874873843 where x=1");
+		tab.onQueryChange(query);
+		
+		verify(mockPlaceChanger).goTo(placeCaptor.capture());
+		Synapse place = (Synapse)placeCaptor.getValue();
+		assertEquals(EntityArea.TABLES, place.getArea());
+		assertTrue(place.getAreaToken().isEmpty());
+		assertNull(place.getVersionNumber());
+		assertEquals("syn837874873843", place.getEntityId());
 	}
 	
 	@Test
