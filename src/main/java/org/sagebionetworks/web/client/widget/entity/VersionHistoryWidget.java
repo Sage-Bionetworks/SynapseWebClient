@@ -66,7 +66,7 @@ public class VersionHistoryWidget implements VersionHistoryWidgetView.Presenter,
 	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
 		this.bundle = bundle;
 		this.versionNumber = versionNumber;
-		this.canEdit = bundle.getPermissions().getCanCertifiedUserEdit() && !(bundle.getEntity() instanceof Table);
+		this.canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
 		refreshFileHistory();
 	}
 

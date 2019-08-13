@@ -54,15 +54,12 @@ public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
 	public VersionHistoryRowViewImpl(Binder binder, UserBadge userBadge, Md5Link md5Link) {
 		widget = binder.createAndBindUi(this);
 		this.md5Link = md5Link;
-		deleteButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.confirmDelete(DisplayConstants.PROMPT_SURE_DELETE + " version?", () -> {
-					if (deleteCallback != null) {
-						deleteCallback.invoke();			
-					}
-				});
-			}
+		deleteButton.addClickHandler(event -> {
+			DisplayUtils.confirmDelete(DisplayConstants.PROMPT_SURE_DELETE + " version?", () -> {
+				if (deleteCallback != null) {
+					deleteCallback.invoke();			
+				}
+			});
 		});
 		
 		md5LinkContainer.setWidget(md5Link.asWidget());
@@ -93,8 +90,8 @@ public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
 	}
 	
 	@Override
-	public void setCanEdit(boolean canEdit) {
-		deleteButton.setVisible(canEdit);
+	public void setCanDelete(boolean canDelete) {
+		deleteButton.setVisible(canDelete);
 	}
 	@Override
 	public void setIsVersionSelected(boolean isVersionSelected) {

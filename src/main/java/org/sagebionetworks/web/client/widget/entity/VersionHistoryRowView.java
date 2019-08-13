@@ -18,7 +18,7 @@ public interface VersionHistoryRowView extends IsWidget {
 			Callback deleteCallback,
 			IsWidget doiWidget);
 	
-	void setCanEdit(boolean canEdit);
+	void setCanDelete(boolean canEdit);
 	void setIsVersionSelected(boolean isVersionSelected);
 	void setSizeTableDataVisible(boolean isVisible);
 	void setMd5TableDataVisible(boolean isVisible);
