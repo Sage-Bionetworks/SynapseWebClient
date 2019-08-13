@@ -26,6 +26,8 @@ public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
 	@UiField
 	Anchor versionNameLink;
 	@UiField
+	FormControlStatic versionName;
+	@UiField
 	FormControlStatic versionComment;
 	@UiField
 	SimplePanel modifiedByContainer;
@@ -74,6 +76,7 @@ public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
 			String modifiedByUserId, String modifiedOn, String size,
 			String md5, String versionComment, Callback deleteCallback, IsWidget doiWidget) {
 		this.versionNameLink.setText(versionName);
+		this.versionName.setText(versionName);
 		this.modifiedOn.setText(modifiedOn);
 		this.versionComment.setText(versionComment);
 		this.size.setText(size);
@@ -96,8 +99,15 @@ public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
 	@Override
 	public void setIsVersionSelected(boolean isVersionSelected) {
 		if (isVersionSelected) {
-			versionNameLink.addStyleName("boldText");
+			versionName.addStyleName("boldText");
+		} else {
+			versionName.removeStyleName("boldText");
 		}
+	}
+	@Override
+	public void setIsUnlinked(boolean isUnlinked) {
+		versionName.setVisible(isUnlinked);
+		versionNameLink.setVisible(!isUnlinked);
 	}
 	@Override
 	public void setMd5TableDataVisible(boolean isVisible) {

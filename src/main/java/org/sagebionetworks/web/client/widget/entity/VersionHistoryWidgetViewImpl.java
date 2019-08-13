@@ -104,10 +104,12 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 	}
 	
 	@Override
-	public void addVersion(String entityId, final VersionInfo version, boolean canEdit, boolean isVersionSelected) {
+	public void addVersion(String entityId, final VersionInfo version, boolean canEdit, boolean isVersionSelected, Long currentVersion) {
 		VersionHistoryRowView fileHistoryRow = ginInjector.getFileHistoryRow();
 		fileHistoryRow.setMd5TableDataVisible(!isTable);
 		fileHistoryRow.setSizeTableDataVisible(!isTable);
+		boolean isUnlinked = isVersionSelected || (isTable && version.getVersionNumber().equals(currentVersion));
+		fileHistoryRow.setIsUnlinked(isUnlinked);
 		DoiWidgetV2 doiWidget = ginInjector.getDoiWidget();
 		doiWidget.setLabelVisible(false);
 		String versionName = version.getVersionLabel();

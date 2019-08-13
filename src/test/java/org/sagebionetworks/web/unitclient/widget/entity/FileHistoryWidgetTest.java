@@ -320,8 +320,8 @@ public class FileHistoryWidgetTest {
 		setupVersionResults(VersionHistoryWidget.VERSION_LIMIT, 0);
 		boolean canEdit = true;
 		when(bundle.getPermissions().getCanCertifiedUserEdit()).thenReturn(canEdit);
-		
-		fileHistoryWidget.setEntityBundle(bundle, 0L);
+		Long currentVersion = 0L;
+		fileHistoryWidget.setEntityBundle(bundle, currentVersion);
 
 		verify(mockJsClient).getEntityVersions(eq(entityId), eq(0), eq(VersionHistoryWidget.VERSION_LIMIT), any(AsyncCallback.class));
 		verify(mockView).clearVersions();
@@ -331,9 +331,9 @@ public class FileHistoryWidgetTest {
 		verify(mockView).setMoreButtonVisible(true);
 		//verify full page is added (one of which is selected)
 		boolean isVersionSelected = false;
-		verify(mockView, times(VersionHistoryWidget.VERSION_LIMIT - 1)).addVersion(eq(entityId), any(VersionInfo.class), eq(canEdit), eq(isVersionSelected));
+		verify(mockView, times(VersionHistoryWidget.VERSION_LIMIT - 1)).addVersion(eq(entityId), any(VersionInfo.class), eq(canEdit), eq(isVersionSelected), eq(currentVersion));
 		isVersionSelected = true;
-		verify(mockView).addVersion(eq(entityId), any(VersionInfo.class), eq(canEdit), eq(isVersionSelected));
+		verify(mockView).addVersion(eq(entityId), any(VersionInfo.class), eq(canEdit), eq(isVersionSelected), eq(currentVersion));
 		
 		// now get the second page (verify new offset).
 		// second page contains 2 versions only.
@@ -343,10 +343,11 @@ public class FileHistoryWidgetTest {
 		fileHistoryWidget.onMore();
 		
 		//add the 2 remaining results
+		currentVersion = null; //current version is not on the current page
 		verify(mockView, never()).clearVersions();
 		verify(mockJsClient).getEntityVersions(eq(entityId), eq(VersionHistoryWidget.VERSION_LIMIT), eq(VersionHistoryWidget.VERSION_LIMIT), any(AsyncCallback.class));
 		isVersionSelected = false;
-		verify(mockView, times(2)).addVersion(eq(entityId), any(VersionInfo.class), eq(canEdit), eq(isVersionSelected));
+		verify(mockView, times(2)).addVersion(eq(entityId), any(VersionInfo.class), eq(canEdit), eq(isVersionSelected), eq(currentVersion));
 		verify(mockView).setMoreButtonVisible(false);
 	}
 	

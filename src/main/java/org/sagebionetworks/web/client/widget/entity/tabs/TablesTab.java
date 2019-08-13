@@ -3,11 +3,13 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -36,6 +38,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.inject.Inject;
 
@@ -65,6 +68,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	CallbackP<String> entitySelectedCallback;
 	public static final String TABLES_HELP = "Build structured queryable data that can be described by a schema using the Tables.";
 	public static final String TABLES_HELP_URL = WebConstants.DOCS_URL + "tables.html";
+	Long version;
 	
 	@Inject
 	public TablesTab(Tab tab,
@@ -190,6 +194,8 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		Entity entity = bundle.getEntity();
 		boolean isTable = entity instanceof Table;
 		boolean isProject = entity instanceof Project;
+		boolean isVersionSupported = EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity(), ginInjector.getCookieProvider());
+		version = isVersionSupported ? versionNumber : null;
 		view.setEntityMetadataVisible(isTable);
 		view.setBreadcrumbVisible(isTable);
 		view.setTableListVisible(isProject);
@@ -200,8 +206,6 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		view.setProvenanceVisible(isTable);
 		
 		if (isTable) {
-			boolean isVersionSupported = EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity(), ginInjector.getCookieProvider());
-			Long version = isVersionSupported ? versionNumber : null;
 			updateVersionAndAreaToken(version, areaToken);
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
 			tableTitleBar.configure(bundle);
@@ -236,14 +240,22 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	
 	private void updateVersionAndAreaToken(Long versionNumber, String areaToken) {
 		boolean isVersionSupported = EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity(), ginInjector.getCookieProvider());
-		Long version = isVersionSupported ? versionNumber : null;
-		metadata.configure(entityBundle, version, entityActionMenu);
-		tab.setEntityNameAndPlace(entityBundle.getEntity().getName(), new Synapse(entityBundle.getEntity().getId(), version, EntityArea.TABLES, areaToken));
+		Long newVersion = isVersionSupported ? versionNumber : null;
+		Synapse newPlace = new Synapse(entityBundle.getEntity().getId(), newVersion, EntityArea.TABLES, areaToken);
+		// SWC-4942: if versions are supported, and the version has changed (the version in the query does not match the entity bundle, for example),
+		// then reload the entity bundle (to reconfigure the tools menu and other widgets on the page) by doing a place change to the correct version of the bundle.
+		if (isVersionSupported && !Objects.equals(newVersion, version)) {
+			ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(newPlace);
+			return;
+		}
+		metadata.configure(entityBundle, newVersion, entityActionMenu);
+		tab.setEntityNameAndPlace(entityBundle.getEntity().getName(), newPlace);
 		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(FilesTab.WIDGET_HEIGHT_PX-84));
-		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(entityBundle.getEntity().getId(), version));
+		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(entityBundle.getEntity().getId(), newVersion));
 		ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
 		view.setProvenance(provWidget);
 		provWidget.configure(configMap);
+		version = newVersion;
 	}
 	
 	public Query getQueryString() {
