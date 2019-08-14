@@ -19,7 +19,8 @@ import com.google.inject.Inject;
 
 public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 
-	public static final String LASTPASS_IGNORE_INPUT_FIELD = "data-lpignore";
+	// SWC-4943: This was to disable Last Pass (due to leftover LP UI left in the SPA DOM after login). But functionality of the pw manager is more important! 
+	//public static final String LASTPASS_IGNORE_INPUT_FIELD = "data-lpignore";
 	public static final String GOOGLE_OAUTH_CALLBACK_URL = "/Portal/oauth2callback?oauth2provider=GOOGLE_OAUTH_2_0";
 	public static final String GOOGLE_OAUTH_WITH_STATE_CALLBACK_URL = GOOGLE_OAUTH_CALLBACK_URL + "&state=";
 	
@@ -60,13 +61,13 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 			}
 		});
 		username.setFocus(true);
-		username.getElement().setAttribute(LASTPASS_IGNORE_INPUT_FIELD, "true");
+//		username.getElement().setAttribute(LASTPASS_IGNORE_INPUT_FIELD, "true");
 		password.addKeyDownHandler(event -> {
 			if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
 				loginUser();
 			}
 		});
-		password.getElement().setAttribute(LASTPASS_IGNORE_INPUT_FIELD, "true");
+//		password.getElement().setAttribute(LASTPASS_IGNORE_INPUT_FIELD, "true");
 	}
 	
 	@Override
