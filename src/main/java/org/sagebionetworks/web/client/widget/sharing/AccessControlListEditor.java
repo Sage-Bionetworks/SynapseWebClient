@@ -277,11 +277,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	public void setAccess(Long principalId, PermissionLevel permissionLevel) {
 		validateEditorState();
 		synAlert.clear();
-		String currentUserId = getCurrentUserId();
-		if (currentUserId != null && principalId.toString().equals(currentUserId)) {
-			synAlert.showError(ERROR_CANNOT_MODIFY_ACTIVE_USER_PERMISSIONS);
-			return;
-		}
 		if (principalId.equals(publicPrincipalIds.getPublicAclPrincipalId()))
 			uep.setCanPublicRead(true);
 		
@@ -364,8 +359,10 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		if (oldAclEtag != null) {
 			acl.setEtag(oldAclEtag);	
 		}
+		
 		hasChangesHandler.hasChanges(true);
-		setViewDetails();
+		// SWC-4944: add current user explicitly as admin to new ACL
+		setAccess(Long.parseLong(getCurrentUserId()), PermissionLevel.CAN_ADMINISTER);
 	}
 	
 	@Override
