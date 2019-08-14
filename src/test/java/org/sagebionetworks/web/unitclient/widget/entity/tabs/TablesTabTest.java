@@ -345,15 +345,15 @@ public class TablesTabTest {
 		reset(mockTab);
 		when(mockTab.isTabPaneVisible()).thenReturn(true);
 		when(mockTableEntityWidget.getDefaultQuery()).thenReturn(query);
-		
-		query.setSql("select * from syn1234.88888888 where x=1");
+		Long newVersion = 88888888L;
+		query.setSql("select * from "+tableEntityId+"."+newVersion.toString() + " where x=1");
 		tab.onQueryChange(query);
 		
 		verify(mockPlaceChanger).goTo(placeCaptor.capture());
 		Synapse place = (Synapse)placeCaptor.getValue();
 		assertEquals(EntityArea.TABLES, place.getArea());
 		assertTrue(place.getAreaToken().isEmpty());
-		assertEquals(new Long(88888888), place.getVersionNumber());
+		assertEquals(newVersion, place.getVersionNumber());
 	}
 	@Test
 	public void testSetTableQueryChangeTableId() {
