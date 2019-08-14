@@ -6,6 +6,7 @@
 	<t:TableRow>
 		<t:TableData>
 			<g:Anchor ui:field="versionNameLink" />
+			<b:FormControlStatic ui:field="versionName" addStyleNames="displayInline" visible="false"/>
 		</t:TableData>
 		<t:TableData>
 			<g:SimplePanel ui:field="modifiedByContainer" />
