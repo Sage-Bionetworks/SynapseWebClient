@@ -200,13 +200,8 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				add(readOnly);
 				
 				// 'Create ACL' button
-				Button createAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_CREATE_NEW_ACL, IconType.PLUS, new ClickHandler() {
-	
-					@Override
-					public void onClick(ClickEvent event) {
-						presenter.createAcl();
-					}
-					
+				Button createAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_CREATE_NEW_ACL, IconType.PLUS, event -> {
+					presenter.createAcl();
 				});
 				createAclButton.setType(ButtonType.SUCCESS);
 				createAclButton.setSize(ButtonSize.SMALL);

@@ -26,6 +26,8 @@ public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
 	@UiField
 	Anchor versionNameLink;
 	@UiField
+	FormControlStatic versionName;
+	@UiField
 	FormControlStatic versionComment;
 	@UiField
 	SimplePanel modifiedByContainer;
@@ -52,15 +54,12 @@ public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
 	public VersionHistoryRowViewImpl(Binder binder, UserBadge userBadge, Md5Link md5Link) {
 		widget = binder.createAndBindUi(this);
 		this.md5Link = md5Link;
-		deleteButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.confirmDelete(DisplayConstants.PROMPT_SURE_DELETE + " version?", () -> {
-					if (deleteCallback != null) {
-						deleteCallback.invoke();			
-					}
-				});
-			}
+		deleteButton.addClickHandler(event -> {
+			DisplayUtils.confirmDelete(DisplayConstants.PROMPT_SURE_DELETE + " version?", () -> {
+				if (deleteCallback != null) {
+					deleteCallback.invoke();			
+				}
+			});
 		});
 		
 		md5LinkContainer.setWidget(md5Link.asWidget());
@@ -74,6 +73,7 @@ public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
 			String modifiedByUserId, String modifiedOn, String size,
 			String md5, String versionComment, Callback deleteCallback, IsWidget doiWidget) {
 		this.versionNameLink.setText(versionName);
+		this.versionName.setText(versionName);
 		this.modifiedOn.setText(modifiedOn);
 		this.versionComment.setText(versionComment);
 		this.size.setText(size);
@@ -90,14 +90,21 @@ public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
 	}
 	
 	@Override
-	public void setCanEdit(boolean canEdit) {
-		deleteButton.setVisible(canEdit);
+	public void setCanDelete(boolean canDelete) {
+		deleteButton.setVisible(canDelete);
 	}
 	@Override
 	public void setIsVersionSelected(boolean isVersionSelected) {
 		if (isVersionSelected) {
-			versionNameLink.addStyleName("boldText");
+			versionName.addStyleName("boldText");
+		} else {
+			versionName.removeStyleName("boldText");
 		}
+	}
+	@Override
+	public void setIsUnlinked(boolean isUnlinked) {
+		versionName.setVisible(isUnlinked);
+		versionNameLink.setVisible(!isUnlinked);
 	}
 	@Override
 	public void setMd5TableDataVisible(boolean isVisible) {
