@@ -5,6 +5,7 @@ import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.ACCES
 import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.EXPIRES_BEFORE_PARAM;
 import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.SUBMITTER_ID_PARAM;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
@@ -56,7 +57,7 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 	Callback refreshCallback;
 	GlobalApplicationState globalAppState;
 	String accessRequirementId;
-	
+	ArrayList<AccessorGroup> allExportData; 
 	@Inject
 	public ACTAccessApprovalsPresenter(
 			final ACTAccessApprovalsView view,
@@ -159,6 +160,8 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 	
 	public void loadData() {
 		globalAppState.pushCurrentPlace(place);
+		allExportData = new ArrayList<>();
+		view.clear();
 		loadMoreContainer.clear();
 		accessorGroupRequest.setNextPageToken(null);
 		loadMore();
@@ -181,7 +184,9 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 					w.setOnRevokeCallback(refreshCallback);
 					loadMoreContainer.add(w.asWidget());
 				}
-				loadMoreContainer.setIsMore(response.getNextPageToken() != null);
+				boolean isMore = response.getNextPageToken() != null;
+				loadMoreContainer.setIsMore(isMore);
+				allExportData.addAll(response.getResults());
 			};
 		});
 	}
@@ -240,7 +245,12 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 	}
 	
 	@Override
-    public String mayStop() {
-        return null;
-    }
+	public String mayStop() {
+		return null;
+	}
+	
+	@Override
+	public ArrayList<AccessorGroup> getExportData() {
+		return allExportData;
+	}
 }
