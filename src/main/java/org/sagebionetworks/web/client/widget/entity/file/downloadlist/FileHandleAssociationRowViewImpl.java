@@ -26,6 +26,8 @@ public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRo
 	@UiField
 	Span externalLink;
 	@UiField
+	Span unsupportedFileLocation;
+	@UiField
 	Text createdBy;
 	@UiField
 	Text createdOn;
@@ -92,6 +94,11 @@ public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRo
 	public void showIsLink() {
 		hasAccess.setVisible(false);
 		externalLink.setVisible(true);
+	}
+	@Override
+	public void showIsUnsupportedFileLocation() {
+		hasAccess.setVisible(false);
+		unsupportedFileLocation.setVisible(true);
 	}
 	@Override
 	public void showTooLarge() {

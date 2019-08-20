@@ -27,10 +27,10 @@
 				     		<bh:Div addStyleNames="margin-bottom-10">
 				     			<b:Anchor href="http://docs.synapse.org/articles/custom_storage_location.html" icon="QUESTION_CIRCLE" target="_blank" text="More info..." />
 				     		</bh:Div>
-							<b:FormLabel for="bucketField" >Bucket</b:FormLabel>
-					     	<b:TextBox ui:field="bucketField" addStyleNames="margin-bottom-10 hide-resize "/>
-					     	<b:FormLabel for="baseKeyField" >Base Key</b:FormLabel>
-					     	<b:TextBox ui:field="baseKeyField" addStyleNames="margin-bottom-10 hide-resize "/>
+							<b:FormLabel for="s3BucketField" >Bucket</b:FormLabel>
+					     	<b:TextBox ui:field="s3BucketField" addStyleNames="margin-bottom-10 hide-resize "/>
+					     	<b:FormLabel for="s3BaseKeyField" >Base Key</b:FormLabel>
+					     	<b:TextBox ui:field="s3BaseKeyField" addStyleNames="margin-bottom-10 hide-resize "/>
 					     	<b:FormLabel for="externalS3BannerField" >Banner</b:FormLabel>
 	
 							<b:InputGroup width="100%">
@@ -41,6 +41,27 @@
 									</b:DropDownMenu>
 								</b:InputGroupButton>
 								<b:TextBox ui:field="externalS3BannerField" addStyleNames="margin-bottom-10 hide-resize padding-left-10" />
+							</b:InputGroup>
+						</bh:Div>
+						<b:Radio ui:field="externalGoogleCloudStorageButton" name="storageLocationRadio" text="Google Cloud Storage Bucket" addStyleNames="font-size-18" />
+						<bh:Div addStyleNames="margin-left-20" ui:field="googleCloudCollapse">
+							<bh:Div addStyleNames="margin-bottom-10">
+								<b:Anchor href="http://docs.synapse.org/articles/custom_storage_location.html" icon="QUESTION_CIRCLE" target="_blank" text="More info..." />
+							</bh:Div>
+							<b:FormLabel for="googleCloudBucketField" >Bucket</b:FormLabel>
+							<b:TextBox ui:field="googleCloudBucketField" addStyleNames="margin-bottom-10 hide-resize "/>
+							<b:FormLabel for="googleCloudBaseKeyField" >Base Key</b:FormLabel>
+							<b:TextBox ui:field="googleCloudBaseKeyField" addStyleNames="margin-bottom-10 hide-resize "/>
+							<b:FormLabel for="externalGoogleCloudBannerField" >Banner</b:FormLabel>
+
+							<b:InputGroup width="100%">
+								<b:InputGroupButton>
+									<b:Button ui:field="externalGoogleCloudBannerDropdownButton"
+											  dataToggle="DROPDOWN" height="28px" />
+									<b:DropDownMenu ui:field="externalGoogleCloudBannerOptions">
+									</b:DropDownMenu>
+								</b:InputGroupButton>
+								<b:TextBox ui:field="externalGoogleCloudBannerField" addStyleNames="margin-bottom-10 hide-resize padding-left-10" />
 							</b:InputGroup>
 						</bh:Div>
 						<b:Radio ui:field="externalObjectStoreButton"  name="storageLocationRadio"  text="External Object Store" addStyleNames="font-size-18" />

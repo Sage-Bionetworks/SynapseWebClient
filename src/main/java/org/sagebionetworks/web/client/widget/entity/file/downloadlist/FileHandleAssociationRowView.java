@@ -12,6 +12,7 @@ public interface FileHandleAssociationRowView extends IsWidget {
 	void showHasUnmetAccessRequirements(String entityId);
 	void showTooLarge();
 	void showIsLink();
+	void showIsUnsupportedFileLocation();
 	public interface Presenter {
 		void onRemove();
 		void onViewAttached();

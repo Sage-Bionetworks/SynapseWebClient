@@ -31,6 +31,11 @@
 					<b:Icon type="LINK"/>
 				</b:Tooltip>
 			</bh:Span>
+			<bh:Span ui:field="unsupportedFileLocation" addStyleNames="synapse-green-bg color-white img-circle" visible="false" paddingTop="3" paddingRight="5" paddingBottom="3" paddingLeft="5">
+				<b:Tooltip placement="LEFT" title="Your list contains files that must be downloaded manually (e.g. files in Google Cloud). Clicking on the item will take you the download page.">
+					<b:Icon type="EXCLAMATION_CIRCLE"/>
+				</b:Tooltip>
+			</bh:Span>
 		</t:TableData>
 		<t:TableData addStyleNames="min-width-150 hidden-xs visible-md visible-lg" width="150px">
 			<bh:Text ui:field="createdBy"/>

@@ -8,6 +8,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.file.UploadType;
+import org.sagebionetworks.repo.model.project.ExternalGoogleCloudStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalObjectStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalStorageLocationSetting;
@@ -57,6 +58,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		getStorageLocationSetting();
 		getMyLocationSettingBanners();
 		boolean isInAlpha = DisplayUtils.isInTestWebsite(cookies);
+		view.setGoogleCloudVisible(isInAlpha);
 		view.setSFTPVisible(isInAlpha);
 		view.setExternalObjectStoreVisible(isInAlpha);
 	}
@@ -77,6 +79,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 	
 	public void getStorageLocationSetting() {
 		Entity entity = entityBundle.getEntity();
+		view.setGoogleCloudVisible(DisplayUtils.isInTestWebsite(cookies));
 		view.setSFTPVisible(DisplayUtils.isInTestWebsite(cookies));
 		synapseClient.getStorageLocationSetting(entity.getId(), new AsyncCallback<StorageLocationSetting>() {
 			@Override
@@ -95,10 +98,17 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 					String banner = trim(location.getBanner());
 					if (location instanceof ExternalS3StorageLocationSetting) {
 						ExternalS3StorageLocationSetting setting = (ExternalS3StorageLocationSetting) location;
-						view.setBaseKey(trim(setting.getBaseKey()));
-						view.setBucket(trim(setting.getBucket()));
+						view.setS3BaseKey(trim(setting.getBaseKey()));
+						view.setS3Bucket(trim(setting.getBucket()));
 						view.setExternalS3Banner(banner);
 						view.selectExternalS3Storage();
+					} else if (location instanceof ExternalGoogleCloudStorageLocationSetting) {
+						view.setGoogleCloudVisible(true);
+						ExternalGoogleCloudStorageLocationSetting setting = (ExternalGoogleCloudStorageLocationSetting) location;
+						view.setGoogleCloudBaseKey(trim(setting.getBaseKey()));
+						view.setGoogleCloudBucket(trim(setting.getBucket()));
+						view.setExternalGoogleCloudBanner(banner);
+						view.selectExternalGoogleCloudStorage();
 					} else if (location instanceof ExternalObjectStorageLocationSetting) {
 						ExternalObjectStorageLocationSetting setting = (ExternalObjectStorageLocationSetting) location;
 						view.setExternalObjectStoreBanner(banner);
@@ -166,9 +176,16 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		if (view.isExternalS3StorageSelected()) {
 			ExternalS3StorageLocationSetting setting = new ExternalS3StorageLocationSetting();
 			setting.setBanner(view.getExternalS3Banner().trim());
-			setting.setBucket(view.getBucket().trim());
-			setting.setBaseKey(view.getBaseKey().trim());
+			setting.setBucket(view.getS3Bucket().trim());
+			setting.setBaseKey(view.getS3BaseKey().trim());
 			setting.setUploadType(UploadType.S3);
+			return setting;
+		}else if (view.isExternalGoogleCloudStorageSelected()) {
+			ExternalGoogleCloudStorageLocationSetting setting = new ExternalGoogleCloudStorageLocationSetting();
+			setting.setBanner(view.getExternalGoogleCloudBanner().trim());
+			setting.setBucket(view.getGoogleCloudBucket().trim());
+			setting.setBaseKey(view.getGoogleCloudBaseKey().trim());
+			setting.setUploadType(UploadType.GOOGLECLOUDSTORAGE);
 			return setting;
 		} else if (view.isExternalObjectStoreSelected()) {
 			ExternalObjectStorageLocationSetting setting = new ExternalObjectStorageLocationSetting();
@@ -197,10 +214,15 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 	public String validate(StorageLocationSetting setting) {
 		if (setting != null) {
 			if (setting instanceof ExternalS3StorageLocationSetting) {
-				ExternalS3StorageLocationSetting externalS3StorageLocationSetting = (ExternalS3StorageLocationSetting)setting;
+				ExternalS3StorageLocationSetting externalS3StorageLocationSetting = (ExternalS3StorageLocationSetting) setting;
 				if (externalS3StorageLocationSetting.getBucket().trim().isEmpty()) {
 					return "Bucket is required.";
 				}
+			} else if (setting instanceof ExternalGoogleCloudStorageLocationSetting) {
+				ExternalGoogleCloudStorageLocationSetting externalGoogleCloudStorageLocationSetting = (ExternalGoogleCloudStorageLocationSetting)setting;
+					if (externalGoogleCloudStorageLocationSetting.getBucket().trim().isEmpty()) {
+						return "Bucket is required.";
+					}
 			} else if (setting instanceof ExternalStorageLocationSetting) {
 				ExternalStorageLocationSetting externalStorageLocationSetting = (ExternalStorageLocationSetting) setting;
 				if (!isValidSftpUrl(externalStorageLocationSetting.getUrl().trim())) {

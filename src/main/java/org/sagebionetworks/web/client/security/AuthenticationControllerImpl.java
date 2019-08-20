@@ -35,7 +35,7 @@ import com.google.inject.Inject;
  */
 public class AuthenticationControllerImpl implements AuthenticationController {
 	public static final String USER_AUTHENTICATION_RECEIPT = "last_user_authentication_receipt";
-	private static final String AUTHENTICATION_MESSAGE = "Invalid usename or password.";
+	private static final String AUTHENTICATION_MESSAGE = "Invalid username or password.";
 	private static String currentUserSessionToken;
 	private static UserProfile currentUserProfile;
 	private UserAccountServiceAsync userAccountService;	
