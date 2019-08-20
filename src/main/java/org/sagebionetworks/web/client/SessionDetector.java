@@ -42,6 +42,8 @@ public class SessionDetector {
 				authController.checkForUserChange();
 			}
 		}, INTERVAL_MS);
+		// SWC-4947: check for user change immediately (don't wait 10 seconds to discover the existing session token).
+		authController.checkForUserChange();
 	}
 	
 	public void initializeSessionTokenState() {
