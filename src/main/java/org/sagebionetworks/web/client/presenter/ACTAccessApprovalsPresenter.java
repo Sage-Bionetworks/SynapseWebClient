@@ -161,13 +161,13 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 	public void loadData() {
 		globalAppState.pushCurrentPlace(place);
 		allExportData = new ArrayList<>();
-		view.clear();
 		loadMoreContainer.clear();
 		accessorGroupRequest.setNextPageToken(null);
 		loadMore();
 	}
 
 	public void loadMore() {
+		view.resetExportButton();
 		synAlert.clear();
 		dataAccessClient.listAccessorGroup(accessorGroupRequest, new AsyncCallback<AccessorGroupResponse>() {
 			@Override

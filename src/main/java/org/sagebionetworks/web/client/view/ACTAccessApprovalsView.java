@@ -19,6 +19,7 @@ public interface ACTAccessApprovalsView extends IsWidget, SynapseView {
 	void setSelectedUserBadgeVisible(boolean visible);
 	void setExpiresBeforeDate(Date date);
 	void setClearAccessRequirementFilterButtonVisible(boolean visible);
+	void resetExportButton();
 	
 	public interface Presenter {
 		void onClearUserFilter();

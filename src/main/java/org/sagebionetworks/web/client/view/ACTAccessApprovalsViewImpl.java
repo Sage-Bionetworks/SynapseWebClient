@@ -124,11 +124,16 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 	}
 
 	@Override
-	public void clear() {
+	public void resetExportButton() {
 		exportButton.setEnabled(true);
 		exportButton.setVisible(true);
 		downloadLink.setHref("");
 		downloadLink.setVisible(false);
+	}
+	
+	@Override
+	public void clear() {
+		resetExportButton();
 	}
 	@Override
 	public void setExpiresBeforeDate(Date date) {
