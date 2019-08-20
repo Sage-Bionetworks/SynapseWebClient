@@ -44,7 +44,7 @@
 					</b:PanelBody>
 				</b:Panel>
 			</b:Column>
-			<b:Button ui:field="exportButton" text="Export Rows Shown Below" pull="RIGHT"/>
+			<b:Button ui:field="exportButton" text="Export Rows Shown Below" size="EXTRA_SMALL" pull="RIGHT"/>
 			<b:Anchor ui:field="downloadLink" text="Download CSV" visible="false" icon="DOWNLOAD" pull="RIGHT"/>
 			<!-- table header -->
 			<t:Table addStyleNames="table-layout-fixed margin-left-10 margin-bottom-20" width="100%" >
