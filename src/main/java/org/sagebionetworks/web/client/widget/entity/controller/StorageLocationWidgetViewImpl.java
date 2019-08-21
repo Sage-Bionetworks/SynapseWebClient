@@ -10,7 +10,6 @@ import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -103,14 +102,11 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	@UiField
 	Div contentUI;
 
-	private CookieProvider cookies;
 	Widget widget;
 	Presenter presenter;
 	
 	@Inject
-	public StorageLocationWidgetViewImpl(StorageLocationWidgetViewImplUiBinder binder,
-										 CookieProvider cookies) {
-		this.cookies = cookies;
+	public StorageLocationWidgetViewImpl(StorageLocationWidgetViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
 		saveButton.addClickHandler(event -> presenter.onSave());
 		cancelButton.addClickHandler(event -> modal.hide());
