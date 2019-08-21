@@ -129,6 +129,7 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 		exportButton.setVisible(true);
 		downloadLink.setHref("");
 		downloadLink.setVisible(false);
+		_revokeObjectUrl(downloadLink.getElement());
 	}
 	
 	@Override
@@ -237,6 +238,17 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 			});
 			anchorElement.href = URL.createObjectURL(blob);
 			anchorElement.download = "accessApprovals.csv";
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
+
+	private static native String _revokeObjectUrl(Element anchorElement) /*-{
+		try {
+			if (anchorElement.download) {
+				URL.revokeObjectURL(anchorElement.href);
+				anchorElement.removeAttribute("download");
+			}
 		} catch (err) {
 			console.error(err);
 		}
