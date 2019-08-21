@@ -22,7 +22,8 @@ public class ShinySiteWidget implements WidgetRendererPresenter {
 		"https://docs.google.com/a/sagebase.org/forms/",
 		"https://calendar.google.com/calendar/",
 		"https://sage-bionetworks.shinyapps.io/",
-		"https://dce-demo.infoclinika.org/"
+		"https://dce.seattlebiosoftware.com/",
+		"https://dce-demo.infoclinika.org/" //TODO: should be safe to remove (after 8/2019)
 		};
 	private IFrameView view;
 	private Map<String, String> descriptor;
