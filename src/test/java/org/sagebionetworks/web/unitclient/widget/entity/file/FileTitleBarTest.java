@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.file;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyCollection;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -25,6 +26,7 @@ import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.GoogleCloudFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -54,7 +56,8 @@ public class FileTitleBarTest {
 	SynapseProperties mockSynapseProperties;
 	@Mock
 	org.sagebionetworks.repo.model.FileEntity mockFileEntity;
-	S3FileHandle handle;
+	S3FileHandle s3FileHandle;
+	GoogleCloudFileHandle googleCloudFileHandle;
 	Long synStorageLocationId = 1L;
 	@Mock
 	FileDownloadMenuItem mockFileDownloadButton;
@@ -73,7 +76,7 @@ public class FileTitleBarTest {
 	EventBus mockEventBus;
 	@Mock
 	UserEntityPermissions mockPermissions;
-	
+
 	public static final String DATA_FILE_HANDLE_ID = "872";
 	public static final Long FILE_VERSION = 3L;
 	public static final String FILE_NAME = "afile.txt";
@@ -90,12 +93,12 @@ public class FileTitleBarTest {
 		when(mockSynapseProperties.getSynapseProperty("org.sagebionetworks.portal.synapse_storage_id"))
 				.thenReturn(String.valueOf(synStorageLocationId));
 		List<FileHandle> fileHandles = new LinkedList<FileHandle>();
-		handle = new S3FileHandle();
-		handle.setId(DATA_FILE_HANDLE_ID);
-		handle.setBucketName("testBucket");
-		handle.setKey("testKey");
-		handle.setStorageLocationId(synStorageLocationId);
-		fileHandles.add(handle);
+		s3FileHandle = new S3FileHandle();
+		s3FileHandle.setId(DATA_FILE_HANDLE_ID);
+		s3FileHandle.setBucketName("testBucket");
+		s3FileHandle.setKey("testKey");
+		s3FileHandle.setStorageLocationId(synStorageLocationId);
+		fileHandles.add(s3FileHandle);
 		Mockito.when(mockBundle.getFileHandles()).thenReturn(fileHandles);
 		verify(mockView).setFileDownloadMenuItem(any(Widget.class));
 		versions = new ArrayList<>();
@@ -122,11 +125,24 @@ public class FileTitleBarTest {
 
 	@Test
 	public void testSetS3DescriptionForExternalS3() {
-		handle.setStorageLocationId(2L);
+		s3FileHandle.setStorageLocationId(2L);
 		fileTitleBar.configure(mockBundle);
-		verify(mockView).setFileLocation("| s3://" + handle.getBucketName() + "/" + handle.getKey());
+		verify(mockView).setFileLocation("| s3://" + s3FileHandle.getBucketName() + "/" + s3FileHandle.getKey());
 	}
-	
+
+	@Test
+	public void testSetGoogleCloudDescriptionForExternalGoogleCloud() {
+		googleCloudFileHandle = new GoogleCloudFileHandle();
+		googleCloudFileHandle.setId(DATA_FILE_HANDLE_ID);
+		googleCloudFileHandle.setBucketName("testBucket");
+		googleCloudFileHandle.setKey("testKey");
+		googleCloudFileHandle.setStorageLocationId(synStorageLocationId);
+		googleCloudFileHandle.setStorageLocationId(2L);
+		when(mockBundle.getFileHandles()).thenReturn(Collections.singletonList(googleCloudFileHandle));
+		fileTitleBar.configure(mockBundle);
+		verify(mockView).setFileLocation("| gs://" + googleCloudFileHandle.getBucketName() + "/" + googleCloudFileHandle.getKey());
+	}
+
 	@Test
 	public void testConfigure() {
 		fileTitleBar.configure(mockBundle);

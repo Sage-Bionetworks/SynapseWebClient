@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.file.ExternalFileHandleInterface;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
+import org.sagebionetworks.repo.model.file.GoogleCloudFileHandle;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -121,6 +122,8 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 					updateCreatedBy(fileHandle.getCreatedBy());
 					if (fileHandle instanceof ExternalFileHandleInterface) {
 						view.showIsLink();
+					} else if (fileHandle instanceof GoogleCloudFileHandle) {
+						view.showIsUnsupportedFileLocation();
 					}
 				}
 			};

@@ -24,6 +24,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.v2.DoiAssociation;
+import org.sagebionetworks.repo.model.file.ExternalGoogleCloudUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
@@ -232,6 +233,20 @@ public class EntityMetadataTest {
 		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockJsClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		widget.configureStorageLocation(en);
 		verify(mockView).setUploadDestinationText("s3://testBucket/testBaseKey");
+		verify(mockView).setUploadDestinationPanelVisible(false);
+		verify(mockView).setUploadDestinationPanelVisible(true);
+	}
+
+	@Test
+	public void testConfigureStorageLocationExternalGoogleCloud() {
+		List<UploadDestination> uploadDestinations = new ArrayList<UploadDestination>();
+		ExternalGoogleCloudUploadDestination exGCDestination = new ExternalGoogleCloudUploadDestination();
+		exGCDestination.setBucket("testBucket");
+		exGCDestination.setBaseKey("testBaseKey");
+		uploadDestinations.add(exGCDestination);
+		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockJsClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		widget.configureStorageLocation(en);
+		verify(mockView).setUploadDestinationText("gs://testBucket/testBaseKey");
 		verify(mockView).setUploadDestinationPanelVisible(false);
 		verify(mockView).setUploadDestinationPanelVisible(true);
 	}

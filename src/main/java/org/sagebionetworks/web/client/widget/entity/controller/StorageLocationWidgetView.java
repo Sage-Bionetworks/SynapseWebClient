@@ -26,6 +26,8 @@ public interface StorageLocationWidgetView {
 	boolean isSynapseStorageSelected();
 	void selectExternalS3Storage();
 	boolean isExternalS3StorageSelected();
+	void selectExternalGoogleCloudStorage();
+	boolean isExternalGoogleCloudStorageSelected();
 	void selectExternalObjectStore();
 	boolean isExternalObjectStoreSelected();
 	void setExternalObjectStoreBanner(String banner);
@@ -35,12 +37,18 @@ public interface StorageLocationWidgetView {
 	void setExternalObjectStoreEndpointUrl(String url);
 	String getExternalObjectStoreEndpointUrl();
 	void setExternalObjectStoreVisible(boolean visible);
-	String getBucket();
-	void setBucket(String bucket);
-	String getBaseKey();
-	void setBaseKey(String baseKey);
+	String getS3Bucket();
+	void setS3Bucket(String bucket);
+	String getGoogleCloudBucket();
+	void setGoogleCloudBucket(String bucket);
+	String getS3BaseKey();
+	String getGoogleCloudBaseKey();
+	void setS3BaseKey(String baseKey);
+	void setGoogleCloudBaseKey(String baseKey);
 	String getExternalS3Banner();
 	void setExternalS3Banner(String banner);
+	String getExternalGoogleCloudBanner();
+	void setExternalGoogleCloudBanner(String banner);
 	void selectSFTPStorage();
 	boolean isSFTPStorageSelected();
 	String getSFTPUrl();
@@ -50,6 +58,7 @@ public interface StorageLocationWidgetView {
 	void showErrorMessage(String message);
 	void setBannerSuggestions(List<String> banners);
 	void setBannerDropdownVisible(boolean isVisible);
+	void setGoogleCloudVisible(boolean visible);
 	void setSFTPVisible(boolean visible);
 	void setLoading(boolean isLoading);
 }

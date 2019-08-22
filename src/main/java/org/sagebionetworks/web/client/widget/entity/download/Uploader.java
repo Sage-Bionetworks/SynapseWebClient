@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
+import org.sagebionetworks.repo.model.file.ExternalGoogleCloudUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
@@ -223,7 +224,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.uploadBasedOnConfiguration();
 	}
 	
-	public void updateS3UploadBannerView(String banner) {
+	public void updateUploadBannerView(String banner) {
 		if (DisplayUtils.isDefined(banner))
 			view.showUploadingBanner(banner);
 		else
@@ -249,7 +250,12 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 					} else if (uploadDestinations.get(0) instanceof S3UploadDestination) {
 						currentUploadType = UploadType.S3;
 						storageLocationId = uploadDestinations.get(0).getStorageLocationId();
-						updateS3UploadBannerView(uploadDestinations.get(0).getBanner());
+						updateUploadBannerView(uploadDestinations.get(0).getBanner());
+
+					} else if (uploadDestinations.get(0) instanceof ExternalGoogleCloudUploadDestination) {
+						currentUploadType = UploadType.GOOGLECLOUDSTORAGE;
+						storageLocationId = uploadDestinations.get(0).getStorageLocationId();
+						updateUploadBannerView(uploadDestinations.get(0).getBanner());
 
 					} else if (uploadDestinations.get(0) instanceof ExternalUploadDestination){
 						ExternalUploadDestination externalUploadDestination = (ExternalUploadDestination) uploadDestinations.get(0);
@@ -273,7 +279,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 							if (externalUploadDestination.getBaseKey() != null)
 								banner += "/" + externalUploadDestination.getBaseKey();
 						}
-						updateS3UploadBannerView(banner);
+						updateUploadBannerView(banner);
 					// direct to s3(-like) storage
 					} else if (uploadDestinations.get(0) instanceof ExternalObjectStoreUploadDestination) {
 						ExternalObjectStoreUploadDestination externalUploadDestination = (ExternalObjectStoreUploadDestination) uploadDestinations.get(0);
@@ -333,8 +339,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	private void uploadBasedOnConfigurationAfterFolderCreation() {
 		if (validateFileName(fileNames[currIndex])) {
-			if (currentUploadType == UploadType.S3) {
-				uploadToS3();
+			if (currentUploadType == UploadType.S3 || currentUploadType == UploadType.GOOGLECLOUDSTORAGE) {
+				uploadToS3OrGoogleCloud();
 			} else if (currentUploadType == UploadType.SFTP){
 				uploadToSftpProxy(currentExternalUploadUrl);
 			} else {
@@ -464,15 +470,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		return isFileAPISupported;
 	}
 	
-	public void uploadToS3() {
+	public void uploadToS3OrGoogleCloud() {
 		if (checkFileAPISupported()) {
 			//use case B from above
-			Callback callback = new Callback() {
-				@Override
-				public void invoke() {
-					directUploadStep2(fileNames[currIndex]);
-				}
-			};
+			Callback callback = () -> directUploadStep2(fileNames[currIndex]);
 			checkForExistingFileName(fileNames[currIndex], callback);
 		}
 	}

@@ -42,6 +42,7 @@ import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
+import org.sagebionetworks.repo.model.file.ExternalGoogleCloudUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
@@ -76,6 +77,7 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.upload.MultipartUploaderStub;
 
+import com.gargoylesoftware.htmlunit.javascript.host.External;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -321,20 +323,20 @@ public class UploaderTest {
 	@Test
 	public void testUpdateS3UploadBannerViewNull() throws Exception {
 		reset(mockView);
-		uploader.updateS3UploadBannerView(null);
+		uploader.updateUploadBannerView(null);
 		verify(mockView).showUploadingToSynapseStorage();
 	}
 	@Test
 	public void testUpdateS3UploadBannerViewEmpty() throws Exception {
 		reset(mockView);
-		uploader.updateS3UploadBannerView("");
+		uploader.updateUploadBannerView("");
 		verify(mockView).showUploadingToSynapseStorage();
 	}
 	@Test
 	public void testUpdateS3UploadBannerViewSet() throws Exception {
 		reset(mockView);
 		String banner = "this is my test banner";
-		uploader.updateS3UploadBannerView(banner);
+		uploader.updateUploadBannerView(banner);
 		verify(mockView).showUploadingBanner(banner);
 	}
 	
@@ -496,6 +498,17 @@ public class UploaderTest {
 		assertEquals(uploader.getStorageLocationId(), storageLocationId);
 	}
 
+	@Test
+	public void testUploadToValidExternalGoogleCloud() {
+		ExternalGoogleCloudUploadDestination d = new ExternalGoogleCloudUploadDestination();
+		d.setUploadType(UploadType.GOOGLECLOUDSTORAGE);
+		d.setStorageLocationId(storageLocationId);
+		List<UploadDestination> destinations = new ArrayList<>();
+		destinations.add(d);
+		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseJavascriptClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		uploader.queryForUploadDestination();
+		assertEquals(uploader.getStorageLocationId(), storageLocationId);
+	}
 	
 	@Test
 	public void testInvalidUploadDestination() {

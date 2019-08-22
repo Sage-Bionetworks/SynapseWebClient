@@ -17,9 +17,12 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.file.ExternalFileHandle;
+import org.sagebionetworks.repo.model.file.ExternalFileHandleInterface;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
+import org.sagebionetworks.repo.model.file.GoogleCloudFileHandle;
 import org.sagebionetworks.repo.web.NotFoundException;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -74,6 +77,11 @@ public class FileHandleAssociationRowTest {
 	FileHandle mockFileHandle;
 	@Mock
 	UserProfile mockUserProfile;
+	@Mock
+	ExternalFileHandleInterface mockExternalFileHandle;
+	@Mock
+	GoogleCloudFileHandle mockGoogleCloudFileHandle;
+
 	@Captor
 	ArgumentCaptor<AsyncCallback<RestrictionInformationResponse>> asyncCallbackCaptor;
 	@Mock
@@ -98,6 +106,12 @@ public class FileHandleAssociationRowTest {
 		when(mockFileHandle.getCreatedOn()).thenReturn(CREATED_ON);
 		when(mockFileHandle.getContentSize()).thenReturn(CONTENT_SIZE);
 		when(mockFileHandle.getCreatedBy()).thenReturn(CREATED_BY);
+		when(mockExternalFileHandle.getCreatedOn()).thenReturn(CREATED_ON);
+		when(mockExternalFileHandle.getContentSize()).thenReturn(CONTENT_SIZE);
+		when(mockExternalFileHandle.getCreatedBy()).thenReturn(CREATED_BY);
+		when(mockGoogleCloudFileHandle.getCreatedOn()).thenReturn(CREATED_ON);
+		when(mockGoogleCloudFileHandle.getContentSize()).thenReturn(CONTENT_SIZE);
+		when(mockGoogleCloudFileHandle.getCreatedBy()).thenReturn(CREATED_BY);
 		when(mockDateTimeUtils.getDateTimeString(any(Date.class))).thenReturn(FRIENDLY_DATE);
 		when(mockGwt.getFriendlySize(anyDouble(), anyBoolean())).thenReturn(FRIENDLY_SIZE);
 		when(mockView.isAttached()).thenReturn(true);
@@ -148,7 +162,46 @@ public class FileHandleAssociationRowTest {
 		verifyZeroInteractions(mockAccessRestrictionDetectedCallback);
 		assertEquals(false, widget.getHasAccess());
 	}
-	
+
+	@Test
+	public void testExternalFileHandle() {
+		when(mockFileResult.getFileHandle()).thenReturn(mockExternalFileHandle);
+
+		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback, mockOnDeleteCallback);
+
+		verify(mockView).setFileName(FILENAME, ENTITY_ID);
+		verify(mockView).setCreatedOn(FRIENDLY_DATE);
+		verify(mockView).setFileSize(FRIENDLY_SIZE);
+		verify(mockView).showIsLink();
+		verify(mockAddToPackageSizeCallback).invoke(CONTENT_SIZE.doubleValue());
+		verify(mockView).setCreatedBy(DisplayUtils.getDisplayName(mockUserProfile));
+		verifyZeroInteractions(mockAccessRestrictionDetectedCallback);
+		assertEquals(CREATED_ON, widget.getCreatedOn());
+		assertEquals(DisplayUtils.getDisplayName(mockUserProfile), widget.getCreatedBy());
+		assertEquals(CONTENT_SIZE, widget.getFileSize());
+		assertEquals(FILENAME, widget.getFileName());
+		assertEquals(true, widget.getHasAccess());
+	}
+
+	@Test
+	public void testGoogleCloudFileHandle() { // Not capable of bulk download
+		when(mockFileResult.getFileHandle()).thenReturn(mockGoogleCloudFileHandle);
+		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback, mockOnDeleteCallback);
+
+		verify(mockView).setFileName(FILENAME, ENTITY_ID);
+		verify(mockView).setCreatedOn(FRIENDLY_DATE);
+		verify(mockView).setFileSize(FRIENDLY_SIZE);
+		verify(mockView).showIsUnsupportedFileLocation();
+		verify(mockAddToPackageSizeCallback).invoke(CONTENT_SIZE.doubleValue());
+		verify(mockView).setCreatedBy(DisplayUtils.getDisplayName(mockUserProfile));
+		verifyZeroInteractions(mockAccessRestrictionDetectedCallback);
+		assertEquals(CREATED_ON, widget.getCreatedOn());
+		assertEquals(DisplayUtils.getDisplayName(mockUserProfile), widget.getCreatedBy());
+		assertEquals(CONTENT_SIZE, widget.getFileSize());
+		assertEquals(FILENAME, widget.getFileName());
+		assertEquals(true, widget.getHasAccess());
+	}
+
 	@Test
 	public void testHasAccessRestriction() {
 		String errorMessage = "forbidden";
@@ -166,7 +219,7 @@ public class FileHandleAssociationRowTest {
 		verify(mockView).showHasUnmetAccessRequirements(ENTITY_ID);
 		verify(mockAccessRestrictionDetectedCallback).invoke();
 	}
-	
+
 	@Test
 	public void testFileNotFound() {
 		String errorMessage = "file not found";
