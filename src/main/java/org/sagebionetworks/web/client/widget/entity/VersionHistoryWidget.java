@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.VersionableEntity;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -161,7 +162,7 @@ public class VersionHistoryWidget implements VersionHistoryWidgetView.Presenter,
 						currentVersion = results.get(0).getVersionNumber();
 						boolean isCurrentVersion = versionNumber == null || currentVersion.equals(versionNumber);
 						view.setEntityBundle(bundle.getEntity(), !isCurrentVersion);
-						view.setEditVersionInfoButtonVisible(isCurrentVersion && canEdit && !(bundle.getEntity() instanceof TableEntity) );
+						view.setEditVersionInfoButtonVisible(isCurrentVersion && canEdit && !(bundle.getEntity() instanceof Table) );
 					}
 					if (versionNumber == null && currentOffset == 0 && results.size() > 0) {
 						versionNumber = results.get(0).getVersionNumber();
