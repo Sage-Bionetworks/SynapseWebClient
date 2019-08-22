@@ -161,7 +161,7 @@ public class VersionHistoryWidget implements VersionHistoryWidgetView.Presenter,
 						currentVersion = results.get(0).getVersionNumber();
 						boolean isCurrentVersion = versionNumber == null || currentVersion.equals(versionNumber);
 						view.setEntityBundle(bundle.getEntity(), !isCurrentVersion);
-						view.setEditVersionInfoButtonVisible(isCurrentVersion && canEdit);
+						view.setEditVersionInfoButtonVisible(isCurrentVersion && canEdit && !(bundle.getEntity() instanceof Table) );
 					}
 					if (versionNumber == null && currentOffset == 0 && results.size() > 0) {
 						versionNumber = results.get(0).getVersionNumber();
