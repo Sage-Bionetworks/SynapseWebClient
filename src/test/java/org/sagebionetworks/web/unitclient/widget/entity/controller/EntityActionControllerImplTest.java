@@ -8,8 +8,10 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
@@ -223,6 +225,9 @@ public class EntityActionControllerImplTest {
 	GWTWrapper mockGWT;
 	@Mock
 	SynapseProperties mockSynapseProperties;
+	@Captor
+	ArgumentCaptor<CallbackP<List<String>>> callbackListStringCaptor;
+	
 	Set<ResourceAccess> resourceAccessSet;
 	
 	public static final String SELECTED_TEAM_ID = "987654";
@@ -819,6 +824,27 @@ public class EntityActionControllerImplTest {
 		verify(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		// Must not make it to the actual delete since preflight failed.
 		verify(mockSynapseJavascriptClient, never()).deleteEntityById(anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testOnCreateTableViewSnapshot(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
+		
+		// the call under test
+		controller.onAction(Action.CREATE_TABLE_VERSION);
+		
+		verify(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		verify(mockView).showMultiplePromptDialog(anyString(), anyList(), anyList(), callbackListStringCaptor.capture());
+		CallbackP<List<String>> valuesCallback = callbackListStringCaptor.getValue();
+		//invoke with a label and comment
+		String label = "my label";
+		String comment = "my comment";
+		List<String> values = new ArrayList<String>();
+		values.add(label);
+		values.add(comment);
+		valuesCallback.invoke(values);
+		verify(mockSynapseJavascriptClient).createSnapshot(eq(entityId), eq(comment), eq(label), isNull(String.class), any(AsyncCallback.class));
 	}
 	
 	@Test
