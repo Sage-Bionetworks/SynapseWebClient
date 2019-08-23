@@ -1306,7 +1306,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		view.showMultiplePromptDialog("New Version", prompts, null, values -> {
 			String entityId = entityBundle.getEntity().getId();
 			String label = values.get(0);
-			String comment = values.get(0);
+			String comment = values.get(1);
 			String activityId = null;
 			getSynapseJavascriptClient().createSnapshot(entityId, comment, label, activityId, new AsyncCallback<SnapshotResponse>() {
 				@Override
