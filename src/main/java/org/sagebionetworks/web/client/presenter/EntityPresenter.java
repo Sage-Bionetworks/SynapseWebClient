@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -138,6 +137,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		final AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
+				synAlert.clear();
 				view.setLoadingVisible(false);
 				// Redirect if Entity is a Link
 				if(bundle.getEntity() instanceof Link) {
