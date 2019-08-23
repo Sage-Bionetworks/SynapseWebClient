@@ -97,7 +97,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		this.historyWidget = historyWidget;
 		this.markdownWidget = markdownWidget;
 		this.wikiSubpages = wikiSubpages;
-		this.stuAlert = stuAlert;
 		this.sessionStorage = sessionStorage;
 		this.authController = authController;
 		this.adapterFactory = adapterFactory;
@@ -166,6 +165,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		jsClient.getV2WikiPage(wikiKey, new AsyncCallback<V2WikiPage>() {
 			@Override
 			public void onSuccess(V2WikiPage v2WikiPage) {
+				stuAlert.clear();
 				if (v2WikiPage.getEtag().equals(cachedWikiPage.getEtag())) {
 					setWikiPage(cachedWikiPage);
 				} else {

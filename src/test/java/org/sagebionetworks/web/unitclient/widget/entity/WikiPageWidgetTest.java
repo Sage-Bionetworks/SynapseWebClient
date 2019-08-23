@@ -251,6 +251,7 @@ public class WikiPageWidgetTest {
 		AsyncMockStubber.callSuccessWith(wikiPage).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, null), canEdit, null);
+		verify(mockStuAlert, times(2)).clear();
 		presenter.showSubpages(mockActionMenuWidget);
 		verify(mockSubpages).configure(any(WikiPageKey.class), anyBoolean(), callbackPCaptor.capture(), any(ActionMenuWidget.class));
 		// invoke subpage clicked
