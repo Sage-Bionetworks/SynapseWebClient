@@ -14,6 +14,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -36,6 +37,9 @@ public class WikiTabTest {
 	PortalGinInjector mockPortalGinInjector;
 	@Mock
 	ActionMenuWidget mockActionMenuWidget;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
+
 	WikiTab tab;
 	
 	@Before
@@ -43,6 +47,7 @@ public class WikiTabTest {
 		MockitoAnnotations.initMocks(this);
 		tab = new WikiTab(mockTab, mockPortalGinInjector);
 		when(mockPortalGinInjector.getWikiPageWidget()).thenReturn(mockWikiPageWidget);
+		when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
 		tab.lazyInject();
 	}
 	
@@ -67,6 +72,7 @@ public class WikiTabTest {
 		WikiPageWidget.Callback callback = mock(WikiPageWidget.Callback.class);
 		tab.configure(entityId, entityName, wikiPageId, canEdit, callback, mockActionMenuWidget);
 		
+		verify(mockJsClient).cancelPendingRequestsForCurrentUrl();
 		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), eq(callback));
 		verify(mockWikiPageWidget).showSubpages(mockActionMenuWidget);
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);

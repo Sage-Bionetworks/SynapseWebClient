@@ -120,6 +120,9 @@ public class AppActivityMapper implements ActivityMapper {
 		synapseJSNIUtils.setPageTitle(DisplayConstants.DEFAULT_PAGE_TITLE);
 		synapseJSNIUtils.setPageDescription(DisplayConstants.DEFAULT_PAGE_DESCRIPTION);
 
+		// cancel any pending requests on place change.
+		ginjector.getSynapseJavascriptClient().cancelAllPendingRequests();
+
 		AuthenticationController authenticationController = this.ginjector.getAuthenticationController();
 		GlobalApplicationState globalApplicationState = this.ginjector.getGlobalApplicationState();
 		
@@ -140,7 +143,7 @@ public class AppActivityMapper implements ActivityMapper {
 		if (cookies.getCookie(CookieKeys.PORTAL_CONFIG) != null && !excludeFromLastPlace.contains(place.getClass())) {
 			cookies.removeCookie(CookieKeys.PORTAL_CONFIG);
 		}
-
+		
 		// If the user is not logged in then we redirect them to the login screen
 		// except for the fully public places
 		if(!openAccessPlaces.contains(place.getClass())) {

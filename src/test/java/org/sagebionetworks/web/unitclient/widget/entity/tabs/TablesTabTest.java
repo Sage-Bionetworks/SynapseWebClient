@@ -42,6 +42,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -123,6 +124,8 @@ public class TablesTabTest {
 	String tableName = "test table";
 	@Mock
 	QueryTokenProvider mockQueryTokenProvider;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
 	@Captor
 	ArgumentCaptor<Map<String, String>> mapCaptor;
 	@Captor
@@ -145,7 +148,8 @@ public class TablesTabTest {
 		when(mockPortalGinInjector.getModifiedCreatedByWidget()).thenReturn(mockModifiedCreatedBy);
 		when(mockPortalGinInjector.getProvenanceRenderer()).thenReturn(mockProvenanceWidget);
 		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
-
+		when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
+		
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		tab.setEntitySelectedCallback(mockEntitySelectedCallback);
 		when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);
@@ -208,6 +212,7 @@ public class TablesTabTest {
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockTableEntityBundle, version, areaToken, mockActionMenuWidget);
 		
+		verify(mockJsClient).cancelPendingRequestsForCurrentUrl();
 		verifyTableConfiguration(version);
 	}
 
