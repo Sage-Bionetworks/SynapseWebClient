@@ -308,16 +308,30 @@ public class SynapseJavascriptClient {
 		requestsMap = new HashMap<String, List<Request>>();
 		// periodically clean up requests map
 		gwt.scheduleFixedDelay(() -> {
-			for (String key : requestsMap.keySet()) {
-				List<Request> newRequestList = new ArrayList<Request>();
-				for (Request request : requestsMap.get(key)) {
-					if (request.isPending()) {
-						newRequestList.add(request);
-					}
-				}
-				requestsMap.put(key, newRequestList);
-			}
+			cleanupRequestsMap();
 		}, 4000);
+	}
+	
+	public void cleanupRequestsMap() {
+		for (String key : requestsMap.keySet()) {
+			List<Request> newRequestList = new ArrayList<Request>();
+			for (Request request : requestsMap.get(key)) {
+				if (request.isPending()) {
+					newRequestList.add(request);
+				}
+			}
+			requestsMap.put(key, newRequestList);
+		}
+	}
+	
+	/**
+	 * For testing purposes only.  Returns Requests associated to the given url.
+	 * Requests are periodically removed from this list once they leave the Pending state.
+	 * @param forUrl
+	 * @return
+	 */
+	public List<Request> getRequests(String forUrl) {
+		return requestsMap.get(forUrl);
 	}
 	
 	public void cancelAllPendingRequests() {

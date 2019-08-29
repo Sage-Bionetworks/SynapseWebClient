@@ -110,7 +110,9 @@ public class SynapseJavascriptClientTest {
 	@Mock
 	AsyncCallback mockAsyncCallback;
 	@Mock
-	Request mockRequest;
+	Request mockRequest1;
+	@Mock
+	Request mockRequest2;
 	@Mock
 	Response mockResponse;
 	@Captor
@@ -132,7 +134,7 @@ public class SynapseJavascriptClientTest {
 	UserGroupHeader mockUgh2;
 	
 	@Before
-	public void before() {
+	public void before() throws RequestException {
 		entityId2BundleCache = new EntityId2BundleCacheImpl();
 		when(mockSynapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY)).thenReturn(REPO_ENDPOINT);
 		when(mockSynapseProperties.getSynapseProperty(FILE_SERVICE_URL_KEY)).thenReturn(FILE_ENDPOINT);
@@ -141,6 +143,7 @@ public class SynapseJavascriptClientTest {
 		when(mockGinInjector.getAuthenticationController()).thenReturn(mockAuthController);
 		when(mockJsniUtils.getSessionCookieUrl()).thenReturn(SESSION_COOKIE_URL);
 
+		when(mockRequestBuilder.sendRequest(anyString(), any(RequestCallback.class))).thenReturn(mockRequest1, mockRequest2);
 		client = new SynapseJavascriptClient(
 				jsonObjectAdapter, 
 				mockSynapseProperties, 
@@ -191,7 +194,7 @@ public class SynapseJavascriptClientTest {
 		testBundle.writeToJSONObject(adapter);
 		when(mockResponse.getStatusCode()).thenReturn(SC_OK);
 		when(mockResponse.getText()).thenReturn(adapter.toJSONString());
-		requestCallback.onResponseReceived(mockRequest, mockResponse);
+		requestCallback.onResponseReceived(mockRequest1, mockResponse);
 		
 		verify(mockAsyncCallback).onSuccess(testBundle);
 	}
@@ -219,7 +222,7 @@ public class SynapseJavascriptClientTest {
 		testBundle2.writeToJSONObject(adapter);
 		when(mockResponse.getStatusCode()).thenReturn(SC_OK);
 		when(mockResponse.getText()).thenReturn(adapter.toJSONString());
-		requestCallback.onResponseReceived(mockRequest, mockResponse);
+		requestCallback.onResponseReceived(mockRequest1, mockResponse);
 
 		//verify cache is updated
 		assertEquals(testBundle2, entityId2BundleCache.get(entityId));
@@ -243,7 +246,7 @@ public class SynapseJavascriptClientTest {
 		when(mockResponse.getStatusCode()).thenReturn(SC_FORBIDDEN);
 		String statusText = "user is not allowed access";
 		when(mockResponse.getStatusText()).thenReturn(statusText);
-		requestCallback.onResponseReceived(mockRequest, mockResponse);
+		requestCallback.onResponseReceived(mockRequest1, mockResponse);
 		
 		verify(mockAsyncCallback).onFailure(any(ForbiddenException.class));
 	}
@@ -270,7 +273,7 @@ public class SynapseJavascriptClientTest {
 		when(mockResponse.getStatusCode()).thenReturn(SC_FORBIDDEN);
 		String statusText = "user is not allowed access";
 		when(mockResponse.getStatusText()).thenReturn(statusText);
-		requestCallback.onResponseReceived(mockRequest, mockResponse);
+		requestCallback.onResponseReceived(mockRequest1, mockResponse);
 		
 		verify(mockAsyncCallback).onFailure(throwableCaptor.capture());
 		Throwable t = throwableCaptor.getValue();
@@ -296,7 +299,7 @@ public class SynapseJavascriptClientTest {
 		String responseText = "{\"reason\":" + "\""+reason+"\"}";
 		when(mockResponse.getStatusText()).thenReturn(statusText);
 		when(mockResponse.getText()).thenReturn(responseText);
-		requestCallback.onResponseReceived(mockRequest, mockResponse);
+		requestCallback.onResponseReceived(mockRequest1, mockResponse);
 		
 		verify(mockAsyncCallback).onFailure(throwableCaptor.capture());
 		Throwable t = throwableCaptor.getValue();
@@ -317,7 +320,7 @@ public class SynapseJavascriptClientTest {
 		
 		//simulate too many requests
 		when(mockResponse.getStatusCode()).thenReturn(TOO_MANY_REQUESTS_STATUS_CODE);
-		requestCallback.onResponseReceived(mockRequest, mockResponse);
+		requestCallback.onResponseReceived(mockRequest1, mockResponse);
 		
 		//verify we'll try again later
 		verify(mockGwt).scheduleExecution(callbackCaptor.capture(), eq(INITIAL_RETRY_REQUEST_DELAY_MS));
@@ -366,7 +369,7 @@ public class SynapseJavascriptClientTest {
 		RequestCallback requestCallback = requestCallbackCaptor.getValue();
 		//simulate too many requests
 		when(mockResponse.getStatusCode()).thenReturn(TOO_MANY_REQUESTS_STATUS_CODE);
-		requestCallback.onResponseReceived(mockRequest, mockResponse);
+		requestCallback.onResponseReceived(mockRequest1, mockResponse);
 		
 		//verify we'll try again later
 		verify(mockGwt).scheduleExecution(callbackCaptor.capture(), eq(INITIAL_RETRY_REQUEST_DELAY_MS));
@@ -378,7 +381,7 @@ public class SynapseJavascriptClientTest {
 		
 		//verify exponential backoff
 		requestCallback = requestCallbackCaptor.getValue();
-		requestCallback.onResponseReceived(mockRequest, mockResponse);
+		requestCallback.onResponseReceived(mockRequest1, mockResponse);
 		verify(mockGwt).scheduleExecution(callbackCaptor.capture(), eq(INITIAL_RETRY_REQUEST_DELAY_MS*2));
 	}
 	
@@ -449,7 +452,7 @@ public class SynapseJavascriptClientTest {
 		results.writeToJSONObject(adapter);
 		when(mockResponse.getStatusCode()).thenReturn(SC_OK);
 		when(mockResponse.getText()).thenReturn(adapter.toJSONString());
-		requestCallback.onResponseReceived(mockRequest, mockResponse);
+		requestCallback.onResponseReceived(mockRequest1, mockResponse);
 		
 		verify(mockAsyncCallback).onSuccess(profiles);
 	}
@@ -581,7 +584,7 @@ public class SynapseJavascriptClientTest {
 		when(mockResponse.getStatusCode()).thenReturn(SC_CREATED);
 		when(mockResponse.getText()).thenReturn(adapter.toJSONString());
 		
-		requestCallback.onResponseReceived(mockRequest, mockResponse);
+		requestCallback.onResponseReceived(mockRequest1, mockResponse);
 		
 		verify(mockAsyncCallback).onSuccess(result);
 	}
@@ -671,7 +674,7 @@ public class SynapseJavascriptClientTest {
 		RequestCallback requestCallback = requestCallbackCaptor.getValue();
 		when(mockResponse.getStatusCode()).thenReturn(SC_ACCEPTED);
 		when(mockResponse.getText()).thenReturn(adapter.toJSONString());
-		requestCallback.onResponseReceived(mockRequest, mockResponse);
+		requestCallback.onResponseReceived(mockRequest1, mockResponse);
 		
 		verify(mockAsyncCallback).onFailure(throwableCaptor.capture());
 		Throwable th = throwableCaptor.getValue();
@@ -819,5 +822,56 @@ public class SynapseJavascriptClientTest {
 		List<Long> userIds = request.getList();
 		assertTrue(userIds.contains(userId1));
 		assertTrue(userIds.contains(userId2));
+	}
+	
+	@Test
+	public void testPendingRequests() throws RequestException, JSONObjectAdapterException {
+		String currentUrl = "https://www.synapse.org/#!Team:9123";
+		when(mockRequest1.isPending()).thenReturn(false);
+		when(mockRequest2.isPending()).thenReturn(true);
+		when(mockGwt.getCurrentURL()).thenReturn(currentUrl);
+		
+		client.getTeam("9123", mockAsyncCallback);
+		client.getTeam("9123", mockAsyncCallback);
+		
+		verify(mockRequestBuilder, times(2)).sendRequest(eq((String)null), any());
+		
+		assertEquals(2, client.getRequests(currentUrl).size());
+		//test cleanup, should remove the first request (since it isn't pending)
+		client.cleanupRequestsMap();
+		List<Request> requests = client.getRequests(currentUrl);
+		assertEquals(1, requests.size());
+		assertEquals(mockRequest2, requests.get(0));
+		
+		// cancel all pending requests
+		client.cancelAllPendingRequests();
+		verify(mockRequest2).cancel();
+	}
+	
+	@Test
+	public void testCancelPendingRequestsForUrl() throws RequestException, JSONObjectAdapterException {
+		String url1 = "https://www.synapse.org/#!Team:1";
+		when(mockRequest1.isPending()).thenReturn(true);
+		String url2 = "https://www.synapse.org/#!Team:2";
+		when(mockRequest2.isPending()).thenReturn(true);
+		when(mockGwt.getCurrentURL()).thenReturn(url1, url2);
+		
+		client.getTeam("1", mockAsyncCallback);
+		client.getTeam("2", mockAsyncCallback);
+		
+		verify(mockRequestBuilder, times(2)).sendRequest(eq((String)null), any());
+		
+		assertEquals(1, client.getRequests(url1).size());
+		assertEquals(mockRequest1, client.getRequests(url1).get(0));
+		assertEquals(1, client.getRequests(url2).size());
+		assertEquals(mockRequest2, client.getRequests(url2).get(0));
+		
+		//test cancel requests for a url
+		client.cancelPendingRequests(url1);
+		verify(mockRequest1).cancel();
+		verify(mockRequest2, never()).cancel();
+		
+		client.cancelPendingRequests(url2);
+		verify(mockRequest2).cancel();
 	}
 }
