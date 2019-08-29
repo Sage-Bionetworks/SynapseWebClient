@@ -43,6 +43,7 @@ public class WikiTab {
 	public void configure(String entityId, String entityName, String wikiPageId, Boolean canEdit,
 			Callback callback, ActionMenuWidget actionMenu) {
 		lazyInject();
+		ginInjector.getSynapseJavascriptClient().cancelPendingRequestsForCurrentUrl();
 		WikiPageKey wikiPageKey = new WikiPageKey(entityId, ObjectType.ENTITY.name(), wikiPageId);
 		wikiPageWidget.configure(wikiPageKey, canEdit, callback);
 		wikiPageWidget.showSubpages(actionMenu);

@@ -159,6 +159,7 @@ public class FilesTab {
 	}
 	
 	public void configure(EntityBundle targetEntityBundle, Long versionNumber, ActionMenuWidget actionMenu) {
+		ginInjector.getSynapseJavascriptClient().cancelPendingRequestsForCurrentUrl();
 		lazyInject();
 		this.actionMenu = actionMenu;
 		view.showLoading(true);

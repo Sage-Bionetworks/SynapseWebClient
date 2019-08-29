@@ -18,6 +18,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
@@ -57,6 +58,9 @@ public class AppActivityMapperTest {
 	CookieProvider mockCookies;
 	@Mock
 	LoginPresenter mockLoginPresenter;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
+
 	@Before
 	public void before(){
 		when(mockInjector.getBulkPresenterProxy()).thenReturn(mockBulkPresenterProxy);
@@ -66,6 +70,7 @@ public class AppActivityMapperTest {
 		when(mockInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockInjector.getAuthenticationController()).thenReturn(mockAuthenticationController);
 		when(mockInjector.getLoginPresenter()).thenReturn(mockLoginPresenter);
+		when(mockInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
 		
 		appActivityMapper = new AppActivityMapper(mockInjector, mockSynapseJSNIUtils, null);
 	}
@@ -102,6 +107,7 @@ public class AppActivityMapperTest {
 		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(entityPlace);
 		
 		appActivityMapper.getActivity(loginPlace1);
+		verify(mockJsClient).cancelAllPendingRequests();
 		verify(mockGlobalApplicationState).setLastPlace(entityPlace);
 		
 		// Part 2
