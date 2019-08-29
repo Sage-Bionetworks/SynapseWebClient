@@ -33,6 +33,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -120,6 +121,8 @@ public class FilesTabTest {
 	ArgumentCaptor<CallbackP> callbackPCaptor;
 	@Mock
 	ActionMenuWidget mockActionMenuWidget;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
 	
 	FilesTab tab;
 	String projectEntityId = "syn9";
@@ -154,6 +157,7 @@ public class FilesTabTest {
 		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockPortalGinInjector.getModifiedCreatedByWidget()).thenReturn(mockModifiedCreatedBy);
 		when(mockPortalGinInjector.getDiscussionThreadListWidget()).thenReturn(mockDiscussionThreadListWidget);
+		when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
 		
 		tab.setEntitySelectedCallback(mockEntitySelectedCallback);
 		
@@ -215,6 +219,7 @@ public class FilesTabTest {
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockProjectEntityBundle, version, mockActionMenuWidget);
 		
+		verify(mockJsClient).cancelPendingRequestsForCurrentUrl();
 		verify(mockView, times(2)).setFileTitlebarVisible(false);
 		verify(mockView, times(2)).setFolderTitlebarVisible(false);
 		verify(mockView, times(2)).setPreviewVisible(false);
@@ -267,6 +272,7 @@ public class FilesTabTest {
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockEntityBundle, version, mockActionMenuWidget);
 
+		verify(mockJsClient).cancelPendingRequestsForCurrentUrl();
 		verify(mockView).setFileTitlebarVisible(false);
 		verify(mockView).setFileTitlebarVisible(true);
 		verify(mockView, times(2)).setFolderTitlebarVisible(false);

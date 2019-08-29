@@ -24,7 +24,9 @@ import static org.sagebionetworks.web.shared.WebConstants.SYNAPSE_VERSION_KEY;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
@@ -283,6 +285,7 @@ public class SynapseJavascriptClient {
 
 	public static final int LIMIT_50 = 50;
 	
+	public Map<String, List<Request>> requestsMap;
 	
 	public String repoServiceUrl,fileServiceUrl, authServiceUrl, synapseVersionInfo; 
 	@Inject
@@ -302,7 +305,53 @@ public class SynapseJavascriptClient {
 		this.ginInjector = ginInjector;
 		this.jsniUtils = jsniUtils;
 		this.entityIdBundleCache = entityIdBundleCache;
+		requestsMap = new HashMap<String, List<Request>>();
+		// periodically clean up requests map
+		gwt.scheduleFixedDelay(() -> {
+			cleanupRequestsMap();
+		}, 4000);
 	}
+	
+	public void cleanupRequestsMap() {
+		for (String key : requestsMap.keySet()) {
+			List<Request> newRequestList = new ArrayList<Request>();
+			for (Request request : requestsMap.get(key)) {
+				if (request.isPending()) {
+					newRequestList.add(request);
+				}
+			}
+			requestsMap.put(key, newRequestList);
+		}
+	}
+	
+	/**
+	 * For testing purposes only.  Returns Requests associated to the given url.
+	 * Requests are periodically removed from this list once they leave the Pending state.
+	 * @param forUrl
+	 * @return
+	 */
+	public List<Request> getRequests(String forUrl) {
+		return requestsMap.get(forUrl);
+	}
+	
+	public void cancelAllPendingRequests() {
+		for (String key : requestsMap.keySet()) {
+			cancelPendingRequests(key);
+		}
+	}
+
+	public void cancelPendingRequestsForCurrentUrl() {
+		cancelPendingRequests(gwt.getCurrentURL());
+	}
+
+	public void cancelPendingRequests(String forUrl) {
+		for (Request request : requestsMap.get(forUrl)) {
+			if (request.isPending()) {
+				request.cancel();	
+			}
+		}
+	}
+	
 	private String getRepoServiceUrl() {
 		if (repoServiceUrl == null) {
 			repoServiceUrl = synapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY);
@@ -396,7 +445,7 @@ public class SynapseJavascriptClient {
 	
 	private void sendRequest(final RequestBuilderWrapper requestBuilder, final String requestData, final OBJECT_TYPE responseType, final int retryDelay, final AsyncCallback callback) {
 		try {
-			requestBuilder.sendRequest(requestData, new RequestCallback() {
+			Request request = requestBuilder.sendRequest(requestData, new RequestCallback() {
 				@Override
 				public void onResponseReceived(Request request,
 						Response response) {
@@ -468,6 +517,12 @@ public class SynapseJavascriptClient {
 					}
 				}
 			});
+			
+			String currentUrl = gwt.getCurrentURL();
+			if (!requestsMap.containsKey(currentUrl))  {
+				requestsMap.put(currentUrl, new ArrayList<>());
+			}
+			requestsMap.get(currentUrl).add(request);
 		} catch (final Exception e) {
 			if (callback != null) {
 				callback.onFailure(e);	
