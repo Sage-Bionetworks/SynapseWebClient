@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
@@ -65,6 +66,7 @@ public class TableEntityWidget implements IsWidget,
 	TableEntityWidgetView view;
 	ActionMenuWidget actionMenu;
 	PreflightController preflightController;
+	SessionStorage sessionStorage;
 
 	EntityBundle entityBundle;
 	String tableId;
@@ -88,6 +90,7 @@ public class TableEntityWidget implements IsWidget,
 	String entityTypeDisplay;
 	PortalGinInjector ginInjector;
 	AddToDownloadList addToDownloadList;
+	public static final String PORTAL_CONFIG_DOWNLOAD_TABLE_KEY = "portal-config-invoke-download-table";
 	@Inject
 	public TableEntityWidget(TableEntityWidgetView view,
 			TableQueryResultWidget queryResultsWidget,
@@ -96,7 +99,8 @@ public class TableEntityWidget implements IsWidget,
 			SynapseClientAsync synapseClient,
 			FileViewClientsHelp fileViewClientsHelp,
 			AddToDownloadList addToDownloadList,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			SessionStorage sessionStorage) {
 		this.view = view;
 		this.queryResultsWidget = queryResultsWidget;
 		this.queryInputWidget = queryInputWidget;
@@ -106,6 +110,7 @@ public class TableEntityWidget implements IsWidget,
 		this.fileViewClientsHelp = fileViewClientsHelp;
 		this.addToDownloadList = addToDownloadList;
 		this.ginInjector = ginInjector;
+		this.sessionStorage = sessionStorage;
 		this.view.setPresenter(this);
 		this.view.setQueryResultsWidget(this.queryResultsWidget);
 		this.view.setQueryInputWidget(this.queryInputWidget);
@@ -239,6 +244,13 @@ public class TableEntityWidget implements IsWidget,
 		this.view.setTableMessageVisible(false);
 		if(!isFromResults){
 			this.queryResultsWidget.configure(query, this.canEditResults, tableType, this);
+		}
+		if (sessionStorage.getItem(PORTAL_CONFIG_DOWNLOAD_TABLE_KEY) != null && ginInjector.getAuthenticationController().isLoggedIn()) {
+			String isDownloadTableString = sessionStorage.getItem(PORTAL_CONFIG_DOWNLOAD_TABLE_KEY);
+			if (Boolean.parseBoolean(isDownloadTableString)) {
+				sessionStorage.removeItem(PORTAL_CONFIG_DOWNLOAD_TABLE_KEY);
+				onAddToDownloadList();
+			}
 		}
 	}
 
