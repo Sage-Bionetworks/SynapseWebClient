@@ -245,6 +245,7 @@ public class TableEntityWidget implements IsWidget,
 		if(!isFromResults){
 			this.queryResultsWidget.configure(query, this.canEditResults, tableType, this);
 		}
+		// PORTALS-596: if being directed to Synapse.org to download a file set, then automatically show the "Add To Download List" UI.
 		if (sessionStorage.getItem(PORTAL_CONFIG_DOWNLOAD_TABLE_KEY) != null && ginInjector.getAuthenticationController().isLoggedIn()) {
 			String isDownloadTableString = sessionStorage.getItem(PORTAL_CONFIG_DOWNLOAD_TABLE_KEY);
 			if (Boolean.parseBoolean(isDownloadTableString)) {

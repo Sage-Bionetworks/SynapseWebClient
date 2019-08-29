@@ -449,6 +449,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 					portalLogo.setVisible(true);	
 				}
 			}
+			// PORTALS-596
 			if (json.has("isInvokingDownloadTable")) {
 				String isInvokingDownloadTable = json.getString("isInvokingDownloadTable");
 				sessionStorage.setItem(TableEntityWidget.PORTAL_CONFIG_DOWNLOAD_TABLE_KEY, isInvokingDownloadTable);

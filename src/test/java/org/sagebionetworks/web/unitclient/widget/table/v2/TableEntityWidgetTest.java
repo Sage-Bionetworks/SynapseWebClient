@@ -24,11 +24,11 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
@@ -43,6 +43,8 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cache.SessionStorage;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
@@ -70,23 +72,33 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * @author John
  *
  */
+@RunWith(MockitoJUnitRunner.class)
 public class TableEntityWidgetTest {
 
 	AdapterFactory adapterFactory;
 	List<ColumnModel> columns;
 	TableBundle tableBundle;
 	TableEntity tableEntity;
+	@Mock
 	ActionMenuWidget mockActionMenu;
+	@Mock
 	DownloadTableQueryModalWidget mockDownloadTableQueryModalWidget;
+	@Mock
 	UploadTableModalWidget mockUploadTableModalWidget;
+	@Mock
 	PreflightController mockPreflightController;
+	@Mock
 	TableEntityWidgetView mockView;
+	@Mock
 	QueryChangeHandler mockQueryChangeHandler;
+	@Mock
 	TableQueryResultWidget mockQueryResultsWidget;
+	@Mock
 	QueryInputWidget mockQueryInputWidget;
 	TableEntityWidget widget;
 	EntityBundle entityBundle;
 	Long versionNumber;
+	@Mock
 	SynapseClientAsync mockSynapseClient;
 	@Mock
 	CopyTextModal mockCopyTextModal;
@@ -104,22 +116,15 @@ public class TableEntityWidgetTest {
 	PortalGinInjector mockPortalGinInjector;
 	@Mock
 	AddToDownloadList mockAddToDownloadList;
+	@Mock
+	SessionStorage mockSessionStorage;
+	@Mock
+	AuthenticationController mockAuthController;
 	@Captor
 	ArgumentCaptor<ActionListener> actionListenerCaptor;
 	
 	@Before
 	public void before(){
-		MockitoAnnotations.initMocks(this);
-		// mocks
-		mockActionMenu = Mockito.mock(ActionMenuWidget.class);
-		mockView = Mockito.mock(TableEntityWidgetView.class);
-		mockDownloadTableQueryModalWidget = Mockito.mock(DownloadTableQueryModalWidget.class);
-		mockQueryChangeHandler = Mockito.mock(QueryChangeHandler.class);
-		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
-		mockQueryResultsWidget = Mockito.mock(TableQueryResultWidget.class);
-		mockQueryInputWidget = Mockito.mock(QueryInputWidget.class);
-		mockUploadTableModalWidget = Mockito.mock(UploadTableModalWidget.class);
-		mockPreflightController = Mockito.mock(PreflightController.class);
 		// stubs
 		adapterFactory = new AdapterFactoryImpl();
 		columns = TableModelTestUtils.createOneOfEachType();
@@ -132,7 +137,7 @@ public class TableEntityWidgetTest {
 		when(mockPortalGinInjector.getDownloadTableQueryModalWidget()).thenReturn(mockDownloadTableQueryModalWidget);
 		when(mockPortalGinInjector.getUploadTableModalWidget()).thenReturn(mockUploadTableModalWidget);
 		when(mockPortalGinInjector.getCopyTextModal()).thenReturn(mockCopyTextModal);
-		
+		when(mockPortalGinInjector.getAuthenticationController()).thenReturn(mockAuthController);
 		
 		widget = new TableEntityWidget(
 				mockView, 
@@ -142,7 +147,8 @@ public class TableEntityWidgetTest {
 				mockSynapseClient, 
 				mockFileViewClientsHelp,
 				mockAddToDownloadList,
-				mockPortalGinInjector);
+				mockPortalGinInjector,
+				mockSessionStorage);
 		
 		AsyncMockStubber.callSuccessWith(FACET_SQL).when(mockSynapseClient).generateSqlWithFacets(anyString(), anyList(), anyList(), any(AsyncCallback.class));
 		// The test bundle
@@ -656,4 +662,44 @@ public class TableEntityWidgetTest {
 		verify(mockView).setSimpleSearchLinkVisible(false);
 		verify(mockView, atLeastOnce()).setAdvancedSearchLinkVisible(false);
 	}
+	
+	@Test
+	public void testAutoAddToDownloadList(){
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		configureBundleWithView(ViewType.file);
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(new Query());
+		when(mockSessionStorage.getItem(TableEntityWidget.PORTAL_CONFIG_DOWNLOAD_TABLE_KEY)).thenReturn("true");
+		
+		widget.configure(entityBundle, versionNumber, true, mockQueryChangeHandler, mockActionMenu);
+		
+		verify(mockAddToDownloadList).addToDownloadList(anyString(), any(Query.class));
+		verify(mockSessionStorage).removeItem(TableEntityWidget.PORTAL_CONFIG_DOWNLOAD_TABLE_KEY);
+	}
+
+	@Test
+	public void testAutoAddToDownloadListFalse(){
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		configureBundleWithView(ViewType.file);
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(new Query());
+		when(mockSessionStorage.getItem(TableEntityWidget.PORTAL_CONFIG_DOWNLOAD_TABLE_KEY)).thenReturn("false");
+		
+		widget.configure(entityBundle, versionNumber, true, mockQueryChangeHandler, mockActionMenu);
+		
+		verify(mockAddToDownloadList, never()).addToDownloadList(anyString(), any(Query.class));
+		verify(mockSessionStorage, never()).removeItem(TableEntityWidget.PORTAL_CONFIG_DOWNLOAD_TABLE_KEY);
+	}
+	
+	@Test
+	public void testAutoAddToDownloadListNotLoggedIn(){
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		configureBundleWithView(ViewType.file);
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(new Query());
+		when(mockSessionStorage.getItem(TableEntityWidget.PORTAL_CONFIG_DOWNLOAD_TABLE_KEY)).thenReturn("true");
+		
+		widget.configure(entityBundle, versionNumber, true, mockQueryChangeHandler, mockActionMenu);
+		
+		verify(mockAddToDownloadList, never()).addToDownloadList(anyString(), any(Query.class));
+		verify(mockSessionStorage, never()).removeItem(TableEntityWidget.PORTAL_CONFIG_DOWNLOAD_TABLE_KEY);
+	}
+
 }
