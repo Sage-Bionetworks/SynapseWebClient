@@ -874,4 +874,35 @@ public class SynapseJavascriptClientTest {
 		client.cancelPendingRequests(url2);
 		verify(mockRequest2).cancel();
 	}
+	
+	@Test
+	public void testDeleteRequestsCannotBeCancelled() throws RequestException {
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		String currentUrl = "https://www.synapse.org/#!Team:9123";
+		when(mockRequest1.isPending()).thenReturn(true);
+		when(mockRequest2.isPending()).thenReturn(true);
+		when(mockGwt.getCurrentURL()).thenReturn(currentUrl);
+		
+		client.logout();
+		
+		verify(mockRequestBuilder).sendRequest(anyString(), any());
+		
+		//verify no requests are associated to the current URL
+		assertNull(client.getRequests(currentUrl));
+	}
+
+	@Test
+	public void testCreateRequestsCannotBeCancelled() throws RequestException {
+		String currentUrl = "https://www.synapse.org/#!Team:9123";
+		when(mockRequest1.isPending()).thenReturn(true);
+		when(mockRequest2.isPending()).thenReturn(true);
+		when(mockGwt.getCurrentURL()).thenReturn(currentUrl);
+		
+		client.createEntity(new FileEntity(), mockAsyncCallback);
+		
+		verify(mockRequestBuilder).sendRequest(anyString(), any());
+		
+		//verify no requests are associated to the current URL
+		assertNull(client.getRequests(currentUrl));
+	}
 }
