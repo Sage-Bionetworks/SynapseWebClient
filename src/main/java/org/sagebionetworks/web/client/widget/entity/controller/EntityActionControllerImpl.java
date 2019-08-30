@@ -1344,7 +1344,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				snapshotRequest.setSnapshotComment(comment);
 				transactionRequest.setSnapshotOptions(snapshotRequest);
 				view.showCreateVersionDialog();
-				getJobTrackingWidget().startAndTrackJob("Applying CSV to the Table...", false, AsynchType.TableTransaction, transactionRequest, new AsynchronousProgressHandler() {
+				getJobTrackingWidget().startAndTrackJob("Creating a new View version...", false, AsynchType.TableTransaction, transactionRequest, new AsynchronousProgressHandler() {
 					
 					@Override
 					public void onFailure(Throwable failure) {
