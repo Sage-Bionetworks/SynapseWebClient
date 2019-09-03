@@ -212,7 +212,6 @@ public class TablesTabTest {
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockTableEntityBundle, version, areaToken, mockActionMenuWidget);
 		
-		verify(mockJsClient).cancelPendingRequestsForCurrentUrl();
 		verifyTableConfiguration(version);
 	}
 

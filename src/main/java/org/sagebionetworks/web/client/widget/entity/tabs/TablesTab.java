@@ -150,7 +150,6 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	}
 	
 	public void configure(EntityBundle entityBundle, Long versionNumber, String areaToken, ActionMenuWidget entityActionMenu) {
-		ginInjector.getSynapseJavascriptClient().cancelPendingRequestsForCurrentUrl();
 		lazyInject();
 		this.areaToken = areaToken;
 		this.entityActionMenu = entityActionMenu;

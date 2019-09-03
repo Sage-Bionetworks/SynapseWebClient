@@ -219,7 +219,6 @@ public class FilesTabTest {
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockProjectEntityBundle, version, mockActionMenuWidget);
 		
-		verify(mockJsClient).cancelPendingRequestsForCurrentUrl();
 		verify(mockView, times(2)).setFileTitlebarVisible(false);
 		verify(mockView, times(2)).setFolderTitlebarVisible(false);
 		verify(mockView, times(2)).setPreviewVisible(false);
@@ -272,7 +271,6 @@ public class FilesTabTest {
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockEntityBundle, version, mockActionMenuWidget);
 
-		verify(mockJsClient).cancelPendingRequestsForCurrentUrl();
 		verify(mockView).setFileTitlebarVisible(false);
 		verify(mockView).setFileTitlebarVisible(true);
 		verify(mockView, times(2)).setFolderTitlebarVisible(false);
