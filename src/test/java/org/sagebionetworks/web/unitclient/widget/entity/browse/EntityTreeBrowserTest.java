@@ -25,30 +25,23 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
@@ -293,41 +286,6 @@ public class EntityTreeBrowserTest {
 		return header;
 	}
 	
-	@Test
-	public void testGetEntityQueryResultsFromHeaders() {
-		List<EntityHeader> headers = new ArrayList<EntityHeader>();
-		String id, name, type;
-		Long versionNumber;
-		id = "12";
-		name = "project 1";
-		type = Project.class.getName();
-		versionNumber = 1L;
-		headers.add(createEntityHeader(id, name, type, versionNumber));
-		
-		EntityQueryResults results = entityTreeBrowser.getEntityQueryResultsFromHeaders(headers);
-		assertEquals(1L, results.getTotalEntityCount().longValue());
-		assertEquals(1, results.getEntities().size());
-		EntityQueryResult result = results.getEntities().get(0);
-		assertEquals(id, result.getId());
-		assertEquals(name, result.getName());
-		assertEquals(EntityType.project.name(), result.getEntityType());
-		assertEquals(versionNumber, result.getVersionNumber());
-		
-		id = "24";
-		name = "project 2";
-		type = "file";
-		versionNumber = 3L;
-		headers.add(createEntityHeader(id, name, type, versionNumber));
-		
-		results = entityTreeBrowser.getEntityQueryResultsFromHeaders(headers);
-		assertEquals(2L, results.getTotalEntityCount().longValue());
-		assertEquals(2, results.getEntities().size());
-		result = results.getEntities().get(1);
-		assertEquals(id, result.getId());
-		assertEquals(name, result.getName());
-		assertEquals(type, result.getEntityType());
-		assertEquals(versionNumber, result.getVersionNumber());
-	}
 	
 	@Test
 	public void testIsExpandable() {

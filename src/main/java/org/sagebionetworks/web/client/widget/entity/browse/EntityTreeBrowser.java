@@ -11,8 +11,6 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -134,25 +132,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	}
 	public void setLoadingVisible(boolean visible) {
 		view.setLoadingVisible(visible);
-	}
-	public EntityQueryResults getEntityQueryResultsFromHeaders(
-			List<EntityHeader> headers) {
-		EntityQueryResults results = new EntityQueryResults();
-		List<EntityQueryResult> resultList = new ArrayList<EntityQueryResult>();
-		
-		for (EntityHeader header : headers) {
-			EntityQueryResult result = new EntityQueryResult();
-			result.setId(header.getId());
-			result.setName(header.getName());
-			result.setEntityType(EntityTypeUtils.getEntityTypeForEntityClassName(header.getType()).name());
-			result.setVersionNumber(header.getVersionNumber());
-			resultList.add(result);
-		}
-		
-		results.setEntities(resultList);
-		results.setTotalEntityCount((long)headers.size());
-		
-		return results;
 	}
 	
 	@Override
