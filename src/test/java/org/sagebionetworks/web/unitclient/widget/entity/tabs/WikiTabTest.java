@@ -72,7 +72,6 @@ public class WikiTabTest {
 		WikiPageWidget.Callback callback = mock(WikiPageWidget.Callback.class);
 		tab.configure(entityId, entityName, wikiPageId, canEdit, callback, mockActionMenuWidget);
 		
-		verify(mockJsClient).cancelPendingRequestsForCurrentUrl();
 		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), eq(callback));
 		verify(mockWikiPageWidget).showSubpages(mockActionMenuWidget);
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
