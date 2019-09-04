@@ -2,9 +2,9 @@ package org.sagebionetworks.web.unitclient.widget.docker;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -39,6 +39,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.pagination.countbased.BasicPaginationWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.http.client.Request;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -61,7 +62,8 @@ public class DockerRepoListWidgetTest {
 	ArgumentCaptor<CallbackP<String>> callbackPCaptor;
 	@Mock
 	CallbackP<String> mockCallbackP;
-	
+	@Mock
+	Request mockRequest;
 	List<EntityHeader> searchResults;
 	
 	DockerRepoListWidget dockerRepoListWidget;
@@ -216,8 +218,25 @@ public class DockerRepoListWidgetTest {
 		verify(mockMembersContainer).setIsMore(true);
 		when(mockResults.getNextPageToken()).thenReturn(null);
 		dockerRepoListWidget.loadMore();
+		verify(mockRequest, never()).cancel();
 		verify(mockSynapseJavascriptClient, times(2)).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		verify(mockMembersContainer).setIsMore(false);
+	}
+	
+	@Test
+	public void testReconfigureCancels() {
+		// Do not test async response, only test the Request
+		reset(mockSynapseJavascriptClient);
+		when(mockSynapseJavascriptClient.getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class))).thenReturn(mockRequest);
+		dockerRepoListWidget.configure(projectId);
+		
+		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
+		verify(mockRequest, never()).cancel();
+		
+		dockerRepoListWidget.configure(projectId);
+		
+		verify(mockRequest).cancel();
+		verify(mockSynapseJavascriptClient, times(2)).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 	}
 	
 	@Test

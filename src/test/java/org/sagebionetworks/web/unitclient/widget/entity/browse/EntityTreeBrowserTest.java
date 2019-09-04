@@ -51,6 +51,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsTreeItem;
 
@@ -88,6 +89,8 @@ public class EntityTreeBrowserTest {
 	EntityHeader mockEntityHeader;
 	@Mock
 	SynapseAlert mockSynAlert;
+	@Mock
+	Request mockRequest;
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
 
@@ -277,16 +280,6 @@ public class EntityTreeBrowserTest {
 		verify(handler).onSelection(any(EntitySelectedEvent.class));
 	}
 	
-	private EntityHeader createEntityHeader(String id, String name, String type, Long versionNumber) {
-		EntityHeader header = new EntityHeader();
-		header.setId(id);
-		header.setName(name);
-		header.setType(type);
-		header.setVersionNumber(versionNumber);
-		return header;
-	}
-	
-	
 	@Test
 	public void testIsExpandable() {
 		EntityHeader result = new EntityHeader();
@@ -313,5 +306,22 @@ public class EntityTreeBrowserTest {
 		for (int i = 0; i < 10; i++) {
 			assertTrue(clipboardValue.contains(TEST_RESULT_ID+i));
 		}
+	}
+	
+	@Test
+	public void testReconfigureCancels() {
+		// Do not test async response, only test the Request
+		reset(mockSynapseJavascriptClient);
+		when(mockSynapseJavascriptClient.getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class))).thenReturn(mockRequest);
+		
+		entityTreeBrowser.configure("123");
+		
+		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
+		verify(mockRequest, never()).cancel();
+		
+		entityTreeBrowser.configure("1234");
+		
+		verify(mockRequest).cancel();
+		verify(mockSynapseJavascriptClient, times(2)).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 	}
 }
