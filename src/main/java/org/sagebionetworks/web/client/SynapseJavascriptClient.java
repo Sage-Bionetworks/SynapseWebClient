@@ -340,10 +340,6 @@ public class SynapseJavascriptClient {
 		}
 	}
 
-	public void cancelPendingRequestsForCurrentUrl() {
-		cancelPendingRequests(gwt.getCurrentURL());
-	}
-
 	public void cancelPendingRequests(String forUrl) {
 		for (Request request : requestsMap.get(forUrl)) {
 			if (request.isPending()) {
@@ -381,7 +377,7 @@ public class SynapseJavascriptClient {
 		return synapseVersionInfo;
 	}
 	
-	private void doDelete(String url, AsyncCallback callback) {
+	private Request doDelete(String url, AsyncCallback callback) {
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
 		requestBuilder.configure(DELETE, url);
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
@@ -390,19 +386,19 @@ public class SynapseJavascriptClient {
 		}
 		// never cancel a DELETE request
 		boolean canCancel = false;
-		sendRequest(requestBuilder, null, OBJECT_TYPE.None, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, callback);
+		return sendRequest(requestBuilder, null, OBJECT_TYPE.None, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, callback);
 	}
 
-	private void doGet(String url, OBJECT_TYPE responseType, AsyncCallback callback) {
-		doGet(url, responseType, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserSessionToken(), callback);
+	private Request doGet(String url, OBJECT_TYPE responseType, AsyncCallback callback) {
+		return doGet(url, responseType, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserSessionToken(), callback);
 	}
 	
-	public void doGetString(String url, boolean forceAnonymous, AsyncCallback callback) {
+	public Request doGetString(String url, boolean forceAnonymous, AsyncCallback callback) {
 		String sessionToken = forceAnonymous ? null : authController.getCurrentUserSessionToken();
-		doGet(url, OBJECT_TYPE.String, null, sessionToken, callback);
+		return doGet(url, OBJECT_TYPE.String, null, sessionToken, callback);
 	}
 	
-	private void doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, String sessionToken, AsyncCallback callback) {
+	private Request doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, String sessionToken, AsyncCallback callback) {
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
 		requestBuilder.configure(GET, url);
 		if (acceptedResponseType != null) {
@@ -413,10 +409,10 @@ public class SynapseJavascriptClient {
 		}
 		// can always cancel a GET request
 		boolean canCancel = true;
-		sendRequest(requestBuilder, null, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, callback);
+		return sendRequest(requestBuilder, null, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, callback);
 	}
 	
-	private void doPostOrPut(RequestBuilder.Method method, String url, JSONEntity requestObject, OBJECT_TYPE responseType, boolean canCancel, AsyncCallback callback) {
+	private Request doPostOrPut(RequestBuilder.Method method, String url, JSONEntity requestObject, OBJECT_TYPE responseType, boolean canCancel, AsyncCallback callback) {
 		String requestData = null;
 		if (requestObject != null) {
 			try {
@@ -425,7 +421,7 @@ public class SynapseJavascriptClient {
 				requestData = adapter.toJSONString();
 			} catch (JSONObjectAdapterException exception) {
 				callback.onFailure(exception);
-				return;
+				return null;
 			}
 		}
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
@@ -435,21 +431,21 @@ public class SynapseJavascriptClient {
 		if (authController.isLoggedIn()) {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}
-		sendRequest(requestBuilder, requestData, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, callback);
+		return sendRequest(requestBuilder, requestData, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, callback);
 	}
 	
-	private void doPost(String url, JSONEntity requestObject, OBJECT_TYPE responseType, boolean canCancel, AsyncCallback callback) {
-		doPostOrPut(POST, url, requestObject, responseType, canCancel, callback);
+	private Request doPost(String url, JSONEntity requestObject, OBJECT_TYPE responseType, boolean canCancel, AsyncCallback callback) {
+		return doPostOrPut(POST, url, requestObject, responseType, canCancel, callback);
 	}
 	
-	private void doPut(String url, JSONEntity requestObject, OBJECT_TYPE responseType, AsyncCallback callback) {
+	private Request doPut(String url, JSONEntity requestObject, OBJECT_TYPE responseType, AsyncCallback callback) {
 		// never cancel a PUT request
 		boolean canCancel = false;
-		doPostOrPut(PUT, url, requestObject, responseType, false, callback);
+		return doPostOrPut(PUT, url, requestObject, responseType, false, callback);
 	}
 
 	
-	private void sendRequest(final RequestBuilderWrapper requestBuilder, final String requestData, final OBJECT_TYPE responseType, final int retryDelay, boolean canCancel, final AsyncCallback callback) {
+	private Request sendRequest(final RequestBuilderWrapper requestBuilder, final String requestData, final OBJECT_TYPE responseType, final int retryDelay, boolean canCancel, final AsyncCallback callback) {
 		try {
 			Request request = requestBuilder.sendRequest(requestData, new RequestCallback() {
 				@Override
@@ -531,10 +527,12 @@ public class SynapseJavascriptClient {
 				}
 				requestsMap.get(currentUrl).add(request);
 			}
+			return request;
 		} catch (final Exception e) {
 			if (callback != null) {
 				callback.onFailure(e);	
 			}
+			return null;
 		}
 	}
 	
@@ -671,9 +669,9 @@ public class SynapseJavascriptClient {
 		doPost(url, request, OBJECT_TYPE.RestrictionInformationResponse, true, callback);
 	}
 	
-	public void getEntityChildren(EntityChildrenRequest request, final AsyncCallback<EntityChildrenResponse> callback) {
+	public Request getEntityChildren(EntityChildrenRequest request, final AsyncCallback<EntityChildrenResponse> callback) {
 		String url = getRepoServiceUrl() + ENTITY + CHILDREN;
-		doPost(url, request, OBJECT_TYPE.EntityChildrenResponse, true, callback);
+		return doPost(url, request, OBJECT_TYPE.EntityChildrenResponse, true, callback);
 	}
 	
 	public void getV2WikiPageAsV1(WikiPageKey key, AsyncCallback<WikiPage> callback) {

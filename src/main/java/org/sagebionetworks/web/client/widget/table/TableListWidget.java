@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
+import com.google.gwt.http.client.Request;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -38,6 +39,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	public static final SortBy DEFAULT_SORT_BY = SortBy.CREATED_ON;
 	public static final Direction DEFAULT_DIRECTION = Direction.DESC;
 	boolean isInitializing = false;
+	Request currentRequest = null;
 	private List<String> idList = null;
 	
 	@Inject
@@ -68,6 +70,9 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	 * @param showAddTable
 	 */
 	public void configure(EntityBundle parentBundle) {
+		if (currentRequest != null) {
+			currentRequest.cancel();
+		}
 		isInitializing = true;
 		this.parentBundle = parentBundle;
 		loadData();
@@ -134,7 +139,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 		} else {
 			view.setSortUI(query.getSortBy(), query.getSortDirection());	
 		}
-		jsClient.getEntityChildren(query, new AsyncCallback<EntityChildrenResponse>() {
+		currentRequest = jsClient.getEntityChildren(query, new AsyncCallback<EntityChildrenResponse>() {
 			public void onSuccess(EntityChildrenResponse result) {
 				query.setNextPageToken(result.getNextPageToken());
 				loadMoreWidget.setIsMore(result.getNextPageToken() != null);
