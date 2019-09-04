@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
+import com.google.gwt.http.client.Request;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -48,6 +49,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	boolean isInitializing = false;
 	private List<String> idList;
 	CallbackP<Boolean> isEmptyCallback;
+	Request currentRequest = null;
 	@Inject
 	public EntityTreeBrowser(PortalGinInjector ginInjector,
 			EntityTreeBrowserView view, 
@@ -76,6 +78,9 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	 * @param entityId
 	 */
 	public void configure(String entityId) {
+		if (currentRequest != null) {
+			currentRequest.cancel();
+		}
 		view.setSortable(true);
 		isInitializing = true;
 		resetSynIdList();
@@ -84,6 +89,9 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	}
 	
 	public void configure(List<EntityHeader> headers) {
+		if (currentRequest != null) {
+			currentRequest.cancel();
+		}
 		view.setSortable(false);
 		isInitializing = true;
 		//set existing headers.
@@ -152,7 +160,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		
 		synAlert.clear();
 		// ask for the folder children, then the files
-		jsClient.getEntityChildren(request,
+		currentRequest = jsClient.getEntityChildren(request,
 				new AsyncCallback<EntityChildrenResponse>() {
 					@Override
 					public void onSuccess(EntityChildrenResponse results) {
