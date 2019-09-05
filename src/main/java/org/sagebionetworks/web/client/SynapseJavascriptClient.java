@@ -1490,10 +1490,10 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + ENTITY + "/" + tableEntityId + COLUMN;
 		doGet(url, OBJECT_TYPE.PaginatedColumnModelsResults, callback);
 	}
-	public void getEntityVersions(String entityId, int offset, int limit, AsyncCallback<List<VersionInfo>> callback) {
+	public Request getEntityVersions(String entityId, int offset, int limit, AsyncCallback<List<VersionInfo>> callback) {
 		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + REPO_SUFFIX_VERSION
 				+ "?" + OFFSET_PARAMETER + offset + "&" + LIMIT_PARAMETER + limit;
-		doGet(url, OBJECT_TYPE.PaginatedResultsVersionInfo, callback);
+		return doGet(url, OBJECT_TYPE.PaginatedResultsVersionInfo, callback);
 	}
 	public void getThreadsForEntity(String entityId, Long limit, Long offset,
 			DiscussionThreadOrder order, Boolean ascending, DiscussionFilter filter,
