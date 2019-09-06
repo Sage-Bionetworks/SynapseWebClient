@@ -160,12 +160,11 @@ public class VersionHistoryWidget implements VersionHistoryWidgetView.Presenter,
 				@Override
 				public void onSuccess(List<VersionInfo> results) {
 					view.setMoreButtonVisible(results.size() == VERSION_LIMIT);
-					Long currentVersion = null;
 					if (currentOffset == 0) {
 						boolean isCurrentVersion = versionNumber == null;
 						//we know the current version based on this, unless we're looking at a Table
 						if (!(bundle.getEntity() instanceof Table)) {
-							currentVersion = results.get(0).getVersionNumber();
+							Long currentVersion = results.get(0).getVersionNumber();
 							isCurrentVersion = isCurrentVersion || currentVersion.equals(versionNumber);
 						}
 						
