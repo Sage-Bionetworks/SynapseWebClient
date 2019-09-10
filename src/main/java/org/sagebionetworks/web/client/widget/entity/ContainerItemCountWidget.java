@@ -27,9 +27,9 @@ public class ContainerItemCountWidget implements IsWidget {
 		entityTypes.add(EntityType.file);
 		entityTypes.add(EntityType.folder);
 		entityTypes.add(EntityType.link);
-		// TODO: uncomment if tables are in the hierarchy
-//		entityTypes.add(EntityType.table);
-//		entityTypes.add(EntityType.entityview);
+		// include Tables, even though it's not currently possible to move them to a subfolder.
+		entityTypes.add(EntityType.table);
+		entityTypes.add(EntityType.entityview);
 	}
 	
 	public Widget asWidget() {
