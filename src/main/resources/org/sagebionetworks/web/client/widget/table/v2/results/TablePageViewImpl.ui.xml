@@ -10,21 +10,23 @@
 			<g:ScrollPanel ui:field="topScrollBar" height="18px" visible="false">
 				<bh:Div ui:field="topScrollDiv" height="18px"/>
 			</g:ScrollPanel>
-			<g:ScrollPanel ui:field="tableScrollPanel">
-				<bh:Div ui:field="tableDiv">
-					<t:Table styleName="table table-striped table-condensed">
-						<t:THead>
-							<t:TableRow ui:field="header">
-							</t:TableRow>
-						</t:THead>
-						<t:TBody ui:field="body"></t:TBody>
-					</t:Table>
-					<g:SimplePanel ui:field="editorPopupBuffer">
-						<bh:Div styleName="margin-top-300" />
-					</g:SimplePanel>
-					<g:SimplePanel ui:field="paginationPanel" />
-				</bh:Div>
-			</g:ScrollPanel>
+			<bh:Div>
+				<g:ScrollPanel ui:field="tableScrollPanel" height="100%">
+					<bh:Div ui:field="tableDiv">
+						<t:Table styleName="table table-striped table-condensed">
+							<t:THead>
+								<t:TableRow ui:field="header">
+								</t:TableRow>
+							</t:THead>
+							<t:TBody ui:field="body"></t:TBody>
+						</t:Table>
+						<g:SimplePanel ui:field="editorPopupBuffer">
+							<bh:Div styleName="margin-top-300" />
+						</g:SimplePanel>
+					</bh:Div>
+				</g:ScrollPanel>
+				<bh:Div ui:field="paginationPanel" />
+			</bh:Div>
 		</bh:Div>
 	</bh:Div>
 </ui:UiBinder>
