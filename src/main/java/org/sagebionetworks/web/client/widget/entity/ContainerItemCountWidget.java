@@ -1,13 +1,18 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.repo.model.EntityType.entityview;
+import static org.sagebionetworks.repo.model.EntityType.file;
+import static org.sagebionetworks.repo.model.EntityType.folder;
+import static org.sagebionetworks.repo.model.EntityType.link;
+import static org.sagebionetworks.repo.model.EntityType.table;
+
 import java.util.ArrayList;
 import java.util.List;
-import static org.sagebionetworks.repo.model.EntityType.*;
+
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;

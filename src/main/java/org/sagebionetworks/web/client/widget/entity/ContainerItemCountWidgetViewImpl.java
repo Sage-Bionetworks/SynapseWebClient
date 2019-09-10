@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -26,10 +25,6 @@ public class ContainerItemCountWidgetViewImpl implements ContainerItemCountWidge
 	}
 	
 	@Override
-	public void showLoading() {
-	}
-
-	@Override
 	public Widget asWidget() {
 		return widget;
 	}
@@ -37,16 +32,6 @@ public class ContainerItemCountWidgetViewImpl implements ContainerItemCountWidge
 	@Override
 	public void clear() {
 		itemCountField.clear();
-	}
-
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
-
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
 	}
 	
 	@Override
