@@ -72,6 +72,7 @@ public class VideoWidgetViewImpl extends FlowPanel implements VideoWidgetView {
 		
 	}
 
+	@Override
 	public void showError(String error) {
 		clear();
 		add(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(error)));
