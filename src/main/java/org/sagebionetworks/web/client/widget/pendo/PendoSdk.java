@@ -37,35 +37,44 @@ public class PendoSdk {
 		return $wnd.pendo;
 	}-*/;
 	
-	private static native void _initialize(
-			String userId,
-			String synapseEmail) /*-{
+	private static native void _initialize(String userId, String synapseEmail) /*-{
 		// Call this whenever information about your visitors becomes available
-	    // Please use Strings, Numbers, or Bools for value types.
-	    try {
-		    	$wnd.pendo.initialize({
-		      visitor: {
-		        id: userId,   // Required if user is logged in
-		        email: synapseEmail// Optional
-		        // role:         // Optional
-		
-		        // You can add any additional visitor level key-values here,
-		        // as long as it's not one of the above reserved names.
-		      },
-		
-		      account: {
-		        // id:           'ACCOUNT-UNIQUE-ID' // Highly recommended
-		        // name:         // Optional
-		        // planLevel:    // Optional
-		        // planPrice:    // Optional
-		        // creationDate: // Optional
-		
-		        // You can add any additional account level key-values here,
-		        // as long as it's not one of the above reserved names.
-		      }
-		    });
-	    } catch(err) {
-	    		console.error(err);
-	    }
+		// Please use Strings, Numbers, or Bools for value types.
+		try {
+			$wnd.pendo.initialize({
+				sanitizeUrl: function (url) {
+					// NOTE: use pendo.normalizedUrl in the js console to see what url we send to Pendo for the page that you're on!
+					if (url.includes('#!')) {
+						return url.replace('#!', '');
+					} else {
+						// no place like Home
+						var sep = url.endsWith('/') ? '' : '/';
+						return url + sep + 'Home';
+					}
+				},
+				visitor : {
+					id : userId, // Required if user is logged in
+					email : synapseEmail
+				// Optional
+				// role:         // Optional
+
+				// You can add any additional visitor level key-values here,
+				// as long as it's not one of the above reserved names.
+				},
+
+				account : {
+				// id:           'ACCOUNT-UNIQUE-ID' // Highly recommended
+				// name:         // Optional
+				// planLevel:    // Optional
+				// planPrice:    // Optional
+				// creationDate: // Optional
+
+				// You can add any additional account level key-values here,
+				// as long as it's not one of the above reserved names.
+				}
+			});
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
 }
