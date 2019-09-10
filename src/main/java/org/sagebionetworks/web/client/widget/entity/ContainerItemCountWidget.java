@@ -2,10 +2,11 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import static org.sagebionetworks.repo.model.EntityType.*;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 
@@ -17,19 +18,20 @@ import com.google.inject.Inject;
 public class ContainerItemCountWidget implements IsWidget {
 	private ContainerItemCountWidgetView view;
 	private SynapseJavascriptClient jsClient;
-	private SynapseJSNIUtilsImpl utils;
+	private SynapseJSNIUtils utils;
 	List<EntityType> entityTypes = new ArrayList<>();
 
 	@Inject
-	public ContainerItemCountWidget(ContainerItemCountWidgetView view, SynapseJavascriptClient jsClient, SynapseJSNIUtilsImpl utils) {
+	public ContainerItemCountWidget(ContainerItemCountWidgetView view, SynapseJavascriptClient jsClient, SynapseJSNIUtils utils) {
 		this.view = view;
 		this.jsClient = jsClient;
-		entityTypes.add(EntityType.file);
-		entityTypes.add(EntityType.folder);
-		entityTypes.add(EntityType.link);
+		this.utils = utils;
+		entityTypes.add(file);
+		entityTypes.add(folder);
+		entityTypes.add(link);
 		// include Tables, even though it's not currently possible to move them to a subfolder.
-		entityTypes.add(EntityType.table);
-		entityTypes.add(EntityType.entityview);
+		entityTypes.add(table);
+		entityTypes.add(entityview);
 	}
 	
 	public Widget asWidget() {
@@ -44,7 +46,6 @@ public class ContainerItemCountWidget implements IsWidget {
 		request.setIncludeTotalChildCount(true);
 		request.setIncludeTypes(entityTypes);
 		jsClient.getEntityChildren(request, new AsyncCallback<EntityChildrenResponse>() {
-			
 			@Override
 			public void onSuccess(EntityChildrenResponse result) {
 				Long childCount = result.getTotalChildCount();
@@ -52,7 +53,6 @@ public class ContainerItemCountWidget implements IsWidget {
 					view.showCount(childCount);
 				}
 			}
-			
 			@Override
 			public void onFailure(Throwable caught) {
 				utils.consoleError(caught);
