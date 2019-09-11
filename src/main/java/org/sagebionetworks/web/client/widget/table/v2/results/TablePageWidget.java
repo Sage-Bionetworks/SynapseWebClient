@@ -58,6 +58,7 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 		this.paginationWidget = paginationWidget;
 		this.view = view;
 		this.view.setPaginationWidget(paginationWidget);
+		paginationWidget.hideClearFix();
 	}
 	
 	/**

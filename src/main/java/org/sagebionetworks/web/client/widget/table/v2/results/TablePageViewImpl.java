@@ -2,17 +2,13 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ScrollEvent;
 import com.google.gwt.event.dom.client.ScrollHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -39,7 +35,7 @@ public class TablePageViewImpl implements TablePageView {
 	@UiField
 	TBody body;
 	@UiField
-	SimplePanel paginationPanel;
+	Div paginationPanel;
 	@UiField
 	SimplePanel editorPopupBuffer;
 	@UiField
@@ -68,6 +64,7 @@ public class TablePageViewImpl implements TablePageView {
 					topScrollDiv.setWidth(tableDiv.getElement().getScrollWidth() + "px");
 					boolean isScrollBarShowing = tableDiv.getElement().getScrollWidth() > tableDiv.getElement().getClientWidth();
 					topScrollBar.setVisible(isScrollBarShowing && tableScrollPanel.getOffsetHeight() > 600);
+					paginationPanel.setMarginLeft(tableScrollPanel.getAbsoluteLeft() - 20);
 					gwt.scheduleExecution(this, 400);
 				}
 			}

@@ -72,4 +72,8 @@ public class BasicPaginationWidget implements BasicPaginationView.Presenter, IsW
 		return view.asWidget();
 	}
 
+	public void hideClearFix() {
+		view.hideClearFix();
+	}
+
 }

@@ -6,7 +6,7 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<bh:Div>
-		<bh:ClearFix />
+		<bh:ClearFix ui:field="clearFix" />
 		<bh:UnorderedList addStyleNames="pager padding-left-0-imp margin-top-5" pull="LEFT">
 			<b:ListItem addStyleNames="margin-right-5">
 				<b:Anchor ui:field="previousButton" text="Previous" width="90px"/>
