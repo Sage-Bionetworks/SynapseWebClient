@@ -219,6 +219,8 @@ import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
 import org.sagebionetworks.web.client.widget.entity.BigPromptModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeView;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeViewImpl;
+import org.sagebionetworks.web.client.widget.entity.ContainerItemCountWidgetView;
+import org.sagebionetworks.web.client.widget.entity.ContainerItemCountWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalView;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
@@ -1370,5 +1372,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(Linkify.class).to(LinkifyImpl.class);
 		bind(PasswordResetSignedTokenView.class).to(PasswordResetSignedTokenViewImpl.class);
 		bind(TeamProjectsModalWidgetView.class).to(TeamProjectsModalWidgetViewImpl.class);
+		bind(ContainerItemCountWidgetView.class).to(ContainerItemCountWidgetViewImpl.class);
 	}
 }

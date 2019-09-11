@@ -39,6 +39,7 @@ public class EntityMetadata implements Presenter {
 	private SynapseJavascriptClient jsClient;
 	private SynapseJSNIUtils jsni;
 	private PortalGinInjector ginInjector;
+	private ContainerItemCountWidget containerItemCountWidget;
 	private org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget restrictionWidgetV2;
 
 	boolean isShowingAnnotations;
@@ -49,6 +50,7 @@ public class EntityMetadata implements Presenter {
 			SynapseJavascriptClient jsClient, 
 			SynapseJSNIUtils jsni,
 			RestrictionWidget restrictionWidgetV2,
+			ContainerItemCountWidget containerItemCountWidget,
 			PortalGinInjector ginInjector) {
 		this.view = view;
 		this.doiWidgetV2 = doiWidgetV2;
@@ -56,10 +58,12 @@ public class EntityMetadata implements Presenter {
 		this.jsClient = jsClient;
 		this.jsni = jsni;
 		this.restrictionWidgetV2 = restrictionWidgetV2;
+		this.containerItemCountWidget = containerItemCountWidget;
 		this.ginInjector = ginInjector;
 		this.view.setDoiWidget(doiWidgetV2);
 		this.view.setAnnotationsRendererWidget(annotationsWidget);
 		this.view.setRestrictionWidgetV2(restrictionWidgetV2);
+		this.view.setContainerItemCountWidget(containerItemCountWidget);
 		restrictionWidgetV2.setShowChangeLink(true);
 		restrictionWidgetV2.setShowIfProject(false);
 		restrictionWidgetV2.setShowFlagLink(true);
@@ -106,6 +110,9 @@ public class EntityMetadata implements Presenter {
 			view.setRestrictionPanelVisible(en instanceof TableEntity
 					|| en instanceof Folder || en instanceof DockerRepository);
 		}
+		if (bundle.getEntity() instanceof Folder) {
+			containerItemCountWidget.configure(bundle.getEntity().getId());
+		}
 		configureStorageLocation(en);
 		doiWidgetV2.configure(bundle.getDoiAssociation());
 		annotationsWidget.configure(bundle, canEdit, isCurrentVersion);
@@ -121,6 +128,7 @@ public class EntityMetadata implements Presenter {
 	
 	public void clear() {
 		doiWidgetV2.clear();
+		containerItemCountWidget.clear();
 		view.clear();
 	}
 	
