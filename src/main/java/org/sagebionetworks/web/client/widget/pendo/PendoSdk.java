@@ -46,8 +46,13 @@ public class PendoSdk {
 			$wnd.pendo.initialize({
 				sanitizeUrl: function (url) {
 					// NOTE: use pendo.normalizedUrl in the js console to see what url we send to Pendo for the page that you're on!
+//					console.log('pendo given this url:' + url);
 					if (url.includes('#!')) {
-						return url.replace('#!', '');
+						// also replace last ':' (place token separator) with a '/'
+						var n = url.lastIndexOf(':');
+						var pendoSanitizedUrl = (url.slice(0, n) + '/' + url.slice(n + 1)).replace('#!', '');
+//						console.log('pendo sanitized url:' + pendoSanitizedUrl);
+						return pendoSanitizedUrl;
 					} else {
 						// no place like Home
 						var sep = url.endsWith('/') ? '' : '/';
@@ -73,7 +78,8 @@ public class PendoSdk {
 
 				// You can add any additional account level key-values here,
 				// as long as it's not one of the above reserved names.
-				}
+				},
+				excludeAllText: true // Do not send DOM element text to Pendo
 			});
 		} catch (err) {
 			console.error(err);
