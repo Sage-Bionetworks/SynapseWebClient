@@ -116,6 +116,11 @@ public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
 			}
 		});
 		currentWizardContentPanel.setWidget(currentWizardContent);
+		widget.addAttachHandler(attachEvent -> {
+			if (!attachEvent.isAttached()) {
+				hideJoinWizard();
+			}
+		});
 	}
 	
 	@Override
