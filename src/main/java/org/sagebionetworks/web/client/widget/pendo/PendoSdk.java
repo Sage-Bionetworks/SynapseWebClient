@@ -78,7 +78,8 @@ public class PendoSdk {
 
 				// You can add any additional account level key-values here,
 				// as long as it's not one of the above reserved names.
-				}
+				},
+				excludeAllText: true // Do not send DOM element text to Pendo
 			});
 		} catch (err) {
 			console.error(err);
