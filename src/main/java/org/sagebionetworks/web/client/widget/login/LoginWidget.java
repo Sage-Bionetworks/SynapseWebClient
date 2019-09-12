@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.login;
 
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
 import com.google.gwt.user.client.ui.Widget;

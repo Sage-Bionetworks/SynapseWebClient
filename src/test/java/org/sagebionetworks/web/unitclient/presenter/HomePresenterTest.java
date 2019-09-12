@@ -3,7 +3,6 @@ package org.sagebionetworks.web.unitclient.presenter;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -29,7 +28,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -94,7 +92,6 @@ public class HomePresenterTest {
 				mockGlobalApplicationState,
 				mockCookies
 				);
-		verify(mockView).setPresenter(homePresenter);
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		testProfile = new UserProfile();
@@ -127,13 +124,5 @@ public class HomePresenterTest {
 		Home place = Mockito.mock(Home.class);
 		homePresenter.setPlace(place);
 		verify(mockView).showLoginUI();
-	}
-
-	@Test
-	public void testOnUserChange() {
-		String userId = "77776";
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
-		homePresenter.onUserChange();
-		verify(mockPlaceChanger).goTo(isA(Profile.class));
 	}
 }
