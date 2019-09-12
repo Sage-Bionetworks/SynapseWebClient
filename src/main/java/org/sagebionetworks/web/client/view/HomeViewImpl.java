@@ -74,7 +74,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@UiField
 	Div registerWidgetContainer;
 	
-	private Presenter presenter;
 	private Header headerWidget;
 	UserBadge userBadge;
 	HorizontalPanel myDashboardButtonContents;
@@ -110,10 +109,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 			}
 		});
 		registerWidgetContainer.add(registerWidget.asWidget());
-		
-		loginWidget.setUserListener(() -> {
-			presenter.onUserChange();
-		});
 		// Other links
 		dreamChallengesBox.addClickHandler(new ClickHandler() {
 			@Override
@@ -185,7 +180,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	public void addUserPicturePanel() {
 		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
 			@Override
-            public void execute() {
+			public void execute() {
 				dashboardBtn.add(myDashboardButtonContents);
 			}
 		});
@@ -220,12 +215,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	}
 	
 	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-		Window.scrollTo(0, 0); // scroll user to top of page		
-	}
-	
-	@Override
 	public void refresh() {
 		headerWidget.configure();
 		headerWidget.refresh();
@@ -241,12 +230,16 @@ public class HomeViewImpl extends Composite implements HomeView {
 	public void showLoading() {
 	}
 
-
 	@Override
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message);
 	}
 
+	@Override
+	public void scrollToTop() {
+		Window.scrollTo(0, 0); // scroll user to top of page		
+	}
+	
 	@Override
 	public void clear() {
 		userBadge.clearState();

@@ -39,7 +39,6 @@ public class SynapseAlertImpl implements SynapseAlert {
 	SynapseAlertView view;
 	PortalGinInjector ginInjector;
 	Throwable ex;
-	Callback reloadOnLoginListener;
 	SynapseJSNIUtils jsniUtils;
 	JSONObjectAdapter jsonObjectAdapter;
 	GWTWrapper gwt;
@@ -61,9 +60,6 @@ public class SynapseAlertImpl implements SynapseAlert {
 		this.jsniUtils = jsniUtils;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.gwt = gwt;
-		reloadOnLoginListener = () -> {
-			SynapseAlertImpl.this.view.reload();
-		};
 	}
 
 	@Override
@@ -168,7 +164,6 @@ public class SynapseAlertImpl implements SynapseAlert {
 		clear();
 		// lazy inject login widget
 		LoginWidget loginWidget = ginInjector.getLoginWidget();
-		loginWidget.setUserListener(reloadOnLoginListener);
 		view.setLoginWidget(loginWidget.asWidget());
 		view.showLogin();
 	}
