@@ -25,7 +25,7 @@ public class SynapseStatusDetector {
 	
 	public void showScheduledMaintenance(String moreInfo) {
 		String moreInfoString = moreInfo != null ? ": " + moreInfo : "";
-		popupUtils.showInfo("<a href=\"http://status.synapse.org/\" target=\"_blank\" class=\"color-white\">Under Maintenance" + moreInfoString + "</a>", INTERVAL_MS - 1200);
+		popupUtils.showInfo("<a href=\"http://status.synapse.org/\" target=\"_blank\" class=\"color-white\">Maintenance" + moreInfoString + "</a>", INTERVAL_MS - 1200);
 	}
 	
 	public void showOutage(String info) {
