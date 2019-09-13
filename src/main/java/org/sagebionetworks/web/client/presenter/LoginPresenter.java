@@ -115,8 +115,13 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				token != null) {			
 			revalidateSession(token);
 		} else {
-			// standard view
-			view.showLogin();
+			if (authenticationController.isLoggedIn()) {
+				Place defaultPlace = new Profile(authenticationController.getCurrentUserPrincipalId(), ProfileArea.PROJECTS);
+				globalApplicationState.gotoLastPlace(defaultPlace);
+			} else {
+				// standard view
+				view.showLogin();
+			}
 		}
 	}
 	
