@@ -4,10 +4,10 @@ import com.google.inject.Inject;
 
 public class SynapseStatusDetector {
 
-	public static final int INTERVAL_MS = 1000*5; //check every 30 seconds
+	public static final int INTERVAL_MS = 1000*60; //check once every minute
 	PopupUtilsView popupUtils;
 	GWTWrapper gwt;
-	public static final String STATUS_PAGE_IO_PAGE = "223nz8zg557t";
+	public static final String STATUS_PAGE_IO_PAGE = "kh896k90gyvg";
 	@Inject
 	public SynapseStatusDetector(
 			GWTWrapper gwt,
@@ -25,17 +25,16 @@ public class SynapseStatusDetector {
 	
 	public void showScheduledMaintenance(String moreInfo) {
 		String moreInfoString = moreInfo != null ? ": " + moreInfo : "";
-		popupUtils.showInfo("<a href=\"http://status.synapse.org/\">Under Maintenance" + moreInfoString + "</a>", INTERVAL_MS);
+		popupUtils.showInfo("<a href=\"http://status.synapse.org/\" target=\"_blank\" class=\"color-white\">Under Maintenance" + moreInfoString + "</a>", INTERVAL_MS - 1200);
 	}
 	
 	public void showOutage(String info) {
-		popupUtils.showError("<a href=\"http://status.synapse.org/\">" + info + "</a>", INTERVAL_MS);
+		popupUtils.showError("<a href=\"http://status.synapse.org/\" target=\"_blank\" class=\"color-white\">" + info + "</a>", INTERVAL_MS - 1200);
 	}
 	
 	private static native void _getCurrentStatus(SynapseStatusDetector x) /*-{
 		var sp = new $wnd.StatusPage.page({
-			page : @org.sagebionetworks.web.client.SynapseStatusDetector::STATUS_PAGE_IO_PAGE,
-			apikey: 'd0119b91-501d-4818-8e91-24f9ad9a048a'
+			page : @org.sagebionetworks.web.client.SynapseStatusDetector::STATUS_PAGE_IO_PAGE
 		});
 		sp.status({
 			success : function(data) {
@@ -50,8 +49,7 @@ public class SynapseStatusDetector {
 	
 	private static native void _getActiveScheduledMaintenance(SynapseStatusDetector x) /*-{
 		var sp = new $wnd.StatusPage.page({
-			page : @org.sagebionetworks.web.client.SynapseStatusDetector::STATUS_PAGE_IO_PAGE,
-			apikey: 'd0119b91-501d-4818-8e91-24f9ad9a048a'
+			page : @org.sagebionetworks.web.client.SynapseStatusDetector::STATUS_PAGE_IO_PAGE
 		});
 		sp.scheduled_maintenances({
 			filter : 'active',
