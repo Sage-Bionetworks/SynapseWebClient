@@ -13,8 +13,13 @@ public class PopupUtilsViewImpl implements PopupUtilsView {
 	}
 	
 	@Override
+	public void showInfo(String message, Integer timeout) {
+		DisplayUtils.showInfo(message, timeout);
+	}
+	
+	@Override
 	public void showInfo(String message, String href, String buttonText, IconType iconType) {
-		DisplayUtils.showInfo(message, href, buttonText, iconType);
+		DisplayUtils.showInfo(message, href, buttonText, iconType, null);
 	}
 
 	@Override

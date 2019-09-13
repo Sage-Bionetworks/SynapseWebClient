@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 
 public interface PopupUtilsView {
 	void showInfo(String message);
+	void showInfo(String message, Integer timeout);
 	void showError(String message, Integer timeout);
 	void showErrorMessage(String message);
 	void showErrorMessage(String title, String message);

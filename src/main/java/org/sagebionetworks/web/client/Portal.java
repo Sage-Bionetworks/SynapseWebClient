@@ -102,7 +102,8 @@ public class Portal implements EntryPoint {
 								ginjector.getVersionTimer().start();
 								// start timer to check for user session state change (session expired, or user explicitly logged out)
 								ginjector.getSessionDetector().start();
-								
+								// start timer to check for Synapse outage or scheduled maintenance
+								ginjector.getSynapseStatusDetector().start();
 								// Goes to place represented on URL or default place
 								historyHandler.handleCurrentHistory();
 								globalApplicationState.initializeDropZone();
