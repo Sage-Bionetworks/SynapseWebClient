@@ -2734,6 +2734,10 @@ div.border {
 	}
 }
 #body {
+	.dropdown-menu>li>a:focus, .dropdown-menu>li>a:hover {
+		background-color: $synapse-blue;
+	}
+
 	.dropdown.SRC-primary-background-color-hover.open {
 		background-color: $synapse-blue;
 		> a {
