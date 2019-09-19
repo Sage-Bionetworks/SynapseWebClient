@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseProperties;
 
+import com.google.gwt.http.client.URL;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Element;
@@ -31,7 +32,7 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 		this.jsniUtils = jsniUtils;
 		widget.addAttachHandler(event -> {
 			if (event.isAttached()) {
-				String endpoint = "https://" + synapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY);
+				String endpoint = synapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY);
 				_createSRCLogin(srcLoginContainer.getElement(), ROOT_PORTAL_URL, GOOGLE_OAUTH_CALLBACK_URL, endpoint);
 			} else {
 				//detach event, clean up react component
@@ -42,12 +43,14 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 	
 	private static native void _createSRCLogin(Element el, String rootPortalURL, String googleSSORedirectUrl, String fullRepoEndpoint) /*-{
 		try {
-			var repoEndpoint = 'https://' + new URL(fullRepoEndpoint).hostname;
+			// URL.host returns the domain (that is the hostname) followed by (if a port was specified) a ':' and the port of the URL
+			var repoURL = new URL(fullRepoEndpoint);
+			var rootRepoEndpoint = repoURL.protocol + '//' + repoURL.host;
 			var props = {
 				theme:'light',
 				icon:true,
 				googleRedirectUrl: googleSSORedirectUrl,
-				endpoint:repoEndpoint,
+				repoEndpoint:rootRepoEndpoint,
 				swcEndpoint:rootPortalURL
 			};
 			
