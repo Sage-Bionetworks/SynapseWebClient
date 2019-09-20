@@ -59,6 +59,14 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		SAFE_TO_IGNORE_ERRORS.add("resizeobserver loop limit exceeded");
 		//Server response was not json (html-based error page from the web server)
 		SAFE_TO_IGNORE_ERRORS.add("error parsing json");
+		//not actionable script errors
+		SAFE_TO_IGNORE_ERRORS.add("script error. (:0)");
+		SAFE_TO_IGNORE_ERRORS.add("unspecified error");
+		SAFE_TO_IGNORE_ERRORS.add("unbekannter fehler");
+		//DOM has changed such that insert of widget fails
+		SAFE_TO_IGNORE_ERRORS.add("the node before which the new node is to be inserted is not a child of this node.");
+		SAFE_TO_IGNORE_ERRORS.add("die eigenschaft \"removechild\" eines undefinierten oder nullverweises kann nicht abgerufen werden.");
+		
 	}
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,

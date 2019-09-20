@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -13,6 +14,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.GlobalApplicationStateImpl.isIgnoredErrorMessage;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -129,6 +131,17 @@ public class GlobalApplicationStateImplTest {
 		globalApplicationState.handleUncaughtException(t);
 		verify(mockSynapseJSNIUtils).consoleError(t);
 		verify(mockJsClient).logError(eq(t));
+	}
+	
+	@Test
+	public void testIgnoredJSExceptions() {
+		// real messages
+		assertTrue(isIgnoredErrorMessage("ResizeObserver loop limit exceeded."));
+		assertTrue(isIgnoredErrorMessage("Script error. (:0)"));
+		assertTrue(isIgnoredErrorMessage("Unspecified error."));
+		assertTrue(isIgnoredErrorMessage("Failed to execute 'insertBefore' on 'Node': The node before which the new node is to be inserted is not a child of this node."));
+		
+		assertFalse(isIgnoredErrorMessage("Blocked an iframe from loading on this page."));
 	}
 	
 	@Test
