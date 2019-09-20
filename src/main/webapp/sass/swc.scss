@@ -1598,8 +1598,20 @@ ol.lowerroman {
 	details > summary::-webkit-details-marker {
 		display:none;
 	}
-	details[open] > summary {
-		display: none;
+	
+	// SWC-4987 (css hack). change position when open. set the visiblity of the element to hidden, and make the pseudo-element visible!
+	details[open] {
+		position: relative;
+		padding-bottom: 25px;
+		summary {
+			position: absolute;
+			bottom: 0px;
+			visibility: hidden;
+		}
+		summary::before {
+			content: 'Show less';
+			visibility: visible;
+		}
 	}
 }
 
