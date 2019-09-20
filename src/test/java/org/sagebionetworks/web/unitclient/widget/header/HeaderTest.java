@@ -337,5 +337,29 @@ public class HeaderTest {
 		
 		verify(mockCookies).setCookie(eq(CookieKeys.COOKIES_ACCEPTED), eq(Boolean.TRUE.toString()), any(Date.class));
 	}
+	
+	@Test
+	public void testRefreshNoPortalBanner() {
+		String cookieValue = null;
+		when(mockCookies.getCookie(CookieKeys.PORTAL_CONFIG)).thenReturn(cookieValue);
+		
+		header.refresh();
+		
+		//should be hidden
+		boolean isVisible = false;
+		verify(mockView).setPortalAlertVisible(isVisible, cookieValue);
+	}
+	
+	@Test
+	public void testRefreshWithPortalBanner() {
+		String cookieValue = "portal config exists";
+		when(mockCookies.getCookie(CookieKeys.PORTAL_CONFIG)).thenReturn(cookieValue);
+		
+		header.refresh();
+		
+		// should be shown
+		boolean isVisible = true;
+		verify(mockView).setPortalAlertVisible(isVisible, cookieValue);
+	}
 
 }

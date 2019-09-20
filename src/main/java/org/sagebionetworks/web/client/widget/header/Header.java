@@ -80,10 +80,6 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		} else {
 			view.setCookieNotificationVisible(false);
 		}
-		
-		if (cookies.getCookie(CookieKeys.PORTAL_CONFIG) != null) {
-			view.showPortalAlert(cookies.getCookie(CookieKeys.PORTAL_CONFIG));
-		}
 	}
 	
 	public void initStagingAlert() {
@@ -116,6 +112,8 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	}
 
 	public void refresh() {
+		boolean isPortalAlert = cookies.getCookie(CookieKeys.PORTAL_CONFIG) != null;
+		view.setPortalAlertVisible(isPortalAlert, cookies.getCookie(CookieKeys.PORTAL_CONFIG));
 		UserProfile profile = authenticationController.getCurrentUserProfile();
 		view.setUser(profile);
 		view.refresh();

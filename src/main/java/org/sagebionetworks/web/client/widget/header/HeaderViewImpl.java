@@ -417,46 +417,49 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	}
 	
 	@Override
-	public void showPortalAlert(String cookieValue) {
-		try {
-			JSONObjectAdapter json = jsonObjectAdapter.createNew(cookieValue);
-			if (json.has("backgroundColor")) {
-				String color = json.getString("backgroundColor");
-				String oldStyle = portalAlert.getElement().getAttribute("style");
-				portalAlert.getElement().setAttribute("style", oldStyle + ";background-color: "+color+";");
-			}
-			if (json.has("foregroundColor")) {
-				String color = json.getString("foregroundColor");
-				portalGoBackArrow.setColor(color);
-			}
-			if (json.has("callbackUrl")) {
-				String href = json.getString("callbackUrl");
-				portalHref = href;
-			}
-			if (json.has("portalName")) {
-				String name = json.getString("portalName");
-				if (!name.trim().isEmpty()) {
-					portalName.setText(name);
-					portalName.setVisible(true);
-					portalLogo.setVisible(false);	
+	public void setPortalAlertVisible(boolean visible, String cookieValue) {
+		if (visible) {
+			try {
+				JSONObjectAdapter json = jsonObjectAdapter.createNew(cookieValue);
+				if (json.has("backgroundColor")) {
+					String color = json.getString("backgroundColor");
+					String oldStyle = portalAlert.getElement().getAttribute("style");
+					portalAlert.getElement().setAttribute("style", oldStyle + ";background-color: "+color+";");
 				}
-			}
-			if (json.has("logoUrl")) {
-				String logoUrl = json.getString("logoUrl");
-				if (!logoUrl.trim().isEmpty()) {
-					portalLogo.setUrl(logoUrl);
-					portalName.setVisible(false);
-					portalLogo.setVisible(true);	
+				if (json.has("foregroundColor")) {
+					String color = json.getString("foregroundColor");
+					portalGoBackArrow.setColor(color);
 				}
+				if (json.has("callbackUrl")) {
+					String href = json.getString("callbackUrl");
+					portalHref = href;
+				}
+				if (json.has("portalName")) {
+					String name = json.getString("portalName");
+					if (!name.trim().isEmpty()) {
+						portalName.setText(name);
+						portalName.setVisible(true);
+						portalLogo.setVisible(false);	
+					}
+				}
+				if (json.has("logoUrl")) {
+					String logoUrl = json.getString("logoUrl");
+					if (!logoUrl.trim().isEmpty()) {
+						portalLogo.setUrl(logoUrl);
+						portalName.setVisible(false);
+						portalLogo.setVisible(true);	
+					}
+				}
+				// PORTALS-596
+				if (json.has("isInvokingDownloadTable")) {
+					String isInvokingDownloadTable = json.getString("isInvokingDownloadTable");
+					sessionStorage.setItem(TableEntityWidget.PORTAL_CONFIG_DOWNLOAD_TABLE_KEY, isInvokingDownloadTable);
+				}
+				portalAlert.setVisible(true);
+			} catch (JSONObjectAdapterException e) {
+				e.printStackTrace();
 			}
-			// PORTALS-596
-			if (json.has("isInvokingDownloadTable")) {
-				String isInvokingDownloadTable = json.getString("isInvokingDownloadTable");
-				sessionStorage.setItem(TableEntityWidget.PORTAL_CONFIG_DOWNLOAD_TABLE_KEY, isInvokingDownloadTable);
-			}
-			portalAlert.setVisible(true);
-		} catch (JSONObjectAdapterException e) {
-			e.printStackTrace();
 		}
+		portalAlert.setVisible(visible);
 	}
 }
