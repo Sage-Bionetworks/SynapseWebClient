@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.PreflightControll
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
@@ -47,6 +48,7 @@ public class TableEntityWidget implements IsWidget,
 		TableEntityWidgetView.Presenter, QueryResultsListener,
 		QueryInputListener{
 
+	public static final String IS_INVOKING_DOWNLOAD_TABLE = "isInvokingDownloadTable";
 	public static final String NO_FACETS_SIMPLE_SEARCH_UNSUPPORTED = "In order to use simple search, you must first set columns to be facets in the schema editor.";
 	public static final String RESET_SEARCH_QUERY_MESSAGE = "The search query will be reset. Are you sure that you would like to switch to simple search mode?";
 	
@@ -90,7 +92,6 @@ public class TableEntityWidget implements IsWidget,
 	String entityTypeDisplay;
 	PortalGinInjector ginInjector;
 	AddToDownloadList addToDownloadList;
-	public static final String PORTAL_CONFIG_DOWNLOAD_TABLE_KEY = "portal-config-invoke-download-table";
 	@Inject
 	public TableEntityWidget(TableEntityWidgetView view,
 			TableQueryResultWidget queryResultsWidget,
@@ -244,14 +245,6 @@ public class TableEntityWidget implements IsWidget,
 		this.view.setTableMessageVisible(false);
 		if(!isFromResults){
 			this.queryResultsWidget.configure(query, this.canEditResults, tableType, this);
-		}
-		// PORTALS-596: if being directed to Synapse.org to download a file set, then automatically show the "Add To Download List" UI.
-		if (sessionStorage.getItem(PORTAL_CONFIG_DOWNLOAD_TABLE_KEY) != null && ginInjector.getAuthenticationController().isLoggedIn()) {
-			String isDownloadTableString = sessionStorage.getItem(PORTAL_CONFIG_DOWNLOAD_TABLE_KEY);
-			if (Boolean.parseBoolean(isDownloadTableString)) {
-				sessionStorage.removeItem(PORTAL_CONFIG_DOWNLOAD_TABLE_KEY);
-				onAddToDownloadList();
-			}
 		}
 	}
 
@@ -442,6 +435,17 @@ public class TableEntityWidget implements IsWidget,
 		// Set this as the query if it was successful
 		if (wasSuccessful) {
 			this.queryChangeHandler.onQueryChange(this.currentQuery);
+			
+			// PORTALS-596: if being directed to Synapse.org to download a file set, then automatically show the "Add To Download List" UI.
+			if (Header.isShowingPortalAlert && ginInjector.getAuthenticationController().isLoggedIn()) {
+				try {
+					boolean isDownloadTable = Header.portalAlertJson.getBoolean(IS_INVOKING_DOWNLOAD_TABLE);
+					if (isDownloadTable) {
+						onAddToDownloadList();
+					}
+					Header.portalAlertJson.put(IS_INVOKING_DOWNLOAD_TABLE, false);
+				} catch (Exception e) {ginInjector.getSynapseJSNIUtils().consoleError(e);}
+			}
 		}
 		view.setTableToolbarVisible(true);
 	}

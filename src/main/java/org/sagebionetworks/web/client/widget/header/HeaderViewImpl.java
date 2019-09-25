@@ -23,7 +23,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Search;
@@ -31,7 +30,6 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
-import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -147,9 +145,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	UserBadge userBadge;
 	String userId;
 	AnchorListItem defaultItem = new AnchorListItem("Empty");
-	JSONObjectAdapter jsonObjectAdapter;
 	String portalHref = "";
-	SessionStorage sessionStorage;
 	
 	@Inject
 	public HeaderViewImpl(Binder binder,
@@ -157,17 +153,14 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			SearchBox searchBox,
 			CookieProvider cookies,
 			UserBadge userBadge,
-			GlobalApplicationState globalAppState,
-			JSONObjectAdapter jsonObjectAdapter,
-			SessionStorage sessionStorage) {
+			GlobalApplicationState globalAppState
+			) {
 		this.initWidget(binder.createAndBindUi(this));
 		this.searchBox = searchBox;
 		this.cookies = cookies;
 		this.sageImageBundle = sageImageBundle;
 		this.userBadge = userBadge;
 		this.globalAppState = globalAppState;
-		this.jsonObjectAdapter = jsonObjectAdapter;
-		this.sessionStorage = sessionStorage;
 		userBadge.setTooltipHidden(true);
 		userBadge.setTextHidden(true);
 		userBadge.addStyleNames("padding-top-15 padding-bottom-15 padding-left-10");
@@ -417,10 +410,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	}
 	
 	@Override
-	public void setPortalAlertVisible(boolean visible, String cookieValue) {
+	public void setPortalAlertVisible(boolean visible, JSONObjectAdapter json) {
 		if (visible) {
 			try {
-				JSONObjectAdapter json = jsonObjectAdapter.createNew(cookieValue);
 				if (json.has("backgroundColor")) {
 					String color = json.getString("backgroundColor");
 					String oldStyle = portalAlert.getElement().getAttribute("style");
@@ -449,11 +441,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 						portalName.setVisible(false);
 						portalLogo.setVisible(true);	
 					}
-				}
-				// PORTALS-596
-				if (json.has("isInvokingDownloadTable")) {
-					String isInvokingDownloadTable = json.getString("isInvokingDownloadTable");
-					sessionStorage.setItem(TableEntityWidget.PORTAL_CONFIG_DOWNLOAD_TABLE_KEY, isInvokingDownloadTable);
 				}
 				portalAlert.setVisible(true);
 			} catch (JSONObjectAdapterException e) {

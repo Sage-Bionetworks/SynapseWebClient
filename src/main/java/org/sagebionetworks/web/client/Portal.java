@@ -1,4 +1,5 @@
 package org.sagebionetworks.web.client;
+
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -22,12 +23,13 @@ import com.google.gwt.user.client.ui.SimplePanel;
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class Portal implements EntryPoint {
-	
-	//If there's a failure to load the code from the server, how long (in ms) should we wait before trying again...
+
+	// If there's a failure to load the code from the server, how long (in ms) should we wait before trying again...
 	public static final int CODE_LOAD_DELAY = 5000;
-	//  We are using gin to create all of our objects
+	// We are using gin to create all of our objects
 	private static final PortalGinInjector ginjector = GWT.create(PortalGinInjector.class);
 	private SimplePanel appWidget = new SimplePanel();
+
 	public final static native void _consoleError(String message) /*-{
 		console.error(message);
 	}-*/;
@@ -35,17 +37,17 @@ public class Portal implements EntryPoint {
 	public static PortalGinInjector getInjector() {
 		return ginjector;
 	}
-	
+
 	/**
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
 		zeroOpacity(RootPanel.get("headerPanel"), RootPanel.get("rootPanel"));
-		//we might need to reload using the new token scheme (required for SEO)
+		// we might need to reload using the new token scheme (required for SEO)
 		String initToken = History.getToken();
 		if (initToken.length() > 0 && !initToken.startsWith("!")) {
 			String fullUrl = Window.Location.getHref();
-			fullUrl = fullUrl.replace("#"+initToken, "#!"+initToken);
+			fullUrl = fullUrl.replace("#" + initToken, "#!" + initToken);
 			Window.Location.replace(fullUrl);
 			Window.Location.reload();
 		} else {
@@ -53,7 +55,7 @@ public class Portal implements EntryPoint {
 			GWT.runAsync(new RunAsyncCallback() {
 				@Override
 				public void onFailure(Throwable reason) {
-					//SWC-2444: if there is a problem getting the code, try to reload the app after some time
+					// SWC-2444: if there is a problem getting the code, try to reload the app after some time
 					_consoleError(reason.getMessage());
 					reloadApp(CODE_LOAD_DELAY);
 				}
@@ -61,7 +63,7 @@ public class Portal implements EntryPoint {
 				@Override
 				public void onSuccess() {
 					try {
-						// previous session will be detected on place change (if there is one).  do not block app load to check.
+						// previous session will be detected on place change (if there is one). do not block app load to check.
 						// make sure jsni utils code is available to the client
 						ginjector.getSynapseJSNIUtils();
 						EventBus eventBus = ginjector.getEventBus();
@@ -71,7 +73,7 @@ public class Portal implements EntryPoint {
 						AppActivityMapper activityMapper = new AppActivityMapper(ginjector, new SynapseJSNIUtilsImpl(), null);
 						ActivityManager activityManager = new ActivityManager(activityMapper, eventBus);
 						activityManager.setDisplay(appWidget);
-						
+
 						// All pages get added to the root panel
 						appWidget.addStyleName("rootPanel");
 
@@ -83,7 +85,7 @@ public class Portal implements EntryPoint {
 						RootPanel.get("headerPanel").add(header);
 						Footer footer = ginjector.getFooter();
 						RootPanel.get("footerPanel").add(footer);
-						
+
 						RootPanel.get("rootPanel").add(appWidget);
 						RootPanel.get("initialLoadingUI").setVisible(false);
 						fullOpacity(RootPanel.get("headerPanel"), RootPanel.get("rootPanel"));
@@ -91,13 +93,12 @@ public class Portal implements EntryPoint {
 						globalApplicationState.setPlaceController(placeController);
 						globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
 						globalApplicationState.init(new Callback() {
-							
 							@Override
 							public void invoke() {
-								//listen for window close (or navigating away)
+								// listen for window close (or navigating away)
 								registerWindowClosingHandler(globalApplicationState);
 								registerOnPopStateHandler(globalApplicationState);
-								
+
 								// start version timer
 								ginjector.getVersionTimer().start();
 								// start timer to check for user session state change (session expired, or user explicitly logged out)
@@ -116,38 +117,37 @@ public class Portal implements EntryPoint {
 			});
 		}
 	}
-	
-	public static void zeroOpacity(RootPanel...panels) {
+
+	public static void zeroOpacity(RootPanel... panels) {
 		for (RootPanel panel : panels) {
 			panel.removeStyleName("fullOpacity");
 			panel.addStyleName("zeroOpacity");
 		}
 	}
-	
-	public static void fullOpacity(RootPanel...panels) {
+
+	public static void fullOpacity(RootPanel... panels) {
 		for (RootPanel panel : panels) {
 			panel.removeStyleName("zeroOpacity");
 			panel.addStyleName("fullOpacity");
 		}
 	}
-	
+
 	public void reloadApp(int delay) {
-		Timer timer = new Timer() { 
-		    public void run() { 
-		    	Window.Location.reload();
-		    } 
+		Timer timer = new Timer() {
+			public void run() {
+				Window.Location.reload();
+			}
 		};
 		timer.schedule(delay);
 	}
 
-	
 	private void registerWindowClosingHandler(final GlobalApplicationState globalApplicationState) {
 		Window.addWindowClosingHandler(new Window.ClosingHandler() {
-		      public void onWindowClosing(Window.ClosingEvent closingEvent) {
-		    	  if (globalApplicationState.isEditing())
-		    		  closingEvent.setMessage(DisplayConstants.CLOSE_PORTAL_CONFIRMATION_MESSAGE);
-		      }
-		    });
+			public void onWindowClosing(Window.ClosingEvent closingEvent) {
+				if (globalApplicationState.isEditing())
+					closingEvent.setMessage(DisplayConstants.CLOSE_PORTAL_CONFIRMATION_MESSAGE);
+			}
+		});
 	}
 
 	private void registerOnPopStateHandler(final GlobalApplicationState globalApplicationState) {
