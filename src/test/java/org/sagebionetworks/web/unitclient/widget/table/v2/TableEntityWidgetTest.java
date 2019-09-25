@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
@@ -40,7 +40,10 @@ import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -53,6 +56,7 @@ import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
+import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
@@ -123,6 +127,8 @@ public class TableEntityWidgetTest {
 	@Captor
 	ArgumentCaptor<ActionListener> actionListenerCaptor;
 	
+	JSONObjectAdapterImpl portalJson = new JSONObjectAdapterImpl();
+	
 	@Before
 	public void before(){
 		// stubs
@@ -160,6 +166,8 @@ public class TableEntityWidgetTest {
 		Query query = new Query();
 		query.setSql(sql);
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(query);
+		Header.isShowingPortalAlert = false;
+		Header.portalAlertJson = null;
 	}
 	
 	private void configureBundleWithView(ViewType viewType) {
@@ -664,42 +672,48 @@ public class TableEntityWidgetTest {
 	}
 	
 	@Test
-	public void testAutoAddToDownloadList(){
+	public void testAutoAddToDownloadList() throws JSONObjectAdapterException{
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		configureBundleWithView(ViewType.file);
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(new Query());
-		when(mockSessionStorage.getItem(TableEntityWidget.PORTAL_CONFIG_DOWNLOAD_TABLE_KEY)).thenReturn("true");
+		Header.isShowingPortalAlert = true;
+		Header.portalAlertJson = portalJson;
+		portalJson.put(TableEntityWidget.IS_INVOKING_DOWNLOAD_TABLE, true);
 		
 		widget.configure(entityBundle, versionNumber, true, mockQueryChangeHandler, mockActionMenu);
-		
+		widget.queryExecutionFinished(true, false);
+	
 		verify(mockAddToDownloadList).addToDownloadList(anyString(), any(Query.class));
-		verify(mockSessionStorage).removeItem(TableEntityWidget.PORTAL_CONFIG_DOWNLOAD_TABLE_KEY);
+		assertFalse(portalJson.getBoolean(TableEntityWidget.IS_INVOKING_DOWNLOAD_TABLE));
 	}
 
 	@Test
-	public void testAutoAddToDownloadListFalse(){
+	public void testAutoAddToDownloadListFalse() throws JSONObjectAdapterException{
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		configureBundleWithView(ViewType.file);
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(new Query());
-		when(mockSessionStorage.getItem(TableEntityWidget.PORTAL_CONFIG_DOWNLOAD_TABLE_KEY)).thenReturn("false");
-		
+		Header.isShowingPortalAlert = true;
+		Header.portalAlertJson = portalJson;
+		portalJson.put(TableEntityWidget.IS_INVOKING_DOWNLOAD_TABLE, false);
+
 		widget.configure(entityBundle, versionNumber, true, mockQueryChangeHandler, mockActionMenu);
+		widget.queryExecutionFinished(true, false);
 		
 		verify(mockAddToDownloadList, never()).addToDownloadList(anyString(), any(Query.class));
-		verify(mockSessionStorage, never()).removeItem(TableEntityWidget.PORTAL_CONFIG_DOWNLOAD_TABLE_KEY);
 	}
 	
 	@Test
-	public void testAutoAddToDownloadListNotLoggedIn(){
+	public void testAutoAddToDownloadListNotLoggedIn() throws JSONObjectAdapterException{
 		when(mockAuthController.isLoggedIn()).thenReturn(false);
 		configureBundleWithView(ViewType.file);
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(new Query());
-		when(mockSessionStorage.getItem(TableEntityWidget.PORTAL_CONFIG_DOWNLOAD_TABLE_KEY)).thenReturn("true");
+		Header.isShowingPortalAlert = true;
+		Header.portalAlertJson = portalJson;
+		portalJson.put(TableEntityWidget.IS_INVOKING_DOWNLOAD_TABLE, true);
 		
 		widget.configure(entityBundle, versionNumber, true, mockQueryChangeHandler, mockActionMenu);
+		widget.queryExecutionFinished(true, false);
 		
 		verify(mockAddToDownloadList, never()).addToDownloadList(anyString(), any(Query.class));
-		verify(mockSessionStorage, never()).removeItem(TableEntityWidget.PORTAL_CONFIG_DOWNLOAD_TABLE_KEY);
 	}
-
 }
