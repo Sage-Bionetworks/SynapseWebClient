@@ -118,20 +118,4 @@ public class AppActivityMapperTest {
 		appActivityMapper.getActivity(loginPlace2);		
 		verify(mockGlobalApplicationState, times(0)).setLastPlace(any(Place.class));
 	}
-	
-	@Test 
-	public void testRemovePortalPlaceCookie() {
-		when(mockCookies.getCookie(CookieKeys.PORTAL_CONFIG)).thenReturn("cookieIsSet");
-		
-		// not removed if registering
-		appActivityMapper.getActivity(new RegisterAccount("0"));
-		verify(mockCookies, never()).removeCookie(anyString());
-		// or resetting your password
-		appActivityMapper.getActivity(new PasswordReset("0"));
-		verify(mockCookies, never()).removeCookie(anyString());
-
-		//but is on visit to an entity page
-		appActivityMapper.getActivity(new Synapse("syn123"));
-		verify(mockCookies).removeCookie(CookieKeys.PORTAL_CONFIG);
-	}
 }

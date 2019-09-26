@@ -11,8 +11,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.cookie.CookieKeys;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ChangeUsername;
@@ -57,7 +55,6 @@ public class AppActivityMapper implements ActivityMapper {
 	private List<Class> excludeFromLastPlace;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	AppLoadingView loading;
-	private static boolean isFirstTime = false;
 
 	/**
 	 * AppActivityMapper associates each Place with its corresponding
@@ -132,18 +129,9 @@ public class AppActivityMapper implements ActivityMapper {
 		Place storedCurrentPlace = globalApplicationState.getCurrentPlace(); 
 		// only update move storedCurrentPlace to storedLastPlace if storedCurrentPlace is  
 		if(storedCurrentPlace != null && !excludeFromLastPlace.contains(storedCurrentPlace.getClass())) {
-			if (!(isFirstTime && storedCurrentPlace.getClass().equals(Profile.class)))  //if first load, then do not set the last place (if it's a default place) 
-				globalApplicationState.setLastPlace(storedCurrentPlace);			
+			globalApplicationState.setLastPlace(storedCurrentPlace);
 		}
-		
-		isFirstTime = false;
 
-		// PORTALS-441: remove the portals cookie on place change, unless user is in transition (registering, password reset, ...)
-		CookieProvider cookies = ginjector.getCookieProvider();
-		if (cookies.getCookie(CookieKeys.PORTAL_CONFIG) != null && !excludeFromLastPlace.contains(place.getClass())) {
-			cookies.removeCookie(CookieKeys.PORTAL_CONFIG);
-		}
-		
 		// If the user is not logged in then we redirect them to the login screen
 		// except for the fully public places
 		if(!openAccessPlaces.contains(place.getClass())) {
