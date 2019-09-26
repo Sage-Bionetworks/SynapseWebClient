@@ -19,15 +19,12 @@ import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
@@ -108,6 +105,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public SynapseJavascriptClient jsClient;
 	public DownloadListWidget downloadListWidget;
 	public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
+	
 	@Inject
 	public ProfilePresenter(ProfileView view,
 			AuthenticationController authenticationController,
@@ -208,13 +206,22 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void editMyProfile() {
-		if (checkIsLoggedIn())
+		if (authenticationController.isLoggedIn()) {
 			goTo(new Profile(authenticationController.getCurrentUserPrincipalId(), ProfileArea.SETTINGS));
+		} else {
+			view.showLoginAlert();
+		}
 	}
 	
-	public void viewMyProfile() {
-		if (checkIsLoggedIn())
-			goTo(new Profile(authenticationController.getCurrentUserPrincipalId()));
+	public void viewMyProfile(String area) {
+		Place gotoPlace = null;
+		if (authenticationController.isLoggedIn()) {
+			//replace url with most recently logged in user id
+			gotoPlace = new Profile(authenticationController.getCurrentUserPrincipalId() + area);
+			globalApplicationState.getPlaceChanger().goTo(gotoPlace);
+		} else {
+			view.showLoginAlert();
+		}
 	}
 	
 	@Override
@@ -243,7 +250,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		isOwner = authenticationController.isLoggedIn()
 				&& authenticationController.getCurrentUserPrincipalId().equals(
 						userId);
-		if (currentArea == null || (ProfileArea.SETTINGS.equals(currentArea) && !isOwner)) {
+		if (currentArea == null) {
 			currentArea = ProfileArea.PROFILE;
 		}
 		view.clear();
@@ -755,15 +762,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});		
 	}
 	
-	private boolean checkIsLoggedIn() {
-		if (!authenticationController.isLoggedIn()) {
-			view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
-			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-			return false;
-		}
-		return true;
-	}
-	
 	private void profileUpdated() {
 		view.showInfo("Your profile has been successfully updated.");
 		updateProfileView(currentUserId);
@@ -792,16 +790,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			return;
 		}
 		if (token.equals(Profile.VIEW_PROFILE_TOKEN) || token.startsWith(Profile.VIEW_PROFILE_TOKEN + "/") || token.isEmpty()) {
-			Place gotoPlace = null;
-			if (authenticationController.isLoggedIn()) {
-				//replace url with current user id
-				token = authenticationController.getCurrentUserPrincipalId() + token.substring(1);
-				gotoPlace = new Profile(token);
-			} else {
-				//does not make sense, go home
-				gotoPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
-			}
-			globalApplicationState.getPlaceChanger().goTo(gotoPlace);
+			viewMyProfile(token.substring(1));
 			return;
 		}
 		if (authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(place.getUserId())) {
