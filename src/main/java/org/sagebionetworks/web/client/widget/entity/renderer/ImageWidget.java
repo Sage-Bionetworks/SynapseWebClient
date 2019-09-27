@@ -26,6 +26,9 @@ import com.google.inject.Inject;
 
 public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPresenter {
 	
+	public static final String ALIGN_CENTER_STYLES = "align-center";
+	public static final String FLOAT_RIGHT_STYLES = "floatright margin-left-10";
+	public static final String FLOAT_LEFT_STYLES = "floatleft margin-right-10";
 	private ImageWidgetView view;
 	private Map<String,String> descriptor;
 	AuthenticationController authenticationController;
@@ -149,15 +152,15 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	public static String getAlignmentStyleNames (String alignment) {
+	public static String getAlignmentStyleNames(String alignment) {
 		if (alignment != null) {
 			String trimmedAlignment = alignment.trim();
 			if (WidgetConstants.FLOAT_LEFT.equalsIgnoreCase(trimmedAlignment)) {
-				return "floatleft margin-right-10";
+				return FLOAT_LEFT_STYLES;
 			} else if (WidgetConstants.FLOAT_RIGHT.equalsIgnoreCase(trimmedAlignment)) {
-				return "floatright margin-left-10";
+				return FLOAT_RIGHT_STYLES;
 			}else if (WidgetConstants.FLOAT_CENTER.equalsIgnoreCase(trimmedAlignment)) {
-				return "align-center";
+				return ALIGN_CENTER_STYLES;
 			}
 		}
 		return "";

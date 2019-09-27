@@ -9,7 +9,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
+import static org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +37,7 @@ import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
-
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -211,7 +211,11 @@ public class ImageWidgetTest {
 		widget.configure(wikiKey,descriptor, null, null);
 		verify(mockView).addStyleName(ImageWidget.MAX_WIDTH_NONE);
 	}
-
-
-	
+	@Test
+	public void testAlignmentStyles() {
+		assertEquals("", getAlignmentStyleNames(WidgetConstants.FLOAT_NONE));
+		assertEquals(FLOAT_LEFT_STYLES, getAlignmentStyleNames(WidgetConstants.FLOAT_LEFT));
+		assertEquals(FLOAT_RIGHT_STYLES, getAlignmentStyleNames(WidgetConstants.FLOAT_RIGHT));
+		assertEquals(ALIGN_CENTER_STYLES, getAlignmentStyleNames(WidgetConstants.FLOAT_CENTER));
+	}
 }
