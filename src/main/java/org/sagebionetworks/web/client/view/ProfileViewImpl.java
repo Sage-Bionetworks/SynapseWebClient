@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.view;
 
-import static org.mockito.Mockito.verify;
 import static org.sagebionetworks.web.client.DisplayUtils.DO_NOTHING_CLICKHANDLER;
 
 import org.gwtbootstrap3.client.ui.Alert;
