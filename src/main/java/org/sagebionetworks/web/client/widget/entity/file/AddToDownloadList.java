@@ -14,10 +14,12 @@ import org.sagebionetworks.repo.model.file.AddFileToDownloadListRequest;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.InlineAsynchronousProgressViewImpl;
@@ -36,7 +38,8 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	public static final String ZERO_FILES_IN_FOLDER_MESSAGE = "If a folder contains no files, no files will be added to the download list. Additionally, sub-folders cannot be added directly; please navigate into the directory that contains the files you’d like to download to add them.";
 	public static final String SUCCESS_ADDED_FILES_MESSAGE = "Successfully added files to the Download List.";
 	public static final String ADD_QUERY_FILES_CONFIRMATION_MESSAGE = "Add all files from this query result to the Download List?";
-	public static final Long FILE_SIZE_QUERY_PART_MASK = BUNDLE_MASK_QUERY_SUM_FILE_SIZES | BUNDLE_MASK_QUERY_COUNT; 
+	public static final Long FILE_SIZE_QUERY_PART_MASK = BUNDLE_MASK_QUERY_SUM_FILE_SIZES | BUNDLE_MASK_QUERY_COUNT;
+	public static final String PLEASE_LOGIN_TO_ADD_TO_DOWNLOAD_LIST = "Sign in to add files to your download list.";
 	AddToDownloadListView view;
 	PopupUtilsView popupUtilsView;
 	AddFileToDownloadListRequest request;
@@ -46,6 +49,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	PackageSizeSummary packageSizeSummary;
 	SynapseJavascriptClient jsClient;
 	AsynchronousProgressWidget progress;
+	AuthenticationController authController;
 	String queryEntityID;
 	int fileCountToAdd;
 	public static final String FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME = "FilesAddedToDownloadList";
@@ -60,7 +64,8 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 			SynapseAlert synAlert,
 			PackageSizeSummary packageSizeSummary,
 			SynapseJavascriptClient jsClient,
-			SynapseJSNIUtils jsniUtils) {
+			SynapseJSNIUtils jsniUtils,
+			AuthenticationController authController) {
 		this.jsClient = jsClient;
 		this.view = view;
 		this.popupUtilsView = popupUtilsView;
@@ -75,6 +80,7 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 		view.add(synAlert);
 		this.packageSizeSummary = packageSizeSummary;
 		packageSizeSummary.showWhiteSpinner();
+		this.authController = authController;
 		view.setPackageSizeSummary(packageSizeSummary);
 		view.setPresenter(this);
 		view.hideAll();
@@ -85,7 +91,6 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 		request = new AddFileToDownloadListRequest();
 		packageSizeSummary.clear();
 		synAlert.clear();
-		
 	}
 	
 	public void addToDownloadList(String entityID, Query query) {
@@ -102,65 +107,74 @@ public class AddToDownloadList implements IsWidget, AddToDownloadListView.Presen
 	}
 	
 	public void confirmAddQueryResultsToDownloadList() {
-		// run the query, ask for the stats
-		QueryBundleRequest queryBundleRequest = new QueryBundleRequest();
-		queryBundleRequest.setEntityId(queryEntityID);
-		queryBundleRequest.setQuery(request.getQuery());
-		queryBundleRequest.setPartMask(FILE_SIZE_QUERY_PART_MASK);
-		view.showAsynchronousProgressWidget();
-		progress.startAndTrackJob("Calculating the total query result file size", false, AsynchType.TableQuery, queryBundleRequest, new AsynchronousProgressHandler() {
-			@Override
-			public void onFailure(Throwable failure) {
-				synAlert.handleException(failure);
-				view.hideAll();
-			}
-			
-			@Override
-			public void onComplete(AsynchronousResponseBody response) {
-				QueryResultBundle queryResultBundle = (QueryResultBundle) response;
-				view.hideAll();
-				//get sum file sizes from query result
-				double sumFileSizesBytes = 0.0;
-				if (queryResultBundle.getSumFileSizes() != null && queryResultBundle.getSumFileSizes().getSumFileSizesBytes() != null) {
-					sumFileSizesBytes = queryResultBundle.getSumFileSizes().getSumFileSizesBytes().doubleValue();
+		if (authController.isLoggedIn()) {
+			// run the query, ask for the stats
+			QueryBundleRequest queryBundleRequest = new QueryBundleRequest();
+			queryBundleRequest.setEntityId(queryEntityID);
+			queryBundleRequest.setQuery(request.getQuery());
+			queryBundleRequest.setPartMask(FILE_SIZE_QUERY_PART_MASK);
+			view.showAsynchronousProgressWidget();
+			progress.startAndTrackJob("Calculating the total query result file size", false, AsynchType.TableQuery, queryBundleRequest, new AsynchronousProgressHandler() {
+				@Override
+				public void onFailure(Throwable failure) {
+					synAlert.handleException(failure);
+					view.hideAll();
 				}
-				fileCountToAdd = queryResultBundle.getQueryCount().intValue();
-				packageSizeSummary.addFiles(fileCountToAdd, sumFileSizesBytes);
-				view.showConfirmAdd();
-			}
-			
-			@Override
-			public void onCancel() {
-				view.hideAll();
-			}
-		});
+				
+				@Override
+				public void onComplete(AsynchronousResponseBody response) {
+					QueryResultBundle queryResultBundle = (QueryResultBundle) response;
+					view.hideAll();
+					//get sum file sizes from query result
+					double sumFileSizesBytes = 0.0;
+					if (queryResultBundle.getSumFileSizes() != null && queryResultBundle.getSumFileSizes().getSumFileSizesBytes() != null) {
+						sumFileSizesBytes = queryResultBundle.getSumFileSizes().getSumFileSizesBytes().doubleValue();
+					}
+					fileCountToAdd = queryResultBundle.getQueryCount().intValue();
+					packageSizeSummary.addFiles(fileCountToAdd, sumFileSizesBytes);
+					view.showConfirmAdd();
+				}
+				
+				@Override
+				public void onCancel() {
+					view.hideAll();
+				}
+			});
+		} else {
+			synAlert.showError(PLEASE_LOGIN_TO_ADD_TO_DOWNLOAD_LIST);
+		}
+		
 	}
 	
 	public void confirmAddFolderChildrenToDownloadList() {
-		//get children stats
-		EntityChildrenRequest entityChildrenRequest = new EntityChildrenRequest();
-		entityChildrenRequest.setIncludeSumFileSizes(true);
-		entityChildrenRequest.setIncludeTotalChildCount(true);
-		entityChildrenRequest.setParentId(request.getFolderId());
-		List<EntityType> includeTypes = new ArrayList<EntityType>();
-		includeTypes.add(EntityType.file);
-		entityChildrenRequest.setIncludeTypes(includeTypes);
-		jsClient.getEntityChildren(entityChildrenRequest, new AsyncCallback<EntityChildrenResponse>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
-			@Override
-			public void onSuccess(EntityChildrenResponse entityChildrenResponse) {
-				fileCountToAdd = entityChildrenResponse.getTotalChildCount().intValue();
-				if (fileCountToAdd == 0) {
-					synAlert.showError(ZERO_FILES_IN_FOLDER_MESSAGE);
-				} else {
-					packageSizeSummary.addFiles(fileCountToAdd, entityChildrenResponse.getSumFileSizesBytes().doubleValue());
-					view.showConfirmAdd();
+		if (authController.isLoggedIn()) {
+			//get children stats
+			EntityChildrenRequest entityChildrenRequest = new EntityChildrenRequest();
+			entityChildrenRequest.setIncludeSumFileSizes(true);
+			entityChildrenRequest.setIncludeTotalChildCount(true);
+			entityChildrenRequest.setParentId(request.getFolderId());
+			List<EntityType> includeTypes = new ArrayList<EntityType>();
+			includeTypes.add(EntityType.file);
+			entityChildrenRequest.setIncludeTypes(includeTypes);
+			jsClient.getEntityChildren(entityChildrenRequest, new AsyncCallback<EntityChildrenResponse>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					synAlert.handleException(caught);
 				}
-			}
-		});
+				@Override
+				public void onSuccess(EntityChildrenResponse entityChildrenResponse) {
+					fileCountToAdd = entityChildrenResponse.getTotalChildCount().intValue();
+					if (fileCountToAdd == 0) {
+						synAlert.showError(ZERO_FILES_IN_FOLDER_MESSAGE);
+					} else {
+						packageSizeSummary.addFiles(fileCountToAdd, entityChildrenResponse.getSumFileSizesBytes().doubleValue());
+						view.showConfirmAdd();
+					}
+				}
+			});
+		} else {
+			synAlert.showError(PLEASE_LOGIN_TO_ADD_TO_DOWNLOAD_LIST);
+		}
 	}
 	
 	@Override
