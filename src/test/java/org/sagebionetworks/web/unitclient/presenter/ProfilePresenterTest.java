@@ -55,8 +55,6 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
-import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
@@ -409,6 +407,7 @@ public class ProfilePresenterTest {
 		when(place.getUserId()).thenReturn("2");
 		profilePresenter.setPlace(place);
 		verify(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
+		verify(mockView, never()).showLoginAlert();
 	}
 	
 	@Test
@@ -418,7 +417,8 @@ public class ProfilePresenterTest {
 		when(place.getUserId()).thenReturn("4");
 		when(place.getArea()).thenReturn(ProfileArea.SETTINGS);
 		profilePresenter.setPlace(place);
-		verify(mockView).setTabSelected(eq(ProfileArea.PROFILE));
+		boolean isOwner = false;
+		verify(mockView).showTabs(isOwner);
 	}		
 	
 	@Test
@@ -1006,10 +1006,11 @@ public class ProfilePresenterTest {
 	public void testEditMyProfileAsAnonymous() {
 		//verify forces login if anonymous and trying to edit own profile
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		
 		profilePresenter.editMyProfile();
 		
-		verify(mockView).showErrorMessage(eq(DisplayConstants.ERROR_LOGIN_REQUIRED));
-		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
+		verify(mockView).showLoginAlert();
+		verify(mockPlaceChanger, never()).goTo(any(Place.class));
 	}
 	
 	@Test
@@ -1018,7 +1019,7 @@ public class ProfilePresenterTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(testUserId);
 		
-		profilePresenter.viewMyProfile();
+		profilePresenter.viewMyProfile("");
 		//verify updateView shows Settings as the initial tab
 		ArgumentCaptor<Profile> captor = ArgumentCaptor.forClass(Profile.class);
 		verify(mockPlaceChanger).goTo(captor.capture());
@@ -1029,11 +1030,12 @@ public class ProfilePresenterTest {
 	@Test
 	public void testViewMyProfileAsAnonymous() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		//verify forces login if anonymous and trying to view own anonymous profile
-		profilePresenter.viewMyProfile();
 		
-		verify(mockView).showErrorMessage(eq(DisplayConstants.ERROR_LOGIN_REQUIRED));
-		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
+		//verify forces login if anonymous and trying to view own anonymous profile
+		profilePresenter.viewMyProfile("");
+		
+		verify(mockView).showLoginAlert();
+		verify(mockPlaceChanger, never()).goTo(any(Place.class));
 	}
 
 	@Test
@@ -1297,7 +1299,8 @@ public class ProfilePresenterTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		when(place.toToken()).thenReturn(token);
 		profilePresenter.setPlace(place);
-		verify(mockPlaceChanger).goTo(isA(Home.class));
+		verify(mockView).showLoginAlert();
+		verify(mockPlaceChanger, never()).goTo(any(Place.class));
 	}
 	
 	@Test

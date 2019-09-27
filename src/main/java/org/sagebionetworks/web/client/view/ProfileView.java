@@ -80,4 +80,5 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void open(String url);
 	void setLastActivityOnColumnVisible(boolean visible);
 	void setCertifiedValidatedWidget(IsWidget w);
+	void showLoginAlert();
 }

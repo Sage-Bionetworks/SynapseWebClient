@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.view;
 
+import static org.mockito.Mockito.verify;
 import static org.sagebionetworks.web.client.DisplayUtils.DO_NOTHING_CLICKHANDLER;
 
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
@@ -224,6 +226,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@UiField
 	Span teamNotifications;
+	@UiField
+	Alert loginAlert;
 	private Presenter presenter;
 	private Header headerWidget;
 	@UiField
@@ -534,6 +538,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		projectNameColumnHeader.setSortDirection(null);
 		lastActivityOnColumnHeader.setSortDirection(null);
 		certifiedValidatedContainer.clear();
+		loginAlert.setVisible(false);
 	}
 	
 	@Override
@@ -701,5 +706,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setCertifiedValidatedWidget(IsWidget w) {
 		certifiedValidatedContainer.add(w);
+	}
+	@Override
+	public void showLoginAlert() {
+		loginAlert.setVisible(true);
 	}
 }
