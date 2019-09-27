@@ -30,8 +30,18 @@ public class ButtonLinkConfigViewImpl implements ButtonLinkConfigView {
 	Radio defaultButtonStyle;
 	
 	@UiField
+	Button noneButton;
+	@UiField
+	Button leftButton;
+	@UiField
+	Button centerButton;
+	@UiField
+	Button rightButton;
+	
+	@UiField
 	Button previewButton;
 	Widget widget;
+	String alignment;
 	
 	@Inject
 	public ButtonLinkConfigViewImpl(ButtonLinkConfigViewImplUiBinder binder) {
@@ -45,6 +55,18 @@ public class ButtonLinkConfigViewImpl implements ButtonLinkConfigView {
 		
 		nameField.addKeyUpHandler(event -> {
 			updatePreviewButton();
+		});
+		noneButton.addClickHandler(event -> {
+			setAlignment(WidgetConstants.FLOAT_NONE);
+		});
+		leftButton.addClickHandler(event -> {
+			setAlignment(WidgetConstants.FLOAT_LEFT);
+		});
+		centerButton.addClickHandler(event -> {
+			setAlignment(WidgetConstants.FLOAT_CENTER);
+		});
+		rightButton.addClickHandler(event -> {
+			setAlignment(WidgetConstants.FLOAT_RIGHT);
 		});
 	}
 	
@@ -73,10 +95,39 @@ public class ButtonLinkConfigViewImpl implements ButtonLinkConfigView {
 			isHighlight = Boolean.parseBoolean(descriptor.get(WebConstants.HIGHLIGHT_KEY));
 		}
 		setIsHighlightButtonStyle(isHighlight);
-		
+		alignment = WidgetConstants.FLOAT_NONE;
+		if (descriptor.containsKey(WidgetConstants.ALIGNMENT_KEY)) {
+			alignment = descriptor.get(WidgetConstants.ALIGNMENT_KEY);
+		}
+		setAlignment(alignment);
 		updatePreviewButton();
 	}
+	
+	private void setAlignment(String alignment) {
+		this.alignment = alignment;
+		clearActive();
+		switch(alignment) {
+			case WidgetConstants.FLOAT_NONE:
+				noneButton.setActive(true);
+				break;
+			case WidgetConstants.FLOAT_CENTER:
+				centerButton.setActive(true);
+				break;
+			case WidgetConstants.FLOAT_LEFT:
+				leftButton.setActive(true);
+				break;
+			case WidgetConstants.FLOAT_RIGHT:
+				rightButton.setActive(true);
+				break;
+			default:
+		}
+	}
 
+	@Override
+	public String getAlignment() {
+		return alignment;
+	}
+	
 	@Override
 	public void checkParams() throws IllegalArgumentException {
 		if (!ValidationUtils.isValidUrl(urlField.getValue(), false))
@@ -110,6 +161,7 @@ public class ButtonLinkConfigViewImpl implements ButtonLinkConfigView {
 			nameField.setValue("");
 		if (urlField != null)
 			urlField.setValue("");
+		clearActive();
 	}
 
 	@Override
@@ -131,5 +183,12 @@ public class ButtonLinkConfigViewImpl implements ButtonLinkConfigView {
 	public void setIsHighlightButtonStyle(boolean isHighlight) {
 		infoButtonStyle.setValue(isHighlight, true);
 		defaultButtonStyle.setValue(!isHighlight, true);
+	}
+	
+	private void clearActive() {
+		noneButton.setActive(false);
+		leftButton.setActive(false);
+		centerButton.setActive(false);
+		rightButton.setActive(false);
 	}
 }

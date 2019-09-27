@@ -115,7 +115,7 @@ public class WidgetConstants {
 	 */
 	public static final String IMAGE_WIDGET_FILE_NAME_KEY = "fileName";
 	public static final String IMAGE_WIDGET_SCALE_KEY = "scale";
-	public static final String IMAGE_WIDGET_ALIGNMENT_KEY = "align";
+	public static final String ALIGNMENT_KEY = "align";
 	public static final String IMAGE_WIDGET_ALT_TEXT_KEY = "altText";
 	public static final String IMAGE_WIDGET_SYNAPSE_ID_KEY = "synapseId";
 	public static final String IMAGE_WIDGET_RESPONSIVE_KEY = "responsive";

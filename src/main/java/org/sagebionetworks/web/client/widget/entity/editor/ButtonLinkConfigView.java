@@ -13,4 +13,5 @@ public interface ButtonLinkConfigView extends IsWidget, WidgetEditorView {
 	String getName();
 	void setIsHighlightButtonStyle(boolean isHighlight);
 	boolean isHighlightButtonStyle();
+	String getAlignment();
 }

@@ -70,23 +70,10 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 				}
 			});
 		}
-
-		if (alignment != null) {
-			String trimmedAlignment = alignment.trim();
-			if (WidgetConstants.FLOAT_LEFT.equalsIgnoreCase(trimmedAlignment)) {
-				image.addStyleName("floatleft");
-				image.addStyleName("margin-right-10");
-			} else if (WidgetConstants.FLOAT_RIGHT.equalsIgnoreCase(trimmedAlignment)) {
-				image.addStyleName("floatright");
-				image.addStyleName("margin-left-10");
-			}else if (WidgetConstants.FLOAT_CENTER.equalsIgnoreCase(trimmedAlignment)) {
-				image.addStyleName("align-center");
-			} else if (!WidgetConstants.FLOAT_NONE.equalsIgnoreCase(trimmedAlignment)) {
-				p.handleLoadingError("Alignment value not recognized: " + alignment);
-				return;
-			}
+		String imageStyleNames = ImageWidget.getAlignmentStyleNames(alignment);
+		if (imageStyleNames != null && imageStyleNames.length() > 0) {
+			image.addStyleName(imageStyleNames);
 		}
-		
 		if (altText == null) {
 			altText="";
 		}
