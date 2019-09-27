@@ -80,6 +80,9 @@ public class ButtonLinkWidget implements WidgetRendererPresenter {
 		} else {
 			view.setSize(ButtonSize.LARGE);
 		}
+		if (descriptor.containsKey(WidgetConstants.ALIGNMENT_KEY)) {
+			view.addStyleNames(ImageWidget.getAlignmentStyleNames(descriptor.get(WidgetConstants.ALIGNMENT_KEY)));
+		}
 		descriptor = widgetDescriptor;
 	}
 	

@@ -46,6 +46,7 @@ public class ButtonLinkConfigEditor implements WidgetEditorPresenter {
 		if (view.isHighlightButtonStyle()) {
 			descriptor.put(WebConstants.HIGHLIGHT_KEY, Boolean.toString(true));	
 		}
+		descriptor.put(WidgetConstants.ALIGNMENT_KEY, view.getAlignment());
 	}
 	
 	@Override

@@ -17,7 +17,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -61,7 +61,7 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 				view.configure(fileResult.getPreSignedURL(),
 						descriptor.get(IMAGE_WIDGET_FILE_NAME_KEY),
 						descriptor.get(IMAGE_WIDGET_SCALE_KEY),
-						descriptor.get(IMAGE_WIDGET_ALIGNMENT_KEY),
+						descriptor.get(ALIGNMENT_KEY),
 						descriptor.get(IMAGE_WIDGET_ALT_TEXT_KEY),
 						descriptor.get(IMAGE_WIDGET_SYNAPSE_ID_KEY), 
 						authenticationController.isLoggedIn());
@@ -149,8 +149,17 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-
-		/*
-	 * Private Methods
-	 */
+	public static String getAlignmentStyleNames (String alignment) {
+		if (alignment != null) {
+			String trimmedAlignment = alignment.trim();
+			if (WidgetConstants.FLOAT_LEFT.equalsIgnoreCase(trimmedAlignment)) {
+				return "floatleft margin-right-10";
+			} else if (WidgetConstants.FLOAT_RIGHT.equalsIgnoreCase(trimmedAlignment)) {
+				return "floatright margin-left-10";
+			}else if (WidgetConstants.FLOAT_CENTER.equalsIgnoreCase(trimmedAlignment)) {
+				return "align-center";
+			}
+		}
+		return "";
+	}
 }

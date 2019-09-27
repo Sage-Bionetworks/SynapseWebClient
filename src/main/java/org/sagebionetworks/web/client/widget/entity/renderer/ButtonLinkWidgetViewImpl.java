@@ -75,6 +75,13 @@ public class ButtonLinkWidgetViewImpl extends Div implements ButtonLinkWidgetVie
 		add(button);
 	}
 	
+	@Override
+	public void addStyleNames(String styleNames) {
+		if (styleNames != null && styleNames.length() > 0) {
+			button.addStyleName(styleNames);
+		}
+	}
+	
 	public void showError(String error) {
 		clear();
 		add(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(error)));
