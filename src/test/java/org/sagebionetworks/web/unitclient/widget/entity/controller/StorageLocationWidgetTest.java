@@ -109,7 +109,6 @@ public class StorageLocationWidgetTest {
 		widget.getStorageLocationSetting();
 		//should remain set to the default config
 		verify(mockView).setSFTPVisible(anyBoolean());
-		verify(mockView).setGoogleCloudVisible(anyBoolean());
 		verify(mockView).setLoading(false);
 		verifyNoMoreInteractions(mockView);
 		
@@ -156,7 +155,6 @@ public class StorageLocationWidgetTest {
 		verify(mockView).setExternalS3Banner(banner);
 		verify(mockView).selectExternalS3Storage();
 		verify(mockView).setSFTPVisible(true);
-		verify(mockView).setGoogleCloudVisible(true);
 	}
 	
 	@Test
@@ -169,7 +167,6 @@ public class StorageLocationWidgetTest {
 		widget.getStorageLocationSetting();
 		verify(mockView).selectExternalS3Storage();
 		verify(mockView, never()).setSFTPVisible(true);
-		verify(mockView, never()).setGoogleCloudVisible(true);
 	}
 	
 	@Test
