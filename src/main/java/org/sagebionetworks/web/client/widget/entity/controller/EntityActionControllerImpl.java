@@ -69,6 +69,7 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
+import org.sagebionetworks.web.client.widget.statistics.StatisticsPlotWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
@@ -158,6 +159,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	GWTWrapper gwt;
 	Callback reconfigureActionsCallback;
 	WikiPageDeleteConfirmationDialog wikiPageDeleteConfirmationDialog;
+	StatisticsPlotWidget statisticsPlotWidget;
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
 			PreflightController preflightController,
@@ -235,6 +237,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			view.addWidget(createOrUpdateDoiModal.asWidget());
 		}
 		return createOrUpdateDoiModal;
+	}
+	
+	private StatisticsPlotWidget getStatisticsPlotWidget() {
+		if (statisticsPlotWidget == null) {
+			statisticsPlotWidget = ginInjector.getStatisticsPlotWidget();
+			view.addWidget(statisticsPlotWidget.asWidget());
+		}
+		return statisticsPlotWidget;
 	}
 
 	private ChallengeClientAsync getChallengeClient() {
@@ -414,8 +424,22 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureAddFolder();
 		configureUploadNewFileEntity();
 		configureAddExternalDockerRepo();
+		configureStatisticsPlotAction();
 	}
 	
+	private void configureStatisticsPlotAction() {
+		if (entityBundle.getEntity() instanceof Project) {
+			// is a project, if the current user has admin privileges then show command
+			// TODO: remove alpha mode check
+			boolean isAlphaMode = DisplayUtils.isInTestWebsite(cookies);
+			boolean canChangePermissions = entityBundle.getPermissions().getCanChangePermissions();
+			actionMenu.setActionVisible(Action.SHOW_PROJECT_STATS, canChangePermissions && isAlphaMode);
+			actionMenu.setActionListener(Action.SHOW_PROJECT_STATS, this);
+		} else {
+			actionMenu.setActionVisible(Action.SHOW_PROJECT_STATS, false);
+		}
+
+	}
 	private void configureAddExternalDockerRepo() {
 		if (entityBundle.getEntity() instanceof Project && EntityArea.DOCKER.equals(currentArea)) {
 			actionMenu.setActionVisible(Action.CREATE_EXTERNAL_DOCKER_REPO, entityBundle.getPermissions().getCanCertifiedUserEdit());
@@ -1005,6 +1029,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case CREATE_EXTERNAL_DOCKER_REPO :
 			onCreateExternalDockerRepo();
 			break;
+		case SHOW_PROJECT_STATS :
+			onShowProjectStats();
+			break;
 		default:
 			break;
 		}
@@ -1016,6 +1043,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			public void invoke() {
 				postCheckCreateExternalDockerRepo();
 			}
+		});
+	}
+	
+	public void onShowProjectStats() {
+		checkUpdateEntity(() -> {
+			getStatisticsPlotWidget().configureAndShow(entityBundle.getEntity().getId());
 		});
 	}
 	private void postCheckCreateExternalDockerRepo(){
