@@ -58,7 +58,6 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		getStorageLocationSetting();
 		getMyLocationSettingBanners();
 		boolean isInAlpha = DisplayUtils.isInTestWebsite(cookies);
-		view.setGoogleCloudVisible(isInAlpha);
 		view.setSFTPVisible(isInAlpha);
 		view.setExternalObjectStoreVisible(isInAlpha);
 	}
@@ -79,7 +78,6 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 	
 	public void getStorageLocationSetting() {
 		Entity entity = entityBundle.getEntity();
-		view.setGoogleCloudVisible(DisplayUtils.isInTestWebsite(cookies));
 		view.setSFTPVisible(DisplayUtils.isInTestWebsite(cookies));
 		synapseClient.getStorageLocationSetting(entity.getId(), new AsyncCallback<StorageLocationSetting>() {
 			@Override
