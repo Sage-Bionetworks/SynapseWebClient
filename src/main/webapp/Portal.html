@@ -44,6 +44,12 @@
 			ga('send', 'pageview');
 		</script>
 		<script>
+			// Modern browsers natively support this function.
+			if (typeof Object.assign !== 'function') {
+				document.write("<div class=\"alert alert-danger\" role=\"alert\" style=\"margin:0px\">Unsupported browser: A modern browser is required for security, reliability, and performance.</div>");
+			}
+		</script>
+		<script>
 			// determine cdn endpoint (staging or prod, do not use a cdn for local or dev builds)
 			var cdnEndpoint = "//cdn-" + location.hostname + "/";
 			var synapseOrgRegex = /(www|staging|tst)\.synapse\.org$/;
