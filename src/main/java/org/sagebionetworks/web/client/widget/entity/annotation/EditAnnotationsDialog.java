@@ -5,8 +5,8 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.Annotations;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.annotation.v2.Annotations;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -50,7 +50,7 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 		Annotations originalAnnotations = bundle.getAnnotations();
 		annotationsCopy.setId(originalAnnotations.getId());
 		annotationsCopy.setEtag(originalAnnotations.getEtag());
-		annotationsCopy.addAll(originalAnnotations);
+		annotationsCopy.getAnnotations().putAll(originalAnnotations.getAnnotations());
 		List<Annotation> annotationList = transformer.annotationsToList(bundle.getAnnotations());
 		annotationEditors = new ArrayList<AnnotationEditor>();
 		for (Annotation annotation : annotationList) {

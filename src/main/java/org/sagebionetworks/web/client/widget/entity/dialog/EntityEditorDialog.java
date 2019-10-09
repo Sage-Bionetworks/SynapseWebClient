@@ -2,10 +2,10 @@ package org.sagebionetworks.web.client.widget.entity.dialog;
 
 import java.util.Set;
 
-import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 
 /**
  * The abstraction of an entity dialog.

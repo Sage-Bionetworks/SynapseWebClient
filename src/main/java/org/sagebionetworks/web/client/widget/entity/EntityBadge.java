@@ -3,8 +3,8 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.sagebionetworks.repo.model.Annotations;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.annotation.v2.Annotations;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;

@@ -8,7 +8,7 @@ import java.util.Date;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 
 public class AnnotationTest {
 	

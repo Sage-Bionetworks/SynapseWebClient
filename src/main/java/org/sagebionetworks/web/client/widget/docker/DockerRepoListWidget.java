@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.docker;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;

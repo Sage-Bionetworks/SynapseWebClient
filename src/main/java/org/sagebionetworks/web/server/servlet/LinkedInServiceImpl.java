@@ -13,7 +13,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.repo.model.file.CloudProviderFileHandleInterface;
 import org.sagebionetworks.web.client.LinkedInService;
 import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.shared.LinkedInInfo;
@@ -112,7 +112,7 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements
 			temp = ServiceUtils.writeToTempFile(conn.getInputStream(),
 					MAX_ATTACHMENT_SIZE_IN_BYTES);
 			// Now upload the file
-			S3FileHandle s3fh = client.multipartUpload(temp, null, false, false);
+			CloudProviderFileHandleInterface s3fh = client.multipartUpload(temp, null, false, false);
 			return s3fh.getId();
 		} catch (Throwable t) {
 			// couldn't pull the picture from the external server. log

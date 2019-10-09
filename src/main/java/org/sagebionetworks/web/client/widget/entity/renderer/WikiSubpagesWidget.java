@@ -1,12 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
-
 import java.util.List;
 
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -89,8 +87,10 @@ public class WikiSubpagesWidget implements IsWidget, WikiSubpagesView.Presenter 
 		//figure out owner object name/link
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
 			//lookup the entity name based on the id
-			int mask = ENTITY | PERMISSIONS;
-			jsClient.getEntityBundle(wikiKey.getOwnerObjectId(), mask, new AsyncCallback<EntityBundle>() {
+			EntityBundleRequest bundleRequest = new EntityBundleRequest();
+			bundleRequest.setIncludeEntity(true);
+			bundleRequest.setIncludePermissions(true);
+			jsClient.getEntityBundle(wikiKey.getOwnerObjectId(), bundleRequest, new AsyncCallback<EntityBundle>() {
 				@Override
 				public void onSuccess(EntityBundle bundle) {
 					//if the owner object name is different, clear old wiki headers (force reconfigure)

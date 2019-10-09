@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
-
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
@@ -30,8 +28,10 @@ public class SharingAndDataUseConditionWidget implements SynapseWidgetPresenter 
 	
 	public void setEntity(String entityId) {
 		//get entity bundle (only the parts required by the public/private widget and restrictions widget
-		int mask = ENTITY | PERMISSIONS ;
-		jsClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundle>() {
+		EntityBundleRequest bundleRequest = new EntityBundleRequest();
+		bundleRequest.setIncludeEntity(true);
+		bundleRequest.setIncludePermissions(true);
+		jsClient.getEntityBundle(entityId, bundleRequest, new AsyncCallback<EntityBundle>() {
 			
 			@Override
 			public void onSuccess(EntityBundle bundle) {

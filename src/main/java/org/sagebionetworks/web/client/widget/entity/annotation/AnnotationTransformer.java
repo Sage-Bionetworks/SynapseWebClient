@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.annotation;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.web.client.exceptions.DuplicateKeyException;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 

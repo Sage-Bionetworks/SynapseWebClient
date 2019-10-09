@@ -16,7 +16,7 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.exceptions.DuplicateKeyException;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformerImpl;

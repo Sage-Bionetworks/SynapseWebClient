@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.shared;
 
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.UserProfile;
 
 import com.google.gwt.user.client.rpc.IsSerializable;

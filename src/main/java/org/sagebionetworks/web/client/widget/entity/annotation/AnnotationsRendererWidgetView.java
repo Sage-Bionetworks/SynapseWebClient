@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.annotation;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 
 import com.google.gwt.user.client.ui.IsWidget;

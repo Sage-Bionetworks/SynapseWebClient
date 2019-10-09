@@ -1,11 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
@@ -13,6 +11,7 @@ import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -133,8 +132,9 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		view.setCurrentContextTabVisible(isSynapsePlace);
 		if (isSynapsePlace) {
 			String entityId = ((Synapse) currentPlace).getEntityId();
-			int mask = ENTITY_PATH;
-			jsClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundle>() {
+			EntityBundleRequest bundleRequest = new EntityBundleRequest();
+			bundleRequest.setIncludeEntityPath(true);
+			jsClient.getEntityBundle(entityId, bundleRequest, new AsyncCallback<EntityBundle>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					view.showErrorMessage(caught.getMessage());

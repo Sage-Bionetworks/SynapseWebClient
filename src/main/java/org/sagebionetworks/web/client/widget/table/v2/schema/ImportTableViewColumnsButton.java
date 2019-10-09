@@ -1,15 +1,13 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
-
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -63,8 +61,10 @@ public class ImportTableViewColumnsButton implements IsWidget {
 	
 	public void onTableViewSelected(String entityId) {
 		// get the column schema
-		int mask =  ENTITY | TABLE_DATA;
-		jsClient.getEntityBundle(entityId, mask, 
+		EntityBundleRequest bundleRequest = new EntityBundleRequest();
+		bundleRequest.setIncludeEntity(true);
+		bundleRequest.setIncludeTableBundle(true);
+		jsClient.getEntityBundle(entityId, bundleRequest, 
 			new AsyncCallback<EntityBundle>() {
 				@Override
 				public void onSuccess(EntityBundle bundle) {

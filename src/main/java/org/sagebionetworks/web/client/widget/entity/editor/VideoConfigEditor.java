@@ -1,14 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import static org.sagebionetworks.repo.model.EntityBundle.FILE_NAME;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
@@ -83,7 +82,8 @@ public class VideoConfigEditor implements VideoConfigView.Presenter, WidgetEdito
 		//determine what video type this is
 		view.setVideoFormatWarningVisible(false);
 		final String entityId = ref.getTargetId();
-		int mask = FILE_NAME;
+		EntityBundleRequest bundleRequest = new EntityBundleRequest();
+		bundleRequest.setIncludeFileName(true);
 		AsyncCallback<EntityBundle> ebCallback = new AsyncCallback<EntityBundle> () {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -114,7 +114,7 @@ public class VideoConfigEditor implements VideoConfigView.Presenter, WidgetEdito
 			}
 			
 		};
-		jsClient.getEntityBundle(ref.getTargetId(), mask, ebCallback);
+		jsClient.getEntityBundle(ref.getTargetId(), bundleRequest, ebCallback);
 	}
 	
 	public static boolean isRecognizedVideoFileName(String fileName) {

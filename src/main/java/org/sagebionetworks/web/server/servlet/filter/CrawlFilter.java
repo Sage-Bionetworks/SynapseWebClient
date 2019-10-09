@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.server.servlet.filter;
 
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
-import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +12,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
@@ -30,9 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
 import org.sagebionetworks.markdown.SynapseMarkdownProcessor;
-import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -42,12 +39,16 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.annotation.v2.Annotations;
+import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.discussion.Forum;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -228,8 +229,10 @@ public class CrawlFilter implements Filter {
 	}
 	
 	private String getEntityHtml(String entityId) throws RestServiceException, JSONObjectAdapterException{
-		int mask = ENTITY | ANNOTATIONS;
-		EntityBundle bundle = synapseClient.getEntityBundle(entityId, mask);
+		EntityBundleRequest bundleRequest = new EntityBundleRequest();
+		bundleRequest.setIncludeEntity(true);
+		bundleRequest.setIncludeAnnotations(true);
+		EntityBundle bundle = synapseClient.getEntityBundle(entityId, bundleRequest);
 		Entity entity = bundle.getEntity();
 		Annotations annotations = bundle.getAnnotations();
 		String name = escapeHtml(entity.getName());
@@ -266,16 +269,10 @@ public class CrawlFilter implements Filter {
 			html.append(markdown + "<br />");
 		}
 		html.append("<br />");
-		for (String key : annotations.getStringAnnotations().keySet()) {
-			List<String> value = annotations.getStringAnnotations().get(key);
-			html.append(escapeHtml(key) + escapeHtml(getValueString(value)) + "<br />");
-		}
-		for (String key : annotations.getLongAnnotations().keySet()) {
-			List<Long> value = annotations.getLongAnnotations().get(key);
-			html.append(escapeHtml(key) + escapeHtml(getValueString(value)) + "<br />");
-		}
-		for (String key : annotations.getDoubleAnnotations().keySet()) {
-			List<Double> value = annotations.getDoubleAnnotations().get(key);
+		Map<String,AnnotationsValue> annotationMap = annotations.getAnnotations();
+		for(String key : annotationMap.keySet()) {
+			AnnotationsValue values = annotationMap.get(key);
+			List<String> value = values.getValue();
 			html.append(escapeHtml(key) + escapeHtml(getValueString(value)) + "<br />");
 		}
 		//and link to the discussion forum (all threads and replies) if this is a project.

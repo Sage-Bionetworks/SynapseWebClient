@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.presenter;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Reference;
@@ -133,7 +133,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		view.setSynAlertWidget(synAlert.asWidget());
 		// Hide the view panel contents until async callback completes
 		view.setLoadingVisible(true);
-		int mask = EntityPageTop.ALL_PARTS_MASK;
 		final AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
@@ -182,9 +181,9 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		
 		if(isValidEntityId(entityId)) {
 			if (versionNumber == null) {
-				jsClient.getEntityBundle(entityId, mask, callback);
+				jsClient.getEntityBundle(entityId, EntityPageTop.ALL_PARTS_REQUEST, callback);
 			} else {
-				jsClient.getEntityBundleForVersion(entityId, versionNumber, mask, callback);
+				jsClient.getEntityBundleForVersion(entityId, versionNumber, EntityPageTop.ALL_PARTS_REQUEST, callback);
 			}
 		} else {
 			//invalid entity detected, indicate that the page was not found

@@ -1,13 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
-
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.DateTimeUtils;
@@ -90,7 +88,9 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	}
 	
 	public void getEntityBundle() {
-		int partsMask = ENTITY | FILE_HANDLES;
+		EntityBundleRequest request = new EntityBundleRequest();
+		request.setIncludeEntity(true);
+		request.setIncludeFileHandles(true);
 		view.showLoading();
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
@@ -103,9 +103,9 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 			};
 		};
 		if (version == null) {
-			jsClient.getEntityBundle(entityId, partsMask, callback);	
+			jsClient.getEntityBundle(entityId, request, callback);	
 		} else {
-			jsClient.getEntityBundleForVersion(entityId, version, partsMask, callback);
+			jsClient.getEntityBundleForVersion(entityId, version, request, callback);
 		}
 	}
 	
