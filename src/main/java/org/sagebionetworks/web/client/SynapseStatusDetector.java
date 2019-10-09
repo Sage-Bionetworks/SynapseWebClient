@@ -42,15 +42,11 @@ public class SynapseStatusDetector {
 		}, INTERVAL_MS);
 	}
 	
-	public void showScheduledMaintenance(String moreInfo, String scheduledFor, String scheduledUntil) {
-		String moreInfoString = moreInfo != null ? ": " + moreInfo : "";
+	public void showScheduledMaintenance(String name, String scheduledFor, String scheduledUntil) {
 		Date startDate = getDate(scheduledFor);
-		Date endDate = getDate(scheduledUntil);
 		String startTime = dateTimeUtils.getDateTimeString(startDate);
-		Long seconds = (endDate.getTime() - startDate.getTime()) / 1000L;
-		String friendlyTimeEstimate = dateTimeUtils.getFriendlyTimeEstimate(seconds);
 		// setting the delay to 0 to show until dismissed
-		popupUtils.showInfo("<a href=\"http://status.synapse.org/\" target=\"_blank\" class=\"color-white\">Scheduled maintenance beginning at " + startTime + ", expecting to last for approximately " + friendlyTimeEstimate  + moreInfoString + "</a>", 0);
+		popupUtils.showInfo("<a href=\"http://status.synapse.org/\" target=\"_blank\" class=\"color-white\">Maintenance on " + startTime + " - " + name + "</a>", 0);
 	}
 	
 	public Date getDate(String iso8601DateString) {
@@ -110,14 +106,9 @@ public class SynapseStatusDetector {
 					var scheduledMaintenance = data.scheduled_maintenances[0];
 					var scheduledFor = scheduledMaintenance.scheduled_for;
 					var scheduledUntil = scheduledMaintenance.scheduled_until;
+					var name = scheduledMaintenance.name;
 					// there's a scheduled maintenance. invoke alert with info.
-					if (scheduledMaintenance.incident_updates && scheduledMaintenance.incident_updates[0]) {
-						// we have more information, invoke with more information
-						var info = scheduledMaintenance.incident_updates[0].body;
-						x.@org.sagebionetworks.web.client.SynapseStatusDetector::showScheduledMaintenance(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)(info, scheduledFor, scheduledUntil);
-					} else {
-						x.@org.sagebionetworks.web.client.SynapseStatusDetector::showScheduledMaintenance(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)(null, scheduledFor, scheduledUntil);
-					}
+					x.@org.sagebionetworks.web.client.SynapseStatusDetector::showScheduledMaintenance(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)(name, scheduledFor, scheduledUntil);
 				} else {
 					// no scheduled maintenance found, check again later
 					x.@org.sagebionetworks.web.client.SynapseStatusDetector::checkForScheduledMaintenanceLater()();
