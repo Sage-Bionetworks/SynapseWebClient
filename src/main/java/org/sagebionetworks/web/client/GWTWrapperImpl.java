@@ -94,9 +94,9 @@ public class GWTWrapperImpl implements GWTWrapper {
 	@Override
 	public void scheduleExecution(final Callback callback, int delayMillis) {
 		Timer timer = new Timer() { 
-		    public void run() { 
-		    	callback.invoke();
-		    } 
+			public void run() { 
+				callback.invoke();
+			} 
 		};
 		timer.schedule(delayMillis);
 	}

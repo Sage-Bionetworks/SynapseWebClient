@@ -25,10 +25,20 @@ public class SynapseStatusDetector {
 	}
 	
 	public void start() {
+		_getCurrentStatus(this);
+		_getUnresolvedIncidents(this);
+		_getScheduledMaintenance(this);
+		
 		gwt.scheduleFixedDelay(() -> {
 			_getCurrentStatus(this);
 			_getUnresolvedIncidents(this);
-			_getActiveScheduledMaintenance(this);
+		}, INTERVAL_MS);
+		checkForScheduledMaintenanceLater();
+	}
+	
+	private void checkForScheduledMaintenanceLater() {
+		gwt.scheduleExecution(() -> {
+			_getScheduledMaintenance(this);
 		}, INTERVAL_MS);
 	}
 	
@@ -39,7 +49,8 @@ public class SynapseStatusDetector {
 		String startTime = dateTimeUtils.getDateTimeString(startDate);
 		Long seconds = (endDate.getTime() - startDate.getTime()) / 1000L;
 		String friendlyTimeEstimate = dateTimeUtils.getFriendlyTimeEstimate(seconds);
-		popupUtils.showInfo("<a href=\"http://status.synapse.org/\" target=\"_blank\" class=\"color-white\">Scheduled maintenance beginning at " + startTime + ", expecting to last for approximately " + friendlyTimeEstimate  + moreInfoString + "</a>", INTERVAL_MS - 1200);
+		// setting the delay to 0 to show until dismissed
+		popupUtils.showInfo("<a href=\"http://status.synapse.org/\" target=\"_blank\" class=\"color-white\">Scheduled maintenance beginning at " + startTime + ", expecting to last for approximately " + friendlyTimeEstimate  + moreInfoString + "</a>", 0);
 	}
 	
 	public Date getDate(String iso8601DateString) {
@@ -86,20 +97,9 @@ public class SynapseStatusDetector {
 				}
 			}
 		})
-		
-		sp.status({
-			success : function(data) {
-				if (data.status.indicator !== 'none') {
-					// Houston, we have a problem...
-					var description = data.status.description;
-					x.@org.sagebionetworks.web.client.SynapseStatusDetector::showOutage(Ljava/lang/String;)(description);
-				}
-			}
-		});
 	}-*/;
-
 	
-	private static native void _getActiveScheduledMaintenance(SynapseStatusDetector x) /*-{
+	private static native void _getScheduledMaintenance(SynapseStatusDetector x) /*-{
 		var sp = new $wnd.StatusPage.page({
 			page : @org.sagebionetworks.web.client.SynapseStatusDetector::STATUS_PAGE_IO_PAGE
 		});
@@ -118,6 +118,9 @@ public class SynapseStatusDetector {
 					} else {
 						x.@org.sagebionetworks.web.client.SynapseStatusDetector::showScheduledMaintenance(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)(null, scheduledFor, scheduledUntil);
 					}
+				} else {
+					// no scheduled maintenance found, check again later
+					x.@org.sagebionetworks.web.client.SynapseStatusDetector::checkForScheduledMaintenanceLater()();
 				}
 			}
 		});
