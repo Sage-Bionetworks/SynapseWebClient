@@ -1,16 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity.annotation;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
 import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValueType;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -21,8 +21,7 @@ import com.google.inject.Inject;
 public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presenter {
 	public static final String SEE_THE_ERRORS_ABOVE = "See the error(s) above.";
 	EditAnnotationsDialogView view;
-	SynapseClientAsync synapseClient;
-	AnnotationTransformer transformer;
+	SynapseJavascriptClient jsClient;
 	PortalGinInjector ginInjector;
 	String entityId;
 	List<AnnotationEditor> annotationEditors;
@@ -30,13 +29,10 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 	
 	@Inject
 	public EditAnnotationsDialog(EditAnnotationsDialogView view, 
-			SynapseClientAsync synapseClient, 
-			AnnotationTransformer transformer, 
+			SynapseJavascriptClient jsClient, 
 			PortalGinInjector ginInjector)  {
 		this.view = view;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
-		this.transformer = transformer;
+		this.jsClient = jsClient;
 		this.ginInjector = ginInjector;
 		view.setPresenter(this);
 	}
@@ -49,7 +45,9 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 		Annotations originalAnnotations = bundle.getAnnotations();
 		annotationsCopy.setId(originalAnnotations.getId());
 		annotationsCopy.setEtag(originalAnnotations.getEtag());
-		annotationsCopy.getAnnotations().putAll(originalAnnotations.getAnnotations());
+		Map<String, AnnotationsValue> annnotationsMapCopy = new HashMap<>();
+		annotationsCopy.setAnnotations(annnotationsMapCopy);
+		annnotationsMapCopy.putAll(originalAnnotations.getAnnotations());
 		annotationEditors = new ArrayList<AnnotationEditor>();
 		for (String key : annotationsCopy.getAnnotations().keySet()) {
 			AnnotationsValue value = originalAnnotations.getAnnotations().get(key);
@@ -115,9 +113,9 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 			AnnotationsValue updatedValue = annotationEditor.getUpdatedAnnotation();
 			annotationsCopy.getAnnotations().put(updatedKey, updatedValue);
 		}
-		synapseClient.updateAnnotations(entityId, annotationsCopy, new AsyncCallback<Void>() {
+		jsClient.updateAnnotations(entityId, annotationsCopy, new AsyncCallback<Annotations>() {
 			@Override
-			public void onSuccess(Void result) {
+			public void onSuccess(Annotations result) {
 				view.showInfo("Successfully updated the annotations");
 				view.hideEditor();
 				ginInjector.getEventBus().fireEvent(new EntityUpdatedEvent());

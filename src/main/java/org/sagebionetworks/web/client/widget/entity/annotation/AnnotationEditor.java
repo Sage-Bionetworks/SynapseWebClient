@@ -53,6 +53,9 @@ public class AnnotationEditor implements Presenter {
 		newAnnotation.setType(annotation.getType());
 		this.deletedCallback = deletedCallback;
 		cellEditors = new ArrayList<CellEditor>();
+		if (annotation.getValue() == null) {
+			annotation.setValue(new ArrayList<String>());
+		}
 		for (String value : annotation.getValue()) {
 			//create an editor for each value
 			CellEditor editor = createNewEditor();

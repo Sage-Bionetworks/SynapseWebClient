@@ -186,8 +186,6 @@ public interface SynapseClientAsync {
 	
 	void moveEntity(String entityId, String newParentEntityId, AsyncCallback<Entity> callback);
 	
-	void updateAnnotations(String entityId, Annotations annotations, AsyncCallback<Void> callback);
-
 	void createStorageLocationSetting(String parentEntityId, StorageLocationSetting setting, AsyncCallback<Void> callback);
 
 	void getStorageLocationSetting(String parentEntityId, AsyncCallback<StorageLocationSetting> callback);

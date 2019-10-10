@@ -58,6 +58,7 @@ import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
@@ -1657,5 +1658,11 @@ public class SynapseJavascriptClient {
 		};
 		listUserProfiles(userIds, profilesCallback);
 	}
+	
+	public void updateAnnotations(String entityId, Annotations annotations, AsyncCallback<Annotations> cb) {
+		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + "/annotations2";
+		doPut(url, annotations, OBJECT_TYPE.Annotations, cb);
+	}
+
 }
 

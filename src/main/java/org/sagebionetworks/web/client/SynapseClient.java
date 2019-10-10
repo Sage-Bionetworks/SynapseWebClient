@@ -171,8 +171,6 @@ public interface SynapseClient extends RemoteService{
 	
 	String getHost(String urlString) throws RestServiceException;
 
-	void updateAnnotations(String entityId, Annotations annotations) throws RestServiceException;
-
 	AccessApproval createAccessApproval(AccessApproval aaEW) throws RestServiceException;
 
 	Entity updateExternalFile(String entityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId) throws RestServiceException;
