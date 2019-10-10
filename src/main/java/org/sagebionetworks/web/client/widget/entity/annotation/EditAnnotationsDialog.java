@@ -108,6 +108,7 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 		
 		//else, try to update the annotations
 		view.setLoading();
+		annotationsCopy.getAnnotations().clear();
 		for (AnnotationEditor annotationEditor : annotationEditors) {
 			String updatedKey = annotationEditor.getUpdatedKey();
 			AnnotationsValue updatedValue = annotationEditor.getUpdatedAnnotation();
