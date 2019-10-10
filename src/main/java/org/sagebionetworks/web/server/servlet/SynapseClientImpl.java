@@ -1730,6 +1730,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 	
+	@Override
 	public void updateAnnotations(String entityId, Annotations annotations) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();

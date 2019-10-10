@@ -6,14 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.annotation.v2.Annotations;
+import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
+import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValueType;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.exceptions.DuplicateKeyException;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
-import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -51,19 +50,19 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 		annotationsCopy.setId(originalAnnotations.getId());
 		annotationsCopy.setEtag(originalAnnotations.getEtag());
 		annotationsCopy.getAnnotations().putAll(originalAnnotations.getAnnotations());
-		List<Annotation> annotationList = transformer.annotationsToList(bundle.getAnnotations());
 		annotationEditors = new ArrayList<AnnotationEditor>();
-		for (Annotation annotation : annotationList) {
-			AnnotationEditor newEditor = createAnnotationEditor(annotation);
+		for (String key : annotationsCopy.getAnnotations().keySet()) {
+			AnnotationsValue value = originalAnnotations.getAnnotations().get(key);
+			AnnotationEditor newEditor = createAnnotationEditor(key, value);
 			view.addAnnotationEditor(newEditor.asWidget());
 		}
 		//if there are no annotations, prepopulate with a single default annotation
-		if (annotationList.isEmpty())
+		if (annotationsCopy.getAnnotations().isEmpty())
 			onAddNewAnnotation();
 		view.showEditor();
 	}
 	
-	public AnnotationEditor createAnnotationEditor(Annotation annotation) {
+	public AnnotationEditor createAnnotationEditor(String key, AnnotationsValue annotation) {
 		final AnnotationEditor editor = ginInjector.getAnnotationEditor();
 		Callback deletedCallback = new Callback() {
 			@Override
@@ -71,22 +70,18 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 				onAnnotationDeleted(editor);
 			}
 		};
-		editor.configure(annotation, deletedCallback);
+		editor.configure(key, annotation, deletedCallback);
 		annotationEditors.add(editor);
 		return editor;
 	}
 	
 	@Override
 	public void onAddNewAnnotation() {
-		AnnotationEditor newEditor = createAnnotationEditor(ANNOTATION_TYPE.STRING);
+		String initialKey = "";
+		AnnotationsValue value = new AnnotationsValue();
+		value.setType(AnnotationsValueType.STRING);
+		AnnotationEditor newEditor = createAnnotationEditor(initialKey, value);
 		view.addAnnotationEditor(newEditor.asWidget());
-	}
-	
-	public AnnotationEditor createAnnotationEditor(ANNOTATION_TYPE type) {
-		List<String> valuesList = new ArrayList<String>();
-		valuesList.add("");
-		Annotation newAnnotation = new Annotation(type, "", valuesList);
-		return createAnnotationEditor(newAnnotation);
 	}
 	
 	@Override
@@ -115,29 +110,24 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 		
 		//else, try to update the annotations
 		view.setLoading();
-		List<Annotation> updatedAnnotationsList = new ArrayList<Annotation>();
 		for (AnnotationEditor annotationEditor : annotationEditors) {
-			updatedAnnotationsList.add(annotationEditor.getUpdatedAnnotation());
+			String updatedKey = annotationEditor.getUpdatedKey();
+			AnnotationsValue updatedValue = annotationEditor.getUpdatedAnnotation();
+			annotationsCopy.getAnnotations().put(updatedKey, updatedValue);
 		}
-		try {
-			transformer.updateAnnotationsFromList(annotationsCopy, updatedAnnotationsList);
+		synapseClient.updateAnnotations(entityId, annotationsCopy, new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				view.showInfo("Successfully updated the annotations");
+				view.hideEditor();
+				ginInjector.getEventBus().fireEvent(new EntityUpdatedEvent());
+			}
 			
-			synapseClient.updateAnnotations(entityId, annotationsCopy, new AsyncCallback<Void>() {
-				@Override
-				public void onSuccess(Void result) {
-					view.showInfo("Successfully updated the annotations");
-					view.hideEditor();
-					ginInjector.getEventBus().fireEvent(new EntityUpdatedEvent());
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showError(caught.getMessage());
-				}
-			});
-		} catch (DuplicateKeyException e) {
-			view.showError(e.getMessage());
-		}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showError(caught.getMessage());
+			}
+		});
 	}
 	
 	public Widget asWidget() {

@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.annotation;
 
-import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
+import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 
 /**
@@ -13,5 +13,5 @@ public interface AnnotationCellFactory {
 	 * Crate an editor for a cell.
 	 * @return
 	 */
-	public CellEditor createEditor(Annotation annotation);
+	public CellEditor createEditor(AnnotationsValue annotation);
 }
