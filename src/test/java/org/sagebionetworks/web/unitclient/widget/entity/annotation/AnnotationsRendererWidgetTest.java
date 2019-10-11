@@ -4,22 +4,22 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.Annotations;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.annotation.v2.Annotations;
+import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
@@ -27,8 +27,6 @@ import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRender
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidgetView;
 import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialog;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
-import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
-import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -44,21 +42,24 @@ public class AnnotationsRendererWidgetTest {
 	EditAnnotationsDialog mockEditAnnotationsDialog;
 	@Mock
 	EntityBundle mockBundle;
-	List<Annotation> annotationList;
+	Map<String, AnnotationsValue> annotationMap;
 	@Mock
 	PreflightController mockPreflightController;
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
-	
+	@Mock
+	Annotations mockAnnotations;
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		when(mockPortalGinInjector.getEditAnnotationsDialog()).thenReturn(mockEditAnnotationsDialog);
-		widget = new AnnotationsRendererWidget(mockView, mockAnnotationTransformer, mockPreflightController, mockPortalGinInjector);
-		mockBundle = mock(EntityBundle.class);
-		annotationList = new ArrayList<Annotation>();
-		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, "key", Collections.EMPTY_LIST));
-		when(mockAnnotationTransformer.annotationsToList(any(Annotations.class))).thenReturn(annotationList);
+		widget = new AnnotationsRendererWidget(mockView, mockPreflightController, mockPortalGinInjector);
+		annotationMap = new HashMap<String, AnnotationsValue>();
+		AnnotationsValue value = new AnnotationsValue();
+		value.setValue(Collections.EMPTY_LIST);
+		annotationMap.put("key", value);
+		when(mockBundle.getAnnotations()).thenReturn(mockAnnotations);
+		when(mockAnnotations.getAnnotations()).thenReturn(annotationMap);
 	}
 
 	@Test
@@ -66,7 +67,7 @@ public class AnnotationsRendererWidgetTest {
 		//also verify construction
 		verify(mockView).setPresenter(widget);
 		
-		annotationList.clear();
+		annotationMap.clear();
 		boolean canEdit = true;
 		boolean isCurrentVersion = true;
 		widget.configure(mockBundle, canEdit, isCurrentVersion);
@@ -83,7 +84,7 @@ public class AnnotationsRendererWidgetTest {
 		boolean isCurrentVersion = true;
 		widget.configure(mockBundle, canEdit, isCurrentVersion);
 		
-		verify(mockView).configure(annotationList);
+		verify(mockView).configure(annotationMap);
 		verify(mockView).setEditUIVisible(false);
 		
 		assertFalse(widget.isEmpty());
@@ -94,7 +95,7 @@ public class AnnotationsRendererWidgetTest {
 		boolean isCurrentVersion = false;
 		widget.configure(mockBundle, canEdit, isCurrentVersion);
 		
-		verify(mockView).configure(annotationList);
+		verify(mockView).configure(annotationMap);
 		verify(mockView).setEditUIVisible(false);
 		
 		assertFalse(widget.isEmpty());

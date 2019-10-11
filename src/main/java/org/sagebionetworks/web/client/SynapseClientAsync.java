@@ -10,7 +10,7 @@ import java.util.Set;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -186,8 +186,6 @@ public interface SynapseClientAsync {
 	
 	void moveEntity(String entityId, String newParentEntityId, AsyncCallback<Entity> callback);
 	
-	void updateAnnotations(String entityId, Annotations annotations, AsyncCallback<Void> callback);
-
 	void createStorageLocationSetting(String parentEntityId, StorageLocationSetting setting, AsyncCallback<Void> callback);
 
 	void getStorageLocationSetting(String parentEntityId, AsyncCallback<StorageLocationSetting> callback);

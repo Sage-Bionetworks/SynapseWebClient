@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 import static org.sagebionetworks.repo.model.util.ContentTypeUtils.isRecognizedCodeFileName;
 import static org.sagebionetworks.web.client.ClientProperties.MB;
 import static org.sagebionetworks.web.client.ContentTypeUtils.isCSV;
@@ -16,11 +14,13 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.EntityBundle;
+
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.file.CloudProviderFileHandleInterface;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
@@ -168,8 +168,9 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			entityId = tokens[0];
 			version = tokens[1];
 		}
-		
-		int mask = ENTITY  | FILE_HANDLES;
+		EntityBundleRequest bundleRequest = new EntityBundleRequest();
+		bundleRequest.setIncludeEntity(true);
+		bundleRequest.setIncludeFileHandles(true);
 		AsyncCallback<EntityBundle> entityBundleCallback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -183,9 +184,9 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		};
 		if (EntityPresenter.isValidEntityId(entityId)) {
 			if (version == null) {
-				jsClient.getEntityBundle(entityId, mask, entityBundleCallback);
+				jsClient.getEntityBundle(entityId, bundleRequest, entityBundleCallback);
 			} else {
-				jsClient.getEntityBundleForVersion(entityId, Long.parseLong(version), mask, entityBundleCallback);	
+				jsClient.getEntityBundleForVersion(entityId, Long.parseLong(version), bundleRequest, entityBundleCallback);	
 			}
 		} else {
 			view.addSynapseAlertWidget(synapseAlert.asWidget());

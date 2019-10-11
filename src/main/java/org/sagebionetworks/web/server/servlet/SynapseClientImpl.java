@@ -32,10 +32,8 @@ import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -58,6 +56,8 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.auth.NewUserSignedToken;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyResult;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
@@ -74,6 +74,7 @@ import org.sagebionetworks.repo.model.principal.AliasCheckRequest;
 import org.sagebionetworks.repo.model.principal.AliasCheckResponse;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
+import org.sagebionetworks.repo.model.principal.NotificationEmail;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.project.ProjectSettingsType;
@@ -190,21 +191,21 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 
-	public EntityBundle getEntityBundle(String entityId, int partsMask)
+	public EntityBundle getEntityBundle(String entityId, EntityBundleRequest bundleRequest)
 			throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			return synapseClient.getEntityBundle(entityId, partsMask);
+			return synapseClient.getEntityBundleV2(entityId, bundleRequest);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 
 	public EntityBundle getEntityBundleForVersion(String entityId,
-			Long versionNumber, int partsMask) throws RestServiceException {
+			Long versionNumber, EntityBundleRequest bundleRequest) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			return synapseClient.getEntityBundle(entityId, versionNumber, partsMask);
+			return synapseClient.getEntityBundleV2(entityId, versionNumber, bundleRequest);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -381,7 +382,11 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public String getNotificationEmail() throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.getNotificationEmail();
+			NotificationEmail notificationEmail = synapseClient.getNotificationEmail();
+			if (notificationEmail != null) {
+				return notificationEmail.getEmail(); 
+			}
+			return null;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -410,7 +415,9 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public AccessControlList getBenefactorAcl(String id) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.getEntityBundle(id, EntityBundle.BENEFACTOR_ACL).getBenefactorAcl();
+			EntityBundleRequest bundleRequest = new EntityBundleRequest();
+			bundleRequest.setIncludeBenefactorACL(true);
+			return synapseClient.getEntityBundleV2(id, bundleRequest).getBenefactorAcl();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -1727,15 +1734,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 	
-	public void updateAnnotations(String entityId, Annotations annotations) throws RestServiceException {
-		try {
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			synapseClient.updateAnnotations(entityId, annotations);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
 	@Override
 	public List<String> getMyLocationSettingBanners() throws RestServiceException{
 		try {

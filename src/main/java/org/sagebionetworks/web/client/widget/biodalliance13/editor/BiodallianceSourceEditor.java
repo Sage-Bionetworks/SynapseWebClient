@@ -1,14 +1,12 @@
 package org.sagebionetworks.web.client.widget.biodalliance13.editor;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.FILE_NAME;
-
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource;
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource.SourceType;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -104,7 +102,9 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 		source.setEntity(null, null);
 		source.setSourceType(null);
 		//determine the source type of the given reference before accepting
-		int mask = ENTITY | FILE_NAME;
+		EntityBundleRequest bundleRequest = new EntityBundleRequest();
+		bundleRequest.setIncludeEntity(true);
+		bundleRequest.setIncludeFileName(true);
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
@@ -129,16 +129,18 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 			}			
 		};
 		if (ref.getTargetVersionNumber() == null) {
-			jsClient.getEntityBundle(ref.getTargetId(), mask, callback);
+			jsClient.getEntityBundle(ref.getTargetId(), bundleRequest, callback);
 		} else {
-			jsClient.getEntityBundleForVersion(ref.getTargetId(), ref.getTargetVersionNumber(), mask, callback);
+			jsClient.getEntityBundleForVersion(ref.getTargetId(), ref.getTargetVersionNumber(), bundleRequest, callback);
 		}
 	}
 	
 	@Override
 	public void indexEntitySelected(Reference ref) {
 		source.setIndexEntity(null, null);
-		int mask = ENTITY | FILE_NAME;
+		EntityBundleRequest bundleRequest = new EntityBundleRequest();
+		bundleRequest.setIncludeEntity(true);
+		bundleRequest.setIncludeFileName(true);
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
@@ -162,9 +164,9 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 			}			
 		};
 		if (ref.getTargetVersionNumber() == null) {
-			jsClient.getEntityBundle(ref.getTargetId(), mask, callback);
+			jsClient.getEntityBundle(ref.getTargetId(), bundleRequest, callback);
 		} else {
-			jsClient.getEntityBundleForVersion(ref.getTargetId(), ref.getTargetVersionNumber(), mask, callback);
+			jsClient.getEntityBundleForVersion(ref.getTargetId(), ref.getTargetVersionNumber(), bundleRequest, callback);
 		}
 	}
 	
@@ -190,7 +192,6 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 				if (".bed".equals(extension) || fileName.toLowerCase().endsWith(".bed.gz")) {
 					return SourceType.BED;
 				}
-
 			}
 		}
 		throw new IllegalArgumentException("Unsupported source file type.");

@@ -1,9 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.annotation;
 
-import java.util.List;
+import java.util.Map;
 
-import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
+import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -14,7 +13,7 @@ public interface AnnotationsRendererWidgetView extends IsWidget{
 		 void onEdit();
 	}
 
-	void configure(List<Annotation> annotations);
+	void configure(Map<String, AnnotationsValue> annotationsMap);
 	void setPresenter(Presenter presenter);
 	void setEditUIVisible(boolean isVisible);
 	void showNoAnnotations();

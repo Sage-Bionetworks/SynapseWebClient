@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -25,19 +24,6 @@ public interface AnnotationEditorView extends IsWidget {
 		 * @return
 		 */
 		boolean isValid();
-		/**
-		 * Configure this Annotation editor with an annotation and callback handlers
-		 * @param annotation
-		 * @param deletedCallback
-		 */
-		void configure(Annotation annotation, 
-				Callback deletedCallback);
-		/**
-		 * Ask the editor for the updated Annotation (based on values entered in the view)
-		 * @return
-		 */
-		Annotation getUpdatedAnnotation();
-		
 		/**
 		 * Called when a particular value is deleted from the view
 		 * @param editor

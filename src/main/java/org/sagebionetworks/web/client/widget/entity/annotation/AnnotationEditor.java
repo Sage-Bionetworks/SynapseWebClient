@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
+import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
+import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValueType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditorView.Presenter;
-import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
-import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -20,12 +20,16 @@ import com.google.inject.Inject;
 
 public class AnnotationEditor implements Presenter {
 	
+	private static final String DATE = "Date";
+	private static final String TEXT = "Text";
+	private static final String INTEGER = "Integer";
+	private static final String FLOATING_POINT = "Floating Point";
 	private AnnotationEditorView view;
-	private Annotation annotation;
 	private Callback deletedCallback;
 	private List<CellEditor> cellEditors;
 	AnnotationCellFactory factory;
-	private List<ANNOTATION_TYPE> annotationTypes;
+	AnnotationsValue newAnnotation;
+	private List<AnnotationsValueType> annotationTypes;
 	@Inject
 	public AnnotationEditor(AnnotationEditorView view, AnnotationCellFactory factory) {
 		this.view = view;
@@ -33,23 +37,26 @@ public class AnnotationEditor implements Presenter {
 		view.setPresenter(this);
 		
 		List<String> displayTypes = new ArrayList<String>();
-		annotationTypes = new ArrayList<ANNOTATION_TYPE>();
-		annotationTypes.add(ANNOTATION_TYPE.STRING);
-		annotationTypes.add(ANNOTATION_TYPE.LONG);
-		annotationTypes.add(ANNOTATION_TYPE.DOUBLE);
-		annotationTypes.add(ANNOTATION_TYPE.DATE);
-		for (ANNOTATION_TYPE type : annotationTypes) {
-			displayTypes.add(type.getDisplayText());
+		annotationTypes = new ArrayList<AnnotationsValueType>();
+		annotationTypes.add(AnnotationsValueType.STRING);
+		annotationTypes.add(AnnotationsValueType.LONG);
+		annotationTypes.add(AnnotationsValueType.DOUBLE);
+		annotationTypes.add(AnnotationsValueType.TIMESTAMP_MS);
+		for (AnnotationsValueType type : annotationTypes) {
+			displayTypes.add(getDisplayName(type));
 		}
 		view.setTypeOptions(displayTypes);
 	}
 	
-	@Override
-	public void configure(Annotation annotation, Callback deletedCallback) {
-		this.annotation = annotation;
+	public void configure(String key, AnnotationsValue annotation, Callback deletedCallback) {
+		newAnnotation = new AnnotationsValue();
+		newAnnotation.setType(annotation.getType());
 		this.deletedCallback = deletedCallback;
 		cellEditors = new ArrayList<CellEditor>();
-		for (String value : annotation.getValues()) {
+		if (annotation.getValue() == null) {
+			annotation.setValue(new ArrayList<String>());
+		}
+		for (String value : annotation.getValue()) {
 			//create an editor for each value
 			CellEditor editor = createNewEditor();
 			editor.setValue(value);
@@ -57,12 +64,11 @@ public class AnnotationEditor implements Presenter {
 		}
 		
 		//if no values, then add a single editor (allows edit or delete of annotation)
-		if (annotation.getValues().isEmpty()) {
+		if (annotation.getValue().isEmpty()) {
 			CellEditor editor = createNewEditor();
 			view.addNewEditor(editor);
 		}
-		
-		view.configure(annotation.getKey(), annotationTypes.indexOf(annotation.getType()));
+		view.configure(key, annotationTypes.indexOf(annotation.getType()));
 	}
 	
 	@Override
@@ -74,7 +80,7 @@ public class AnnotationEditor implements Presenter {
 	}
 
 	public CellEditor createNewEditor(){
-		CellEditor editor = factory.createEditor(annotation);
+		CellEditor editor = factory.createEditor(newAnnotation);
 		editor.addKeyDownHandler(new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
@@ -97,7 +103,7 @@ public class AnnotationEditor implements Presenter {
 	@Override
 	public void onTypeChange(int typeIndex) {
 		//clear values, add an appropriate
-		annotation.setType(annotationTypes.get(typeIndex));
+		newAnnotation.setType(annotationTypes.get(typeIndex));
 		cellEditors = new ArrayList<CellEditor>();
 		view.clearValueEditors();
 		onAddNewValue();
@@ -128,8 +134,7 @@ public class AnnotationEditor implements Presenter {
 		return true;
 	}
 	
-	@Override
-	public Annotation getUpdatedAnnotation() {
+	public AnnotationsValue getUpdatedAnnotation() {
 		//get the values from the current cell editors
 		List<String> updatedValues = new ArrayList<String>();
 		for (CellEditor cellEditor : cellEditors) {
@@ -137,8 +142,12 @@ public class AnnotationEditor implements Presenter {
 			if (DisplayUtils.isDefined(value))
 				updatedValues.add(value);
 		}
-		Annotation updatedAnnotation = new Annotation(annotation.getType(), view.getKey(), updatedValues);
-		return updatedAnnotation;
+		newAnnotation.setValue(updatedValues);
+		return newAnnotation;
+	}
+	
+	public String getUpdatedKey() {
+		return view.getKey();
 	}
 
 	@Override
@@ -153,10 +162,43 @@ public class AnnotationEditor implements Presenter {
 		return view.asWidget();
 	}
 	
-	public List<ANNOTATION_TYPE> getAnnotationTypes() {
+	public List<AnnotationsValueType> getAnnotationTypes() {
 		return annotationTypes;
 	}
-	public Annotation getAnnotation() {
-		return annotation;
+	public AnnotationsValue getAnnotation() {
+		return newAnnotation;
+	}
+	
+	public static final String getDisplayName(AnnotationsValueType type) {
+		String displayName = "Unknown";
+		switch (type) {
+			case DOUBLE:
+				displayName = FLOATING_POINT;
+				break;
+			case LONG:
+				displayName = INTEGER;
+				break;
+			case STRING:
+				displayName = TEXT;
+				break;
+			case TIMESTAMP_MS:
+				displayName = DATE;
+				break;
+			default:
+				break;
+		}
+		return displayName;
+	}
+	
+	public static final AnnotationsValueType getType(String displayName) {
+		if (FLOATING_POINT.equals(displayName)) {
+			return AnnotationsValueType.DOUBLE;
+		} else if (INTEGER.equals(displayName)) {
+			return AnnotationsValueType.LONG;
+		} else if (DATE.equals(displayName)) {
+			return AnnotationsValueType.TIMESTAMP_MS;
+		} else {
+			return AnnotationsValueType.STRING;
+		}
 	}
 }

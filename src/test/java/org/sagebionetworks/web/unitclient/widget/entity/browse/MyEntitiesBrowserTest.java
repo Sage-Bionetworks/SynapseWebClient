@@ -20,7 +20,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.ProjectHeader;
@@ -175,24 +176,24 @@ public class MyEntitiesBrowserTest {
 		EntityPath path = new EntityPath();
 		path.setPath(new ArrayList<EntityHeader>());
 		eb.setPath(path);
-		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		
 		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(new Synapse("syn123"));
 		widget.loadCurrentContext();
 		verify(mockView).setCurrentContextTabVisible(true);
-		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		verify(mockCurrentContextTreeBrowser).configure(anyList());
 	}
 	@Test
 	public void testLoadContextSynapsePlaceFailure() {
 		String errorMessage = "failure to load entity path";
 		Exception ex = new Exception(errorMessage);
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		
 		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(new Synapse("syn123"));
 		widget.loadCurrentContext();
 		verify(mockView).setCurrentContextTabVisible(true);
-		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(errorMessage);
 	}
 	

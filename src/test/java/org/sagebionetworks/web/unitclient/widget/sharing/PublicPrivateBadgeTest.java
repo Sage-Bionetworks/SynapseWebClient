@@ -4,7 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 
@@ -17,9 +16,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.ResourceAccess;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -61,7 +61,7 @@ public class PublicPrivateBadgeTest {
 		publicPrincipalIds=new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID, TEST_ANONYMOUS_PRINCIPAL_ID);
 		EntityBundle transport = new EntityBundle();
 		transport.setBenefactorAcl(acl);
-		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseJavascriptClient).getEntityBundle(anyString(),  anyInt(),  any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseJavascriptClient).getEntityBundle(anyString(),  any(EntityBundleRequest.class),  any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(publicPrincipalIds).when(mockUserService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
 		DisplayUtils.publicPrincipalIds = null;
 	}
@@ -74,7 +74,7 @@ public class PublicPrivateBadgeTest {
 	
 	@Test
 	public void testGetACLFailure() {
-		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseJavascriptClient).getEntityBundle(anyString(),  anyInt(),  any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		publicPrivateBadge.configure(testEntity);
 		verify(mockView).showErrorMessage(anyString());
 	}

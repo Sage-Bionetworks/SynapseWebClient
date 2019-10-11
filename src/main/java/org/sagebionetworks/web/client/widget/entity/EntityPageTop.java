@@ -1,24 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ACL;
-import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
-import static org.sagebionetworks.repo.model.EntityBundle.DOI;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
-import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
-import static org.sagebionetworks.repo.model.EntityBundle.FILE_NAME;
-import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
-import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.RESTRICTION_INFORMATION;
-import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
-import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
-import static org.sagebionetworks.repo.model.EntityBundle.THREAD_COUNT;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -26,6 +12,7 @@ import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -95,7 +82,25 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	private EventBus eventBus;
 	private EntityId2BundleCache entityId2BundleCache;
 	public boolean pushTabUrlToBrowserHistory = false;
-	public static final int ALL_PARTS_MASK = ENTITY | ENTITY_PATH | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME | BENEFACTOR_ACL | TABLE_DATA | ACL | BENEFACTOR_ACL | THREAD_COUNT | RESTRICTION_INFORMATION;
+	public static final EntityBundleRequest ALL_PARTS_REQUEST = new EntityBundleRequest();
+	static {
+		ALL_PARTS_REQUEST.setIncludeEntity(true);
+		ALL_PARTS_REQUEST.setIncludeEntityPath(true);
+		ALL_PARTS_REQUEST.setIncludeAnnotations(true);
+		ALL_PARTS_REQUEST.setIncludePermissions(true);
+		ALL_PARTS_REQUEST.setIncludeEntityPath(true);
+		ALL_PARTS_REQUEST.setIncludeHasChildren(true);
+		ALL_PARTS_REQUEST.setIncludeFileHandles(true);
+		ALL_PARTS_REQUEST.setIncludeRootWikiId(true);
+		ALL_PARTS_REQUEST.setIncludeDOIAssociation(true);
+		ALL_PARTS_REQUEST.setIncludeFileName(true);
+		ALL_PARTS_REQUEST.setIncludeBenefactorACL(true);
+		ALL_PARTS_REQUEST.setIncludeTableBundle(true);
+		ALL_PARTS_REQUEST.setIncludeAccessControlList(true);
+		ALL_PARTS_REQUEST.setIncludeBenefactorACL(true);
+		ALL_PARTS_REQUEST.setIncludeThreadCount(true);
+		ALL_PARTS_REQUEST.setIncludeRestrictionInformation(true);
+	}
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -371,7 +376,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			if (version == null) {
 				synapseJavascriptClient.getEntityBundleFromCache(entityId, callback);
 			} else {
-				synapseJavascriptClient.getEntityBundleForVersion(entityId, version, ALL_PARTS_MASK, callback);	
+				synapseJavascriptClient.getEntityBundleForVersion(entityId, version, ALL_PARTS_REQUEST, callback);	
 			}
 		}
 	}

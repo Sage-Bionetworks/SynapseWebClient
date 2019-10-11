@@ -32,7 +32,6 @@ import static org.sagebionetworks.web.client.widget.entity.controller.EntityActi
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -51,10 +50,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
-import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -68,6 +65,7 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.v2.DoiAssociation;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -181,7 +179,6 @@ public class EntityActionControllerImplTest {
 	@Mock
 	StorageLocationWidget mockStorageLocationWidget;
 	Reference selected;
-	List<AccessRequirement> accessReqs;
 	@Mock
 	EvaluationEditorModal mockEvalEditor;
 	@Mock
@@ -276,7 +273,6 @@ public class EntityActionControllerImplTest {
 		
 		parentId = "syn456";
 		entityId = "syn123";
-		accessReqs = new LinkedList<AccessRequirement>();
 		Entity table = new TableEntity();
 		table.setId(entityId);
 		table.setParentId(parentId);
@@ -293,7 +289,6 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(table);
 		entityBundle.setPermissions(permissions);
 		entityBundle.setDoiAssociation(new DoiAssociation());
-		entityBundle.setAccessRequirements(accessReqs);
 		entityBundle.setBenefactorAcl(mockACL);
 		resourceAccessSet = new HashSet<>();
 		when(mockACL.getResourceAccess()).thenReturn(resourceAccessSet);
@@ -544,7 +539,6 @@ public class EntityActionControllerImplTest {
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(file);
 		entityBundle.setPermissions(permissions);
-		entityBundle.setAccessRequirements(accessReqs);
 		entityBundle.setBenefactorAcl(mockACL);
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, true);
@@ -903,7 +897,6 @@ public class EntityActionControllerImplTest {
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(project);
 		entityBundle.setPermissions(permissions);
-		entityBundle.setAccessRequirements(accessReqs);
 		entityBundle.setBenefactorAcl(mockACL);
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		// call under test

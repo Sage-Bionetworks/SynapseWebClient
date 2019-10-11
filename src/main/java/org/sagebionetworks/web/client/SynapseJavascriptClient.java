@@ -30,7 +30,6 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -59,6 +58,7 @@ import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
@@ -81,6 +81,8 @@ import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.EntityLookupRequest;
 import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.file.AddPartResponse;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
@@ -164,6 +166,7 @@ import com.google.inject.Inject;
  *
  */
 public class SynapseJavascriptClient {
+	public static final String BUNDLE2 = "/bundle2";
 	public static final String TABLE_SNAPSHOT = "/table/snapshot";
 	public static final String SESSION = "/session";
 	public static final String TYPE_FILTER_PARAMETER = "&typeFilter=";
@@ -563,8 +566,8 @@ public class SynapseJavascriptClient {
 		}
 	}
 	
-	public void getEntityBundle(String entityId, int partsMask, final AsyncCallback<EntityBundle> callback) {
-		getEntityBundleForVersion(entityId, null, partsMask, callback);
+	public void getEntityBundle(String entityId, EntityBundleRequest request, final AsyncCallback<EntityBundle> callback) {
+		getEntityBundleForVersion(entityId, null, request, callback);
 	}
 	
 	public void populateEntityBundleCache(String entityId) {
@@ -588,7 +591,7 @@ public class SynapseJavascriptClient {
 		} else {
 			jsniUtils.consoleLog("Cache miss: " + entityId);
 		}
-		getEntityBundleForVersion(entityId, null, EntityPageTop.ALL_PARTS_MASK, new AsyncCallback<EntityBundle>() {
+		getEntityBundleForVersion(entityId, null, EntityPageTop.ALL_PARTS_REQUEST, new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle latestEntityBundle) {
 				if (!latestEntityBundle.equals(cachedBundle)) {
@@ -615,13 +618,13 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + uri;
 		doGet(url, OBJECT_TYPE.JSON, callback);
 	}
-	public void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, final AsyncCallback<EntityBundle> callback) {
+	public void getEntityBundleForVersion(String entityId, Long versionNumber, EntityBundleRequest request, final AsyncCallback<EntityBundle> callback) {
 		String url = getRepoServiceUrl() + ENTITY + "/" + entityId;
 		if (versionNumber != null) {
 			url += REPO_SUFFIX_VERSION + "/" + versionNumber;
 		}
-		url += BUNDLE_MASK_PATH + partsMask;
-		doGet(url, OBJECT_TYPE.EntityBundle, callback);
+		url += BUNDLE2;
+		doPost(url, request, OBJECT_TYPE.EntityBundle, true, callback);
 	}
 
 	public void getTeam(String teamId, final AsyncCallback<Team> callback) {
@@ -1655,5 +1658,11 @@ public class SynapseJavascriptClient {
 		};
 		listUserProfiles(userIds, profilesCallback);
 	}
+	
+	public void updateAnnotations(String entityId, Annotations annotations, AsyncCallback<Annotations> cb) {
+		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + "/annotations2";
+		doPut(url, annotations, OBJECT_TYPE.Annotations, cb);
+	}
+
 }
 
