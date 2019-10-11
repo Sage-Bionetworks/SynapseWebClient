@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -26,17 +25,17 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
@@ -91,7 +90,7 @@ public class WikiSubpagesWidgetTest {
 		when(mockWikiProject.getId()).thenReturn(entityId);
 		when(mockWikiProject.getName()).thenReturn(projectName);
 		bundle.setEntity(mockWikiProject);
-		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
 
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseJavascriptClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		wikiHeadersList = new ArrayList<V2WikiHeader>();
@@ -110,9 +109,9 @@ public class WikiSubpagesWidgetTest {
 
 	@Test
 	public void testConfigureEntityBundleFailure() throws Exception {
-		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), false, null, mockActionMenuWidget);
-		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
 
@@ -196,18 +195,18 @@ public class WikiSubpagesWidgetTest {
 	@Test
 	public void testConfigureDifferentEntity() throws Exception {
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), false, null, mockActionMenuWidget);
-		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		
 		String entityId2 = "syn9834";
 		widget.configure(new WikiPageKey(entityId2, ObjectType.ENTITY.toString(), null), false, null, mockActionMenuWidget);
-		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId2), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId2), any(EntityBundleRequest.class), any(AsyncCallback.class));
 	}
 	
 	@Test
 	public void testConfigureSameEntityViewContainsWikiPageId() throws Exception {
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), false, null, mockActionMenuWidget);
 		verify(mockView, times(2)).clear();
-		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));		
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), any(EntityBundleRequest.class), any(AsyncCallback.class));		
 		
 		//widget has been configured for this entity id, let's reconfigure with a different page (same entity)
 		String wikiPageId = "123";
@@ -229,7 +228,7 @@ public class WikiSubpagesWidgetTest {
 	public void testConfigureViewContainsWikiPageIdChangeEntityName() throws Exception {
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), false, null, mockActionMenuWidget);
 		verify(mockView, times(2)).clear();
-		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));		
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), any(EntityBundleRequest.class), any(AsyncCallback.class));		
 		verify(mockView).configure(anyList(), eq(projectName), any(Place.class), any(), anyBoolean(), any(CallbackP.class), any(ActionMenuWidget.class));
 		
 		//widget has been configured for this entity id, let's reconfigure with a different page.  same entity, but the entity name has changed.
@@ -251,7 +250,7 @@ public class WikiSubpagesWidgetTest {
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), false, null, mockActionMenuWidget);
 		
 		verify(mockView, times(2)).clear();
-		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));		
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), any(EntityBundleRequest.class), any(AsyncCallback.class));		
 		verify(mockView).configure(anyList(), eq(projectName), any(Place.class), any(), anyBoolean(), any(CallbackP.class), any(ActionMenuWidget.class));
 		
 		//widget has been configured for this entity id, let's reconfigure with a different page that's in the view.

@@ -126,9 +126,11 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			view.showPrivateIcon();
 		}
 		
-		Map<String,AnnotationsValue> annotationsMap = annotations.getAnnotations();
-		if (!annotationsMap.isEmpty()) {
-			view.setAnnotations(getAnnotationsHTML(annotationsMap));
+		if (annotations != null) {
+			Map<String,AnnotationsValue> annotationsMap = annotations.getAnnotations();
+			if (!annotationsMap.isEmpty()) {
+				view.setAnnotations(getAnnotationsHTML(annotationsMap));
+			}
 		}
 		if (eb.getEntity() instanceof Link && eb.getPermissions().getCanDelete()) {
 			view.showUnlinkIcon();

@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -14,10 +13,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
@@ -28,15 +27,16 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.AccessControlList;
-import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ResourceAccess;
+import org.sagebionetworks.repo.model.annotation.v2.Annotations;
+import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -52,12 +52,9 @@ import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
-import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
-import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
@@ -89,7 +86,7 @@ public class EntityBadgeTest {
 	EntityBadge widget;
 	AnnotationTransformer mockTransformer;
 	String rootWikiKeyId;
-	List<Annotation> annotationList;
+	Map<String, AnnotationsValue> annotationsMap;
 	Annotations annotations;
 	UserEntityPermissions mockPermissions;
 	AccessControlList mockBenefactorAcl;
@@ -140,12 +137,6 @@ public class EntityBadgeTest {
 		
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockSynapseProperties.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
-		annotationList = new ArrayList<Annotation>();
-		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, KEY1, Collections.EMPTY_LIST));
-		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, KEY2, Collections.singletonList(VALUE2)));
-		annotationList.add(new Annotation(ANNOTATION_TYPE.LONG, KEY3, Collections.singletonList(VALUE3)));
-		when(mockTransformer.annotationsToList(any(Annotations.class))).thenReturn(annotationList);
-		when(mockTransformer.getFriendlyValues(any(Annotation.class))).thenReturn(TRANSFORMED_FRIENDLY_VALUE);
 		rootWikiKeyId = "123";
 		when(mockView.isAttached()).thenReturn(true);
 		entityThreadCount = 0L;
@@ -154,6 +145,7 @@ public class EntityBadgeTest {
 		when(mockBenefactorAcl.getResourceAccess()).thenReturn(resourceAccessSet);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).addFileToDownloadList(anyString(), anyString(), any(AsyncCallback.class));
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(USER_ID);
+		annotationsMap = new HashMap<String, AnnotationsValue>();
 	}
 	
 	private EntityBundle setupEntity(Entity entity) {
@@ -262,18 +254,19 @@ public class EntityBadgeTest {
 	
 	@Test
 	public void testAnnotationsEmpty() throws Exception {
-		annotationList.clear();
-		String result = widget.getAnnotationsHTML(annotationList);
+		String result = widget.getAnnotationsHTML(annotationsMap);
 		assertTrue("".equals(result));
 	}
 	
 	@Test
 	public void testAnnotations() throws Exception {
-		String result = widget.getAnnotationsHTML(annotationList);
+		annotationsMap.put(KEY1, new AnnotationsValue());
+		annotationsMap.put(KEY2, new AnnotationsValue());
+		annotationsMap.put(KEY3, new AnnotationsValue());
+		String result = widget.getAnnotationsHTML(annotationsMap);
 		assertTrue(result.contains(KEY1));
 		assertTrue(result.contains(KEY2));
 		assertTrue(result.contains(KEY3));
-		assertTrue(result.contains(TRANSFORMED_FRIENDLY_VALUE));
 	}
 
 	@Test

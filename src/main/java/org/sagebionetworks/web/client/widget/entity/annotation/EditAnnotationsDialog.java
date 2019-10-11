@@ -92,6 +92,7 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 	public void onCancel() {
 		view.hideEditor();	
 	};
+	
 	@Override
 	public void onSave() {
 		//check all annotation editor validity

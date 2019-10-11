@@ -23,8 +23,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationCellFactory;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditorView;
-import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
-import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 
 import com.google.gwt.event.dom.client.KeyCodes;
