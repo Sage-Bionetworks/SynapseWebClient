@@ -35,6 +35,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
+import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValueType;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
@@ -68,8 +69,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class EntityBadgeTest {
 
 	private static final String TRANSFORMED_FRIENDLY_VALUE = "friendly value";
-	private static final String VALUE3 = "42";
-	private static final String VALUE2 = "foo";
 	private static final String KEY3 = "key3";
 	private static final String KEY1 = "key1";
 	private static final String KEY2 = "key2";
@@ -146,6 +145,7 @@ public class EntityBadgeTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).addFileToDownloadList(anyString(), anyString(), any(AsyncCallback.class));
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(USER_ID);
 		annotationsMap = new HashMap<String, AnnotationsValue>();
+		when(mockTransformer.getFriendlyValues(any(AnnotationsValue.class))).thenReturn(TRANSFORMED_FRIENDLY_VALUE);
 	}
 	
 	private EntityBundle setupEntity(Entity entity) {
@@ -260,9 +260,12 @@ public class EntityBadgeTest {
 	
 	@Test
 	public void testAnnotations() throws Exception {
-		annotationsMap.put(KEY1, new AnnotationsValue());
-		annotationsMap.put(KEY2, new AnnotationsValue());
-		annotationsMap.put(KEY3, new AnnotationsValue());
+		AnnotationsValue value = new AnnotationsValue();
+		value.setType(AnnotationsValueType.STRING);
+		value.setValue(Collections.EMPTY_LIST);
+		annotationsMap.put(KEY1, value);
+		annotationsMap.put(KEY2, value);
+		annotationsMap.put(KEY3, value);
 		String result = widget.getAnnotationsHTML(annotationsMap);
 		assertTrue(result.contains(KEY1));
 		assertTrue(result.contains(KEY2));

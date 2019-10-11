@@ -68,6 +68,7 @@ import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -189,7 +190,6 @@ public class SynapseClientImplTest {
 	public static final String USER_ID = "900";
 	UserProfile inviteeUserProfile;
 	ExampleEntity entity;
-	Annotations annos;
 	UserEntityPermissions eup;
 	UserEvaluationPermissions userEvaluationPermissions;
 	List<EntityHeader> batchHeaderResults;
@@ -304,12 +304,6 @@ public class SynapseClientImplTest {
 		entity.setModifiedBy(testUserId);
 		// the mock synapse should return this object
 		when(mockSynapse.getEntityById(entityId)).thenReturn(entity);
-		// Setup the annotations
-		annos = new Annotations();
-		annos.setId(entityId);
-		annos.addAnnotation("string", "a string value");
-		// the mock synapse should return this object
-		when(mockSynapse.getAnnotations(entityId)).thenReturn(annos);
 		// Setup the Permissions
 		eup = new UserEntityPermissions();
 		eup.setCanDelete(true);
@@ -405,21 +399,12 @@ public class SynapseClientImplTest {
 		int emptyMask = 0;
 		EntityBundle bundle = new EntityBundle();
 		bundle.setEntity(entity);
-		bundle.setAnnotations(annos);
 		bundle.setPermissions(eup);
 		bundle.setPath(path);
 		bundle.setHasChildren(false);
-		bundle.setAccessRequirements(accessRequirements);
-		bundle.setUnmetAccessRequirements(accessRequirements);
 		bundle.setBenefactorAcl(acl);
-		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(mask)))
+		when(mockSynapse.getEntityBundleV2(anyString(), any(EntityBundleRequest.class)))
 				.thenReturn(bundle);
-		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL)))
-				.thenReturn(bundle);
-
-		EntityBundle emptyBundle = new EntityBundle();
-		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(emptyMask)))
-				.thenReturn(emptyBundle);
 
 		when(mockSynapse.canAccess("syn101", ACCESS_TYPE.READ))
 				.thenReturn(true);
@@ -597,32 +582,12 @@ public class SynapseClientImplTest {
 
 
 	@Test
-	public void testGetEntityBundleAll() throws RestServiceException {
+	public void testGetEntityBundleAll() throws SynapseException, RestServiceException {
 		// Make sure we can get all parts of the bundel
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH
-				| HAS_CHILDREN;
-		EntityBundle bundle = synapseClient.getEntityBundle(entityId, mask);
-		assertNotNull(bundle);
-		// We should have all of the strings
-		assertNotNull(bundle.getEntity());
-		assertNotNull(bundle.getAnnotations());
-		assertNotNull(bundle.getPath());
-		assertNotNull(bundle.getPermissions());
-		assertNotNull(bundle.getHasChildren());
-	}
-
-	@Test
-	public void testGetEntityBundleNone() throws RestServiceException {
-		// Make sure all are null
-		int mask = 0x0;
-		EntityBundle bundle = synapseClient.getEntityBundle(entityId, mask);
-		assertNotNull(bundle);
-		// We should have all of the strings
-		assertNull(bundle.getEntity());
-		assertNull(bundle.getAnnotations());
-		assertNull(bundle.getPath());
-		assertNull(bundle.getPermissions());
-		assertNull(bundle.getHasChildren());
+		EntityBundleRequest request = new EntityBundleRequest();
+		EntityBundle bundle = synapseClient.getEntityBundle(entityId, request);
+		
+		verify(mockSynapse).getEntityBundleV2(entityId, request);
 	}
 
 	@Test
@@ -654,7 +619,7 @@ public class SynapseClientImplTest {
 	public void testGetEntityBenefactorAcl() throws Exception {
 		EntityBundle bundle = new EntityBundle();
 		bundle.setBenefactorAcl(acl);
-		when(mockSynapse.getEntityBundle("syn101", EntityBundle.BENEFACTOR_ACL))
+		when(mockSynapse.getEntityBundleV2(anyString(), any(EntityBundleRequest.class)))
 				.thenReturn(bundle);
 		AccessControlList clone = synapseClient
 				.getEntityBenefactorAcl("syn101");
@@ -678,7 +643,7 @@ public class SynapseClientImplTest {
 	public void testDeleteAcl() throws Exception {
 		EntityBundle bundle = new EntityBundle();
 		bundle.setBenefactorAcl(acl);
-		when(mockSynapse.getEntityBundle("syn101", EntityBundle.BENEFACTOR_ACL))
+		when(mockSynapse.getEntityBundleV2(eq("syn101"), any(EntityBundleRequest.class)))
 				.thenReturn(bundle);
 		AccessControlList clone = synapseClient.deleteAcl("syn101");
 		assertEquals(acl, clone);
@@ -1693,8 +1658,8 @@ public class SynapseClientImplTest {
 		Entity file = new FileEntity();
 		eb.setEntity(file);
 		eb.getEntity().setId(entityId);
-		when(mockSynapse.getEntityBundle(anyString(), anyInt())).thenReturn(eb);
-		when(mockSynapse.getEntityBundle(anyString(), anyLong(), anyInt())).thenReturn(eb);
+		when(mockSynapse.getEntityBundleV2(anyString(), any(EntityBundleRequest.class))).thenReturn(eb);
+		when(mockSynapse.getEntityBundleV2(anyString(), anyLong(), any(EntityBundleRequest.class))).thenReturn(eb);
 		PaginatedResults<VersionInfo> versionInfoPaginatedResults = new PaginatedResults<VersionInfo>();
 		List<VersionInfo> versionInfoList = new LinkedList<VersionInfo>();
 		VersionInfo versionInfo = new VersionInfo();
