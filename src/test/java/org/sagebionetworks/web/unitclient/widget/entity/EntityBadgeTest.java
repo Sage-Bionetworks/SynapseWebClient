@@ -86,7 +86,8 @@ public class EntityBadgeTest {
 	AnnotationTransformer mockTransformer;
 	String rootWikiKeyId;
 	Map<String, AnnotationsValue> annotationsMap;
-	Annotations annotations;
+	@Mock
+	Annotations mockAnnotations;
 	UserEntityPermissions mockPermissions;
 	AccessControlList mockBenefactorAcl;
 	@Mock
@@ -145,13 +146,14 @@ public class EntityBadgeTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).addFileToDownloadList(anyString(), anyString(), any(AsyncCallback.class));
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(USER_ID);
 		annotationsMap = new HashMap<String, AnnotationsValue>();
+		when(mockAnnotations.getAnnotations()).thenReturn(annotationsMap);
 		when(mockTransformer.getFriendlyValues(any(AnnotationsValue.class))).thenReturn(TRANSFORMED_FRIENDLY_VALUE);
 	}
 	
 	private EntityBundle setupEntity(Entity entity) {
 		EntityBundle bundle = mock(EntityBundle.class);
 		when(bundle.getEntity()).thenReturn(entity);
-//		when(bundle.getAnnotations()).thenReturn(value);
+		when(bundle.getAnnotations()).thenReturn(mockAnnotations);
 		when(bundle.getPermissions()).thenReturn(mockPermissions);
 		when(bundle.getBenefactorAcl()).thenReturn(mockBenefactorAcl);
 		when(bundle.getRootWikiId()).thenReturn(rootWikiKeyId);
@@ -188,6 +190,7 @@ public class EntityBadgeTest {
 		testProject.setId(entityId);
 		entityThreadCount = 0L;
 		setupEntity(testProject);
+		setupAnnotations();
 		
 		//configure
 		configure();
@@ -213,6 +216,8 @@ public class EntityBadgeTest {
 		when(mockPublicPrincipalIds.isPublic(anyLong())).thenReturn(true);
 		entityThreadCount = 1L;
 		setupEntity(testFile);
+		setupAnnotations();
+		
 		configure();
 		widget.getEntityBundle();
 		
@@ -258,14 +263,18 @@ public class EntityBadgeTest {
 		assertTrue("".equals(result));
 	}
 	
-	@Test
-	public void testAnnotations() throws Exception {
+	private void setupAnnotations() {
 		AnnotationsValue value = new AnnotationsValue();
 		value.setType(AnnotationsValueType.STRING);
 		value.setValue(Collections.EMPTY_LIST);
 		annotationsMap.put(KEY1, value);
 		annotationsMap.put(KEY2, value);
 		annotationsMap.put(KEY3, value);
+	}
+	
+	@Test
+	public void testAnnotations() throws Exception {
+		setupAnnotations();
 		String result = widget.getAnnotationsHTML(annotationsMap);
 		assertTrue(result.contains(KEY1));
 		assertTrue(result.contains(KEY2));
