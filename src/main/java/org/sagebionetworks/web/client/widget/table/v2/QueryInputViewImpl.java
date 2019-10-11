@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Divider;
@@ -7,9 +8,15 @@ import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.InfoAlert;
+import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -24,7 +31,7 @@ import com.google.inject.Inject;
  */
 public class QueryInputViewImpl implements QueryInputView{
 
-	public static final String REST_DOC_URL = "https://api-docs.synapse.org/rest/org/sagebionetworks/repo/web/controller/TableExamples.html";
+	public static final String REST_DOC_URL = "http://rest.synapse.org/org/sagebionetworks/repo/web/controller/TableExamples.html";
 
 	public interface Binder extends UiBinder<HTMLPanel, QueryInputViewImpl> {
 	}
