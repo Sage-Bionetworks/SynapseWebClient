@@ -278,6 +278,7 @@ public class EntityActionControllerImplTest {
 		table.setParentId(parentId);
 		permissions = new UserEntityPermissions();
 		permissions.setCanChangePermissions(true);
+		permissions.setCanView(true);
 		permissions.setCanDelete(true);
 		permissions.setCanPublicRead(true);
 		permissions.setCanUpload(true);
