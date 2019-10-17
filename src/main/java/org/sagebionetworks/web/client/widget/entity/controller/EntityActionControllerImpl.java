@@ -429,17 +429,17 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	private void configureStatisticsPlotAction() {
 		if (entityBundle.getEntity() instanceof Project) {
-			// is a project, if the current user has admin privileges then show command
+			// is a project, if the current user can view then show the command
 			// TODO: remove alpha mode check
 			boolean isAlphaMode = DisplayUtils.isInTestWebsite(cookies);
-			boolean canChangePermissions = entityBundle.getPermissions().getCanChangePermissions();
-			actionMenu.setActionVisible(Action.SHOW_PROJECT_STATS, canChangePermissions && isAlphaMode);
+			boolean canView = entityBundle.getPermissions().getCanView();
+			actionMenu.setActionVisible(Action.SHOW_PROJECT_STATS, canView && isAlphaMode);
 			actionMenu.setActionListener(Action.SHOW_PROJECT_STATS, this);
 		} else {
 			actionMenu.setActionVisible(Action.SHOW_PROJECT_STATS, false);
 		}
-
 	}
+
 	private void configureAddExternalDockerRepo() {
 		if (entityBundle.getEntity() instanceof Project && EntityArea.DOCKER.equals(currentArea)) {
 			actionMenu.setActionVisible(Action.CREATE_EXTERNAL_DOCKER_REPO, entityBundle.getPermissions().getCanCertifiedUserEdit());
