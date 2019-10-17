@@ -9,7 +9,6 @@
 		dataBackdrop="STATIC" dataKeyboard="true" b:id="confirmUnsubscribeUI">
 		<b:ModalBody>
 			<bh:Paragraph addStyleNames="margin-top-10">
-				<bh:Div ui:field="synAlertContainer" />
 				It looks like the primary email address associated to your account is no longer valid.
 				Please update your primary email address to continue to receive:
 				<bh:UnorderedList>
