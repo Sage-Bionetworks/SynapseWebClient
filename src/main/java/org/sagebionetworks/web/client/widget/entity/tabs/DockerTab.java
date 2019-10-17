@@ -111,7 +111,7 @@ public class DockerTab implements DockerTabView.Presenter{
 		view.setBreadcrumbVisible(false);
 		view.setDockerRepoListVisible(false);
 		view.clearDockerRepoWidget();
-		view.setDockerRepoWidgetVisible(false);
+		view.setDockerRepoUIVisible(false);
 	}
 	
 	public void showError(Throwable error) {
@@ -129,8 +129,7 @@ public class DockerTab implements DockerTabView.Presenter{
 			boolean isProject = entity instanceof Project;
 			view.setBreadcrumbVisible(isRepo);
 			view.setDockerRepoListVisible(isProject);
-			view.setDockerRepoWidgetVisible(isRepo);
-			view.setDockerActionMenuVisible(isRepo);
+			view.setDockerRepoUIVisible(isRepo);
 			if (isRepo) {
 				tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(bundle.getEntity().getId(), null, null, null));
 				List<LinkData> links = new ArrayList<LinkData>();

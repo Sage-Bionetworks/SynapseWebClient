@@ -116,7 +116,7 @@ public class TablesTabViewImpl implements TablesTabView {
 		tableModifiedAndCreatedContainer.setWidget(modifiedCreatedBy);		
 	}
 	@Override
-	public void setProvenanceVisible(boolean visible) {
+	public void setTableUIVisible(boolean visible) {
 		provenanceContainer.setVisible(visible);
 	}
 	@Override

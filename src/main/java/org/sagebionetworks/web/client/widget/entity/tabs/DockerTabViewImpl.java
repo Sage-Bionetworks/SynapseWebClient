@@ -66,7 +66,7 @@ public class DockerTabViewImpl implements DockerTabView {
 	}
 
 	@Override
-	public void setDockerRepoWidgetVisible(boolean visible) {
+	public void setDockerRepoUIVisible(boolean visible) {
 		dockerRepoWidgetContainer.setVisible(visible);
 	}
 

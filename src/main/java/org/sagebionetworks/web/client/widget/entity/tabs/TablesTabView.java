@@ -21,5 +21,5 @@ public interface TablesTabView extends IsWidget {
 	void clearActionMenuContainer();
 	void setModifiedCreatedBy(IsWidget modifiedCreatedBy);
 	void setProvenance(IsWidget w);
-	void setProvenanceVisible(boolean visible);
+	void setTableUIVisible(boolean visible);
 }

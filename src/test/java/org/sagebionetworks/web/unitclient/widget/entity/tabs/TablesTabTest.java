@@ -246,7 +246,7 @@ public class TablesTabTest {
 		String provEntityList = provConfig.get(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY);
 		String expectedProvEntityList = DisplayUtils.createEntityVersionString(mockTableEntityBundle.getEntity().getId(), version);
 		assertEquals(expectedProvEntityList, provEntityList);
-		verify(mockView).setProvenanceVisible(true);
+		verify(mockView).setTableUIVisible(true);
 		verify(mockView).setEntityMetadataVisible(true);
 		verify(mockView).setBreadcrumbVisible(true);
 		verify(mockView).setTableListVisible(false);
@@ -287,8 +287,8 @@ public class TablesTabTest {
 		verify(mockView).clearActionMenuContainer();
 		verify(mockView).clearTableEntityWidget();
 		verify(mockModifiedCreatedBy).setVisible(false);
-		verify(mockView).setProvenanceVisible(false);
-		verify(mockView, never()).setProvenanceVisible(true);
+		verify(mockView).setTableUIVisible(false);
+		verify(mockView, never()).setTableUIVisible(true);
 		
 		verify(mockTableListWidget).configure(mockProjectEntityBundle);
 		
@@ -444,7 +444,7 @@ public class TablesTabTest {
 		verify(mockView).clearTableEntityWidget();
 		verify(mockView).clearActionMenuContainer();
 		verify(mockModifiedCreatedBy).setVisible(false);
-		verify(mockView).setProvenanceVisible(false);
+		verify(mockView).setTableUIVisible(false);
 	}
 
 	@Test

@@ -200,7 +200,7 @@ public class DockerTabTest {
 		verify(mockTab).showTab();
 		verify(mockView).setBreadcrumbVisible(true);
 		verify(mockView, times(2)).setDockerRepoListVisible(false);
-		verify(mockView).setDockerRepoWidgetVisible(true);
+		verify(mockView).setDockerRepoUIVisible(true);
 		verify(mockView, atLeastOnce()).clearDockerRepoWidget();
 		ArgumentCaptor<List> listCaptor = ArgumentCaptor.forClass(List.class);
 		verify(mockBreadcrumb).configure(listCaptor.capture(), eq(dockerRepoName));
@@ -228,7 +228,7 @@ public class DockerTabTest {
 		tab.resetView();
 		verify(mockView).setBreadcrumbVisible(false);
 		verify(mockView).setDockerRepoListVisible(false);
-		verify(mockView).setDockerRepoWidgetVisible(false);
+		verify(mockView).setDockerRepoUIVisible(false);
 		verify(mockView).clearDockerRepoWidget();
 		verify(mockSynAlert, never()).handleException(any(Throwable.class));
 	}

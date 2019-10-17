@@ -13,7 +13,7 @@ public interface FilesTabView extends IsWidget {
 	void setPreview(Widget w);
 	void setProvenance(Widget w);
 	void setMetadata(Widget w);
-	void setMetadataVisible(boolean visible);
+	void setFileFolderUIVisible(boolean visible);
 	void setActionMenu(Widget w);
 	void setWikiPage(Widget w);
 	void setSynapseAlert(Widget w);

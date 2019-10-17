@@ -30,11 +30,9 @@ import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
-import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.EntityRefreshAlert;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -141,7 +139,7 @@ public class FilesTab {
 			view.setFileTitlebarVisible(false);
 			view.setFolderTitlebarVisible(false);
 			view.setPreviewVisible(false);
-			view.setMetadataVisible(false);
+			view.setFileFolderUIVisible(false);
 			view.setWikiPageWidgetVisible(false);
 			view.setFileBrowserVisible(false);
 			view.clearActionMenuContainer();
@@ -241,10 +239,9 @@ public class FilesTab {
 		}
 		
 		//Metadata
-		boolean isMetadataVisible = isFile || isFolder;
-		view.setMetadataVisible(isMetadataVisible);
-		view.setActionMenuVisible(isMetadataVisible);
-		if (isMetadataVisible) {
+		boolean isFileOrFolder = isFile || isFolder;
+		view.setFileFolderUIVisible(isFileOrFolder);
+		if (isFileOrFolder) {
 			metadata.configure(bundle, versionNumber, tab.getEntityActionMenu());
 			boolean isCurrentVersion = versionNumber == null;
 			tab.configureEntityActionController(bundle, isCurrentVersion, null);

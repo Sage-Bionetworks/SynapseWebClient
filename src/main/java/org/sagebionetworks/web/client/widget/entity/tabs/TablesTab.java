@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -24,11 +24,9 @@ import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
-import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
@@ -179,7 +177,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			view.clearActionMenuContainer();
 			view.clearTableEntityWidget();
 			modifiedCreatedBy.setVisible(false);
-			view.setProvenanceVisible(false);
+			view.setTableUIVisible(false);
 		}
 	}
 	
@@ -202,8 +200,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		view.clearActionMenuContainer();
 		view.clearTableEntityWidget();
 		modifiedCreatedBy.setVisible(false);
-		view.setProvenanceVisible(isTable);
-		view.setActionMenuVisible(isTable);
+		view.setTableUIVisible(isTable);
 		if (isTable) {
 			updateVersionAndAreaToken(entity.getId(), version, areaToken);
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);

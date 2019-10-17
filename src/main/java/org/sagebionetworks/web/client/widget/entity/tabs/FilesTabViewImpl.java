@@ -167,7 +167,7 @@ public class FilesTabViewImpl implements FilesTabView {
 		fileMetadataContainer.setWidget(w);		
 	}
 	@Override
-	public void setMetadataVisible(boolean visible) {
+	public void setFileFolderUIVisible(boolean visible) {
 		fileMetadataContainer.setVisible(visible);
 	}
 	@Override

@@ -222,7 +222,7 @@ public class FilesTabTest {
 		verify(mockView, times(2)).setFileTitlebarVisible(false);
 		verify(mockView, times(2)).setFolderTitlebarVisible(false);
 		verify(mockView, times(2)).setPreviewVisible(false);
-		verify(mockView, times(2)).setMetadataVisible(false);
+		verify(mockView, times(2)).setFileFolderUIVisible(false);
 		verify(mockView, times(2)).setWikiPageWidgetVisible(false);
 		
 		//note: breadcrumbs are not shown on the project level
@@ -276,8 +276,8 @@ public class FilesTabTest {
 		verify(mockView, times(2)).setFolderTitlebarVisible(false);
 		verify(mockView).setPreviewVisible(false);
 		verify(mockView).setPreviewVisible(true);
-		verify(mockView).setMetadataVisible(false);
-		verify(mockView).setMetadataVisible(true);
+		verify(mockView).setFileFolderUIVisible(false);
+		verify(mockView).setFileFolderUIVisible(true);
 		verify(mockView).setWikiPageWidgetVisible(false);
 		verify(mockView).setWikiPageWidgetVisible(true);
 		
@@ -330,8 +330,8 @@ public class FilesTabTest {
 		verify(mockView).setFolderTitlebarVisible(false);
 		verify(mockView).setFolderTitlebarVisible(true);
 		verify(mockView, times(2)).setPreviewVisible(false);
-		verify(mockView).setMetadataVisible(false);
-		verify(mockView).setMetadataVisible(true);
+		verify(mockView).setFileFolderUIVisible(false);
+		verify(mockView).setFileFolderUIVisible(true);
 		verify(mockView).setWikiPageWidgetVisible(false);
 		verify(mockView).setWikiPageWidgetVisible(true);
 
@@ -389,7 +389,7 @@ public class FilesTabTest {
 		verify(mockView).setFileTitlebarVisible(false);
 		verify(mockView).setFolderTitlebarVisible(false);
 		verify(mockView).setPreviewVisible(false);
-		verify(mockView).setMetadataVisible(false);
+		verify(mockView).setFileFolderUIVisible(false);
 		verify(mockView).setWikiPageWidgetVisible(false);
 		verify(mockView).setFileBrowserVisible(false);
 		verify(mockView).clearActionMenuContainer();
