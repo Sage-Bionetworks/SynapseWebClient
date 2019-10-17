@@ -74,7 +74,6 @@ import org.sagebionetworks.repo.model.principal.AliasCheckRequest;
 import org.sagebionetworks.repo.model.principal.AliasCheckResponse;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
-import org.sagebionetworks.repo.model.principal.NotificationEmail;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.project.ProjectSettingsType;
@@ -373,20 +372,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			synapseClient.addEmail(emailValidationSignedToken, true);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public String getNotificationEmail() throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			NotificationEmail notificationEmail = synapseClient.getNotificationEmail();
-			if (notificationEmail != null) {
-				return notificationEmail.getEmail(); 
-			}
-			return null;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

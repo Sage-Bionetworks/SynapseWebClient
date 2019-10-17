@@ -54,6 +54,7 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestinationInstanceFactory;
+import org.sagebionetworks.repo.model.principal.NotificationEmail;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
 import org.sagebionetworks.repo.model.provenance.Activity;
@@ -133,6 +134,7 @@ public class SynapseJavascriptFactory {
 		Activity,
 		Annotations,
 		MultipartUploadStatus,
+		NotificationEmail,
 		BatchPresignedUploadUrlResponse,
 		AddPartResponse,
 		PaginatedResultsTotalNumberOfResults,
@@ -399,6 +401,8 @@ public class SynapseJavascriptFactory {
 			return new Activity(json);
 		case Annotations:
 			return new Annotations(json);
+		case NotificationEmail:
+			return new NotificationEmail(json);
 		case MultipartUploadStatus : 
 			return new MultipartUploadStatus(json);
 		case BatchPresignedUploadUrlResponse :

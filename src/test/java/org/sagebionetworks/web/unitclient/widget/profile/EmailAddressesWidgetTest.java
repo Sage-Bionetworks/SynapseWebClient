@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.principal.NotificationEmail;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -48,6 +49,8 @@ public class EmailAddressesWidgetTest {
 	UserProfile mockUserProfile;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	NotificationEmail mockNotificationEmail;
 	List<String> userEmails;
 	public static final String USER_ID = "982";
 	public static final String EMAIL1 = "one@one.com";
@@ -70,7 +73,8 @@ public class EmailAddressesWidgetTest {
 		userEmails.add(EMAIL2);
 		when(mockUserProfile.getEmails()).thenReturn(userEmails);
 		when(mockUserProfile.getOwnerId()).thenReturn(USER_ID);
-		AsyncMockStubber.callSuccessWith(EMAIL1).when(mockSynapseClient).getNotificationEmail(any(AsyncCallback.class));
+		when(mockNotificationEmail.getEmail()).thenReturn(EMAIL1);
+		AsyncMockStubber.callSuccessWith(mockNotificationEmail).when(mockSynapseJavascriptClient).getNotificationEmail(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setNotificationEmail(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).removeEmail(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
@@ -82,7 +86,7 @@ public class EmailAddressesWidgetTest {
 	public void testConfigure() {
 		widget.configure(mockUserProfile);
 		
-		verify(mockSynapseClient).getNotificationEmail(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getNotificationEmail(any(AsyncCallback.class));
 		verify(mockView).clearEmails();
 		verify(mockSynAlert).clear();
 		verify(mockView).setLoadingVisible(true);
@@ -96,10 +100,10 @@ public class EmailAddressesWidgetTest {
 	@Test
 	public void testConfigureFailure() {
 		Exception ex = new Exception("failed");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getNotificationEmail(any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getNotificationEmail(any(AsyncCallback.class));
 		widget.configure(mockUserProfile);
 		
-		verify(mockSynapseClient).getNotificationEmail(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getNotificationEmail(any(AsyncCallback.class));
 		verify(mockView).clearEmails();
 		verify(mockSynAlert).clear();
 		verify(mockView).setLoadingVisible(true);

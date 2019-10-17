@@ -101,6 +101,7 @@ import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.principal.AliasList;
+import org.sagebionetworks.repo.model.principal.NotificationEmail;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
@@ -1662,6 +1663,11 @@ public class SynapseJavascriptClient {
 	public void updateAnnotations(String entityId, Annotations annotations, AsyncCallback<Annotations> cb) {
 		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + "/annotations2";
 		doPut(url, annotations, OBJECT_TYPE.Annotations, cb);
+	}
+
+	public Request getNotificationEmail(AsyncCallback<NotificationEmail> cb) {
+		String url = getRepoServiceUrl() + "/notificationEmail";
+		return doGet(url, OBJECT_TYPE.NotificationEmail, cb);
 	}
 
 }

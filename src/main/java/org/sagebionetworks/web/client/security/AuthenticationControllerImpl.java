@@ -8,6 +8,9 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
+import org.sagebionetworks.repo.model.principal.EmailQuarantineReason;
+import org.sagebionetworks.repo.model.principal.EmailQuarantineStatus;
+import org.sagebionetworks.repo.model.principal.NotificationEmail;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DateTimeUtilsImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -143,6 +146,23 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		});
 	}
 	
+	public void checkForQuarantinedEmail() {
+		ginInjector.getSynapseJavascriptClient().getNotificationEmail(new AsyncCallback<NotificationEmail>() {
+			@Override
+			public void onSuccess(NotificationEmail notificationEmailStatus) {
+				EmailQuarantineStatus status = notificationEmailStatus.getQuarantineStatus();
+				if (status != null && EmailQuarantineReason.PERMANENT_BOUNCE.equals(status.getReason())) {
+					ginInjector.getQuarantinedEmailModal().show(status.getReasonDetails());
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				jsniUtils.consoleError(caught);
+			}
+		});
+	}
+	
 	@Override
 	public void logoutUser() {
 		// terminate the session, remove the cookie
@@ -217,6 +237,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 							public void onSuccess(UserProfile result) {
 								// we've reinitialized the app with the correct session, refresh the page (do not get rid of js state)!
 								ginInjector.getGlobalApplicationState().refreshPage();
+								checkForQuarantinedEmail();
 							}
 						});
 					}
