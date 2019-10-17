@@ -24,6 +24,9 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.repo.model.principal.EmailQuarantineReason;
+import org.sagebionetworks.repo.model.principal.EmailQuarantineStatus;
+import org.sagebionetworks.repo.model.principal.NotificationEmail;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -36,6 +39,7 @@ import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.QuarantinedEmailModal;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -75,6 +79,12 @@ public class AuthenticationControllerImplTest {
 	AsyncCallback<UserProfile> mockUserProfileCallback;
 	@Captor
 	ArgumentCaptor<Place> placeCaptor;
+	@Mock
+	NotificationEmail mockNotificationEmail;
+	@Mock
+	QuarantinedEmailModal mockQuarantinedEmailModal;
+	@Mock
+	EmailQuarantineStatus mockEmailQuarantineStatus;
 	UserProfile profile;
 	UserSessionData usd;
 	public static final String USER_ID = "98208";
@@ -95,12 +105,15 @@ public class AuthenticationControllerImplTest {
 		session.setAcceptsTermsOfUse(true);
 		usd.setSession(session);
 		AsyncMockStubber.callSuccessWith(usd).when(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockNotificationEmail).when(mockJsClient).getNotificationEmail(any(AsyncCallback.class));
 		when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
 		authenticationController = new AuthenticationControllerImpl(mockUserAccountService, mockClientCache, mockCookieProvider, mockGinInjector, mockSynapseJSNIUtils);
 		when(mockGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockGinInjector.getHeader()).thenReturn(mockHeader);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockGinInjector.getSessionDetector()).thenReturn(mockSessionDetector);
+		when(mockGinInjector.getQuarantinedEmailModal()).thenReturn(mockQuarantinedEmailModal);
+		when(mockNotificationEmail.getQuarantineStatus()).thenReturn(mockEmailQuarantineStatus);
 	}
 	
 	@Test
@@ -219,4 +232,33 @@ public class AuthenticationControllerImplTest {
 	}
 		
 	// Note.  If login when the stack is in READ_ONLY mode, then the widgets SynapseAlert should send user to the Down page.
+	
+	@Test
+	public void testCheckForQuarantinedEmailNullStatus() {
+		when(mockNotificationEmail.getQuarantineStatus()).thenReturn(null);
+		
+		authenticationController.checkForQuarantinedEmail();
+		
+		verify(mockQuarantinedEmailModal, never()).show(anyString());
+	}
+	
+	@Test
+	public void testCheckForQuarantinedEmailTransientBounceStatus() {
+		when(mockEmailQuarantineStatus.getReason()).thenReturn(EmailQuarantineReason.TRANSIENT_BOUNCE);
+		
+		authenticationController.checkForQuarantinedEmail();
+		
+		verify(mockQuarantinedEmailModal, never()).show(anyString());
+	}
+	
+	@Test
+	public void testCheckForQuarantinedEmailPermanentBounceStatus() {
+		String detailedReason = "server does not recognize this email address";
+		when(mockEmailQuarantineStatus.getReason()).thenReturn(EmailQuarantineReason.PERMANENT_BOUNCE);
+		when(mockEmailQuarantineStatus.getReasonDetails()).thenReturn(detailedReason);
+		
+		authenticationController.checkForQuarantinedEmail();
+		
+		verify(mockQuarantinedEmailModal).show(detailedReason);
+	}
 }
