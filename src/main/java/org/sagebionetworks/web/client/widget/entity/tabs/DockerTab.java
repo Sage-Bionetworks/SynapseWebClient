@@ -34,13 +34,14 @@ public class DockerTab implements DockerTabView.Presenter{
 	Breadcrumb breadcrumb;
 	PortalGinInjector ginInjector;
 	StuAlert synAlert;
-	ActionMenuWidget actionMenu;
-
+	
 	EntityBundle projectBundle;
 	Throwable projectBundleLoadError;
 	String projectEntityId;
 	String areaToken;
 	CallbackP<String> entitySelectedCallback;
+	
+	//TODO: add action menu to view!
 	
 	@Inject
 	public DockerTab(
@@ -48,7 +49,7 @@ public class DockerTab implements DockerTabView.Presenter{
 			PortalGinInjector ginInjector) {
 		this.tab = tab;
 		this.ginInjector = ginInjector;
-		tab.configure(DOCKER_TAB_TITLE, "A [Docker](https://www.docker.com/what-docker) container is a convenient way to bundle up code and dependencies into a lightweight virtual machine to support reusable and reproducible analysis.", WebConstants.DOCS_URL + "docker.html");
+		tab.configure(DOCKER_TAB_TITLE, "A [Docker](https://www.docker.com/what-docker) container is a convenient way to bundle up code and dependencies into a lightweight virtual machine to support reusable and reproducible analysis.", WebConstants.DOCS_URL + "docker.html", EntityArea.DOCKER);
 
 		// Necessary for "beta" badge.  Remove when bringing out of beta.
 		tab.addTabListItemStyle("min-width-150");
@@ -87,9 +88,8 @@ public class DockerTab implements DockerTabView.Presenter{
 		tab.addTabClickedCallback(onClickCallback);
 	}
 
-	public void configure(EntityBundle entityBundle, String areaToken, ActionMenuWidget actionMenu) {
+	public void configure(EntityBundle entityBundle, String areaToken) {
 		lazyInject();
-		this.actionMenu = actionMenu;
 		this.areaToken = areaToken;
 		synAlert.clear();
 		setTargetBundle(entityBundle);
@@ -130,6 +130,7 @@ public class DockerTab implements DockerTabView.Presenter{
 			view.setBreadcrumbVisible(isRepo);
 			view.setDockerRepoListVisible(isProject);
 			view.setDockerRepoWidgetVisible(isRepo);
+			view.setDockerActionMenuVisible(isRepo);
 			if (isRepo) {
 				tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(bundle.getEntity().getId(), null, null, null));
 				List<LinkData> links = new ArrayList<LinkData>();
@@ -138,7 +139,8 @@ public class DockerTab implements DockerTabView.Presenter{
 				breadcrumb.configure(links, ((DockerRepository)entity).getRepositoryName());
 				DockerRepoWidget repoWidget = ginInjector.createNewDockerRepoWidget();
 				view.setDockerRepoWidget(repoWidget.asWidget());
-				repoWidget.configure(bundle, actionMenu);
+				repoWidget.configure(bundle, tab.getEntityActionMenu());
+				tab.configureEntityActionController(bundle, true, null);
 			} else if (isProject) {
 				areaToken = null;
 				showProjectLevelUI();

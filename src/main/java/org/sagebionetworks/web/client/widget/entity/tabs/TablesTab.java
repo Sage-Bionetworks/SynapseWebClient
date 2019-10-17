@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
@@ -62,11 +63,12 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	ModifiedCreatedByWidget modifiedCreatedBy;
 	TableEntityWidget v2TableWidget;
 	Map<String,String> configMap;
-	ActionMenuWidget entityActionMenu;
 	CallbackP<String> entitySelectedCallback;
 	public static final String TABLES_HELP = "Build structured queryable data that can be described by a schema using the Tables.";
 	public static final String TABLES_HELP_URL = WebConstants.DOCS_URL + "tables.html";
 	Long version;
+	
+	//TODO: add action menu to view!
 	
 	@Inject
 	public TablesTab(Tab tab,
@@ -74,7 +76,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			) {
 		this.tab = tab;
 		this.ginInjector = ginInjector;
-		tab.configure(DisplayConstants.TABLES, TABLES_HELP, TABLES_HELP_URL);
+		tab.configure(DisplayConstants.TABLES, TABLES_HELP, TABLES_HELP_URL, EntityArea.TABLES);
 	}
 	
 	public void lazyInject() {
@@ -149,10 +151,9 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		this.projectBundleLoadError = projectBundleLoadError;
 	}
 	
-	public void configure(EntityBundle entityBundle, Long versionNumber, String areaToken, ActionMenuWidget entityActionMenu) {
+	public void configure(EntityBundle entityBundle, Long versionNumber, String areaToken) {
 		lazyInject();
 		this.areaToken = areaToken;
-		this.entityActionMenu = entityActionMenu;
 		synAlert.clear();
 		setTargetBundle(entityBundle, versionNumber);
 	}
@@ -202,7 +203,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		view.clearTableEntityWidget();
 		modifiedCreatedBy.setVisible(false);
 		view.setProvenanceVisible(isTable);
-		
+		view.setActionMenuVisible(isTable);
 		if (isTable) {
 			updateVersionAndAreaToken(entity.getId(), version, areaToken);
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
@@ -210,7 +211,9 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
 			v2TableWidget = ginInjector.createNewTableEntityWidget();
 			view.setTableEntityWidget(v2TableWidget.asWidget());
-			v2TableWidget.configure(bundle, version, bundle.getPermissions().getCanCertifiedUserEdit(), this, entityActionMenu);
+			v2TableWidget.configure(bundle, version, bundle.getPermissions().getCanCertifiedUserEdit(), this, tab.getEntityActionMenu());
+			boolean isCurrentVersion = version == null;
+			tab.configureEntityActionController(bundle, isCurrentVersion, null);
 		} else if (isProject) {
 			areaToken = null;
 			tableListWidget.configure(bundle);
@@ -247,7 +250,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(newPlace);
 			return;
 		}
-		metadata.configure(entityBundle, newVersion, entityActionMenu);
+		metadata.configure(entityBundle, newVersion, tab.getEntityActionMenu());
 		tab.setEntityNameAndPlace(entityBundle.getEntity().getName(), newPlace);
 		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(FilesTab.WIDGET_HEIGHT_PX-84));
 		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(entityId, newVersion));

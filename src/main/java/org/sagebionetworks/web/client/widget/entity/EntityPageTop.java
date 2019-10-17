@@ -75,8 +75,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 
 	private EntityActionController projectActionController;
 	private ActionMenuWidget projectActionMenu;
-	private EntityActionController entityActionController;
-	private ActionMenuWidget entityActionMenu;
 	private PlaceChanger placeChanger;
 	private CookieProvider cookies;
 	private EventBus eventBus;
@@ -115,8 +113,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			DockerTab dockerTab,
 			EntityActionController projectActionController,
 			ActionMenuWidget projectActionMenu,
-			EntityActionController entityActionController,
-			ActionMenuWidget entityActionMenu,
 			CookieProvider cookies,
 			SynapseJavascriptClient synapseJavascriptClient,
 			GlobalApplicationState globalAppState,
@@ -135,8 +131,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		this.projectMetadata = projectMetadata;
 		this.projectActionController = projectActionController;
 		this.projectActionMenu = projectActionMenu;
-		this.entityActionController = entityActionController;
-		this.entityActionMenu = entityActionMenu;
 		this.cookies = cookies;
 		this.synapseJavascriptClient = synapseJavascriptClient;
 		this.placeChanger = globalAppState.getPlaceChanger();
@@ -150,9 +144,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		projectActionMenu.addControllerWidget(projectActionController.asWidget());
 		view.setProjectActionMenu(projectActionMenu.asWidget());
 
-		entityActionMenu.addControllerWidget(entityActionController.asWidget());
-		view.setEntityActionMenu(entityActionMenu.asWidget());
-		
 		projectMetadata.setAnnotationsTitleText("Project Annotations");
 		
 		view.getEventBinder().bindEventHandlers(this, eventBus);
@@ -449,8 +440,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				dockerChanged(bundle);
 			}
 		}
-		boolean isCurrentVersion = currentTargetVersionNumber == null;
-		entityActionController.configure(entityActionMenu, bundle, isCurrentVersion, null, area);
 		projectMetadata.setVisible(bundle.getEntity() instanceof Project);
 		reconfigureCurrentArea();
 	}
@@ -636,21 +625,17 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	public void configureTablesTab() {
 		if (tablesTab.asTab().isContentStale()) {
 			tablesTab.setProject(projectHeader.getId(), projectBundle, projectBundleLoadError);
-			tablesTab.configure(tablesEntityBundle, tablesVersionNumber, tablesAreaToken, entityActionMenu);
+			tablesTab.configure(tablesEntityBundle, tablesVersionNumber, tablesAreaToken);
 			tablesTab.asTab().setContentStale(false);
 		}
-		boolean isCurrentVersion = tablesVersionNumber == null;
-		entityActionController.configure(entityActionMenu, tablesEntityBundle, isCurrentVersion, null, area);
 	}
 
 	public void configureFilesTab() {
 		if (filesTab.asTab().isContentStale()) {
 			filesTab.setProject(projectHeader.getId(), projectBundle, projectBundleLoadError);
-			filesTab.configure(filesEntityBundle, filesVersionNumber, entityActionMenu);
+			filesTab.configure(filesEntityBundle, filesVersionNumber);
 			filesTab.asTab().setContentStale(false);
 		}
-		boolean isCurrentVersion = filesVersionNumber == null;
-		entityActionController.configure(entityActionMenu, filesEntityBundle, isCurrentVersion, null, area);
 	}
 	
 	public void fireEntityUpdatedEvent() {
@@ -685,8 +670,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				}
 			};
 
-			wikiTab.configure(projectHeader.getId(), projectHeader.getName(), wikiId, 
-					canEdit, callback, entityActionMenu);
+			wikiTab.configure(projectHeader.getId(), projectHeader.getName(), projectBundle, wikiId, 
+					canEdit, callback);
 			if (isWikiTabShown) {
 				tabs.showTab(wikiTab.asTab(), false);
 				projectMetadata.setVisible(true);
@@ -699,8 +684,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 					// update the tab link.  Note that WikiSubpageNavigationTree will push the link into the history.
 					Entity project = projectBundle.getEntity();
 					wikiTab.asTab().setEntityNameAndPlace(project.getName(), new Synapse(project.getId(), null, EntityArea.WIKI, wikiPageId));
-					// also update the action menu to target the correct wiki page.
-					entityActionController.configure(entityActionMenu, projectBundle, true, wikiPageId, area);
 				}
 			};
 			wikiTab.setWikiReloadHandler(wikiReloadHandler);
@@ -708,21 +691,17 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		}
 
 		// on configure of wiki tab, always update the entity action controller with the correct wiki page
-		String wikiId = wikiAreaToken;
 		if (projectBundle != null) {
 			entity = projectBundle.getEntity();
-			wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
 		}
-		entityActionController.configure(entityActionMenu, projectBundle, true, wikiId, area);
 	}
 
 	public void configureAdminTab() {
 		if (adminTab.asTab().isContentStale()) {
 			String projectId = projectHeader.getId();
-			adminTab.configure(projectId, projectHeader.getName());
+			adminTab.configure(projectId, projectHeader.getName(), projectBundle);
 			adminTab.asTab().setContentStale(false);
 		}
-		entityActionController.configure(entityActionMenu, projectBundle, true, null, area);
 	}
 
 	public void configureDiscussionTab() {
@@ -732,20 +711,18 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			if (projectBundle != null) {
 				canModerate = projectBundle.getPermissions().getCanModerate();
 			}
-			discussionTab.configure(projectId, projectHeader.getName(), discussionAreaToken, canModerate, entityActionMenu);
+			discussionTab.configure(projectId, projectHeader.getName(), discussionAreaToken, canModerate);
 			discussionTab.asTab().setContentStale(false);
 		}
-		entityActionController.configure(entityActionMenu, projectBundle, true, null, area);
 		discussionTab.updateActionMenuCommands();
 	}
 
 	public void configureDockerTab() {
 		if (dockerTab.asTab().isContentStale()) {
 			dockerTab.setProject(projectHeader.getId(), projectBundle, projectBundleLoadError);
-			dockerTab.configure(dockerEntityBundle, dockerAreaToken, entityActionMenu);
+			dockerTab.configure(dockerEntityBundle, dockerAreaToken);
 			dockerTab.asTab().setContentStale(false);
 		}
-		entityActionController.configure(entityActionMenu, dockerEntityBundle, true, null, area);
 	}
 
 	public String getWikiPageId(String areaToken, String rootWikiId) {

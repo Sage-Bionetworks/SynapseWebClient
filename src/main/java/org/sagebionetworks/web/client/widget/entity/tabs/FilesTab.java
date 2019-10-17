@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
@@ -58,7 +59,6 @@ public class FilesTab {
 	SynapseClientAsync synapseClient;
 	GlobalApplicationState globalApplicationState;
 	DiscussionThreadListWidget discussionThreadListWidget;
-	ActionMenuWidget actionMenu;
 	ModifiedCreatedByWidget modifiedCreatedBy;
 	
 	public static int WIDGET_HEIGHT_PX = 270;
@@ -70,11 +70,13 @@ public class FilesTab {
 	EntityBundle entityBundle;
 	CallbackP<String> entitySelectedCallback;
 	
+	//TODO: add action menu to view!
+	
 	@Inject
 	public FilesTab(Tab tab, PortalGinInjector ginInjector) {
 		this.tab = tab;
 		this.ginInjector = ginInjector;
-		tab.configure("Files", "Organize your data by uploading files into a directory structure built in the Files section.", WebConstants.DOCS_URL + "versioning.html");
+		tab.configure("Files", "Organize your data by uploading files into a directory structure built in the Files section.", WebConstants.DOCS_URL + "versioning.html", EntityArea.FILES);
 	}
 	
 	public void lazyInject() {
@@ -158,9 +160,8 @@ public class FilesTab {
 		this.projectBundleLoadError = projectBundleLoadError;
 	}
 	
-	public void configure(EntityBundle targetEntityBundle, Long versionNumber, ActionMenuWidget actionMenu) {
+	public void configure(EntityBundle targetEntityBundle, Long versionNumber) {
 		lazyInject();
-		this.actionMenu = actionMenu;
 		view.showLoading(true);
 		setTargetBundle(targetEntityBundle, versionNumber);
 	}
@@ -242,9 +243,13 @@ public class FilesTab {
 		//Metadata
 		boolean isMetadataVisible = isFile || isFolder;
 		view.setMetadataVisible(isMetadataVisible);
+		view.setActionMenuVisible(isMetadataVisible);
 		if (isMetadataVisible) {
-			metadata.configure(bundle, versionNumber, actionMenu);
+			metadata.configure(bundle, versionNumber, tab.getEntityActionMenu());
+			boolean isCurrentVersion = versionNumber == null;
+			tab.configureEntityActionController(bundle, isCurrentVersion, null);
 		}
+		
 		EntityArea area = isProject ? EntityArea.FILES : null;
 		tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(currentEntityId, versionNumber, area, null));
 		

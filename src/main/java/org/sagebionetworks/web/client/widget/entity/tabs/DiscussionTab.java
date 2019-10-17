@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseProperties;
@@ -26,11 +27,14 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	GlobalApplicationState globalAppState;
 	SynapseProperties synapseProperties;
 	PortalGinInjector ginInjector;
+	
+	//TODO: add action menu to view!
+	
 	@Inject
 	public DiscussionTab(Tab tab, PortalGinInjector ginInjector) {
 		this.tab = tab;
 		this.ginInjector = ginInjector;
-		tab.configure("Discussion", "Engage your collaborators in project specific Discussions.", WebConstants.DOCS_URL + "discussion.html");
+		tab.configure("Discussion", "Engage your collaborators in project specific Discussions.", WebConstants.DOCS_URL + "discussion.html", EntityArea.DISCUSSION);
 	}
 	
 	public void lazyInject() {
@@ -49,7 +53,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		tab.addTabClickedCallback(onClickCallback);
 	}
 
-	public void configure(final String entityId, String entityName, String areaToken, Boolean isCurrentUserModerator, ActionMenuWidget actionMenu) {
+	public void configure(final String entityId, String entityName, EntityBundle projectBundle, String areaToken, Boolean isCurrentUserModerator) {
 		lazyInject();
 		this.entityId = entityId;
 		this.entityName = entityName;
@@ -64,7 +68,8 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 				tab.showTab();
 			}
 		};
-		forumWidget.configure(entityId, params, isCurrentUserModerator, actionMenu, updateParamsCallback, updateURLCallback);
+		tab.configureEntityActionController(projectBundle, true, null);
+		forumWidget.configure(entityId, params, isCurrentUserModerator, tab.getEntityActionMenu(), updateParamsCallback, updateURLCallback);
 		// SWC-3994: initialize tab Place to set the initial area token
 		updateParamsCallback.invoke(params);
 	}
