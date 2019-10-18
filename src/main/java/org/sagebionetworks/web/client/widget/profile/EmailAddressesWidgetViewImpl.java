@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
+import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -82,9 +83,16 @@ public class EmailAddressesWidgetViewImpl implements EmailAddressesWidgetView {
 		synapseAlertContainer.add(w);
 	}
 	@Override
-	public void addPrimaryEmail(String email) {
+	public void addPrimaryEmail(String email, boolean isQuarantined) {
 		Div emailDiv = new Div();
 		emailDiv.add(new Strong(email + " (Primary)"));
+		if (isQuarantined) {
+			HelpWidget helpWidget = new HelpWidget();
+			helpWidget.setIconType(IconType.EXCLAMATION_CIRCLE);
+			helpWidget.setHelpMarkdown("#### Your email address may be invalid\n\nWe have been unable to reach you at this email address.  Please update your primary email address.");
+			helpWidget.setIconStyles("text-danger");
+			emailDiv.add(helpWidget);
+		}
 		emailsPanel.add(emailDiv);
 	}
 	

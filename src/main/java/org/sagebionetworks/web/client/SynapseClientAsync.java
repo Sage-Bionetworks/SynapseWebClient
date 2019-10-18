@@ -55,8 +55,6 @@ public interface SynapseClientAsync {
 	
 	void addEmail(EmailValidationSignedToken emailValidationSignedToken, AsyncCallback<Void> callback);
 	
-	void getNotificationEmail(AsyncCallback<String> callback);
-	
 	void setNotificationEmail(String email, AsyncCallback<Void> callback);
 	void removeEmail(String email, AsyncCallback<Void> callback);
 

@@ -111,6 +111,7 @@ import org.sagebionetworks.web.client.widget.FileHandleWidgetView;
 import org.sagebionetworks.web.client.widget.FileHandleWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerViewImpl;
+import org.sagebionetworks.web.client.widget.QuarantinedEmailModal;
 import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.RadioWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetView;
@@ -1376,5 +1377,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TeamProjectsModalWidgetView.class).to(TeamProjectsModalWidgetViewImpl.class);
 		bind(ContainerItemCountWidgetView.class).to(ContainerItemCountWidgetViewImpl.class);
 		bind(StatisticsPlotWidgetView.class).to(StatisticsPlotWidgetViewImpl.class);
+		bind(QuarantinedEmailModal.class).in(Singleton.class);
 	}
 }
