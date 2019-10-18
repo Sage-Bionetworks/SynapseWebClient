@@ -25,6 +25,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -151,7 +152,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			@Override
 			public void onSuccess(NotificationEmail notificationEmailStatus) {
 				EmailQuarantineStatus status = notificationEmailStatus.getQuarantineStatus();
-				if (status != null && EmailQuarantineReason.PERMANENT_BOUNCE.equals(status.getReason())) {
+				if (isQuarantined(status)) {
 					ginInjector.getQuarantinedEmailModal().show(status.getReasonDetails());
 				}
 			}
@@ -161,6 +162,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				jsniUtils.consoleError(caught);
 			}
 		});
+	}
+	public static boolean isQuarantined(EmailQuarantineStatus status) {
+		return status != null && EmailQuarantineReason.PERMANENT_BOUNCE.equals(status.getReason());
 	}
 	
 	@Override

@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Popover;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -52,10 +53,13 @@ public class HelpWidget implements IsWidget {
 	SpanElement icon;
 	@UiField
 	Anchor anchor;
+	@UiField
+	SpanElement innerIconSpan;
 	
 	Widget widget;
 	private String popoverElementId;
 	private String closePopoverJs;
+	private IconType iconType = IconType.QUESTION_CIRCLE;
 	
 	private static MarkdownIt markdownIt = new MarkdownItImpl(GWT.create(SynapseJSNIUtilsImpl.class));
 	public interface Binder extends UiBinder<Widget, HelpWidget> {}
@@ -85,6 +89,10 @@ public class HelpWidget implements IsWidget {
 		updateContent();
 	}
 	
+	public void setIconType(IconType newType) {
+		iconType = newType;
+		updateContent();
+	}
 	public void setIconStyles(String iconStyles) {
 		this.iconStyles = iconStyles;
 		updateContent();
@@ -112,6 +120,7 @@ public class HelpWidget implements IsWidget {
 	}
 	
 	public void updateContent() {
+		innerIconSpan.setClassName("fa " + iconType.getCssName());
 		if (DisplayUtils.isDefined(iconStyles))
 			icon.setClassName(iconStyles);
 		moreInfoText.setInnerText(text);

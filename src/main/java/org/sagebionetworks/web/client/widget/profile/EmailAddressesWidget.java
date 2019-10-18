@@ -5,6 +5,7 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import java.util.List;
 
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.principal.EmailQuarantineReason;
 import org.sagebionetworks.repo.model.principal.NotificationEmail;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -13,6 +14,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -87,7 +89,7 @@ public class EmailAddressesWidget implements EmailAddressesWidgetView.Presenter,
 				@Override
 				public void onSuccess(NotificationEmail notificationEmail) {
 					view.setLoadingVisible(false);
-					view.addPrimaryEmail(notificationEmail.getEmail());
+					view.addPrimaryEmail(notificationEmail.getEmail(), AuthenticationControllerImpl.isQuarantined(notificationEmail.getQuarantineStatus()));
 					for (String email : profile.getEmails()) {
 						if (!notificationEmail.getEmail().equals(email)) {
 							view.addSecondaryEmail(email);
