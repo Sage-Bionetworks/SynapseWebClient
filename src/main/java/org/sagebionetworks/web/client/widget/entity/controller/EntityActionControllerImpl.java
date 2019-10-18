@@ -428,7 +428,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureStatisticsPlotAction() {
-		if (entityBundle.getEntity() instanceof Project) {
+		if (entityBundle.getEntity() instanceof Project && currentArea == null) {
 			// is a project, if the current user can view then show the command
 			// TODO: remove alpha mode check
 			boolean isAlphaMode = DisplayUtils.isInTestWebsite(cookies);
