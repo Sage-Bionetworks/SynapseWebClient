@@ -14,7 +14,6 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import java.util.ArrayList;
 import java.util.Map;
 
-
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Reference;
@@ -324,8 +323,13 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 									}
 								}
 							} else {
+								String statusText = response.getStatusText();
+								if (statusText == null || statusText.length() == 0) {
+									statusText = "Unable to directly download a preview for " + fileEntity.getName();
+								}
+								synapseAlert.consoleError("Attempt to download \"" + fileHandleToShow.getFileName() + "\" (file handle ID = " + fileHandleToShow.getId() + ") failed with status code = " + response.getStatusCode());
 								view.addSynapseAlertWidget(synapseAlert.asWidget());
-								synapseAlert.showError(response.getStatusText());
+								synapseAlert.showError(statusText);
 							}
 						}
 					});
