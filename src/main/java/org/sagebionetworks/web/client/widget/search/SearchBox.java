@@ -38,6 +38,7 @@ public class SearchBox implements SearchBoxView.Presenter, SynapseWidgetPresente
 	@Override
 	public void search(String value) {
 		if (value != null && !value.isEmpty()) {
+			value = value.trim();
 			if (value.charAt(0) == '@') {
 				globalApplicationState.getPlaceChanger().goTo(new PeopleSearch(value.substring(1)));
 			} else {
