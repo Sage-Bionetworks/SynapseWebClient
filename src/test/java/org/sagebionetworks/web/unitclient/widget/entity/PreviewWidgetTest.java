@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyChar;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -110,13 +110,17 @@ public class PreviewWidgetTest {
 	String fileContent = "base.jar\ntarget/\ntarget/directory/\ntarget/directory/test.txt\n";
 	Map<String, String> descriptor;
 	public static final String TEST_ENTITY_ID = "syn20923";
+	public static final Long TEST_ENTITY_VERSION_NUMBER = 20L;
 	public static final String TEST_ENTITY_MAIN_FILE_CREATED_BY = "8992983";
+	public static final String TARGET_FILE_PRESIGNED_URL = "https://target.presigned.url/test.txt";
 	@Before
 	public void before() throws Exception{
 		MockitoAnnotations.initMocks(this);
 		previewWidget = new PreviewWidget(mockView, mockRequestBuilder, mockSynapseJSNIUtils, mockSynapseAlert, mockSynapseClient, mockAuthController, mockSynapseJavascriptClient, mockPortalGinInjector);
 		testEntity = new FileEntity();
 		testEntity.setId(TEST_ENTITY_ID);
+		// when asking for the FileEntity EntityBundle, the version is always set (even if the latest version).  so we should set it here.
+		testEntity.setVersionNumber(TEST_ENTITY_VERSION_NUMBER);
 		testFileHandleList = new ArrayList<FileHandle>();
 		mainFileHandle = new S3FileHandle();
 		String mainFileId = "MAIN_FILE";
@@ -142,7 +146,7 @@ public class PreviewWidgetTest {
 		
 		AsyncMockStubber.callSuccessWith(testBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(testBundle).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		
+		AsyncMockStubber.callSuccessWith(TARGET_FILE_PRESIGNED_URL).when(mockSynapseJavascriptClient).getFileEntityTemporaryUrlForVersion(anyString(), anyLong(), anyBoolean(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockParseResults).when(mockSynapseClient).parseCsv(anyString(), anyChar(), any(AsyncCallback.class));
 		// create empty wiki descriptor
 		descriptor = new HashMap<String, String>();
@@ -172,7 +176,7 @@ public class PreviewWidgetTest {
 		previewWidget.asWidget();
 		verify(mockView, times(0)).setImagePreview(anyString());
 		
-		verify(mockView).showNoPreviewAvailable(TEST_ENTITY_ID, null);
+		verify(mockView).showNoPreviewAvailable(TEST_ENTITY_ID, TEST_ENTITY_VERSION_NUMBER);
 	}
 	
 	@Test
@@ -357,7 +361,7 @@ public class PreviewWidgetTest {
 		verify(mockView, times(0)).setTablePreview(any());
 		verify(mockView, times(0)).setImagePreview(anyString());
 		verify(mockView, times(0)).setPreviewWidget(any(Widget.class));
-		verify(mockView).showNoPreviewAvailable(TEST_ENTITY_ID, null);
+		verify(mockView).showNoPreviewAvailable(TEST_ENTITY_ID, TEST_ENTITY_VERSION_NUMBER);
 	}
 	
 	@Test
@@ -459,8 +463,10 @@ public class PreviewWidgetTest {
 		
 		previewWidget.configure(testBundle);
 		
+		boolean isPreview = true;
+		verify(mockSynapseJavascriptClient).getFileEntityTemporaryUrlForVersion(eq(TEST_ENTITY_ID), eq(TEST_ENTITY_VERSION_NUMBER), eq(isPreview), any(AsyncCallback.class));
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), stringCaptor.capture());
-		assertTrue(stringCaptor.getValue().contains("preview=true"));
+		assertEquals(TARGET_FILE_PRESIGNED_URL, stringCaptor.getValue());
 		verify(mockView).showLoading();
 	}
 	
@@ -481,7 +487,7 @@ public class PreviewWidgetTest {
 		mainFileHandle.setFileName("test.html");
 		previewWidget.configure(testBundle);
 		
-		verify(mockView).showNoPreviewAvailable(TEST_ENTITY_ID, null);
+		verify(mockView).showNoPreviewAvailable(TEST_ENTITY_ID, TEST_ENTITY_VERSION_NUMBER);
 	}
 	
 	@Test

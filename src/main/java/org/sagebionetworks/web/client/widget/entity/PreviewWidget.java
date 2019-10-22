@@ -274,69 +274,80 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				boolean isGetPreviewFile = !fileHandleToShow.getId().equals(fileEntity.getDataFileHandleId());
 				//must be a text type of some kind
 				//try to load the text of the preview, if available
-				requestBuilder.configure(RequestBuilder.GET, 
-						DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), isGetPreviewFile, false));
-				requestBuilder.setHeader(WebConstants.CONTENT_TYPE, contentType);
-				
-				try {
-					requestBuilder.sendRequest(null, new RequestCallback() {
-						public void onError(final Request request, final Throwable e) {
+				jsClient.getFileEntityTemporaryUrlForVersion(fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), isGetPreviewFile, new AsyncCallback<String>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						view.addSynapseAlertWidget(synapseAlert.asWidget());
+						synapseAlert.handleException(caught);
+					}
+					@Override
+					public void onSuccess(String url) {
+						requestBuilder.configure(RequestBuilder.GET, url);
+						// SWC-5014: Setting the request header "Content-Type" messes up the signed string verification in Google storage files (causes a 403). 
+						// We must set another request header so RequestBuilder does not auto-set "Content-Type" to "text/plain; charset=utf-8"
+						// (see http://www.gwtproject.org/javadoc/latest/com/google/gwt/http/client/RequestBuilder.html#send--)
+						requestBuilder.setHeader("Sec-Fetch-Mode", "cors");
+						try {
+							requestBuilder.sendRequest(null, new RequestCallback() {
+								public void onError(final Request request, final Throwable e) {
+									view.addSynapseAlertWidget(synapseAlert.asWidget());
+									synapseAlert.handleException(e);
+								}
+								public void onResponseReceived(final Request request, final Response response) {
+									// if this response is not for the file entity associated to this preview widget, then ignore it!
+									if (!fileEntity.equals(bundle.getEntity())) {
+										return;
+									}
+									//add the response text
+									int statusCode = response.getStatusCode();
+									// if it's a 200 level response, it's OK
+									if (statusCode > 199 && statusCode < 300) {
+										String responseText = response.getText();
+										if (responseText != null && responseText.length() > 0) {
+											if (responseText.length() > MAX_LENGTH) {
+												responseText = responseText.substring(0, MAX_LENGTH) + "...";
+											}
+											switch(previewType) {
+												case CODE :
+													String codePreview = SafeHtmlUtils.htmlEscapeAllowEntities(responseText);
+													String extension = ContentTypeUtils.getExtension(fileHandleToShow.getFileName());
+													view.setCodePreview(codePreview, getLanguage(extension));
+													break;
+												case MARKDOWN :
+													MarkdownWidget markdownWidget = ginInjector.getMarkdownWidget();
+													markdownWidget.configure(responseText);
+													view.setPreviewWidget(markdownWidget);
+													break;
+												case CSV :
+													parseCsv(responseText, ',');
+													break;
+												case TAB :
+													parseCsv(responseText, '\t');
+													break;
+												case PLAINTEXT :
+												case ZIP :
+													view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
+													break;
+												default :
+											}
+										}
+									} else {
+										String statusText = response.getStatusText();
+										if (statusText == null || statusText.length() == 0) {
+											statusText = "Unable to directly download a preview for " + fileEntity.getName();
+										}
+										synapseAlert.consoleError("Attempt to download \"" + fileHandleToShow.getFileName() + "\" (file handle ID = " + fileHandleToShow.getId() + ") failed with status code = " + response.getStatusCode());
+										view.addSynapseAlertWidget(synapseAlert.asWidget());
+										synapseAlert.showError(statusText);
+									}
+								}
+							});
+						} catch (final Exception e) {
 							view.addSynapseAlertWidget(synapseAlert.asWidget());
 							synapseAlert.handleException(e);
 						}
-						public void onResponseReceived(final Request request, final Response response) {
-							// if this response is not for the file entity associated to this preview widget, then ignore it!
-							if (!fileEntity.equals(bundle.getEntity())) {
-								return;
-							}
-							//add the response text
-							int statusCode = response.getStatusCode();
-							// if it's a 200 level response, it's OK
-							if (statusCode > 199 && statusCode < 300) {
-								String responseText = response.getText();
-								if (responseText != null && responseText.length() > 0) {
-									if (responseText.length() > MAX_LENGTH) {
-										responseText = responseText.substring(0, MAX_LENGTH) + "...";
-									}
-									switch(previewType) {
-										case CODE :
-											String codePreview = SafeHtmlUtils.htmlEscapeAllowEntities(responseText);
-											String extension = ContentTypeUtils.getExtension(fileHandleToShow.getFileName());
-											view.setCodePreview(codePreview, getLanguage(extension));
-											break;
-										case MARKDOWN :
-											MarkdownWidget markdownWidget = ginInjector.getMarkdownWidget();
-											markdownWidget.configure(responseText);
-											view.setPreviewWidget(markdownWidget);
-											break;
-										case CSV :
-											parseCsv(responseText, ',');
-											break;
-										case TAB :
-											parseCsv(responseText, '\t');
-											break;
-										case PLAINTEXT :
-										case ZIP :
-											view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
-											break;
-										default :
-									}
-								}
-							} else {
-								String statusText = response.getStatusText();
-								if (statusText == null || statusText.length() == 0) {
-									statusText = "Unable to directly download a preview for " + fileEntity.getName();
-								}
-								synapseAlert.consoleError("Attempt to download \"" + fileHandleToShow.getFileName() + "\" (file handle ID = " + fileHandleToShow.getId() + ") failed with status code = " + response.getStatusCode());
-								view.addSynapseAlertWidget(synapseAlert.asWidget());
-								synapseAlert.showError(statusText);
-							}
-						}
-					});
-				} catch (final Exception e) {
-					view.addSynapseAlertWidget(synapseAlert.asWidget());
-					synapseAlert.handleException(e);
-				}
+					}
+				});
 		}
 	}
 	
