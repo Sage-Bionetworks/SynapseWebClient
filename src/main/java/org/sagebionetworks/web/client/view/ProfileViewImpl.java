@@ -62,7 +62,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	SimplePanel editUserProfilePanel;
 	HTML noChallengesHtml = new HTML("<p>This tab shows you challenges you have registered for.</p>" + 
-			"<p><a href=\"http://sagebionetworks.org/platforms/\" target=\"_blank\">Challenges</a> are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.</p>");
+			"<p><a href=\"http://sagebionetworks.org/challenges/\" target=\"_blank\">Challenges</a> are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.</p>");
 	
 	@UiField
 	Div userBadgeFooter;
