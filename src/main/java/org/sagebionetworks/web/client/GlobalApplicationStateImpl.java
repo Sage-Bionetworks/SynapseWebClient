@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-import static org.sagebionetworks.web.client.cookie.CookieKeys.LAST_PLACE;
 import static org.sagebionetworks.web.client.cookie.CookieKeys.SHOW_DATETIME_IN_UTC;
 
 import java.util.ArrayList;
@@ -10,6 +9,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
@@ -50,9 +50,14 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private boolean isShowingVersionAlert;
 	private DateTimeUtils dateTimeUtils;
 	private SynapseJavascriptClient jsClient;
+	private SessionStorage sessionStorage;
 	private CallbackP<JavaScriptObject> fileListCallback;
 	private SynapseProperties synapseProperties;
 	boolean isDragDropInitialized = false;
+	/**
+	 * Last Place in the app
+	 */
+	public static String LAST_PLACE = "org.sagebionetworks.synapse.place.last.place";
 	public static final ArrayList<String> SAFE_TO_IGNORE_ERRORS = new ArrayList<String>();
 	static {
 		//Benign error thrown by VideoWidget (<video>). ResizeObserver was not able to deliver all observations within a single animation frame.
@@ -78,7 +83,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			GWTWrapper gwt,
 			DateTimeUtils dateTimeUtils,
 			SynapseJavascriptClient jsClient,
-			SynapseProperties synapseProperties) {
+			SynapseProperties synapseProperties,
+			SessionStorage sessionStorage) {
 		this.cookieProvider = cookieProvider;
 		this.eventBus = eventBus;
 		this.stackConfigService = stackConfigService;
@@ -92,6 +98,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		isEditing = false;
 		isShowingVersionAlert = false;
 		this.synapseProperties = synapseProperties;
+		this.sessionStorage = sessionStorage;
 		initUncaughtExceptionHandler();
 	}
 	
@@ -179,13 +186,13 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	
 	@Override
 	public Place getLastPlace(Place defaultPlace) {
-		String historyValue = cookieProvider.getCookie(LAST_PLACE);
+		String historyValue = sessionStorage.getItem(GlobalApplicationStateImpl.LAST_PLACE);
 		return getPlaceFromHistoryValue(historyValue, fixIfNull(defaultPlace));
 	}
 	
 	@Override
 	public void clearLastPlace() {
-		cookieProvider.removeCookie(LAST_PLACE);
+		sessionStorage.removeItem(GlobalApplicationStateImpl.LAST_PLACE);
 	}
 	
 	@Override
@@ -205,8 +212,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 
 	@Override
 	public void setLastPlace(Place lastPlace) {
-		Date expires = new Date(System.currentTimeMillis() + (1000*60*60*2)); // store for 2 hours (we don't want to lose this state while a user registers for Synapse)
-		cookieProvider.setCookie(LAST_PLACE, appPlaceHistoryMapper.getToken(lastPlace), expires);
+		sessionStorage.setItem(GlobalApplicationStateImpl.LAST_PLACE, appPlaceHistoryMapper.getToken(lastPlace));
 	}
 
 	@Override
