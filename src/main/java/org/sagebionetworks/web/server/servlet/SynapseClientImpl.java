@@ -354,19 +354,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public void additionalEmailValidation(String userId, String emailAddress,
-			String callbackUrl) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			Long userIdLong = Long.parseLong(userId);
-			synapseClient.additionalEmailValidation(userIdLong, emailAddress,
-					callbackUrl);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
 	public void addEmail(EmailValidationSignedToken emailValidationSignedToken)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();

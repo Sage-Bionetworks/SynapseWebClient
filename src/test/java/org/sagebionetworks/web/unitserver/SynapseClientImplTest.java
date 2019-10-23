@@ -1380,19 +1380,6 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class), any(ACCESS_TYPE.class), eq(SynapseClientImpl.LIMIT_50), eq(SynapseClientImpl.LIMIT_50));
 	}
 	
-	// pass through tests for email validation
-
-	@Test
-	public void testAdditionalEmailValidation() throws Exception {
-		Long userId = 992843l;
-		String emailAddress = "test@test.com";
-		String callbackUrl = "http://www.synapse.org/#!Account:";
-		synapseClient.additionalEmailValidation(userId.toString(),
-				emailAddress, callbackUrl);
-		verify(mockSynapse).additionalEmailValidation(eq(userId),
-				eq(emailAddress), eq(callbackUrl));
-	}
-
 	@Test
 	public void testAddEmail() throws Exception {
 		EmailValidationSignedToken emailValidationSignedToken = new EmailValidationSignedToken();
