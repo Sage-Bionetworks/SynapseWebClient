@@ -143,7 +143,7 @@ public class SettingsPresenterTest {
 		when(mockNotificationEmail.getEmail()).thenReturn(email);
 		AsyncMockStubber.callSuccessWith(mockNotificationEmail).when(mockSynapseJavascriptClient).getNotificationEmail(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setNotificationEmail(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(APIKEY2).when(mockSynapseClient).deleteApiKey(any(AsyncCallback.class));
 		
 		profile.setDisplayName("tester");
