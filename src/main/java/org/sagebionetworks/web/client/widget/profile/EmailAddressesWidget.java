@@ -5,7 +5,6 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import java.util.List;
 
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.principal.EmailQuarantineReason;
 import org.sagebionetworks.repo.model.principal.NotificationEmail;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -148,7 +147,8 @@ public class EmailAddressesWidget implements EmailAddressesWidgetView.Presenter,
 		}
 
 		String callbackUrl = gwt.getHostPageBaseURL() + "#!Account:";
-		synapseClient.additionalEmailValidation(
+		
+		jsClient.additionalEmailValidation(
 				authenticationController.getCurrentUserPrincipalId(),
 				emailAddress, callbackUrl, new AsyncCallback<Void>() {
 					@Override

@@ -7,18 +7,17 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	
 	<bh:Div>
-		<bh:Div ui:field="synapseAlertContainer"/>
 		<w:LoadingSpinner ui:field="loadingUI" size="31px"/>
-		
 		<bh:Div ui:field="emailsPanel" addStyleNames="margin-left-10"/>
 		<bh:Div ui:field="changeEmailUI" addStyleNames="margin-top-10 margin-left-10">
-		    <bh:Span addStyleNames="input-group">
-		      <g:TextBox ui:field="newEmailTextBox" styleName="form-control" />
-		      <bh:Span addStyleNames="input-group-btn">
-		           <b:Button ui:field="addEmailButton" icon="PLUS">Add email</b:Button>
-		      </bh:Span>
-		    </bh:Span>
+			<bh:Span addStyleNames="input-group">
+				<g:TextBox ui:field="newEmailTextBox" styleName="form-control" />
+				<bh:Span addStyleNames="input-group-btn">
+					<b:Button ui:field="addEmailButton" icon="PLUS">Add email</b:Button>
+				</bh:Span>
+			</bh:Span>
 		</bh:Div>
+		<bh:Div ui:field="synapseAlertContainer"/>
 	</bh:Div>
 	
 </ui:UiBinder>
