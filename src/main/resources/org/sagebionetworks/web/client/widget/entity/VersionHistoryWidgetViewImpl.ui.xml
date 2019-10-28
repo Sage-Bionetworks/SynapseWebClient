@@ -21,6 +21,7 @@
 			<t:Table ui:field="versionTable" addStyleNames="table table-condensed">
 				<t:THead>
 					<t:TableRow>
+						<t:TableHeader text="Version" />
 						<t:TableHeader text="Label" />
 						<t:TableHeader text="Modified By" />
 						<t:TableHeader text="Modified On" />
