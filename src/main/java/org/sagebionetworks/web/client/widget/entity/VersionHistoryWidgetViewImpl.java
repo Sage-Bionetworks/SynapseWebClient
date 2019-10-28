@@ -59,6 +59,10 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 	TableHeader sizeTableHeader;
 	@UiField
 	TableHeader md5TableHeader;
+	@UiField
+	org.sagebionetworks.web.client.view.bootstrap.table.Table versionTable;
+	@UiField
+	Div emptyUI;
 	CallbackP<List<String>> versionValuesCallback; 
 	PromptForValuesModalView editVersionInfoModal;
 	boolean isTable = false;
@@ -100,7 +104,9 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 	
 	@Override
 	public void clearVersions() {
-		previousVersionsTable.clear();	
+		previousVersionsTable.clear();
+		emptyUI.setVisible(false);
+		versionTable.setVisible(true);
 	}
 	
 	@Override
@@ -197,5 +203,10 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
+	}
+	@Override
+	public void showNoResults() {
+		emptyUI.setVisible(true);
+		versionTable.setVisible(false);
 	}
 }
