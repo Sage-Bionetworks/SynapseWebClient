@@ -111,6 +111,7 @@ import org.sagebionetworks.web.client.widget.FileHandleWidgetView;
 import org.sagebionetworks.web.client.widget.FileHandleWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerViewImpl;
+import org.sagebionetworks.web.client.widget.QuarantinedEmailModal;
 import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.RadioWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetView;
@@ -219,6 +220,8 @@ import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
 import org.sagebionetworks.web.client.widget.entity.BigPromptModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeView;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeViewImpl;
+import org.sagebionetworks.web.client.widget.entity.ContainerItemCountWidgetView;
+import org.sagebionetworks.web.client.widget.entity.ContainerItemCountWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalView;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
@@ -549,6 +552,8 @@ import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeView;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGridView;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGridViewImpl;
+import org.sagebionetworks.web.client.widget.statistics.StatisticsPlotWidgetView;
+import org.sagebionetworks.web.client.widget.statistics.StatisticsPlotWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidgetView;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidgetView;
@@ -1370,5 +1375,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(Linkify.class).to(LinkifyImpl.class);
 		bind(PasswordResetSignedTokenView.class).to(PasswordResetSignedTokenViewImpl.class);
 		bind(TeamProjectsModalWidgetView.class).to(TeamProjectsModalWidgetViewImpl.class);
+		bind(ContainerItemCountWidgetView.class).to(ContainerItemCountWidgetViewImpl.class);
+		bind(StatisticsPlotWidgetView.class).to(StatisticsPlotWidgetViewImpl.class);
+		bind(QuarantinedEmailModal.class).in(Singleton.class);
 	}
 }

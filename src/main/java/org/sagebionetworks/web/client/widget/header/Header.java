@@ -5,6 +5,8 @@ import java.util.List;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.DownloadList;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DateTimeUtilsImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -33,7 +35,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 
 	public static final String SYNAPSE = "SYNAPSE";
 	public static final String N_A = "n/a";
-	public static final String ANONYMOUS = "VISITOR_UNIQUE_ID";
+	public static final String ANONYMOUS = "";
 	public static final String SYNAPSE_ORG = "@synapse.org";
 	public static final String GET_SATISFACTION_SUPPORT_SITE = "http://support.sagebase.org";
 	public static final String WWW_SYNAPSE_ORG = "www.synapse.org";
@@ -50,6 +52,8 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	private PendoSdk pendoSdk;
 	PortalGinInjector portalGinInjector;
 	CookieProvider cookies;
+	public static boolean isShowingPortalAlert = false;
+	public static JSONObjectAdapter portalAlertJson = null;
 	@Inject
 	public Header(HeaderView view, 
 			AuthenticationController authenticationController,
@@ -60,10 +64,12 @@ public class Header implements HeaderView.Presenter, IsWidget {
 			PendoSdk pendoSdk,
 			PortalGinInjector portalGinInjector,
 			EventBus eventBus,
-			CookieProvider cookies) {
+			CookieProvider cookies,
+			JSONObjectAdapter jsonObjectAdapter) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
+		
 		this.jsClient = jsClient;
 		this.favWidget = favWidget;
 		this.cookies = cookies;
@@ -80,10 +86,19 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		} else {
 			view.setCookieNotificationVisible(false);
 		}
-		
-		if (cookies.getCookie(CookieKeys.PORTAL_CONFIG) != null) {
-			view.showPortalAlert(cookies.getCookie(CookieKeys.PORTAL_CONFIG));
+		// portal alert state sticks around for entire app session
+		String portalAlertString = cookies.getCookie(CookieKeys.PORTAL_CONFIG);
+		isShowingPortalAlert = portalAlertString != null;
+		if (isShowingPortalAlert) {
+			cookies.removeCookie(CookieKeys.PORTAL_CONFIG);
+			try {
+				portalAlertJson = jsonObjectAdapter.createNew(portalAlertString);
+			} catch (JSONObjectAdapterException e) {synapseJSNIUtils.consoleError(e);}
+		} else {
+			portalAlertJson = null;
 		}
+		view.setPortalAlertVisible(isShowingPortalAlert, portalAlertJson);
+		
 	}
 	
 	public void initStagingAlert() {
@@ -116,6 +131,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	}
 
 	public void refresh() {
+		view.setPortalAlertVisible(isShowingPortalAlert, portalAlertJson);
 		UserProfile profile = authenticationController.getCurrentUserProfile();
 		view.setUser(profile);
 		view.refresh();

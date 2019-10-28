@@ -25,7 +25,7 @@ $synapse-orange: #E8762B;
 $synapse-accent-primary: #17a2b8;
 
 .colored { color:$synapse-blue;}
-.link { color:$synapse-blue;}
+.link, details > summary { color:$synapse-blue;}
 .link, .link:visited, .link:hover {  color:$synapse-blue; }
 .link:hover { text-decoration: underline; cursor:pointer;}
 a {color:$synapse-blue;text-decoration:none;}
@@ -1584,6 +1584,35 @@ ol.lowerroman {
 	.cursor-text {
 		cursor: text;
 	}
+	// PORTALS-700
+	details > summary {
+		list-style: none;
+		cursor: pointer;
+		display: inline;
+		margin-left: 2px;
+		border-bottom: 1px solid transparent;
+	}
+	details > summary:hover {
+		border-bottom: 1px solid $synapse-blue;
+	}
+	details > summary::-webkit-details-marker {
+		display:none;
+	}
+	
+	// SWC-4987 (css hack). change position when open. set the visiblity of the element to hidden, and make the pseudo-element visible!
+	details[open] {
+		position: relative;
+		padding-bottom: 25px;
+		summary {
+			position: absolute;
+			bottom: 0px;
+			visibility: hidden;
+		}
+		summary::before {
+			content: 'Show Less';
+			visibility: visible;
+		}
+	}
 }
 
 .smallerText {
@@ -1615,7 +1644,7 @@ ol.lowerroman {
 	overflow-y: hidden;
 }
 
-.align-center {display: block; margin-left: auto; margin-right: auto;}
+#rootPanel .align-center {display: block; margin-left: auto; margin-right: auto;}
 #rootPanel .text-align-center { text-align: center;}
 
 .bottomright {
@@ -2734,6 +2763,10 @@ div.border {
 	}
 }
 #body {
+	.dropdown-menu>li>a:focus, .dropdown-menu>li>a:hover {
+		background-color: $synapse-blue;
+	}
+
 	.dropdown.SRC-primary-background-color-hover.open {
 		background-color: $synapse-blue;
 		> a {

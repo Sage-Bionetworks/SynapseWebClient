@@ -5,7 +5,6 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
@@ -14,6 +13,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -159,7 +159,6 @@ public class FilesTab {
 	}
 	
 	public void configure(EntityBundle targetEntityBundle, Long versionNumber, ActionMenuWidget actionMenu) {
-		ginInjector.getSynapseJavascriptClient().cancelPendingRequestsForCurrentUrl();
 		lazyInject();
 		this.actionMenu = actionMenu;
 		view.showLoading(true);

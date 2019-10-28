@@ -20,7 +20,8 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.ErrorResponseCode;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -177,17 +178,17 @@ public class SynapseJavascriptClientTest {
 
 	@Test
 	public void testGetEntityBundleAnonymousSuccess() throws RequestException, JSONObjectAdapterException {
+		EntityBundleRequest request = new EntityBundleRequest();
 		String entityId = "syn291";
-		int partsMask = 22;
-		client.getEntityBundle(entityId, partsMask, mockAsyncCallback);
+		client.getEntityBundle(entityId, request, mockAsyncCallback);
 		
 		//verify url and method
-		String url = REPO_ENDPOINT + ENTITY + "/" + entityId + BUNDLE_MASK_PATH + partsMask;
-		verify(mockRequestBuilder).configure(GET, url);
+		String url = REPO_ENDPOINT + ENTITY + "/" + entityId + BUNDLE2;
+		verify(mockRequestBuilder).configure(POST, url);
 		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		verify(mockRequestBuilder, never()).setHeader(eq(SESSION_TOKEN_HEADER), anyString());
 		
-		verify(mockRequestBuilder).sendRequest(eq((String)null), requestCallbackCaptor.capture());
+		verify(mockRequestBuilder).sendRequest(anyString(), requestCallbackCaptor.capture());
 		RequestCallback requestCallback = requestCallbackCaptor.getValue();
 		EntityBundle testBundle = new EntityBundle();
 		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
@@ -211,10 +212,10 @@ public class SynapseJavascriptClientTest {
 		verify(mockAsyncCallback).onSuccess(testBundle);
 		
 		//verify url and method
-		String url = REPO_ENDPOINT + ENTITY + "/" + entityId + BUNDLE_MASK_PATH + EntityPageTop.ALL_PARTS_MASK;
-		verify(mockRequestBuilder).configure(GET, url);
+		String url = REPO_ENDPOINT + ENTITY + "/" + entityId + BUNDLE2;
+		verify(mockRequestBuilder).configure(POST, url);
 		
-		verify(mockRequestBuilder).sendRequest(eq((String)null), requestCallbackCaptor.capture());
+		verify(mockRequestBuilder).sendRequest(anyString(), requestCallbackCaptor.capture());
 		RequestCallback requestCallback = requestCallbackCaptor.getValue();
 		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
 		EntityBundle testBundle2 = new EntityBundle();
@@ -240,7 +241,7 @@ public class SynapseJavascriptClientTest {
 		//verify immediate response due to cache hit
 		verify(mockAsyncCallback, never()).onSuccess(any(EntityBundle.class));
 		
-		verify(mockRequestBuilder).sendRequest(eq((String)null), requestCallbackCaptor.capture());
+		verify(mockRequestBuilder).sendRequest(anyString(), requestCallbackCaptor.capture());
 		RequestCallback requestCallback = requestCallbackCaptor.getValue();
 		
 		when(mockResponse.getStatusCode()).thenReturn(SC_FORBIDDEN);
@@ -254,20 +255,20 @@ public class SynapseJavascriptClientTest {
 	@Test
 	public void testGetEntityBundleForVersionLoggedInFailure() throws RequestException, JSONObjectAdapterException {
 		String entityId = "syn291";
-		int partsMask = 22;
+		EntityBundleRequest request = new EntityBundleRequest();
 		Long versionNumber = 5L;
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
 		
-		client.getEntityBundleForVersion(entityId, versionNumber, partsMask, mockAsyncCallback);
+		client.getEntityBundleForVersion(entityId, versionNumber, request, mockAsyncCallback);
 		
 		//verify url and method
-		String url = REPO_ENDPOINT + ENTITY + "/" + entityId + REPO_SUFFIX_VERSION + "/" + versionNumber + BUNDLE_MASK_PATH + partsMask;
-		verify(mockRequestBuilder).configure(GET, url);
+		String url = REPO_ENDPOINT + ENTITY + "/" + entityId + REPO_SUFFIX_VERSION + "/" + versionNumber + BUNDLE2;
+		verify(mockRequestBuilder).configure(POST, url);
 		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		verify(mockRequestBuilder).setHeader(SESSION_TOKEN_HEADER, USER_SESSION_TOKEN);
 		
-		verify(mockRequestBuilder).sendRequest(eq((String)null), requestCallbackCaptor.capture());
+		verify(mockRequestBuilder).sendRequest(anyString(), requestCallbackCaptor.capture());
 		RequestCallback requestCallback = requestCallbackCaptor.getValue();
 		
 		when(mockResponse.getStatusCode()).thenReturn(SC_FORBIDDEN);
@@ -284,13 +285,13 @@ public class SynapseJavascriptClientTest {
 	@Test
 	public void testGetReasonFromFailure() throws RequestException, JSONObjectAdapterException {
 		String entityId = "syn291";
-		int partsMask = 22;
+		EntityBundleRequest request = new EntityBundleRequest();
 		Long versionNumber = 5L;
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
-		client.getEntityBundleForVersion(entityId, versionNumber, partsMask, mockAsyncCallback);
+		client.getEntityBundleForVersion(entityId, versionNumber, request, mockAsyncCallback);
 		
-		verify(mockRequestBuilder).sendRequest(eq((String)null), requestCallbackCaptor.capture());
+		verify(mockRequestBuilder).sendRequest(anyString(), requestCallbackCaptor.capture());
 		RequestCallback requestCallback = requestCallbackCaptor.getValue();
 		
 		when(mockResponse.getStatusCode()).thenReturn(SC_BAD_REQUEST);

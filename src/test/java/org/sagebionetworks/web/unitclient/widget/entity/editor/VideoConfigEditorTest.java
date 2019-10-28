@@ -13,7 +13,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -45,7 +46,7 @@ public class VideoConfigEditorTest {
 		mockView = mock(VideoConfigView.class);
 		editor = new VideoConfigEditor(mockView, mockSynapseJavascriptClient);
 		
-		AsyncMockStubber.callSuccessWith(mockBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		when(mockSelectedEntityReference.getTargetId()).thenReturn(selectedEntityId);
 	}
 	
@@ -95,7 +96,7 @@ public class VideoConfigEditorTest {
 		editor.configure(wikiKey, descriptor, null);
 		editor.validateSelection(mockSelectedEntityReference);
 		
-		verify(mockSynapseJavascriptClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(selectedEntityId), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		verify(mockView, never()).setVideoFormatWarningVisible(true);
 		verify(mockView).setEntity(selectedEntityId);
 		verify(mockView).hideFinder();
@@ -115,7 +116,7 @@ public class VideoConfigEditorTest {
 		editor.configure(wikiKey, descriptor, null);
 		editor.validateSelection(mockSelectedEntityReference);
 		
-		verify(mockSynapseJavascriptClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(selectedEntityId), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		verify(mockView).setVideoFormatWarningVisible(true);
 		verify(mockView).setEntity(selectedEntityId);
 		verify(mockView).hideFinder();
@@ -135,7 +136,7 @@ public class VideoConfigEditorTest {
 		editor.configure(wikiKey, descriptor, null);
 		editor.validateSelection(mockSelectedEntityReference);
 		
-		verify(mockSynapseJavascriptClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(selectedEntityId), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		verify(mockView).setVideoFormatWarningVisible(true);
 		verify(mockView).setEntity(selectedEntityId);
 		verify(mockView).hideFinder();
@@ -153,7 +154,7 @@ public class VideoConfigEditorTest {
 		
 		editor.validateSelection(mockSelectedEntityReference);
 		
-		verify(mockSynapseJavascriptClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(selectedEntityId), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		verify(mockView).setVideoFormatWarningVisible(true);
 		verify(mockView).showFinderError(VideoConfigEditor.UNRECOGNIZED_VIDEO_FORMAT_MESSAGE);
 		verify(mockView, never()).setEntity(selectedEntityId);
@@ -163,10 +164,10 @@ public class VideoConfigEditorTest {
 	@Test
 	public void testValidateSelectionRPCError() {
 		Exception ex = new Exception("error seeking file name");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		editor.validateSelection(mockSelectedEntityReference);
 		
-		verify(mockSynapseJavascriptClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(selectedEntityId), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		verify(mockView).showFinderError(ex.getMessage());
 	}
 	

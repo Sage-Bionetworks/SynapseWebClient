@@ -30,4 +30,6 @@ public interface EntityMetadataView extends IsWidget {
 	void setUploadDestinationText(String text);
 	void setRestrictionWidgetV2Visible(boolean visible);
 	void setAnnotationsTitleText(String text);
+
+	void setContainerItemCountWidget(IsWidget w);
 }

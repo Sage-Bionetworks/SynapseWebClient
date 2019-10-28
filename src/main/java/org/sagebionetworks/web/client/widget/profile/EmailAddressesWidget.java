@@ -5,6 +5,7 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import java.util.List;
 
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.principal.NotificationEmail;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PopupUtilsView;
@@ -12,6 +13,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -77,18 +79,18 @@ public class EmailAddressesWidget implements EmailAddressesWidgetView.Presenter,
 		clear();
 		if (authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(profile.getOwnerId())) {
 			view.setLoadingVisible(true);
-			synapseClient.getNotificationEmail(new AsyncCallback<String>() {
+			jsClient.getNotificationEmail(new AsyncCallback<NotificationEmail>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					view.setLoadingVisible(false);
 					synAlert.handleException(caught);
 				}
 				@Override
-				public void onSuccess(String notificationEmail) {
+				public void onSuccess(NotificationEmail notificationEmail) {
 					view.setLoadingVisible(false);
-					view.addPrimaryEmail(notificationEmail);
+					view.addPrimaryEmail(notificationEmail.getEmail(), AuthenticationControllerImpl.isQuarantined(notificationEmail.getQuarantineStatus()));
 					for (String email : profile.getEmails()) {
-						if (!notificationEmail.equals(email)) {
+						if (!notificationEmail.getEmail().equals(email)) {
 							view.addSecondaryEmail(email);
 						}
 					}
@@ -145,7 +147,8 @@ public class EmailAddressesWidget implements EmailAddressesWidgetView.Presenter,
 		}
 
 		String callbackUrl = gwt.getHostPageBaseURL() + "#!Account:";
-		synapseClient.additionalEmailValidation(
+		
+		jsClient.additionalEmailValidation(
 				authenticationController.getCurrentUserPrincipalId(),
 				emailAddress, callbackUrl, new AsyncCallback<Void>() {
 					@Override

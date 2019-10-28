@@ -1,14 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
+import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.sagebionetworks.repo.model.Annotations;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
-import org.sagebionetworks.repo.model.file.CloudProviderFileHandleInterface;
+import org.sagebionetworks.repo.model.annotation.v2.Annotations;
+import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -25,7 +26,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.FileHandleUtils;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
-import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
@@ -125,9 +125,12 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		} else {
 			view.showPrivateIcon();
 		}
-		List<Annotation> annotationList = transformer.annotationsToList(annotations);
-		if (!annotationList.isEmpty()) {
-			view.setAnnotations(getAnnotationsHTML(annotationList));
+		
+		if (annotations != null) {
+			Map<String,AnnotationsValue> annotationsMap = annotations.getAnnotations();
+			if (!annotationsMap.isEmpty()) {
+				view.setAnnotations(getAnnotationsHTML(annotationsMap));
+			}
 		}
 		if (eb.getEntity() instanceof Link && eb.getPermissions().getCanDelete()) {
 			view.showUnlinkIcon();
@@ -188,14 +191,14 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	 * @param keyValueDisplay
 	 * @param annotations
 	 */
-	public String getAnnotationsHTML(List<Annotation> annotations) {
+	public String getAnnotationsHTML(Map<String, AnnotationsValue> annotations) {
 		StringBuilder sb = new StringBuilder();
-		for (Annotation annotation : annotations) {
-			String key = annotation.getKey();
+		for (String key : annotations.keySet()) {
 			sb.append("<strong>");
 			sb.append(SafeHtmlUtils.htmlEscapeAllowEntities(key));
 			sb.append("</strong>&nbsp;");
-			sb.append(SafeHtmlUtils.htmlEscapeAllowEntities(transformer.getFriendlyValues(annotation)));
+			AnnotationsValue value = annotations.get(key);
+			sb.append(SafeHtmlUtils.htmlEscapeAllowEntities(transformer.getFriendlyValues(value)));
 			sb.append("<br />");
 		}
 		return sb.toString();

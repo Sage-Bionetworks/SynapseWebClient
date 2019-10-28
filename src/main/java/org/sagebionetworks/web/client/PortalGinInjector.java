@@ -43,6 +43,7 @@ import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
+import org.sagebionetworks.web.client.widget.QuarantinedEmailModal;
 import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
@@ -190,6 +191,7 @@ import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.AclAddPeoplePanel;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGrid;
+import org.sagebionetworks.web.client.widget.statistics.StatisticsPlotWidget;
 import org.sagebionetworks.web.client.widget.subscription.TopicRowWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.TableEntityListGroupItem;
@@ -406,6 +408,7 @@ public interface PortalGinInjector extends Ginjector {
 	EmailInvitationBadge getEmailInvitationBadgeWidget();
 	VersionTimer getVersionTimer();
 	SessionDetector getSessionDetector();
+	SynapseStatusDetector getSynapseStatusDetector();
 	QuestionContainerWidget getQuestionContainerWidget();
 	SynapseAlert getSynapseAlertWidget();
 	EntityRefProvEntryView getEntityRefEntry();
@@ -602,4 +605,6 @@ public interface PortalGinInjector extends Ginjector {
 	TeamLeaveModalWidget getTeamLeaveModalWidget();
 	TeamEditModalWidget getTeamEditModalWidget();
 	TeamProjectsModalWidget getTeamProjectsModalWidget();
+	StatisticsPlotWidget getStatisticsPlotWidget();
+	QuarantinedEmailModal getQuarantinedEmailModal();
 }

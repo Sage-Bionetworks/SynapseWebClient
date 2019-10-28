@@ -15,6 +15,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.principal.EmailQuarantineReason;
+import org.sagebionetworks.repo.model.principal.EmailQuarantineStatus;
+import org.sagebionetworks.repo.model.principal.NotificationEmail;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -48,11 +51,15 @@ public class EmailAddressesWidgetTest {
 	UserProfile mockUserProfile;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	NotificationEmail mockNotificationEmail;
 	List<String> userEmails;
 	public static final String USER_ID = "982";
 	public static final String EMAIL1 = "one@one.com";
 	public static final String EMAIL2 = "two@two.com";
 	public static final String EMAIL3 = "three@three.com";
+	@Mock
+	EmailQuarantineStatus mockEmailQuarantineStatus;
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
@@ -70,36 +77,51 @@ public class EmailAddressesWidgetTest {
 		userEmails.add(EMAIL2);
 		when(mockUserProfile.getEmails()).thenReturn(userEmails);
 		when(mockUserProfile.getOwnerId()).thenReturn(USER_ID);
-		AsyncMockStubber.callSuccessWith(EMAIL1).when(mockSynapseClient).getNotificationEmail(any(AsyncCallback.class));
+		when(mockNotificationEmail.getEmail()).thenReturn(EMAIL1);
+		AsyncMockStubber.callSuccessWith(mockNotificationEmail).when(mockSynapseJavascriptClient).getNotificationEmail(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setNotificationEmail(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).removeEmail(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockSynapseJavascriptClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		
 	}
 
 	@Test
 	public void testConfigure() {
+		when(mockNotificationEmail.getQuarantineStatus()).thenReturn(null);
+		
 		widget.configure(mockUserProfile);
 		
-		verify(mockSynapseClient).getNotificationEmail(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getNotificationEmail(any(AsyncCallback.class));
 		verify(mockView).clearEmails();
 		verify(mockSynAlert).clear();
 		verify(mockView).setLoadingVisible(true);
 		verify(mockView).setLoadingVisible(false);
-		verify(mockView).addPrimaryEmail(EMAIL1);
+		verify(mockView).addPrimaryEmail(EMAIL1, false);
 		verify(mockView, never()).addSecondaryEmail(EMAIL1);
 		verify(mockView).addSecondaryEmail(EMAIL2);
 		verify(mockView).setVisible(true);
 	}
 	
 	@Test
-	public void testConfigureFailure() {
-		Exception ex = new Exception("failed");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getNotificationEmail(any(AsyncCallback.class));
+	public void testConfigureWithQuarantinedEmail() {
+		when(mockEmailQuarantineStatus.getReason()).thenReturn(EmailQuarantineReason.PERMANENT_BOUNCE);
+		when(mockNotificationEmail.getQuarantineStatus()).thenReturn(mockEmailQuarantineStatus);
+
 		widget.configure(mockUserProfile);
 		
-		verify(mockSynapseClient).getNotificationEmail(any(AsyncCallback.class));
+		verify(mockView).addPrimaryEmail(EMAIL1, true);
+		verify(mockView, never()).addSecondaryEmail(EMAIL1);
+		verify(mockView).addSecondaryEmail(EMAIL2);
+	}
+	
+	@Test
+	public void testConfigureFailure() {
+		Exception ex = new Exception("failed");
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getNotificationEmail(any(AsyncCallback.class));
+		widget.configure(mockUserProfile);
+		
+		verify(mockSynapseJavascriptClient).getNotificationEmail(any(AsyncCallback.class));
 		verify(mockView).clearEmails();
 		verify(mockSynAlert).clear();
 		verify(mockView).setLoadingVisible(true);
@@ -146,16 +168,16 @@ public class EmailAddressesWidgetTest {
 	public void testAdditionalEmailValidation() throws JSONObjectAdapterException {
 		widget.configure(mockUserProfile);
 		widget.additionalEmailValidation(EMAIL3 + "    ");
-		verify(mockSynapseClient).additionalEmailValidation(eq(USER_ID), eq(EMAIL3), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).additionalEmailValidation(eq(USER_ID), eq(EMAIL3), anyString(), any(AsyncCallback.class));
 		verify(mockPopupUtils).showInfo(DisplayConstants.EMAIL_ADDED);
 	}
 	
 	@Test
 	public void testAdditionalEmailValidationFailure() throws JSONObjectAdapterException {
 		Exception ex = new Exception("unexpected exception");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		widget.additionalEmailValidation(EMAIL3);
-		verify(mockSynapseClient).additionalEmailValidation(eq(USER_ID), eq(EMAIL3), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).additionalEmailValidation(eq(USER_ID), eq(EMAIL3), anyString(), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(ex);
 	}
 	
@@ -164,7 +186,7 @@ public class EmailAddressesWidgetTest {
 		String email = "invalidEmailAddress";
 		widget.additionalEmailValidation(email);
 		verify(mockSynAlert).showError(WebConstants.INVALID_EMAIL_MESSAGE);
-		verify(mockSynapseClient, never()).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, never()).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test

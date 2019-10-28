@@ -12,7 +12,6 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -67,11 +66,7 @@ public interface SynapseClient extends RemoteService{
 	 */
 	void updateUserProfile(UserProfile userProfile) throws RestServiceException;
 
-	void additionalEmailValidation(String userId, String emailAddress, String callbackUrl) throws RestServiceException;
-
 	void addEmail(EmailValidationSignedToken emailValidationSignedToken) throws RestServiceException;
-
-	String getNotificationEmail() throws RestServiceException;
 
 	void setNotificationEmail(String email) throws RestServiceException;
 
@@ -170,8 +165,6 @@ public interface SynapseClient extends RemoteService{
 	List<ColumnModel> createTableColumns(List<ColumnModel> value) throws RestServiceException;
 	
 	String getHost(String urlString) throws RestServiceException;
-
-	void updateAnnotations(String entityId, Annotations annotations) throws RestServiceException;
 
 	AccessApproval createAccessApproval(AccessApproval aaEW) throws RestServiceException;
 

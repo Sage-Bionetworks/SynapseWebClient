@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.events.WikiSubpagesCollapseEvent;
 import org.sagebionetworks.web.client.events.WikiSubpagesExpandEvent;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -35,14 +36,17 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	private EventBus eventBus;
 	private Presenter presenter;
 	private SynapseJSNIUtils jsniUtils;
+	private SynapseAlert synAlert;
 	@Inject
 	public WikiSubpagesViewImpl(WikiSubpagesOrderEditor orderEditor,
 								WikiSubpageNavigationTree navTree,
 								EventBus eventBus,
-								SynapseJSNIUtils jsniUtils) {
+								SynapseJSNIUtils jsniUtils,
+								SynapseAlert synAlert) {
 		this.orderEditor = orderEditor;
 		this.navTree = navTree;
 		this.eventBus = eventBus;
+		this.synAlert = synAlert;
 		this.jsniUtils = jsniUtils;
 		addStyleName("wikiSubpages");
 	}
@@ -170,7 +174,9 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		clear();
+		add(synAlert);
+		synAlert.showError(message);
 	}
 
 	@Override

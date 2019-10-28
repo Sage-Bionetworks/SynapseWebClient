@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -13,6 +14,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.GlobalApplicationStateImpl.isIgnoredErrorMessage;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -36,6 +38,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
@@ -74,6 +77,8 @@ public class GlobalApplicationStateImplTest {
 	SynapseProperties mockSynapseProperties;
 	@Captor
 	ArgumentCaptor<Callback> synapsePropertiesInitCallbackCaptor;
+	@Mock
+	SessionStorage mockSessionStorage;
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
@@ -85,7 +90,7 @@ public class GlobalApplicationStateImplTest {
 		mockView = mock(GlobalApplicationStateView.class);
 		AsyncMockStubber.callSuccessWith("v1").when(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
 		
-		globalApplicationState = new GlobalApplicationStateImpl(mockView, mockCookieProvider, mockEventBus, mockStackConfigService, mockSynapseJSNIUtils, mockLocalStorage, mockGWT, mockDateTimeUtils, mockJsClient, mockSynapseProperties);
+		globalApplicationState = new GlobalApplicationStateImpl(mockView, mockCookieProvider, mockEventBus, mockStackConfigService, mockSynapseJSNIUtils, mockLocalStorage, mockGWT, mockDateTimeUtils, mockJsClient, mockSynapseProperties, mockSessionStorage);
 		globalApplicationState.setPlaceController(mockPlaceController);
 		globalApplicationState.setAppPlaceHistoryMapper(mockAppPlaceHistoryMapper);
 	}
@@ -129,6 +134,17 @@ public class GlobalApplicationStateImplTest {
 		globalApplicationState.handleUncaughtException(t);
 		verify(mockSynapseJSNIUtils).consoleError(t);
 		verify(mockJsClient).logError(eq(t));
+	}
+	
+	@Test
+	public void testIgnoredJSExceptions() {
+		// real messages
+		assertTrue(isIgnoredErrorMessage("ResizeObserver loop limit exceeded."));
+		assertTrue(isIgnoredErrorMessage("Script error. (:0)"));
+		assertTrue(isIgnoredErrorMessage("Unspecified error."));
+		assertTrue(isIgnoredErrorMessage("Failed to execute 'insertBefore' on 'Node': The node before which the new node is to be inserted is not a child of this node."));
+		
+		assertFalse(isIgnoredErrorMessage("Blocked an iframe from loading on this page."));
 	}
 	
 	@Test
@@ -253,7 +269,7 @@ public class GlobalApplicationStateImplTest {
 	@Test
 	public void testGetLastPlaceWhenSet() {
 		//history value is set in the cookies
-		when(mockCookieProvider.getCookie(CookieKeys.LAST_PLACE)).thenReturn("a history value");
+		when(mockSessionStorage.getItem(GlobalApplicationStateImpl.LAST_PLACE)).thenReturn("a history value");
 		//and the history value resolves to a place
 		Place mockPlace = mock(Place.class);
 		when(mockAppPlaceHistoryMapper.getPlace(anyString())).thenReturn(mockPlace);
@@ -265,7 +281,7 @@ public class GlobalApplicationStateImplTest {
 	@Test
 	public void testGetLastPlaceDefaultPlace() {
 		//next line is not really necessary, but to make this explicit
-		when(mockCookieProvider.getCookie(CookieKeys.LAST_PLACE)).thenReturn(null);
+		when(mockSessionStorage.getItem(GlobalApplicationStateImpl.LAST_PLACE)).thenReturn(null);
 		//and the history value resolves to a place
 		Place mockDefaultPlace = mock(Place.class);
 		Place returnedPlace = globalApplicationState.getLastPlace(mockDefaultPlace);
@@ -275,7 +291,7 @@ public class GlobalApplicationStateImplTest {
 	@Test
 	public void testGetLastPlaceNullDefault() {
 		//next line is not really necessary, but to make this explicit
-		when(mockCookieProvider.getCookie(CookieKeys.LAST_PLACE)).thenReturn(null);
+		when(mockSessionStorage.getItem(GlobalApplicationStateImpl.LAST_PLACE)).thenReturn(null);
 		//and the history value resolves to a place
 		Place returnedPlace = globalApplicationState.getLastPlace(null);
 		assertEquals(AppActivityMapper.getDefaultPlace(), returnedPlace);
@@ -284,7 +300,7 @@ public class GlobalApplicationStateImplTest {
 	@Test
 	public void testClearLastPlace() {
 		globalApplicationState.clearLastPlace();
-		verify(mockCookieProvider).removeCookie(CookieKeys.LAST_PLACE);
+		verify(mockSessionStorage).removeItem(GlobalApplicationStateImpl.LAST_PLACE);
 	}
 	
 	@Test
@@ -294,14 +310,14 @@ public class GlobalApplicationStateImplTest {
 		when(mockAppPlaceHistoryMapper.getToken(mockPlace)).thenReturn(newToken);
 		globalApplicationState.pushCurrentPlace(mockPlace);
 		//should have set the last place (to the current), and the current place (as requested)
-		verify(mockCookieProvider).setCookie(eq(CookieKeys.LAST_PLACE), anyString(), any(Date.class));
+		verify(mockSessionStorage).setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), anyString());
 		verify(mockGWT).newItem(newToken, false);
 		
 		//if I push the same place again, it should not push the history state again
 		when(mockAppPlaceHistoryMapper.getPlace(anyString())).thenReturn(mockPlace);
 		globalApplicationState.pushCurrentPlace(mockPlace);
 		//verify that these were still only called once
-		verify(mockCookieProvider).setCookie(eq(CookieKeys.LAST_PLACE), anyString(), any(Date.class));
+		verify(mockSessionStorage).setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), anyString());
 		verify(mockGWT).newItem(newToken, false);
 	}
 	
@@ -312,14 +328,14 @@ public class GlobalApplicationStateImplTest {
 		when(mockAppPlaceHistoryMapper.getToken(mockPlace)).thenReturn(newToken);
 		globalApplicationState.replaceCurrentPlace(mockPlace);
 		//should have set the last place (to the current), and the current place (as requested)
-		verify(mockCookieProvider).setCookie(eq(CookieKeys.LAST_PLACE), anyString(), any(Date.class));
+		verify(mockSessionStorage).setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), anyString());
 		verify(mockGWT).replaceItem(newToken, false);
 		
 		//if I push the same place again, it should not push the history state again
 		when(mockAppPlaceHistoryMapper.getPlace(anyString())).thenReturn(mockPlace);
 		globalApplicationState.replaceCurrentPlace(mockPlace);
 		//verify that these were still only called once
-		verify(mockCookieProvider).setCookie(eq(CookieKeys.LAST_PLACE), anyString(), any(Date.class));
+		verify(mockSessionStorage).setItem(eq(GlobalApplicationStateImpl.LAST_PLACE), anyString());
 		verify(mockGWT).replaceItem(newToken, false);
 	}
 	

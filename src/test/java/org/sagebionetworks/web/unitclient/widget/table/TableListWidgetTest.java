@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,7 +20,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -38,6 +40,7 @@ import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.http.client.Request;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class TableListWidgetTest {
@@ -63,6 +66,8 @@ public class TableListWidgetTest {
 	CallbackP<EntityHeader> mockTableClickedCallback;
 	@Mock
 	EntityHeader mockEntityHeader;
+	@Mock
+	Request mockRequest;
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
 	List<EntityHeader> searchResults;
@@ -166,5 +171,22 @@ public class TableListWidgetTest {
 		verify(mockView).copyToClipboard(stringCaptor.capture());
 		String clipboardValue = stringCaptor.getValue();
 		assertEquals(expectedClipboardValue.toString(), clipboardValue);
+	}
+	
+	@Test
+	public void testReconfigureCancels() {
+		// Do not test async response, only test the Request
+		reset(mockSynapseJavascriptClient);
+		when(mockSynapseJavascriptClient.getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class))).thenReturn(mockRequest);
+		
+		widget.configure(parentBundle);
+		
+		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
+		verify(mockRequest, never()).cancel();
+		
+		widget.configure(parentBundle);
+		
+		verify(mockRequest).cancel();
+		verify(mockSynapseJavascriptClient, times(2)).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 	}
 }

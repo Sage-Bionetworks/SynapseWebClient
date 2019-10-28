@@ -14,6 +14,7 @@ import com.google.inject.Inject;
 
 public class VideoWidget implements WidgetRendererPresenter {
 	
+	public static final String PLEASE_LOGIN_TO_VIEW_THIS_RESOURCE = "Please login to view this resource.";
 	public static final String VIMEO_URL_PREFIX = "https://player.vimeo.com/video/";
 	public static final String YOUTUBE_URL_PREFIX = "https://www.youtube.com/embed/";
 	private VideoWidgetView view;
@@ -44,7 +45,7 @@ public class VideoWidget implements WidgetRendererPresenter {
 		} else if (vimeoVideoId != null) {
 			view.configure(VIMEO_URL_PREFIX + vimeoVideoId);
 		} else {
-			view.configure(mp4SynapseId, oggSynapseId, webmSynapseId, width, height);
+			configureFromSynapseFile(mp4SynapseId, oggSynapseId, webmSynapseId, width, height);
 		}
 		descriptor = widgetDescriptor;
 	}
@@ -53,7 +54,16 @@ public class VideoWidget implements WidgetRendererPresenter {
 		String mp4SynapseId = VideoConfigEditor.isRecognizedMP4FileName(filename) ? synapseId : null;
 		String oggSynapseId = VideoConfigEditor.isRecognizedOggFileName(filename) ? synapseId : null;
 		String webmSynapseId = VideoConfigEditor.isRecognizedWebMFileName(filename) ? synapseId : null;
-		view.configure(mp4SynapseId, oggSynapseId, webmSynapseId, Integer.toString(width), Integer.toString(height));
+		configureFromSynapseFile(mp4SynapseId, oggSynapseId, webmSynapseId, Integer.toString(width), Integer.toString(height));
+	}
+	
+	private void configureFromSynapseFile(String mp4SynapseId, String oggSynapseId, String webmSynapseId, String width, String height) {
+		if (!authenticationController.isLoggedIn()) {
+			// not logged in and attempting to download a Synapse video file.
+			view.showError(PLEASE_LOGIN_TO_VIEW_THIS_RESOURCE);
+		} else {
+			view.configure(mp4SynapseId, oggSynapseId, webmSynapseId, width, height);
+		}
 	}
 	
 	@Override

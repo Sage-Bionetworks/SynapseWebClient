@@ -40,6 +40,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	SimplePanel annotationsContainer;
 	@UiField
+	Span containerItemCountContainer;
+	@UiField
 	Span restrictionPanelV2;
 	@UiField
 	Div fileHistoryContainer;
@@ -61,6 +63,12 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		});
 	}
 
+	@Override
+	public void setContainerItemCountWidget(IsWidget w) {
+		containerItemCountContainer.clear();
+		containerItemCountContainer.add(w);
+	}
+	
 	@Override
 	public void setDoiWidget(IsWidget doiWidget) {
 		doiPanel.clear();

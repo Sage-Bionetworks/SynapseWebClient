@@ -9,4 +9,5 @@ public interface ButtonLinkWidgetView extends IsWidget {
 	void configure(WikiPageKey wikiKey, String buttonText, String url, boolean isHighlight, boolean openInNewWindow);
 	void setWidth(String width);
 	void setSize(ButtonSize size);
+	void addStyleNames(String styleNames);
 }

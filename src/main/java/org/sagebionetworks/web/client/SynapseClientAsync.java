@@ -10,7 +10,6 @@ import java.util.Set;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -51,11 +50,7 @@ public interface SynapseClientAsync {
 
 	void updateUserProfile(UserProfile userProfileJson, AsyncCallback<Void> callback);
 	
-	void additionalEmailValidation(String userId, String emailAddress, String callbackUrl, AsyncCallback<Void> callback);
-	
 	void addEmail(EmailValidationSignedToken emailValidationSignedToken, AsyncCallback<Void> callback);
-	
-	void getNotificationEmail(AsyncCallback<String> callback);
 	
 	void setNotificationEmail(String email, AsyncCallback<Void> callback);
 	void removeEmail(String email, AsyncCallback<Void> callback);
@@ -186,8 +181,6 @@ public interface SynapseClientAsync {
 	
 	void moveEntity(String entityId, String newParentEntityId, AsyncCallback<Entity> callback);
 	
-	void updateAnnotations(String entityId, Annotations annotations, AsyncCallback<Void> callback);
-
 	void createStorageLocationSetting(String parentEntityId, StorageLocationSetting setting, AsyncCallback<Void> callback);
 
 	void getStorageLocationSetting(String parentEntityId, AsyncCallback<StorageLocationSetting> callback);

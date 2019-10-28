@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.docker;
 
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.web.client.DisplayUtils;

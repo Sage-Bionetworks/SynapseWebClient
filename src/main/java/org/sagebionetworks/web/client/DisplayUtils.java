@@ -34,7 +34,6 @@ import org.gwtbootstrap3.extras.notify.client.constants.NotifyPlacement;
 import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -43,6 +42,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionableEntity;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.CloudProviderFileHandleInterface;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -242,12 +242,25 @@ public class DisplayUtils {
 	 * @param message
 	 */
 	public static void showInfo(String message) {
-		showInfo(message, null, null, IconType.INFO_CIRCLE);
+		showInfo(message, null, null, IconType.INFO_CIRCLE, null);
 	}
 
-	public static void showInfo(String message, String href, String buttonText, IconType iconType) {
+	/**
+	 * Shows an info message to the user in the "Global Alert area" for the given timeout period
+	 * @param title
+	 * @param message
+	 */
+	public static void showInfo(String message, Integer timeout) {
+		showInfo(message, null, null, IconType.INFO_CIRCLE, timeout);
+	}
+
+	public static void showInfo(String message, String href, String buttonText, IconType iconType, Integer timeout) {
 		NotifySettings settings = getDefaultSettings(href, buttonText);
 		settings.setType(NotifyType.INFO);
+		if (timeout != null) {
+			settings.setDelay(timeout);	
+		}
+		settings.setZIndex(2001);
 		notify(message, iconType, settings);
 	}
 	

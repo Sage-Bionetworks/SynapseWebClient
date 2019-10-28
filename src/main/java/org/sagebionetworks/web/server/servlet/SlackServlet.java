@@ -1,10 +1,5 @@
 package org.sagebionetworks.web.server.servlet;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
-import static org.sagebionetworks.repo.model.EntityBundle.THREAD_COUNT;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -23,9 +18,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.repo.model.Annotations;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.annotation.v2.Annotations;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.client.exceptions.IllegalArgumentException;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -106,8 +102,12 @@ public class SlackServlet extends HttpServlet {
 					SynapseClient client = createNewClient();
 					// extend
 //					int partsMask = ENTITY | ENTITY_PATH | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL | THREAD_COUNT;
-					int partsMask = ENTITY | ENTITY_PATH  | THREAD_COUNT | ANNOTATIONS;
-					EntityBundle bundle = client.getEntityBundle(text, partsMask);
+					EntityBundleRequest bundleRequest = new EntityBundleRequest();
+					bundleRequest.setIncludeEntity(true);
+					bundleRequest.setIncludeEntityPath(true);
+					bundleRequest.setIncludeThreadCount(true);
+					bundleRequest.setIncludeAnnotations(true);
+					EntityBundle bundle = client.getEntityBundleV2(text, bundleRequest);
 					title = bundle.getEntity().getName();
 					List<EntityHeader> path = bundle.getPath().getPath();
 					if (path.size() > 2) {
@@ -167,39 +167,13 @@ public class SlackServlet extends HttpServlet {
 		StringBuilder sb = new StringBuilder();
 		if (annos != null) {
 			// Strings
-			if (annos.getStringAnnotations() != null) {
-				for (String key : annos.getStringAnnotations().keySet()) {
+			if (annos.getAnnotations() != null) {
+				for (String key : annos.getAnnotations().keySet()) {
 					sb.append("\n ");
 					sb.append(key);
 					sb.append(" : ");
-					sb.append(join(annos.getStringAnnotations().get(key)));
-				}
-			}
-			// Longs
-			if (annos.getLongAnnotations() != null) {
-				for (String key : annos.getLongAnnotations().keySet()) {
-					sb.append("\n ");
-					sb.append(key);
-					sb.append(" : ");
-					sb.append(join(annos.getLongAnnotations().get(key)));
-				}
-			}
-			// Doubles
-			if (annos.getDoubleAnnotations() != null) {
-				for (String key : annos.getDoubleAnnotations().keySet()) {
-					sb.append("\n ");
-					sb.append(key);
-					sb.append(" : ");
-					sb.append(join(annos.getDoubleAnnotations().get(key)));
-				}
-			}
-			// Dates
-			if (annos.getDateAnnotations() != null) {
-				for (String key : annos.getDateAnnotations().keySet()) {
-					sb.append("\n ");
-					sb.append(key);
-					sb.append(" : ");
-					sb.append(join(annos.getDateAnnotations().get(key)));
+					
+					sb.append(join(annos.getAnnotations().get(key).getValue()));
 				}
 			}
 		}
@@ -209,7 +183,7 @@ public class SlackServlet extends HttpServlet {
 	public static String join(List list) {
 		StringBuilder sb = new StringBuilder();
 		for (Object s : list) {
-		    sb.append(COMMA).append(s);
+			sb.append(COMMA).append(s);
 		}
 		String result = sb.toString();
 		if (list.size() > 0) {

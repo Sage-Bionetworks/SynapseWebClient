@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.docker;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
+import com.google.gwt.http.client.Request;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -28,7 +29,7 @@ public class DockerRepoListWidget {
 	private EntityChildrenRequest query;
 	private LoadMoreWidgetContainer membersContainer;
 	private SynapseJavascriptClient jsClient;
-	
+	private Request currentRequest = null;
 	@Inject
 	public DockerRepoListWidget(
 			DockerRepoListWidgetView view,
@@ -59,6 +60,9 @@ public class DockerRepoListWidget {
 	 * @param projectBundle
 	 */
 	public void configure(String projectId) {
+		if (currentRequest != null) {
+			currentRequest.cancel();
+		}
 		this.query = createDockerRepoEntityQuery(projectId);
 		view.clear();
 		view.setLoadingVisible(false);
@@ -68,7 +72,7 @@ public class DockerRepoListWidget {
 	
 	public void loadMore() {
 		synAlert.clear();
-		jsClient.getEntityChildren(query, new AsyncCallback<EntityChildrenResponse>() {
+		currentRequest = jsClient.getEntityChildren(query, new AsyncCallback<EntityChildrenResponse>() {
 			public void onSuccess(EntityChildrenResponse results) {
 				query.setNextPageToken(results.getNextPageToken());
 				membersContainer.setIsMore(results.getNextPageToken() != null);

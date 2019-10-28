@@ -4,13 +4,14 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
@@ -18,6 +19,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.PreflightControll
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
@@ -46,6 +48,7 @@ public class TableEntityWidget implements IsWidget,
 		TableEntityWidgetView.Presenter, QueryResultsListener,
 		QueryInputListener{
 
+	public static final String IS_INVOKING_DOWNLOAD_TABLE = "isInvokingDownloadTable";
 	public static final String NO_FACETS_SIMPLE_SEARCH_UNSUPPORTED = "In order to use simple search, you must first set columns to be facets in the schema editor.";
 	public static final String RESET_SEARCH_QUERY_MESSAGE = "The search query will be reset. Are you sure that you would like to switch to simple search mode?";
 	
@@ -65,6 +68,7 @@ public class TableEntityWidget implements IsWidget,
 	TableEntityWidgetView view;
 	ActionMenuWidget actionMenu;
 	PreflightController preflightController;
+	SessionStorage sessionStorage;
 
 	EntityBundle entityBundle;
 	String tableId;
@@ -96,7 +100,8 @@ public class TableEntityWidget implements IsWidget,
 			SynapseClientAsync synapseClient,
 			FileViewClientsHelp fileViewClientsHelp,
 			AddToDownloadList addToDownloadList,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			SessionStorage sessionStorage) {
 		this.view = view;
 		this.queryResultsWidget = queryResultsWidget;
 		this.queryInputWidget = queryInputWidget;
@@ -106,6 +111,7 @@ public class TableEntityWidget implements IsWidget,
 		this.fileViewClientsHelp = fileViewClientsHelp;
 		this.addToDownloadList = addToDownloadList;
 		this.ginInjector = ginInjector;
+		this.sessionStorage = sessionStorage;
 		this.view.setPresenter(this);
 		this.view.setQueryResultsWidget(this.queryResultsWidget);
 		this.view.setQueryInputWidget(this.queryInputWidget);
@@ -429,6 +435,17 @@ public class TableEntityWidget implements IsWidget,
 		// Set this as the query if it was successful
 		if (wasSuccessful) {
 			this.queryChangeHandler.onQueryChange(this.currentQuery);
+			
+			// PORTALS-596: if being directed to Synapse.org to download a file set, then automatically show the "Add To Download List" UI.
+			if (Header.isShowingPortalAlert && ginInjector.getAuthenticationController().isLoggedIn()) {
+				try {
+					boolean isDownloadTable = Header.portalAlertJson.getBoolean(IS_INVOKING_DOWNLOAD_TABLE);
+					if (isDownloadTable) {
+						onAddToDownloadList();
+					}
+					Header.portalAlertJson.put(IS_INVOKING_DOWNLOAD_TABLE, false);
+				} catch (Exception e) {ginInjector.getSynapseJSNIUtils().consoleError(e);}
+			}
 		}
 		view.setTableToolbarVisible(true);
 	}

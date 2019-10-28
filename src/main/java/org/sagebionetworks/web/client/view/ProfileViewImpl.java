@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.view;
 
 import static org.sagebionetworks.web.client.DisplayUtils.DO_NOTHING_CLICKHANDLER;
 
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
@@ -61,7 +62,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	SimplePanel editUserProfilePanel;
 	HTML noChallengesHtml = new HTML("<p>This tab shows you challenges you have registered for.</p>" + 
-			"<p><a href=\"http://sagebionetworks.org/platforms/\" target=\"_blank\">Challenges</a> are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.</p>");
+			"<p><a href=\"http://sagebionetworks.org/challenges/\" target=\"_blank\">Challenges</a> are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.</p>");
 	
 	@UiField
 	Div userBadgeFooter;
@@ -224,6 +225,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@UiField
 	Span teamNotifications;
+	@UiField
+	Alert loginAlert;
 	private Presenter presenter;
 	private Header headerWidget;
 	@UiField
@@ -534,6 +537,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		projectNameColumnHeader.setSortDirection(null);
 		lastActivityOnColumnHeader.setSortDirection(null);
 		certifiedValidatedContainer.clear();
+		loginAlert.setVisible(false);
 	}
 	
 	@Override
@@ -701,5 +705,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setCertifiedValidatedWidget(IsWidget w) {
 		certifiedValidatedContainer.add(w);
+	}
+	@Override
+	public void showLoginAlert() {
+		loginAlert.setVisible(true);
 	}
 }

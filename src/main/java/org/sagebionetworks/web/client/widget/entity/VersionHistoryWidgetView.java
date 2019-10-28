@@ -22,7 +22,7 @@ public interface VersionHistoryWidgetView extends IsWidget, SynapseView{
 	void setEntityBundle(Entity entity, boolean autoShowFileHistory);
 	void setPresenter(Presenter presenter);
 	void clearVersions();
-	void addVersion(String entityId, VersionInfo version, boolean canEdit, boolean isVersionSelected, Long currentVersion);
+	void addVersion(String entityId, VersionInfo version, boolean canEdit, boolean isVersionSelected);
 	void setEditVersionInfoButtonVisible(boolean isVisible);
 	void showEditVersionInfo(String oldLabel, String oldComment);
 	void showEditVersionInfoError(String error);

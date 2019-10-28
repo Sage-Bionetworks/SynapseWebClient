@@ -6,7 +6,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.ChallengePagedResults;
 import org.sagebionetworks.repo.model.Count;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityId;
@@ -29,6 +29,7 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.repo.model.asynch.AsyncJobId;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBodyInstanceFactory;
@@ -53,6 +54,7 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestinationInstanceFactory;
+import org.sagebionetworks.repo.model.principal.NotificationEmail;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
 import org.sagebionetworks.repo.model.provenance.Activity;
@@ -130,7 +132,9 @@ public class SynapseJavascriptFactory {
 		ChallengePagedResults,
 		Etag,
 		Activity,
+		Annotations,
 		MultipartUploadStatus,
+		NotificationEmail,
 		BatchPresignedUploadUrlResponse,
 		AddPartResponse,
 		PaginatedResultsTotalNumberOfResults,
@@ -395,6 +399,10 @@ public class SynapseJavascriptFactory {
 			return new LoginResponse(json);
 		case Activity:
 			return new Activity(json);
+		case Annotations:
+			return new Annotations(json);
+		case NotificationEmail:
+			return new NotificationEmail(json);
 		case MultipartUploadStatus : 
 			return new MultipartUploadStatus(json);
 		case BatchPresignedUploadUrlResponse :

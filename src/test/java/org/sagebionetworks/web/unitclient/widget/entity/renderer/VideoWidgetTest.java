@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -96,4 +98,16 @@ public class VideoWidgetTest {
 		widget.configure(oggVideoId, "filename.ogg", 400, 600);
 		verify(mockView).configure(eq(mp4VideoId), eq(oggVideoId), eq(webMVideoId), eq(width), eq(height));
 	}
+	
+	@Test
+	public void testSynapseFileAnonymousView() {
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		String webMVideoId = "syn456";
+		
+		widget.configure(webMVideoId, "filename.webm", 400, 600);
+		
+		verify(mockView, never()).configure(anyString(), anyString(), anyString(), anyString(), anyString());
+		verify(mockView).showError(VideoWidget.PLEASE_LOGIN_TO_VIEW_THIS_RESOURCE);
+	}
+
 }

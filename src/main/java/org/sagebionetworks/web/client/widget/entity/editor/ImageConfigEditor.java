@@ -78,8 +78,8 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 			}
 		}
 		
-		if (descriptor.containsKey(IMAGE_WIDGET_ALIGNMENT_KEY)) {
-			view.setAlignment(descriptor.get(IMAGE_WIDGET_ALIGNMENT_KEY));
+		if (descriptor.containsKey(ALIGNMENT_KEY)) {
+			view.setAlignment(descriptor.get(ALIGNMENT_KEY));
 		}
 		if (descriptor.containsKey(IMAGE_WIDGET_SCALE_KEY)) {
 			view.setScale(Integer.parseInt(descriptor.get(IMAGE_WIDGET_SCALE_KEY)));
@@ -127,7 +127,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 				descriptor.put(IMAGE_WIDGET_FILE_NAME_KEY, wikiAttachments.getSelectedFilename());
 			}
 				
-			descriptor.put(IMAGE_WIDGET_ALIGNMENT_KEY, view.getAlignment());
+			descriptor.put(ALIGNMENT_KEY, view.getAlignment());
 			descriptor.put(IMAGE_WIDGET_SCALE_KEY, view.getScale().toString());
 			descriptor.put(IMAGE_WIDGET_RESPONSIVE_KEY, Boolean.TRUE.toString());
 			descriptor.put(IMAGE_WIDGET_ALT_TEXT_KEY, view.getAltText());

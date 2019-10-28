@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
@@ -24,12 +24,12 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
@@ -40,9 +40,14 @@ import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cache.SessionStorage;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
@@ -51,6 +56,7 @@ import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
+import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
@@ -70,23 +76,33 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * @author John
  *
  */
+@RunWith(MockitoJUnitRunner.class)
 public class TableEntityWidgetTest {
 
 	AdapterFactory adapterFactory;
 	List<ColumnModel> columns;
 	TableBundle tableBundle;
 	TableEntity tableEntity;
+	@Mock
 	ActionMenuWidget mockActionMenu;
+	@Mock
 	DownloadTableQueryModalWidget mockDownloadTableQueryModalWidget;
+	@Mock
 	UploadTableModalWidget mockUploadTableModalWidget;
+	@Mock
 	PreflightController mockPreflightController;
+	@Mock
 	TableEntityWidgetView mockView;
+	@Mock
 	QueryChangeHandler mockQueryChangeHandler;
+	@Mock
 	TableQueryResultWidget mockQueryResultsWidget;
+	@Mock
 	QueryInputWidget mockQueryInputWidget;
 	TableEntityWidget widget;
 	EntityBundle entityBundle;
 	Long versionNumber;
+	@Mock
 	SynapseClientAsync mockSynapseClient;
 	@Mock
 	CopyTextModal mockCopyTextModal;
@@ -104,22 +120,17 @@ public class TableEntityWidgetTest {
 	PortalGinInjector mockPortalGinInjector;
 	@Mock
 	AddToDownloadList mockAddToDownloadList;
+	@Mock
+	SessionStorage mockSessionStorage;
+	@Mock
+	AuthenticationController mockAuthController;
 	@Captor
 	ArgumentCaptor<ActionListener> actionListenerCaptor;
 	
+	JSONObjectAdapterImpl portalJson = new JSONObjectAdapterImpl();
+	
 	@Before
 	public void before(){
-		MockitoAnnotations.initMocks(this);
-		// mocks
-		mockActionMenu = Mockito.mock(ActionMenuWidget.class);
-		mockView = Mockito.mock(TableEntityWidgetView.class);
-		mockDownloadTableQueryModalWidget = Mockito.mock(DownloadTableQueryModalWidget.class);
-		mockQueryChangeHandler = Mockito.mock(QueryChangeHandler.class);
-		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
-		mockQueryResultsWidget = Mockito.mock(TableQueryResultWidget.class);
-		mockQueryInputWidget = Mockito.mock(QueryInputWidget.class);
-		mockUploadTableModalWidget = Mockito.mock(UploadTableModalWidget.class);
-		mockPreflightController = Mockito.mock(PreflightController.class);
 		// stubs
 		adapterFactory = new AdapterFactoryImpl();
 		columns = TableModelTestUtils.createOneOfEachType();
@@ -132,7 +143,7 @@ public class TableEntityWidgetTest {
 		when(mockPortalGinInjector.getDownloadTableQueryModalWidget()).thenReturn(mockDownloadTableQueryModalWidget);
 		when(mockPortalGinInjector.getUploadTableModalWidget()).thenReturn(mockUploadTableModalWidget);
 		when(mockPortalGinInjector.getCopyTextModal()).thenReturn(mockCopyTextModal);
-		
+		when(mockPortalGinInjector.getAuthenticationController()).thenReturn(mockAuthController);
 		
 		widget = new TableEntityWidget(
 				mockView, 
@@ -142,7 +153,8 @@ public class TableEntityWidgetTest {
 				mockSynapseClient, 
 				mockFileViewClientsHelp,
 				mockAddToDownloadList,
-				mockPortalGinInjector);
+				mockPortalGinInjector,
+				mockSessionStorage);
 		
 		AsyncMockStubber.callSuccessWith(FACET_SQL).when(mockSynapseClient).generateSqlWithFacets(anyString(), anyList(), anyList(), any(AsyncCallback.class));
 		// The test bundle
@@ -154,6 +166,8 @@ public class TableEntityWidgetTest {
 		Query query = new Query();
 		query.setSql(sql);
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(query);
+		Header.isShowingPortalAlert = false;
+		Header.portalAlertJson = null;
 	}
 	
 	private void configureBundleWithView(ViewType viewType) {
@@ -655,5 +669,51 @@ public class TableEntityWidgetTest {
 		verify(mockQueryResultsWidget, atLeastOnce()).setFacetsVisible(false);
 		verify(mockView).setSimpleSearchLinkVisible(false);
 		verify(mockView, atLeastOnce()).setAdvancedSearchLinkVisible(false);
+	}
+	
+	@Test
+	public void testAutoAddToDownloadList() throws JSONObjectAdapterException{
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		configureBundleWithView(ViewType.file);
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(new Query());
+		Header.isShowingPortalAlert = true;
+		Header.portalAlertJson = portalJson;
+		portalJson.put(TableEntityWidget.IS_INVOKING_DOWNLOAD_TABLE, true);
+		
+		widget.configure(entityBundle, versionNumber, true, mockQueryChangeHandler, mockActionMenu);
+		widget.queryExecutionFinished(true, false);
+	
+		verify(mockAddToDownloadList).addToDownloadList(anyString(), any(Query.class));
+		assertFalse(portalJson.getBoolean(TableEntityWidget.IS_INVOKING_DOWNLOAD_TABLE));
+	}
+
+	@Test
+	public void testAutoAddToDownloadListFalse() throws JSONObjectAdapterException{
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		configureBundleWithView(ViewType.file);
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(new Query());
+		Header.isShowingPortalAlert = true;
+		Header.portalAlertJson = portalJson;
+		portalJson.put(TableEntityWidget.IS_INVOKING_DOWNLOAD_TABLE, false);
+
+		widget.configure(entityBundle, versionNumber, true, mockQueryChangeHandler, mockActionMenu);
+		widget.queryExecutionFinished(true, false);
+		
+		verify(mockAddToDownloadList, never()).addToDownloadList(anyString(), any(Query.class));
+	}
+	
+	@Test
+	public void testAutoAddToDownloadListNotLoggedIn() throws JSONObjectAdapterException{
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		configureBundleWithView(ViewType.file);
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(new Query());
+		Header.isShowingPortalAlert = true;
+		Header.portalAlertJson = portalJson;
+		portalJson.put(TableEntityWidget.IS_INVOKING_DOWNLOAD_TABLE, true);
+		
+		widget.configure(entityBundle, versionNumber, true, mockQueryChangeHandler, mockActionMenu);
+		widget.queryExecutionFinished(true, false);
+		
+		verify(mockAddToDownloadList, never()).addToDownloadList(anyString(), any(Query.class));
 	}
 }

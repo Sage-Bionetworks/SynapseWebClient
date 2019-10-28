@@ -23,7 +23,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
@@ -112,8 +113,8 @@ public class EntityPresenterTest {
 		path.setPath(Collections.singletonList(mockProjectEntityHeader));
 		when(mockProjectEntityHeader.getType()).thenReturn(Project.class.getName());
 		eb.setPath(path);
-		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		id=0L;
 	}	
 	
@@ -132,7 +133,7 @@ public class EntityPresenterTest {
 		
 		entityPresenter.setPlace(place);
 		//verify that background image is cleared
-		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), eq(EntityPageTop.ALL_PARTS_MASK), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), eq(EntityPageTop.ALL_PARTS_REQUEST), any(AsyncCallback.class));
 		verify(mockView, times(2)).setLoadingVisible(Mockito.anyBoolean());
 		verify(mockView).setEntityPageTopVisible(true);
 		verify(mockEntityPageTop, atLeastOnce()).clearState();
@@ -152,7 +153,7 @@ public class EntityPresenterTest {
 		when(place.getEntityId()).thenReturn(entityId);
 		entityPresenter.setPlace(place);
 		//verify that background image is cleared
-		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		verify(mockView, times(2)).setLoadingVisible(Mockito.anyBoolean());
 		verify(mockView).setEntityPageTopVisible(true);
 		verify(mockEntityPageTop, atLeastOnce()).clearState();
@@ -173,7 +174,7 @@ public class EntityPresenterTest {
 		
 		entityPresenter.setPlace(place);
 		
-		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		verify(mockSynAlert).showError(DisplayConstants.ERROR_GENERIC_RELOAD);
 	}
 	

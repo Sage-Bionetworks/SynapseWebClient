@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
@@ -90,9 +91,11 @@ public class AddToDownloadListTest {
 	Long testFolderChildCount = 22L, testFolderSumFileSizesBytes = 7777777L;
 	Long queryCount = 4L;
 	Long querySumFileSize = 88L;
+	@Mock
+	AuthenticationController mockAuthController;
 	@Before
 	public void setUp() throws Exception {
-		widget = new AddToDownloadList(mockView, mockAsynchronousProgressWidget, mockInlineAsynchronousProgressView, mockPopupUtils, mockEventBus, mockSynAlert, mockPackageSizeSummary, mockJsClient, mockSynapseJSNIUtils);
+		widget = new AddToDownloadList(mockView, mockAsynchronousProgressWidget, mockInlineAsynchronousProgressView, mockPopupUtils, mockEventBus, mockSynAlert, mockPackageSizeSummary, mockJsClient, mockSynapseJSNIUtils, mockAuthController);
 		when(mockEntityChildrenResponse.getTotalChildCount()).thenReturn(testFolderChildCount);
 		when(mockEntityChildrenResponse.getSumFileSizesBytes()).thenReturn(testFolderSumFileSizesBytes);
 		when(mockQueryResultBundle.getQueryCount()).thenReturn(queryCount);
@@ -100,6 +103,7 @@ public class AddToDownloadListTest {
 		querySumFileSize = 20L;
 		when(mockSumFileSizes.getSumFileSizesBytes()).thenReturn(querySumFileSize);
 		when(mockQueryResultBundle.getSumFileSizes()).thenReturn(mockSumFileSizes);
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
 	}
 
 	@Test
@@ -198,5 +202,23 @@ public class AddToDownloadListTest {
 		widget.addToDownloadList(folderId);
 
 		verify(mockSynAlert).showError(ZERO_FILES_IN_FOLDER_MESSAGE);
+	}
+	
+	@Test
+	public void testAddFolderToDownloadListAsAnonymous() {
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+
+		widget.addToDownloadList(folderId);
+
+		verify(mockSynAlert).showError(PLEASE_LOGIN_TO_ADD_TO_DOWNLOAD_LIST);
+	}
+	
+	@Test
+	public void testAddQueryToDownloadListAsAnonymous() {
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+
+		widget.addToDownloadList(queryEntityId, mockQuery);
+
+		verify(mockSynAlert).showError(PLEASE_LOGIN_TO_ADD_TO_DOWNLOAD_LIST);
 	}
 }

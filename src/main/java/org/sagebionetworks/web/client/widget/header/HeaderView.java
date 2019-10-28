@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.web.bindery.event.shared.binder.EventBinder;
@@ -48,5 +48,5 @@ public interface HeaderView extends IsWidget {
 	void setDownloadListUIVisible(boolean visible);
 	void setDownloadListFileCount(Integer count);
 	void setCookieNotificationVisible(boolean visible);
-	void showPortalAlert(String cookieValue);
+	void setPortalAlertVisible(boolean visible, JSONObjectAdapter portalJson);
 }

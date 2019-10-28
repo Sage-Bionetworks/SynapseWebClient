@@ -14,6 +14,7 @@
 						<b:DropDownHeader ui:field="noActionsAvailable" addStyleNames="font-italic">No actions available</b:DropDownHeader>
 						<a:ActionMenuItem icon="LOCK" iconFixedWidth="true" action="SHARE">Share</a:ActionMenuItem>
 						<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_PROJECT_METADATA">Edit Project Metadata</a:ActionMenuItem>
+						<a:ActionMenuItem icon="BAR_CHART" iconFixedWidth="true" action="SHOW_PROJECT_STATS">Show Project Statistics</a:ActionMenuItem>
 						<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_FILE_METADATA">Edit File Metadata</a:ActionMenuItem>
 						<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="CHANGE_ENTITY_NAME">Rename</a:ActionMenuItem>
 						<a:ActionMenuItem icon="INFO_CIRCLE" iconFixedWidth="true" action="SHOW_ANNOTATIONS">Annotations</a:ActionMenuItem>

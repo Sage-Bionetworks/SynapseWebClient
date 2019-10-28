@@ -25,30 +25,23 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
@@ -58,6 +51,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsTreeItem;
 
@@ -95,6 +89,8 @@ public class EntityTreeBrowserTest {
 	EntityHeader mockEntityHeader;
 	@Mock
 	SynapseAlert mockSynAlert;
+	@Mock
+	Request mockRequest;
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
 
@@ -284,51 +280,6 @@ public class EntityTreeBrowserTest {
 		verify(handler).onSelection(any(EntitySelectedEvent.class));
 	}
 	
-	private EntityHeader createEntityHeader(String id, String name, String type, Long versionNumber) {
-		EntityHeader header = new EntityHeader();
-		header.setId(id);
-		header.setName(name);
-		header.setType(type);
-		header.setVersionNumber(versionNumber);
-		return header;
-	}
-	
-	@Test
-	public void testGetEntityQueryResultsFromHeaders() {
-		List<EntityHeader> headers = new ArrayList<EntityHeader>();
-		String id, name, type;
-		Long versionNumber;
-		id = "12";
-		name = "project 1";
-		type = Project.class.getName();
-		versionNumber = 1L;
-		headers.add(createEntityHeader(id, name, type, versionNumber));
-		
-		EntityQueryResults results = entityTreeBrowser.getEntityQueryResultsFromHeaders(headers);
-		assertEquals(1L, results.getTotalEntityCount().longValue());
-		assertEquals(1, results.getEntities().size());
-		EntityQueryResult result = results.getEntities().get(0);
-		assertEquals(id, result.getId());
-		assertEquals(name, result.getName());
-		assertEquals(EntityType.project.name(), result.getEntityType());
-		assertEquals(versionNumber, result.getVersionNumber());
-		
-		id = "24";
-		name = "project 2";
-		type = "file";
-		versionNumber = 3L;
-		headers.add(createEntityHeader(id, name, type, versionNumber));
-		
-		results = entityTreeBrowser.getEntityQueryResultsFromHeaders(headers);
-		assertEquals(2L, results.getTotalEntityCount().longValue());
-		assertEquals(2, results.getEntities().size());
-		result = results.getEntities().get(1);
-		assertEquals(id, result.getId());
-		assertEquals(name, result.getName());
-		assertEquals(type, result.getEntityType());
-		assertEquals(versionNumber, result.getVersionNumber());
-	}
-	
 	@Test
 	public void testIsExpandable() {
 		EntityHeader result = new EntityHeader();
@@ -355,5 +306,22 @@ public class EntityTreeBrowserTest {
 		for (int i = 0; i < 10; i++) {
 			assertTrue(clipboardValue.contains(TEST_RESULT_ID+i));
 		}
+	}
+	
+	@Test
+	public void testReconfigureCancels() {
+		// Do not test async response, only test the Request
+		reset(mockSynapseJavascriptClient);
+		when(mockSynapseJavascriptClient.getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class))).thenReturn(mockRequest);
+		
+		entityTreeBrowser.configure("123");
+		
+		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
+		verify(mockRequest, never()).cancel();
+		
+		entityTreeBrowser.configure("1234");
+		
+		verify(mockRequest).cancel();
+		verify(mockSynapseJavascriptClient, times(2)).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 	}
 }

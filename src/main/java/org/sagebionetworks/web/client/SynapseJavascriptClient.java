@@ -30,7 +30,6 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -59,6 +58,7 @@ import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
@@ -81,6 +81,8 @@ import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.EntityLookupRequest;
 import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.file.AddPartResponse;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
@@ -99,6 +101,7 @@ import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.principal.AliasList;
+import org.sagebionetworks.repo.model.principal.NotificationEmail;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
@@ -164,6 +167,7 @@ import com.google.inject.Inject;
  *
  */
 public class SynapseJavascriptClient {
+	public static final String BUNDLE2 = "/bundle2";
 	public static final String TABLE_SNAPSHOT = "/table/snapshot";
 	public static final String SESSION = "/session";
 	public static final String TYPE_FILTER_PARAMETER = "&typeFilter=";
@@ -282,7 +286,12 @@ public class SynapseJavascriptClient {
 	public static final String TEAM_MEMBERS = "/teamMembers/";
 	public static final String NAME_FRAGMENT_FILTER = "fragment=";
 	public static final String NAME_MEMBERTYPE_FILTER = "memberType=";
-
+	public static final String VERSION_INFO = "/version";
+	public static final String FILE_PREVIEW = "/filepreview";
+	public static final String REDIRECT_PARAMETER = "redirect=";
+	public static final String ACCOUNT = "/account";
+	public static final String EMAIL_VALIDATION = "/emailValidation";
+	public static final String PORTAL_ENDPOINT_PARAM = "portalEndpoint=";
 	public static final int LIMIT_50 = 50;
 	
 	public Map<String, List<Request>> requestsMap;
@@ -340,10 +349,6 @@ public class SynapseJavascriptClient {
 		}
 	}
 
-	public void cancelPendingRequestsForCurrentUrl() {
-		cancelPendingRequests(gwt.getCurrentURL());
-	}
-
 	public void cancelPendingRequests(String forUrl) {
 		for (Request request : requestsMap.get(forUrl)) {
 			if (request.isPending()) {
@@ -381,7 +386,7 @@ public class SynapseJavascriptClient {
 		return synapseVersionInfo;
 	}
 	
-	private void doDelete(String url, AsyncCallback callback) {
+	private Request doDelete(String url, AsyncCallback callback) {
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
 		requestBuilder.configure(DELETE, url);
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
@@ -390,19 +395,19 @@ public class SynapseJavascriptClient {
 		}
 		// never cancel a DELETE request
 		boolean canCancel = false;
-		sendRequest(requestBuilder, null, OBJECT_TYPE.None, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, callback);
+		return sendRequest(requestBuilder, null, OBJECT_TYPE.None, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, callback);
 	}
 
-	private void doGet(String url, OBJECT_TYPE responseType, AsyncCallback callback) {
-		doGet(url, responseType, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserSessionToken(), callback);
+	private Request doGet(String url, OBJECT_TYPE responseType, AsyncCallback callback) {
+		return doGet(url, responseType, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserSessionToken(), callback);
 	}
 	
-	public void doGetString(String url, boolean forceAnonymous, AsyncCallback callback) {
+	public Request doGetString(String url, boolean forceAnonymous, AsyncCallback callback) {
 		String sessionToken = forceAnonymous ? null : authController.getCurrentUserSessionToken();
-		doGet(url, OBJECT_TYPE.String, null, sessionToken, callback);
+		return doGet(url, OBJECT_TYPE.String, null, sessionToken, callback);
 	}
 	
-	private void doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, String sessionToken, AsyncCallback callback) {
+	private Request doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, String sessionToken, AsyncCallback callback) {
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
 		requestBuilder.configure(GET, url);
 		if (acceptedResponseType != null) {
@@ -413,10 +418,10 @@ public class SynapseJavascriptClient {
 		}
 		// can always cancel a GET request
 		boolean canCancel = true;
-		sendRequest(requestBuilder, null, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, callback);
+		return sendRequest(requestBuilder, null, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, callback);
 	}
 	
-	private void doPostOrPut(RequestBuilder.Method method, String url, JSONEntity requestObject, OBJECT_TYPE responseType, boolean canCancel, AsyncCallback callback) {
+	private Request doPostOrPut(RequestBuilder.Method method, String url, JSONEntity requestObject, OBJECT_TYPE responseType, boolean canCancel, AsyncCallback callback) {
 		String requestData = null;
 		if (requestObject != null) {
 			try {
@@ -425,7 +430,7 @@ public class SynapseJavascriptClient {
 				requestData = adapter.toJSONString();
 			} catch (JSONObjectAdapterException exception) {
 				callback.onFailure(exception);
-				return;
+				return null;
 			}
 		}
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
@@ -435,21 +440,21 @@ public class SynapseJavascriptClient {
 		if (authController.isLoggedIn()) {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}
-		sendRequest(requestBuilder, requestData, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, callback);
+		return sendRequest(requestBuilder, requestData, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, callback);
 	}
 	
-	private void doPost(String url, JSONEntity requestObject, OBJECT_TYPE responseType, boolean canCancel, AsyncCallback callback) {
-		doPostOrPut(POST, url, requestObject, responseType, canCancel, callback);
+	private Request doPost(String url, JSONEntity requestObject, OBJECT_TYPE responseType, boolean canCancel, AsyncCallback callback) {
+		return doPostOrPut(POST, url, requestObject, responseType, canCancel, callback);
 	}
 	
-	private void doPut(String url, JSONEntity requestObject, OBJECT_TYPE responseType, AsyncCallback callback) {
+	private Request doPut(String url, JSONEntity requestObject, OBJECT_TYPE responseType, AsyncCallback callback) {
 		// never cancel a PUT request
 		boolean canCancel = false;
-		doPostOrPut(PUT, url, requestObject, responseType, false, callback);
+		return doPostOrPut(PUT, url, requestObject, responseType, false, callback);
 	}
 
 	
-	private void sendRequest(final RequestBuilderWrapper requestBuilder, final String requestData, final OBJECT_TYPE responseType, final int retryDelay, boolean canCancel, final AsyncCallback callback) {
+	private Request sendRequest(final RequestBuilderWrapper requestBuilder, final String requestData, final OBJECT_TYPE responseType, final int retryDelay, boolean canCancel, final AsyncCallback callback) {
 		try {
 			Request request = requestBuilder.sendRequest(requestData, new RequestCallback() {
 				@Override
@@ -531,10 +536,12 @@ public class SynapseJavascriptClient {
 				}
 				requestsMap.get(currentUrl).add(request);
 			}
+			return request;
 		} catch (final Exception e) {
 			if (callback != null) {
 				callback.onFailure(e);	
 			}
+			return null;
 		}
 	}
 	
@@ -565,8 +572,8 @@ public class SynapseJavascriptClient {
 		}
 	}
 	
-	public void getEntityBundle(String entityId, int partsMask, final AsyncCallback<EntityBundle> callback) {
-		getEntityBundleForVersion(entityId, null, partsMask, callback);
+	public void getEntityBundle(String entityId, EntityBundleRequest request, final AsyncCallback<EntityBundle> callback) {
+		getEntityBundleForVersion(entityId, null, request, callback);
 	}
 	
 	public void populateEntityBundleCache(String entityId) {
@@ -590,7 +597,7 @@ public class SynapseJavascriptClient {
 		} else {
 			jsniUtils.consoleLog("Cache miss: " + entityId);
 		}
-		getEntityBundleForVersion(entityId, null, EntityPageTop.ALL_PARTS_MASK, new AsyncCallback<EntityBundle>() {
+		getEntityBundleForVersion(entityId, null, EntityPageTop.ALL_PARTS_REQUEST, new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle latestEntityBundle) {
 				if (!latestEntityBundle.equals(cachedBundle)) {
@@ -617,13 +624,13 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + uri;
 		doGet(url, OBJECT_TYPE.JSON, callback);
 	}
-	public void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, final AsyncCallback<EntityBundle> callback) {
+	public void getEntityBundleForVersion(String entityId, Long versionNumber, EntityBundleRequest request, final AsyncCallback<EntityBundle> callback) {
 		String url = getRepoServiceUrl() + ENTITY + "/" + entityId;
 		if (versionNumber != null) {
 			url += REPO_SUFFIX_VERSION + "/" + versionNumber;
 		}
-		url += BUNDLE_MASK_PATH + partsMask;
-		doGet(url, OBJECT_TYPE.EntityBundle, callback);
+		url += BUNDLE2;
+		doPost(url, request, OBJECT_TYPE.EntityBundle, true, callback);
 	}
 
 	public void getTeam(String teamId, final AsyncCallback<Team> callback) {
@@ -671,9 +678,9 @@ public class SynapseJavascriptClient {
 		doPost(url, request, OBJECT_TYPE.RestrictionInformationResponse, true, callback);
 	}
 	
-	public void getEntityChildren(EntityChildrenRequest request, final AsyncCallback<EntityChildrenResponse> callback) {
+	public Request getEntityChildren(EntityChildrenRequest request, final AsyncCallback<EntityChildrenResponse> callback) {
 		String url = getRepoServiceUrl() + ENTITY + CHILDREN;
-		doPost(url, request, OBJECT_TYPE.EntityChildrenResponse, true, callback);
+		return doPost(url, request, OBJECT_TYPE.EntityChildrenResponse, true, callback);
 	}
 	
 	public void getV2WikiPageAsV1(WikiPageKey key, AsyncCallback<WikiPage> callback) {
@@ -1492,10 +1499,10 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + ENTITY + "/" + tableEntityId + COLUMN;
 		doGet(url, OBJECT_TYPE.PaginatedColumnModelsResults, callback);
 	}
-	public void getEntityVersions(String entityId, int offset, int limit, AsyncCallback<List<VersionInfo>> callback) {
+	public Request getEntityVersions(String entityId, int offset, int limit, AsyncCallback<List<VersionInfo>> callback) {
 		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + REPO_SUFFIX_VERSION
 				+ "?" + OFFSET_PARAMETER + offset + "&" + LIMIT_PARAMETER + limit;
-		doGet(url, OBJECT_TYPE.PaginatedResultsVersionInfo, callback);
+		return doGet(url, OBJECT_TYPE.PaginatedResultsVersionInfo, callback);
 	}
 	public void getThreadsForEntity(String entityId, Long limit, Long offset,
 			DiscussionThreadOrder order, Boolean ascending, DiscussionFilter filter,
@@ -1656,6 +1663,32 @@ public class SynapseJavascriptClient {
 			}
 		};
 		listUserProfiles(userIds, profilesCallback);
+	}
+	
+	public void updateAnnotations(String entityId, Annotations annotations, AsyncCallback<Annotations> cb) {
+		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + "/annotations2";
+		doPut(url, annotations, OBJECT_TYPE.Annotations, cb);
+	}
+
+	public Request getNotificationEmail(AsyncCallback<NotificationEmail> cb) {
+		String url = getRepoServiceUrl() + "/notificationEmail";
+		return doGet(url, OBJECT_TYPE.NotificationEmail, cb);
+	}
+
+	public Request getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber, boolean preview, AsyncCallback<String> cb) {
+		String filePath = preview ? FILE_PREVIEW : FILE;
+		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + VERSION_INFO + "/"
+				+ versionNumber + filePath + "?" + REDIRECT_PARAMETER
+				+ "false";
+		return doGet(url, OBJECT_TYPE.String, cb);
+	}
+	
+	public void additionalEmailValidation(String userId, String emailAddress, String callbackUrl, AsyncCallback<Void> cb) {
+		String url = getRepoServiceUrl() + ACCOUNT + "/" + userId + "/"
+				+ EMAIL_VALIDATION + "?" + PORTAL_ENDPOINT_PARAM + callbackUrl;
+		Username username = new Username();
+		username.setEmail(emailAddress);
+		doPost(url, username, OBJECT_TYPE.None, false, cb);
 	}
 }
 

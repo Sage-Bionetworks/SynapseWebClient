@@ -17,7 +17,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -26,6 +26,9 @@ import com.google.inject.Inject;
 
 public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPresenter {
 	
+	public static final String ALIGN_CENTER_STYLES = "align-center";
+	public static final String FLOAT_RIGHT_STYLES = "floatright margin-left-10";
+	public static final String FLOAT_LEFT_STYLES = "floatleft margin-right-10";
 	private ImageWidgetView view;
 	private Map<String,String> descriptor;
 	AuthenticationController authenticationController;
@@ -61,7 +64,7 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 				view.configure(fileResult.getPreSignedURL(),
 						descriptor.get(IMAGE_WIDGET_FILE_NAME_KEY),
 						descriptor.get(IMAGE_WIDGET_SCALE_KEY),
-						descriptor.get(IMAGE_WIDGET_ALIGNMENT_KEY),
+						descriptor.get(ALIGNMENT_KEY),
 						descriptor.get(IMAGE_WIDGET_ALT_TEXT_KEY),
 						descriptor.get(IMAGE_WIDGET_SYNAPSE_ID_KEY), 
 						authenticationController.isLoggedIn());
@@ -149,8 +152,17 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-
-		/*
-	 * Private Methods
-	 */
+	public static String getAlignmentStyleNames(String alignment) {
+		if (alignment != null) {
+			String trimmedAlignment = alignment.trim();
+			if (WidgetConstants.FLOAT_LEFT.equalsIgnoreCase(trimmedAlignment)) {
+				return FLOAT_LEFT_STYLES;
+			} else if (WidgetConstants.FLOAT_RIGHT.equalsIgnoreCase(trimmedAlignment)) {
+				return FLOAT_RIGHT_STYLES;
+			}else if (WidgetConstants.FLOAT_CENTER.equalsIgnoreCase(trimmedAlignment)) {
+				return ALIGN_CENTER_STYLES;
+			}
+		}
+		return "";
+	}
 }

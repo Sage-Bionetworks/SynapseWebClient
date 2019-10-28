@@ -20,13 +20,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
-import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -48,7 +45,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.Whitebox;
@@ -64,10 +60,8 @@ import org.sagebionetworks.reflection.model.PaginatedResults;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -101,6 +95,8 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyResult;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
@@ -189,7 +185,6 @@ public class SynapseClientImplTest {
 	public static final String USER_ID = "900";
 	UserProfile inviteeUserProfile;
 	ExampleEntity entity;
-	Annotations annos;
 	UserEntityPermissions eup;
 	UserEvaluationPermissions userEvaluationPermissions;
 	List<EntityHeader> batchHeaderResults;
@@ -304,12 +299,6 @@ public class SynapseClientImplTest {
 		entity.setModifiedBy(testUserId);
 		// the mock synapse should return this object
 		when(mockSynapse.getEntityById(entityId)).thenReturn(entity);
-		// Setup the annotations
-		annos = new Annotations();
-		annos.setId(entityId);
-		annos.addAnnotation("string", "a string value");
-		// the mock synapse should return this object
-		when(mockSynapse.getAnnotations(entityId)).thenReturn(annos);
 		// Setup the Permissions
 		eup = new UserEntityPermissions();
 		eup.setCanDelete(true);
@@ -405,21 +394,12 @@ public class SynapseClientImplTest {
 		int emptyMask = 0;
 		EntityBundle bundle = new EntityBundle();
 		bundle.setEntity(entity);
-		bundle.setAnnotations(annos);
 		bundle.setPermissions(eup);
 		bundle.setPath(path);
 		bundle.setHasChildren(false);
-		bundle.setAccessRequirements(accessRequirements);
-		bundle.setUnmetAccessRequirements(accessRequirements);
 		bundle.setBenefactorAcl(acl);
-		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(mask)))
+		when(mockSynapse.getEntityBundleV2(anyString(), any(EntityBundleRequest.class)))
 				.thenReturn(bundle);
-		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL)))
-				.thenReturn(bundle);
-
-		EntityBundle emptyBundle = new EntityBundle();
-		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(emptyMask)))
-				.thenReturn(emptyBundle);
 
 		when(mockSynapse.canAccess("syn101", ACCESS_TYPE.READ))
 				.thenReturn(true);
@@ -597,32 +577,12 @@ public class SynapseClientImplTest {
 
 
 	@Test
-	public void testGetEntityBundleAll() throws RestServiceException {
+	public void testGetEntityBundleAll() throws SynapseException, RestServiceException {
 		// Make sure we can get all parts of the bundel
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH
-				| HAS_CHILDREN;
-		EntityBundle bundle = synapseClient.getEntityBundle(entityId, mask);
-		assertNotNull(bundle);
-		// We should have all of the strings
-		assertNotNull(bundle.getEntity());
-		assertNotNull(bundle.getAnnotations());
-		assertNotNull(bundle.getPath());
-		assertNotNull(bundle.getPermissions());
-		assertNotNull(bundle.getHasChildren());
-	}
-
-	@Test
-	public void testGetEntityBundleNone() throws RestServiceException {
-		// Make sure all are null
-		int mask = 0x0;
-		EntityBundle bundle = synapseClient.getEntityBundle(entityId, mask);
-		assertNotNull(bundle);
-		// We should have all of the strings
-		assertNull(bundle.getEntity());
-		assertNull(bundle.getAnnotations());
-		assertNull(bundle.getPath());
-		assertNull(bundle.getPermissions());
-		assertNull(bundle.getHasChildren());
+		EntityBundleRequest request = new EntityBundleRequest();
+		EntityBundle bundle = synapseClient.getEntityBundle(entityId, request);
+		
+		verify(mockSynapse).getEntityBundleV2(entityId, request);
 	}
 
 	@Test
@@ -654,7 +614,7 @@ public class SynapseClientImplTest {
 	public void testGetEntityBenefactorAcl() throws Exception {
 		EntityBundle bundle = new EntityBundle();
 		bundle.setBenefactorAcl(acl);
-		when(mockSynapse.getEntityBundle("syn101", EntityBundle.BENEFACTOR_ACL))
+		when(mockSynapse.getEntityBundleV2(anyString(), any(EntityBundleRequest.class)))
 				.thenReturn(bundle);
 		AccessControlList clone = synapseClient
 				.getEntityBenefactorAcl("syn101");
@@ -678,7 +638,7 @@ public class SynapseClientImplTest {
 	public void testDeleteAcl() throws Exception {
 		EntityBundle bundle = new EntityBundle();
 		bundle.setBenefactorAcl(acl);
-		when(mockSynapse.getEntityBundle("syn101", EntityBundle.BENEFACTOR_ACL))
+		when(mockSynapse.getEntityBundleV2(eq("syn101"), any(EntityBundleRequest.class)))
 				.thenReturn(bundle);
 		AccessControlList clone = synapseClient.deleteAcl("syn101");
 		assertEquals(acl, clone);
@@ -1420,30 +1380,11 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class), any(ACCESS_TYPE.class), eq(SynapseClientImpl.LIMIT_50), eq(SynapseClientImpl.LIMIT_50));
 	}
 	
-	// pass through tests for email validation
-
-	@Test
-	public void testAdditionalEmailValidation() throws Exception {
-		Long userId = 992843l;
-		String emailAddress = "test@test.com";
-		String callbackUrl = "http://www.synapse.org/#!Account:";
-		synapseClient.additionalEmailValidation(userId.toString(),
-				emailAddress, callbackUrl);
-		verify(mockSynapse).additionalEmailValidation(eq(userId),
-				eq(emailAddress), eq(callbackUrl));
-	}
-
 	@Test
 	public void testAddEmail() throws Exception {
 		EmailValidationSignedToken emailValidationSignedToken = new EmailValidationSignedToken();
 		synapseClient.addEmail(emailValidationSignedToken);
 		verify(mockSynapse).addEmail(any(EmailValidationSignedToken.class), anyBoolean());
-	}
-
-	@Test
-	public void testGetNotificationEmail() throws Exception {
-		synapseClient.getNotificationEmail();
-		verify(mockSynapse).getNotificationEmail();
 	}
 
 	@Test
@@ -1693,8 +1634,8 @@ public class SynapseClientImplTest {
 		Entity file = new FileEntity();
 		eb.setEntity(file);
 		eb.getEntity().setId(entityId);
-		when(mockSynapse.getEntityBundle(anyString(), anyInt())).thenReturn(eb);
-		when(mockSynapse.getEntityBundle(anyString(), anyLong(), anyInt())).thenReturn(eb);
+		when(mockSynapse.getEntityBundleV2(anyString(), any(EntityBundleRequest.class))).thenReturn(eb);
+		when(mockSynapse.getEntityBundleV2(anyString(), anyLong(), any(EntityBundleRequest.class))).thenReturn(eb);
 		PaginatedResults<VersionInfo> versionInfoPaginatedResults = new PaginatedResults<VersionInfo>();
 		List<VersionInfo> versionInfoList = new LinkedList<VersionInfo>();
 		VersionInfo versionInfo = new VersionInfo();

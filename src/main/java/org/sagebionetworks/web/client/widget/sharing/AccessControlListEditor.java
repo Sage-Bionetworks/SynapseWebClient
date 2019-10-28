@@ -12,13 +12,14 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.ErrorResponseCode;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -162,8 +163,10 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		view.showLoading();
 		hasChangesHandler.hasChanges(false);
 		
-		int partsMask = EntityBundle.BENEFACTOR_ACL | EntityBundle.PERMISSIONS;
-		jsClient.getEntityBundle(entity.getId(), partsMask, new AsyncCallback<EntityBundle>() {
+		EntityBundleRequest bundleRequest = new EntityBundleRequest();
+		bundleRequest.setIncludeBenefactorACL(true);
+		bundleRequest.setIncludePermissions(true);
+		jsClient.getEntityBundle(entity.getId(), bundleRequest, new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				try {

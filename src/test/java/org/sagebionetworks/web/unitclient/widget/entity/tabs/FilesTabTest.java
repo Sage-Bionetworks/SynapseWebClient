@@ -20,7 +20,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -219,7 +219,6 @@ public class FilesTabTest {
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockProjectEntityBundle, version, mockActionMenuWidget);
 		
-		verify(mockJsClient).cancelPendingRequestsForCurrentUrl();
 		verify(mockView, times(2)).setFileTitlebarVisible(false);
 		verify(mockView, times(2)).setFolderTitlebarVisible(false);
 		verify(mockView, times(2)).setPreviewVisible(false);
@@ -272,7 +271,6 @@ public class FilesTabTest {
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockEntityBundle, version, mockActionMenuWidget);
 
-		verify(mockJsClient).cancelPendingRequestsForCurrentUrl();
 		verify(mockView).setFileTitlebarVisible(false);
 		verify(mockView).setFileTitlebarVisible(true);
 		verify(mockView, times(2)).setFolderTitlebarVisible(false);

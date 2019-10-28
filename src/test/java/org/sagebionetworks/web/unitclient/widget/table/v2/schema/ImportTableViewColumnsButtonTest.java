@@ -21,7 +21,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Table;
@@ -66,7 +67,7 @@ public class ImportTableViewColumnsButtonTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		widget = new ImportTableViewColumnsButton(mockButton, mockFinder, mockSynapseJavascriptClient);
-		AsyncMockStubber.callSuccessWith(mockBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		when(mockBundle.getEntity()).thenReturn(mockTable);
 		when(mockBundle.getTableBundle()).thenReturn(mockTableBundle);
 		tableColumnModels = Collections.singletonList(mockTableColumnModel);
@@ -96,7 +97,7 @@ public class ImportTableViewColumnsButtonTest {
 		
 		widget.onTableViewSelected(entityId);
 		
-		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		verify(mockFinder).hide();
 		verify(mockTableColumnModel).setId(null);
 		verify(mockCallback).invoke(tableColumnModels);
@@ -110,7 +111,7 @@ public class ImportTableViewColumnsButtonTest {
 		
 		widget.onTableViewSelected(entityId);
 		
-		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		verify(mockFinder).showError(anyString());
 		verify(mockFinder, never()).hide();
 		verify(mockCallback, never()).invoke(anyList());
@@ -119,13 +120,13 @@ public class ImportTableViewColumnsButtonTest {
 	@Test
 	public void testOnGetEntityError() {
 		String error = "problem getting entity";
-		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		String entityId = "syn100000000";
 		widget.configure(mockCallback);
 		
 		widget.onTableViewSelected(entityId);
 		
-		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		verify(mockFinder).showError(eq(error));
 		verify(mockFinder, never()).hide();
 		verify(mockCallback, never()).invoke(anyList());

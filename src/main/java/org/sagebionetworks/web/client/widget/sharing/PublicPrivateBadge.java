@@ -4,8 +4,9 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.ResourceAccess;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
@@ -108,8 +109,9 @@ public class PublicPrivateBadge {
 	}
 	
 	public void getAcl(final AsyncCallback<AccessControlList> callback) {
-		int partsMask = EntityBundle.BENEFACTOR_ACL;
-		jsClient.getEntityBundle(entity.getId(), partsMask, new AsyncCallback<EntityBundle>() {
+		EntityBundleRequest bundleRequest = new EntityBundleRequest();
+		bundleRequest.setIncludeBenefactorACL(true);
+		jsClient.getEntityBundle(entity.getId(), bundleRequest, new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				// retrieve ACL and user entity permissions from bundle

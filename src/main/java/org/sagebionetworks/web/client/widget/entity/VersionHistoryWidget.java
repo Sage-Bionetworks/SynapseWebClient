@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.table.Table;
@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
+import com.google.gwt.http.client.Request;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -43,6 +44,7 @@ public class VersionHistoryWidget implements VersionHistoryWidgetView.Presenter,
 	private Long versionNumber;
 	private SynapseJavascriptClient jsClient;
 	int currentOffset;
+	private Request currentRequest;
 	
 	@Inject
 	public VersionHistoryWidget(VersionHistoryWidgetView view,
@@ -140,6 +142,9 @@ public class VersionHistoryWidget implements VersionHistoryWidgetView.Presenter,
 		synAlert.clear();
 		view.clearVersions();
 		currentOffset = 0;
+		if (currentRequest != null) {
+			currentRequest.cancel();
+		}
 		onMore();
 	}
 	
@@ -150,24 +155,30 @@ public class VersionHistoryWidget implements VersionHistoryWidgetView.Presenter,
 	}
 	
 	public void onMore() {
-		jsClient.getEntityVersions(bundle.getEntity().getId(), currentOffset, VERSION_LIMIT,
+		currentRequest = jsClient.getEntityVersions(bundle.getEntity().getId(), currentOffset, VERSION_LIMIT,
 			new AsyncCallback<List<VersionInfo>>() {
 				@Override
 				public void onSuccess(List<VersionInfo> results) {
 					view.setMoreButtonVisible(results.size() == VERSION_LIMIT);
-					Long currentVersion = null;
 					if (currentOffset == 0) {
-						//we know the current version based on this
-						currentVersion = results.get(0).getVersionNumber();
-						boolean isCurrentVersion = versionNumber == null || currentVersion.equals(versionNumber);
+						boolean isCurrentVersion = versionNumber == null;
+						//we know the current version based on this, unless we're looking at a Table
+						if (!(bundle.getEntity() instanceof Table)) {
+							Long currentVersion = results.get(0).getVersionNumber();
+							isCurrentVersion = isCurrentVersion || currentVersion.equals(versionNumber);
+						}
+						
 						view.setEntityBundle(bundle.getEntity(), !isCurrentVersion);
 						view.setEditVersionInfoButtonVisible(isCurrentVersion && canEdit && !(bundle.getEntity() instanceof Table) );
 					}
 					if (versionNumber == null && currentOffset == 0 && results.size() > 0) {
-						versionNumber = results.get(0).getVersionNumber();
+						// if not a table, then the first row represents the current version
+						if (!(bundle.getEntity() instanceof Table)) {
+							versionNumber = results.get(0).getVersionNumber();
+						}
 					}
 					for (VersionInfo versionInfo : results) {
-						view.addVersion(bundle.getEntity().getId(), versionInfo, canEdit, versionInfo.getVersionNumber().equals(versionNumber), currentVersion);
+						view.addVersion(bundle.getEntity().getId(), versionInfo, canEdit, versionInfo.getVersionNumber().equals(versionNumber));
 					}
 					currentOffset += VERSION_LIMIT;
 				}

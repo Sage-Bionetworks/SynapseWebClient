@@ -6,7 +6,7 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.repo.model.project.ExternalGoogleCloudStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalObjectStorageLocationSetting;
@@ -58,7 +58,6 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		getStorageLocationSetting();
 		getMyLocationSettingBanners();
 		boolean isInAlpha = DisplayUtils.isInTestWebsite(cookies);
-		view.setGoogleCloudVisible(isInAlpha);
 		view.setSFTPVisible(isInAlpha);
 		view.setExternalObjectStoreVisible(isInAlpha);
 	}
@@ -79,7 +78,6 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 	
 	public void getStorageLocationSetting() {
 		Entity entity = entityBundle.getEntity();
-		view.setGoogleCloudVisible(DisplayUtils.isInTestWebsite(cookies));
 		view.setSFTPVisible(DisplayUtils.isInTestWebsite(cookies));
 		synapseClient.getStorageLocationSetting(entity.getId(), new AsyncCallback<StorageLocationSetting>() {
 			@Override

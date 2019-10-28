@@ -92,7 +92,7 @@ public class ImageConfigEditorTest {
 	public void testConstructionWithAlignment() {
 		String alignment = "alignment";
 		reset(mockView);
-		descriptor.put(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY, alignment);
+		descriptor.put(WidgetConstants.ALIGNMENT_KEY, alignment);
 		editor.configure(wikiKey, descriptor, mockCallback);
 		verify(mockView).setAlignment(alignment);
 	}

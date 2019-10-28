@@ -31,11 +31,12 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.VersionableEntity;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -58,7 +59,7 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 @RunWith(MockitoJUnitRunner.class)
-public class FileHistoryWidgetTest {
+public class VersionHistoryWidgetTest {
 	public static final Long CURRENT_FILE_VERSION = 8888L;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
@@ -76,7 +77,7 @@ public class FileHistoryWidgetTest {
 	PreflightController mockPreflightController;
 	@Mock
 	PlaceChanger mockPlaceChanger;
-	VersionHistoryWidget fileHistoryWidget;
+	VersionHistoryWidget versionHistoryWidget;
 	VersionableEntity vb;
 	String entityId = "syn123";
 	EntityBundle bundle;
@@ -87,7 +88,7 @@ public class FileHistoryWidgetTest {
 	SynapseAlert mockSynAlert;
 	@Before
 	public void before() throws JSONObjectAdapterException {
-		fileHistoryWidget = new VersionHistoryWidget(mockView, mockSynapseClient, mockJsClient, mockGlobalApplicationState, mockPreflightController, mockSynAlert);
+		versionHistoryWidget = new VersionHistoryWidget(mockView, mockSynapseClient, mockJsClient, mockGlobalApplicationState, mockPreflightController, mockSynAlert);
 
 		vb = new FileEntity();
 		vb.setId(entityId);
@@ -121,12 +122,12 @@ public class FileHistoryWidgetTest {
 	@Test
 	public void testOnMore() throws Exception {
 		//with null version
-		fileHistoryWidget.setEntityBundle(bundle, null);
+		versionHistoryWidget.setEntityBundle(bundle, null);
 				
 		verify(mockView).clearVersions();
 		
 		//verify current version is set when offset is 0
-		assertEquals(CURRENT_FILE_VERSION, fileHistoryWidget.getVersionNumber());
+		assertEquals(CURRENT_FILE_VERSION, versionHistoryWidget.getVersionNumber());
 		
 		verify(mockJsClient).getEntityVersions(anyString(), eq(WebConstants.ZERO_OFFSET.intValue()), anyInt(), any(AsyncCallback.class));
 	}
@@ -149,15 +150,15 @@ public class FileHistoryWidgetTest {
 				fail("Called onSuccess on a failure");
 			}
 		};
-		fileHistoryWidget.setEntityBundle(bundle, null);
+		versionHistoryWidget.setEntityBundle(bundle, null);
 	}
 
 	@Test
 	public void testUpdateVersionInfo() throws Exception {
 		String testLabel = "testLabel";
 		String testComment = "testComment";
-		fileHistoryWidget.setEntityBundle(bundle, null);
-		fileHistoryWidget.updateVersionInfo(testLabel, testComment);
+		versionHistoryWidget.setEntityBundle(bundle, null);
+		versionHistoryWidget.updateVersionInfo(testLabel, testComment);
 		ArgumentCaptor<Entity> entityCaptor = ArgumentCaptor.forClass(Entity.class);
 		verify(mockJsClient).updateEntity(entityCaptor.capture(), anyString(), anyBoolean(), (AsyncCallback<Entity>) any());
 		VersionableEntity capturedEntity = (VersionableEntity)entityCaptor.getValue();
@@ -172,8 +173,8 @@ public class FileHistoryWidgetTest {
 		String testComment = "testComment";
 		vb.setVersionLabel(testLabel);
 		vb.setVersionComment(testComment);
-		fileHistoryWidget.setEntityBundle(bundle, null);
-		fileHistoryWidget.updateVersionInfo(testLabel, testComment);
+		versionHistoryWidget.setEntityBundle(bundle, null);
+		versionHistoryWidget.updateVersionInfo(testLabel, testComment);
 		verify(mockJsClient, never()).updateEntity(any(Entity.class), anyString(), anyBoolean(), (AsyncCallback<Entity>) any());
 		verify(mockView).hideEditVersionInfo();
 	}
@@ -184,9 +185,9 @@ public class FileHistoryWidgetTest {
 		Exception ex = new Exception(errorMessage);
 		String testLabel = "testLabel";
 		String testComment = "testComment";
-		fileHistoryWidget.setEntityBundle(bundle, null);
+		versionHistoryWidget.setEntityBundle(bundle, null);
 		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).updateEntity(any(Entity.class), anyString(), anyBoolean(), any(AsyncCallback.class));
-		fileHistoryWidget.updateVersionInfo(testLabel, testComment);
+		versionHistoryWidget.updateVersionInfo(testLabel, testComment);
 		verify(mockJsClient).updateEntity(any(Entity.class), anyString(), anyBoolean(), (AsyncCallback<Entity>) any());
 		verify(mockSynAlert).handleException(ex);
 	}
@@ -194,10 +195,10 @@ public class FileHistoryWidgetTest {
 	@Test
 	public void testDeleteVersion() {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteEntityVersionById(anyString(), anyLong(), any(AsyncCallback.class));
-		fileHistoryWidget.setEntityBundle(bundle, 20L);
+		versionHistoryWidget.setEntityBundle(bundle, 20L);
 		verify(mockJsClient).getEntityVersions(anyString(), eq(WebConstants.ZERO_OFFSET.intValue()), anyInt(), any(AsyncCallback.class));
 		
-		fileHistoryWidget.deleteVersion(vb.getVersionNumber());
+		versionHistoryWidget.deleteVersion(vb.getVersionNumber());
 		
 		verify(mockSynapseClient).deleteEntityVersionById(matches(vb.getId()), eq(vb.getVersionNumber()), (AsyncCallback<Void>) any());
 		//deleting a different version, verify file history widget is refreshed
@@ -207,10 +208,10 @@ public class FileHistoryWidgetTest {
 	@Test
 	public void testDeleteCurrentlyViewedVersion() {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteEntityVersionById(anyString(), anyLong(), any(AsyncCallback.class));
-		fileHistoryWidget.setEntityBundle(bundle, vb.getVersionNumber());
+		versionHistoryWidget.setEntityBundle(bundle, vb.getVersionNumber());
 		verify(mockJsClient).getEntityVersions(anyString(), eq(WebConstants.ZERO_OFFSET.intValue()), anyInt(), any(AsyncCallback.class));
 		
-		fileHistoryWidget.deleteVersion(vb.getVersionNumber());
+		versionHistoryWidget.deleteVersion(vb.getVersionNumber());
 		
 		verify(mockSynapseClient).deleteEntityVersionById(matches(vb.getId()), eq(vb.getVersionNumber()), (AsyncCallback<Void>) any());
 		//deleting a different version, verify file history widget is not simply refreshed (still called only once during setEntityBundle())
@@ -226,9 +227,9 @@ public class FileHistoryWidgetTest {
 	public void testDeleteVersionFailure() {
 		Exception ex = new Exception("error occurred");
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).deleteEntityVersionById(anyString(), anyLong(), any(AsyncCallback.class));
-		fileHistoryWidget.setEntityBundle(bundle, 20L);
+		versionHistoryWidget.setEntityBundle(bundle, 20L);
 		
-		fileHistoryWidget.deleteVersion(vb.getVersionNumber());
+		versionHistoryWidget.deleteVersion(vb.getVersionNumber());
 		
 		verify(mockSynapseClient).deleteEntityVersionById(matches(vb.getId()), eq(vb.getVersionNumber()), (AsyncCallback<Void>) any());
 		verify(mockSynAlert).handleException(ex);
@@ -236,36 +237,36 @@ public class FileHistoryWidgetTest {
 	
 	@Test
 	public void testOnEdit() {
-		fileHistoryWidget.setEntityBundle(bundle, null);
+		versionHistoryWidget.setEntityBundle(bundle, null);
 		String oldComment = "an old comment";
 		vb.setVersionComment(oldComment);
 		String oldLabel = "an old label";
 		vb.setVersionLabel(oldLabel);
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
-		fileHistoryWidget.onEditVersionInfoClicked();
+		versionHistoryWidget.onEditVersionInfoClicked();
 		verify(mockView).showEditVersionInfo(oldLabel, oldComment);
 	}
 	
 	@Test
 	public void testOnEditFailedPreflight() {
-		fileHistoryWidget.setEntityBundle(bundle, null);
+		versionHistoryWidget.setEntityBundle(bundle, null);
 		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
-		fileHistoryWidget.onEditVersionInfoClicked();
+		versionHistoryWidget.onEditVersionInfoClicked();
 		verify(mockView, never()).showEditVersionInfo(anyString(), anyString());
 	}
 	
 	@Test
 	public void testOnEditLabelFailedPreflight() {
-		fileHistoryWidget.setEntityBundle(bundle, null);
+		versionHistoryWidget.setEntityBundle(bundle, null);
 		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
-		fileHistoryWidget.onEditVersionInfoClicked();
+		versionHistoryWidget.onEditVersionInfoClicked();
 		verify(mockView, never()).showEditVersionInfo(anyString(), anyString());
 	}
 	
 	@Test
 	public void testSetEntityBundleCanEditCurrent() {
 		when(bundle.getPermissions().getCanCertifiedUserEdit()).thenReturn(true);
-		fileHistoryWidget.setEntityBundle(bundle, null);
+		versionHistoryWidget.setEntityBundle(bundle, null);
 		
 		//auto expand version history = false
 		verify(mockView).setEntityBundle(vb, false);
@@ -277,7 +278,7 @@ public class FileHistoryWidgetTest {
 		//showing a previous version
 		//TODO: fix
 		when(bundle.getPermissions().getCanCertifiedUserEdit()).thenReturn(true);
-		fileHistoryWidget.setEntityBundle(bundle, 24L);
+		versionHistoryWidget.setEntityBundle(bundle, 24L);
 
 		//auto expand version history = true
 		verify(mockView).setEntityBundle(vb, true);
@@ -287,7 +288,7 @@ public class FileHistoryWidgetTest {
 	@Test
 	public void testSetEntityBundleNoEditCurrent() {
 		when(bundle.getPermissions().getCanCertifiedUserEdit()).thenReturn(false);
-		fileHistoryWidget.setEntityBundle(bundle, null);
+		versionHistoryWidget.setEntityBundle(bundle, null);
 		
 		//auto expand version history = false
 		verify(mockView).setEntityBundle(vb, false);
@@ -297,7 +298,7 @@ public class FileHistoryWidgetTest {
 	@Test
 	public void testSetEntityBundleNoEditPrevious() {
 		when(bundle.getPermissions().getCanCertifiedUserEdit()).thenReturn(false);
-		fileHistoryWidget.setEntityBundle(bundle, 24L);
+		versionHistoryWidget.setEntityBundle(bundle, 24L);
 
 		//auto expand version history = false
 		verify(mockView).setEntityBundle(vb, true);
@@ -321,7 +322,7 @@ public class FileHistoryWidgetTest {
 		boolean canEdit = true;
 		when(bundle.getPermissions().getCanCertifiedUserEdit()).thenReturn(canEdit);
 		Long currentVersion = 0L;
-		fileHistoryWidget.setEntityBundle(bundle, currentVersion);
+		versionHistoryWidget.setEntityBundle(bundle, currentVersion);
 
 		verify(mockJsClient).getEntityVersions(eq(entityId), eq(0), eq(VersionHistoryWidget.VERSION_LIMIT), any(AsyncCallback.class));
 		verify(mockView).clearVersions();
@@ -331,24 +332,42 @@ public class FileHistoryWidgetTest {
 		verify(mockView).setMoreButtonVisible(true);
 		//verify full page is added (one of which is selected)
 		boolean isVersionSelected = false;
-		verify(mockView, times(VersionHistoryWidget.VERSION_LIMIT - 1)).addVersion(eq(entityId), any(VersionInfo.class), eq(canEdit), eq(isVersionSelected), eq(currentVersion));
+		verify(mockView, times(VersionHistoryWidget.VERSION_LIMIT - 1)).addVersion(eq(entityId), any(VersionInfo.class), eq(canEdit), eq(isVersionSelected));
 		isVersionSelected = true;
-		verify(mockView).addVersion(eq(entityId), any(VersionInfo.class), eq(canEdit), eq(isVersionSelected), eq(currentVersion));
+		verify(mockView).addVersion(eq(entityId), any(VersionInfo.class), eq(canEdit), eq(isVersionSelected));
 		
 		// now get the second page (verify new offset).
 		// second page contains 2 versions only.
 		setupVersionResults(2, VersionHistoryWidget.VERSION_LIMIT);
 		reset(mockView);
 		
-		fileHistoryWidget.onMore();
+		versionHistoryWidget.onMore();
 		
 		//add the 2 remaining results
 		currentVersion = null; //current version is not on the current page
 		verify(mockView, never()).clearVersions();
 		verify(mockJsClient).getEntityVersions(eq(entityId), eq(VersionHistoryWidget.VERSION_LIMIT), eq(VersionHistoryWidget.VERSION_LIMIT), any(AsyncCallback.class));
 		isVersionSelected = false;
-		verify(mockView, times(2)).addVersion(eq(entityId), any(VersionInfo.class), eq(canEdit), eq(isVersionSelected), eq(currentVersion));
+		verify(mockView, times(2)).addVersion(eq(entityId), any(VersionInfo.class), eq(canEdit), eq(isVersionSelected));
 		verify(mockView).setMoreButtonVisible(false);
 	}
 	
+	@Test
+	public void testTableOnMore() throws Exception {
+		vb = new TableEntity();
+		vb.setId(entityId);
+		vb.setVersionNumber(CURRENT_FILE_VERSION);
+		vb.setVersionLabel("");
+		vb.setVersionComment("");
+		when(bundle.getEntity()).thenReturn(vb);
+
+		//with null version
+		versionHistoryWidget.setEntityBundle(bundle, null);
+
+		verify(mockView).clearVersions();
+		
+		//verify current version is not set when offset is 0, because (unlike Files) the first row of the version history does not represent the latest version for Tables
+		assertNull(versionHistoryWidget.getVersionNumber());
+		verify(mockJsClient).getEntityVersions(anyString(), eq(WebConstants.ZERO_OFFSET.intValue()), anyInt(), any(AsyncCallback.class));
+	}
 }
