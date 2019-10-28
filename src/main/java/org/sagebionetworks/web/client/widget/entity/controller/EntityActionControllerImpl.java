@@ -1376,6 +1376,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				snapshotRequest.setSnapshotLabel(label);
 				snapshotRequest.setSnapshotComment(comment);
 				transactionRequest.setSnapshotOptions(snapshotRequest);
+				transactionRequest.setChanges(new ArrayList<>());
+				transactionRequest.setCreateSnapshot(true);
 				view.showCreateVersionDialog();
 				getJobTrackingWidget().startAndTrackJob("Creating a new View version...", false, AsynchType.TableTransaction, transactionRequest, new AsynchronousProgressHandler() {
 					
