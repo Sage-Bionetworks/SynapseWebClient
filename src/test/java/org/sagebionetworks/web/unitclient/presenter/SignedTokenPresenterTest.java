@@ -78,6 +78,7 @@ public class SignedTokenPresenterTest {
 	PopupUtilsView mockPopupUtils;
 	@Captor
 	ArgumentCaptor<AsyncCallback> asyncCaptor;
+	JoinTeamSignedToken defaultToken = new JoinTeamSignedToken();
 	
 	@Before
 	public void setup(){
@@ -92,7 +93,7 @@ public class SignedTokenPresenterTest {
 		AsyncMockStubber.callSuccessWith(responseMessage).when(mockSynapseClient).handleSignedToken(any(SignedTokenInterface.class), anyString(), any(AsyncCallback.class));
 		
 		//by default, decode into a JoinTeamSignedToken
-		AsyncMockStubber.callSuccessWith(new JoinTeamSignedToken()).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(defaultToken).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
 		
 		verify(mockView).setSynapseAlert(any(Widget.class));
 		verify(mockView).setPresenter(presenter);
@@ -217,8 +218,9 @@ public class SignedTokenPresenterTest {
 	
 	@Test
 	public void testSetPlaceUnsubscribe() {
-		//For the unsubscribe token, a special view is shown.  
-		AsyncMockStubber.callSuccessWith(new NotificationSettingsSignedToken()).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
+		//For the unsubscribe token, a special view is shown.
+		NotificationSettingsSignedToken token = new NotificationSettingsSignedToken();
+		AsyncMockStubber.callSuccessWith(token).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
 		presenter.setPlace(testPlace);
 		
 		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
@@ -226,10 +228,10 @@ public class SignedTokenPresenterTest {
 		verify(mockSynapseAlert).clear();
 		verify(mockView).clear();
 		verify(mockView, times(2)).setLoadingVisible(anyBoolean());
-		verify(mockView).showConfirmUnsubscribe();
+		verify(mockView).showConfirmUnsubscribe(token);
 
 		//simulate confirmation of unsubscribe
-		presenter.unsubscribeConfirmed();
+		presenter.unsubscribeConfirmed(token);
 		verify(mockSynapseClient).handleSignedToken(any(NotificationSettingsSignedToken.class), anyString(), any(AsyncCallback.class));
 	}
 	
