@@ -348,19 +348,19 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			switch (filterType) {
 				case ALL:
 					view.setAllProjectsFilterSelected();
-					getMyProjects(ProjectListType.MY_PROJECTS, ProjectFilterEnum.ALL, currentProjectOffset);
+					getMyProjects(ProjectListType.ALL, ProjectFilterEnum.ALL, currentProjectOffset);
 					break;
 				case CREATED_BY_ME:
 					view.setMyProjectsFilterSelected();
-					getMyProjects(ProjectListType.MY_CREATED_PROJECTS, ProjectFilterEnum.CREATED_BY_ME, currentProjectOffset);
+					getMyProjects(ProjectListType.CREATED, ProjectFilterEnum.CREATED_BY_ME, currentProjectOffset);
 					break;
 				case SHARED_DIRECTLY_WITH_ME:
 					view.setSharedDirectlyWithMeFilterSelected();
-					getMyProjects(ProjectListType.MY_PARTICIPATED_PROJECTS, ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME, currentProjectOffset);
+					getMyProjects(ProjectListType.PARTICIPATED, ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME, currentProjectOffset);
 					break;
 				case ALL_MY_TEAM_PROJECTS:
 					view.setTeamsFilterSelected();
-					getMyProjects(ProjectListType.MY_TEAM_PROJECTS, ProjectFilterEnum.ALL_MY_TEAM_PROJECTS, currentProjectOffset);
+					getMyProjects(ProjectListType.TEAM, ProjectFilterEnum.ALL_MY_TEAM_PROJECTS, currentProjectOffset);
 					break;
 				case FAVORITES:
 					view.setFavoritesFilterSelected();
