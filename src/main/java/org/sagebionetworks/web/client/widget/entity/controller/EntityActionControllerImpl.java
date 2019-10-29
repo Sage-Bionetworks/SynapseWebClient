@@ -95,6 +95,8 @@ import com.google.inject.Inject;
 
 public class EntityActionControllerImpl implements EntityActionController, ActionListener{
 	
+	public static final String CREATING_A_NEW_VIEW_VERSION_MESSAGE = "Creating a new View version...";
+
 	public static final String TOOLS = " Tools";
 
 	public static final String MOVE_PREFIX = "Move ";
@@ -1379,7 +1381,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				transactionRequest.setChanges(new ArrayList<>());
 				transactionRequest.setCreateSnapshot(true);
 				view.showCreateVersionDialog();
-				getJobTrackingWidget().startAndTrackJob("Creating a new View version...", false, AsynchType.TableTransaction, transactionRequest, new AsynchronousProgressHandler() {
+				getJobTrackingWidget().startAndTrackJob(CREATING_A_NEW_VIEW_VERSION_MESSAGE, false, AsynchType.TableTransaction, transactionRequest, new AsynchronousProgressHandler() {
 					
 					@Override
 					public void onFailure(Throwable failure) {
