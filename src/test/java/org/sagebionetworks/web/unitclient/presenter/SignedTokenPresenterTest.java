@@ -218,8 +218,9 @@ public class SignedTokenPresenterTest {
 	
 	@Test
 	public void testSetPlaceUnsubscribe() {
-		//For the unsubscribe token, a special view is shown.  
-		AsyncMockStubber.callSuccessWith(new NotificationSettingsSignedToken()).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
+		//For the unsubscribe token, a special view is shown.
+		NotificationSettingsSignedToken token = new NotificationSettingsSignedToken();
+		AsyncMockStubber.callSuccessWith(token).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
 		presenter.setPlace(testPlace);
 		
 		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
@@ -227,10 +228,10 @@ public class SignedTokenPresenterTest {
 		verify(mockSynapseAlert).clear();
 		verify(mockView).clear();
 		verify(mockView, times(2)).setLoadingVisible(anyBoolean());
-		verify(mockView).showConfirmUnsubscribe(defaultToken);
+		verify(mockView).showConfirmUnsubscribe(token);
 
 		//simulate confirmation of unsubscribe
-		presenter.unsubscribeConfirmed(defaultToken);
+		presenter.unsubscribeConfirmed(token);
 		verify(mockSynapseClient).handleSignedToken(any(NotificationSettingsSignedToken.class), anyString(), any(AsyncCallback.class));
 	}
 	
