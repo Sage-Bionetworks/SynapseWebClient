@@ -5,11 +5,13 @@ import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -49,7 +51,7 @@ public class SignedTokenViewImpl implements SignedTokenView {
 	private Header headerWidget;
 	
 	Widget widget;
-	
+	HandlerRegistration confirmUnsubscribeHandler;
 	@Inject
 	public SignedTokenViewImpl(
 			SignedTokenViewImplUiBinder binder,
@@ -66,13 +68,6 @@ public class SignedTokenViewImpl implements SignedTokenView {
 		};
 		okButton.addClickHandler(okClickHandler);
 		cancelUnsubscribe.addClickHandler(okClickHandler);
-		
-		confirmUnsubscribe.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.unsubscribeConfirmed();
-			}
-		});
 	}
 
 	@Override
@@ -108,9 +103,15 @@ public class SignedTokenViewImpl implements SignedTokenView {
 	}
 	
 	@Override
-	public void showConfirmUnsubscribe() {
+	public void showConfirmUnsubscribe(SignedTokenInterface signedToken) {
 		confirmUnsubscribeUI.show();
 		okButton.setVisible(false);
+		if (confirmUnsubscribeHandler != null) {
+			confirmUnsubscribeHandler.removeHandler();
+		}
+		confirmUnsubscribeHandler = confirmUnsubscribe.addClickHandler(event -> {
+			presenter.unsubscribeConfirmed(signedToken);
+		});
 	}
 	@Override
 	public void setUnsubscribingUserBadge(Widget w) {

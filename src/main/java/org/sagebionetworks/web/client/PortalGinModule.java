@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenterEventBinder;
 import org.sagebionetworks.web.client.presenter.EntityPresenterEventBinderImpl;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
+import org.sagebionetworks.web.client.presenter.SignedTokenPresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.resources.ResourceLoaderImpl;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -760,6 +761,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ProfilePresenter.class).in(Singleton.class);
 		bind(EntityPresenter.class).in(Singleton.class);
 		bind(DownPresenter.class).in(Singleton.class);
+		bind(SignedTokenPresenter.class).in(Singleton.class);
 		
 		bind(AnnotationsRendererWidgetView.class).to(AnnotationsRendererWidgetViewImpl.class);
 		bind(VersionHistoryWidgetView.class).to(VersionHistoryWidgetViewImpl.class);
