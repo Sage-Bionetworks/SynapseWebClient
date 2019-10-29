@@ -157,7 +157,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	@Override
 	public void loadMoreUserUpdateable() {
 		if (authenticationController.isLoggedIn()) {
-			jsClient.getMyProjects(ProjectListType.MY_CREATED_PROJECTS, PROJECT_LIMIT, userUpdatableOffset, ProjectListSortColumn.PROJECT_NAME, SortDirection.ASC, new AsyncCallback<List<ProjectHeader>>() {
+			jsClient.getMyProjects(ProjectListType.CREATED, PROJECT_LIMIT, userUpdatableOffset, ProjectListSortColumn.PROJECT_NAME, SortDirection.ASC, new AsyncCallback<List<ProjectHeader>>() {
 				@Override
 				public void onSuccess(List<ProjectHeader> projectHeaders) {
 					List<EntityHeader> headers = new ArrayList<EntityHeader>();
