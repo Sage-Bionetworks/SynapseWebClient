@@ -36,11 +36,11 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 	private GWTWrapper gwt;
 	private SynapseAlert synapseAlert;
 	private GlobalApplicationState globalApplicationState;
-	SignedTokenInterface signedToken;
 	UserBadge unsubscribingUserBadge;
 	AuthenticationController authController;
 	PopupUtilsView popupUtils;
 	boolean isFirstTry;
+	String currentlyProcessingToken = "";
 	@Inject
 	public SignedTokenPresenter(SignedTokenView view,
 								SynapseClientAsync synapseClient,
@@ -78,46 +78,47 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 	}
 
 	public void configure(final String signedEncodedToken) {
-		signedToken = null;
-		synapseAlert.clear();
-		view.clear();
-		view.setLoadingVisible(true);
-		//hex decode the token
-		synapseClient.hexDecodeAndDeserialize(signedEncodedToken, new AsyncCallback<SignedTokenInterface>() {
-			@Override
-			public void onSuccess(SignedTokenInterface result) {
-				view.setLoadingVisible(false);
-				signedToken = result;
-				if (result instanceof NotificationSettingsSignedToken) {
-					handleSettingsToken();
-				} else if (result instanceof JoinTeamSignedToken) {
-					isFirstTry = true;
-					handleJoinTeamToken();
-				} else if (result instanceof MembershipInvtnSignedToken) {
-					handleEmailInvitationToken(signedEncodedToken);
-				} else {
-					handleSignedToken();
+		if (!currentlyProcessingToken.equals(signedEncodedToken)) {
+			currentlyProcessingToken = signedEncodedToken;
+			synapseAlert.clear();
+			view.clear();
+			view.setLoadingVisible(true);
+			//hex decode the token
+			synapseClient.hexDecodeAndDeserialize(signedEncodedToken, new AsyncCallback<SignedTokenInterface>() {
+				@Override
+				public void onSuccess(SignedTokenInterface result) {
+					view.setLoadingVisible(false);
+					if (result instanceof NotificationSettingsSignedToken) {
+						handleSettingsToken(result);
+					} else if (result instanceof JoinTeamSignedToken) {
+						isFirstTry = true;
+						handleJoinTeamToken(result);
+					} else if (result instanceof MembershipInvtnSignedToken) {
+						handleEmailInvitationToken(signedEncodedToken);
+					} else {
+						handleSignedToken(result);
+					}
 				}
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				view.setLoadingVisible(false);
-				synapseAlert.handleException(caught);
-			}
-		});
+				@Override
+				public void onFailure(Throwable caught) {
+					view.setLoadingVisible(false);
+					synapseAlert.handleException(caught);
+				}
+			});
+		}
 	}
 
 	public void handleEmailInvitationToken(final String signedEncodedToken) {
 		globalApplicationState.getPlaceChanger().goTo(new EmailInvitation(signedEncodedToken));
 	}
 
-	public void handleSettingsToken() {
+	public void handleSettingsToken(SignedTokenInterface signedToken) {
 		NotificationSettingsSignedToken token = (NotificationSettingsSignedToken) signedToken;
 		unsubscribingUserBadge.configure(token.getUserId());
-		view.showConfirmUnsubscribe();
+		view.showConfirmUnsubscribe(signedToken);
 	}
 
-	public void handleJoinTeamToken() {
+	public void handleJoinTeamToken(SignedTokenInterface signedToken) {
 		final JoinTeamSignedToken token = (JoinTeamSignedToken) signedToken;
 		String teamId = token.getTeamId();
 		view.setLoadingVisible(true);
@@ -130,7 +131,7 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 					view.setLoadingVisible(false);
 					globalApplicationState.getPlaceChanger().goTo(new Team(token.getTeamId()));
 				} else {
-					handleSignedToken();
+					handleSignedToken(signedToken);
 				}
 			}
 
@@ -140,7 +141,7 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 					// invalid session token.  get rid of it and try again.
 					isFirstTry = false;
 					authController.logoutUser();
-					handleJoinTeamToken();
+					handleJoinTeamToken(signedToken);
 				} else {
 					view.setLoadingVisible(false);
 					synapseAlert.handleException(caught);
@@ -149,7 +150,7 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 		});
 	}
 
-	public void handleSignedToken() {
+	public void handleSignedToken(SignedTokenInterface signedToken) {
 		view.clear();
 		view.setLoadingVisible(true);
 		synapseClient.handleSignedToken(signedToken, gwt.getHostPageBaseURL(), new AsyncCallback<ResponseMessage>() {
@@ -173,8 +174,8 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 	}
 
 	@Override
-	public void unsubscribeConfirmed() {
-		handleSignedToken();
+	public void unsubscribeConfirmed(SignedTokenInterface signedToken) {
+		handleSignedToken(signedToken);
 	}
 
 	@Override
