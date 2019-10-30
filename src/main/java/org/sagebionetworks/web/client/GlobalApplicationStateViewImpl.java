@@ -29,6 +29,25 @@ public class GlobalApplicationStateViewImpl implements
 		options.setAnimate(false);
 		Bootbox.setDefaults(options);
 	}
+
+	@Override
+	public void initSRCEndpoints(String repoEndpoint, String portalEndpoint ) {
+		_initSRCEndpoints(repoEndpoint, portalEndpoint);
+	}
+	private final static native void _initSRCEndpoints(
+			String repoEndpoint,
+			String portalEndpoint
+			) /*-{
+		try {
+			$wnd.SRC.OVERRIDE_ENDPOINT_CONFIG = {
+				REPO: repoEndpoint,
+				PORTAL: portalEndpoint,
+			}
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
+
 	
 	public void preloadNewVersion() {
 		//preload, after a (10 minute) delay
