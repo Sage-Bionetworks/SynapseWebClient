@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
@@ -36,6 +36,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.PaginatedTeamIds;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.ProjectHeaderList;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
@@ -166,7 +167,9 @@ public class ProfilePresenterTest {
 	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
 	@Mock
 	ProfileCertifiedValidatedWidget mockProfileCertifiedValidatedWidget;
-	
+	@Mock
+	ProjectHeaderList mockProjectHeaderList;
+
 	List<Team> myTeams;
 	List<String> teamIds;
 	public static final String NEXT_PAGE_TOKEN = "19282";
@@ -224,7 +227,6 @@ public class ProfilePresenterTest {
 		myFavorites = new ArrayList<EntityHeader>();
 		myFavorites.add(project1);
 		myFavorites.add(project2);
-		
 		ProjectHeader projectHeader1 = new ProjectHeader();
 		projectHeader1.setId("syn1");
 		ProjectHeader projectHeader2 = new ProjectHeader();
@@ -233,10 +235,10 @@ public class ProfilePresenterTest {
 		myProjects = new ArrayList<ProjectHeader>();
 		myProjects.add(projectHeader1);
 		myProjects.add(projectHeader2);
-		
-		AsyncMockStubber.callSuccessWith(myProjects).when(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(myProjects).when(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(myProjects).when(mockSynapseJavascriptClient).getProjectsForTeam(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
+		when(mockProjectHeaderList.getResults()).thenReturn(myProjects);
+		AsyncMockStubber.callSuccessWith(mockProjectHeaderList).when(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockProjectHeaderList).when(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockProjectHeaderList).when(mockSynapseJavascriptClient).getProjectsForTeam(anyString(), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		
 		AsyncMockStubber.callSuccessWith(myFavorites).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		
@@ -433,10 +435,11 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testRefreshProjects() {
-		profilePresenter.setCurrentOffset(22);
-		//on refresh, current project offset should be reset to 0
+		String nextPageToken = "5ef2abc";
+		profilePresenter.setProjectNextPageToken(nextPageToken);
+		//on refresh, current project next page token should be reset to null
 		profilePresenter.refreshProjects();
-		assertEquals(ProfilePresenter.PROJECT_PAGE_SIZE, profilePresenter.getCurrentOffset());
+		assertNull(profilePresenter.getProjectNextPageToken());
 		verify(mockInjector).getLoadMoreProjectsWidgetContainer();
 		verify(mockView).setProjectContainer(any(Widget.class));
 		verify(mockLoadMoreContainer, times(2)).setIsMore(false);
@@ -451,7 +454,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setProjectContainer(any(Widget.class));
 		verify(mockView).setAllProjectsFilterSelected();
 		verify(mockView).showProjectFiltersUI();
-		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.ALL), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.ALL), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
 		verify(mockView).setLastActivityOnColumnVisible(true);
 		verify(mockLoadMoreContainer, never()).clear();
@@ -467,7 +470,7 @@ public class ProfilePresenterTest {
 		//when setting the filter to all, it should ask for all of their projects
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
 		verify(mockView).setProjectContainer(any(Widget.class));
-		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
 	}
 	
@@ -477,18 +480,18 @@ public class ProfilePresenterTest {
 		//when setting the filter to all, it should ask for all of their projects
 		profilePresenter.setProjectFilterAndRefresh(null, null);
 		verify(mockView).setProjectContainer(any(Widget.class));
-		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
 	}
 	
 	@Test
 	public void testGetProjectsDefaultFilterFailure() {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),   any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class),   any(AsyncCallback.class));
 		profilePresenter.setIsOwner(false);
 		//when setting the filter to all, it should ask for all of their projects
 		profilePresenter.setProjectFilterAndRefresh(null, null);
 		verify(mockView).setProjectContainer(any(Widget.class));
-		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(any(Exception.class));
 	}
 	
@@ -501,7 +504,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setProjectContainer(any(Widget.class));
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setMyProjectsFilterSelected();
-		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.CREATED), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.CREATED), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
 		verify(mockView).setLastActivityOnColumnVisible(true);
 	}
@@ -527,7 +530,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setProjectContainer(any(Widget.class));
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setSharedDirectlyWithMeFilterSelected();
-		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.PARTICIPATED), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.PARTICIPATED), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
 		verify(mockView).setLastActivityOnColumnVisible(true);
 	}
@@ -556,7 +559,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setProjectContainer(any(Widget.class));
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setTeamsFilterSelected();
-		verify(mockSynapseJavascriptClient).getProjectsForTeam(eq(teamId), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getProjectsForTeam(eq(teamId), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
 		verify(mockView).setLastActivityOnColumnVisible(true);
 	}
@@ -565,7 +568,7 @@ public class ProfilePresenterTest {
 	public void testGetProjectsByTeamFailure() {
 		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
-		AsyncMockStubber.callFailureWith(new Exception("failed")).when(mockSynapseJavascriptClient).getProjectsForTeam(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("failed")).when(mockSynapseJavascriptClient).getProjectsForTeam(anyString(), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.TEAM, "123");
 		verify(mockSynAlert).handleException(any(Exception.class));
 	}
@@ -575,7 +578,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("111");
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.CREATED), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),   any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.CREATED), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class),   any(AsyncCallback.class));
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.CREATED_BY_ME, null);
 		verify(mockSynAlert).handleException(any(Exception.class));
 	}
@@ -585,7 +588,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.applyFilterClicked(ProjectFilterEnum.ALL, null);
-		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.ALL), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.ALL), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockView).setLastActivityOnColumnVisible(true);
 		verify(mockGlobalApplicationState).pushCurrentPlace(any(Place.class));
 	}
@@ -596,7 +599,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("007");
 		profilePresenter.applyFilterClicked(ProjectFilterEnum.CREATED_BY_ME, null);
-		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.CREATED), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.CREATED), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockView).setLastActivityOnColumnVisible(true);
 	}
 	
@@ -606,7 +609,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("007");
 		profilePresenter.applyFilterClicked(ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME, null);
-		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.PARTICIPATED), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.PARTICIPATED), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockView).setLastActivityOnColumnVisible(true);
 	}
 	
@@ -616,7 +619,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("007");
 		profilePresenter.applyFilterClicked(ProjectFilterEnum.ALL_MY_TEAM_PROJECTS, null);
-		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.TEAM), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.TEAM), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockView).setLastActivityOnColumnVisible(true);
 	}
 
@@ -632,48 +635,27 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetMyProjectsError() {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.ALL), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
-		profilePresenter.getMyProjects(ProjectListType.ALL, ProjectFilterEnum.ALL, 0);
-		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.ALL), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.ALL), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
+		profilePresenter.getMyProjects(ProjectListType.ALL, ProjectFilterEnum.ALL, null);
+		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.ALL), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(any(Exception.class));
 	}
 	
 	@Test
-	public void testProjectPageAdded() {
-		//add a page (where the full project list fits in a single page
+	public void testProjectPageAddedNoMoreResults() {
 		profilePresenter.setLoadMoreProjectsWidgetContainer(mockLoadMoreContainer);
-		profilePresenter.setCurrentOffset(0);
-		profilePresenter.projectPageAdded(ProfilePresenter.PROJECT_PAGE_SIZE - 10);
-		assertEquals(ProfilePresenter.PROJECT_PAGE_SIZE, profilePresenter.getCurrentOffset());
-		verify(mockLoadMoreContainer).setIsMore(false);
-	}
-	
-	@Test
-	public void testProjectPageAddedZeroResults() {
-		profilePresenter.setLoadMoreProjectsWidgetContainer(mockLoadMoreContainer);
-		profilePresenter.setCurrentOffset(0);
-		profilePresenter.projectPageAdded(0);
+		profilePresenter.projectPageAdded(null);
 		verify(mockLoadMoreContainer).setIsMore(false);
 	}
 	
 	@Test
 	public void testProjectPageAddedWithMoreResults() {
 		profilePresenter.setLoadMoreProjectsWidgetContainer(mockLoadMoreContainer);
-		profilePresenter.setCurrentOffset(0);
-		profilePresenter.projectPageAdded(ProfilePresenter.PROJECT_PAGE_SIZE + 10);
-		assertEquals(ProfilePresenter.PROJECT_PAGE_SIZE, profilePresenter.getCurrentOffset());
+		String nextPageToken = "abcdef";
+		profilePresenter.projectPageAdded(nextPageToken);
+		assertEquals(nextPageToken, profilePresenter.getProjectNextPageToken());
 		verify(mockLoadMoreContainer).setIsMore(true);
 	}
-	
-	@Test
-	public void testProjectPageTwoAddedWithMoreResults() {
-		profilePresenter.setLoadMoreProjectsWidgetContainer(mockLoadMoreContainer);
-		profilePresenter.setCurrentOffset(ProfilePresenter.PROJECT_PAGE_SIZE);
-		profilePresenter.projectPageAdded(2*ProfilePresenter.PROJECT_PAGE_SIZE + 10);
-		assertEquals(2*ProfilePresenter.PROJECT_PAGE_SIZE, profilePresenter.getCurrentOffset());
-		verify(mockLoadMoreContainer).setIsMore(true);
-	}
-
 	
 	@Test
 	public void testCreateProject() {
@@ -716,16 +698,16 @@ public class ProfilePresenterTest {
 	@Test
 	public void testSortedByLatestActivity() {
 		profilePresenter.sort(ProjectListSortColumn.LAST_ACTIVITY);
-		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyInt(), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.ASC), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyString(), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.ASC), any(AsyncCallback.class));
 		
 		profilePresenter.sort(ProjectListSortColumn.LAST_ACTIVITY);
-		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyInt(), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.DESC), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyString(), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.DESC), any(AsyncCallback.class));
 
 		profilePresenter.sort(ProjectListSortColumn.PROJECT_NAME);
-		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyInt(), eq(ProjectListSortColumn.PROJECT_NAME), eq(SortDirection.ASC), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyString(), eq(ProjectListSortColumn.PROJECT_NAME), eq(SortDirection.ASC), any(AsyncCallback.class));
 		
 		profilePresenter.sort(ProjectListSortColumn.PROJECT_NAME);
-		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyInt(), eq(ProjectListSortColumn.PROJECT_NAME), eq(SortDirection.DESC), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyString(), eq(ProjectListSortColumn.PROJECT_NAME), eq(SortDirection.DESC), any(AsyncCallback.class));
 	}
 
 	@Test

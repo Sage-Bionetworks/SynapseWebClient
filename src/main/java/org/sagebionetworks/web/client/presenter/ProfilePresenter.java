@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.PaginatedTeamIds;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.ProjectHeaderList;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
@@ -79,8 +80,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private int openRequestCount;
 	private String currentUserId;
 	private boolean isOwner;
-	private int currentProjectOffset, currentChallengeOffset;
-	private String teamNextPageToken;
+	private int currentChallengeOffset;
+	private String teamNextPageToken, projectNextPageToken;
 	private boolean isRefreshingTeamsTab;
 	public final static int PROJECT_PAGE_SIZE=20;
 	public final static int CHALLENGE_PAGE_SIZE=20;
@@ -309,7 +310,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void refreshProjects() {
-		currentProjectOffset = 0;
+		projectNextPageToken = null;
 		loadMoreProjectsWidgetContainer = ginInjector.getLoadMoreProjectsWidgetContainer();
 		view.setProjectContainer(loadMoreProjectsWidgetContainer.asWidget());
 		loadMoreProjectsWidgetContainer.setIsMore(false);
@@ -348,19 +349,19 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			switch (filterType) {
 				case ALL:
 					view.setAllProjectsFilterSelected();
-					getMyProjects(ProjectListType.ALL, ProjectFilterEnum.ALL, currentProjectOffset);
+					getMyProjects(ProjectListType.ALL, ProjectFilterEnum.ALL, projectNextPageToken);
 					break;
 				case CREATED_BY_ME:
 					view.setMyProjectsFilterSelected();
-					getMyProjects(ProjectListType.CREATED, ProjectFilterEnum.CREATED_BY_ME, currentProjectOffset);
+					getMyProjects(ProjectListType.CREATED, ProjectFilterEnum.CREATED_BY_ME, projectNextPageToken);
 					break;
 				case SHARED_DIRECTLY_WITH_ME:
 					view.setSharedDirectlyWithMeFilterSelected();
-					getMyProjects(ProjectListType.PARTICIPATED, ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME, currentProjectOffset);
+					getMyProjects(ProjectListType.PARTICIPATED, ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME, projectNextPageToken);
 					break;
 				case ALL_MY_TEAM_PROJECTS:
 					view.setTeamsFilterSelected();
-					getMyProjects(ProjectListType.TEAM, ProjectFilterEnum.ALL_MY_TEAM_PROJECTS, currentProjectOffset);
+					getMyProjects(ProjectListType.TEAM, ProjectFilterEnum.ALL_MY_TEAM_PROJECTS, projectNextPageToken);
 					break;
 				case FAVORITES:
 					view.setFavoritesFilterSelected();
@@ -369,13 +370,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					break;
 				case TEAM:
 					view.setTeamsFilterSelected();
-					getTeamProjects(currentProjectOffset);
+					getTeamProjects(projectNextPageToken);
 					break;
 				default:
 					break;
 			}
 		} else
-			getUserProjects(currentProjectOffset);
+			getUserProjects(projectNextPageToken);
 	}
 	
 	@Override
@@ -577,14 +578,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void getMyProjects(ProjectListType projectListType, final ProjectFilterEnum filter, int offset) {
+	public void getMyProjects(ProjectListType projectListType, final ProjectFilterEnum filter, String nextPageToken) {
 		projectSynAlert.clear();
-		jsClient.getMyProjects(projectListType, PROJECT_PAGE_SIZE, offset, currentSortColumn, currentSortDirection, new AsyncCallback<List<ProjectHeader>>() {
+		jsClient.getMyProjects(projectListType, PROJECT_PAGE_SIZE, nextPageToken, currentSortColumn, currentSortDirection, new AsyncCallback<ProjectHeaderList>() {
 			@Override
-			public void onSuccess(List<ProjectHeader> results) {
+			public void onSuccess(ProjectHeaderList results) {
 				if (filterType == filter) {
-					addProjectResults(results);
-					projectPageAdded(results.size());
+					addProjectResults(results.getResults());
+					projectPageAdded(results.getNextPageToken());
 				}
 			}
 			@Override
@@ -594,14 +595,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void getTeamProjects(int offset) {
+	public void getTeamProjects(String nextPageToken) {
 		projectSynAlert.clear();
-		jsClient.getProjectsForTeam(filterTeamId, PROJECT_PAGE_SIZE, offset, currentSortColumn, currentSortDirection, new AsyncCallback<List<ProjectHeader>>(){
+		jsClient.getProjectsForTeam(filterTeamId, PROJECT_PAGE_SIZE, nextPageToken, currentSortColumn, currentSortDirection, new AsyncCallback<ProjectHeaderList>(){
 			@Override
-			public void onSuccess(List<ProjectHeader> results) {
+			public void onSuccess(ProjectHeaderList results) {
 				if (filterType == ProjectFilterEnum.TEAM) {
-					addProjectResults(results);
-					projectPageAdded(results.size());
+					addProjectResults(results.getResults());
+					projectPageAdded(results.getNextPageToken());
 				}
 			}
 			@Override
@@ -611,13 +612,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 
-	public void getUserProjects(int offset) {
+	public void getUserProjects(String nextPageToken) {
 		projectSynAlert.clear();
-		jsClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, currentSortColumn, currentSortDirection, new AsyncCallback<List<ProjectHeader>>() {
+		jsClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, nextPageToken, currentSortColumn, currentSortDirection, new AsyncCallback<ProjectHeaderList>() {
 			@Override
-			public void onSuccess(List<ProjectHeader> results) {
-				addProjectResults(results);
-				projectPageAdded(results.size());
+			public void onSuccess(ProjectHeaderList results) {
+				addProjectResults(results.getResults());
+				projectPageAdded(results.getNextPageToken());
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -645,9 +646,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 	}
 	
-	public void projectPageAdded(int projectsAdded) {
-		currentProjectOffset += PROJECT_PAGE_SIZE;
-		loadMoreProjectsWidgetContainer.setIsMore(projectsAdded >= PROJECT_PAGE_SIZE);
+	public void projectPageAdded(String nextPageToken) {
+		projectNextPageToken = nextPageToken;
+		loadMoreProjectsWidgetContainer.setIsMore(projectNextPageToken != null);
 	}
 	
 	public void challengePageAdded(int challengesAdded) {
@@ -872,16 +873,16 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	 * Exposed for unit testing purposes only
 	 * @return
 	 */
-	public int getCurrentOffset() {
-		return currentProjectOffset;
+	public String getProjectNextPageToken() {
+		return projectNextPageToken;
 	}
 
 	/**
 	 * Exposed for unit testing purposes only
 	 * @return
 	 */
-	public void setCurrentOffset(int currentOffset) {
-		this.currentProjectOffset = currentOffset;
+	public void setProjectNextPageToken(String nextPageToken) {
+		this.projectNextPageToken = nextPageToken;
 	}
 	
 	/**
