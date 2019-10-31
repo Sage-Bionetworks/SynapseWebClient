@@ -1,8 +1,7 @@
 package org.sagebionetworks.web.client.widget.team.controller;
 
-import java.util.List;
-
 import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.ProjectHeaderList;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
@@ -28,7 +27,7 @@ public class TeamProjectsModalWidget implements IsWidget, TeamProjectsModalWidge
 	LoadMoreWidgetContainer loadMoreWidgetContainer;
 	Team team;
 	PortalGinInjector ginInjector;
-	int currentOffset;
+	String nextPageToken;
 	Callback loadMoreCallback;
 	ClickHandler projectBadgeClickHandler = event -> {
 		view.hide();
@@ -62,7 +61,7 @@ public class TeamProjectsModalWidget implements IsWidget, TeamProjectsModalWidge
 		synAlert.clear();
 		loadMoreWidgetContainer = ginInjector.getLoadMoreProjectsWidgetContainer();
 		loadMoreWidgetContainer.configure(loadMoreCallback);
-		currentOffset = 0;
+		nextPageToken = null;
 		view.setProjectsContent(loadMoreWidgetContainer);
 	}
 	
@@ -79,19 +78,19 @@ public class TeamProjectsModalWidget implements IsWidget, TeamProjectsModalWidge
 	
 	public void getMoreTeamProjects() {
 		synAlert.clear();
-		jsClient.getProjectsForTeam(team.getId(), ProfilePresenter.PROJECT_PAGE_SIZE, currentOffset, currentSortColumn, currentSortDirection, new AsyncCallback<List<ProjectHeader>>(){
+		jsClient.getProjectsForTeam(team.getId(), ProfilePresenter.PROJECT_PAGE_SIZE, nextPageToken, currentSortColumn, currentSortDirection, new AsyncCallback<ProjectHeaderList>(){
 			@Override
-			public void onSuccess(List<ProjectHeader> projectHeaders) {
-				for (int i = 0; i < projectHeaders.size(); i++) {
+			public void onSuccess(ProjectHeaderList projectHeaders) {
+				for (ProjectHeader projectHeader : projectHeaders.getResults()) {
 					ProjectBadge badge = ginInjector.getProjectBadgeWidget();
-					badge.configure(projectHeaders.get(i));
+					badge.configure(projectHeader);
 					badge.addClickHandler(projectBadgeClickHandler);
 					Widget widget = badge.asWidget();
 					loadMoreWidgetContainer.add(widget);
 				}
 				
-				currentOffset += ProfilePresenter.PROJECT_PAGE_SIZE;
-				loadMoreWidgetContainer.setIsMore(projectHeaders.size() >= ProfilePresenter.PROJECT_PAGE_SIZE);
+				nextPageToken = projectHeaders.getNextPageToken();
+				loadMoreWidgetContainer.setIsMore(nextPageToken != null);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
