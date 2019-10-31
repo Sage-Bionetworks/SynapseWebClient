@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.ProjectHeaderList;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
@@ -50,6 +51,8 @@ public class TeamProjectsModalWidgetTest {
 	ProjectBadge mockProjectBadge;
 	@Mock
 	LoadMoreWidgetContainer mockLoadMoreWidgetContainer;
+	@Mock
+	ProjectHeaderList mockProjectHeaderList;
 	ArrayList<ProjectHeader> myProjects;
 	
 	String teamId = "teamId";
@@ -72,8 +75,8 @@ public class TeamProjectsModalWidgetTest {
 		myProjects = new ArrayList<ProjectHeader>();
 		myProjects.add(projectHeader1);
 		myProjects.add(projectHeader2);
-		
-		AsyncMockStubber.callSuccessWith(myProjects).when(mockJsClient).getProjectsForTeam(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
+		when(mockProjectHeaderList.getResults()).thenReturn(myProjects);
+		AsyncMockStubber.callSuccessWith(mockProjectHeaderList).when(mockJsClient).getProjectsForTeam(anyString(), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -89,16 +92,11 @@ public class TeamProjectsModalWidgetTest {
 		verify(mockView).setTitle(teamName + " Projects");
 		verify(mockView).show();
 		//ask for the projects
-		int expectedOffset = 0;
-		verify(mockJsClient).getProjectsForTeam(eq(teamId), eq(ProfilePresenter.PROJECT_PAGE_SIZE), eq(expectedOffset), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.DESC),  any(AsyncCallback.class));
+		String expectedNextPageToken = null;
+		verify(mockJsClient).getProjectsForTeam(eq(teamId), eq(ProfilePresenter.PROJECT_PAGE_SIZE), eq(expectedNextPageToken), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.DESC),  any(AsyncCallback.class));
 		// added the 2 project badges
 		verify(mockGinInjector, times(2)).getProjectBadgeWidget();
 		verify(mockLoadMoreWidgetContainer, times(2)).add(any(Widget.class));
-		
-		//verify getMore changes offset
-		presenter.getMoreTeamProjects();
-		expectedOffset += ProfilePresenter.PROJECT_PAGE_SIZE;
-		verify(mockJsClient).getProjectsForTeam(eq(teamId), eq(ProfilePresenter.PROJECT_PAGE_SIZE), eq(expectedOffset), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.DESC),  any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -107,14 +105,14 @@ public class TeamProjectsModalWidgetTest {
 		
 		// simulate clicking sort on LAST_ACTIVITY
 		presenter.sort(ProjectListSortColumn.LAST_ACTIVITY);
-		verify(mockJsClient).getProjectsForTeam(eq(teamId), eq(ProfilePresenter.PROJECT_PAGE_SIZE), eq(0), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.ASC),  any(AsyncCallback.class));
+		verify(mockJsClient).getProjectsForTeam(eq(teamId), eq(ProfilePresenter.PROJECT_PAGE_SIZE), eq(null), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.ASC),  any(AsyncCallback.class));
 
 		// simulate clicking sort on PROJECT_NAME
 		presenter.sort(ProjectListSortColumn.PROJECT_NAME);
-		verify(mockJsClient).getProjectsForTeam(eq(teamId), eq(ProfilePresenter.PROJECT_PAGE_SIZE), eq(0), eq(ProjectListSortColumn.PROJECT_NAME), eq(SortDirection.DESC),  any(AsyncCallback.class));
+		verify(mockJsClient).getProjectsForTeam(eq(teamId), eq(ProfilePresenter.PROJECT_PAGE_SIZE), eq(null), eq(ProjectListSortColumn.PROJECT_NAME), eq(SortDirection.DESC),  any(AsyncCallback.class));
 
 		// simulate clicking sort on PROJECT_NAME again
 		presenter.sort(ProjectListSortColumn.PROJECT_NAME);
-		verify(mockJsClient).getProjectsForTeam(eq(teamId), eq(ProfilePresenter.PROJECT_PAGE_SIZE), eq(0), eq(ProjectListSortColumn.PROJECT_NAME), eq(SortDirection.ASC),  any(AsyncCallback.class));
+		verify(mockJsClient).getProjectsForTeam(eq(teamId), eq(ProfilePresenter.PROJECT_PAGE_SIZE), eq(null), eq(ProjectListSortColumn.PROJECT_NAME), eq(SortDirection.ASC),  any(AsyncCallback.class));
 	}
 }
