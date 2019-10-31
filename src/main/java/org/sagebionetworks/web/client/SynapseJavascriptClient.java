@@ -44,6 +44,7 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.PaginatedTeamIds;
 import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.ProjectHeaderList;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Reference;
@@ -1214,19 +1215,19 @@ public class SynapseJavascriptClient {
 		}
 	}
 
-	public void getMyProjects(ProjectListType projectListType, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<List<ProjectHeader>> projectHeadersCallback) {
-		getProjects(projectListType, null, null, limit, offset, sortBy, sortDir, projectHeadersCallback);
+	public void getMyProjects(ProjectListType projectListType, int limit, String nextPageToken, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<ProjectHeaderList> projectHeadersCallback) {
+		getProjects(projectListType, null, null, limit, nextPageToken, sortBy, sortDir, projectHeadersCallback);
 	}
 	
-	public void getProjectsForTeam(String teamId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<List<ProjectHeader>> projectHeadersCallback) {
-		getProjects(ProjectListType.TEAM, null, teamId, limit, offset, sortBy, sortDir, projectHeadersCallback);
+	public void getProjectsForTeam(String teamId, int limit, String nextPageToken, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<ProjectHeaderList> projectHeadersCallback) {
+		getProjects(ProjectListType.TEAM, null, teamId, limit, nextPageToken, sortBy, sortDir, projectHeadersCallback);
 	}
 	
-	public void getUserProjects(String userId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<List<ProjectHeader>> projectHeadersCallback) {
-		getProjects(ProjectListType.ALL, userId, null, limit, offset, sortBy, sortDir, projectHeadersCallback);
+	public void getUserProjects(String userId, int limit, String nextPageToken, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<ProjectHeaderList> projectHeadersCallback) {
+		getProjects(ProjectListType.ALL, userId, null, limit, nextPageToken, sortBy, sortDir, projectHeadersCallback);
 	}
 	
-	private void getProjects(ProjectListType projectListType, String userId, String teamId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<List<ProjectHeader>> projectHeadersCallback) {
+	private void getProjects(ProjectListType projectListType, String userId, String teamId, int limit, String nextPageToken, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<ProjectHeaderList> projectHeadersCallback) {
 		String url = getRepoServiceUrl() + PROJECTS_URI_PATH;
 		if (userId != null) {
 			url += USER + '/' + userId;
@@ -1239,9 +1240,13 @@ public class SynapseJavascriptClient {
 			sortDir = SortDirection.DESC;
 		}
 
-		url += '?' + OFFSET_PARAMETER + offset + '&' + LIMIT_PARAMETER + limit + "&sort=" + sortBy.name() + "&sortDirection="
+		
+		url += '?' + LIMIT_PARAMETER + limit + "&sort=" + sortBy.name() + "&sortDirection="
 				+ sortDir.name();
 		
+		if (nextPageToken != null) {
+			url += "&" + NEXT_PAGE_TOKEN_PARAM + nextPageToken;
+		}
 		if (teamId != null) {
 			url += "&teamId=" + teamId;
 		}
@@ -1249,7 +1254,7 @@ public class SynapseJavascriptClient {
 			url += "&filter=" + projectListType;
 		}
 
-		doGet(url, OBJECT_TYPE.PaginatedResultProjectHeader, projectHeadersCallback);
+		doGet(url, OBJECT_TYPE.ProjectHeaderList, projectHeadersCallback);
 	}
 	
 	private String getEndpoint(AsynchType type) {
