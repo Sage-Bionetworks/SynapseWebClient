@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.cookie.CookieKeys.SHOW_DATETIME_IN_UTC;
+import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -476,6 +477,15 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	
 	private void initStep2(Callback finalCallback) {
 		view.initGlobalViewProperties();
+		
+		String repoServiceUrl = synapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY);
+		String repoUrl = repoServiceUrl.substring(0, repoServiceUrl.indexOf("/repo/")) + "/";
+		String portalUrl = gwt.getHostPrefix();
+		if (!portalUrl.endsWith("/")) {
+			portalUrl += "/";
+		}
+		view.initSRCEndpoints(repoUrl, portalUrl);
+		
 		String showInUTC = cookieProvider.getCookie(SHOW_DATETIME_IN_UTC);
 		if (showInUTC != null) {
 			setShowUTCTime(Boolean.parseBoolean(showInUTC));

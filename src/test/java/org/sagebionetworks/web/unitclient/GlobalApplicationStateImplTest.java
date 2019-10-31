@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.unitclient;
 
+import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -79,6 +80,9 @@ public class GlobalApplicationStateImplTest {
 	ArgumentCaptor<Callback> synapsePropertiesInitCallbackCaptor;
 	@Mock
 	SessionStorage mockSessionStorage;
+	public static final String REPO_ENDPOINT = "https://repo-staging.prod.sagebase.org/";
+	public static final String SWC_ENDPOINT = "https://staging.synapse.org/";
+	
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
@@ -93,6 +97,8 @@ public class GlobalApplicationStateImplTest {
 		globalApplicationState = new GlobalApplicationStateImpl(mockView, mockCookieProvider, mockEventBus, mockStackConfigService, mockSynapseJSNIUtils, mockLocalStorage, mockGWT, mockDateTimeUtils, mockJsClient, mockSynapseProperties, mockSessionStorage);
 		globalApplicationState.setPlaceController(mockPlaceController);
 		globalApplicationState.setAppPlaceHistoryMapper(mockAppPlaceHistoryMapper);
+		when(mockSynapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY)).thenReturn(REPO_ENDPOINT + "repo/v1");
+		when(mockGWT.getHostPrefix()).thenReturn(SWC_ENDPOINT);
 	}
 	
 	/**
@@ -263,6 +269,7 @@ public class GlobalApplicationStateImplTest {
 		verifyAndInvokeSynapsePropertiesInitCallback();
 		
 		verify(mockView).initGlobalViewProperties();
+		verify(mockView).initSRCEndpoints(REPO_ENDPOINT, SWC_ENDPOINT);
 		verify(mockCallback).invoke();
 	}
 	

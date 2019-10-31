@@ -1219,22 +1219,19 @@ public class SynapseJavascriptClient {
 	}
 	
 	public void getProjectsForTeam(String teamId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<List<ProjectHeader>> projectHeadersCallback) {
-		getProjects(ProjectListType.TEAM_PROJECTS, null, teamId, limit, offset, sortBy, sortDir, projectHeadersCallback);
+		getProjects(ProjectListType.TEAM, null, teamId, limit, offset, sortBy, sortDir, projectHeadersCallback);
 	}
 	
 	public void getUserProjects(String userId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<List<ProjectHeader>> projectHeadersCallback) {
-		getProjects(ProjectListType.OTHER_USER_PROJECTS, userId, null, limit, offset, sortBy, sortDir, projectHeadersCallback);
+		getProjects(ProjectListType.ALL, userId, null, limit, offset, sortBy, sortDir, projectHeadersCallback);
 	}
 	
 	private void getProjects(ProjectListType projectListType, String userId, String teamId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<List<ProjectHeader>> projectHeadersCallback) {
-		String url = getRepoServiceUrl() + PROJECTS_URI_PATH + '/' + projectListType.name();
+		String url = getRepoServiceUrl() + PROJECTS_URI_PATH;
 		if (userId != null) {
 			url += USER + '/' + userId;
 		}
-		if (teamId != null) {
-			url += TEAM + '/' + teamId;
-		}
-
+		
 		if (sortBy == null) {
 			sortBy = ProjectListSortColumn.LAST_ACTIVITY;
 		}
@@ -1244,6 +1241,14 @@ public class SynapseJavascriptClient {
 
 		url += '?' + OFFSET_PARAMETER + offset + '&' + LIMIT_PARAMETER + limit + "&sort=" + sortBy.name() + "&sortDirection="
 				+ sortDir.name();
+		
+		if (teamId != null) {
+			url += "&teamId=" + teamId;
+		}
+		if (projectListType != null) {
+			url += "&filter=" + projectListType;
+		}
+
 		doGet(url, OBJECT_TYPE.PaginatedResultProjectHeader, projectHeadersCallback);
 	}
 	

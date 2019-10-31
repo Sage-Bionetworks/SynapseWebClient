@@ -6,4 +6,5 @@ public interface GlobalApplicationStateView {
 	void initGlobalViewProperties();
 	void showGetVersionError(String error);
 	void back();
+	void initSRCEndpoints(String repoEndpoint, String portalEndpoint);
 }
