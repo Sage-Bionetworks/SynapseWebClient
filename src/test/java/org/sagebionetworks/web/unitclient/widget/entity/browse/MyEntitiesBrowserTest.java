@@ -25,6 +25,7 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.ProjectHeaderList;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
@@ -56,6 +57,8 @@ public class MyEntitiesBrowserTest {
 	EntityTreeBrowser mockCurrentContextTreeBrowser;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	ProjectHeaderList mockProjectHeaderList;
 	List<ProjectHeader> entities;
 	String currentUserId = "100042";
 	
@@ -83,19 +86,21 @@ public class MyEntitiesBrowserTest {
 			projectHeader.setId("syn"+i);
 			entities.add(projectHeader);
 		}
-		AsyncMockStubber.callSuccessWith(entities).when(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
+		when(mockProjectHeaderList.getResults()).thenReturn(entities);
+		AsyncMockStubber.callSuccessWith(mockProjectHeaderList).when(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 	}
 
 	@Test
 	public void testLoadUserUpdateable() {
+		when(mockProjectHeaderList.getNextPageToken()).thenReturn("abc", null);
 		widget.loadMoreUserUpdateable();
-		verify(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 		verify(mockView).addUpdatableEntities(anyList());
 		verify(mockView).setIsMoreUpdatableEntities(true);
 		
 		entities.clear();
 		widget.loadMoreUserUpdateable();
-		verify(mockSynapseJavascriptClient, times(2)).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, times(2)).getMyProjects(any(ProjectListType.class), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 		verify(mockView).setIsMoreUpdatableEntities(false);
 	}
 		
@@ -109,7 +114,7 @@ public class MyEntitiesBrowserTest {
 	@Test
 	public void testLoadUserUpdateableFailure() {
 		String errorMessage = "An error occurred.";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 		widget.loadMoreUserUpdateable();
 		verify(mockView, never()).addUpdatableEntities(anyList());
 		verify(mockView).showErrorMessage(errorMessage);
@@ -129,6 +134,7 @@ public class MyEntitiesBrowserTest {
 	
 	@Test
 	public void testContextChange() {
+		when(mockProjectHeaderList.getNextPageToken()).thenReturn("abc", "def", "null");
 		//first, verify that updateContext does what we expect it to
 		Synapse s = new Synapse("syn123");
 		String userId = "12345";
@@ -153,8 +159,7 @@ public class MyEntitiesBrowserTest {
 		
 		verify(mockEntityTreeBrowser).clear();
 		verify(mockView, times(2)).setIsMoreUpdatableEntities(true);
-		assertEquals(MyEntitiesBrowser.PROJECT_LIMIT, widget.getUserUpdatableOffset());
-		verify(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyString(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 		
 		//test clearState() when context has changed
 		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(new Synapse("yet another different place"));
