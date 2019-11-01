@@ -34,6 +34,10 @@ public class EntityActionControllerViewImpl implements
 	Div extraWidgetsContainer;
 	@UiField
 	Div uploadDialogWidgetContainer;
+	@UiField
+	Modal createVersionDialog;
+	@UiField
+	Div createVersionJobTrackingWidgetContainer;
 	
 	Span widget = new Span();
 	Widget viewWidget = null;
@@ -111,6 +115,21 @@ public class EntityActionControllerViewImpl implements
 			promptForValuesDialog.hide();
 			newValuesCallback.invoke(values);
 		});
+	}
+	@Override
+	public void setCreateVersionDialogJobTrackingWidget(IsWidget w) {
+		lazyConstruct();
+		createVersionJobTrackingWidgetContainer.add(w);
+	}
+	@Override
+	public void hideCreateVersionDialog() {
+		lazyConstruct();
+		createVersionDialog.hide();
+	}
+	@Override
+	public void showCreateVersionDialog() {
+		lazyConstruct();
+		createVersionDialog.show();
 	}
 }
 

@@ -14,9 +14,14 @@
 					<b:Button icon="PENCIL" ui:field="editInfoButton" size="EXTRA_SMALL" addStyleNames="displayInline margin-left-3 margin-top-5" text="Edit Version Info" />
 				</b:Tooltip>
 			</g:FlowPanel>
-			<t:Table addStyleNames="table table-condensed">
+			<bh:Div ui:field="emptyUI" addStyleNames="padding-15" visible="false">
+				<bh:Text>- No versions found</bh:Text>
+			</bh:Div>
+			
+			<t:Table ui:field="versionTable" addStyleNames="table table-condensed">
 				<t:THead>
 					<t:TableRow>
+						<t:TableHeader text="Version" />
 						<t:TableHeader text="Label" />
 						<t:TableHeader text="Modified By" />
 						<t:TableHeader text="Modified On" />

@@ -44,6 +44,10 @@ public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
 	@UiField
 	TableData sizeTableData;
 	@UiField
+	FormControlStatic versionNumber;
+	@UiField
+	Anchor versionNumberLink;
+	@UiField
 	TableData md5TableData;
 	Callback deleteCallback;
 	UserBadge userBadge;
@@ -72,6 +76,8 @@ public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
 	public void configure(Long versionNumber, String versionLinkHref, String versionName,
 			String modifiedByUserId, String modifiedOn, String size,
 			String md5, String versionComment, Callback deleteCallback, IsWidget doiWidget) {
+		this.versionNumber.setText(versionNumber.toString());
+		this.versionNumberLink.setText(versionNumber.toString());
 		this.versionNameLink.setText(versionName);
 		this.versionName.setText(versionName);
 		this.modifiedOn.setText(modifiedOn);
@@ -81,6 +87,7 @@ public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
 		this.deleteCallback = deleteCallback;
 		userBadge.configure(modifiedByUserId);
 		versionNameLink.setHref(versionLinkHref);
+		versionNumberLink.setHref(versionLinkHref);
 		doiWidgetContainer.add(doiWidget);
 	}
 	
@@ -97,14 +104,18 @@ public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
 	public void setIsVersionSelected(boolean isVersionSelected) {
 		if (isVersionSelected) {
 			versionName.addStyleName("boldText");
+			versionNumberLink.addStyleName("boldText");
 		} else {
 			versionName.removeStyleName("boldText");
+			versionNumberLink.removeStyleName("boldText");
 		}
 	}
 	@Override
 	public void setIsUnlinked(boolean isUnlinked) {
 		versionName.setVisible(isUnlinked);
 		versionNameLink.setVisible(!isUnlinked);
+		versionNumber.setVisible(isUnlinked);
+		versionNumberLink.setVisible(!isUnlinked);
 	}
 	@Override
 	public void setMd5TableDataVisible(boolean isVisible) {

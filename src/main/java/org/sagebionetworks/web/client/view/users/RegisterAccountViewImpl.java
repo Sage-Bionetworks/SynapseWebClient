@@ -9,10 +9,8 @@ import org.sagebionetworks.web.client.GWTTimer;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.ValidationUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.header.Header;
-import org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -43,19 +41,19 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	GWTTimer timer;
 	Presenter presenter;
 	private Header headerWidget;
-	private CookieProvider cookies;
+	public static final String ROOT_PORTAL_URL = Window.Location.getProtocol() + "//" + Window.Location.getHost() + "/";
+	public static final String GOOGLE_OAUTH_CALLBACK_URL = RegisterAccountViewImpl.ROOT_PORTAL_URL + "Portal/oauth2callback?oauth2provider=GOOGLE_OAUTH_2_0";
+	public static final String GOOGLE_OAUTH_WITH_STATE_CALLBACK_URL = GOOGLE_OAUTH_CALLBACK_URL + "&state=";
 	@Inject
 	public RegisterAccountViewImpl(
 			RegisterAccountViewImplUiBinder binder, 
 			GlobalApplicationState globalAppState,
 			Header headerWidget,
 			GWTTimer timer,
-			CookieProvider cookies,
 			SageImageBundle sageImageBundle) {		
 		initWidget(binder.createAndBindUi(this));
 		this.timer = timer;
 		this.headerWidget = headerWidget;
-		this.cookies = cookies;
 		timer.configure(() -> {
 			setGoogleRegisterButtonEnabled(false);
 			if (checkUsernameFormat())
@@ -81,7 +79,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 		googleSignUpButton.addClickHandler(event -> {
 			if(checkUsernameFormat()) {
 				String encodedUsername = URL.encodeQueryString(userNameField.getValue());
-				Window.Location.assign(LoginWidgetViewImpl.GOOGLE_OAUTH_WITH_STATE_CALLBACK_URL + encodedUsername);
+				Window.Location.assign(RegisterAccountViewImpl.GOOGLE_OAUTH_WITH_STATE_CALLBACK_URL + encodedUsername);
 			}
 		});
 	}

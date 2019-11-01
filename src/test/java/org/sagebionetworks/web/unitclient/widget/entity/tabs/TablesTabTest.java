@@ -219,7 +219,6 @@ public class TablesTabTest {
 	@Test
 	public void testConfigureUsingFileView() {
 		Long version = 29L;
-		Long expectedVersion = null; // EntityView is not supported, so we expect to configure all subcomponents with a null version for this type.
 		when(mockTableEntityBundle.getEntity()).thenReturn(mockFileViewEntity);
 		String areaToken = null;
 		boolean canCertifiedUserEdit = true;
@@ -230,7 +229,7 @@ public class TablesTabTest {
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockTableEntityBundle, version, areaToken, mockActionMenuWidget);
 		
-		verifyTableConfiguration(expectedVersion);
+		verifyTableConfiguration(version);
 	}
 	
 	private void verifyTableConfiguration(Long version) {

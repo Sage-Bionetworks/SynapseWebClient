@@ -45,4 +45,8 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	void setUploadDialogWidget(IsWidget w);
 	void addWidget(IsWidget asWidget);
 	void showMultiplePromptDialog(String title, List<String> prompts, List<String> initialValues, CallbackP<List<String>> newValuesCallback);
+	void setCreateVersionDialogJobTrackingWidget(IsWidget w);
+	void showCreateVersionDialog();
+	void hideCreateVersionDialog();
+	
 }

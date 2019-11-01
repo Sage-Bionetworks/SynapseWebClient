@@ -29,4 +29,5 @@ public interface VersionHistoryWidgetView extends IsWidget, SynapseView{
 	void hideEditVersionInfo();
 	void setMoreButtonVisible(boolean visible);
 	void setSynAlert(IsWidget w);
+	void showNoResults();
 }

@@ -5,14 +5,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -62,6 +62,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.v2.DoiAssociation;
@@ -69,6 +70,7 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
@@ -93,7 +95,10 @@ import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
+import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
@@ -122,6 +127,7 @@ import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.shared.FormParams;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
@@ -164,6 +170,8 @@ public class EntityActionControllerImplTest {
 	ActionMenuWidget mockActionMenu;
 	@Mock
 	EventBus mockEventBus;
+	@Mock
+	AsynchronousProgressWidget mockJobTrackingWidget;
 	EntityBundle entityBundle;
 	UserEntityPermissions permissions;
 
@@ -224,7 +232,12 @@ public class EntityActionControllerImplTest {
 	SynapseProperties mockSynapseProperties;
 	@Captor
 	ArgumentCaptor<CallbackP<List<String>>> callbackListStringCaptor;
-	
+	@Captor
+	ArgumentCaptor<TableUpdateTransactionRequest> tableUpdateTransactionRequestCaptor;
+	@Captor
+	ArgumentCaptor<AsynchronousProgressHandler> asyncProgressHandlerCaptor;
+	@Mock
+	AsynchronousResponseBody mockAsyncResponseBody;
 	Set<ResourceAccess> resourceAccessSet;
 	
 	public static final String SELECTED_TEAM_ID = "987654";
@@ -261,6 +274,7 @@ public class EntityActionControllerImplTest {
 		when(mockPortalGinInjector.getUploadTableModalWidget()).thenReturn(mockUploadTableModalWidget);
 		when(mockPortalGinInjector.getAddExternalRepoModal()).thenReturn(mockAddExternalRepoModal);
 		when(mockPortalGinInjector.getAddFolderDialogWidget()).thenReturn(mockAddFolderDialogWidget);
+		when(mockPortalGinInjector.creatNewAsynchronousProgressWidget()).thenReturn(mockJobTrackingWidget);
 		// The controller under test.
 		controller = new EntityActionControllerImpl(mockView,
 				mockPreflightController,
@@ -822,7 +836,7 @@ public class EntityActionControllerImplTest {
 	}
 	
 	@Test
-	public void testOnCreateTableViewSnapshot(){
+	public void testOnCreateTableSnapshot(){
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		
@@ -840,6 +854,57 @@ public class EntityActionControllerImplTest {
 		values.add(comment);
 		valuesCallback.invoke(values);
 		verify(mockSynapseJavascriptClient).createSnapshot(eq(entityId), eq(comment), eq(label), isNull(String.class), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testOnCreateEntityViewSnapshot(){
+		Entity entityView = new EntityView();
+		entityView.setId(entityId);
+		entityView.setParentId(parentId);
+		entityBundle.setEntity(entityView);
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
+		
+		// the call under test
+		controller.onAction(Action.CREATE_TABLE_VERSION);
+		
+		verify(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		verify(mockView).showMultiplePromptDialog(anyString(), anyList(), anyList(), callbackListStringCaptor.capture());
+		CallbackP<List<String>> valuesCallback = callbackListStringCaptor.getValue();
+		//invoke with a label and comment
+		String label = "my label";
+		String comment = "my comment";
+		List<String> values = new ArrayList<String>();
+		values.add(label);
+		values.add(comment);
+		valuesCallback.invoke(values);
+		
+		verify(mockJobTrackingWidget).startAndTrackJob(eq(EntityActionControllerImpl.CREATING_A_NEW_VIEW_VERSION_MESSAGE), eq(false), eq(AsynchType.TableTransaction), tableUpdateTransactionRequestCaptor.capture(), asyncProgressHandlerCaptor.capture());
+		TableUpdateTransactionRequest request = tableUpdateTransactionRequestCaptor.getValue();
+		AsynchronousProgressHandler handler = asyncProgressHandlerCaptor.getValue();
+		
+		// verify request
+		assertEquals(entityId, request.getEntityId());
+		assertEquals(label, request.getSnapshotOptions().getSnapshotLabel());
+		assertEquals(comment, request.getSnapshotOptions().getSnapshotComment());
+		
+		// verify response handler
+		// on error
+		String errorMessage = "an error";
+		handler.onFailure(new Exception(errorMessage));
+		verify(mockView).hideCreateVersionDialog();
+		verify(mockView).showErrorMessage(errorMessage);
+		reset(mockView);
+
+		// on cancel
+		handler.onCancel();
+		verify(mockView).hideCreateVersionDialog();
+		reset(mockView);
+
+		// on success
+		handler.onComplete(mockAsyncResponseBody);
+		verify(mockView).hideCreateVersionDialog();
+		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 	}
 	
 	@Test

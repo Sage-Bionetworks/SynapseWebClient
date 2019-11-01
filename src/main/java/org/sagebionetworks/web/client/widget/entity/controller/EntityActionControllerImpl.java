@@ -20,14 +20,17 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.SnapshotRequest;
 import org.sagebionetworks.repo.model.table.SnapshotResponse;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
@@ -49,7 +52,9 @@ import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
+import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.doi.CreateOrUpdateDoiModal;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
@@ -74,8 +79,10 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableVie
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
@@ -88,6 +95,8 @@ import com.google.inject.Inject;
 
 public class EntityActionControllerImpl implements EntityActionController, ActionListener{
 	
+	public static final String CREATING_A_NEW_VIEW_VERSION_MESSAGE = "Creating a new View version...";
+
 	public static final String TOOLS = " Tools";
 
 	public static final String MOVE_PREFIX = "Move ";
@@ -129,7 +138,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	EditFileMetadataModalWidget editFileMetadataModalWidget;
 	EditProjectMetadataModalWidget editProjectMetadataModalWidget;
 	EventBus eventBus;
-	
+	JobTrackingWidget jobTrackingWidget;
 	EntityBundle entityBundle;
 	String wikiPageId;
 	Entity entity;
@@ -216,6 +225,15 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 		return approveUserAccessModal;
 	}
+	
+	private JobTrackingWidget getJobTrackingWidget() {
+		if (jobTrackingWidget == null) {
+			jobTrackingWidget = ginInjector.creatNewAsynchronousProgressWidget();
+			view.setCreateVersionDialogJobTrackingWidget(jobTrackingWidget);
+		}
+		return jobTrackingWidget;
+	}
+
 	private SelectTeamModal getSelectTeamModal() {
 		if (selectTeamModal == null) {
 			selectTeamModal = ginInjector.getSelectTeamModal();
@@ -852,12 +870,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	public static boolean isVersionSupported(Entity entity, CookieProvider cookies) {
-		// TODO: remove check for TableEntity once Table versions are released from alpha mode.
-		if (entity instanceof TableEntity) {
+		// TODO: remove check once Table versions are released from alpha mode.
+		if (entity instanceof Table) {
 			return DisplayUtils.isInTestWebsite(cookies);
 		}
-		// TODO: remove the EntityView check once View versions are supported (PLFM-4247 is resolved)
-		return entity instanceof Versionable && !(entity instanceof EntityView);
+		return entity instanceof Versionable;
 	}
 
 	public boolean isTopLevelProjectToolsMenu(Entity entity, EntityArea area) {
@@ -1341,16 +1358,54 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			String label = values.get(0);
 			String comment = values.get(1);
 			String activityId = null;
-			getSynapseJavascriptClient().createSnapshot(entityId, comment, label, activityId, new AsyncCallback<SnapshotResponse>() {
-				@Override
-				public void onSuccess(SnapshotResponse result) {
-					fireEntityUpdatedEvent();
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showErrorMessage(caught.getMessage());
-				}
-			});
+			if (entity instanceof TableEntity) {
+				getSynapseJavascriptClient().createSnapshot(entityId, comment, label, activityId, new AsyncCallback<SnapshotResponse>() {
+					@Override
+					public void onSuccess(SnapshotResponse result) {
+						fireEntityUpdatedEvent();
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						view.showErrorMessage(caught.getMessage());
+					}
+				});
+			} else if (entity instanceof EntityView) {
+				// create the version via an update table transaction
+				// Start the job.
+				TableUpdateTransactionRequest transactionRequest = new TableUpdateTransactionRequest();
+				transactionRequest.setEntityId(entityId);
+				SnapshotRequest snapshotRequest = new SnapshotRequest();
+				snapshotRequest.setSnapshotLabel(label);
+				snapshotRequest.setSnapshotComment(comment);
+				transactionRequest.setSnapshotOptions(snapshotRequest);
+				transactionRequest.setChanges(new ArrayList<>());
+				transactionRequest.setCreateSnapshot(true);
+				view.showCreateVersionDialog();
+				getJobTrackingWidget().startAndTrackJob(CREATING_A_NEW_VIEW_VERSION_MESSAGE, false, AsynchType.TableTransaction, transactionRequest, new AsynchronousProgressHandler() {
+					
+					@Override
+					public void onFailure(Throwable failure) {
+						view.hideCreateVersionDialog();
+						view.showErrorMessage(failure.getMessage());
+					}
+					
+					@Override
+					public void onComplete(AsynchronousResponseBody response) {
+						view.hideCreateVersionDialog();
+						String errors = QueryResultEditorWidget.getEntityUpdateResultsFailures(response);
+						if (!errors.isEmpty()){
+							view.showErrorMessage(errors);
+						} else {
+							fireEntityUpdatedEvent();
+						}
+					}
+					
+					@Override
+					public void onCancel() {
+						view.hideCreateVersionDialog();
+					}
+				});
+			}
 		});
 	}
 	
