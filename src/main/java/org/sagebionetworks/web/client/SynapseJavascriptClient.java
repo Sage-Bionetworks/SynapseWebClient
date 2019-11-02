@@ -1695,7 +1695,7 @@ public class SynapseJavascriptClient {
 	
 	public void additionalEmailValidation(String userId, String emailAddress, String callbackUrl, AsyncCallback<Void> cb) {
 		String url = getRepoServiceUrl() + ACCOUNT + "/" + userId + "/"
-				+ EMAIL_VALIDATION + "?" + PORTAL_ENDPOINT_PARAM + callbackUrl;
+				+ EMAIL_VALIDATION + "?" + PORTAL_ENDPOINT_PARAM + gwt.encodeQueryString(callbackUrl);
 		Username username = new Username();
 		username.setEmail(emailAddress);
 		doPost(url, username, OBJECT_TYPE.None, false, cb);
