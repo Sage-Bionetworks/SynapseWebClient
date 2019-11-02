@@ -33,7 +33,6 @@ public class SynapseStatusDetector {
 			_getCurrentStatus(this);
 			_getUnresolvedIncidents(this);
 		}, INTERVAL_MS);
-		checkForScheduledMaintenanceLater();
 	}
 	
 	private void checkForScheduledMaintenanceLater() {
