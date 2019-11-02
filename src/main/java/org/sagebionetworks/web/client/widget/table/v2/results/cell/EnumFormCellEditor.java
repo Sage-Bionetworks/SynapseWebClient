@@ -2,9 +2,7 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.sagebionetworks.web.client.StringUtils;
-
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -41,8 +39,7 @@ public class EnumFormCellEditor implements CellEditor {
 			return;
 		}
 		/*
-		 * Find the index matching the value. Note: Linear search for less than
-		 * 100 items is reasonable.
+		 * Find the index matching the value. Note: Linear search for less than 100 items is reasonable.
 		 */
 		for (int i = 0; i < items.size(); i++) {
 			if (value.equals(items.get(i))) {

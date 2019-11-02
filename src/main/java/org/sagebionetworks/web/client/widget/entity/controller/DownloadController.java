@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 
 /**
  * Can the user download from this entity.
@@ -14,6 +13,7 @@ public interface DownloadController {
 
 	/**
 	 * Can the user download from the entity.
+	 * 
 	 * @param uploadTo
 	 * @param callback
 	 */

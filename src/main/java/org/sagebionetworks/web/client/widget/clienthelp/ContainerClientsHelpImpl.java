@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.clienthelp;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
-
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -32,10 +31,12 @@ public class ContainerClientsHelpImpl implements ContainerClientsHelp {
 	@UiField
 	TabPane rTabPane;
 
-	
+
 	Widget widget;
 	String entityId = null;
-	public interface Binder extends UiBinder<Widget, ContainerClientsHelpImpl> {}
+
+	public interface Binder extends UiBinder<Widget, ContainerClientsHelpImpl> {
+	}
 
 	@Inject
 	public ContainerClientsHelpImpl(Binder binder) {
@@ -44,11 +45,12 @@ public class ContainerClientsHelpImpl implements ContainerClientsHelp {
 		FileClientsHelpViewImpl.setId(pythonTabListItem, pythonTabPane);
 		FileClientsHelpViewImpl.setId(rTabListItem, rTabPane);
 	}
+
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
-	
+
 	@Override
 	public void configureAndShow(String entityId) {
 		this.entityId = entityId;

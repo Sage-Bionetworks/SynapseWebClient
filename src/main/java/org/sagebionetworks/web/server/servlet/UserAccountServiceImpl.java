@@ -14,19 +14,19 @@ import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.springframework.web.client.RestClientException;
-
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
-public class UserAccountServiceImpl extends RemoteServiceServlet implements UserAccountService, TokenProvider {
-	
+public class UserAccountServiceImpl extends RemoteServiceServlet
+		implements UserAccountService, TokenProvider {
+
 	public static final long serialVersionUID = 498269726L;
-	
+
 	private TokenProvider tokenProvider = this;
-	
+
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
-	
+
 	public static PublicPrincipalIds publicPrincipalIds = null;
-	
+
 	/**
 	 * This allows integration tests to override the token provider.
 	 */
@@ -44,22 +44,22 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 
 	/**
-	 * Validate that the service is ready to go. If any of the injected data is
-	 * missing then it cannot run. Public for tests.
+	 * Validate that the service is ready to go. If any of the injected data is missing then it cannot
+	 * run. Public for tests.
 	 */
 	private void validateService() {
 		if (tokenProvider == null) {
 			throw new IllegalStateException("The token provider was not set");
 		}
 	}
-	
+
 	@Override
 	public String getCurrentSessionToken() throws RestServiceException {
 		validateService();
 		String sessionToken = tokenProvider.getSessionToken();
 		try {
 			if (sessionToken != null) {
-				//validate
+				// validate
 				createSynapseClient(sessionToken).getUserSessionData();
 			}
 		} catch (SynapseException e) {
@@ -67,11 +67,12 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		}
 		return sessionToken;
 	}
-	
+
 	@Override
-	public void signTermsOfUse(String sessionToken, boolean acceptsTerms) throws RestServiceException {
+	public void signTermsOfUse(String sessionToken, boolean acceptsTerms)
+			throws RestServiceException {
 		validateService();
-		
+
 		SynapseClient synapseClient = createSynapseClient();
 		try {
 			synapseClient.signTermsOfUse(sessionToken, acceptsTerms);
@@ -79,7 +80,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
 	public void createUserStep1(NewUser newUser, String portalEndpoint) throws RestServiceException {
 		validateService();
@@ -91,7 +92,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
 	public UserSessionData getCurrentUserSessionData() throws RestServiceException {
 		validateService();
@@ -104,9 +105,10 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		}
 	}
 
-	
+
 	@Override
-	public String createUserStep2(String userName, String fName, String lName, String password, EmailValidationSignedToken emailValidationSignedToken) throws RestServiceException {
+	public String createUserStep2(String userName, String fName, String lName, String password,
+			EmailValidationSignedToken emailValidationSignedToken) throws RestServiceException {
 		validateService();
 
 		SynapseClient client = createAnonymousSynapseClient();
@@ -123,14 +125,13 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
 	public String getSessionToken() {
 		// By default, we get the token from the request cookies.
-		return UserDataProvider.getThreadLocalUserToken(this
-				.getThreadLocalRequest());
+		return UserDataProvider.getThreadLocalUserToken(this.getThreadLocalRequest());
 	}
-	
+
 	@Override
 	public PublicPrincipalIds getPublicAndAuthenticatedGroupPrincipalIds() {
 		if (publicPrincipalIds == null) {
@@ -147,10 +148,13 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	public static void initPublicAndAuthenticatedPrincipalIds() {
 		try {
 			PublicPrincipalIds results = new PublicPrincipalIds();
-			results.setPublicAclPrincipalId(AuthorizationConstants.BOOTSTRAP_PRINCIPAL.PUBLIC_GROUP.getPrincipalId());
-			results.setAuthenticatedAclPrincipalId(AuthorizationConstants.BOOTSTRAP_PRINCIPAL.AUTHENTICATED_USERS_GROUP.getPrincipalId());
-			results.setAnonymousUserId(AuthorizationConstants.BOOTSTRAP_PRINCIPAL.ANONYMOUS_USER.getPrincipalId());
-			
+			results.setPublicAclPrincipalId(
+					AuthorizationConstants.BOOTSTRAP_PRINCIPAL.PUBLIC_GROUP.getPrincipalId());
+			results.setAuthenticatedAclPrincipalId(
+					AuthorizationConstants.BOOTSTRAP_PRINCIPAL.AUTHENTICATED_USERS_GROUP.getPrincipalId());
+			results.setAnonymousUserId(
+					AuthorizationConstants.BOOTSTRAP_PRINCIPAL.ANONYMOUS_USER.getPrincipalId());
+
 			publicPrincipalIds = results;
 		} catch (Exception e) {
 			throw new RestClientException(e.getMessage());
@@ -166,7 +170,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 
 	private SynapseClient createSynapseClient(String sessionToken) {
 		SynapseClient synapseClient = synapseProvider.createNewClient();
-		if(sessionToken == null) {
+		if (sessionToken == null) {
 			sessionToken = tokenProvider.getSessionToken();
 		}
 		synapseClient.setSessionToken(sessionToken);
@@ -174,7 +178,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		synapseClient.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
 		return synapseClient;
 	}
-	
+
 	private SynapseClient createAnonymousSynapseClient() {
 		SynapseClient synapseClient = synapseProvider.createNewClient();
 		synapseClient.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());

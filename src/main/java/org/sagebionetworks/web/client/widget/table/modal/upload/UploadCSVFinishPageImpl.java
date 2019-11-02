@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnChange;
@@ -24,14 +22,14 @@ import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 
-	private static final String INSTRUCTIONS = "Use the schema options button to make changes to the columns of the table.  Use the create button to finish building the table.";
+	private static final String INSTRUCTIONS =
+			"Use the schema options button to make changes to the columns of the table.  Use the create button to finish building the table.";
 	private static final String COL = "col";
 	private static final String CREATE = "Create";
 	public static final String APPLYING_CSV_TO_THE_TABLE = "Applying CSV to the Table...";
@@ -51,12 +49,9 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 	List<ColumnModelTableRow> editors;
 
 	@Inject
-	public UploadCSVFinishPageImpl(UploadCSVFinishPageView view,
-			SynapseClientAsync synapseClient,
-			SynapseJavascriptClient jsClient,
-			PortalGinInjector portalGinInjector,
-			JobTrackingWidget jobTrackingWidget,
-			KeyboardNavigationHandler keyboardNavigationHandler) {
+	public UploadCSVFinishPageImpl(UploadCSVFinishPageView view, SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient, PortalGinInjector portalGinInjector,
+			JobTrackingWidget jobTrackingWidget, KeyboardNavigationHandler keyboardNavigationHandler) {
 		super();
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -87,8 +82,8 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 	}
 
 	@Override
-	public void configure(String fileName, String parentId,
-			UploadToTableRequest request, List<ColumnModel> suggestedSchema) {
+	public void configure(String fileName, String parentId, UploadToTableRequest request,
+			List<ColumnModel> suggestedSchema) {
 		view.setTableName(fileName);
 		this.parentId = parentId;
 		this.uploadtoTableRequest = preProcessUploadToTableRequest(request);
@@ -112,19 +107,18 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 
 			List<ColumnModel> schema = getCurrentSchema();
 			// Create the columns
-			synapseClient.createTableColumns(schema,
-					new AsyncCallback<List<ColumnModel>>() {
+			synapseClient.createTableColumns(schema, new AsyncCallback<List<ColumnModel>>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							presenter.setErrorMessage(caught.getMessage());
-						}
+				@Override
+				public void onFailure(Throwable caught) {
+					presenter.setErrorMessage(caught.getMessage());
+				}
 
-						@Override
-						public void onSuccess(List<ColumnModel> schema) {
-							createTable(schema);
-						}
-					});
+				@Override
+				public void onSuccess(List<ColumnModel> schema) {
+					createTable(schema);
+				}
+			});
 		} catch (IllegalArgumentException e) {
 			presenter.setErrorMessage(e.getMessage());
 		}
@@ -136,19 +130,18 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 		table.setParentId(this.parentId);
 		table.setName(this.view.getTableName());
 		// Create the table
-		jsClient.createEntity(table,
-				new AsyncCallback<Entity>() {
+		jsClient.createEntity(table, new AsyncCallback<Entity>() {
 
-					@Override
-					public void onSuccess(Entity result) {
-						applyCSVToTable((TableEntity) result, schema);
-					}
+			@Override
+			public void onSuccess(Entity result) {
+				applyCSVToTable((TableEntity) result, schema);
+			}
 
-					@Override
-					public void onFailure(Throwable caught) {
-						presenter.setErrorMessage(caught.getMessage());
-					}
-				});
+			@Override
+			public void onFailure(Throwable caught) {
+				presenter.setErrorMessage(caught.getMessage());
+			}
+		});
 	}
 
 	/**
@@ -160,7 +153,7 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 		// Get the preview request.
 		this.uploadtoTableRequest.setTableId(table.getId());
 		this.view.setTrackerVisible(true);
-		
+
 		TableUpdateTransactionRequest transactionRequest = new TableUpdateTransactionRequest();
 		transactionRequest.setEntityId(uploadtoTableRequest.getTableId());
 		List<TableUpdateRequest> changes = new ArrayList<TableUpdateRequest>();
@@ -176,30 +169,30 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 		changes.add(changeRequest);
 		changes.add(uploadtoTableRequest);
 		transactionRequest.setChanges(changes);
-		
-		
-		this.jobTrackingWidget.startAndTrackJob(APPLYING_CSV_TO_THE_TABLE, false, AsynchType.TableTransaction, transactionRequest, new AsynchronousProgressHandler() {
-			
-			@Override
-			public void onFailure(Throwable failure) {
-				presenter.setErrorMessage(failure.getMessage());
-			}
-			
-			@Override
-			public void onComplete(AsynchronousResponseBody response) {
-				presenter.onFinished();
-			}
-			
-			@Override
-			public void onCancel() {
-				presenter.onCancel();
-			}
-		});
+
+
+		this.jobTrackingWidget.startAndTrackJob(APPLYING_CSV_TO_THE_TABLE, false,
+				AsynchType.TableTransaction, transactionRequest, new AsynchronousProgressHandler() {
+
+					@Override
+					public void onFailure(Throwable failure) {
+						presenter.setErrorMessage(failure.getMessage());
+					}
+
+					@Override
+					public void onComplete(AsynchronousResponseBody response) {
+						presenter.onFinished();
+					}
+
+					@Override
+					public void onCancel() {
+						presenter.onCancel();
+					}
+				});
 	}
 
 	/**
-	 * Pre-process the passed columns. Returns a cloned list of ColumnModels,
-	 * each modified as needed.
+	 * Pre-process the passed columns. Returns a cloned list of ColumnModels, each modified as needed.
 	 * 
 	 * @param adapter
 	 * @param columns
@@ -217,20 +210,16 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 	}
 
 	/**
-	 * This method will create a clone of the input object and change some of
-	 * the values if needed.
+	 * This method will create a clone of the input object and change some of the values if needed.
 	 * 
 	 * @param request
 	 * @return
 	 */
-	public static UploadToTableRequest preProcessUploadToTableRequest(
-			UploadToTableRequest request) {
-		UploadToTableRequest clone = UploadRequestUtils
-				.cloneUploadToTableRequest(request);
+	public static UploadToTableRequest preProcessUploadToTableRequest(UploadToTableRequest request) {
+		UploadToTableRequest clone = UploadRequestUtils.cloneUploadToTableRequest(request);
 		/*
-		 * If the first line is a header, then we want to skip it. This allows
-		 * the table's schema to have different names than the headers in the
-		 * original CSV file.
+		 * If the first line is a header, then we want to skip it. This allows the table's schema to
+		 * have different names than the headers in the original CSV file.
 		 */
 		if (clone.getCsvTableDescriptor() != null
 				&& clone.getCsvTableDescriptor().getIsFirstLineHeader() != null) {
@@ -240,8 +229,7 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 				} else {
 					clone.setLinesToSkip(Long.valueOf(clone.getLinesToSkip() + 1L));
 				}
-				clone.getCsvTableDescriptor().setIsFirstLineHeader(
-						Boolean.FALSE);
+				clone.getCsvTableDescriptor().setIsFirstLineHeader(Boolean.FALSE);
 			}
 		}
 		return clone;

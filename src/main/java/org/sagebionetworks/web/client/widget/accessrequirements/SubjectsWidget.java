@@ -1,13 +1,11 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import java.util.List;
-
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -17,10 +15,9 @@ public class SubjectsWidget implements IsWidget {
 	PortalGinInjector ginInjector;
 	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	CallbackP<SubjectWidget> subjectWidgetDeletedCallback;
-	
+
 	@Inject
-	public SubjectsWidget(DivView view, 
-			PortalGinInjector ginInjector,
+	public SubjectsWidget(DivView view, PortalGinInjector ginInjector,
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler) {
 		this.view = view;
 		this.ginInjector = ginInjector;
@@ -45,7 +42,7 @@ public class SubjectsWidget implements IsWidget {
 			}
 		});
 	}
-	
+
 	private void configureAfterACTCheck(List<RestrictableObjectDescriptor> subjects) {
 		view.clear();
 		for (RestrictableObjectDescriptor rod : subjects) {
@@ -55,7 +52,8 @@ public class SubjectsWidget implements IsWidget {
 		}
 	}
 
-	public void setDeleteCallback(final CallbackP<RestrictableObjectDescriptor> subjectDeletedCallback) {
+	public void setDeleteCallback(
+			final CallbackP<RestrictableObjectDescriptor> subjectDeletedCallback) {
 		subjectWidgetDeletedCallback = new CallbackP<SubjectWidget>() {
 			@Override
 			public void invoke(SubjectWidget subjectWidget) {
@@ -63,5 +61,5 @@ public class SubjectsWidget implements IsWidget {
 				subjectDeletedCallback.invoke(subjectWidget.getRestrictableObjectDescriptor());
 			}
 		};
-	}	
+	}
 }

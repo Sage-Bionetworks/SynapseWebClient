@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmission;
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmissionPage;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
@@ -13,14 +12,14 @@ import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.OpenSubmissionWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class ACTDataAccessSubmissionDashboardPresenter extends AbstractActivity implements Presenter<ACTDataAccessSubmissionDashboardPlace> {
+public class ACTDataAccessSubmissionDashboardPresenter extends AbstractActivity
+		implements Presenter<ACTDataAccessSubmissionDashboardPlace> {
 	public static final String TITLE = "Data Access Submission Dashboard";
 	public static final String NO_RESULTS = "There is no new Data Access Submissions.";
 	private ACTDataAccessSubmissionDashboardPlace place;
@@ -33,14 +32,9 @@ public class ACTDataAccessSubmissionDashboardPresenter extends AbstractActivity 
 	String nextPageToken;
 
 	@Inject
-	public ACTDataAccessSubmissionDashboardPresenter(
-			PlaceView view,
-			DataAccessClientAsync dataAccessClient,
-			SynapseAlert synAlert,
-			PortalGinInjector ginInjector,
-			LoadMoreWidgetContainer loadMoreContainer,
-			DivView noResultsDiv
-			) {
+	public ACTDataAccessSubmissionDashboardPresenter(PlaceView view,
+			DataAccessClientAsync dataAccessClient, SynapseAlert synAlert, PortalGinInjector ginInjector,
+			LoadMoreWidgetContainer loadMoreContainer, DivView noResultsDiv) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
@@ -70,14 +64,14 @@ public class ACTDataAccessSubmissionDashboardPresenter extends AbstractActivity 
 		// Install the view
 		panel.setWidget(view);
 	}
-	
+
 	@Override
 	public void setPlace(ACTDataAccessSubmissionDashboardPlace place) {
 		this.place = place;
 		view.initHeaderAndFooter();
 		loadData();
 	}
-	
+
 	public void loadData() {
 		loadMoreContainer.clear();
 		nextPageToken = null;
@@ -86,7 +80,7 @@ public class ACTDataAccessSubmissionDashboardPresenter extends AbstractActivity 
 
 	public void loadMore() {
 		synAlert.clear();
-		dataAccessClient.getOpenSubmissions(nextPageToken, new AsyncCallback<OpenSubmissionPage>(){
+		dataAccessClient.getOpenSubmissions(nextPageToken, new AsyncCallback<OpenSubmissionPage>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -96,11 +90,12 @@ public class ACTDataAccessSubmissionDashboardPresenter extends AbstractActivity 
 
 			@Override
 			public void onSuccess(OpenSubmissionPage openSubmissionPage) {
-				noResultsDiv.setVisible(nextPageToken == null && openSubmissionPage.getOpenSubmissionList().isEmpty());
+				noResultsDiv.setVisible(
+						nextPageToken == null && openSubmissionPage.getOpenSubmissionList().isEmpty());
 				nextPageToken = openSubmissionPage.getNextPageToken();
 				for (OpenSubmission openSubmission : openSubmissionPage.getOpenSubmissionList()) {
 					OpenSubmissionWidget w = ginInjector.getOpenSubmissionWidget();
-					w.configure(openSubmission); 
+					w.configure(openSubmission);
 					loadMoreContainer.add(w.asWidget());
 				}
 				loadMoreContainer.setIsMore(nextPageToken != null);

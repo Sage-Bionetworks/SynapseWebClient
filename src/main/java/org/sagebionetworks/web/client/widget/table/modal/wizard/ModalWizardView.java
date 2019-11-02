@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.modal.wizard;
 
 import org.gwtbootstrap3.client.ui.ModalSize;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface ModalWizardView extends IsWidget {
@@ -16,6 +15,7 @@ public interface ModalWizardView extends IsWidget {
 		 * Called when the primary button is pressed.
 		 */
 		void onPrimary();
+
 		void onCancel();
 
 	}
@@ -69,12 +69,14 @@ public interface ModalWizardView extends IsWidget {
 
 	/**
 	 * Set the modal title.
+	 * 
 	 * @param title
 	 */
 	public void setTile(String title);
 
 	/**
 	 * Set the modal size.
+	 * 
 	 * @param size
 	 */
 	public void setSize(ModalSize size);

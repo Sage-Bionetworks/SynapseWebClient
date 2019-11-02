@@ -2,10 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -16,10 +13,12 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSubpagesOrderEditorView {
-	public interface Binder extends UiBinder<Widget, WikiSubpagesOrderEditorViewImpl> {}
-	
-	
+public class WikiSubpagesOrderEditorViewImpl extends Composite
+		implements WikiSubpagesOrderEditorView {
+	public interface Binder extends UiBinder<Widget, WikiSubpagesOrderEditorViewImpl> {
+	}
+
+
 	@UiField
 	SimplePanel treePanel;
 	@UiField
@@ -32,7 +31,7 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 	Button leftButton;
 	@UiField
 	Button rightButton;
-	
+
 	@UiField
 	Button upButton2;
 	@UiField
@@ -44,15 +43,15 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 
 	@UiField
 	LoadingSpinner loadingUI;
-	
+
 	private WikiSubpageOrderEditorTree tree;
-	
+
 	@Inject
 	public WikiSubpagesOrderEditorViewImpl(Binder binder) {
 		initWidget(binder.createAndBindUi(this));
 		addButtonHandlers();
 	}
-	
+
 	public void disableDirectionalButtons() {
 		upButton.setEnabled(false);
 		downButton.setEnabled(false);
@@ -64,7 +63,7 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 		rightButton2.setEnabled(false);
 
 	}
-	
+
 	@Override
 	public void configure(WikiSubpageOrderEditorTree subpageTree) {
 		this.tree = subpageTree;
@@ -72,12 +71,12 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 		treePanel.setWidget(tree.asWidget());
 		subpageTree.setMovabilityCallback(getTreeItemMovabilityCallback());
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return this;
 	}
-	
+
 	private void addButtonHandlers() {
 		ClickHandler moveUpClickHandler = new ClickHandler() {
 			@Override
@@ -87,7 +86,7 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 		};
 		upButton.addClickHandler(moveUpClickHandler);
 		upButton2.addClickHandler(moveUpClickHandler);
-		
+
 		ClickHandler moveDownClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -96,7 +95,7 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 		};
 		downButton.addClickHandler(moveDownClickHandler);
 		downButton2.addClickHandler(moveDownClickHandler);
-		
+
 		ClickHandler moveRightClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -107,7 +106,7 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 		};
 		rightButton.addClickHandler(moveRightClickHandler);
 		rightButton2.addClickHandler(moveRightClickHandler);
-		
+
 		ClickHandler moveLeftClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -119,12 +118,12 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 		leftButton.addClickHandler(moveLeftClickHandler);
 		leftButton2.addClickHandler(moveLeftClickHandler);
 	}
-	
+
 	@Override
 	public void initializeState() {
 		disableDirectionalButtons();
 	}
-	
+
 	public TreeItemMovabilityCallback getTreeItemMovabilityCallback() {
 		return new TreeItemMovabilityCallback() {
 			@Override
@@ -140,17 +139,17 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 			}
 		};
 	}
-	
+
 	public interface TreeItemMovabilityCallback {
 		public void invoke(boolean canMoveUpOrRight, boolean canMoveDown, boolean canMoveLeft);
 	}
-	
+
 	@Override
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
 	}
-	
+
 	@Override
 	public void setLoadingVisible(boolean visible) {
 		loadingUI.setVisible(visible);

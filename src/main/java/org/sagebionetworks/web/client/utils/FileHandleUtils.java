@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 
 public class FileHandleUtils {
 	public static boolean isPreviewFileHandle(FileHandle fh) {
-		return fh instanceof CloudProviderFileHandleInterface && ((CloudProviderFileHandleInterface) fh).getIsPreview();
+		return fh instanceof CloudProviderFileHandleInterface
+				&& ((CloudProviderFileHandleInterface) fh).getIsPreview();
 	}
 }

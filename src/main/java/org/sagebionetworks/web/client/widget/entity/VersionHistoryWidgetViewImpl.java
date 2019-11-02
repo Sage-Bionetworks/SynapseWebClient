@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -17,7 +16,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -33,14 +31,16 @@ import com.google.inject.Inject;
 /**
  * @author jayhodgson
  */
-public class VersionHistoryWidgetViewImpl extends Composite implements VersionHistoryWidgetView, IsWidget {
-	
-	interface VersionHistoryWidgetViewImplUiBinder extends UiBinder<Widget, VersionHistoryWidgetViewImpl> {
+public class VersionHistoryWidgetViewImpl extends Composite
+		implements VersionHistoryWidgetView, IsWidget {
+
+	interface VersionHistoryWidgetViewImplUiBinder
+			extends UiBinder<Widget, VersionHistoryWidgetViewImpl> {
 	}
-	
-	private static VersionHistoryWidgetViewImplUiBinder uiBinder = GWT
-			.create(VersionHistoryWidgetViewImplUiBinder.class);
-	
+
+	private static VersionHistoryWidgetViewImplUiBinder uiBinder =
+			GWT.create(VersionHistoryWidgetViewImplUiBinder.class);
+
 	private PortalGinInjector ginInjector;
 
 	@UiField
@@ -63,14 +63,15 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 	org.sagebionetworks.web.client.view.bootstrap.table.Table versionTable;
 	@UiField
 	Div emptyUI;
-	CallbackP<List<String>> versionValuesCallback; 
+	CallbackP<List<String>> versionValuesCallback;
 	PromptForValuesModalView editVersionInfoModal;
 	boolean isTable = false;
 	private static DateTimeFormat shortDateFormat = DateTimeFormat.getShortDateFormat();
 	private Presenter presenter;
-	
+
 	@Inject
-	public VersionHistoryWidgetViewImpl(PortalGinInjector ginInjector, PromptForValuesModalView editVersionInfoDialog) {
+	public VersionHistoryWidgetViewImpl(PortalGinInjector ginInjector,
+			PromptForValuesModalView editVersionInfoDialog) {
 		this.ginInjector = ginInjector;
 		this.editVersionInfoModal = editVersionInfoDialog;
 		initWidget(uiBinder.createAndBindUi(this));
@@ -88,29 +89,31 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 			presenter.onMore();
 		});
 	}
-	
+
 	@Override
 	public void setEntityBundle(Entity entity, boolean isShowingOlderVersion) {
 		clear();
 		isTable = entity instanceof Table;
 		sizeTableHeader.setVisible(!isTable);
 		md5TableHeader.setVisible(!isTable);
-		currentVersionLink.setTargetHistoryToken(DisplayUtils.getSynapseHistoryTokenNoHash(entity.getId()));
+		currentVersionLink
+				.setTargetHistoryToken(DisplayUtils.getSynapseHistoryTokenNoHash(entity.getId()));
 		currentVersionLink.setVisible(isShowingOlderVersion);
 		if (isShowingOlderVersion) {
 			setVisible(true);
 		}
 	}
-	
+
 	@Override
 	public void clearVersions() {
 		previousVersionsTable.clear();
 		emptyUI.setVisible(false);
 		versionTable.setVisible(true);
 	}
-	
+
 	@Override
-	public void addVersion(String entityId, final VersionInfo version, boolean canEdit, boolean isVersionSelected) {
+	public void addVersion(String entityId, final VersionInfo version, boolean canEdit,
+			boolean isVersionSelected) {
 		VersionHistoryRowView fileHistoryRow = ginInjector.getFileHistoryRow();
 		fileHistoryRow.setMd5TableDataVisible(!isTable);
 		fileHistoryRow.setSizeTableDataVisible(!isTable);
@@ -121,7 +124,7 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 		String modifiedByUserId = version.getModifiedByPrincipalId();
 		String modifiedOn = shortDateFormat.format(version.getModifiedOn());
 		String size = "";
-		try{
+		try {
 			double sizeDouble = Double.parseDouble(version.getContentSize());
 			size = DisplayUtils.getFriendlySize(sizeDouble, true);
 		} catch (Throwable t) {
@@ -133,51 +136,51 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 
 		String versionComment = version.getVersionComment();
 		Long versionNumber = version.getVersionNumber();
-		String versionHref = DisplayUtils.
-				getSynapseHistoryToken(version.getId(),
-				version.getVersionNumber());
-		fileHistoryRow.configure(versionNumber, versionHref, "Version " + versionName, modifiedByUserId, modifiedOn, size, md5, versionComment, deleteCallback, doiWidget);
+		String versionHref =
+				DisplayUtils.getSynapseHistoryToken(version.getId(), version.getVersionNumber());
+		fileHistoryRow.configure(versionNumber, versionHref, "Version " + versionName, modifiedByUserId,
+				modifiedOn, size, md5, versionComment, deleteCallback, doiWidget);
 		previousVersionsTable.add(fileHistoryRow.asWidget());
 		fileHistoryRow.setCanDelete(canEdit);
 		fileHistoryRow.setIsVersionSelected(isVersionSelected);
 		doiWidget.configure(entityId, ObjectType.ENTITY, versionNumber);
 	}
-	
+
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-	
+
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
+
 	@Override
-	public void showLoading() {
-	}
-	
+	public void showLoading() {}
+
 	@Override
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message);
 	}
-	
+
 	@Override
 	public void clear() {
-		//reset versions ui
+		// reset versions ui
 		clearVersions();
 		currentVersionLink.setVisible(false);
 	}
-	
+
 	@Override
 	public void setMoreButtonVisible(boolean visible) {
 		moreButton.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setEditVersionInfoButtonVisible(boolean isVisible) {
 		editInfoButton.setVisible(isVisible);
 	}
-	
+
 	@Override
 	public void showEditVersionInfo(String oldLabel, String oldComment) {
 		List<String> prompts = new ArrayList<>();
@@ -186,24 +189,26 @@ public class VersionHistoryWidgetViewImpl extends Composite implements VersionHi
 		List<String> initialValues = new ArrayList<>();
 		initialValues.add(oldLabel);
 		initialValues.add(oldComment);
-		editVersionInfoModal.configureAndShow("Edit Version Info", prompts, initialValues, versionValuesCallback);
+		editVersionInfoModal.configureAndShow("Edit Version Info", prompts, initialValues,
+				versionValuesCallback);
 	}
-	
+
 	@Override
 	public void showEditVersionInfoError(String error) {
 		editVersionInfoModal.showError(error);
 	}
-	
+
 	@Override
 	public void hideEditVersionInfo() {
 		editVersionInfoModal.hide();
 	}
-	
+
 	@Override
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
 	}
+
 	@Override
 	public void showNoResults() {
 		emptyUI.setVisible(true);

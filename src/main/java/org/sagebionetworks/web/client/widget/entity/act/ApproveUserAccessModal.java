@@ -1,21 +1,19 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResult;
@@ -23,7 +21,6 @@ import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -36,36 +33,37 @@ import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presenter, IsWidget {
-	
+
 	public static final String EMAIL_SUBJECT = "Data access approval";
 	public static final String SELECT_FROM = "SELECT \"Email Body\" FROM ";
-	public static final String WHERE = " WHERE \"Dataset Id\"='";	
+	public static final String WHERE = " WHERE \"Dataset Id\"='";
 	public static final String QUERY_CANCELLED = "Query cancelled";
 	public static final String NO_EMAIL_MESSAGE = "You must enter an email to send to the user";
 	public static final String NO_USER_SELECTED = "You must select a user to approve";
-	public static final String APPROVE_BUT_FAIL_TO_EMAIL = "User has been approved, but an error was encountered while emailing them: ";
+	public static final String APPROVE_BUT_FAIL_TO_EMAIL =
+			"User has been approved, but an error was encountered while emailing them: ";
 	public static final String APPROVED_USER = "Successfully Approved User. ";
 	public static final String REVOKED_USER = "Successfully Revoked User Access. ";
 	public static final String EMAIL_SENT = "An email has been sent to notify them";
 	public static final String MESSAGE_BLANK = "You must enter an email message to approve this user";
-	public static final String NO_APPROVAL_FOUND = "There was no approval found for the specified user and requirement";
-	
+	public static final String NO_APPROVAL_FOUND =
+			"There was no approval found for the specified user and requirement";
+
 	// Mask to get all parts of a query.
 	private static final Long ALL_PARTS_MASK = new Long(255);
-	
+
 	private String accessRequirement;
 	private String userId;
 	private String datasetId;
 	private String message;
 	private EntityBundle entityBundle;
-	
+
 	private ApproveUserAccessModalView view;
 	private SynapseAlert synAlert;
 	private SynapseSuggestBox peopleSuggestWidget;
@@ -74,15 +72,12 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	private SynapseProperties synapseProperties;
 	private JobTrackingWidget progressWidget;
 	private DataAccessClientAsync dataAccessClient;
+
 	@Inject
-	public ApproveUserAccessModal(ApproveUserAccessModalView view,
-			SynapseAlert synAlert,
-			SynapseSuggestBox peopleSuggestBox,
-			UserGroupSuggestionProvider provider, 
-			SynapseClientAsync synapseClient,
-			SynapseProperties synapseProperties,
-			JobTrackingWidget progressWidget,
-			DataAccessClientAsync dataAccessClient) {
+	public ApproveUserAccessModal(ApproveUserAccessModalView view, SynapseAlert synAlert,
+			SynapseSuggestBox peopleSuggestBox, UserGroupSuggestionProvider provider,
+			SynapseClientAsync synapseClient, SynapseProperties synapseProperties,
+			JobTrackingWidget progressWidget, DataAccessClientAsync dataAccessClient) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;
@@ -108,23 +103,26 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		RestrictableObjectDescriptor subject = new RestrictableObjectDescriptor();
 		subject.setId(bundle.getEntity().getId());
 		subject.setType(RestrictableObjectType.ENTITY);
-		dataAccessClient.getAccessRequirements(subject, 50L, 0L, new AsyncCallback<List<AccessRequirement>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
-			@Override
-			public void onSuccess(List<AccessRequirement> result) {
-				List<ACTAccessRequirement> ars = new ArrayList<>();
-				for (AccessRequirement ar : result) {
-					if (ar instanceof ACTAccessRequirement) {
-						ars.add((ACTAccessRequirement)ar);
+		dataAccessClient.getAccessRequirements(subject, 50L, 0L,
+				new AsyncCallback<List<AccessRequirement>>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						synAlert.handleException(caught);
 					}
-				}
-				configure(ars, bundle);
-			}
-		});
+
+					@Override
+					public void onSuccess(List<AccessRequirement> result) {
+						List<ACTAccessRequirement> ars = new ArrayList<>();
+						for (AccessRequirement ar : result) {
+							if (ar instanceof ACTAccessRequirement) {
+								ars.add((ACTAccessRequirement) ar);
+							}
+						}
+						configure(ars, bundle);
+					}
+				});
 	}
+
 	public void configure(List<ACTAccessRequirement> accessRequirements, EntityBundle bundle) {
 		view.startLoadingEmail();
 		this.entityBundle = bundle;
@@ -137,50 +135,52 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		view.setSynAlert(synAlert.asWidget());
 		view.setStates(list);
 		if (list.size() > 0) {
-			onStateSelected(list.get(0));			
+			onStateSelected(list.get(0));
 		}
-		datasetId = entityBundle.getEntity().getId(); //get synId of dataset we are currently on
+		datasetId = entityBundle.getEntity().getId(); // get synId of dataset we are currently on
 		view.setDatasetTitle(entityBundle.getEntity().getName());
 		loadEmailMessage();
 	}
-	
+
 	private void loadEmailMessage() {
 		Query query = getDefaultQuery();
 		QueryBundleRequest qbr = new QueryBundleRequest();
 		qbr.setPartMask(ALL_PARTS_MASK);
 		qbr.setQuery(query);
 		qbr.setEntityId(QueryBundleUtils.getTableId(query));
-		this.progressWidget.startAndTrackJob("Running query...", false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
-			
-			@Override
-			public void onFailure(Throwable failure) {
-				view.setLoadingEmailVisible(false);
-				synAlert.handleException(failure);
-			}
-			
-			@Override
-			public void onComplete(AsynchronousResponseBody response) {
-				QueryResultBundle result = (QueryResultBundle) response;
-				if (hasResult(result)) {
-					message = result.getQueryResult().getQueryResults().getRows().get(0).getValues().get(0);
-					view.setMessageEditArea(message);
-				} else {
-					message = "";
-				}
-				view.setMessageBody(message);
-				view.finishLoadingEmail();
-			}
+		this.progressWidget.startAndTrackJob("Running query...", false, AsynchType.TableQuery, qbr,
+				new AsynchronousProgressHandler() {
 
-			@Override
-			public void onCancel() {
-				view.setLoadingEmailVisible(false);
-				view.finishLoadingEmail();
-				synAlert.showError(QUERY_CANCELLED);
-			}
-		});
+					@Override
+					public void onFailure(Throwable failure) {
+						view.setLoadingEmailVisible(false);
+						synAlert.handleException(failure);
+					}
+
+					@Override
+					public void onComplete(AsynchronousResponseBody response) {
+						QueryResultBundle result = (QueryResultBundle) response;
+						if (hasResult(result)) {
+							message =
+									result.getQueryResult().getQueryResults().getRows().get(0).getValues().get(0);
+							view.setMessageEditArea(message);
+						} else {
+							message = "";
+						}
+						view.setMessageBody(message);
+						view.finishLoadingEmail();
+					}
+
+					@Override
+					public void onCancel() {
+						view.setLoadingEmailVisible(false);
+						view.finishLoadingEmail();
+						synAlert.showError(QUERY_CANCELLED);
+					}
+				});
 		view.setLoadingEmailWidget(progressWidget.asWidget());
 	}
-	
+
 	private boolean hasResult(QueryResultBundle result) {
 		QueryResult qr = result.getQueryResult();
 		if (qr != null) {
@@ -200,25 +200,26 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		}
 		return false;
 	}
-	
+
 	public Query getDefaultQuery() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(SELECT_FROM);
-		builder.append(synapseProperties.getSynapseProperty("org.sagebionetworks.portal.act.synapse_storage_id"));
+		builder.append(
+				synapseProperties.getSynapseProperty("org.sagebionetworks.portal.act.synapse_storage_id"));
 		builder.append(WHERE);
 		builder.append(datasetId + "'");
-		
+
 		Query query = new Query();
 		query.setSql(builder.toString());
 		query.setIsConsistent(true);
 		return query;
 	}
-	
+
 	public void show() {
 		synAlert.clear();
 		view.show();
 	}
-	
+
 	@Override
 	public void onRevoke() {
 		if (userId == null) {
@@ -233,7 +234,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 				synAlert.handleException(caught);
 				view.setRevokeProcessing(false);
 			}
-			
+
 			@Override
 			public void onSuccess(Void result) {
 				view.setRevokeProcessing(false);
@@ -242,7 +243,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			}
 		});
 	}
-	
+
 	@Override
 	public void onSubmit() {
 		if (userId == null) {
@@ -256,9 +257,9 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		}
 		accessRequirement = view.getAccessRequirement();
 		view.setApproveProcessing(true);
-		AccessApproval aa  = new AccessApproval();
-		aa.setAccessorId(userId);  //user id
-		aa.setRequirementId(Long.parseLong(accessRequirement)); //requirement id
+		AccessApproval aa = new AccessApproval();
+		aa.setAccessorId(userId); // user id
+		aa.setRequirementId(Long.parseLong(accessRequirement)); // requirement id
 		synapseClient.createAccessApproval(aa, new AsyncCallback<AccessApproval>() {
 
 			@Override
@@ -269,44 +270,46 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 
 			@Override
 			public void onSuccess(AccessApproval result) {
-				sendEmail(result);						
+				sendEmail(result);
 			}
 		});
 	}
-	
+
 	private void sendEmail(AccessApproval result) {
 		Set<String> recipients = new HashSet<String>();
 		recipients.add(userId);
-		synapseClient.sendMessage(recipients, EMAIL_SUBJECT, message, null, new AsyncCallback<String>() {
+		synapseClient.sendMessage(recipients, EMAIL_SUBJECT, message, null,
+				new AsyncCallback<String>() {
 
-			@Override
-			public void onFailure(Throwable caught) {
-				view.setApproveProcessing(false);
-				synAlert.showError(APPROVE_BUT_FAIL_TO_EMAIL + caught.getMessage());
-			}
+					@Override
+					public void onFailure(Throwable caught) {
+						view.setApproveProcessing(false);
+						synAlert.showError(APPROVE_BUT_FAIL_TO_EMAIL + caught.getMessage());
+					}
 
-			@Override
-			public void onSuccess(String result) {
-				view.setApproveProcessing(false);
-				view.hide();
-				view.showInfo(APPROVED_USER + EMAIL_SENT);
-			}
-		});
+					@Override
+					public void onSuccess(String result) {
+						view.setApproveProcessing(false);
+						view.hide();
+						view.showInfo(APPROVED_USER + EMAIL_SENT);
+					}
+				});
 	}
-	
+
 	public void onUserSelected(UserGroupSuggestion suggestion) {
 		this.userId = suggestion.getId();
 	}
-	
+
 	public Widget asWidget() {
-		view.setPresenter(this);			
+		view.setPresenter(this);
 		return view.asWidget();
 	}
 
 	@Override
 	public void onStateSelected(String state) {
 		accessRequirement = state;
-		view.setAccessRequirement(state, GovernanceServiceHelper.getAccessRequirementText(arMap.get(state)));
+		view.setAccessRequirement(state,
+				GovernanceServiceHelper.getAccessRequirementText(arMap.get(state)));
 	}
-		
+
 }

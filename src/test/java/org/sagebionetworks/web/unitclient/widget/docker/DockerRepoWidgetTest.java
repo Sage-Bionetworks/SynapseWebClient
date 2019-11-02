@@ -5,17 +5,15 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.docker.DockerRepoWidget.DOCKER_PULL_COMMAND;
-
 import java.util.Date;
 import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -29,7 +27,6 @@ import org.sagebionetworks.web.client.widget.entity.file.DockerTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
-
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -74,12 +71,9 @@ public class DockerRepoWidgetTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		dockerRepoWidget = new DockerRepoWidget(
-				mockView, mockWikiPageWidget, mockProvWidget,
-				mockDockerTitleBar, mockMetadata,
-				mockModifiedCreatedBy, mockDockerCommitListWidget,
-				mockCookieProvider,
-				mockEventBus);
+		dockerRepoWidget = new DockerRepoWidget(mockView, mockWikiPageWidget, mockProvWidget,
+				mockDockerTitleBar, mockMetadata, mockModifiedCreatedBy, mockDockerCommitListWidget,
+				mockCookieProvider, mockEventBus);
 		when(mockEntity.getId()).thenReturn(entityId);
 		when(mockEntity.getRepositoryName()).thenReturn(repoName);
 		when(mockEntityBundle.getEntity()).thenReturn(mockEntity);
@@ -90,7 +84,8 @@ public class DockerRepoWidgetTest {
 		when(mockEntity.getModifiedBy()).thenReturn(modifiedBy);
 		when(mockEntity.getModifiedOn()).thenReturn(modifiedOn);
 		when(mockEntityBundle.getRootWikiId()).thenReturn(rootWikiId);
-		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
+		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))
+				.thenReturn(null);
 	}
 
 	@Test
@@ -107,7 +102,8 @@ public class DockerRepoWidgetTest {
 	@Test
 	public void testConfigure() {
 		dockerRepoWidget.configure(mockEntityBundle, mockActionWidget);
-		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), any(WikiPageWidget.Callback.class));
+		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit),
+				any(WikiPageWidget.Callback.class));
 		verify(mockWikiPageWidget).setWikiReloadHandler(any(CallbackP.class));
 		verify(mockProvWidget).configure(any(Map.class));
 		verify(mockView).setDockerPullCommand(DOCKER_PULL_COMMAND + repoName);
@@ -117,14 +113,15 @@ public class DockerRepoWidgetTest {
 		verify(mockDockerCommitListWidget).configure(entityId, false);
 		verify(mockView).setProvenanceWidgetVisible(false);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfigureCannotEdit() {
 		canEdit = false;
 		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(canEdit);
 		dockerRepoWidget.configure(mockEntityBundle, mockActionWidget);
-		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), any(WikiPageWidget.Callback.class));
+		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit),
+				any(WikiPageWidget.Callback.class));
 		verify(mockWikiPageWidget).setWikiReloadHandler(any(CallbackP.class));
 		verify(mockProvWidget).configure(any(Map.class));
 		verify(mockView).setDockerPullCommand(DOCKER_PULL_COMMAND + repoName);

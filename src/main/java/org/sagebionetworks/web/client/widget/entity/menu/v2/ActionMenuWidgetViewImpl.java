@@ -3,20 +3,19 @@ package org.sagebionetworks.web.client.widget.entity.menu.v2;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
 import org.gwtbootstrap3.client.ui.Divider;
 import org.gwtbootstrap3.client.ui.DropDownHeader;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+
 /**
  * Basic implementation with zero business logic.
  * 
@@ -24,15 +23,17 @@ import com.google.inject.Inject;
  *
  */
 public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
-	
-	public interface Binder extends UiBinder<Widget, ActionMenuWidgetViewImpl> {}
+
+	public interface Binder extends UiBinder<Widget, ActionMenuWidgetViewImpl> {
+	}
+
 	@UiField
 	ButtonToolBar buttonToolBar;
 	@UiField
 	Div controllerContainer;
 	@UiField
 	Button toolsMenu;
-	
+
 	Widget widget;
 	@UiField
 	Divider actDivider;
@@ -41,16 +42,17 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	@UiField
 	DropDownHeader actHeader;
 	Presenter presenter;
-	
+
 	@Inject
-	public ActionMenuWidgetViewImpl(Binder binder){
+	public ActionMenuWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 	}
-	
+
 	@Override
 	public void setPresenter(Presenter p) {
 		presenter = p;
 	}
+
 	@Override
 	public Widget asWidget() {
 		return widget;
@@ -62,20 +64,21 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 		recursiveSearch(list, buttonToolBar);
 		return list;
 	}
+
 	/**
 	 * Recursive function to find all ActionView within this widget.
 	 * 
 	 * @param results
 	 * @param toSearch
 	 */
-	private static void recursiveSearch(List<ActionView> results, ComplexPanel toSearch){
+	private static void recursiveSearch(List<ActionView> results, ComplexPanel toSearch) {
 		Iterator<Widget> childIterator = toSearch.iterator();
-		if(childIterator != null){
-			while(childIterator.hasNext()){
+		if (childIterator != null) {
+			while (childIterator.hasNext()) {
 				Widget child = childIterator.next();
-				if(child instanceof ActionView){
+				if (child instanceof ActionView) {
 					results.add((ActionView) child);
-				}else if(child instanceof ComplexPanel){
+				} else if (child instanceof ComplexPanel) {
 					ComplexPanel container = (ComplexPanel) child;
 					recursiveSearch(results, container);
 				}
@@ -87,9 +90,9 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	public void addControllerWidget(IsWidget controllerWidget) {
 		controllerContainer.add(controllerWidget);
 	}
-	
+
 	@Override
-	public void setACTDividerVisible(boolean visible){
+	public void setACTDividerVisible(boolean visible) {
 		actDivider.setVisible(visible);
 		actHeader.setVisible(visible);
 	}
@@ -99,6 +102,7 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 		toolsMenu.setText(text);
 		toolsMenu.setIcon(icon);
 	}
+
 	@Override
 	public void setNoActionsAvailableVisible(boolean visible) {
 		noActionsAvailable.setVisible(visible);

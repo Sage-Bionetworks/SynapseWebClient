@@ -4,21 +4,20 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.HasChangesHandler;
-
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class AccessControlListModalWidgetImpl implements AccessControlListModalWidget, AccessControlListModalWidgetView.Presenter, HasChangesHandler {
+public class AccessControlListModalWidgetImpl implements AccessControlListModalWidget,
+		AccessControlListModalWidgetView.Presenter, HasChangesHandler {
 
 	public static final String OK = "OK";
 	public static final String CANCEL = "Cancel";
 	AccessControlListModalWidgetView view;
 	AccessControlListEditor editor;
 	Callback changeCallback;
-	
+
 	@Inject
-	public AccessControlListModalWidgetImpl(
-			AccessControlListModalWidgetView view,
+	public AccessControlListModalWidgetImpl(AccessControlListModalWidgetView view,
 			AccessControlListEditor editor) {
 		super();
 		this.view = view;
@@ -38,12 +37,13 @@ public class AccessControlListModalWidgetImpl implements AccessControlListModalW
 	@Override
 	public void configure(Entity entity, boolean canChangePermission) {
 		editor.configure(entity, canChangePermission, this);
-		String entityTypeName = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entity.getClass()));
+		String entityTypeName =
+				EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entity.getClass()));
 		view.setTitle(entityTypeName + " Sharing Settings");
-		if(canChangePermission){
+		if (canChangePermission) {
 			view.setPrimaryButtonVisible(true);
 			view.setDefaultButtonText(CANCEL);
-		}else{
+		} else {
 			view.setPrimaryButtonVisible(false);
 			view.setDefaultButtonText(OK);
 		}

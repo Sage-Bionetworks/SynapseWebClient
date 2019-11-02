@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
@@ -16,16 +15,15 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
-
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class DiscussionThreadListWidget implements DiscussionThreadListWidgetView.Presenter{
+public class DiscussionThreadListWidget implements DiscussionThreadListWidgetView.Presenter {
 
 	public static final Long LIMIT = 20L;
-	public static final DiscussionThreadOrder DEFAULT_ORDER = DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY;
+	public static final DiscussionThreadOrder DEFAULT_ORDER =
+			DiscussionThreadOrder.PINNED_AND_LAST_ACTIVITY;
 	public static final Boolean DEFAULT_ASCENDING = false;
 	public static final DiscussionFilter DEFAULT_FILTER = DiscussionFilter.EXCLUDE_DELETED;
 	DiscussionThreadListWidgetView view;
@@ -43,17 +41,14 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	private DiscussionFilter filter;
 	private String entityId;
 	private LoadMoreWidgetContainer loadMoreWidgetContainer;
-	private Map<String, DiscussionThreadListItemWidget> threadId2Widget = new HashMap<String, DiscussionThreadListItemWidget>();
-	
+	private Map<String, DiscussionThreadListItemWidget> threadId2Widget =
+			new HashMap<String, DiscussionThreadListItemWidget>();
+
 	@Inject
-	public DiscussionThreadListWidget(
-			DiscussionThreadListWidgetView view,
-			PortalGinInjector ginInjector,
-			SynapseAlert synAlert,
-			LoadMoreWidgetContainer loadMoreWidgetContainer,
-			SynapseJSNIUtils jsniUtils,
-			SynapseJavascriptClient jsClient
-			) {
+	public DiscussionThreadListWidget(DiscussionThreadListWidgetView view,
+			PortalGinInjector ginInjector, SynapseAlert synAlert,
+			LoadMoreWidgetContainer loadMoreWidgetContainer, SynapseJSNIUtils jsniUtils,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.synAlert = synAlert;
@@ -65,12 +60,11 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 		view.setThreadsContainer(loadMoreWidgetContainer);
 	}
 
-	public void configure(String forumId, Boolean isCurrentUserModerator,
-			Set<String> moderatorIds, CallbackP<Boolean> emptyListCallback,
-			DiscussionFilter filter) {
+	public void configure(String forumId, Boolean isCurrentUserModerator, Set<String> moderatorIds,
+			CallbackP<Boolean> emptyListCallback, DiscussionFilter filter) {
 		order = DEFAULT_ORDER;
 		ascending = DEFAULT_ASCENDING;
-//		this.isCurrentUserModerator = isCurrentUserModerator;
+		// this.isCurrentUserModerator = isCurrentUserModerator;
 		this.emptyListCallback = emptyListCallback;
 		this.moderatorIds = moderatorIds;
 		this.entityId = null;
@@ -86,13 +80,13 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 				loadMoreThreadsForForum();
 			}
 		});
-		
+
 		DiscussionThreadCountAlert threadCountAlert = ginInjector.getDiscussionThreadCountAlert();
 		view.setThreadCountAlert(threadCountAlert.asWidget());
 		threadCountAlert.configure(forumId);
 		loadInitialForumResults();
 	}
-	
+
 	private void loadInitialForumResults() {
 		clear();
 		offset = 0L;
@@ -128,41 +122,42 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 
 	public void loadMoreThreadsForEntity() {
 		synAlert.clear();
-		jsClient.getThreadsForEntity(entityId, LIMIT, offset, order, ascending, filter, getLoadMoreCallback());
+		jsClient.getThreadsForEntity(entityId, LIMIT, offset, order, ascending, filter,
+				getLoadMoreCallback());
 	}
 
 	public AsyncCallback<List<DiscussionThreadBundle>> getLoadMoreCallback() {
-		return new AsyncCallback<List<DiscussionThreadBundle>>(){
+		return new AsyncCallback<List<DiscussionThreadBundle>>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						loadMoreWidgetContainer.setIsMore(false);
-						synAlert.handleException(caught);
-					}
+			@Override
+			public void onFailure(Throwable caught) {
+				loadMoreWidgetContainer.setIsMore(false);
+				synAlert.handleException(caught);
+			}
 
-					@Override
-					public void onSuccess(List<DiscussionThreadBundle> results) {
-						boolean isEmpty = results.isEmpty() && offset == 0; //no threads
-						
-						for(DiscussionThreadBundle bundle: results) {
-							DiscussionThreadListItemWidget thread = ginInjector.createThreadListItemWidget();
-							thread.configure(bundle);
-							if (threadIdClickedCallback != null) {
-								thread.setThreadIdClickedCallback(threadIdClickedCallback);
-							}
-							threadId2Widget.put(bundle.getId(), thread);
-							loadMoreWidgetContainer.add(thread.asWidget());
-						}
-						
-						offset += LIMIT;
-						loadMoreWidgetContainer.setIsMore(results.size() == LIMIT);
-						
-						if (emptyListCallback != null) {
-							emptyListCallback.invoke(!isEmpty);
-						};
-						view.setThreadHeaderVisible(!isEmpty);
-						view.setNoThreadsFoundVisible(isEmpty);
+			@Override
+			public void onSuccess(List<DiscussionThreadBundle> results) {
+				boolean isEmpty = results.isEmpty() && offset == 0; // no threads
+
+				for (DiscussionThreadBundle bundle : results) {
+					DiscussionThreadListItemWidget thread = ginInjector.createThreadListItemWidget();
+					thread.configure(bundle);
+					if (threadIdClickedCallback != null) {
+						thread.setThreadIdClickedCallback(threadIdClickedCallback);
 					}
+					threadId2Widget.put(bundle.getId(), thread);
+					loadMoreWidgetContainer.add(thread.asWidget());
+				}
+
+				offset += LIMIT;
+				loadMoreWidgetContainer.setIsMore(results.size() == LIMIT);
+
+				if (emptyListCallback != null) {
+					emptyListCallback.invoke(!isEmpty);
+				} ;
+				view.setThreadHeaderVisible(!isEmpty);
+				view.setNoThreadsFoundVisible(isEmpty);
+			}
 		};
 	}
 
@@ -171,8 +166,9 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 		loadMoreWidgetContainer.clear();
 		threadId2Widget.clear();
 	}
-	
-	public void setThreadIdClickedCallback(CallbackP<DiscussionThreadBundle> threadIdClickedCallback) {
+
+	public void setThreadIdClickedCallback(
+			CallbackP<DiscussionThreadBundle> threadIdClickedCallback) {
 		this.threadIdClickedCallback = threadIdClickedCallback;
 	}
 
@@ -183,8 +179,8 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 
 	public void loadMoreThreadsForForum() {
 		synAlert.clear();
-		jsClient.getThreadsForForum(forumId, LIMIT, offset,
-				order, ascending, filter, getLoadMoreCallback());
+		jsClient.getThreadsForForum(forumId, LIMIT, offset, order, ascending, filter,
+				getLoadMoreCallback());
 	}
 
 	public void sortBy(DiscussionThreadOrder newOrder) {
@@ -201,10 +197,10 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 		}
 		view.setSorted(order, ascending);
 	}
-	
+
 	public void scrollToThread(String threadId) {
 		if (threadId2Widget.containsKey(threadId)) {
-			//update thread data and scroll into view
+			// update thread data and scroll into view
 			final DiscussionThreadListItemWidget threadListItemWidget = threadId2Widget.get(threadId);
 			jsClient.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>() {
 				@Override
@@ -212,6 +208,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 					// unable to update thread data
 					jsniUtils.consoleError(caught.getMessage());
 				}
+
 				@Override
 				public void onSuccess(DiscussionThreadBundle bundle) {
 					threadListItemWidget.configure(bundle);

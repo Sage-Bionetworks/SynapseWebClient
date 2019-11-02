@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.http.client.URL;
@@ -25,8 +24,10 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class RegisterAccountViewImpl extends Composite implements RegisterAccountView {
-	public interface RegisterAccountViewImplUiBinder extends UiBinder<Widget, RegisterAccountViewImpl> {}
-	
+	public interface RegisterAccountViewImplUiBinder
+			extends UiBinder<Widget, RegisterAccountViewImpl> {
+	}
+
 	@UiField
 	Div registerWidgetContainer;
 	@UiField
@@ -41,16 +42,17 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	GWTTimer timer;
 	Presenter presenter;
 	private Header headerWidget;
-	public static final String ROOT_PORTAL_URL = Window.Location.getProtocol() + "//" + Window.Location.getHost() + "/";
-	public static final String GOOGLE_OAUTH_CALLBACK_URL = RegisterAccountViewImpl.ROOT_PORTAL_URL + "Portal/oauth2callback?oauth2provider=GOOGLE_OAUTH_2_0";
-	public static final String GOOGLE_OAUTH_WITH_STATE_CALLBACK_URL = GOOGLE_OAUTH_CALLBACK_URL + "&state=";
+	public static final String ROOT_PORTAL_URL =
+			Window.Location.getProtocol() + "//" + Window.Location.getHost() + "/";
+	public static final String GOOGLE_OAUTH_CALLBACK_URL = RegisterAccountViewImpl.ROOT_PORTAL_URL
+			+ "Portal/oauth2callback?oauth2provider=GOOGLE_OAUTH_2_0";
+	public static final String GOOGLE_OAUTH_WITH_STATE_CALLBACK_URL =
+			GOOGLE_OAUTH_CALLBACK_URL + "&state=";
+
 	@Inject
-	public RegisterAccountViewImpl(
-			RegisterAccountViewImplUiBinder binder, 
-			GlobalApplicationState globalAppState,
-			Header headerWidget,
-			GWTTimer timer,
-			SageImageBundle sageImageBundle) {		
+	public RegisterAccountViewImpl(RegisterAccountViewImplUiBinder binder,
+			GlobalApplicationState globalAppState, Header headerWidget, GWTTimer timer,
+			SageImageBundle sageImageBundle) {
 		initWidget(binder.createAndBindUi(this));
 		this.timer = timer;
 		this.headerWidget = headerWidget;
@@ -68,7 +70,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 		googleText.addStyleName("movedown-9");
 		googleSignUpButton.add(googleText);
 		KeyDownHandler register = event -> {
-			if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+			if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
 				googleSignUpButton.click();
 			} else {
 				timer.cancel();
@@ -77,16 +79,18 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 		};
 		userNameField.addKeyDownHandler(register);
 		googleSignUpButton.addClickHandler(event -> {
-			if(checkUsernameFormat()) {
+			if (checkUsernameFormat()) {
 				String encodedUsername = URL.encodeQueryString(userNameField.getValue());
-				Window.Location.assign(RegisterAccountViewImpl.GOOGLE_OAUTH_WITH_STATE_CALLBACK_URL + encodedUsername);
+				Window.Location
+						.assign(RegisterAccountViewImpl.GOOGLE_OAUTH_WITH_STATE_CALLBACK_URL + encodedUsername);
 			}
 		});
 	}
-	
+
 	private boolean checkUsernameFormat() {
 		synAlert.clear();
-		if (userNameField.getValue().length() > 3 && ValidationUtils.isValidUsername(userNameField.getValue())) {
+		if (userNameField.getValue().length() > 3
+				&& ValidationUtils.isValidUsername(userNameField.getValue())) {
 			return true;
 		} else {
 			synAlert.showError(DisplayConstants.USERNAME_FORMAT_ERROR);
@@ -99,6 +103,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 		registerWidgetContainer.clear();
 		registerWidgetContainer.add(w);
 	}
+
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
@@ -111,6 +116,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	public void setGoogleRegisterButtonEnabled(boolean enabled) {
 		googleSignUpButton.setEnabled(enabled);
 	}
+
 	@Override
 	public void setGoogleSynAlert(SynapseAlert w) {
 		googleSynAlertContainer.clear();

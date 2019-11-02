@@ -14,10 +14,8 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,7 +47,6 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -99,8 +96,7 @@ public class EntityTreeBrowserTest {
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		adapterFactory = new AdapterFactoryImpl();
-		entityTreeBrowser = new EntityTreeBrowser(mockInjector, mockView,
-				mockSynapseJavascriptClient,
+		entityTreeBrowser = new EntityTreeBrowser(mockInjector, mockView, mockSynapseJavascriptClient,
 				mockIconsImageBundle, adapterFactory, mockSynAlert);
 		verify(mockView).setPresenter(entityTreeBrowser);
 		reset(mockView);
@@ -108,21 +104,18 @@ public class EntityTreeBrowserTest {
 		searchResults = new ArrayList<EntityHeader>();
 		when(mockResults.getPage()).thenReturn(searchResults);
 
-		when(mockInjector.getEntityTreeItemWidget()).thenReturn(
-				mockEntityTreeItem);
+		when(mockInjector.getEntityTreeItemWidget()).thenReturn(mockEntityTreeItem);
 		EntityHeader header = new EntityHeader();
 		header.setId(parentId);
 		header.setType(Folder.class.getName());
-		
+
 		when(mockEntityTreeItem.getHeader()).thenReturn(header);
-//		when(mockView.appendLoading(any(EntityTreeItem.class))).thenReturn(mockLoadingItem);
-//		when(mockView.insertLoading(any(EntityTreeItem.class), Mockito.anyInt())).thenReturn(mockLoadingItem);
+		// when(mockView.appendLoading(any(EntityTreeItem.class))).thenReturn(mockLoadingItem);
+		// when(mockView.insertLoading(any(EntityTreeItem.class),
+		// Mockito.anyInt())).thenReturn(mockLoadingItem);
 		Mockito.when(mockInjector.getMoreTreeWidget()).thenReturn(mockMoreTreeItem);
-		AsyncMockStubber
-				.callSuccessWith(mockResults)
-				.when(mockSynapseJavascriptClient)
-				.getEntityChildren(any(EntityChildrenRequest.class),
-						any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockResults).when(mockSynapseJavascriptClient)
+				.getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		entityTreeBrowser.setIsEmptyCallback(mockIsEmptyCallback);
 	}
 
@@ -132,11 +125,12 @@ public class EntityTreeBrowserTest {
 		searchResults.add(mockEntityHeader);
 		when(mockEntityHeader.getId()).thenReturn(childEntityId);
 		when(mockEntityHeader.getType()).thenReturn(FileEntity.class.getName());
-		
+
 		entityTreeBrowser.setEntityClickedHandler(mockEntityClickedCallback);
 		entityTreeBrowser.configure("123");
-		
-		verify(mockSynapseJavascriptClient).getEntityChildren(entityChildrenRequestCaptor.capture(), any(AsyncCallback.class));
+
+		verify(mockSynapseJavascriptClient).getEntityChildren(entityChildrenRequestCaptor.capture(),
+				any(AsyncCallback.class));
 		EntityChildrenRequest request = entityChildrenRequestCaptor.getValue();
 		assertEquals("123", request.getParentId());
 		assertNull(request.getNextPageToken());
@@ -146,30 +140,34 @@ public class EntityTreeBrowserTest {
 		assertEquals(EntityTreeBrowser.DEFAULT_DIRECTION, request.getSortDirection());
 		verify(mockView).clearSortUI();
 		verify(mockIsEmptyCallback).invoke(false);
-		
-		//verify user selecting another sorting option resets the query, and changes the request sort parameters
+
+		// verify user selecting another sorting option resets the query, and changes the request sort
+		// parameters
 		entityTreeBrowser.onSort(SortBy.CREATED_ON, Direction.DESC);
-		
+
 		verify(mockView, times(2)).clear();
-		verify(mockSynapseJavascriptClient, times(2)).getEntityChildren(entityChildrenRequestCaptor.capture(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, times(2))
+				.getEntityChildren(entityChildrenRequestCaptor.capture(), any(AsyncCallback.class));
 		request = entityChildrenRequestCaptor.getValue();
 		assertEquals(SortBy.CREATED_ON, request.getSortBy());
 		assertEquals(Direction.DESC, request.getSortDirection());
 		verify(mockView).setSortUI(SortBy.CREATED_ON, Direction.DESC);
-		
+
 		assertNull(request.getNextPageToken());
 		assertEquals("123", request.getParentId());
-		
+
 		clickHandlerCaptor.getValue().onClick(null);
 		verify(mockEntityClickedCallback).invoke(childEntityId);
 	}
+
 	@Test
 	public void testGetChildrenEmptyResult() {
 		entityTreeBrowser.setEntityClickedHandler(mockEntityClickedCallback);
 		entityTreeBrowser.configure("123");
-		
-		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
-		
+
+		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class),
+				any(AsyncCallback.class));
+
 		verify(mockIsEmptyCallback).invoke(true);
 	}
 
@@ -187,14 +185,13 @@ public class EntityTreeBrowserTest {
 	public void testGetFolderChildrenRaceCondition() {
 		mockSynapseJavascriptClient = mock(SynapseJavascriptClient.class);
 		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
-		entityTreeBrowser = new EntityTreeBrowser(mockInjector, mockView,
-				mockSynapseJavascriptClient,
+		entityTreeBrowser = new EntityTreeBrowser(mockInjector, mockView, mockSynapseJavascriptClient,
 				mockIconsImageBundle, adapterFactory, mockSynAlert);
 		entityTreeBrowser.getChildren("123", null, null);
 		// capture the servlet call
-		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor
-				.forClass(AsyncCallback.class);
-		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), captor.capture());
+		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor.forClass(AsyncCallback.class);
+		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class),
+				captor.capture());
 		// before invoking asynccallback.success, set the current entity id to
 		// something else (simulating that the user
 		// has selected a different folder while this was still processing)
@@ -210,10 +207,9 @@ public class EntityTreeBrowserTest {
 		entityTreeBrowser.getChildren(parentId, null, null);
 		// Creates the limited number of entity items
 		// 100 links, and 100 files
-		verify(mockView, times(100))
-				.appendRootEntityTreeItem(any(EntityTreeItem.class));
-		verify(mockView).placeRootMoreTreeItem(
-				any(MoreTreeItem.class), eq(parentId), eq(nextPageToken));
+		verify(mockView, times(100)).appendRootEntityTreeItem(any(EntityTreeItem.class));
+		verify(mockView).placeRootMoreTreeItem(any(MoreTreeItem.class), eq(parentId),
+				eq(nextPageToken));
 	}
 
 	// Taken care of by expandTreeItemOnOpen
@@ -226,7 +222,8 @@ public class EntityTreeBrowserTest {
 		// Creates the limited number of entity items
 		verify(mockView).appendChildEntityTreeItem(any(EntityTreeItem.class), eq(mockEntityTreeItem));
 		// Calls once for folders, once for files.
-		verify(mockView).placeChildMoreTreeItem(any(MoreTreeItem.class), Mockito.eq(mockEntityTreeItem), anyString());
+		verify(mockView).placeChildMoreTreeItem(any(MoreTreeItem.class), Mockito.eq(mockEntityTreeItem),
+				anyString());
 	}
 
 	@Test
@@ -236,11 +233,10 @@ public class EntityTreeBrowserTest {
 		when(mockResults.getNextPageToken()).thenReturn(nextPageToken);
 		entityTreeBrowser.getChildren(parentId, mockEntityTreeItem, null);
 		// Adds the limited number of entity items
-		verify(mockView, times(20)).appendChildEntityTreeItem(
-				any(EntityTreeItem.class), Mockito.eq(mockEntityTreeItem));
+		verify(mockView, times(20)).appendChildEntityTreeItem(any(EntityTreeItem.class),
+				Mockito.eq(mockEntityTreeItem));
 		// Calls once for folders, once for files.
-		verify(mockView).placeChildMoreTreeItem(
-				any(MoreTreeItem.class), Mockito.eq(mockEntityTreeItem),
+		verify(mockView).placeChildMoreTreeItem(any(MoreTreeItem.class), Mockito.eq(mockEntityTreeItem),
 				eq(nextPageToken));
 	}
 
@@ -253,33 +249,33 @@ public class EntityTreeBrowserTest {
 			searchResults.add(res);
 		}
 	}
-	
+
 	@Test
 	public void testConfigure() {
 		List<EntityHeader> headers = new ArrayList<EntityHeader>();
 		EntityHeader header = new EntityHeader();
 		header.setType(Project.class.getName());
 		headers.add(header);
-		
+
 		entityTreeBrowser.configure(headers);
 		verify(mockView).clear();
 		verify(mockView).setLoadingVisible(true);
 		verify(mockView).appendRootEntityTreeItem(any(EntityTreeItem.class));
 		verify(mockView).setLoadingVisible(false);
 	}
-	
+
 	@Test
 	public void testEntitySelectedHandler() {
 		EntitySelectedHandler handler = mock(EntitySelectedHandler.class);
 		assertNull(entityTreeBrowser.getEntitySelectedHandler());
-		//set entity selected handler
+		// set entity selected handler
 		entityTreeBrowser.setEntitySelectedHandler(handler);
 		assertEquals(handler, entityTreeBrowser.getEntitySelectedHandler());
-		//verify firing a selection event
+		// verify firing a selection event
 		entityTreeBrowser.fireEntitySelectedEvent();
 		verify(handler).onSelection(any(EntitySelectedEvent.class));
 	}
-	
+
 	@Test
 	public void testIsExpandable() {
 		EntityHeader result = new EntityHeader();
@@ -290,38 +286,41 @@ public class EntityTreeBrowserTest {
 		result.setType(FileEntity.class.getName());
 		assertFalse(entityTreeBrowser.isExpandable(result));
 	}
-	
+
 	@Test
 	public void testCopyToClipboard() {
 		setQueryResults(10);
-		
+
 		String nextPageToken = "abc";
 		when(mockResults.getNextPageToken()).thenReturn(nextPageToken);
 		entityTreeBrowser.getChildren(parentId, null, null);
-		
+
 		entityTreeBrowser.copyIDsToClipboard();
-		
+
 		verify(mockView).copyToClipboard(stringCaptor.capture());
 		String clipboardValue = stringCaptor.getValue();
 		for (int i = 0; i < 10; i++) {
-			assertTrue(clipboardValue.contains(TEST_RESULT_ID+i));
+			assertTrue(clipboardValue.contains(TEST_RESULT_ID + i));
 		}
 	}
-	
+
 	@Test
 	public void testReconfigureCancels() {
 		// Do not test async response, only test the Request
 		reset(mockSynapseJavascriptClient);
-		when(mockSynapseJavascriptClient.getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class))).thenReturn(mockRequest);
-		
+		when(mockSynapseJavascriptClient.getEntityChildren(any(EntityChildrenRequest.class),
+				any(AsyncCallback.class))).thenReturn(mockRequest);
+
 		entityTreeBrowser.configure("123");
-		
-		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
+
+		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class),
+				any(AsyncCallback.class));
 		verify(mockRequest, never()).cancel();
-		
+
 		entityTreeBrowser.configure("1234");
-		
+
 		verify(mockRequest).cancel();
-		verify(mockSynapseJavascriptClient, times(2)).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, times(2))
+				.getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 	}
 }

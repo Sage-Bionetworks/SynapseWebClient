@@ -2,36 +2,44 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" 
+	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 
 	<t:Table width="100%" height="36px">
 		<t:TableRow>
-			<t:TableHeader width="20px"/>
+			<t:TableHeader width="20px" />
 			<t:TableData width="20px">
 				<g:FocusPanel ui:field="iconContainer">
-					<b:Icon ui:field="icon" type="TABLE"/>
+					<b:Icon ui:field="icon" type="TABLE" />
 				</g:FocusPanel>
 			</t:TableData>
 			<t:TableData addStyleNames="overflow-x-hidden ">
-				<bh:Div addStyleNames="margin-right-5" ui:field="nameContainer"> 
-					<g:FlowPanel ui:field="entityContainer" addStyleNames="displayInline pull-left"/>
+				<bh:Div addStyleNames="margin-right-5"
+					ui:field="nameContainer">
+					<g:FlowPanel ui:field="entityContainer"
+						addStyleNames="displayInline pull-left" />
 				</bh:Div>
 			</t:TableData>
-			<t:TableData width="310px" addStyleNames="visible-xl overflow-x-hidden">
-				<bh:Div ui:field="modifiedByField"/>
+			<t:TableData width="310px"
+				addStyleNames="visible-xl overflow-x-hidden">
+				<bh:Div ui:field="modifiedByField" />
 			</t:TableData>
-			<t:TableData width="165px" addStyleNames="visible-md visible-lg overflow-x-hidden">
-				<g:Label ui:field="modifiedOnField"/>
+			<t:TableData width="165px"
+				addStyleNames="visible-md visible-lg overflow-x-hidden">
+				<g:Label ui:field="modifiedOnField" />
 			</t:TableData>
-			<t:TableData width="165px" addStyleNames="visible-md visible-lg overflow-x-hidden">
-				<g:Label ui:field="createdOnField"/>
+			<t:TableData width="165px"
+				addStyleNames="visible-md visible-lg overflow-x-hidden">
+				<g:Label ui:field="createdOnField" />
 			</t:TableData>
-			<t:TableData width="130px" addStyleNames="visible-md visible-lg overflow-x-hidden">
-				<g:TextBox ui:field="idField" width="130px" addStyleNames="border-none noBackground font-size-14" readOnly="true" />
+			<t:TableData width="130px"
+				addStyleNames="visible-md visible-lg overflow-x-hidden">
+				<g:TextBox ui:field="idField" width="130px"
+					addStyleNames="border-none noBackground font-size-14"
+					readOnly="true" />
 			</t:TableData>
 		</t:TableRow>
-	</t:Table>    
+	</t:Table>
 </ui:UiBinder>

@@ -10,10 +10,16 @@ public interface SubscribersWidgetView extends IsWidget {
 	}
 
 	void setPresenter(SubscribersWidget presenter);
+
 	void clearSubscriberCount();
+
 	void setSubscriberCount(Long count);
+
 	void setSubscribersLinkVisible(boolean visible);
+
 	void setSynapseAlert(Widget w);
+
 	void setUserListContainer(Widget w);
+
 	void showDialog();
 }

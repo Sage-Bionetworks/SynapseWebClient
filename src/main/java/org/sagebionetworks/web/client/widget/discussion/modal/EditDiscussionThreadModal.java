@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.discussion.modal;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -12,7 +11,6 @@ import org.sagebionetworks.web.client.validation.ValidationResult;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.discussion.UpdateThread;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -20,7 +18,7 @@ import com.google.inject.Inject;
 /**
  * A simple modal dialog for editing a thread.
  */
-public class EditDiscussionThreadModal implements DiscussionThreadModalView.Presenter{
+public class EditDiscussionThreadModal implements DiscussionThreadModalView.Presenter {
 
 	private static final String EDIT_THREAD_MODAL_TITLE = "Edit Thread";
 	private static final String SUCCESS_TITLE = "Thread edited";
@@ -37,14 +35,10 @@ public class EditDiscussionThreadModal implements DiscussionThreadModalView.Pres
 	GlobalApplicationState globalAppState;
 
 	@Inject
-	public EditDiscussionThreadModal(
-			DiscussionThreadModalView view,
-			DiscussionForumClientAsync discussionForumClient,
-			SynapseAlert synAlert,
-			MarkdownEditorWidget markdownEditor,
-			PopupUtilsView popupUtils,
-			GlobalApplicationState globalAppState
-			) {
+	public EditDiscussionThreadModal(DiscussionThreadModalView view,
+			DiscussionForumClientAsync discussionForumClient, SynapseAlert synAlert,
+			MarkdownEditorWidget markdownEditor, PopupUtilsView popupUtils,
+			GlobalApplicationState globalAppState) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
 		fixServiceEntryPoint(discussionForumClient);
@@ -58,7 +52,8 @@ public class EditDiscussionThreadModal implements DiscussionThreadModalView.Pres
 		view.setMarkdownEditor(markdownEditor.asWidget());
 	}
 
-	public void configure(String threadId, String currentTitle, String currentMessage, Callback editThreadCallback) {
+	public void configure(String threadId, String currentTitle, String currentMessage,
+			Callback editThreadCallback) {
 		this.threadId = threadId;
 		this.editThreadCallback = editThreadCallback;
 		this.title = currentTitle;
@@ -88,8 +83,7 @@ public class EditDiscussionThreadModal implements DiscussionThreadModalView.Pres
 		String threadTitle = view.getThreadTitle();
 		String messageMarkdown = markdownEditor.getMarkdown();
 		ValidationResult result = new ValidationResult();
-		result.requiredField("Title", threadTitle)
-				.requiredField("Message", messageMarkdown);
+		result.requiredField("Title", threadTitle).requiredField("Message", messageMarkdown);
 		if (!result.isValid()) {
 			synAlert.showError(result.getErrorMessage());
 			return;
@@ -98,31 +92,33 @@ public class EditDiscussionThreadModal implements DiscussionThreadModalView.Pres
 		UpdateThread updateThread = new UpdateThread();
 		updateThread.setTitle(threadTitle);
 		updateThread.setMessage(messageMarkdown);
-		discussionForumClient.updateThread(threadId, updateThread, new AsyncCallback<DiscussionThreadBundle>(){
-			@Override
-			public void onFailure(Throwable caught) {
-				view.resetButton();
-				synAlert.handleException(caught);
-			}
+		discussionForumClient.updateThread(threadId, updateThread,
+				new AsyncCallback<DiscussionThreadBundle>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						view.resetButton();
+						synAlert.handleException(caught);
+					}
 
-			@Override
-			public void onSuccess(DiscussionThreadBundle result) {
-				hide();
-				view.showSuccess(SUCCESS_TITLE, SUCCESS_MESSAGE);
-				if (editThreadCallback != null) {
-					editThreadCallback.invoke();
-				}
-			}
+					@Override
+					public void onSuccess(DiscussionThreadBundle result) {
+						hide();
+						view.showSuccess(SUCCESS_TITLE, SUCCESS_MESSAGE);
+						if (editThreadCallback != null) {
+							editThreadCallback.invoke();
+						}
+					}
 
-		});
+				});
 	}
-	
+
 	@Override
 	public void onCancel() {
 		if (!markdownEditor.getMarkdown().equals(message)) {
-			popupUtils.showConfirmDialog(DisplayConstants.UNSAVED_CHANGES, DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, () -> {
-				hide();
-			});
+			popupUtils.showConfirmDialog(DisplayConstants.UNSAVED_CHANGES,
+					DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, () -> {
+						hide();
+					});
 		} else {
 			hide();
 		}

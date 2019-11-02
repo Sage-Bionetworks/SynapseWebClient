@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.HasAccessorRequirement;
@@ -19,17 +18,18 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.shared.WikiPageKey;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * Second page of creating an access requirement (Terms Of Use or old ACT)  
+ * Second page of creating an access requirement (Terms Of Use or old ACT)
+ * 
  * @author Jay
  *
  */
-public class CreateBasicAccessRequirementStep2 implements ModalPage, CreateBasicAccessRequirementStep2View.Presenter {
+public class CreateBasicAccessRequirementStep2
+		implements ModalPage, CreateBasicAccessRequirementStep2View.Presenter {
 	CreateBasicAccessRequirementStep2View view;
 	ModalPresenter modalPresenter;
 	AccessRequirement accessRequirement;
@@ -39,15 +39,11 @@ public class CreateBasicAccessRequirementStep2 implements ModalPage, CreateBasic
 	SynapseClientAsync synapseClient;
 	SynapseAlert synAlert;
 	PopupUtilsView popupUtils;
+
 	@Inject
-	public CreateBasicAccessRequirementStep2(
-			CreateBasicAccessRequirementStep2View view,
-			WikiMarkdownEditor wikiMarkdownEditor,
-			WikiPageWidget wikiPageRenderer,
-			SynapseClientAsync synapseClient,
-			SynapseAlert synAlert,
-			PopupUtilsView popupUtils
-		) {
+	public CreateBasicAccessRequirementStep2(CreateBasicAccessRequirementStep2View view,
+			WikiMarkdownEditor wikiMarkdownEditor, WikiPageWidget wikiPageRenderer,
+			SynapseClientAsync synapseClient, SynapseAlert synAlert, PopupUtilsView popupUtils) {
 		super();
 		this.view = view;
 		this.wikiMarkdownEditor = wikiMarkdownEditor;
@@ -62,14 +58,15 @@ public class CreateBasicAccessRequirementStep2 implements ModalPage, CreateBasic
 		view.setSynAlert(synAlert);
 		wikiPageRenderer.setModifiedCreatedByHistoryVisible(false);
 	}
-	
+
 	/**
 	 * Configure this widget before use.
 	 * 
 	 */
 	public void configure(AccessRequirement accessRequirement) {
 		this.accessRequirement = accessRequirement;
-		wikiKey = new WikiPageKey(accessRequirement.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
+		wikiKey = new WikiPageKey(accessRequirement.getId().toString(),
+				ObjectType.ACCESS_REQUIREMENT.toString(), null);
 		String oldTerms = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
 		boolean isExistOldTermsOfUse = oldTerms != null && oldTerms.length() > 0;
 		view.setOldTermsVisible(isExistOldTermsOfUse);
@@ -82,7 +79,7 @@ public class CreateBasicAccessRequirementStep2 implements ModalPage, CreateBasic
 		}
 		configureWiki();
 	}
-	
+
 	@Override
 	public void onEditWiki() {
 		wikiMarkdownEditor.configure(wikiKey, new CallbackP<WikiPage>() {
@@ -92,40 +89,44 @@ public class CreateBasicAccessRequirementStep2 implements ModalPage, CreateBasic
 			}
 		});
 	}
+
 	@Override
 	public void onClearOldInstructions() {
-		popupUtils.showConfirmDialog("Are you sure?", "Deleting the old instructions cannot be undone.  Continue?", new Callback() {
-			@Override
-			public void invoke() {
-				onClearOldInstructionsAfterConfirm();
-			}
-		});
-		
+		popupUtils.showConfirmDialog("Are you sure?",
+				"Deleting the old instructions cannot be undone.  Continue?", new Callback() {
+					@Override
+					public void invoke() {
+						onClearOldInstructionsAfterConfirm();
+					}
+				});
+
 	}
+
 	public void onClearOldInstructionsAfterConfirm() {
 		if (accessRequirement instanceof TermsOfUseAccessRequirement) {
-			((TermsOfUseAccessRequirement)accessRequirement).setTermsOfUse(null);
+			((TermsOfUseAccessRequirement) accessRequirement).setTermsOfUse(null);
 		} else if (accessRequirement instanceof ACTAccessRequirement) {
-			((ACTAccessRequirement)accessRequirement).setActContactInfo(null);
+			((ACTAccessRequirement) accessRequirement).setActContactInfo(null);
 		}
 		synAlert.clear();
-		synapseClient.createOrUpdateAccessRequirement(accessRequirement, new AsyncCallback<AccessRequirement>() {
-			@Override
-			public void onSuccess(AccessRequirement ar) {
-				configure(ar);
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
-		});
+		synapseClient.createOrUpdateAccessRequirement(accessRequirement,
+				new AsyncCallback<AccessRequirement>() {
+					@Override
+					public void onSuccess(AccessRequirement ar) {
+						configure(ar);
+					}
+
+					@Override
+					public void onFailure(Throwable caught) {
+						synAlert.handleException(caught);
+					}
+				});
 	}
-	
+
 	private void configureWiki() {
 		wikiPageRenderer.configure(wikiKey, false, null);
 	}
-	
+
 	@Override
 	public void onPrimary() {
 		if (accessRequirement instanceof HasAccessorRequirement) {
@@ -133,18 +134,20 @@ public class CreateBasicAccessRequirementStep2 implements ModalPage, CreateBasic
 			// update AR
 			hasAccessorRequirement.setIsCertifiedUserRequired(view.isCertifiedUserRequired());
 			hasAccessorRequirement.setIsValidatedProfileRequired(view.isValidatedProfileRequired());
-			synapseClient.createOrUpdateAccessRequirement(accessRequirement, new AsyncCallback<AccessRequirement>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					synAlert.handleException(caught);
-				}
-				@Override
-				public void onSuccess(AccessRequirement result) {
-					modalPresenter.onFinished();		
-				}
-			});
+			synapseClient.createOrUpdateAccessRequirement(accessRequirement,
+					new AsyncCallback<AccessRequirement>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							synAlert.handleException(caught);
+						}
+
+						@Override
+						public void onSuccess(AccessRequirement result) {
+							modalPresenter.onFinished();
+						}
+					});
 		} else {
-			//can update wiki only
+			// can update wiki only
 			modalPresenter.onFinished();
 		}
 	}

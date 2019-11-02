@@ -1,22 +1,32 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<bh:Div>
-		<bh:Div addStyleNames="margin-top-30 margin-left-35 min-height-400 margin-right-10">
+		<bh:Div
+			addStyleNames="margin-top-30 margin-left-35 min-height-400 margin-right-10">
 			<b:Row>
 				<b:Column size="XS_12">
 					<bh:Div ui:field="synAlertContainer" />
-					<b:Heading size="H2" text="Notification Settings" addStyleNames="margin-top-30" />
+					<b:Heading size="H2" text="Notification Settings"
+						addStyleNames="margin-top-30" />
 					<bh:Div addStyleNames="margin-left-15 margin-top-20">
 						<bh:Div ui:field="topicWidgetContainer" />
-						
-						<b:Radio ui:field="followButton" text="Following" name="subscriptionState" addStyleNames="font-size-24" />
-						<b:Heading size="H5" text="You will receive notifications on this topic" addStyleNames="margin-left-20 margin-right-10 margin-bottom-20" />
-						<b:Radio ui:field="unfollowButton" text="Not following" name="subscriptionState" addStyleNames="font-size-24"/>
-						<b:Heading size="H5" text="You will not receive notifications on this topic" addStyleNames="margin-left-20 margin-right-10 margin-bottom-20" />
-						<!--  <b:Anchor ui:field="notificationCenterLink" text="Manage all notifications" addStyleNames="margin-top-10 font-size-24"/>  -->
+
+						<b:Radio ui:field="followButton" text="Following"
+							name="subscriptionState" addStyleNames="font-size-24" />
+						<b:Heading size="H5"
+							text="You will receive notifications on this topic"
+							addStyleNames="margin-left-20 margin-right-10 margin-bottom-20" />
+						<b:Radio ui:field="unfollowButton" text="Not following"
+							name="subscriptionState" addStyleNames="font-size-24" />
+						<b:Heading size="H5"
+							text="You will not receive notifications on this topic"
+							addStyleNames="margin-left-20 margin-right-10 margin-bottom-20" />
+						<!-- <b:Anchor ui:field="notificationCenterLink" text="Manage all notifications" 
+							addStyleNames="margin-top-10 font-size-24"/> -->
 					</bh:Div>
 				</b:Column>
 			</b:Row>

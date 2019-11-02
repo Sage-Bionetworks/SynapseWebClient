@@ -2,10 +2,7 @@ package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Heading;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
-
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -13,11 +10,11 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.binder.EventBinder;
 
 public class EntityViewImpl implements EntityView {
-	
-	public interface EntityViewImplUiBinder extends UiBinder<Widget, EntityViewImpl> {}
+
+	public interface EntityViewImplUiBinder extends UiBinder<Widget, EntityViewImpl> {
+	}
 
 	@UiField
 	SimplePanel entityPageTopPanel;
@@ -29,15 +26,15 @@ public class EntityViewImpl implements EntityView {
 	LoadingSpinner loadingUI;
 	@UiField
 	Heading accessDependentMessage;
-	
+
 	private Widget widget;
-	
+
 	@Inject
-	public EntityViewImpl(EntityViewImplUiBinder binder) {		
+	public EntityViewImpl(EntityViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
 		Window.scrollTo(0, 0); // scroll user to top of page
 		// TODO : need to dynamically set the header widget
-		//headerWidget.setMenuItemActive(MenuItems.PROJECTS);
+		// headerWidget.setMenuItemActive(MenuItems.PROJECTS);
 	}
 
 	@Override
@@ -45,7 +42,7 @@ public class EntityViewImpl implements EntityView {
 		entityPageTopPanel.clear();
 		entityPageTopPanel.setWidget(entityPageTopWidget);
 	}
-		
+
 	@Override
 	public void setOpenTeamInvitesWidget(IsWidget openTeamInvitesWidget) {
 		openInvitesPanel.clear();
@@ -56,7 +53,7 @@ public class EntityViewImpl implements EntityView {
 	public Widget asWidget() {
 		return widget;
 	}
-		
+
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
@@ -71,13 +68,13 @@ public class EntityViewImpl implements EntityView {
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message);
 	}
-	
+
 	@Override
 	public void setSynAlertWidget(IsWidget synAlert) {
 		synAlert.asWidget().addStyleName("min-height-400 margin-top-60");
 		synAlertContainer.setWidget(synAlert);
 	}
-	
+
 
 	@Override
 	public void clear() {
@@ -86,7 +83,7 @@ public class EntityViewImpl implements EntityView {
 		loadingUI.setVisible(false);
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
-	
+
 	@Override
 	public void setEntityPageTopVisible(boolean isVisible) {
 		entityPageTopPanel.setVisible(isVisible);
@@ -96,7 +93,7 @@ public class EntityViewImpl implements EntityView {
 	public void setAccessDependentMessageVisible(boolean isVisible) {
 		accessDependentMessage.setVisible(isVisible);
 	}
-	
+
 	@Override
 	public void setOpenTeamInvitesVisible(boolean isVisible) {
 		openInvitesPanel.setVisible(isVisible);

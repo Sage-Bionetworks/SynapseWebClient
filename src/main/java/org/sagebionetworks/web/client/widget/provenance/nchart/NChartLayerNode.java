@@ -7,5 +7,5 @@ public interface NChartLayerNode {
 	void setSubnodes(List<String> subnodes);
 
 	void setEvent(String event);
-	
+
 }

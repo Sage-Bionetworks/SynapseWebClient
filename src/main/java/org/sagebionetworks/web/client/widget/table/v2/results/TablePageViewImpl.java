@@ -1,14 +1,12 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
-
 import com.google.gwt.event.dom.client.ScrollEvent;
 import com.google.gwt.event.dom.client.ScrollHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -21,13 +19,16 @@ import com.google.inject.Inject;
 
 /**
  * UiBound implementation of a TableView with zero business logic.
+ * 
  * @author John
  *
  */
 
 public class TablePageViewImpl implements TablePageView {
-	
-	public interface Binder extends UiBinder<Widget, TablePageViewImpl> {}
+
+	public interface Binder extends UiBinder<Widget, TablePageViewImpl> {
+	}
+
 	@UiField
 	Div loadingUI;
 	@UiField
@@ -51,18 +52,17 @@ public class TablePageViewImpl implements TablePageView {
 	Div tableDiv;
 
 	@Inject
-	public TablePageViewImpl(
-			Binder binder, 
-			final GWTWrapper gwt){
-		widget = (Div)binder.createAndBindUi(this);
-		
+	public TablePageViewImpl(Binder binder, final GWTWrapper gwt) {
+		widget = (Div) binder.createAndBindUi(this);
+
 		gwt.scheduleExecution(new Callback() {
 			@Override
 			public void invoke() {
 				if (tableScrollPanel.isAttached() && tableScrollPanel.isVisible()) {
 					// match width
 					topScrollDiv.setWidth(tableDiv.getElement().getScrollWidth() + "px");
-					boolean isScrollBarShowing = tableDiv.getElement().getScrollWidth() > tableDiv.getElement().getClientWidth();
+					boolean isScrollBarShowing =
+							tableDiv.getElement().getScrollWidth() > tableDiv.getElement().getClientWidth();
 					topScrollBar.setVisible(isScrollBarShowing && tableScrollPanel.getOffsetHeight() > 600);
 					paginationPanel.setMarginLeft(tableScrollPanel.getAbsoluteLeft() - 20);
 					gwt.scheduleExecution(this, 400);
@@ -83,7 +83,7 @@ public class TablePageViewImpl implements TablePageView {
 			}
 		});
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
@@ -95,7 +95,7 @@ public class TablePageViewImpl implements TablePageView {
 		body.clear();
 		// Blank header for the selection.
 		header.add(new TableHeader());
-		for(IsWidget inHeader: headers){
+		for (IsWidget inHeader : headers) {
 			header.add(inHeader);
 		}
 	}
@@ -129,6 +129,7 @@ public class TablePageViewImpl implements TablePageView {
 	public void setTableVisible(boolean visible) {
 		tablePanel.setVisible(visible);
 	}
+
 	@Override
 	public void hideLoading() {
 		loadingUI.setVisible(false);
@@ -136,6 +137,7 @@ public class TablePageViewImpl implements TablePageView {
 			widget.add(tablePanel);
 		}
 	}
+
 	@Override
 	public void showLoading() {
 		loadingUI.setVisible(true);

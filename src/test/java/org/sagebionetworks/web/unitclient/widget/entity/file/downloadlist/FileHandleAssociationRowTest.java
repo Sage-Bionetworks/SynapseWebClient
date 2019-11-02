@@ -1,11 +1,16 @@
 package org.sagebionetworks.web.unitclient.widget.entity.file.downloadlist;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyDouble;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 import java.util.Date;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +22,6 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.ExternalFileHandleInterface;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
@@ -38,8 +42,6 @@ import org.sagebionetworks.web.client.widget.entity.file.downloadlist.FileHandle
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.FileHandleAssociationRowView;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
-import com.google.gwt.dev.javac.testing.impl.MockJavaResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -86,7 +88,7 @@ public class FileHandleAssociationRowTest {
 	ArgumentCaptor<AsyncCallback<RestrictionInformationResponse>> asyncCallbackCaptor;
 	@Mock
 	RestrictionInformationResponse mockRestrictionInformationResponse;
-	
+
 	public static final String ENTITY_ID = "syn92832";
 	public static final String FILENAME = "filename.txt";
 	public static final Date CREATED_ON = new Date();
@@ -95,10 +97,12 @@ public class FileHandleAssociationRowTest {
 	public static final Long CONTENT_SIZE = 38473L;
 	public static final String FRIENDLY_SIZE = "38 KB";
 	public static final String USERNAME = "myusername";
-	 
+
 	@Before
 	public void setUp() throws Exception {
-		widget = new FileHandleAssociationRow(mockView, mockFhaAsyncHandler, mockUserProfileAsyncHandler, mockJsniUtils, mockEntityHeaderAsyncHandler, mockDateTimeUtils, mockGwt, mockJsClient);
+		widget =
+				new FileHandleAssociationRow(mockView, mockFhaAsyncHandler, mockUserProfileAsyncHandler,
+						mockJsniUtils, mockEntityHeaderAsyncHandler, mockDateTimeUtils, mockGwt, mockJsClient);
 		when(mockFileResult.getFileHandle()).thenReturn(mockFileHandle);
 		when(mockFha.getAssociateObjectId()).thenReturn(ENTITY_ID);
 		when(mockEntityHeader.getName()).thenReturn(FILENAME);
@@ -116,20 +120,24 @@ public class FileHandleAssociationRowTest {
 		when(mockGwt.getFriendlySize(anyDouble(), anyBoolean())).thenReturn(FRIENDLY_SIZE);
 		when(mockView.isAttached()).thenReturn(true);
 		when(mockUserProfile.getUserName()).thenReturn(USERNAME);
-		AsyncMockStubber.callSuccessWith(mockEntityHeader).when(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(mockFileResult).when(mockFhaAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockUserProfileAsyncHandler).getUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockEntityHeader).when(mockEntityHeaderAsyncHandler)
+				.getEntityHeader(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockFileResult).when(mockFhaAsyncHandler)
+				.getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockUserProfileAsyncHandler)
+				.getUserProfile(anyString(), any(AsyncCallback.class));
 	}
 
 	@Test
 	public void testConstructor() {
 		verify(mockView).setPresenter(widget);
 	}
-	
+
 	@Test
 	public void testHappyCase() {
-		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback, mockOnDeleteCallback);
-		
+		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback,
+				mockOnDeleteCallback);
+
 		verify(mockView).setFileName(FILENAME, ENTITY_ID);
 		verify(mockView).setCreatedOn(FRIENDLY_DATE);
 		verify(mockView).setFileSize(FRIENDLY_SIZE);
@@ -146,19 +154,22 @@ public class FileHandleAssociationRowTest {
 	@Test
 	public void testGetEntityHeaderFailure() {
 		String errorMessage = "unable to get entity header";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockEntityHeaderAsyncHandler)
+				.getEntityHeader(anyString(), any(AsyncCallback.class));
 
-		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback, mockOnDeleteCallback);
-		
+		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback,
+				mockOnDeleteCallback);
+
 		verify(mockJsniUtils).consoleError(errorMessage);
 	}
-	
+
 	@Test
 	public void testNoFileHandleReturned() {
 		when(mockFileResult.getFileHandle()).thenReturn(null);
 
-		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback, mockOnDeleteCallback);
-		
+		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback,
+				mockOnDeleteCallback);
+
 		verifyZeroInteractions(mockAccessRestrictionDetectedCallback);
 		assertEquals(false, widget.getHasAccess());
 	}
@@ -167,7 +178,8 @@ public class FileHandleAssociationRowTest {
 	public void testExternalFileHandle() {
 		when(mockFileResult.getFileHandle()).thenReturn(mockExternalFileHandle);
 
-		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback, mockOnDeleteCallback);
+		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback,
+				mockOnDeleteCallback);
 
 		verify(mockView).setFileName(FILENAME, ENTITY_ID);
 		verify(mockView).setCreatedOn(FRIENDLY_DATE);
@@ -186,7 +198,8 @@ public class FileHandleAssociationRowTest {
 	@Test
 	public void testGoogleCloudFileHandle() { // Not capable of bulk download
 		when(mockFileResult.getFileHandle()).thenReturn(mockGoogleCloudFileHandle);
-		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback, mockOnDeleteCallback);
+		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback,
+				mockOnDeleteCallback);
 
 		verify(mockView).setFileName(FILENAME, ENTITY_ID);
 		verify(mockView).setCreatedOn(FRIENDLY_DATE);
@@ -205,17 +218,20 @@ public class FileHandleAssociationRowTest {
 	@Test
 	public void testHasAccessRestriction() {
 		String errorMessage = "forbidden";
-		AsyncMockStubber.callFailureWith(new ForbiddenException(errorMessage)).when(mockFhaAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new ForbiddenException(errorMessage)).when(mockFhaAsyncHandler)
+				.getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
 
-		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback, mockOnDeleteCallback);
-		
+		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback,
+				mockOnDeleteCallback);
+
 		assertEquals(false, widget.getHasAccess());
 		verify(mockAccessRestrictionDetectedCallback, never()).invoke();
-		
-		verify(mockJsClient).getRestrictionInformation(eq(ENTITY_ID), eq(RestrictableObjectType.ENTITY), asyncCallbackCaptor.capture());
+
+		verify(mockJsClient).getRestrictionInformation(eq(ENTITY_ID), eq(RestrictableObjectType.ENTITY),
+				asyncCallbackCaptor.capture());
 		when(mockRestrictionInformationResponse.getHasUnmetAccessRequirement()).thenReturn(true);
 		asyncCallbackCaptor.getValue().onSuccess(mockRestrictionInformationResponse);
-		
+
 		verify(mockView).showHasUnmetAccessRequirements(ENTITY_ID);
 		verify(mockAccessRestrictionDetectedCallback).invoke();
 	}
@@ -223,10 +239,12 @@ public class FileHandleAssociationRowTest {
 	@Test
 	public void testFileNotFound() {
 		String errorMessage = "file not found";
-		AsyncMockStubber.callFailureWith(new NotFoundException(errorMessage)).when(mockFhaAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new NotFoundException(errorMessage)).when(mockFhaAsyncHandler)
+				.getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
 
-		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback, mockOnDeleteCallback);
-		
+		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback,
+				mockOnDeleteCallback);
+
 		assertEquals(false, widget.getHasAccess());
 		verify(mockJsniUtils).consoleError(errorMessage);
 		verifyZeroInteractions(mockAccessRestrictionDetectedCallback);
@@ -235,19 +253,22 @@ public class FileHandleAssociationRowTest {
 	@Test
 	public void testGetUserProfileError() {
 		String errorMessage = "unable to get user profile";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockUserProfileAsyncHandler).getUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockUserProfileAsyncHandler)
+				.getUserProfile(anyString(), any(AsyncCallback.class));
 
-		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback, mockOnDeleteCallback);
+		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback,
+				mockOnDeleteCallback);
 
 		verify(mockJsniUtils).consoleError(errorMessage);
 	}
-	
+
 	@Test
 	public void testOnRemove() {
-		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback, mockOnDeleteCallback);
+		widget.configure(mockFha, mockAccessRestrictionDetectedCallback, mockAddToPackageSizeCallback,
+				mockOnDeleteCallback);
 
 		widget.onRemove();
-		
+
 		verify(mockOnDeleteCallback).invoke(mockFha);
 	}
 }

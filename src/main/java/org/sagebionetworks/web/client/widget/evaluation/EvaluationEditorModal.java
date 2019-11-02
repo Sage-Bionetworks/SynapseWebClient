@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.Date;
-
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
 import org.sagebionetworks.evaluation.model.SubmissionQuota;
@@ -13,7 +11,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -30,13 +27,10 @@ public class EvaluationEditorModal implements EvaluationEditorModalView.Presente
 	private UserBadge createdByBadge;
 	private AuthenticationController authController;
 	private DateTimeUtils dateTimeUtils;
-	
+
 	@Inject
-	public EvaluationEditorModal(EvaluationEditorModalView view, 
-			ChallengeClientAsync challengeClient,
-			SynapseAlert synAlert,
-			UserBadge createdByBadge,
-			AuthenticationController authController,
+	public EvaluationEditorModal(EvaluationEditorModalView view, ChallengeClientAsync challengeClient,
+			SynapseAlert synAlert, UserBadge createdByBadge, AuthenticationController authController,
 			DateTimeUtils dateTimeUtils) {
 		this.view = view;
 		this.challengeClient = challengeClient;
@@ -54,7 +48,7 @@ public class EvaluationEditorModal implements EvaluationEditorModalView.Presente
 					evaluationUpdatedCallback.invoke();
 				}
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				EvaluationEditorModal.this.synAlert.handleException(caught);
@@ -63,7 +57,7 @@ public class EvaluationEditorModal implements EvaluationEditorModalView.Presente
 		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
 	}
-	
+
 	public void configure(String entityId, Callback evaluationUpdatedCallback) {
 		Evaluation newEvaluation = new Evaluation();
 		newEvaluation.setContentSource(entityId);
@@ -72,12 +66,13 @@ public class EvaluationEditorModal implements EvaluationEditorModalView.Presente
 		newEvaluation.setCreatedOn(new Date());
 		configure(newEvaluation, evaluationUpdatedCallback, true);
 	}
-	
+
 	public void configure(Evaluation evaluation, Callback evaluationUpdatedCallback) {
 		configure(evaluation, evaluationUpdatedCallback, false);
 	}
-	
-	private void configure(Evaluation evaluation, Callback evaluationUpdatedCallback, boolean isCreate) {
+
+	private void configure(Evaluation evaluation, Callback evaluationUpdatedCallback,
+			boolean isCreate) {
 		view.clear();
 		this.isCreate = isCreate;
 		this.evaluation = evaluation;
@@ -91,28 +86,28 @@ public class EvaluationEditorModal implements EvaluationEditorModalView.Presente
 		if (evaluation.getQuota() != null) {
 			SubmissionQuota quota = evaluation.getQuota();
 			if (quota.getFirstRoundStart() != null) {
-				view.setRoundStart(quota.getFirstRoundStart());	
+				view.setRoundStart(quota.getFirstRoundStart());
 			}
 			if (quota.getNumberOfRounds() != null) {
-				view.setNumberOfRounds(quota.getNumberOfRounds());	
+				view.setNumberOfRounds(quota.getNumberOfRounds());
 			}
 			if (quota.getRoundDurationMillis() != null) {
-				view.setRoundDuration(quota.getRoundDurationMillis());	
+				view.setRoundDuration(quota.getRoundDurationMillis());
 			}
 			if (quota.getSubmissionLimit() != null) {
-				view.setSubmissionLimit(quota.getSubmissionLimit());	
+				view.setSubmissionLimit(quota.getSubmissionLimit());
 			}
 		}
 	}
-	
+
 	public void show() {
 		view.show();
 	}
-	
+
 	@Override
 	public void onSave() {
 		synAlert.clear();
-		
+
 		evaluation.setName(view.getEvaluationName());
 		evaluation.setSubmissionInstructionsMessage(view.getSubmissionInstructionsMessage());
 		evaluation.setSubmissionReceiptMessage(view.getSubmissionReceiptMessage());
@@ -122,7 +117,8 @@ public class EvaluationEditorModal implements EvaluationEditorModalView.Presente
 		Double numberOfRounds = view.getNumberOfRounds();
 		Double roundDuration = view.getRoundDuration();
 		Date roundStart = view.getRoundStart();
-		boolean isUserTryingToSetQuota = submissionLimit != null || numberOfRounds != null || roundDuration != null || roundStart != null;
+		boolean isUserTryingToSetQuota = submissionLimit != null || numberOfRounds != null
+				|| roundDuration != null || roundStart != null;
 		if (isUserTryingToSetQuota) {
 			// user is attempting to set quota
 			SubmissionQuota newQuota = new SubmissionQuota();
@@ -130,7 +126,7 @@ public class EvaluationEditorModal implements EvaluationEditorModalView.Presente
 				newQuota.setSubmissionLimit(submissionLimit.longValue());
 			}
 			if (roundStart != null) {
-				newQuota.setFirstRoundStart(roundStart);	
+				newQuota.setFirstRoundStart(roundStart);
 			}
 			if (numberOfRounds != null) {
 				newQuota.setNumberOfRounds(numberOfRounds.longValue());
@@ -142,26 +138,26 @@ public class EvaluationEditorModal implements EvaluationEditorModalView.Presente
 		} else {
 			evaluation.setQuota(null);
 		}
-		
+
 		if (isCreate) {
 			createEvaluationFromView();
 		} else {
 			updateEvaluationFromView();
-			
+
 		}
 	}
-	
+
 	public void updateEvaluationFromView() {
 		challengeClient.updateEvaluation(evaluation, rpcCallback);
 	}
-	
+
 	public void createEvaluationFromView() {
 		challengeClient.createEvaluation(evaluation, rpcCallback);
 	}
-	
+
 	public Widget asWidget() {
-		view.setPresenter(this);			
+		view.setPresenter(this);
 		return view.asWidget();
 	}
-		
+
 }

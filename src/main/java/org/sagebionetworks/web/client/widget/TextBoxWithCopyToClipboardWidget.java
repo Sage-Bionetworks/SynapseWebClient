@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
-
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -13,18 +12,17 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * View only widget used to show a text box and a 'copy to clipboard' icon.  When the icon is clicked, the text in the
- * textbox is copied to the clipboard and a popup confirming the copy appears
- * ## Usage
+ * View only widget used to show a text box and a 'copy to clipboard' icon. When the icon is
+ * clicked, the text in the textbox is copied to the clipboard and a popup confirming the copy
+ * appears ## Usage
  * 
- * In your ui.xml, add the TextBoxWithCopyToClipboardWidget.
- * ```
+ * In your ui.xml, add the TextBoxWithCopyToClipboardWidget. ```
  * xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
- * 	<w:TextBoxWithCopyToClipboardWidget ui:field="copyToClipboardWidget" icon="CLIPBOARD" width="170px"/>
- * ```
+ * <w:TextBoxWithCopyToClipboardWidget ui:field="copyToClipboardWidget" icon="CLIPBOARD" width=
+ * "170px"/> ```
  * 
- * That's it!
- * You can set visibility and placement today, and we can easily extend it to have additional options in the future.
+ * That's it! You can set visibility and placement today, and we can easily extend it to have
+ * additional options in the future.
  * 
  * @author Nick Grosenbacher
  *
@@ -35,7 +33,9 @@ public class TextBoxWithCopyToClipboardWidget implements IsWidget {
 	Anchor textAnchor;
 	Widget widget;
 
-	public interface Binder extends UiBinder<Widget, TextBoxWithCopyToClipboardWidget> {}
+	public interface Binder extends UiBinder<Widget, TextBoxWithCopyToClipboardWidget> {
+	}
+
 	private static Binder uiBinder = GWT.create(Binder.class);
 
 	public TextBoxWithCopyToClipboardWidget() {
@@ -46,12 +46,12 @@ public class TextBoxWithCopyToClipboardWidget implements IsWidget {
 	public void setText(String text) {
 		textAnchor.setText(text);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
-	
+
 	public void setVisible(boolean visible) {
 		widget.setVisible(visible);
 	}
@@ -69,7 +69,7 @@ public class TextBoxWithCopyToClipboardWidget implements IsWidget {
 	 */
 	private void copyContentsToClipboard() {
 		TextBox textBox = new TextBox();
-		((Span)widget).add(textBox);
+		((Span) widget).add(textBox);
 		textBox.setFocus(true);
 		textBox.setText(textAnchor.getText());
 		textBox.selectAll();

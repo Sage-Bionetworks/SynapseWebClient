@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -26,12 +26,11 @@ import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccess
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class AccessRequirementWidgetTest {
 	AccessRequirementWidget widget;
-	
+
 	@Mock
 	ManagedACTAccessRequirementWidget mockManagedACTAccessRequirementWidget;
 	@Mock
@@ -40,7 +39,7 @@ public class AccessRequirementWidgetTest {
 	TermsOfUseAccessRequirementWidget mockToUAccessRequirementWidget;
 	@Mock
 	LockAccessRequirementWidget mockLockAccessRequirementWidget;
-	
+
 	@Mock
 	DivView mockView;
 	@Mock
@@ -67,23 +66,30 @@ public class AccessRequirementWidgetTest {
 	AccessRequirement mockAccessRequirement;
 	@Mock
 	RestrictableObjectDescriptor mockSubject;
+
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		
-		widget = new AccessRequirementWidget(mockGinInjector,
-				mockDataAccessClient,
-				mockView);
-		
-		AsyncMockStubber.callSuccessWith(mockManagedACTAccessRequirement).when(mockDataAccessClient).getAccessRequirement(eq(MANAGED_ACT_AR_ID), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(mockACTAccessRequirement).when(mockDataAccessClient).getAccessRequirement(eq(ACT_AR_ID), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(mockToUAccessRequirement).when(mockDataAccessClient).getAccessRequirement(eq(TOU_AR_ID), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(mockLockAccessRequirement).when(mockDataAccessClient).getAccessRequirement(eq(LOCK_AR_ID), any(AsyncCallback.class));
-		
-		when(mockGinInjector.getManagedACTAccessRequirementWidget()).thenReturn(mockManagedACTAccessRequirementWidget);
-		when(mockGinInjector.getTermsOfUseAccessRequirementWidget()).thenReturn(mockToUAccessRequirementWidget);
-		when(mockGinInjector.getACTAccessRequirementWidget()).thenReturn(mockACTAccessRequirementWidget);
-		when(mockGinInjector.getLockAccessRequirementWidget()).thenReturn(mockLockAccessRequirementWidget);
+
+		widget = new AccessRequirementWidget(mockGinInjector, mockDataAccessClient, mockView);
+
+		AsyncMockStubber.callSuccessWith(mockManagedACTAccessRequirement).when(mockDataAccessClient)
+				.getAccessRequirement(eq(MANAGED_ACT_AR_ID), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockACTAccessRequirement).when(mockDataAccessClient)
+				.getAccessRequirement(eq(ACT_AR_ID), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockToUAccessRequirement).when(mockDataAccessClient)
+				.getAccessRequirement(eq(TOU_AR_ID), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockLockAccessRequirement).when(mockDataAccessClient)
+				.getAccessRequirement(eq(LOCK_AR_ID), any(AsyncCallback.class));
+
+		when(mockGinInjector.getManagedACTAccessRequirementWidget())
+				.thenReturn(mockManagedACTAccessRequirementWidget);
+		when(mockGinInjector.getTermsOfUseAccessRequirementWidget())
+				.thenReturn(mockToUAccessRequirementWidget);
+		when(mockGinInjector.getACTAccessRequirementWidget())
+				.thenReturn(mockACTAccessRequirementWidget);
+		when(mockGinInjector.getLockAccessRequirementWidget())
+				.thenReturn(mockLockAccessRequirementWidget);
 		when(mockGinInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 	}
 
@@ -91,45 +97,53 @@ public class AccessRequirementWidgetTest {
 	public void testConfigureManagedACTAccessRequirement() {
 		widget.configure(Long.toString(MANAGED_ACT_AR_ID), mockSubject);
 		verify(mockDataAccessClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
-		verify(mockManagedACTAccessRequirementWidget).setRequirement(eq(mockManagedACTAccessRequirement), any(Callback.class));
+		verify(mockManagedACTAccessRequirementWidget)
+				.setRequirement(eq(mockManagedACTAccessRequirement), any(Callback.class));
 		verify(mockManagedACTAccessRequirementWidget).setTargetSubject(mockSubject);
 		verify(mockView).add(mockManagedACTAccessRequirementWidget);
 	}
+
 	@Test
 	public void testConfigureACTAccessRequirement() {
 		widget.configure(Long.toString(ACT_AR_ID), mockSubject);
 		verify(mockDataAccessClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
-		verify(mockACTAccessRequirementWidget).setRequirement(eq(mockACTAccessRequirement), any(Callback.class));
+		verify(mockACTAccessRequirementWidget).setRequirement(eq(mockACTAccessRequirement),
+				any(Callback.class));
 		verify(mockView).add(mockACTAccessRequirementWidget);
 	}
+
 	@Test
 	public void testConfigureToUAccessRequirement() {
 		widget.configure(Long.toString(TOU_AR_ID), mockSubject);
 		verify(mockDataAccessClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
-		verify(mockToUAccessRequirementWidget).setRequirement(eq(mockToUAccessRequirement), any(Callback.class));
+		verify(mockToUAccessRequirementWidget).setRequirement(eq(mockToUAccessRequirement),
+				any(Callback.class));
 		verify(mockView).add(mockToUAccessRequirementWidget);
 	}
+
 	@Test
 	public void testConfigureLockAccessRequirement() {
 		widget.configure(Long.toString(LOCK_AR_ID), mockSubject);
 		verify(mockDataAccessClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
-		verify(mockLockAccessRequirementWidget).setRequirement(eq(mockLockAccessRequirement), any(Callback.class));
+		verify(mockLockAccessRequirementWidget).setRequirement(eq(mockLockAccessRequirement),
+				any(Callback.class));
 		verify(mockView).add(mockLockAccessRequirementWidget);
 	}
-	
+
 	@Test
 	public void testConfigureUnsupportedAccessRequirement() {
 		widget.configure(mockAccessRequirement, mockSubject, mockRefreshCallback);
 		verify(mockSynAlert).handleException(any(Throwable.class));
 	}
-	
+
 	@Test
 	public void testFailureToLoadAccessRequirement() {
 		Exception ex = new Exception();
-		AsyncMockStubber.callFailureWith(ex).when(mockDataAccessClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockDataAccessClient).getAccessRequirement(anyLong(),
+				any(AsyncCallback.class));
 		widget.configure("888", mockSubject);
 		verify(mockSynAlert).handleException(any(Throwable.class));
 	}
-	
-	
+
+
 }

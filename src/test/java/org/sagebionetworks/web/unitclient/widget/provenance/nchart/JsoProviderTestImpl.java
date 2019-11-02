@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.provenance.nchart;
 
 import org.sagebionetworks.web.client.transform.JsoProvider;
-import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayer;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayerNode;
@@ -32,7 +31,7 @@ public class JsoProviderTestImpl implements JsoProvider {
 
 	@Override
 	public XYPoint newXYPoint() {
-		return new XYPointTestImpl(0,0);
+		return new XYPointTestImpl(0, 0);
 	}
-	
+
 }

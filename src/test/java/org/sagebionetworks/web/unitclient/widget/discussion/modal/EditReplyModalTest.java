@@ -1,4 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.discussion.modal;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -6,8 +7,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.discussion.NewReplyWidget.DEFAULT_MARKDOWN;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -26,7 +25,6 @@ import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalView;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -56,7 +54,8 @@ public class EditReplyModalTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		modal = new EditReplyModal(mockView, mockDiscussionForumClient, mockSynAlert, mockMarkdownEditor, mockPopupUtilsView, mockGlobalAppState);
+		modal = new EditReplyModal(mockView, mockDiscussionForumClient, mockSynAlert,
+				mockMarkdownEditor, mockPopupUtilsView, mockGlobalAppState);
 		modal.configure(replyId, message, mockCallback);
 		when(mockMarkdownEditor.getMarkdown()).thenReturn(message);
 	}
@@ -107,14 +106,15 @@ public class EditReplyModalTest {
 	@Test
 	public void testOnSaveSuccess() {
 		when(mockMarkdownEditor.getMarkdown()).thenReturn("message");
-		AsyncMockStubber.callSuccessWith(mockDiscussionReplyBundle)
-			.when(mockDiscussionForumClient).updateReplyMessage(anyString(), any(UpdateReplyMessage.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockDiscussionReplyBundle).when(mockDiscussionForumClient)
+				.updateReplyMessage(anyString(), any(UpdateReplyMessage.class), any(AsyncCallback.class));
 		modal.onSave();
 		verify(mockSynAlert).clear();
 		verify(mockView).showSaving();
 		verify(mockView).hideDialog();
 		verify(mockView).showSuccess(anyString(), anyString());
-		verify(mockDiscussionForumClient).updateReplyMessage(anyString(), any(UpdateReplyMessage.class), any(AsyncCallback.class));
+		verify(mockDiscussionForumClient).updateReplyMessage(anyString(), any(UpdateReplyMessage.class),
+				any(AsyncCallback.class));
 		verify(mockCallback).invoke();
 	}
 
@@ -122,38 +122,41 @@ public class EditReplyModalTest {
 	@Test
 	public void testOnSaveFailure() {
 		when(mockMarkdownEditor.getMarkdown()).thenReturn("message");
-		AsyncMockStubber.callFailureWith(new Exception())
-			.when(mockDiscussionForumClient).updateReplyMessage(anyString(), any(UpdateReplyMessage.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockDiscussionForumClient)
+				.updateReplyMessage(anyString(), any(UpdateReplyMessage.class), any(AsyncCallback.class));
 
 		modal.onSave();
 		verify(mockSynAlert).clear();
 		verify(mockView).showSaving();
-		verify(mockDiscussionForumClient).updateReplyMessage(anyString(), any(UpdateReplyMessage.class), any(AsyncCallback.class));
+		verify(mockDiscussionForumClient).updateReplyMessage(anyString(), any(UpdateReplyMessage.class),
+				any(AsyncCallback.class));
 		verifyZeroInteractions(mockCallback);
 		verify(mockSynAlert).handleException(any(Throwable.class));
 		verify(mockView).resetButton();
 	}
-	
+
 	@Test
 	public void testOnClickCancel() {
 		modal.onCancel();
-		
-		//since no changes were made, verify confirmation dialog was not shown
-		verify(mockPopupUtilsView, never()).showConfirmDialog(eq(DisplayConstants.UNSAVED_CHANGES), eq(DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE), callbackCaptor.capture());
+
+		// since no changes were made, verify confirmation dialog was not shown
+		verify(mockPopupUtilsView, never()).showConfirmDialog(eq(DisplayConstants.UNSAVED_CHANGES),
+				eq(DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE), callbackCaptor.capture());
 		verify(mockView).hideDialog();
 	}
-	
+
 	@Test
 	public void testOnClickCancelWithUnsavedChanges() {
 		when(mockMarkdownEditor.getMarkdown()).thenReturn("unsaved changes");
 		modal.onCancel();
-		
-		//since no changes were made, verify confirmation dialog was not shown
-		verify(mockPopupUtilsView).showConfirmDialog(eq(DisplayConstants.UNSAVED_CHANGES), eq(DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE), callbackCaptor.capture());
+
+		// since no changes were made, verify confirmation dialog was not shown
+		verify(mockPopupUtilsView).showConfirmDialog(eq(DisplayConstants.UNSAVED_CHANGES),
+				eq(DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE), callbackCaptor.capture());
 		verify(mockView, never()).hideDialog();
 		// simulate user confirmed
 		callbackCaptor.getValue().invoke();
-		
+
 		verify(mockView).hideDialog();
 	}
 }

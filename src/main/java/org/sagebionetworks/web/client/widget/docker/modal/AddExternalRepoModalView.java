@@ -3,12 +3,12 @@ package org.sagebionetworks.web.client.widget.docker.modal;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface AddExternalRepoModalView extends IsWidget{
+public interface AddExternalRepoModalView extends IsWidget {
 
 	public interface Presenter {
 
 		void onSave();
-		
+
 	}
 
 	void setPresenter(Presenter presenter);

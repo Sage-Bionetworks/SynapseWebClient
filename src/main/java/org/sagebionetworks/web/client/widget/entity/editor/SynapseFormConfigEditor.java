@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.List;
 import java.util.Map;
-
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -13,11 +12,11 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
-
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class SynapseFormConfigEditor implements SynapseFormConfigView.Presenter, WidgetEditorPresenter {
+public class SynapseFormConfigEditor
+		implements SynapseFormConfigView.Presenter, WidgetEditorPresenter {
 
 	private SynapseFormConfigView view;
 	private Map<String, String> descriptor;
@@ -44,7 +43,8 @@ public class SynapseFormConfigEditor implements SynapseFormConfigView.Presenter,
 	}
 
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor,
+			DialogCallback dialogCallback) {
 		descriptor = widgetDescriptor;
 
 		if (descriptor.get(WidgetConstants.TABLE_ID_KEY) != null) {

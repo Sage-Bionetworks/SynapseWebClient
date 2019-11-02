@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.entity.download;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +16,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidgetView;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
-
 import com.google.gwt.user.client.ui.Widget;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -26,12 +25,12 @@ public class UploadDialogTest {
 	@Mock
 	Uploader mockUploader;
 	UploadDialogWidget widget;
-	
+
 	@Before
 	public void before() throws Exception {
 		widget = new UploadDialogWidget(view, mockUploader);
 	}
-	
+
 	@Test
 	public void testConfigure() {
 		String title = "dialog title";
@@ -40,20 +39,20 @@ public class UploadDialogTest {
 		CallbackP<String> fileHandleIdCallback = mock(CallbackP.class);
 		boolean isEntity = true;
 		widget.configure(title, entity, parentEntityId, fileHandleIdCallback, isEntity);
-		
+
 		verify(mockUploader).configure(entity, parentEntityId, fileHandleIdCallback, isEntity);
 		verify(view).configureDialog(eq(title), any(Widget.class));
-		
+
 		verify(mockUploader).setSuccessHandler(any(UploadSuccessHandler.class));
 		verify(mockUploader).setCancelHandler(any(CancelHandler.class));
 	}
-	
+
 	@Test
 	public void testDisableMultipleFileUploads() {
 		widget.disableMultipleFileUploads();
 		verify(mockUploader).disableMultipleFileUploads();
 	}
-	
+
 	@Test
 	public void testShow() {
 		widget.show();

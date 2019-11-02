@@ -2,7 +2,6 @@ package org.sagebionetworks.web.shared;
 
 import java.io.Serializable;
 import java.util.List;
-
 import org.sagebionetworks.repo.model.UserProfile;
 
 public class UserProfilePagedResults implements Serializable {
@@ -12,10 +11,9 @@ public class UserProfilePagedResults implements Serializable {
 	/**
 	 * Default constructor is required
 	 */
-	public UserProfilePagedResults() {
-	}
-	
-	
+	public UserProfilePagedResults() {}
+
+
 	public UserProfilePagedResults(List<UserProfile> results, Long totalNumberOfResults) {
 		super();
 		this.totalNumberOfResults = totalNumberOfResults;
@@ -45,7 +43,8 @@ public class UserProfilePagedResults implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((results == null) ? 0 : results.hashCode());
-		result = prime * result + ((totalNumberOfResults == null) ? 0 : totalNumberOfResults.hashCode());
+		result =
+				prime * result + ((totalNumberOfResults == null) ? 0 : totalNumberOfResults.hashCode());
 		return result;
 	}
 
@@ -75,8 +74,9 @@ public class UserProfilePagedResults implements Serializable {
 
 	@Override
 	public String toString() {
-		return "UserProfilePagedResults [totalNumberOfResults=" + totalNumberOfResults + ", results=" + results + "]";
+		return "UserProfilePagedResults [totalNumberOfResults=" + totalNumberOfResults + ", results="
+				+ results + "]";
 	}
 
-	
+
 }

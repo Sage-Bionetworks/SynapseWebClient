@@ -10,11 +10,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,7 +45,6 @@ import org.sagebionetworks.web.client.widget.doi.CreateOrUpdateDoiModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.gwt.event.shared.EventBus;
 
@@ -101,7 +98,8 @@ public class CreateOrUpdateDoiModalTest {
 
 	@Before
 	public void setup() {
-		presenter = new CreateOrUpdateDoiModal(mockView, mockJobTrackingWidget, mockSynapseClient, mockSynAlert, mockPopupUtilsView, mockEventBus, mockDateTimeUtils);
+		presenter = new CreateOrUpdateDoiModal(mockView, mockJobTrackingWidget, mockSynapseClient,
+				mockSynAlert, mockPopupUtilsView, mockEventBus, mockDateTimeUtils);
 		creators = new ArrayList<>();
 		DoiCreator creator1 = new DoiCreator();
 		DoiCreator creator2 = new DoiCreator();
@@ -135,7 +133,8 @@ public class CreateOrUpdateDoiModalTest {
 		boolean doiExists = true;
 		Doi doi = createDoi();
 		when(mockEntity.getId()).thenReturn(objectId);
-		when(mockSynapseClient.getDoi(objectId, objectType, objectVersion)).thenReturn(getDoneFuture(doi));
+		when(mockSynapseClient.getDoi(objectId, objectType, objectVersion))
+				.thenReturn(getDoneFuture(doi));
 
 		// Call under test
 		presenter.configureAndShow(mockEntity, objectVersion, mockUserProfile);
@@ -168,7 +167,8 @@ public class CreateOrUpdateDoiModalTest {
 		when(mockUserProfile.getLastName()).thenReturn(lastName);
 		when(mockUserProfile.getFirstName()).thenReturn(firstName);
 		when(mockDateTimeUtils.getYear(any(Date.class))).thenReturn(pubYearString);
-		when(mockSynapseClient.getDoi(objectId, ObjectType.ENTITY, objectVersion)).thenReturn(getFailedFuture(new NotFoundException()));
+		when(mockSynapseClient.getDoi(objectId, ObjectType.ENTITY, objectVersion))
+				.thenReturn(getFailedFuture(new NotFoundException()));
 
 		Doi expectedDoi = new Doi();
 		expectedDoi.setObjectId(objectId);
@@ -217,7 +217,8 @@ public class CreateOrUpdateDoiModalTest {
 	public void testConfigureAndShowOtherFailure() {
 		when(mockEntity.getId()).thenReturn(objectId);
 		Throwable error = new Throwable("error message");
-		when(mockSynapseClient.getDoi(objectId, ObjectType.ENTITY, objectVersion)).thenReturn(getFailedFuture(error));
+		when(mockSynapseClient.getDoi(objectId, ObjectType.ENTITY, objectVersion))
+				.thenReturn(getFailedFuture(error));
 
 		// Call under test
 		presenter.configureAndShow(mockEntity, objectVersion, mockUserProfile);
@@ -250,9 +251,10 @@ public class CreateOrUpdateDoiModalTest {
 		assertEquals(objectId, result.getObjectId());
 		assertEquals(ObjectType.ENTITY, result.getObjectType());
 		assertEquals(objectVersion, result.getObjectVersion());
-		assertEquals(CreateOrUpdateDoiModal.getSuggestedResourceTypeGeneral(
-				EntityTypeUtils.getEntityTypeForEntityClassName(mockEntity.getClass().getName())
-		), result.getResourceType().getResourceTypeGeneral());
+		assertEquals(
+				CreateOrUpdateDoiModal.getSuggestedResourceTypeGeneral(
+						EntityTypeUtils.getEntityTypeForEntityClassName(mockEntity.getClass().getName())),
+				result.getResourceType().getResourceTypeGeneral());
 		assertEquals(expectedCreators, result.getCreators());
 		assertEquals(expectedTitles, result.getTitles());
 		assertEquals(pubYearString, result.getPublicationYear().toString());
@@ -273,7 +275,7 @@ public class CreateOrUpdateDoiModalTest {
 		presenter.onSaveDoi();
 
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(""), eq(false), eq(AsynchType.Doi),
-				any(DoiRequest.class),  asyncProgressHandlerCaptor.capture());
+				any(DoiRequest.class), asyncProgressHandlerCaptor.capture());
 
 		DoiResponse response = new DoiResponse();
 		response.setDoi(createDoi());
@@ -282,12 +284,14 @@ public class CreateOrUpdateDoiModalTest {
 		verify(mockView).setIsLoading(true);
 		verify(mockView).setIsLoading(false);
 		verify(mockView).hide();
-		verify(mockJobTrackingWidget).startAndTrackJob(eq(""), eq(false), eq(AsynchType.Doi), doiRequestCaptor.capture(), any(AsynchronousProgressHandler.class));
+		verify(mockJobTrackingWidget).startAndTrackJob(eq(""), eq(false), eq(AsynchType.Doi),
+				doiRequestCaptor.capture(), any(AsynchronousProgressHandler.class));
 		verify(mockPopupUtilsView).showInfo(CreateOrUpdateDoiModal.DOI_CREATED_MESSAGE + objectId);
 		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 		assertEquals(creators, doiRequestCaptor.getValue().getDoi().getCreators());
 		assertEquals(titles, doiRequestCaptor.getValue().getDoi().getTitles());
-		assertEquals(rtg, doiRequestCaptor.getValue().getDoi().getResourceType().getResourceTypeGeneral());
+		assertEquals(rtg,
+				doiRequestCaptor.getValue().getDoi().getResourceType().getResourceTypeGeneral());
 		assertEquals(pubYear, doiRequestCaptor.getValue().getDoi().getPublicationYear());
 	}
 
@@ -310,7 +314,8 @@ public class CreateOrUpdateDoiModalTest {
 		asyncProgressHandlerCaptor.getValue().onFailure(failureException);
 
 		verify(mockView).setIsLoading(false);
-		verify(mockJobTrackingWidget).startAndTrackJob(eq(""), eq(false), eq(AsynchType.Doi), any(DoiRequest.class), any(AsynchronousProgressHandler.class));
+		verify(mockJobTrackingWidget).startAndTrackJob(eq(""), eq(false), eq(AsynchType.Doi),
+				any(DoiRequest.class), any(AsynchronousProgressHandler.class));
 		verify(mockSynAlert).handleException(failureException);
 	}
 
@@ -332,7 +337,8 @@ public class CreateOrUpdateDoiModalTest {
 		asyncProgressHandlerCaptor.getValue().onCancel();
 
 		verify(mockView).setIsLoading(false);
-		verify(mockJobTrackingWidget).startAndTrackJob(eq(""), eq(false), eq(AsynchType.Doi), any(DoiRequest.class), any(AsynchronousProgressHandler.class));
+		verify(mockJobTrackingWidget).startAndTrackJob(eq(""), eq(false), eq(AsynchType.Doi),
+				any(DoiRequest.class), any(AsynchronousProgressHandler.class));
 	}
 
 	@Test
@@ -539,7 +545,8 @@ public class CreateOrUpdateDoiModalTest {
 	public void testGetSuggestedResourceTypeGeneral() {
 		for (EntityType entityType : EntityType.values()) {
 			// Call under test
-			DoiResourceTypeGeneral actual = CreateOrUpdateDoiModal.getSuggestedResourceTypeGeneral(entityType);
+			DoiResourceTypeGeneral actual =
+					CreateOrUpdateDoiModal.getSuggestedResourceTypeGeneral(entityType);
 			if (entityType.equals(EntityType.project) || entityType.equals(EntityType.folder)) {
 				assertEquals(DoiResourceTypeGeneral.Collection, actual);
 			} else {

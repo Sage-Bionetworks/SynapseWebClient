@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.discussion.modal;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
@@ -12,7 +11,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.validation.ValidationResult;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -20,7 +18,7 @@ import com.google.inject.Inject;
 /**
  * A simple modal dialog for editing a reply.
  */
-public class EditReplyModal implements ReplyModalView.Presenter{
+public class EditReplyModal implements ReplyModalView.Presenter {
 
 	private static final String EDIT_REPLY_MODAL_TITLE = "Edit Reply";
 	private static final String SUCCESS_TITLE = "Reply edited";
@@ -34,15 +32,11 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 	private String message;
 	Callback editReplyCallback;
 	GlobalApplicationState globalAppState;
+
 	@Inject
-	public EditReplyModal(
-			ReplyModalView view,
-			DiscussionForumClientAsync discussionForumClient,
-			SynapseAlert synAlert,
-			MarkdownEditorWidget markdownEditor,
-			PopupUtilsView popupUtils,
-			GlobalApplicationState globalAppState
-			) {
+	public EditReplyModal(ReplyModalView view, DiscussionForumClientAsync discussionForumClient,
+			SynapseAlert synAlert, MarkdownEditorWidget markdownEditor, PopupUtilsView popupUtils,
+			GlobalApplicationState globalAppState) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
 		fixServiceEntryPoint(discussionForumClient);
@@ -81,18 +75,19 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 	@Override
 	public void onCancel() {
 		if (!markdownEditor.getMarkdown().equals(message)) {
-			popupUtils.showConfirmDialog(DisplayConstants.UNSAVED_CHANGES, DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, () -> {
-				onCancelAfterConfirm();
-			});
+			popupUtils.showConfirmDialog(DisplayConstants.UNSAVED_CHANGES,
+					DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, () -> {
+						onCancelAfterConfirm();
+					});
 		} else {
 			onCancelAfterConfirm();
 		}
 	}
-	
+
 	public void onCancelAfterConfirm() {
 		hide();
 	}
-	
+
 	@Override
 	public void onSave() {
 		synAlert.clear();
@@ -106,22 +101,23 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 		view.showSaving();
 		UpdateReplyMessage updateReply = new UpdateReplyMessage();
 		updateReply.setMessageMarkdown(messageMarkdown);
-		discussionForumClient.updateReplyMessage(replyId, updateReply, new AsyncCallback<DiscussionReplyBundle>(){
-			@Override
-			public void onFailure(Throwable caught) {
-				view.resetButton();
-				synAlert.handleException(caught);
-			}
+		discussionForumClient.updateReplyMessage(replyId, updateReply,
+				new AsyncCallback<DiscussionReplyBundle>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						view.resetButton();
+						synAlert.handleException(caught);
+					}
 
-			@Override
-			public void onSuccess(DiscussionReplyBundle result) {
-				hide();
-				view.showSuccess(SUCCESS_TITLE, SUCCESS_MESSAGE);
-				if (editReplyCallback != null) {
-					editReplyCallback.invoke();
-				}
-			}
-		});
+					@Override
+					public void onSuccess(DiscussionReplyBundle result) {
+						hide();
+						view.showSuccess(SUCCESS_TITLE, SUCCESS_MESSAGE);
+						if (editReplyCallback != null) {
+							editReplyCallback.invoke();
+						}
+					}
+				});
 	}
 
 	@Override

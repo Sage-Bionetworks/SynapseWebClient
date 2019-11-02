@@ -1,11 +1,9 @@
 package org.sagebionetworks.web.client.widget.doi;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityType;
@@ -28,7 +26,6 @@ import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.Widget;
@@ -49,12 +46,9 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 
 	@Inject
 	public CreateOrUpdateDoiModal(CreateOrUpdateDoiModalView view,
-								  JobTrackingWidget jobTrackingWidget,
-								  SynapseJavascriptClient javascriptClient,
-								  SynapseAlert synapseAlert,
-								  PopupUtilsView popupUtilsView,
-								  EventBus eventBus,
-								  DateTimeUtils dateTimeUtils) {
+			JobTrackingWidget jobTrackingWidget, SynapseJavascriptClient javascriptClient,
+			SynapseAlert synapseAlert, PopupUtilsView popupUtilsView, EventBus eventBus,
+			DateTimeUtils dateTimeUtils) {
 		this.view = view;
 		this.jobTrackingWidget = jobTrackingWidget;
 		this.javascriptClient = javascriptClient;
@@ -72,25 +66,26 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 		view.reset();
 		synapseAlert.clear();
 		doi = new Doi();
-		javascriptClient.getDoi(entity.getId(), ObjectType.ENTITY, entityVersion).addCallback(new FutureCallback<Doi>() {
-			@Override
-			public void onSuccess(@NullableDecl Doi doi) {
-				boolean doiExists = true;
-				setDoi(doi);
-				populateAndShowView(doiExists);
-			}
+		javascriptClient.getDoi(entity.getId(), ObjectType.ENTITY, entityVersion)
+				.addCallback(new FutureCallback<Doi>() {
+					@Override
+					public void onSuccess(@NullableDecl Doi doi) {
+						boolean doiExists = true;
+						setDoi(doi);
+						populateAndShowView(doiExists);
+					}
 
-			@Override
-			public void onFailure(Throwable t) {
-				boolean doiExists = false;
-				if (t instanceof NotFoundException) {
-					setDoi(createNewDoi(entity, entityVersion, userProfile));
-					populateAndShowView(doiExists);
-				} else {
-					popupUtilsView.showErrorMessage(t.getMessage());
-				}
-			}
-		}, directExecutor());
+					@Override
+					public void onFailure(Throwable t) {
+						boolean doiExists = false;
+						if (t instanceof NotFoundException) {
+							setDoi(createNewDoi(entity, entityVersion, userProfile));
+							populateAndShowView(doiExists);
+						} else {
+							popupUtilsView.showErrorMessage(t.getMessage());
+						}
+					}
+				}, directExecutor());
 	}
 
 	private void populateAndShowView(boolean doiExists) {
@@ -102,8 +97,8 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 	/**
 	 * Do not use!!! Public only for testing purposes
 	 *
-	 * Creates a 'skeleton' DOI object that a user is given as a template to mint a DOI, where the populated values are
-	 * 'best guesses' for what the user may want to enter.
+	 * Creates a 'skeleton' DOI object that a user is given as a template to mint a DOI, where the
+	 * populated values are 'best guesses' for what the user may want to enter.
 	 */
 	public Doi createNewDoi(Entity entity, Long entityVersion, UserProfile userProfile) {
 		Doi newDoi = new Doi();
@@ -125,8 +120,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 
 		newDoi.setResourceType(new DoiResourceType());
 		newDoi.getResourceType().setResourceTypeGeneral(getSuggestedResourceTypeGeneral(
-				EntityTypeUtils.getEntityTypeForEntityClassName(entity.getClass().getName())
-		));
+				EntityTypeUtils.getEntityTypeForEntityClassName(entity.getClass().getName())));
 
 		newDoi.setPublicationYear(Long.valueOf(dateTimeUtils.getYear(new Date())));
 		return newDoi;
@@ -135,13 +129,13 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 	/**
 	 * Do not use!!! Public only for testing purposes
 	 *
-	 * Retrieves a user's name in "Last, First" format.
-	 * If the user has not set a first and last name, returns an empty string.
+	 * Retrieves a user's name in "Last, First" format. If the user has not set a first and last name,
+	 * returns an empty string.
 	 */
 	public static String getFormattedCreatorName(UserProfile userProfile) {
-		if (userProfile != null &&
-				userProfile.getLastName() != null && userProfile.getFirstName() != null &&
-				!userProfile.getLastName().isEmpty() && !userProfile.getFirstName().isEmpty()) {
+		if (userProfile != null && userProfile.getLastName() != null
+				&& userProfile.getFirstName() != null && !userProfile.getLastName().isEmpty()
+				&& !userProfile.getFirstName().isEmpty()) {
 			return userProfile.getLastName() + ", " + userProfile.getFirstName();
 		} else {
 			return "";
@@ -186,26 +180,27 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 
 		DoiRequest request = new DoiRequest();
 		request.setDoi(newDoi);
-		jobTrackingWidget.startAndTrackJob("", false, AsynchType.Doi, request, new AsynchronousProgressHandler() {
-			@Override
-			public void onComplete(AsynchronousResponseBody response) {
-				popupUtilsView.showInfo(DOI_CREATED_MESSAGE + newDoi.getObjectId());
-				eventBus.fireEvent(new EntityUpdatedEvent());
-				view.setIsLoading(false);
-				view.hide();
-			}
+		jobTrackingWidget.startAndTrackJob("", false, AsynchType.Doi, request,
+				new AsynchronousProgressHandler() {
+					@Override
+					public void onComplete(AsynchronousResponseBody response) {
+						popupUtilsView.showInfo(DOI_CREATED_MESSAGE + newDoi.getObjectId());
+						eventBus.fireEvent(new EntityUpdatedEvent());
+						view.setIsLoading(false);
+						view.hide();
+					}
 
-			@Override
-			public void onFailure(Throwable caught) {
-				synapseAlert.handleException(caught);
-				view.setIsLoading(false);
-			}
+					@Override
+					public void onFailure(Throwable caught) {
+						synapseAlert.handleException(caught);
+						view.setIsLoading(false);
+					}
 
-			@Override
-			public void onCancel() {
-				view.setIsLoading(false);
-			}
-		});
+					@Override
+					public void onCancel() {
+						view.setIsLoading(false);
+					}
+				});
 	}
 
 	public void setDoi(Doi doi) {
@@ -254,7 +249,8 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 	/**
 	 * Do not use!!! Public only for testing purposes
 	 *
-	 * Converts a string of creator names to a List of DoiCreator, where creatorNames are separated with newlines
+	 * Converts a string of creator names to a List of DoiCreator, where creatorNames are separated
+	 * with newlines
 	 */
 	public static List<DoiCreator> parseCreatorsString(String creators) {
 		List<DoiCreator> doiCreators = new ArrayList<>();
@@ -274,9 +270,12 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 	 * Converts a List of DoiCreator to a string of creator names, concatenated with new lines
 	 */
 	public static String convertMultipleCreatorsToString(List<DoiCreator> creators) {
-		return creators.stream()
-				.map(DoiCreator::getCreatorName)
-				.reduce((x,y) -> x + "\n" + y) //Separate creator names with new line
+		return creators.stream().map(DoiCreator::getCreatorName).reduce((x, y) -> x + "\n" + y) // Separate
+																																														// creator
+																																														// names
+																																														// with
+																																														// new
+																																														// line
 				.orElse("");
 	}
 
@@ -303,9 +302,8 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 	 * Converts a List of DoiTitle to a string of titles, concatenated with new lines
 	 */
 	public static String convertMultipleTitlesToString(List<DoiTitle> titles) {
-		return titles.stream()
-				.map(DoiTitle::getTitle)
-				.reduce((x,y) -> x + "\n" + y) // Separate titles with new line
+		return titles.stream().map(DoiTitle::getTitle).reduce((x, y) -> x + "\n" + y) // Separate titles
+																																									// with new line
 				.orElse("");
 	}
 }

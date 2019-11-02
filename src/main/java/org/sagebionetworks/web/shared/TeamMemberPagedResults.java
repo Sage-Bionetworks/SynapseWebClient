@@ -10,10 +10,9 @@ public class TeamMemberPagedResults implements Serializable {
 	/**
 	 * Default constructor is required
 	 */
-	public TeamMemberPagedResults() {
-	}
-	
-	
+	public TeamMemberPagedResults() {}
+
+
 	public TeamMemberPagedResults(List<TeamMemberBundle> results, Long totalNumberOfResults) {
 		super();
 		this.totalNumberOfResults = totalNumberOfResults;
@@ -44,7 +43,8 @@ public class TeamMemberPagedResults implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((results == null) ? 0 : results.hashCode());
-		result = prime * result + ((totalNumberOfResults == null) ? 0 : totalNumberOfResults.hashCode());
+		result =
+				prime * result + ((totalNumberOfResults == null) ? 0 : totalNumberOfResults.hashCode());
 		return result;
 	}
 
@@ -74,9 +74,10 @@ public class TeamMemberPagedResults implements Serializable {
 
 	@Override
 	public String toString() {
-		return "TeamMemberPagedResults [totalNumberOfResults=" + totalNumberOfResults + ", results=" + results + "]";
+		return "TeamMemberPagedResults [totalNumberOfResults=" + totalNumberOfResults + ", results="
+				+ results + "]";
 	}
 
-	
-	
+
+
 }

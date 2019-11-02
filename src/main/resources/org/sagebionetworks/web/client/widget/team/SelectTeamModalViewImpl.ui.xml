@@ -2,19 +2,21 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
->
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
-		<b:Modal ui:field="teamModal" closable="true" dataBackdrop="STATIC" dataKeyboard="true">
+		<b:Modal ui:field="teamModal" closable="true"
+			dataBackdrop="STATIC" dataKeyboard="true">
 			<b:ModalHeader>
-			    <b:Heading ui:field="title" size="H4" text="Select Team" addStyleNames="displayInline"/>
+				<b:Heading ui:field="title" size="H4" text="Select Team"
+					addStyleNames="displayInline" />
 			</b:ModalHeader>
 			<b:ModalBody>
-				<bh:Div ui:field="teamSelectBoxContainer"/>
+				<bh:Div ui:field="teamSelectBoxContainer" />
 			</b:ModalBody>
 			<b:ModalFooter>
-			    <b:Button type="LINK" ui:field="cancelButton">Cancel</b:Button>
-			    <b:Button type="PRIMARY" text="OK" ui:field="selectTeamButton"/>
+				<b:Button type="LINK" ui:field="cancelButton">Cancel</b:Button>
+				<b:Button type="PRIMARY" text="OK"
+					ui:field="selectTeamButton" />
 			</b:ModalFooter>
 		</b:Modal>
 	</bh:Div>

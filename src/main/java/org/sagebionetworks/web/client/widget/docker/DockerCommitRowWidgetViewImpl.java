@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.client.widget.docker;
 
 import java.util.Date;
-
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -17,7 +15,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class DockerCommitRowWidgetViewImpl implements DockerCommitRowWidgetView {
-	public static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_SHORT);
+	public static final DateTimeFormat DATE_FORMAT =
+			DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_SHORT);
 
 	@UiField
 	Span tag;
@@ -30,7 +29,9 @@ public class DockerCommitRowWidgetViewImpl implements DockerCommitRowWidgetView 
 
 	private Widget widget;
 	private Presenter presenter;
-	public interface Binder extends UiBinder<Widget, DockerCommitRowWidgetViewImpl> {}
+
+	public interface Binder extends UiBinder<Widget, DockerCommitRowWidgetViewImpl> {
+	}
 
 	@Inject
 	public DockerCommitRowWidgetViewImpl(Binder binder, final SynapseJSNIUtils jsniUtils) {
@@ -41,7 +42,7 @@ public class DockerCommitRowWidgetViewImpl implements DockerCommitRowWidgetView 
 				digest.selectAll();
 			}
 		});
-		row.addClickHandler(new ClickHandler(){
+		row.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent arg0) {

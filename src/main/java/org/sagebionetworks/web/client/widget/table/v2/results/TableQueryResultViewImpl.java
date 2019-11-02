@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -39,6 +38,7 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 
 	Presenter presenter;
 	SynapseJSNIUtils jsniUtils;
+
 	@Inject
 	public TableQueryResultViewImpl(Binder binder, SynapseJSNIUtils jsniUtils) {
 		widget = binder.createAndBindUi(this);
@@ -50,7 +50,7 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	public void setPresenter(Presenter presenterin) {
 		this.presenter = presenterin;
 	}
-	
+
 	@Override
 	public void setPageWidget(TablePageWidget pageWidget) {
 		tablePanel.add(pageWidget);
@@ -81,21 +81,23 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	public void setProgressWidgetVisible(boolean visible) {
 		this.progressPanel.setVisible(visible);
 	}
+
 	@Override
 	public void setSynapseAlertWidget(Widget w) {
 		synapseAlertContainer.setWidget(w);
 	}
+
 	@Override
 	public void scrollTableIntoView() {
 		jsniUtils.scrollIntoView(scrollTarget.getElement());
 	}
-	
+
 	@Override
 	public void setFacetsWidget(IsWidget w) {
 		facetsWidgetPanel.clear();
 		facetsWidgetPanel.add(w);
 	}
-	
+
 	@Override
 	public void setFacetsVisible(boolean visible) {
 		facetsWidgetPanel.setVisible(visible);

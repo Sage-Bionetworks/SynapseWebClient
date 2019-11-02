@@ -6,7 +6,6 @@ import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -16,7 +15,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ForumWidgetViewImpl implements ForumWidgetView {
-	
+
 	@UiField
 	Button newThreadButton;
 	@UiField
@@ -30,7 +29,7 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	@UiField
 	Button repliesSortButton;
 	@UiField
-	DropDownMenu sortRepliesDropDownMenu;	
+	DropDownMenu sortRepliesDropDownMenu;
 	@UiField
 	SimplePanel singleThreadContainer;
 	@UiField
@@ -49,11 +48,13 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	AnchorListItem sortRepliesAscending;
 	@UiField
 	AnchorListItem sortRepliesDescending;
-	
+
 	private Presenter presenter;
 
 	Widget widget;
-	public interface Binder extends UiBinder<Widget, ForumWidgetViewImpl> {}
+
+	public interface Binder extends UiBinder<Widget, ForumWidgetViewImpl> {
+	}
 
 	@Inject
 	public ForumWidgetViewImpl(Binder binder) {
@@ -85,7 +86,7 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 			}
 		});
 	}
-	
+
 	@Override
 	public void setSingleThread(Widget w) {
 		singleThreadContainer.setWidget(w);
@@ -121,7 +122,7 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	public void showErrorMessage(String errorMessage) {
 		DisplayUtils.showErrorMessage(errorMessage);
 	}
-	
+
 	@Override
 	public void setSingleThreadUIVisible(boolean visible) {
 		singleThreadContainer.setVisible(visible);
@@ -131,33 +132,38 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	public void setThreadListUIVisible(boolean visible) {
 		threadListContainer.setVisible(visible);
 	}
+
 	@Override
 	public void setNewThreadButtonVisible(boolean visible) {
 		newThreadButton.setVisible(visible);
 	}
+
 	@Override
 	public void setShowAllThreadsButtonVisible(boolean visible) {
 		showAllThreadsButton.setVisible(visible);
 	}
+
 	@Override
 	public void setSortRepliesButtonVisible(boolean visible) {
 		repliesSortButton.setVisible(visible);
 	}
+
 	@Override
 	public void setSubscribeButton(Widget w) {
 		subscribeButtonContainer.clear();
 		subscribeButtonContainer.add(w);
 	}
-	
+
 	@Override
 	public void setDefaultThreadWidget(Widget w) {
 		defaultThreadContainer.setWidget(w);
 	}
+
 	@Override
 	public void setDefaultThreadWidgetVisible(boolean visible) {
 		defaultThreadContainer.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setSubscribersWidget(Widget w) {
 		subscribersContainer.clear();

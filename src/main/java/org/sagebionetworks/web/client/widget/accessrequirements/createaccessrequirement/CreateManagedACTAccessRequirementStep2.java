@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -19,17 +18,18 @@ import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.shared.WikiPageKey;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * Second page of creating an access requirement (ACT)  
+ * Second page of creating an access requirement (ACT)
+ * 
  * @author Jay
  *
  */
-public class CreateManagedACTAccessRequirementStep2 implements ModalPage, CreateManagedACTAccessRequirementStep2View.Presenter {
+public class CreateManagedACTAccessRequirementStep2
+		implements ModalPage, CreateManagedACTAccessRequirementStep2View.Presenter {
 	CreateManagedACTAccessRequirementStep2View view;
 	ModalPresenter modalPresenter;
 	ManagedACTAccessRequirement accessRequirement;
@@ -39,14 +39,12 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 	WikiPageKey wikiKey;
 	FileHandleUploadWidget ducTemplateUploader;
 	FileHandleWidget ducTemplateFileHandleWidget;
-	public static final int DAY_IN_MS = 1000*60*60*24;
+	public static final int DAY_IN_MS = 1000 * 60 * 60 * 24;
+
 	@Inject
-	public CreateManagedACTAccessRequirementStep2(
-			CreateManagedACTAccessRequirementStep2View view,
-			SynapseClientAsync synapseClient,
-			WikiMarkdownEditor wikiMarkdownEditor,
-			WikiPageWidget wikiPageRenderer,
-			FileHandleUploadWidget ducTemplateUploader,
+	public CreateManagedACTAccessRequirementStep2(CreateManagedACTAccessRequirementStep2View view,
+			SynapseClientAsync synapseClient, WikiMarkdownEditor wikiMarkdownEditor,
+			WikiPageWidget wikiPageRenderer, FileHandleUploadWidget ducTemplateUploader,
 			FileHandleWidget ducTemplateFileHandleWidget) {
 		super();
 		this.view = view;
@@ -69,13 +67,13 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 		view.setPresenter(this);
 		wikiPageRenderer.setModifiedCreatedByHistoryVisible(false);
 	}
-	
+
 	public void setDUCFileHandle(String fileName, String fileHandleId) {
 		accessRequirement.setDucTemplateFileHandleId(fileHandleId);
 		ducTemplateFileHandleWidget.configure(fileName, fileHandleId);
 		ducTemplateFileHandleWidget.setVisible(true);
 	}
-	
+
 	/**
 	 * Configure this widget before use.
 	 * 
@@ -83,7 +81,8 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 	public void configure(ManagedACTAccessRequirement accessRequirement) {
 		ducTemplateFileHandleWidget.setVisible(false);
 		this.accessRequirement = accessRequirement;
-		wikiKey = new WikiPageKey(accessRequirement.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
+		wikiKey = new WikiPageKey(accessRequirement.getId().toString(),
+				ObjectType.ACCESS_REQUIREMENT.toString(), null);
 		if (accessRequirement.getDucTemplateFileHandleId() != null) {
 			FileHandleAssociation fha = new FileHandleAssociation();
 			fha.setAssociateObjectType(FileHandleAssociateType.AccessRequirementAttachment);
@@ -92,9 +91,9 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 			ducTemplateFileHandleWidget.configure(fha);
 			ducTemplateFileHandleWidget.setVisible(true);
 		}
-		
+
 		configureWiki();
-		
+
 		view.setAreOtherAttachmentsRequired(accessRequirement.getAreOtherAttachmentsRequired());
 		if (accessRequirement.getExpirationPeriod() != null) {
 			view.setExpirationPeriod(Long.toString(accessRequirement.getExpirationPeriod() / DAY_IN_MS));
@@ -107,8 +106,8 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 		view.setIsIRBApprovalRequired(accessRequirement.getIsIRBApprovalRequired());
 		view.setIsValidatedProfileRequired(accessRequirement.getIsValidatedProfileRequired());
 	}
-	
-	
+
+
 	@Override
 	public void onEditWiki() {
 		wikiMarkdownEditor.configure(wikiKey, new CallbackP<WikiPage>() {
@@ -118,11 +117,11 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 			}
 		});
 	}
-	
+
 	private void configureWiki() {
 		wikiPageRenderer.configure(wikiKey, false, null);
 	}
-	
+
 	@Override
 	public void onPrimary() {
 		// update access requirement from view
@@ -137,32 +136,35 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 				}
 				accessRequirement.setExpirationPeriod(expirationPeriodInDays * DAY_IN_MS);
 			} catch (NumberFormatException e) {
-				modalPresenter.setErrorMessage("Please enter a valid expiration period (in days): " + e.getMessage());
+				modalPresenter
+						.setErrorMessage("Please enter a valid expiration period (in days): " + e.getMessage());
 				return;
-			}	
+			}
 		} else {
 			accessRequirement.setExpirationPeriod(null);
 		}
-		
+
 		accessRequirement.setIsCertifiedUserRequired(view.isCertifiedUserRequired());
 		accessRequirement.setIsDUCRequired(view.isDUCRequired());
 		accessRequirement.setIsIDUPublic(view.isIDUPublic());
 		accessRequirement.setIsIRBApprovalRequired(view.isIRBApprovalRequired());
 		accessRequirement.setIsValidatedProfileRequired(view.isValidatedProfileRequired());
 		// create/update access requirement
-		synapseClient.createOrUpdateAccessRequirement(accessRequirement, new AsyncCallback<AccessRequirement>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				modalPresenter.setLoading(false);
-				modalPresenter.setErrorMessage(caught.getMessage());
-			}
-			@Override
-			public void onSuccess(AccessRequirement result) {
-				modalPresenter.setLoading(false);
-				modalPresenter.onFinished();
-			}
-		});
-		
+		synapseClient.createOrUpdateAccessRequirement(accessRequirement,
+				new AsyncCallback<AccessRequirement>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						modalPresenter.setLoading(false);
+						modalPresenter.setErrorMessage(caught.getMessage());
+					}
+
+					@Override
+					public void onSuccess(AccessRequirement result) {
+						modalPresenter.setLoading(false);
+						modalPresenter.onFinished();
+					}
+				});
+
 	}
 
 	@Override

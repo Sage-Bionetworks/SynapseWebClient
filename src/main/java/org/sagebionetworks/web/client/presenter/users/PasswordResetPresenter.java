@@ -15,7 +15,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -23,19 +22,19 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 @SuppressWarnings("unused")
-public class PasswordResetPresenter extends AbstractActivity implements PasswordResetView.Presenter, Presenter<PasswordReset> {
-	private PasswordReset place;	
+public class PasswordResetPresenter extends AbstractActivity
+		implements PasswordResetView.Presenter, Presenter<PasswordReset> {
+	private PasswordReset place;
 	private PasswordResetView view;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseAlert synAlert;
 	private SynapseJavascriptClient jsClient;
-	
+
 	@Inject
 	public PasswordResetPresenter(PasswordResetView view,
 			AuthenticationController authenticationController,
-			GlobalApplicationState globalApplicationState,
-			SynapseJavascriptClient jsClient,
+			GlobalApplicationState globalApplicationState, SynapseJavascriptClient jsClient,
 			SynapseAlert synAlert) {
 		this.view = view;
 		this.authenticationController = authenticationController;
@@ -56,7 +55,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 	public void setPlace(PasswordReset place) {
 		this.place = place;
 		view.setPresenter(this);
-		view.clear(); 
+		view.clear();
 		if (ErrorResponseCode.PASSWORD_RESET_VIA_EMAIL_REQUIRED.toString().equals(place.toToken())) {
 			view.showRequestForm();
 			view.showPasswordResetRequired();
@@ -64,16 +63,18 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 			// Assume all tokens other than the default are session tokens
 			// validate that session token is still valid before showing form
 			view.showLoading();
-			authenticationController.setNewSessionToken(place.toToken(), new AsyncCallback<UserProfile>() {
-				@Override
-				public void onSuccess(UserProfile result) {
-					view.showResetForm();	
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showExpiredRequest();
-				}
-			});
+			authenticationController.setNewSessionToken(place.toToken(),
+					new AsyncCallback<UserProfile>() {
+						@Override
+						public void onSuccess(UserProfile result) {
+							view.showResetForm();
+						}
+
+						@Override
+						public void onFailure(Throwable caught) {
+							view.showExpiredRequest();
+						}
+					});
 		} else {
 			view.showRequestForm();
 		}
@@ -98,30 +99,34 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 				view.setSubmitButtonEnabled(true);
 			}
 		});
-		
+
 	}
 
 	@Override
 	public void resetPassword(String currentPassword, String newPassword) {
 		synAlert.clear();
-		ChangePasswordWithCurrentPassword changePasswordRequest = new ChangePasswordWithCurrentPassword();
+		ChangePasswordWithCurrentPassword changePasswordRequest =
+				new ChangePasswordWithCurrentPassword();
 		changePasswordRequest.setCurrentPassword(currentPassword);
 		changePasswordRequest.setNewPassword(newPassword);
-		changePasswordRequest.setUsername(authenticationController.getCurrentUserProfile().getUserName());
+		changePasswordRequest
+				.setUsername(authenticationController.getCurrentUserProfile().getUserName());
 		jsClient.changePassword(changePasswordRequest, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				view.showInfo(DisplayConstants.PASSWORD_RESET_TEXT);
 				view.showPasswordResetSuccess();
-				
+
 				UserProfile profile = authenticationController.getCurrentUserProfile();
-				if (profile != null && profile.getUserName() != null && !DisplayUtils.isTemporaryUsername(profile.getUserName()))
-					//re-login like we do on the Settings page (when changing the password)
+				if (profile != null && profile.getUserName() != null
+						&& !DisplayUtils.isTemporaryUsername(profile.getUserName()))
+					// re-login like we do on the Settings page (when changing the password)
 					reloginUser(profile.getUserName(), newPassword);
 				else {
-					//pop up terms of service on re-login
+					// pop up terms of service on re-login
 					authenticationController.logoutUser();
-					globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN)); // redirect to login page
+					globalApplicationState.getPlaceChanger()
+							.goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN)); // redirect to login page
 				}
 			}
 
@@ -132,7 +137,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 			}
 		});
 	}
-	
+
 	public void reloginUser(String username, String newPassword) {
 		// login user as session token has changed
 		authenticationController.loginUser(username, newPassword, new AsyncCallback<UserProfile>() {
@@ -140,9 +145,10 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 			public void onSuccess(UserProfile result) {
 				globalApplicationState.gotoLastPlace();
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
-				//if login fails, simple send them to the login page to get a new session
+				// if login fails, simple send them to the login page to get a new session
 				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			}
 		});

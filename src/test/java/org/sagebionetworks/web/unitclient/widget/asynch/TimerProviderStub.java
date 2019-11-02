@@ -4,14 +4,15 @@ import org.sagebionetworks.web.client.widget.asynch.TimerProvider;
 
 /**
  * A simple stub that does not wait.
+ * 
  * @author jmhill
  *
  */
-public class TimerProviderStub implements TimerProvider{
+public class TimerProviderStub implements TimerProvider {
 
 	FireHandler handler;
 	boolean isCanceled = false;
-	
+
 	@Override
 	public void setHandler(FireHandler handler) {
 		this.handler = handler;
@@ -28,7 +29,7 @@ public class TimerProviderStub implements TimerProvider{
 		isCanceled = true;
 	}
 
-	public boolean isCancled(){
+	public boolean isCancled() {
 		return isCanceled;
 	}
 }

@@ -7,7 +7,6 @@ import org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -19,10 +18,9 @@ public class ReviewAccessorsButton implements IsWidget {
 	public Button button;
 	public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	AccessRequirement ar;
-	
+
 	@Inject
-	public ReviewAccessorsButton(Button button, 
-			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
+	public ReviewAccessorsButton(Button button, IsACTMemberAsyncHandler isACTMemberAsyncHandler,
 			final GlobalApplicationState globalAppState) {
 		this.button = button;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
@@ -33,17 +31,18 @@ public class ReviewAccessorsButton implements IsWidget {
 		button.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				ACTAccessApprovalsPlace place = new ACTAccessApprovalsPlace(ACTAccessApprovalsPlace.ACCESS_REQUIREMENT_ID_PARAM + "=" + ar.getId());
+				ACTAccessApprovalsPlace place = new ACTAccessApprovalsPlace(
+						ACTAccessApprovalsPlace.ACCESS_REQUIREMENT_ID_PARAM + "=" + ar.getId());
 				globalAppState.getPlaceChanger().goTo(place);
 			}
 		});
-	}	
-	
+	}
+
 	public void configure(AccessRequirement ar) {
 		this.ar = ar;
 		showIfACTMember();
 	}
-	
+
 	private void showIfACTMember() {
 		isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
 			@Override
@@ -52,9 +51,9 @@ public class ReviewAccessorsButton implements IsWidget {
 			}
 		});
 	}
-	
+
 	public Widget asWidget() {
 		return button.asWidget();
 	}
-	
+
 }

@@ -6,7 +6,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
@@ -26,17 +25,18 @@ import com.google.inject.Inject;
  *
  */
 public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
-	
-	public interface Binder extends UiBinder<Widget, MarkdownEditorWidgetViewImpl> {}
-	
+
+	public interface Binder extends UiBinder<Widget, MarkdownEditorWidgetViewImpl> {
+	}
+
 	private Presenter presenter;
-	//dialog for the formatting guide
+	// dialog for the formatting guide
 	@UiField
 	public Div mdCommands;
-	
+
 	@UiField
 	public org.gwtbootstrap3.client.ui.TextArea markdownTextArea;
-	
+
 	@UiField
 	public Div selectTeamModalContainer;
 	/**
@@ -46,7 +46,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public Button editWidgetButton;
 	@UiField
 	public Button writeMarkdownButton;
-	//insert widget menu commands
+	// insert widget menu commands
 	@UiField
 	public AnchorListItem attachmentLink;
 	@UiField
@@ -89,18 +89,18 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public AnchorListItem graphLink;
 	@UiField
 	public Button userButton;
-	
+
 	@UiField
 	public AnchorListItem teamLink;
 	@UiField
 	public AnchorListItem synapseFormLink;
 	@UiField
 	public AnchorListItem videoLink;
-	
+
 	@UiField
 	public Button formattingGuideButton;
-	
-	//Alpha mode button and commands
+
+	// Alpha mode button and commands
 	@UiField
 	public Button alphaInsertButton;
 	@UiField
@@ -123,14 +123,14 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public AnchorListItem teamMembersLink;
 	@UiField
 	public AnchorListItem teamMemberCountLink;
-	
+
 	@UiField
 	public Button boldButton;
 	@UiField
 	public Button italicButton;
 	@UiField
 	public Button strikeButton;
-	
+
 	@UiField
 	public Button codeBlockButton;
 	@UiField
@@ -139,8 +139,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public Button subscriptButton;
 	@UiField
 	public Button superscriptButton;
-	
-	//Heading commands
+
+	// Heading commands
 	@UiField
 	public AnchorListItem heading1Link;
 	@UiField
@@ -153,8 +153,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public AnchorListItem heading5Link;
 	@UiField
 	public AnchorListItem heading6Link;
-	
-	//convenience buttons
+
+	// convenience buttons
 	@UiField
 	public Button attachmentButton;
 	@UiField
@@ -167,8 +167,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public Button linkButton;
 	@UiField
 	public Button markdownPreviewButton;
-	
-	//preview
+
+	// preview
 	@UiField
 	public SimplePanel previewHtmlContainer;
 	@UiField
@@ -176,43 +176,47 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public Div writingUI;
 	Span widget = new Span();
-	//this UI widget
+	// this UI widget
 	Widget viewWidget;
 	Widget formattingGuideWidget;
 	Binder binder;
+
 	@Inject
 	public MarkdownEditorWidgetViewImpl(Binder binder) {
 		super();
 		this.binder = binder;
 	}
-	
+
 	@Override
 	public void addTextAreaKeyUpHandler(KeyUpHandler handler) {
 		markdownTextArea.addKeyUpHandler(handler);
 	}
-	
+
 	@Override
 	public void addTextAreaClickHandler(ClickHandler handler) {
 		markdownTextArea.addClickHandler(handler);
 	}
-	
+
 	private void lazyConstruct() {
 		if (viewWidget == null) {
 			viewWidget = binder.createAndBindUi(this);
 			editWidgetButton.addClickHandler(getClickHandler(MarkdownEditorAction.EDIT_WIDGET));
 			attachmentLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_ATTACHMENT));
-			genomeBrowserLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_BIODALLIANCE_GENOME_BROWSER));
+			genomeBrowserLink.addClickHandler(
+					getClickHandler(MarkdownEditorAction.INSERT_BIODALLIANCE_GENOME_BROWSER));
 			buttonLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_BUTTON_LINK));
 			entityListLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_ENTITY_LIST));
 			imageLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_IMAGE));
 			joinTeamLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_JOIN_TEAM));
 			linkLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LINK));
-			detailsSummaryLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_DETAILS_SUMMARY));
+			detailsSummaryLink
+					.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_DETAILS_SUMMARY));
 			provenanceGraphLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_PROV_GRAPH));
 			queryLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_QUERY_TABLE));
 			leaderboardLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LEADERBOARD));
 			referenceLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_REFERENCE));
-			submitToEvaluationLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_SUBMIT_TO_EVALUATION));
+			submitToEvaluationLink
+					.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_SUBMIT_TO_EVALUATION));
 			tableLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TABLE));
 			tableOfContentsLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TOC));
 			userLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_USER_LINK));
@@ -223,13 +227,19 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 			videoLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIDEO));
 			previewLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_PREVIEW));
 			synapseTableLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_SYNAPSE_TABLE));
-			externalWebsiteLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_EXTERNAL_WEBSITE));
+			externalWebsiteLink
+					.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_EXTERNAL_WEBSITE));
 			supertableLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_API_SUPERTABLE));
-			wikifilesPreviewLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_WIKI_FILES_PREVIEW));
-			tutorialWizardLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TUTORIAL_WIZARD));
-			registerChallengeTeamLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_REGISTER_CHALLENGE_TEAM));
-			challengeTeamsLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_CHALLENGE_TEAMS));
-			challengeParticipantsLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_CHALLENGE_PARTICIPANTS));
+			wikifilesPreviewLink
+					.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_WIKI_FILES_PREVIEW));
+			tutorialWizardLink
+					.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TUTORIAL_WIZARD));
+			registerChallengeTeamLink
+					.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_REGISTER_CHALLENGE_TEAM));
+			challengeTeamsLink
+					.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_CHALLENGE_TEAMS));
+			challengeParticipantsLink
+					.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_CHALLENGE_PARTICIPANTS));
 			boldButton.addClickHandler(getClickHandler(MarkdownEditorAction.BOLD));
 			italicButton.addClickHandler(getClickHandler(MarkdownEditorAction.ITALIC));
 			strikeButton.addClickHandler(getClickHandler(MarkdownEditorAction.STRIKETHROUGH));
@@ -251,7 +261,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 			linkButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LINK));
 			cytoscapeJsLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_CYTOSCAPE_JS));
 			teamMembersLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TEAM_MEMBERS));
-			teamMemberCountLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TEAM_MEMBER_COUNT));
+			teamMemberCountLink
+					.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TEAM_MEMBER_COUNT));
 			markdownPreviewButton.addClickHandler(getClickHandler(MarkdownEditorAction.MARKDOWN_PREVIEW));
 			heading1Link.addStyleName("font-size-36");
 			heading2Link.addStyleName("font-size-30");
@@ -268,7 +279,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 				formattingGuideModal.add(formattingGuideWidget);
 				formattingGuideModal.show();
 			});
-			
+
 			markdownTextArea.addKeyPressHandler(new KeyPressHandler() {
 				@Override
 				public void onKeyPress(KeyPressEvent event) {
@@ -284,69 +295,68 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 			widget.add(viewWidget);
 		}
 	}
-	
+
 	private ClickHandler getClickHandler(final MarkdownEditorAction action) {
 		return new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.handleCommand(action);		
+				presenter.handleCommand(action);
 			}
 		};
 	}
-	
+
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-	
+
 	@Override
 	public void configure(String markdown) {
 		lazyConstruct();
-		markdownTextArea.setText(markdown);		
+		markdownTextArea.setText(markdown);
 	}
-	
+
 	@Override
 	public void setAttachmentCommandsVisible(boolean visible) {
 		lazyConstruct();
 		attachmentLink.setVisible(visible);
 		attachmentButton.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setAlphaCommandsVisible(boolean visible) {
 		lazyConstruct();
 		alphaInsertButton.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setEditButtonEnabled(boolean enabled) {
 		editWidgetButton.setEnabled(enabled);
 	}
-	
-	
-	
+
+
+
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
-	
+
 	@Override
-	public void showLoading() {
-	}
-	
+	public void showLoading() {}
+
 	@Override
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
-	
+
 	@Override
 	public void clear() {
 		if (markdownTextArea != null) {
-			markdownTextArea.setText("");	
+			markdownTextArea.setText("");
 		}
 	}
 
@@ -354,58 +364,59 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public String getMarkdown() {
 		return markdownTextArea.getText();
 	}
-	
+
 	@Override
 	public void setMarkdown(String markdown) {
 		lazyConstruct();
 		markdownTextArea.setValue(markdown);
 	}
-	
+
 	@Override
 	public int getCursorPos() {
 		lazyConstruct();
 		return markdownTextArea.getCursorPos();
 	}
-	
+
 	@Override
 	public void setCursorPos(int pos) {
 		lazyConstruct();
 		markdownTextArea.setCursorPos(pos);
 	}
-	
+
 	@Override
 	public void setMarkdownFocus() {
 		lazyConstruct();
 		markdownTextArea.setFocus(true);
 	}
-	
+
 	@Override
 	public int getSelectionLength() {
 		lazyConstruct();
 		return markdownTextArea.getSelectionLength();
 	}
-	
+
 	@Override
 	public void setSelectionRange(int pos, int length) {
 		lazyConstruct();
 		markdownTextArea.setSelectionRange(pos, length);
 	}
-	
+
 	@Override
 	public int getClientHeight() {
 		return Window.getClientHeight();
 	};
-	
+
 	@Override
 	public void setMarkdownTextAreaHeight(int heightPx) {
 		lazyConstruct();
 		markdownTextArea.setHeight(heightPx + "px");
 	}
-	
+
 	@Override
 	public void setFormattingGuideWidget(Widget formattingGuideWidget) {
 		this.formattingGuideWidget = formattingGuideWidget;
 	}
+
 	@Override
 	public boolean isEditorAttachedAndVisible() {
 		return widget.isAttached() && widget.isVisible();
@@ -431,18 +442,19 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		imageLinkMenuItem.setVisible(visible);
 		imageLinkButton.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setFocus(boolean focused) {
 		lazyConstruct();
 		markdownTextArea.setFocus(focused);
 	}
+
 	@Override
 	public void setEditorEnabled(boolean enabled) {
 		lazyConstruct();
 		markdownTextArea.setEnabled(enabled);
 	}
-	
+
 	@Override
 	public void setMarkdownPreviewWidget(Widget markdownPreviewWidget) {
 		lazyConstruct();
@@ -454,12 +466,13 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		writingUI.setVisible(false);
 		previewUI.setVisible(true);
 	}
-	
+
 	@Override
 	public void showEditMode() {
 		previewUI.setVisible(false);
-		writingUI.setVisible(true);	
+		writingUI.setVisible(true);
 	}
+
 	@Override
 	public void setSelectTeamModal(Widget widget) {
 		lazyConstruct();

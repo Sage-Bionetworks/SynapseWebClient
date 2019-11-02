@@ -4,21 +4,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class EntityHeaderAsyncHandlerImpl implements EntityHeaderAsyncHandler {
-	private Map<String, List<AsyncCallback<EntityHeader>>> reference2Callback = new HashMap<String, List<AsyncCallback<EntityHeader>>>();
+	private Map<String, List<AsyncCallback<EntityHeader>>> reference2Callback =
+			new HashMap<String, List<AsyncCallback<EntityHeader>>>();
 	SynapseJavascriptClient jsClient;
-	
+
 	@Inject
 	public EntityHeaderAsyncHandlerImpl(SynapseJavascriptClient jsClient, GWTWrapper gwt) {
 		this.jsClient = jsClient;
@@ -30,7 +29,7 @@ public class EntityHeaderAsyncHandlerImpl implements EntityHeaderAsyncHandler {
 		};
 		gwt.scheduleFixedDelay(callback, 200 + gwt.nextInt(150));
 	}
-	
+
 	@Override
 	public void getEntityHeader(String entityId, AsyncCallback<EntityHeader> callback) {
 		List<AsyncCallback<EntityHeader>> list = reference2Callback.get(entityId);
@@ -40,52 +39,55 @@ public class EntityHeaderAsyncHandlerImpl implements EntityHeaderAsyncHandler {
 		}
 		list.add(callback);
 	}
-	
+
 	public void executeRequests() {
 		if (!reference2Callback.isEmpty()) {
-			final Map<String, List<AsyncCallback<EntityHeader>>> reference2CallbackCopy = new HashMap<String, List<AsyncCallback<EntityHeader>>>();
+			final Map<String, List<AsyncCallback<EntityHeader>>> reference2CallbackCopy =
+					new HashMap<String, List<AsyncCallback<EntityHeader>>>();
 			reference2CallbackCopy.putAll(reference2Callback);
 			reference2Callback.clear();
 			List<String> entityIdsList = new ArrayList<String>();
 			entityIdsList.addAll(reference2CallbackCopy.keySet());
-			jsClient.getEntityHeaderBatch(entityIdsList,new AsyncCallback<ArrayList<EntityHeader>>() {
+			jsClient.getEntityHeaderBatch(entityIdsList, new AsyncCallback<ArrayList<EntityHeader>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					// go through all requested objects, and inform them of the error
-					for (String entityId: reference2CallbackCopy.keySet()) {
+					for (String entityId : reference2CallbackCopy.keySet()) {
 						callOnFailure(entityId, caught);
 					}
 				}
-				
+
 				private void callOnFailure(String entityId, Throwable ex) {
 					List<AsyncCallback<EntityHeader>> callbacks = reference2CallbackCopy.get(entityId);
 					if (callbacks != null) {
 						for (AsyncCallback<EntityHeader> callback : callbacks) {
-							callback.onFailure(ex);	
+							callback.onFailure(ex);
 						}
 					}
 				}
-				
+
 				public void onSuccess(ArrayList<EntityHeader> results) {
 					// go through all results, and inform the proper callback of the success
 					for (EntityHeader entityHeader : results) {
-						List<AsyncCallback<EntityHeader>> callbacks = reference2CallbackCopy.remove(entityHeader.getId());
+						List<AsyncCallback<EntityHeader>> callbacks =
+								reference2CallbackCopy.remove(entityHeader.getId());
 						if (callbacks != null) {
 							for (AsyncCallback<EntityHeader> callback : callbacks) {
-								callback.onSuccess(entityHeader);	
+								callback.onSuccess(entityHeader);
 							}
 						}
 					}
-					NotFoundException notReturnedException = new NotFoundException(DisplayConstants.ERROR_LOADING);
+					NotFoundException notReturnedException =
+							new NotFoundException(DisplayConstants.ERROR_LOADING);
 					for (String entityId : reference2CallbackCopy.keySet()) {
 						// not returned
 						callOnFailure(entityId, notReturnedException);
-						
+
 					}
 				};
 			});
 		}
 	}
-	
-	
+
+
 }

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.provenance.Activity;
@@ -35,7 +34,6 @@ import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -74,9 +72,9 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	SynapseAlert synAlert;
 
 	@Inject
-	public ProvenanceWidget(ProvenanceWidgetView view, SynapseJSNIUtils synapseJSNIUtils, JsoProvider jsoProvider,
-			ClientCache clientCache, DateTimeUtils dateTimeUtils, SynapseJavascriptClient jsClient,
-			SynapseAlert synAlert) {
+	public ProvenanceWidget(ProvenanceWidgetView view, SynapseJSNIUtils synapseJSNIUtils,
+			JsoProvider jsoProvider, ClientCache clientCache, DateTimeUtils dateTimeUtils,
+			SynapseJavascriptClient jsClient, SynapseAlert synAlert) {
 		this.view = view;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.jsoProvider = jsoProvider;
@@ -93,8 +91,8 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	}
 
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired,
-			Long wikiVersionInView) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor,
+			Callback widgetRefreshRequired, Long wikiVersionInView) {
 		view.setPresenter(this);
 		view.showLoading();
 		// set up view based on descriptor parameters
@@ -133,9 +131,10 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		maxDepth = descriptor.containsKey(WidgetConstants.PROV_WIDGET_DEPTH_KEY)
 				? Integer.parseInt(descriptor.get(WidgetConstants.PROV_WIDGET_DEPTH_KEY))
 				: 1;
-		showUndefinedAndErrorActivity = descriptor.get(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY) != null
-				? Boolean.parseBoolean(descriptor.get(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY))
-				: true;
+		showUndefinedAndErrorActivity =
+				descriptor.get(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY) != null
+						? Boolean.parseBoolean(descriptor.get(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY))
+						: true;
 		showExpand = descriptor.get(WidgetConstants.PROV_WIDGET_EXPAND_KEY) != null
 				? Boolean.parseBoolean(descriptor.get(WidgetConstants.PROV_WIDGET_EXPAND_KEY))
 				: false;
@@ -210,8 +209,8 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	 */
 
 	/**
-	 * Recursively look up versions, adding the references to the startRefs until
-	 * the lookupVersion stack is empty
+	 * Recursively look up versions, adding the references to the startRefs until the lookupVersion
+	 * stack is empty
 	 * 
 	 * @param doneCallback
 	 */
@@ -352,9 +351,9 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 									UsedEntity ue = (UsedEntity) u;
 									if (ue.getReference() != null) {
 										toProcess.push(new ReferenceProcessItem(ue.getReference(), item.getDepth())); // same
-																														// depth
-																														// as
-																														// activity
+										// depth
+										// as
+										// activity
 									}
 								}
 							}
@@ -375,8 +374,8 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			for (Used u : used) {
 				if (u instanceof UsedEntity) { // ignore UsedUrl, nothing to process
 					UsedEntity ue = (UsedEntity) u;
-					if (ue.getReference() != null
-							&& (references.contains(ue.getReference()) || ue.getReference().getTargetId() == null)) {
+					if (ue.getReference() != null && (references.contains(ue.getReference())
+							|| ue.getReference().getTargetId() == null)) {
 						previouslyProcessed.add(u);
 					}
 				}
@@ -420,8 +419,8 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 
 		// build the tree, layout and render
 		idToNode = new HashMap<String, ProvGraphNode>();
-		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader,
-				showExpand, startRefs, noExpandNode);
+		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode,
+				refToHeader, showExpand, startRefs, noExpandNode);
 		currentGraph = graph;
 
 		NChartCharacters characters = NChartUtil.createNChartCharacters(jsoProvider, graph.getNodes());

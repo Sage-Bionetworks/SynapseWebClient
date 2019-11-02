@@ -4,9 +4,8 @@ public class WidgetSelectionState {
 	private boolean isWidgetSelected = false;
 	private String innerWidgetText = null;
 	private int widgetStartIndex = -1, widgetEndIndex = -1;
-	
-	public WidgetSelectionState() {
-	}
+
+	public WidgetSelectionState() {}
 
 	public boolean isWidgetSelected() {
 		return isWidgetSelected;
@@ -39,6 +38,6 @@ public class WidgetSelectionState {
 	public void setWidgetEndIndex(int widgetEndIndex) {
 		this.widgetEndIndex = widgetEndIndex;
 	}
-	
-	
+
+
 }

@@ -11,7 +11,7 @@ public class ProvTreeNodeExtentProvider implements NodeExtentProvider<ProvTreeNo
 	private static final Dimension ACTIVITY_MANUAL_DIMENSION = new Dimension(110, 24);
 	private static final Dimension ACTIVITY_UNDEFINED_DIMENSION = new Dimension(110, 42);
 	private static final Dimension EXPAND_DIMENSION = new Dimension(24, 10);
-	
+
 	@Override
 	public double getHeight(ProvTreeNode node) {
 		return getProvNodeDimenion(node).getHeight();
@@ -21,7 +21,7 @@ public class ProvTreeNodeExtentProvider implements NodeExtentProvider<ProvTreeNo
 	public double getWidth(ProvTreeNode node) {
 		return getProvNodeDimenion(node).getWidth();
 	}
-	
+
 	private static Dimension getProvNodeDimenion(ProvTreeNode node) {
 		return ENTITY_DIMENSION;
 	}

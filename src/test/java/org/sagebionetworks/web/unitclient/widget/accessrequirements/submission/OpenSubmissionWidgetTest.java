@@ -1,15 +1,18 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements.submission;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmission;
@@ -21,7 +24,6 @@ import org.sagebionetworks.web.client.widget.accessrequirements.submission.OpenS
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class OpenSubmissionWidgetTest {
@@ -41,8 +43,9 @@ public class OpenSubmissionWidgetTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new OpenSubmissionWidget(mockView, mockAccessRequirementWidget, mockClient, mockSynapseAlert, mockLazyLoadHelper);
-		
+		widget = new OpenSubmissionWidget(mockView, mockAccessRequirementWidget, mockClient,
+				mockSynapseAlert, mockLazyLoadHelper);
+
 	}
 
 	@Test
@@ -62,7 +65,8 @@ public class OpenSubmissionWidgetTest {
 	@Test
 	public void testLoadAccessRequirementFailure() {
 		Exception ex = new Exception();
-		AsyncMockStubber.callFailureWith(ex).when(mockClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockClient).getAccessRequirement(anyLong(),
+				any(AsyncCallback.class));
 		widget.loadAccessRequirement();
 		verify(mockClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
 		InOrder inOrder = inOrder(mockSynapseAlert);
@@ -73,17 +77,20 @@ public class OpenSubmissionWidgetTest {
 	@Test
 	public void testLoadAccessRequirementSuccessWithACTAccessRequirement() {
 		ManagedACTAccessRequirement actAccessRequirement = new ManagedACTAccessRequirement();
-		AsyncMockStubber.callSuccessWith(actAccessRequirement).when(mockClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(actAccessRequirement).when(mockClient)
+				.getAccessRequirement(anyLong(), any(AsyncCallback.class));
 		widget.loadAccessRequirement();
 		verify(mockClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
 		verify(mockSynapseAlert).clear();
-		verify(mockAccessRequirementWidget).setRequirement(eq(actAccessRequirement), any(Callback.class));
+		verify(mockAccessRequirementWidget).setRequirement(eq(actAccessRequirement),
+				any(Callback.class));
 	}
 
 	@Test
 	public void testLoadAccessRequirementSuccessWithTermsOfUseAccessRequirement() {
 		TermsOfUseAccessRequirement touAccessRequirement = new TermsOfUseAccessRequirement();
-		AsyncMockStubber.callSuccessWith(touAccessRequirement).when(mockClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(touAccessRequirement).when(mockClient)
+				.getAccessRequirement(anyLong(), any(AsyncCallback.class));
 		widget.loadAccessRequirement();
 		verify(mockClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
 		InOrder inOrder = inOrder(mockSynapseAlert);

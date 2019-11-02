@@ -8,52 +8,55 @@ import com.google.gwt.user.client.ui.IsWidget;
  */
 public interface RejectReasonView extends IsWidget {
 
-    /**
-     * @return String representation of rejected reason
-     */
-    String getValue();
+	/**
+	 * @return String representation of rejected reason
+	 */
+	String getValue();
 
-    String getSelectedCheckboxText();
-    
-    /**
-     * Show an error message..
-     * @param error
-     */
-    void showError(String error);
+	String getSelectedCheckboxText();
 
-    void setValue (String value);
+	/**
+	 * Show an error message..
+	 * 
+	 * @param error
+	 */
+	void showError(String error);
 
-    /**
-     * Show the view
-     */
-    void show();
+	void setValue(String value);
 
-    /**
-     * Hide the dialog.
-     */
-    void hide();
+	/**
+	 * Show the view
+	 */
+	void show();
 
-    /**
-     * Clear name and errors.
-     */
-    void clear();
+	/**
+	 * Hide the dialog.
+	 */
+	void hide();
 
-    /**
-       * clear error state
-     */
-    void clearError();
+	/**
+	 * Clear name and errors.
+	 */
+	void clear();
 
-    /**
-     * Set Presenter
-     * @param presenter
-     */
-    void setPresenter (Presenter presenter);
+	/**
+	 * clear error state
+	 */
+	void clearError();
 
-    /**
-     * Presenter interface
-     */
-    public interface Presenter {
-        void updateResponse();
-        void onSave();
-    }
+	/**
+	 * Set Presenter
+	 * 
+	 * @param presenter
+	 */
+	void setPresenter(Presenter presenter);
+
+	/**
+	 * Presenter interface
+	 */
+	public interface Presenter {
+		void updateResponse();
+
+		void onSave();
+	}
 }

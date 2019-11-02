@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.Set;
-
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
@@ -21,7 +19,6 @@ import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
-
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -30,10 +27,11 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ReplyWidget implements ReplyWidgetView.Presenter{
+public class ReplyWidget implements ReplyWidgetView.Presenter {
 
 	public static final String REPLY_URL = "Reply URL:";
-	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this reply?";
+	private static final String DELETE_CONFIRM_MESSAGE =
+			"Are you sure you want to delete this reply?";
 	private static final String DELETE_SUCCESS_TITLE = "Reply deleted";
 	private static final String DELETE_SUCCESS_MESSAGE = "A reply has been deleted.";
 	ReplyWidgetView view;
@@ -57,23 +55,14 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	private DateTimeUtils dateTimeUtils;
 	private ClientCache clientCache;
 	private PopupUtilsView popupUtils;
+
 	@Inject
-	public ReplyWidget(
-			ReplyWidgetView view,
-			UserBadge authorWidget,
-			DateTimeUtils dateTimeUtils,
-			SynapseAlert synAlert,
-			RequestBuilderWrapper requestBuilder,
+	public ReplyWidget(ReplyWidgetView view, UserBadge authorWidget, DateTimeUtils dateTimeUtils,
+			SynapseAlert synAlert, RequestBuilderWrapper requestBuilder,
 			DiscussionForumClientAsync discussionForumClientAsync,
-			AuthenticationController authController,
-			EditReplyModal editReplyModal,
-			MarkdownWidget markdownWidget,
-			GWTWrapper gwt,
-			CopyTextModal copyTextModal,
-			SynapseJavascriptClient jsClient,
-			ClientCache clientCache,
-			PopupUtilsView popupUtils
-			) {
+			AuthenticationController authController, EditReplyModal editReplyModal,
+			MarkdownWidget markdownWidget, GWTWrapper gwt, CopyTextModal copyTextModal,
+			SynapseJavascriptClient jsClient, ClientCache clientCache, PopupUtilsView popupUtils) {
 		this.view = view;
 		this.authorWidget = authorWidget;
 		this.dateTimeUtils = dateTimeUtils;
@@ -95,11 +84,12 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		view.setEditReplyModal(editReplyModal.asWidget());
 		view.setMarkdownWidget(markdownWidget.asWidget());
 		view.setCopyTextModal(copyTextModal.asWidget());
-		
+
 		copyTextModal.setTitle(REPLY_URL);
 	}
 
-	public void configure(DiscussionReplyBundle bundle, Boolean isCurrentUserModerator, Set<String> moderatorIds, Callback deleteReplyCallback, boolean isThreadDeleted) {
+	public void configure(DiscussionReplyBundle bundle, Boolean isCurrentUserModerator,
+			Set<String> moderatorIds, Callback deleteReplyCallback, boolean isThreadDeleted) {
 		view.clear();
 		markdownWidget.clear();
 		this.replyId = bundle.getId();
@@ -111,7 +101,8 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		this.deleteReplyCallback = deleteReplyCallback;
 		this.isThreadDeleted = isThreadDeleted;
 		authorWidget.configure(bundle.getCreatedBy());
-		view.setCreatedOn(SingleDiscussionThreadWidget.CREATED_ON_PREFIX+dateTimeUtils.getRelativeTime(bundle.getCreatedOn()));
+		view.setCreatedOn(SingleDiscussionThreadWidget.CREATED_ON_PREFIX
+				+ dateTimeUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setMessageVisible(true);
 		view.setEditedVisible(bundle.getIsEdited());
 		boolean isAuthorModerator = moderatorIds.contains(bundle.getCreatedBy());
@@ -119,7 +110,8 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		view.setCommandsContainerVisible(!isThreadDeleted);
 		if (!isThreadDeleted) {
 			view.setDeleteIconVisibility(isCurrentUserModerator);
-			view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
+			view.setEditIconVisible(
+					bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
 		}
 
 		configureMessage();
@@ -133,14 +125,14 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 			// cache miss
 			synAlert.clear();
 			view.setLoadingMessageVisible(true);
-			jsClient.getReplyUrl(messageKey, new AsyncCallback<String>(){
-	
+			jsClient.getReplyUrl(messageKey, new AsyncCallback<String>() {
+
 				@Override
 				public void onFailure(Throwable caught) {
 					view.setLoadingMessageVisible(false);
 					synAlert.handleException(caught);
 				}
-	
+
 				@Override
 				public void onSuccess(String result) {
 					getMessage(result);
@@ -156,14 +148,14 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 			requestBuilder.sendRequest(null, new RequestCallback() {
 
 				@Override
-				public void onResponseReceived(Request request,
-						Response response) {
+				public void onResponseReceived(Request request, Response response) {
 					int statusCode = response.getStatusCode();
 					if (statusCode == Response.SC_OK) {
 						view.setLoadingMessageVisible(false);
 						setMessage(response.getText());
 					} else {
-						onError(null, new IllegalArgumentException("Unable to retrieve message for reply " + replyId + ". Reason: " + response.getStatusText()));
+						onError(null, new IllegalArgumentException("Unable to retrieve message for reply "
+								+ replyId + ". Reason: " + response.getStatusText()));
 					}
 				}
 
@@ -178,7 +170,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 			synAlert.handleException(e);
 		}
 	}
-	
+
 	public void setMessage(String message) {
 		this.message = message;
 		markdownWidget.configure(message);
@@ -186,7 +178,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	}
 
 	private void configureEditReplyModal(String message) {
-		editReplyModal.configure(replyId, message, new Callback(){
+		editReplyModal.configure(replyId, message, new Callback() {
 
 			@Override
 			public void invoke() {
@@ -209,7 +201,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 	public void deleteReply() {
 		synAlert.clear();
-		discussionForumClientAsync.markReplyAsDeleted(replyId, new AsyncCallback<Void>(){
+		discussionForumClientAsync.markReplyAsDeleted(replyId, new AsyncCallback<Void>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -228,7 +220,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 	public void reconfigure() {
 		synAlert.clear();
-		jsClient.getReply(replyId, new AsyncCallback<DiscussionReplyBundle>(){
+		jsClient.getReply(replyId, new AsyncCallback<DiscussionReplyBundle>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -237,7 +229,8 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 			@Override
 			public void onSuccess(DiscussionReplyBundle result) {
-				configure(result, isCurrentUserModerator, moderatorIds, deleteReplyCallback, isThreadDeleted);
+				configure(result, isCurrentUserModerator, moderatorIds, deleteReplyCallback,
+						isThreadDeleted);
 			}
 		});
 	}
@@ -247,10 +240,11 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		configureEditReplyModal(message);
 		editReplyModal.show();
 	}
-	
+
 	@Override
 	public void onClickReplyLink() {
-		String url = gwt.getHostPageBaseURL() + TopicUtils.buildReplyLink(projectId, threadId, replyId).substring(1);
+		String url = gwt.getHostPageBaseURL()
+				+ TopicUtils.buildReplyLink(projectId, threadId, replyId).substring(1);
 		copyTextModal.setText(url);
 		copyTextModal.show();
 	}

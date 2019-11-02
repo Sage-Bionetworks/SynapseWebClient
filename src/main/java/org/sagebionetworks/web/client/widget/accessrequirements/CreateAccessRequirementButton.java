@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -20,7 +19,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class CreateAccessRequirementButton implements IsWidget {
-	public static final String CREATE_NEW_ACCESS_REQUIREMENT_BUTTON_TEXT = "Create New Access Requirement";
+	public static final String CREATE_NEW_ACCESS_REQUIREMENT_BUTTON_TEXT =
+			"Create New Access Requirement";
 	public static final String EDIT_ACCESS_REQUIREMENT_BUTTON_TEXT = "Edit Access Requirement";
 	public Button button;
 	public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
@@ -28,11 +28,10 @@ public class CreateAccessRequirementButton implements IsWidget {
 	RestrictableObjectDescriptor subject;
 	AccessRequirement ar;
 	Callback refreshCallback;
-	
+
 	@Inject
-	public CreateAccessRequirementButton(Button button, 
-			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
-			final PortalGinInjector ginInjector) {
+	public CreateAccessRequirementButton(Button button,
+			IsACTMemberAsyncHandler isACTMemberAsyncHandler, final PortalGinInjector ginInjector) {
 		this.button = button;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.ginInjector = ginInjector;
@@ -43,7 +42,7 @@ public class CreateAccessRequirementButton implements IsWidget {
 			public void onClick(ClickEvent event) {
 				CreateAccessRequirementWizard wizard = ginInjector.getCreateAccessRequirementWizard();
 				if (subject != null) {
-					wizard.configure(subject);	
+					wizard.configure(subject);
 				} else if (ar != null) {
 					wizard.configure(ar);
 				}
@@ -52,7 +51,7 @@ public class CreateAccessRequirementButton implements IsWidget {
 					public void onFinished() {
 						refreshCallback.invoke();
 					}
-					
+
 					@Override
 					public void onCanceled() {
 						refreshCallback.invoke();
@@ -60,8 +59,8 @@ public class CreateAccessRequirementButton implements IsWidget {
 				});
 			}
 		});
-	}	
-	
+	}
+
 	public void configure(AccessRequirement ar, Callback refreshCallback) {
 		button.setText(EDIT_ACCESS_REQUIREMENT_BUTTON_TEXT);
 		button.setSize(ButtonSize.DEFAULT);
@@ -72,7 +71,7 @@ public class CreateAccessRequirementButton implements IsWidget {
 		this.ar = ar;
 		showIfACTMember();
 	}
-	
+
 	public void configure(RestrictableObjectDescriptor subject, Callback refreshCallback) {
 		button.setText(CREATE_NEW_ACCESS_REQUIREMENT_BUTTON_TEXT);
 		button.setSize(ButtonSize.LARGE);
@@ -83,7 +82,7 @@ public class CreateAccessRequirementButton implements IsWidget {
 		this.ar = null;
 		showIfACTMember();
 	}
-	
+
 	private void showIfACTMember() {
 		isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
 			@Override
@@ -92,9 +91,9 @@ public class CreateAccessRequirementButton implements IsWidget {
 			}
 		});
 	}
-	
+
 	public Widget asWidget() {
 		return button.asWidget();
 	}
-	
+
 }

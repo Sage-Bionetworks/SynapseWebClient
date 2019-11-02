@@ -9,12 +9,15 @@ public class ValidationResult {
 	public boolean isValid() {
 		return valid;
 	}
+
 	public void setValidity(boolean result) {
 		this.valid = result;
 	}
+
 	public String getErrorMessage() {
 		return errorMessage;
 	}
+
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;
 	}

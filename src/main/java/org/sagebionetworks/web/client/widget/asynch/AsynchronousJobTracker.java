@@ -12,8 +12,8 @@ import org.sagebionetworks.web.shared.asynch.AsynchType;
 public interface AsynchronousJobTracker {
 
 	/**
-	 * Start a new Asynchronous Job from the passed AsynchronousRequestBody and
-	 * track the progress of the job until completion.
+	 * Start a new Asynchronous Job from the passed AsynchronousRequestBody and track the progress of
+	 * the job until completion.
 	 * 
 	 * @param requestBody
 	 * @param waitTimeMS

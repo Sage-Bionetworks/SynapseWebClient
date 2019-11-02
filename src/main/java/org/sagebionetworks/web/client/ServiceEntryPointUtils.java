@@ -10,7 +10,8 @@ public class ServiceEntryPointUtils {
 			ServiceDefTarget serviceDefTarget = (ServiceDefTarget) serviceDefTargetObject;
 			String oldUrl = serviceDefTarget.getServiceEntryPoint();
 			if (oldUrl.startsWith(GWT.getModuleBaseURL())) {
-				String serviceEntryPoint = GWTWrapperImpl.getRealGWTModuleBaseURL() + oldUrl.substring(GWT.getModuleBaseURL().length());
+				String serviceEntryPoint = GWTWrapperImpl.getRealGWTModuleBaseURL()
+						+ oldUrl.substring(GWT.getModuleBaseURL().length());
 				serviceDefTarget.setServiceEntryPoint(serviceEntryPoint);
 			}
 		}

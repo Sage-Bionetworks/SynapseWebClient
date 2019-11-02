@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
 import java.util.List;
-
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.CsvTableDescriptor;
@@ -11,12 +10,11 @@ import org.sagebionetworks.repo.model.table.UploadToTableRequest;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
-
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class UploadCSVPreviewPageImpl implements UploadCSVPreviewPage,
-		UploadCSVPreviewPageView.Presenter {
+public class UploadCSVPreviewPageImpl
+		implements UploadCSVPreviewPage, UploadCSVPreviewPageView.Presenter {
 
 	public static final String CREATING_TABLE_COLUMNS = "Creating table columns...";
 	public static final String CREATING_THE_TABLE = "Creating the table...";
@@ -43,9 +41,9 @@ public class UploadCSVPreviewPageImpl implements UploadCSVPreviewPage,
 
 	@Inject
 	public UploadCSVPreviewPageImpl(UploadCSVPreviewPageView view,
-			UploadPreviewWidget uploadPreviewWidget,
-			CSVOptionsWidget csvOptionsWidget,
-			JobTrackingWidget jobTrackingWidget, UploadCSVFinishPage createNextPage, UploadCSVAppendPage appendNextPage) {
+			UploadPreviewWidget uploadPreviewWidget, CSVOptionsWidget csvOptionsWidget,
+			JobTrackingWidget jobTrackingWidget, UploadCSVFinishPage createNextPage,
+			UploadCSVAppendPage appendNextPage) {
 		this.view = view;
 		this.uploadPreviewWidget = uploadPreviewWidget;
 		this.jobTrackingWidget = jobTrackingWidget;
@@ -64,8 +62,8 @@ public class UploadCSVPreviewPageImpl implements UploadCSVPreviewPage,
 	}
 
 	@Override
-	public void configure(ContentTypeDelimiter type, String fileName,
-			String parentId, String fileHandleId, String tableId) {
+	public void configure(ContentTypeDelimiter type, String fileName, String parentId,
+			String fileHandleId, String tableId) {
 		this.type = type;
 		this.fileName = fileName;
 		this.parentId = parentId;
@@ -78,14 +76,14 @@ public class UploadCSVPreviewPageImpl implements UploadCSVPreviewPage,
 		// Get the current options
 		UploadToTablePreviewRequest currentOptions = csvOptionsWidget.getCurrentOptions();
 		UploadToTableRequest uploadRequest = UploadRequestUtils.createFromPreview(currentOptions);
-		if(this.tableId != null){
+		if (this.tableId != null) {
 			// This is an append.
 			uploadRequest.setTableId(this.tableId);
 			this.appendNextPage.configure(uploadRequest, suggestedSchema);
 			this.presenter.setNextActivePage(this.appendNextPage);
-			// For now just execute the next page.  This may change in the future.
+			// For now just execute the next page. This may change in the future.
 			this.appendNextPage.onPrimary();
-		}else{
+		} else {
 			// This is a create
 			this.createNextPage.configure(fileName, parentId, uploadRequest, suggestedSchema);
 			this.presenter.setNextActivePage(this.createNextPage);
@@ -101,12 +99,13 @@ public class UploadCSVPreviewPageImpl implements UploadCSVPreviewPage,
 		});
 		generatePreview();
 	}
-	
+
 	/**
 	 * Build a default UploadToTablePreviewRequest using what we know about the file.
+	 * 
 	 * @return
 	 */
-	private UploadToTablePreviewRequest createDefaultPreviewRequest(){
+	private UploadToTablePreviewRequest createDefaultPreviewRequest() {
 		UploadToTablePreviewRequest previewRequest = new UploadToTablePreviewRequest();
 		CsvTableDescriptor descriptor = new CsvTableDescriptor();
 		descriptor.setSeparator(type.getDelimiter());
@@ -125,12 +124,10 @@ public class UploadCSVPreviewPageImpl implements UploadCSVPreviewPage,
 		this.presenter.setPrimaryButtonText(NEXT);
 		this.presenter.setInstructionMessage(PREPARING_A_PREVIEW);
 		this.presenter.setLoading(true);
-		final UploadToTablePreviewRequest previewRequest = csvOptionsWidget
-				.getCurrentOptions();
+		final UploadToTablePreviewRequest previewRequest = csvOptionsWidget.getCurrentOptions();
 		// Start the job
-		jobTrackingWidget.startAndTrackJob(ANALYZING_FILE, false,
-				AsynchType.TableCSVUploadPreview, previewRequest,
-				new AsynchronousProgressHandler() {
+		jobTrackingWidget.startAndTrackJob(ANALYZING_FILE, false, AsynchType.TableCSVUploadPreview,
+				previewRequest, new AsynchronousProgressHandler() {
 
 					@Override
 					public void onFailure(Throwable failure) {
@@ -151,6 +148,7 @@ public class UploadCSVPreviewPageImpl implements UploadCSVPreviewPage,
 
 	/**
 	 * Called after a preview is created.
+	 * 
 	 * @param results
 	 */
 	private void previewCreated(UploadToTablePreviewResult results) {

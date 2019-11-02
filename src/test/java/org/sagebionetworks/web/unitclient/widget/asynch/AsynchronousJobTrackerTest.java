@@ -6,7 +6,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -27,8 +26,8 @@ import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandle
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
+
 /**
  * Complex test for the AsynchronousJobTracker
  * 
@@ -54,16 +53,16 @@ public class AsynchronousJobTrackerTest {
 	AsynchType type;
 	String jobId;
 	String tableId;
-	
+
 	@Before
-	public void before() throws JSONObjectAdapterException{
+	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
 		mockTimerProvider = new TimerProviderStub();
 		adapterFactory = new AdapterFactoryImpl();
 		waitTimeMS = 1000;
 		mockHandler = Mockito.mock(UpdatingAsynchProgressHandler.class);
 		tracker = new AsynchronousJobTrackerImpl(mockTimerProvider, mockJsClient);
-		
+
 		// Setup three phases for a job.
 		jobId = "99999";
 		tableId = "syn123";
@@ -92,20 +91,23 @@ public class AsynchronousJobTrackerTest {
 		requestBody.setSql("select * from " + tableId);
 		requestBody.setEntityId(tableId);
 		type = AsynchType.TableCSVDownload;
-		
+
 		responseBody = new DownloadFromTableResult();
 		responseBody.setEtag("etag123");
 		responseBody.setTableId(tableId);
-		
+
 		when(mockHandler.isAttached()).thenReturn(true);
 	}
-	
+
 	@Test
-	public void testMultipleStatesThenSuccess() throws JSONObjectAdapterException{
+	public void testMultipleStatesThenSuccess() throws JSONObjectAdapterException {
 		// Simulate start
-		AsyncMockStubber.callSuccessWith(jobId).when(mockJsClient).startAsynchJob(any(AsynchType.class), any(AsynchronousRequestBody.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(jobId).when(mockJsClient).startAsynchJob(any(AsynchType.class),
+				any(AsynchronousRequestBody.class), any(AsyncCallback.class));
 		// simulate three calls
-		AsyncMockStubber.callMixedWith(startNotReady, middleNotReady, doneNotReady, responseBody).when(mockJsClient).getAsynchJobResults(any(AsynchType.class), anyString(), any(AsynchronousRequestBody.class), any(AsyncCallback.class));
+		AsyncMockStubber.callMixedWith(startNotReady, middleNotReady, doneNotReady, responseBody)
+				.when(mockJsClient).getAsynchJobResults(any(AsynchType.class), anyString(),
+						any(AsynchronousRequestBody.class), any(AsyncCallback.class));
 		tracker.startAndTrack(type, requestBody, waitTimeMS, mockHandler);
 		// Update should occur for all three phases
 		verify(mockHandler).onUpdate(start);
@@ -116,13 +118,16 @@ public class AsynchronousJobTrackerTest {
 		verify(mockHandler, never()).onCancel();
 		verify(mockHandler, never()).onFailure(any(Throwable.class));
 	}
-	
+
 	@Test
-	public void testWithFailure() throws JSONObjectAdapterException{
+	public void testWithFailure() throws JSONObjectAdapterException {
 		// Simulate start
-		AsyncMockStubber.callSuccessWith(jobId).when(mockJsClient).startAsynchJob(any(AsynchType.class), any(AsynchronousRequestBody.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(jobId).when(mockJsClient).startAsynchJob(any(AsynchType.class),
+				any(AsynchronousRequestBody.class), any(AsyncCallback.class));
 		Throwable error = new Throwable("Something went wrong");
-		AsyncMockStubber.callFailureWith(error).when(mockJsClient).getAsynchJobResults(any(AsynchType.class), anyString(), any(AsynchronousRequestBody.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(error).when(mockJsClient).getAsynchJobResults(
+				any(AsynchType.class), anyString(), any(AsynchronousRequestBody.class),
+				any(AsyncCallback.class));
 		tracker.startAndTrack(type, requestBody, waitTimeMS, mockHandler);
 		// It should also be updated when done
 		verify(mockHandler, never()).onComplete(any(AsynchronousResponseBody.class));
@@ -130,14 +135,17 @@ public class AsynchronousJobTrackerTest {
 		// The error must be passed to the handler
 		verify(mockHandler).onFailure(error);
 	}
-	
+
 	@Test
-	public void testMultipleStatesThenFailure() throws JSONObjectAdapterException{
+	public void testMultipleStatesThenFailure() throws JSONObjectAdapterException {
 		// Simulate start
-		AsyncMockStubber.callSuccessWith(jobId).when(mockJsClient).startAsynchJob(any(AsynchType.class), any(AsynchronousRequestBody.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(jobId).when(mockJsClient).startAsynchJob(any(AsynchType.class),
+				any(AsynchronousRequestBody.class), any(AsyncCallback.class));
 		// simulate three calls
 		Throwable exception = new Throwable("Something went wrong");
-		AsyncMockStubber.callMixedWith(startNotReady, middleNotReady, doneNotReady, exception).when(mockJsClient).getAsynchJobResults(any(AsynchType.class), anyString(), any(AsynchronousRequestBody.class), any(AsyncCallback.class));
+		AsyncMockStubber.callMixedWith(startNotReady, middleNotReady, doneNotReady, exception)
+				.when(mockJsClient).getAsynchJobResults(any(AsynchType.class), anyString(),
+						any(AsynchronousRequestBody.class), any(AsyncCallback.class));
 		tracker.startAndTrack(type, requestBody, waitTimeMS, mockHandler);
 		// Update should occur for all three phases
 		verify(mockHandler).onUpdate(start);
@@ -148,34 +156,41 @@ public class AsynchronousJobTrackerTest {
 		verify(mockHandler, never()).onCancel();
 		verify(mockHandler, never()).onComplete(any(AsynchronousResponseBody.class));
 	}
-	
+
 	@Test
-	public void testCancel() throws JSONObjectAdapterException{		
+	public void testCancel() throws JSONObjectAdapterException {
 		// Simulate start
-		AsyncMockStubber.callSuccessWith(jobId).when(mockJsClient).startAsynchJob(any(AsynchType.class), any(AsynchronousRequestBody.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(jobId).when(mockJsClient).startAsynchJob(any(AsynchType.class),
+				any(AsynchronousRequestBody.class), any(AsyncCallback.class));
 		// These will still be called ever after the cancel.
-		AsyncMockStubber.callMixedWith(startNotReady, middleNotReady, doneNotReady, responseBody).when(mockJsClient).getAsynchJobResults(any(AsynchType.class), anyString(), any(AsynchronousRequestBody.class), any(AsyncCallback.class));
+		AsyncMockStubber.callMixedWith(startNotReady, middleNotReady, doneNotReady, responseBody)
+				.when(mockJsClient).getAsynchJobResults(any(AsynchType.class), anyString(),
+						any(AsynchronousRequestBody.class), any(AsyncCallback.class));
 		// Since this test is not using a multiple threads cancel must be called before we start.
 		tracker.startAndTrack(type, requestBody, waitTimeMS, mockHandler);
 		tracker.cancel();
 		assertTrue(this.mockTimerProvider.isCancled());
 		// Since cancel happens after complete, complete should still be called.
 		verify(mockHandler).onComplete(any(AsynchronousResponseBody.class));
-		// The handler should not get the onCancle() because the onComplete() would have already been sent.
+		// The handler should not get the onCancle() because the onComplete() would have already been
+		// sent.
 		verify(mockHandler, never()).onCancel();
 	}
-	
+
 	/**
 	 * This is a test for SWC-1780.
 	 */
 	@Test
-	public void testDetached(){
+	public void testDetached() {
 		// Setup a case were the handler starts attached but then becomes detached.
 		when(mockHandler.isAttached()).thenReturn(true, true, false);
 		// Simulate start
-		AsyncMockStubber.callSuccessWith(jobId).when(mockJsClient).startAsynchJob(any(AsynchType.class), any(AsynchronousRequestBody.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(jobId).when(mockJsClient).startAsynchJob(any(AsynchType.class),
+				any(AsynchronousRequestBody.class), any(AsyncCallback.class));
 		// simulate three calls
-		AsyncMockStubber.callMixedWith(startNotReady, middleNotReady, doneNotReady, responseBody).when(mockJsClient).getAsynchJobResults(any(AsynchType.class), anyString(), any(AsynchronousRequestBody.class), any(AsyncCallback.class));
+		AsyncMockStubber.callMixedWith(startNotReady, middleNotReady, doneNotReady, responseBody)
+				.when(mockJsClient).getAsynchJobResults(any(AsynchType.class), anyString(),
+						any(AsynchronousRequestBody.class), any(AsyncCallback.class));
 		tracker.startAndTrack(type, requestBody, waitTimeMS, mockHandler);
 		// Update should occur for all three phases
 		verify(mockHandler).onUpdate(start);

@@ -6,11 +6,9 @@ import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace
 import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.MIN_DATE_PARAM;
 import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.STATE_FILTER_PARAM;
 import static org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateManagedACTAccessRequirementStep2.DAY_IN_MS;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
@@ -33,7 +31,6 @@ import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccess
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -44,7 +41,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implements Presenter<ACTDataAccessSubmissionsPlace>, ACTDataAccessSubmissionsView.Presenter {
+public class ACTDataAccessSubmissionsPresenter extends AbstractActivity
+		implements Presenter<ACTDataAccessSubmissionsPlace>, ACTDataAccessSubmissionsView.Presenter {
 	private SubmissionState stateFilter;
 	private ACTDataAccessSubmissionsPlace place;
 	private ACTDataAccessSubmissionsView view;
@@ -67,20 +65,14 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	private SubjectsWidget subjectsWidget;
 	DateTimeFormat dateFormat;
 	Callback refreshCallback;
-	
+
 	@Inject
-	public ACTDataAccessSubmissionsPresenter(
-			final ACTDataAccessSubmissionsView view,
-			SynapseAlert synAlert,
-			PortalGinInjector ginInjector,
+	public ACTDataAccessSubmissionsPresenter(final ACTDataAccessSubmissionsView view,
+			SynapseAlert synAlert, PortalGinInjector ginInjector,
 			LoadMoreWidgetContainer loadMoreContainer,
 			ManagedACTAccessRequirementWidget actAccessRequirementWidget,
-			final Button showHideAccessRequirementButton,
-			FileHandleWidget ducTemplateFileHandleWidget,
-			DataAccessClientAsync dataAccessClient,
-			SubjectsWidget subjectsWidget,
-			GWTWrapper gwt
-			) {
+			final Button showHideAccessRequirementButton, FileHandleWidget ducTemplateFileHandleWidget,
+			DataAccessClientAsync dataAccessClient, SubjectsWidget subjectsWidget, GWTWrapper gwt) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
@@ -94,7 +86,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		dateFormat = gwt.getDateTimeFormat(PredefinedFormat.DATE_FULL);
 		states = new ArrayList<String>();
 		for (SubmissionState state : SubmissionState.values()) {
-			states.add(state.toString());	
+			states.add(state.toString());
 		}
 		view.setStates(states);
 		isAccessRequirementVisible = false;
@@ -107,7 +99,8 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 				isAccessRequirementVisible = !isAccessRequirementVisible;
 				String buttonText = isAccessRequirementVisible ? HIDE_AR_TEXT : SHOW_AR_TEXT;
 				showHideAccessRequirementButton.setText(buttonText);
-				showHideAccessRequirementButton.setIcon(isAccessRequirementVisible ? IconType.TOGGLE_DOWN : IconType.TOGGLE_RIGHT);
+				showHideAccessRequirementButton
+						.setIcon(isAccessRequirementVisible ? IconType.TOGGLE_DOWN : IconType.TOGGLE_RIGHT);
 				view.setAccessRequirementUIVisible(isAccessRequirementVisible);
 			}
 		});
@@ -117,7 +110,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		view.setShowHideButton(showHideAccessRequirementButton);
 		view.setSubjectsWidget(subjectsWidget);
 		view.setPresenter(this);
-		
+
 		loadMoreContainer.configure(new Callback() {
 			@Override
 			public void invoke() {
@@ -127,7 +120,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		refreshCallback = new Callback() {
 			@Override
 			public void invoke() {
-				loadData();	
+				loadData();
 			}
 		};
 	}
@@ -137,7 +130,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		// Install the view
 		panel.setWidget(view);
 	}
-	
+
 	@Override
 	public void setPlace(ACTDataAccessSubmissionsPlace place) {
 		this.place = place;
@@ -158,47 +151,53 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		view.setProjectedExpirationDateVisible(false);
 		if (actAccessRequirementIdString != null) {
 			actAccessRequirementId = Long.parseLong(actAccessRequirementIdString);
-			dataAccessClient.getAccessRequirement(actAccessRequirementId, new AsyncCallback<AccessRequirement>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					synAlert.showError(INVALID_AR_ID);
-				}
-				@Override
-				public void onSuccess(AccessRequirement requirement) {
-					if (requirement instanceof ManagedACTAccessRequirement) {
-						actAccessRequirement = (ManagedACTAccessRequirement) requirement;
-						refreshProjectedExpiration();
-						if (actAccessRequirement.getDucTemplateFileHandleId() != null) {
-							FileHandleAssociation fha = new FileHandleAssociation();
-							fha.setAssociateObjectType(FileHandleAssociateType.AccessRequirementAttachment);
-							fha.setAssociateObjectId(actAccessRequirement.getId().toString());
-							fha.setFileHandleId(actAccessRequirement.getDucTemplateFileHandleId());
-							ducTemplateFileHandleWidget.configure(fha);	
+			dataAccessClient.getAccessRequirement(actAccessRequirementId,
+					new AsyncCallback<AccessRequirement>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							synAlert.showError(INVALID_AR_ID);
 						}
-						view.setAreOtherAttachmentsRequired(actAccessRequirement.getAreOtherAttachmentsRequired());
-						if (actAccessRequirement.getExpirationPeriod() != null) {
-							view.setExpirationPeriod(actAccessRequirement.getExpirationPeriod() / DAY_IN_MS);	
+
+						@Override
+						public void onSuccess(AccessRequirement requirement) {
+							if (requirement instanceof ManagedACTAccessRequirement) {
+								actAccessRequirement = (ManagedACTAccessRequirement) requirement;
+								refreshProjectedExpiration();
+								if (actAccessRequirement.getDucTemplateFileHandleId() != null) {
+									FileHandleAssociation fha = new FileHandleAssociation();
+									fha.setAssociateObjectType(FileHandleAssociateType.AccessRequirementAttachment);
+									fha.setAssociateObjectId(actAccessRequirement.getId().toString());
+									fha.setFileHandleId(actAccessRequirement.getDucTemplateFileHandleId());
+									ducTemplateFileHandleWidget.configure(fha);
+								}
+								view.setAreOtherAttachmentsRequired(
+										actAccessRequirement.getAreOtherAttachmentsRequired());
+								if (actAccessRequirement.getExpirationPeriod() != null) {
+									view.setExpirationPeriod(actAccessRequirement.getExpirationPeriod() / DAY_IN_MS);
+								}
+
+								view.setIsCertifiedUserRequired(actAccessRequirement.getIsCertifiedUserRequired());
+								view.setIsDUCRequired(actAccessRequirement.getIsDUCRequired());
+								view.setIsIDUPublic(actAccessRequirement.getIsIDUPublic());
+								view.setIsIRBApprovalRequired(actAccessRequirement.getIsIRBApprovalRequired());
+								view.setIsValidatedProfileRequired(
+										actAccessRequirement.getIsValidatedProfileRequired());
+
+								actAccessRequirementWidget.setRequirement(actAccessRequirement, refreshCallback);
+								subjectsWidget.configure(actAccessRequirement.getSubjectIds());
+
+								loadData();
+							} else {
+								synAlert.showError(
+										INVALID_AR_ID + ": wrong type - " + requirement.getClass().getName());
+							}
 						}
-						
-						view.setIsCertifiedUserRequired(actAccessRequirement.getIsCertifiedUserRequired());
-						view.setIsDUCRequired(actAccessRequirement.getIsDUCRequired());
-						view.setIsIDUPublic(actAccessRequirement.getIsIDUPublic());
-						view.setIsIRBApprovalRequired(actAccessRequirement.getIsIRBApprovalRequired());
-						view.setIsValidatedProfileRequired(actAccessRequirement.getIsValidatedProfileRequired());
-						
-						actAccessRequirementWidget.setRequirement(actAccessRequirement, refreshCallback);
-						subjectsWidget.configure(actAccessRequirement.getSubjectIds());
-						
-						loadData();
-					} else {
-						synAlert.showError(INVALID_AR_ID + ": wrong type - " + requirement.getClass().getName());
-					}
-				}
-			});
+					});
 		} else {
 			synAlert.showError(INVALID_AR_ID);
 		}
 	}
+
 	public void refreshProjectedExpiration() {
 		Long expirationPeriod = actAccessRequirement.getExpirationPeriod();
 		if (expirationPeriod != null && expirationPeriod > 0) {
@@ -206,9 +205,9 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 			view.setProjectedExpirationDate(dateFormat.format(expirationDate));
 			view.setProjectedExpirationDateVisible(true);
 		}
-		
+
 	}
-	
+
 	public void loadData() {
 		loadMoreContainer.clear();
 		nextPageToken = null;
@@ -219,31 +218,33 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		loadMoreContainer.setIsProcessing(true);
 		synAlert.clear();
 		// ask for data access submissions once call is available, and create a widget to render.
-		dataAccessClient.getDataAccessSubmissions(actAccessRequirementId, nextPageToken, stateFilter, SubmissionOrder.CREATED_ON, isSortedAsc, new AsyncCallback<SubmissionPage>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-				loadMoreContainer.setIsMore(false);
-				loadMoreContainer.setIsProcessing(false);
-			}
-			
-			public void onSuccess(SubmissionPage submissionPage) {
-				nextPageToken = submissionPage.getNextPageToken();
-				for (Submission submission : submissionPage.getResults()) {
-					// create a new row for each data access submission.
-					ACTDataAccessSubmissionWidget w = ginInjector.getACTDataAccessSubmissionWidget();
-					w.configure(submission); 
-					w.setDucColumnVisible(actAccessRequirement.getIsDUCRequired());
-					w.setIrbColumnVisible(actAccessRequirement.getIsIRBApprovalRequired());
-					w.setOtherAttachmentsColumnVisible(actAccessRequirement.getAreOtherAttachmentsRequired());
-					loadMoreContainer.add(w.asWidget());
-				}
-				loadMoreContainer.setIsMore(nextPageToken != null);
-				loadMoreContainer.setIsProcessing(false);
-			};
-		});
+		dataAccessClient.getDataAccessSubmissions(actAccessRequirementId, nextPageToken, stateFilter,
+				SubmissionOrder.CREATED_ON, isSortedAsc, new AsyncCallback<SubmissionPage>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						synAlert.handleException(caught);
+						loadMoreContainer.setIsMore(false);
+						loadMoreContainer.setIsProcessing(false);
+					}
+
+					public void onSuccess(SubmissionPage submissionPage) {
+						nextPageToken = submissionPage.getNextPageToken();
+						for (Submission submission : submissionPage.getResults()) {
+							// create a new row for each data access submission.
+							ACTDataAccessSubmissionWidget w = ginInjector.getACTDataAccessSubmissionWidget();
+							w.configure(submission);
+							w.setDucColumnVisible(actAccessRequirement.getIsDUCRequired());
+							w.setIrbColumnVisible(actAccessRequirement.getIsIRBApprovalRequired());
+							w.setOtherAttachmentsColumnVisible(
+									actAccessRequirement.getAreOtherAttachmentsRequired());
+							loadMoreContainer.add(w.asWidget());
+						}
+						loadMoreContainer.setIsMore(nextPageToken != null);
+						loadMoreContainer.setIsProcessing(false);
+					};
+				});
 	}
-	
+
 	@Override
 	public void onClearDateFilter() {
 		fromDate = null;
@@ -254,37 +255,37 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		place.removeParam(MAX_DATE_PARAM);
 		loadData();
 	}
-	
+
 	@Override
 	public void onClearStateFilter() {
 		stateFilter = null;
 		place.removeParam(STATE_FILTER_PARAM);
 		view.setSelectedStateText("");
-		loadData();	
+		loadData();
 	}
-	
+
 	@Override
 	public void onMaxDateSelected(Date date) {
 		toDate = date;
 		place.putParam(MAX_DATE_PARAM, Long.toString(date.getTime()));
 		loadData();
 	}
-	
+
 	@Override
 	public void onMinDateSelected(Date date) {
 		fromDate = date;
 		place.putParam(MIN_DATE_PARAM, Long.toString(date.getTime()));
 		loadData();
 	}
-	
+
 	public ACTDataAccessSubmissionsPlace getPlace() {
 		return place;
 	}
-	
+
 	@Override
-    public String mayStop() {
-        return null;
-    }
+	public String mayStop() {
+		return null;
+	}
 
 	@Override
 	public void onStateSelected(String selectedState) {
@@ -293,7 +294,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		view.setSelectedStateText(selectedState);
 		loadData();
 	}
-	
+
 	@Override
 	public void onCreatedOnClick() {
 		isSortedAsc = !isSortedAsc;

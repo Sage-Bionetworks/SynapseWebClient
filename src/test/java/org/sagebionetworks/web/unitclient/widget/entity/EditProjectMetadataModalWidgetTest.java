@@ -7,7 +7,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidgetImpl.NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +19,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalView;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidgetImpl;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -39,9 +37,9 @@ public class EditProjectMetadataModalWidgetTest {
 	boolean canChangeSettings;
 	String newEntityName;
 	String newAlias;
-	
+
 	@Before
-	public void before(){
+	public void before() {
 		entity = new Project();
 		startName = "Start Name";
 		canChangeSettings = true;
@@ -52,31 +50,33 @@ public class EditProjectMetadataModalWidgetTest {
 		when(mockView.getEntityName()).thenReturn(newEntityName);
 		newAlias = "modified";
 		when(mockView.getAlias()).thenReturn(newAlias);
-		AsyncMockStubber.callSuccessWith(new Project()).when(mockSynapseJavascriptClient).updateEntity(any(Entity.class), anyString(), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(new Project()).when(mockSynapseJavascriptClient)
+				.updateEntity(any(Entity.class), anyString(), anyBoolean(), any(AsyncCallback.class));
 	}
-	
+
 	@Test
-	public void testConfigure(){
+	public void testConfigure() {
 		widget.configure(entity, canChangeSettings, mockCallback);
 		verify(mockView).clear();
 		verify(mockView).show();
 		verify(mockView).configure(startName, null);
 	}
-	
+
 	@Test
-	public void testNullName(){
+	public void testNullName() {
 		widget.configure(entity, canChangeSettings, mockCallback);
 		when(mockView.getEntityName()).thenReturn(null);
 		widget.onPrimary();
 		verify(mockView).showError(NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
-		verify(mockSynapseJavascriptClient, never()).updateEntity(any(Entity.class), anyString(), anyBoolean(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, never()).updateEntity(any(Entity.class), anyString(),
+				anyBoolean(), any(AsyncCallback.class));
 		// should only be called on success
 		verify(mockCallback, never()).invoke();
 	}
-	
+
 	@Test
-	public void testNullAlias(){
-		//ok to be null or empty
+	public void testNullAlias() {
+		// ok to be null or empty
 		widget.configure(entity, canChangeSettings, mockCallback);
 		when(mockView.getAlias()).thenReturn(null);
 		widget.onPrimary();
@@ -84,10 +84,10 @@ public class EditProjectMetadataModalWidgetTest {
 		verify(mockView).hide();
 		verify(mockCallback).invoke();
 	}
-	
+
 	@Test
-	public void testEmptyAlias(){
-		//ok to be null or empty
+	public void testEmptyAlias() {
+		// ok to be null or empty
 		widget.configure(entity, canChangeSettings, mockCallback);
 		when(mockView.getAlias()).thenReturn("");
 		widget.onPrimary();
@@ -97,7 +97,7 @@ public class EditProjectMetadataModalWidgetTest {
 	}
 
 	@Test
-	public void testNoChanges(){
+	public void testNoChanges() {
 		widget.configure(entity, canChangeSettings, mockCallback);
 		when(mockView.getEntityName()).thenReturn(startName);
 		when(mockView.getAlias()).thenReturn(null);
@@ -105,13 +105,14 @@ public class EditProjectMetadataModalWidgetTest {
 		widget.onPrimary();
 		verify(mockView, never()).setLoading(true);
 		verify(mockView).hide();
-		verify(mockSynapseJavascriptClient, never()).updateEntity(any(Entity.class), anyString(), anyBoolean(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, never()).updateEntity(any(Entity.class), anyString(),
+				anyBoolean(), any(AsyncCallback.class));
 		// should only be called on success
 		verify(mockCallback, never()).invoke();
 	}
-	
+
 	@Test
-	public void testHappyCase(){
+	public void testHappyCase() {
 		widget.configure(entity, canChangeSettings, mockCallback);
 		// save button
 		widget.onPrimary();
@@ -119,12 +120,13 @@ public class EditProjectMetadataModalWidgetTest {
 		verify(mockView).hide();
 		verify(mockCallback).invoke();
 	}
-	
+
 	@Test
-	public void testUpdateFailed(){
+	public void testUpdateFailed() {
 		Exception error = new Exception("an error");
 		widget.configure(entity, canChangeSettings, mockCallback);
-		AsyncMockStubber.callFailureWith(error).when(mockSynapseJavascriptClient).updateEntity(any(Entity.class), anyString(), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(error).when(mockSynapseJavascriptClient)
+				.updateEntity(any(Entity.class), anyString(), anyBoolean(), any(AsyncCallback.class));
 		// save button
 		widget.onPrimary();
 		verify(mockView).setLoading(true);

@@ -4,9 +4,9 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
 
-public class PasswordResetSignedTokenPlace extends Place{
+public class PasswordResetSignedTokenPlace extends Place {
 	private String token;
-	
+
 	public PasswordResetSignedTokenPlace(String token) {
 		this.token = token;
 	}

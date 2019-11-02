@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
-
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -10,15 +9,13 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class StuAlertViewImpl implements
-		StuAlertView {
-	
-	public interface Binder extends
-			UiBinder<Widget, StuAlertViewImpl> {
+public class StuAlertViewImpl implements StuAlertView {
+
+	public interface Binder extends UiBinder<Widget, StuAlertViewImpl> {
 	}
 
 	Widget widget;
-	
+
 	@UiField
 	HTMLPanel httpCode403;
 	@UiField
@@ -27,10 +24,10 @@ public class StuAlertViewImpl implements
 	Div synAlertContainer;
 	Widget synAlertWidget;
 	Div container = new Div();
+
 	@Inject
-	public StuAlertViewImpl(){
-	}
-	
+	public StuAlertViewImpl() {}
+
 	@Override
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message);
@@ -40,7 +37,7 @@ public class StuAlertViewImpl implements
 	public Widget asWidget() {
 		return container;
 	}
-	
+
 	@Override
 	public void clearState() {
 		container.setVisible(false);
@@ -49,7 +46,7 @@ public class StuAlertViewImpl implements
 			httpCode404.setVisible(false);
 		}
 	}
-	
+
 	private void lazyConstruct() {
 		if (widget == null) {
 			Binder b = GWT.create(Binder.class);
@@ -58,29 +55,30 @@ public class StuAlertViewImpl implements
 			container.add(widget);
 		}
 	}
-	
+
 	@Override
 	public void show403() {
 		lazyConstruct();
 		container.setVisible(true);
 		httpCode403.setVisible(true);
 	}
-	
+
 	@Override
 	public void show404() {
 		lazyConstruct();
 		container.setVisible(true);
 		httpCode404.setVisible(true);
 	}
+
 	@Override
 	public void setSynAlert(Widget w) {
 		synAlertWidget = w;
 	}
-	
+
 	@Override
 	public void setVisible(boolean visible) {
 		if (visible) {
-			lazyConstruct();	
+			lazyConstruct();
 		}
 		container.setVisible(visible);
 	}

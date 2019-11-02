@@ -3,7 +3,6 @@ package org.sagebionetworks.web.unitclient.presenter;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -13,9 +12,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.Collections;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,11 +20,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
-import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -48,7 +45,6 @@ import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -82,7 +78,7 @@ public class EntityPresenterTest {
 	@Mock
 	EntityPageTop mockEntityPageTop;
 	String EntityId = "1";
-	Synapse place = new Synapse("Synapse:"+ EntityId);
+	Synapse place = new Synapse("Synapse:" + EntityId);
 	Entity EntityModel1;
 	EntityBundle eb;
 	String entityId = "syn43344";
@@ -99,13 +95,15 @@ public class EntityPresenterTest {
 	EntityId2BundleCache mockEntityId2BundleCache;
 	@Mock
 	EventBus mockEventBus;
-	
+
 	@Before
-	public void setup() throws Exception{
+	public void setup() throws Exception {
 		when(mockEntityPresenterEventBinder.getEventBinder()).thenReturn(mockEventBinder);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		entityPresenter = new EntityPresenter(mockView, mockEntityPresenterEventBinder, mockGlobalApplicationState, mockAuthenticationController, mockSynapseJavascriptClient,
-				mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockOpenInviteWidget, mockGwtWrapper, mockEventBus);
+		entityPresenter = new EntityPresenter(mockView, mockEntityPresenterEventBinder,
+				mockGlobalApplicationState, mockAuthenticationController, mockSynapseJavascriptClient,
+				mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockOpenInviteWidget, mockGwtWrapper,
+				mockEventBus);
 		Entity testEntity = new Project();
 		eb = new EntityBundle();
 		eb.setEntity(testEntity);
@@ -113,38 +111,43 @@ public class EntityPresenterTest {
 		path.setPath(Collections.singletonList(mockProjectEntityHeader));
 		when(mockProjectEntityHeader.getType()).thenReturn(Project.class.getName());
 		eb.setPath(path);
-		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		id=0L;
-	}	
-	
+		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseJavascriptClient)
+				.getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseJavascriptClient)
+				.getEntityBundleForVersion(anyString(), anyLong(), any(EntityBundleRequest.class),
+						any(AsyncCallback.class));
+		id = 0L;
+	}
+
 	@Test
 	public void testConstruction() {
 		verify(mockHeaderWidget, never()).configure(); // waits to configure for entity header
 		verify(mockEventBinder).bindEventHandlers(entityPresenter, mockEventBus);
 	}
-	
+
 	@Test
 	public void testSetPlaceAndRefreshWithVersion() {
 		Long versionNumber = 1L;
 		Synapse place = Mockito.mock(Synapse.class);
 		when(place.getVersionNumber()).thenReturn(1L);
 		when(place.getEntityId()).thenReturn(entityId);
-		
+
 		entityPresenter.setPlace(place);
-		//verify that background image is cleared
-		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), eq(EntityPageTop.ALL_PARTS_REQUEST), any(AsyncCallback.class));
+		// verify that background image is cleared
+		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber),
+				eq(EntityPageTop.ALL_PARTS_REQUEST), any(AsyncCallback.class));
 		verify(mockView, times(2)).setLoadingVisible(Mockito.anyBoolean());
 		verify(mockView).setEntityPageTopVisible(true);
 		verify(mockEntityPageTop, atLeastOnce()).clearState();
-		verify(mockEntityPageTop).configure(eq(eb), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
+		verify(mockEntityPageTop).configure(eq(eb), eq(versionNumber), any(EntityHeader.class),
+				any(EntityArea.class), anyString());
 		verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop);
 		verify(mockView).setOpenTeamInvitesWidget(mockOpenInviteWidget);
 		verify(mockHeaderWidget).refresh();
 		verify(mockHeaderWidget).configure(any(EntityHeader.class));
 		verify(mockSynAlert, times(3)).clear();
 	}
-	
+
 	@Test
 	public void testSetPlaceAndRefreshWithoutVersion() {
 		Long versionNumber = 1L;
@@ -152,16 +155,18 @@ public class EntityPresenterTest {
 		when(place.getVersionNumber()).thenReturn(versionNumber);
 		when(place.getEntityId()).thenReturn(entityId);
 		entityPresenter.setPlace(place);
-		//verify that background image is cleared
-		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), any(EntityBundleRequest.class), any(AsyncCallback.class));
+		// verify that background image is cleared
+		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber),
+				any(EntityBundleRequest.class), any(AsyncCallback.class));
 		verify(mockView, times(2)).setLoadingVisible(Mockito.anyBoolean());
 		verify(mockView).setEntityPageTopVisible(true);
 		verify(mockEntityPageTop, atLeastOnce()).clearState();
-		verify(mockEntityPageTop).configure(eq(eb), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
-		
+		verify(mockEntityPageTop).configure(eq(eb), eq(versionNumber), any(EntityHeader.class),
+				any(EntityArea.class), anyString());
+
 		verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop);
 	}
-	
+
 	@Test
 	public void testInvalidEntityPath() {
 		EntityPath emptyPath = new EntityPath();
@@ -171,22 +176,23 @@ public class EntityPresenterTest {
 		Synapse place = Mockito.mock(Synapse.class);
 		when(place.getVersionNumber()).thenReturn(versionNumber);
 		when(place.getEntityId()).thenReturn(entityId);
-		
+
 		entityPresenter.setPlace(place);
-		
-		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), any(EntityBundleRequest.class), any(AsyncCallback.class));
+
+		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber),
+				any(EntityBundleRequest.class), any(AsyncCallback.class));
 		verify(mockSynAlert).showError(DisplayConstants.ERROR_GENERIC_RELOAD);
 	}
-	
+
 	@Test
 	public void testStart() {
-		entityPresenter.setPlace(place);		
+		entityPresenter.setPlace(place);
 		AcceptsOneWidget panel = mock(AcceptsOneWidget.class);
-		EventBus eventBus = mock(EventBus.class);		
-		entityPresenter.start(panel, eventBus);		
-		verify(panel).setWidget(mockView);		
+		EventBus eventBus = mock(EventBus.class);
+		entityPresenter.start(panel, eventBus);
+		verify(panel).setWidget(mockView);
 	}
-	
+
 	@Test
 	public void testClear() {
 		entityPresenter.clear();
@@ -194,7 +200,7 @@ public class EntityPresenterTest {
 		verify(mockSynAlert, times(2)).clear();
 		verify(mockOpenInviteWidget, times(2)).clear();
 	}
-	
+
 	@Test
 	public void testShow403() {
 		entityPresenter.setEntityId("123");
@@ -203,14 +209,14 @@ public class EntityPresenterTest {
 		verify(mockView).setEntityPageTopVisible(false);
 		verify(mockView).setOpenTeamInvitesVisible(true);
 	}
-	
+
 	@Test
 	public void testEntityUpdatedHandler() {
 		entityPresenter.onEntityUpdatedEvent(new EntityUpdatedEvent());
-		
+
 		verify(mockGlobalApplicationState).refreshPage();
 	}
-	
+
 	@Test
 	public void testIsValidEntityId() {
 		assertFalse(entityPresenter.isValidEntityId(""));

@@ -5,11 +5,13 @@ import org.sagebionetworks.repo.model.table.ColumnType;
 public class ColumnModelKey {
 	private String name;
 	private ColumnType type;
+
 	public ColumnModelKey(String name, ColumnType type) {
 		super();
 		this.name = name;
 		this.type = type;
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -18,6 +20,7 @@ public class ColumnModelKey {
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -36,5 +39,5 @@ public class ColumnModelKey {
 			return false;
 		return true;
 	}
-	
+
 }

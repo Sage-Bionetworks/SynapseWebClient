@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.client.presenter;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.sagebionetworks.repo.model.AccessApprovalInfo;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.BatchAccessApprovalInfoRequest;
@@ -23,7 +21,6 @@ import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequ
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
-
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -31,7 +28,8 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.Inject;
 
-public class AccessRequirementsPresenter extends AbstractActivity implements Presenter<AccessRequirementsPlace> {
+public class AccessRequirementsPresenter extends AbstractActivity
+		implements Presenter<AccessRequirementsPlace> {
 	private AccessRequirementsPlace place;
 	private PlaceView view;
 	private PortalGinInjector ginInjector;
@@ -41,7 +39,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	public static Long LIMIT = 30L;
 	Long currentOffset;
 	RestrictableObjectDescriptor subject;
-	EntityIdCellRenderer entityIdRenderer; 
+	EntityIdCellRenderer entityIdRenderer;
 	TeamBadge teamBadge;
 	List<AccessRequirement> allArs;
 	CreateAccessRequirementButton createAccessRequirementButton;
@@ -49,20 +47,13 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	DivView metAccessRequirementsDiv;
 	DivView unmetAccessRequirementsDiv;
 	Callback refreshCallback;
-	
+
 	@Inject
-	public AccessRequirementsPresenter(PlaceView view,
-			DataAccessClientAsync dataAccessClient,
-			SynapseAlert synAlert,
-			PortalGinInjector ginInjector,
-			EntityIdCellRenderer entityIdRenderer, 
-			TeamBadge teamBadge,
-			CreateAccessRequirementButton createAccessRequirementButton,
-			DivView noResultsDiv,
-			DivView unmetAccessRequirementsDiv,
-			DivView metAccessRequirementsDiv,
-			AuthenticationController authController
-			) {
+	public AccessRequirementsPresenter(PlaceView view, DataAccessClientAsync dataAccessClient,
+			SynapseAlert synAlert, PortalGinInjector ginInjector, EntityIdCellRenderer entityIdRenderer,
+			TeamBadge teamBadge, CreateAccessRequirementButton createAccessRequirementButton,
+			DivView noResultsDiv, DivView unmetAccessRequirementsDiv, DivView metAccessRequirementsDiv,
+			AuthenticationController authController) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
@@ -91,10 +82,10 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		refreshCallback = new Callback() {
 			@Override
 			public void invoke() {
-				loadData();	
+				loadData();
 			}
 		};
-		
+
 	}
 
 	@Override
@@ -102,7 +93,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		// Install the view
 		panel.setWidget(view);
 	}
-	
+
 	@Override
 	public void setPlace(AccessRequirementsPlace place) {
 		this.place = place;
@@ -125,7 +116,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		}
 		loadData();
 	}
-	
+
 	public void loadData() {
 		createAccessRequirementButton.configure(subject, refreshCallback);
 		metAccessRequirementsDiv.clear();
@@ -137,30 +128,32 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 
 	public void loadMore() {
 		synAlert.clear();
-		// TODO: call should also return the user state (approved, pending, ...) for each access requirement
-		dataAccessClient.getAccessRequirements(subject, LIMIT, currentOffset, new AsyncCallback<List<AccessRequirement>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
-			
-			public void onSuccess(List<AccessRequirement> accessRequirements) {
-				noResultsDiv.setVisible(currentOffset == 0 && accessRequirements.isEmpty());
-				currentOffset += LIMIT;
-				boolean isNewAr = false;
-				for (AccessRequirement ar : accessRequirements) {
-					if (!allArs.contains(ar)) {
-						isNewAr = true;
-						allArs.add(ar);
+		// TODO: call should also return the user state (approved, pending, ...) for each access
+		// requirement
+		dataAccessClient.getAccessRequirements(subject, LIMIT, currentOffset,
+				new AsyncCallback<List<AccessRequirement>>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						synAlert.handleException(caught);
 					}
-				}
-				if (isNewAr) {
-					loadMore();
-				} else {
-					getStatusForEachAccessRequirement();
-				}
-			};
-		});
+
+					public void onSuccess(List<AccessRequirement> accessRequirements) {
+						noResultsDiv.setVisible(currentOffset == 0 && accessRequirements.isEmpty());
+						currentOffset += LIMIT;
+						boolean isNewAr = false;
+						for (AccessRequirement ar : accessRequirements) {
+							if (!allArs.contains(ar)) {
+								isNewAr = true;
+								allArs.add(ar);
+							}
+						}
+						if (isNewAr) {
+							loadMore();
+						} else {
+							getStatusForEachAccessRequirement();
+						}
+					};
+				});
 	}
 
 	public IsWidget getAccessRequirementWidget(AccessRequirement ar) {
@@ -176,7 +169,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 			}
 			return;
 		}
-		
+
 		List<String> arIds = new ArrayList<String>();
 		for (AccessRequirement accessRequirement : allArs) {
 			arIds.add(Long.toString(accessRequirement.getId()));
@@ -184,31 +177,33 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		BatchAccessApprovalInfoRequest request = new BatchAccessApprovalInfoRequest();
 		request.setAccessRequirementIds(arIds);
 		request.setUserId(authController.getCurrentUserPrincipalId());
-		
-		dataAccessClient.getAccessRequirementStatus(request, new AsyncCallback<BatchAccessApprovalInfoResponse>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
-			@Override
-			public void onSuccess(BatchAccessApprovalInfoResponse response) {
-				List<AccessApprovalInfo> results = response.getResults();
-				for (int i = 0; i < results.size(); i++) {
-					AccessRequirement ar = allArs.get(i);
-					if (results.get(i).getHasAccessApproval()) {
-						metAccessRequirementsDiv.add(getAccessRequirementWidget(ar));	
-					} else {
-						unmetAccessRequirementsDiv.add(getAccessRequirementWidget(ar));	
+
+		dataAccessClient.getAccessRequirementStatus(request,
+				new AsyncCallback<BatchAccessApprovalInfoResponse>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						synAlert.handleException(caught);
 					}
-				}
-			}
-		});	
+
+					@Override
+					public void onSuccess(BatchAccessApprovalInfoResponse response) {
+						List<AccessApprovalInfo> results = response.getResults();
+						for (int i = 0; i < results.size(); i++) {
+							AccessRequirement ar = allArs.get(i);
+							if (results.get(i).getHasAccessApproval()) {
+								metAccessRequirementsDiv.add(getAccessRequirementWidget(ar));
+							} else {
+								unmetAccessRequirementsDiv.add(getAccessRequirementWidget(ar));
+							}
+						}
+					}
+				});
 	}
-	
+
 	public AccessRequirementsPlace getPlace() {
 		return place;
 	}
-	
+
 	@Override
 	public String mayStop() {
 		return null;

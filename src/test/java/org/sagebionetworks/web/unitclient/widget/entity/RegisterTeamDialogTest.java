@@ -1,12 +1,17 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -22,7 +27,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialogView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -39,10 +43,10 @@ public class RegisterTeamDialogTest {
 	AuthenticationController mockAuthenticationController;
 	PlaceChanger mockPlaceChanger;
 	Callback mockCallback;
-	
+
 	List<Team> registratableTeams;
 	Team firstTeam;
-	
+
 	@Before
 	public void before() {
 		mockChallengeClient = mock(ChallengeClientAsync.class);
@@ -52,7 +56,8 @@ public class RegisterTeamDialogTest {
 		mockCallback = mock(Callback.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		widget = new RegisterTeamDialog(mockView, mockChallengeClient, mockGlobalApplicationState, mockAuthenticationController);
+		widget = new RegisterTeamDialog(mockView, mockChallengeClient, mockGlobalApplicationState,
+				mockAuthenticationController);
 		registratableTeams = new ArrayList<Team>();
 
 		firstTeam = new Team();
@@ -61,75 +66,85 @@ public class RegisterTeamDialogTest {
 		secondTeam.setId("1002");
 		registratableTeams.add(firstTeam);
 		registratableTeams.add(secondTeam);
-		
-		AsyncMockStubber.callSuccessWith(registratableTeams).when(mockChallengeClient).getRegistratableTeams(anyString(), anyString(), any(AsyncCallback.class));
+
+		AsyncMockStubber.callSuccessWith(registratableTeams).when(mockChallengeClient)
+				.getRegistratableTeams(anyString(), anyString(), any(AsyncCallback.class));
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(LOGGED_IN_USER_ID);
 		ChallengeTeam newChallengeTeam = new ChallengeTeam();
-		AsyncMockStubber.callSuccessWith(newChallengeTeam).when(mockChallengeClient).registerChallengeTeam(any(ChallengeTeam.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(newChallengeTeam).when(mockChallengeClient)
+				.registerChallengeTeam(any(ChallengeTeam.class), any(AsyncCallback.class));
 	}
 
 	@Test
 	public void testConfigureWithTeams() {
 		widget.configure(CHALLENGE_ID, mockCallback);
-		
+
 		verify(mockView).setRecruitmentMessage("");
-		verify(mockView).setNewTeamLink(eq("#!Profile:"+mockAuthenticationController.getCurrentUserPrincipalId()+Profile.DELIMITER+Synapse.ProfileArea.TEAMS));
+		verify(mockView)
+				.setNewTeamLink(eq("#!Profile:" + mockAuthenticationController.getCurrentUserPrincipalId()
+						+ Profile.DELIMITER + Synapse.ProfileArea.TEAMS));
 		verify(mockView).setNoTeamsFoundVisible(false);
 		verify(mockView).setTeams(registratableTeams);
 		assertEquals(firstTeam.getId(), widget.getSelectedTeamId());
 		verify(mockView).showModal();
-		
-		//now try selecting invalid and valid indices
+
+		// now try selecting invalid and valid indices
 		widget.teamSelected(-1);
 		assertNull(widget.getSelectedTeamId());
-		
+
 		widget.teamSelected(0);
 		assertEquals(firstTeam.getId(), widget.getSelectedTeamId());
-		
+
 		widget.teamSelected(10);
 		assertNull(widget.getSelectedTeamId());
 	}
-	
+
 	@Test
 	public void testConfigureWithNoTeams() {
 		registratableTeams.clear();
 		widget.configure(CHALLENGE_ID, mockCallback);
-		
+
 		verify(mockView).setRecruitmentMessage("");
-		verify(mockView).setNewTeamLink(eq("#!Profile:"+mockAuthenticationController.getCurrentUserPrincipalId()+Profile.DELIMITER+Synapse.ProfileArea.TEAMS));
+		verify(mockView)
+				.setNewTeamLink(eq("#!Profile:" + mockAuthenticationController.getCurrentUserPrincipalId()
+						+ Profile.DELIMITER + Synapse.ProfileArea.TEAMS));
 		verify(mockView).setNoTeamsFoundVisible(true);
 		verify(mockView).showModal();
 	}
-	
+
 	@Test
 	public void testConfigureFail() {
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockChallengeClient).getRegistratableTeams(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockChallengeClient)
+				.getRegistratableTeams(anyString(), anyString(), any(AsyncCallback.class));
 		widget.configure(CHALLENGE_ID, mockCallback);
 		verify(mockView).showErrorMessage(anyString());
 	}
-	
+
 	@Test
 	public void testIsValidNoSelectedTeam() {
 		assertFalse(widget.isValid());
 		verify(mockView).showErrorMessage(anyString());
 	}
+
 	@Test
 	public void testIsValid() {
 		widget.configure(CHALLENGE_ID, mockCallback);
 		assertTrue(widget.isValid());
 	}
-	
+
 	@Test
 	public void testRegisterChallengeTeam() {
 		widget.configure(CHALLENGE_ID, mockCallback);
 		widget.onOk();
-		ArgumentCaptor<ChallengeTeam> challengeTeamCaptor = ArgumentCaptor.forClass(ChallengeTeam.class);
-		verify(mockChallengeClient).registerChallengeTeam(challengeTeamCaptor.capture(), any(AsyncCallback.class));
+		ArgumentCaptor<ChallengeTeam> challengeTeamCaptor =
+				ArgumentCaptor.forClass(ChallengeTeam.class);
+		verify(mockChallengeClient).registerChallengeTeam(challengeTeamCaptor.capture(),
+				any(AsyncCallback.class));
 		ChallengeTeam capturedTeam = challengeTeamCaptor.getValue();
 		assertEquals(CHALLENGE_ID, capturedTeam.getChallengeId());
 		assertEquals(firstTeam.getId(), capturedTeam.getTeamId());
-		
+
 		verify(mockCallback).invoke();
 		verify(mockView).showInfo(anyString());
 		verify(mockView).hideModal();
@@ -137,10 +152,12 @@ public class RegisterTeamDialogTest {
 
 	@Test
 	public void testRegisterChallengeTeamFailure() {
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockChallengeClient).registerChallengeTeam(any(ChallengeTeam.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockChallengeClient)
+				.registerChallengeTeam(any(ChallengeTeam.class), any(AsyncCallback.class));
 		widget.configure(CHALLENGE_ID, mockCallback);
 		widget.onOk();
-		verify(mockChallengeClient).registerChallengeTeam(any(ChallengeTeam.class), any(AsyncCallback.class));
+		verify(mockChallengeClient).registerChallengeTeam(any(ChallengeTeam.class),
+				any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
 }

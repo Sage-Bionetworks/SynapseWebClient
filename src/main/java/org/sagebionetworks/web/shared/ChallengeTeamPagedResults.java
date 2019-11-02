@@ -1,19 +1,18 @@
 package org.sagebionetworks.web.shared;
 
 import java.util.List;
-
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class ChallengeTeamPagedResults implements IsSerializable {
 	private Long totalNumberOfResults;
 	private List<ChallengeTeamBundle> results;
+
 	/**
 	 * Default constructor is required
 	 */
-	public ChallengeTeamPagedResults() {
-	}
-	
-	
+	public ChallengeTeamPagedResults() {}
+
+
 	public ChallengeTeamPagedResults(List<ChallengeTeamBundle> results, Long totalNumberOfResults) {
 		super();
 		this.totalNumberOfResults = totalNumberOfResults;
@@ -42,7 +41,8 @@ public class ChallengeTeamPagedResults implements IsSerializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((results == null) ? 0 : results.hashCode());
-		result = prime * result + ((totalNumberOfResults == null) ? 0 : totalNumberOfResults.hashCode());
+		result =
+				prime * result + ((totalNumberOfResults == null) ? 0 : totalNumberOfResults.hashCode());
 		return result;
 	}
 
@@ -72,7 +72,8 @@ public class ChallengeTeamPagedResults implements IsSerializable {
 
 	@Override
 	public String toString() {
-		return "ChallengeTeamPagedResults [totalNumberOfResults=" + totalNumberOfResults + ", results=" + results + "]";
+		return "ChallengeTeamPagedResults [totalNumberOfResults=" + totalNumberOfResults + ", results="
+				+ results + "]";
 	}
-	
+
 }

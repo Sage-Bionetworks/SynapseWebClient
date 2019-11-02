@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -36,14 +35,13 @@ import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
-
 import com.google.gwt.place.shared.Place;
 import com.google.inject.Inject;
 
-public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
-	
+public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler {
+
 	public static final String TABLE_QUERY_PREFIX = "query/";
-	
+
 	Tab tab;
 	TablesTabView view;
 	TableListWidget tableListWidget;
@@ -61,22 +59,21 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	PortalGinInjector ginInjector;
 	ModifiedCreatedByWidget modifiedCreatedBy;
 	TableEntityWidget v2TableWidget;
-	Map<String,String> configMap;
+	Map<String, String> configMap;
 	ActionMenuWidget entityActionMenu;
 	CallbackP<String> entitySelectedCallback;
-	public static final String TABLES_HELP = "Build structured queryable data that can be described by a schema using the Tables.";
+	public static final String TABLES_HELP =
+			"Build structured queryable data that can be described by a schema using the Tables.";
 	public static final String TABLES_HELP_URL = WebConstants.DOCS_URL + "tables.html";
 	Long version;
-	
+
 	@Inject
-	public TablesTab(Tab tab,
-			PortalGinInjector ginInjector
-			) {
+	public TablesTab(Tab tab, PortalGinInjector ginInjector) {
 		this.tab = tab;
 		this.ginInjector = ginInjector;
 		tab.configure(DisplayConstants.TABLES, TABLES_HELP, TABLES_HELP_URL);
 	}
-	
+
 	public void lazyInject() {
 		if (view == null) {
 			this.view = ginInjector.getTablesTabView();
@@ -87,7 +84,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			this.queryTokenProvider = ginInjector.getQueryTokenProvider();
 			this.synAlert = ginInjector.getStuAlert();
 			this.modifiedCreatedBy = ginInjector.getModifiedCreatedByWidget();
-			
+
 			view.setBreadcrumb(breadcrumb.asWidget());
 			view.setTableList(tableListWidget.asWidget());
 			view.setTitlebar(tableTitleBar.asWidget());
@@ -95,7 +92,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			view.setSynapseAlert(synAlert.asWidget());
 			view.setModifiedCreatedBy(modifiedCreatedBy);
 			tab.setContent(view.asWidget());
-			
+
 			tableListWidget.setTableClickedCallback(new CallbackP<EntityHeader>() {
 				@Override
 				public void invoke(EntityHeader entityHeader) {
@@ -103,12 +100,14 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 					entitySelectedCallback.invoke(entityHeader.getId());
 					// selected a table/view, show title info immediately
 					tableTitleBar.configure(entityHeader);
-					
+
 					List<LinkData> links = new ArrayList<LinkData>();
 					Place projectPlace = new Synapse(projectEntityId, null, EntityArea.TABLES, null);
-					links.add(new LinkData(DisplayConstants.TABLES, EntityTypeUtils.getIconTypeForEntityClassName(TableEntity.class.getName()), projectPlace));
+					links.add(new LinkData(DisplayConstants.TABLES,
+							EntityTypeUtils.getIconTypeForEntityClassName(TableEntity.class.getName()),
+							projectPlace));
 					breadcrumb.configure(links, entityHeader.getName());
-					
+
 					view.setBreadcrumbVisible(true);
 					view.setTitlebarVisible(true);
 				}
@@ -117,7 +116,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			configMap = ProvenanceWidget.getDefaultWidgetDescriptor();
 		}
 	}
-	
+
 	public void setEntitySelectedCallback(CallbackP<String> entitySelectedCallback) {
 		this.entitySelectedCallback = entitySelectedCallback;
 	}
@@ -126,37 +125,39 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	public void onPersistSuccess(EntityUpdatedEvent event) {
 		ginInjector.getEventBus().fireEvent(event);
 	}
-	
+
 	public void initBreadcrumbLinkClickedHandler() {
 		CallbackP<Place> breadcrumbClicked = new CallbackP<Place>() {
 			public void invoke(Place place) {
-				//if this is the project id, then just reconfigure from the project bundle
-				Synapse synapse = (Synapse)place;
+				// if this is the project id, then just reconfigure from the project bundle
+				Synapse synapse = (Synapse) place;
 				String entityId = synapse.getEntityId();
 				entitySelectedCallback.invoke(entityId);
 			};
 		};
 		breadcrumb.setLinkClickedHandler(breadcrumbClicked);
 	}
-	
+
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
 		tab.addTabClickedCallback(onClickCallback);
 	}
-	
-	public void setProject(String projectEntityId, EntityBundle projectBundle, Throwable projectBundleLoadError) {
+
+	public void setProject(String projectEntityId, EntityBundle projectBundle,
+			Throwable projectBundleLoadError) {
 		this.projectEntityId = projectEntityId;
 		this.projectBundle = projectBundle;
 		this.projectBundleLoadError = projectBundleLoadError;
 	}
-	
-	public void configure(EntityBundle entityBundle, Long versionNumber, String areaToken, ActionMenuWidget entityActionMenu) {
+
+	public void configure(EntityBundle entityBundle, Long versionNumber, String areaToken,
+			ActionMenuWidget entityActionMenu) {
 		lazyInject();
 		this.areaToken = areaToken;
 		this.entityActionMenu = entityActionMenu;
 		synAlert.clear();
 		setTargetBundle(entityBundle, versionNumber);
 	}
-	
+
 	public void showProjectLevelUI() {
 		String title = projectEntityId;
 		if (projectBundle != null) {
@@ -167,7 +168,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		tab.setEntityNameAndPlace(title, new Synapse(projectEntityId, null, EntityArea.TABLES, null));
 		tab.showTab(true);
 	}
-	
+
 	public void resetView() {
 		if (view != null) {
 			synAlert.clear();
@@ -181,18 +182,19 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			view.setProvenanceVisible(false);
 		}
 	}
-	
+
 	public void showError(Throwable error) {
 		resetView();
 		synAlert.handleException(error);
 	}
-	
+
 	public void setTargetBundle(EntityBundle bundle, Long versionNumber) {
 		this.entityBundle = bundle;
 		Entity entity = bundle.getEntity();
 		boolean isTable = entity instanceof Table;
 		boolean isProject = entity instanceof Project;
-		boolean isVersionSupported = EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity(), ginInjector.getCookieProvider());
+		boolean isVersionSupported = EntityActionControllerImpl
+				.isVersionSupported(entityBundle.getEntity(), ginInjector.getCookieProvider());
 		version = isVersionSupported ? versionNumber : null;
 		view.setEntityMetadataVisible(isTable);
 		view.setBreadcrumbVisible(isTable);
@@ -202,32 +204,34 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		view.clearTableEntityWidget();
 		modifiedCreatedBy.setVisible(false);
 		view.setProvenanceVisible(isTable);
-		
+
 		if (isTable) {
 			updateVersionAndAreaToken(entity.getId(), version, areaToken);
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
 			tableTitleBar.configure(bundle);
-			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
+			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(),
+					entity.getModifiedOn(), entity.getModifiedBy());
 			v2TableWidget = ginInjector.createNewTableEntityWidget();
 			view.setTableEntityWidget(v2TableWidget.asWidget());
-			v2TableWidget.configure(bundle, version, bundle.getPermissions().getCanCertifiedUserEdit(), this, entityActionMenu);
+			v2TableWidget.configure(bundle, version, bundle.getPermissions().getCanCertifiedUserEdit(),
+					this, entityActionMenu);
 		} else if (isProject) {
 			areaToken = null;
 			tableListWidget.configure(bundle);
 			showProjectLevelUI();
 		}
 	}
-	
-	public Tab asTab(){
+
+	public Tab asTab() {
 		return tab;
 	}
-	
+
 	public void onQueryChange(Query newQuery) {
-		if(newQuery != null && tab.isTabPaneVisible()) {
+		if (newQuery != null && tab.isTabPaneVisible()) {
 			String token = queryTokenProvider.queryToToken(newQuery);
 			Long versionNumber = QueryBundleUtils.getTableVersion(newQuery.getSql());
 			String synId = QueryBundleUtils.getTableIdFromSql(newQuery.getSql());
-			if(token != null && !newQuery.equals(v2TableWidget.getDefaultQuery())){
+			if (token != null && !newQuery.equals(v2TableWidget.getDefaultQuery())) {
 				areaToken = TABLE_QUERY_PREFIX + token;
 			} else {
 				areaToken = "";
@@ -236,31 +240,37 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			tab.showTab(true);
 		}
 	}
-	
+
 	private void updateVersionAndAreaToken(String entityId, Long versionNumber, String areaToken) {
-		boolean isVersionSupported = EntityActionControllerImpl.isVersionSupported(entityBundle.getEntity(), ginInjector.getCookieProvider());
+		boolean isVersionSupported = EntityActionControllerImpl
+				.isVersionSupported(entityBundle.getEntity(), ginInjector.getCookieProvider());
 		Long newVersion = isVersionSupported ? versionNumber : null;
 		Synapse newPlace = new Synapse(entityId, newVersion, EntityArea.TABLES, areaToken);
-		// SWC-4942: if versions are supported, and the version has changed (the version in the query does not match the entity bundle, for example),
-		// then reload the entity bundle (to reconfigure the tools menu and other widgets on the page) by doing a place change to the correct version of the bundle.
-		if ((isVersionSupported && !Objects.equals(newVersion, version)) || !entityId.equals(entityBundle.getEntity().getId())) {
+		// SWC-4942: if versions are supported, and the version has changed (the version in the query
+		// does not match the entity bundle, for example),
+		// then reload the entity bundle (to reconfigure the tools menu and other widgets on the page)
+		// by doing a place change to the correct version of the bundle.
+		if ((isVersionSupported && !Objects.equals(newVersion, version))
+				|| !entityId.equals(entityBundle.getEntity().getId())) {
 			ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(newPlace);
 			return;
 		}
 		metadata.configure(entityBundle, newVersion, entityActionMenu);
 		tab.setEntityNameAndPlace(entityBundle.getEntity().getName(), newPlace);
-		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(FilesTab.WIDGET_HEIGHT_PX-84));
-		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(entityId, newVersion));
+		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY,
+				Integer.toString(FilesTab.WIDGET_HEIGHT_PX - 84));
+		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY,
+				DisplayUtils.createEntityVersionString(entityId, newVersion));
 		ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
 		view.setProvenance(provWidget);
 		provWidget.configure(configMap);
 		version = newVersion;
 	}
-	
+
 	public Query getQueryString() {
-		if(areaToken != null && areaToken.startsWith(TABLE_QUERY_PREFIX)) {
+		if (areaToken != null && areaToken.startsWith(TABLE_QUERY_PREFIX)) {
 			String token = areaToken.substring(TABLE_QUERY_PREFIX.length(), areaToken.length());
-			if(token != null){
+			if (token != null) {
 				return queryTokenProvider.tokenToQuery(token);
 			}
 		}

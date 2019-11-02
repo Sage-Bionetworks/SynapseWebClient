@@ -5,7 +5,6 @@ import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -22,15 +21,16 @@ public class RenameEntityModalWidgetImpl implements RenameEntityModalWidget {
 	public static final String LABLE_SUFFIX = " name";
 	public static final String TITLE_PREFIX = "Rename ";
 
-	public static final String NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER = "Name must include at least one character.";
-	
+	public static final String NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER =
+			"Name must include at least one character.";
+
 	PromptForValuesModalView view;
 	SynapseJavascriptClient jsClient;
 	String parentId;
 	Entity toRename;
 	String startingName;
 	Callback handler;
-	
+
 	@Inject
 	public RenameEntityModalWidgetImpl(PromptForValuesModalView view,
 			SynapseJavascriptClient jsClient) {
@@ -38,10 +38,11 @@ public class RenameEntityModalWidgetImpl implements RenameEntityModalWidget {
 		this.view = view;
 		this.jsClient = jsClient;
 	}
-	
-	
+
+
 	/**
 	 * Update entity with a new name.
+	 * 
 	 * @param name
 	 */
 	private void updateEntity(final String name) {
@@ -53,6 +54,7 @@ public class RenameEntityModalWidgetImpl implements RenameEntityModalWidget {
 				view.hide();
 				handler.invoke();
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				// put the name back.
@@ -68,17 +70,17 @@ public class RenameEntityModalWidgetImpl implements RenameEntityModalWidget {
 	 */
 	public void onRename(String newName) {
 		String name = StringUtils.emptyAsNull(newName);
-		if(name == null){
+		if (name == null) {
 			view.showError(NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
-		}else if(this.startingName.equals(name)){
+		} else if (this.startingName.equals(name)) {
 			// just hide the view if the name has not changed.
 			view.hide();
-		}else{
+		} else {
 			// Create the table
 			updateEntity(name);
 		}
 	}
-	
+
 
 	@Override
 	public Widget asWidget() {
@@ -88,13 +90,15 @@ public class RenameEntityModalWidgetImpl implements RenameEntityModalWidget {
 	@Override
 	public void onRename(Entity toRename, Callback handler) {
 		this.handler = handler;
-		String typeName = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(toRename.getClass()));
+		String typeName =
+				EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(toRename.getClass()));
 		this.toRename = toRename;
 		this.startingName = toRename.getName();
 		this.view.clear();
-		this.view.configureAndShow(TITLE_PREFIX+typeName, typeName+LABLE_SUFFIX, toRename.getName(), newName -> {
-			onRename(newName);
-		});
+		this.view.configureAndShow(TITLE_PREFIX + typeName, typeName + LABLE_SUFFIX, toRename.getName(),
+				newName -> {
+					onRename(newName);
+				});
 	}
 
 

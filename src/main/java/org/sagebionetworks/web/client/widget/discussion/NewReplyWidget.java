@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
@@ -15,7 +14,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.validation.ValidationResult;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -23,13 +21,14 @@ import com.google.inject.Inject;
 /**
  * A simple dialog for creating a reply.
  */
-public class NewReplyWidget implements NewReplyWidgetView.Presenter{
+public class NewReplyWidget implements NewReplyWidgetView.Presenter {
 
 	public static final String DEFAULT_MARKDOWN = "";
 	private static final String SUCCESS_TITLE = "Reply created";
 	private static final String SUCCESS_MESSAGE = "A reply has been created.";
 	public static final String RESTORE_TITLE = "Restore draft?";
-	public static final String RESTORE_MESSAGE = "Would you like to continue writing where you left off?"; 
+	public static final String RESTORE_MESSAGE =
+			"Would you like to continue writing where you left off?";
 	private NewReplyWidgetView view;
 	private DiscussionForumClientAsync discussionForumClient;
 	private SynapseAlert synAlert;
@@ -43,16 +42,10 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 	private PopupUtilsView popupUtils;
 
 	@Inject
-	public NewReplyWidget(
-			NewReplyWidgetView view,
-			DiscussionForumClientAsync discussionForumClient,
-			SynapseAlert synAlert,
-			MarkdownEditorWidget markdownEditor,
-			AuthenticationController authController,
-			GlobalApplicationState globalApplicationState,
-			SessionStorage sessionStorage,
-			PopupUtilsView popupUtils
-			) {
+	public NewReplyWidget(NewReplyWidgetView view, DiscussionForumClientAsync discussionForumClient,
+			SynapseAlert synAlert, MarkdownEditorWidget markdownEditor,
+			AuthenticationController authController, GlobalApplicationState globalApplicationState,
+			SessionStorage sessionStorage, PopupUtilsView popupUtils) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
 		fixServiceEntryPoint(discussionForumClient);
@@ -73,7 +66,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 		this.key = threadId + "_" + authController.getCurrentUserPrincipalId() + "_reply";
 		reset();
 	}
-	
+
 	public void reset() {
 		onCancelAfterConfirm();
 	}
@@ -92,12 +85,12 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 			view.scrollIntoView();
 		}
 	}
-	
+
 	private void checkForSavedReply() {
 		markdownEditor.hideUploadRelatedCommands();
 		markdownEditor.showExternalImageButton();
 		if (storage.getItem(key) == null) {
-			markdownEditor.configure(DEFAULT_MARKDOWN);			
+			markdownEditor.configure(DEFAULT_MARKDOWN);
 		} else {
 			Callback yesCallback = new Callback() {
 				@Override
@@ -110,7 +103,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 			Callback noCallback = new Callback() {
 				@Override
 				public void invoke() {
-					markdownEditor.configure(DEFAULT_MARKDOWN);	
+					markdownEditor.configure(DEFAULT_MARKDOWN);
 					storage.removeItem(key);
 				}
 			};
@@ -133,7 +126,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 		CreateDiscussionReply toCreate = new CreateDiscussionReply();
 		toCreate.setThreadId(threadId);
 		toCreate.setMessageMarkdown(messageMarkdown);
-		discussionForumClient.createReply(toCreate, new AsyncCallback<DiscussionReplyBundle>(){
+		discussionForumClient.createReply(toCreate, new AsyncCallback<DiscussionReplyBundle>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.resetButton();
@@ -151,18 +144,19 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 			}
 		});
 	}
-	
+
 	@Override
 	public void onCancel() {
 		if (!markdownEditor.getMarkdown().isEmpty()) {
-			popupUtils.showConfirmDialog(DisplayConstants.UNSAVED_CHANGES, DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, () -> {
-				onCancelAfterConfirm();
-			});
+			popupUtils.showConfirmDialog(DisplayConstants.UNSAVED_CHANGES,
+					DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, () -> {
+						onCancelAfterConfirm();
+					});
 		} else {
 			onCancelAfterConfirm();
 		}
 	}
-	
+
 	public void onCancelAfterConfirm() {
 		globalApplicationState.setIsEditing(false);
 		view.resetButton();

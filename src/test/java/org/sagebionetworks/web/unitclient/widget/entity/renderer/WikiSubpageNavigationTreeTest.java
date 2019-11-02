@@ -3,12 +3,14 @@ package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.*;
-
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -49,11 +51,11 @@ public class WikiSubpageNavigationTreeTest {
 		wikiHeaders = new ArrayList<V2WikiHeader>();
 
 		// Set up headers for tree:
-		//	A
-		//		B
-		//			C
-		//		D
-		//		E
+		// A
+		// B
+		// C
+		// D
+		// E
 
 		V2WikiHeader a = new V2WikiHeader();
 		V2WikiHeader b = new V2WikiHeader();
@@ -87,7 +89,7 @@ public class WikiSubpageNavigationTreeTest {
 		e.setParentId("0");
 
 		currentWikiKey = new WikiPageKey();
-		currentWikiKey.setWikiPageId("3");	// On page D
+		currentWikiKey.setWikiPageId("3"); // On page D
 		currentWikiKey.setOwnerObjectId("3");
 		currentWikiKey.setVersion(new Long(1));
 		currentWikiKey.setOwnerObjectType(ObjectType.ENTITY.name());
@@ -96,7 +98,8 @@ public class WikiSubpageNavigationTreeTest {
 	@Test
 	public void testConfigure() {
 		Synapse rootPlace = new Synapse("");
-		tree.configure(wikiHeaders, ownerObjectName, rootPlace, currentWikiKey, true, mockReloadWikiPageCallback);
+		tree.configure(wikiHeaders, ownerObjectName, rootPlace, currentWikiKey, true,
+				mockReloadWikiPageCallback);
 		SubpageNavTreeNode aNode = tree.getOverallRoot();
 		SubpageNavTreeNode bNode = aNode.getChildren().get(0);
 		SubpageNavTreeNode cNode = bNode.getChildren().get(0);
@@ -105,23 +108,31 @@ public class WikiSubpageNavigationTreeTest {
 
 		testTreeStructure(aNode, bNode, cNode, dNode, eNode);
 
-		WikiPageKey aWikiPageKey = new WikiPageKey(currentWikiKey.getOwnerObjectId(), currentWikiKey.getOwnerObjectType(), "0", currentWikiKey.getVersion());
-		WikiPageKey bWikiPageKey = new WikiPageKey(currentWikiKey.getOwnerObjectId(), currentWikiKey.getOwnerObjectType(), "1", currentWikiKey.getVersion());
-		WikiPageKey cWikiPageKey = new WikiPageKey(currentWikiKey.getOwnerObjectId(), currentWikiKey.getOwnerObjectType(), "2", currentWikiKey.getVersion());
-		WikiPageKey dWikiPageKey = new WikiPageKey(currentWikiKey.getOwnerObjectId(), currentWikiKey.getOwnerObjectType(), "3", currentWikiKey.getVersion());
-		WikiPageKey eWikiPageKey = new WikiPageKey(currentWikiKey.getOwnerObjectId(), currentWikiKey.getOwnerObjectType(), "4", currentWikiKey.getVersion());
+		WikiPageKey aWikiPageKey = new WikiPageKey(currentWikiKey.getOwnerObjectId(),
+				currentWikiKey.getOwnerObjectType(), "0", currentWikiKey.getVersion());
+		WikiPageKey bWikiPageKey = new WikiPageKey(currentWikiKey.getOwnerObjectId(),
+				currentWikiKey.getOwnerObjectType(), "1", currentWikiKey.getVersion());
+		WikiPageKey cWikiPageKey = new WikiPageKey(currentWikiKey.getOwnerObjectId(),
+				currentWikiKey.getOwnerObjectType(), "2", currentWikiKey.getVersion());
+		WikiPageKey dWikiPageKey = new WikiPageKey(currentWikiKey.getOwnerObjectId(),
+				currentWikiKey.getOwnerObjectType(), "3", currentWikiKey.getVersion());
+		WikiPageKey eWikiPageKey = new WikiPageKey(currentWikiKey.getOwnerObjectId(),
+				currentWikiKey.getOwnerObjectType(), "4", currentWikiKey.getVersion());
 
-		assertEquals(Arrays.asList(aWikiPageKey, bWikiPageKey, cWikiPageKey, dWikiPageKey, eWikiPageKey),
-				Arrays.asList(aNode.getWikiPageKey(), bNode.getWikiPageKey(), cNode.getWikiPageKey(), dNode.getWikiPageKey(), eNode.getWikiPageKey()));
-		
-		//on page D by default, should expand all
+		assertEquals(
+				Arrays.asList(aWikiPageKey, bWikiPageKey, cWikiPageKey, dWikiPageKey, eWikiPageKey),
+				Arrays.asList(aNode.getWikiPageKey(), bNode.getWikiPageKey(), cNode.getWikiPageKey(),
+						dNode.getWikiPageKey(), eNode.getWikiPageKey()));
+
+		// on page D by default, should expand all
 		assertFalse(aNode.isCollapsed());
 		assertFalse(bNode.isCollapsed());
 	}
 
 	@Test
 	public void testConfigureIsEmbedded() {
-		tree.configure(wikiHeaders, ownerObjectName, new Synapse(""), currentWikiKey, true, mockReloadWikiPageCallback);
+		tree.configure(wikiHeaders, ownerObjectName, new Synapse(""), currentWikiKey, true,
+				mockReloadWikiPageCallback);
 
 		SubpageNavTreeNode aNode = tree.getOverallRoot();
 		SubpageNavTreeNode bNode = aNode.getChildren().get(0);
@@ -134,7 +145,8 @@ public class WikiSubpageNavigationTreeTest {
 
 	@Test
 	public void testConfigureNotaEmbedded() {
-		tree.configure(wikiHeaders, ownerObjectName, new Wiki(""), currentWikiKey, false, mockReloadWikiPageCallback);
+		tree.configure(wikiHeaders, ownerObjectName, new Wiki(""), currentWikiKey, false,
+				mockReloadWikiPageCallback);
 
 		SubpageNavTreeNode aNode = tree.getOverallRoot();
 		SubpageNavTreeNode bNode = aNode.getChildren().get(0);
@@ -147,7 +159,8 @@ public class WikiSubpageNavigationTreeTest {
 
 	@Test
 	public void testIsCurrentPage() {
-		tree.configure(wikiHeaders, ownerObjectName, new Wiki(""), currentWikiKey, false, mockReloadWikiPageCallback);
+		tree.configure(wikiHeaders, ownerObjectName, new Wiki(""), currentWikiKey, false,
+				mockReloadWikiPageCallback);
 
 		SubpageNavTreeNode aNode = tree.getOverallRoot();
 		SubpageNavTreeNode bNode = aNode.getChildren().get(0);
@@ -161,24 +174,26 @@ public class WikiSubpageNavigationTreeTest {
 		assertFalse(tree.isCurrentPage(cNode));
 		assertFalse(tree.isCurrentPage(eNode));
 	}
-	
+
 	@Test
 	public void testRootCurrentPage() {
-		//set root to be the currently selected node
+		// set root to be the currently selected node
 		currentWikiKey.setWikiPageId("0");
-		tree.configure(wikiHeaders, ownerObjectName, new Wiki(""), currentWikiKey, false, mockReloadWikiPageCallback);
+		tree.configure(wikiHeaders, ownerObjectName, new Wiki(""), currentWikiKey, false,
+				mockReloadWikiPageCallback);
 
 		SubpageNavTreeNode aNode = tree.getOverallRoot();
 		SubpageNavTreeNode bNode = aNode.getChildren().get(0);
-		
-		//verify other parent nodes are collapsed, but root is expanded
+
+		// verify other parent nodes are collapsed, but root is expanded
 		assertFalse(aNode.isCollapsed());
 		assertTrue(bNode.isCollapsed());
 	}
 
 	@Test
 	public void testReloadWiki() {
-		tree.configure(wikiHeaders, ownerObjectName, new Wiki(""), currentWikiKey, false, mockReloadWikiPageCallback);
+		tree.configure(wikiHeaders, ownerObjectName, new Wiki(""), currentWikiKey, false,
+				mockReloadWikiPageCallback);
 		reset(mockGlobalApplicationState);
 		SubpageNavTreeNode aNode = tree.getOverallRoot();
 		SubpageNavTreeNode bNode = aNode.getChildren().get(0);
@@ -198,7 +213,7 @@ public class WikiSubpageNavigationTreeTest {
 	private void testReloadWikiForNode(SubpageNavTreeNode aNode, SubpageNavTreeNode root, int time) {
 		tree.reloadWiki(aNode);
 		verify(mockReloadWikiPageCallback).invoke(aNode.getWikiPageKey());
-		//pushCurrentPlace called once from configure, and once from reload
+		// pushCurrentPlace called once from configure, and once from reload
 		verify(mockGlobalApplicationState).pushCurrentPlace(aNode.getTargetPlace());
 		verify(mockView, Mockito.times(time)).resetNavTree(root);
 	}
@@ -215,9 +230,8 @@ public class WikiSubpageNavigationTreeTest {
 		}
 	}
 
-	private void testTreeStructure(SubpageNavTreeNode aNode,
-			SubpageNavTreeNode bNode, SubpageNavTreeNode cNode,
-			SubpageNavTreeNode dNode, SubpageNavTreeNode eNode) {
+	private void testTreeStructure(SubpageNavTreeNode aNode, SubpageNavTreeNode bNode,
+			SubpageNavTreeNode cNode, SubpageNavTreeNode dNode, SubpageNavTreeNode eNode) {
 		assertTrue(aNode.getChildren().size() == 3);
 		assertTrue(aNode.getPageTitle().equals(ownerObjectName));
 
@@ -235,25 +249,27 @@ public class WikiSubpageNavigationTreeTest {
 		// E has an empty string for a title, should use it's ID
 		assertTrue(eNode.getPageTitle().equals("4"));
 	}
-	
+
 	@Test
 	public void testContains() {
-		tree.configure(wikiHeaders, ownerObjectName, new Wiki(""), currentWikiKey, false, mockReloadWikiPageCallback);
-		
+		tree.configure(wikiHeaders, ownerObjectName, new Wiki(""), currentWikiKey, false,
+				mockReloadWikiPageCallback);
+
 		assertTrue(tree.contains(wikiHeaders.get(0).getId()));
 		assertTrue(tree.contains(wikiHeaders.get(1).getId()));
 		assertFalse(tree.contains("777"));
 	}
-	
+
 	@Test
 	public void testSetPage() {
 		// tree contains no pages
 		String pageId = wikiHeaders.get(0).getId();
 		tree.setPage(pageId);
 		verify(mockReloadWikiPageCallback, never()).invoke(any(WikiPageKey.class));
-		
-		//tree contains wiki headers
-		tree.configure(wikiHeaders, ownerObjectName, new Wiki(""), currentWikiKey, false, mockReloadWikiPageCallback);
+
+		// tree contains wiki headers
+		tree.configure(wikiHeaders, ownerObjectName, new Wiki(""), currentWikiKey, false,
+				mockReloadWikiPageCallback);
 		tree.setPage(pageId);
 		verify(mockReloadWikiPageCallback).invoke(pageKeyCaptor.capture());
 		assertEquals(pageId, pageKeyCaptor.getValue().getWikiPageId());
