@@ -3,29 +3,29 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class DetailsSummaryConfigViewImpl implements DetailsSummaryConfigView {
-	public interface DetailsSummaryConfigViewImplUiBinder extends UiBinder<Widget, DetailsSummaryConfigViewImpl> {}
+	public interface DetailsSummaryConfigViewImplUiBinder extends UiBinder<Widget, DetailsSummaryConfigViewImpl> {
+	}
+
 	@UiField
 	TextBox summaryField;
 	@UiField
 	TextArea detailsField;
-	
+
 	private Widget widget;
-	
+
 	@Inject
 	public DetailsSummaryConfigViewImpl(DetailsSummaryConfigViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
 	}
-	
+
 	@Override
-	public void initView() {
-	}
+	public void initView() {}
 
 	@Override
 	public void checkParams() throws IllegalArgumentException {
@@ -36,16 +36,15 @@ public class DetailsSummaryConfigViewImpl implements DetailsSummaryConfigView {
 	@Override
 	public Widget asWidget() {
 		return widget;
-	}	
-		
+	}
+
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override
-	public void showLoading() {
-	}
+	public void showLoading() {}
 
 	@Override
 	public void showInfo(String message) {
@@ -53,13 +52,13 @@ public class DetailsSummaryConfigViewImpl implements DetailsSummaryConfigView {
 	}
 
 	@Override
-	public void clear() {
-	}
+	public void clear() {}
 
 	@Override
 	public String getDetails() {
 		return detailsField.getValue();
 	}
+
 	@Override
 	public String getSummary() {
 		return summaryField.getValue();

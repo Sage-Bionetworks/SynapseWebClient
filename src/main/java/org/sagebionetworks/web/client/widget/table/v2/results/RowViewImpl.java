@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.CheckBox;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -19,16 +18,17 @@ import com.google.inject.Inject;
  *
  */
 public class RowViewImpl implements RowView {
-	
-	public interface Binder extends UiBinder<TableRow, RowViewImpl> {	}
-	
+
+	public interface Binder extends UiBinder<TableRow, RowViewImpl> {
+	}
+
 	@UiField
 	CheckBox select;
-	
+
 	TableRow row;
-	
+
 	@Inject
-	public RowViewImpl(Binder binder){
+	public RowViewImpl(Binder binder) {
 		row = binder.createAndBindUi(this);
 	}
 

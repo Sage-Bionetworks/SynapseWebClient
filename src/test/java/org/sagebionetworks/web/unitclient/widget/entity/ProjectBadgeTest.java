@@ -1,15 +1,17 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -36,7 +38,6 @@ import org.sagebionetworks.web.client.widget.provenance.ProvViewUtil;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -72,6 +73,7 @@ public class ProjectBadgeTest {
 	UserProfileAsyncHandler mockUserProfileAsyncHandler;
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
+
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -80,18 +82,18 @@ public class ProjectBadgeTest {
 		when(mockProjectHeader.getModifiedOn()).thenReturn(mockDate);
 		when(mockDate.toString()).thenReturn("today");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		//by default, the view is attached
+		// by default, the view is attached
 		when(mockView.isAttached()).thenReturn(true);
 		widget = new ProjectBadge(mockView, mockFavoriteWidget, mockGWT, mockUserProfileAsyncHandler);
-		
-		//set up user profile
-		userProfile =  new UserProfile();
+
+		// set up user profile
+		userProfile = new UserProfile();
 		userProfile.setOwnerId("4444");
 		userProfile.setUserName("Bilbo");
-		
+
 		AsyncMockStubber.callSuccessWith(userProfile).when(mockUserProfileAsyncHandler).getUserProfile(anyString(), any(AsyncCallback.class));
 	}
-	
+
 	private void setupEntity(Project entity, Date lastActivityDate) throws JSONObjectAdapterException {
 		ProjectHeader header = new ProjectHeader();
 		header.setId(entity.getId());
@@ -99,7 +101,7 @@ public class ProjectBadgeTest {
 		header.setLastActivity(lastActivityDate);
 		widget.configure(header);
 	}
-	
+
 	@Test
 	public void testConfigure() throws Exception {
 		ProjectHeader header = new ProjectHeader();
@@ -109,7 +111,7 @@ public class ProjectBadgeTest {
 		header.setId(id);
 		header.setName(name);
 		header.setLastActivity(lastActivity);
-		
+
 		widget.configure(header);
 		verify(mockView).configure(eq(name), anyString());
 		verify(mockView).setLastActivityVisible(true);
@@ -117,7 +119,7 @@ public class ProjectBadgeTest {
 		verify(mockView).setFavoritesWidget(any(Widget.class));
 		verify(mockFavoriteWidget).asWidget();
 	}
-	
+
 	@Test
 	public void testConfigureNoActivityDate() throws Exception {
 		ProjectHeader header = new ProjectHeader();
@@ -130,7 +132,7 @@ public class ProjectBadgeTest {
 		verify(mockView).setLastActivityVisible(false);
 		verify(mockView, never()).setLastActivityText(anyString());
 	}
-	
+
 	@Test
 	public void testGetProjectTooltipNoUserProfile() {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockUserProfileAsyncHandler).getUserProfile(anyString(), any(AsyncCallback.class));
@@ -141,18 +143,18 @@ public class ProjectBadgeTest {
 		header.setName(name);
 		header.setModifiedBy(Long.valueOf(userProfile.getOwnerId()));
 		widget.configure(header);
-		//note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
-		Map<String,String> map = new HashMap<String, String>();
+		// note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
+		Map<String, String> map = new HashMap<String, String>();
 		List<String> order = new ArrayList<String>();
 		order.add("ID");
 		map.put("ID", header.getId());
 		String expected = ProvViewUtil.createEntityPopoverHtml(new KeyValueDisplay<String>(map, order)).asString();
-		
+
 		verify(mockView).setTooltip(stringCaptor.capture());
 		String tooltip = stringCaptor.getValue();
 		assertEquals(expected, tooltip);
 	}
-	
+
 	@Test
 	public void testGetProjectTooltipComplete() {
 		ProjectHeader header = new ProjectHeader();
@@ -163,7 +165,7 @@ public class ProjectBadgeTest {
 		header.setModifiedBy(Long.valueOf(userProfile.getOwnerId()));
 		header.setModifiedOn(mockDate);
 		widget.configure(header);
-		Map<String,String> map = new HashMap<String, String>();
+		Map<String, String> map = new HashMap<String, String>();
 		List<String> order = new ArrayList<String>();
 		order.add("ID");
 		map.put("ID", header.getId());
@@ -172,15 +174,15 @@ public class ProjectBadgeTest {
 		order.add("Modified On");
 		map.put("Modified On", "today");
 		String expected = ProvViewUtil.createEntityPopoverHtml(new KeyValueDisplay<String>(map, order)).asString();
-		//note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
+		// note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
 		verify(mockView).setTooltip(stringCaptor.capture());
 		String tooltip = stringCaptor.getValue();
 		assertEquals(expected, tooltip);
 	}
-	
+
 	@Test
 	public void testEntityClicked() throws Exception {
-		//check the passthrough
+		// check the passthrough
 		String entityId = "syn12345";
 		Project testProject = new Project();
 		testProject.setModifiedBy("4444");

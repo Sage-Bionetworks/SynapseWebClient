@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.FormControlStatic;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -17,8 +15,9 @@ import com.google.inject.Inject;
  *
  */
 public class ColumnModelTableRowViewerImpl extends AbstractColumnModelTableRow implements ColumnModelTableRowViewer {
-	
-	public interface Binder extends UiBinder<TableRow, ColumnModelTableRowViewerImpl> {	}
+
+	public interface Binder extends UiBinder<TableRow, ColumnModelTableRowViewerImpl> {
+	}
 
 	@UiField
 	FormControlStatic name;
@@ -32,14 +31,14 @@ public class ColumnModelTableRowViewerImpl extends AbstractColumnModelTableRow i
 	FormControlStatic defaultValue;
 	@UiField
 	FormControlStatic restrictValues;
-	
+
 	String id;
-	
+
 	@Inject
-	public ColumnModelTableRowViewerImpl(Binder uiBinder){
+	public ColumnModelTableRowViewerImpl(Binder uiBinder) {
 		row = uiBinder.createAndBindUi(this);
 	}
-	
+
 	@Override
 	public String getId() {
 		return id;
@@ -114,6 +113,7 @@ public class ColumnModelTableRowViewerImpl extends AbstractColumnModelTableRow i
 	public ColumnFacetTypeViewEnum getFacetType() {
 		return ColumnFacetTypeViewEnum.getEnumForFriendlyName(facetType.getText());
 	}
+
 	@Override
 	public void setFacetType(ColumnFacetTypeViewEnum type) {
 		this.facetType.setText(type.toString());

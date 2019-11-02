@@ -2,10 +2,8 @@ package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
-
 import java.util.HashMap;
 import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -14,6 +12,7 @@ import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageLinkConfigEditor;
 import org.sagebionetworks.web.shared.WikiPageKey;
+
 public class ImageLinkConfigEditorTest {
 
 	@Mock
@@ -25,9 +24,9 @@ public class ImageLinkConfigEditorTest {
 	WikiPageKey wikiKey;
 	Map<String, String> descriptor;
 
-	
+
 	@Before
-	public void setup(){
+	public void setup() {
 		descriptor = new HashMap<String, String>();
 		MockitoAnnotations.initMocks(this);
 		editor = new ImageLinkConfigEditor(mockImageConfigEditor);
@@ -52,7 +51,7 @@ public class ImageLinkConfigEditorTest {
 	}
 
 	@Test
-	public void testUpdateDescriptorFromView(){
+	public void testUpdateDescriptorFromView() {
 		editor.updateDescriptorFromView();
 		verify(mockImageConfigEditor).updateDescriptorFromView();
 	}

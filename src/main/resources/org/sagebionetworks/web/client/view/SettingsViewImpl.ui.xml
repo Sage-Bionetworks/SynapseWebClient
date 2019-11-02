@@ -1,6 +1,7 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
@@ -10,154 +11,205 @@
 		<bh:Div>
 			<b:Row>
 				<b:Column size="LG_6">
-					<bh:Div ui:field="editProfilePanel" addStyleNames="highlight-box">
-						<b:Button ui:field="editProfileButton" icon="EDIT" >Edit Profile</b:Button>
+					<bh:Div ui:field="editProfilePanel"
+						addStyleNames="highlight-box">
+						<b:Button ui:field="editProfileButton" icon="EDIT">Edit
+							Profile</b:Button>
 					</bh:Div>
-					<bh:Div ui:field="dateTimeFormatPanel" addStyleNames="highlight-box">
+					<bh:Div ui:field="dateTimeFormatPanel"
+						addStyleNames="highlight-box">
 						<b:ButtonGroup>
-							<b:Button ui:field="dateFormatDropdown" dataToggle="DROPDOWN" size="SMALL" text="Local time" addStyleNames="margin-top-10"/>
+							<b:Button ui:field="dateFormatDropdown"
+								dataToggle="DROPDOWN" size="SMALL" text="Local time"
+								addStyleNames="margin-top-10" />
 							<b:DropDownMenu>
-								<b:AnchorListItem ui:field="dateFormatLocal" text="Local time"/>
-								<b:AnchorListItem ui:field="dateFormatUTC" text="UTC"/>
+								<b:AnchorListItem ui:field="dateFormatLocal"
+									text="Local time" />
+								<b:AnchorListItem ui:field="dateFormatUTC"
+									text="UTC" />
 							</b:DropDownMenu>
 						</b:ButtonGroup>
 					</bh:Div>
 					<bh:Div addStyleNames="light-border" marginTop="10">
 						<bh:Div addStyleNames="highlight-title">
-			    			<bh:Text>Certification</bh:Text>
-			    		</bh:Div>
-			    		<bh:Div>
-							<bh:Div marginLeft="10" marginRight="10" marginTop="10" marginBottom="10">
+							<bh:Text>Certification</bh:Text>
+						</bh:Div>
+						<bh:Div>
+							<bh:Div marginLeft="10" marginRight="10" marginTop="10"
+								marginBottom="10">
 								<b:Button ui:field="certificationButton">Get Certified</b:Button>
-								<b:Button ui:field="certificationPassedButton" type="SUCCESS" visible="false">Passed Certification Quiz</b:Button>
+								<b:Button ui:field="certificationPassedButton"
+									type="SUCCESS" visible="false">Passed Certification Quiz</b:Button>
 							</bh:Div>
-							<w:HelpWidget helpMarkdown="There are times where human data can only be shared with certain restrictions. Learn what the rules are and how to apply and comply with data privacy levels. This topic is covered during certification."
-									text="More info..." href="https://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#certified-users"/>
+							<w:HelpWidget
+								helpMarkdown="There are times where human data can only be shared with certain restrictions. Learn what the rules are and how to apply and comply with data privacy levels. This topic is covered during certification."
+								text="More info..."
+								href="https://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#certified-users" />
 						</bh:Div>
 					</bh:Div>
-					<bh:Div ui:field="profileValidationUI" addStyleNames="light-border" marginTop="10">
+					<bh:Div ui:field="profileValidationUI"
+						addStyleNames="light-border" marginTop="10">
 						<bh:Div addStyleNames="highlight-title">
-			    			<bh:Text>Profile Validation</bh:Text>
-			    		</bh:Div>
+							<bh:Text>Profile Validation</bh:Text>
+						</bh:Div>
 						<bh:Div>
-							<bh:Div marginLeft="10" marginRight="10" marginTop="10" marginBottom="10">
-								<b:Button ui:field="verificationSubmittedButton" type="PRIMARY" addStyleNames="margin-right-5">Profile Validation Pending</b:Button>
-								<b:Button ui:field="verificationRejectedButton" type="WARNING" addStyleNames="margin-right-5">Profile Validation Rejected</b:Button>
-								<b:Button ui:field="verificationSuspendedButton" type="WARNING" addStyleNames="margin-right-5">Validated Profile Suspended</b:Button>
-								<b:Button ui:field="resubmitProfileValidationButton" type="PRIMARY" addStyleNames="margin-right-5">Revalidate My Profile</b:Button>
-								<b:Button ui:field="verificationApprovedButton" type="SUCCESS" addStyleNames="margin-right-5">Profile Validated</b:Button>
+							<bh:Div marginLeft="10" marginRight="10" marginTop="10"
+								marginBottom="10">
+								<b:Button ui:field="verificationSubmittedButton"
+									type="PRIMARY" addStyleNames="margin-right-5">Profile Validation Pending</b:Button>
+								<b:Button ui:field="verificationRejectedButton"
+									type="WARNING" addStyleNames="margin-right-5">Profile Validation Rejected</b:Button>
+								<b:Button ui:field="verificationSuspendedButton"
+									type="WARNING" addStyleNames="margin-right-5">Validated Profile Suspended</b:Button>
+								<b:Button ui:field="resubmitProfileValidationButton"
+									type="PRIMARY" addStyleNames="margin-right-5">Revalidate My Profile</b:Button>
+								<b:Button ui:field="verificationApprovedButton"
+									type="SUCCESS" addStyleNames="margin-right-5">Profile Validated</b:Button>
 							</bh:Div>
 						</bh:Div>
 						<bh:Div ui:field="verifyAlert">
-							<bh:Div marginLeft="10" marginRight="10" marginTop="10" marginBottom="10">
+							<bh:Div marginLeft="10" marginRight="10" marginTop="10"
+								marginBottom="10">
 								<bh:Paragraph>
-									<bh:Text>Certified users with a validated profile can access more features and data.</bh:Text>
-									<b:Anchor ui:field="requestProfileValidationLink1" text="Validate your profile today!"/>
+									<bh:Text>Certified users with a validated profile can access
+										more features and data.</bh:Text>
+									<b:Anchor ui:field="requestProfileValidationLink1"
+										text="Validate your profile today!" />
 								</bh:Paragraph>
 								<bh:Paragraph>
 									<bh:OrderedList>
 										<b:ListItem>
-											<b:Anchor ui:field="reviewProfileLink" text="Review and complete your profile."/>
+											<b:Anchor ui:field="reviewProfileLink"
+												text="Review and complete your profile." />
 										</b:ListItem>
 										<b:ListItem>
-											<b:Anchor ui:field="createOrcIdLink" text="Create/populate a public ORCID profile or link to your existing one."/>
+											<b:Anchor ui:field="createOrcIdLink"
+												text="Create/populate a public ORCID profile or link to your existing one." />
 										</b:ListItem>
 										<b:ListItem>
-											<b:Anchor ui:field="requestProfileValidationLink2" text="Request profile validation."/>
+											<b:Anchor ui:field="requestProfileValidationLink2"
+												text="Request profile validation." />
 										</b:ListItem>
 									</bh:OrderedList>
 								</bh:Paragraph>
 							</bh:Div>
 						</bh:Div>
-						<w:HelpWidget helpMarkdown="A Synapse Qualified Researcher is a Certified User with a validated user profile.&#10;Synapse Qualified Researchers are eligible to request access to Bridge data."
-							text="More info..." href="http://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#validated-profile"/>
+						<w:HelpWidget
+							helpMarkdown="A Synapse Qualified Researcher is a Certified User with a validated user profile.&#10;Synapse Qualified Researchers are eligible to request access to Bridge data."
+							text="More info..."
+							href="http://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#validated-profile" />
 					</bh:Div>
 				</b:Column>
 				<b:Column size="LG_6">
 					<bh:Div ui:field="changeSynapsePasswordUI">
-						<bh:Div ui:field="changeSynapsePasswordHighlightBox" addStyleNames="highlight-box" >
+						<bh:Div ui:field="changeSynapsePasswordHighlightBox"
+							addStyleNames="highlight-box">
 							<bh:Div addStyleNames="form-horizontal">
-								<b:Row ui:field="currentPassword" addStyleNames="form-group">
-									<b:Column size="SM_3" addStyleNames="control-label boldText">
+								<b:Row ui:field="currentPassword"
+									addStyleNames="form-group">
+									<b:Column size="SM_3"
+										addStyleNames="control-label boldText">
 										<bh:Text>Current password</bh:Text>
 									</b:Column>
 									<b:Column size="SM_8">
-										<g:PasswordTextBox ui:field="currentPasswordField" addStyleNames="form-control"/>
+										<g:PasswordTextBox
+											ui:field="currentPasswordField" addStyleNames="form-control" />
 									</b:Column>
 								</b:Row>
 								<b:Row ui:field="password1" addStyleNames="form-group">
-									<b:Column size="SM_3" addStyleNames="control-label boldText">
+									<b:Column size="SM_3"
+										addStyleNames="control-label boldText">
 										<bh:Text>New password</bh:Text>
 									</b:Column>
 									<b:Column size="SM_8">
-										<g:PasswordTextBox ui:field="password1Field" styleName="form-control"/>
+										<g:PasswordTextBox ui:field="password1Field"
+											styleName="form-control" />
 									</b:Column>
 								</b:Row>
 								<b:Row ui:field="password2" addStyleNames="form-group">
-									<b:Column size="SM_3" addStyleNames="control-label boldText">
+									<b:Column size="SM_3"
+										addStyleNames="control-label boldText">
 										<bh:Text>Confirm password</bh:Text>
 									</b:Column>
 									<b:Column size="SM_8">
-										<g:PasswordTextBox ui:field="password2Field" styleName="form-control"/>
+										<g:PasswordTextBox ui:field="password2Field"
+											styleName="form-control" />
 									</b:Column>
 								</b:Row>
 								<b:Row>
 									<b:Column size="SM_12">
-										<b:Button ui:field="changePasswordBtn" addStyleNames="margin-top-10 margin-bottom-10" text="Change Password"/>
-								 		<g:FlowPanel ui:field="forgotPasswordContainer"/>
+										<b:Button ui:field="changePasswordBtn"
+											addStyleNames="margin-top-10 margin-bottom-10"
+											text="Change Password" />
+										<g:FlowPanel ui:field="forgotPasswordContainer" />
 									</b:Column>
 								</b:Row>
 								<b:Row>
 									<b:Column size="SM_12">
-										<g:SimplePanel ui:field="passwordSynAlertPanel"/>
+										<g:SimplePanel ui:field="passwordSynAlertPanel" />
 									</b:Column>
 								</b:Row>
 							</bh:Div>
 						</bh:Div>
 					</bh:Div>
-					<bh:Div ui:field="orcIdUI" addStyleNames="light-border" marginTop="10" marginBottom="10">
+					<bh:Div ui:field="orcIdUI" addStyleNames="light-border"
+						marginTop="10" marginBottom="10">
 						<bh:Div addStyleNames="highlight-title">
-			    			<bh:Text>ORCID</bh:Text>
-			    		</bh:Div>
-			    		<bh:Div marginLeft="10" marginRight="10" marginTop="10" marginBottom="10">
-				    		<b:Button ui:field="linkORCIDButton" addStyleNames="margin-right-10">Link to ORCID</b:Button>
-							<b:Anchor ui:field="orcIdField" target="_blank" addStyleNames="margin-right-15" />
+							<bh:Text>ORCID</bh:Text>
+						</bh:Div>
+						<bh:Div marginLeft="10" marginRight="10" marginTop="10"
+							marginBottom="10">
+							<b:Button ui:field="linkORCIDButton"
+								addStyleNames="margin-right-10">Link to ORCID</b:Button>
+							<b:Anchor ui:field="orcIdField" target="_blank"
+								addStyleNames="margin-right-15" />
 							<bh:Span ui:field="unbindButtonUI">
-								<b:Tooltip title="Unlink this ORCID from your Synapse profile.">
-									<b:Icon type="TIMES" ui:field="unbindButton" addStyleNames="imageButton text-danger" />
+								<b:Tooltip
+									title="Unlink this ORCID from your Synapse profile.">
+									<b:Icon type="TIMES" ui:field="unbindButton"
+										addStyleNames="imageButton text-danger" />
 								</b:Tooltip>
 							</bh:Span>
-			    		</bh:Div>
+						</bh:Div>
 					</bh:Div>
-				<bh:Div addStyleNames="light-border" marginTop="10">
+					<bh:Div addStyleNames="light-border" marginTop="10">
 						<bh:Div addStyleNames="highlight-title">
-						<bh:Text>Synapse Terms and Conditions for Use</bh:Text>
-					</bh:Div>
-					<bh:Div>
-							<bh:Div marginLeft="10" marginRight="10" marginTop="10" marginBottom="10">
-								<b:Button ui:field="synapseTermsAcceptedButton" type="SUCCESS">Accepted Terms and Conditions for Use</b:Button>
+							<bh:Text>Synapse Terms and Conditions for Use</bh:Text>
+						</bh:Div>
+						<bh:Div>
+							<bh:Div marginLeft="10" marginRight="10" marginTop="10"
+								marginBottom="10">
+								<b:Button ui:field="synapseTermsAcceptedButton"
+									type="SUCCESS">Accepted Terms and Conditions for Use</b:Button>
 							</bh:Div>
 						</bh:Div>
 					</bh:Div>
-					
+
 				</b:Column>
 			</b:Row>
-			<bh:Div ui:field="emailSettingsPanel" addStyleNames="highlight-box margin-bottom-15">
+			<bh:Div ui:field="emailSettingsPanel"
+				addStyleNames="highlight-box margin-bottom-15">
 				<bh:Div ui:field="emailsPanel" />
 				<g:FlowPanel styleName="margin-left-10 margin-top-10">
-					<b:CheckBox ui:field="emailNotificationsCheckbox" text="Allow Synapse to send me email notifications" addStyleNames="margin-0-imp" />
+					<b:CheckBox ui:field="emailNotificationsCheckbox"
+						text="Allow Synapse to send me email notifications"
+						addStyleNames="margin-0-imp" />
 				</g:FlowPanel>
 				<g:SimplePanel ui:field="notificationSynAlertPanel" />
 			</bh:Div>
-			<g:FlowPanel addStyleNames="light-border padding-10 margin-bottom-15">
+			<g:FlowPanel
+				addStyleNames="light-border padding-10 margin-bottom-15">
 				<bh:Div addStyleNames="highlight-title">
 					<bh:Text>Following</bh:Text>
-					<w:HelpWidget helpMarkdown="These are discussion threads and forums that you have been subscribed to which means you will receive an email when someone responds or creates a thread." 
-						href="http://docs.synapse.org/articles/discussion.html" addStyleNames="margin-left-5"/>
+					<w:HelpWidget
+						helpMarkdown="These are discussion threads and forums that you have been subscribed to which means you will receive an email when someone responds or creates a thread."
+						href="http://docs.synapse.org/articles/discussion.html"
+						addStyleNames="margin-left-5" />
 				</bh:Div>
 				<bh:Div ui:field="subscriptionsContainer" />
 			</g:FlowPanel>
-			<g:HTMLPanel ui:field="apiKeyHighlightBox" addStyleNames="highlight-box">
+			<g:HTMLPanel ui:field="apiKeyHighlightBox"
+				addStyleNames="highlight-box">
 				<p>Using an API key allows you to authenticate your scripts for an
 					indefinite amount of time. It is important that you treat your API
 					key with
@@ -165,13 +217,17 @@
 				<b:Panel ui:field="apiKeyUI">
 					<b:PanelBody>
 						<g:ScrollPanel styleName="center">
-							<g:TextBox ui:field="apiKeyContainer" addStyleNames="border-none noBackground center" readOnly="true" width="100%" />
+							<g:TextBox ui:field="apiKeyContainer"
+								addStyleNames="border-none noBackground center" readOnly="true"
+								width="100%" />
 						</g:ScrollPanel>
 					</b:PanelBody>
 				</b:Panel>
-				<g:SimplePanel ui:field="apiSynAlertPanel"/>
-				<b:Button ui:field="showApiKey" addStyleNames="margin-top-10" text="Show API Key"/>
-				<b:Button ui:field="changeApiKey" addStyleNames="margin-top-10" text="Change API Key"/>
+				<g:SimplePanel ui:field="apiSynAlertPanel" />
+				<b:Button ui:field="showApiKey"
+					addStyleNames="margin-top-10" text="Show API Key" />
+				<b:Button ui:field="changeApiKey"
+					addStyleNames="margin-top-10" text="Change API Key" />
 			</g:HTMLPanel>
 
 			<bh:Div addStyleNames="clear"></bh:Div>

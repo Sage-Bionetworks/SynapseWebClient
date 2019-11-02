@@ -4,7 +4,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
@@ -14,22 +13,20 @@ import com.google.inject.Inject;
 
 /**
  * UserId cell editor
+ * 
  * @author Jay
  *
  */
-public class UserIdCellEditor implements CellEditor{
+public class UserIdCellEditor implements CellEditor {
 	UserIdCellEditorView view;
 	SynapseSuggestBox peopleSuggestWidget;
 	UserGroupSuggestionProvider provider;
 	UserIdCellRenderer userIdCellRenderer;
 	ClickHandler onUserBadgeClick;
 	String value;
-	
+
 	@Inject
-	public UserIdCellEditor(UserIdCellEditorView view, 
-			SynapseSuggestBox peopleSuggestWidget,
-			UserGroupSuggestionProvider provider,
-			UserIdCellRenderer userIdCellRenderer) {
+	public UserIdCellEditor(UserIdCellEditorView view, SynapseSuggestBox peopleSuggestWidget, UserGroupSuggestionProvider provider, UserIdCellRenderer userIdCellRenderer) {
 		this.view = view;
 		this.peopleSuggestWidget = peopleSuggestWidget;
 		this.provider = provider;
@@ -51,11 +48,11 @@ public class UserIdCellEditor implements CellEditor{
 		};
 		view.setUserIdCellRendererClickHandler(onUserBadgeClick);
 	}
-	
+
 	public void onUserSelected(UserGroupSuggestion suggestion) {
 		setValue(suggestion.getId());
 	}
-	
+
 	@Override
 	public boolean isValid() {
 		return true;
@@ -70,7 +67,7 @@ public class UserIdCellEditor implements CellEditor{
 		}
 		return value;
 	}
-	
+
 	@Override
 	public HandlerRegistration addKeyDownHandler(KeyDownHandler handler) {
 		return peopleSuggestWidget.addKeyDownHandler(handler);

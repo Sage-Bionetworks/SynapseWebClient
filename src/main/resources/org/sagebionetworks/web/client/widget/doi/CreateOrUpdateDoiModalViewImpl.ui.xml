@@ -3,46 +3,58 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
- 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<bh:Div>
-		<b:Modal ui:field="doiModal" closable="true" dataBackdrop="STATIC" dataKeyboard="true">
+		<b:Modal ui:field="doiModal" closable="true"
+			dataBackdrop="STATIC" dataKeyboard="true">
 			<b:ModalHeader>
-			    <b:Heading ui:field="title" size="H4" text="Create or Update Doi" addStyleNames="displayInline"/>
-			<bh:Span ui:field="modalTitleContainer" />
+				<b:Heading ui:field="title" size="H4"
+					text="Create or Update Doi" addStyleNames="displayInline" />
+				<bh:Span ui:field="modalTitleContainer" />
 			</b:ModalHeader>
 			<b:ModalBody>
-				<bh:Paragraph text="Minting a DOI allows you to credit contributors to your work, and makes it easier to cite your work."/>
-				<bh:Paragraph text="Note that all supplementary information attached to a DOI is publicly available outside of Synapse, even if your data is private." addStyleNames="em"/>
+				<bh:Paragraph
+					text="Minting a DOI allows you to credit contributors to your work, and makes it easier to cite your work." />
+				<bh:Paragraph
+					text="Note that all supplementary information attached to a DOI is publicly available outside of Synapse, even if your data is private."
+					addStyleNames="em" />
 				<bh:Div ui:field="doiEditorDiv">
 					<b:Form>
 						<b:FormGroup>
 							<b:FormLabel>Creator(s), one per line</b:FormLabel>
-							<w:HelpWidget helpMarkdown="The main creators or authors of your work, in priority order. These may be the names of actual people and/or institutions. One per line."
-										  addStyleNames="margin-left-5" placement="BOTTOM"/>
-							<b:TextArea ui:field="creatorsField" visibleLines="4" placeholder="Smith, Rosalind F&#10;Colleague, Marie C&#10;Sunnyside Tech Research Consortium"  />
+							<w:HelpWidget
+								helpMarkdown="The main creators or authors of your work, in priority order. These may be the names of actual people and/or institutions. One per line."
+								addStyleNames="margin-left-5" placement="BOTTOM" />
+							<b:TextArea ui:field="creatorsField" visibleLines="4"
+								placeholder="Smith, Rosalind F&#10;Colleague, Marie C&#10;Sunnyside Tech Research Consortium" />
 						</b:FormGroup>
 						<b:FormGroup>
 							<b:FormLabel>Title(s)
 							</b:FormLabel>
-							<w:HelpWidget helpMarkdown="The title or titles of your work. One per line."
-										  addStyleNames="margin-left-5" placement="BOTTOM"/>
-							<b:TextArea ui:field="titlesField" visibleLines="2" placeholder="My Digital Object" />
+							<w:HelpWidget
+								helpMarkdown="The title or titles of your work. One per line."
+								addStyleNames="margin-left-5" placement="BOTTOM" />
+							<b:TextArea ui:field="titlesField" visibleLines="2"
+								placeholder="My Digital Object" />
 						</b:FormGroup>
 						<bh:Div addStyleNames="flexcontainer-row">
 							<b:FormGroup>
 								<b:FormLabel>General Resource Type</b:FormLabel>
-								<w:HelpWidget helpMarkdown="The general type of content that best matches this work."
-											  addStyleNames="margin-left-5" placement="BOTTOM"/>
+								<w:HelpWidget
+									helpMarkdown="The general type of content that best matches this work."
+									addStyleNames="margin-left-5" placement="BOTTOM" />
 								<bh:Div>
-									<b:ListBox ui:field="resourceTypeGeneralSelect"/>
+									<b:ListBox ui:field="resourceTypeGeneralSelect" />
 								</bh:Div>
 							</b:FormGroup>
-							<bh:Span width="80px"/>
+							<bh:Span width="80px" />
 							<b:FormGroup>
 								<b:FormLabel>Publication Year</b:FormLabel>
-								<w:HelpWidget helpMarkdown="The year your work became or will become public. May be at most one year in the future."
-											  addStyleNames="margin-left-5" placement="BOTTOM"/>
-								<b:IntegerBox ui:field="publicationYearField" placeholder="YYYY" />
+								<w:HelpWidget
+									helpMarkdown="The year your work became or will become public. May be at most one year in the future."
+									addStyleNames="margin-left-5" placement="BOTTOM" />
+								<b:IntegerBox ui:field="publicationYearField"
+									placeholder="YYYY" />
 							</b:FormGroup>
 						</bh:Div>
 					</b:Form>
@@ -50,15 +62,16 @@
 				<bh:Div ui:field="doiOverwriteWarning">
 					<b:Alert type="WARNING" addStyleNames="margin-top-10">
 						<bh:Strong text="Note: &nbsp;" />
-						<bh:Text text="Updating the DOI information will cause old information to be lost!"/>
+						<bh:Text
+							text="Updating the DOI information will cause old information to be lost!" />
 					</b:Alert>
 				</bh:Div>
-				<bh:Div ui:field="synAlert"/>
+				<bh:Div ui:field="synAlert" />
 			</b:ModalBody>
 			<b:ModalFooter>
-				<bh:Div ui:field="jobTrackingWidget"/>
-			    <b:Button type="LINK" ui:field="cancelButton">Cancel</b:Button>
-			    <b:Button type="PRIMARY" text="OK" ui:field="mintDoiButton"/>
+				<bh:Div ui:field="jobTrackingWidget" />
+				<b:Button type="LINK" ui:field="cancelButton">Cancel</b:Button>
+				<b:Button type="PRIMARY" text="OK" ui:field="mintDoiButton" />
 			</b:ModalFooter>
 		</b:Modal>
 	</bh:Div>

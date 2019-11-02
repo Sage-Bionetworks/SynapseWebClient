@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -19,7 +18,6 @@ import org.sagebionetworks.web.shared.provenance.ExternalGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
-
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -44,8 +42,7 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 	private Map<String, ProvNodeContainer> nodeToContainer;
 
 	@Inject
-	public ProvenanceWidgetViewImpl(SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle,
-			SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector) {
+	public ProvenanceWidgetViewImpl(SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector) {
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
@@ -143,8 +140,7 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 			afterJSPlumbLoad();
 		}
 
-		if (startingNodeContainer != null && graph.getNodes().size() > 3
-				&& DisplayUtils.isInViewport(startingNodeContainer)) {
+		if (startingNodeContainer != null && graph.getNodes().size() > 3 && DisplayUtils.isInViewport(startingNodeContainer)) {
 			startingNodeContainer.getElement().scrollIntoView();
 		}
 	}
@@ -160,15 +156,13 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 			ProvNodeContainer container = ProvViewUtil.createEntityContainer((EntityGraphNode) node, iconsImageBundle);
 			return container;
 		} else if (node instanceof ActivityGraphNode) {
-			ProvNodeContainer container = ProvViewUtil.createActivityContainer((ActivityGraphNode) node,
-					iconsImageBundle, ginInjector);
+			ProvNodeContainer container = ProvViewUtil.createActivityContainer((ActivityGraphNode) node, iconsImageBundle, ginInjector);
 			// create tool tip for defined activities only
 			return container;
 		} else if (node instanceof ExpandGraphNode) {
 			return ProvViewUtil.createExpandContainer((ExpandGraphNode) node, presenter, this);
 		} else if (node instanceof ExternalGraphNode) {
-			ProvNodeContainer container = ProvViewUtil.createExternalUrlContainer((ExternalGraphNode) node,
-					iconsImageBundle);
+			ProvNodeContainer container = ProvViewUtil.createExternalUrlContainer((ExternalGraphNode) node, iconsImageBundle);
 			return container;
 		}
 		return null;
@@ -187,8 +181,8 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 	}-*/;
 
 	/**
-	 * Call before connecting divs. Suspends drawing graph until bulk operation is
-	 * complete (call afterJSPlumbLoad)
+	 * Call before connecting divs. Suspends drawing graph until bulk operation is complete (call
+	 * afterJSPlumbLoad)
 	 * 
 	 * @param parentContainerId
 	 */
@@ -267,12 +261,12 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 	 * Call after connecting divs.
 	 */
 	private static native void afterJSPlumbLoad() /*-{
-													try {
-													jsPlumbInstance.setSuspendDrawing(false, true);
-													} catch(err) {
-													console.log(err);
-													}
-													}-*/;
+		try {
+			jsPlumbInstance.setSuspendDrawing(false, true);
+		} catch (err) {
+			console.log(err);
+		}
+	}-*/;
 
 	@Override
 	public void markOldVersions(List<String> notCurrentNodeIds) {

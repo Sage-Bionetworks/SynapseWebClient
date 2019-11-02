@@ -2,10 +2,8 @@ package org.sagebionetworks.web.client.widget.table.modal.wizard;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.ModalSize;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -16,23 +14,23 @@ import com.google.inject.Inject;
  * @author jhill
  *
  */
-public class ModalWizardWidgetImpl implements ModalWizardWidget,  ModalWizardView.Presenter, IsWidget {
+public class ModalWizardWidgetImpl implements ModalWizardWidget, ModalWizardView.Presenter, IsWidget {
 
 	List<WizardCallback> callbacks;
 	ModalPage currentPage;
 	ModalPage firstPage;
 	ModalWizardView view;
 	SynapseAlert synAlert;
-	
+
 	@Inject
-	public ModalWizardWidgetImpl(ModalWizardView view, SynapseAlert synAlert){
+	public ModalWizardWidgetImpl(ModalWizardView view, SynapseAlert synAlert) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.view.setPresenter(this);
 		view.setSynAlert(synAlert);
 		callbacks = new ArrayList<WizardCallback>();
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
@@ -46,7 +44,7 @@ public class ModalWizardWidgetImpl implements ModalWizardWidget,  ModalWizardVie
 
 	@Override
 	public void onCancel() {
-		if(!callbacks.isEmpty()){
+		if (!callbacks.isEmpty()) {
 			for (WizardCallback callback : callbacks) {
 				callback.onCanceled();
 			}
@@ -84,15 +82,18 @@ public class ModalWizardWidgetImpl implements ModalWizardWidget,  ModalWizardVie
 		synAlert.handleException(error);
 		view.setLoading(false);
 	}
+
 	@Override
 	public void setErrorMessage(String message) {
 		synAlert.showError(message);
 		view.setLoading(false);
 	}
+
 	@Override
 	public void clearErrors() {
 		synAlert.clear();
 	}
+
 	@Override
 	public void onFinished() {
 		for (WizardCallback callback : callbacks) {
@@ -125,17 +126,17 @@ public class ModalWizardWidgetImpl implements ModalWizardWidget,  ModalWizardVie
 			callbacks.add(callback);
 		}
 	}
-	
+
 	@Override
 	public void configure(ModalPage firstPage) {
 		this.firstPage = firstPage;
 	}
-	
+
 	@Override
 	public void setHelp(String helpMarkdown, String helpUrl) {
 		view.setHelp(helpMarkdown, helpUrl);
 	}
-	
+
 	public List<WizardCallback> getCallbacks() {
 		return callbacks;
 	}

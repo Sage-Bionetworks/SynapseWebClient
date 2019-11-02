@@ -6,7 +6,6 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.HomeView;
-
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -19,12 +18,9 @@ public class HomePresenter extends AbstractActivity implements Presenter<Home> {
 	private AuthenticationController authenticationController;
 	private CookieProvider cookies;
 	public static final String SYNAPSE_BLUE = "#1e7098";
-	
+
 	@Inject
-	public HomePresenter(HomeView view,  
-			AuthenticationController authenticationController, 
-			GlobalApplicationState globalApplicationState,
-			CookieProvider cookies){
+	public HomePresenter(HomeView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, CookieProvider cookies) {
 		this.view = view;
 		// Set the presenter on the view
 		this.authenticationController = authenticationController;
@@ -41,11 +37,11 @@ public class HomePresenter extends AbstractActivity implements Presenter<Home> {
 
 	@Override
 	public void setPlace(Home place) {
-		this.place = place;		
+		this.place = place;
 		view.refresh();
-		if(authenticationController.isLoggedIn()) {
+		if (authenticationController.isLoggedIn()) {
 			view.showLoggedInUI(authenticationController.getCurrentUserProfile());
-			//note that the session token is validated on every place change (and on app load)
+			// note that the session token is validated on every place change (and on app load)
 		} else {
 			if (cookies.getCookie(CookieKeys.USER_LOGGED_IN_RECENTLY) != null) {
 				view.showLoginUI();
@@ -54,7 +50,7 @@ public class HomePresenter extends AbstractActivity implements Presenter<Home> {
 			}
 		}
 	}
-	
+
 	@Override
 	public String mayStop() {
 		view.clear();

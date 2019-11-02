@@ -1,11 +1,9 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -22,7 +20,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -41,14 +38,9 @@ public class IntendedDataUseReportButton implements IsWidget {
 	BigPromptModalView copyTextModal;
 	Map<String, Submission> researchProjectId2Submission;
 	DateTimeUtils dateTimeUtils;
-	
+
 	@Inject
-	public IntendedDataUseReportButton(Button button, 
-			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
-			DataAccessClientAsync dataAccessClient,
-			PopupUtilsView popupUtils,
-			BigPromptModalView copyTextModal,
-			DateTimeUtils dateTimeUtils) {
+	public IntendedDataUseReportButton(Button button, IsACTMemberAsyncHandler isACTMemberAsyncHandler, DataAccessClientAsync dataAccessClient, PopupUtilsView popupUtils, BigPromptModalView copyTextModal, DateTimeUtils dateTimeUtils) {
 		this.button = button;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.popupUtils = popupUtils;
@@ -64,8 +56,8 @@ public class IntendedDataUseReportButton implements IsWidget {
 			researchProjectId2Submission = new HashMap<>();
 			gatherAllSubmissions(null);
 		});
-	}	
-	
+	}
+
 	public void gatherAllSubmissions(String nextPageToken) {
 		dataAccessClient.getDataAccessSubmissions(ar.getId(), nextPageToken, SubmissionState.APPROVED, SubmissionOrder.CREATED_ON, true, new AsyncCallback<SubmissionPage>() {
 			@Override
@@ -80,14 +72,14 @@ public class IntendedDataUseReportButton implements IsWidget {
 					showIDUs();
 				}
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				popupUtils.showErrorMessage("Unable to get all submissions: " + caught.getMessage());
 			}
 		});
 	}
-	
+
 	public void showIDUs() {
 		StringBuilder sb = new StringBuilder();
 		for (Submission submission : researchProjectId2Submission.values()) {
@@ -100,14 +92,14 @@ public class IntendedDataUseReportButton implements IsWidget {
 			sb.append("\n**Affiliation:** ");
 			sb.append(currentInstitution);
 			String lastModifiedOn = dateTimeUtils.getDateString(submission.getModifiedOn());
-			sb.append("\n**Intended Data Use Statement (accepted on "+lastModifiedOn+"):**\n");
+			sb.append("\n**Intended Data Use Statement (accepted on " + lastModifiedOn + "):**\n");
 			sb.append(currentIDU);
 			sb.append("\n\n-------------\n\n");
 		}
 		copyTextModal.configure(IDU_MODAL_TITLE, IDU_MODAL_FIELD_NAME, sb.toString());
 		copyTextModal.show();
 	}
-	
+
 	public void configure(AccessRequirement ar) {
 		button.setText(GENERATE_REPORT_BUTTON_TEXT);
 		button.setSize(ButtonSize.DEFAULT);
@@ -125,7 +117,7 @@ public class IntendedDataUseReportButton implements IsWidget {
 			}
 		});
 	}
-	
+
 	public Widget asWidget() {
 		return button.asWidget();
 	}

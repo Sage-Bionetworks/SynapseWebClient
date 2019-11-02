@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.InfoAlert;
 import org.sagebionetworks.web.client.widget.header.Header;
-
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.BlurEvent;
@@ -29,8 +28,9 @@ import com.google.inject.Inject;
 
 public class PasswordResetViewImpl extends Composite implements PasswordResetView {
 
-	public interface PasswordResetViewImplUiBinder extends UiBinder<Widget, PasswordResetViewImpl> {}
-	
+	public interface PasswordResetViewImplUiBinder extends UiBinder<Widget, PasswordResetViewImpl> {
+	}
+
 	@UiField
 	DivElement resetPasswordForm;
 	@UiField
@@ -45,7 +45,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	PasswordTextBox password2Field;
 	@UiField
 	TextBox emailAddressField;
-	
+
 	@UiField
 	DivElement currentPassword;
 	@UiField
@@ -63,11 +63,11 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	DivElement password2Error;
 	@UiField
 	Alert emailAddressError;
-	
-	@UiField 
+
+	@UiField
 	Heading pageTitle;
 	@UiField
-	SimplePanel loadingPanel;	
+	SimplePanel loadingPanel;
 
 	@UiField
 	Button submitBtn;
@@ -77,31 +77,29 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 
 	@UiField
 	Div synAlertContainer;
-	
+
 	private Presenter presenter;
 	private Header headerWidget;
-	
+
 	private boolean isShowingResetUI;
-	
+
 	@Inject
-	public PasswordResetViewImpl(PasswordResetViewImplUiBinder binder,
-			Header headerWidget) {		
+	public PasswordResetViewImpl(PasswordResetViewImplUiBinder binder, Header headerWidget) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
-		
+
 		headerWidget.configure();
 		init();
-		
+
 		loadingPanel.setVisible(false);
 		showRequestForm();
 	}
-	
-	private boolean checkEmail(){
+
+	private boolean checkEmail() {
 		emailAddressError.setVisible(false);
 		if (DisplayUtils.isDefined(emailAddressField.getValue())) {
 			return true;
-		}
-		else {
+		} else {
 			emailAddressError.setText(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
 			emailAddressError.setVisible(true);
 			return false;
@@ -110,7 +108,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 
 	private boolean checkCurrentPassword() {
 		DisplayUtils.hideFormError(currentPassword, currentPasswordError);
-		if (!DisplayUtils.isDefined(currentPasswordField.getText())){
+		if (!DisplayUtils.isDefined(currentPasswordField.getText())) {
 			currentPasswordError.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
 			DisplayUtils.showFormError(currentPassword, currentPasswordError);
 			return false;
@@ -120,24 +118,24 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 
 	private boolean checkPassword1() {
 		DisplayUtils.hideFormError(password1, password1Error);
-		if (!DisplayUtils.isDefined(password1Field.getText())){
+		if (!DisplayUtils.isDefined(password1Field.getText())) {
 			password1Error.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
 			DisplayUtils.showFormError(password1, password1Error);
 			return false;
 		} else
 			return true;
 	}
-	
+
 	private boolean checkPassword2() {
 		DisplayUtils.hideFormError(password2, password2Error);
-		if (!DisplayUtils.isDefined(password2Field.getText())){
+		if (!DisplayUtils.isDefined(password2Field.getText())) {
 			password2Error.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
 			DisplayUtils.showFormError(password2, password2Error);
 			return false;
 		} else
 			return true;
 	}
-	
+
 	private boolean checkPasswordMatch() {
 		DisplayUtils.hideFormError(password2, password2Error);
 		if (!password1Field.getValue().equals(password2Field.getValue())) {
@@ -153,7 +151,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 		KeyDownHandler submit = new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
-				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
 					submitBtn.click();
 				}
 			}
@@ -165,25 +163,25 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 			@Override
 			public void onClick(ClickEvent event) {
 				if (isShowingResetUI) {
-					//validate passwords are filled in and match
-					if(checkCurrentPassword() && checkPassword1() && checkPassword2() && checkPasswordMatch()) {
+					// validate passwords are filled in and match
+					if (checkCurrentPassword() && checkPassword1() && checkPassword2() && checkPasswordMatch()) {
 						submitBtn.setEnabled(false);
 						presenter.resetPassword(currentPasswordField.getValue(), password1Field.getValue());
 					}
 				} else {
-					//validate email address is filled in
-					if(checkEmail()) {
+					// validate email address is filled in
+					if (checkEmail()) {
 						submitBtn.setEnabled(false);
 						presenter.requestPasswordReset(emailAddressField.getValue());
 					}
 				}
 			}
 		});
-		
+
 		emailAddressField.getElement().setAttribute("placeholder", "Email address -or- username");
 		password1Field.getElement().setAttribute("placeholder", "Enter password");
 		password2Field.getElement().setAttribute("placeholder", "Confirm password");
-		
+
 		emailAddressField.addBlurHandler(new BlurHandler() {
 			@Override
 			public void onBlur(BlurEvent event) {
@@ -196,7 +194,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 				checkPassword1();
 			}
 		});
-		
+
 		password2Field.addBlurHandler(new BlurHandler() {
 			@Override
 			public void onBlur(BlurEvent event) {
@@ -220,6 +218,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 		isShowingResetUI = false;
 		submitBtn.setVisible(true);
 	}
+
 	@Override
 	public void showResetForm() {
 		clear();
@@ -229,10 +228,11 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 		isShowingResetUI = true;
 		submitBtn.setVisible(true);
 	}
-	
+
 	@Override
 	public void clear() {
-		if(contentHtml != null) contentHtml.setInnerHTML("");
+		if (contentHtml != null)
+			contentHtml.setInnerHTML("");
 		loadingPanel.setVisible(false);
 		submitBtn.setText("Submit");
 		DisplayUtils.hide(sendPasswordChangeForm);
@@ -273,7 +273,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	@Override
 	public void showLoading() {
 		loadingPanel.setWidget(DisplayUtils.getSmallLoadingWidget());
-		loadingPanel.setVisible(true);		
+		loadingPanel.setVisible(true);
 	}
 
 	@Override
@@ -287,16 +287,17 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 		pageTitle.setText(DisplayConstants.REQUEST_EXPIRED);
 		contentHtml.setInnerHTML(DisplayConstants.SET_PASSWORD_EXPIRED);
 	}
-	
+
 	public void setSynAlertWidget(Widget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
 	};
-	
+
 	@Override
 	public void setSubmitButtonEnabled(boolean enabled) {
 		submitBtn.setEnabled(enabled);
 	}
+
 	@Override
 	public void showPasswordResetRequired() {
 		passwordResetRequired.setVisible(true);

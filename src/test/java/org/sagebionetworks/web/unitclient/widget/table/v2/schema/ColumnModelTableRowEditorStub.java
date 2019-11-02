@@ -3,19 +3,20 @@ package org.sagebionetworks.web.unitclient.widget.table.v2.schema;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
  * Stub for ColumnModelTableRowEditor
+ * 
  * @author jmhill
  *
  */
 public class ColumnModelTableRowEditorStub extends ColumnModelTableRowStub implements ColumnModelTableRowEditorWidget {
 
 	private boolean isValid = true;
-	private boolean isSetToBeDefaultFileViewColumn=false;
+	private boolean isSetToBeDefaultFileViewColumn = false;
 	private boolean canHaveDefault = true;
+
 	@Override
 	public IsWidget getWidget(int index) {
 		// TODO Auto-generated method stub
@@ -29,8 +30,7 @@ public class ColumnModelTableRowEditorStub extends ColumnModelTableRowStub imple
 	}
 
 	@Override
-	public void configure(ColumnModel model,
-			SelectionPresenter selectionPresenter) {
+	public void configure(ColumnModel model, SelectionPresenter selectionPresenter) {
 		ColumnModelUtils.applyColumnModelToRow(model, this);
 		setSelectionPresenter(selectionPresenter);
 	}
@@ -42,6 +42,7 @@ public class ColumnModelTableRowEditorStub extends ColumnModelTableRowStub imple
 
 	/**
 	 * Override the is valid
+	 * 
 	 * @param isValid
 	 */
 	public void setValid(boolean isValid) {
@@ -61,9 +62,9 @@ public class ColumnModelTableRowEditorStub extends ColumnModelTableRowStub imple
 	public void setCanHaveDefault(boolean canHaveDefault) {
 		this.canHaveDefault = canHaveDefault;
 	}
-	
+
 	public boolean canHaveDefault() {
 		return canHaveDefault;
 	}
-	
+
 }

@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.table.api;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.TableState;
@@ -22,7 +21,6 @@ import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.table.TimedRetryWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeader;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
@@ -46,11 +44,9 @@ public class APITableWidgetViewImpl implements APITableWidgetView {
 	boolean isPaging = true;
 	List<SortableTableHeader> sortableTableHeaders = new ArrayList<>();
 	GWTWrapper gwt;
+
 	@Inject
-	public APITableWidgetViewImpl(
-			PortalGinInjector ginInjector, 
-			SynapseJSNIUtils synapseJSNIUtils,
-			GWTWrapper gwt) {
+	public APITableWidgetViewImpl(PortalGinInjector ginInjector, SynapseJSNIUtils synapseJSNIUtils, GWTWrapper gwt) {
 		this.ginInjector = ginInjector;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.gwt = gwt;
@@ -58,25 +54,25 @@ public class APITableWidgetViewImpl implements APITableWidgetView {
 		table.add(thead);
 		table.add(tbody);
 	}
-	
+
 	@Override
 	public void clear() {
 		div.clear();
 		div.add(table);
-		//clear all table rows
+		// clear all table rows
 		thead.clear();
 		tbody.clear();
 		table.setVisible(false);
 	}
-	
+
 	@Override
 	public void initializeTableSorter() {
 		isPaging = false;
-		//do not apply sorter if paging (service needs to be involved for a true column sort)
+		// do not apply sorter if paging (service needs to be involved for a true column sort)
 		table.addStyleName("tablesorter");
 		synapseJSNIUtils.loadTableSorters();
 	}
-	
+
 	@Override
 	public void setColumnHeaders(List<APITableColumnConfig> headers) {
 		thead.clear();
@@ -113,7 +109,7 @@ public class APITableWidgetViewImpl implements APITableWidgetView {
 		thead.add(row);
 		table.setVisible(true);
 	}
-	
+
 	private void refreshTableSorterHeaderUI() {
 		gwt.scheduleExecution(() -> {
 			for (SortableTableHeader tableHeader : sortableTableHeaders) {
@@ -130,7 +126,7 @@ public class APITableWidgetViewImpl implements APITableWidgetView {
 			}
 		}, 250);
 	}
-	
+
 	@Override
 	public void addRow(List<IsWidget> columnWidgets) {
 		TableRow row = new TableRow();
@@ -141,7 +137,7 @@ public class APITableWidgetViewImpl implements APITableWidgetView {
 		}
 		tbody.add(row);
 	}
-	
+
 	@Override
 	public void configurePager(int start, int end, int total) {
 		isPaging = true;
@@ -149,7 +145,7 @@ public class APITableWidgetViewImpl implements APITableWidgetView {
 		pager.setStyleName("pager padding-left-5-imp inline-block margin-top-5");
 		Label label = new Label(start + "-" + end + " of " + total);
 		label.addStyleName("inline-block margin-left-5 margin-right-5");
-		
+
 		Anchor prev = new Anchor();
 		prev.setHTML("Previous");
 		prev.addStyleName("link");
@@ -159,7 +155,7 @@ public class APITableWidgetViewImpl implements APITableWidgetView {
 				presenter.pageBack();
 			}
 		});
-		
+
 		Anchor next = new Anchor();
 		next.setHTML("Next");
 		next.addStyleName("link");
@@ -169,14 +165,14 @@ public class APITableWidgetViewImpl implements APITableWidgetView {
 				presenter.pageForward();
 			}
 		});
-		
+
 		if (start == 1) {
 			pager.add(prev, "disabled");
 		} else {
 			pager.add(prev);
 		}
 		pager.add(label, "pagerLabel");
-		if(end == total) {
+		if (end == total) {
 			pager.add(next, "disabled");
 		} else {
 			pager.add(next);
@@ -184,46 +180,45 @@ public class APITableWidgetViewImpl implements APITableWidgetView {
 		if (pager.getParent() == null)
 			div.add(pager);
 	}
-	
+
 	@Override
 	public void showError(IsWidget synAlert) {
 		clear();
-		div.add(synAlert);	
+		div.add(synAlert);
 	}
-	
+
 	@Override
 	public void showTableUnavailable() {
 		clear();
 		FlowPanel unavailableContainer = new FlowPanel();
 		unavailableContainer.addStyleName("jumbotron");
-		unavailableContainer.add(new HTML("<h2>" + DisplayConstants.TABLE_UNAVAILABLE + "</h2><p><strong>"+ TableState.PROCESSING +"</strong>: "+ DisplayConstants.TABLE_PROCESSING_DESCRIPTION +"</p>"));
-		
+		unavailableContainer.add(new HTML("<h2>" + DisplayConstants.TABLE_UNAVAILABLE + "</h2><p><strong>" + TableState.PROCESSING + "</strong>: " + DisplayConstants.TABLE_PROCESSING_DESCRIPTION + "</p>"));
+
 		TimedRetryWidget tryAgain = new TimedRetryWidget();
 		tryAgain.configure(10, new Callback() {
-			
+
 			@Override
 			public void invoke() {
 				presenter.refreshData();
 			}
 		});
 		unavailableContainer.add(tryAgain);
-		
+
 		div.add(unavailableContainer);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return div;
-	}	
+	}
 
-	@Override 
+	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
 
 	@Override
-	public void showLoading() {
-	}
+	public void showLoading() {}
 
 	@Override
 	public void showInfo(String message) {

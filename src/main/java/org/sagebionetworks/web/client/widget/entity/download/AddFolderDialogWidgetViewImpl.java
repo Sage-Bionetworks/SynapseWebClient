@@ -5,7 +5,6 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -32,8 +31,10 @@ public class AddFolderDialogWidgetViewImpl implements AddFolderDialogWidgetView 
 	@UiField
 	Div synAlertContainer;
 	Widget w;
-	public interface Binder extends UiBinder<Widget, AddFolderDialogWidgetViewImpl> {}
-	
+
+	public interface Binder extends UiBinder<Widget, AddFolderDialogWidgetViewImpl> {
+	}
+
 	@Inject
 	public AddFolderDialogWidgetViewImpl(Binder uiBinder) {
 		w = uiBinder.createAndBindUi(this);
@@ -61,7 +62,7 @@ public class AddFolderDialogWidgetViewImpl implements AddFolderDialogWidgetView 
 		});
 		newFolderDialog.addDomHandler(DisplayUtils.getESCKeyDownHandler(deleteCancelledHandler), KeyDownEvent.getType());
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return w;
@@ -85,15 +86,18 @@ public class AddFolderDialogWidgetViewImpl implements AddFolderDialogWidgetView 
 		sharingAndDataUseContainer.clear();
 		sharingAndDataUseContainer.add(w);
 	}
+
 	@Override
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
 	}
+
 	@Override
 	public void hide() {
 		newFolderDialog.hide();
 	}
+
 	@Override
 	public void setSaveEnabled(boolean enabled) {
 		okNewFolderButton.setEnabled(enabled);

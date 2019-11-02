@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
@@ -16,7 +15,6 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.shared.WikiPageKey;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -37,19 +35,9 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	LazyLoadHelper lazyLoadHelper;
 	Callback refreshCallback;
 	ReviewAccessorsButton manageAccessButton;
+
 	@Inject
-	public TermsOfUseAccessRequirementWidget(TermsOfUseAccessRequirementWidgetView view,
-			AuthenticationController authController,
-			DataAccessClientAsync dataAccessClient,
-			SynapseClientAsync synapseClient,
-			SynapseJavascriptClient jsClient,
-			WikiPageWidget wikiPageWidget,
-			SynapseAlert synAlert,
-			SubjectsWidget subjectsWidget,
-			CreateAccessRequirementButton createAccessRequirementButton,
-			DeleteAccessRequirementButton deleteAccessRequirementButton,
-			LazyLoadHelper lazyLoadHelper,
-			ReviewAccessorsButton manageAccessButton) {
+	public TermsOfUseAccessRequirementWidget(TermsOfUseAccessRequirementWidgetView view, AuthenticationController authController, DataAccessClientAsync dataAccessClient, SynapseClientAsync synapseClient, SynapseJavascriptClient jsClient, WikiPageWidget wikiPageWidget, SynapseAlert synAlert, SubjectsWidget subjectsWidget, CreateAccessRequirementButton createAccessRequirementButton, DeleteAccessRequirementButton deleteAccessRequirementButton, LazyLoadHelper lazyLoadHelper, ReviewAccessorsButton manageAccessButton) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -77,11 +65,11 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 				refreshApprovalState();
 			}
 		};
-		
+
 		lazyLoadHelper.configure(loadDataCallback, view);
 	}
-	
-	
+
+
 	public void setRequirement(final TermsOfUseAccessRequirement ar, Callback refreshCallback) {
 		this.ar = ar;
 		this.refreshCallback = refreshCallback;
@@ -89,14 +77,15 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setTerms(ar.getTermsOfUse());
-	 			view.showTermsUI();
+				view.showTermsUI();
 			}
+
 			@Override
 			public void onSuccess(String rootWikiId) {
-				//get wiki terms
-	 			WikiPageKey wikiKey = new WikiPageKey(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), rootWikiId);
-	 			wikiPageWidget.configure(wikiKey, false, null);
-	 			view.showWikiTermsUI();
+				// get wiki terms
+				WikiPageKey wikiKey = new WikiPageKey(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), rootWikiId);
+				wikiPageWidget.configure(wikiKey, false, null);
+				view.showWikiTermsUI();
 			}
 		});
 		createAccessRequirementButton.configure(ar, refreshCallback);
@@ -105,20 +94,22 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		manageAccessButton.configure(ar);
 		lazyLoadHelper.setIsConfigured();
 	}
-	
+
 	public void setDataAccessSubmissionStatus(BasicAccessRequirementStatus status) {
 		// set up view based on DataAccessSubmission state
 		if (status.getIsApproved()) {
-			view.showApprovedHeading();	
+			view.showApprovedHeading();
 		} else {
 			view.showUnapprovedHeading();
 			view.showSignTermsButton();
 		}
 	}
+
 	public void showAnonymous() {
 		view.showUnapprovedHeading();
 		view.showLoginButton();
 	}
+
 	public void refreshApprovalState() {
 		view.resetState();
 		if (!authController.isLoggedIn()) {
@@ -130,13 +121,14 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
+
 			@Override
 			public void onSuccess(AccessRequirementStatus status) {
-				setDataAccessSubmissionStatus((BasicAccessRequirementStatus)status);
+				setDataAccessSubmissionStatus((BasicAccessRequirementStatus) status);
 			}
 		});
 	}
-	
+
 	@Override
 	public void onSignTerms() {
 		// create the self-signed access approval, then update this object
@@ -146,6 +138,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			public void onFailure(Throwable t) {
 				synAlert.handleException(t);
 			}
+
 			@Override
 			public void onSuccess(AccessApproval result) {
 				refreshCallback.invoke();
@@ -156,11 +149,11 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		approval.setRequirementId(ar.getId());
 		synapseClient.createAccessApproval(approval, callback);
 	}
-	
+
 	public void addStyleNames(String styleNames) {
 		view.addStyleNames(styleNames);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();

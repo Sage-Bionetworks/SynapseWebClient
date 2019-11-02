@@ -4,37 +4,53 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-	
+
 	<g:HTMLPanel>
-        <div class="clear"></div>
-        <div class="separator margin-top-10-imp"></div>
-    	<g:SimplePanel ui:field="synAlertPanel" addStyleNames="margin-left-10 margin-right-10"/>
-    	<div class="container margin-top-10"> 
-    	    <w:LoadingSpinner ui:field="loadingUI" addStyleNames="center-block center margin-150" size="60px"/>
-    	    <g:SimplePanel ui:field="successContainer" visible="false">	</g:SimplePanel>
-    	    <div ui:field="quizSuccessUI" style="display:none">
-    			<b:Heading size="H4" ui:field="successScoreContainer" />
+		<div class="clear"></div>
+		<div class="separator margin-top-10-imp"></div>
+		<g:SimplePanel ui:field="synAlertPanel"
+			addStyleNames="margin-left-10 margin-right-10" />
+		<div class="container margin-top-10">
+			<w:LoadingSpinner ui:field="loadingUI"
+				addStyleNames="center-block center margin-150" size="60px" />
+			<g:SimplePanel ui:field="successContainer"
+				visible="false">
+			</g:SimplePanel>
+			<div ui:field="quizSuccessUI" style="display:none">
+				<b:Heading size="H4" ui:field="successScoreContainer" />
 			</div>
 			<div ui:field="quizFailureUI" style="display:none">
-			    <div class="panel panel-danger">
-				      <div class="panel-heading">
-						<b:Heading size="H3" addStyleNames="panel-title" text="Quiz failed"></b:Heading>
-				      </div>
-				      <b:Heading size="H4" ui:field="failureScoreContainer" addStyleNames="margin-10"></b:Heading>
-				      <div class="margin-10">
-							<p>Please review the items shown in red below, and <g:Anchor ui:field="tryAgainLink" styleName="link" text="try again"/>.</p>
-				      </div>
+				<div class="panel panel-danger">
+					<div class="panel-heading">
+						<b:Heading size="H3" addStyleNames="panel-title"
+							text="Quiz failed"></b:Heading>
+					</div>
+					<b:Heading size="H4" ui:field="failureScoreContainer"
+						addStyleNames="margin-10"></b:Heading>
+					<div class="margin-10">
+						<p>
+							Please review the items shown in red below, and
+							<g:Anchor ui:field="tryAgainLink" styleName="link"
+								text="try again" />
+							.
+						</p>
+					</div>
 				</div>
 			</div>
 			<g:HTMLPanel ui:field="quizContainer" visible="false">
-			    <div class="highlight-box padding-top-15-imp">
-			    	<b:Button ui:field="tutorialButton1" addStyleNames="margin-right-10 top-right" text="Help" icon="QUESTION_CIRCLE" />
-			    	<g:HTML ui:field="quizHeader" addStyleNames="margin-bottom-40 margin-left-10 markdown"/>
-			        <div role="form">
-					    <g:FlowPanel ui:field="testContainer">
-					    </g:FlowPanel>
-	   				</div>
-	   				<g:Button ui:field="submitButton" styleName="btn btn-primary btn-lg bottomright margin-bottom-5 margin-right-20" text="Submit"/>
+				<div class="highlight-box padding-top-15-imp">
+					<b:Button ui:field="tutorialButton1"
+						addStyleNames="margin-right-10 top-right" text="Help"
+						icon="QUESTION_CIRCLE" />
+					<g:HTML ui:field="quizHeader"
+						addStyleNames="margin-bottom-40 margin-left-10 markdown" />
+					<div role="form">
+						<g:FlowPanel ui:field="testContainer">
+						</g:FlowPanel>
+					</div>
+					<g:Button ui:field="submitButton"
+						styleName="btn btn-primary btn-lg bottomright margin-bottom-5 margin-right-20"
+						text="Submit" />
 				</div>
 			</g:HTMLPanel>
 		</div> <!-- close class="container" -->

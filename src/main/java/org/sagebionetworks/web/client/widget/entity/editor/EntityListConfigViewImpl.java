@@ -6,7 +6,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.CheckBoxState;
 import org.sagebionetworks.web.client.widget.SelectableListView;
 import org.sagebionetworks.web.client.widget.SelectionToolbar;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -15,7 +14,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityListConfigViewImpl implements EntityListConfigView {
-	public interface Binder extends UiBinder<Widget, EntityListConfigViewImpl> {}
+	public interface Binder extends UiBinder<Widget, EntityListConfigViewImpl> {
+	}
+
 	Widget widget;
 	private Presenter presenter;
 	private SelectableListView.Presenter selectionHandler;
@@ -29,7 +30,7 @@ public class EntityListConfigViewImpl implements EntityListConfigView {
 	Div entityListContainer;
 	@UiField
 	Div widgets;
-	
+
 	@Inject
 	public EntityListConfigViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
@@ -51,7 +52,7 @@ public class EntityListConfigViewImpl implements EntityListConfigView {
 				selectionHandler.onMoveDown();
 			}
 		});
-		
+
 		selectionToolbar.setMoveupClicked(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -71,45 +72,42 @@ public class EntityListConfigViewImpl implements EntityListConfigView {
 			}
 		});
 		editNoteButton.addClickHandler(new ClickHandler() {
-			
+
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onUpdateNote();
 			}
 		});
 	}
+
 	@Override
-	public void setSelectionToolbarHandler(
-			org.sagebionetworks.web.client.widget.SelectableListView.Presenter selectableItemList) {
+	public void setSelectionToolbarHandler(org.sagebionetworks.web.client.widget.SelectableListView.Presenter selectableItemList) {
 		selectionHandler = selectableItemList;
 	}
-	
+
 	@Override
-	public void initView() {
-	}
-	
+	public void initView() {}
+
 	@Override
-	public void checkParams() throws IllegalArgumentException {
-	}
-	
+	public void checkParams() throws IllegalArgumentException {}
+
 	@Override
 	public Widget asWidget() {
 		return widget;
-	}	
-	
-	@Override 
+	}
+
+	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-		
+
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override
-	public void showLoading() {
-	}
+	public void showLoading() {}
 
 	@Override
 	public void showInfo(String message) {
@@ -120,38 +118,42 @@ public class EntityListConfigViewImpl implements EntityListConfigView {
 	public void setCanDelete(boolean canDelete) {
 		selectionToolbar.setCanDelete(canDelete);
 	}
-	
+
 	@Override
 	public void setCanMoveDown(boolean canMoveDown) {
 		selectionToolbar.setCanMoveDown(canMoveDown);
 	}
+
 	@Override
 	public void setCanMoveUp(boolean canMoveUp) {
 		selectionToolbar.setCanMoveUp(canMoveUp);
 	}
+
 	@Override
 	public void setButtonToolbarVisible(boolean visible) {
 		selectionToolbar.setVisible(visible);
 		editNoteButton.setVisible(visible);
 	}
+
 	@Override
 	public void setCanEditNote(boolean canEditNote) {
 		editNoteButton.setEnabled(canEditNote);
 	}
+
 	@Override
-	public void clear() {
-	}
+	public void clear() {}
 
 	@Override
 	public void setEntityListWidget(Widget w) {
 		entityListContainer.clear();
 		entityListContainer.add(w);
 	}
-	
+
 	@Override
 	public void addWidget(Widget w) {
 		widgets.add(w);
 	}
+
 	@Override
 	public void setSelectionState(CheckBoxState selectionState) {
 		selectionToolbar.setSelectionState(selectionState);

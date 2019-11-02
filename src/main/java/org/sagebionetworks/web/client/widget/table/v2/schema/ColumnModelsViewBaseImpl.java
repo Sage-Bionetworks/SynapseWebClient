@@ -3,8 +3,6 @@ package org.sagebionetworks.web.client.widget.table.v2.schema;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -16,15 +14,16 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * This is the base of a list of ColumnModels.  It consists of a view of columns and
- * if editable it also includes a button for launching a editor in a modal.
+ * This is the base of a list of ColumnModels. It consists of a view of columns and if editable it
+ * also includes a button for launching a editor in a modal.
  * 
  * @author John
  *
  */
-public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsViewBase{
-	
-	public interface Binder extends UiBinder<Widget, ColumnModelsViewBaseImpl> {	}
+public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsViewBase {
+
+	public interface Binder extends UiBinder<Widget, ColumnModelsViewBaseImpl> {
+	}
 
 	@UiField
 	SimplePanel viewerPanel;
@@ -41,8 +40,9 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 	Presenter presenter;
 	@UiField
 	SimplePanel jobTrackerWidgetContainer;
+
 	@Inject
-	public ColumnModelsViewBaseImpl(final Binder uiBinder){
+	public ColumnModelsViewBaseImpl(final Binder uiBinder) {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 
@@ -83,12 +83,13 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 	public void setLoading() {
 		saveButton.state().loading();
 	}
-	
+
 	@Override
 	public void setSynAlert(IsWidget w) {
 		synapseAlertContainer.clear();
 		synapseAlertContainer.add(w);
 	}
+
 	@Override
 	public void resetSaveButton() {
 		saveButton.state().reset();
@@ -99,6 +100,7 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 		jobTrackerWidgetContainer.clear();
 		jobTrackerWidgetContainer.add(jobTrackingWidget);
 	}
+
 	@Override
 	public void setJobTrackingWidgetVisible(boolean visible) {
 		jobTrackerWidgetContainer.setVisible(visible);

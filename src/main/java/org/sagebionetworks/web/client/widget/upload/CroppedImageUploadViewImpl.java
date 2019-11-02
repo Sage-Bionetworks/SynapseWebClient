@@ -11,7 +11,6 @@ import org.gwtbootstrap3.client.ui.ProgressBar;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
-
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.InputElement;
@@ -33,15 +32,16 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 	private static final String PREFIX_FILE_INPUT_WIDGET = "croppedImageInputWidget";
 
 	/**
-	 * Used to ensure each new instance of this widget has its own ID. This is
-	 * important because the ID is used when interacting with the actual DOM
-	 * element.
+	 * Used to ensure each new instance of this widget has its own ID. This is important because the ID
+	 * is used when interacting with the actual DOM element.
 	 */
 	private static long ID_SEQUENCE = 0;
 
 	private Widget widget;
+
 	public interface Binder extends UiBinder<Widget, CroppedImageUploadViewImpl> {
 	}
+
 	@UiField
 	Modal previewModal;
 	@UiField
@@ -67,6 +67,7 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 	Button saveCropButton;
 	@UiField
 	ModalBody previewModalBody;
+
 	@Inject
 	public CroppedImageUploadViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
@@ -85,14 +86,14 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 			@Override
 			public void onClick(ClickEvent event) {
 				// When they press the button trigger the input box
-				fileInput.getElement().<InputElement> cast().click();
+				fileInput.getElement().<InputElement>cast().click();
 			}
 		});
-		
+
 		cancelCropButton.addClickHandler(event -> {
 			cancelCropImage();
 		});
-		
+
 		saveCropButton.addClickHandler(event -> {
 			saveCroppedImage();
 		});
@@ -101,7 +102,7 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 			previewModalBody.clear();
 			Image image = new Image();
 			previewModalBody.add(image);
-			_loadImage(fileInput.getElement().getId(), image.getElement(), CroppedImageUploadViewImpl.this);	
+			_loadImage(fileInput.getElement().getId(), image.getElement(), CroppedImageUploadViewImpl.this);
 		});
 	}
 
@@ -113,10 +114,7 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 		loadingUI.setVisible(false);
 	}
 
-	private static native void _loadImage(
-			String fileFieldId, 
-			Element imagePreviewEl,
-			CroppedImageUploadViewImpl v) /*-{
+	private static native void _loadImage(String fileFieldId, Element imagePreviewEl, CroppedImageUploadViewImpl v) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
 		var file;
 		var canProcess = true;
@@ -131,44 +129,58 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 				$wnd.cropping.destroy();
 			}
 			$wnd.cropping = new $wnd.Croppie(imagePreviewEl, {
-				enableExif: true,
-				enableOrientation: true,
-			    viewport: { width: 300, height: 300, type: 'circle' },
-			    boundary: { width: 310, height: 310 }
+				enableExif : true,
+				enableOrientation : true,
+				viewport : {
+					width : 300,
+					height : 300,
+					type : 'circle'
+				},
+				boundary : {
+					width : 310,
+					height : 310
+				}
 			});
 			$wnd.cropping.bind({
-			    url: fileUrl
+				url : fileUrl
 			});
 		} else {
 			// send back original content
 			v.@org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl::cancelCropImage()();
 		}
-		
-		
+
 	}-*/;
 
 	private static native void _getCroppedImageBlob(CroppedImageUploadViewImpl v) /*-{
 		try {
-			$wnd.cropping.result({type: 'blob', format: 'png', quality: 1, circle: true}).then(function(blob) {
-				v.@org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl::saveCroppedImage(Lcom/google/gwt/core/client/JavaScriptObject;)(blob);
-			});
+			$wnd.cropping
+					.result({
+						type : 'blob',
+						format : 'png',
+						quality : 1,
+						circle : true
+					})
+					.then(
+							function(blob) {
+								v.@org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl::saveCroppedImage(Lcom/google/gwt/core/client/JavaScriptObject;)(blob);
+							});
 		} catch (err) {
 			console.error(err);
 		}
 	}-*/;
-	
+
 	public void saveCroppedImage() {
 		// get the blob from the cropper
 		_getCroppedImageBlob(this);
 	}
-	
+
 	public void saveCroppedImage(JavaScriptObject blob) {
 		// get the blob from the cropper
 		loadingUI.setVisible(false);
 		previewModal.hide();
 		presenter.onFileProcessed(new JavaScriptObjectWrapper(blob), "image/png");
 	}
-	
+
 	public void cancelCropImage() {
 		loadingUI.setVisible(false);
 		resetForm();

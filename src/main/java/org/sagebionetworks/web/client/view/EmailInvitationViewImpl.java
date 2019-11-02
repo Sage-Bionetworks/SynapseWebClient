@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -40,11 +39,9 @@ public class EmailInvitationViewImpl extends Composite implements EmailInvitatio
 	private Presenter presenter;
 	private Header headerWidget;
 	SynapseJSNIUtils jsniUtils;
-	
+
 	@Inject
-	public EmailInvitationViewImpl(EmailInvitationViewImplUiBinder binder,
-								Header headerWidget,
-								SynapseJSNIUtils jsniUtils) {
+	public EmailInvitationViewImpl(EmailInvitationViewImplUiBinder binder, Header headerWidget, SynapseJSNIUtils jsniUtils) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.jsniUtils = jsniUtils;
@@ -91,7 +88,7 @@ public class EmailInvitationViewImpl extends Composite implements EmailInvitatio
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message);
 	}
-	
+
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);

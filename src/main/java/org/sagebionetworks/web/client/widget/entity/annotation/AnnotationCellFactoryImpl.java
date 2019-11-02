@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.annotation;
 import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
-
 import com.google.inject.Inject;
 
 /**
@@ -14,14 +13,14 @@ public class AnnotationCellFactoryImpl implements AnnotationCellFactory {
 	PortalGinInjector ginInjector;
 
 	@Inject
-	public AnnotationCellFactoryImpl(PortalGinInjector ginInjector){
+	public AnnotationCellFactoryImpl(PortalGinInjector ginInjector) {
 		this.ginInjector = ginInjector;
 	}
 
 	@Override
 	public CellEditor createEditor(AnnotationsValue annotation) {
 		CellEditor editor;
-		switch(annotation.getType()) {
+		switch (annotation.getType()) {
 			case LONG:
 				editor = ginInjector.createIntegerCellEditor();
 				break;

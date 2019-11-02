@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
 import org.sagebionetworks.repo.model.AccessControlList;
@@ -30,51 +28,43 @@ import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * Editor dialog to view and modify the Access Control List of a given Evaluation.
- * This class is the Presenter in the MVP design pattern.
+ * Editor dialog to view and modify the Access Control List of a given Evaluation. This class is the
+ * Presenter in the MVP design pattern.
  * 
  * @author jay
  */
 public class EvaluationAccessControlListEditor implements AccessControlListEditorView.Presenter {
-	
+
 	private static final String ERROR_CANNOT_MODIFY_ACTIVE_USER_PERMISSIONS = "Current user permissions cannot be modified. Please select a different user.";
 	private static final String NULL_UEP_MESSAGE = "User's evaluation permissions are missing.";
 	private static final String NULL_ACL_MESSAGE = "ACL is missing.";
 	private static final String NULL_EVALUATION_MESSAGE = "Evaluation is missing.";
-	
+
 	// Editor components
 	private AccessControlListEditorView view;
 	private SynapseJavascriptClient jsClient;
 	private ChallengeClientAsync challengeClient;
 	private AuthenticationController authenticationController;
 	private JSONObjectAdapter jsonObjectAdapter;
-	
+
 	PublicPrincipalIds publicPrincipalIds;
-	
+
 	// Evaluation components
 	private Evaluation evaluation;
 	private UserEvaluationPermissions uep;
-	private AccessControlList acl;	
+	private AccessControlList acl;
 	private Map<String, UserGroupHeader> userGroupHeaders;
 	private Set<String> originalPrincipalIdSet;
 	HasChangesHandler hasChangesHandler;
 	SynapseAlert synAlert;
-	
+
 	@Inject
-	public EvaluationAccessControlListEditor(AccessControlListEditorView view,
-			SynapseJavascriptClient jsClient,
-			AuthenticationController authenticationController,
-			SynapseProperties synapseProperties,
-			JSONObjectAdapter jsonObjectAdapter,
-			ChallengeClientAsync challengeClient,
-			SynapseAlert synAlert
-			) {
+	public EvaluationAccessControlListEditor(AccessControlListEditorView view, SynapseJavascriptClient jsClient, AuthenticationController authenticationController, SynapseProperties synapseProperties, JSONObjectAdapter jsonObjectAdapter, ChallengeClientAsync challengeClient, SynapseAlert synAlert) {
 		this.view = view;
 		this.jsClient = jsClient;
 		this.challengeClient = challengeClient;
@@ -92,10 +82,9 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 		initViewPrincipalIds();
 	}
 
-	
+
 	/**
-	 * Configure this widget before using it.
-	 * Set the entity with which this ACLEditor is associated.
+	 * Configure this widget before using it. Set the entity with which this ACLEditor is associated.
 	 */
 	public void configure(Evaluation evaluation, HasChangesHandler hasChangesHandler) {
 		if (!evaluation.equals(this.evaluation)) {
@@ -105,14 +94,14 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 		this.hasChangesHandler = hasChangesHandler;
 		this.evaluation = evaluation;
 	}
-	
+
 	/**
 	 * Get the ID of the entity with which this ACLEditor is associated.
 	 */
 	public String getResourceId() {
 		return evaluation == null ? null : evaluation.getId();
 	}
-	
+
 	public PermissionLevel[] getPermList() {
 		return new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_SUBMIT_EVALUATION, PermissionLevel.CAN_SCORE_EVALUATION, PermissionLevel.CAN_ADMINISTER_EVALUATION};
 	}
@@ -122,69 +111,73 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
 		permissionDisplay.put(PermissionLevel.CAN_SCORE_EVALUATION, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_SCORE);
 		permissionDisplay.put(PermissionLevel.CAN_SUBMIT_EVALUATION, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_SUBMIT);
-		permissionDisplay.put(PermissionLevel.CAN_ADMINISTER_EVALUATION, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);		
+		permissionDisplay.put(PermissionLevel.CAN_ADMINISTER_EVALUATION, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);
 		return permissionDisplay;
 	}
-	
+
 	/**
 	 * Generate the ACLEditor Widget
 	 */
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	private void initViewPrincipalIds(){
+
+	private void initViewPrincipalIds() {
 		if (publicPrincipalIds != null) {
 			view.setPublicAclPrincipalId(publicPrincipalIds.getPublicAclPrincipalId());
 		}
 	}
-	
+
 	/**
 	 * Refresh the ACLEditor by fetching from Synapse
 	 */
 	private void refresh(final AsyncCallback<Void> callback) {
-		if (this.evaluation.getId() == null) throw new IllegalStateException(NULL_EVALUATION_MESSAGE);
+		if (this.evaluation.getId() == null)
+			throw new IllegalStateException(NULL_EVALUATION_MESSAGE);
 		view.showLoading();
 		hasChangesHandler.hasChanges(false);
-		
+
 		challengeClient.getEvaluationAcl(evaluation.getId(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
-				//set the evaluation acl
+				// set the evaluation acl
 				try {
 					acl = new AccessControlList(jsonObjectAdapter.createNew(result));
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 					return;
 				}
-				
-				//initialize original principal id set
+
+				// initialize original principal id set
 				originalPrincipalIdSet = new HashSet<String>();
 				for (final ResourceAccess ra : acl.getResourceAccess()) {
 					final String principalId = ra.getPrincipalId().toString();
 					originalPrincipalIdSet.add(principalId);
 				}
-				//default notification to true
+				// default notification to true
 				view.setIsNotifyPeople(true);
-				getUserPermissions(callback);				
+				getUserPermissions(callback);
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				callback.onFailure(caught);
 			}
 		});
 	}
+
 	public void getUserPermissions(final AsyncCallback<Void> callback) {
 		challengeClient.getUserEvaluationPermissions(evaluation.getId(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
-				//set the user permissions object
+				// set the user permissions object
 				try {
 					uep = new UserEvaluationPermissions(jsonObjectAdapter.createNew(result));
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 					return;
 				}
-				
+
 				fetchUserGroupHeaders(new AsyncCallback<Void>() {
 					public void onSuccess(Void result) {
 						// update the view
@@ -192,18 +185,20 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 						hasChangesHandler.hasChanges(false);
 						callback.onSuccess(null);
 					};
+
 					public void onFailure(Throwable caught) {
 						onFailure(caught);
 					};
 				});
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				callback.onFailure(caught);
 			}
 		});
 	}
-	
+
 	/**
 	 * Send ACL details to the View.
 	 */
@@ -215,16 +210,16 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 		updateIsPublicAccess();
 	}
 
-	private void updateIsPublicAccess(){
-		view.setIsPubliclyVisible(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));	
+	private void updateIsPublicAccess() {
+		view.setIsPubliclyVisible(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));
 	}
-	
+
 	@Override
 	public void makePrivate() {
-		//try to remove the public principal ids from the acl
+		// try to remove the public principal ids from the acl
 		List<Long> toRemove = new ArrayList<Long>();
 		for (ResourceAccess ra : acl.getResourceAccess()) {
-			if (publicPrincipalIds.getAuthenticatedAclPrincipalId().equals(ra.getPrincipalId())){
+			if (publicPrincipalIds.getAuthenticatedAclPrincipalId().equals(ra.getPrincipalId())) {
 				toRemove.add(publicPrincipalIds.getAuthenticatedAclPrincipalId());
 			} else if (publicPrincipalIds.getPublicAclPrincipalId().equals(ra.getPrincipalId())) {
 				toRemove.add(publicPrincipalIds.getPublicAclPrincipalId());
@@ -233,30 +228,29 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 			}
 		}
 		for (Long id : toRemove) {
-			removeAccess(id);	
+			removeAccess(id);
 		}
 	}
-	
+
 	private void populateAclEntries() {
 		synAlert.clear();
 		for (final ResourceAccess ra : acl.getResourceAccess()) {
 			final String principalId = ra.getPrincipalId().toString();
 			final UserGroupHeader header = userGroupHeaders.get(principalId);
 			if (header != null) {
-				String title = header.getIsIndividual() ? DisplayUtils.getDisplayName(header.getFirstName(), header.getLastName(), header.getUserName()) : 
-					header.getUserName();
+				String title = header.getIsIndividual() ? DisplayUtils.getDisplayName(header.getFirstName(), header.getLastName(), header.getUserName()) : header.getUserName();
 				view.addAclEntry(new AclEntry(principalId, ra.getAccessType(), title, "", header.getIsIndividual()));
 			} else {
 				synAlert.showError("Could not find user " + principalId);
 			}
 		}
 	}
-	
+
 	private void fetchUserGroupHeaders(final AsyncCallback<Void> callback) {
 		ArrayList<String> ids = new ArrayList<String>();
 		for (ResourceAccess ra : acl.getResourceAccess())
 			ids.add(ra.getPrincipalId().toString());
-		jsClient.getUserGroupHeadersById(ids, new AsyncCallback<UserGroupHeaderResponsePage>(){
+		jsClient.getUserGroupHeadersById(ids, new AsyncCallback<UserGroupHeaderResponsePage>() {
 			@Override
 			public void onSuccess(UserGroupHeaderResponsePage response) {
 				for (UserGroupHeader ugh : response.getChildren())
@@ -264,6 +258,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 				if (callback != null)
 					callback.onSuccess(null);
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				if (callback != null)
@@ -271,7 +266,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 			}
 		});
 	}
-	
+
 	@Override
 	public void setAccess(Long principalId, PermissionLevel permissionLevel) {
 		validateEditorState();
@@ -283,7 +278,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 		}
 		if (principalId.equals(publicPrincipalIds.getPublicAclPrincipalId()))
 			uep.setCanPublicRead(true);
-		
+
 		ResourceAccess toSet = null;
 		for (ResourceAccess ra : acl.getResourceAccess()) {
 			if (ra.getPrincipalId().equals(principalId))
@@ -311,14 +306,15 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 				// update the view
 				setViewDetails();
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
-				// update the view anyway - will fetch individual Profiles					
+				// update the view anyway - will fetch individual Profiles
 				setViewDetails();
 			}
 		};
 	}
-	
+
 	@Override
 	public void removeAccess(Long principalIdToRemove) {
 		validateEditorState();
@@ -335,7 +331,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 		for (ResourceAccess ra : acl.getResourceAccess()) {
 			if (!ra.getPrincipalId().equals(principalIdToRemove)) {
 				newRAs.add(ra);
-			} else {				
+			} else {
 				foundUser = true;
 			}
 		}
@@ -356,22 +352,21 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 		if (acl.getId().equals(evaluation.getId())) {
 			synAlert.showError("Entity already has an ACL!");
 			return;
-		}		
+		}
 		acl.setId(evaluation.getId());
-		acl.setCreationDate(new Date());		
+		acl.setCreationDate(new Date());
 		hasChangesHandler.hasChanges(true);
 		setViewDetails();
 	}
-	
+
 	@Override
-	public void deleteAcl() {
-	}
-	
+	public void deleteAcl() {}
+
 	public void pushChangesToSynapse(final Callback changesPushedCallback) {
 		validateEditorState();
 		synAlert.clear();
 		// Create an async callback to receive the updated ACL from Synapse
-		AsyncCallback<AccessControlList> callback = new AsyncCallback<AccessControlList>(){
+		AsyncCallback<AccessControlList> callback = new AsyncCallback<AccessControlList>() {
 			@Override
 			public void onSuccess(AccessControlList result) {
 				acl = result;
@@ -379,30 +374,31 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 				view.showInfoSuccess("Success", "Permissions were successfully saved to Synapse");
 				changesPushedCallback.invoke();
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 				hasChangesHandler.hasChanges(true);
 			}
 		};
-		
+
 		applyChanges(callback);
 	}
-	
+
 	protected void applyChanges(AsyncCallback<AccessControlList> callback) {
 		// Apply changes
 		challengeClient.updateEvaluationAcl(acl, callback);
 	}
-	
+
 	public String getDisplayName(String principalId) {
-		//get the user group header for this resource
+		// get the user group header for this resource
 		UserGroupHeader header = userGroupHeaders.get(principalId);
 		if (header != null) {
 			return DisplayUtils.getDisplayName(header);
 		}
 		return "(Unknown user)";
 	}
-	
+
 	private String getCurrentUserId() {
 		return authenticationController.getCurrentUserPrincipalId();
 	}
@@ -411,17 +407,19 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	 * Ensure the editor has a valid Entity ID, ACL, and User Permissions.
 	 */
 	private void validateEditorState() {
-		if (this.evaluation.getId() == null) throw new IllegalStateException(NULL_EVALUATION_MESSAGE);
-		if (this.acl == null) throw new IllegalStateException(NULL_ACL_MESSAGE);
-		if (this.uep == null) throw new IllegalStateException(NULL_UEP_MESSAGE);
+		if (this.evaluation.getId() == null)
+			throw new IllegalStateException(NULL_EVALUATION_MESSAGE);
+		if (this.acl == null)
+			throw new IllegalStateException(NULL_ACL_MESSAGE);
+		if (this.uep == null)
+			throw new IllegalStateException(NULL_UEP_MESSAGE);
 	}
 
 	public void refresh() {
 		synAlert.clear();
 		refresh(new AsyncCallback<Void>() {
 			@Override
-			public void onSuccess(Void result) {
-			}
+			public void onSuccess(Void result) {}
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -429,20 +427,23 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 			}
 		});
 	}
+
 	/**
 	 * This handler is notified when there are changes made to the editor.
 	 */
-	public interface HasChangesHandler{
+	public interface HasChangesHandler {
 		/**
-		 * Called with true then the user has changes in the editor.  Called with false when there are no changes in this editor.
-		 * @param hasChanges True when there are changes.  False when there are no changes.
+		 * Called with true then the user has changes in the editor. Called with false when there are no
+		 * changes in this editor.
+		 * 
+		 * @param hasChanges True when there are changes. False when there are no changes.
 		 */
 		void hasChanges(boolean hasChanges);
-		
+
 	}
-	
+
 	public UserEvaluationPermissions getUserEvaluationPermissions() {
 		return uep;
 	}
-	
+
 }

@@ -2,17 +2,17 @@ package org.sagebionetworks.web.test.helper.examples;
 
 import java.util.LinkedList;
 import java.util.List;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
- * This is an example Presenter class that is used to drive the asynchronous service and capture the results.
+ * This is an example Presenter class that is used to drive the asynchronous service and capture the
+ * results.
  * 
  * @author jmhill
  *
  */
 public class ExamplePresenter {
-	
+
 	private ExampleServiceAsync asyncService = null;
 	// No args
 	private List<SampleDTO> noArgSuccess = null;
@@ -29,21 +29,22 @@ public class ExamplePresenter {
 	// createSampel
 	private Integer createSucces = null;
 	private Throwable createFailure = null;
-	
-	public ExamplePresenter(ExampleServiceAsync asyncService){
-		if(asyncService == null) throw new IllegalArgumentException("ExampleServiceAsync cannot be null");
+
+	public ExamplePresenter(ExampleServiceAsync asyncService) {
+		if (asyncService == null)
+			throw new IllegalArgumentException("ExampleServiceAsync cannot be null");
 		this.asyncService = asyncService;
 	}
-	
-	public void doNoArgs(){
+
+	public void doNoArgs() {
 		// Make the call
 		asyncService.noArgs(new AsyncCallback<List<SampleDTO>>() {
-			
+
 			@Override
 			public void onSuccess(List<SampleDTO> result) {
 				setNoArgSuccess(result);
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				setNoArgFailure(caught);
@@ -54,15 +55,15 @@ public class ExamplePresenter {
 		setNoArgFailure(null);
 		setNoArgSuccess(null);
 	}
-	
-	public void doWithArgs(final List<Integer> idList){
-		asyncService.withArgs(idList,new AsyncCallback<List<SampleDTO>>() {
-			
+
+	public void doWithArgs(final List<Integer> idList) {
+		asyncService.withArgs(idList, new AsyncCallback<List<SampleDTO>>() {
+
 			@Override
 			public void onSuccess(List<SampleDTO> result) {
 				setWithArgSuccess(result);
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				setWithArgFailure(caught);
@@ -73,15 +74,15 @@ public class ExamplePresenter {
 		setWithArgFailure(null);
 		setWithArgSuccess(null);
 	}
-	
-	public void doNullReturn(){
+
+	public void doNullReturn() {
 		asyncService.nullReturn(new AsyncCallback<List<SampleDTO>>() {
-			
+
 			@Override
 			public void onSuccess(List<SampleDTO> result) {
 				setNullReturnSuccess(result);
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				setNullReturnFailure(caught);
@@ -93,19 +94,19 @@ public class ExamplePresenter {
 		// Since onSuccess will set this to null, start with a non-null list
 		setNullReturnSuccess(new LinkedList<SampleDTO>());
 	}
-	
+
 	public void doVoidReturn(int id) {
 		asyncService.voidReturn(id, new AsyncCallback<Void>() {
-			
+
 			@Override
 			public void onSuccess(Void result) {
 				setVoidReturnSuccess(true);
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				setVoidReturnFailure(caught);
-				
+
 			}
 		});
 		// Note, if the asycnh service calls either onSuccess() or onFailure()
@@ -113,28 +114,28 @@ public class ExamplePresenter {
 		setVoidReturnSuccess(false);
 		setVoidReturnFailure(null);
 	}
-	
-	public void doCreateSample(String name, String description){
+
+	public void doCreateSample(String name, String description) {
 		asyncService.createSample(name, description, new AsyncCallback<Integer>() {
-			
+
 			@Override
 			public void onSuccess(Integer result) {
 				setCreateSucces(result);
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				setCreateFailure(caught);
 			}
 		});
-		
+
 		// Note, if the asycnh service calls either onSuccess() or onFailure()
 		// before returning than the data will be lost.
 		setCreateSucces(null);
 		setCreateFailure(null);
 	}
-	
-	
+
+
 
 	public Integer getCreateSucces() {
 		return createSucces;

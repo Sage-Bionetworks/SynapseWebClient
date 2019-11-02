@@ -1,4 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
@@ -7,11 +8,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -26,7 +25,7 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 
 public class ViewDefaultColumnsTest {
-	
+
 	@Mock
 	SynapseJavascriptClient mockJsClient;
 	ColumnModel columnModel;
@@ -38,9 +37,11 @@ public class ViewDefaultColumnsTest {
 	PopupUtilsView mockPopupUtils;
 	AdapterFactoryImpl adapterFactory;
 	public static final String errorMessage = "an error occurred.";
-	
+
 	@Captor
-	ArgumentCaptor<Set<String>> setCaptor;	@Before
+	ArgumentCaptor<Set<String>> setCaptor;
+
+	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		when(mockException.getMessage()).thenReturn(errorMessage);
@@ -59,9 +60,9 @@ public class ViewDefaultColumnsTest {
 	public void testGetDefaultColumnsWithIds() {
 		boolean isClearIds = false;
 		assertEquals(columns, fileViewDefaultColumns.getDefaultViewColumns(true, isClearIds));
-		assertEquals(projectColumns, fileViewDefaultColumns.getDefaultViewColumns(false,isClearIds));
+		assertEquals(projectColumns, fileViewDefaultColumns.getDefaultViewColumns(false, isClearIds));
 	}
-	
+
 	@Test
 	public void testGetDefaultColumnNames() {
 		String colName = "default column name";
@@ -71,21 +72,21 @@ public class ViewDefaultColumnsTest {
 		assertTrue(columnNames.contains(colName));
 		assertTrue(projectColumnNames.contains(colName));
 	}
-	
+
 	@Test
 	public void testInitFailureFailure() {
 		when(mockJsClient.getDefaultColumnsForView(eq(ViewType.file))).thenReturn(getFailedFuture(mockException));
 		fileViewDefaultColumns = new ViewDefaultColumns(mockJsClient, adapterFactory, mockPopupUtils);
-		
+
 		verify(mockJsClient, times(2)).getDefaultColumnsForView(eq(ViewType.file));
 		verify(mockPopupUtils).showErrorMessage(errorMessage);
 	}
-	
+
 	@Test
 	public void testProjectInitFailure() {
 		when(mockJsClient.getDefaultColumnsForView(eq(ViewType.project))).thenReturn(getFailedFuture(mockException));
 		fileViewDefaultColumns = new ViewDefaultColumns(mockJsClient, adapterFactory, mockPopupUtils);
-		
+
 		verify(mockJsClient, times(2)).getDefaultColumnsForView(eq(ViewType.project));
 		verify(mockPopupUtils).showErrorMessage(errorMessage);
 	}

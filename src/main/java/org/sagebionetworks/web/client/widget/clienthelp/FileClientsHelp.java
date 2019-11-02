@@ -1,11 +1,9 @@
 package org.sagebionetworks.web.client.widget.clienthelp;
 
 import java.util.List;
-
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -15,17 +13,14 @@ public class FileClientsHelp implements IsWidget {
 	private FileClientsHelpView view;
 	private SynapseJavascriptClient jsClient;
 	private SynapseJSNIUtils jsniUtils;
-	
+
 	@Inject
-	public FileClientsHelp(
-			FileClientsHelpView view,
-			SynapseJavascriptClient jsClient,
-			SynapseJSNIUtils jsniUtils) {
+	public FileClientsHelp(FileClientsHelpView view, SynapseJavascriptClient jsClient, SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.jsClient = jsClient;
 		this.jsniUtils = jsniUtils;
 	}
-	
+
 	public void configureAndShow(String entityId, Long version) {
 		jsClient.getEntityVersions(entityId, 0, 1, new AsyncCallback<List<VersionInfo>>() {
 			@Override
@@ -38,7 +33,7 @@ public class FileClientsHelp implements IsWidget {
 				}
 				view.configureAndShow(entityId, version);
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				jsniUtils.consoleError(caught.getMessage());
@@ -46,7 +41,7 @@ public class FileClientsHelp implements IsWidget {
 			}
 		});
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();

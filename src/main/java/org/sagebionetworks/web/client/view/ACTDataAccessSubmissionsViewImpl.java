@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.Date;
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
@@ -19,7 +18,6 @@ import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.ChangeDateE
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.ChangeDateHandler;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.header.Header;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -31,28 +29,30 @@ import com.google.inject.Inject;
 
 public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmissionsView {
 
-	public interface ACTViewImplUiBinder extends UiBinder<Widget, ACTDataAccessSubmissionsViewImpl> {}
+	public interface ACTViewImplUiBinder extends UiBinder<Widget, ACTDataAccessSubmissionsViewImpl> {
+	}
+
 	@UiField
 	DropDownMenu stateDropdownMenu;
 	@UiField
 	DateTimePicker minDatePicker;
 	@UiField
 	DateTimePicker maxDatePicker;
-	
+
 	@UiField
 	Div synAlertContainer;
 	@UiField
 	Div accessRequirementContainer;
 	@UiField
 	Div showHideAccessRequirementButtonContainer;
-	
+
 	@UiField
 	Div tableData;
 	@UiField
 	Button clearStateFilter;
 	@UiField
 	Button clearDateFilter;
-	
+
 	@UiField
 	Span currentState;
 	@UiField
@@ -81,15 +81,14 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	Well expirationDateUI;
 	@UiField
 	Strong expirationDate;
-	
+
 	private Presenter presenter;
 	private Header headerWidget;
-	
+
 	Widget widget;
+
 	@Inject
-	public ACTDataAccessSubmissionsViewImpl(ACTViewImplUiBinder binder,
-			Header headerWidget
-			) {
+	public ACTDataAccessSubmissionsViewImpl(ACTViewImplUiBinder binder, Header headerWidget) {
 		widget = binder.createAndBindUi(this);
 		this.headerWidget = headerWidget;
 		headerWidget.configure();
@@ -124,12 +123,12 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 			}
 		});
 	}
-	
+
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		headerWidget.configure();
-		headerWidget.refresh();	
+		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
 
@@ -137,14 +136,14 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	public void setAccessRequirementUIVisible(boolean visible) {
 		accessRequirementUI.setVisible(visible);
 	}
+
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override
-	public void showLoading() {
-	}
+	public void showLoading() {}
 
 	@Override
 	public void showInfo(String message) {
@@ -152,26 +151,28 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	}
 
 	@Override
-	public void clear() {		
-	}
+	public void clear() {}
+
 	@Override
 	public void setSelectedStateText(String state) {
 		currentState.setText(state);
 	}
+
 	@Override
 	public void setSelectedMaxDate(Date date) {
 		maxDatePicker.setValue(date);
 	}
+
 	@Override
 	public void setSelectedMinDate(Date date) {
 		minDatePicker.setValue(date);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
-	
+
 	@Override
 	public void setStates(List<String> states) {
 		stateDropdownMenu.clear();
@@ -186,29 +187,31 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 			stateDropdownMenu.add(item);
 		}
 	}
-	
+
 	@Override
 	public void setLoadMoreContainer(IsWidget w) {
 		tableData.clear();
 		tableData.add(w);
 	}
+
 	@Override
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
 	}
-	
+
 	@Override
 	public void setAccessRequirementWidget(IsWidget w) {
 		accessRequirementContainer.clear();
 		accessRequirementContainer.add(w);
 	}
+
 	@Override
 	public void setShowHideButton(IsWidget button) {
 		showHideAccessRequirementButtonContainer.clear();
 		showHideAccessRequirementButtonContainer.add(button);
 	}
-	
+
 	@Override
 	public void setAreOtherAttachmentsRequired(boolean value) {
 		otherAttachmentsCheckbox.setValue(value);
@@ -238,21 +241,23 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	public void setIsValidatedProfileRequired(boolean value) {
 		validatedCheckbox.setValue(value);
 	}
+
 	@Override
 	public void setSubjectsWidget(IsWidget w) {
 		subjectsContainer.clear();
 		subjectsContainer.add(w);
 	}
+
 	@Override
 	public void setExpirationPeriod(Long value) {
 		expirationPeriodTextbox.setValue(value.toString());
 	}
-	
+
 	@Override
 	public void setProjectedExpirationDate(String date) {
 		expirationDate.setText(date);
 	}
-	
+
 	@Override
 	public void setProjectedExpirationDateVisible(boolean visible) {
 		expirationDateUI.setVisible(visible);

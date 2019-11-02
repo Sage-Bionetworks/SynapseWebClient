@@ -3,12 +3,10 @@ package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -23,24 +21,24 @@ import org.sagebionetworks.web.client.widget.table.v2.results.RowSetUtils;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
 
 public class RowSetUtilsTest {
-	
+
 	Row rowOne;
 	Row rowTwo;
 	List<ColumnModel> schema;
 	List<SelectColumn> headers;
-	
+
 	@Before
-	public void before(){
+	public void before() {
 		schema = TableModelTestUtils.createColumsWithNames("one", "two");
 		headers = TableModelTestUtils.buildSelectColumns(schema);
 		rowOne = new Row();
-		rowOne.setValues(Arrays.asList("1,1","1,2"));
+		rowOne.setValues(Arrays.asList("1,1", "1,2"));
 		rowTwo = new Row();
-		rowTwo.setValues(Arrays.asList("2,1","2,2"));
+		rowTwo.setValues(Arrays.asList("2,1", "2,2"));
 	}
-	
+
 	@Test
-	public void testAddOnly(){
+	public void testAddOnly() {
 		RowSet original = new RowSet();
 		original.setTableId("syn999");
 		List<Row> updateRows = Arrays.asList(rowOne, rowTwo);
@@ -67,7 +65,7 @@ public class RowSetUtilsTest {
 		assertEquals("2,1", pr.getValues().get(headers.get(0).getId()));
 		assertEquals("2,2", pr.getValues().get(headers.get(1).getId()));
 	}
-	
+
 	@Test
 	public void testUpdateNoChange() throws JSONObjectAdapterException {
 		RowSet original = new RowSet();
@@ -81,7 +79,7 @@ public class RowSetUtilsTest {
 		assertNotNull(delta);
 		assertEquals(0, delta.size());
 	}
-		
+
 	@Test
 	public void testUpdateWithChanges() throws JSONObjectAdapterException {
 		RowSet original = new RowSet();
@@ -110,9 +108,9 @@ public class RowSetUtilsTest {
 		assertEquals(rowTwo.getRowId(), pr.getRowId());
 		assertEquals("newTwo", pr.getValues().get(headers.get(1).getId()));
 	}
-	
+
 	@Test
-	public void testDeleteOnly() throws JSONObjectAdapterException{
+	public void testDeleteOnly() throws JSONObjectAdapterException {
 		RowSet original = new RowSet();
 		rowOne.setRowId(123L);
 		rowTwo.setRowId(456L);
@@ -132,7 +130,7 @@ public class RowSetUtilsTest {
 	}
 
 	@Test
-	public void testAddUpdateDelete() throws JSONObjectAdapterException{
+	public void testAddUpdateDelete() throws JSONObjectAdapterException {
 		RowSet original = new RowSet();
 		rowOne.setRowId(123L);
 		rowTwo.setRowId(456L);
@@ -171,15 +169,15 @@ public class RowSetUtilsTest {
 		assertEquals("a", pr.getValues().get(headers.get(0).getId()));
 		assertEquals("b", pr.getValues().get(headers.get(1).getId()));
 	}
-	
+
 	/**
-	 * If the original value contains empty strings and the update also contains empty strings
-	 * there should be no update.
+	 * If the original value contains empty strings and the update also contains empty strings there
+	 * should be no update.
 	 * 
 	 * @throws JSONObjectAdapterException
 	 */
 	@Test
-	public void testOriginalEmptyStringAndChangeEmptyString() throws JSONObjectAdapterException{
+	public void testOriginalEmptyStringAndChangeEmptyString() throws JSONObjectAdapterException {
 		RowSet original = new RowSet();
 		rowOne.setRowId(123L);
 		rowOne.setValues(Arrays.asList("", ""));
@@ -191,18 +189,18 @@ public class RowSetUtilsTest {
 		PartialRowSet prs = RowSetUtils.buildDelta(original, updates, schema);
 		assertTrue(prs.getRows().isEmpty());
 	}
-	
+
 	/**
-	 * If the original value contains nulls and the update also contains empty strings
-	 * there should be no update.
+	 * If the original value contains nulls and the update also contains empty strings there should be
+	 * no update.
 	 * 
 	 * @throws JSONObjectAdapterException
 	 */
 	@Test
-	public void testOriginalNullAndChangeEmptyString() throws JSONObjectAdapterException{
+	public void testOriginalNullAndChangeEmptyString() throws JSONObjectAdapterException {
 		RowSet original = new RowSet();
 		rowOne.setRowId(123L);
-		rowOne.setValues(Arrays.asList((String)null,(String)null));
+		rowOne.setValues(Arrays.asList((String) null, (String) null));
 		original.setRows(Arrays.asList(rowOne));
 		// Clone the data.
 		List<Row> updates = TableModelTestUtils.cloneObject(original.getRows(), Row.class);
@@ -210,36 +208,37 @@ public class RowSetUtilsTest {
 		PartialRowSet prs = RowSetUtils.buildDelta(original, updates, schema);
 		assertTrue(prs.getRows().isEmpty());
 	}
-	
+
 	/**
-	 * If the original value contains nulls and the update also contains empty strings
-	 * there should be no update.
+	 * If the original value contains nulls and the update also contains empty strings there should be
+	 * no update.
 	 * 
 	 * @throws JSONObjectAdapterException
 	 */
 	@Test
-	public void testOriginalEmptyStringAndChangeNulls() throws JSONObjectAdapterException{
+	public void testOriginalEmptyStringAndChangeNulls() throws JSONObjectAdapterException {
 		RowSet original = new RowSet();
 		rowOne.setRowId(123L);
-		rowOne.setValues(Arrays.asList("",""));
+		rowOne.setValues(Arrays.asList("", ""));
 		original.setRows(Arrays.asList(rowOne));
 		// Clone the data.
 		List<Row> updates = TableModelTestUtils.cloneObject(original.getRows(), Row.class);
-		updates.get(0).setValues(Arrays.asList((String)null,(String)null));
+		updates.get(0).setValues(Arrays.asList((String) null, (String) null));
 		PartialRowSet prs = RowSetUtils.buildDelta(original, updates, schema);
 		assertTrue(prs.getRows().isEmpty());
 	}
-	
+
 	/**
 	 * Adding a row with null or empty values should both be treated as null values.
+	 * 
 	 * @throws JSONObjectAdapterException
 	 */
 	@Test
-	public void testAddRowWithNullAndEmptyStrings() throws JSONObjectAdapterException{
+	public void testAddRowWithNullAndEmptyStrings() throws JSONObjectAdapterException {
 		RowSet original = new RowSet();
 		original.setTableId("syn999");
 		Row emptyRow = new Row();
-		emptyRow.setValues(Arrays.asList("",null));
+		emptyRow.setValues(Arrays.asList("", null));
 		List<Row> updateRows = Arrays.asList(emptyRow);
 		PartialRowSet prs = RowSetUtils.buildDelta(original, updateRows, schema);
 		assertNotNull(prs);
@@ -248,16 +247,16 @@ public class RowSetUtilsTest {
 		assertEquals(null, pr.getValues().get(headers.get(0)));
 		assertEquals(null, pr.getValues().get(headers.get(1)));
 	}
-	
 
-	
+
 
 	/**
 	 * This is currently throwing an exception.
+	 * 
 	 * @throws JSONObjectAdapterException
 	 */
 	@Test
-	public void testPartialRowWithNulls() throws JSONObjectAdapterException{
+	public void testPartialRowWithNulls() throws JSONObjectAdapterException {
 		PartialRow pr = new PartialRow();
 		pr.setRowId(123L);
 		Map<String, String> values = new HashMap<String, String>();

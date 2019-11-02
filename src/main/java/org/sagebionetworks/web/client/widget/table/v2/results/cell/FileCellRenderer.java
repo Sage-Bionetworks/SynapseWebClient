@@ -9,13 +9,12 @@ import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandler;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.table.CellAddress;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class FileCellRenderer implements TakesAddressCell {
-	
+
 	public static final String FILE_SYNAPSE_ID_UNAVAILABLE = "File Synapse ID is unavailable in the row.";
 	public static final String UNABLE_TO_LOAD_FILE_DATA = "Unable to load file data";
 	FileCellRendererView view;
@@ -24,7 +23,7 @@ public class FileCellRenderer implements TakesAddressCell {
 	AuthenticationController authController;
 	FileHandleAsyncHandler fileHandleAsynHandler;
 	FileHandleAssociation association;
-	
+
 	@Inject
 	public FileCellRenderer(FileCellRendererView view, AuthenticationController authController, FileHandleAsyncHandler fileHandleAsynHandler) {
 		this.view = view;
@@ -40,9 +39,9 @@ public class FileCellRenderer implements TakesAddressCell {
 	@Override
 	public void setValue(String value) {
 		fileHandleId = StringUtils.emptyAsNull(value);
-		if(fileHandleId == null){
+		if (fileHandleId == null) {
 			view.setLoadingVisible(false);
-		}else{
+		} else {
 			view.setLoadingVisible(true);
 			association = new FileHandleAssociation();
 			association.setFileHandleId(fileHandleId);
@@ -60,27 +59,27 @@ public class FileCellRenderer implements TakesAddressCell {
 				}
 			}
 			fileHandleAsynHandler.getFileResult(association, new AsyncCallback<FileResult>() {
-				
+
 				@Override
 				public void onSuccess(FileResult result) {
-					if(view.isAttached() && result != null){
+					if (view.isAttached() && result != null) {
 						view.setLoadingVisible(false);
 						if (result.getFileHandle() != null) {
 							view.setAnchor(result.getFileHandle().getFileName(), createAnchorHref());
 							Long contentSize = result.getFileHandle().getContentSize();
 							if (contentSize != null) {
-								view.setTooltip(contentSize);	
+								view.setTooltip(contentSize);
 							}
 						} else if (result.getFailureCode() != null) {
-							//failed
+							// failed
 							view.setErrorText(UNABLE_TO_LOAD_FILE_DATA + ": " + result.getFailureCode().toString());
 						}
 					}
 				}
-				
+
 				@Override
 				public void onFailure(Throwable caught) {
-					if(view.isAttached()){
+					if (view.isAttached()) {
 						view.setLoadingVisible(false);
 						view.setErrorText(UNABLE_TO_LOAD_FILE_DATA + ": " + caught.getMessage());
 					}
@@ -88,12 +87,13 @@ public class FileCellRenderer implements TakesAddressCell {
 			});
 		}
 	}
-	
+
 	/**
 	 * Create the href using the address of this renderer.
+	 * 
 	 * @return
 	 */
-	public String createAnchorHref(){
+	public String createAnchorHref() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("/Portal/");
 		builder.append(WebConstants.FILE_HANDLE_ASSOCIATION_SERVLET);

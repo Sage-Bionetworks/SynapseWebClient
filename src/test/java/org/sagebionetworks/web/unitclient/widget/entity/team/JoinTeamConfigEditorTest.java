@@ -3,10 +3,8 @@ package org.sagebionetworks.web.unitclient.widget.entity.team;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.HashMap;
 import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -27,7 +25,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class JoinTeamConfigEditorTest {
@@ -41,7 +38,7 @@ public class JoinTeamConfigEditorTest {
 	SynapseJSNIUtils mockJSNI;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
-	
+
 	Map<String, String> descriptor;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	String teamID = "123123";
@@ -53,11 +50,11 @@ public class JoinTeamConfigEditorTest {
 	String openRequestText = "Request to join team sent!";
 	Team testTeam;
 	String teamName = "testName";
-	
+
 	// challenge params
 	boolean isChallenge = true; // current
 	boolean showProfileFormKey = true; // deprecated but needs support
-	
+
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
@@ -84,20 +81,20 @@ public class JoinTeamConfigEditorTest {
 		when(mockSuggestion.getId()).thenReturn(suggestionID);
 		AsyncMockStubber.callSuccessWith(testTeam).when(mockSynapseJavascriptClient).getTeam(Mockito.anyString(), Mockito.any(AsyncCallback.class));
 	}
-	
+
 	@Test
 	public void testAsWidget() {
 		presenter.asWidget();
 		verify(mockView).asWidget();
 	}
-	
+
 	@Test
 	public void testConstruction() {
 		verify(mockSuggestBox).setSuggestionProvider(mockProvider);
 		verify(mockSuggestBox).setTypeFilter(TypeFilter.TEAMS_ONLY);
 		verify(mockView).setSuggestWidget(mockSuggestBox);
 	}
-	
+
 	@Test
 	public void testConfigure() {
 		presenter.configure(wikiKey, descriptor, mockCallback);
@@ -109,7 +106,7 @@ public class JoinTeamConfigEditorTest {
 		verify(mockView).setButtonText(joinTeamButtonText);
 		verify(mockView).setRequestOpenInfotext(openRequestText);
 	}
-	
+
 	@Test
 	public void updateDescriptorFromViewSuccess() {
 		presenter.setDescriptor(descriptor);
@@ -123,8 +120,8 @@ public class JoinTeamConfigEditorTest {
 		verify(mockView).getButtonText();
 		verify(mockView).getRequestOpenInfotext();
 	}
-	
-	@Test(expected=IllegalArgumentException.class)
+
+	@Test(expected = IllegalArgumentException.class)
 	public void updateDescriptorFromViewNoTeamSelected() {
 		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(null);
 		descriptor = new HashMap<String, String>();

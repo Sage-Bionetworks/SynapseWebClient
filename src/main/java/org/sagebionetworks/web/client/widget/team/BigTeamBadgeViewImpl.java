@@ -13,7 +13,6 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.Linkify;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.TextBoxWithCopyToClipboardWidget;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -27,7 +26,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class BigTeamBadgeViewImpl implements BigTeamBadgeView {
-	public interface Binder extends UiBinder<Widget, BigTeamBadgeViewImpl> {	}
+	public interface Binder extends UiBinder<Widget, BigTeamBadgeViewImpl> {
+	}
+
 	@UiField
 	Span pictureSpan;
 	@UiField
@@ -52,14 +53,9 @@ public class BigTeamBadgeViewImpl implements BigTeamBadgeView {
 	IconsImageBundle iconsImageBundle;
 	Linkify linkify;
 	Widget widget;
-	
+
 	@Inject
-	public BigTeamBadgeViewImpl(
-			Binder uiBinder,
-			SynapseJSNIUtils synapseJSNIUtils,
-			GlobalApplicationState globalApplicationState,
-			IconsImageBundle iconsImageBundle,
-			Linkify linkify) {
+	public BigTeamBadgeViewImpl(Binder uiBinder, SynapseJSNIUtils synapseJSNIUtils, GlobalApplicationState globalApplicationState, IconsImageBundle iconsImageBundle, Linkify linkify) {
 		widget = uiBinder.createAndBindUi(this);
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.globalApplicationState = globalApplicationState;
@@ -67,14 +63,15 @@ public class BigTeamBadgeViewImpl implements BigTeamBadgeView {
 		this.linkify = linkify;
 		addStyleName("bigTeamBadge");
 	}
-	
+
 	@Override
 	public void setTeam(final Team team, String description) {
 		teamPicture.setVisible(false);
 		defaultPicture.setVisible(false);
 		notificationsSpan.clear();
-		if(team == null)  throw new IllegalArgumentException("Team is required");
-		
+		if (team == null)
+			throw new IllegalArgumentException("Team is required");
+
 		String name = team.getName();
 		ClickHandler clickHandler = event -> {
 			event.preventDefault();
@@ -89,9 +86,9 @@ public class BigTeamBadgeViewImpl implements BigTeamBadgeView {
 		String descriptionWithoutHtml = SafeHtmlUtils.htmlEscape(description);
 		descriptionContainer.clear();
 		descriptionContainer.add(new HTML(linkify.linkify(descriptionWithoutHtml)));
-		
+
 		nameLink.setText(name);
-		nameLink.setHref("#!Team:"+team.getId());
+		nameLink.setHref("#!Team:" + team.getId());
 		pictureFocusPanel.addClickHandler(clickHandler);
 	}
 
@@ -100,18 +97,15 @@ public class BigTeamBadgeViewImpl implements BigTeamBadgeView {
 		descriptionContainer.clear();
 		descriptionContainer.add(new Text(DisplayConstants.ERROR_LOADING));
 	}
-	
-	@Override
-	public void showLoading() {
-	}
 
 	@Override
-	public void showInfo(String message) {
-	}
+	public void showLoading() {}
 
 	@Override
-	public void showErrorMessage(String message) {
-	}
+	public void showInfo(String message) {}
+
+	@Override
+	public void showErrorMessage(String message) {}
 
 	@Override
 	public void setRequestCount(String count) {
@@ -125,8 +119,7 @@ public class BigTeamBadgeViewImpl implements BigTeamBadgeView {
 	}
 
 	@Override
-	public void clear() {
-	}
+	public void clear() {}
 
 	@Override
 	public void addStyleName(String style) {
@@ -137,12 +130,13 @@ public class BigTeamBadgeViewImpl implements BigTeamBadgeView {
 	public void setHeight(String height) {
 		widget.setHeight(height);
 	}
+
 	@Override
 	public void setMemberCountWidget(IsWidget widget) {
 		memberCountContainer.clear();
 		memberCountContainer.add(widget);
 	}
-	
+
 	@Override
 	public void setTeamEmailAddress(String teamEmail) {
 		synapseEmailField.setText(teamEmail);

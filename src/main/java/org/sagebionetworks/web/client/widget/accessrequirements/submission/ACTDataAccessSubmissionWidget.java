@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.submission;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.List;
-
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.repo.model.dataaccess.Submission;
@@ -22,14 +20,13 @@ import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWidgetView.Presenter, IsWidget {
-	
+
 	private ACTDataAccessSubmissionWidgetView view;
 	DataAccessClientAsync dataAccessClient;
 	SynapseAlert synAlert;
@@ -42,18 +39,9 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	PortalGinInjector ginInjector;
 	DateTimeUtils dateTimeUtils;
 	UserProfileAsyncHandler userProfileAsyncHandler;
+
 	@Inject
-	public ACTDataAccessSubmissionWidget(ACTDataAccessSubmissionWidgetView view, 
-			SynapseAlert synAlert,
-			DataAccessClientAsync dataAccessClient,
-			BigPromptModalView promptDialog,
-			FileHandleWidget ducFileRenderer,
-			FileHandleWidget irbFileRenderer,
-			FileHandleList otherDocuments,
-			SynapseJSNIUtils jsniUtils,
-			PortalGinInjector ginInjector,
-			DateTimeUtils dateTimeUtils,
-			UserProfileAsyncHandler userProfileAsyncHandler) {
+	public ACTDataAccessSubmissionWidget(ACTDataAccessSubmissionWidgetView view, SynapseAlert synAlert, DataAccessClientAsync dataAccessClient, BigPromptModalView promptDialog, FileHandleWidget ducFileRenderer, FileHandleWidget irbFileRenderer, FileHandleList otherDocuments, SynapseJSNIUtils jsniUtils, PortalGinInjector ginInjector, DateTimeUtils dateTimeUtils, UserProfileAsyncHandler userProfileAsyncHandler) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.dataAccessClient = dataAccessClient;
@@ -63,15 +51,13 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		this.ginInjector = ginInjector;
 		this.dateTimeUtils = dateTimeUtils;
 		this.userProfileAsyncHandler = userProfileAsyncHandler;
-		
-		otherDocuments.configure()
-			.setCanDelete(false)
-			.setCanUpload(false);
+
+		otherDocuments.configure().setCanDelete(false).setCanUpload(false);
 		this.ducFileRenderer = ducFileRenderer;
 		this.irbFileRenderer = irbFileRenderer;
 		this.otherDocuments = otherDocuments;
 		view.setPresenter(this);
-		
+
 		view.setDucWidget(ducFileRenderer);
 		view.setIrbWidget(irbFileRenderer);
 		view.setPromptModal(promptDialog);
@@ -85,14 +71,14 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 			}
 		});
 	}
-	
+
 	public void configure(Submission submission) {
 		this.submission = submission;
 		view.hideActions();
 		// setup the view wrt submission state
 		view.setState(submission.getState().name());
 		view.setRejectedReasonVisible(SubmissionState.REJECTED.equals(submission.getState()));
-		
+
 		switch (submission.getState()) {
 			case SUBMITTED:
 				view.showApproveButton();
@@ -100,13 +86,13 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 				break;
 			case REJECTED:
 				String reason = submission.getRejectedReason() == null ? "" : submission.getRejectedReason();
-				view.setRejectedReason(reason);	
+				view.setRejectedReason(reason);
 				break;
 			case APPROVED:
 			case CANCELLED:
 			default:
 		}
-		
+
 		view.setInstitution(submission.getResearchProjectSnapshot().getInstitution());
 		view.setIntendedDataUse(submission.getResearchProjectSnapshot().getIntendedDataUseStatement());
 		view.setIsRenewal(submission.getIsRenewalSubmission());
@@ -119,7 +105,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		badge.configure(submission.getSubmittedBy());
 		view.setSubmittedBy(badge);
 	}
-	
+
 	@Override
 	public void onMoreInfo() {
 		otherDocuments.clear();
@@ -132,10 +118,10 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 				otherDocuments.addFileLink(getFileHandleAssociation(fileHandleId));
 			}
 		}
-		
+
 		if (submission.getDucFileHandleId() != null) {
 			ducFileRenderer.configure(getFileHandleAssociation(submission.getDucFileHandleId()));
-			ducFileRenderer.setVisible(true);			
+			ducFileRenderer.setVisible(true);
 		} else {
 			ducFileRenderer.setVisible(false);
 		}
@@ -147,7 +133,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		}
 		view.showMoreInfoDialog();
 	}
-	
+
 	public void addAccessorUserBadges(List<AccessorChange> accessorChanges) {
 		for (AccessorChange change : accessorChanges) {
 			userProfileAsyncHandler.getUserProfile(change.getUserId(), new AsyncCallback<UserProfile>() {
@@ -155,18 +141,19 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 				public void onFailure(Throwable caught) {
 					synAlert.handleException(caught);
 				}
+
 				public void onSuccess(UserProfile profile) {
 					UserBadgeItem badge = ginInjector.getUserBadgeItem();
 					badge.configure(change, profile);
 					badge.setSelectVisible(false);
 					badge.setAccessTypeDropdownEnabled(false);
 					view.addAccessors(badge, profile.getUserName());
-				}; 
+				};
 			});
-			
+
 		}
 	}
-	
+
 	private FileHandleAssociation getFileHandleAssociation(String fileHandleId) {
 		FileHandleAssociation fha = new FileHandleAssociation();
 		fha.setAssociateObjectId(submission.getId());
@@ -174,49 +161,53 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		fha.setFileHandleId(fileHandleId);
 		return fha;
 	}
-	
+
 	public void updateDataAccessSubmissionState(SubmissionState state, String reason) {
 		dataAccessClient.updateDataAccessSubmissionState(submission.getId(), state, reason, new AsyncCallback<Submission>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
+
 			@Override
 			public void onSuccess(Submission result) {
 				configure(result);
 			}
 		});
 	}
-	
+
 	@Override
 	public void onApprove() {
 		updateDataAccessSubmissionState(SubmissionState.APPROVED, null);
 	}
+
 	@Override
 	public void onReject() {
-		//prompt for reason
+		// prompt for reason
 		promptDialog.show();
 	}
-	
+
 	public void addStyleNames(String styleNames) {
 		view.addStyleNames(styleNames);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	
+
 	public void setVisible(boolean visible) {
 		view.setVisible(visible);
 	}
-	
+
 	public void setDucColumnVisible(boolean visible) {
 		view.setDucColumnVisible(visible);
 	}
+
 	public void setIrbColumnVisible(boolean visible) {
 		view.setIrbColumnVisible(visible);
 	}
+
 	public void setOtherAttachmentsColumnVisible(boolean visible) {
 		view.setOtherAttachmentsColumnVisible(visible);
 	}

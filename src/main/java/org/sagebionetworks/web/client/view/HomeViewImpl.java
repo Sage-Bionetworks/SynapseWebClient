@@ -15,7 +15,6 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
-
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -30,8 +29,10 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class HomeViewImpl extends Composite implements HomeView {
-	
-	public interface HomeViewImplUiBinder extends UiBinder<Widget, HomeViewImpl> {}
+
+	public interface HomeViewImplUiBinder extends UiBinder<Widget, HomeViewImpl> {
+	}
+
 	@UiField
 	org.gwtbootstrap3.client.ui.Button dashboardBtn;
 	@UiField
@@ -40,14 +41,14 @@ public class HomeViewImpl extends Composite implements HomeView {
 	Div registerUI;
 	@UiField
 	Div loginUI;
-	
+
 	@UiField
 	FocusPanel dreamChallengesBox;
 	@UiField
 	FocusPanel openResearchProjectsBox;
 	@UiField
 	FocusPanel researchCommunitiesBox;
-	
+
 	@UiField
 	FocusPanel termsOfUseBox;
 	@UiField
@@ -58,11 +59,11 @@ public class HomeViewImpl extends Composite implements HomeView {
 	FocusPanel organizeResearchAssetsBox;
 	@UiField
 	FocusPanel collaborateBox;
-	
-	
+
+
 	@UiField
 	FocusPanel gettingStartedBox;
-	
+
 	@UiField
 	Heading organizeDigitalResearchAssetsHeading;
 	@UiField
@@ -73,19 +74,14 @@ public class HomeViewImpl extends Composite implements HomeView {
 	Heading userDisplayName;
 	@UiField
 	Div registerWidgetContainer;
-	
+
 	private Header headerWidget;
 	UserBadge userBadge;
 	HorizontalPanel myDashboardButtonContents;
 	LoginWidget loginWidget;
+
 	@Inject
-	public HomeViewImpl(HomeViewImplUiBinder binder, 
-			Header headerWidget,
-			final GlobalApplicationState globalApplicationState,
-			final AuthenticationController authController,
-			UserBadge userBadge,
-			RegisterWidget registerWidget,
-			LoginWidget loginWidget) {
+	public HomeViewImpl(HomeViewImplUiBinder binder, Header headerWidget, final GlobalApplicationState globalApplicationState, final AuthenticationController authController, UserBadge userBadge, RegisterWidget registerWidget, LoginWidget loginWidget) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.userBadge = userBadge;
@@ -97,12 +93,12 @@ public class HomeViewImpl extends Composite implements HomeView {
 		myDashboardButtonContents.add(userBadge.asWidget());
 		myDashboardButtonContents.add(new Span("My Dashboard"));
 		myDashboardButtonContents.addStyleName("margin-auto");
-		
+
 		addUserPicturePanel();
-		
+
 		headerWidget.configure();
-		
-		dashboardBtn.addClickHandler(new ClickHandler() {			
+
+		dashboardBtn.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				globalApplicationState.getPlaceChanger().goTo(new Profile(authController.getCurrentUserPrincipalId(), ProfileArea.PROJECTS));
@@ -119,26 +115,26 @@ public class HomeViewImpl extends Composite implements HomeView {
 		openResearchProjectsBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				//go to new open research project page
+				// go to new open research project page
 				globalApplicationState.getPlaceChanger().goTo(new StandaloneWiki("OpenResearchProjects"));
 			}
 		});
-		
+
 		researchCommunitiesBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				//go to new research communities page
+				// go to new research communities page
 				globalApplicationState.getPlaceChanger().goTo(new StandaloneWiki("ResearchCommunities"));
 			}
 		});
-		
+
 		creditForResearchBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				Window.scrollTo(0, getCreditHeading.getAbsoluteTop());
 			}
 		});
-		
+
 		organizeResearchAssetsBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -157,14 +153,14 @@ public class HomeViewImpl extends Composite implements HomeView {
 				DisplayUtils.newWindow(WebConstants.DOCS_URL + "governance.html", "", "");
 			}
 		});
-		
+
 		gettingStartedBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				DisplayUtils.newWindow(WebConstants.DOCS_URL + "getting_started.html", "", "");
 			}
 		});
-		
+
 		becomeCertifiedBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -172,9 +168,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 			}
 		});
 	}
-	
+
 	/**
 	 * Clear the divider/caret from the user button, and add the picture container
+	 * 
 	 * @param button
 	 */
 	public void addUserPicturePanel() {
@@ -186,7 +183,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		});
 	}
 
-	
+
 	@Override
 	public void showLoggedInUI(UserProfile profile) {
 		setUserProfilePicture(profile);
@@ -201,34 +198,33 @@ public class HomeViewImpl extends Composite implements HomeView {
 		loginUI.add(loginWidget.asWidget());
 		loginUI.setVisible(true);
 	}
-	
+
 	@Override
 	public void showRegisterUI() {
 		registerUI.setVisible(true);
 	}
-	
+
 	private void setUserProfilePicture(UserProfile profile) {
 		if (profile != null) {
 			userBadge.configure(profile);
 			userBadge.setDoNothingOnClick();
 		}
 	}
-	
+
 	@Override
 	public void refresh() {
 		headerWidget.configure();
 		headerWidget.refresh();
 		clear();
 	}
-	
+
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override
-	public void showLoading() {
-	}
+	public void showLoading() {}
 
 	@Override
 	public void showInfo(String message) {
@@ -237,9 +233,9 @@ public class HomeViewImpl extends Composite implements HomeView {
 
 	@Override
 	public void scrollToTop() {
-		Window.scrollTo(0, 0); // scroll user to top of page		
+		Window.scrollTo(0, 0); // scroll user to top of page
 	}
-	
+
 	@Override
 	public void clear() {
 		userBadge.clearState();

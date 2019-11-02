@@ -3,35 +3,26 @@ package org.sagebionetworks.web.client;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
-import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
-import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
-import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.discussion.UpdateThread;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
-@RemoteServiceRelativePath("discussionforumclient")	
+@RemoteServiceRelativePath("discussionforumclient")
 public interface DiscussionForumClient extends RemoteService {
 
-	DiscussionThreadBundle createThread(CreateDiscussionThread toCreate)
-			throws RestServiceException;
+	DiscussionThreadBundle createThread(CreateDiscussionThread toCreate) throws RestServiceException;
 
-	DiscussionThreadBundle updateThread(String threadId, UpdateThread newThread)
-			throws RestServiceException;
+	DiscussionThreadBundle updateThread(String threadId, UpdateThread newThread) throws RestServiceException;
 
 	void markThreadAsDeleted(String threadId) throws RestServiceException;
 
-	DiscussionReplyBundle createReply(CreateDiscussionReply toCreate)
-			throws RestServiceException;
+	DiscussionReplyBundle createReply(CreateDiscussionReply toCreate) throws RestServiceException;
 
-	DiscussionReplyBundle updateReplyMessage(String replyId, UpdateReplyMessage newMessage)
-			throws RestServiceException;
+	DiscussionReplyBundle updateReplyMessage(String replyId, UpdateReplyMessage newMessage) throws RestServiceException;
 
 	void markReplyAsDeleted(String replyId) throws RestServiceException;
 

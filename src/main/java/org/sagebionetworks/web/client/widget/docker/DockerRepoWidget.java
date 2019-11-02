@@ -1,10 +1,9 @@
 package org.sagebionetworks.web.client.widget.docker;
 
 import java.util.Map;
-
-import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -17,7 +16,6 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
-
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -36,18 +34,9 @@ public class DockerRepoWidget {
 	private boolean canEdit;
 	private DockerRepository entity;
 	private EventBus eventBus;
+
 	@Inject
-	public DockerRepoWidget(
-			DockerRepoWidgetView view,
-			WikiPageWidget wikiPageWidget,
-			ProvenanceWidget provWidget,
-			DockerTitleBar dockerTitleBar,
-			EntityMetadata metadata,
-			ModifiedCreatedByWidget modifiedCreatedBy,
-			DockerCommitListWidget dockerCommitListWidget,
-			CookieProvider cookies,
-			EventBus eventBus
-			) {
+	public DockerRepoWidget(DockerRepoWidgetView view, WikiPageWidget wikiPageWidget, ProvenanceWidget provWidget, DockerTitleBar dockerTitleBar, EntityMetadata metadata, ModifiedCreatedByWidget modifiedCreatedBy, DockerCommitListWidget dockerCommitListWidget, CookieProvider cookies, EventBus eventBus) {
 		this.view = view;
 		this.wikiPageWidget = wikiPageWidget;
 		this.provWidget = provWidget;
@@ -70,7 +59,7 @@ public class DockerRepoWidget {
 	}
 
 	public void configure(EntityBundle bundle, ActionMenuWidget actionMenu) {
-		this.entity = (DockerRepository)bundle.getEntity();
+		this.entity = (DockerRepository) bundle.getEntity();
 		this.canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
 		metadata.configure(bundle, null, actionMenu);
 		dockerTitleBar.configure(entity);
@@ -95,12 +84,12 @@ public class DockerRepoWidget {
 			public void pageUpdated() {
 				eventBus.fireEvent(new EntityUpdatedEvent());
 			}
+
 			@Override
-			public void noWikiFound() {
-			}
+			public void noWikiFound() {}
 		};
 		wikiPageWidget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), bundle.getRootWikiId(), null), canEdit, wikiCallback);
-		CallbackP<String> wikiReloadHandler = new CallbackP<String>(){
+		CallbackP<String> wikiReloadHandler = new CallbackP<String>() {
 			@Override
 			public void invoke(String wikiPageId) {
 				wikiPageWidget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), wikiPageId, null), canEdit, wikiCallback);

@@ -5,8 +5,8 @@ public class PaginationEntry {
 	private String label;
 	private int start;
 	private boolean isCurrent;
-	
-	
+
+
 	public PaginationEntry(String label, int start, boolean isCurrent) {
 		super();
 		this.label = label;
@@ -76,6 +76,6 @@ public class PaginationEntry {
 			return false;
 		return true;
 	}
-	
-	
+
+
 }

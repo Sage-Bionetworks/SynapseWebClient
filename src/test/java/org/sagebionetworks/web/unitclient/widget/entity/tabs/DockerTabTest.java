@@ -1,4 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.entity.tabs;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
@@ -9,22 +10,20 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -39,7 +38,6 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.DockerTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DockerTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
-
 import com.google.gwt.user.client.ui.Widget;
 
 public class DockerTabTest {
@@ -93,12 +91,12 @@ public class DockerTabTest {
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		tab = new DockerTab(mockTab, mockGinInjector);
-		
+
 		when(mockGinInjector.getDockerTabView()).thenReturn(mockView);
 		when(mockGinInjector.getDockerRepoListWidget()).thenReturn(mockDockerRepoListWidget);
 		when(mockGinInjector.getBreadcrumb()).thenReturn(mockBreadcrumb);
 		when(mockGinInjector.getStuAlert()).thenReturn(mockSynAlert);
-		
+
 		when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);
 		when(mockProjectEntityBundle.getPermissions()).thenReturn(mockPermissions);
 		when(mockProjectEntity.getName()).thenReturn(projectName);
@@ -110,22 +108,22 @@ public class DockerTabTest {
 		when(mockGinInjector.createNewDockerRepoWidget()).thenReturn(mockDockerRepoWidget);
 
 		List<EntityHeader> pathHeaders = new ArrayList<EntityHeader>();
-		
+
 		EntityHeader rootHeader = new EntityHeader();
 		rootHeader.setId("1");
 		rootHeader.setName("root");
 		pathHeaders.add(rootHeader);
-		
+
 		EntityHeader projHeader = new EntityHeader();
 		projHeader.setId("123");
 		projHeader.setName(projectName);
 		pathHeaders.add(projHeader);
-		
+
 		EntityHeader dsHeader = new EntityHeader();
 		dsHeader.setId("170");
 		dsHeader.setName("syn170");
 		pathHeaders.add(dsHeader);
-		
+
 		path = new EntityPath();
 		path.setPath(pathHeaders);
 		when(mockDockerRepoEntityBundle.getPath()).thenReturn(path);
@@ -142,7 +140,7 @@ public class DockerTabTest {
 		verify(mockTab).configure(anyString(), anyString(), anyString());
 		verify(mockBreadcrumb).setLinkClickedHandler(callbackPCaptor.capture());
 		verify(mockTab).setContent(any(Widget.class));
-		
+
 		// test click on breadcrumb
 		String newEntityId = "syn9898989822";
 		tab.setEntitySelectedCallback(mockEntitySelectedCallback);
@@ -218,7 +216,7 @@ public class DockerTabTest {
 	@Test
 	public void testShowError() {
 		Throwable error = new Throwable();
-		tab.showError(error );
+		tab.showError(error);
 		verify(mockSynAlert).clear();
 		verify(mockSynAlert).handleException(error);
 	}

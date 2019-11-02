@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.table.SortDirection;
-
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -23,17 +22,18 @@ public class SortableTableHeaderImpl implements SortableTableHeader {
 	public static final String UNSORTED_STYLES = "synapse-blue";
 	public static final String SORTED_STYLES = "synapse-blue-bg color-white";
 
-	public interface Binder extends UiBinder<Widget, SortableTableHeaderImpl> {}
-	
+	public interface Binder extends UiBinder<Widget, SortableTableHeaderImpl> {
+	}
+
 	@UiField
 	Anchor tableHeaderLink;
 	@UiField
 	Icon sortIcon;
 	Widget widget;
 	private static Binder uiBinder = GWT.create(Binder.class);
-	
+
 	@Inject
-	public SortableTableHeaderImpl(){
+	public SortableTableHeaderImpl() {
 		widget = uiBinder.createAndBindUi(this);
 		setSortDirection(null);
 	}
@@ -48,9 +48,9 @@ public class SortableTableHeaderImpl implements SortableTableHeader {
 		tableHeaderLink.setText(text);
 		setSortingListener(handler);
 	}
-	
+
 	public void setSortingListener(final SortingListener handler) {
-		if(handler != null){
+		if (handler != null) {
 			ClickHandler onClick = event -> {
 				handler.onToggleSort(getText());
 			};
@@ -74,24 +74,31 @@ public class SortableTableHeaderImpl implements SortableTableHeader {
 		}
 		sortIcon.setType(icon);
 	}
+
 	public void setWidth(String width) {
 		widget.setWidth(width);
 	}
+
 	public void setHeight(String height) {
 		widget.setHeight(height);
 	}
+
 	public void setAddStyleNames(String styles) {
 		widget.addStyleName(styles);
 	}
+
 	public void setStyleName(String styles) {
 		widget.setStyleName(styles);
 	}
+
 	public void setText(String text) {
 		tableHeaderLink.setText(text);
 	}
+
 	public String getText() {
 		return tableHeaderLink.getText();
 	}
+
 	public void setVisible(boolean visible) {
 		widget.setVisible(visible);
 	}

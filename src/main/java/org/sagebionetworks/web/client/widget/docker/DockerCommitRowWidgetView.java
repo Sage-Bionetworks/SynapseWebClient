@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.docker;
 
 import java.util.Date;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface DockerCommitRowWidgetView extends IsWidget {

@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.FormLabel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -17,16 +16,17 @@ import com.google.inject.Inject;
  *
  */
 public class RowFormViewImpl implements RowFormView {
-	
-	public interface Binder extends UiBinder<Widget, RowFormViewImpl> {	}
-	
+
+	public interface Binder extends UiBinder<Widget, RowFormViewImpl> {
+	}
+
 	@UiField
 	Div form;
-	
+
 	Widget w;
-	
+
 	@Inject
-	public RowFormViewImpl(Binder binder){
+	public RowFormViewImpl(Binder binder) {
 		w = binder.createAndBindUi(this);
 	}
 
@@ -36,8 +36,7 @@ public class RowFormViewImpl implements RowFormView {
 	}
 
 	@Override
-	public void setPresenter(final Presenter presenter) {
-	}
+	public void setPresenter(final Presenter presenter) {}
 
 	@Override
 	public void addCell(String labelText, Cell cell) {
@@ -49,7 +48,7 @@ public class RowFormViewImpl implements RowFormView {
 		fg.add(cell);
 		form.add(fg);
 	}
-	
+
 	@Override
 	public void clear() {
 		form.clear();

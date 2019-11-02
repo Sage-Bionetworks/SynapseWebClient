@@ -6,13 +6,10 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.io.IOException;
-
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -38,7 +35,7 @@ public class ProjectAliasServletTest {
 	String testAliasUrl = "https://www.synapse.org/" + testAlias;
 	String testAliasSynapseId = "syn3334444";
 	String testFilesPath = "/files";
-	
+
 	@Before
 	public void setup() throws IOException, SynapseException, JSONObjectAdapterException {
 		servlet = new ProjectAliasServlet();
@@ -66,12 +63,12 @@ public class ProjectAliasServletTest {
 		when(mockRequest.getRequestURL()).thenReturn(sb);
 		when(mockRequest.getRequestURI()).thenReturn("");
 		when(mockRequest.getContextPath()).thenReturn("");
-		
+
 		EntityId id = new EntityId();
 		id.setId(testAliasSynapseId);
 		when(mockSynapse.getEntityIdByAlias(anyString())).thenReturn(id);
 	}
-	
+
 
 	@Test
 	public void testHappyCaseRedirect() throws Exception {
@@ -79,10 +76,10 @@ public class ProjectAliasServletTest {
 		verify(mockSynapse).getEntityIdByAlias(anyString());
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockResponse).encodeRedirectURL(captor.capture());
-		assertTrue(captor.getValue().endsWith("/#!Synapse:"+testAliasSynapseId));
+		assertTrue(captor.getValue().endsWith("/#!Synapse:" + testAliasSynapseId));
 		verify(mockResponse).sendRedirect(anyString());
 	}
-	
+
 	@Test
 	public void testWithPathRedirect() throws Exception {
 		mockRequest = mock(HttpServletRequest.class);
@@ -94,20 +91,20 @@ public class ProjectAliasServletTest {
 		verify(mockSynapse).getEntityIdByAlias(eq(testAlias));
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockResponse).encodeRedirectURL(captor.capture());
-		assertTrue(captor.getValue().endsWith("/#!Synapse:"+testAliasSynapseId + testFilesPath));
+		assertTrue(captor.getValue().endsWith("/#!Synapse:" + testAliasSynapseId + testFilesPath));
 		verify(mockResponse).sendRedirect(anyString());
 	}
-	
+
 	@Test
 	public void testNoAliasMapping() throws Exception {
-		
+
 		when(mockSynapse.getEntityIdByAlias(anyString())).thenThrow(new SynapseNotFoundException("not found"));
-		
+
 		servlet.doGet(mockRequest, mockResponse);
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockResponse).sendRedirect(captor.capture());
 		String value = captor.getValue();
 		assertTrue(value.contains("#!Error:"));
 	}
-}	
+}
 

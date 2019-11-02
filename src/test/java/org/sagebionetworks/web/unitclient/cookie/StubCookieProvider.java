@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
-
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 
 /**
@@ -17,7 +16,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
  *
  */
 public class StubCookieProvider implements CookieProvider {
-	
+
 	private TreeMap<String, String> map = new TreeMap<String, String>();
 
 	@Override
@@ -30,7 +29,7 @@ public class StubCookieProvider implements CookieProvider {
 		List<String> results = new ArrayList<String>();
 		Set<String> keySet = map.keySet();
 		Iterator<String> it = keySet.iterator();
-		while(it.hasNext()){
+		while (it.hasNext()) {
 			String key = it.next();
 			results.add(key);
 		}
@@ -53,8 +52,7 @@ public class StubCookieProvider implements CookieProvider {
 	}
 
 	@Override
-	public void setCookie(String name, String value, Date expires,
-			String domain, String path, boolean secure) {
+	public void setCookie(String name, String value, Date expires, String domain, String path, boolean secure) {
 		throw new UnsupportedOperationException("Not implemented");
 	}
 

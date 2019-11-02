@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.shared.exceptions;
 
 public class TableUnavilableException extends RestServiceException {
-	
+
 	private static final long serialVersionUID = 1L;
 	private String statusJson;
 
@@ -11,7 +11,7 @@ public class TableUnavilableException extends RestServiceException {
 
 	/**
 	 * 
-	 * @param statusJson JSON serialized TableStatus object 
+	 * @param statusJson JSON serialized TableStatus object
 	 */
 	public TableUnavilableException(String statusJson) {
 		super(statusJson);
@@ -25,5 +25,5 @@ public class TableUnavilableException extends RestServiceException {
 	public String getStatusJson() {
 		return statusJson;
 	}
-	
+
 }

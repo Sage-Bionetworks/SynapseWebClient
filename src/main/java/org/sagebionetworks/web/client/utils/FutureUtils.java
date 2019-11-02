@@ -1,15 +1,14 @@
 package org.sagebionetworks.web.client.utils;
 
 import java.util.function.Consumer;
-
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class FutureUtils {
 	/**
-	 * Calls the given closure, passing it an AsyncCallback that transmits the success
-	 * failure scenarios to a FluentFuture; then it returns the future.
+	 * Calls the given closure, passing it an AsyncCallback that transmits the success failure scenarios
+	 * to a FluentFuture; then it returns the future.
 	 *
 	 * @param closure
 	 * @param <T>

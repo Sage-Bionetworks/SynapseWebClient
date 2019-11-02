@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -20,12 +20,12 @@ public class TableTypeTest {
 	TableEntity mockTableEntity;
 	@Mock
 	EntityView mockEntityView;
-	
+
 	@Before
-	public void before(){
+	public void before() {
 		MockitoAnnotations.initMocks(this);
 	}
-	
+
 	@Test
 	public void testIncludeFiles() {
 		assertFalse(TableType.table.isIncludeFiles());
@@ -38,7 +38,7 @@ public class TableTypeTest {
 		assertTrue(TableType.files_folders.isIncludeFiles());
 		assertTrue(TableType.files_folders_tables.isIncludeFiles());
 	}
-	
+
 	@Test
 	public void testIncludeFolders() {
 		assertFalse(TableType.table.isIncludeFolders());
@@ -51,7 +51,7 @@ public class TableTypeTest {
 		assertTrue(TableType.files_folders.isIncludeFolders());
 		assertTrue(TableType.files_folders_tables.isIncludeFolders());
 	}
-	
+
 	@Test
 	public void testIncludeTables() {
 		assertFalse(TableType.table.isIncludeTables());
@@ -74,14 +74,14 @@ public class TableTypeTest {
 		assertEquals(TableType.files_tables, TableType.getTableType(true, false, true));
 		assertEquals(TableType.files_folders, TableType.getTableType(true, true, false));
 		assertEquals(TableType.files_folders_tables, TableType.getTableType(true, true, true));
-		assertEquals(TableType.table, TableType.getTableType((Long)null));
+		assertEquals(TableType.table, TableType.getTableType((Long) null));
 	}
 
 	@Test
 	public void testGetTableTypeFromEntity() {
 		assertEquals(TableType.table, TableType.getTableType(mockTableEntity));
-		
-		//using old type
+
+		// using old type
 		when(mockEntityView.getViewTypeMask()).thenReturn(null);
 		when(mockEntityView.getType()).thenReturn(ViewType.file);
 		assertEquals(TableType.files, TableType.getTableType(mockEntityView));
@@ -89,7 +89,7 @@ public class TableTypeTest {
 		assertEquals(TableType.files_tables, TableType.getTableType(mockEntityView));
 		when(mockEntityView.getType()).thenReturn(ViewType.project);
 		assertEquals(TableType.projects, TableType.getTableType(mockEntityView));
-		
+
 		// using new mask
 		when(mockEntityView.getType()).thenReturn(null);
 		when(mockEntityView.getViewTypeMask()).thenReturn(ViewTypeMask.File.getMask());

@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.discussion.modal;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
@@ -13,20 +12,20 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.validation.ValidationResult;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+
 /**
  * A simple modal dialog for adding a new thread.
  */
-public class NewDiscussionThreadModal implements DiscussionThreadModalView.Presenter{
+public class NewDiscussionThreadModal implements DiscussionThreadModalView.Presenter {
 
 	private static final String NEW_THREAD_MODAL_TITLE = "New Thread";
 	private static final String SUCCESS_TITLE = "Thread created";
 	private static final String SUCCESS_MESSAGE = "A new thread has been created.";
 	public static final String RESTORE_TITLE = "Restore draft?";
-	public static final String RESTORE_MESSAGE = "Would you like to continue writing where you left off?"; 
+	public static final String RESTORE_MESSAGE = "Would you like to continue writing where you left off?";
 	public static final String DEFAULT_MARKDOWN = "";
 	private DiscussionThreadModalView view;
 	private DiscussionForumClientAsync discussionForumClient;
@@ -41,15 +40,7 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 	Callback newThreadCallback;
 
 	@Inject
-	public NewDiscussionThreadModal(
-			DiscussionThreadModalView view,
-			DiscussionForumClientAsync discussionForumClient,
-			SynapseAlert synAlert,
-			MarkdownEditorWidget markdownEditor,
-			AuthenticationController authController,
-			SessionStorage sessionStorage,
-			PopupUtilsView popupUtils
-			) {
+	public NewDiscussionThreadModal(DiscussionThreadModalView view, DiscussionForumClientAsync discussionForumClient, SynapseAlert synAlert, MarkdownEditorWidget markdownEditor, AuthenticationController authController, SessionStorage sessionStorage, PopupUtilsView popupUtils) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
 		fixServiceEntryPoint(discussionForumClient);
@@ -77,12 +68,12 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 		checkForSavedThread();
 		view.showDialog();
 	}
-	
+
 	private void checkForSavedThread() {
 		markdownEditor.hideUploadRelatedCommands();
 		markdownEditor.showExternalImageButton();
 		if (storage.getItem(titleKey) == null || storage.getItem(messageKey) == null) {
-			markdownEditor.configure(DEFAULT_MARKDOWN);			
+			markdownEditor.configure(DEFAULT_MARKDOWN);
 		} else {
 			Callback yesCallback = new Callback() {
 				@Override
@@ -98,7 +89,7 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 			Callback noCallback = new Callback() {
 				@Override
 				public void invoke() {
-					markdownEditor.configure(DEFAULT_MARKDOWN);	
+					markdownEditor.configure(DEFAULT_MARKDOWN);
 					storage.removeItem(titleKey);
 					storage.removeItem(messageKey);
 				}
@@ -118,8 +109,7 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 		String threadTitle = view.getThreadTitle();
 		String messageMarkdown = markdownEditor.getMarkdown();
 		ValidationResult result = new ValidationResult();
-		result.requiredField("Title", threadTitle)
-				.requiredField("Message", messageMarkdown);
+		result.requiredField("Title", threadTitle).requiredField("Message", messageMarkdown);
 		if (!result.isValid()) {
 			synAlert.showError(result.getErrorMessage());
 			return;
@@ -131,7 +121,7 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 		toCreate.setForumId(forumId);
 		toCreate.setTitle(threadTitle);
 		toCreate.setMessageMarkdown(messageMarkdown);
-		discussionForumClient.createThread(toCreate, new AsyncCallback<DiscussionThreadBundle>(){
+		discussionForumClient.createThread(toCreate, new AsyncCallback<DiscussionThreadBundle>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.resetButton();
@@ -151,7 +141,7 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 
 		});
 	}
-	
+
 	@Override
 	public void onCancel() {
 		if (!markdownEditor.getMarkdown().isEmpty()) {

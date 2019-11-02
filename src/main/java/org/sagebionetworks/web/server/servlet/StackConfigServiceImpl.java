@@ -2,7 +2,6 @@ package org.sagebionetworks.web.server.servlet;
 
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sagebionetworks.client.exceptions.SynapseException;
@@ -15,18 +14,17 @@ import org.sagebionetworks.web.server.servlet.SynapseClientImpl.PortalVersionHol
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
-
 import com.google.gwt.thirdparty.guava.common.base.Supplier;
 import com.google.gwt.thirdparty.guava.common.base.Suppliers;
 
 /**
-* 
-* This class provides access to stack configuration information.
-* It can be extended, as needed, with methods from StackConfiguration.
-* 
-* @author brucehoff
-*
-*/
+ * 
+ * This class provides access to stack configuration information. It can be extended, as needed,
+ * with methods from StackConfiguration.
+ * 
+ * @author brucehoff
+ *
+ */
 public class StackConfigServiceImpl extends SynapseClientBase implements StackConfigService {
 	static private Log log = LogFactory.getLog(StackConfigServiceImpl.class);
 	public static final long serialVersionUID = 46893767375462651L;
@@ -50,13 +48,12 @@ public class StackConfigServiceImpl extends SynapseClientBase implements StackCo
 			}
 		};
 	}
-	
+
 	@Override
 	public String getSynapseVersions() throws RestServiceException {
-		return PortalVersionHolder.getVersionInfo() + ","
-				+ getSynapseVersionInfo().getVersion();
+		return PortalVersionHolder.getVersionInfo() + "," + getSynapseVersionInfo().getVersion();
 	}
-	
+
 	@Override
 	public StackStatus getCurrentStatus() throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createAnonymousSynapseClient();
@@ -66,9 +63,9 @@ public class StackConfigServiceImpl extends SynapseClientBase implements StackCo
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	@Override
-	public HashMap<String, String> getSynapseProperties(){
+	public HashMap<String, String> getSynapseProperties() {
 		HashMap<String, String> properties = PortalPropertiesHolder.getPropertiesMap();
 		properties.put(WebConstants.REPO_SERVICE_URL_KEY, StackEndpoints.getRepositoryServiceEndpoint());
 		properties.put(WebConstants.FILE_SERVICE_URL_KEY, StackEndpoints.getFileServiceEndpoint());

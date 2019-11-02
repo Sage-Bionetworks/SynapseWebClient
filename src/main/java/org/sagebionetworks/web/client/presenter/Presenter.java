@@ -5,6 +5,7 @@ import com.google.gwt.place.shared.Place;
 
 /**
  * A presenter extends an Active and has a setPlace
+ * 
  * @author John
  *
  * @param <T> - the presenter's place

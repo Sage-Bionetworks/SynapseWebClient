@@ -9,9 +9,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.widget.entity.file.Md5Link;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
@@ -21,8 +18,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
-	public interface Binder extends UiBinder<Widget, VersionHistoryRowViewImpl> {}
-	
+	public interface Binder extends UiBinder<Widget, VersionHistoryRowViewImpl> {
+	}
+
 	@UiField
 	Anchor versionNameLink;
 	@UiField
@@ -53,7 +51,7 @@ public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
 	UserBadge userBadge;
 	private Widget widget;
 	Md5Link md5Link;
-	
+
 	@Inject
 	public VersionHistoryRowViewImpl(Binder binder, UserBadge userBadge, Md5Link md5Link) {
 		widget = binder.createAndBindUi(this);
@@ -61,21 +59,19 @@ public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
 		deleteButton.addClickHandler(event -> {
 			DisplayUtils.confirmDelete(DisplayConstants.PROMPT_SURE_DELETE + " version?", () -> {
 				if (deleteCallback != null) {
-					deleteCallback.invoke();			
+					deleteCallback.invoke();
 				}
 			});
 		});
-		
+
 		md5LinkContainer.setWidget(md5Link.asWidget());
 		this.userBadge = userBadge;
 		modifiedByContainer.setWidget(userBadge.asWidget());
 	}
-	
-	
+
+
 	@Override
-	public void configure(Long versionNumber, String versionLinkHref, String versionName,
-			String modifiedByUserId, String modifiedOn, String size,
-			String md5, String versionComment, Callback deleteCallback, IsWidget doiWidget) {
+	public void configure(Long versionNumber, String versionLinkHref, String versionName, String modifiedByUserId, String modifiedOn, String size, String md5, String versionComment, Callback deleteCallback, IsWidget doiWidget) {
 		this.versionNumber.setText(versionNumber.toString());
 		this.versionNumberLink.setText(versionNumber.toString());
 		this.versionNameLink.setText(versionName);
@@ -90,16 +86,17 @@ public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
 		versionNumberLink.setHref(versionLinkHref);
 		doiWidgetContainer.add(doiWidget);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
-	
+
 	@Override
 	public void setCanDelete(boolean canDelete) {
 		deleteButton.setVisible(canDelete);
 	}
+
 	@Override
 	public void setIsVersionSelected(boolean isVersionSelected) {
 		if (isVersionSelected) {
@@ -110,6 +107,7 @@ public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
 			versionNumberLink.removeStyleName("boldText");
 		}
 	}
+
 	@Override
 	public void setIsUnlinked(boolean isUnlinked) {
 		versionName.setVisible(isUnlinked);
@@ -117,10 +115,12 @@ public class VersionHistoryRowViewImpl implements VersionHistoryRowView {
 		versionNumber.setVisible(isUnlinked);
 		versionNumberLink.setVisible(!isUnlinked);
 	}
+
 	@Override
 	public void setMd5TableDataVisible(boolean isVisible) {
 		md5TableData.setVisible(isVisible);
 	}
+
 	@Override
 	public void setSizeTableDataVisible(boolean isVisible) {
 		sizeTableData.setVisible(isVisible);

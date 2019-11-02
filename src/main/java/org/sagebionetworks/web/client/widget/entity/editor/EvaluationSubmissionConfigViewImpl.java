@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.Map;
-
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.TextBox;
@@ -13,14 +12,15 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionConfigView {
-	public interface EvaluationSubmissionConfigViewImplUiBinder extends UiBinder<Widget, EvaluationSubmissionConfigViewImpl> {}
+	public interface EvaluationSubmissionConfigViewImplUiBinder extends UiBinder<Widget, EvaluationSubmissionConfigViewImpl> {
+	}
+
 	CookieProvider cookies;
 	@UiField
 	TextBox challengeProjectField;
@@ -40,7 +40,7 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 	Div evaluationQueueUi;
 	@UiField
 	Button findProjectButton;
-	
+
 	// form-based submission params
 	@UiField
 	Radio submitEntityOption;
@@ -63,45 +63,44 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 	@UiField
 	Div submissionTypeOptions;
 	Widget widget;
-	
+
 	EntityFinder entityFinder;
-	
+
 	@Inject
-	public EvaluationSubmissionConfigViewImpl(EvaluationSubmissionConfigViewImplUiBinder binder,
-			EntityFinder entityFinder, CookieProvider cookies) {
+	public EvaluationSubmissionConfigViewImpl(EvaluationSubmissionConfigViewImplUiBinder binder, EntityFinder entityFinder, CookieProvider cookies) {
 		widget = binder.createAndBindUi(this);
 		this.entityFinder = entityFinder;
 		this.cookies = cookies;
-		findProjectButton.addClickHandler(event-> {
+		findProjectButton.addClickHandler(event -> {
 			entityFinder.configure(EntityFilter.PROJECT, false, selectedRef -> {
 				challengeProjectField.setValue(selectedRef.getTargetId());
 				entityFinder.hide();
 			});
 			entityFinder.show();
 		});
-		
-		findFormContainerButton.addClickHandler(event-> {
+
+		findFormContainerButton.addClickHandler(event -> {
 			entityFinder.configure(EntityFilter.CONTAINER, false, selectedRef -> {
 				formContainerIdField.setValue(selectedRef.getTargetId());
 				entityFinder.hide();
 			});
 			entityFinder.show();
 		});
-		findSchemaFileButton.addClickHandler(event-> {
+		findSchemaFileButton.addClickHandler(event -> {
 			entityFinder.configure(EntityFilter.ALL_BUT_LINK, false, selectedRef -> {
 				schemaFileSynIdField.setValue(selectedRef.getTargetId());
 				entityFinder.hide();
 			});
 			entityFinder.show();
 		});
-		findUiSchemaFileButton.addClickHandler(event-> {
+		findUiSchemaFileButton.addClickHandler(event -> {
 			entityFinder.configure(EntityFilter.ALL_BUT_LINK, false, selectedRef -> {
 				uiSchemaFileSynIdField.setValue(selectedRef.getTargetId());
 				entityFinder.hide();
 			});
 			entityFinder.show();
 		});
-		
+
 		challengeRadioOption.addClickHandler(event -> {
 			setChallengeProjectUIVisible(true);
 		});
@@ -115,21 +114,21 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 			formUi.setVisible(false);
 		});
 	}
-	
+
 	private void setChallengeProjectUIVisible(boolean visible) {
 		challengeProjectUi.setVisible(visible);
 		evaluationQueueUi.setVisible(!visible);
 	}
-	
+
 	@Override
 	public void initView() {
 		clear();
 	}
-	
+
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> descriptor) {
 		submissionTypeOptions.setVisible(DisplayUtils.isInTestWebsite(cookies));
-		
+
 		String text = descriptor.get(WidgetConstants.UNAVAILABLE_MESSAGE);
 		if (text != null)
 			unavailableMessageField.setValue(text);
@@ -145,7 +144,7 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 			evaluationQueueOption.setValue(true);
 			setChallengeProjectUIVisible(false);
 		}
-		
+
 		String formContainerId = descriptor.get(WidgetConstants.FORM_CONTAINER_ID_KEY);
 		if (formContainerId != null) {
 			submitForm.setValue(true);
@@ -157,7 +156,7 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 			submitEntityOption.setValue(true);
 			formUi.setVisible(false);
 		}
-		
+
 		text = descriptor.get(WidgetConstants.BUTTON_TEXT_KEY);
 		if (text != null)
 			buttonTextField.setValue(text);
@@ -171,13 +170,13 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 			throw new IllegalArgumentException(DisplayConstants.ERROR_SET_EVALUATION_QUEUE_ID);
 		if (submitForm.getValue()) {
 			if ("".equals(formContainerIdField.getValue())) {
-				throw new IllegalArgumentException(DisplayConstants.ERROR_SELECT_FORM_CONTAINER);	
+				throw new IllegalArgumentException(DisplayConstants.ERROR_SELECT_FORM_CONTAINER);
 			}
 			if ("".equals(schemaFileSynIdField.getValue())) {
-				throw new IllegalArgumentException(DisplayConstants.ERROR_SELECT_FORM_SCHEMA);	
+				throw new IllegalArgumentException(DisplayConstants.ERROR_SELECT_FORM_SCHEMA);
 			}
 			if ("".equals(uiSchemaFileSynIdField.getValue())) {
-				throw new IllegalArgumentException(DisplayConstants.ERROR_SELECT_FORM_UI_SCHEMA);	
+				throw new IllegalArgumentException(DisplayConstants.ERROR_SELECT_FORM_UI_SCHEMA);
 			}
 		}
 	}
@@ -185,16 +184,15 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 	@Override
 	public Widget asWidget() {
 		return widget;
-	}	
-		
+	}
+
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override
-	public void showLoading() {
-	}
+	public void showLoading() {}
 
 	@Override
 	public void showInfo(String message) {
@@ -215,35 +213,42 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 	public String getButtonText() {
 		return buttonTextField.getValue();
 	}
+
 	@Override
 	public String getChallengeProjectId() {
 		return challengeProjectField.getValue();
 	}
+
 	@Override
 	public String getUnavailableMessage() {
 		return unavailableMessageField.getValue();
 	}
+
 	@Override
 	public String getEvaluationQueueId() {
 		return evaluationQueueIdField.getValue();
 	}
+
 	@Override
 	public boolean isChallengeProjectIdSelected() {
 		return challengeRadioOption.getValue();
 	}
-	
+
 	@Override
 	public String getFormContainerId() {
 		return formContainerIdField.getValue();
 	}
+
 	@Override
 	public String getFormJsonSchemaId() {
 		return schemaFileSynIdField.getValue();
 	}
+
 	@Override
 	public String getFormUiSchemaId() {
 		return uiSchemaFileSynIdField.getValue();
 	}
+
 	@Override
 	public boolean isFormSubmission() {
 		return submitForm.getValue();

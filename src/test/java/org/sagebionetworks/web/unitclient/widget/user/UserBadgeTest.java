@@ -7,7 +7,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -27,12 +26,12 @@ import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadgeView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * Unit test for the Summary widget.
+ * 
  * @author dburdick
  *
  */
@@ -41,7 +40,7 @@ public class UserBadgeTest {
 	private static final String DOEBOY = "doeboy";
 	private static final String DOE = "Doe";
 	private static final String FIRST_NAME = "John";
-	
+
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	@Mock
 	SynapseClientAsync mockSynapseClient;
@@ -58,13 +57,14 @@ public class UserBadgeTest {
 	@Mock
 	ClientCache mockCache;
 	String principalId = "id1", fileHandleId = "1234";
-	int max=10;
+	int max = 10;
 	String displayName;
 	@Mock
 	UserProfileAsyncHandler mockUserProfileAsyncHandler;
 	public static final String PICTURE_URL = "http://url.to.profile.picture";
+
 	@Before
-	public void before(){
+	public void before() {
 		MockitoAnnotations.initMocks(this);
 		profile = new UserProfile();
 		profile.setFirstName(FIRST_NAME);
@@ -78,44 +78,44 @@ public class UserBadgeTest {
 		when(mockSynapseJSNIUtils.getFileHandleAssociationUrl(anyString(), any(FileHandleAssociateType.class), anyString())).thenReturn(PICTURE_URL);
 		userBadge = new UserBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseJSNIUtils, mockCache, mockUserProfileAsyncHandler, adapterFactory);
 	}
-	
+
 	@Test
 	public void testConfigureAsync() throws Exception {
 		AsyncMockStubber.callSuccessWith(profile).when(mockUserProfileAsyncHandler).getUserProfile(eq(principalId), any(AsyncCallback.class));
 		userBadge.configure(principalId);
-		
+
 		verify(mockUserProfileAsyncHandler).getUserProfile(eq(principalId), any(AsyncCallback.class));
 		verify(mockView).configure(profile);
 	}
-	
+
 	@Test
 	public void testConfigureAsyncFail() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockUserProfileAsyncHandler).getUserProfile(eq(principalId), any(AsyncCallback.class));		
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockUserProfileAsyncHandler).getUserProfile(eq(principalId), any(AsyncCallback.class));
 		profile.setDisplayName("name");
 		userBadge.configure(principalId);
 		verify(mockView).showLoadError(principalId);
 	}
-	
+
 	@Test
 	public void testConfigureNullPrincipalId() throws Exception {
-		userBadge.configure((String)null);
+		userBadge.configure((String) null);
 		verify(mockView).showLoadError(anyString());
 	}
-	
+
 	@Test
 	public void testConfigureEmptyPrincipalId() throws Exception {
 		userBadge.configure("");
 		verify(mockView).showLoadError(anyString());
 	}
-	
-	
+
+
 	@Test
 	public void testBadgeClickedNewWindowTrue() {
 		userBadge.configure(profile);
 		userBadge.setOpenInNewWindow();
 		verify(mockView).setOpenInNewWindow();
 	}
-	
+
 	@Test
 	public void testBadgeClickedCustomClickHandler() {
 		userBadge.configure(profile);
@@ -123,7 +123,7 @@ public class UserBadgeTest {
 		userBadge.setCustomClickHandler(mockClickHandler);
 		verify(mockView).setCustomClickHandler(mockClickHandler);
 	}
-	
+
 	@Test
 	public void testConfigureAsyncFailFromCache() throws Exception {
 		AsyncMockStubber.callSuccessWith(profile).when(mockUserProfileAsyncHandler).getUserProfile(eq(principalId), any(AsyncCallback.class));
@@ -133,17 +133,17 @@ public class UserBadgeTest {
 		verify(mockUserProfileAsyncHandler).getUserProfile(eq(principalId), any(AsyncCallback.class));
 		verify(mockView).configure(profile);
 	}
-	
+
 	@Test
 	public void testConfigureSuccessFromCache() throws Exception {
 		JSONObjectAdapter adapter = adapterFactory.createNew();
 		profile.writeToJSONObject(adapter);
 		when(mockCache.get(anyString())).thenReturn(adapter.toJSONString());
-		
+
 		userBadge.configure(principalId);
 		verify(mockCache).get(anyString());
 		verify(mockUserProfileAsyncHandler, never()).getUserProfile(eq(principalId), any(AsyncCallback.class));
 		verify(mockView).configure(profile);
 	}
-	
+
 }

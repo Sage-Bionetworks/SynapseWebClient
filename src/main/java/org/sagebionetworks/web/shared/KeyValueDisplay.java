@@ -3,11 +3,11 @@ package org.sagebionetworks.web.shared;
 import java.util.List;
 import java.util.Map;
 
-public class KeyValueDisplay <T> {
+public class KeyValueDisplay<T> {
 
-	private Map<String,T> map;
+	private Map<String, T> map;
 	private List<String> keyDisplayOrder;
-	
+
 	public KeyValueDisplay(Map<String, T> map, List<String> keyDisplayOrder) {
 		super();
 		this.map = map;
@@ -29,5 +29,5 @@ public class KeyValueDisplay <T> {
 	public void setKeyDisplayOrder(List<String> keyDisplayOrder) {
 		this.keyDisplayOrder = keyDisplayOrder;
 	}
-	
+
 }

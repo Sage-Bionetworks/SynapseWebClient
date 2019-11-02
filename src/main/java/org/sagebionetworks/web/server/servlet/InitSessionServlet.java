@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.server.servlet;
 
 import static org.sagebionetworks.web.client.cookie.CookieKeys.USER_LOGIN_TOKEN;
-
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -12,7 +10,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,25 +29,22 @@ public class InitSessionServlet extends HttpServlet {
 	public static final String SYNAPSE_ORG = "synapse.org";
 	private static final long serialVersionUID = 1L;
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
-	public static final int ONE_DAY_IN_SECONDS = 60*60*24;
-	
+	public static final int ONE_DAY_IN_SECONDS = 60 * 60 * 24;
+
 	@Override
-	protected void service(HttpServletRequest arg0, HttpServletResponse arg1)
-			throws ServletException, IOException {
+	protected void service(HttpServletRequest arg0, HttpServletResponse arg1) throws ServletException, IOException {
 		InitSessionServlet.perThreadRequest.set(arg0);
 		super.service(arg0, arg1);
 	}
 
 	@Override
-	public void service(ServletRequest arg0, ServletResponse arg1)
-			throws ServletException, IOException {
+	public void service(ServletRequest arg0, ServletResponse arg1) throws ServletException, IOException {
 		super.service(arg0, arg1);
 	}
 
 	@Override
-	public void doPost(final HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		
+	public void doPost(final HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
 		// return the Set-Cookie response with the session token
 		try {
 			String sessionJson = IOUtils.toString(request.getReader());
@@ -61,7 +55,7 @@ public class InitSessionServlet extends HttpServlet {
 				sessionToken = WebConstants.EXPIRE_SESSION_TOKEN;
 			}
 			Cookie cookie = new Cookie(USER_LOGIN_TOKEN, sessionToken);
-			
+
 			if (!WebConstants.EXPIRE_SESSION_TOKEN.equals(sessionToken)) {
 				cookie.setMaxAge(ONE_DAY_IN_SECONDS);
 			} else {
@@ -71,10 +65,10 @@ public class InitSessionServlet extends HttpServlet {
 			cookie.setSecure(isSecure);
 			cookie.setHttpOnly(true);
 			cookie.setPath(ROOT_PATH);
-			
+
 			String domain = request.getServerName();
 			String lowerCaseDomain = domain.toLowerCase();
-			if (lowerCaseDomain.contains("."+SYNAPSE_ORG)) {
+			if (lowerCaseDomain.contains("." + SYNAPSE_ORG)) {
 				cookie.setDomain(SYNAPSE_ORG);
 			}
 			response.addCookie(cookie);
@@ -90,7 +84,7 @@ public class InitSessionServlet extends HttpServlet {
 			response.getOutputStream().flush();
 		}
 	}
-	
+
 	/**
 	 * Unit test uses this to provide a mock token provider
 	 *
@@ -107,14 +101,13 @@ public class InitSessionServlet extends HttpServlet {
 		}
 	};
 
-	public String getSessionToken(final HttpServletRequest request){
+	public String getSessionToken(final HttpServletRequest request) {
 		return tokenProvider.getSessionToken();
 	}
-	
+
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		//instruct not to cache
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// instruct not to cache
 		response.setHeader(WebConstants.CACHE_CONTROL_KEY, WebConstants.CACHE_CONTROL_VALUE_NO_CACHE); // Set standard HTTP/1.1 no-cache headers.
 		response.setHeader(WebConstants.PRAGMA_KEY, WebConstants.NO_CACHE_VALUE); // Set standard HTTP/1.0 no-cache header.
 		response.setDateHeader(WebConstants.EXPIRES_KEY, 0L); // Proxy

@@ -6,7 +6,7 @@ public class XYPointTestImpl implements XYPoint {
 
 	int x;
 	int y;
-	
+
 	public XYPointTestImpl(int x, int y) {
 		super();
 		this.x = x;

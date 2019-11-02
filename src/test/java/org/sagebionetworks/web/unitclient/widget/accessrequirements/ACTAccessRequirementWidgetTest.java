@@ -1,4 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
@@ -11,10 +12,8 @@ import static org.sagebionetworks.web.shared.WebConstants.ISSUE_PRIORITY_MINOR;
 import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_ISSUE_COLLECTOR_URL;
 import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_ISSUE_DESCRIPTION;
 import static org.sagebionetworks.web.shared.WebConstants.REQUEST_ACCESS_ISSUE_SUMMARY;
-
 import java.util.Collections;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,7 +48,6 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -62,10 +60,10 @@ public class ACTAccessRequirementWidgetTest {
 	public static final String USERNAME = "Clue";
 	public static final String FIRST_NAME = "Professor";
 	public static final String LAST_NAME = "Plum";
-	
+
 	ACTAccessRequirementWidget widget;
 	@Mock
-	ACTAccessRequirementWidgetView mockView; 
+	ACTAccessRequirementWidgetView mockView;
 	@Mock
 	SynapseJavascriptClient mockJsClient;
 	@Mock
@@ -113,26 +111,12 @@ public class ACTAccessRequirementWidgetTest {
 	@Mock
 	SynapseJSNIUtils mockJsniUtils;
 	Callback lazyLoadDataCallback;
-	
+
 	public final static String ROOT_WIKI_ID = "777";
-	
+
 	@Before
 	public void setUp() throws Exception {
-		widget = new ACTAccessRequirementWidget(
-				mockView, 
-				mockJsClient, 
-				mockWikiPageWidget, 
-				mockSynAlert, 
-				mockGinInjector, 
-				mockSubjectsWidget, 
-				mockCreateAccessRequirementButton, 
-				mockDeleteAccessRequirementButton, 
-				mockDataAccessClient, 
-				mockLazyLoadHelper, 
-				mockAuthController, 
-				mockManageAccessButton,
-				mockConvertACTAccessRequirementButton,
-				mockJsniUtils);
+		widget = new ACTAccessRequirementWidget(mockView, mockJsClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockDataAccessClient, mockLazyLoadHelper, mockAuthController, mockManageAccessButton, mockConvertACTAccessRequirementButton, mockJsniUtils);
 		when(mockGinInjector.getCreateDataAccessRequestWizard()).thenReturn(mockCreateDataAccessRequestWizard);
 		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockJsClient).getRootWikiPageKey(anyString(), anyString(), any(AsyncCallback.class));
@@ -173,6 +157,7 @@ public class ACTAccessRequirementWidgetTest {
 		verify(mockSubjectsWidget).configure(mockSubjectIds);
 		verify(mockLazyLoadHelper).setIsConfigured();
 	}
+
 	@Test
 	public void testSetRequirementWithWikiTerms() {
 		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
@@ -180,7 +165,7 @@ public class ACTAccessRequirementWidgetTest {
 		verify(mockView, never()).setTerms(anyString());
 		verify(mockView, never()).showTermsUI();
 	}
-	
+
 	@Test
 	public void testApprovedState() {
 		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
@@ -189,7 +174,7 @@ public class ACTAccessRequirementWidgetTest {
 		verify(mockView).showApprovedHeading();
 		verify(mockView).showRequestApprovedMessage();
 	}
-	
+
 	@Test
 	public void testAnonymous() {
 		when(mockAuthController.isLoggedIn()).thenReturn(false);
@@ -198,7 +183,7 @@ public class ACTAccessRequirementWidgetTest {
 		verify(mockView).showUnapprovedHeading();
 		verify(mockView).showLoginButton();
 	}
-	
+
 	@Test
 	public void testUnApprovedStateNoOpenJira() {
 		when(mockACTAccessRequirement.getOpenJiraIssue()).thenReturn(false);
@@ -218,7 +203,7 @@ public class ACTAccessRequirementWidgetTest {
 		verify(mockView).showUnapprovedHeading();
 		verify(mockView, never()).showRequestAccessButton();
 	}
-	
+
 	@Test
 	public void testUnApprovedStateNoDataAccessRequestWithOpenJiraIssue() {
 		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
@@ -228,25 +213,14 @@ public class ACTAccessRequirementWidgetTest {
 		verify(mockView).showUnapprovedHeading();
 		verify(mockView).showRequestAccessButton();
 	}
-	
+
 	@Test
 	public void testRequestAccess() {
 		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
 		lazyLoadDataCallback.invoke();
-		
+
 		widget.onRequestAccess();
-		
-		verify(mockJsniUtils).showJiraIssueCollector(
-				REQUEST_ACCESS_ISSUE_SUMMARY,
-				REQUEST_ACCESS_ISSUE_DESCRIPTION,
-				REQUEST_ACCESS_ISSUE_COLLECTOR_URL,
-				USER_ID,
-				DisplayUtils.getDisplayName(FIRST_NAME, LAST_NAME, USERNAME),
-				USER_EMAIL,
-				SUBJECT_OBJECT_ID,
-				GRANT_ACCESS_REQUEST_COMPONENT_ID,
-				ACCESS_REQUIREMENT_ID.toString(),
-				ISSUE_PRIORITY_MINOR
-				);
+
+		verify(mockJsniUtils).showJiraIssueCollector(REQUEST_ACCESS_ISSUE_SUMMARY, REQUEST_ACCESS_ISSUE_DESCRIPTION, REQUEST_ACCESS_ISSUE_COLLECTOR_URL, USER_ID, DisplayUtils.getDisplayName(FIRST_NAME, LAST_NAME, USERNAME), USER_EMAIL, SUBJECT_OBJECT_ID, GRANT_ACCESS_REQUEST_COMPONENT_ID, ACCESS_REQUIREMENT_ID.toString(), ISSUE_PRIORITY_MINOR);
 	}
 }

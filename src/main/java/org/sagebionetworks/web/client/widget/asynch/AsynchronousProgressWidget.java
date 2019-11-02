@@ -4,7 +4,6 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
-
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -14,8 +13,7 @@ import com.google.inject.Inject;
  * @author John
  * 
  */
-public class AsynchronousProgressWidget implements
-		AsynchronousProgressView.Presenter, JobTrackingWidget {
+public class AsynchronousProgressWidget implements AsynchronousProgressView.Presenter, JobTrackingWidget {
 
 	/**
 	 * The format used to convert doubles to strings.
@@ -32,8 +30,7 @@ public class AsynchronousProgressWidget implements
 	private boolean isDeterminate;
 
 	@Inject
-	public AsynchronousProgressWidget(AsynchronousProgressView view,
-			NumberFormatProvider numberFormatProvider, AsynchronousJobTracker jobTracker) {
+	public AsynchronousProgressWidget(AsynchronousProgressView view, NumberFormatProvider numberFormatProvider, AsynchronousJobTracker jobTracker) {
 		this.view = view;
 		this.numberFormatProvider = numberFormatProvider;
 		this.numberFormatProvider.setFormat(PERCENT_FORMAT);
@@ -45,6 +42,7 @@ public class AsynchronousProgressWidget implements
 		this.view = altView;
 		altView.setPresenter(this);
 	}
+
 	/**
 	 * Reset this widget to track the passed status.
 	 * 
@@ -52,38 +50,37 @@ public class AsynchronousProgressWidget implements
 	 * @param statusToTrack
 	 */
 	@Override
-	public void startAndTrackJob(String title, boolean isDeterminate, AsynchType type, AsynchronousRequestBody requestBody,
-			final AsynchronousProgressHandler handler) {
+	public void startAndTrackJob(String title, boolean isDeterminate, AsynchType type, AsynchronousRequestBody requestBody, final AsynchronousProgressHandler handler) {
 		this.isDeterminate = isDeterminate;
 		view.setTitle(title);
 		view.setIsDetermiante(isDeterminate);
 		// Configure this job
 		jobTracker.startAndTrack(type, requestBody, WAIT_MS, new UpdatingAsynchProgressHandler() {
-					@Override
-					public void onFailure(Throwable failure) {
-						handler.onFailure(failure);
-					}
+			@Override
+			public void onFailure(Throwable failure) {
+				handler.onFailure(failure);
+			}
 
-					@Override
-					public void onCancel() {
-						handler.onCancel();
-					}
+			@Override
+			public void onCancel() {
+				handler.onCancel();
+			}
 
-					@Override
-					public void onUpdate(AsynchronousJobStatus status) {
-						setCurrentStatus(status);
-					}
+			@Override
+			public void onUpdate(AsynchronousJobStatus status) {
+				setCurrentStatus(status);
+			}
 
-					@Override
-					public void onComplete(AsynchronousResponseBody response) {
-						handler.onComplete(response);
-					}
+			@Override
+			public void onComplete(AsynchronousResponseBody response) {
+				handler.onComplete(response);
+			}
 
-					@Override
-					public boolean isAttached() {
-						return view.isAttached();
-					}
-				});
+			@Override
+			public boolean isAttached() {
+				return view.isAttached();
+			}
+		});
 	}
 
 	/**
@@ -93,11 +90,11 @@ public class AsynchronousProgressWidget implements
 	 */
 	private void setCurrentStatus(AsynchronousJobStatus status) {
 		String message = status.getProgressMessage();
-		if(isDeterminate){
+		if (isDeterminate) {
 			double percent = calculateProgressPercent(status);
 			String text = numberFormatProvider.format(percent) + "%";
 			this.view.setDeterminateProgress(percent, text, message);
-		}else{
+		} else {
 			this.view.setIndetermianteProgress(message);
 		}
 	}
@@ -109,8 +106,7 @@ public class AsynchronousProgressWidget implements
 	 * @return
 	 */
 	private double calculateProgressPercent(AsynchronousJobStatus status) {
-		if (status.getProgressCurrent() == null
-				|| status.getProgressTotal() == null || status.getProgressTotal() < 1l) {
+		if (status.getProgressCurrent() == null || status.getProgressTotal() == null || status.getProgressTotal() < 1l) {
 			return 0.0;
 		}
 		double current = status.getProgressCurrent();

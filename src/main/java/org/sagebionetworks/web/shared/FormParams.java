@@ -64,8 +64,7 @@ public class FormParams implements IsSerializable {
 
 	@Override
 	public String toString() {
-		return "FormParams [containerSynId=" + containerSynId + ", jsonSchemaSynId=" + jsonSchemaSynId
-				+ ", uiSchemaSynId=" + uiSchemaSynId + "]";
+		return "FormParams [containerSynId=" + containerSynId + ", jsonSchemaSynId=" + jsonSchemaSynId + ", uiSchemaSynId=" + uiSchemaSynId + "]";
 	}
-		
+
 }

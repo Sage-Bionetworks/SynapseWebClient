@@ -1,11 +1,9 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import java.util.Date;
-
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
 import org.sagebionetworks.web.client.StringUtils;
-
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -13,11 +11,11 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class DateCellEditor implements CellEditor {
-	
+
 	private DateCellEditorView view;
 	private Long originalTime;
 	GlobalApplicationState globalAppState;
-	
+
 	@Inject
 	public DateCellEditor(DateCellEditorView view, GlobalApplicationState globalAppState) {
 		this.view = view;
@@ -40,7 +38,7 @@ public class DateCellEditor implements CellEditor {
 		value = StringUtils.emptyAsNull(value);
 		Date date = null;
 		originalTime = null;
-		if(value != null){
+		if (value != null) {
 			originalTime = Long.parseLong(value);
 			Long time = originalTime;
 			if (globalAppState.isShowingUTCTime()) {
@@ -54,7 +52,7 @@ public class DateCellEditor implements CellEditor {
 	@Override
 	public String getValue() {
 		Date date = view.getValue();
-		if(date != null){
+		if (date != null) {
 			Long time = date.getTime();
 			if (globalAppState.isShowingUTCTime()) {
 				time -= GlobalApplicationStateImpl.getTimezoneOffsetMs();
@@ -70,7 +68,7 @@ public class DateCellEditor implements CellEditor {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public HandlerRegistration addKeyDownHandler(KeyDownHandler handler) {
 		return view.addKeyDownHandler(handler);

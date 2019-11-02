@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.AppendableRowSetRequest;
 import org.sagebionetworks.repo.model.table.EntityUpdateResult;
@@ -23,7 +22,6 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
-
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -35,14 +33,13 @@ import com.google.inject.Inject;
  * @author John
  * 
  */
-public class QueryResultEditorWidget implements
-		QueryResultEditorView.Presenter, IsWidget, RowSelectionListener {
+public class QueryResultEditorWidget implements QueryResultEditorView.Presenter, IsWidget, RowSelectionListener {
 
 	public static final String VIEW_RECENTLY_CHANGED_KEY = "_view_recently_changed_etag";
 	public static final String CREATING_THE_FILE = "Applying changes...";
 	public static final String YOU_HAVE_UNSAVED_CHANGES = "You have unsaved changes. Do you want to discard your changes?";
 	public static final String SEE_THE_ERRORS_ABOVE = "See the error(s) above.";
-	public static final long MESSAGE_EXPIRE_TIME = 1000*60*10;  //10 minutes
+	public static final long MESSAGE_EXPIRE_TIME = 1000 * 60 * 10; // 10 minutes
 	QueryResultEditorView view;
 	TablePageWidget pageWidget;
 	QueryResultBundle startingBundle;
@@ -52,14 +49,9 @@ public class QueryResultEditorWidget implements
 	String tableId;
 	TableType tableType;
 	EventBus eventBus;
-	
+
 	@Inject
-	public QueryResultEditorWidget(QueryResultEditorView view,
-			TablePageWidget pageWidget,
-			JobTrackingWidget editJobTrackingWidget,
-			GlobalApplicationState globalApplicationState, 
-			ClientCache clientCache,
-			EventBus eventBus) {
+	public QueryResultEditorWidget(QueryResultEditorView view, TablePageWidget pageWidget, JobTrackingWidget editJobTrackingWidget, GlobalApplicationState globalApplicationState, ClientCache clientCache, EventBus eventBus) {
 		this.view = view;
 		this.pageWidget = pageWidget;
 		pageWidget.setTableVisible(true);
@@ -127,8 +119,7 @@ public class QueryResultEditorWidget implements
 	public void onSelectionChanged() {
 		// the delete button should only be enabled when there is at least one
 		// row selected.
-		this.view.setDeleteButtonEnabled(pageWidget
-				.isOneRowOrMoreRowsSelected());
+		this.view.setDeleteButtonEnabled(pageWidget.isOneRowOrMoreRowsSelected());
 	}
 
 	/**
@@ -137,9 +128,7 @@ public class QueryResultEditorWidget implements
 	 * @return
 	 */
 	private PartialRowSet extractDelta() {
-		PartialRowSet prs = RowSetUtils.buildDelta(startingBundle.getQueryResult()
-				.getQueryResults(), pageWidget.extractRowSet(), pageWidget
-				.extractHeaders());
+		PartialRowSet prs = RowSetUtils.buildDelta(startingBundle.getQueryResult().getQueryResults(), pageWidget.extractRowSet(), pageWidget.extractHeaders());
 		return prs;
 	}
 
@@ -188,7 +177,8 @@ public class QueryResultEditorWidget implements
 
 	/**
 	 * @param response
-	 * @return Returns an EntityUpdateResults (if response contains one).  Otherwise this method returns null.
+	 * @return Returns an EntityUpdateResults (if response contains one). Otherwise this method returns
+	 *         null.
 	 */
 	public static EntityUpdateResults getEntityUpdateResults(AsynchronousResponseBody response) {
 		if (response instanceof TableUpdateTransactionResponse) {
@@ -196,14 +186,14 @@ public class QueryResultEditorWidget implements
 			if (results != null) {
 				for (TableUpdateResponse tableUpdateResponse : results) {
 					if (tableUpdateResponse instanceof EntityUpdateResults) {
-						return (EntityUpdateResults)tableUpdateResponse;
+						return (EntityUpdateResults) tableUpdateResponse;
 					}
 				}
 			}
 		}
 		return null;
 	}
-	
+
 	public static String getEntityUpdateResultsFailures(AsynchronousResponseBody response) {
 		EntityUpdateResults results = getEntityUpdateResults(response);
 		StringBuilder sb = new StringBuilder();
@@ -216,7 +206,7 @@ public class QueryResultEditorWidget implements
 					sb.append(result.getFailureCode());
 					sb.append("): ");
 					if (result.getFailureMessage() != null) {
-						sb.append(result.getFailureMessage());	
+						sb.append(result.getFailureMessage());
 					}
 					sb.append("</p>");
 				}
@@ -224,10 +214,11 @@ public class QueryResultEditorWidget implements
 		}
 		return sb.toString();
 	}
-	
+
 	/**
 	 * @param response
-	 * @return first index in EntityUpdateResult list that does not contain a failure code.  -1 if not found
+	 * @return first index in EntityUpdateResult list that does not contain a failure code. -1 if not
+	 *         found
 	 */
 	public static int getFirstIndexOfEntityUpdateResultSuccess(AsynchronousResponseBody response) {
 		EntityUpdateResults results = getEntityUpdateResults(response);
@@ -241,7 +232,7 @@ public class QueryResultEditorWidget implements
 		}
 		return -1;
 	}
-	
+
 	@Override
 	public void onSave() {
 		view.setErrorMessageVisible(false);
@@ -270,47 +261,45 @@ public class QueryResultEditorWidget implements
 		List<TableUpdateRequest> changes = new ArrayList<TableUpdateRequest>();
 		changes.add(rowSetRequest);
 		request.setChanges(changes);
-		editJobTrackingWidget.startAndTrackJob("Applying changes...", false,
-				AsynchType.TableTransaction, request,
-				new AsynchronousProgressHandler() {
+		editJobTrackingWidget.startAndTrackJob("Applying changes...", false, AsynchType.TableTransaction, request, new AsynchronousProgressHandler() {
 
-					@Override
-					public void onFailure(Throwable failure) {
-						showError(failure.getMessage());
-					}
+			@Override
+			public void onFailure(Throwable failure) {
+				showError(failure.getMessage());
+			}
 
-					@Override
-					public void onComplete(AsynchronousResponseBody response) {
-						String errors = QueryResultEditorWidget.getEntityUpdateResultsFailures(response);
-						if (!errors.isEmpty()){
-							view.showErrorDialog("<h4>Unable to update the following files</h4>" + errors);
-						}
-						if (!TableType.table.equals(tableType)) {
-							int successIndex = getFirstIndexOfEntityUpdateResultSuccess(response);
-							if (successIndex > -1) {
-								PartialRow pr = prs.getRows().get(successIndex);
-								String etag = pr.getEtag();
-								Date now = new Date();
-								clientCache.put(tableId + VIEW_RECENTLY_CHANGED_KEY, etag, now.getTime() + MESSAGE_EXPIRE_TIME);
-							}
-						}
-						fireEntityUpdatedEvent();
+			@Override
+			public void onComplete(AsynchronousResponseBody response) {
+				String errors = QueryResultEditorWidget.getEntityUpdateResultsFailures(response);
+				if (!errors.isEmpty()) {
+					view.showErrorDialog("<h4>Unable to update the following files</h4>" + errors);
+				}
+				if (!TableType.table.equals(tableType)) {
+					int successIndex = getFirstIndexOfEntityUpdateResultSuccess(response);
+					if (successIndex > -1) {
+						PartialRow pr = prs.getRows().get(successIndex);
+						String etag = pr.getEtag();
+						Date now = new Date();
+						clientCache.put(tableId + VIEW_RECENTLY_CHANGED_KEY, etag, now.getTime() + MESSAGE_EXPIRE_TIME);
 					}
+				}
+				fireEntityUpdatedEvent();
+			}
 
-					@Override
-					public void onCancel() {
-						// If they cancel after the job starts, treat it as a
-						// change.
-						fireEntityUpdatedEvent();
-					}
-					
-					private void fireEntityUpdatedEvent() {
-						doHideEditor();
-						eventBus.fireEvent(new EntityUpdatedEvent());
-					}
-				});
+			@Override
+			public void onCancel() {
+				// If they cancel after the job starts, treat it as a
+				// change.
+				fireEntityUpdatedEvent();
+			}
+
+			private void fireEntityUpdatedEvent() {
+				doHideEditor();
+				eventBus.fireEvent(new EntityUpdatedEvent());
+			}
+		});
 	}
-	
+
 	@Override
 	public void onCancel() {
 		// Are there changes?
@@ -326,7 +315,7 @@ public class QueryResultEditorWidget implements
 			doHideEditor();
 		}
 	}
-	
+
 	/**
 	 * Hide the modal editor.
 	 */

@@ -3,8 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.file.downloadlist;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -14,7 +12,10 @@ import com.google.inject.Inject;
 
 public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRowView, IsWidget {
 	Widget w;
-	interface FileHandleAssociationRowViewImplUiBinder extends UiBinder<Widget, FileHandleAssociationRowViewImpl> {}
+
+	interface FileHandleAssociationRowViewImplUiBinder extends UiBinder<Widget, FileHandleAssociationRowViewImpl> {
+	}
+
 	@UiField
 	Anchor fileNameLink;
 	@UiField
@@ -38,12 +39,12 @@ public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRo
 	@UiField
 	Anchor requestAccessLink;
 	Presenter presenter;
-	private static FileHandleAssociationRowViewImplUiBinder uiBinder = GWT
-			.create(FileHandleAssociationRowViewImplUiBinder.class);
+	private static FileHandleAssociationRowViewImplUiBinder uiBinder = GWT.create(FileHandleAssociationRowViewImplUiBinder.class);
+
 	@Inject
 	public FileHandleAssociationRowViewImpl() {
 		w = uiBinder.createAndBindUi(this);
-		removeLink.addClickHandler(event->{
+		removeLink.addClickHandler(event -> {
 			presenter.onRemove();
 		});
 		w.addAttachHandler(event -> {
@@ -52,37 +53,43 @@ public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRo
 			}
 		});
 	}
+
 	@Override
 	public Widget asWidget() {
 		return w;
 	}
+
 	@Override
 	public void setCreatedBy(String value) {
 		createdBy.setText(value);
 	}
+
 	@Override
 	public void setCreatedOn(String value) {
 		createdOn.setText(value);
 	}
+
 	@Override
 	public void setFileSize(String value) {
 		fileSize.setText(value);
 	}
-	
+
 	@Override
 	public void setPresenter(Presenter p) {
 		this.presenter = p;
 	}
+
 	@Override
 	public boolean isAttached() {
 		return w.isAttached();
 	}
+
 	@Override
 	public void setFileName(String fileName, String entityId) {
 		fileNameLink.setText(fileName);
-		fileNameLink.setHref("#!Synapse:"+entityId);
+		fileNameLink.setHref("#!Synapse:" + entityId);
 	}
-	
+
 	@Override
 	public void showHasUnmetAccessRequirements(String entityId) {
 		hasAccess.setVisible(false);
@@ -90,16 +97,19 @@ public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRo
 		requestAccessLink.setVisible(true);
 		requestAccessLink.setHref("#!AccessRequirements:TYPE=ENTITY&ID=" + entityId);
 	}
+
 	@Override
 	public void showIsLink() {
 		hasAccess.setVisible(false);
 		externalLink.setVisible(true);
 	}
+
 	@Override
 	public void showIsUnsupportedFileLocation() {
 		hasAccess.setVisible(false);
 		unsupportedFileLocation.setVisible(true);
 	}
+
 	@Override
 	public void showTooLarge() {
 		hasAccess.setVisible(false);

@@ -7,7 +7,6 @@ import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.Progress;
 import org.gwtbootstrap3.client.ui.ProgressBar;
 import org.gwtbootstrap3.client.ui.html.Span;
-
 import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -22,20 +21,20 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class FileHandleUploadViewImpl implements FileHandleUploadView {
-	
+
 	private static final String PREFIX_FILE_INPUT_WIDGET = "fileHandleInputWidget";
 
 	/**
-	 * Used to ensure each new instance of this widget has its own ID.
-	 * This is important because the ID is used when interacting with the actual
-	 * DOM element.
+	 * Used to ensure each new instance of this widget has its own ID. This is important because the ID
+	 * is used when interacting with the actual DOM element.
 	 */
 	private static long ID_SEQUENCE = 0;
-	
+
 	private Widget widget;
-	
-	public interface Binder extends UiBinder<Widget, FileHandleUploadViewImpl> {}
-	
+
+	public interface Binder extends UiBinder<Widget, FileHandleUploadViewImpl> {
+	}
+
 	@UiField
 	Form form;
 	@UiField
@@ -50,23 +49,24 @@ public class FileHandleUploadViewImpl implements FileHandleUploadView {
 	Alert alert;
 	@UiField
 	Span uploadedFileNameField;
-	
+
 	@Inject
-	public FileHandleUploadViewImpl(Binder binder){
+	public FileHandleUploadViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 		// Create a unique for each new instance.
-		this.fileInput.getElement().setId(PREFIX_FILE_INPUT_WIDGET+ID_SEQUENCE++);
+		this.fileInput.getElement().setId(PREFIX_FILE_INPUT_WIDGET + ID_SEQUENCE++);
 	}
 
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
-	
+
 	@Override
 	public HandlerRegistration addAttachHandler(Handler handler) {
 		return widget.addAttachHandler(handler);
 	}
+
 	@Override
 	public boolean isAttached() {
 		return widget.isAttached();
@@ -81,7 +81,7 @@ public class FileHandleUploadViewImpl implements FileHandleUploadView {
 				presenter.onFileSelected();
 			}
 		});
-		
+
 		this.uploadbutton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -89,14 +89,14 @@ public class FileHandleUploadViewImpl implements FileHandleUploadView {
 				fileInput.getElement().<InputElement>cast().click();
 			}
 		});
-		
+
 	}
 
 	@Override
 	public void setUploadedFileText(String text) {
 		uploadedFileNameField.setText(text);
 	}
-	
+
 	@Override
 	public String getInputId() {
 		return fileInput.getElement().getId();
@@ -123,7 +123,7 @@ public class FileHandleUploadViewImpl implements FileHandleUploadView {
 	public void setInputEnabled(boolean enabled) {
 		this.uploadbutton.setEnabled(enabled);
 	}
-	
+
 	@Override
 	public void showError(String error) {
 		this.alert.setVisible(true);
@@ -139,11 +139,11 @@ public class FileHandleUploadViewImpl implements FileHandleUploadView {
 	public void setButtonText(String buttonText) {
 		this.uploadbutton.setText(buttonText);
 	}
-	
+
 	@Override
 	public void allowMultipleFileUpload(boolean enabled) {
 		if (enabled) {
-			this.fileInput.getElement().setAttribute("multiple", null);			
+			this.fileInput.getElement().setAttribute("multiple", null);
 		} else {
 			this.fileInput.getElement().removeAttribute("multiple");
 		}

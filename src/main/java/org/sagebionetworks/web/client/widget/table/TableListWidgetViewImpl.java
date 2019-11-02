@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -21,12 +20,13 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * View of a widget that lists table entities.  
+ * View of a widget that lists table entities.
  */
 public class TableListWidgetViewImpl implements TableListWidgetView {
-	
-	public interface Binder extends UiBinder<HTMLPanel, TableListWidgetViewImpl> {}
-	
+
+	public interface Binder extends UiBinder<HTMLPanel, TableListWidgetViewImpl> {
+	}
+
 	@UiField
 	Div tablesList;
 	@UiField
@@ -50,8 +50,7 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	Icon copyIDToClipboardIcon;
 
 	@Inject
-	public TableListWidgetViewImpl(Binder binder, 
-			PortalGinInjector ginInjector) {
+	public TableListWidgetViewImpl(Binder binder, PortalGinInjector ginInjector) {
 		this.panel = binder.createAndBindUi(this);
 		this.ginInjector = ginInjector;
 		nameColumnHeader.setSortingListener(header -> {
@@ -68,6 +67,7 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 		nameColumnHeader.setSortDirection(null);
 		createdOnColumnHeader.setSortDirection(null);
 	}
+
 	@Override
 	public void setSortUI(SortBy sortBy, Direction dir) {
 		clearSortUI();
@@ -77,8 +77,9 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 		} else if (SortBy.CREATED_ON.equals(sortBy)) {
 			createdOnColumnHeader.setSortDirection(direction);
 		}
-		
+
 	}
+
 	@Override
 	public void addTableListItem(final EntityHeader header) {
 		emptyUI.setVisible(false);
@@ -88,31 +89,32 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 		});
 		tablesList.add(item);
 	}
-	
+
 	@Override
 	public void clearTableWidgets() {
 		tablesList.clear();
 		emptyUI.setVisible(true);
 	}
-	
+
 	@Override
 	public void setLoadMoreWidget(IsWidget w) {
 		loadMoreWidgetContainer.clear();
 		loadMoreWidgetContainer.add(w);
 	}
-	
+
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 	}
-	
+
 	@Override
 	public void showLoading() {
 		loadingUI.setVisible(true);
 	}
+
 	@Override
 	public void hideLoading() {
-		loadingUI.setVisible(false);	
+		loadingUI.setVisible(false);
 	}
 
 	@Override
@@ -124,7 +126,7 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return panel;
@@ -134,14 +136,14 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	public void clear() {
 		tablesList.clear();
 	}
-	
+
 	@Override
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
 	}
-	
-	
+
+
 	@Override
 	public void copyToClipboard(String value) {
 		copyToClipboardTextbox.setVisible(true);

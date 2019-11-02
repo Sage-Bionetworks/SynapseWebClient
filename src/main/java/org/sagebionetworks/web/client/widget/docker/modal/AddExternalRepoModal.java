@@ -5,7 +5,6 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.Inject;
@@ -23,11 +22,7 @@ public class AddExternalRepoModal implements AddExternalRepoModalView.Presenter 
 	private Callback repoAddedCallback;
 
 	@Inject
-	public AddExternalRepoModal(
-			AddExternalRepoModalView view,
-			SynapseAlert synAlert,
-			SynapseJavascriptClient jsClient
-			){
+	public AddExternalRepoModal(AddExternalRepoModalView view, SynapseAlert synAlert, SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.jsClient = jsClient;
@@ -69,6 +64,7 @@ public class AddExternalRepoModal implements AddExternalRepoModalView.Presenter 
 				view.showSuccess(SUCCESS_TITLE, SUCCESS_MESSAGE);
 				repoAddedCallback.invoke();
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				view.resetButton();

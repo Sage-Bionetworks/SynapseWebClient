@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.client.widget.profile;
 
 import org.sagebionetworks.web.client.utils.Callback;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface ProfileImageWidget extends IsWidget {
-	
+
 	/**
 	 * Configure this widget before using.
+	 * 
 	 * @param userId
 	 * @param fileHandleId
 	 */
@@ -15,6 +15,7 @@ public interface ProfileImageWidget extends IsWidget {
 
 	/**
 	 * This method can be used to render a picture before it has been applied to the a user.
+	 * 
 	 * @param fileHandleId
 	 */
 	void configure(String fileHandleId);

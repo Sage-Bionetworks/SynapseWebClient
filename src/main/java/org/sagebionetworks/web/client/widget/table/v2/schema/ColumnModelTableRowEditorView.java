@@ -13,32 +13,35 @@ public interface ColumnModelTableRowEditorView extends ColumnModelTableRow, Keyb
 
 	/**
 	 * Control for this view.
+	 * 
 	 * @author John
 	 *
 	 */
-	public interface TypePresenter{
-		
+	public interface TypePresenter {
+
 		/**
 		 * Called when the type changes.
 		 */
 		public void onTypeChanged();
 	}
-	
+
 	/**
 	 * Bind this view to its presenter.
 	 * 
 	 * @param presenter
 	 */
 	public void setTypePresenter(TypePresenter presenter);
-	
+
 	/**
 	 * Set the size field to be visible
+	 * 
 	 * @param visible
 	 */
 	public void setSizeFieldVisible(boolean visible);
 
 	/**
 	 * Set the editor to be used for default values.
+	 * 
 	 * @param defaultEditor
 	 */
 	public void setDefaultEditor(CellEditor defaultEditor);
@@ -46,12 +49,14 @@ public interface ColumnModelTableRowEditorView extends ColumnModelTableRow, Keyb
 
 	/**
 	 * Clear the editor to be used for default values.
+	 * 
 	 * @param defaultEditor
 	 */
 	public void setDefaultEditorVisible(boolean visible);
 
 	/**
 	 * Set an error for a name.
+	 * 
 	 * @param string
 	 */
 	public void setNameError(String string);
@@ -63,6 +68,7 @@ public interface ColumnModelTableRowEditorView extends ColumnModelTableRow, Keyb
 
 	/**
 	 * Set an error on the size of a column.
+	 * 
 	 * @param string
 	 */
 	public void setSizeError(String string);
@@ -74,24 +80,27 @@ public interface ColumnModelTableRowEditorView extends ColumnModelTableRow, Keyb
 
 	/**
 	 * Validate the default editor.
+	 * 
 	 * @return
 	 */
 	public boolean validateDefault();
 
 	/**
 	 * Show/hid the restrict values editor
+	 * 
 	 * @param showRestrictValues
 	 */
 	public void setRestrictValuesVisible(boolean showRestrictValues);
-	
+
 	/**
 	 * Show/hide the facets editor
+	 * 
 	 * @param showFacetTypes
 	 */
 	public void setFacetVisible(boolean showFacetTypes);
-	
-	public void setFacetValues(String...items);
-	
+
+	public void setFacetValues(String... items);
+
 	void setToBeDefaultFileViewColumn();
-	
+
 }

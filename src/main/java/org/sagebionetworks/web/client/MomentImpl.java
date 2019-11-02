@@ -20,6 +20,7 @@ public class MomentImpl implements Moment {
 			return s;
 		}
 	}-*/;
+
 	private static native String _getCalendarTime(String s) /*-{
 		try {
 			return $wnd.moment(s).calendar();

@@ -4,29 +4,29 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
 
-public class Wiki extends Place{
-	public static final String DELIMITER = "/"; 
-	
+public class Wiki extends Place {
+	public static final String DELIMITER = "/";
+
 	private String token;
 	private String ownerId, ownerType, wikiId;
-	
+
 	public Wiki(String token) {
 		this.token = token;
-		if(token.contains(DELIMITER)) {
+		if (token.contains(DELIMITER)) {
 			String[] parts = token.split(DELIMITER);
-			if(parts.length >= 2) {				
+			if (parts.length >= 2) {
 				ownerId = parts[0];
 				ownerType = parts[1];
 				if (parts.length == 3)
 					wikiId = parts[2];
-			} 		
-		} 
+			}
+		}
 	}
 
-	public Wiki(String ownerId, String ownerType, String wikiId) {	
-		String wikiIdToken = wikiId != null ? DELIMITER + wikiId : ""; 
+	public Wiki(String ownerId, String ownerType, String wikiId) {
+		String wikiIdToken = wikiId != null ? DELIMITER + wikiId : "";
 		this.token = ownerId + DELIMITER + ownerType + wikiIdToken;
-			
+
 		this.ownerId = ownerId;
 		this.ownerType = ownerType;
 		this.wikiId = wikiId;
@@ -35,7 +35,7 @@ public class Wiki extends Place{
 	public String toToken() {
 		return token;
 	}
-	
+
 	public String getOwnerId() {
 		return ownerId;
 	}
@@ -62,16 +62,16 @@ public class Wiki extends Place{
 
 	@Prefix("!Wiki")
 	public static class Tokenizer implements PlaceTokenizer<Wiki> {
-        @Override
-        public String getToken(Wiki place) {
-            return place.toToken();
-        }
+		@Override
+		public String getToken(Wiki place) {
+			return place.toToken();
+		}
 
-        @Override
-        public Wiki getPlace(String token) {
-            return new Wiki(token);
-        }
-    }
+		@Override
+		public Wiki getPlace(String token) {
+			return new Wiki(token);
+		}
+	}
 
 	@Override
 	public int hashCode() {
@@ -98,5 +98,5 @@ public class Wiki extends Place{
 		return true;
 	}
 
-	
+
 }

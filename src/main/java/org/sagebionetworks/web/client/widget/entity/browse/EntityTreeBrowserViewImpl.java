@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -24,7 +23,6 @@ import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ClientBundle;
@@ -39,11 +37,9 @@ import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityTreeBrowserViewImpl extends FlowPanel implements
-		EntityTreeBrowserView {
+public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBrowserView {
 
-	public static final String EMPTY_DISPLAY = "&#8212" + " "
-			+ DisplayConstants.EMPTY;
+	public static final String EMPTY_DISPLAY = "&#8212" + " " + DisplayConstants.EMPTY;
 
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
@@ -51,8 +47,10 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	private boolean isSelectable = false;
 	private Map<TreeItem, EntityTreeItem> treeItem2entityTreeItem;
 	private EntityTreeItem selectedItem;
-	public interface Binder extends UiBinder<Widget, EntityTreeBrowserViewImpl> {}
-	
+
+	public interface Binder extends UiBinder<Widget, EntityTreeBrowserViewImpl> {
+	}
+
 	@UiField
 	Span emptyUI;
 	@UiField
@@ -85,7 +83,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	TableHeader md5ColumnHeader;
 	@UiField
 	TableHeader downloadColumnHeader;
-	
+
 	@UiField
 	Icon copyIDToClipboardIcon;
 	SynapseJSNIUtils jsniUtils;
@@ -95,12 +93,9 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	CookieProvider cookies;
 	private Widget widget;
 	boolean isShowingMinColumnSet = false;
+
 	@Inject
-	public EntityTreeBrowserViewImpl(IconsImageBundle iconsImageBundle,
-			Binder uiBinder, 
-			AuthenticationController authController, 
-			GlobalApplicationState globalAppState,
-			SynapseJSNIUtils jsniUtils, CookieProvider cookies) {
+	public EntityTreeBrowserViewImpl(IconsImageBundle iconsImageBundle, Binder uiBinder, AuthenticationController authController, GlobalApplicationState globalAppState, SynapseJSNIUtils jsniUtils, CookieProvider cookies) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.authController = authController;
 		this.globalAppState = globalAppState;
@@ -110,7 +105,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		// Make sure to show this and hide the tree on empty.
 		hideEmptyUI();
 		nameColumnHeader.setSortingListener(headerName -> {
-			presenter.onToggleSort(SortBy.NAME);	
+			presenter.onToggleSort(SortBy.NAME);
 		});
 		createdOnColumnHeader.setSortingListener(headerName -> {
 			presenter.onToggleSort(SortBy.CREATED_ON);
@@ -134,7 +129,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	public Widget asWidget() {
 		return widget;
 	}
-	
+
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -161,32 +156,30 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		entityTree = null;
 		treeItem2entityTreeItem = null;
 	}
-	
+
 	private Map<TreeItem, EntityTreeItem> getTreeItem2entityTreeItem() {
 		if (treeItem2entityTreeItem == null) {
 			treeItem2entityTreeItem = new HashMap<TreeItem, EntityTreeItem>();
 		}
 		return treeItem2entityTreeItem;
 	}
-	
+
 	private Tree getTree() {
 		if (entityTree == null) {
 			// On open, it will call expandTreeItemOnOpen, which starts a loading message.
 			entityTree = new Tree(new EntityTreeResources());
 			entityTree.addOpenHandler(event -> {
-				final EntityTreeItem target = getTreeItem2entityTreeItem().get(event
-						.getTarget());
+				final EntityTreeItem target = getTreeItem2entityTreeItem().get(event.getTarget());
 				presenter.expandTreeItemOnOpen(target);
 			});
-			
+
 			presenter.clearRecordsFetchedChildren();
 			if (isSelectable) {
 				entityTree.addSelectionHandler(event -> {
-					EntityTreeItem targetItem = getTreeItem2entityTreeItem()
-							.get(event.getSelectedItem());
-					selectEntity(targetItem);	
-					
-				});	
+					EntityTreeItem targetItem = getTreeItem2entityTreeItem().get(event.getSelectedItem());
+					selectEntity(targetItem);
+
+				});
 			}
 			entityTreeContainer.clear();
 			entityTreeContainer.add(entityTree);
@@ -232,12 +225,11 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		if (!childToAdd.isExpandable()) {
 			childToAdd.asTreeItem().removeItems();
 		}
-		
+
 	}
 
 	@Override
-	public void appendChildEntityTreeItem(final EntityTreeItem childToAdd,
-			EntityTreeItem parent) {
+	public void appendChildEntityTreeItem(final EntityTreeItem childToAdd, EntityTreeItem parent) {
 		// (Re)move the error to presenter
 		configureEntityTreeItem(childToAdd);
 		// Place the created child in the tree as the child of the given parent
@@ -248,15 +240,12 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 
 	/**
 	 * 
-	 * @param childToCreate
-	 *            - the button to place into the current root-level tree.
-	 * @param parentId
-	 *            - when not adding to the parent tree item, still need the
-	 *            parentId to conduct searches.
+	 * @param childToCreate - the button to place into the current root-level tree.
+	 * @param parentId - when not adding to the parent tree item, still need the parentId to conduct
+	 *        searches.
 	 */
 	@Override
-	public void placeRootMoreTreeItem(final MoreTreeItem childToCreate,
-			final String parentId, final String nextPageToken) {
+	public void placeRootMoreTreeItem(final MoreTreeItem childToCreate, final String parentId, final String nextPageToken) {
 		childToCreate.setClickHandler(event -> {
 			setLoadingVisible(true);
 			presenter.getChildren(parentId, null, nextPageToken);
@@ -267,15 +256,11 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 
 	/**
 	 * 
-	 * @param childToCreate
-	 *            - the button to place under the passed parent.
-	 * @param parent
-	 *            - where to place the new child, where the id can be
-	 *            ascertained from the header.
+	 * @param childToCreate - the button to place under the passed parent.
+	 * @param parent - where to place the new child, where the id can be ascertained from the header.
 	 */
 	@Override
-	public void placeChildMoreTreeItem(final MoreTreeItem childToCreate,
-			final EntityTreeItem parent, final String nextPageToken) {
+	public void placeChildMoreTreeItem(final MoreTreeItem childToCreate, final EntityTreeItem parent, final String nextPageToken) {
 		childToCreate.setClickHandler(event -> {
 			presenter.getChildren(parent.getHeader().getId(), parent, nextPageToken);
 			childToCreate.setVisible(false);
@@ -293,7 +278,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		selectedItem.asWidget().addStyleName("entityTreeItem-selected");
 		presenter.setSelection(selectedItem.getHeader().getId());
 	}
-	
+
 	@Override
 	public void clearSelection() {
 		if (selectedItem != null) {
@@ -333,15 +318,14 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		}
 	}
 
-	public interface EntityTreeImageBundle extends ClientBundle,
-			ClientBundleWithLookup {
+	public interface EntityTreeImageBundle extends ClientBundle, ClientBundleWithLookup {
 		Tree.Resources DEFAULT_RESOURCES = GWT.create(Tree.Resources.class);
 	}
 
 	@Override
 	public void setLoadingVisible(boolean isShown) {
 		if (isShown && loadingSpinner == null) {
-			loadingSpinner = (LoadingSpinner)DisplayUtils.getLoadingWidget();
+			loadingSpinner = (LoadingSpinner) DisplayUtils.getLoadingWidget();
 			loadingSpinner.setAddStyleNames("center-block center");
 			mainContainer.add(loadingSpinner);
 		}
@@ -357,16 +341,19 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	public void showLoading() {
 		setLoadingVisible(true);
 	}
+
 	@Override
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
 	}
+
 	@Override
 	public void clearSortUI() {
 		nameColumnHeader.setSortDirection(null);
 		createdOnColumnHeader.setSortDirection(null);
 	}
+
 	@Override
 	public void setSortUI(SortBy sortBy, Direction dir) {
 		clearSortUI();
@@ -377,7 +364,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 			createdOnColumnHeader.setSortDirection(direction);
 		}
 	}
-	
+
 	@Override
 	public void setSortable(boolean isSortable) {
 		nameColumnHeader.setVisible(isSortable);
@@ -389,22 +376,22 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 				createdOnColumnHeaderUnsortable.setStyleName("");
 			} else {
 				createdOnColumnHeader.setStyleName("");
-			}	
+			}
 		}
 	}
-	
+
 	@Override
 	public void copyToClipboard(String value) {
 		TextArea copyToClipboardTextbox = new TextArea();
-		((Div)widget).add(copyToClipboardTextbox);
+		((Div) widget).add(copyToClipboardTextbox);
 		copyToClipboardTextbox.setWidth("1px");
 		copyToClipboardTextbox.setFocus(true);
 		copyToClipboardTextbox.setValue(value);
 		copyToClipboardTextbox.selectAll();
 		jsniUtils.copyToClipboard();
-		((Div)widget).remove(copyToClipboardTextbox);
+		((Div) widget).remove(copyToClipboardTextbox);
 	}
-	
+
 	@Override
 	public void showMinimalColumnSet() {
 		this.isShowingMinColumnSet = true;
@@ -412,14 +399,14 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		sizeColumnHeader.setStyleName("");
 		modifiedOnColumnHeader.setVisible(false);
 		modifiedOnColumnHeader.setStyleName("");
-//		idColumnHeader.setVisible(false);
-//		idColumnHeader.setStyleName("");
+		// idColumnHeader.setVisible(false);
+		// idColumnHeader.setStyleName("");
 		createdOnColumnHeader.setVisible(false);
 		createdOnColumnHeader.setStyleName("");
 		createdOnColumnHeaderUnsortable.setVisible(false);
 		createdOnColumnHeaderUnsortable.setStyleName("");
-//		modifiedByColumnHeader.setVisible(false);
-//		modifiedByColumnHeader.setStyleName("");
+		// modifiedByColumnHeader.setVisible(false);
+		// modifiedByColumnHeader.setStyleName("");
 		md5ColumnHeader.setVisible(false);
 		md5ColumnHeader.setStyleName("");
 		downloadColumnHeader.setVisible(false);

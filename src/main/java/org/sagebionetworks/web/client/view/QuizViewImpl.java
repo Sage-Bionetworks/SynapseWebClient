@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WebConstants;
-
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -33,46 +32,47 @@ public class QuizViewImpl extends Composite implements QuizView {
 	org.gwtbootstrap3.client.ui.Button tutorialButton1;
 	@UiField
 	HTML quizHeader;
-	
+
 	@UiField
 	DivElement quizSuccessUI;
-	
+
 	@UiField
 	DivElement quizFailureUI;
-	
+
 	@UiField
 	Heading failureScoreContainer;
-	
+
 	@UiField
-	Heading successScoreContainer; 
-	
+	Heading successScoreContainer;
+
 	@UiField
 	FlowPanel testContainer;
 	@UiField
 	Button submitButton;
-	
+
 	@UiField
 	SimplePanel successContainer;
-	
+
 	@UiField
 	Anchor tryAgainLink;
-	
+
 	@UiField
 	LoadingSpinner loadingUI;
-	
+
 	@UiField
 	SimplePanel synAlertPanel;
-	
+
 	private Presenter presenter;
 	private CertificateWidget certificateWidget;
 	private Header headerWidget;
-	public interface Binder extends UiBinder<Widget, QuizViewImpl> {}
+
+	public interface Binder extends UiBinder<Widget, QuizViewImpl> {
+	}
+
 	SynapseJSNIUtils jsniUtils;
+
 	@Inject
-	public QuizViewImpl(Binder uiBinder,
-			Header headerWidget, 
-			CertificateWidget certificateWidget,
-			PortalGinInjector ginInjector) {
+	public QuizViewImpl(Binder uiBinder, Header headerWidget, CertificateWidget certificateWidget, PortalGinInjector ginInjector) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.certificateWidget = certificateWidget;
@@ -106,7 +106,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 		headerWidget.refresh();
 		com.google.gwt.user.client.Window.scrollTo(0, 0); // scroll user to top of page
 	}
-	
+
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
@@ -128,47 +128,47 @@ public class QuizViewImpl extends Composite implements QuizView {
 		submitButton.setVisible(true);
 		submitButton.setEnabled(true);
 	}
-	
+
 
 	@Override
 	public void clear() {
 		hideAll();
 		testContainer.clear();
-		
+
 		hideLoading();
 	}
-	
+
 	@Override
 	public void setQuizHeader(String quizHeader) {
 		this.quizHeader.setHTML(SimpleHtmlSanitizer.sanitizeHtml(quizHeader));
 	}
-	
+
 	@Override
 	public void setSynAlertWidget(Widget synAlert) {
 		synAlertPanel.setWidget(synAlert);
 	}
-	
+
 	@Override
 	public void addQuestionContainerWidget(Widget widget) {
 		testContainer.add(widget);
 	}
-	
+
 	@Override
 	public void setSubmitEnabled(boolean isEnabled) {
 		submitButton.setEnabled(isEnabled);
 	}
-	
+
 	@Override
 	public void setSubmitVisible(boolean isVisible) {
 		submitButton.setVisible(isVisible);
 	}
-	
+
 	@Override
 	public void showScore(String scoreContainerText) {
 		successScoreContainer.setText(scoreContainerText);
 		failureScoreContainer.setText(scoreContainerText);
 	}
-	
+
 	@Override
 	public void showSuccess(PassingRecord passingRecord) {
 		hideAll();
@@ -179,17 +179,17 @@ public class QuizViewImpl extends Composite implements QuizView {
 		quizContainer.setVisible(true);
 		DisplayUtils.scrollToTop();
 	}
-	
+
 	@Override
 	public void showFailure(PassingRecord passingRecord) {
 		hideAll();
-		//show failure message and quiz
+		// show failure message and quiz
 		DisplayUtils.hide(quizSuccessUI);
 		DisplayUtils.show(quizFailureUI);
 		jsniUtils.scrollIntoView(quizFailureUI);
 		quizContainer.setVisible(true);
 	}
-	
+
 	@Override
 	public void hideAll() {
 		quizContainer.setVisible(false);

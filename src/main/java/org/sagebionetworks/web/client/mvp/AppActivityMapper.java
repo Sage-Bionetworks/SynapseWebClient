@@ -4,7 +4,6 @@ package org.sagebionetworks.web.client.mvp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-
 import org.sagebionetworks.web.client.AppLoadingView;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -41,35 +40,33 @@ import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-
 import com.google.gwt.activity.shared.Activity;
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.place.shared.Place;
 
-public class AppActivityMapper implements ActivityMapper {	
+public class AppActivityMapper implements ActivityMapper {
 
 	private static Logger log = Logger.getLogger(AppActivityMapper.class.getName());
 	private PortalGinInjector ginjector;
 	@SuppressWarnings("rawtypes")
-	private List<Class> openAccessPlaces; 
+	private List<Class> openAccessPlaces;
 	private List<Class> excludeFromLastPlace;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	AppLoadingView loading;
 
 	/**
-	 * AppActivityMapper associates each Place with its corresponding
-	 * {@link Activity}
-	 * @param synapseJSNIUtilsImpl 
-	 * @param clientFactory
-	 *            Factory to be passed to activities
+	 * AppActivityMapper associates each Place with its corresponding {@link Activity}
+	 * 
+	 * @param synapseJSNIUtilsImpl
+	 * @param clientFactory Factory to be passed to activities
 	 */
 	@SuppressWarnings("rawtypes")
 	public AppActivityMapper(PortalGinInjector ginjector, SynapseJSNIUtils synapseJSNIUtils, AppLoadingView loading) {
 		super();
 		this.ginjector = ginjector;
-		this.synapseJSNIUtils = synapseJSNIUtils; 
+		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.loading = loading;
-		
+
 		openAccessPlaces = new ArrayList<Class>();
 		openAccessPlaces.add(Home.class);
 		openAccessPlaces.add(ErrorPlace.class);
@@ -96,7 +93,7 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(SynapseForumPlace.class);
 		openAccessPlaces.add(EmailInvitation.class);
 		openAccessPlaces.add(AccessRequirementsPlace.class);
-		
+
 		excludeFromLastPlace = new ArrayList<Class>();
 		excludeFromLastPlace.add(Home.class);
 		excludeFromLastPlace.add(ErrorPlace.class);
@@ -122,29 +119,30 @@ public class AppActivityMapper implements ActivityMapper {
 
 		AuthenticationController authenticationController = this.ginjector.getAuthenticationController();
 		GlobalApplicationState globalApplicationState = this.ginjector.getGlobalApplicationState();
-		
+
 		globalApplicationState.recordPlaceVisit(place);
-		
+
 		// set current and last places
-		Place storedCurrentPlace = globalApplicationState.getCurrentPlace(); 
-		// only update move storedCurrentPlace to storedLastPlace if storedCurrentPlace is  
-		if(storedCurrentPlace != null && !excludeFromLastPlace.contains(storedCurrentPlace.getClass())) {
+		Place storedCurrentPlace = globalApplicationState.getCurrentPlace();
+		// only update move storedCurrentPlace to storedLastPlace if storedCurrentPlace is
+		if (storedCurrentPlace != null && !excludeFromLastPlace.contains(storedCurrentPlace.getClass())) {
 			globalApplicationState.setLastPlace(storedCurrentPlace);
 		}
 
 		// If the user is not logged in then we redirect them to the login screen
 		// except for the fully public places
-		if(!openAccessPlaces.contains(place.getClass())) {
-			if(!authenticationController.isLoggedIn()){
+		if (!openAccessPlaces.contains(place.getClass())) {
+			if (!authenticationController.isLoggedIn()) {
 				// Redirect them to the login screen
 				LoginPlace loginPlace = new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN);
 				return getActivity(loginPlace);
 			}
 		}
-		
-		// We use GIN to generate and inject all presenters with 
+
+		// We use GIN to generate and inject all presenters with
 		// their dependencies.
-		if(loading != null) loading.showWidget();
+		if (loading != null)
+			loading.showWidget();
 		BulkPresenterProxy bulkPresenterProxy = ginjector.getBulkPresenterProxy();
 		bulkPresenterProxy.setGinjector(ginjector);
 		bulkPresenterProxy.setloader(loading);
@@ -154,10 +152,11 @@ public class AppActivityMapper implements ActivityMapper {
 
 	/**
 	 * Get the default place
+	 * 
 	 * @return
 	 */
 	public static Place getDefaultPlace() {
 		return new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
 	}
-	
+
 }

@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.discussion;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface SingleDiscussionThreadWidgetView extends IsWidget{
+public interface SingleDiscussionThreadWidgetView extends IsWidget {
 
 	public interface Presenter {
 
@@ -14,9 +14,9 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 		void onClickDeleteThread();
 
 		void onClickEditThread();
-		
+
 		void onClickThread();
-		
+
 		void onClickShowAllReplies();
 	}
 
@@ -27,7 +27,7 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	void setTitle(String title);
 
 	void setSubscribeButtonWidget(Widget widget);
-	
+
 	void setMarkdownWidget(Widget widget);
 
 	void setAuthor(Widget author);
@@ -37,7 +37,7 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	void setAlert(Widget w);
 
 	void setDeleteIconVisible(boolean visible);
-	
+
 	void setShowAllRepliesButtonVisible(boolean visible);
 
 	void setCommandsVisible(boolean visible);
@@ -51,7 +51,9 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	void setEditedLabelVisible(Boolean visible);
 
 	void setLoadingMessageVisible(boolean visible);
+
 	void setRepliesContainer(IsWidget container);
+
 	void showSuccess(String successTitle, String successMessage);
 
 	void setRefreshAlert(Widget w);
@@ -59,7 +61,9 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	void removeRefreshAlert();
 
 	void setPinIconVisible(boolean visible);
+
 	void setUnpinIconVisible(boolean visible);
+
 	void setIsAuthorModerator(boolean isModerator);
 
 	void setReplyContainersVisible(boolean visible);
@@ -75,7 +79,8 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	void setSecondNewReplyContainer(Widget widget);
 
 	void setSecondNewReplyContainerVisible(boolean visible);
-	
+
 	void setSubscribersWidget(Widget widget);
+
 	void setSubscribersWidgetContainerVisible(boolean visible);
 }

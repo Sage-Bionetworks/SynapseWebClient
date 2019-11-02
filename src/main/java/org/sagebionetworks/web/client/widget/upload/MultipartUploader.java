@@ -18,5 +18,6 @@ public interface MultipartUploader {
 	 * @param handler
 	 */
 	void uploadFile(String fileName, String contentType, JavaScriptObject blob, ProgressingFileUploadHandler handler, Long storageLocationId, HasAttachHandlers view);
+
 	void cancelUpload();
 }

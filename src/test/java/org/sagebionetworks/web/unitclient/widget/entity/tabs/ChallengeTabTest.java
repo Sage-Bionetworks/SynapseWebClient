@@ -1,13 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.entity.tabs;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
-
+import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -16,14 +14,12 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidget;
-
 import com.google.gwt.user.client.ui.Widget;
 
 public class ChallengeTabTest {
@@ -40,7 +36,7 @@ public class ChallengeTabTest {
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
 	ChallengeTab tab;
-	
+
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
@@ -56,7 +52,7 @@ public class ChallengeTabTest {
 		verify(mockView).setEvaluationList(any(Widget.class));
 		verify(mockView).setChallengeWidget(any(Widget.class));
 	}
-	
+
 	@Test
 	public void testSetTabClickedCallback() {
 		tab.setTabClickedCallback(mockOnClickCallback);
@@ -65,13 +61,13 @@ public class ChallengeTabTest {
 
 	@Test
 	public void testConfigure() {
-		String entityId = "syn1"; 
+		String entityId = "syn1";
 		String entityName = "challenge project test";
 		tab.configure(entityId, entityName);
-		
+
 		verify(mockAdministerEvaluationsList).configure(eq(entityId));
 		verify(mockChallengeWidget).configure(eq(entityId));
-		
+
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab).setEntityNameAndPlace(eq(entityName), captor.capture());
 		Synapse place = captor.getValue();

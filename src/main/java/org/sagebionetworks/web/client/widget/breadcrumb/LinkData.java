@@ -1,10 +1,7 @@
 package org.sagebionetworks.web.client.widget.breadcrumb;
 
-import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconType;
-
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.resources.client.ImageResource;
 
 public class LinkData {
 

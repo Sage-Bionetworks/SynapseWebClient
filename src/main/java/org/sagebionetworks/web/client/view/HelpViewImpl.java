@@ -4,7 +4,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WikiPageKey;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -15,17 +14,18 @@ import com.google.inject.Inject;
 
 public class HelpViewImpl extends Composite implements HelpView {
 
-	public interface HelpViewImplUiBinder extends UiBinder<Widget, HelpViewImpl> {}
+	public interface HelpViewImplUiBinder extends UiBinder<Widget, HelpViewImpl> {
+	}
+
 	@UiField
 	FlowPanel mainContainer;
-	
+
 	private Presenter presenter;
 	private Header headerWidget;
 	private WikiPageWidget wikiPage;
-	
+
 	@Inject
-	public HelpViewImpl(HelpViewImplUiBinder binder,
-			Header headerWidget, WikiPageWidget wikiPage) {		
+	public HelpViewImpl(HelpViewImplUiBinder binder, Header headerWidget, WikiPageWidget wikiPage) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.wikiPage = wikiPage;
@@ -47,23 +47,21 @@ public class HelpViewImpl extends Composite implements HelpView {
 		mainContainer.add(wikiPage.asWidget());
 		wikiPage.configure(wikiKey, false, new WikiPageWidget.Callback() {
 			@Override
-			public void pageUpdated() {
-			}
+			public void pageUpdated() {}
+
 			@Override
-			public void noWikiFound() {
-			}
+			public void noWikiFound() {}
 		});
 		wikiPage.showSubpages(null);
 	}
-	
+
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override
-	public void showLoading() {
-	}
+	public void showLoading() {}
 
 	@Override
 	public void showInfo(String message) {
@@ -71,8 +69,7 @@ public class HelpViewImpl extends Composite implements HelpView {
 	}
 
 	@Override
-	public void clear() {		
-	}
+	public void clear() {}
 
 
 }

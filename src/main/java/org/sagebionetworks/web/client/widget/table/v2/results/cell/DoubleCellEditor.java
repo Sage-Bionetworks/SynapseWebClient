@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.sagebionetworks.web.client.StringUtils;
-
 import com.google.inject.Inject;
 
 /**
@@ -23,11 +22,11 @@ public class DoubleCellEditor extends AbstractCellEditor implements CellEditor {
 	@Override
 	public boolean isValid() {
 		String value = StringUtils.emptyAsNull(this.getValue());
-		if(value != null){
-			try{
+		if (value != null) {
+			try {
 				// if it parses it is valid.
 				Double.parseDouble(value);
-			}catch(NumberFormatException e){
+			} catch (NumberFormatException e) {
 				view.setValidationState(ValidationState.ERROR);
 				view.setHelpText(VALUE_MUST_BE_A_DOUBLE);
 				return false;

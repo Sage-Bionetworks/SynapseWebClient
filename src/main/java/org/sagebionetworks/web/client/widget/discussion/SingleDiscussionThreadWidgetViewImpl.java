@@ -8,7 +8,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -21,7 +20,8 @@ import com.google.inject.Inject;
 
 public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThreadWidgetView {
 
-	public interface Binder extends UiBinder<Widget, SingleDiscussionThreadWidgetViewImpl> {}
+	public interface Binder extends UiBinder<Widget, SingleDiscussionThreadWidgetViewImpl> {
+	}
 
 	@UiField
 	Div replyListContainer;
@@ -71,35 +71,35 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	Div deletedThread;
 	@UiField
 	Span subscribersContainer;
-	
+
 	private Widget widget;
 	private SingleDiscussionThreadWidget presenter;
 
 	@Inject
 	public SingleDiscussionThreadWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		deleteIcon.addClickHandler(new ClickHandler(){
+		deleteIcon.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickDeleteThread();
 			}
 		});
-		editIcon.addClickHandler(new ClickHandler(){
+		editIcon.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickEditThread();
 			}
 		});
-		
-		pinIcon.addClickHandler(new ClickHandler(){
+
+		pinIcon.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickPinThread();
 			}
 		});
-		
-		unpinIcon.addClickHandler(new ClickHandler(){
+
+		unpinIcon.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickUnpinThread();
@@ -111,7 +111,7 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 				presenter.onClickShowAllReplies();
 			}
 		});
-		restoreIcon.addClickHandler(new ClickHandler(){
+		restoreIcon.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickRestore();
@@ -123,7 +123,7 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	public void setShowAllRepliesButtonVisible(boolean visible) {
 		showAllRepliesButton.setVisible(visible);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
@@ -212,12 +212,13 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 		subscribeButtonContainer.clear();
 		subscribeButtonContainer.add(widget);
 	}
-	
+
 	@Override
 	public void setRefreshAlert(Widget w) {
 		refreshAlertContainer.clear();
 		refreshAlertContainer.add(w);
 	}
+
 	@Override
 	public void removeRefreshAlert() {
 		refreshAlertContainer.clear();
@@ -227,17 +228,17 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	public void setPinIconVisible(boolean visible) {
 		pinIcon.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setUnpinIconVisible(boolean visible) {
 		unpinIconStack.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setIsAuthorModerator(boolean isModerator) {
 		moderatorBadge.setVisible(isModerator);
 	}
-	
+
 	@Override
 	public void setCommandsVisible(boolean visible) {
 		commandsContainer.setVisible(visible);
@@ -280,12 +281,13 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 		secondNewReplyContainer.clear();
 		secondNewReplyContainer.add(widget);
 	}
-	
+
 	@Override
 	public void setSubscribersWidget(Widget widget) {
 		subscribersContainer.clear();
 		subscribersContainer.add(widget);
 	}
+
 	@Override
 	public void setSubscribersWidgetContainerVisible(boolean visible) {
 		subscribersContainer.setVisible(visible);

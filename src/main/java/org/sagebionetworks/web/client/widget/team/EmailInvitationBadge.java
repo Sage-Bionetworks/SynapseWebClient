@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import javax.inject.Inject;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -9,8 +8,7 @@ public class EmailInvitationBadge implements EmailInvitationBadgeView.Presenter,
 	private EmailInvitationBadgeView view;
 
 	@Inject
-	public EmailInvitationBadge(
-			EmailInvitationBadgeView view) {
+	public EmailInvitationBadge(EmailInvitationBadgeView view) {
 		this.view = view;
 	}
 

@@ -1,17 +1,15 @@
 package org.sagebionetworks.web.client.widget.table;
-import static org.sagebionetworks.web.client.DisplayUtils.TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER;
 
+import static org.sagebionetworks.web.client.DisplayUtils.TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -45,22 +43,24 @@ public class TableEntityListGroupItem implements IsWidget {
 	@UiField
 	Icon icon;
 
-	public interface Binder extends UiBinder<IsWidget, TableEntityListGroupItem> {}
+	public interface Binder extends UiBinder<IsWidget, TableEntityListGroupItem> {
+	}
+
 	public IsWidget w;
 	private UserBadge modifiedByBadge;
 	private DateTimeUtils dateTimeUtils;
-	
+
 	@Inject
-	TableEntityListGroupItem(Binder binder, UserBadge modifiedByBadge, DateTimeUtils dateTimeUtils, PortalGinInjector ginInjector){
+	TableEntityListGroupItem(Binder binder, UserBadge modifiedByBadge, DateTimeUtils dateTimeUtils, PortalGinInjector ginInjector) {
 		w = binder.createAndBindUi(this);
 		this.modifiedByBadge = modifiedByBadge;
 		this.dateTimeUtils = dateTimeUtils;
 		if (EntityBadgeViewImpl.placeChanger == null) {
-			EntityBadgeViewImpl.placeChanger = ginInjector.getGlobalApplicationState().getPlaceChanger(); 
+			EntityBadgeViewImpl.placeChanger = ginInjector.getGlobalApplicationState().getPlaceChanger();
 		}
 		idField.addClickHandler(TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER);
 	}
-	
+
 	public void configure(EntityHeader header, final ClickHandler clickHandler) {
 		entityAnchor = new Anchor();
 		entityAnchor.addClickHandler(EntityBadgeViewImpl.STANDARD_CLICKHANDLER);
@@ -75,15 +75,15 @@ public class TableEntityListGroupItem implements IsWidget {
 			modifiedByField.add(modifiedByBadge);
 		}
 		if (header.getModifiedOn() != null) {
-			modifiedOnField.setText(dateTimeUtils.getDateTimeString(header.getModifiedOn()));	
+			modifiedOnField.setText(dateTimeUtils.getDateTimeString(header.getModifiedOn()));
 		}
 		if (header.getCreatedOn() != null) {
-			createdOnField.setText(dateTimeUtils.getDateTimeString(header.getCreatedOn()));	
+			createdOnField.setText(dateTimeUtils.getDateTimeString(header.getCreatedOn()));
 		}
 
 		icon.setType(EntityTypeUtils.getIconTypeForEntityClassName(header.getType()));
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return w.asWidget();

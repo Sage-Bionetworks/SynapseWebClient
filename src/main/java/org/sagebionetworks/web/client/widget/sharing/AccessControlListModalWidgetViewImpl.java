@@ -6,8 +6,6 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
-
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
@@ -17,16 +15,16 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+
 /**
  * Implementation with zero business logic.
+ * 
  * @author John
  *
  */
-public class AccessControlListModalWidgetViewImpl implements
-		AccessControlListModalWidgetView {
+public class AccessControlListModalWidgetViewImpl implements AccessControlListModalWidgetView {
 
-	public interface Binder extends
-			UiBinder<Modal, AccessControlListModalWidgetViewImpl> {
+	public interface Binder extends UiBinder<Modal, AccessControlListModalWidgetViewImpl> {
 	}
 
 	@UiField
@@ -95,19 +93,19 @@ public class AccessControlListModalWidgetViewImpl implements
 
 	@Override
 	public void setLoading(boolean loading) {
-		if(loading){
+		if (loading) {
 			this.primaryButton.state().loading();
-		}else{
+		} else {
 			this.primaryButton.state().reset();
 		}
 	}
-	
+
 	@Override
 	public void setTitle(String title) {
 		modalTitleContainer.clear();
 		Heading h = new Heading(HeadingSize.H4);
 		h.addStyleName("displayInline");
 		h.setText(title);
-		modalTitleContainer.add(h);	
+		modalTitleContainer.add(h);
 	}
 }

@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.constants.IconType;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -22,13 +21,12 @@ public class WidgetMenu extends FlowPanel {
 	public static int EDIT = 0x4;
 	public static int DELETE = 0x8;
 
-	
+
 	/**
 	 * Constructor
 	 */
 	@Inject
-	public WidgetMenu() {
-	}
+	public WidgetMenu() {}
 
 	/*
 	 * Pseudo Presenter
@@ -41,7 +39,8 @@ public class WidgetMenu extends FlowPanel {
 
 	@Override
 	public Widget asWidget() {
-		if(showCog) mask = mask | COG;
+		if (showCog)
+			mask = mask | COG;
 		createMenu(mask);
 
 		return this;
@@ -64,6 +63,7 @@ public class WidgetMenu extends FlowPanel {
 
 	/**
 	 * Show the cog menu which gives text versions of each icon option
+	 * 
 	 * @param show
 	 */
 	public void showCog(boolean show) {
@@ -84,7 +84,7 @@ public class WidgetMenu extends FlowPanel {
 
 	public void createMenu(int mask) {
 		// Add
-		if((mask & ADD) > 0) {
+		if ((mask & ADD) > 0) {
 			Anchor anchor = new Anchor();
 			anchor.setIcon(IconType.PLUS);
 			anchor.addClickHandler(new ClickHandler() {
@@ -100,7 +100,7 @@ public class WidgetMenu extends FlowPanel {
 		}
 
 		// Edit
-		if((mask & EDIT) > 0) {
+		if ((mask & EDIT) > 0) {
 			Anchor anchor = new Anchor();
 			anchor.setIcon(IconType.EDIT);
 			anchor.addClickHandler(new ClickHandler() {
@@ -115,7 +115,7 @@ public class WidgetMenu extends FlowPanel {
 		}
 
 		// Delete
-		if((mask & DELETE) > 0) {
+		if ((mask & DELETE) > 0) {
 			Anchor anchor = new Anchor();
 			anchor.setIcon(IconType.TIMES);
 			anchor.addClickHandler(new ClickHandler() {

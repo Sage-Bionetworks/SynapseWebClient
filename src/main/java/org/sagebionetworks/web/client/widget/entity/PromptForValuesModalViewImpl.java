@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.FormLabel;
@@ -12,7 +11,6 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -25,9 +23,10 @@ import com.google.inject.Inject;
  *
  */
 public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
-	
-	public interface Binder extends UiBinder<Modal, PromptForValuesModalViewImpl> {}
-	
+
+	public interface Binder extends UiBinder<Modal, PromptForValuesModalViewImpl> {
+	}
+
 	Modal modal;
 	@UiField
 	Div form;
@@ -39,9 +38,9 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 	List<TextBox> textBoxes;
 	SynapseAlert synAlert;
 	KeyDownHandler handler;
-	
+
 	@Inject
-	public PromptForValuesModalViewImpl(Binder binder, SynapseAlert synAlert){
+	public PromptForValuesModalViewImpl(Binder binder, SynapseAlert synAlert) {
 		modal = binder.createAndBindUi(this);
 		this.synAlert = synAlert;
 		synAlertContainer.add(synAlert);
@@ -51,17 +50,17 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 				textBoxes.get(0).selectAll();
 			}
 		});
-		
+
 		this.primaryButton.addClickHandler(event -> {
 			onPrimary();
 		});
 		handler = event -> {
-			if(KeyCodes.KEY_ENTER == event.getNativeKeyCode()){
+			if (KeyCodes.KEY_ENTER == event.getNativeKeyCode()) {
 				onPrimary();
 			}
 		};
 	}
-	
+
 	private void onPrimary() {
 		// collect values
 		List<String> values = new ArrayList<>();
@@ -70,7 +69,7 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 		}
 		newValuesCallback.invoke(values);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return modal;
@@ -88,20 +87,18 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 		};
 		configureAndShow(title, promptListWrapper, initialValueListWrapper, newValueCallbackWrapper);
 	}
+
 	@Override
-	public void configureAndShow(String title, List<String> prompts, List<String> initialValues,
-			CallbackP<List<String>> newValuesCallback) {
+	public void configureAndShow(String title, List<String> prompts, List<String> initialValues, CallbackP<List<String>> newValuesCallback) {
 		clear();
 		modal.setTitle(title);
 		this.newValuesCallback = newValuesCallback;
-		if (initialValues != null && prompts.size() != initialValues.size() ) {
+		if (initialValues != null && prompts.size() != initialValues.size()) {
 			throw new IllegalArgumentException("If set, initialValues size must equal prompts size.");
 		}
 		/**
-			<b:FormGroup>
-				<b:FormLabel ui:field="label1" for="value1">Label1 goes here</b:FormLabel>
-				<b:TextBox b:id="value1" ui:field="valueField1" />
-			</b:FormGroup>
+		 * <b:FormGroup> <b:FormLabel ui:field="label1" for="value1">Label1 goes here</b:FormLabel>
+		 * <b:TextBox b:id="value1" ui:field="valueField1" /> </b:FormGroup>
 		 */
 		for (int i = 0; i < prompts.size(); i++) {
 			FormGroup group = new FormGroup();
@@ -116,13 +113,13 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 				String initialValue = initialValues.get(i);
 				textBox.setValue(initialValue);
 			}
-			
+
 			form.add(group);
 			textBoxes.add(textBox);
 		}
 		modal.show();
 	}
-	
+
 	@Override
 	public void showError(String error) {
 		synAlert.showError(error);
@@ -138,12 +135,13 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 
 	@Override
 	public void setLoading(boolean isLoading) {
-		if(isLoading){
+		if (isLoading) {
 			this.primaryButton.state().loading();
-		}else{
+		} else {
 			this.primaryButton.state().reset();
-		}	
+		}
 	}
+
 	@Override
 	public void hide() {
 		modal.hide();

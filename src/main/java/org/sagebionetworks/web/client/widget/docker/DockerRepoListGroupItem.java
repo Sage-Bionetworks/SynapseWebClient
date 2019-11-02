@@ -12,7 +12,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
-
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 
@@ -21,6 +20,7 @@ public class DockerRepoListGroupItem extends ListGroupItem {
 	private static final String LAST_UPDATED = "Last Updated: ";
 	static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_SHORT);
 	Anchor anchor = new Anchor();
+
 	public DockerRepoListGroupItem(HeadingSize size, EntityHeader entityHeader, CallbackP<String> entityClickedHandler) {
 		addStyleName("padding-10");
 		Heading iconHeading = new Heading(HeadingSize.H3);
@@ -42,8 +42,8 @@ public class DockerRepoListGroupItem extends ListGroupItem {
 		heading.addStyleName("displayInline");
 
 		LinkedGroupItemText text = new LinkedGroupItemText();
-		text.setText(LAST_UPDATED+DATE_FORMAT.format(entityHeader.getModifiedOn()));
-		Anchor anchor = new Anchor("#!Synapse:"+entityHeader.getId());
+		text.setText(LAST_UPDATED + DATE_FORMAT.format(entityHeader.getModifiedOn()));
+		Anchor anchor = new Anchor("#!Synapse:" + entityHeader.getId());
 		anchor.setTarget("_blank");
 		anchor.setIcon(IconType.ANGLE_RIGHT);
 		anchor.addStyleName("margin-right-10 moveup-2 pull-right h3");
@@ -55,7 +55,7 @@ public class DockerRepoListGroupItem extends ListGroupItem {
 		div.add(text);
 		this.add(div);
 	}
-	
+
 	public void setDockerRepositoryName(String name) {
 		anchor.setText(name);
 	}

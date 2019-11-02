@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module rename-to='Portal'>
 	<inherits name="org.sagebionetworks.web.Portal" />
-	
-	<set-property name="user.agent" value="safari"/>
+
+	<set-property name="user.agent" value="safari" />
 </module>

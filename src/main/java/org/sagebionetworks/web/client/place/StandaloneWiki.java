@@ -5,38 +5,37 @@ import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
 
 /**
- * This place supports either a token with the full wiki key definition.  For example: 
+ * This place supports either a token with the full wiki key definition. For example:
  * !StandaloneWiki:syn1768504/ENTITY/56098
  * 
- * Or one defined via alias in the portal.properties.  For example:
- * !StandaloneWiki:Collaborate
+ * Or one defined via alias in the portal.properties. For example: !StandaloneWiki:Collaborate
  * 
  * @author jayhodgson
  *
  */
-public class StandaloneWiki extends Place{
-	public static final String DELIMITER = "/"; 
-	
+public class StandaloneWiki extends Place {
+	public static final String DELIMITER = "/";
+
 	private String token;
 	private String ownerId, ownerType, wikiId;
-	
+
 	public StandaloneWiki(String token) {
 		this.token = token;
-		if(token.contains(DELIMITER)) {
+		if (token.contains(DELIMITER)) {
 			String[] parts = token.split(DELIMITER);
-			if(parts.length >= 2) {				
+			if (parts.length >= 2) {
 				ownerId = parts[0];
 				ownerType = parts[1];
 				if (parts.length == 3)
 					wikiId = parts[2];
-			} 		
-		} 
+			}
+		}
 	}
 
-	public StandaloneWiki(String ownerId, String ownerType, String wikiId) {	
-		String wikiIdToken = wikiId != null ? DELIMITER + wikiId : ""; 
+	public StandaloneWiki(String ownerId, String ownerType, String wikiId) {
+		String wikiIdToken = wikiId != null ? DELIMITER + wikiId : "";
 		this.token = ownerId + DELIMITER + ownerType + wikiIdToken;
-			
+
 		this.ownerId = ownerId;
 		this.ownerType = ownerType;
 		this.wikiId = wikiId;
@@ -45,7 +44,7 @@ public class StandaloneWiki extends Place{
 	public String toToken() {
 		return token;
 	}
-	
+
 	public String getOwnerId() {
 		return ownerId;
 	}
@@ -72,16 +71,16 @@ public class StandaloneWiki extends Place{
 
 	@Prefix("!StandaloneWiki")
 	public static class Tokenizer implements PlaceTokenizer<StandaloneWiki> {
-        @Override
-        public String getToken(StandaloneWiki place) {
-            return place.toToken();
-        }
+		@Override
+		public String getToken(StandaloneWiki place) {
+			return place.toToken();
+		}
 
-        @Override
-        public StandaloneWiki getPlace(String token) {
-            return new StandaloneWiki(token);
-        }
-    }
+		@Override
+		public StandaloneWiki getPlace(String token) {
+			return new StandaloneWiki(token);
+		}
+	}
 
 	@Override
 	public int hashCode() {
@@ -108,5 +107,5 @@ public class StandaloneWiki extends Place{
 		return true;
 	}
 
-	
+
 }

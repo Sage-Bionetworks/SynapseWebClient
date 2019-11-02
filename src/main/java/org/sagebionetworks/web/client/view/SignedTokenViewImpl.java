@@ -8,7 +8,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -21,8 +20,9 @@ import com.google.inject.Inject;
 
 public class SignedTokenViewImpl implements SignedTokenView {
 
-	public interface SignedTokenViewImplUiBinder extends UiBinder<Widget, SignedTokenViewImpl> {}
-	
+	public interface SignedTokenViewImplUiBinder extends UiBinder<Widget, SignedTokenViewImpl> {
+	}
+
 	@UiField
 	SimplePanel synapseAlertContainer;
 	@UiField
@@ -31,33 +31,32 @@ public class SignedTokenViewImpl implements SignedTokenView {
 	Button confirmUnsubscribe;
 	@UiField
 	Button cancelUnsubscribe;
-	
+
 	@UiField
 	Row successUI;
 	@UiField
 	Heading successMessage;
-	
+
 	@UiField
 	Modal confirmUnsubscribeUI;
 	@UiField
 	SimplePanel unsubscribeUserBadgeContainer;
-	
+
 	@UiField
 	LoadingSpinner loadingUI;
 	@UiField
 	Div otherUI;
-	
+
 	private Presenter presenter;
 	private Header headerWidget;
-	
+
 	Widget widget;
 	HandlerRegistration confirmUnsubscribeHandler;
+
 	@Inject
-	public SignedTokenViewImpl(
-			SignedTokenViewImplUiBinder binder,
-			Header headerWidget) {		
+	public SignedTokenViewImpl(SignedTokenViewImplUiBinder binder, Header headerWidget) {
 		widget = binder.createAndBindUi(this);
-		
+
 		this.headerWidget = headerWidget;
 		headerWidget.configure();
 		ClickHandler okClickHandler = new ClickHandler() {
@@ -95,13 +94,13 @@ public class SignedTokenViewImpl implements SignedTokenView {
 	public void setSynapseAlert(Widget w) {
 		synapseAlertContainer.setWidget(w);
 	}
-	
+
 	@Override
 	public void showSuccess(String message) {
 		successMessage.setText(message);
 		successUI.setVisible(true);
 	}
-	
+
 	@Override
 	public void showConfirmUnsubscribe(SignedTokenInterface signedToken) {
 		confirmUnsubscribeUI.show();
@@ -113,10 +112,12 @@ public class SignedTokenViewImpl implements SignedTokenView {
 			presenter.unsubscribeConfirmed(signedToken);
 		});
 	}
+
 	@Override
 	public void setUnsubscribingUserBadge(Widget w) {
 		unsubscribeUserBadgeContainer.setWidget(w);
 	}
+
 	@Override
 	public void setLoadingVisible(boolean visible) {
 		loadingUI.setVisible(visible);

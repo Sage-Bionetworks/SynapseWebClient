@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.provenance;
 
 import java.util.Map;
-
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconSize;
@@ -27,7 +26,6 @@ import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
 import org.sagebionetworks.web.shared.provenance.ExternalGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
-
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -57,8 +55,7 @@ public class ProvViewUtil {
 	private static String ACT_MARGIN_TIME = "margin-bottom-3 margin-left-10";
 	private static final String ACT_MARGIN_NAME = "margin-top-5 margin-right-4 margin-bottom-10 margin-left-10";
 
-	public static ProvNodeContainer createActivityContainer(ActivityGraphNode node, IconsImageBundle iconsImageBundle,
-			PortalGinInjector ginInjector) {
+	public static ProvNodeContainer createActivityContainer(ActivityGraphNode node, IconsImageBundle iconsImageBundle, PortalGinInjector ginInjector) {
 		ProvNodeContainer container = new ProvNodeContainer();
 		container.getElement().setId(node.getId());
 		container.addStyleName(PROV_ACTIVITY_NODE_STYLE);
@@ -101,14 +98,12 @@ public class ProvViewUtil {
 	}
 
 	public static ProvNodeContainer createEntityContainer(EntityGraphNode node, IconsImageBundle iconsImageBundle) {
-		ProvNodeContainer container = createEntityContainer(node.getId(), node.getEntityId(), node.getName(),
-				node.getVersionLabel(), node.getVersionNumber(), node.getEntityType(), iconsImageBundle);
+		ProvNodeContainer container = createEntityContainer(node.getId(), node.getEntityId(), node.getName(), node.getVersionLabel(), node.getVersionNumber(), node.getEntityType(), iconsImageBundle);
 		setPosition(node, container);
 		return container;
 	}
 
-	public static ProvNodeContainer createExpandContainer(final ExpandGraphNode node, final Presenter presenter,
-			final ProvenanceWidgetView view) {
+	public static ProvNodeContainer createExpandContainer(final ExpandGraphNode node, final Presenter presenter, final ProvenanceWidgetView view) {
 		final Anchor link = new Anchor();
 		link.addStyleName("textDecorationNone");
 		Span sp = new Span("&#8230;"); // ellipsis
@@ -130,8 +125,7 @@ public class ProvViewUtil {
 		return container;
 	}
 
-	public static ProvNodeContainer createExternalUrlContainer(ExternalGraphNode node,
-			IconsImageBundle iconsImageBundle) {
+	public static ProvNodeContainer createExternalUrlContainer(ExternalGraphNode node, IconsImageBundle iconsImageBundle) {
 		if (node.getName() == null)
 			node.setName("");
 		if (node.getUrl() == null)
@@ -176,8 +170,7 @@ public class ProvViewUtil {
 		container.getElement().getStyle().setLeft(node.getxPos(), Unit.PX);
 	}
 
-	private static ProvNodeContainer createEntityContainer(String id, String entityId, String name, String versionLabel,
-			Long versionNumber, String entityType, IconsImageBundle iconsImageBundle) {
+	private static ProvNodeContainer createEntityContainer(String id, String entityId, String name, String versionLabel, Long versionNumber, String entityType, IconsImageBundle iconsImageBundle) {
 		FlowPanel container = new FlowPanel();
 		SafeHtmlBuilder builder = new SafeHtmlBuilder();
 		Anchor link = new Anchor();
@@ -190,8 +183,7 @@ public class ProvViewUtil {
 		// icon
 		IconType iconType = EntityTypeUtils.getIconTypeForEntityClassName(entityType);
 		if (FileEntity.class.getName().equals(entityType)) {
-			if (ContentTypeUtils.isRecognizedCodeFileName(name)
-					|| org.sagebionetworks.web.client.ContentTypeUtils.isWebRecognizedCodeFileName(name)) {
+			if (ContentTypeUtils.isRecognizedCodeFileName(name) || org.sagebionetworks.web.client.ContentTypeUtils.isWebRecognizedCodeFileName(name)) {
 				iconType = IconType.FILE_CODE_O;
 			}
 		}
@@ -213,11 +205,9 @@ public class ProvViewUtil {
 			if (versionLabel == null || versionNumber.toString().equals(versionLabel)) {
 				versionDisplay = versionNumberStr;
 			} else {
-				versionDisplay = DisplayUtils.stubStrPartialWord(versionLabel + " (" + versionNumberStr + ")",
-						ENTITY_LINE_NUMBER_CHARS - versionNumberStr.length());
+				versionDisplay = DisplayUtils.stubStrPartialWord(versionLabel + " (" + versionNumberStr + ")", ENTITY_LINE_NUMBER_CHARS - versionNumberStr.length());
 			}
-			versionHtml = new HTML(SafeHtmlUtils.fromString(DisplayUtils.stubStrPartialWord(versionDisplay,
-					ENTITY_LINE_NUMBER_CHARS - versionNumberStr.length())));
+			versionHtml = new HTML(SafeHtmlUtils.fromString(DisplayUtils.stubStrPartialWord(versionDisplay, ENTITY_LINE_NUMBER_CHARS - versionNumberStr.length())));
 		} else {
 			versionHtml = new HTML("");
 		}
@@ -242,8 +232,7 @@ public class ProvViewUtil {
 					String val = map.get(key);
 					if (val == null)
 						val = "";
-					val = val.length() > MAX_TOOL_TIP_VALUE_CHAR ? val.substring(0, MAX_TOOL_TIP_VALUE_CHAR - 3) + "..."
-							: val;
+					val = val.length() > MAX_TOOL_TIP_VALUE_CHAR ? val.substring(0, MAX_TOOL_TIP_VALUE_CHAR - 3) + "..." : val;
 					sb.appendHtmlConstant("<span class=\"boldText\">").appendEscaped(key).appendHtmlConstant("</span>");
 					if (val.length() > 0) {
 						sb.appendEscaped(": ").appendEscaped(val);

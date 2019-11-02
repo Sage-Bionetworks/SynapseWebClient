@@ -8,10 +8,8 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +30,6 @@ import org.sagebionetworks.web.shared.TeamMemberBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -55,47 +52,48 @@ public class MemberListWidgetTest {
 	LoadMoreWidgetContainer mockMembersContainer;
 	@Mock
 	SynapseJavascriptClient mockJsClient;
-	
+
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		widget = new MemberListWidget(mockView, mockSynapseClient, mockJsClient, mockAuthenticationController, mockGlobalApplicationState, mockMembersContainer);
 		isAdmin = true;
-		
+
 		AsyncMockStubber.callSuccessWith(getTestTeamMembers()).when(mockJsClient).getTeamMembers(anyString(), anyString(), any(TeamMemberTypeFilterOptions.class), anyInt(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).deleteTeamMember(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setIsTeamAdmin(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 	}
-	
+
 	private TeamMemberPagedResults getTestTeamMembers() {
 		TeamMemberPagedResults teamMembers = new TeamMemberPagedResults();
-		
+
 		List<TeamMemberBundle> teamMemberList = new ArrayList<TeamMemberBundle>();
 		TeamMemberBundle team = new TeamMemberBundle();
 		team.setIsAdmin(true);
 		team.setUserProfile(new UserProfile());
 		team.setTeamId(teamId);
 		teamMemberList.add(team);
-		
+
 		team = new TeamMemberBundle();
 		team.setIsAdmin(false);
 		team.setUserProfile(new UserProfile());
 		team.setTeamId(teamId);
 		teamMemberList.add(team);
-		
+
 		teamMembers.setResults(teamMemberList);
-		teamMembers.setTotalNumberOfResults((long)teamMemberList.size());
+		teamMembers.setTotalNumberOfResults((long) teamMemberList.size());
 		return teamMembers;
 	}
-	
+
 	@Test
 	public void testConfigure() {
-		//verify it tries to refresh all members
+		// verify it tries to refresh all members
 		TeamMemberTypeFilterOptions memberType = TeamMemberTypeFilterOptions.ALL;
 		widget.configure(teamId, isAdmin, memberType, mockTeamUpdatedCallback);
 		verify(mockJsClient).getTeamMembers(anyString(), anyString(), eq(memberType), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).addMembers(anyList(), anyBoolean());
 		verify(mockMembersContainer).configure(any(Callback.class));
 	}
+
 	@Test
 	public void testConfigureFailure() {
 		TeamMemberTypeFilterOptions memberType = TeamMemberTypeFilterOptions.MEMBER;
@@ -115,6 +113,7 @@ public class MemberListWidgetTest {
 		verify(mockView).showInfo(anyString());
 		verify(mockTeamUpdatedCallback).invoke();
 	}
+
 	@Test
 	public void testRemoveMemberFailure() {
 		widget.configure(teamId, isAdmin, TeamMemberTypeFilterOptions.ALL, mockTeamUpdatedCallback);
@@ -125,6 +124,7 @@ public class MemberListWidgetTest {
 		verify(mockJsClient).deleteTeamMember(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(error);
 	}
+
 	@Test
 	public void testRemoveMemberBadRequestFailure() {
 		widget.configure(teamId, isAdmin, TeamMemberTypeFilterOptions.ALL, mockTeamUpdatedCallback);
@@ -135,17 +135,17 @@ public class MemberListWidgetTest {
 		verify(mockJsClient).deleteTeamMember(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(badRequestMessage);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testSetIsAdmin(){
+	public void testSetIsAdmin() {
 		widget.configure(teamId, isAdmin, TeamMemberTypeFilterOptions.ALL, mockTeamUpdatedCallback);
 		widget.setIsAdmin("a user id", true);
 		verify(mockSynapseClient).setIsTeamAdmin(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString());
 		verify(mockTeamUpdatedCallback).invoke();
 	}
-	
+
 	@Test
 	public void testSetIsAdminFailure() {
 		String message = "unhandled exception";
@@ -155,10 +155,10 @@ public class MemberListWidgetTest {
 		widget.setIsAdmin("a user id", true);
 		verify(mockSynapseClient).setIsTeamAdmin(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(message);;
-		//called twice.  once during configuration, and once to refresh members to get correct admin state
+		// called twice. once during configuration, and once to refresh members to get correct admin state
 		verify(mockJsClient, times(2)).getTeamMembers(anyString(), anyString(), any(TeamMemberTypeFilterOptions.class), anyInt(), anyInt(), any(AsyncCallback.class));
 	}
-	
+
 	@Test
 	public void testSearch() {
 		widget.configure(teamId, isAdmin, TeamMemberTypeFilterOptions.ALL, mockTeamUpdatedCallback);
@@ -168,9 +168,9 @@ public class MemberListWidgetTest {
 		searchResults.setResults(new ArrayList<>());
 		searchResults.setTotalNumberOfResults(totalNumberOfResults);
 		AsyncMockStubber.callSuccessWith(searchResults).when(mockJsClient).getTeamMembers(anyString(), anyString(), any(TeamMemberTypeFilterOptions.class), anyInt(), anyInt(), any(AsyncCallback.class));
-		
+
 		widget.search(searchTerm);
-		
+
 		verify(mockJsClient).getTeamMembers(anyString(), eq(searchTerm), any(TeamMemberTypeFilterOptions.class), anyInt(), anyInt(), any(AsyncCallback.class));
 	}
 }

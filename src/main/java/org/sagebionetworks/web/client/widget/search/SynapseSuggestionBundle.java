@@ -5,7 +5,7 @@ import java.util.List;
 public class SynapseSuggestionBundle {
 	List<UserGroupSuggestion> suggestions;
 	long totalResults;
-	
+
 	public SynapseSuggestionBundle(List<UserGroupSuggestion> suggestions, long totalResults) {
 		this.totalResults = totalResults;
 		this.suggestions = suggestions;
@@ -14,7 +14,7 @@ public class SynapseSuggestionBundle {
 	public long getTotalNumberOfResults() {
 		return totalResults;
 	}
-	
+
 	public List<UserGroupSuggestion> getSuggestionBundle() {
 		return suggestions;
 	}

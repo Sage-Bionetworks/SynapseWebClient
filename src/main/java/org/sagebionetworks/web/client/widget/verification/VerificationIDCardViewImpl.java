@@ -2,11 +2,8 @@ package org.sagebionetworks.web.client.widget.verification;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Heading;
-import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Span;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -15,9 +12,11 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class VerificationIDCardViewImpl implements IsWidget {
 
-	public interface Binder extends UiBinder<Widget, VerificationIDCardViewImpl> {}
-	private static Binder uiBinder = GWT.create(Binder.class);	
-	
+	public interface Binder extends UiBinder<Widget, VerificationIDCardViewImpl> {
+	}
+
+	private static Binder uiBinder = GWT.create(Binder.class);
+
 	Widget widget;
 
 	@UiField
@@ -34,7 +33,7 @@ public class VerificationIDCardViewImpl implements IsWidget {
 	Modal modal;
 	@UiField
 	Span dateVerified;
-	
+
 	public VerificationIDCardViewImpl() {
 		widget = uiBinder.createAndBindUi(this);
 	}
@@ -47,7 +46,7 @@ public class VerificationIDCardViewImpl implements IsWidget {
 		location.setText("");
 		orcIdAnchor.setText("");
 	}
-	
+
 	public void setFirstName(String fname) {
 		firstName.setText(fname);
 	}
@@ -68,7 +67,7 @@ public class VerificationIDCardViewImpl implements IsWidget {
 		orcIdAnchor.setText(href);
 		orcIdAnchor.setHref(href);
 	}
-	
+
 	public void setDateVerified(String date) {
 		dateVerified.setText(date);
 	}
@@ -77,10 +76,11 @@ public class VerificationIDCardViewImpl implements IsWidget {
 	public Widget asWidget() {
 		return widget;
 	}
-	
-	public void show(){
+
+	public void show() {
 		modal.show();
 	}
+
 	public void hide() {
 		modal.hide();
 	}

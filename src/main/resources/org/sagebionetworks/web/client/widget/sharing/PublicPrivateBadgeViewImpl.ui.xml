@@ -4,17 +4,20 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
 	<bh:Div addStyleNames="inline-block">
-		<b:Tooltip title="Anyone on the internet can access" placement="BOTTOM">
+		<b:Tooltip title="Anyone on the internet can access"
+			placement="BOTTOM">
 			<bh:Span ui:field="publicSpan" visible="false">
 				<b:Icon type="GLOBE" />
 				<bh:Text>Public</bh:Text>
 			</bh:Span>
 		</b:Tooltip>
-		<b:Tooltip title="Restricted to those people selected in the Share Settings window" placement="BOTTOM">
+		<b:Tooltip
+			title="Restricted to those people selected in the Share Settings window"
+			placement="BOTTOM">
 			<bh:Span ui:field="privateSpan" visible="false">
 				<b:Icon type="LOCK" />
 				<bh:Text>Private</bh:Text>
 			</bh:Span>
 		</b:Tooltip>
-    </bh:Div>
+	</bh:Div>
 </ui:UiBinder>

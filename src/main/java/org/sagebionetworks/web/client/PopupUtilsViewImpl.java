@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.utils.Callback;
-
 import com.google.gwt.user.client.Window;
 
 public class PopupUtilsViewImpl implements PopupUtilsView {
@@ -11,12 +10,12 @@ public class PopupUtilsViewImpl implements PopupUtilsView {
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message);
 	}
-	
+
 	@Override
 	public void showInfo(String message, Integer timeout) {
 		DisplayUtils.showInfo(message, timeout);
 	}
-	
+
 	@Override
 	public void showInfo(String message, String href, String buttonText, IconType iconType) {
 		DisplayUtils.showInfo(message, href, buttonText, iconType, null);
@@ -34,7 +33,7 @@ public class PopupUtilsViewImpl implements PopupUtilsView {
 
 	@Override
 	public void showErrorMessage(String title, String message) {
-		DisplayUtils.showErrorMessage(title, message);		
+		DisplayUtils.showErrorMessage(title, message);
 	}
 
 	@Override
@@ -51,12 +50,12 @@ public class PopupUtilsViewImpl implements PopupUtilsView {
 	public void showConfirmDialog(String title, String message, Callback yesCallback) {
 		DisplayUtils.showConfirmDialog(title, message, yesCallback);
 	}
-	
+
 	@Override
 	public void openInNewWindow(String url) {
-		Window.open(url, "_blank", "");	
+		Window.open(url, "_blank", "");
 	}
-	
+
 	@Override
 	public void showConfirmDelete(String message, Callback callback) {
 		DisplayUtils.confirmDelete(message, callback);

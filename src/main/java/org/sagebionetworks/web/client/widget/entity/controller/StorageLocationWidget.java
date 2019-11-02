@@ -2,9 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import static org.sagebionetworks.web.client.DisplayUtils.trim;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.List;
-
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.UploadType;
@@ -18,7 +16,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.shared.WebConstants;
-
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
@@ -34,13 +31,9 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 	EntityBundle entityBundle;
 	CookieProvider cookies;
 	EventBus eventBus;
-	
+
 	@Inject
-	public StorageLocationWidget(StorageLocationWidgetView view,
-			SynapseClientAsync synapseClient, 
-			SynapseAlert synAlert, 
-			CookieProvider cookies,
-			EventBus eventBus) {
+	public StorageLocationWidget(StorageLocationWidgetView view, SynapseClientAsync synapseClient, SynapseAlert synAlert, CookieProvider cookies, EventBus eventBus) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -50,7 +43,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		view.setSynAlertWidget(synAlert);
 		view.setPresenter(this);
 	}
-	
+
 	public void configure(EntityBundle entityBundle) {
 		this.entityBundle = entityBundle;
 		clear();
@@ -61,7 +54,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		view.setSFTPVisible(isInAlpha);
 		view.setExternalObjectStoreVisible(isInAlpha);
 	}
-	
+
 	public void getMyLocationSettingBanners() {
 		synapseClient.getMyLocationSettingBanners(new AsyncCallback<List<String>>() {
 			@Override
@@ -69,13 +62,14 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 				hide();
 				view.showErrorMessage(caught.getMessage());
 			}
+
 			public void onSuccess(List<String> banners) {
 				view.setBannerDropdownVisible(!banners.isEmpty());
 				view.setBannerSuggestions(banners);
 			};
 		});
 	}
-	
+
 	public void getStorageLocationSetting() {
 		Entity entity = entityBundle.getEntity();
 		view.setSFTPVisible(DisplayUtils.isInTestWebsite(cookies));
@@ -83,16 +77,16 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 			@Override
 			public void onFailure(Throwable caught) {
 				// unable to get storage location
-				// if this is a proxy, then upload is not supported.  Let the user set back to default Synapse.
+				// if this is a proxy, then upload is not supported. Let the user set back to default Synapse.
 				view.showErrorMessage(caught.getMessage());
 				view.setLoading(false);
 			}
-			
+
 			@Override
 			public void onSuccess(StorageLocationSetting location) {
-				//if null, then still show the default UI
+				// if null, then still show the default UI
 				if (location != null) {
-					//set up the view
+					// set up the view
 					String banner = trim(location.getBanner());
 					if (location instanceof ExternalS3StorageLocationSetting) {
 						ExternalS3StorageLocationSetting setting = (ExternalS3StorageLocationSetting) location;
@@ -115,7 +109,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 						view.selectExternalObjectStore();
 					} else if (location instanceof ExternalStorageLocationSetting) {
 						view.setSFTPVisible(true);
-						ExternalStorageLocationSetting setting= (ExternalStorageLocationSetting) location;
+						ExternalStorageLocationSetting setting = (ExternalStorageLocationSetting) location;
 						view.setSFTPUrl(trim(setting.getUrl()));
 						view.setSFTPBanner(banner);
 						view.selectSFTPStorage();
@@ -125,20 +119,20 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 			}
 		});
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	
+
 	public void show() {
 		view.show();
 	}
-	
+
 	public void hide() {
 		view.hide();
 	}
-	
+
 	@Override
 	public void clear() {
 		synAlert.clear();
@@ -153,7 +147,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		if (error != null) {
 			synAlert.showError(error);
 		} else {
-			//look for duplicate storage location in existing settings
+			// look for duplicate storage location in existing settings
 			AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 				@Override
 				public void onFailure(Throwable caught) {
@@ -166,10 +160,10 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 					eventBus.fireEvent(new EntityUpdatedEvent());
 				}
 			};
-			synapseClient.createStorageLocationSetting(entityBundle.getEntity().getId(), setting, callback);	
+			synapseClient.createStorageLocationSetting(entityBundle.getEntity().getId(), setting, callback);
 		}
 	}
-	
+
 	public StorageLocationSetting getStorageLocationSettingFromView() {
 		if (view.isExternalS3StorageSelected()) {
 			ExternalS3StorageLocationSetting setting = new ExternalS3StorageLocationSetting();
@@ -178,7 +172,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 			setting.setBaseKey(view.getS3BaseKey().trim());
 			setting.setUploadType(UploadType.S3);
 			return setting;
-		}else if (view.isExternalGoogleCloudStorageSelected()) {
+		} else if (view.isExternalGoogleCloudStorageSelected()) {
 			ExternalGoogleCloudStorageLocationSetting setting = new ExternalGoogleCloudStorageLocationSetting();
 			setting.setBanner(view.getExternalGoogleCloudBanner().trim());
 			setting.setBucket(view.getGoogleCloudBucket().trim());
@@ -199,15 +193,17 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 			setting.setUploadType(UploadType.SFTP);
 			return setting;
 		} else {
-			//default synapse storage
+			// default synapse storage
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Up front validation of storage setting parameters.
+	 * 
 	 * @param setting
-	 * @return Returns an error string if problems are detected with the input, null otherwise.  Note, returns null if settings object is null (default synapse storage).  
+	 * @return Returns an error string if problems are detected with the input, null otherwise. Note,
+	 *         returns null if settings object is null (default synapse storage).
 	 */
 	public String validate(StorageLocationSetting setting) {
 		if (setting != null) {
@@ -217,10 +213,10 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 					return "Bucket is required.";
 				}
 			} else if (setting instanceof ExternalGoogleCloudStorageLocationSetting) {
-				ExternalGoogleCloudStorageLocationSetting externalGoogleCloudStorageLocationSetting = (ExternalGoogleCloudStorageLocationSetting)setting;
-					if (externalGoogleCloudStorageLocationSetting.getBucket().trim().isEmpty()) {
-						return "Bucket is required.";
-					}
+				ExternalGoogleCloudStorageLocationSetting externalGoogleCloudStorageLocationSetting = (ExternalGoogleCloudStorageLocationSetting) setting;
+				if (externalGoogleCloudStorageLocationSetting.getBucket().trim().isEmpty()) {
+					return "Bucket is required.";
+				}
 			} else if (setting instanceof ExternalStorageLocationSetting) {
 				ExternalStorageLocationSetting externalStorageLocationSetting = (ExternalStorageLocationSetting) setting;
 				if (!isValidSftpUrl(externalStorageLocationSetting.getUrl().trim())) {
@@ -234,11 +230,11 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 
 	public static boolean isValidSftpUrl(String url) {
 		if (url == null || url.trim().length() == 0) {
-			//url is undefined
+			// url is undefined
 			return false;
 		}
 		RegExp regEx = RegExp.compile(WebConstants.VALID_SFTP_URL_REGEX, "gmi");
 		MatchResult matchResult = regEx.exec(url);
-		return (matchResult != null && url.equals(matchResult.getGroup(0))); 
+		return (matchResult != null && url.equals(matchResult.getGroup(0)));
 	}
 }

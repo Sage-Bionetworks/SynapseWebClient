@@ -4,7 +4,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -14,7 +13,6 @@ import org.sagebionetworks.web.client.presenter.MapPresenter;
 import org.sagebionetworks.web.client.view.MapView;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
-
 import com.google.gwt.user.client.ui.Widget;
 
 public class MapPresenterTest {
@@ -27,7 +25,7 @@ public class MapPresenterTest {
 	TeamBadge mockTeamBadge;
 	@Mock
 	MapPlace mockPlace;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
@@ -40,7 +38,7 @@ public class MapPresenterTest {
 		verify(mockView).setMap(any(Widget.class));
 		verify(mockView).setTeamBadge(any(Widget.class));
 	}
-	
+
 	@Test
 	public void testSetPlaceAllUsers() {
 		when(mockPlace.getTeamId()).thenReturn(MapPresenter.ALL_USERS);
@@ -48,8 +46,8 @@ public class MapPresenterTest {
 		verify(mockMap).configure();
 		verify(mockView).setAllUsersTitleVisible(true);
 		verify(mockView).setTeamBadgeVisible(false);
-		
-		//besides setting the team badge in the view, there should be no interactions
+
+		// besides setting the team badge in the view, there should be no interactions
 		verify(mockTeamBadge).asWidget();
 		verifyNoMoreInteractions(mockTeamBadge);
 	}

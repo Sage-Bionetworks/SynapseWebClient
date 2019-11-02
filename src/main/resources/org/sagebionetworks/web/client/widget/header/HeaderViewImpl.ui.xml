@@ -5,109 +5,187 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-	<ui:with field='sageImages' type='org.sagebionetworks.web.client.SageImageBundle' />
-	
+	<ui:with field='sageImages'
+		type='org.sagebionetworks.web.client.SageImageBundle' />
+
 	<bh:Div addStyleNames="header">
-		<b:Alert ui:field="portalAlert" visible="false" addStyleNames="fullWidthAlert" type="INFO" height="50px" marginTop="0" marginRight="0" paddingRight="40" marginBottom="0">
-			<g:FocusPanel ui:field="portalLogoFocusPanel" addStyleNames="imageButton">
+		<b:Alert ui:field="portalAlert" visible="false"
+			addStyleNames="fullWidthAlert" type="INFO" height="50px"
+			marginTop="0" marginRight="0" paddingRight="40" marginBottom="0">
+			<g:FocusPanel ui:field="portalLogoFocusPanel"
+				addStyleNames="imageButton">
 				<bh:Div>
-					<b:Icon ui:field="portalGoBackArrow" type="ARROW_LEFT" addStyleNames="movedown-2 font-size-14"/>
-					<b:Image ui:field="portalLogo" height="35px" addStyleNames="margin-left-10"/>
-					<bh:Span ui:field="portalName" addStyleNames="font-size-18 movedown-3" marginLeft="10"/>
+					<b:Icon ui:field="portalGoBackArrow" type="ARROW_LEFT"
+						addStyleNames="movedown-2 font-size-14" />
+					<b:Image ui:field="portalLogo" height="35px"
+						addStyleNames="margin-left-10" />
+					<bh:Span ui:field="portalName"
+						addStyleNames="font-size-18 movedown-3" marginLeft="10" />
 				</bh:Div>
 			</g:FocusPanel>
 		</b:Alert>
-		<b:Alert ui:field="stagingAlert" type="WARNING" visible="false" marginRight="0" marginLeft="0" marginBottom="0" marginTop="0">
+		<b:Alert ui:field="stagingAlert" type="WARNING"
+			visible="false" marginRight="0" marginLeft="0" marginBottom="0"
+			marginTop="0">
 			<bh:Div width="100%">
 				<bh:Span paddingRight="5" paddingLeft="10">
 					<b:Icon type="SYN_CRASH_HELMET" />
 				</bh:Span>
-				<bh:Span addStyleNames="displayInlineBlock color-white moveup-3" paddingRight="5" paddingLeft="5">
-					<bh:Span addStyleNames="displayInlineBlock" paddingRight="3">
-						<bh:Span text="THIS WEBSITE IS FOR" addStyleNames="hidden-xs" />
+				<bh:Span
+					addStyleNames="displayInlineBlock color-white moveup-3"
+					paddingRight="5" paddingLeft="5">
+					<bh:Span addStyleNames="displayInlineBlock"
+						paddingRight="3">
+						<bh:Span text="THIS WEBSITE IS FOR"
+							addStyleNames="hidden-xs" />
 					</bh:Span>
-					<bh:Span text="TESTING ONLY!" addStyleNames="hidden-xxs"/>
+					<bh:Span text="TESTING ONLY!" addStyleNames="hidden-xxs" />
 					<bh:Span addStyleNames="displayInlineBlock">
-						<bh:Span text="Any data created will be deleted. To do your work, please use production site." addStyleNames="margin-left-5 visible-lg" />
+						<bh:Span
+							text="Any data created will be deleted. To do your work, please use production site."
+							addStyleNames="margin-left-5 visible-lg" />
 					</bh:Span>
 				</bh:Span>
 				<bh:Span>
-					<bh:Span addStyleNames="right" >
-						<b:Anchor text="GO TO PRODUCTION" addStyleNames="color-white" href="https://www.synapse.org" />
-						<w:HelpWidget helpMarkdown="This is not the official Sage Bionetworks Synapse Production website." 
-									addStyleNames="margin-left-5 right" iconStyles="color-white" placement="LEFT"/>
+					<bh:Span addStyleNames="right">
+						<b:Anchor text="GO TO PRODUCTION"
+							addStyleNames="color-white" href="https://www.synapse.org" />
+						<w:HelpWidget
+							helpMarkdown="This is not the official Sage Bionetworks Synapse Production website."
+							addStyleNames="margin-left-5 right" iconStyles="color-white"
+							placement="LEFT" />
 					</bh:Span>
 				</bh:Span>
 			</bh:Div>
 		</b:Alert>
-		<bh:Div ui:field="headerDiv" addStyleNames="notopmargin synapse-blue-bg-gradient" height="53px">
-			<bh:Div addStyleNames="margin-left-15 inline-block maxWidth50 overflowHidden text-overflow-ellipsis whitespace-nowrap color-white" paddingTop="13">
-				<g:Image ui:field="synapseLogo" url="images/logo.svg" 
-					addStyleNames="imageButton margin-right-5 moveup-5" width="35px" height="35px"/>
-				<b:Heading size="H3" addStyleNames="displayInline color-white">
-					<b:Anchor ui:field="projectHeadingAnchor" addStyleNames="color-white textDecorationNone lato notransition"/>
+		<bh:Div ui:field="headerDiv"
+			addStyleNames="notopmargin synapse-blue-bg-gradient" height="53px">
+			<bh:Div
+				addStyleNames="margin-left-15 inline-block maxWidth50 overflowHidden text-overflow-ellipsis whitespace-nowrap color-white"
+				paddingTop="13">
+				<g:Image ui:field="synapseLogo" url="images/logo.svg"
+					addStyleNames="imageButton margin-right-5 moveup-5" width="35px"
+					height="35px" />
+				<b:Heading size="H3"
+					addStyleNames="displayInline color-white">
+					<b:Anchor ui:field="projectHeadingAnchor"
+						addStyleNames="color-white textDecorationNone lato notransition" />
 				</b:Heading>
 			</bh:Div>
-			<bh:Div ui:field="projectFavoritePanelUI" addStyleNames="inline-block favoriteIcon hidden-xs vertical-align-top color-white font-size-24 movedown-7"/>
-			<bh:Span ui:field="headerButtons" addStyleNames="right" marginRight="10">
-				<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-10 margin-right-10 padding-left-15" visible="false">
-					<b:Button ui:field="loginLink" text="&nbsp;&nbsp;&nbsp;Sign in&nbsp;&nbsp;&nbsp;" type="SUCCESS" marginTop="7"/>
+			<bh:Div ui:field="projectFavoritePanelUI"
+				addStyleNames="inline-block favoriteIcon hidden-xs vertical-align-top color-white font-size-24 movedown-7" />
+			<bh:Span ui:field="headerButtons" addStyleNames="right"
+				marginRight="10">
+				<g:SimplePanel ui:field="loginLinkUI"
+					addStyleNames="right margin-left-10 margin-right-10 padding-left-15"
+					visible="false">
+					<b:Button ui:field="loginLink"
+						text="&nbsp;&nbsp;&nbsp;Sign in&nbsp;&nbsp;&nbsp;" type="SUCCESS"
+						marginTop="7" />
 				</g:SimplePanel>
-				<b:DropDown ui:field="dashboardDropdown" addStyleNames="right imageButton greenBackgroundOnHover" visible="false" height="53px" width="62px">
-					<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" addStyleNames="color-white textDecorationNone" />
-					<b:DropDownMenu ui:field="dashboardDropdownMenu" addStyleNames="pull-right">
-						<b:ListItem paddingTop="5" addStyleNames="whitespace-nowrap"><bh:Span paddingLeft="20" paddingRight="25" paddingTop="5">Signed in as <bh:Strong ui:field="signedInAsName"/></bh:Span></b:ListItem>
-						<b:Divider/>
+				<b:DropDown ui:field="dashboardDropdown"
+					addStyleNames="right imageButton greenBackgroundOnHover"
+					visible="false" height="53px" width="62px">
+					<b:Anchor dataToggle="DROPDOWN"
+						ui:field="dashboardDropdownAnchor"
+						addStyleNames="color-white textDecorationNone" />
+					<b:DropDownMenu ui:field="dashboardDropdownMenu"
+						addStyleNames="pull-right">
+						<b:ListItem paddingTop="5"
+							addStyleNames="whitespace-nowrap">
+							<bh:Span paddingLeft="20" paddingRight="25"
+								paddingTop="5">
+								Signed in as
+								<bh:Strong ui:field="signedInAsName" />
+							</bh:Span>
+						</b:ListItem>
+						<b:Divider />
 						<b:AnchorListItem ui:field="myProfileLink">Profile</b:AnchorListItem>
 						<b:AnchorListItem ui:field="myDashboardLink">Projects</b:AnchorListItem>
 						<b:AnchorListItem ui:field="myTeamsLink">Teams</b:AnchorListItem>
 						<b:AnchorListItem ui:field="myChallengesLink">Challenges</b:AnchorListItem>
 						<b:AnchorListItem ui:field="myDownloadsLink">Downloads</b:AnchorListItem>
-						<b:AnchorListItem ui:field="trashLink" icon="TRASH_O" visible="false" iconFixedWidth="true" iconPosition="RIGHT">Trash can</b:AnchorListItem>
-						<b:Divider/>
+						<b:AnchorListItem ui:field="trashLink"
+							icon="TRASH_O" visible="false" iconFixedWidth="true"
+							iconPosition="RIGHT">Trash can</b:AnchorListItem>
+						<b:Divider />
 						<b:AnchorListItem ui:field="mySettingsLink">Settings</b:AnchorListItem>
-						<b:Divider/>
-						<b:AnchorListItem addStyleNames="submit-feedback-command" ui:field="sendFeedbackLink">Send Feedback</b:AnchorListItem>
-						<b:AnchorListItem ui:field="documentationLink" icon="EXTERNAL_LINK" iconFixedWidth="true" iconPosition="RIGHT" href="http://docs.synapse.org">Documentation</b:AnchorListItem>
+						<b:Divider />
+						<b:AnchorListItem
+							addStyleNames="submit-feedback-command"
+							ui:field="sendFeedbackLink">Send Feedback</b:AnchorListItem>
+						<b:AnchorListItem ui:field="documentationLink"
+							icon="EXTERNAL_LINK" iconFixedWidth="true" iconPosition="RIGHT"
+							href="http://docs.synapse.org">Documentation</b:AnchorListItem>
 						<b:AnchorListItem ui:field="helpForumLink">Help Forum</b:AnchorListItem>
-						<b:AnchorListItem ui:field="emailSynapseSupportLink" icon="ENVELOPE_O" href="mailto:synapseinfo@sagebionetworks.org" iconFixedWidth="true" iconPosition="RIGHT">Contact Us</b:AnchorListItem>
-						<b:Divider/>
-						<b:AnchorListItem ui:field="xsFavoritesLink" addStyleNames="visible-xs">Favorites</b:AnchorListItem>
-						<b:AnchorListItem ui:field="xsSearchLink" addStyleNames="visible-xs">Search</b:AnchorListItem>
-						<b:Divider addStyleNames="visible-xs"/>
-						<b:AnchorListItem ui:field="logoutLink" icon="SIGN_OUT" iconFixedWidth="true" iconPosition="RIGHT">Sign out</b:AnchorListItem>
+						<b:AnchorListItem
+							ui:field="emailSynapseSupportLink" icon="ENVELOPE_O"
+							href="mailto:synapseinfo@sagebionetworks.org"
+							iconFixedWidth="true" iconPosition="RIGHT">Contact Us</b:AnchorListItem>
+						<b:Divider />
+						<b:AnchorListItem ui:field="xsFavoritesLink"
+							addStyleNames="visible-xs">Favorites</b:AnchorListItem>
+						<b:AnchorListItem ui:field="xsSearchLink"
+							addStyleNames="visible-xs">Search</b:AnchorListItem>
+						<b:Divider addStyleNames="visible-xs" />
+						<b:AnchorListItem ui:field="logoutLink"
+							icon="SIGN_OUT" iconFixedWidth="true" iconPosition="RIGHT">Sign out</b:AnchorListItem>
 					</b:DropDownMenu>
 				</b:DropDown>
-				<b:DropDown ui:field="headerFavDropdown" pull="RIGHT" addStyleNames="imageButton hidden-xs greenBackgroundOnHover color-white textDecorationNone" visible="false" height="53px" paddingLeft="0">
+				<b:DropDown ui:field="headerFavDropdown" pull="RIGHT"
+					addStyleNames="imageButton hidden-xs greenBackgroundOnHover color-white textDecorationNone"
+					visible="false" height="53px" paddingLeft="0">
 					<b:Anchor ui:field="headerFavAnchor" dataToggle="DROPDOWN" />
-					<b:DropDownMenu ui:field="headerFavDropdownMenu" addStyleNames="dropdown-menu-right">
+					<b:DropDownMenu ui:field="headerFavDropdownMenu"
+						addStyleNames="dropdown-menu-right">
 					</b:DropDownMenu>
 				</b:DropDown>
-				<bh:Div pull="RIGHT" addStyleNames="searchBoxContainer inactive hidden-xs" height="53px" >
-					<bh:Div ui:field="searchBoxContainer"/>
+				<bh:Div pull="RIGHT"
+					addStyleNames="searchBoxContainer inactive hidden-xs" height="53px">
+					<bh:Div ui:field="searchBoxContainer" />
 				</bh:Div>
-				<bh:Div pull="RIGHT" height="53px" ui:field="downloadListNotificationUI" visible="false" addStyleNames="greenBackgroundOnHover">
-					<b:Tooltip text="Click to view items in your download list." placement="BOTTOM">
-						<g:FocusPanel addStyleNames="displayInlineBlock" ui:field="downloadListLink">
-							<bh:Div height="35px" marginLeft="7" marginTop="9" marginBottom="9" addStyleNames="synapse-green-bg img-circle ">
-								<b:Icon type="DOWNLOAD" addStyleNames="imageButton color-white" size="LARGE" marginTop="9" marginRight="5" marginBottom="5" marginLeft="5"/>
+				<bh:Div pull="RIGHT" height="53px"
+					ui:field="downloadListNotificationUI" visible="false"
+					addStyleNames="greenBackgroundOnHover">
+					<b:Tooltip
+						text="Click to view items in your download list."
+						placement="BOTTOM">
+						<g:FocusPanel addStyleNames="displayInlineBlock"
+							ui:field="downloadListLink">
+							<bh:Div height="35px" marginLeft="7" marginTop="9"
+								marginBottom="9" addStyleNames="synapse-green-bg img-circle ">
+								<b:Icon type="DOWNLOAD"
+									addStyleNames="imageButton color-white" size="LARGE"
+									marginTop="9" marginRight="5" marginBottom="5" marginLeft="5" />
 							</bh:Div>
 						</g:FocusPanel>
 					</b:Tooltip>
-					<b:Label text="0" ui:field="downloadListFileCount" addStyleNames="moveup-15 dropshadow" marginLeft="-8" type="INFO"/>
+					<b:Label text="0" ui:field="downloadListFileCount"
+						addStyleNames="moveup-15 dropshadow" marginLeft="-8" type="INFO" />
 				</bh:Div>
 			</bh:Span>
 		</bh:Div>
-		<b:Alert ui:field="cookieNotificationAlert" visible="false" addStyleNames="fullWidthAlert" type="INFO" marginTop="0" marginRight="0" paddingRight="40">
+		<b:Alert ui:field="cookieNotificationAlert" visible="false"
+			addStyleNames="fullWidthAlert" type="INFO" marginTop="0"
+			marginRight="0" paddingRight="40">
 			<bh:Span marginLeft="10">
-				<b:Icon addStyleNames="font-size-17 black-25-percent" type="INFO_CIRCLE" marginLeft="5" marginTop="15"/>
-				<bh:Span addStyleNames="font-size-15" marginLeft="10" marginTop="13" >
-					<bh:Span>This site uses Cookies to enhance your experience and to analyze our traffic. Using Synapse means that you agree with our cookie policy.</bh:Span>
+				<b:Icon addStyleNames="font-size-17 black-25-percent"
+					type="INFO_CIRCLE" marginLeft="5" marginTop="15" />
+				<bh:Span addStyleNames="font-size-15" marginLeft="10"
+					marginTop="13">
+					<bh:Span>This site uses Cookies to enhance your experience and to
+						analyze our traffic. Using Synapse means that you agree with our
+						cookie policy.</bh:Span>
 				</bh:Span>
 			</bh:Span>
 			<bh:Br addStyleNames="hidden-lg" />
-			<b:Anchor text="LEARN MORE" ui:field="cookieNotificationLearnMoreLink" target="_blank" addStyleNames="color-white font-size-15" marginLeft="15" marginTop="13" marginRight="10" href="https://s3.amazonaws.com/static.synapse.org/governance/SynapsePrivacyPolicy.pdf"/>
-			<b:Button ui:field="cookieNotificationAlertOkButton" text="OK" size="SMALL" marginLeft="15" marginBottom="4"/>	
+			<b:Anchor text="LEARN MORE"
+				ui:field="cookieNotificationLearnMoreLink" target="_blank"
+				addStyleNames="color-white font-size-15" marginLeft="15"
+				marginTop="13" marginRight="10"
+				href="https://s3.amazonaws.com/static.synapse.org/governance/SynapsePrivacyPolicy.pdf" />
+			<b:Button ui:field="cookieNotificationAlertOkButton"
+				text="OK" size="SMALL" marginLeft="15" marginBottom="4" />
 		</b:Alert>
 	</bh:Div>
 </ui:UiBinder>

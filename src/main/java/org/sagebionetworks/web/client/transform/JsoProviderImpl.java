@@ -5,7 +5,6 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayer;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayerNode;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 import org.sagebionetworks.web.client.widget.provenance.nchart.XYPoint;
-
 import com.google.gwt.core.client.JavaScriptObject;
 
 public class JsoProviderImpl implements JsoProvider {

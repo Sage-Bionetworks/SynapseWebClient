@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.mvp;
 
-import org.sagebionetworks.repo.model.auth.PasswordResetSignedToken;
 import org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionDashboardPlace;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
@@ -36,31 +35,15 @@ import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.place.WikiDiff;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
-
 import com.google.gwt.place.shared.PlaceHistoryMapper;
 import com.google.gwt.place.shared.WithTokenizers;
 
 /**
- * PlaceHistoryMapper interface is used to attach all places which the
- * PlaceHistoryHandler should be aware of. This is done via the @WithTokenizers
- * annotation or by extending PlaceHistoryMapperWithFactory and creating a
- * separate TokenizerFactory.
+ * PlaceHistoryMapper interface is used to attach all places which the PlaceHistoryHandler should be
+ * aware of. This is done via the @WithTokenizers annotation or by extending
+ * PlaceHistoryMapperWithFactory and creating a separate TokenizerFactory.
  */
-@WithTokenizers({ Home.Tokenizer.class, LoginPlace.Tokenizer.class,
-		PasswordReset.Tokenizer.class, RegisterAccount.Tokenizer.class,
-		Profile.Tokenizer.class,
-		ComingSoon.Tokenizer.class, Synapse.Tokenizer.class, Wiki.Tokenizer.class,
-		Search.Tokenizer.class,
-		Challenges.Tokenizer.class, Help.Tokenizer.class, Governance.Tokenizer.class,
-		Down.Tokenizer.class, Team.Tokenizer.class, MapPlace.Tokenizer.class,
-		TeamSearch.Tokenizer.class, Quiz.Tokenizer.class, Account.Tokenizer.class,
-		NewAccount.Tokenizer.class,
-		ChangeUsername.Tokenizer.class, Trash.Tokenizer.class, PeopleSearch.Tokenizer.class,
-		StandaloneWiki.Tokenizer.class,
-		SignedToken.Tokenizer.class, ErrorPlace.Tokenizer.class, ACTPlace.Tokenizer.class,
-		SynapseForumPlace.Tokenizer.class, SubscriptionPlace.Tokenizer.class,
-		AccessRequirementsPlace.Tokenizer.class, ACTDataAccessSubmissionsPlace.Tokenizer.class,
-		ACTDataAccessSubmissionDashboardPlace.Tokenizer.class, ACTAccessApprovalsPlace.Tokenizer.class,
-		EmailInvitation.Tokenizer.class, WikiDiff.Tokenizer.class, PasswordResetSignedTokenPlace.Tokenizer.class})
+@WithTokenizers({Home.Tokenizer.class, LoginPlace.Tokenizer.class, PasswordReset.Tokenizer.class, RegisterAccount.Tokenizer.class, Profile.Tokenizer.class, ComingSoon.Tokenizer.class, Synapse.Tokenizer.class, Wiki.Tokenizer.class, Search.Tokenizer.class, Challenges.Tokenizer.class, Help.Tokenizer.class, Governance.Tokenizer.class, Down.Tokenizer.class, Team.Tokenizer.class, MapPlace.Tokenizer.class, TeamSearch.Tokenizer.class, Quiz.Tokenizer.class, Account.Tokenizer.class, NewAccount.Tokenizer.class, ChangeUsername.Tokenizer.class, Trash.Tokenizer.class, PeopleSearch.Tokenizer.class, StandaloneWiki.Tokenizer.class, SignedToken.Tokenizer.class, ErrorPlace.Tokenizer.class, ACTPlace.Tokenizer.class, SynapseForumPlace.Tokenizer.class, SubscriptionPlace.Tokenizer.class, AccessRequirementsPlace.Tokenizer.class, ACTDataAccessSubmissionsPlace.Tokenizer.class, ACTDataAccessSubmissionDashboardPlace.Tokenizer.class, ACTAccessApprovalsPlace.Tokenizer.class, EmailInvitation.Tokenizer.class,
+		WikiDiff.Tokenizer.class, PasswordResetSignedTokenPlace.Tokenizer.class})
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {
 }

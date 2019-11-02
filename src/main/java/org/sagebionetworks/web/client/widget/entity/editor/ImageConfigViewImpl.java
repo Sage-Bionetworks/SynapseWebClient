@@ -15,7 +15,6 @@ import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -26,15 +25,17 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ImageConfigViewImpl implements ImageConfigView {
-	public interface ImageConfigViewImplUiBinder extends UiBinder<Widget, ImageConfigViewImpl> {}
+	public interface ImageConfigViewImplUiBinder extends UiBinder<Widget, ImageConfigViewImpl> {
+	}
+
 	private Widget widget;
-	
+
 	private Presenter presenter;
 	SageImageBundle sageImageBundle;
 	EntityFinder entityFinder;
 	ClientCache clientCache;
 	SynapseJSNIUtils synapseJSNIUtils;
-	
+
 	@UiField
 	TextBox nameField;
 	@UiField
@@ -43,17 +44,17 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	TextBox entityField;
 	@UiField
 	Button findEntitiesButton;
-	
+
 	@UiField
 	SimplePanel fileInputWidgetContainer;
 	@UiField
 	SimplePanel uploadParamsPanelContainer;
 	@UiField
 	SimplePanel wikiAttachmentsContainer;
-	
+
 	@UiField
 	SimplePanel synapseParamsPanelContainer;
-	
+
 	@UiField
 	TabListItem uploadTabListItem;
 	@UiField
@@ -74,16 +75,11 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	TabPane tab3;
 	@UiField
 	Text fileNameText;
-	
+
 	private ImageParamsPanel uploadParamsPanel, synapseParamsPanel;
-	
+
 	@Inject
-	public ImageConfigViewImpl(
-			ImageConfigViewImplUiBinder binder,
-			SageImageBundle sageImageBundle, EntityFinder entityFinder, ClientCache clientCache, SynapseJSNIUtils synapseJSNIUtils,
-			ImageParamsPanel synapseParamsPanel,
-			ImageParamsPanel uploadParamsPanel
-			) {
+	public ImageConfigViewImpl(ImageConfigViewImplUiBinder binder, SageImageBundle sageImageBundle, EntityFinder entityFinder, ClientCache clientCache, SynapseJSNIUtils synapseJSNIUtils, ImageParamsPanel synapseParamsPanel, ImageParamsPanel uploadParamsPanel) {
 		widget = binder.createAndBindUi(this);
 		this.sageImageBundle = sageImageBundle;
 		this.entityFinder = entityFinder;
@@ -91,18 +87,18 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseParamsPanel = synapseParamsPanel;
 		this.uploadParamsPanel = uploadParamsPanel;
-		
+
 		uploadParamsPanelContainer.setWidget(uploadParamsPanel.asWidget());
 		synapseParamsPanelContainer.setWidget(synapseParamsPanel.asWidget());
-		
+
 		initClickHandlers();
 	}
-	
+
 	private void initClickHandlers() {
 		findEntitiesButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				entityFinder.configure(EntityFilter.ALL_BUT_LINK, true, new SelectedHandler<Reference>() {					
+				entityFinder.configure(EntityFilter.ALL_BUT_LINK, true, new SelectedHandler<Reference>() {
 					@Override
 					public void onSelected(Reference selected) {
 						entityField.setValue(DisplayUtils.createEntityVersionString(selected));
@@ -113,13 +109,13 @@ public class ImageConfigViewImpl implements ImageConfigView {
 			}
 		});
 	}
-	
+
 	@Override
 	public void initView() {
 		uploadSuccessUI.setVisible(false);
 		uploadFailureUI.setVisible(false);
 		fileInputWidgetContainer.setVisible(true);
-		
+
 		entityField.setValue("");
 		urlField.setValue("");
 		nameField.setValue("");
@@ -127,18 +123,18 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		setWikiFilesTabVisible(true);
 		setExternalTabVisible(true);
 		setSynapseTabVisible(true);
-		
+
 		synapseTabListItem.setActive(false);
 		tab3.setActive(false);
 		externalTabListItem.setActive(false);
 		tab2.setActive(false);
 		uploadTabListItem.setActive(false);
 		tab1.setActive(false);
-		
+
 		uploadParamsPanel.clear();
 		synapseParamsPanel.clear();
 	}
-	
+
 	private ImageParamsPanel getCurrentParamsPanel() {
 		if (isSynapseEntity()) {
 			return synapseParamsPanel;
@@ -146,41 +142,44 @@ public class ImageConfigViewImpl implements ImageConfigView {
 			return uploadParamsPanel;
 		}
 	}
-	
+
 	@Override
 	public String getAlignment() {
 		return getCurrentParamsPanel().getAlignment();
 	}
-	
+
 	@Override
 	public void setAlignment(String alignment) {
 		getCurrentParamsPanel().setAlignment(alignment);
 	}
-	
+
 	@Override
 	public void setScale(Integer scale) {
 		getCurrentParamsPanel().setScale(scale);
 	}
-	
+
 	@Override
 	public Integer getScale() {
 		return getCurrentParamsPanel().getScale();
 	}
+
 	@Override
 	public void setAltText(String altText) {
 		getCurrentParamsPanel().setAltText(altText);
 	}
+
 	@Override
 	public String getAltText() {
-		return getCurrentParamsPanel().getAltText();	
+		return getCurrentParamsPanel().getAltText();
 	}
+
 	@Override
 	public void showUploadFailureUI(String error) {
 		uploadErrorText.setText(error);
 		uploadFailureUI.setVisible(true);
 		uploadSuccessUI.setVisible(false);
 	}
-	
+
 	@Override
 	public void showUploadSuccessUI(String fileName) {
 		fileInputWidgetContainer.setVisible(false);
@@ -189,22 +188,23 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		uploadSuccessUI.setVisible(true);
 		fileNameText.setText(fileName);
 	}
-	
+
 	@Override
 	public void setFileInputWidget(Widget fileInputWidget) {
 		fileInputWidgetContainer.clear();
 		fileInputWidgetContainer.setWidget(fileInputWidget);
 	}
+
 	@Override
 	public void setWikiAttachmentsWidget(Widget widget) {
 		wikiAttachmentsContainer.setWidget(widget);
 	}
-	
+
 	@Override
 	public void setWikiAttachmentsWidgetVisible(boolean visible) {
 		wikiAttachmentsContainer.setVisible(visible);
 	}
-	
+
 	@Override
 	public void checkParams() throws IllegalArgumentException {
 		if (isExternal()) {
@@ -215,27 +215,26 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		} else if (isSynapseEntity()) {
 			if (!DisplayUtils.isDefined(entityField.getValue()))
 				throw new IllegalArgumentException(DisplayConstants.INVALID_SYNAPSE_ID_MESSAGE);
-		} 
+		}
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
-	}	
+	}
 
-	@Override 
+	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-		
+
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override
-	public void showLoading() {
-	}
+	public void showLoading() {}
 
 	@Override
 	public void showInfo(String message) {
@@ -243,52 +242,55 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	}
 
 	@Override
-	public void clear() {
-	}
-	
+	public void clear() {}
+
 	@Override
 	public String getImageUrl() {
 		return urlField.getValue();
 	}
+
 	@Override
 	public String getExternalAltText() {
 		return nameField.getValue();
 	}
+
 	@Override
 	public void setImageUrl(String url) {
 		urlField.setValue(url);
 	}
-	
+
 	@Override
 	public String getSynapseId() {
 		return DisplayUtils.parseEntityVersionString(entityField.getValue()).getTargetId();
 	}
-	
+
 	@Override
 	public Long getVersion() {
 		return DisplayUtils.parseEntityVersionString(entityField.getValue()).getTargetVersionNumber();
 	}
+
 	@Override
 	public void showSynapseTab() {
 		synapseTabListItem.setActive(true);
 		tab3.setActive(true);
 	}
+
 	@Override
 	public void setSynapseId(String synapseId) {
 		entityField.setValue(synapseId);
 	}
-	
+
 	@Override
 	public boolean isExternal() {
 		return externalTabListItem.isActive();
 	}
-	
-	
+
+
 	@Override
 	public boolean isSynapseEntity() {
 		return synapseTabListItem.isActive();
 	}
-	
+
 	@Override
 	public void setExternalTabVisible(boolean visible) {
 		externalTabListItem.setEnabled(visible);
@@ -299,7 +301,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		uploadTabListItem.setVisible(visible);
 		tab1.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setSynapseTabVisible(boolean visible) {
 		synapseTabListItem.setVisible(visible);

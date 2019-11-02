@@ -1,21 +1,11 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_CANCEL;
-import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_DELETE;
-import static org.sagebionetworks.web.client.DisplayConstants.DANGER_BUTTON_STYLE;
-import static org.sagebionetworks.web.client.DisplayConstants.LINK_BUTTON_STYLE;
-
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
-import org.gwtbootstrap3.extras.bootbox.client.options.DialogOptions;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -26,7 +16,8 @@ import com.google.inject.Inject;
 
 public class ReplyWidgetViewImpl implements ReplyWidgetView {
 
-	public interface Binder extends UiBinder<Widget, ReplyWidgetViewImpl> {}
+	public interface Binder extends UiBinder<Widget, ReplyWidgetViewImpl> {
+	}
 
 	@UiField
 	Span author;
@@ -38,14 +29,14 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	Div synAlertContainer;
 	@UiField
 	Div copyTextModalContainer;
-	
+
 	@UiField
 	Icon deleteIcon;
 	@UiField
 	Icon editIcon;
 	@UiField
 	Icon linkIcon;
-	
+
 	@UiField
 	SimplePanel editReplyModalContainer;
 	@UiField
@@ -59,17 +50,17 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 
 	private Widget widget;
 	private ReplyWidget presenter;
-	
+
 	@Inject
-	public ReplyWidgetViewImpl (Binder binder) {
+	public ReplyWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		deleteIcon.addClickHandler(new ClickHandler(){
+		deleteIcon.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickDeleteReply();
 			}
 		});
-		editIcon.addClickHandler(new ClickHandler(){
+		editIcon.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
@@ -95,7 +86,7 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	}
 
 	@Override
-	public void setAuthor(Widget author){
+	public void setAuthor(Widget author) {
 		this.author.add(author);
 	}
 
@@ -153,7 +144,7 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	public void showSuccess(String title, String message) {
 		DisplayUtils.showInfo(message);
 	}
-	
+
 	@Override
 	public void setIsAuthorModerator(boolean isModerator) {
 		moderatorBadge.setVisible(isModerator);

@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,16 +8,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.ErrorResponseCode;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -36,24 +34,23 @@ import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * Editor dialog to view and modify the Access Control List of a given Entity.
- * This class is the Presenter in the MVP design pattern.
+ * Editor dialog to view and modify the Access Control List of a given Entity. This class is the
+ * Presenter in the MVP design pattern.
  * 
  * @author bkng
  */
 public class AccessControlListEditor implements AccessControlListEditorView.Presenter {
-	
+
 	private static final String ERROR_CANNOT_MODIFY_ACTIVE_USER_PERMISSIONS = "Current user permissions cannot be modified. Please select a different user.";
 	private static final String NULL_UEP_MESSAGE = "User's entity permissions are missing.";
 	private static final String NULL_ACL_MESSAGE = "ACL is missing.";
 	private static final String NULL_ENTITY_MESSAGE = "Entity is missing.";
-	
+
 	// Editor components
 	private AccessControlListEditorView view;
 	private SynapseClientAsync synapseClient;
@@ -63,28 +60,21 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	GWTWrapper gwt;
 	SynapseJavascriptClient jsClient;
 	QuizInfoDialog quizInfoDialog = null;
-	
+
 	// Entity components
 	private Entity entity;
 	private boolean canChangePermission;
 	private UserEntityPermissions uep;
-	private AccessControlList acl;	
+	private AccessControlList acl;
 	private Map<String, UserGroupHeader> userGroupHeaders;
 	private Set<String> originalPrincipalIdSet;
 	HasChangesHandler hasChangesHandler;
 	private SynapseAlert synAlert;
 	private String oldAclEtag;
 	private PortalGinInjector ginInjector;
-	
+
 	@Inject
-	public AccessControlListEditor(AccessControlListEditorView view,
-			SynapseClientAsync synapseClientAsync,
-			AuthenticationController authenticationController,
-			SynapseProperties synapseProperties,
-			GWTWrapper gwt,
-			SynapseJavascriptClient jsClient,
-			SynapseAlert synAlert,
-			PortalGinInjector ginInjector) {
+	public AccessControlListEditor(AccessControlListEditorView view, SynapseClientAsync synapseClientAsync, AuthenticationController authenticationController, SynapseProperties synapseProperties, GWTWrapper gwt, SynapseJavascriptClient jsClient, SynapseAlert synAlert, PortalGinInjector ginInjector) {
 		this.view = view;
 		this.synapseClient = synapseClientAsync;
 		fixServiceEntryPoint(synapseClient);
@@ -93,7 +83,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		this.jsClient = jsClient;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
-		
+
 		userGroupHeaders = new HashMap<String, UserGroupHeader>();
 		view.setPresenter(this);
 		view.setSynAlert(synAlert);
@@ -101,10 +91,9 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		initViewPrincipalIds();
 	}
 
-	
+
 	/**
-	 * Configure this widget before using it.
-	 * Set the entity with which this ACLEditor is associated.
+	 * Configure this widget before using it. Set the entity with which this ACLEditor is associated.
 	 */
 	public void configure(Entity entity, boolean canChangePermission, HasChangesHandler hasChangesHandler) {
 		synAlert.clear();
@@ -118,51 +107,53 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		this.canChangePermission = canChangePermission;
 		view.setPermissionsToDisplay(getPermList(), getPermissionsToDisplay());
 	}
-	
+
 	/**
 	 * Get the ID of the entity with which this ACLEditor is associated.
 	 */
 	public String getResourceId() {
 		return entity == null ? null : entity.getId();
 	}
-	
+
 	/**
 	 * Generate the ACLEditor Widget
 	 */
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	private void initViewPrincipalIds(){
+
+	private void initViewPrincipalIds() {
 		if (publicPrincipalIds != null) {
 			view.setPublicAclPrincipalId(publicPrincipalIds.getPublicAclPrincipalId());
 			view.setAuthenticatedAclPrinciapalId(publicPrincipalIds.getAuthenticatedAclPrincipalId());
 		}
 	}
-	
-	public static final PermissionLevel[] PERMISSIONS =  new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_DOWNLOAD, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};
-	
+
+	public static final PermissionLevel[] PERMISSIONS = new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_DOWNLOAD, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};
+
 	public PermissionLevel[] getPermList() {
 		return PERMISSIONS;
 	}
-	
+
 	public HashMap<PermissionLevel, String> getPermissionsToDisplay() {
 		HashMap<PermissionLevel, String> permissionDisplay = new HashMap<PermissionLevel, String>();
 		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
 		permissionDisplay.put(PermissionLevel.CAN_DOWNLOAD, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_DOWNLOAD);
 		permissionDisplay.put(PermissionLevel.CAN_EDIT, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT);
 		permissionDisplay.put(PermissionLevel.CAN_EDIT_DELETE, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT_DELETE);
-		permissionDisplay.put(PermissionLevel.CAN_ADMINISTER, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);		
+		permissionDisplay.put(PermissionLevel.CAN_ADMINISTER, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);
 		return permissionDisplay;
 	}
-	
+
 	/**
 	 * Refresh the ACLEditor by fetching from Synapse
 	 */
 	private void refresh(final AsyncCallback<Void> callback) {
-		if (this.entity.getId() == null) throw new IllegalStateException(NULL_ENTITY_MESSAGE);
+		if (this.entity.getId() == null)
+			throw new IllegalStateException(NULL_ENTITY_MESSAGE);
 		view.showLoading();
 		hasChangesHandler.hasChanges(false);
-		
+
 		EntityBundleRequest bundleRequest = new EntityBundleRequest();
 		bundleRequest.setIncludeBenefactorACL(true);
 		bundleRequest.setIncludePermissions(true);
@@ -173,13 +164,13 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 					// retrieve ACL and user entity permissions from bundle
 					acl = bundle.getBenefactorAcl();
 					uep = bundle.getPermissions();
-					//initialize original principal id set
+					// initialize original principal id set
 					originalPrincipalIdSet = new HashSet<String>();
 					for (final ResourceAccess ra : acl.getResourceAccess()) {
 						final String principalId = ra.getPrincipalId().toString();
 						originalPrincipalIdSet.add(principalId);
 					}
-					//default notification to true
+					// default notification to true
 					view.setIsNotifyPeople(true);
 					fetchUserGroupHeaders(new AsyncCallback<Void>() {
 						public void onSuccess(Void result) {
@@ -189,21 +180,23 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 							hasLocalACL_inRepo = (acl.getId().equals(entity.getId()));
 							callback.onSuccess(null);
 						};
+
 						public void onFailure(Throwable caught) {
 							onFailure(caught);
 						};
-					});				
+					});
 				} catch (Throwable e) {
-					onFailure(e);					
+					onFailure(e);
 				}
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				callback.onFailure(caught);
 			}
 		});
 	}
-	
+
 	/**
 	 * Send ACL details to the View.
 	 */
@@ -217,16 +210,16 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		updateIsPublicAccess();
 	}
 
-	private void updateIsPublicAccess(){
-		view.setIsPubliclyVisible(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));	
+	private void updateIsPublicAccess() {
+		view.setIsPubliclyVisible(PublicPrivateBadge.isPublic(acl, publicPrincipalIds));
 	}
-	
+
 	@Override
 	public void makePrivate() {
-		//try to remove the public principal ids from the acl
+		// try to remove the public principal ids from the acl
 		List<Long> toRemove = new ArrayList<Long>();
 		for (ResourceAccess ra : acl.getResourceAccess()) {
-			if (publicPrincipalIds.getAuthenticatedAclPrincipalId().equals(ra.getPrincipalId())){
+			if (publicPrincipalIds.getAuthenticatedAclPrincipalId().equals(ra.getPrincipalId())) {
 				toRemove.add(publicPrincipalIds.getAuthenticatedAclPrincipalId());
 			} else if (publicPrincipalIds.getPublicAclPrincipalId().equals(ra.getPrincipalId())) {
 				toRemove.add(publicPrincipalIds.getPublicAclPrincipalId());
@@ -235,24 +228,23 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			}
 		}
 		for (Long id : toRemove) {
-			removeAccess(id);	
+			removeAccess(id);
 		}
 	}
-	
+
 	private void populateAclEntries() {
 		for (final ResourceAccess ra : acl.getResourceAccess()) {
 			final String principalId = ra.getPrincipalId().toString();
 			final UserGroupHeader header = userGroupHeaders.get(principalId);
 			if (header != null) {
-				String title = header.getIsIndividual() ? DisplayUtils.getDisplayName(header.getFirstName(), header.getLastName(), header.getUserName()) : 
-					header.getUserName();
+				String title = header.getIsIndividual() ? DisplayUtils.getDisplayName(header.getFirstName(), header.getLastName(), header.getUserName()) : header.getUserName();
 				view.addAclEntry(new AclEntry(principalId, ra.getAccessType(), title, "", header.getIsIndividual()));
 			} else {
 				synAlert.showError("Could not find user " + principalId);
 			}
 		}
 	}
-	
+
 	private void fetchUserGroupHeaders(final AsyncCallback<Void> callback) {
 		ArrayList<String> ids = new ArrayList<String>();
 		for (ResourceAccess ra : acl.getResourceAccess())
@@ -260,7 +252,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		ids.add(publicPrincipalIds.getAuthenticatedAclPrincipalId().toString());
 		ids.add(publicPrincipalIds.getAnonymousUserPrincipalId().toString());
 		ids.add(publicPrincipalIds.getPublicAclPrincipalId().toString());
-		jsClient.getUserGroupHeadersById(ids, new AsyncCallback<UserGroupHeaderResponsePage>(){
+		jsClient.getUserGroupHeadersById(ids, new AsyncCallback<UserGroupHeaderResponsePage>() {
 			@Override
 			public void onSuccess(UserGroupHeaderResponsePage response) {
 				for (UserGroupHeader ugh : response.getChildren())
@@ -268,6 +260,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 				if (callback != null)
 					callback.onSuccess(null);
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				if (callback != null)
@@ -275,14 +268,14 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			}
 		});
 	}
-	
+
 	@Override
 	public void setAccess(Long principalId, PermissionLevel permissionLevel) {
 		validateEditorState();
 		synAlert.clear();
 		if (principalId.equals(publicPrincipalIds.getPublicAclPrincipalId()))
 			uep.setCanPublicRead(true);
-		
+
 		ResourceAccess toSet = null;
 		for (ResourceAccess ra : acl.getResourceAccess()) {
 			if (ra.getPrincipalId().equals(principalId))
@@ -310,14 +303,15 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 				// update the view
 				setViewDetails();
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
-				// update the view anyway - will fetch individual Profiles					
+				// update the view anyway - will fetch individual Profiles
 				setViewDetails();
 			}
 		};
 	}
-	
+
 	@Override
 	public void removeAccess(Long principalIdToRemove) {
 		validateEditorState();
@@ -334,7 +328,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		for (ResourceAccess ra : acl.getResourceAccess()) {
 			if (!ra.getPrincipalId().equals(principalIdToRemove)) {
 				newRAs.add(ra);
-			} else {				
+			} else {
 				foundUser = true;
 			}
 		}
@@ -358,16 +352,16 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		}
 		acl.setId(entity.getId());
 		acl.setCreationDate(new Date());
-		// SWC-3795.  if deleted and recreating, use old etag (we're updating)
+		// SWC-3795. if deleted and recreating, use old etag (we're updating)
 		if (oldAclEtag != null) {
-			acl.setEtag(oldAclEtag);	
+			acl.setEtag(oldAclEtag);
 		}
-		
+
 		hasChangesHandler.hasChanges(true);
 		// SWC-4944: add current user explicitly as admin to new ACL
 		setAccess(Long.parseLong(getCurrentUserId()), PermissionLevel.CAN_ADMINISTER);
 	}
-	
+
 	@Override
 	public void deleteAcl() {
 		synAlert.clear();
@@ -380,7 +374,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			synAlert.showError("Cannot enable inheritance on this entity!");
 			return;
 		}
-		// SWC-3795.  if deleted and recreating, remember old etag (to indicate that we're updating the existing)
+		// SWC-3795. if deleted and recreating, remember old etag (to indicate that we're updating the
+		// existing)
 		oldAclEtag = acl.getEtag();
 		// Fetch parent's benefactor's ACL (candidate benefactor for this entity)
 		synapseClient.getEntityBenefactorAcl(entity.getParentId(), new AsyncCallback<AccessControlList>() {
@@ -389,31 +384,33 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 				try {
 					acl = result;
 					hasChangesHandler.hasChanges(hasLocalACL_inRepo);
-					fetchUserGroupHeaders(updateViewDetailsCallback());					
+					fetchUserGroupHeaders(updateViewDetailsCallback());
 				} catch (Throwable e) {
 					onFailure(e);
 				}
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
 		});
 	}
-	
+
 	public void pushChangesToSynapse(final boolean recursive, final Callback changesPushedCallback) {
 		validateEditorState();
 		synAlert.clear();
 		// Create an async callback to receive the updated ACL from Synapse
-		AsyncCallback<AccessControlList> callback = new AsyncCallback<AccessControlList>(){
+		AsyncCallback<AccessControlList> callback = new AsyncCallback<AccessControlList>() {
 			@Override
 			public void onSuccess(AccessControlList result) {
 				acl = result;
-				hasLocalACL_inRepo = (acl.getId().equals(entity.getId()));				
+				hasLocalACL_inRepo = (acl.getId().equals(entity.getId()));
 				setViewDetails();
 				view.showInfoSuccess("Success", "Permissions were successfully saved to Synapse");
 				changesPushedCallback.invoke();
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				// due to certification state? (see PLFM-5479)
@@ -425,14 +422,14 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 				}
 			}
 		};
-		
+
 		applyChanges(recursive, callback);
 	}
-	
+
 	protected void applyChanges(boolean recursive, AsyncCallback<AccessControlList> callback) {
 		// Apply changes
 		boolean hasLocalACL_inPortal = (acl.getId().equals(entity.getId()));
-		
+
 		if (hasLocalACL_inPortal && !hasLocalACL_inRepo) {
 			// Local ACL exists in Portal, but does not exist in Repo
 			// Create local ACL in Repo
@@ -453,36 +450,37 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			throw new IllegalStateException("Cannot modify an inherited ACL.");
 		}
 	}
+
 	public void notifyNewUsers() {
 		if (view.isNotifyPeople()) {
-			//create the principal id set
+			// create the principal id set
 			HashSet<String> newPrincipalIdSet = new HashSet<String>();
 			for (ResourceAccess ra : acl.getResourceAccess()) {
-				//SWC-1195: only notify individuals (not teams)
+				// SWC-1195: only notify individuals (not teams)
 				UserGroupHeader header = userGroupHeaders.get(ra.getPrincipalId().toString());
 				if (header != null && header.getIsIndividual()) {
 					newPrincipalIdSet.add(ra.getPrincipalId().toString());
 				}
 			}
-			//now remove all of the original entries
+			// now remove all of the original entries
 			for (String principalId : originalPrincipalIdSet) {
 				newPrincipalIdSet.remove(principalId);
 			}
-			//never try to notify all users
+			// never try to notify all users
 			newPrincipalIdSet.remove(publicPrincipalIds.getAnonymousUserPrincipalId().toString());
 			newPrincipalIdSet.remove(publicPrincipalIds.getAuthenticatedAclPrincipalId().toString());
 			newPrincipalIdSet.remove(publicPrincipalIds.getPublicAclPrincipalId().toString());
-			
+
 			if (newPrincipalIdSet.size() > 0) {
-				//now send a message to these users
+				// now send a message to these users
 				String userDisplayName = DisplayUtils.getDisplayName(authenticationController.getCurrentUserProfile());
 				String message = DisplayUtils.getShareMessage(userDisplayName, entity.getId(), gwt.getHostPageBaseURL());
 				String subject = entity.getName() + DisplayConstants.SHARED_ON_SYNAPSE_SUBJECT;
 				synAlert.clear();
 				synapseClient.sendMessage(newPrincipalIdSet, subject, message, gwt.getHostPageBaseURL(), new AsyncCallback<String>() {
 					@Override
-					public void onSuccess(String result) {
-					}
+					public void onSuccess(String result) {}
+
 					@Override
 					public void onFailure(Throwable caught) {
 						synAlert.handleException(caught);
@@ -491,21 +489,23 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			}
 		}
 	}
+
 	public String getDisplayName(String principalId) {
-		//get the user group header for this resource
+		// get the user group header for this resource
 		UserGroupHeader header = userGroupHeaders.get(principalId);
 		if (header != null) {
 			return DisplayUtils.getDisplayName(header);
 		}
 		return "(Unknown user)";
 	}
+
 	/**
 	 * @return the uep associated with the entity
 	 */
 	public UserEntityPermissions getUserEntityPermissions() {
 		return uep;
 	}
-	
+
 	private String getCurrentUserId() {
 		return authenticationController.getCurrentUserPrincipalId();
 	}
@@ -514,17 +514,19 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	 * Ensure the editor has a valid Entity ID, ACL, and User Permissions.
 	 */
 	private void validateEditorState() {
-		if (this.entity.getId() == null) throw new IllegalStateException(NULL_ENTITY_MESSAGE);
-		if (this.acl == null) throw new IllegalStateException(NULL_ACL_MESSAGE);
-		if (this.uep == null) throw new IllegalStateException(NULL_UEP_MESSAGE);
+		if (this.entity.getId() == null)
+			throw new IllegalStateException(NULL_ENTITY_MESSAGE);
+		if (this.acl == null)
+			throw new IllegalStateException(NULL_ACL_MESSAGE);
+		if (this.uep == null)
+			throw new IllegalStateException(NULL_UEP_MESSAGE);
 	}
 
 	public void refresh() {
 		synAlert.clear();
 		refresh(new AsyncCallback<Void>() {
 			@Override
-			public void onSuccess(Void result) {
-			}
+			public void onSuccess(Void result) {}
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -532,18 +534,21 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			}
 		});
 	}
+
 	/**
 	 * This handler is notified when there are changes made to the editor.
 	 */
-	public interface HasChangesHandler{
+	public interface HasChangesHandler {
 		/**
-		 * Called with true then the user has changes in the editor.  Called with false when there are no changes in this editor.
-		 * @param hasChanges True when there are changes.  False when there are no changes.
+		 * Called with true then the user has changes in the editor. Called with false when there are no
+		 * changes in this editor.
+		 * 
+		 * @param hasChanges True when there are changes. False when there are no changes.
 		 */
 		void hasChanges(boolean hasChanges);
-		
+
 	}
-	
+
 	public QuizInfoDialog getQuizInfoDialog() {
 		if (quizInfoDialog == null) {
 			quizInfoDialog = ginInjector.getQuizInfoDialog();

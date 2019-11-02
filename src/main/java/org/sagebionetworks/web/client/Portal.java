@@ -5,7 +5,6 @@ import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
-
 import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -24,7 +23,8 @@ import com.google.gwt.user.client.ui.SimplePanel;
  */
 public class Portal implements EntryPoint {
 
-	// If there's a failure to load the code from the server, how long (in ms) should we wait before trying again...
+	// If there's a failure to load the code from the server, how long (in ms) should we wait before
+	// trying again...
 	public static final int CODE_LOAD_DELAY = 5000;
 	// We are using gin to create all of our objects
 	private static final PortalGinInjector ginjector = GWT.create(PortalGinInjector.class);
@@ -63,7 +63,8 @@ public class Portal implements EntryPoint {
 				@Override
 				public void onSuccess() {
 					try {
-						// previous session will be detected on place change (if there is one). do not block app load to check.
+						// previous session will be detected on place change (if there is one). do not block app load to
+						// check.
 						// make sure jsni utils code is available to the client
 						ginjector.getSynapseJSNIUtils();
 						EventBus eventBus = ginjector.getEventBus();
@@ -101,7 +102,8 @@ public class Portal implements EntryPoint {
 
 								// start version timer
 								ginjector.getVersionTimer().start();
-								// start timer to check for user session state change (session expired, or user explicitly logged out)
+								// start timer to check for user session state change (session expired, or user explicitly logged
+								// out)
 								ginjector.getSessionDetector().start();
 								// start timer to check for Synapse outage or scheduled maintenance
 								ginjector.getSynapseStatusDetector().start();

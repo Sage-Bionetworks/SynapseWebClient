@@ -4,9 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.Arrays;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -77,6 +75,7 @@ public class CellFactoryImplTest {
 	UserIdCellRenderer mockUserIdCellRenderer;
 	@Mock
 	LargeStringCellEditor mockLargeStringCellEditor;
+
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
@@ -106,95 +105,95 @@ public class CellFactoryImplTest {
 	 */
 	@Test
 	public void testEditorAllTypes() {
-		for(ColumnType type: ColumnType.values()){
+		for (ColumnType type : ColumnType.values()) {
 			ColumnModel cm = new ColumnModel();
 			cm.setColumnType(type);
 			Cell cell = cellFactory.createEditor(cm);
-			assertNotNull("Could not create a cell editor for type: "+type, cell);
+			assertNotNull("Could not create a cell editor for type: " + type, cell);
 		}
 	}
-	
+
 	/**
 	 * Must be able to get a cell renderer for each column type.
 	 */
 	@Test
 	public void testRendererAllTypes() {
-		for(ColumnType type: ColumnType.values()){
+		for (ColumnType type : ColumnType.values()) {
 			ColumnModel cm = new ColumnModel();
 			cm.setColumnType(type);
 			Cell cell = cellFactory.createRenderer(cm);
-			assertNotNull("Could not create a cell renderer for type: "+type, cell);
+			assertNotNull("Could not create a cell renderer for type: " + type, cell);
 		}
 	}
-	
+
 
 	/**
 	 * Must be able to get a form cell editor for each column type.
 	 */
 	@Test
 	public void testFormEditorAllTypes() {
-		for(ColumnType type: ColumnType.values()){
+		for (ColumnType type : ColumnType.values()) {
 			ColumnModel cm = new ColumnModel();
 			cm.setColumnType(type);
 			Cell cell = cellFactory.createFormEditor(cm);
-			assertNotNull("Could not create a cell editor for type: "+type, cell);
+			assertNotNull("Could not create a cell editor for type: " + type, cell);
 		}
 	}
-	
+
 	@Test
-	public void testGetEntityIdRenderer(){
+	public void testGetEntityIdRenderer() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.ENTITYID);
 		assertEquals(mockEntityIdCellRenderer, cellFactory.createRenderer(cm));
 	}
-	
+
 	@Test
-	public void testGetLinkCellRenderer(){
+	public void testGetLinkCellRenderer() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.LINK);
 		assertEquals(mockLinkCellRenderer, cellFactory.createRenderer(cm));
 	}
-	
+
 	@Test
-	public void testGetEntityIdEditor(){
+	public void testGetEntityIdEditor() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.ENTITYID);
 		assertEquals(mockEntityIdCellEditor, cellFactory.createEditor(cm));
 	}
-	
+
 	@Test
-	public void testGetEntityIdFormEditor(){
+	public void testGetEntityIdFormEditor() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.ENTITYID);
 		assertEquals(mockEntityIdCellEditor, cellFactory.createFormEditor(cm));
 	}
-	
+
 	@Test
-	public void testGetEnumEditor(){
+	public void testGetEnumEditor() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.STRING);
-		cm.setEnumValues(Arrays.asList("a","b","c"));
+		cm.setEnumValues(Arrays.asList("a", "b", "c"));
 		assertEquals(mockEnumEditor, cellFactory.createEditor(cm));
 		// should be configured with the enum values
 		verify(mockEnumEditor).configure(cm.getEnumValues());
 	}
 
 	@Test
-	public void testGetBooleanEditor(){
+	public void testGetBooleanEditor() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.BOOLEAN);
 		assertEquals(mockBooleanCellEditor, cellFactory.createEditor(cm));
 	}
-	
+
 	@Test
-	public void testGetBooleanFormEditor(){
+	public void testGetBooleanFormEditor() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.BOOLEAN);
 		assertEquals(mockBooleanFormCellEditor, cellFactory.createFormEditor(cm));
 	}
-	
+
 	@Test
-	public void testGetEditorDefaultValueNull(){
+	public void testGetEditorDefaultValueNull() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.STRING);
 		cm.setDefaultValue(null);
@@ -202,10 +201,10 @@ public class CellFactoryImplTest {
 		// The null default value should be passed to the editor.
 		verify(mockStringEditorCell).setValue(null);
 	}
-	
+
 
 	@Test
-	public void testGetFormEditorDefaultValueNull(){
+	public void testGetFormEditorDefaultValueNull() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.STRING);
 		cm.setDefaultValue(null);
@@ -213,9 +212,9 @@ public class CellFactoryImplTest {
 		// The null default value should be passed to the editor.
 		verify(mockStringEditorCell).setValue(null);
 	}
-	
+
 	@Test
-	public void testGetEditorDefaultValueNotNull(){
+	public void testGetEditorDefaultValueNotNull() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.STRING);
 		cm.setDefaultValue("a default value");
@@ -223,10 +222,10 @@ public class CellFactoryImplTest {
 		// The null default value should be passed to the editor.
 		verify(mockStringEditorCell).setValue(cm.getDefaultValue());
 	}
-	
+
 
 	@Test
-	public void testGetFormEditorDefaultValueNotNull(){
+	public void testGetFormEditorDefaultValueNotNull() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.STRING);
 		cm.setDefaultValue("a default value");
@@ -234,86 +233,86 @@ public class CellFactoryImplTest {
 		// The null default value should be passed to the editor.
 		verify(mockStringEditorCell).setValue(cm.getDefaultValue());
 	}
-	
+
 	@Test
-	public void testGetDateCellEditor(){
+	public void testGetDateCellEditor() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.DATE);
 		assertEquals(mockDateCellEditor, cellFactory.createEditor(cm));
 	}
-	
+
 	@Test
-	public void testGetDateFormCellEditor(){
+	public void testGetDateFormCellEditor() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.DATE);
 		assertEquals(mockDateCellEditor, cellFactory.createFormEditor(cm));
 	}
-	
+
 	@Test
-	public void testGetDateCellRenderer(){
+	public void testGetDateCellRenderer() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.DATE);
 		assertEquals(mockDateCellRenderer, cellFactory.createRenderer(cm));
 	}
-	
+
 	@Test
-	public void testGetDoubleEditor(){
+	public void testGetDoubleEditor() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.DOUBLE);
 		assertEquals(mockDoubleCellEditor, cellFactory.createEditor(cm));
 	}
-	
+
 	@Test
-	public void testGetDoubleFormEditor(){
+	public void testGetDoubleFormEditor() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.DOUBLE);
 		assertEquals(mockDoubleCellEditor, cellFactory.createFormEditor(cm));
 	}
-	
+
 	@Test
-	public void testGetIntegerEditor(){
+	public void testGetIntegerEditor() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.INTEGER);
 		assertEquals(mockIntegerCellEditor, cellFactory.createEditor(cm));
 	}
-	
+
 	@Test
-	public void testGetIntegerFormEditor(){
+	public void testGetIntegerFormEditor() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.INTEGER);
 		assertEquals(mockIntegerCellEditor, cellFactory.createFormEditor(cm));
 	}
-	
+
 	@Test
-	public void testGetFileCellEditor(){
+	public void testGetFileCellEditor() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.FILEHANDLEID);
 		assertEquals(mockFileCellEditor, cellFactory.createEditor(cm));
 	}
-	
+
 	@Test
-	public void testGetFileFormCellEditor(){
+	public void testGetFileFormCellEditor() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.FILEHANDLEID);
 		assertEquals(mockFileCellEditor, cellFactory.createFormEditor(cm));
 	}
-	
+
 	@Test
-	public void testGetLargeStringCellEditor(){
+	public void testGetLargeStringCellEditor() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.LARGETEXT);
 		assertEquals(mockLargeStringCellEditor, cellFactory.createFormEditor(cm));
 	}
 
 	@Test
-	public void testGetFileCellRenderer(){
+	public void testGetFileCellRenderer() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.FILEHANDLEID);
 		assertEquals(mockFileCellRenderer, cellFactory.createRenderer(cm));
 	}
-	
+
 	@Test
-	public void testGetStringCellEditor(){
+	public void testGetStringCellEditor() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.STRING);
 		Long maxSize = 13L;
@@ -322,9 +321,9 @@ public class CellFactoryImplTest {
 		// The max size must get passed to the editor
 		verify(mockStringEditorCell).setMaxSize(maxSize);
 	}
-	
+
 	@Test
-	public void testGetStringFormCellEditor(){
+	public void testGetStringFormCellEditor() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.STRING);
 		Long maxSize = 13L;

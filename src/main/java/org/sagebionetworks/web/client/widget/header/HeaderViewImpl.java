@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.header;
 
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
@@ -32,7 +31,6 @@ import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -72,10 +70,10 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	SimplePanel loginLinkUI;
 	@UiField
 	Button loginLink;
-	
+
 	@UiField
 	Span headerButtons;
-	
+
 	@UiField
 	AnchorListItem trashLink;
 	@UiField
@@ -102,7 +100,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	AnchorListItem xsFavoritesLink;
 	@UiField
 	AnchorListItem xsSearchLink;
-	
+
 	@UiField
 	DropDown dashboardDropdown;
 	@UiField
@@ -125,7 +123,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	Anchor cookieNotificationLearnMoreLink;
 	@UiField
 	Button cookieNotificationAlertOkButton;
-	
+
 	@UiField
 	Alert portalAlert;
 	@UiField
@@ -136,7 +134,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	Span portalName;
 	@UiField
 	FocusPanel portalLogoFocusPanel;
-	
+
 	private Presenter presenter;
 	private SearchBox searchBox;
 	private CookieProvider cookies;
@@ -146,15 +144,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	String userId;
 	AnchorListItem defaultItem = new AnchorListItem("Empty");
 	String portalHref = "";
-	
+
 	@Inject
-	public HeaderViewImpl(Binder binder,
-			SageImageBundle sageImageBundle,
-			SearchBox searchBox,
-			CookieProvider cookies,
-			UserBadge userBadge,
-			GlobalApplicationState globalAppState
-			) {
+	public HeaderViewImpl(Binder binder, SageImageBundle sageImageBundle, SearchBox searchBox, CookieProvider cookies, UserBadge userBadge, GlobalApplicationState globalAppState) {
 		this.initWidget(binder.createAndBindUi(this));
 		this.searchBox = searchBox;
 		this.cookies = cookies;
@@ -183,7 +175,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		starIcon.setPaddingBottom(12);
 		starIcon.setPaddingLeft(5);
 		headerFavAnchor.add(starIcon);
-		
+
 		angleDown = new Icon(IconType.ANGLE_DOWN);
 		angleDown.setColor("white");
 		angleDown.setPull(Pull.RIGHT);
@@ -193,7 +185,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		angleDown.setPaddingLeft(1);
 		angleDown.setMarginLeft(0);
 		headerFavAnchor.add(angleDown);
-		
+
 		cookieNotificationAlertOkButton.addClickHandler(event -> {
 			presenter.onCookieNotificationDismissed();
 		});
@@ -201,12 +193,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		initClickHandlers();
 		clear();
 	}
-	
+
 	@Override
 	public void clear() {
 		setProjectHeaderText("");
 	}
-	
+
 	@Override
 	public void setProjectHeaderText(String text) {
 		boolean isDefault = Header.SYNAPSE.equals(text);
@@ -217,12 +209,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		}
 		projectHeadingAnchor.setText(text);
 	}
-	
+
 	@Override
 	public void setProjectHeaderAnchorTarget(String href) {
 		projectHeadingAnchor.setHref(href);
 	}
-	
+
 	@Override
 	public void setProjectFavoriteWidget(IsWidget favWidget) {
 		projectFavoritePanelUI.clear();
@@ -233,12 +225,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public void showProjectFavoriteWidget() {
 		projectFavoritePanelUI.setVisible(true);
 	}
-	
+
 	@Override
 	public void hideProjectFavoriteWidget() {
 		projectFavoritePanelUI.setVisible(false);
 	}
-	
+
 	public void initClickHandlers() {
 		documentationLink.addClickHandler(event -> {
 			event.preventDefault();
@@ -249,7 +241,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			DisplayUtils.newWindow("mailto:synapseinfo@sagebionetworks.org", "", "");
 		});
 		trashLink.addClickHandler(event -> {
-    		presenter.onTrashClick();
+			presenter.onTrashClick();
 		});
 		logoutLink.addClickHandler(event -> {
 			presenter.onLogoutClick();
@@ -260,7 +252,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		synapseLogo.addClickHandler(event -> {
 			presenter.onLogoClick();
 		});
-		
+
 		myProfileLink.addClickHandler(event -> {
 			Profile place = new Profile(userId, ProfileArea.PROFILE);
 			globalAppState.getPlaceChanger().goTo(place);
@@ -292,12 +284,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		sendFeedbackLink.addClickHandler(event -> {
 			// pendo should also listen for click event on this element
 		});
-		
+
 		xsFavoritesLink.addClickHandler(event -> {
 			Profile place = new Profile(userId + "/projects/favorites");
 			globalAppState.getPlaceChanger().goTo(place);
 		});
-		
+
 		xsSearchLink.addClickHandler(event -> {
 			Search place = new Search("");
 			globalAppState.getPlaceChanger().goTo(place);
@@ -312,7 +304,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			}
 		});
 	}
-	
+
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -334,19 +326,19 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public void openNewWindow(String url) {
 		DisplayUtils.newWindow(url, "", "");
 	}
-	
+
 	@Override
 	public void setUser(UserProfile profile) {
 		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
-	 	trashLink.setVisible(isInTestWebsite);
-	 	userBadge.clearState();
-	 	signedInAsName.setText("");
-	 	if (profile != null) {
-			//has user data, update the user name and add user commands (and set to the current user name)
-	 		userBadge.configure(profile);
-	 		userBadge.setDoNothingOnClick();
-	 		userId = profile.getOwnerId();
-	 		loginLinkUI.setVisible(false);
+		trashLink.setVisible(isInTestWebsite);
+		userBadge.clearState();
+		signedInAsName.setText("");
+		if (profile != null) {
+			// has user data, update the user name and add user commands (and set to the current user name)
+			userBadge.configure(profile);
+			userBadge.setDoNothingOnClick();
+			userId = profile.getOwnerId();
+			loginLinkUI.setVisible(false);
 			logoutLink.setVisible(true);
 			dashboardDropdown.setVisible(true);
 			headerFavDropdown.setVisible(true);
@@ -385,30 +377,35 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
 	@Override
 	public void setStagingAlertVisible(boolean visible) {
-		stagingAlert.setVisible(visible);	
+		stagingAlert.setVisible(visible);
 	}
+
 	@Override
 	public void setCookieNotificationVisible(boolean visible) {
 		cookieNotificationAlert.setVisible(visible);
 	}
-	
+
 	/** Event binder code **/
-	interface EBinder extends EventBinder<Header> {};
+	interface EBinder extends EventBinder<Header> {
+	};
+
 	private final EBinder eventBinder = GWT.create(EBinder.class);
-	
+
 	@Override
 	public EventBinder<Header> getEventBinder() {
 		return eventBinder;
 	}
+
 	@Override
 	public void setDownloadListFileCount(Integer count) {
 		downloadListFileCount.setText(count.toString());
 	}
+
 	@Override
 	public void setDownloadListUIVisible(boolean visible) {
 		downloadListNotificationUI.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setPortalAlertVisible(boolean visible, JSONObjectAdapter json) {
 		if (visible) {
@@ -416,7 +413,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				if (json.has("backgroundColor")) {
 					String color = json.getString("backgroundColor");
 					String oldStyle = portalAlert.getElement().getAttribute("style");
-					portalAlert.getElement().setAttribute("style", oldStyle + ";background-color: "+color+";");
+					portalAlert.getElement().setAttribute("style", oldStyle + ";background-color: " + color + ";");
 				}
 				if (json.has("foregroundColor")) {
 					String color = json.getString("foregroundColor");
@@ -431,7 +428,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 					if (!name.trim().isEmpty()) {
 						portalName.setText(name);
 						portalName.setVisible(true);
-						portalLogo.setVisible(false);	
+						portalLogo.setVisible(false);
 					}
 				}
 				if (json.has("logoUrl")) {
@@ -439,7 +436,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 					if (!logoUrl.trim().isEmpty()) {
 						portalLogo.setUrl(logoUrl);
 						portalName.setVisible(false);
-						portalLogo.setVisible(true);	
+						portalLogo.setVisible(true);
 					}
 				}
 				portalAlert.setVisible(true);

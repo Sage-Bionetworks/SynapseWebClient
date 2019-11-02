@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget;
 
 import java.util.Iterator;
-
 import org.gwtbootstrap3.client.ui.Radio;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -12,7 +10,7 @@ import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class RadioWidgetViewImpl implements RadioWidget{
+public class RadioWidgetViewImpl implements RadioWidget {
 	@UiField
 	FocusPanel item;
 	@UiField
@@ -20,12 +18,13 @@ public class RadioWidgetViewImpl implements RadioWidget{
 
 	private Widget widget;
 
-	public interface Binder extends UiBinder<Widget, RadioWidgetViewImpl> {}
+	public interface Binder extends UiBinder<Widget, RadioWidgetViewImpl> {
+	}
 
 	@Inject
 	public RadioWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		item.addClickHandler(new ClickHandler(){
+		item.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {

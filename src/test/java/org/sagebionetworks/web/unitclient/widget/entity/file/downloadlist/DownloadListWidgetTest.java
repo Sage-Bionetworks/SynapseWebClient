@@ -1,11 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.entity.file.downloadlist;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +36,6 @@ import org.sagebionetworks.web.client.widget.entity.file.downloadlist.FileHandle
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.PackageSizeSummary;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -41,7 +43,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class DownloadListWidgetTest {
 	DownloadListWidget widget;
 	@Mock
-	DownloadListWidgetView mockView; 
+	DownloadListWidgetView mockView;
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
@@ -60,7 +62,7 @@ public class DownloadListWidgetTest {
 	ArgumentCaptor<CallbackP<Double>> addToPackageSizeCallbackCaptor;
 	@Captor
 	ArgumentCaptor<CallbackP<FileHandleAssociation>> onRemoveFileHandleAssociationCaptor;
-	
+
 	@Mock
 	DownloadOrder mockDownloadOrder;
 	@Mock
@@ -77,7 +79,7 @@ public class DownloadListWidgetTest {
 	BulkFileDownloadResponse mockBulkFileDownloadResponse;
 	@Mock
 	InlineAsynchronousProgressViewImpl mockInlineAsynchronousProgressView;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		widget = new DownloadListWidget(mockView, mockSynAlert, mockJsClient, mockEventBus, mockFhaTable, mockPackageSizeSummary, mockProgressWidget, mockInlineAsynchronousProgressView, mockJsniUtils);
@@ -103,18 +105,18 @@ public class DownloadListWidgetTest {
 	@Test
 	public void testRefresh() {
 		widget.refresh();
-		
+
 		verify(mockView).setCreatePackageUIVisible(true);
 		verify(mockView).setDownloadPackageUIVisible(false);
 		verify(mockPackageSizeSummary, times(2)).clear();
 		verify(mockFhaTable).configure(eq(mockFhas), addToPackageSizeCallbackCaptor.capture(), onRemoveFileHandleAssociationCaptor.capture());
-	
-		//verify add file size 
+
+		// verify add file size
 		Double fileSize = 4.0;
 		addToPackageSizeCallbackCaptor.getValue().invoke(fileSize);
 		verify(mockPackageSizeSummary).addFile(fileSize);
-		
-		//verify remove file
+
+		// verify remove file
 		onRemoveFileHandleAssociationCaptor.getValue().invoke(mockFha);
 		verify(mockJsClient).removeFileFromDownloadList(eq(mockFha), any(AsyncCallback.class));
 	}
@@ -122,30 +124,30 @@ public class DownloadListWidgetTest {
 	@Test
 	public void testOnCreatePackageEmptyZipfileName() {
 		widget.onCreatePackage("");
-		
+
 		verify(mockSynAlert).showError(DownloadListWidget.EMPTY_FILENAME_MESSAGE_);
 		verify(mockJsClient, never()).createDownloadOrderFromUsersDownloadList(anyString(), any(AsyncCallback.class));
 	}
-	
+
 	@Test
 	public void testOnCreatePackage() {
 		String fileName = "package";
 		when(mockDownloadOrder.getZipFileName()).thenReturn(fileName + DownloadListWidget.ZIP_EXTENSION);
-		
+
 		widget.onCreatePackage(fileName);
-		
+
 		verify(mockJsClient).createDownloadOrderFromUsersDownloadList(eq(fileName + DownloadListWidget.ZIP_EXTENSION), any(AsyncCallback.class));
 		verify(mockView).setProgressTrackingWidgetVisible(true);
 		verify(mockView).setCreatePackageUIVisible(false);
 		verify(mockJsniUtils).sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, DownloadListWidget.DOWNLOAD_LIST_PACKAGE_CREATED_EVENT_NAME);
 		verify(mockProgressWidget).startAndTrackJob(anyString(), eq(false), eq(AsynchType.BulkFileDownload), requestCaptor.capture(), progressHandlerCaptor.capture());
-		
-		//verify request
+
+		// verify request
 		BulkFileDownloadRequest request = requestCaptor.getValue();
 		assertEquals(mockFhas, request.getRequestedFiles());
 		assertEquals(fileName + DownloadListWidget.ZIP_EXTENSION, request.getZipFileName());
-		
-		//verify successful async job
+
+		// verify successful async job
 		String downloadUrl = "presignedurl";
 		when(mockJsniUtils.getRawFileHandleUrl(anyString())).thenReturn(downloadUrl);
 		String resultFileHandleId = "87654";
@@ -160,20 +162,20 @@ public class DownloadListWidgetTest {
 	public void testOnDownloadPackageFailureCreatingOrder() {
 		Exception ex = new Exception("failed to create order");
 		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).createDownloadOrderFromUsersDownloadList(anyString(), any(AsyncCallback.class));
-		
+
 		widget.onCreatePackage("test");
-		
+
 		verify(mockSynAlert).handleException(ex);
 	}
-	
+
 	@Test
 	public void testFailureCreatingPackage() {
 		Exception ex = new Exception("failed to create package");
 		widget.startDownload(mockDownloadOrder);
 		verify(mockProgressWidget).startAndTrackJob(anyString(), eq(false), eq(AsynchType.BulkFileDownload), requestCaptor.capture(), progressHandlerCaptor.capture());
-		
+
 		progressHandlerCaptor.getValue().onFailure(ex);
-		
+
 		verify(mockSynAlert).handleException(ex);
 		verify(mockView, times(2)).setProgressTrackingWidgetVisible(false);
 		verify(mockView).setCreatePackageUIVisible(true);
@@ -182,48 +184,48 @@ public class DownloadListWidgetTest {
 	@Test
 	public void testOnClearDownloadList() {
 		widget.onClearDownloadList();
-		
+
 		verify(mockSynAlert, times(2)).clear();
 		verify(mockJsClient).clearDownloadList(any(AsyncCallback.class));
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
 		verify(mockJsClient).getDownloadList(any(AsyncCallback.class));
 		verify(mockJsniUtils).sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, DownloadListWidget.DOWNLOAD_LIST_CLEARED_EVENT_NAME);
 	}
-	
+
 	@Test
 	public void testOnClearDownloadListFailure() {
 		Exception ex = new Exception("failed to clear");
 		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).clearDownloadList(any(AsyncCallback.class));
-		
+
 		widget.onClearDownloadList();
-		
+
 		verify(mockSynAlert).handleException(ex);
 	}
 
 	@Test
 	public void testOnRemoveFileHandleAssociation() {
 		widget.onRemoveFileHandleAssociation(mockFha);
-		
+
 		verify(mockJsClient).removeFileFromDownloadList(eq(mockFha), any(AsyncCallback.class));
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
 		verify(mockFhaTable).configure(eq(mockFhas), addToPackageSizeCallbackCaptor.capture(), onRemoveFileHandleAssociationCaptor.capture());
 	}
-	
+
 	@Test
 	public void testOnRemoveFileHandleAssociationFailure() {
 		Exception ex = new Exception("failed to remove fha");
 		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).removeFileFromDownloadList(any(FileHandleAssociation.class), any(AsyncCallback.class));
-		
+
 		widget.onRemoveFileHandleAssociation(mockFha);
-		
+
 		verify(mockSynAlert).handleException(ex);
 	}
 
 	@Test
 	public void testOnDownloadPackage() {
 		widget.onDownloadPackage();
-		
-		//verify when the user clicks download package, the package list is refreshed (and view reset)
+
+		// verify when the user clicks download package, the package list is refreshed (and view reset)
 		verify(mockView).hideFilesDownloadedAlert();
 		verify(mockView).setPackageName("");
 		verify(mockView).setCreatePackageUIVisible(true);
@@ -237,7 +239,7 @@ public class DownloadListWidgetTest {
 	@Test
 	public void testAsWidget() {
 		widget.asWidget();
-		
+
 		verify(mockView).asWidget();
 	}
 
