@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -34,13 +33,9 @@ public class TeamProjectsModalWidget implements IsWidget, TeamProjectsModalWidge
 	};
 	ProjectListSortColumn currentSortColumn;
 	SortDirection currentSortDirection;
-	
+
 	@Inject
-	public TeamProjectsModalWidget(
-			SynapseAlert synAlert,
-			SynapseJavascriptClient jsClient,
-			PortalGinInjector ginInjector,
-			TeamProjectsModalWidgetView view) {
+	public TeamProjectsModalWidget(SynapseAlert synAlert, SynapseJavascriptClient jsClient, PortalGinInjector ginInjector, TeamProjectsModalWidgetView view) {
 		this.synAlert = synAlert;
 		this.jsClient = jsClient;
 		this.ginInjector = ginInjector;
@@ -51,7 +46,7 @@ public class TeamProjectsModalWidget implements IsWidget, TeamProjectsModalWidge
 		view.setPresenter(this);
 		view.setSynAlertWidget(synAlert.asWidget());
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
@@ -64,7 +59,7 @@ public class TeamProjectsModalWidget implements IsWidget, TeamProjectsModalWidge
 		nextPageToken = null;
 		view.setProjectsContent(loadMoreWidgetContainer);
 	}
-	
+
 	public void configureAndShow(Team team) {
 		clear();
 		currentSortColumn = ProjectListSortColumn.LAST_ACTIVITY;
@@ -75,10 +70,10 @@ public class TeamProjectsModalWidget implements IsWidget, TeamProjectsModalWidge
 		view.show();
 		getMoreTeamProjects();
 	}
-	
+
 	public void getMoreTeamProjects() {
 		synAlert.clear();
-		jsClient.getProjectsForTeam(team.getId(), ProfilePresenter.PROJECT_PAGE_SIZE, nextPageToken, currentSortColumn, currentSortDirection, new AsyncCallback<ProjectHeaderList>(){
+		jsClient.getProjectsForTeam(team.getId(), ProfilePresenter.PROJECT_PAGE_SIZE, nextPageToken, currentSortColumn, currentSortDirection, new AsyncCallback<ProjectHeaderList>() {
 			@Override
 			public void onSuccess(ProjectHeaderList projectHeaders) {
 				for (ProjectHeader projectHeader : projectHeaders.getResults()) {
@@ -88,17 +83,18 @@ public class TeamProjectsModalWidget implements IsWidget, TeamProjectsModalWidge
 					Widget widget = badge.asWidget();
 					loadMoreWidgetContainer.add(widget);
 				}
-				
+
 				nextPageToken = projectHeaders.getNextPageToken();
 				loadMoreWidgetContainer.setIsMore(nextPageToken != null);
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
 		});
 	}
-	
+
 	@Override
 	public void sort(ProjectListSortColumn column) {
 		clear();

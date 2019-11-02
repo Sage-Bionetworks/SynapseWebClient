@@ -1,13 +1,16 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
-	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt"
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<!-- Dialog for creating a new table -->
-	<b:Modal ui:field="modal" title="Edit Project Metadata" closable="true"
-		dataBackdrop="STATIC" dataKeyboard="true">
+	<b:Modal ui:field="modal" title="Edit Project Metadata"
+		closable="true" dataBackdrop="STATIC" dataKeyboard="true">
 		<b:ModalBody>
 			<bh:Div>
 				<b:FormGroup>
@@ -17,19 +20,23 @@
 				<bh:Div ui:field="aliasUI">
 					<b:FormGroup>
 						<b:FormLabel>Add a "Friendly" URL Name (Optional)</b:FormLabel>
-						<bh:Paragraph>You may add a personalized URL alias which will redirect users to this project automatically.</bh:Paragraph>
+						<bh:Paragraph>You may add a personalized URL alias which will
+							redirect users to this project automatically.</bh:Paragraph>
 						<bh:Div addStyleNames="form-horizontal">
 							<b:FormGroup>
-								<b:FormLabel addStyleNames="col-xs-4 font-weight-normal" width="160px">https://www.synapse.org/</b:FormLabel>
+								<b:FormLabel
+									addStyleNames="col-xs-4 font-weight-normal" width="160px">https://www.synapse.org/</b:FormLabel>
 								<g:FlowPanel addStyleNames="col-xs-8">
-									<b:TextBox ui:field="aliasField" placeholder="UberInterestingResearch"/>
+									<b:TextBox ui:field="aliasField"
+										placeholder="UberInterestingResearch" />
 								</g:FlowPanel>
 							</b:FormGroup>
 						</bh:Div>
 					</b:FormGroup>
 					<b:Alert type="WARNING" addStyleNames="margin-top-10">
 						<bh:Strong text="Note &nbsp;" />
-						<bh:Text text=" Changing the friendly URL name will release the previous name for anyone to use."/>
+						<bh:Text
+							text=" Changing the friendly URL name will release the previous name for anyone to use." />
 					</b:Alert>
 				</bh:Div>
 			</bh:Div>
@@ -38,7 +45,8 @@
 		<b:ModalFooter>
 			<b:Button ui:field="defaultButton" type="LINK"
 				dataDismiss="MODAL">Cancel</b:Button>
-			<b:Button ui:field="primaryButton" type="PRIMARY" dataLoadingText="Saving..." >Save</b:Button>
+			<b:Button ui:field="primaryButton" type="PRIMARY"
+				dataLoadingText="Saving...">Save</b:Button>
 		</b:ModalFooter>
 	</b:Modal>
 </ui:UiBinder>

@@ -8,10 +8,8 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -30,7 +28,6 @@ import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidgetView;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitRowWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -67,8 +64,7 @@ public class DockerCommitListWidgetTest {
 
 		entityId = "syn123";
 		dockerCommitList = new ArrayList<DockerCommit>();
-		AsyncMockStubber.callSuccessWith(dockerCommitList)
-			.when(mockJsClient).getDockerTaggedCommits(anyString(), anyLong(), anyLong(), any(DockerCommitSortBy.class), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(dockerCommitList).when(mockJsClient).getDockerTaggedCommits(anyString(), anyLong(), anyLong(), any(DockerCommitSortBy.class), anyBoolean(), any(AsyncCallback.class));
 	}
 
 	@Test
@@ -100,9 +96,7 @@ public class DockerCommitListWidgetTest {
 		dockerCommitListWidget.configure(entityId, withRadio);
 		verify(mockCommitsContainer).clear();
 		verify(mockSynAlert).clear();
-		verify(mockJsClient).getDockerTaggedCommits(eq(entityId),
-				anyLong(), anyLong(), any(DockerCommitSortBy.class),
-				anyBoolean(), any(AsyncCallback.class));
+		verify(mockJsClient).getDockerTaggedCommits(eq(entityId), anyLong(), anyLong(), any(DockerCommitSortBy.class), anyBoolean(), any(AsyncCallback.class));
 		verify(mockCommitsContainer, never()).add(any(Widget.class));
 		verify(mockCommitsContainer).setIsMore(false);
 		verify(mockCallback).invoke();
@@ -117,24 +111,22 @@ public class DockerCommitListWidgetTest {
 		verify(mockCommitRow).configure(mockCommit);
 		verify(mockCommitsContainer).clear();
 		verify(mockSynAlert).clear();
-		verify(mockJsClient).getDockerTaggedCommits(eq(entityId),
-				anyLong(), anyLong(), any(DockerCommitSortBy.class),
-				anyBoolean(), any(AsyncCallback.class));
+		verify(mockJsClient).getDockerTaggedCommits(eq(entityId), anyLong(), anyLong(), any(DockerCommitSortBy.class), anyBoolean(), any(AsyncCallback.class));
 		verify(mockCommitsContainer).add(any(Widget.class));
-		//only a single value was returned, so there must not be more
+		// only a single value was returned, so there must not be more
 		verify(mockCommitsContainer).setIsMore(false);
 		verify(mockCommitsContainer, never()).setIsMore(true);
 	}
-	
+
 	@Test
 	public void testLoadMoreSuccessIsMore() {
 		boolean withRadio = false;
 		when(mockGinInjector.createNewDockerCommitRowWidget()).thenReturn(mockCommitRow);
 		for (int i = 0; i < DockerCommitListWidget.LIMIT; i++) {
-			dockerCommitList.add(mockCommit);	
+			dockerCommitList.add(mockCommit);
 		}
 		dockerCommitListWidget.configure(entityId, withRadio);
-		//the maximum number of commits were returned, there may be more...
+		// the maximum number of commits were returned, there may be more...
 		verify(mockCommitsContainer, never()).setIsMore(false);
 		verify(mockCommitsContainer).setIsMore(true);
 	}
@@ -155,9 +147,7 @@ public class DockerCommitListWidgetTest {
 		verify(mockRadioWidget).addClickHandler(any(ClickHandler.class));
 		verify(mockCommitsContainer).clear();
 		verify(mockSynAlert).clear();
-		verify(mockJsClient).getDockerTaggedCommits(eq(entityId),
-				anyLong(), anyLong(), any(DockerCommitSortBy.class),
-				anyBoolean(), any(AsyncCallback.class));
+		verify(mockJsClient).getDockerTaggedCommits(eq(entityId), anyLong(), anyLong(), any(DockerCommitSortBy.class), anyBoolean(), any(AsyncCallback.class));
 		verify(mockCommitsContainer).add(any(Widget.class));
 		verify(mockCommitsContainer).setIsMore(false);
 	}
@@ -166,16 +156,11 @@ public class DockerCommitListWidgetTest {
 	public void testLoadMoreFailure() {
 		boolean withRadio = false;
 		Throwable exception = new Throwable();
-		AsyncMockStubber.callFailureWith(exception)
-				.when(mockJsClient).getDockerTaggedCommits(anyString(),
-						anyLong(), anyLong(), any(DockerCommitSortBy.class),
-						anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(exception).when(mockJsClient).getDockerTaggedCommits(anyString(), anyLong(), anyLong(), any(DockerCommitSortBy.class), anyBoolean(), any(AsyncCallback.class));
 		dockerCommitListWidget.configure(entityId, withRadio);
 		verify(mockCommitsContainer).clear();
 		verify(mockSynAlert).clear();
-		verify(mockJsClient).getDockerTaggedCommits(eq(entityId),
-				anyLong(), anyLong(), any(DockerCommitSortBy.class),
-				anyBoolean(), any(AsyncCallback.class));
+		verify(mockJsClient).getDockerTaggedCommits(eq(entityId), anyLong(), anyLong(), any(DockerCommitSortBy.class), anyBoolean(), any(AsyncCallback.class));
 		verify(mockCommitsContainer, never()).add(any(Widget.class));
 		verify(mockSynAlert).handleException(exception);
 		verify(mockCommitsContainer).setIsMore(false);

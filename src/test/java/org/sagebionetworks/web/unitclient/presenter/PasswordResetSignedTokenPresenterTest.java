@@ -5,7 +5,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,13 +27,12 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.PasswordResetSignedTokenView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PasswordResetSignedTokenPresenterTest {
-	
+
 	PasswordResetSignedTokenPresenter presenter;
 	@Mock
 	PasswordResetSignedTokenView mockView;
@@ -61,19 +59,19 @@ public class PasswordResetSignedTokenPresenterTest {
 	JoinTeamSignedToken mockJoinTeamSignedToken;
 	@Captor
 	ArgumentCaptor<ChangePasswordWithToken> changePasswordWithTokenCaptor;
-	
+
 	@Before
-	public void setup(){
+	public void setup() {
 		presenter = new PasswordResetSignedTokenPresenter(mockView, mockSynapseClient, mockJsClient, mockSynapseAlert, mockAuthenticationController, mockGlobalApplicationState);
-		
+
 		when(testPlace.getToken()).thenReturn(TEST_TOKEN);
-		
-		//by default, decode into a PasswordResetSignedToken
+
+		// by default, decode into a PasswordResetSignedToken
 		AsyncMockStubber.callSuccessWith(mockPasswordResetSignedToken).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).changePassword(any(ChangePasswordWithToken.class), any(AsyncCallback.class));
-	}	
-	
+	}
+
 	@Test
 	public void testConstruction() {
 		verify(mockView).setPresenter(presenter);
@@ -83,29 +81,29 @@ public class PasswordResetSignedTokenPresenterTest {
 	@Test
 	public void testSetPlacePasswordResetSignedToken() {
 		presenter.setPlace(testPlace);
-		
+
 		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
 		verify(mockView).clear();
 		verify(mockSynapseAlert).clear();
 	}
-	
+
 	@Test
 	public void testSetPlaceDecodeFailure() {
 		Exception ex = new Exception("something bad happened");
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
-		
+
 		presenter.setPlace(testPlace);
-		
+
 		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseAlert).handleException(ex);
 	}
-	
+
 	@Test
 	public void testSetPlaceInvalidSignedTokenType() {
 		AsyncMockStubber.callSuccessWith(mockJoinTeamSignedToken).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
-		
+
 		presenter.setPlace(testPlace);
-		
+
 		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), any(AsyncCallback.class));
 		verify(mockView).clear();
 		verify(mockSynapseAlert).showError(PasswordResetSignedTokenPresenter.INVALID_PASSWORD_RESET_SIGNED_TOKEN);
@@ -116,10 +114,10 @@ public class PasswordResetSignedTokenPresenterTest {
 		String newPassword = "new password";
 		when(mockView.getPassword1Field()).thenReturn(newPassword);
 		when(mockView.getPassword2Field()).thenReturn(newPassword);
-		
+
 		presenter.setPlace(testPlace);
 		presenter.onChangePassword();
-		
+
 		verify(mockJsClient).changePassword(changePasswordWithTokenCaptor.capture(), any(AsyncCallback.class));
 		ChangePasswordWithToken changePasswordWithTokenRequest = changePasswordWithTokenCaptor.getValue();
 		assertEquals(newPassword, changePasswordWithTokenRequest.getNewPassword());
@@ -133,29 +131,29 @@ public class PasswordResetSignedTokenPresenterTest {
 	public void testChangePasswordField1Undefined() {
 		when(mockView.getPassword1Field()).thenReturn(null);
 		when(mockView.getPassword2Field()).thenReturn("defined");
-		
+
 		presenter.onChangePassword();
-		
+
 		verify(mockSynapseAlert).showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
 	}
-	
+
 	@Test
 	public void testChangePasswordField2Undefined() {
 		when(mockView.getPassword1Field()).thenReturn("defined");
 		when(mockView.getPassword2Field()).thenReturn("");
-		
+
 		presenter.onChangePassword();
-		
+
 		verify(mockSynapseAlert).showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
 	}
-	
+
 	@Test
 	public void testChangePasswordFieldsMismatch() {
 		when(mockView.getPassword1Field()).thenReturn("password1");
 		when(mockView.getPassword2Field()).thenReturn("password2");
-		
+
 		presenter.onChangePassword();
-		
+
 		verify(mockSynapseAlert).showError(DisplayConstants.PASSWORDS_MISMATCH);
 	}
 

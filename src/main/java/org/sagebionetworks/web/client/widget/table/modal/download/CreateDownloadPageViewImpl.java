@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.table.modal.download;
 
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Radio;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -12,8 +11,9 @@ import com.google.inject.Inject;
 
 public class CreateDownloadPageViewImpl implements CreateDownloadPageView {
 
-	public interface Binder extends UiBinder<Widget, CreateDownloadPageViewImpl> {}
-	
+	public interface Binder extends UiBinder<Widget, CreateDownloadPageViewImpl> {
+	}
+
 	@UiField
 	Radio commaRadio;
 	@UiField
@@ -24,28 +24,28 @@ public class CreateDownloadPageViewImpl implements CreateDownloadPageView {
 	CheckBox includeMetadata;
 	@UiField
 	SimplePanel trackerPanel;
-	
+
 	Widget widget;
-	
+
 	@Inject
-	public CreateDownloadPageViewImpl(Binder binder){
+	public CreateDownloadPageViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 	}
-	
+
 	@Override
 	public void setFileType(FileType type) {
-		if(FileType.CSV.equals(type)){
+		if (FileType.CSV.equals(type)) {
 			commaRadio.setValue(true);
-		}else{
+		} else {
 			tabRadio.setValue(true);
 		}
 	}
 
 	@Override
 	public FileType getFileType() {
-		if(commaRadio.getValue()){
+		if (commaRadio.getValue()) {
 			return FileType.CSV;
-		}else{
+		} else {
 			return FileType.TSV;
 		}
 	}

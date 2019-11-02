@@ -4,14 +4,14 @@ import com.google.gwt.event.logical.shared.HasAttachHandlers;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface FileHandleUploadView extends IsWidget, HasAttachHandlers {
-	
-	public interface Presenter{
+
+	public interface Presenter {
 		/**
 		 * Called when a file is selected.
 		 */
 		public void onFileSelected();
 	}
-	
+
 	/**
 	 * Bind the presenter to the view.
 	 * 
@@ -38,12 +38,13 @@ public interface FileHandleUploadView extends IsWidget, HasAttachHandlers {
 
 	/**
 	 * Set the text for the upload button.
+	 * 
 	 * @param buttonText
 	 */
 	public void setButtonText(String buttonText);
 
 	void setUploadedFileText(String text);
-	
+
 	public void allowMultipleFileUpload(boolean enabled);
 
 }

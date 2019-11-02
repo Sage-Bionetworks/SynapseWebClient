@@ -10,7 +10,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.discussion.NewReplyWidget.DEFAULT_MARKDOWN;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -32,7 +31,6 @@ import org.sagebionetworks.web.client.widget.discussion.NewReplyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -66,8 +64,7 @@ public class NewReplyWidgetTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		newReplyWidget = new NewReplyWidget(mockView, mockDiscussionForumClient, mockSynAlert,
-				mockMarkdownEditor, mockAuthController, mockGlobalApplicationState, mockStorage, mockPopupUtilsView);
+		newReplyWidget = new NewReplyWidget(mockView, mockDiscussionForumClient, mockSynAlert, mockMarkdownEditor, mockAuthController, mockGlobalApplicationState, mockStorage, mockPopupUtilsView);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockMarkdownEditor.getMarkdown()).thenReturn(DEFAULT_MARKDOWN);
@@ -107,26 +104,26 @@ public class NewReplyWidgetTest {
 	@Test
 	public void testOnClickCancel() {
 		newReplyWidget.onCancel();
-		
-		//since no changes were made, verify confirmation dialog was not shown
+
+		// since no changes were made, verify confirmation dialog was not shown
 		verify(mockPopupUtilsView, never()).showConfirmDialog(eq(DisplayConstants.UNSAVED_CHANGES), eq(DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE), callbackCaptor.capture());
 		verify(mockView, times(2)).resetButton();
 		verify(mockView, times(2)).setReplyTextBoxVisible(true);
 		verify(mockView, times(2)).setNewReplyContainerVisible(false);
 		verify(mockGlobalApplicationState, times(2)).setIsEditing(false);
 	}
-	
+
 	@Test
 	public void testOnClickCancelWithUnsavedChanges() {
 		when(mockMarkdownEditor.getMarkdown()).thenReturn("unsaved changes");
 		newReplyWidget.onCancel();
-		
+
 		verify(mockPopupUtilsView).showConfirmDialog(eq(DisplayConstants.UNSAVED_CHANGES), eq(DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE), callbackCaptor.capture());
-		
+
 		// simulate user confirmed
 		callbackCaptor.getValue().invoke();
-		
-		//verify cancel
+
+		// verify cancel
 		verify(mockView, times(2)).resetButton();
 		verify(mockView, times(2)).setReplyTextBoxVisible(true);
 		verify(mockView, times(2)).setNewReplyContainerVisible(false);
@@ -146,9 +143,7 @@ public class NewReplyWidgetTest {
 	@Test
 	public void testOnClickSaveSuccess() {
 		when(mockMarkdownEditor.getMarkdown()).thenReturn("message");
-		AsyncMockStubber.callSuccessWith(mockDiscussionReplyBundle)
-			.when(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class),
-					any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockDiscussionReplyBundle).when(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class), any(AsyncCallback.class));
 		newReplyWidget.onSave();
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockView).showSaving();
@@ -158,7 +153,7 @@ public class NewReplyWidgetTest {
 		verify(mockView, times(2)).setReplyTextBoxVisible(true);
 		verify(mockView, times(2)).setNewReplyContainerVisible(false);
 		verify(mockCallback).invoke();
-		// called once during configure (reset), once on reset after successful save 
+		// called once during configure (reset), once on reset after successful save
 		verify(mockGlobalApplicationState, times(2)).setIsEditing(false);
 	}
 
@@ -166,9 +161,7 @@ public class NewReplyWidgetTest {
 	public void testOnSaveFailure() {
 		when(mockMarkdownEditor.getMarkdown()).thenReturn("message");
 		Exception exception = new Exception();
-		AsyncMockStubber.callFailureWith(exception)
-			.when(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class),
-					any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(exception).when(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class), any(AsyncCallback.class));
 		newReplyWidget.onSave();
 		verify(mockSynAlert).clear();
 		verify(mockView).showSaving();
@@ -186,7 +179,7 @@ public class NewReplyWidgetTest {
 		verify(mockView).setMarkdownEditor(any(Widget.class));
 		verify(mockView).setPresenter(newReplyWidget);
 	}
-	
+
 	@Test
 	public void testCacheReplyWhenLoggedOut() {
 		when(mockMarkdownEditor.getMarkdown()).thenReturn("message");
@@ -194,37 +187,37 @@ public class NewReplyWidgetTest {
 		newReplyWidget.onSave();
 		verify(mockStorage).setItem(anyString(), eq("message"));
 	}
-	
+
 	@Test
 	public void testLoadCachedReplyClickYes() {
 		when(mockStorage.getItem(anyString())).thenReturn("message");
 		newReplyWidget.onClickNewReply();
 		verify(mockView).showConfirmDialog(anyString(), anyString(), callbackCaptor.capture(), any(Callback.class));
 		callbackCaptor.getValue().invoke();
-		
+
 		verify(mockMarkdownEditor).configure("message");
 		verify(mockMarkdownEditor).showExternalImageButton();
 		verify(mockMarkdownEditor).hideUploadRelatedCommands();
 		verify(mockStorage).removeItem(anyString());
 	}
-	
+
 	@Test
 	public void testLoadCachedReplyClickNo() {
 		when(mockStorage.getItem(anyString())).thenReturn("message");
 		newReplyWidget.onClickNewReply();
 		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class), callbackCaptor.capture());
 		callbackCaptor.getValue().invoke();
-		
+
 		verify(mockMarkdownEditor).configure(DEFAULT_MARKDOWN);
 		verify(mockStorage).removeItem(anyString());
 	}
-	
+
 	@Test
 	public void testNoCacheToLoad() {
 		when(mockStorage.getItem(anyString())).thenReturn(null);
 		newReplyWidget.onClickNewReply();
 		verify(mockView, times(0)).showConfirmDialog(anyString(), anyString(), any(Callback.class), any(Callback.class));
-		
+
 		verify(mockMarkdownEditor).configure(DEFAULT_MARKDOWN);
 		verify(mockStorage, times(0)).removeItem(anyString());
 	}

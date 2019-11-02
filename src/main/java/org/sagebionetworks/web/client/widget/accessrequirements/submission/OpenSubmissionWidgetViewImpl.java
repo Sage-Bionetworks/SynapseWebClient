@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
-
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -12,7 +11,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class OpenSubmissionWidgetViewImpl implements OpenSubmissionWidgetView{
+public class OpenSubmissionWidgetViewImpl implements OpenSubmissionWidgetView {
 
 	@UiField
 	Div synAlertContainer;
@@ -25,15 +24,15 @@ public class OpenSubmissionWidgetViewImpl implements OpenSubmissionWidgetView{
 
 	public interface Binder extends UiBinder<Widget, OpenSubmissionWidgetViewImpl> {
 	}
-	
+
 	Widget w;
 	Presenter presenter;
 
 	@Inject
-	public OpenSubmissionWidgetViewImpl(Binder binder){
+	public OpenSubmissionWidgetViewImpl(Binder binder) {
 		this.w = binder.createAndBindUi(this);
 		w.addAttachHandler(new AttachEvent.Handler() {
-			
+
 			@Override
 			public void onAttachOrDetach(AttachEvent event) {
 				if (event.isAttached()) {
@@ -45,7 +44,7 @@ public class OpenSubmissionWidgetViewImpl implements OpenSubmissionWidgetView{
 
 	@Override
 	public void setNumberOfSubmissions(long number) {
-		numberOfSubmissions.setText(number+" ");
+		numberOfSubmissions.setText(number + " ");
 	}
 
 	@Override

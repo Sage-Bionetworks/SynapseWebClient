@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.sagebionetworks.web.client.StringUtils;
-
 import com.google.inject.Inject;
 
 /**
@@ -12,12 +11,12 @@ import com.google.inject.Inject;
  *
  */
 public class StringEditorCell extends AbstractCellEditor implements CellEditor {
-	
+
 	public static final String MUST_BE = "Must be ";
 	public static final String CHARACTERS_OR_LESS = " characters or less";
 
 	Long maximumSize;
-	
+
 	@Inject
 	public StringEditorCell(CellEditorView view) {
 		super(view);
@@ -26,11 +25,11 @@ public class StringEditorCell extends AbstractCellEditor implements CellEditor {
 	@Override
 	public boolean isValid() {
 		String value = StringUtils.emptyAsNull(this.getValue());
-		if(value != null && maximumSize != null){
+		if (value != null && maximumSize != null) {
 			boolean valid = value.length() <= maximumSize;
-			if(!valid){
+			if (!valid) {
 				view.setValidationState(ValidationState.ERROR);
-				view.setHelpText(MUST_BE+maximumSize+CHARACTERS_OR_LESS);
+				view.setHelpText(MUST_BE + maximumSize + CHARACTERS_OR_LESS);
 				return false;
 			}
 		}
@@ -42,5 +41,5 @@ public class StringEditorCell extends AbstractCellEditor implements CellEditor {
 	public void setMaxSize(Long maximumSize) {
 		this.maximumSize = maximumSize;
 	}
-	
+
 }

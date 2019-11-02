@@ -3,24 +3,27 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
-	>
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<g:HTMLPanel>
 		<bh:Div addStyleNames="margin-left-15 margin-right-15">
 			<b:Heading size="H2" text="People Search" />
 			<bh:Div>
 				<b:InputGroup>
-					<b:TextBox ui:field="searchField" addStyleNames="input-lg"/>
+					<b:TextBox ui:field="searchField"
+						addStyleNames="input-lg" />
 					<b:InputGroupButton>
-						<b:Button ui:field="searchButton" icon="SEARCH" addStyleNames="btn-lg">Search</b:Button>
+						<b:Button ui:field="searchButton" icon="SEARCH"
+							addStyleNames="btn-lg">Search</b:Button>
 					</b:InputGroupButton>
 				</b:InputGroup>
 			</bh:Div>
 			<bh:Div>
-				<g:SimplePanel ui:field="synAlertPanel" addStyleNames="margin-top-10" visible="false"/>
-			</bh:Div>	
+				<g:SimplePanel ui:field="synAlertPanel"
+					addStyleNames="margin-top-10" visible="false" />
+			</bh:Div>
 			<bh:Div>
-				<g:SimplePanel ui:field="peopleListPanel" addStyleNames="margin-top-15"/>
+				<g:SimplePanel ui:field="peopleListPanel"
+					addStyleNames="margin-top-15" />
 			</bh:Div>
 			<bh:Div>
 				<b:Container addStyleNames="clear"></b:Container>

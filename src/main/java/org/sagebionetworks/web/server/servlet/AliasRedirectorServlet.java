@@ -5,18 +5,14 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
-
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.UserGroupHeader;
-import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -35,12 +31,12 @@ public class AliasRedirectorServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
-	
+
 	/**
 	 * Injected with Gin
 	 */
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
-	
+
 	/**
 	 * Unit test can override this.
 	 *
@@ -51,34 +47,31 @@ public class AliasRedirectorServlet extends HttpServlet {
 	}
 
 	@Override
-	protected void service(HttpServletRequest arg0, HttpServletResponse arg1)
-			throws ServletException, IOException {
+	protected void service(HttpServletRequest arg0, HttpServletResponse arg1) throws ServletException, IOException {
 		AliasRedirectorServlet.perThreadRequest.set(arg0);
 		super.service(arg0, arg1);
 	}
 
 	@Override
-	public void service(ServletRequest arg0, ServletResponse arg1)
-			throws ServletException, IOException {
+	public void service(ServletRequest arg0, ServletResponse arg1) throws ServletException, IOException {
 		super.service(arg0, arg1);
 	}
 
-	
-	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
 
-		//instruct not to cache
+	@Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		// instruct not to cache
 		response.setHeader(WebConstants.CACHE_CONTROL_KEY, WebConstants.CACHE_CONTROL_VALUE_NO_CACHE); // Set standard HTTP/1.1 no-cache headers.
 		response.setHeader(WebConstants.PRAGMA_KEY, WebConstants.NO_CACHE_VALUE); // Set standard HTTP/1.0 no-cache header.
 		response.setDateHeader(WebConstants.EXPIRES_KEY, 0L); // Proxy
-		HttpServletRequest httpRqst = (HttpServletRequest)request;
+		HttpServletRequest httpRqst = (HttpServletRequest) request;
 		URL requestURL = new URL(httpRqst.getRequestURL().toString());
 		try {
 			String alias = httpRqst.getParameter(WebConstants.ALIAS_PARAM_KEY);
 			SynapseClient client = createNewClient();
 			perThreadRequest.set(httpRqst);
-			
+
 			// use new service call to resolve
 			List<UserGroupHeader> ughList = client.getUserGroupHeadersByAliases(Collections.singletonList(alias));
 			if (!ughList.isEmpty()) {
@@ -93,11 +86,11 @@ public class AliasRedirectorServlet extends HttpServlet {
 				response.sendRedirect(encodedRedirectURL);
 			}
 		} catch (Exception e) {
-			//redirect to error place
+			// redirect to error place
 			response.sendRedirect(FileHandleAssociationServlet.getBaseUrl(request) + FileHandleAssociationServlet.ERROR_PLACE + URLEncoder.encode(e.getMessage()));
 		}
 	}
-		
+
 	private SynapseClient createNewClient() {
 		SynapseClient client = synapseProvider.createNewClient();
 		client.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());

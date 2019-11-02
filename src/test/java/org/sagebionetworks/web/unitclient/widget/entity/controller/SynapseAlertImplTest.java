@@ -1,4 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.entity.controller;
+
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -11,9 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.shared.WebConstants.ISSUE_PRIORITY_MINOR;
 import static org.sagebionetworks.web.shared.WebConstants.SWC_ISSUE_COLLECTOR_URL;
-
 import java.util.Collections;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -45,7 +44,6 @@ import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
-
 import com.amazonaws.services.greengrass.model.BadRequestException;
 import com.google.gwt.user.client.rpc.StatusCodeException;
 import com.google.gwt.user.client.ui.Widget;
@@ -72,11 +70,11 @@ public class SynapseAlertImplTest {
 	SynapseJSNIUtils mockJsniUtils;
 	// a new jira odyssey
 	String newJiraKey = "SWC-2001";
-	JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl(); 
-	
-	public static final String HOST_PAGE_URL="http://foobar";
-	public static final String JIRA_ENDPOINT_URL="http://foo.bar.com/";
-	
+	JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
+
+	public static final String HOST_PAGE_URL = "http://foobar";
+	public static final String JIRA_ENDPOINT_URL = "http://foo.bar.com/";
+
 	public static final String USER_EMAIL = "email@email.com";
 	public static final String USER_ID = "123";
 	public static final String USERNAME = "Clue";
@@ -84,7 +82,7 @@ public class SynapseAlertImplTest {
 	public static final String LAST_NAME = "Plum";
 
 	@Before
-	public void before(){
+	public void before() {
 		MockitoAnnotations.initMocks(this);
 		widget = new SynapseAlertImpl(mockView, mockGlobalApplicationState, mockAuthenticationController, mockGWT, mockPortalGinInjector, mockJsniUtils, jsonObjectAdapter);
 		UserProfile mockProfile = mock(UserProfile.class);
@@ -101,21 +99,21 @@ public class SynapseAlertImplTest {
 		when(mockProfile.getUserName()).thenReturn(USERNAME);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 	}
-	
+
 	@Test
 	public void testHandleServiceExceptionReadOnly() {
 		widget.handleException(new ReadOnlyModeException());
 		verify(mockView).clearState();
 		verify(mockPlaceChanger).goTo(isA(Down.class));
 	}
-	
+
 	@Test
 	public void testHandleServiceExceptionDown() {
 		widget.handleException(new SynapseDownException());
 		verify(mockView).clearState();
 		verify(mockPlaceChanger).goTo(isA(Down.class));
 	}
-	
+
 	@Test
 	public void testHandleStatusCodeExceptionWithMessage() {
 		String statusText = "error described here";
@@ -127,20 +125,20 @@ public class SynapseAlertImplTest {
 
 	@Test
 	public void testHandleStatusCodeExceptionWithStatusCodeOnly() {
-		int statusCode = 418; //I'm a teapot status code
+		int statusCode = 418; // I'm a teapot status code
 		widget.handleException(new StatusCodeException(statusCode, ""));
 		verify(mockView).clearState();
 		verify(mockView).showError(SynapseAlertImpl.SERVER_STATUS_CODE_MESSAGE + statusCode);
 		verify(mockView, never()).setRetryButtonVisible(true);
 	}
-	
+
 	public void testHandleStatusCodeExceptionZero() {
 		widget.handleException(new StatusCodeException(0, ""));
 		verify(mockView).clearState();
 		verify(mockView).showError(DisplayConstants.NETWORK_ERROR);
 		verify(mockView).setRetryButtonVisible(true);
 	}
-	
+
 	@Test
 	public void testHandleServiceExceptionForbiddenLoggedIn() {
 		widget.handleException(new ForbiddenException());
@@ -149,7 +147,7 @@ public class SynapseAlertImplTest {
 		verify(mockView).showError(c.capture());
 		assertTrue(c.getValue().startsWith(DisplayConstants.ERROR_FAILURE_PRIVLEDGES));
 	}
-	
+
 	@Test
 	public void testHandleServiceExceptionDeprecatedService() {
 		widget.handleException(new DeprecatedServiceException());
@@ -158,7 +156,7 @@ public class SynapseAlertImplTest {
 		verify(mockView).showError(c.capture());
 		assertTrue(c.getValue().startsWith(DisplayConstants.ERROR_DEPRECATED_SERVICE));
 	}
-	
+
 	@Test
 	public void testHandleServiceExceptionForbiddenNotLoggedIn() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
@@ -168,7 +166,7 @@ public class SynapseAlertImplTest {
 		verify(mockView).setLoginWidget(any(Widget.class));
 		verify(mockView).showLogin();
 	}
-	
+
 	@Test
 	public void testHandleServiceExceptionNotFound() {
 		widget.handleException(new NotFoundException());
@@ -177,28 +175,18 @@ public class SynapseAlertImplTest {
 		verify(mockView).showError(c.capture());
 		assertTrue(c.getValue().startsWith(DisplayConstants.ERROR_NOT_FOUND));
 	}
-	
+
 	@Test
 	public void testHandleServiceUnknownErrorExceptionLoggedIn() {
-		String errorMessage= "unknown";
+		String errorMessage = "unknown";
 		widget.handleException(new UnknownErrorException(errorMessage));
 		verify(mockView).clearState();
 		verify(mockView).showError(errorMessage);
-		
-		verify(mockJsniUtils).showJiraIssueCollector(
-				eq(""),
-				anyString(),
-				eq(SWC_ISSUE_COLLECTOR_URL),
-				eq(USER_ID),
-				eq(DisplayUtils.getDisplayName(FIRST_NAME, LAST_NAME, USERNAME)),
-				eq(WebConstants.ANONYMOUS), //not included
-				eq(""),
-				eq(""),
-				eq(""),
-				eq(ISSUE_PRIORITY_MINOR)
-			);
+
+		verify(mockJsniUtils).showJiraIssueCollector(eq(""), anyString(), eq(SWC_ISSUE_COLLECTOR_URL), eq(USER_ID), eq(DisplayUtils.getDisplayName(FIRST_NAME, LAST_NAME, USERNAME)), eq(WebConstants.ANONYMOUS), // not included
+				eq(""), eq(""), eq(""), eq(ISSUE_PRIORITY_MINOR));
 	}
-	
+
 	@Test
 	public void testHandleServiceUnrecognizedException() {
 		String errorMessage = "unrecognized";
@@ -206,7 +194,7 @@ public class SynapseAlertImplTest {
 		verify(mockView).clearState();
 		verify(mockView).showError(errorMessage);
 	}
-	
+
 	@Test
 	public void testHandleServiceUnrecognizedExceptionNullMessage() {
 		String errorMessage = null;
@@ -214,7 +202,7 @@ public class SynapseAlertImplTest {
 		verify(mockView).clearState();
 		verify(mockView).showError(DisplayConstants.ERROR_RESPONSE_UNAVAILABLE);
 	}
-	
+
 	@Test
 	public void testHandleServiceUnrecognizedExceptionEmptyMessage() {
 		String errorMessage = "";
@@ -222,7 +210,7 @@ public class SynapseAlertImplTest {
 		verify(mockView).clearState();
 		verify(mockView).showError(DisplayConstants.ERROR_RESPONSE_UNAVAILABLE);
 	}
-	
+
 	@Test
 	public void testHandleServiceUnrecognizedExceptionZeroMessage() {
 		String errorMessage = "0";
@@ -230,28 +218,28 @@ public class SynapseAlertImplTest {
 		verify(mockView).clearState();
 		verify(mockView).showError(DisplayConstants.ERROR_RESPONSE_UNAVAILABLE);
 	}
-	
+
 	@Test
 	public void testHandleServiceUnauthorizedExceptionMessage() {
 		widget.handleException(new UnauthorizedException());
 		verify(mockAuthenticationController).logoutUser();
 		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
-	
+
 	@Test
 	public void testHandleServiceConflictingUpdateExceptionMessage() {
 		String errorMessage = "error";
 		widget.handleException(new ConflictingUpdateException(errorMessage));
 		verify(mockView).showError(DisplayConstants.ERROR_CONFLICTING_UPDATE + "\n" + errorMessage);
 	}
-	
+
 	@Test
 	public void testHandleBadRequestExceptionWithJsonReason() {
 		String reason = "This password is known to be a commonly used password. Please choose another password!";
-		String json = "{\"reason\":\""+reason+"\"}";
-		
+		String json = "{\"reason\":\"" + reason + "\"}";
+
 		widget.handleException(new BadRequestException(json));
-		
+
 		verify(mockView).showError(reason);
 	}
 
@@ -260,7 +248,7 @@ public class SynapseAlertImplTest {
 		widget.isUserLoggedIn();
 		verify(mockAuthenticationController).isLoggedIn();
 	}
-	
+
 	@Test
 	public void testShowMustLogin() {
 		widget.showLogin();
@@ -269,7 +257,7 @@ public class SynapseAlertImplTest {
 		verify(mockView).setLoginWidget(any(Widget.class));
 		verify(mockView).showLogin();
 	}
-	
+
 	@Test
 	public void testShowError() {
 		String errorMessage = "a handled error";

@@ -2,7 +2,6 @@ package org.sagebionetworks.web.shared;
 
 import java.io.Serializable;
 import java.util.List;
-
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 
@@ -10,27 +9,26 @@ public class ProjectPagedResults implements Serializable {
 	private int totalNumberOfResults;
 	private List<ProjectHeader> results;
 	private List<UserProfile> lastModifiedBy;
-	
+
 	/**
 	 * Default constructor is required
 	 */
-	public ProjectPagedResults() {
-	}
-	
-	
+	public ProjectPagedResults() {}
+
+
 	public ProjectPagedResults(List<ProjectHeader> results, int totalNumberOfResults) {
 		super();
 		this.totalNumberOfResults = totalNumberOfResults;
 		this.results = results;
 	}
-	
+
 	public ProjectPagedResults(List<ProjectHeader> results, int totalNumberOfResults, List<UserProfile> lastModifiedBy) {
 		super();
 		this.totalNumberOfResults = totalNumberOfResults;
 		this.results = results;
 		this.lastModifiedBy = lastModifiedBy;
 	}
-	
+
 	public void setLastModifiedBy(List<UserProfile> lastModifiedBy) {
 		this.lastModifiedBy = lastModifiedBy;
 	}
@@ -58,9 +56,7 @@ public class ProjectPagedResults implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ProjectPagedResults [totalNumberOfResults="
-				+ totalNumberOfResults + ", results=" + results
-				+ ", lastModifiedBy=" + lastModifiedBy + "]";
+		return "ProjectPagedResults [totalNumberOfResults=" + totalNumberOfResults + ", results=" + results + ", lastModifiedBy=" + lastModifiedBy + "]";
 	}
 
 
@@ -68,8 +64,7 @@ public class ProjectPagedResults implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((lastModifiedBy == null) ? 0 : lastModifiedBy.hashCode());
+		result = prime * result + ((lastModifiedBy == null) ? 0 : lastModifiedBy.hashCode());
 		result = prime * result + ((results == null) ? 0 : results.hashCode());
 		result = prime * result + totalNumberOfResults;
 		return result;
@@ -99,6 +94,6 @@ public class ProjectPagedResults implements Serializable {
 			return false;
 		return true;
 	}
-	
-	
+
+
 }

@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.Map;
-
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -20,7 +19,6 @@ import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -39,15 +37,9 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 	PortalGinInjector ginInjector;
 	GWTWrapper gwt;
 	public static boolean isLoading = false;
+
 	@Inject
-	public TableQueryResultWikiWidget(TableQueryResultWikiWidgetView view, 
-			ActionMenuWidget actionMenu,
-			EntityActionController entityActionController,
-			SynapseJSNIUtils synapseJsniUtils,
-			SynapseJavascriptClient jsClient,
-			SynapseAlert synAlert,
-			GWTWrapper gwt,
-			PortalGinInjector ginInjector) {
+	public TableQueryResultWikiWidget(TableQueryResultWikiWidgetView view, ActionMenuWidget actionMenu, EntityActionController entityActionController, SynapseJSNIUtils synapseJsniUtils, SynapseJavascriptClient jsClient, SynapseAlert synAlert, GWTWrapper gwt, PortalGinInjector ginInjector) {
 		this.view = view;
 		this.actionMenu = actionMenu;
 		this.entityActionController = entityActionController;
@@ -59,7 +51,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		this.gwt = gwt;
 		actionMenu.addControllerWidget(entityActionController.asWidget());
 	}
-	
+
 	private TableEntityWidget getTableEntityWidget() {
 		if (tableEntityWidget == null) {
 			tableEntityWidget = ginInjector.createNewTableEntityWidget();
@@ -67,11 +59,13 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		}
 		return tableEntityWidget;
 	}
-	
+
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> descriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		if (isLoading) {
-			gwt.scheduleExecution(() -> {configure(wikiKey, descriptor, widgetRefreshRequired, wikiVersionInView);}, 1000);
+			gwt.scheduleExecution(() -> {
+				configure(wikiKey, descriptor, widgetRefreshRequired, wikiVersionInView);
+			}, 1000);
 			return;
 		}
 		isLoading = true;
@@ -83,7 +77,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		} catch (Exception e) {
 			synapseJsniUtils.consoleError("Could not set query limit: " + e.getMessage());
 		}
-		
+
 		Long offset = TableEntityWidget.DEFAULT_OFFSET;
 		try {
 			if (descriptor.containsKey(WidgetConstants.TABLE_OFFSET_KEY))
@@ -91,12 +85,12 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		} catch (Exception e) {
 			synapseJsniUtils.consoleError("Could not set query offset: " + e.getMessage());
 		}
-		
+
 		isQueryVisible = true;
 		if (descriptor.containsKey(WidgetConstants.QUERY_VISIBLE)) {
 			isQueryVisible = Boolean.parseBoolean(descriptor.get(WidgetConstants.QUERY_VISIBLE));
 		}
-		
+
 		hideEditActions();
 		query = new Query();
 		query.setLimit(limit);
@@ -108,10 +102,10 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		Long tableVersionNumber = QueryBundleUtils.getTableVersion(query.getSql());
 		configureTableQueryResultWidget(tableId, tableVersionNumber);
 	}
-	
+
 	public void configureTableQueryResultWidget(String tableId, Long tableVersionNumber) {
 		synAlert.clear();
-		
+
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
@@ -122,17 +116,17 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 				hideEditActions();
 				isLoading = false;
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 				isLoading = false;
-			}			
+			}
 		};
-		
+
 		jsClient.getEntityBundleFromCache(tableId, callback);
 	}
-	
+
 	public void hideEditActions() {
 		this.actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, false);
 		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
@@ -142,17 +136,18 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 			getTableEntityWidget().hideFiltering();
 		}
 	}
-	
+
 	@Override
 	public Query getQueryString() {
 		return query;
 	}
+
 	@Override
-	public void onQueryChange(Query newQuery) {
-	}
+	public void onQueryChange(Query newQuery) {}
+
 	@Override
-	public void onPersistSuccess(EntityUpdatedEvent event) {
-	}
+	public void onPersistSuccess(EntityUpdatedEvent event) {}
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();

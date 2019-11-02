@@ -12,12 +12,10 @@ public class EntityGraphNode extends ProvGraphNode implements IsSerializable {
 	private Long versionNumber;
 	private String entityType;
 	private Boolean wasExecuted;
-	
-	public EntityGraphNode() { }
 
-	public EntityGraphNode(String id, String entityId, String name,
-			String versionLabel, Long versionNumber, String entityType,
-			Boolean wasExecuted, Boolean startingNode) {
+	public EntityGraphNode() {}
+
+	public EntityGraphNode(String id, String entityId, String name, String versionLabel, Long versionNumber, String entityType, Boolean wasExecuted, Boolean startingNode) {
 		super();
 		this.id = id;
 		this.entityId = entityId;
@@ -56,7 +54,7 @@ public class EntityGraphNode extends ProvGraphNode implements IsSerializable {
 	public Boolean getWasExecuted() {
 		return wasExecuted;
 	}
-	
+
 	public void setWasExecuted(Boolean wasExecuted) {
 		this.wasExecuted = wasExecuted;
 	}
@@ -65,18 +63,13 @@ public class EntityGraphNode extends ProvGraphNode implements IsSerializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result
-				+ ((entityId == null) ? 0 : entityId.hashCode());
-		result = prime * result
-				+ ((entityType == null) ? 0 : entityType.hashCode());
+		result = prime * result + ((entityId == null) ? 0 : entityId.hashCode());
+		result = prime * result + ((entityType == null) ? 0 : entityType.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result
-				+ ((versionLabel == null) ? 0 : versionLabel.hashCode());
-		result = prime * result
-				+ ((versionNumber == null) ? 0 : versionNumber.hashCode());
-		result = prime * result
-				+ ((wasExecuted == null) ? 0 : wasExecuted.hashCode());
+		result = prime * result + ((versionLabel == null) ? 0 : versionLabel.hashCode());
+		result = prime * result + ((versionNumber == null) ? 0 : versionNumber.hashCode());
+		result = prime * result + ((wasExecuted == null) ? 0 : wasExecuted.hashCode());
 		return result;
 	}
 
@@ -129,10 +122,7 @@ public class EntityGraphNode extends ProvGraphNode implements IsSerializable {
 
 	@Override
 	public String toString() {
-		return "EntityGraphNode [id=" + id + ", entityId=" + entityId
-				+ ", name=" + name + ", versionLabel=" + versionLabel
-				+ ", versionNumber=" + versionNumber + ", entityType="
-				+ entityType + ", wasExecuted=" + wasExecuted + "]";
+		return "EntityGraphNode [id=" + id + ", entityId=" + entityId + ", name=" + name + ", versionLabel=" + versionLabel + ", versionNumber=" + versionNumber + ", entityType=" + entityType + ", wasExecuted=" + wasExecuted + "]";
 	}
-	
+
 }

@@ -7,13 +7,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.io.IOException;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -37,9 +34,9 @@ public class OAuth2AliasServletTest {
 	SynapseClient mockClient;
 	String url;
 	OAuth2AliasServlet servlet;
-	
+
 	@Before
-	public void before(){
+	public void before() {
 		mockRequest = Mockito.mock(HttpServletRequest.class);
 		mockResponse = Mockito.mock(HttpServletResponse.class);
 		mockSynapseProvider = Mockito.mock(SynapseProvider.class);
@@ -52,15 +49,15 @@ public class OAuth2AliasServletTest {
 		when(mockRequest.getRequestURI()).thenReturn("");
 		when(mockRequest.getContextPath()).thenReturn("");
 	}
-	
+
 	@Test
-	public void testCreateRedirectUrl() throws ServletException, IOException, SynapseException{
+	public void testCreateRedirectUrl() throws ServletException, IOException, SynapseException {
 		String url = servlet.createRedirectUrl(mockRequest, OAuthProvider.ORCID);
 		assertEquals("http://127.0.0.1:8888/?oauth2provider=ORCID", url);
 	}
-	
+
 	@Test
-	public void testValidate() throws ServletException, IOException, SynapseException{
+	public void testValidate() throws ServletException, IOException, SynapseException {
 		ArgumentCaptor<OAuthValidationRequest> argument = ArgumentCaptor.forClass(OAuthValidationRequest.class);
 		PrincipalAlias alias = new PrincipalAlias();
 		alias.setPrincipalId(123L);
@@ -75,9 +72,9 @@ public class OAuth2AliasServletTest {
 		assertEquals(authCode, request.getAuthenticationCode());
 		verify(mockResponse).sendRedirect("/#!Profile:oauth_bound");
 	}
-	
+
 	@Test
-	public void testValidateNotFound() throws ServletException, IOException, SynapseException{
+	public void testValidateNotFound() throws ServletException, IOException, SynapseException {
 		ArgumentCaptor<OAuthValidationRequest> argument = ArgumentCaptor.forClass(OAuthValidationRequest.class);
 		when(mockClient.bindOAuthProvidersUserId(argument.capture())).thenThrow(new SynapseNotFoundException("error message"));
 		when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER)).thenReturn(OAuthProvider.ORCID.name());
@@ -86,7 +83,7 @@ public class OAuth2AliasServletTest {
 		servlet.doGet(mockRequest, mockResponse);
 		verify(mockResponse).sendRedirect(contains("/#!Error:"));
 	}
-	
+
 	@Test
 	public void testDoGetError() throws Exception {
 		String errorMessage = "An error from the service call";
@@ -95,30 +92,30 @@ public class OAuth2AliasServletTest {
 		when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER)).thenReturn(OAuthProvider.ORCID.name());
 		String authCode = "authCode";
 		when(mockRequest.getParameter(WebConstants.OAUTH2_CODE)).thenReturn(authCode);
-		
+
 		servlet.doGet(mockRequest, mockResponse);
-		
-		//redirects to an error place
+
+		// redirects to an error place
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockResponse).sendRedirect(captor.capture());
 		String v = captor.getValue();
 		assertTrue(v.contains("#!Error:"));
 	}
-	
+
 	@Test
 	public void testDoGetErrorSynapseDown() throws Exception {
 		SynapseServiceUnavailable exception = new SynapseServiceUnavailable("error message");
 		when(mockClient.getOAuth2AuthenticationUrl(any(OAuthUrlRequest.class))).thenThrow(exception);
 		when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER)).thenReturn(OAuthProvider.ORCID.name());
-		
+
 		servlet.doGet(mockRequest, mockResponse);
-		
-		//redirects to an error place
+
+		// redirects to an error place
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockResponse).sendRedirect(captor.capture());
 		String v = captor.getValue();
 		assertTrue(v.contains("#!Down:0"));
 	}
 
-	
+
 }

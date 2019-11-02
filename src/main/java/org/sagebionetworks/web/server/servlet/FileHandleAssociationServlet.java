@@ -5,21 +5,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLEncoder;
-
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.io.IOUtils;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
-import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.filter.GWTAllCacheFilter;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -35,7 +31,7 @@ public class FileHandleAssociationServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
-	public static final long CACHE_TIME_SECONDS=30;  //30 seconds
+	public static final long CACHE_TIME_SECONDS = 30; // 30 seconds
 	private TokenProvider tokenProvider = new TokenProvider() {
 		@Override
 		public String getSessionToken() {
@@ -62,33 +58,30 @@ public class FileHandleAssociationServlet extends HttpServlet {
 	}
 
 	@Override
-	protected void service(HttpServletRequest arg0, HttpServletResponse arg1)
-			throws ServletException, IOException {
+	protected void service(HttpServletRequest arg0, HttpServletResponse arg1) throws ServletException, IOException {
 		FileHandleAssociationServlet.perThreadRequest.set(arg0);
 		super.service(arg0, arg1);
 	}
 
 	@Override
-	public void service(ServletRequest arg0, ServletResponse arg1)
-			throws ServletException, IOException {
+	public void service(ServletRequest arg0, ServletResponse arg1) throws ServletException, IOException {
 		super.service(arg0, arg1);
 	}
 
-	
+
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		response.setHeader(WebConstants.CACHE_CONTROL_KEY, "max-age="+CACHE_TIME_SECONDS);
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.setHeader(WebConstants.CACHE_CONTROL_KEY, "max-age=" + CACHE_TIME_SECONDS);
 		String token = getSessionToken(request);
 		SynapseClient client = createNewClient(token);
-		
+
 		String objectId = request.getParameter(WebConstants.ASSOCIATED_OBJECT_ID_PARAM_KEY);
 		String objectType = request.getParameter(WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY);
 		String fileHandleId = request.getParameter(WebConstants.FILE_HANDLE_ID_PARAM_KEY);
-		
+
 		try {
 			if (fileHandleId != null && (objectId == null || objectType == null)) {
-				//try to return the raw file handle (will work if user owns the file handle
+				// try to return the raw file handle (will work if user owns the file handle
 				URL resolvedUrl = client.getFileHandleTemporaryUrl(fileHandleId);
 				response.sendRedirect(resolvedUrl.toString());
 			} else {
@@ -102,7 +95,7 @@ public class FileHandleAssociationServlet extends HttpServlet {
 					InputStream in = null;
 					OutputStream out = null;
 					try {
-						response.setHeader("Cache-Control", "max-age="+GWTAllCacheFilter.CACHE_TIME_SECONDS);
+						response.setHeader("Cache-Control", "max-age=" + GWTAllCacheFilter.CACHE_TIME_SECONDS);
 						in = resolvedUrl.openStream();
 						out = response.getOutputStream();
 						IOUtils.copy(in, out);
@@ -111,21 +104,22 @@ public class FileHandleAssociationServlet extends HttpServlet {
 						IOUtils.closeQuietly(out);
 					}
 				} else {
-					response.sendRedirect(resolvedUrl.toString());					
+					response.sendRedirect(resolvedUrl.toString());
 				}
 			}
 		} catch (SynapseException e) {
-			//redirect to error place with an entry
+			// redirect to error place with an entry
 			response.sendRedirect(FileHandleAssociationServlet.getBaseUrl(request) + FileHandleAssociationServlet.ERROR_PLACE + URLEncoder.encode(e.getMessage()));
 		}
 	}
-		
+
 	/**
 	 * Get the session token
+	 * 
 	 * @param request
 	 * @return
 	 */
-	public String getSessionToken(final HttpServletRequest request){
+	public String getSessionToken(final HttpServletRequest request) {
 		return tokenProvider.getSessionToken();
 	}
 

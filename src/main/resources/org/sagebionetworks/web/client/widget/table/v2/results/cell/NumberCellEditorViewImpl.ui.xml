@@ -1,12 +1,14 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
-	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt"
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<b:FormGroup ui:field="formGroup">
-		<b:TextBox ui:field="textBox"/>
-		<b:HelpBlock ui:field="helpBlock" visible="false"/>
+		<b:TextBox ui:field="textBox" />
+		<b:HelpBlock ui:field="helpBlock" visible="false" />
 	</b:FormGroup>
 </ui:UiBinder>

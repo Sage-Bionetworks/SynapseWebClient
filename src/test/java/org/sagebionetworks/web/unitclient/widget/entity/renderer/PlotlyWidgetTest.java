@@ -26,13 +26,11 @@ import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TYPE;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -62,7 +60,6 @@ import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 
@@ -90,11 +87,11 @@ public class PlotlyWidgetTest {
 	ResourceLoader mockResourceLoader;
 	@Mock
 	QueryTokenProvider mockQueryTokenProvider;
-	
+
 	List<SelectColumn> selectColumns;
 	List<Row> rows;
 	List<String> rowValues;
-	
+
 	@Mock
 	SelectColumn mockXColumn;
 	@Mock
@@ -111,7 +108,7 @@ public class PlotlyWidgetTest {
 	ArgumentCaptor<AsyncCallback> webResourceLoadedCallbackCaptor;
 	@Captor
 	ArgumentCaptor<Query> queryCaptor;
-	
+
 	Map<String, String> params;
 	public static final String X_COLUMN_NAME = "x";
 	public static final String Y1_COLUMN_NAME = "y1";
@@ -119,19 +116,16 @@ public class PlotlyWidgetTest {
 	public static final Long MAX_ROWS_PER_PAGE = 400L;
 	public static final String TABLE_ID = "syn2389723";
 	String sql;
+
 	@Before
-	public void setup(){
+	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		widget = new PlotlyWidget(
-				mockView, 
-				mockSynAlert, 
-				mockJobTracker, 
-				mockQueryTokenProvider);
+		widget = new PlotlyWidget(mockView, mockSynAlert, mockJobTracker, mockQueryTokenProvider);
 		params = new HashMap<>();
 		selectColumns = new ArrayList<>();
 		rows = new ArrayList<>();
 		rowValues = new ArrayList<>();
-		
+
 		when(mockQueryResultBundle.getSelectColumns()).thenReturn(selectColumns);
 		when(mockQueryResultBundle.getQueryResult()).thenReturn(mockQueryResult);
 		when(mockQueryResultBundle.getMaxRowsPerPage()).thenReturn(MAX_ROWS_PER_PAGE);
@@ -141,23 +135,23 @@ public class PlotlyWidgetTest {
 		when(mockY1Column.getName()).thenReturn(Y1_COLUMN_NAME);
 		when(mockY2Column.getName()).thenReturn(Y1_COLUMN_NAME);
 		when(mockRow.getValues()).thenReturn(rowValues);
-		
-		sql = "select x, y1, y2 from "+TABLE_ID+" where x>2";
+
+		sql = "select x, y1, y2 from " + TABLE_ID + " where x>2";
 		params.put(TABLE_QUERY_KEY, sql);
 	}
-	
+
 	@Test
 	public void testConstructor() {
 		verify(mockView).setSynAlertWidget(mockSynAlert);
 		verify(mockView).setPresenter(widget);
 	}
-	
+
 	@Test
 	public void testAsWidget() {
 		widget.asWidget();
 		verify(mockView).asWidget();
 	}
-	
+
 	@Test
 	public void testConfigure() {
 		String queryToken = "encoded sql which is passed to place";
@@ -181,78 +175,80 @@ public class PlotlyWidgetTest {
 		params.put(IS_HORIZONTAL, Boolean.toString(isHorizontal));
 		params.put(X_AXIS_TYPE, xAxisType.toString());
 		params.put(Y_AXIS_TYPE, yAxisType.toString());
-		
+
 		selectColumns.add(mockXColumn);
 		selectColumns.add(mockY1Column);
 		selectColumns.add(mockY2Column);
 		rowValues.add("row1X");
 		rowValues.add("1.1");
 		rowValues.add("2.2");
-		// add DEFAULT_LIMIT rows to the result (the max, so the widget will attempt to look for a second page of data).
+		// add DEFAULT_LIMIT rows to the result (the max, so the widget will attempt to look for a second
+		// page of data).
 		for (int i = 0; i < DEFAULT_LIMIT; i++) {
-			rows.add(mockRow);	
+			rows.add(mockRow);
 		}
-		
+
 		widget.configure(pageKey, params, null, null);
-		
+
 		verify(mockView).setSourceDataLink(stringCaptor.capture());
 		verify(mockView).setSourceDataLinkVisible(false);
 		verify(mockView, never()).setSourceDataLinkVisible(true);
 		String sourceDataLink = stringCaptor.getValue();
 		assertTrue(sourceDataLink.contains(TABLE_ID));
 		assertTrue(sourceDataLink.contains(queryToken));
-		
-		//verify query params, and plot configuration based on results
+
+		// verify query params, and plot configuration based on results
 		verify(mockView).setLoadingVisible(true);
 		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
-		//check query
+		// check query
 		QueryBundleRequest request = queryBundleRequestCaptor.getValue();
 		assertEquals(DEFAULT_PART_MASK, request.getPartMask());
 		assertEquals(TABLE_ID, request.getEntityId());
-		assertEquals((Long)0L, request.getQuery().getOffset());
+		assertEquals((Long) 0L, request.getQuery().getOffset());
 		assertEquals(sql, request.getQuery().getSql());
 		// complete first page load
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
-		
+
 		verify(mockView, never()).showChart(eq(plotTitle), anyString(), anyString(), anyList(), anyString(), any(), any(), anyBoolean());
-		
-		//test final page
+
+		// test final page
 		rows.clear();
 		verify(mockJobTracker, times(2)).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
-		//verify offset updated
+		// verify offset updated
 		request = queryBundleRequestCaptor.getValue();
 		assertEquals(DEFAULT_LIMIT, request.getQuery().getOffset());
 		assertEquals(new Long(BUNDLE_MASK_QUERY_RESULTS), request.getPartMask());
 		assertEquals(MAX_ROWS_PER_PAGE, request.getQuery().getLimit());
-		//only sets the loading message on the third page (to avoid always showing "Loaded DEFAULT_LIMIT rows" message).
+		// only sets the loading message on the third page (to avoid always showing "Loaded DEFAULT_LIMIT
+		// rows" message).
 		verify(mockView).setLoadingMessage("Loading...");
-		
+
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
 		verify(mockView).showChart(eq(plotTitle), eq(xAxisLabel), eq(yAxisLabel), plotlyTraceArrayCaptor.capture(), eq(mode.toString().toLowerCase()), eq(xAxisType), eq(yAxisType), eq(showLegend));
 		List traces = plotlyTraceArrayCaptor.getValue();
 		assertTrue(traces.size() > 0);
-		assertEquals(type.toString().toLowerCase(), ((PlotlyTraceWrapper)traces.get(0)).getType());
-		assertEquals(isHorizontal, ((PlotlyTraceWrapper)traces.get(0)).isHorizontal());
+		assertEquals(type.toString().toLowerCase(), ((PlotlyTraceWrapper) traces.get(0)).getType());
+		assertEquals(isHorizontal, ((PlotlyTraceWrapper) traces.get(0)).isHorizontal());
 		verify(mockView).setSourceDataLinkVisible(true);
-		
+
 		// test onclick with horizontal=false (verify x-value is used in query)
 		reset(mockQueryTokenProvider);
 		String xValue = "20";
 		String yValue = "A";
 		widget.onClick(xValue, yValue);
-		
+
 		verify(mockQueryTokenProvider).queryToToken(queryCaptor.capture());
 		Query q = queryCaptor.getValue();
 		assertTrue(q.getIncludeEntityEtag());
-		assertEquals((Long)TableEntityWidget.DEFAULT_OFFSET, q.getOffset());
-		assertEquals((Long)TableEntityWidget.DEFAULT_LIMIT, q.getLimit());
+		assertEquals((Long) TableEntityWidget.DEFAULT_OFFSET, q.getOffset());
+		assertEquals((Long) TableEntityWidget.DEFAULT_LIMIT, q.getLimit());
 		assertTrue(q.getIsConsistent());
 		String sql = q.getSql();
-		assertTrue(sql.contains("\"" + X_COLUMN_NAME + "\"='"+xValue+"'"));
+		assertTrue(sql.contains("\"" + X_COLUMN_NAME + "\"='" + xValue + "'"));
 		assertTrue(sql.contains(TABLE_ID));
 		verify(mockView).newWindow(anyString());
 	}
-	
+
 	@Test
 	public void testTrackerOnCancel() {
 		GraphType type = GraphType.SCATTER;
@@ -261,18 +257,18 @@ public class PlotlyWidgetTest {
 		widget.configure(pageKey, params, null, null);
 		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
 		UpdatingAsynchProgressHandler progressHandler = jobTrackerCallbackCaptor.getValue();
-		
-		//also verify attachment state is based on view
+
+		// also verify attachment state is based on view
 		when(mockView.isAttached()).thenReturn(true);
 		assertTrue(progressHandler.isAttached());
 		when(mockView.isAttached()).thenReturn(false);
 		assertFalse(progressHandler.isAttached());
-		
+
 		progressHandler.onCancel();
 		verify(mockView, times(2)).clearChart();
 		verify(mockView).setLoadingVisible(false);
 	}
-	
+
 	@Test
 	public void testTrackerOnFailure() {
 		GraphType type = GraphType.SCATTER;
@@ -281,7 +277,7 @@ public class PlotlyWidgetTest {
 		widget.configure(pageKey, params, null, null);
 		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
 		UpdatingAsynchProgressHandler progressHandler = jobTrackerCallbackCaptor.getValue();
-		
+
 		Exception error = new Exception();
 		progressHandler.onFailure(error);
 		verify(mockView, times(2)).clearChart();
@@ -293,19 +289,15 @@ public class PlotlyWidgetTest {
 	public void testTransformWithFill() {
 		/**
 		 * 
-		 * Test the following table data
-			| x | fill | y1  |
-			|---|------|----|
-			| 1 | a    | 40 |
-			| 1 | b    | 50 |
-			| 2 | a    | 60 |
+		 * Test the following table data | x | fill | y1 | |---|------|----| | 1 | a | 40 | | 1 | b | 50 | |
+		 * 2 | a | 60 |
 		 * 
-		 * For each y, there should be a new series for each fill value.
-		 * So this should result in 2 series, one for 'a' and one for 'b'.
+		 * For each y, there should be a new series for each fill value. So this should result in 2 series,
+		 * one for 'a' and one for 'b'.
 		 */
 		String xAxisColumnName = "x";
 		String y1ColumnName = "y1";
-		
+
 		String fillColumnName = "fill";
 		GraphType graphType = GraphType.BAR;
 		Map<String, List<String>> graphData = new HashMap<>();
@@ -319,12 +311,12 @@ public class PlotlyWidgetTest {
 		assertEquals("40", a.getY()[0]);
 		assertEquals("60", a.getY()[1]);
 	}
-	
+
 	@Test
 	public void testTransformWithXColumnFill() {
 		String xAxisColumnName = "x";
 		String y1ColumnName = "y1";
-		
+
 		String fillColumnName = xAxisColumnName;
 		GraphType graphType = GraphType.BAR;
 		Map<String, List<String>> graphData = new HashMap<>();
@@ -337,7 +329,7 @@ public class PlotlyWidgetTest {
 		assertEquals("40", a.getY()[0]);
 		assertEquals("50", a.getY()[1]);
 	}
-	
+
 	@Test
 	public void testInitializeHorizontalOrientation() {
 		boolean isHorizontal = true;
@@ -354,30 +346,30 @@ public class PlotlyWidgetTest {
 		rowValues.add("2.2");
 		rows.add(mockRow);
 		when(mockQueryResultBundle.getQueryCount()).thenReturn(1L);
-		
+
 		widget.configure(null, params, null, null);
-		
+
 		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
-		
+
 		verify(mockView).showChart(anyString(), eq(yAxisTitle), eq(xAxisTitle), plotlyTraceArrayCaptor.capture(), anyString(), any(), any(), anyBoolean());
 		List traces = plotlyTraceArrayCaptor.getValue();
 		assertTrue(traces.size() > 0);
-		assertEquals(isHorizontal, ((PlotlyTraceWrapper)traces.get(0)).isHorizontal());
-		
+		assertEquals(isHorizontal, ((PlotlyTraceWrapper) traces.get(0)).isHorizontal());
+
 		// test onclick with horizontal=true (verify y-value is used in query)
 		reset(mockQueryTokenProvider);
 		String xValue = "20";
 		String yValue = "A";
 		widget.onClick(xValue, yValue);
-		
+
 		verify(mockQueryTokenProvider).queryToToken(queryCaptor.capture());
 		Query q = queryCaptor.getValue();
 		String sql = q.getSql();
-		assertTrue(sql.contains("\"" + X_COLUMN_NAME + "\"='"+yValue+"'"));
+		assertTrue(sql.contains("\"" + X_COLUMN_NAME + "\"='" + yValue + "'"));
 		verify(mockView).newWindow(anyString());
 	}
-	
+
 	@Test
 	public void testXColumnIsAlias() {
 		params.put(TYPE, GraphType.BAR.toString());
@@ -387,15 +379,15 @@ public class PlotlyWidgetTest {
 		rowValues.add("1.1");
 		rowValues.add("2.2");
 		rows.add(mockRow);
-		sql = "select hour(FROM_UNIXTIME(\"createdOn\"/1000)) as \"x\", y1, y2 from "+TABLE_ID+" where x>10";
+		sql = "select hour(FROM_UNIXTIME(\"createdOn\"/1000)) as \"x\", y1, y2 from " + TABLE_ID + " where x>10";
 		params.put(TABLE_QUERY_KEY, sql);
-		
+
 		widget.configure(null, params, null, null);
-		
-		// test onclick when x column is an alias.  should do nothing
+
+		// test onclick when x column is an alias. should do nothing
 		reset(mockQueryTokenProvider);
 		widget.onClick("20", "A");
-		
+
 		verify(mockQueryTokenProvider, never()).queryToToken(any(Query.class));
 		verify(mockView, never()).newWindow(anyString());
 	}

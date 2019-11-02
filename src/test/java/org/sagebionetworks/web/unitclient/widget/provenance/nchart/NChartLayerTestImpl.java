@@ -1,14 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.provenance.nchart;
 
 import java.util.List;
-
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayer;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayerNode;
 
 public class NChartLayerTestImpl implements NChartLayer {
 	List<NChartLayerNode> nodes;
-	int duration;		
-	
+	int duration;
+
 	@Override
 	public void setNodes(List<NChartLayerNode> nodes) {
 		this.nodes = nodes;
@@ -55,5 +54,5 @@ public class NChartLayerTestImpl implements NChartLayer {
 		return true;
 	}
 
-	
+
 }

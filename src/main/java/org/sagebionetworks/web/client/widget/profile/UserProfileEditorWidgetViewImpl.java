@@ -6,9 +6,7 @@ import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.widget.search.GooglePlacesSuggestOracle;
-
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -19,11 +17,11 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 // Want to add enter handler... What is the best way to go about this?
-public class UserProfileEditorWidgetViewImpl implements
-		UserProfileEditorWidgetView {
-	
-	public interface Binder extends UiBinder<Widget, UserProfileEditorWidgetViewImpl> {}
-	
+public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetView {
+
+	public interface Binder extends UiBinder<Widget, UserProfileEditorWidgetViewImpl> {
+	}
+
 	@UiField
 	SimplePanel imagePanel;
 	@UiField
@@ -31,7 +29,7 @@ public class UserProfileEditorWidgetViewImpl implements
 	@UiField
 	FormGroup usernameFormGroup;
 	@UiField
-	HelpBlock usernameHelpBlock;	
+	HelpBlock usernameHelpBlock;
 	@UiField
 	TextBox username;
 	@UiField
@@ -56,10 +54,9 @@ public class UserProfileEditorWidgetViewImpl implements
 	TextArea bio;
 	SuggestBox locationSuggestBox;
 	private Widget widget;
-	
+
 	@Inject
-	public UserProfileEditorWidgetViewImpl(Binder binder, 
-			GooglePlacesSuggestOracle locationOracle){
+	public UserProfileEditorWidgetViewImpl(Binder binder, GooglePlacesSuggestOracle locationOracle) {
 		widget = binder.createAndBindUi(this);
 		locationSuggestBox = new SuggestBox(locationOracle);
 		locationSuggestBox.setWidth("100%");

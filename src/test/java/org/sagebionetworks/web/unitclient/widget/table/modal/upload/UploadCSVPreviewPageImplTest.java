@@ -1,10 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.upload;
 
-import static org.mockito.Mockito.*;
-
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -26,7 +25,7 @@ import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalP
 import org.sagebionetworks.web.unitclient.widget.asynch.JobTrackingWidgetStub;
 
 public class UploadCSVPreviewPageImplTest {
-	
+
 	UploadCSVAppendPage mockAppendNextPage;
 	UploadCSVFinishPage mockCreateNextPage;
 	UploadCSVPreviewPageView mockView;
@@ -46,16 +45,16 @@ public class UploadCSVPreviewPageImplTest {
 	ColumnModel column;
 	List<ColumnModel> schema;
 	UploadCSVPreviewPageImpl page;
-	
+
 	@Before
-	public void before(){
+	public void before() {
 		mockView = Mockito.mock(UploadCSVPreviewPageView.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockUploadPreviewWidget = Mockito.mock(UploadPreviewWidget.class);
 		mockCreateNextPage = Mockito.mock(UploadCSVFinishPage.class);
 		mockAppendNextPage = Mockito.mock(UploadCSVAppendPage.class);
 		mockCSVOptionsWidget = Mockito.mock(CSVOptionsWidget.class);
-		
+
 		jobTrackingWidgetStub = new JobTrackingWidgetStub();
 		mockPresenter = Mockito.mock(ModalPresenter.class);
 		page = new UploadCSVPreviewPageImpl(mockView, mockUploadPreviewWidget, mockCSVOptionsWidget, jobTrackingWidgetStub, mockCreateNextPage, mockAppendNextPage);
@@ -76,7 +75,7 @@ public class UploadCSVPreviewPageImplTest {
 	}
 
 	@Test
-	public void setSetModalPresenterSuccess(){
+	public void setSetModalPresenterSuccess() {
 		page.configure(type, fileName, parentId, fileHandleId, null);
 		UploadToTablePreviewResult results = new UploadToTablePreviewResult();
 		jobTrackingWidgetStub.setResponse(new UploadToTablePreviewResult());
@@ -90,7 +89,7 @@ public class UploadCSVPreviewPageImplTest {
 		UploadToTablePreviewRequest expectedRequst = new UploadToTablePreviewRequest();
 		CsvTableDescriptor expectedDescriptor = new CsvTableDescriptor();
 		expectedDescriptor.setSeparator(type.getDelimiter());
-		//expect full scan the first time.
+		// expect full scan the first time.
 		expectedRequst.setDoFullFileScan(true);
 		expectedRequst.setUploadFileHandleId(fileHandleId);
 		expectedRequst.setCsvTableDescriptor(expectedDescriptor);
@@ -100,9 +99,9 @@ public class UploadCSVPreviewPageImplTest {
 		verify(mockView).setTrackerVisible(false);
 		verify(mockView).setPreviewVisible(true);
 	}
-	
+
 	@Test
-	public void setSetModalPresenterFailed(){
+	public void setSetModalPresenterFailed() {
 		page.configure(type, fileName, parentId, fileHandleId, null);
 		// setup the stub to fail
 		String error = "error";
@@ -110,9 +109,9 @@ public class UploadCSVPreviewPageImplTest {
 		page.setModalPresenter(mockPresenter);
 		verify(mockPresenter).setErrorMessage(error);
 	}
-	
+
 	@Test
-	public void setSetModalPresenterCanceled(){
+	public void setSetModalPresenterCanceled() {
 		page.configure(type, fileName, parentId, fileHandleId, null);
 		jobTrackingWidgetStub.setOnCancel(true);
 		page.setModalPresenter(mockPresenter);
@@ -120,7 +119,7 @@ public class UploadCSVPreviewPageImplTest {
 	}
 
 	@Test
-	public void testOnPrimaryCreate(){
+	public void testOnPrimaryCreate() {
 		// A null tableId indicates a create.
 		tableId = null;
 		jobTrackingWidgetStub.setResponse(uploadPreviewResults);
@@ -130,9 +129,9 @@ public class UploadCSVPreviewPageImplTest {
 		verify(mockCreateNextPage).configure(this.fileName, this.parentId, this.uploadRequest, schema);
 		verify(mockPresenter).setNextActivePage(mockCreateNextPage);
 	}
-	
+
 	@Test
-	public void testOnPrimaryAppend(){
+	public void testOnPrimaryAppend() {
 		// a non-null tableId indicates an append
 		jobTrackingWidgetStub.setResponse(uploadPreviewResults);
 		page.configure(type, fileName, parentId, fileHandleId, tableId);

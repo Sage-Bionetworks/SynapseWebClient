@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.refresh;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -19,7 +19,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlertView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class DiscussionThreadCountAlertTest {
@@ -41,8 +40,8 @@ public class DiscussionThreadCountAlertTest {
 		MockitoAnnotations.initMocks(this);
 		refreshAlert = new DiscussionThreadCountAlert(mockView, mockGWTWrapper, mockGlobalApplicationState, mockSynapseJSNIUtils, mockSynapseJavascriptClient);
 		when(mockView.isAttached()).thenReturn(true);
-		AsyncMockStubber.callSuccessWith(count).when(mockSynapseJavascriptClient).getThreadCountForForum(anyString(), any(DiscussionFilter.class),any(AsyncCallback.class));
-		
+		AsyncMockStubber.callSuccessWith(count).when(mockSynapseJavascriptClient).getThreadCountForForum(anyString(), any(DiscussionFilter.class), any(AsyncCallback.class));
+
 	}
 
 	@Test
@@ -54,27 +53,28 @@ public class DiscussionThreadCountAlertTest {
 	public void testConfigureNotAttached() {
 		when(mockView.isAttached()).thenReturn(false);
 		refreshAlert.configure("123");
-		//not ready to ask for the current etag
+		// not ready to ask for the current etag
 		verify(mockSynapseJavascriptClient, never()).getThreadCountForForum(anyString(), any(DiscussionFilter.class), any(AsyncCallback.class));
 	}
+
 	@Test
 	public void testAttachedNotConfigured() {
 		when(mockView.isAttached()).thenReturn(true);
 		refreshAlert.onAttach();
-		//not ready to ask for the current etag
-		verify(mockSynapseJavascriptClient, never()).getThreadCountForForum(anyString(), any(DiscussionFilter.class),any(AsyncCallback.class));
+		// not ready to ask for the current etag
+		verify(mockSynapseJavascriptClient, never()).getThreadCountForForum(anyString(), any(DiscussionFilter.class), any(AsyncCallback.class));
 	}
-	
+
 	@Test
 	public void testConfiguredAndAttached() {
 		when(mockView.isAttached()).thenReturn(true);
 		refreshAlert.configure("123");
-		
-		verify(mockSynapseJavascriptClient).getThreadCountForForum(anyString(), any(DiscussionFilter.class),any(AsyncCallback.class));
-		//and will call this again later
+
+		verify(mockSynapseJavascriptClient).getThreadCountForForum(anyString(), any(DiscussionFilter.class), any(AsyncCallback.class));
+		// and will call this again later
 		verify(mockGWTWrapper).scheduleExecution(any(Callback.class), eq(DiscussionThreadCountAlert.DELAY));
 	}
-	
+
 	@Test
 	public void testOnRefresh() {
 		refreshAlert.onRefresh();

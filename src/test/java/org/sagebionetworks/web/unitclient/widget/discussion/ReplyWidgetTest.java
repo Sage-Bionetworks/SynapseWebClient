@@ -1,16 +1,16 @@
 package org.sagebionetworks.web.unitclient.widget.discussion;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-
 import java.util.Date;
 import java.util.Set;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -35,8 +35,6 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.RequestBuilderMockStubber;
-
-import com.google.gwt.dev.javac.testing.impl.MockJavaResource;
 import com.google.gwt.dev.util.collect.HashSet;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -80,7 +78,7 @@ public class ReplyWidgetTest {
 	PopupUtilsView mockPopupUtils;
 	Set<String> moderatorIds;
 	ReplyWidget replyWidget;
-	
+
 	private static final String CREATED_BY = "123";
 	private static final String NON_AUTHOR = "456";
 
@@ -88,10 +86,7 @@ public class ReplyWidgetTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		replyWidget = new ReplyWidget(mockView, mockAuthorWidget, mockDateTimeUtils,
-				mockSynAlert, mockRequestBuilder, mockDiscussionForumClientAsync,
-				mockAuthController, mockEditReplyModal, mockMarkdownWidget, mockGwt, mockCopyTextModal,
-				mockSynapseJavascriptClient, mockClientCache,mockPopupUtils);
+		replyWidget = new ReplyWidget(mockView, mockAuthorWidget, mockDateTimeUtils, mockSynAlert, mockRequestBuilder, mockDiscussionForumClientAsync, mockAuthController, mockEditReplyModal, mockMarkdownWidget, mockGwt, mockCopyTextModal, mockSynapseJavascriptClient, mockClientCache, mockPopupUtils);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
 		moderatorIds = new HashSet<String>();
 	}
@@ -111,8 +106,7 @@ public class ReplyWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = false;
 		boolean isThreadDeleted = false;
-		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
-				new Date(), isDeleted, CREATED_BY, isEdited);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey", new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockDateTimeUtils.getRelativeTime(any(Date.class))).thenReturn("today");
 		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted);
 		verify(mockView).clear();
@@ -133,8 +127,7 @@ public class ReplyWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = false;
 		boolean isThreadDeleted = true;
-		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
-				new Date(), isDeleted, CREATED_BY, isEdited);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey", new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockDateTimeUtils.getRelativeTime(any(Date.class))).thenReturn("today");
 		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted);
 		verify(mockView).clear();
@@ -156,21 +149,19 @@ public class ReplyWidgetTest {
 		boolean isEdited = false;
 		boolean isThreadDeleted = false;
 		moderatorIds.add(CREATED_BY);
-		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
-				new Date(), isDeleted, CREATED_BY, isEdited);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey", new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockDateTimeUtils.getRelativeTime(any(Date.class))).thenReturn("today");
 		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted);
 		verify(mockView).setIsAuthorModerator(true);
 	}
-	
+
 	@Test
 	public void testConfigureEdited() {
 		boolean isDeleted = false;
 		boolean canModerate = false;
 		boolean isEdited = true;
 		boolean isThreadDeleted = false;
-		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
-				new Date(), isDeleted, CREATED_BY, isEdited);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey", new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockDateTimeUtils.getRelativeTime(any(Date.class))).thenReturn("today");
 		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted);
 		verify(mockView).setEditedVisible(true);
@@ -183,10 +174,9 @@ public class ReplyWidgetTest {
 		boolean isEdited = false;
 		boolean isThreadDeleted = false;
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(CREATED_BY);
-		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
-				new Date(), isDeleted, CREATED_BY, isEdited);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey", new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockDateTimeUtils.getRelativeTime(any(Date.class))).thenReturn("today");
-		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted );
+		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted);
 		verify(mockView).setEditIconVisible(true);
 	}
 
@@ -195,8 +185,7 @@ public class ReplyWidgetTest {
 		boolean isDeleted = false;
 		boolean isEdited = false;
 		boolean isThreadDeleted = false;
-		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
-				new Date(), isDeleted, CREATED_BY, isEdited);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey", new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockDateTimeUtils.getRelativeTime(any(Date.class))).thenReturn("today");
 		replyWidget.configure(bundle, true, moderatorIds, mockDeleteCallback, isThreadDeleted);
 		verify(mockView).setDeleteIconVisibility(true);
@@ -215,10 +204,8 @@ public class ReplyWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = false;
 		boolean isThreadDeleted = false;
-		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, CREATED_BY, isEdited);
-		AsyncMockStubber.callFailureWith(new Exception())
-				.when(mockSynapseJavascriptClient).getReplyUrl(anyString(), any(AsyncCallback.class));
+		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date(), isDeleted, CREATED_BY, isEdited);
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseJavascriptClient).getReplyUrl(anyString(), any(AsyncCallback.class));
 		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted);
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder, never()).configure(eq(RequestBuilder.GET), anyString());
@@ -236,14 +223,11 @@ public class ReplyWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = false;
 		boolean isThreadDeleted = false;
-		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, CREATED_BY, isEdited);
-		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK+1);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date(), isDeleted, CREATED_BY, isEdited);
+		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK + 1);
 		String url = "url";
-		AsyncMockStubber.callSuccessWith(url)
-				.when(mockSynapseJavascriptClient).getReplyUrl(anyString(), any(AsyncCallback.class));
-		RequestBuilderMockStubber.callOnError(null, new Exception())
-				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
+		AsyncMockStubber.callSuccessWith(url).when(mockSynapseJavascriptClient).getReplyUrl(anyString(), any(AsyncCallback.class));
+		RequestBuilderMockStubber.callOnError(null, new Exception()).when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted);
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
@@ -262,16 +246,13 @@ public class ReplyWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = false;
 		boolean isThreadDeleted = false;
-		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, CREATED_BY, isEdited);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
 		String url = "url";
-		AsyncMockStubber.callSuccessWith(url)
-				.when(mockSynapseJavascriptClient).getReplyUrl(anyString(), any(AsyncCallback.class));
-		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
-				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
+		AsyncMockStubber.callSuccessWith(url).when(mockSynapseJavascriptClient).getReplyUrl(anyString(), any(AsyncCallback.class));
+		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse).when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted);
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
@@ -282,12 +263,12 @@ public class ReplyWidgetTest {
 		verify(mockView).setLoadingMessageVisible(true);
 		verify(mockView).setLoadingMessageVisible(false);
 		verify(mockEditReplyModal, never()).configure(anyString(), anyString(), any(Callback.class));
-		
+
 		replyWidget.onClickEditReply();
 		verify(mockEditReplyModal).configure(anyString(), anyString(), any(Callback.class));
 		verify(mockEditReplyModal).show();
 	}
-	
+
 	@Test
 	public void testConfigureMessageFromCache() throws RequestException {
 		boolean isDeleted = false;
@@ -295,14 +276,13 @@ public class ReplyWidgetTest {
 		boolean isEdited = false;
 		boolean isThreadDeleted = false;
 		String messageKey = "messageKey1112";
-		DiscussionReplyBundle bundle = createReplyBundle("123", "1", messageKey,
-				new Date(), isDeleted, CREATED_BY, isEdited);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "1", messageKey, new Date(), isDeleted, CREATED_BY, isEdited);
 		String message = "message";
 		when(mockClientCache.contains(messageKey + WebConstants.MESSAGE_SUFFIX)).thenReturn(true);
 		when(mockClientCache.get(messageKey + WebConstants.MESSAGE_SUFFIX)).thenReturn(message);
-		
+
 		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted);
-		
+
 		verifyZeroInteractions(mockSynapseJavascriptClient, mockRequestBuilder);
 		verify(mockMarkdownWidget).configure(message);
 	}
@@ -320,16 +300,13 @@ public class ReplyWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = false;
 		boolean isThreadDeleted = false;
-		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, CREATED_BY, isEdited);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
-		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
-				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
+		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse).when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted);
-		AsyncMockStubber.callSuccessWith((Void) null)
-				.when(mockDiscussionForumClientAsync).markReplyAsDeleted(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith((Void) null).when(mockDiscussionForumClientAsync).markReplyAsDeleted(anyString(), any(AsyncCallback.class));
 		replyWidget.deleteReply();
 		verify(mockSynAlert, atLeast(1)).clear();
 		verify(mockDiscussionForumClientAsync).markReplyAsDeleted(eq("123"), any(AsyncCallback.class));
@@ -343,16 +320,13 @@ public class ReplyWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = false;
 		boolean isThreadDeleted = false;
-		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, CREATED_BY, isEdited);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
-		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
-				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
+		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse).when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted);
-		AsyncMockStubber.callFailureWith(new Exception())
-				.when(mockDiscussionForumClientAsync).markReplyAsDeleted(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockDiscussionForumClientAsync).markReplyAsDeleted(anyString(), any(AsyncCallback.class));
 		replyWidget.deleteReply();
 		verify(mockSynAlert, atLeast(1)).clear();
 		verify(mockDiscussionForumClientAsync).markReplyAsDeleted(eq("123"), any(AsyncCallback.class));
@@ -367,16 +341,13 @@ public class ReplyWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = false;
 		boolean isThreadDeleted = false;
-		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, CREATED_BY, isEdited);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
-		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
-				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
+		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse).when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted);
-		AsyncMockStubber.callSuccessWith(bundle)
-				.when(mockSynapseJavascriptClient).getReply(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseJavascriptClient).getReply(anyString(), any(AsyncCallback.class));
 		replyWidget.reconfigure();
 		verify(mockSynAlert, atLeast(1)).clear();
 		verify(mockView, times(2)).clear();
@@ -393,16 +364,13 @@ public class ReplyWidgetTest {
 		boolean canModerate = false;
 		boolean isEdited = false;
 		boolean isThreadDeleted = false;
-		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
-				new Date(), isDeleted, CREATED_BY, isEdited);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey", new Date(), isDeleted, CREATED_BY, isEdited);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		String message = "message";
 		when(mockResponse.getText()).thenReturn(message);
-		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
-				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
+		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse).when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted);
-		AsyncMockStubber.callFailureWith(new Exception())
-				.when(mockSynapseJavascriptClient).getReply(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseJavascriptClient).getReply(anyString(), any(AsyncCallback.class));
 		replyWidget.reconfigure();
 		verify(mockSynAlert, atLeast(1)).clear();
 		verify(mockView).clear();
@@ -428,22 +396,19 @@ public class ReplyWidgetTest {
 		String projectId = "syn007";
 		String threadId = "321";
 		String replyId = "123";
-		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey",
-				new Date(), isDeleted, CREATED_BY, isEdited);
+		DiscussionReplyBundle bundle = createReplyBundle("123", "author", "messageKey", new Date(), isDeleted, CREATED_BY, isEdited);
 		bundle.setProjectId(projectId);
 		bundle.setThreadId(threadId);
 		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted);
 		String hostPageBaseURL = "https://www.synapse.org/";
 		when(mockGwt.getHostPageBaseURL()).thenReturn(hostPageBaseURL);
 		replyWidget.onClickReplyLink();
-		
+
 		verify(mockCopyTextModal).setText("https://www.synapse.org/#!Synapse:syn007/discussion/threadId=321&replyId=123");
 		verify(mockCopyTextModal).show();
 	}
-	
-	private DiscussionReplyBundle createReplyBundle(String replyId, String author,
-			String messageKey, Date createdOn, Boolean isDeleted, String createdBy,
-			Boolean isEdited) {
+
+	private DiscussionReplyBundle createReplyBundle(String replyId, String author, String messageKey, Date createdOn, Boolean isDeleted, String createdBy, Boolean isEdited) {
 		DiscussionReplyBundle bundle = new DiscussionReplyBundle();
 		bundle.setId(replyId);
 		bundle.setCreatedBy(author);

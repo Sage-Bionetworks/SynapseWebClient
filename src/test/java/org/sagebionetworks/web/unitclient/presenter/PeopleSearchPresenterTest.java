@@ -7,10 +7,8 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -31,12 +29,11 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 public class PeopleSearchPresenterTest {
-	
+
 	PeopleSearchPresenter presenter;
 	@Mock
 	PeopleSearchView mockView;
@@ -57,38 +54,36 @@ public class PeopleSearchPresenterTest {
 	PeopleSearch mockPlace;
 	@Mock
 	UserBadge mockUserBadge;
+
 	@Before
-	public void setup() throws JSONObjectAdapterException{
+	public void setup() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
 		presenter = new PeopleSearchPresenter(mockView, mockGlobalApplicationState, mockSynAlert, mockLoadMoreWidgetContainer, mockPortalGinInjector, mockSynapseJavascriptClient);
-		AsyncMockStubber.callSuccessWith(peopleList).when(mockSynapseJavascriptClient).getUserGroupHeadersByPrefix(
-				anyString(), any(TypeFilter.class), anyLong(), anyLong(), any(AsyncCallback.class));
-		
+		AsyncMockStubber.callSuccessWith(peopleList).when(mockSynapseJavascriptClient).getUserGroupHeadersByPrefix(anyString(), any(TypeFilter.class), anyLong(), anyLong(), any(AsyncCallback.class));
+
 		verify(mockView).setPresenter(presenter);
 		when(mockPortalGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
-	}	
-	
+	}
+
 	@Test
 	public void testSearch() throws RestServiceException {
 		String searchTerm = "test";
 		when(mockPlace.getSearchTerm()).thenReturn(searchTerm);
 		presenter.setPlace(mockPlace);
-		verify(mockSynapseJavascriptClient).getUserGroupHeadersByPrefix(
-				eq(searchTerm), eq(TypeFilter.USERS_ONLY), anyLong(), anyLong(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserGroupHeadersByPrefix(eq(searchTerm), eq(TypeFilter.USERS_ONLY), anyLong(), anyLong(), any(AsyncCallback.class));
 		verify(mockView).setSearchTerm(searchTerm);
 		verify(mockPortalGinInjector, times(3)).getUserBadgeWidget();
 		verify(mockLoadMoreWidgetContainer, times(3)).add(any(Widget.class));
 	}
-	
+
 	@Test
 	public void testSearchFailure() throws RestServiceException {
 		Exception caught = new Exception("unhandled exception");
-		AsyncMockStubber.callFailureWith(caught).when(mockSynapseJavascriptClient).getUserGroupHeadersByPrefix(
-				anyString(), any(TypeFilter.class), anyLong(), anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(caught).when(mockSynapseJavascriptClient).getUserGroupHeadersByPrefix(anyString(), any(TypeFilter.class), anyLong(), anyLong(), any(AsyncCallback.class));
 		presenter.setPlace(mockPlace);
 		verify(mockSynAlert).handleException(caught);
 	}
-	
+
 	private static UserGroupHeaderResponsePage getTestPeople() {
 		UserGroupHeaderResponsePage people = new UserGroupHeaderResponsePage();
 		List<UserGroupHeader> peopleList = new ArrayList<UserGroupHeader>();

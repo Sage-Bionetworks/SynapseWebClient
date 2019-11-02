@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client.resources;
 
 public class WebResource {
-	
+
 	private String url;
-	
+
 	public WebResource(String url) {
 		super();
 		this.url = url;

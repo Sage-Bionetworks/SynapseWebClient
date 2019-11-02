@@ -4,9 +4,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
-import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -22,7 +19,6 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidgetView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -44,21 +40,16 @@ public class AddFolderDialogWidgetTest {
 	SynapseAlert mockSynAlert;
 	@Mock
 	Folder mockFolder;
-	
+
 	AddFolderDialogWidget w;
-	
+
 	public static final String PARENT_ENTITY_ID = "syn98208";
 	public static final String NEW_FOLDER_ID = "syn98209";
-	
+
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		w = new AddFolderDialogWidget(mockView, 
-				mockSharingAndDataUseWidget, 
-				mockSynapseJavascriptClient, 
-				mockGlobalAppState, 
-				mockPopupUtils, 
-				mockSynAlert);
+		w = new AddFolderDialogWidget(mockView, mockSharingAndDataUseWidget, mockSynapseJavascriptClient, mockGlobalAppState, mockPopupUtils, mockSynAlert);
 		when(mockFolder.getId()).thenReturn(NEW_FOLDER_ID);
 		AsyncMockStubber.callSuccessWith(mockFolder).when(mockSynapseJavascriptClient).createEntity(any(Entity.class), any(AsyncCallback.class));
 	}
@@ -79,25 +70,25 @@ public class AddFolderDialogWidgetTest {
 	@Test
 	public void testShow() {
 		w.show(PARENT_ENTITY_ID);
-		
+
 		verify(mockSynapseJavascriptClient, never()).createEntity(any(Folder.class));
 		verify(mockView).show();
-		
+
 		w.createFolder("test");
-		
+
 		verify(mockSynapseJavascriptClient).createEntity(any(Folder.class), any(AsyncCallback.class));
 		verify(mockView).hide();
 	}
-	
+
 	@Test
 	public void testCreateFolderFail() {
 		String error = "Too many files in one folder, Kenny!";
 		Exception ex = new Exception(error);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).createEntity(any(Entity.class), any(AsyncCallback.class));
-		
+
 		w.show(PARENT_ENTITY_ID);
 		w.createFolder("test");
-		
+
 		verify(mockSynapseJavascriptClient).createEntity(any(Folder.class), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(ex);
 	}

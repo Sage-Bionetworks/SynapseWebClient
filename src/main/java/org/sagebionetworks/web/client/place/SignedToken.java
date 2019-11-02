@@ -4,20 +4,20 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
 
-public class SignedToken extends Place{
-	public static final String DELIMITER = "/"; 
-	
+public class SignedToken extends Place {
+	public static final String DELIMITER = "/";
+
 	private String token;
 	private String signedEncodedToken;
-	
+
 	public SignedToken(String token) {
 		this.token = token;
-		if(token.contains(DELIMITER)) {
+		if (token.contains(DELIMITER)) {
 			String[] parts = token.split(DELIMITER);
-			if(parts.length == 2) {				
-				//tokenType = parts[0];
+			if (parts.length == 2) {
+				// tokenType = parts[0];
 				signedEncodedToken = parts[1];
-			} 		
+			}
 		} else {
 			signedEncodedToken = token;
 		}
@@ -26,7 +26,7 @@ public class SignedToken extends Place{
 	public String toToken() {
 		return token;
 	}
-	
+
 	public String getToken() {
 		return token;
 	}
@@ -45,16 +45,16 @@ public class SignedToken extends Place{
 
 	@Prefix("!SignedToken")
 	public static class Tokenizer implements PlaceTokenizer<SignedToken> {
-        @Override
-        public String getToken(SignedToken place) {
-            return place.toToken();
-        }
+		@Override
+		public String getToken(SignedToken place) {
+			return place.toToken();
+		}
 
-        @Override
-        public SignedToken getPlace(String token) {
-            return new SignedToken(token);
-        }
-    }
+		@Override
+		public SignedToken getPlace(String token) {
+			return new SignedToken(token);
+		}
+	}
 
 	@Override
 	public int hashCode() {
@@ -81,5 +81,5 @@ public class SignedToken extends Place{
 		return true;
 	}
 
-	
+
 }

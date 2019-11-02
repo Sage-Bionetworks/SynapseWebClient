@@ -5,9 +5,11 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
 		<g:FocusPanel ui:field="followersFocusPanel">
-			<bh:Span ui:field="followersLink" addStyleNames="imageButton link" />	
+			<bh:Span ui:field="followersLink"
+				addStyleNames="imageButton link" />
 		</g:FocusPanel>
-		<b:Modal ui:field="modal" closable="true" dataBackdrop="STATIC" dataKeyboard="true" title="Followers">
+		<b:Modal ui:field="modal" closable="true"
+			dataBackdrop="STATIC" dataKeyboard="true" title="Followers">
 			<b:ModalBody>
 				<bh:Div ui:field="userListContainer" />
 				<bh:Div ui:field="synAlertContainer" />
@@ -17,5 +19,5 @@
 			</b:ModalFooter>
 		</b:Modal>
 	</bh:Div>
-	
+
 </ui:UiBinder> 

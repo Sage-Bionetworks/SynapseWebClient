@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.place;
 
 import java.util.LinkedList;
-
 import org.sagebionetworks.web.client.StringUtils;
-
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
@@ -13,12 +11,12 @@ public class Synapse extends Place {
 	public static final String DELIMITER = "/";
 	public static final String SYNAPSE_ENTITY_PREFIX = "#!Synapse:";
 	public static final String VERSION = "version";
-	
+
 	private String synapsePlaceToken;
 	private String entityId, areaToken;
 	private Long versionNumber;
 	private Synapse.EntityArea area;
-	
+
 	public Synapse(String token) {
 		this.synapsePlaceToken = token;
 		area = null;
@@ -28,36 +26,36 @@ public class Synapse extends Place {
 		for (int i = 0; i < tokensArray.length; i++) {
 			tokens.add(tokensArray[i]);
 		}
-		
-		//first token should be the entity id
+
+		// first token should be the entity id
 		entityId = tokens.poll();
-		
-		//look for dot version syntax in this token
+
+		// look for dot version syntax in this token
 		String[] entityIdTokens = entityId.split(DOT_REGEX);
 		if (entityIdTokens.length > 1) {
 			entityId = entityIdTokens[0];
 			try {
 				versionNumber = Long.parseLong(entityIdTokens[1]);
 			} catch (NumberFormatException e) {
-				//invalid version, ignore
+				// invalid version, ignore
 			}
 		}
-		
-		//set the next token
+
+		// set the next token
 		String nextToken = tokens.poll();
-		
+
 		if (nextToken != null && VERSION.equals(nextToken.toLowerCase())) {
 			nextToken = null;
 			if (!tokens.isEmpty()) {
 				try {
 					versionNumber = Long.parseLong(tokens.removeFirst());
 				} catch (NumberFormatException e) {
-					//invalid version, ignore
+					// invalid version, ignore
 				}
 				nextToken = tokens.poll();
 			}
 		}
-		
+
 		if (nextToken != null) {
 			try {
 				area = EntityArea.valueOf(nextToken.toUpperCase());
@@ -65,24 +63,24 @@ public class Synapse extends Place {
 				// invalid entity area, ignore
 			}
 		}
-			
-		//remaining tokens are recognized is the area token
+
+		// remaining tokens are recognized is the area token
 		if (tokens.size() > 0) {
 			areaToken = "";
 		}
 		while (tokens.size() > 0) {
 			areaToken += tokens.poll();
 			if (tokens.size() > 0) {
-				areaToken += "/";	
+				areaToken += "/";
 			}
 		}
 	}
-	
+
 	public static String getDelimiter(Synapse.EntityArea tab) {
-		return "/"+tab.toString().toLowerCase()+"/";
+		return "/" + tab.toString().toLowerCase() + "/";
 	}
 
-	public Synapse(String entityId, Long versionNumber, Synapse.EntityArea area, String areaToken) {				
+	public Synapse(String entityId, Long versionNumber, Synapse.EntityArea area, String areaToken) {
 		this.entityId = entityId;
 		this.versionNumber = versionNumber;
 		this.area = area;
@@ -90,12 +88,11 @@ public class Synapse extends Place {
 		calculateToken(entityId, versionNumber, area, areaToken);
 	}
 
-	private void calculateToken(String entityId, Long versionNumber,
-			Synapse.EntityArea area, String areaToken) {
+	private void calculateToken(String entityId, Long versionNumber, Synapse.EntityArea area, String areaToken) {
 		this.synapsePlaceToken = entityId;
-		if(versionNumber != null)
+		if (versionNumber != null)
 			this.synapsePlaceToken += "." + versionNumber;
-		if(area != null) {
+		if (area != null) {
 			this.synapsePlaceToken += getDelimiter(area);
 			if (areaToken != null) {
 				this.synapsePlaceToken += areaToken;
@@ -106,7 +103,7 @@ public class Synapse extends Place {
 	public String toToken() {
 		return synapsePlaceToken;
 	}
-	
+
 	public String getEntityId() {
 		return entityId;
 	}
@@ -114,15 +111,15 @@ public class Synapse extends Place {
 	public Long getVersionNumber() {
 		return versionNumber;
 	}
-	
+
 	public Synapse.EntityArea getArea() {
 		return area;
 	}
-	
+
 	public String getAreaToken() {
 		return areaToken;
 	}
-	
+
 	public void setArea(Synapse.EntityArea area) {
 		this.area = area;
 		calculateToken(entityId, versionNumber, area, areaToken);
@@ -135,19 +132,23 @@ public class Synapse extends Place {
 
 	@Prefix("!Synapse")
 	public static class Tokenizer implements PlaceTokenizer<Synapse> {
-        @Override
-        public String getToken(Synapse place) {
-            return place.toToken();
-        }
+		@Override
+		public String getToken(Synapse place) {
+			return place.toToken();
+		}
 
-        @Override
-        public Synapse getPlace(String token) {
-            return new Synapse(token);
-        }
-    }
+		@Override
+		public Synapse getPlace(String token) {
+			return new Synapse(token);
+		}
+	}
 
-	public static enum EntityArea { WIKI, FILES, TABLES, CHALLENGE, DISCUSSION, DOCKER }
-	public static enum ProfileArea { PROFILE, PROJECTS, CHALLENGES, TEAMS, DOWNLOADS, SETTINGS }
+	public static enum EntityArea {
+		WIKI, FILES, TABLES, CHALLENGE, DISCUSSION, DOCKER
+	}
+	public static enum ProfileArea {
+		PROFILE, PROJECTS, CHALLENGES, TEAMS, DOWNLOADS, SETTINGS
+	}
 
 	@Override
 	public int hashCode() {
@@ -173,17 +174,18 @@ public class Synapse extends Place {
 			return false;
 		return true;
 	}
-	
+
 	/**
 	 * Given a string where the version number is delimited with a dot (.) convert to a valid token.
+	 * 
 	 * @param dotNotation
 	 * @return
 	 */
-	public static String getHrefForDotVersion(String dotNotation){
+	public static String getHrefForDotVersion(String dotNotation) {
 		dotNotation = StringUtils.emptyAsNull(dotNotation);
-		if(dotNotation == null){
+		if (dotNotation == null) {
 			return null;
 		}
-		return SYNAPSE_ENTITY_PREFIX+dotNotation.toLowerCase();
+		return SYNAPSE_ENTITY_PREFIX + dotNotation.toLowerCase();
 	}
 }

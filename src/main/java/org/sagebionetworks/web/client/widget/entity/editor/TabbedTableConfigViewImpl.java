@@ -2,29 +2,29 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.sagebionetworks.web.client.DisplayUtils;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class TabbedTableConfigViewImpl implements TabbedTableConfigView {
-	public interface TabbedTableConfigViewImplUiBinder extends UiBinder<Widget, TabbedTableConfigViewImpl> {}
+	public interface TabbedTableConfigViewImplUiBinder extends UiBinder<Widget, TabbedTableConfigViewImpl> {
+	}
+
 	private Presenter presenter;
-	
+
 	@UiField
 	public TextArea tableContents;
-	
+
 	public Widget widget;
-	
+
 	@Inject
 	public TabbedTableConfigViewImpl(TabbedTableConfigViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
 	}
-	
+
 	@Override
-	public void initView() {
-	}
+	public void initView() {}
 
 	@Override
 	public void checkParams() throws IllegalArgumentException {
@@ -35,21 +35,20 @@ public class TabbedTableConfigViewImpl implements TabbedTableConfigView {
 	@Override
 	public Widget asWidget() {
 		return widget;
-	}	
+	}
 
-	@Override 
+	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-		
+
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override
-	public void showLoading() {
-	}
+	public void showLoading() {}
 
 	@Override
 	public void showInfo(String message) {
@@ -65,7 +64,7 @@ public class TabbedTableConfigViewImpl implements TabbedTableConfigView {
 	public String getTableContents() {
 		return tableContents.getValue();
 	}
-	
+
 	/*
 	 * Private Methods
 	 */

@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import java.util.Date;
-
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.StringUtils;
-
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -13,6 +11,7 @@ public class DateCellRenderer implements Cell {
 	StringRendererCellView view;
 	DateTimeUtils dateTimeUtils;
 	String value;
+
 	@Inject
 	public DateCellRenderer(StringRendererCellView view, DateTimeUtils dateTimeUtils) {
 		this.view = view;
@@ -31,7 +30,7 @@ public class DateCellRenderer implements Cell {
 		if (this.value != null) {
 			Date date = new Date(Long.parseLong(this.value));
 			view.setValue(dateTimeUtils.getDateTimeString(date));
-		}else{
+		} else {
 			view.setValue("");
 		}
 	}

@@ -9,11 +9,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +32,6 @@ import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransfo
 import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialog;
 import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialogView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -45,13 +42,13 @@ public class EditAnnotationsDialogTest {
 
 	EditAnnotationsDialog dialog;
 	@Mock
-	EditAnnotationsDialogView mockView; 
+	EditAnnotationsDialogView mockView;
 	@Mock
-	SynapseJavascriptClient mockJsClient; 
+	SynapseJavascriptClient mockJsClient;
 	@Mock
-	AnnotationTransformer mockAnnotationTransformer; 
+	AnnotationTransformer mockAnnotationTransformer;
 	@Mock
-	PortalGinInjector mockPortalGinInjector; 
+	PortalGinInjector mockPortalGinInjector;
 	@Mock
 	EventBus mockEventBus;
 	Annotations annotations;
@@ -60,11 +57,12 @@ public class EditAnnotationsDialogTest {
 	@Mock
 	AnnotationEditor mockEditor;
 	Map<String, AnnotationsValue> annotationsMap;
+
 	@Before
 	public void setUp() throws Exception {
 		when(mockPortalGinInjector.getEventBus()).thenReturn(mockEventBus);
 		dialog = new EditAnnotationsDialog(mockView, mockJsClient, mockPortalGinInjector);
-		
+
 		annotations = new Annotations();
 		annotationsMap = new HashMap<String, AnnotationsValue>();
 		annotations.setAnnotations(annotationsMap);
@@ -80,12 +78,12 @@ public class EditAnnotationsDialogTest {
 		annotationsValue.setType(AnnotationsValueType.LONG);
 		annotationsValue.setValue(Collections.singletonList("42"));
 		annotationsMap.put("key3", annotationsValue);
-		
+
 		when(mockBundle.getAnnotations()).thenReturn(annotations);
 		Entity mockEntity = mock(Entity.class);
 		when(mockBundle.getEntity()).thenReturn(mockEntity);
 		when(mockEntity.getId()).thenReturn(ENTITY_ID);
-		
+
 		mockEditor = mock(AnnotationEditor.class);
 		when(mockPortalGinInjector.getAnnotationEditor()).thenReturn(mockEditor);
 		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).updateAnnotations(anyString(), any(Annotations.class), any(AsyncCallback.class));
@@ -96,24 +94,24 @@ public class EditAnnotationsDialogTest {
 		verify(mockView).setPresenter(dialog);
 		annotationsMap.clear();
 		dialog.configure(mockBundle);
-		
-		//verify a single annotation editor is still added by default
+
+		// verify a single annotation editor is still added by default
 		verify(mockPortalGinInjector).getAnnotationEditor();
 		verify(mockView).addAnnotationEditor(any(Widget.class));
 		verify(mockView).showEditor();
-		
+
 		assertEquals(1, dialog.getAnnotationEditors().size());
 	}
-	
+
 	@Test
 	public void testConfigure() {
 		dialog.configure(mockBundle);
-		
-		//verify the 3 annotation editors are created and added to the view
+
+		// verify the 3 annotation editors are created and added to the view
 		verify(mockPortalGinInjector, times(3)).getAnnotationEditor();
 		verify(mockView).showEditor();
 		verify(mockView, times(3)).addAnnotationEditor(any(Widget.class));
-		
+
 		assertEquals(dialog.getAnnotationsCopy(), annotations);
 		assertEquals(3, dialog.getAnnotationEditors().size());
 	}
@@ -122,9 +120,9 @@ public class EditAnnotationsDialogTest {
 	public void testCreateAnnotationEditorAnnotationDeleteCallback() {
 		annotationsMap.clear();
 		dialog.configure(mockBundle);
-		
+
 		assertEquals(1, dialog.getAnnotationEditors().size());
-		
+
 		AnnotationsValue annotationsValue = new AnnotationsValue();
 		annotationsValue.setValue(Collections.EMPTY_LIST);
 		annotationsValue.setType(AnnotationsValueType.STRING);
@@ -132,15 +130,15 @@ public class EditAnnotationsDialogTest {
 		dialog.createAnnotationEditor(key, annotationsValue);
 		verify(mockPortalGinInjector, times(2)).getAnnotationEditor();
 		ArgumentCaptor<Callback> deletedCallbackCaptor = ArgumentCaptor.forClass(Callback.class);
-		
+
 		verify(mockEditor).configure(eq(key), eq(annotationsValue), deletedCallbackCaptor.capture());
 		Callback deletedCallback = deletedCallbackCaptor.getValue();
-		
-		//before delete, 2 editors
+
+		// before delete, 2 editors
 		assertEquals(2, dialog.getAnnotationEditors().size());
 		deletedCallback.invoke();
 		verify(mockView).removeAnnotationEditor(any(Widget.class));
-		
+
 		assertEquals(1, dialog.getAnnotationEditors().size());
 	}
 
@@ -168,18 +166,18 @@ public class EditAnnotationsDialogTest {
 		when(mockEditor.isValid()).thenReturn(false);
 		dialog.onSave();
 		verify(mockView).showError(anyString());
-		//editor detects invalid entry, should not do async call
+		// editor detects invalid entry, should not do async call
 		verify(mockView, never()).setLoading();
 		verify(mockView, never()).hideEditor();
 		verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
 	}
-	
+
 
 	@Test
 	public void testOnSaveServiceCallFailure() {
 		String errorMessage = "Failure detected on server";
 		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockJsClient).updateAnnotations(anyString(), any(Annotations.class), any(AsyncCallback.class));
-		
+
 		dialog.configure(mockBundle);
 		when(mockEditor.isValid()).thenReturn(true);
 		dialog.onSave();
@@ -188,7 +186,7 @@ public class EditAnnotationsDialogTest {
 		verify(mockView, never()).hideEditor();
 		verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
 	}
-	
+
 	@Test
 	public void testAsWidget() {
 		dialog.asWidget();

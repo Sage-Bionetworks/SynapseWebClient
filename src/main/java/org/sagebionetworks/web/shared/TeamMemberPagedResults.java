@@ -10,10 +10,9 @@ public class TeamMemberPagedResults implements Serializable {
 	/**
 	 * Default constructor is required
 	 */
-	public TeamMemberPagedResults() {
-	}
-	
-	
+	public TeamMemberPagedResults() {}
+
+
 	public TeamMemberPagedResults(List<TeamMemberBundle> results, Long totalNumberOfResults) {
 		super();
 		this.totalNumberOfResults = totalNumberOfResults;
@@ -77,6 +76,6 @@ public class TeamMemberPagedResults implements Serializable {
 		return "TeamMemberPagedResults [totalNumberOfResults=" + totalNumberOfResults + ", results=" + results + "]";
 	}
 
-	
-	
+
+
 }

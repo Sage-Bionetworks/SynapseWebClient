@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.slider.client.ui.Slider;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -13,11 +12,12 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ImageParamsPanelViewImpl implements ImageParamsPanelView {
-	public interface ImageParamsPanelViewImplUiBinder extends UiBinder<Widget, ImageParamsPanelViewImpl> {}
-	
+	public interface ImageParamsPanelViewImplUiBinder extends UiBinder<Widget, ImageParamsPanelViewImpl> {
+	}
+
 	Widget widget;
 	Presenter presenter;
-	
+
 	@UiField
 	Button noneButton;
 	@UiField
@@ -31,7 +31,7 @@ public class ImageParamsPanelViewImpl implements ImageParamsPanelView {
 	@UiField
 	TextBox altText;
 	Slider scaleSlider;
-	
+
 	@Inject
 	public ImageParamsPanelViewImpl(ImageParamsPanelViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
@@ -39,7 +39,7 @@ public class ImageParamsPanelViewImpl implements ImageParamsPanelView {
 		setScale(100);
 		altText.clear();
 	}
-	
+
 	private void initClickHandlers() {
 		noneButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -47,14 +47,14 @@ public class ImageParamsPanelViewImpl implements ImageParamsPanelView {
 				presenter.noneButtonClicked();
 			}
 		});
-		
+
 		leftButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.leftButtonClicked();
 			}
 		});
-		
+
 		centerButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -68,6 +68,7 @@ public class ImageParamsPanelViewImpl implements ImageParamsPanelView {
 			}
 		});
 	}
+
 	@Override
 	public Widget asWidget() {
 		return widget;
@@ -77,6 +78,7 @@ public class ImageParamsPanelViewImpl implements ImageParamsPanelView {
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
+
 	@Override
 	public void setNoneButtonActive() {
 		clearActive();
@@ -100,7 +102,7 @@ public class ImageParamsPanelViewImpl implements ImageParamsPanelView {
 		clearActive();
 		rightButton.setActive(true);
 	}
-	
+
 	private void clearActive() {
 		noneButton.setActive(false);
 		leftButton.setActive(false);
@@ -112,19 +114,21 @@ public class ImageParamsPanelViewImpl implements ImageParamsPanelView {
 	public Integer getScale() {
 		return scaleSlider.getValue().intValue();
 	}
-	
+
 	@Override
 	public void setScale(Integer scale) {
-		// Slider does not behave well when it is detached and then re-attached.  Recreate.
+		// Slider does not behave well when it is detached and then re-attached. Recreate.
 		scaleSliderContainer.clear();
 		scaleSlider = new Slider(1.0, 100.0, scale.doubleValue());
 		scaleSlider.setStep(1.0);
 		scaleSliderContainer.add(scaleSlider);
 	}
+
 	@Override
 	public void setAltText(String altTextValue) {
 		altText.setValue(altTextValue);
 	}
+
 	@Override
 	public String getAltText() {
 		return altText.getValue();

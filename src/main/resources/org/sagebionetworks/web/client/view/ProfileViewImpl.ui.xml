@@ -1,67 +1,93 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:s="urn:import:org.sagebionetworks.web.client.view"
-	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html" xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
-	xmlns:w="urn:import:org.sagebionetworks.web.client.widget" xmlns:tr="urn:import:org.sagebionetworks.web.client.widget.table.v2.results">
-	
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
+	xmlns:tr="urn:import:org.sagebionetworks.web.client.widget.table.v2.results">
+
 	<g:HTMLPanel>
 		<div class="margin-top-10-imp"></div>
 		<g:HTMLPanel>
 			<div class="margin-10">
 				<div class="margin-top-5">
 					<div ui:field="dashboardUI" class="inline-block">
-						<b:Alert ui:field="loginAlert" type="INFO" visible="false" addStyleNames="fullWidthAlert">
+						<b:Alert ui:field="loginAlert" type="INFO" visible="false"
+							addStyleNames="fullWidthAlert">
 							<bh:Strong text="Please login to access this resource." />
 						</b:Alert>
 						<div>
 							<div ui:field="navtabContainer">
-								<ul class="nav nav-tabs entity-tabs margin-top-15 border-none">
-									<li class="entity-tab active margin-left-15" ui:field="profileListItem">
+								<ul
+									class="nav nav-tabs entity-tabs margin-top-15 border-none">
+									<li class="entity-tab active margin-left-15"
+										ui:field="profileListItem">
 										<a class="text-align-center link no-background">
-											<w:ClickableDiv ui:field="profileTabItemDiv" addStyleNames="displayInline">
-												<b:Anchor ui:field="profileLink" addStyleNames="textDecorationNone">Profile</b:Anchor>
+											<w:ClickableDiv ui:field="profileTabItemDiv"
+												addStyleNames="displayInline">
+												<b:Anchor ui:field="profileLink"
+													addStyleNames="textDecorationNone">Profile</b:Anchor>
 											</w:ClickableDiv>
 										</a>
 									</li>
 									<li class="entity-tab active" ui:field="projectsListItem">
 										<a class="text-align-center link no-background">
-											<w:ClickableDiv ui:field="projectsTabItemDiv" addStyleNames="displayInline">
-												<b:Anchor ui:field="projectsLink" addStyleNames="textDecorationNone">Projects</b:Anchor>
+											<w:ClickableDiv ui:field="projectsTabItemDiv"
+												addStyleNames="displayInline">
+												<b:Anchor ui:field="projectsLink"
+													addStyleNames="textDecorationNone">Projects</b:Anchor>
 											</w:ClickableDiv>
-											<w:HelpWidget helpMarkdown="This tab shows you the Projects you have created, those that have been shared with you and your favorites.&#10;Start creating a project by giving it a name."
-												href="http://docs.synapse.org/articles/making_a_project.html" placement="BOTTOM"
-											/>
+											<w:HelpWidget
+												helpMarkdown="This tab shows you the Projects you have created, those that have been shared with you and your favorites.&#10;Start creating a project by giving it a name."
+												href="http://docs.synapse.org/articles/making_a_project.html"
+												placement="BOTTOM" />
 										</a>
 									</li>
 									<li class="entity-tab" ui:field="challengesListItem">
 										<a class="text-align-center link no-background">
-											<w:ClickableDiv ui:field="challengesTabItemDiv" addStyleNames="displayInline">
-												<b:Anchor ui:field="challengesLink" addStyleNames="textDecorationNone">Challenges</b:Anchor>
+											<w:ClickableDiv
+												ui:field="challengesTabItemDiv"
+												addStyleNames="displayInline">
+												<b:Anchor ui:field="challengesLink"
+													addStyleNames="textDecorationNone">Challenges</b:Anchor>
 											</w:ClickableDiv>
-											<w:HelpWidget helpMarkdown="This tab shows you challenges you have registered for.&#10;Challenges are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems."
-												href="http://sagebionetworks.org/platforms/" placement="BOTTOM" />
+											<w:HelpWidget
+												helpMarkdown="This tab shows you challenges you have registered for.&#10;Challenges are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems."
+												href="http://sagebionetworks.org/platforms/"
+												placement="BOTTOM" />
 										</a>
 									</li>
 									<li class="entity-tab" ui:field="teamsListItem">
 										<a class="text-align-center link no-background">
-											<w:ClickableDiv ui:field="teamsTabItemDiv" addStyleNames="displayInline">
-												<b:Anchor ui:field="teamsLink" addStyleNames="textDecorationNone">Teams</b:Anchor>
+											<w:ClickableDiv ui:field="teamsTabItemDiv"
+												addStyleNames="displayInline">
+												<b:Anchor ui:field="teamsLink"
+													addStyleNames="textDecorationNone">Teams</b:Anchor>
 											</w:ClickableDiv>
 											<bh:Span ui:field="teamNotifications" />
-											<w:HelpWidget helpMarkdown="This tab lists Teams you have created and have been invited to join.&#10;Create a Team by providing a name and clicking “Create Team”."
-												href="http://docs.synapse.org/articles/teams.html" placement="BOTTOM" />
+											<w:HelpWidget
+												helpMarkdown="This tab lists Teams you have created and have been invited to join.&#10;Create a Team by providing a name and clicking “Create Team”."
+												href="http://docs.synapse.org/articles/teams.html"
+												placement="BOTTOM" />
 										</a>
 									</li>
 									<li class="entity-tab" ui:field="downloadsListItem">
 										<a class="text-align-center link no-background">
-											<w:ClickableDiv ui:field="downloadsTabItemDiv" addStyleNames="displayInline">
-												<b:Anchor ui:field="downloadsLink" addStyleNames="textDecorationNone">Downloads</b:Anchor>
+											<w:ClickableDiv ui:field="downloadsTabItemDiv"
+												addStyleNames="displayInline">
+												<b:Anchor ui:field="downloadsLink"
+													addStyleNames="textDecorationNone">Downloads</b:Anchor>
 											</w:ClickableDiv>
 										</a>
 									</li>
 									<li class="entity-tab" ui:field="settingsListItem">
 										<a class="text-align-center link no-background">
-											<w:ClickableDiv ui:field="settingsTabItemDiv" addStyleNames="displayInline">
-												<b:Anchor ui:field="settingsLink" addStyleNames="textDecorationNone">Settings</b:Anchor>
+											<w:ClickableDiv ui:field="settingsTabItemDiv"
+												addStyleNames="displayInline">
+												<b:Anchor ui:field="settingsLink"
+													addStyleNames="textDecorationNone">Settings</b:Anchor>
 											</w:ClickableDiv>
 										</a>
 									</li>
@@ -70,21 +96,31 @@
 						</div>
 						<div>
 							<div>
-								<div class="tab-background margin-10" ui:field="profileTabContainer">
-									<div ui:field="profileUI" class="profileUI inline-block vertical-align-top max-width-800">
+								<div class="tab-background margin-10"
+									ui:field="profileTabContainer">
+									<div ui:field="profileUI"
+										class="profileUI inline-block vertical-align-top max-width-800">
 										<div class="padding-15">
 											<g:SimplePanel ui:field="profileSynAlertPanel" />
-											<bh:Div ui:field="certifiedValidatedContainer" paddingBottom="3" marginLeft="5" />
+											<bh:Div ui:field="certifiedValidatedContainer"
+												paddingBottom="3" marginLeft="5" />
 											<bh:Div ui:field="userBadgeContainer" />
 											<!-- View Profile Panel -->
-											<bh:Div ui:field="userBadgeFooter" addStyleNames="dropshadow2" marginLeft="2" marginRight="2" marginTop="0" paddingLeft="34" paddingRight="18" paddingTop="3" height="70px">
-												<bh:Div addStyleNames="border-top-1" width="100%" paddingBottom="15" />
+											<bh:Div ui:field="userBadgeFooter"
+												addStyleNames="dropshadow2" marginLeft="2" marginRight="2"
+												marginTop="0" paddingLeft="34" paddingRight="18"
+												paddingTop="3" height="70px">
+												<bh:Div addStyleNames="border-top-1" width="100%"
+													paddingBottom="15" />
 												<bh:Div addStyleNames="flexcontainer-row">
-													<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width">
-														<b:Anchor ui:field="orcIdLink" addStyleNames="movedown-3 margin-right-30" />
+													<bh:Div
+														addStyleNames="flexcontainer-column flexcontainer-column-fill-width">
+														<b:Anchor ui:field="orcIdLink"
+															addStyleNames="movedown-3 margin-right-30" />
 													</bh:Div>
 													<bh:Div addStyleNames="flexcontainer-column">
-														<b:Button ui:field="editProfileButton" icon="EDIT" type="PRIMARY">Edit Profile</b:Button>	
+														<b:Button ui:field="editProfileButton"
+															icon="EDIT" type="PRIMARY">Edit Profile</b:Button>
 													</bh:Div>
 												</bh:Div>
 											</bh:Div>
@@ -92,102 +128,139 @@
 										</div>
 									</div>
 								</div>
-								<div class="tab-background margin-10" ui:field="projectsTabContainer">
-									<div ui:field="createProjectUI" class="margin-bottom-10 margin-top-10 row">
+								<div class="tab-background margin-10"
+									ui:field="projectsTabContainer">
+									<div ui:field="createProjectUI"
+										class="margin-bottom-10 margin-top-10 row">
 										<div class="col-xs-12 col-sm-8">
 											<b:InputGroup addStyleNames="projectSearch">
-												<b:TextBox ui:field="projectSearchTextBox" width="100%" height="35px" />
+												<b:TextBox ui:field="projectSearchTextBox"
+													width="100%" height="35px" />
 												<b:InputGroupButton>
-													<b:Button ui:field="projectSearchButton" text="Search All Projects" icon="SEARCH" />
+													<b:Button ui:field="projectSearchButton"
+														text="Search All Projects" icon="SEARCH" />
 												</b:InputGroupButton>
 											</b:InputGroup>
 										</div>
 										<div class="col-xs-12 col-sm-4 createProject">
-											<b:Button ui:field="createProjectButton" type="DEFAULT" icon="PLUS" pull="RIGHT" text="Create a New Project" />
+											<b:Button ui:field="createProjectButton"
+												type="DEFAULT" icon="PLUS" pull="RIGHT"
+												text="Create a New Project" />
 										</div>
 										<b:Column size="XS_12">
 											<g:FlowPanel ui:field="projectSynAlertPanel" />
 										</b:Column>
 									</div>
-									<div class="panel panel-default padding-5 min-height-200" ui:field="projectsHighlightBox">
+									<div class="panel panel-default padding-5 min-height-200"
+										ui:field="projectsHighlightBox">
 										<bh:Div>
 											<b:Heading ui:field="projectsHeading" size="H3"></b:Heading>
 											<bh:Div height="26px">
 												<b:ButtonGroup ui:field="projectFiltersUI">
-													<b:Button ui:field="allProjectsFilter" size="SMALL">All</b:Button>
-													<b:Button ui:field="myProjectsFilter" size="SMALL">Created by me</b:Button>
-													<b:Button ui:field="favoritesFilter" icon="STAR" addStyleNames="favoriteIcon" size="SMALL">Favorites</b:Button>
-													<b:Button ui:field="sharedDirectlyWithMeFilter" size="SMALL">Shared directly with me</b:Button>
+													<b:Button ui:field="allProjectsFilter"
+														size="SMALL">All</b:Button>
+													<b:Button ui:field="myProjectsFilter" size="SMALL">Created
+														by me</b:Button>
+													<b:Button ui:field="favoritesFilter" icon="STAR"
+														addStyleNames="favoriteIcon" size="SMALL">Favorites</b:Button>
+													<b:Button ui:field="sharedDirectlyWithMeFilter"
+														size="SMALL">Shared directly with me</b:Button>
 													<b:ButtonGroup>
-														<b:Button ui:field="teamFilters" dataToggle="DROPDOWN" size="SMALL">By Team</b:Button>
-														<b:DropDownMenu ui:field="teamFiltersDropDownMenu">
+														<b:Button ui:field="teamFilters"
+															dataToggle="DROPDOWN" size="SMALL">By Team</b:Button>
+														<b:DropDownMenu
+															ui:field="teamFiltersDropDownMenu">
 														</b:DropDownMenu>
 													</b:ButtonGroup>
 												</b:ButtonGroup>
 											</bh:Div>
-											<t:Table ui:field="columnHeaders" width="100%" addStyleNames="margin-top-10"> <!-- Project list table headers -->
+											<t:Table ui:field="columnHeaders" width="100%"
+												addStyleNames="margin-top-10"> <!-- Project list table headers -->
 												<t:TableRow>
-													<tr:SortableTableHeaderImpl ui:field="projectNameColumnHeader" text="Name" />
-													<tr:SortableTableHeaderImpl width="140px" ui:field="lastActivityOnColumnHeader" text="Last Activity On" addStyleNames="hidden-xs" />
+													<tr:SortableTableHeaderImpl
+														ui:field="projectNameColumnHeader" text="Name" />
+													<tr:SortableTableHeaderImpl
+														width="140px" ui:field="lastActivityOnColumnHeader"
+														text="Last Activity On" addStyleNames="hidden-xs" />
 												</t:TableRow>
 											</t:Table>
 											<bh:Hr addStyleNames="margin-top-5 margin-bottom-5" />
-											<g:FlowPanel ui:field="projectsTabContent" addStyleNames="margin-top-10" />
+											<g:FlowPanel ui:field="projectsTabContent"
+												addStyleNames="margin-top-10" />
 										</bh:Div>
-										<g:FlowPanel ui:field="favoritesHelpPanel" addStyleNames="help-panel" visible="false">
+										<g:FlowPanel ui:field="favoritesHelpPanel"
+											addStyleNames="help-panel" visible="false">
 											<b:BlockQuote styleName="panel">
-												<b:Icon type="STAR" pull="LEFT" addStyleNames="font-size-90 favoriteIcon" />
+												<b:Icon type="STAR" pull="LEFT"
+													addStyleNames="font-size-90 favoriteIcon" />
 												<b:Heading text="Favorites" size="H4"></b:Heading>
-												<bh:Text text="Save the entity you’d like to revisit by marking it as a favorite. To mark an entity as a favorite, click the star icon next to its name."></bh:Text>
+												<bh:Text
+													text="Save the entity you’d like to revisit by marking it as a favorite. To mark an entity as a favorite, click the star icon next to its name."></bh:Text>
 											</b:BlockQuote>
 										</g:FlowPanel>
 									</div>
 									<b:Container fluid="true">
 										<b:Row>
 											<b:Column size="XS_12">
-												<b:Anchor href="http://docs.synapse.org/articles/making_a_project.html" target="_blank"
-													text="What's a Project?" /></b:Column>
+												<b:Anchor
+													href="http://docs.synapse.org/articles/making_a_project.html"
+													target="_blank" text="What's a Project?" />
+											</b:Column>
 										</b:Row>
 									</b:Container>
 								</div>
-								<div class="tab-background margin-10" ui:field="challengesTabContainer">
-									<div class="panel panel-default padding-5 min-height-200" ui:field="challengesHighlightBox">
+								<div class="tab-background margin-10"
+									ui:field="challengesTabContainer">
+									<div class="panel panel-default padding-5 min-height-200"
+										ui:field="challengesHighlightBox">
 										<b:Heading ui:field="challengesHeading" size="H3"></b:Heading>
-										<g:FlowPanel ui:field="challengesTabContent" styleName="margin-10" />
+										<g:FlowPanel ui:field="challengesTabContent"
+											styleName="margin-10" />
 									</div>
-									<w:LoadingSpinner ui:field="challengesLoadingUI" size="31px" />
+									<w:LoadingSpinner
+										ui:field="challengesLoadingUI" size="31px" />
 									<div class="clearfix">
-										<b:Button ui:field="moreChallengesButton" styleName="btn btn-default btn-sm col-xs-12 margin-top-10">Show more results...</b:Button>
+										<b:Button ui:field="moreChallengesButton"
+											styleName="btn btn-default btn-sm col-xs-12 margin-top-10">Show more results...</b:Button>
 									</div>
 									<g:FlowPanel ui:field="challengeSynAlertPanel" />
 								</div>
-								<div class="tab-background margin-10 container-fluid" ui:field="teamsTabContainer">
-									<div ui:field="createTeamUI" class="margin-bottom-10 margin-top-10 row">
+								<div class="tab-background margin-10 container-fluid"
+									ui:field="teamsTabContainer">
+									<div ui:field="createTeamUI"
+										class="margin-bottom-10 margin-top-10 row">
 										<div class="col-xs-12 col-sm-8">
 											<b:InputGroup addStyleNames="teamSearch">
-												<b:TextBox ui:field="teamSearchTextBox" width="100%" height="35px" />
+												<b:TextBox ui:field="teamSearchTextBox"
+													width="100%" height="35px" />
 												<b:InputGroupButton>
-													<b:Button ui:field="teamSearchButton" text="Search All Teams" icon="SEARCH" />
+													<b:Button ui:field="teamSearchButton"
+														text="Search All Teams" icon="SEARCH" />
 												</b:InputGroupButton>
 											</b:InputGroup>
 										</div>
 										<div class="col-xs-12 col-sm-4 createTeam">
-											<b:Button ui:field="createTeamButton" type="DEFAULT" icon="PLUS" pull="RIGHT" text="Create a New Team" />
+											<b:Button ui:field="createTeamButton" type="DEFAULT"
+												icon="PLUS" pull="RIGHT" text="Create a New Team" />
 										</div>
 										<b:Column size="XS_12">
 											<g:SimplePanel ui:field="teamSynAlertPanel" />
 										</b:Column>
 									</div>
 									<g:FlowPanel ui:field="openInvitesContainer" />
-									<div class="panel panel-default padding-5 min-height-200" ui:field="teamsHighlightBox">
+									<div class="panel panel-default padding-5 min-height-200"
+										ui:field="teamsHighlightBox">
 										<b:Heading ui:field="teamsHeading" size="H3"></b:Heading>
-										<g:FlowPanel ui:field="teamsTabContent" addStyleNames="margin-10" />
+										<g:FlowPanel ui:field="teamsTabContent"
+											addStyleNames="margin-10" />
 									</div>
 								</div>
-								<div class="tab-background margin-10" ui:field="downloadsTabContainer">
+								<div class="tab-background margin-10"
+									ui:field="downloadsTabContainer">
 									<bh:Div ui:field="downloadsTabContent" />
 								</div>
-								<div class="tab-background margin-10" ui:field="settingsTabContainer">
+								<div class="tab-background margin-10"
+									ui:field="settingsTabContainer">
 									<g:FlowPanel ui:field="settingsTabContent" />
 								</div>
 							</div>

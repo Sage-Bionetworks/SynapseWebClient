@@ -7,7 +7,6 @@ import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.gwtbootstrap3.extras.slider.client.ui.Range;
 import org.gwtbootstrap3.extras.slider.client.ui.RangeSlider;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -15,20 +14,23 @@ import com.google.inject.Inject;
 
 public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultRangeView {
 	public static final int NUMBER_OF_STEPS = 200;
-	public interface Binder extends UiBinder<Widget, FacetColumnResultSliderRangeViewImpl> {	}
+
+	public interface Binder extends UiBinder<Widget, FacetColumnResultSliderRangeViewImpl> {
+	}
+
 	@UiField
 	Strong columnName;
 	@UiField
 	RangeSlider slider;
-	
+
 	@UiField
 	Span minField;
 	@UiField
 	Span maxField;
-	
+
 	Widget w;
 	Presenter presenter;
-	
+
 	@UiField
 	Radio notSetRadio;
 	@UiField
@@ -43,8 +45,9 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultRa
 	Button applyButton;
 	Range currentRange;
 	Double currentSelectedMin, currentSelectedMax, currentLowerbound, currentUpperbound;
+
 	@Inject
-	public FacetColumnResultSliderRangeViewImpl(Binder binder){
+	public FacetColumnResultSliderRangeViewImpl(Binder binder) {
 		w = binder.createAndBindUi(this);
 		slider.setEnabled(true);
 		slider.addSlideStopHandler(event -> {
@@ -53,7 +56,7 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultRa
 		applyButton.addClickHandler(event -> {
 			presenter.onFacetChange();
 		});
-		notSetRadio.addClickHandler(event-> {
+		notSetRadio.addClickHandler(event -> {
 			rangeUI.setVisible(false);
 			presenter.onFacetChange();
 		});
@@ -66,7 +69,7 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultRa
 		});
 	}
 
-	
+
 	@Override
 	public void setMin(String min) {
 		if (min != null) {
@@ -74,7 +77,7 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultRa
 		}
 		updateRange();
 	}
-	
+
 	@Override
 	public void setMax(String max) {
 		if (max != null) {
@@ -82,7 +85,7 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultRa
 		}
 		updateRange();
 	}
-	
+
 	private void updateRange() {
 		if (currentSelectedMin != null && currentSelectedMax != null) {
 			currentRange = new Range(currentSelectedMin, currentSelectedMax);
@@ -91,7 +94,7 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultRa
 			maxField.setText(currentRange.getMaxValue() + "");
 		}
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return w;
@@ -101,7 +104,7 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultRa
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-	
+
 	@Override
 	public void setColumnName(String name) {
 		columnName.setText(name);
@@ -110,23 +113,27 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultRa
 		anyRadio.setName(radioName);
 		rangeRadio.setName(radioName);
 	}
-	
+
 	@Override
 	public boolean isNotSet() {
 		return notSetRadio.getValue();
 	}
+
 	@Override
 	public boolean isAnyValue() {
 		return anyRadio.getValue();
 	}
+
 	@Override
 	public void setIsAnyValue() {
 		anyRadio.setValue(true, true);
 	}
+
 	@Override
 	public void setIsNotSet() {
 		notSetRadio.setValue(true, true);
 	}
+
 	@Override
 	public void setIsRange() {
 		rangeRadio.setValue(true, true);
@@ -166,14 +173,14 @@ public class FacetColumnResultSliderRangeViewImpl implements FacetColumnResultRa
 		}
 		updateStepSize();
 	}
-	
+
 	private void updateStepSize() {
 		if (currentLowerbound != null && currentUpperbound != null) {
 			double stepSize = getStepSize(currentLowerbound, currentUpperbound);
 			slider.setStep(stepSize);
 		}
 	}
-	
+
 	public double getStepSize(Number min, Number max) {
 		double stepSize = 1;
 		if (min != null && max != null) {

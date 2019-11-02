@@ -15,7 +15,6 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
-
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -28,7 +27,9 @@ import com.google.inject.Inject;
 
 public class TeamViewImpl extends Composite implements TeamView {
 
-	public interface TeamViewImplUiBinder extends UiBinder<Widget, TeamViewImpl> {}
+	public interface TeamViewImplUiBinder extends UiBinder<Widget, TeamViewImpl> {
+	}
+
 	@UiField
 	Anchor toolsMenuLink;
 	@UiField
@@ -84,14 +85,9 @@ public class TeamViewImpl extends Composite implements TeamView {
 	private GWTWrapper gwt;
 	private BigTeamBadge bigTeamBadge;
 	private CookieProvider cookieProvider;
+
 	@Inject
-	public TeamViewImpl(TeamViewImplUiBinder binder, 
-			InviteWidget inviteWidget, 
-			Header headerWidget, 
-			GWTWrapper gwt,
-			BigTeamBadge bigTeamBadge,
-			CookieProvider cookieProvider
-			) {
+	public TeamViewImpl(TeamViewImplUiBinder binder, InviteWidget inviteWidget, Header headerWidget, GWTWrapper gwt, BigTeamBadge bigTeamBadge, CookieProvider cookieProvider) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.gwt = gwt;
@@ -104,12 +100,12 @@ public class TeamViewImpl extends Composite implements TeamView {
 		showMapLink.addClickHandler(event -> {
 			presenter.onShowMap();
 		});
-		
+
 		memberSearchButton.addClickHandler(event -> {
 			presenter.onMemberSearch(memberSearchTextBox.getValue());
 		});
 		memberSearchTextBox.addKeyDownHandler(event -> {
-			if(KeyCodes.KEY_ENTER == event.getNativeKeyCode()){
+			if (KeyCodes.KEY_ENTER == event.getNativeKeyCode()) {
 				presenter.onMemberSearch(memberSearchTextBox.getValue());
 			}
 		});
@@ -121,14 +117,14 @@ public class TeamViewImpl extends Composite implements TeamView {
 		icon.setPaddingRight(4);
 		toolsMenuLink.add(icon);
 	}
-	
+
 	@Override
 	public void showMapModal() {
 		mapModal.show();
 	}
-	
+
 	private void setDropdownHandlers() {
-		inviteMemberItem.addClickHandler(event ->  {
+		inviteMemberItem.addClickHandler(event -> {
 			gwt.scheduleDeferred(() -> {
 				presenter.showInviteModal();
 			});
@@ -159,7 +155,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 			});
 		});
 	}
-	
+
 	@Override
 	public void clear() {
 		teamNameHeading.setText("");
@@ -171,7 +167,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		publicJoinField.setVisible(false);
 		memberSearchTextBox.setValue("");
 	}
-	
+
 	@Override
 	public void showLoading() {
 		clear();
@@ -187,31 +183,32 @@ public class TeamViewImpl extends Composite implements TeamView {
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
-	
+
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 		headerWidget.configure();
-		headerWidget.refresh();	
+		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
-	
+
 	@Override
 	public void showMemberMenuItems() {
 		leaveTeamItem.setVisible(true);
 	}
-	
+
 	@Override
 	public void showAdminMenuItems() {
 		deleteTeamItem.setVisible(true);
 		editTeamItem.setVisible(true);
 		inviteMemberItem.setVisible(true);
 	}
+
 	@Override
 	public void setCommandsVisible(boolean visible) {
-		commandsContainer.setVisible(visible);	
+		commandsContainer.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setTeam(Team team, TeamMembershipStatus status) {
 		teamNameHeading.setText(team.getName());
@@ -220,43 +217,45 @@ public class TeamViewImpl extends Composite implements TeamView {
 
 		// TODO: remove next line to take out of alpha mode
 		teamProjectsItem.setVisible(DisplayUtils.isInTestWebsite(cookieProvider));
-	}	
+	}
 
 	@Override
 	public void setSynAlertWidget(Widget synAlert) {
 		this.synAlertPanel.setWidget(synAlert);
 	}
-	
+
 	@Override
 	public void setInviteMemberWidget(Widget inviteWidget) {
 		this.inviteMemberPanel.setWidget(inviteWidget);
 	}
-	
+
 	@Override
 	public void setJoinTeamWidget(Widget joinWidget) {
 		this.joinTeamPanel.setWidget(joinWidget);
 	}
-	
+
 	@Override
 	public void addWidgets(Widget... widgets) {
 		for (Widget widget : widgets) {
 			widgetsContainer.add(widget);
 		}
 	}
-	
+
 	@Override
 	public void setOpenMembershipRequestWidget(Widget openMembershipRequestWidget) {
 		this.openMembershipRequestsPanel.setWidget(openMembershipRequestWidget);
 	}
-	
+
 	@Override
 	public void setOpenUserInvitationsWidget(Widget openUserInvitationsWidget) {
 		this.openUserInvitationsPanel.setWidget(openUserInvitationsWidget);
 	}
+
 	@Override
 	public void setManagerListWidget(Widget managerListWidget) {
 		this.managerListPanel.setWidget(managerListWidget);
 	}
+
 	@Override
 	public void setMemberListWidget(Widget memberListWidget) {
 		this.memberListPanel.setWidget(memberListWidget);
@@ -272,16 +271,17 @@ public class TeamViewImpl extends Composite implements TeamView {
 		mapPanel.clear();
 		mapPanel.add(w);
 	}
-	
+
 	@Override
 	public void setShowMapVisible(boolean visible) {
 		showMapLink.setVisible(visible);
 	}
-	
+
 	@Override
 	public int getClientHeight() {
 		return Window.getClientHeight();
 	};
+
 	@Override
 	public void setManageAccessVisible(boolean visible) {
 		manageAccessItem.setVisible(visible);

@@ -10,7 +10,6 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -27,8 +26,7 @@ import com.google.inject.Inject;
  * @author John
  * 
  */
-public class TableEntityWidgetViewImpl extends Composite implements
-		TableEntityWidgetView {
+public class TableEntityWidgetViewImpl extends Composite implements TableEntityWidgetView {
 
 	public interface Binder extends UiBinder<Widget, TableEntityWidgetViewImpl> {
 	}
@@ -39,7 +37,7 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	Div scopeCollapse;
 	@UiField
 	Div tableToolbar;
-	
+
 	@UiField
 	SimplePanel columnDetailsPanel;
 	@UiField
@@ -64,8 +62,7 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	Presenter presenter;
 
 	@Inject
-	public TableEntityWidgetViewImpl(final Binder uiBinder,
-			PortalGinInjector ginInjector, ScopeWidget scopeWidget) {
+	public TableEntityWidgetViewImpl(final Binder uiBinder, PortalGinInjector ginInjector, ScopeWidget scopeWidget) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.ginInjector = ginInjector;
 		this.columnModelsWidget = ginInjector.createNewColumnModelsWidget();
@@ -78,7 +75,7 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		
+
 		showSimpleSearch.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -118,13 +115,13 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	@Override
 	public void setQueryResultsWidget(IsWidget queryResultsWidget) {
 		this.queryResultsPanel.add(queryResultsWidget);
-		
+
 	}
 
 	@Override
 	public void setQueryInputWidget(IsWidget queryInputWidget) {
 		this.queryInputPanel.add(queryInputWidget);
-		
+
 	}
 
 	@Override
@@ -141,33 +138,37 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	public void setSchemaVisible(boolean visible) {
 		schemaCollapse.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setScopeVisible(boolean visible) {
 		scopeCollapse.setVisible(visible);
 	}
+
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
+
 	@Override
 	public void showConfirmDialog(String title, String message, Callback yesCallback) {
 		DisplayUtils.showConfirmDialog(title, message, yesCallback);
 	}
-	
+
 	@Override
 	public void setAdvancedSearchLinkVisible(boolean visible) {
 		showAdvancedSearch.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setSimpleSearchLinkVisible(boolean visible) {
 		showSimpleSearch.setVisible(visible);
 	}
+
 	@Override
 	public void setTableToolbarVisible(boolean visible) {
 		tableToolbar.setVisible(visible);
 	}
+
 	@Override
 	public void setAddToDownloadList(IsWidget w) {
 		addToDownloadListContainer.clear();

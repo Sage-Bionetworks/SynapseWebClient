@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.file.downloadlist;
 
 import java.util.List;
-
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.file.BulkFileDownloadRequest;
 import org.sagebionetworks.repo.model.file.BulkFileDownloadResponse;
@@ -21,7 +20,6 @@ import org.sagebionetworks.web.client.widget.asynch.InlineAsynchronousProgressVi
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
-
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -29,7 +27,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, DownloadListWidgetView.Presenter {
-	
+
 	public static final String ZIP_EXTENSION = ".zip";
 	public static final String DOWNLOAD_LIST_CLEARED_EVENT_NAME = "DownloadListCleared";
 	public static final String DOWNLOAD_LIST_PACKAGE_CREATED_EVENT_NAME = "PackageCreated";
@@ -45,18 +43,9 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 	AsynchronousProgressWidget progressWidget;
 	SynapseJSNIUtils jsniUtils;
 	int downloadOrderFileCount;
-	
+
 	@Inject
-	public DownloadListWidget(
-			DownloadListWidgetView view, 
-			SynapseAlert synAlert,
-			SynapseJavascriptClient jsClient,
-			EventBus eventBus,
-			FileHandleAssociationTable fhaTable,
-			PackageSizeSummary packageSizeSummary,
-			AsynchronousProgressWidget progressWidget,
-			InlineAsynchronousProgressViewImpl inlineAsyncProgressView,
-			SynapseJSNIUtils jsniUtils) {
+	public DownloadListWidget(DownloadListWidgetView view, SynapseAlert synAlert, SynapseJavascriptClient jsClient, EventBus eventBus, FileHandleAssociationTable fhaTable, PackageSizeSummary packageSizeSummary, AsynchronousProgressWidget progressWidget, InlineAsynchronousProgressViewImpl inlineAsyncProgressView, SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.jsClient = jsClient;
 		this.synAlert = synAlert;
@@ -74,7 +63,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 		view.setProgressTrackingWidgetVisible(false);
 		view.setProgressTrackingWidget(progressWidget);
 		view.setPresenter(this);
-		
+
 		addToPackageSizeCallback = fileSize -> {
 			packageSizeSummary.addFile(fileSize);
 			view.setMultiplePackagesRequiredVisible(packageSizeSummary.getTotalFileSize() > ClientProperties.GB);
@@ -83,7 +72,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 			onRemoveFileHandleAssociation(fha);
 		};
 	}
-	
+
 	public void refresh() {
 		view.hideFilesDownloadedAlert();
 		view.setPackageName("");
@@ -94,26 +83,27 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 		view.setMultiplePackagesRequiredVisible(false);
 		refreshDownloadList();
 	}
-	
+
 	public void refreshDownloadList() {
 		jsClient.getDownloadList(new AsyncCallback<DownloadList>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
+
 			@Override
 			public void onSuccess(DownloadList downloadList) {
 				setDownloadList(downloadList);
 			}
 		});
 	}
-	
+
 	private void setDownloadList(DownloadList downloadList) {
 		List<FileHandleAssociation> fhas = downloadList.getFilesToDownload();
 		packageSizeSummary.clear();
 		fhaTable.configure(fhas, addToPackageSizeCallback, onRemoveFileHandleAssociation);
 	}
-	
+
 	@Override
 	public void onCreatePackage(String zipFileName) {
 		synAlert.clear();
@@ -121,20 +111,21 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 			synAlert.showError(EMPTY_FILENAME_MESSAGE_);
 			return;
 		}
-		
+
 		jsClient.createDownloadOrderFromUsersDownloadList(zipFileName + ZIP_EXTENSION, new AsyncCallback<DownloadOrder>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
+
 			public void onSuccess(DownloadOrder downloadOrder) {
 				// and attempt to download!
 				jsniUtils.sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, DOWNLOAD_LIST_PACKAGE_CREATED_EVENT_NAME);
 				startDownload(downloadOrder);
-			}; 
+			};
 		});
 	}
-	
+
 	public void startDownload(DownloadOrder order) {
 		view.setProgressTrackingWidgetVisible(true);
 		BulkFileDownloadRequest request = new BulkFileDownloadRequest();
@@ -149,7 +140,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 				synAlert.handleException(failure);
 				view.setCreatePackageUIVisible(true);
 			}
-			
+
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
 				downloadOrderFileCount = order.getFiles().size();
@@ -159,7 +150,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 				view.setDownloadPackageUIVisible(true);
 				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}
-			
+
 			@Override
 			public void onCancel() {
 				view.setCreatePackageUIVisible(true);
@@ -167,7 +158,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 			}
 		});
 	}
-	
+
 	@Override
 	public void onClearDownloadList() {
 		synAlert.clear();
@@ -176,6 +167,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
+
 			@Override
 			public void onSuccess(Void result) {
 				refresh();
@@ -184,13 +176,14 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 			}
 		});
 	}
-	
+
 	public void onRemoveFileHandleAssociation(FileHandleAssociation fha) {
 		jsClient.removeFileFromDownloadList(fha, new AsyncCallback<DownloadList>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
+
 			@Override
 			public void onSuccess(DownloadList downloadList) {
 				setDownloadList(downloadList);
@@ -198,11 +191,12 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 			}
 		});
 	}
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	
+
 	@Override
 	public void onDownloadPackage() {
 		// refresh UI (change UI back to Create Package)

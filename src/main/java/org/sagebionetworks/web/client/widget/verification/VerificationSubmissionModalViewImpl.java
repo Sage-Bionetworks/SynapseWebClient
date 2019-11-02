@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.verification;
 
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
@@ -13,7 +12,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.web.client.DisplayUtils;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -23,15 +21,16 @@ import com.google.inject.Inject;
 
 public class VerificationSubmissionModalViewImpl implements VerificationSubmissionWidgetView {
 
-	public interface Binder extends UiBinder<Widget, VerificationSubmissionModalViewImpl> {}
-	
+	public interface Binder extends UiBinder<Widget, VerificationSubmissionModalViewImpl> {
+	}
+
 	VerificationSubmissionWidgetView.Presenter presenter;
-	
+
 	Widget widget;
 
 	@UiField
 	Div publicallyVisible;
-	
+
 	@UiField
 	TextBox firstName;
 	@UiField
@@ -42,14 +41,14 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	TextBox location;
 	@UiField
 	Anchor orcIdAnchor;
-	
+
 	@UiField
 	Div actOnly;
 	@UiField
 	Div emailAddresses;
 	@UiField
 	Panel filesContainer;
-	
+
 	@UiField
 	Button submitButton;
 	@UiField
@@ -74,13 +73,14 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	Div synAlertContainer;
 	@UiField
 	Div promptModalContainer;
-	
+
 	@UiField
 	Heading modalTitle;
 	@UiField
 	Alert reasonAlert;
 	@UiField
 	Paragraph reasonAlertText;
+
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -89,8 +89,8 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	@Inject
 	public VerificationSubmissionModalViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		
-		//click handlers
+
+		// click handlers
 		submitButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -263,6 +263,7 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	public void setSuspendButtonVisible(boolean visible) {
 		suspendButton.setVisible(visible);
 	}
+
 	@Override
 	public void setResubmitButtonVisible(boolean visible) {
 		recreateSubmissionButton.setVisible(visible);
@@ -272,11 +273,12 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	public void setSuspendedAlertVisible(boolean visible) {
 		reasonAlert.setVisible(visible);
 	}
+
 	@Override
 	public void setSuspendedReason(String reason) {
 		reasonAlertText.setText(reason);
 	}
-	
+
 	@Override
 	public void popupError(String message) {
 		DisplayUtils.showErrorMessage(message);
@@ -286,30 +288,33 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	public void openWindow(String url) {
 		DisplayUtils.newWindow(url, "_self", "");
 	}
-	
+
 	@Override
 	public void setPromptModal(Widget w) {
 		promptModalContainer.clear();
 		promptModalContainer.add(w);
 	}
+
 	@Override
 	public void setDeleteButtonVisible(boolean visible) {
 		deleteButton.setVisible(visible);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
+
 	@Override
 	public void setProfileLink(String profileId, String href) {
-		//Not used in this view implementation
+		// Not used in this view implementation
 	}
+
 	@Override
 	public void setState(VerificationStateEnum state) {
-		//Not used in this view implementation
+		// Not used in this view implementation
 	}
-	
+
 	@Override
 	public void setProfileFieldsEditable(boolean editable) {
 		firstName.setEnabled(editable);
@@ -317,23 +322,27 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 		currentAffiliation.setEnabled(editable);
 		location.setEnabled(editable);
 	}
-	
+
 	@Override
 	public String getFirstName() {
 		return firstName.getValue();
 	}
+
 	@Override
 	public String getLastName() {
 		return lastName.getValue();
 	}
+
 	@Override
 	public String getLocation() {
 		return location.getValue();
 	}
+
 	@Override
 	public String getOrganization() {
 		return currentAffiliation.getValue();
 	}
+
 	@Override
 	public void setCloseButtonVisible(boolean visible) {
 		closeButton.setVisible(visible);

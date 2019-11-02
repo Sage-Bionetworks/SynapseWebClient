@@ -3,9 +3,9 @@ package org.sagebionetworks.web.client;
 import com.google.gwt.user.client.Timer;
 
 public class GWTTimerImpl implements GWTTimer {
-	
+
 	Timer timer;
-	
+
 	@Override
 	public void cancel() {
 		if (timer != null) {

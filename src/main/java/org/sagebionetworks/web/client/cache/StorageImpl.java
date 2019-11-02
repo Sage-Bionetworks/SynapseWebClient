@@ -5,6 +5,7 @@ import com.google.gwt.storage.client.Storage;
 public class StorageImpl implements StorageWrapper {
 
 	private Storage storage;
+
 	public StorageImpl() {
 		storage = Storage.getLocalStorageIfSupported();
 	}
@@ -35,11 +36,11 @@ public class StorageImpl implements StorageWrapper {
 			try {
 				storage.setItem(key, data);
 			} catch (Throwable e) {
-				//unlikely
+				// unlikely
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean isStorageSupported() {
 		return storage != null;

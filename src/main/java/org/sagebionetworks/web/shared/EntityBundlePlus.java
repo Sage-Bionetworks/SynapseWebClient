@@ -1,18 +1,16 @@
 package org.sagebionetworks.web.shared;
 
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
-import org.sagebionetworks.repo.model.UserProfile;
-
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
- * This class is to transfer an entity bundle, plus any additional data from service calls, into a single servlet call from the client.
- * Initially this is being used for the EntityBadge (tooltip)
+ * This class is to transfer an entity bundle, plus any additional data from service calls, into a
+ * single servlet call from the client. Initially this is being used for the EntityBadge (tooltip)
  */
 public class EntityBundlePlus implements IsSerializable {
 	EntityBundle entityBundle;
 	Long latestVersionNumber;
-	
+
 	@Override
 	public String toString() {
 		return "EntityBundlePlus [entityBundle=" + entityBundle + ", latestVersionNumber=" + latestVersionNumber + "]";
@@ -60,10 +58,10 @@ public class EntityBundlePlus implements IsSerializable {
 	public EntityBundle getEntityBundle() {
 		return entityBundle;
 	}
-	
+
 	public void setEntityBundle(EntityBundle entityBundle) {
 		this.entityBundle = entityBundle;
 	}
-	
-	
+
+
 }

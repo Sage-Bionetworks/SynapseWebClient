@@ -1,43 +1,39 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.ResourceAccess;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class PublicPrivateBadge {
-	
+
 	private PublicPrivateBadgeView view;
 	private PublicPrincipalIds publicPrincipalIds;
 	private UserAccountServiceAsync userAccountService;
 	private Entity entity;
 	private AccessControlList acl;
 	private SynapseJavascriptClient jsClient;
-	
+
 	@Inject
-	public PublicPrivateBadge(
-			PublicPrivateBadgeView view, 
-			SynapseJavascriptClient jsClient, 
-			UserAccountServiceAsync userAccountService) {
+	public PublicPrivateBadge(PublicPrivateBadgeView view, SynapseJavascriptClient jsClient, UserAccountServiceAsync userAccountService) {
 		this.view = view;
 		this.jsClient = jsClient;
 		this.userAccountService = userAccountService;
 		fixServiceEntryPoint(userAccountService);
-	}	
+	}
 
 	/**
 	 * Configure public/private badge, return answer if it is public or private in the callback.
+	 * 
 	 * @param entity
 	 * @param callback
 	 */
@@ -49,13 +45,14 @@ public class PublicPrivateBadge {
 			public void onSuccess(AccessControlList result) {
 				setAcl(result, callback);
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				callback.onFailure(caught);
 			}
 		});
 	}
-	
+
 	public void configure(Entity entity) {
 		view.clear();
 		this.entity = entity;
@@ -64,26 +61,28 @@ public class PublicPrivateBadge {
 			public void onSuccess(AccessControlList result) {
 				setAcl(result, null);
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(caught.getMessage());
 			}
 		};
-		
+
 		getAcl(callback1);
 	}
-	
+
 	private void setAcl(final AccessControlList acl, final AsyncCallback<Boolean> isPublicCallback) {
 		this.acl = acl;
 		DisplayUtils.getPublicPrincipalIds(userAccountService, new AsyncCallback<PublicPrincipalIds>() {
 			@Override
 			public void onSuccess(PublicPrincipalIds result) {
 				publicPrincipalIds = result;
-				boolean isPublic = isPublic(acl, publicPrincipalIds); 
+				boolean isPublic = isPublic(acl, publicPrincipalIds);
 				view.setIsPublic(isPublic);
 				if (isPublicCallback != null)
 					isPublicCallback.onSuccess(isPublic);
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				if (isPublicCallback != null)
@@ -94,9 +93,10 @@ public class PublicPrivateBadge {
 			}
 		});
 	}
-	
+
 	/**
 	 * Using the acl and public principal ids, determine if this is public or not
+	 * 
 	 * @return
 	 */
 	public static boolean isPublic(AccessControlList acl, PublicPrincipalIds publicPrincipalIds) {
@@ -107,7 +107,7 @@ public class PublicPrivateBadge {
 		}
 		return false;
 	}
-	
+
 	public void getAcl(final AsyncCallback<AccessControlList> callback) {
 		EntityBundleRequest bundleRequest = new EntityBundleRequest();
 		bundleRequest.setIncludeBenefactorACL(true);
@@ -121,18 +121,19 @@ public class PublicPrivateBadge {
 					onFailure(e);
 				}
 			}
+
 			public void onFailure(Throwable caught) {
 				callback.onFailure(caught);
-				};
-			});
+			};
+		});
 	}
-	
+
 	public AccessControlList getAcl() {
 		return acl;
 	}
-	
+
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-		
+
 }

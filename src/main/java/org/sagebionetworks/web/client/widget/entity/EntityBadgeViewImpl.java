@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
-import static org.sagebionetworks.web.client.DisplayUtils.TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER;
 
+import static org.sagebionetworks.web.client.DisplayUtils.TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.Emphasis;
@@ -20,7 +20,6 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -43,8 +42,10 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	Presenter presenter;
 	UserBadge modifiedByBadge;
 	DateTimeUtils dateTimeUtils;
-	public interface Binder extends UiBinder<Widget, EntityBadgeViewImpl> {	}
-	
+
+	public interface Binder extends UiBinder<Widget, EntityBadgeViewImpl> {
+	}
+
 	@UiField
 	FocusPanel iconContainer;
 	@UiField
@@ -83,38 +84,33 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	TableData entityTableData;
 	@UiField
 	org.gwtbootstrap3.client.ui.Anchor addToDownloadListLink;
-	
-	
+
+
 	Callback onAttachCallback;
 	Anchor entityAnchor;
 	public static PlaceChanger placeChanger = null;
 	HandlerRegistration clickHandlerRegistration;
 	public static final String ENTITY_ID_ATTRIBUTE = "data-entity-id";
-	
+
 	public static final ClickHandler STANDARD_CLICKHANDLER = event -> {
 		if (!DisplayUtils.isAnyModifierKeyDown(event)) {
 			event.preventDefault();
-			Widget panel = (Widget)event.getSource();
+			Widget panel = (Widget) event.getSource();
 			String entityId = panel.getElement().getAttribute(ENTITY_ID_ATTRIBUTE);
 			placeChanger.goTo(new Synapse(entityId));
 		}
 	};
-	
+
 	@Inject
-	public EntityBadgeViewImpl(final Binder uiBinder,
-			final SynapseJSNIUtils synapseJSNIUtils,
-			PortalGinInjector ginInjector,
-			GlobalApplicationState globalAppState,
-			UserBadge modifiedByBadge, 
-			DateTimeUtils dateTimeUtils) {
+	public EntityBadgeViewImpl(final Binder uiBinder, final SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector, GlobalApplicationState globalAppState, UserBadge modifiedByBadge, DateTimeUtils dateTimeUtils) {
 		this.modifiedByBadge = modifiedByBadge;
 		this.dateTimeUtils = dateTimeUtils;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		initWidget(uiBinder.createAndBindUi(this));
 		if (EntityBadgeViewImpl.placeChanger == null) {
-			EntityBadgeViewImpl.placeChanger = ginInjector.getGlobalApplicationState().getPlaceChanger(); 
+			EntityBadgeViewImpl.placeChanger = ginInjector.getGlobalApplicationState().getPlaceChanger();
 		}
-		
+
 		idField.addClickHandler(TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER);
 		md5Field.addClickHandler(TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER);
 		addToDownloadListLink.addClickHandler(event -> {
@@ -126,7 +122,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	public void setPresenter(Presenter p) {
 		this.presenter = p;
 	}
-	
+
 	@Override
 	public void setOnAttachCallback(Callback onAttachCallback) {
 		this.onAttachCallback = onAttachCallback;
@@ -139,13 +135,14 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			onAttachCallback.invoke();
 		}
 	}
-	
+
 	@Override
 	public void setEntity(final EntityHeader entityHeader) {
 		clear();
-		if(entityHeader == null)  throw new IllegalArgumentException("Entity is required");
-		
-		if(entityHeader != null) {
+		if (entityHeader == null)
+			throw new IllegalArgumentException("Entity is required");
+
+		if (entityHeader != null) {
 			entityAnchor = new Anchor();
 			clickHandlerRegistration = entityAnchor.addClickHandler(STANDARD_CLICKHANDLER);
 			entityAnchor.setText(entityHeader.getName());
@@ -161,41 +158,41 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 				modifiedByField.add(modifiedByBadge);
 			}
 			if (entityHeader.getModifiedOn() != null) {
-				modifiedOnField.setText(dateTimeUtils.getDateTimeString(entityHeader.getModifiedOn()));	
+				modifiedOnField.setText(dateTimeUtils.getDateTimeString(entityHeader.getModifiedOn()));
 			}
 			if (entityHeader.getCreatedOn() != null) {
 				createdOnField.setText(dateTimeUtils.getDateTimeString(entityHeader.getCreatedOn()));
 			}
-		} 		
+		}
 	}
-	
+
 	@Override
 	public void setEntityNameWidthPx(int width) {
 		entityTableData.setWidth(width + "px");
 		entityAnchor.setWidth(width + "px");
 	}
-	
+
 	@Override
 	public void setIcon(IconType iconType) {
 		icon.setType(iconType);
 	}
-	
+
 	@Override
 	public void showLoadError(String principalId) {
 		clear();
-		entityContainer.add(new HTML(DisplayConstants.ERROR_LOADING));		
+		entityContainer.add(new HTML(DisplayConstants.ERROR_LOADING));
 	}
-	
+
 	public void clear() {
 		iconContainer.clear();
 		entityContainer.clear();
 		iconsContainer.clear();
 	}
-	
+
 	@Override
 	public void addClickHandler(final ClickHandler handler) {
 		if (clickHandlerRegistration != null) {
-			clickHandlerRegistration.removeHandler();	
+			clickHandlerRegistration.removeHandler();
 		}
 		clickHandlerRegistration = entityAnchor.addClickHandler(event -> {
 			if (!DisplayUtils.isAnyModifierKeyDown(event)) {
@@ -204,12 +201,12 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			}
 		});
 	}
-	
+
 	@Override
 	public String getFriendlySize(Long contentSize, boolean abbreviatedUnits) {
 		return DisplayUtils.getFriendlySize(contentSize, abbreviatedUnits);
 	}
-	
+
 	@Override
 	public void setAnnotations(String html) {
 		Icon icon = new Icon(IconType.TAGS);
@@ -220,7 +217,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		tooltip.setHtml(SafeHtmlUtils.fromTrustedString(html));
 		iconsContainer.add(tooltip);
 	}
-	
+
 	@Override
 	public void setError(String error) {
 		Icon icon = new Icon(IconType.EXCLAMATION_CIRCLE);
@@ -231,11 +228,12 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		tooltip.setPlacement(Placement.RIGHT);
 		iconsContainer.add(tooltip);
 	}
-	
+
 	@Override
 	public void setSize(String s) {
 		sizeField.setText(s);
 	}
+
 	@Override
 	public void setMd5(String s) {
 		md5Field.setText(s);
@@ -250,6 +248,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		tooltip.setPlacement(Placement.RIGHT);
 		iconsContainer.add(tooltip);
 	}
+
 	@Override
 	public void showPrivateIcon() {
 		Icon icon = new Icon(IconType.LOCK);
@@ -259,6 +258,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		tooltip.setPlacement(Placement.RIGHT);
 		iconsContainer.add(tooltip);
 	}
+
 	@Override
 	public void showPublicIcon() {
 		Icon icon = new Icon(IconType.GLOBE);
@@ -268,6 +268,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		tooltip.setPlacement(Placement.RIGHT);
 		iconsContainer.add(tooltip);
 	}
+
 	@Override
 	public void showSharingSetIcon() {
 		Icon icon = new Icon(IconType.CHECK);
@@ -277,13 +278,14 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		tooltip.setPlacement(Placement.RIGHT);
 		iconsContainer.add(tooltip);
 	}
+
 	@Override
 	public boolean isInViewport() {
 		return DisplayUtils.isInViewport(this);
 	}
-	
+
 	@Override
-	public void showDiscussionThreadIcon(){
+	public void showDiscussionThreadIcon() {
 		Icon icon = new Icon(IconType.COMMENT);
 		icon.setFixedWidth(true);
 		icon.setPull(Pull.RIGHT);
@@ -291,7 +293,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		tooltip.setPlacement(Placement.RIGHT);
 		iconsContainer.add(tooltip);
 	}
-	
+
 	@Override
 	public void showUnlinkIcon() {
 		Icon icon = new Icon(IconType.CHAIN_BROKEN);
@@ -309,24 +311,25 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 
 	@Override
 	public void showAddToDownloadList() {
-		addToDownloadListLink.setVisible(true);	
+		addToDownloadListLink.setVisible(true);
 	}
 
 	@Override
 	public void setModifiedByUserBadgeClickHandler(ClickHandler handler) {
 		modifiedByBadge.setCustomClickHandler(handler);
 	}
+
 	@Override
 	public void showMinimalColumnSet() {
 		sizeTableData.setVisible(false);
 		sizeTableData.setStyleName("");
 		modifiedOnTableData.setVisible(false);
 		modifiedOnTableData.setStyleName("");
-//		idTableData.setVisible(false);
+		// idTableData.setVisible(false);
 		createdOnTableData.setVisible(false);
 		createdOnTableData.setStyleName("");
-//		modifiedByTableData.setVisible(false);
-//		modifiedByTableData.setStyleName("");
+		// modifiedByTableData.setVisible(false);
+		// modifiedByTableData.setStyleName("");
 		md5TableData.setVisible(false);
 		md5TableData.setStyleName("");
 		downloadTableData.setVisible(false);

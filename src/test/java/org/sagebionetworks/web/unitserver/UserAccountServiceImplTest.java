@@ -5,7 +5,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -34,7 +33,7 @@ public class UserAccountServiceImplTest {
 	UserAccountServiceImpl userAccountService;
 	UserSessionData mockUserSessionData;
 	String testSessionToken = "12345abcde";
-	UserProfile testProfile;	
+	UserProfile testProfile;
 
 	@Before
 	public void before() throws SynapseException, JSONObjectAdapterException {
@@ -45,8 +44,8 @@ public class UserAccountServiceImplTest {
 		mockTokenProvider = Mockito.mock(TokenProvider.class);
 
 		testProfile = new UserProfile();
-		testProfile.setOwnerId("123");		
-		
+		testProfile.setOwnerId("123");
+
 		userAccountService = new UserAccountServiceImpl();
 		userAccountService.setSynapseProvider(mockSynapseProvider);
 		userAccountService.setTokenProvider(mockTokenProvider);

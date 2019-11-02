@@ -2,7 +2,6 @@ package org.sagebionetworks.web.shared;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
-
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class TeamBundle implements IsSerializable {
@@ -11,15 +10,15 @@ public class TeamBundle implements IsSerializable {
 	private TeamMembershipStatus teamMembershipStatus;
 	private Long totalMemberCount;
 	private boolean isUserAdmin;
+
 	/**
 	 * Default constructor
 	 */
 	public TeamBundle() {
-		
+
 	}
 
-	public TeamBundle(Team team, Long totalMemberCount,
-			TeamMembershipStatus teamMembershipStatus, boolean isUserAdmin) {
+	public TeamBundle(Team team, Long totalMemberCount, TeamMembershipStatus teamMembershipStatus, boolean isUserAdmin) {
 		super();
 		this.team = team;
 		this.teamMembershipStatus = teamMembershipStatus;
@@ -50,12 +49,15 @@ public class TeamBundle implements IsSerializable {
 	public boolean isUserAdmin() {
 		return isUserAdmin;
 	}
+
 	public void setIsUserAdmin(boolean isUserAdmin) {
 		this.isUserAdmin = isUserAdmin;
 	}
+
 	public Long getTotalMemberCount() {
 		return totalMemberCount;
 	}
+
 	public void setTotalMemberCount(Long totalMemberCount) {
 		this.totalMemberCount = totalMemberCount;
 	}
@@ -66,13 +68,8 @@ public class TeamBundle implements IsSerializable {
 		int result = 1;
 		result = prime * result + (isUserAdmin ? 1231 : 1237);
 		result = prime * result + ((team == null) ? 0 : team.hashCode());
-		result = prime
-				* result
-				+ ((teamMembershipStatus == null) ? 0 : teamMembershipStatus
-						.hashCode());
-		result = prime
-				* result
-				+ ((totalMemberCount == null) ? 0 : totalMemberCount.hashCode());
+		result = prime * result + ((teamMembershipStatus == null) ? 0 : teamMembershipStatus.hashCode());
+		result = prime * result + ((totalMemberCount == null) ? 0 : totalMemberCount.hashCode());
 		return result;
 	}
 
@@ -107,9 +104,7 @@ public class TeamBundle implements IsSerializable {
 
 	@Override
 	public String toString() {
-		return "TeamBundle [team=" + team + ", teamMembershipStatus="
-				+ teamMembershipStatus + ", totalMemberCount="
-				+ totalMemberCount + ", isUserAdmin=" + isUserAdmin + "]";
+		return "TeamBundle [team=" + team + ", teamMembershipStatus=" + teamMembershipStatus + ", totalMemberCount=" + totalMemberCount + ", isUserAdmin=" + isUserAdmin + "]";
 	}
-	
+
 }

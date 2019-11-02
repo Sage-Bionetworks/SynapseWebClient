@@ -7,7 +7,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.widget.CheckBoxState;
 import org.sagebionetworks.web.client.widget.SelectionToolbar;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -17,7 +16,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
-	public interface BiodallianceEditorViewImplUiBinder extends UiBinder<Widget, BiodallianceEditorViewImpl> {}
+	public interface BiodallianceEditorViewImplUiBinder extends UiBinder<Widget, BiodallianceEditorViewImpl> {
+	}
+
 	private Presenter presenter;
 	@UiField
 	TextBox chrField;
@@ -39,6 +40,7 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 	Table trackColumnHeaders;
 	Widget widget;
 	org.sagebionetworks.web.client.widget.SelectableListView.Presenter selectionToolbarHandler;
+
 	@Inject
 	public BiodallianceEditorViewImpl(BiodallianceEditorViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
@@ -60,7 +62,7 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 				selectionToolbarHandler.onMoveDown();
 			}
 		});
-		
+
 		selectionToolbar.setMoveupClicked(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -80,55 +82,53 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 			}
 		});
 	}
+
 	@Override
-	public void setSelectionToolbarHandler(
-			org.sagebionetworks.web.client.widget.SelectableListView.Presenter selectionToolbarHandler) {
+	public void setSelectionToolbarHandler(org.sagebionetworks.web.client.widget.SelectableListView.Presenter selectionToolbarHandler) {
 		this.selectionToolbarHandler = selectionToolbarHandler;
 	}
-	@Override
-	public void initView() {
-	}
 
-	
-	
 	@Override
-	public void checkParams() throws IllegalArgumentException {
-	}
+	public void initView() {}
+
+
+
+	@Override
+	public void checkParams() throws IllegalArgumentException {}
 
 	@Override
 	public Widget asWidget() {
 		return widget;
-	}	
+	}
 
-	@Override 
+	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-		
+
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override
-	public void showLoading() {
-	}
+	public void showLoading() {}
 
 	@Override
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message);
 	}
-	
+
 	@Override
 	public void addTrack(Widget w) {
 		tracksContainer.add(w);
 	}
-	
+
 	@Override
 	public void clearTracks() {
 		tracksContainer.clear();
 	}
-	
+
 	@Override
 	public void clear() {
 		tracksContainer.clear();
@@ -160,49 +160,56 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 	public void setViewEnd(String viewEnd) {
 		this.viewEndField.setValue(viewEnd);
 	}
+
 	@Override
 	public boolean isHuman() {
 		return humanButton.getValue();
 	}
+
 	@Override
 	public void setHuman() {
 		humanButton.setActive(true);
 		humanButton.setValue(true, true);
 		mouseButton.setActive(false);
 	}
-	
+
 	@Override
 	public boolean isMouse() {
 		return mouseButton.getValue();
 	}
+
 	@Override
 	public void setMouse() {
 		mouseButton.setActive(true);
 		mouseButton.setValue(true, true);
 		humanButton.setActive(false);
 	}
-	
+
 	@Override
 	public void setCanDelete(boolean canDelete) {
 		selectionToolbar.setCanDelete(canDelete);
 	}
-	
+
 	@Override
 	public void setCanMoveDown(boolean canMoveDown) {
 		selectionToolbar.setCanMoveDown(canMoveDown);
 	}
+
 	@Override
 	public void setCanMoveUp(boolean canMoveUp) {
 		selectionToolbar.setCanMoveUp(canMoveUp);
 	}
+
 	@Override
 	public void setButtonToolbarVisible(boolean visible) {
 		selectionToolbar.setVisible(visible);
 	}
+
 	@Override
 	public void setTrackHeaderColumnsVisible(boolean visible) {
 		trackColumnHeaders.setVisible(visible);
 	}
+
 	@Override
 	public void setSelectionState(CheckBoxState selectionState) {
 		selectionToolbar.setSelectionState(selectionState);

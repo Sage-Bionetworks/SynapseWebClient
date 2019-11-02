@@ -1,53 +1,64 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder
-  xmlns:ui="urn:ui:com.google.gwt.uibinder"
-  xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-  xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-  xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
-  xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
-  xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-  
-  	<bh:Div addStyleNames="border-top-1">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
+
+	<bh:Div addStyleNames="border-top-1">
 		<w:LoadingSpinner size="16px" ui:field="loadingUI" />
-	  	<t:Table width="100%" height="36px">
+		<t:Table width="100%" height="36px">
 			<t:TableRow ui:field="row" visible="false">
 				<t:TableData width="35px" ui:field="selectTableData">
 					<b:CheckBox ui:field="select" />
 				</t:TableData>
-				<t:TableData width="20px" ui:field="synAlertTableData" >
+				<t:TableData width="20px" ui:field="synAlertTableData">
 					<b:Tooltip ui:field="errorTooltip" title="Loading error">
-					  <b:Icon fixedWidth="true" type="EXCLAMATION_CIRCLE" addStyleNames="text-danger"/>
+						<b:Icon fixedWidth="true" type="EXCLAMATION_CIRCLE"
+							addStyleNames="text-danger" />
 					</b:Tooltip>
 				</t:TableData>
 				<t:TableData width="20px" ui:field="iconTableData">
-					<b:Icon ui:field="icon" type="FILE"/>
+					<b:Icon ui:field="icon" type="FILE" />
 				</t:TableData>
-				<t:TableData addStyleNames="maxWidth50px overflow-x-hidden ">
-					<bh:Div addStyleNames="margin-right-5"> 
-						<g:Anchor ui:field="entityLink" target="_blank" styleName="displayInline pull-left link"/>
+				<t:TableData
+					addStyleNames="maxWidth50px overflow-x-hidden ">
+					<bh:Div addStyleNames="margin-right-5">
+						<g:Anchor ui:field="entityLink" target="_blank"
+							styleName="displayInline pull-left link" />
 						<b:Tooltip title="Download">
-							<b:Anchor icon="DOWNLOAD" text="+" ui:field="addToDownloadListLink" addStyleNames="right margin-right-10" visible="false"/>
+							<b:Anchor icon="DOWNLOAD" text="+"
+								ui:field="addToDownloadListLink"
+								addStyleNames="right margin-right-10" visible="false" />
 						</b:Tooltip>
 					</bh:Div>
 				</t:TableData>
-				<t:TableData width="60px" addStyleNames="overflow-x-hidden">
-					<g:Label ui:field="versionField"/>
+				<t:TableData width="60px"
+					addStyleNames="overflow-x-hidden">
+					<g:Label ui:field="versionField" />
 				</t:TableData>
-				<t:TableData width="165px" ui:field="descriptionTableData" addStyleNames="overflow-x-hidden text-align-left padding-right-5" visible="false">
-					<g:Label ui:field="descriptionField"/>
+				<t:TableData width="165px"
+					ui:field="descriptionTableData"
+					addStyleNames="overflow-x-hidden text-align-left padding-right-5"
+					visible="false">
+					<g:Label ui:field="descriptionField" />
 				</t:TableData>
-				<t:TableData width="165px" addStyleNames="visible-md visible-lg overflow-x-hidden" >
-					<g:Label ui:field="createdOnField"/>
+				<t:TableData width="165px"
+					addStyleNames="visible-md visible-lg overflow-x-hidden">
+					<g:Label ui:field="createdOnField" />
 				</t:TableData>
-				<t:TableData width="310px" addStyleNames="visible-md visible-lg overflow-x-hidden" >
-					<g:SimplePanel ui:field="createdByField"/>
+				<t:TableData width="310px"
+					addStyleNames="visible-md visible-lg overflow-x-hidden">
+					<g:SimplePanel ui:field="createdByField" />
 				</t:TableData>
-				<t:TableData width="165px" ui:field="noteTableData" addStyleNames="visible-md visible-lg overflow-x-hidden">
-					<g:Label ui:field="noteField"/>
+				<t:TableData width="165px" ui:field="noteTableData"
+					addStyleNames="visible-md visible-lg overflow-x-hidden">
+					<g:Label ui:field="noteField" />
 				</t:TableData>
 			</t:TableRow>
-		</t:Table>  
-  	</bh:Div>
-	  
+		</t:Table>
+	</bh:Div>
+
 </ui:UiBinder>

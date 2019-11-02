@@ -2,8 +2,6 @@ package org.sagebionetworks.web.client.widget.docker;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -11,12 +9,12 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
 import com.google.gwt.http.client.Request;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -30,13 +28,9 @@ public class DockerRepoListWidget {
 	private LoadMoreWidgetContainer membersContainer;
 	private SynapseJavascriptClient jsClient;
 	private Request currentRequest = null;
+
 	@Inject
-	public DockerRepoListWidget(
-			DockerRepoListWidgetView view,
-			LoadMoreWidgetContainer membersContainer,
-			SynapseAlert synAlert,
-			SynapseJavascriptClient jsClient
-			) {
+	public DockerRepoListWidget(DockerRepoListWidgetView view, LoadMoreWidgetContainer membersContainer, SynapseAlert synAlert, SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.membersContainer = membersContainer;
@@ -57,6 +51,7 @@ public class DockerRepoListWidget {
 
 	/**
 	 * Configure this widget before use.
+	 * 
 	 * @param projectBundle
 	 */
 	public void configure(String projectId) {
@@ -69,7 +64,7 @@ public class DockerRepoListWidget {
 		query.setNextPageToken(null);
 		loadMore();
 	}
-	
+
 	public void loadMore() {
 		synAlert.clear();
 		currentRequest = jsClient.getEntityChildren(query, new AsyncCallback<EntityChildrenResponse>() {
@@ -78,23 +73,25 @@ public class DockerRepoListWidget {
 				membersContainer.setIsMore(results.getNextPageToken() != null);
 				setResults(results.getPage());
 			};
+
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
-			
+
 		});
 	}
-	
+
 	private void setResults(List<EntityHeader> results) {
 		synAlert.clear();
-		for (EntityHeader header: results) {
+		for (EntityHeader header : results) {
 			view.addRepo(header);
 			jsClient.getEntityBundleFromCache(header.getId(), new AsyncCallback<EntityBundle>() {
 				@Override
 				public void onSuccess(EntityBundle result) {
-					view.setDockerRepository((DockerRepository)result.getEntity());
+					view.setDockerRepository((DockerRepository) result.getEntity());
 				};
+
 				@Override
 				public void onFailure(Throwable caught) {
 					synAlert.handleException(caught);
@@ -105,6 +102,7 @@ public class DockerRepoListWidget {
 
 	/**
 	 * Create a new query.
+	 * 
 	 * @param parentId
 	 * @return
 	 */
@@ -118,7 +116,7 @@ public class DockerRepoListWidget {
 		newQuery.setIncludeTypes(types);
 		return newQuery;
 	}
-	
+
 	public void setEntityClickedHandler(CallbackP<String> entityClickedHandler) {
 		view.setEntityClickedHandler(entityId -> {
 			view.clear();

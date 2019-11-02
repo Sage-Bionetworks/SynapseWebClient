@@ -1,10 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.doi;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.*;
-import static org.sagebionetworks.web.client.utils.FutureUtils.*;
-
+import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +31,7 @@ public class DoiWidgetV2Test {
 	private DoiAssociation mockDoi;
 	@Mock
 	SynapseJavascriptClient mockJsClient;
-	
+
 	private static final String uri = "10.5072/test-uri";
 
 	@Before
@@ -35,7 +39,7 @@ public class DoiWidgetV2Test {
 		doiWidget = new DoiWidgetV2(mockView, mockJsClient);
 		when(mockJsClient.getDoiAssociation(anyString(), any(ObjectType.class), anyLong())).thenReturn(getDoneFuture(mockDoi));
 	}
-	
+
 	@Test
 	public void testConfigure() throws Exception {
 		when(mockDoi.getDoiUri()).thenReturn(uri);
@@ -68,21 +72,21 @@ public class DoiWidgetV2Test {
 		String objectId = "syn12333";
 		ObjectType objectType = ObjectType.ENTITY;
 		Long version = 4L;
-		
+
 		doiWidget.configure(objectId, objectType, version);
-		
+
 		verify(mockJsClient).getDoiAssociation(objectId, objectType, version);
 		verify(mockView, atLeastOnce()).hide();
 		verify(mockView, atLeastOnce()).clear();
 		verify(mockView).showDoi(uri);
 	}
-	
+
 	@Test
 	public void testConfigureUsingObjectTypeFailure() {
 		when(mockJsClient.getDoiAssociation(anyString(), any(ObjectType.class), anyLong())).thenReturn(getFailedFuture());
-		
+
 		doiWidget.configure("syn123", ObjectType.ENTITY, 44L);
-		
+
 		verify(mockView, atLeastOnce()).hide();
 		verify(mockView, atLeastOnce()).clear();
 		verify(mockView, never()).showDoi(anyString());

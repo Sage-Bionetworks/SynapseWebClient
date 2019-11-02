@@ -8,7 +8,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -28,7 +27,6 @@ import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -36,7 +34,7 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public class RegisterAccountPresenterTest {
-	
+
 	@Mock
 	RegisterAccountPresenter registerAccountPresenter;
 	@Mock
@@ -62,40 +60,43 @@ public class RegisterAccountPresenterTest {
 	SynapseClientAsync mockSynapseClient;
 	@Mock
 	SynapseAlert mockGoogleSynAlert;
+
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
 		when(mockAuthController.isLoggedIn()).thenReturn(false);
 		when(mockGlobalAppState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockSynapseClient, mockRegisterWidget, mockAuthController, mockGlobalAppState, mockGoogleSynAlert);			
+		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockSynapseClient, mockRegisterWidget, mockAuthController, mockGlobalAppState, mockGoogleSynAlert);
 	}
-	
+
 	@Test
 	public void testStart() {
-		registerAccountPresenter.start(mockAcceptsOneWidget, mockEventBus);		
+		registerAccountPresenter.start(mockAcceptsOneWidget, mockEventBus);
 		verify(mockAcceptsOneWidget).setWidget(mockView);
 	}
-	
+
 	@Test
 	public void testSetPlace() {
-		//with email
+		// with email
 		when(mockPlace.toToken()).thenReturn(email);
 		registerAccountPresenter.setPlace(mockPlace);
-		
+
 		verify(mockRegisterWidget).setEmail(email);
 		verify(mockView).setRegisterWidget(any(Widget.class));
 	}
+
 	@Test
 	public void testSetPlaceLoggedIn() {
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
-		
+
 		registerAccountPresenter.setPlace(mockPlace);
-		
+
 		verify(mockPlaceChanger).goTo(placeCaptor.capture());
 		Place wentToPlace = placeCaptor.getValue();
 		assertTrue(wentToPlace instanceof Profile);
-		assertEquals(Profile.VIEW_PROFILE_TOKEN, ((Profile)wentToPlace).toToken());
+		assertEquals(Profile.VIEW_PROFILE_TOKEN, ((Profile) wentToPlace).toToken());
 	}
+
 	@Test
 	public void testIsUsernameAvailableTrue() {
 		registerAccountPresenter.checkUsernameAvailable("abcd");
@@ -104,7 +105,7 @@ public class RegisterAccountPresenterTest {
 		verify(mockGoogleSynAlert, never()).showError(anyString());
 		verify(mockGoogleSynAlert, never()).handleException(any(Throwable.class));
 	}
-	
+
 	@Test
 	public void testIsUsernameAvailableFalse() {
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_NAME.toString()), any(AsyncCallback.class));

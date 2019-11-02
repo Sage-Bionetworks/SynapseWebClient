@@ -6,7 +6,7 @@ import com.google.inject.Inject;
 
 public class WizardProgressWidget implements WizardProgressWidgetView.Presenter, IsWidget {
 	private WizardProgressWidgetView view;
-	
+
 	@Inject
 	public WizardProgressWidget(WizardProgressWidgetView view) {
 		this.view = view;
@@ -20,12 +20,12 @@ public class WizardProgressWidget implements WizardProgressWidgetView.Presenter,
 	public void configure(int current, int total) {
 		view.configure(current, total);
 	};
-	
-	
+
+
 	public void clear() {
 		view.clear();
 	}
-	
+
 	public Widget asWidget() {
 		view.setPresenter(this);
 		return view.asWidget();

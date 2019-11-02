@@ -4,7 +4,6 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -18,11 +17,9 @@ public class EntityIdCellRenderer implements Cell {
 	String entityId, entityName;
 	ClickHandler customClickHandler;
 	boolean hideIfLoadError;
-	
+
 	@Inject
-	public EntityIdCellRenderer(EntityIdCellRendererView view, 
-			EntityHeaderAsyncHandler entityHeaderAsyncHandler,
-			SynapseJSNIUtils jsniUtils) {
+	public EntityIdCellRenderer(EntityIdCellRendererView view, EntityHeaderAsyncHandler entityHeaderAsyncHandler, SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.entityHeaderAsyncHandler = entityHeaderAsyncHandler;
 		this.jsniUtils = jsniUtils;
@@ -31,12 +28,12 @@ public class EntityIdCellRenderer implements Cell {
 	public void loadData() {
 		if (entityName == null && entityId != null) {
 			view.showLoadingIcon();
-			String requestEntityId = entityId.toLowerCase().startsWith("syn") ? entityId : "syn"+entityId;
+			String requestEntityId = entityId.toLowerCase().startsWith("syn") ? entityId : "syn" + entityId;
 			view.setEntityId(requestEntityId);
 			if (customClickHandler != null) {
 				view.setClickHandler(customClickHandler);
 			}
-			
+
 			entityHeaderAsyncHandler.getEntityHeader(requestEntityId, new AsyncCallback<EntityHeader>() {
 				@Override
 				public void onSuccess(EntityHeader entity) {
@@ -44,7 +41,7 @@ public class EntityIdCellRenderer implements Cell {
 					view.setIcon(EntityTypeUtils.getIconTypeForEntityClassName(entity.getType()));
 					view.setLinkText(entityName);
 				}
-				
+
 				@Override
 				public void onFailure(Throwable caught) {
 					if (hideIfLoadError) {
@@ -58,7 +55,7 @@ public class EntityIdCellRenderer implements Cell {
 			});
 		}
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return this.view.asWidget();
@@ -72,7 +69,7 @@ public class EntityIdCellRenderer implements Cell {
 	public void setValue(String value) {
 		setValue(value, null, false);
 	}
-	
+
 	public void setValue(String value, ClickHandler customClickHandler, boolean hideIfLoadError) {
 		view.hideAllIcons();
 		this.entityId = value;

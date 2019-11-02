@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
-import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Divider;
@@ -8,15 +7,8 @@ import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.InfoAlert;
-import org.sagebionetworks.web.shared.WebConstants;
-
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -24,18 +16,18 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * Basic implementation of the QueryInputView.  This view has zero business logic.
+ * Basic implementation of the QueryInputView. This view has zero business logic.
  * 
  * @author John
  *
  */
-public class QueryInputViewImpl implements QueryInputView{
+public class QueryInputViewImpl implements QueryInputView {
 
 	public static final String REST_DOC_URL = "http://rest.synapse.org/org/sagebionetworks/repo/web/controller/TableExamples.html";
 
 	public interface Binder extends UiBinder<HTMLPanel, QueryInputViewImpl> {
 	}
-	
+
 	@UiField
 	FormGroup inputFormGroup;
 	@UiField
@@ -61,12 +53,12 @@ public class QueryInputViewImpl implements QueryInputView{
 
 	HTMLPanel panel;
 	Presenter presenter;
-	
+
 	@Inject
-	public QueryInputViewImpl(Binder binder){
+	public QueryInputViewImpl(Binder binder) {
 		this.panel = binder.createAndBindUi(this);
 	}
-	
+
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
@@ -78,7 +70,7 @@ public class QueryInputViewImpl implements QueryInputView{
 		});
 		// Enter key should execute the query.
 		queryInput.addKeyDownHandler(event -> {
-			if(KeyCodes.KEY_ENTER == event.getNativeKeyCode()){
+			if (KeyCodes.KEY_ENTER == event.getNativeKeyCode()) {
 				presenter.onExecuteQuery();
 			}
 		});
@@ -98,7 +90,7 @@ public class QueryInputViewImpl implements QueryInputView{
 			presenter.onAddToDownloadList();
 		});
 	}
-	
+
 	@Override
 	public void setInputQueryString(String startQuery) {
 		this.queryInput.setText(startQuery);
@@ -126,10 +118,10 @@ public class QueryInputViewImpl implements QueryInputView{
 
 	@Override
 	public void showInputError(boolean visible) {
-		if(visible){
+		if (visible) {
 			this.inputFormGroup.setValidationState(ValidationState.ERROR);
 			this.queryResultsMessage.setVisible(true);
-		}else{
+		} else {
 			this.inputFormGroup.setValidationState(ValidationState.NONE);
 			this.queryResultsMessage.setVisible(false);
 		}
@@ -144,7 +136,7 @@ public class QueryInputViewImpl implements QueryInputView{
 	public void setEditEnabled(boolean enabled) {
 		this.editResultsButton.setEnabled(enabled);
 	}
-	
+
 	@Override
 	public void setEditVisible(boolean visibile) {
 		this.editResultsButton.setVisible(visibile);
@@ -160,11 +152,12 @@ public class QueryInputViewImpl implements QueryInputView{
 	public void setQueryInputVisible(boolean visible) {
 		queryInputGroup.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setShowQueryVisible(boolean visible) {
 		showQueryButton.setVisible(visible);
 	}
+
 	@Override
 	public void setDownloadFilesVisible(boolean visible) {
 		addToDownloadListLink.setVisible(visible);

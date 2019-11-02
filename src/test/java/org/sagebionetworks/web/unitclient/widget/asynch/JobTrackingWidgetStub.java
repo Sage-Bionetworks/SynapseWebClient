@@ -5,7 +5,6 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
-
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -15,7 +14,7 @@ import com.google.gwt.user.client.ui.Widget;
  *
  */
 public class JobTrackingWidgetStub implements JobTrackingWidget {
-	
+
 	AsynchronousResponseBody response;
 	Throwable error;
 	boolean onCancel = false;
@@ -27,14 +26,12 @@ public class JobTrackingWidgetStub implements JobTrackingWidget {
 	}
 
 	@Override
-	public void startAndTrackJob(String title, boolean isDeterminate,
-			AsynchType type, AsynchronousRequestBody requestBody,
-			AsynchronousProgressHandler handler) {
-		if(this.onCancel){
+	public void startAndTrackJob(String title, boolean isDeterminate, AsynchType type, AsynchronousRequestBody requestBody, AsynchronousProgressHandler handler) {
+		if (this.onCancel) {
 			handler.onCancel();
-		}else if(error != null){
+		} else if (error != null) {
 			handler.onFailure(error);
-		}else{
+		} else {
 			handler.onComplete(response);
 		}
 	}

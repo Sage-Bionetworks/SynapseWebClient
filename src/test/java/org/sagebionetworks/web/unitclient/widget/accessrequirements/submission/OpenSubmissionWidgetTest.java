@@ -1,15 +1,18 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements.submission;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmission;
@@ -21,7 +24,6 @@ import org.sagebionetworks.web.client.widget.accessrequirements.submission.OpenS
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class OpenSubmissionWidgetTest {
@@ -42,7 +44,7 @@ public class OpenSubmissionWidgetTest {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		widget = new OpenSubmissionWidget(mockView, mockAccessRequirementWidget, mockClient, mockSynapseAlert, mockLazyLoadHelper);
-		
+
 	}
 
 	@Test

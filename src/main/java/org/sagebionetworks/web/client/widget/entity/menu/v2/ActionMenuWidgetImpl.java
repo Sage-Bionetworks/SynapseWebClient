@@ -4,18 +4,15 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * This ActionMenuWidget implementation will synchronize with its view to find
- * the ActionViews associated with each action. The synchronize is done once
- * during construction.
+ * This ActionMenuWidget implementation will synchronize with its view to find the ActionViews
+ * associated with each action. The synchronize is done once during construction.
  * 
  * @author John
  * 
@@ -26,10 +23,9 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener, A
 
 	Map<Action, ActionView> actionViewMap;
 	Map<Action, List<ActionListener>> actionListenerMap;
-	
+
 	@Inject
-	public ActionMenuWidgetImpl(
-			ActionMenuWidgetView view) {
+	public ActionMenuWidgetImpl(ActionMenuWidgetView view) {
 		this.view = view;
 		this.actionViewMap = new HashMap<Action, ActionView>();
 		this.actionListenerMap = new HashMap<Action, List<ActionListener>>();
@@ -38,21 +34,18 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener, A
 		for (ActionView av : this.view.listActionViews()) {
 			Action action = av.getAction();
 			if (action == null) {
-				throw new IllegalArgumentException(
-						"ActionView has a null action");
+				throw new IllegalArgumentException("ActionView has a null action");
 			}
 			if (this.actionViewMap.containsKey(action)) {
-				throw new IllegalArgumentException("Action " + action
-						+ " was applied to more than one ActionView");
+				throw new IllegalArgumentException("Action " + action + " was applied to more than one ActionView");
 			}
 			this.actionViewMap.put(av.getAction(), av);
 			av.addActionListener(this);
-			this.actionListenerMap.put(av.getAction(),
-					new LinkedList<ActionListener>());
+			this.actionListenerMap.put(av.getAction(), new LinkedList<ActionListener>());
 		}
 		reset();
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
@@ -81,15 +74,13 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener, A
 	 * Get the view for the given action from the map.
 	 * 
 	 * @param action
-	 * @throws IllegalArgumentException
-	 *             When there is no view mapped to the given action.
+	 * @throws IllegalArgumentException When there is no view mapped to the given action.
 	 * @return
 	 */
 	private ActionView getActionView(Action action) {
 		ActionView actionView = this.actionViewMap.get(action);
 		if (actionView == null) {
-			throw new IllegalArgumentException(
-					"No action view found for action: " + action);
+			throw new IllegalArgumentException("No action view found for action: " + action);
 		}
 		return actionView;
 	}
@@ -97,8 +88,7 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener, A
 	private List<ActionListener> getActionListeners(Action action) {
 		List<ActionListener> list = this.actionListenerMap.get(action);
 		if (list == null) {
-			throw new IllegalArgumentException(
-					"No action list found for action: " + action);
+			throw new IllegalArgumentException("No action list found for action: " + action);
 		}
 		return list;
 	}
@@ -109,7 +99,7 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener, A
 		actionListeners.clear();
 		actionListeners.add(listner);
 	}
-	
+
 	@Override
 	public void addActionListener(Action action, ActionListener listener) {
 		getActionListeners(action).add(listener);
@@ -123,7 +113,7 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener, A
 			getActionListeners(action).clear();
 		}
 	}
-	
+
 	@Override
 	public void hideAllActions() {
 		for (Action action : this.actionListenerMap.keySet()) {

@@ -6,10 +6,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.Arrays;
 import java.util.Date;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -22,9 +20,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetView;
-import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-
 import com.google.gwt.user.client.ui.Widget;
 
 public class DiscussionThreadListItemWidgetTest {
@@ -50,7 +46,7 @@ public class DiscussionThreadListItemWidgetTest {
 	private Long numberOfViews = 2L;
 	public static final String THREAD_ID = "83473";
 	public static final String PROJECT_ID = "1111";
-	
+
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
@@ -103,7 +99,7 @@ public class DiscussionThreadListItemWidgetTest {
 		discussionThreadWidget.onClickThread();
 		verify(mockThreadIdClickedCallback, never()).invoke(any(DiscussionThreadBundle.class));
 	}
-	
+
 	@Test
 	public void testOnClickThreadWithCallback() {
 		discussionThreadWidget.setThreadIdClickedCallback(mockThreadIdClickedCallback);

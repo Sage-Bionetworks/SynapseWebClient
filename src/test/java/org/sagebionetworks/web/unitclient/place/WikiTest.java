@@ -8,20 +8,22 @@ import org.sagebionetworks.web.client.place.Wiki;
 
 /**
  * Wiki Place token test
+ * 
  * @author jayhodgson
  *
  */
 public class WikiTest {
-	
+
 	Wiki.Tokenizer tokenizer = new Wiki.Tokenizer();
 	String testOwnerId, testOwnerType, testWikiId;
+
 	@Before
-	public void setup(){
+	public void setup() {
 		testOwnerId = "syn1234";
 		testOwnerType = ObjectType.ENTITY.toString();
 		testWikiId = "20";
-	}	
-	
+	}
+
 	@Test
 	public void testStandardCase() {
 		String testToken = testOwnerId + Wiki.DELIMITER + testOwnerType + Wiki.DELIMITER + testWikiId;
@@ -31,7 +33,7 @@ public class WikiTest {
 		Assert.assertEquals(testWikiId, place.getWikiId());
 		Assert.assertEquals(testToken, tokenizer.getToken(place));
 	}
-	
+
 	@Test
 	public void testNullWikiId() {
 		String testToken = testOwnerId + Wiki.DELIMITER + testOwnerType;
@@ -40,7 +42,7 @@ public class WikiTest {
 		Assert.assertEquals(testOwnerType, place.getOwnerType());
 		Assert.assertNull(place.getWikiId());
 	}
-	
+
 	@Test
 	public void testMissingParams() {
 		String testToken = testOwnerId + Wiki.DELIMITER;

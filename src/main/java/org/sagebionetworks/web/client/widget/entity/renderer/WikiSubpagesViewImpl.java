@@ -1,13 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.List;
-
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.events.WikiSubpagesCollapseEvent;
 import org.sagebionetworks.web.client.events.WikiSubpagesExpandEvent;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -15,7 +12,6 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -31,18 +27,15 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	private Button editOrderButton;
 	private FlowPanel navTreeContainer;
 	boolean isShowingSubpages;
-	
+
 	private WikiSubpageNavigationTree navTree;
 	private EventBus eventBus;
 	private Presenter presenter;
 	private SynapseJSNIUtils jsniUtils;
 	private SynapseAlert synAlert;
+
 	@Inject
-	public WikiSubpagesViewImpl(WikiSubpagesOrderEditor orderEditor,
-								WikiSubpageNavigationTree navTree,
-								EventBus eventBus,
-								SynapseJSNIUtils jsniUtils,
-								SynapseAlert synAlert) {
+	public WikiSubpagesViewImpl(WikiSubpagesOrderEditor orderEditor, WikiSubpageNavigationTree navTree, EventBus eventBus, SynapseJSNIUtils jsniUtils, SynapseAlert synAlert) {
 		this.orderEditor = orderEditor;
 		this.navTree = navTree;
 		this.eventBus = eventBus;
@@ -50,34 +43,30 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		this.jsniUtils = jsniUtils;
 		addStyleName("wikiSubpages");
 	}
-	
+
 	@Override
 	public void setPresenter(Presenter p) {
 		this.presenter = p;
 	}
-	
+
 	@Override
 	public void clear() {
 		super.clear();
 	}
-	
+
 	@Override
-	public void configure(final List<V2WikiHeader> wikiHeaders,
-						final String ownerObjectName, Place ownerObjectLink,
-						final WikiPageKey curWikiKey, boolean isEmbeddedInOwnerPage,
-						CallbackP<WikiPageKey> wikiPageCallback,
-						ActionMenuWidget actionMenu) {
+	public void configure(final List<V2WikiHeader> wikiHeaders, final String ownerObjectName, Place ownerObjectLink, final WikiPageKey curWikiKey, boolean isEmbeddedInOwnerPage, CallbackP<WikiPageKey> wikiPageCallback, ActionMenuWidget actionMenu) {
 		clear();
 		navTreeContainer = new FlowPanel();
 		navTreeContainer.addStyleName("margin-bottom-10");
 
-		//this widget shows nothing if it doesn't have any pages!
-		if (wikiHeaders.size() <=1 )
+		// this widget shows nothing if it doesn't have any pages!
+		if (wikiHeaders.size() <= 1)
 			return;
 
-		//only show the tree if the root has children
+		// only show the tree if the root has children
 		navTree.configure(wikiHeaders, ownerObjectName, ownerObjectLink, curWikiKey, isEmbeddedInOwnerPage, wikiPageCallback);
-		
+
 		showHideButton = DisplayUtils.createButton("");
 		editOrderButton = DisplayUtils.createButton("Edit Order");
 		editOrderButton.addStyleName("btn btn-default btn-xs left margin-top-10");
@@ -117,7 +106,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 					showSubpages();
 			}
 		});
-		
+
 		navTreeContainer.add(navTree.asWidget());
 		navTreeContainer.add(editOrderButton);
 		add(navTreeContainer);
@@ -125,53 +114,53 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		showSubpages();
 		clearWidths();
 	}
-	
+
 	/**
-	 * Work around the Chrome bug.  See DisplayUtils.clearElementWidth() for more info.
+	 * Work around the Chrome bug. See DisplayUtils.clearElementWidth() for more info.
 	 */
 	private void clearWidths() {
 		DisplayUtils.clearElementWidth(getElement());
 		if (navTreeContainer != null)
 			DisplayUtils.clearElementWidth(navTreeContainer.getElement());
 	}
-	
+
 	@Override
 	public void hideSubpages() {
 		isShowingSubpages = false;
-				
+
 		if (showHideButton != null) {
 			showHideButton.setText("Show Pages " + DisplayConstants.RIGHT_ARROWS);
 			showHideButton.removeStyleName("right");
 			showHideButton.addStyleName("btn btn-default btn-xs margin-right-40 left");
 		}
-		
+
 		if (navTreeContainer != null)
 			DisplayUtils.hide(navTreeContainer);
-		
+
 		eventBus.fireEvent(new WikiSubpagesCollapseEvent());
 	}
-	
+
 	@Override
 	public void showSubpages() {
 		isShowingSubpages = true;
-		
+
 		if (showHideButton != null) {
 			showHideButton.setText(DisplayConstants.LEFT_ARROWS);
 			showHideButton.removeStyleName("left");
-			showHideButton.addStyleName("btn btn-default btn-xs right");		
+			showHideButton.addStyleName("btn btn-default btn-xs right");
 		}
-		
+
 		if (navTreeContainer != null)
 			DisplayUtils.show(navTreeContainer);
-		
+
 		eventBus.fireEvent(new WikiSubpagesExpandEvent());
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return this;
-	}	
-		
+	}
+
 	@Override
 	public void showErrorMessage(String message) {
 		clear();
@@ -180,8 +169,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	}
 
 	@Override
-	public void showLoading() {
-	}
+	public void showLoading() {}
 
 	@Override
 	public void showInfo(String message) {
@@ -198,12 +186,12 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			editOrderButton.setVisible(visible);
 		}
 	}
-	
+
 	@Override
 	public boolean contains(String wikiPageKey) {
 		return navTree.contains(wikiPageKey);
 	}
-	
+
 	@Override
 	public void setPage(String wikiPageKey) {
 		navTree.setPage(wikiPageKey);

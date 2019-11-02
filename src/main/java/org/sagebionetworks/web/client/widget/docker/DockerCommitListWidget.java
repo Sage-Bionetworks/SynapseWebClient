@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.docker;
 
 import java.util.ArrayList;
-
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerCommitSortBy;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -12,7 +11,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -41,13 +39,7 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 	private String radioGroupName;
 
 	@Inject
-	public DockerCommitListWidget(
-			DockerCommitListWidgetView view,
-			SynapseJavascriptClient jsClient,
-			SynapseAlert synAlert,
-			LoadMoreWidgetContainer commitsContainer,
-			PortalGinInjector ginInjector,
-			GWTWrapper gwtWrapper) {
+	public DockerCommitListWidget(DockerCommitListWidgetView view, SynapseJavascriptClient jsClient, SynapseAlert synAlert, LoadMoreWidgetContainer commitsContainer, PortalGinInjector ginInjector, GWTWrapper gwtWrapper) {
 		this.view = view;
 		this.jsClient = jsClient;
 		this.synAlert = synAlert;
@@ -68,51 +60,51 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 
 	public void loadMore() {
 		synAlert.clear();
-		jsClient.getDockerTaggedCommits(entityId, LIMIT, offset, order, ascending, new AsyncCallback<ArrayList<DockerCommit>>(){
+		jsClient.getDockerTaggedCommits(entityId, LIMIT, offset, order, ascending, new AsyncCallback<ArrayList<DockerCommit>>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						commitsContainer.setIsMore(false);
-						synAlert.handleException(caught);
+			@Override
+			public void onFailure(Throwable caught) {
+				commitsContainer.setIsMore(false);
+				synAlert.handleException(caught);
+			}
+
+			@Override
+			public void onSuccess(ArrayList<DockerCommit> result) {
+				if (offset == 0 && result.isEmpty()) {
+					if (emptyCommitCallback != null) {
+						emptyCommitCallback.invoke();
 					}
+				} else {
+					for (final DockerCommit commit : result) {
+						DockerCommitRowWidget dockerCommitRow = ginInjector.createNewDockerCommitRowWidget();
+						dockerCommitRow.configure(commit);
+						dockerCommitRow.setOnClickCallback(new CallbackP<DockerCommit>() {
 
-					@Override
-					public void onSuccess(ArrayList<DockerCommit> result) {
-						if (offset == 0 && result.isEmpty()) {
-							if (emptyCommitCallback != null) {
-								emptyCommitCallback.invoke();
+							@Override
+							public void invoke(DockerCommit param) {
+								currentCommit = param;
 							}
-						} else {
-							for(final DockerCommit commit: result) {
-								DockerCommitRowWidget dockerCommitRow = ginInjector.createNewDockerCommitRowWidget();
-								dockerCommitRow.configure(commit);
-								dockerCommitRow.setOnClickCallback(new CallbackP<DockerCommit>(){
-	
-									@Override
-									public void invoke(DockerCommit param) {
-										currentCommit = param;
-									}
-								});
-								if (withRadio) {
-									RadioWidget radioWidget = ginInjector.createNewRadioWidget();
-									radioWidget.add(dockerCommitRow.asWidget());
-									radioWidget.setGroupName(radioGroupName);
-									radioWidget.addClickHandler(new ClickHandler(){
-										@Override
-										public void onClick(ClickEvent event) {
-											currentCommit = commit;
-										}
-									});
-									commitsContainer.add(radioWidget.asWidget());
-								} else {
-									
-									commitsContainer.add(dockerCommitRow.asWidget());
+						});
+						if (withRadio) {
+							RadioWidget radioWidget = ginInjector.createNewRadioWidget();
+							radioWidget.add(dockerCommitRow.asWidget());
+							radioWidget.setGroupName(radioGroupName);
+							radioWidget.addClickHandler(new ClickHandler() {
+								@Override
+								public void onClick(ClickEvent event) {
+									currentCommit = commit;
 								}
-							}
+							});
+							commitsContainer.add(radioWidget.asWidget());
+						} else {
+
+							commitsContainer.add(dockerCommitRow.asWidget());
 						}
-						offset += LIMIT;
-						commitsContainer.setIsMore(!(result.size() < LIMIT));
 					}
+				}
+				offset += LIMIT;
+				commitsContainer.setIsMore(!(result.size() < LIMIT));
+			}
 		});
 	}
 

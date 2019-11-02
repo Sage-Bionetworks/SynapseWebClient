@@ -3,68 +3,104 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
+	<ui:with field='icons'
+		type='org.sagebionetworks.web.client.IconsImageBundle' />
 	<b:Panel marginBottom="0">
 		<b:PanelBody>
 			<bh:Div styleName="margin-bottom-20">
-				<g:Image styleName="displayInline moveup-2 margin-right-5" resource='{icons.shieldRed16}' />
-		       	<b:Icon styleName="displayInline moveup-2 margin-right-5" type="SHIELD" emphasis="DANGER" />
-		       	<g:InlineLabel styleName="font-size-18" text="Access to these data is Controlled Use" />
+				<g:Image styleName="displayInline moveup-2 margin-right-5"
+					resource='{icons.shieldRed16}' />
+				<b:Icon styleName="displayInline moveup-2 margin-right-5"
+					type="SHIELD" emphasis="DANGER" />
+				<g:InlineLabel styleName="font-size-18"
+					text="Access to these data is Controlled Use" />
 			</bh:Div>
 			<bh:Div ui:field="approvedHeading" visible="false">
-			    <g:InlineLabel styleName="boldText" text="You have access to these data under the following terms:" />
+				<g:InlineLabel styleName="boldText"
+					text="You have access to these data under the following terms:" />
 			</bh:Div>
 			<bh:Div ui:field="unapprovedHeading" visible="false">
-			    <g:InlineLabel styleName="boldText" text="Access to the data requires that you are a registered Synapse user and fulfill the following requirements:" />
+				<g:InlineLabel styleName="boldText"
+					text="Access to the data requires that you are a registered Synapse user and fulfill the following requirements:" />
 			</bh:Div>
 			<!-- terms -->
 			<b:BlockQuote>
-				<g:SimplePanel ui:field="wikiContainer" />	
+				<g:SimplePanel ui:field="wikiContainer" />
 			</b:BlockQuote>
 			<bh:Div marginRight="30">
-			    <bh:Text>For more information on use conditions, please read the </bh:Text>
-			    <b:Anchor text="Conditions for using Human Data in Synapse" styleName="link margin-left-5" href="http://docs.synapse.org/articles/governance.html" target="_blank" />
-			    <bh:Text>.&nbsp;&nbsp;</bh:Text>
-			    <bh:Text>If you think this data is posted inappropriately or should have different access conditions, please alert the Synapse Access and Compliance Team (ACT) to discuss at act@sagebase.org </bh:Text>
+				<bh:Text>For more information on use conditions, please read the </bh:Text>
+				<b:Anchor text="Conditions for using Human Data in Synapse"
+					styleName="link margin-left-5"
+					href="http://docs.synapse.org/articles/governance.html"
+					target="_blank" />
+				<bh:Text>.&nbsp;&nbsp;</bh:Text>
+				<bh:Text>If you think this data is posted inappropriately or should
+					have different access conditions, please alert the Synapse Access
+					and Compliance Team (ACT) to discuss at act@sagebase.org </bh:Text>
 			</bh:Div>
 			<bh:ClearFix />
 			<bh:Div>
-				<bh:Div ui:field="subjectsWidgetContainer" pull="LEFT" addStyleNames="margin-left-5 margin-right-5" />
+				<bh:Div ui:field="subjectsWidgetContainer" pull="LEFT"
+					addStyleNames="margin-left-5 margin-right-5" />
 			</bh:Div>
 			<bh:ClearFix />
 			<bh:Div addStyleNames="margin-top-5">
-				<bh:Div ui:field="reviewAccessRequestsContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
-				<bh:Div ui:field="manageAccessContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
-				<bh:Div ui:field="editAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
-				<bh:Div ui:field="deleteAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
-				<bh:Div ui:field="iduReportButtonContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
-				
+				<bh:Div ui:field="reviewAccessRequestsContainer" pull="RIGHT"
+					addStyleNames="margin-right-5 margin-top-5" />
+				<bh:Div ui:field="manageAccessContainer" pull="RIGHT"
+					addStyleNames="margin-right-5 margin-top-5" />
+				<bh:Div ui:field="editAccessRequirementContainer"
+					pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
+				<bh:Div ui:field="deleteAccessRequirementContainer"
+					pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
+				<bh:Div ui:field="iduReportButtonContainer" pull="RIGHT"
+					addStyleNames="margin-right-5 margin-top-5" />
+
 				<bh:Div ui:field="cancelRequestButtonContainer" pull="RIGHT">
-					<b:Button ui:field="cancelRequestButton" type="DEFAULT" text="Cancel Request" visible="false" addStyleNames="margin-right-5 margin-top-5" />
+					<b:Button ui:field="cancelRequestButton" type="DEFAULT"
+						text="Cancel Request" visible="false"
+						addStyleNames="margin-right-5 margin-top-5" />
 				</bh:Div>
 				<bh:Div ui:field="updateRequestButtonContainer" pull="RIGHT">
-					<b:Button ui:field="updateRequestButton" type="DEFAULT" text="Update Request" visible="false" addStyleNames="margin-right-5 margin-top-5"/>
+					<b:Button ui:field="updateRequestButton" type="DEFAULT"
+						text="Update Request" visible="false"
+						addStyleNames="margin-right-5 margin-top-5" />
 				</bh:Div>
 				<bh:Div ui:field="requestAccessButtonContainer" pull="RIGHT">
-					<b:Button ui:field="requestAccessButton" type="PRIMARY" text="Request Access" visible="false" addStyleNames="margin-right-5 margin-top-5"/>
-					<b:Button ui:field="loginButton" type="PRIMARY" text="Request Access" visible="false" addStyleNames="margin-right-5 margin-top-5"/>
+					<b:Button ui:field="requestAccessButton" type="PRIMARY"
+						text="Request Access" visible="false"
+						addStyleNames="margin-right-5 margin-top-5" />
+					<b:Button ui:field="loginButton" type="PRIMARY"
+						text="Request Access" visible="false"
+						addStyleNames="margin-right-5 margin-top-5" />
 				</bh:Div>
 				<bh:Div ui:field="requestSubmittedByOther" visible="false">
-					<b:Alert type="INFO" text="Data access has been requested on your behalf by:" pull="RIGHT" addStyleNames="padding-5 margin-top-5 margin-right-2">
+					<b:Alert type="INFO"
+						text="Data access has been requested on your behalf by:"
+						pull="RIGHT" addStyleNames="padding-5 margin-top-5 margin-right-2">
 						<bh:Div ui:field="submitterUserBadgeContainer" />
 					</b:Alert>
 				</bh:Div>
-				
-				<b:Alert type="INFO" ui:field="requestSubmittedMessage" text="You have submitted a data access request." pull="RIGHT" visible="false" marginRight="5" addStyleNames="padding-5 margin-top-5"/>
-				<b:Alert type="SUCCESS" ui:field="requestApprovedMessage" pull="RIGHT" visible="false" marginRight="5" addStyleNames="padding-5 margin-top-5">
-					<b:Icon ui:field="icon" addStyleNames="font-size-17 black-25-percent" type="CHECK_CIRCLE" />
+
+				<b:Alert type="INFO" ui:field="requestSubmittedMessage"
+					text="You have submitted a data access request." pull="RIGHT"
+					visible="false" marginRight="5"
+					addStyleNames="padding-5 margin-top-5" />
+				<b:Alert type="SUCCESS" ui:field="requestApprovedMessage"
+					pull="RIGHT" visible="false" marginRight="5"
+					addStyleNames="padding-5 margin-top-5">
+					<b:Icon ui:field="icon"
+						addStyleNames="font-size-17 black-25-percent" type="CHECK_CIRCLE" />
 					<bh:Text>Your data access request has been approved.</bh:Text>
-					<bh:Span ui:field="expirationUI" addStyleNames="margin-left-10">
+					<bh:Span ui:field="expirationUI"
+						addStyleNames="margin-left-10">
 						<bh:Text>Access expires on </bh:Text>
-						<bh:Text ui:field="expirationDateText"/>
+						<bh:Text ui:field="expirationDateText" />
 					</bh:Span>
 				</b:Alert>
-				<b:Alert type="WARNING" ui:field="requestRejectedMessage" text="" pull="RIGHT" visible="false" marginRight="5" addStyleNames="padding-5 margin-top-5"/>
+				<b:Alert type="WARNING" ui:field="requestRejectedMessage"
+					text="" pull="RIGHT" visible="false" marginRight="5"
+					addStyleNames="padding-5 margin-top-5" />
 			</bh:Div>
 			<bh:ClearFix />
 			<bh:Div ui:field="requestDataAccessWizardContainer" />

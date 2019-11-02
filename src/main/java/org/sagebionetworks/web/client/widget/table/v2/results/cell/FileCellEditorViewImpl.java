@@ -7,7 +7,6 @@ import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -24,9 +23,10 @@ import com.google.inject.Inject;
  *
  */
 public class FileCellEditorViewImpl implements FileCellEditorView {
-	
-	public interface Binder extends UiBinder<Widget, FileCellEditorViewImpl> {}
-	
+
+	public interface Binder extends UiBinder<Widget, FileCellEditorViewImpl> {
+	}
+
 	@UiField
 	FormGroup formGroup;
 	@UiField
@@ -41,11 +41,11 @@ public class FileCellEditorViewImpl implements FileCellEditorView {
 	SimplePanel fileInputWidgetPanel;
 	@UiField
 	Alert uploadAlert;
-	
+
 	Widget widget;
-	
+
 	@Inject
-	public FileCellEditorViewImpl(Binder binder){
+	public FileCellEditorViewImpl(Binder binder) {
 		this.widget = binder.createAndBindUi(this);
 	}
 
@@ -71,7 +71,7 @@ public class FileCellEditorViewImpl implements FileCellEditorView {
 
 	@Override
 	public void setAccessKey(char key) {
-		showUploadModalButton.setAccessKey(key);		
+		showUploadModalButton.setAccessKey(key);
 	}
 
 	@Override

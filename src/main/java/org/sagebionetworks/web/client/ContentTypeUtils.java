@@ -1,10 +1,12 @@
 package org.sagebionetworks.web.client;
 
-import static org.sagebionetworks.web.client.ClientProperties.*;
-import static org.sagebionetworks.repo.model.util.ContentTypeUtils.*;
+import static org.sagebionetworks.repo.model.util.ContentTypeUtils.APPLICATION_OCTET_STREAM;
+import static org.sagebionetworks.repo.model.util.ContentTypeUtils.PLAIN_TEXT;
+import static org.sagebionetworks.repo.model.util.ContentTypeUtils.isRecognizedCodeFileName;
+import static org.sagebionetworks.web.client.ClientProperties.CODE_EXTENSIONS_SET;
+import static org.sagebionetworks.web.client.ClientProperties.IMAGE_CONTENT_TYPES_SET;
+import static org.sagebionetworks.web.client.ClientProperties.TABLE_CONTENT_TYPES_SET;
 import org.sagebionetworks.web.shared.WebConstants;
-
-import com.google.gwt.core.shared.GWT;
 
 public class ContentTypeUtils {
 
@@ -27,16 +29,16 @@ public class ContentTypeUtils {
 		}
 		return null;
 	}
-	
+
 	public static boolean isWebRecognizedCodeFileName(String fileName) {
 		boolean isPlainText = false;
 		String extension = getExtension(fileName);
 		if (extension != null) {
-			isPlainText = CODE_EXTENSIONS_SET.contains("."+extension);
+			isPlainText = CODE_EXTENSIONS_SET.contains("." + extension);
 		}
 		return isPlainText;
 	}
-	
+
 	public static boolean isTextType(String contentType) {
 		return contentType.toLowerCase().startsWith("text/");
 	}
@@ -52,7 +54,7 @@ public class ContentTypeUtils {
 	public static boolean isHTML(String contentType) {
 		return contentType != null && contentType.toLowerCase().startsWith("text/html");
 	}
-	
+
 	public static boolean isPDF(String contentType) {
 		return contentType != null && contentType.toLowerCase().startsWith("application/pdf");
 	}

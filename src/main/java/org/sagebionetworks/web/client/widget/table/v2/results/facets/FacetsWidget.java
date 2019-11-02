@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.table.v2.results.facets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
@@ -28,7 +27,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.SingleButtonView;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -38,7 +36,7 @@ public class FacetsWidget implements IsWidget {
 	PortalGinInjector ginInjector;
 	SingleButtonView clearButton;
 	Callback resetFacetsHandler;
-	
+
 	@Inject
 	public FacetsWidget(DivView view, SingleButtonView clearButton, PortalGinInjector ginInjector) {
 		this.view = view;
@@ -50,12 +48,12 @@ public class FacetsWidget implements IsWidget {
 		clearButton.addStyleNames("clearFacetsButton margin-top-20");
 		clearButton.setButtonIcon(IconType.FILTER);
 		clearButton.setPresenter(() -> {
-			//on click
+			// on click
 			resetFacetsHandler.invoke();
 		});
 		this.ginInjector = ginInjector;
 	}
-	
+
 	public void configure(Query query, CallbackP<FacetColumnRequest> facetChangedHandler, Callback resetFacetsHandler) {
 		view.clear();
 		AsynchronousProgressWidget progress = ginInjector.creatNewAsynchronousProgressWidget();
@@ -73,20 +71,20 @@ public class FacetsWidget implements IsWidget {
 				view.add(synAlert);
 				synAlert.handleException(failure);
 			}
-			
+
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
 				QueryResultBundle resultBundle = (QueryResultBundle) response;
 				configure(resultBundle.getFacets(), facetChangedHandler, resultBundle.getColumnModels(), resetFacetsHandler);
 			}
-			
+
 			@Override
 			public void onCancel() {
 				view.clear();
 			}
 		});
 	}
-	
+
 	public void configure(List<FacetColumnResult> facets, CallbackP<FacetColumnRequest> facetChangedHandler, List<ColumnModel> types, Callback resetFacetsHandler) {
 		view.clear();
 		this.resetFacetsHandler = resetFacetsHandler;
@@ -98,9 +96,9 @@ public class FacetsWidget implements IsWidget {
 			for (FacetColumnResult facet : facets) {
 				ColumnModel cm = columnName2ColumnModel.get(facet.getColumnName());
 				if (cm != null) {
-					switch(facet.getFacetType()) {
+					switch (facet.getFacetType()) {
 						case enumeration:
-							FacetColumnResultValues facetResultValues = (FacetColumnResultValues)facet;
+							FacetColumnResultValues facetResultValues = (FacetColumnResultValues) facet;
 							// if values are not set, then don't show the facet
 							if (facetResultValues.getFacetValues() != null && facetResultValues.getFacetValues().size() > 0) {
 								FacetColumnResultValuesWidget valuesWidget = ginInjector.getFacetColumnResultValuesWidget();
@@ -109,13 +107,13 @@ public class FacetsWidget implements IsWidget {
 							}
 							break;
 						case range:
-							FacetColumnResultRange rangeFacet = (FacetColumnResultRange)facet;
+							FacetColumnResultRange rangeFacet = (FacetColumnResultRange) facet;
 							// if there are no values found in the column, don't show the facet
 							if (rangeFacet.getColumnMin() != null) {
-								
+
 								FacetColumnResultRangeWidget rangeWidget = ginInjector.getFacetColumnResultRangeWidget();
 								FacetColumnResultRangeView rangeView = null;
-								
+
 								if (ColumnType.INTEGER.equals(cm.getColumnType())) {
 									rangeView = ginInjector.getFacetColumnResultSliderRangeViewImpl();
 								} else if (ColumnType.DOUBLE.equals(cm.getColumnType())) {
@@ -126,10 +124,10 @@ public class FacetsWidget implements IsWidget {
 
 								if (rangeView != null) {
 									rangeWidget.configure(rangeView, rangeFacet, facetChangedHandler);
-									view.add(rangeWidget);	
+									view.add(rangeWidget);
 								}
 							}
-							
+
 							break;
 						default:
 							break;
@@ -137,14 +135,14 @@ public class FacetsWidget implements IsWidget {
 				}
 			}
 			if (facets.size() > 0) {
-				view.add(clearButton);	
+				view.add(clearButton);
 			}
 		}
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	
+
 }

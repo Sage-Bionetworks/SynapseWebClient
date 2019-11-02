@@ -5,7 +5,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WikiPageKey;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -16,18 +15,18 @@ import com.google.inject.Inject;
 
 public class ChallengeOverviewViewImpl extends Composite implements ChallengeOverviewView {
 
-	public interface ChallengeOverviewViewImplUiBinder extends UiBinder<Widget, ChallengeOverviewViewImpl> {}
+	public interface ChallengeOverviewViewImplUiBinder extends UiBinder<Widget, ChallengeOverviewViewImpl> {
+	}
 
 	@UiField
 	SimplePanel content;
-	
+
 	private Presenter presenter;
 	private Header headerWidget;
 	private WikiPageWidget wikiPage;
-	
+
 	@Inject
-	public ChallengeOverviewViewImpl(ChallengeOverviewViewImplUiBinder binder,
-			Header headerWidget, WikiPageWidget wikiPage) {		
+	public ChallengeOverviewViewImpl(ChallengeOverviewViewImplUiBinder binder, Header headerWidget, WikiPageWidget wikiPage) {
 		initWidget(binder.createAndBindUi(this));
 
 		this.headerWidget = headerWidget;
@@ -44,8 +43,7 @@ public class ChallengeOverviewViewImpl extends Composite implements ChallengeOve
 	}
 
 	@Override
-	public void showOverView() {
-	}
+	public void showOverView() {}
 
 	@Override
 	public void showErrorMessage(String message) {
@@ -53,8 +51,7 @@ public class ChallengeOverviewViewImpl extends Composite implements ChallengeOve
 	}
 
 	@Override
-	public void showLoading() {
-	}
+	public void showLoading() {}
 
 	@Override
 	public void showInfo(String message) {
@@ -62,20 +59,18 @@ public class ChallengeOverviewViewImpl extends Composite implements ChallengeOve
 	}
 
 	@Override
-	public void clear() {		
-	}
+	public void clear() {}
 
 	@Override
-	public void showChallengeInfo(){
+	public void showChallengeInfo() {
 		content.setWidget(wikiPage.asWidget());
 		WikiPageKey wikiKey = new WikiPageKey("syn1929437", ObjectType.ENTITY.toString(), null);
 		wikiPage.configure(wikiKey, false, new WikiPageWidget.Callback() {
 			@Override
-			public void pageUpdated() {
-			}
+			public void pageUpdated() {}
+
 			@Override
-			public void noWikiFound() {
-			}
+			public void noWikiFound() {}
 		});
 	}
 

@@ -5,9 +5,8 @@ import com.google.inject.Inject;
 public class LinkifyImpl implements Linkify {
 
 	@Inject
-	public LinkifyImpl() {
-	}
-	
+	public LinkifyImpl() {}
+
 	@Override
 	public String linkify(String s) {
 		if (s == null || s.isEmpty()) {

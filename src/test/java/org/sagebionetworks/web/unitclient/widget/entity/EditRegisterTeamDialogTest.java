@@ -1,29 +1,22 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.ChallengeTeam;
-import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EditRegisteredTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.EditRegisteredTeamDialogView;
-import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
-import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialogView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -38,9 +31,9 @@ public class EditRegisterTeamDialogTest {
 	ChallengeClientAsync mockChallengeClient;
 	PlaceChanger mockPlaceChanger;
 	Callback mockCallback;
-	
+
 	ChallengeTeam challengeTeam;
-	
+
 	@Before
 	public void before() {
 		mockChallengeClient = mock(ChallengeClientAsync.class);
@@ -59,27 +52,27 @@ public class EditRegisterTeamDialogTest {
 		widget.configure(challengeTeam, mockCallback);
 		verify(mockView).setRecruitmentMessage("");
 		verify(mockView).showModal();
-		
-		//click ok
+
+		// click ok
 		String newRecruitmentMessage = "an edited message";
 		when(mockView.getRecruitmentMessage()).thenReturn(newRecruitmentMessage);
 		widget.onOk();
 		ArgumentCaptor<ChallengeTeam> challengeTeamCaptor = ArgumentCaptor.forClass(ChallengeTeam.class);
 		verify(mockChallengeClient).updateRegisteredChallengeTeam(challengeTeamCaptor.capture(), any(AsyncCallback.class));
-		
+
 		assertEquals(newRecruitmentMessage, challengeTeamCaptor.getValue().getMessage());
 		verify(mockCallback).invoke();
 		verify(mockView).hideModal();
 	}
 
-	
+
 	@Test
 	public void testConfigureUnregister() {
 		widget.configure(challengeTeam, mockCallback);
 		verify(mockView).setRecruitmentMessage("");
 		verify(mockView).showModal();
-		
-		//click Unregister
+
+		// click Unregister
 		widget.onUnregister();
 		verify(mockChallengeClient).unregisterChallengeTeam(anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString());
@@ -87,7 +80,7 @@ public class EditRegisterTeamDialogTest {
 		verify(mockView).hideModal();
 	}
 
-	
+
 	@Test
 	public void testConfigureWithChallengeMessage() {
 		challengeTeam.setMessage("my message");
@@ -96,5 +89,5 @@ public class EditRegisterTeamDialogTest {
 		verify(mockView).showModal();
 	}
 
-	
+
 }

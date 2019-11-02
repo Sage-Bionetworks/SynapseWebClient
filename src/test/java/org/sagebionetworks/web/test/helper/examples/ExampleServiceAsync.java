@@ -2,7 +2,6 @@ package org.sagebionetworks.web.test.helper.examples;
 
 import java.io.IOException;
 import java.util.List;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface ExampleServiceAsync {
@@ -31,5 +30,5 @@ public interface ExampleServiceAsync {
 
 	void throwsException(String message, AsyncCallback<Boolean> callback);
 
-	
+
 }

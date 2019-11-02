@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 
@@ -13,13 +12,13 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author John
  *
  */
-public interface UploadTableModalWidget extends IsWidget{
+public interface UploadTableModalWidget extends IsWidget {
 
 	/**
 	 * Configure this widget before using it.
 	 * 
 	 * @param parentId
-	 * @param tableId When provided, the uploaded file will be used to update this table.  Can be null.
+	 * @param tableId When provided, the uploaded file will be used to update this table. Can be null.
 	 */
 	public void configure(String parentId, String tableId);
 
@@ -29,5 +28,5 @@ public interface UploadTableModalWidget extends IsWidget{
 	 * @param wizardCallback
 	 */
 	public void showModal(WizardCallback wizardCallback);
-		
+
 }

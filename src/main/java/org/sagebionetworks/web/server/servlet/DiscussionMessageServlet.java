@@ -2,12 +2,10 @@ package org.sagebionetworks.web.server.servlet;
 
 import java.io.IOException;
 import java.net.URL;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -28,15 +26,13 @@ public class DiscussionMessageServlet extends HttpServlet {
 	};
 
 	@Override
-	protected void service(HttpServletRequest arg0, HttpServletResponse arg1)
-			throws ServletException, IOException {
+	protected void service(HttpServletRequest arg0, HttpServletResponse arg1) throws ServletException, IOException {
 		DiscussionMessageServlet.perThreadRequest.set(arg0);
 		super.service(arg0, arg1);
 	}
 
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		String token = tokenProvider.getSessionToken();
 		SynapseClient client = createNewClient(token);
@@ -51,7 +47,7 @@ public class DiscussionMessageServlet extends HttpServlet {
 			} else if (type.equals(WebConstants.REPLY_TYPE)) {
 				resolvedUrl = client.getReplyUrl(messageKey);
 			} else {
-				throw new IllegalArgumentException("Do not support type "+type);
+				throw new IllegalArgumentException("Do not support type " + type);
 			}
 			response.sendRedirect(resolvedUrl.toString());
 		} catch (Exception e) {

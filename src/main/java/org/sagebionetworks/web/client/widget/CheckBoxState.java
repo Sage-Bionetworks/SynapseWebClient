@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget;
 
 public enum CheckBoxState {
-	SELECTED, 
-	DESELECTED,
-	INDETERMINATE;
+	SELECTED, DESELECTED, INDETERMINATE;
 
 	public static CheckBoxState getStateFromCount(int currentlySelected, int total) {
 		CheckBoxState state;

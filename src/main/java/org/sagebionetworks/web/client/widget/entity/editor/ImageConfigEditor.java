@@ -1,9 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import static org.sagebionetworks.web.shared.WidgetConstants.ALIGNMENT_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.IMAGE_WIDGET_ALT_TEXT_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.IMAGE_WIDGET_RESPONSIVE_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.IMAGE_WIDGET_SCALE_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.WIDGET_ENTITY_VERSION_KEY;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import static org.sagebionetworks.web.shared.WidgetConstants.*;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -12,22 +18,19 @@ import org.sagebionetworks.web.client.widget.entity.WikiAttachments;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
-import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
-
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEditorPresenter {
-	
+
 	private ImageConfigView view;
 	private Map<String, String> descriptor;
 	private FileUpload file;
 	private ImageUploadWidget fileInputWidget;
 	private WikiAttachments wikiAttachments;
 	private List<String> fileHandleIds;
-	
+
 	@Inject
 	public ImageConfigEditor(ImageConfigView view, ImageUploadWidget fileInputWidget, WikiAttachments wikiAttachments) {
 		this.view = view;
@@ -37,7 +40,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		view.setFileInputWidget(fileInputWidget.asWidget());
 		view.setWikiAttachmentsWidget(wikiAttachments.asWidget());
 	}
-	
+
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, final DialogCallback dialogCallback) {
 		fileHandleIds = new ArrayList<String>();
@@ -50,7 +53,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 			@Override
 			public void invoke(FileUpload fileUpload) {
 				view.showUploadSuccessUI(fileUpload.getFileMeta().getFileName());
-				//enable the ok button
+				// enable the ok button
 				dialogCallback.setPrimaryEnabled(true);
 				file = fileUpload;
 				fileHandleIds.add(file.getFileHandleId());
@@ -77,7 +80,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 				wikiAttachments.setSelectedFilename(descriptor.get(IMAGE_WIDGET_FILE_NAME_KEY));
 			}
 		}
-		
+
 		if (descriptor.containsKey(ALIGNMENT_KEY)) {
 			view.setAlignment(descriptor.get(ALIGNMENT_KEY));
 		}
@@ -89,8 +92,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		}
 	}
 
-	public void configureWithoutUpload(WikiPageKey wikiKey, Map<String, String> widgetDescriptor,
-			DialogCallback dialogCallback) {
+	public void configureWithoutUpload(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
 		configure(wikiKey, widgetDescriptor, dialogCallback);
 		view.setWikiFilesTabVisible(false);
 		if (!descriptor.containsKey(IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
@@ -126,19 +128,20 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 				}
 				descriptor.put(IMAGE_WIDGET_FILE_NAME_KEY, wikiAttachments.getSelectedFilename());
 			}
-				
+
 			descriptor.put(ALIGNMENT_KEY, view.getAlignment());
 			descriptor.put(IMAGE_WIDGET_SCALE_KEY, view.getScale().toString());
 			descriptor.put(IMAGE_WIDGET_RESPONSIVE_KEY, Boolean.TRUE.toString());
 			descriptor.put(IMAGE_WIDGET_ALT_TEXT_KEY, view.getAltText());
 		}
 	}
-	
+
 	@Override
 	public String getTextToInsert() {
 		if (view.isExternal())
-			return "!["+view.getExternalAltText()+"]("+view.getImageUrl()+")";
-		else return null;
+			return "![" + view.getExternalAltText() + "](" + view.getImageUrl() + ")";
+		else
+			return null;
 	}
 
 	@Override

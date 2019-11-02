@@ -2,9 +2,7 @@ package org.sagebionetworks.web.client.widget.evaluation;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.ButtonGroup;
-import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -13,7 +11,6 @@ import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.HelpWidget;
-
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Widget;
@@ -21,19 +18,19 @@ import com.google.inject.Inject;
 
 public class EvaluationListViewImpl extends Panel implements EvaluationListView {
 	List<Radio> evaluationCheckboxes;
-	
+
 	@Inject
 	public EvaluationListViewImpl() {
 		evaluationCheckboxes = new ArrayList<Radio>();
 	}
-	
+
 	@Override
 	public void configure(List<Evaluation> list) {
 		clear();
-		
-		if(list == null || list.size() == 0){
+
+		if (list == null || list.size() == 0) {
 			addNoAttachmentRow();
-		} else if (list.size() == 1){
+		} else if (list.size() == 1) {
 			Span singleItem = new Span();
 			singleItem.add(new Text(list.get(0).getName()));
 			add(singleItem);
@@ -45,10 +42,10 @@ public class EvaluationListViewImpl extends Panel implements EvaluationListView 
 	private void addNoAttachmentRow() {
 		add(new InlineHTML("No evaluations found"));
 	}
-	
+
 	private void populateTable(List<Evaluation> list) {
 		ButtonGroup group = new ButtonGroup();
-		for(final Evaluation data: list){
+		for (final Evaluation data : list) {
 			Div row = new Div();
 			final Radio selectBox = new Radio("evaluationButtons", data.getName());
 			selectBox.addStyleName("margin-left-10 displayInline");
@@ -73,7 +70,7 @@ public class EvaluationListViewImpl extends Panel implements EvaluationListView 
 	@Override
 	public void showLoading() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -101,6 +98,7 @@ public class EvaluationListViewImpl extends Panel implements EvaluationListView 
 		}
 		return null;
 	}
+
 	@Override
 	public void setSelectedEvaluationIndex(int i) {
 		evaluationCheckboxes.get(i).setValue(true, true);

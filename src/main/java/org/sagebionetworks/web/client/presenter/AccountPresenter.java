@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -10,7 +9,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Account;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.view.AccountView;
-
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -18,16 +16,14 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class AccountPresenter extends AbstractActivity implements AccountView.Presenter, Presenter<Account> {
-		
+
 	private Account place;
 	private AccountView view;
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalAppState;
-	
+
 	@Inject
-	public AccountPresenter(AccountView view, 
-			SynapseClientAsync synapseClient, 
-			GlobalApplicationState globalAppState){
+	public AccountPresenter(AccountView view, SynapseClientAsync synapseClient, GlobalApplicationState globalAppState) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -68,6 +64,7 @@ public class AccountPresenter extends AbstractActivity implements AccountView.Pr
 				view.showInfo(DisplayConstants.EMAIL_SUCCESS);
 				globalAppState.getPlaceChanger().goTo(new Profile(Profile.EDIT_PROFILE_TOKEN));
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorInPage(DisplayConstants.EMAIL_FAILURE, caught.getMessage());
@@ -76,8 +73,8 @@ public class AccountPresenter extends AbstractActivity implements AccountView.Pr
 	}
 
 	@Override
-    public String mayStop() {
-        view.clear();
-        return null;
-    }
+	public String mayStop() {
+		view.clear();
+		return null;
+	}
 }

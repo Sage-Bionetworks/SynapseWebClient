@@ -19,7 +19,6 @@ import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -37,7 +36,8 @@ import com.google.inject.Inject;
 
 public class SettingsViewImpl extends Composite implements SettingsView {
 
-	public interface SettingsViewImplUiBinder extends UiBinder<Widget, SettingsViewImpl> {}
+	public interface SettingsViewImplUiBinder extends UiBinder<Widget, SettingsViewImpl> {
+	}
 
 	@UiField
 	Div changeSynapsePasswordUI;
@@ -56,19 +56,19 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@UiField
 	FlowPanel forgotPasswordContainer;
 	Anchor forgotPasswordLink;
-	
+
 	@UiField
 	Div emailSettingsPanel;
 	@UiField
 	Div emailsPanel;
-	
+
 	@UiField
 	PasswordTextBox currentPasswordField;
 	@UiField
 	PasswordTextBox password1Field;
 	@UiField
 	PasswordTextBox password2Field;
-	
+
 	@UiField
 	Row currentPassword;
 	@UiField
@@ -82,28 +82,28 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 
 	@UiField
 	TextBox apiKeyContainer;
-	
+
 	@UiField
 	CheckBox emailNotificationsCheckbox;
 	@UiField
 	org.gwtbootstrap3.client.ui.Button changeApiKey;
 	@UiField
 	org.gwtbootstrap3.client.ui.Button showApiKey;
-	
+
 	@UiField
 	SimplePanel notificationSynAlertPanel;
 	@UiField
 	SimplePanel apiSynAlertPanel;
 	@UiField
 	Div subscriptionsContainer;
-	
+
 	@UiField
 	AnchorListItem dateFormatLocal;
 	@UiField
 	AnchorListItem dateFormatUTC;
 	@UiField
 	Button dateFormatDropdown;
-	
+
 	// Profile Validation UI
 	@UiField
 	Div verifyAlert;
@@ -115,7 +115,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	Anchor reviewProfileLink;
 	@UiField
 	Anchor createOrcIdLink;
-	 @UiField
+	@UiField
 	Anchor orcIdField;
 	@UiField
 	Icon unbindButton;
@@ -140,30 +140,30 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@UiField
 	Button synapseTermsAcceptedButton;
 	private Presenter presenter;
-	
+
 	@Inject
 	public SettingsViewImpl(SettingsViewImplUiBinder binder, final SynapseJSNIUtils jsniUtils) {
 		initWidget(binder.createAndBindUi(this));
-		
+
 		ClickHandler notificationsClickHandler = getNotificationsClickHandler();
 		emailNotificationsCheckbox.addClickHandler(notificationsClickHandler);
-		
+
 		changePasswordBtn.addClickHandler(event -> {
 			presenter.changePassword();
 		});
-		
+
 		changeApiKey.addClickHandler(event -> {
 			presenter.changeApiKey();
 		});
-		
+
 		showApiKey.addClickHandler(event -> {
 			presenter.getAPIKey();
 		});
-		
+
 		forgotPasswordLink = new Anchor();
 		forgotPasswordLink.addStyleName("link movedown-4 margin-left-10");
 		forgotPasswordLink.setText(DisplayConstants.FORGOT_PASSWORD);
-		forgotPasswordLink.addClickHandler(event-> {
+		forgotPasswordLink.addClickHandler(event -> {
 			presenter.goTo(new PasswordReset(ClientProperties.DEFAULT_PLACE_TOKEN));
 		});
 		forgotPasswordContainer.addStyleName("inline-block");
@@ -173,21 +173,21 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		apiKeyHighlightBox.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Synapse API Key");
 		editProfilePanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Profile");
 		dateTimeFormatPanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Date/Time Format");
-		
+
 		ClickHandler editProfileClickHandler = event -> {
 			presenter.onEditProfile();
 		};
 		editProfileButton.addClickHandler(editProfileClickHandler);
 		reviewProfileLink.addClickHandler(editProfileClickHandler);
-		
+
 		ClickHandler orcIdClickHandler = event -> presenter.linkOrcIdClicked();
 		linkORCIDButton.addClickHandler(orcIdClickHandler);
 		createOrcIdLink.addClickHandler(orcIdClickHandler);
-		
+
 		apiKeyContainer.addClickHandler(event -> {
 			apiKeyContainer.selectAll();
 		});
-		
+
 		dateFormatLocal.addClickHandler(event -> {
 			dateFormatDropdown.setText(dateFormatLocal.getText());
 			presenter.setShowUTCTime(false);
@@ -199,7 +199,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 
 		ClickHandler newVerificationSubmissionCallback = event -> presenter.newVerificationSubmissionClicked();
 		ClickHandler editVerificationSubmissionCallback = event -> presenter.editVerificationSubmissionClicked();
-		
+
 		requestProfileValidationLink1.addClickHandler(newVerificationSubmissionCallback);
 		requestProfileValidationLink2.addClickHandler(newVerificationSubmissionCallback);
 		verificationApprovedButton.addClickHandler(editVerificationSubmissionCallback);
@@ -207,7 +207,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		verificationSuspendedButton.addClickHandler(editVerificationSubmissionCallback);
 		verificationRejectedButton.addClickHandler(editVerificationSubmissionCallback);
 		resubmitProfileValidationButton.addClickHandler(newVerificationSubmissionCallback);
-		
+
 		unbindButton.addClickHandler(event -> presenter.unbindOrcId());
 		certificationButton.addClickHandler(event -> presenter.goTo(new Quiz("Certification")));
 		certificationPassedButton.addClickHandler(event -> DisplayUtils.newWindow("https://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#certified-users", "_blank", ""));
@@ -216,10 +216,10 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
-		this.presenter = presenter;		
+		this.presenter = presenter;
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
-	
+
 	@Override
 	public void render() {
 		currentPasswordField.getElement().setAttribute("placeholder", "Enter current password");
@@ -240,39 +240,38 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	}
 
 	@Override
-	public void showLoading() {
-	}
-	
+	public void showLoading() {}
+
 	@Override
 	public void updateNotificationCheckbox(UserProfile profile) {
 		boolean isNotify = true;
-		if(profile.getNotificationSettings() != null) {
+		if (profile.getNotificationSettings() != null) {
 			if (profile.getNotificationSettings().getSendEmailNotifications() != null)
 				isNotify = profile.getNotificationSettings().getSendEmailNotifications();
 		}
 		emailNotificationsCheckbox.setValue(isNotify, false);
 	}
-	
+
 	private ClickHandler getNotificationsClickHandler() {
 		return new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				//update notification settings
+				// update notification settings
 				presenter.updateMyNotificationSettings(emailNotificationsCheckbox.getValue(), false);
 			}
 		};
 	}
-	
+
 	@Override
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message);
 	}
-	
+
 	@Override
 	public String getCurrentPasswordField() {
 		return currentPasswordField.getText();
 	}
-	
+
 	@Override
 	public void setCurrentPasswordInError(boolean inError) {
 		if (inError) {
@@ -281,12 +280,12 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 			currentPassword.removeStyleName("has-error");
 		}
 	}
-	
+
 	@Override
 	public String getPassword1Field() {
 		return password1Field.getText();
 	}
-		
+
 	@Override
 	public void setPassword1InError(boolean inError) {
 		if (inError) {
@@ -295,12 +294,12 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 			password1.removeStyleName("has-error");
 		}
 	}
-	
+
 	@Override
 	public String getPassword2Field() {
 		return password2Field.getText();
 	}
-	
+
 	@Override
 	public void setPassword2InError(boolean inError) {
 		if (inError) {
@@ -309,7 +308,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 			password2.removeStyleName("has-error");
 		}
 	}
-	
+
 	@Override
 	public void clear() {
 		hideAPIKey();
@@ -321,7 +320,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		verificationRejectedButton.setVisible(false);
 		verifyAlert.setVisible(false);
 	}
-	
+
 	@Override
 	public void resetChangePasswordUI() {
 		currentPasswordField.setValue("");
@@ -332,7 +331,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		setPassword1InError(false);
 		setPassword2InError(false);
 	}
-	
+
 	@Override
 	public void setApiKey(String apiKey) {
 		apiKeyContainer.setText(apiKey);
@@ -351,7 +350,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void setAPISynAlertWidget(IsWidget apiSynAlert) {
 		apiSynAlertPanel.setWidget(apiSynAlert);
 	}
-	
+
 	@Override
 	public void hideAPIKey() {
 		apiKeyContainer.setText("");
@@ -359,12 +358,12 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		changeApiKey.setVisible(false);
 		showApiKey.setVisible(true);
 	}
-	
+
 	@Override
 	public void showConfirm(String message, Callback callback) {
 		DisplayUtils.confirm(message, callback);
 	}
-	
+
 	@Override
 	public void setChangePasswordEnabled(boolean isEnabled) {
 		changePasswordBtn.setEnabled(isEnabled);
@@ -374,75 +373,86 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void setPasswordSynAlertWidget(IsWidget synAlert) {
 		passwordSynAlertPanel.setWidget(synAlert);
 	}
+
 	@Override
 	public void setSubscriptionsListWidget(Widget w) {
 		subscriptionsContainer.clear();
 		subscriptionsContainer.add(w);
 	}
-	
+
 	@Override
 	public void setSubscriptionsVisible(boolean visible) {
 		subscriptionsContainer.setVisible(visible);
 	}
+
 	@Override
 	public void setShowingUTCTime() {
 		dateFormatDropdown.setText(dateFormatUTC.getText());
 	}
+
 	@Override
 	public void setShowingLocalTime() {
 		dateFormatDropdown.setText(dateFormatLocal.getText());
 	}
-	
+
 	@Override
 	public void setEmailAddressesWidget(IsWidget w) {
 		emailsPanel.clear();
 		emailsPanel.add(w);
 	}
-	
+
 
 	@Override
 	public void setOrcIdVisible(boolean isVisible) {
 		orcIdField.setVisible(isVisible);
 	}
-	
+
 	@Override
 	public void setUnbindOrcIdVisible(boolean isVisible) {
 		unbindButtonUI.setVisible(isVisible);
 	}
-	
+
 	@Override
 	public void setOrcId(String href) {
-		 orcIdField.setText(href);
-		 orcIdField.setHref(href);
+		orcIdField.setText(href);
+		orcIdField.setHref(href);
 	}
+
 	@Override
 	public void setOrcIDLinkButtonVisible(boolean isVisible) {
-		this.linkORCIDButton.setVisible(isVisible);		
+		this.linkORCIDButton.setVisible(isVisible);
 	}
+
 	@Override
-	public void showNotVerified(){
+	public void showNotVerified() {
 		verifyAlert.setVisible(true);
 	}
+
 	@Override
 	public void setResubmitVerificationButtonVisible(boolean isVisible) {
 		resubmitProfileValidationButton.setVisible(isVisible);
 	}
+
 	@Override
 	public void setVerificationSubmittedButtonVisible(boolean isVisible) {
 		verificationSubmittedButton.setVisible(isVisible);
 	}
+
 	@Override
 	public void setVerificationSuspendedButtonVisible(boolean isVisible) {
 		verificationSuspendedButton.setVisible(isVisible);
 	}
+
 	@Override
 	public void setVerificationRejectedButtonVisible(boolean isVisible) {
 		verificationRejectedButton.setVisible(isVisible);
 	}
+
 	@Override
 	public void setVerificationDetailsButtonVisible(boolean isVisible) {
 		verificationApprovedButton.setVisible(isVisible);
 	}
+
 	@Override
 	public void setIsCertified(boolean isCertified) {
 		certificationButton.setVisible(!isCertified);

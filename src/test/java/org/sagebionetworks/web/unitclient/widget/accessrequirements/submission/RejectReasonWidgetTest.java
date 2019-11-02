@@ -5,7 +5,6 @@ import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget.ERROR_MESSAGE;
 import static org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget.TEMPLATE_HEADER_SIGNATURE;
 import static org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget.TEMPLATE_HEADER_THANKS;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,59 +17,59 @@ import org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget;
 @RunWith(MockitoJUnitRunner.class)
 public class RejectReasonWidgetTest {
 
-    RejectReasonWidget widget;
-    @Mock
-    RejectReasonView mockView;
-    @Mock
-    CallbackP<String> getReasonCallback;
-    
-    public static final String SELECTED_CHECKBOXES = "Must do this, and that, and the other thing.";
-    public static final String CANNED_RESPONSE = "canned response";
-    
-    @Before
-    public void setUp() throws Exception {
-        when(mockView.getSelectedCheckboxText()).thenReturn(SELECTED_CHECKBOXES);
-        widget = new RejectReasonWidget(mockView);
-    }
+	RejectReasonWidget widget;
+	@Mock
+	RejectReasonView mockView;
+	@Mock
+	CallbackP<String> getReasonCallback;
 
-    @Test
-    public void testConstructor() {
-        verify(mockView).setPresenter(widget);
-    }
+	public static final String SELECTED_CHECKBOXES = "Must do this, and that, and the other thing.";
+	public static final String CANNED_RESPONSE = "canned response";
 
-    @Test
-    public void testShowOnSuccess() {
-        // call
-        widget.show(getReasonCallback);
-        // verify/assert
-        verify(mockView).clear();
-        verify(mockView).show();
-        
-        // verify save onSave callback
-        when(mockView.getValue()).thenReturn(CANNED_RESPONSE);
+	@Before
+	public void setUp() throws Exception {
+		when(mockView.getSelectedCheckboxText()).thenReturn(SELECTED_CHECKBOXES);
+		widget = new RejectReasonWidget(mockView);
+	}
 
-        widget.onSave();
+	@Test
+	public void testConstructor() {
+		verify(mockView).setPresenter(widget);
+	}
 
-        verify(mockView).hide();
-        verify(getReasonCallback).invoke(CANNED_RESPONSE);
-    }
+	@Test
+	public void testShowOnSuccess() {
+		// call
+		widget.show(getReasonCallback);
+		// verify/assert
+		verify(mockView).clear();
+		verify(mockView).show();
 
-    @Test
-    public void testUpdateResponse() {
-    	widget.show(getReasonCallback);
-        String exp = TEMPLATE_HEADER_THANKS + SELECTED_CHECKBOXES + TEMPLATE_HEADER_SIGNATURE;
+		// verify save onSave callback
+		when(mockView.getValue()).thenReturn(CANNED_RESPONSE);
 
-        widget.updateResponse();
+		widget.onSave();
 
-        verify(mockView).setValue(exp);
-    }
+		verify(mockView).hide();
+		verify(getReasonCallback).invoke(CANNED_RESPONSE);
+	}
 
-    @Test
-    public void testOnSaveNoText() {
-        when(mockView.getValue()).thenReturn("");
+	@Test
+	public void testUpdateResponse() {
+		widget.show(getReasonCallback);
+		String exp = TEMPLATE_HEADER_THANKS + SELECTED_CHECKBOXES + TEMPLATE_HEADER_SIGNATURE;
 
-        widget.onSave();
+		widget.updateResponse();
 
-        verify(mockView).showError(ERROR_MESSAGE);
-    }
+		verify(mockView).setValue(exp);
+	}
+
+	@Test
+	public void testOnSaveNoText() {
+		when(mockView.getValue()).thenReturn("");
+
+		widget.onSave();
+
+		verify(mockView).showError(ERROR_MESSAGE);
+	}
 }

@@ -7,7 +7,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
-
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -17,18 +16,15 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	public static final String PLEASE_SELECT_A_FILE = "Please select a file";
 	public static final String CAN_ONLY_INCLUDE = "Can only include letters, numbers, dot (.), dash (-), and underscore (_)";
 	public static final String MUST_BE_AT_LEAST_3_CHARACTERS = "Must be at least 3 characters";
-	
+
 	UserProfileEditorWidgetView view;
 	ProfileImageWidget imageWidget;
 	ImageUploadWidget fileHandleUploadWidget;
 	String fileHandleId;
 	Callback uploadCompleteCallback;
+
 	@Inject
-	public UserProfileEditorWidgetImpl(
-			UserProfileEditorWidgetView view,
-			ProfileImageWidget imageWidget, 
-			ImageUploadWidget fileHandleUploadWidget,
-			PortalGinInjector ginInjector) {
+	public UserProfileEditorWidgetImpl(UserProfileEditorWidgetView view, ProfileImageWidget imageWidget, ImageUploadWidget fileHandleUploadWidget, PortalGinInjector ginInjector) {
 		super();
 		this.view = view;
 		this.imageWidget = imageWidget;
@@ -38,7 +34,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		this.view.addImageWidget(imageWidget);
 		this.view.setPresenter(this);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return this.view.asWidget();
@@ -82,16 +78,16 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		String username = view.getUsername();
 		if (!ValidationUtils.isValidUsername(username)) {
 			valid = false;
-			if(username.length() < 3){
+			if (username.length() < 3) {
 				view.showUsernameError(MUST_BE_AT_LEAST_3_CHARACTERS);
-			}else{
+			} else {
 				view.showUsernameError(CAN_ONLY_INCLUDE);
 			}
 		}
 		// link
 		String link = view.getLink();
-		if(link != null && !"".equals(link.trim())){
-			if(!ValidationUtils.isValidUrl(link, true)){
+		if (link != null && !"".equals(link.trim())) {
+			if (!ValidationUtils.isValidUrl(link, true)) {
 				valid = false;
 				view.showLinkError(PLEASE_ENTER_A_VALID_URL);
 			}
@@ -148,7 +144,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	public String getSummary() {
 		return view.getBio();
 	}
-	
+
 	public void setNewFileHandle(String fileHandleId) {
 		this.fileHandleId = fileHandleId;
 		this.fileHandleUploadWidget.reset();
@@ -162,10 +158,12 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	public void addKeyDownHandler(KeyDownHandler keyDownHandler) {
 		view.addKeyDownHandlerToFields(keyDownHandler);
 	}
+
 	@Override
 	public void setUploadingCallback(Callback startedUploadingCallback) {
-		fileHandleUploadWidget.setUploadingCallback(startedUploadingCallback);	
+		fileHandleUploadWidget.setUploadingCallback(startedUploadingCallback);
 	}
+
 	@Override
 	public void setUploadingCompleteCallback(Callback uploadCompleteCallback) {
 		this.uploadCompleteCallback = uploadCompleteCallback;

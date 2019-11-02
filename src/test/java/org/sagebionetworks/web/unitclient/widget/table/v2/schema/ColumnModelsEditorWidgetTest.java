@@ -10,12 +10,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.table.v2.results.RowSetUtils.ETAG_COLUMN_NAME;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -34,13 +32,13 @@ import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ImportTableViewColumnsButton;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ImportTableViewColumnsButton;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
 
 /**
@@ -70,25 +68,24 @@ public class ColumnModelsEditorWidgetTest {
 	ColumnModelTableRowEditorWidget mockColumnModelTableRowEditorWidget2;
 	@Mock
 	ImportTableViewColumnsButton mockAddTableViewColumnsButton;
-	
+
 	ColumnModel nonEditableColumn;
 	List<ColumnModel> nonEditableColumns;
+
 	@Before
-	public void before(){
+	public void before() {
 		MockitoAnnotations.initMocks(this);
 		adapterFactory = new AdapterFactoryImpl();
 		when(mockGinInjector.createNewColumnModelsView()).thenReturn(mockEditor);
-		when(mockGinInjector.createColumnModelEditorWidget()).thenAnswer(new Answer<ColumnModelTableRowEditorWidget >() {
+		when(mockGinInjector.createColumnModelEditorWidget()).thenAnswer(new Answer<ColumnModelTableRowEditorWidget>() {
 			@Override
-			public ColumnModelTableRowEditorWidget answer(InvocationOnMock invocation)
-					throws Throwable {
+			public ColumnModelTableRowEditorWidget answer(InvocationOnMock invocation) throws Throwable {
 				return new ColumnModelTableRowEditorStub();
 			}
 		});
 		when(mockGinInjector.createNewColumnModelTableRowViewer()).thenAnswer(new Answer<ColumnModelTableRowViewer>() {
 			@Override
-			public ColumnModelTableRowViewer answer(InvocationOnMock invocation)
-					throws Throwable {
+			public ColumnModelTableRowViewer answer(InvocationOnMock invocation) throws Throwable {
 				return new ColumnModelTableRowViewerStub();
 			}
 		});
@@ -102,7 +99,7 @@ public class ColumnModelsEditorWidgetTest {
 		String colName1 = "non-editable default column";
 		nonEditableColumn.setName(colName1);
 		nonEditableColumns.add(nonEditableColumn);
-		
+
 		nonEditableColumn = new ColumnModel();
 		nonEditableColumn.setColumnType(ColumnType.STRING);
 		nonEditableColumn.setName(ETAG_COLUMN_NAME);
@@ -110,14 +107,14 @@ public class ColumnModelsEditorWidgetTest {
 		Set<String> nonEditableColumnNames = new HashSet<String>();
 		nonEditableColumnNames.add(colName1);
 		nonEditableColumnNames.add(ETAG_COLUMN_NAME);
-		
+
 		when(mockFileViewDefaultColumns.getDefaultViewColumnNames(anyBoolean())).thenReturn(nonEditableColumnNames);
 		widget = new ColumnModelsEditorWidget(mockGinInjector, adapterFactory, mockFileViewDefaultColumns);
 		schema = TableModelTestUtils.createOneOfEachType(true);
 	}
-	
+
 	@Test
-	public void testConfigure(){
+	public void testConfigure() {
 		widget.configure(TableType.table, schema);
 		verify(mockEditor).configure(ViewType.EDITOR, true);
 		// All rows should be added to the editor
@@ -128,53 +125,54 @@ public class ColumnModelsEditorWidgetTest {
 		// Extract the columns from the editor
 		List<ColumnModel> clone = widget.getEditedColumnModels();
 		assertEquals(schema, clone);
-		
-		//attempting to add all columns again is a no-op if they all exist in the editor already
+
+		// attempting to add all columns again is a no-op if they all exist in the editor already
 		widget.addColumns(schema);
 		verify(mockEditor, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
-		
-		//select all, delete, and add schema again (verify all columns from the schema have been re-added).
+
+		// select all, delete, and add schema again (verify all columns from the schema have been re-added).
 		widget.selectAll();
 		widget.deleteSelected();
 		widget.addColumns(schema);
 		verify(mockEditor, times(schema.size() * 2)).addColumn(any(ColumnModelTableRow.class));
 	}
-	
+
 	@Test
-	public void testAddDuplicateColumns(){
+	public void testAddDuplicateColumns() {
 		widget.configure(TableType.table, schema);
-		
+
 		List<ColumnModel> clone = widget.getEditedColumnModels();
 		assertEquals(schema, clone);
-		
+
 		// change the column type of the first column
 		clone.get(0).setId(null);
 		clone.get(0).setColumnType(ColumnType.FILEHANDLEID);
 		// change the column name of the second column
 		clone.get(1).setId(null);
 		clone.get(1).setName("newname");
-		
-		// the third column looks to be new, but should be filtered out because it has the same name and type as an existing column in the editor
+
+		// the third column looks to be new, but should be filtered out because it has the same name and
+		// type as an existing column in the editor
 		clone.get(2).setId(null);
 		// all other columns should be ignored (because they have the same name and type)
 		widget.addColumns(clone);
 		verify(mockEditor, times(schema.size() + 2)).addColumn(any(ColumnModelTableRow.class));
 	}
-	
+
 	@Test
 	public void testFileView() {
-		//try to add non-editable column
+		// try to add non-editable column
 		when(mockGinInjector.createColumnModelEditorWidget()).thenReturn(mockColumnModelTableRowEditorWidget1, mockColumnModelTableRowEditorWidget2);
 		widget.configure(TableType.files, nonEditableColumns);
-		verify(mockGinInjector,  times(nonEditableColumns.size())).createColumnModelEditorWidget();
+		verify(mockGinInjector, times(nonEditableColumns.size())).createColumnModelEditorWidget();
 		verify(mockColumnModelTableRowEditorWidget1).setToBeDefaultFileViewColumn();
 		verify(mockColumnModelTableRowEditorWidget2).setToBeDefaultFileViewColumn();
 		verify(mockColumnModelTableRowEditorWidget1).setCanHaveDefault(false);
 		verify(mockColumnModelTableRowEditorWidget2).setCanHaveDefault(false);
 	}
-	
+
 	@Test
-	public void testAddNewColumn(){
+	public void testAddNewColumn() {
 		widget.configure(TableType.table, schema);
 		// This should add a new string column
 		widget.addNewColumn();
@@ -189,10 +187,10 @@ public class ColumnModelsEditorWidgetTest {
 		List<ColumnModel> clone = widget.getEditedColumnModels();
 		assertEquals(schema, clone);
 	}
-	
-	
+
+
 	@Test
-	public void testOnSaveSuccessValidateFalse() throws JSONObjectAdapterException{
+	public void testOnSaveSuccessValidateFalse() throws JSONObjectAdapterException {
 		widget.configure(TableType.table, schema);
 		// Add a column
 		ColumnModelTableRowEditorStub editor = (ColumnModelTableRowEditorStub) widget.addNewColumn();
@@ -201,24 +199,24 @@ public class ColumnModelsEditorWidgetTest {
 		// Now call validate
 		assertFalse(widget.validate());
 	}
-	
-	
+
+
 	@Test
-	public void testSelectAll(){
+	public void testSelectAll() {
 		widget.configure(TableType.table, schema);
 		// checks selection state each time a column editor is added, and once when columns are initialized.
 		verify(mockEditor, times(schema.size() + 1)).setCanDelete(false);
 		verify(mockEditor, times(schema.size() + 1)).setCanMoveUp(false);
 		verify(mockEditor, times(schema.size() + 1)).setCanMoveDown(false);
-		
+
 		// Add three columns
 		reset(mockEditor);
 		ColumnModelTableRowEditorWidget one = widget.addNewColumn();
 		verify(mockEditor).setCanDelete(false);
 		verify(mockEditor).setCanMoveUp(false);
 		verify(mockEditor).setCanMoveDown(false);
-		assertTrue(((ColumnModelTableRowEditorStub)one).canHaveDefault());
-		
+		assertTrue(((ColumnModelTableRowEditorStub) one).canHaveDefault());
+
 		ColumnModelTableRowEditorWidget two = widget.addNewColumn();
 		// Start with two selected
 		reset(mockEditor);
@@ -226,14 +224,14 @@ public class ColumnModelsEditorWidgetTest {
 		verify(mockEditor).setCanDelete(true);
 		verify(mockEditor).setCanMoveUp(true);
 		verify(mockEditor).setCanMoveDown(false);
-		
+
 		reset(mockEditor);
 		ColumnModelTableRowEditorWidget three = widget.addNewColumn();
 		// With a new row the second row can move down.
 		verify(mockEditor).setCanDelete(true);
 		verify(mockEditor).setCanMoveUp(true);
 		verify(mockEditor).setCanMoveDown(true);;
-		
+
 		// select all
 		reset(mockEditor);
 		widget.selectAll();
@@ -241,15 +239,15 @@ public class ColumnModelsEditorWidgetTest {
 		assertTrue(two.isSelected());
 		assertTrue(three.isSelected());
 		// The select all must not attempt to change the state
-		// of the buttons for each selection and instead 
+		// of the buttons for each selection and instead
 		// update the state at the end of the selection.
 		verify(mockEditor).setCanDelete(true);
 		verify(mockEditor).setCanMoveUp(false);
 		verify(mockEditor).setCanMoveDown(false);
 	}
-	
+
 	@Test
-	public void testSelectNone(){
+	public void testSelectNone() {
 		widget.configure(TableType.table, schema);
 		// Add three columns
 		ColumnModelTableRowEditorWidget one = widget.addNewColumn();
@@ -263,9 +261,9 @@ public class ColumnModelsEditorWidgetTest {
 		assertFalse(two.isSelected());
 		assertFalse(three.isSelected());
 	}
-	
+
 	@Test
-	public void testToggleSelect(){
+	public void testToggleSelect() {
 		widget.configure(TableType.table, schema);
 		// Add three columns
 		ColumnModelTableRowEditorWidget one = widget.addNewColumn();

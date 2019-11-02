@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.Date;
-
 import com.google.gwt.safehtml.shared.SafeHtml;
 
 public class EntityGroupRecordDisplay {
@@ -13,15 +12,13 @@ public class EntityGroupRecordDisplay {
 	private SafeHtml version;
 	private Date modifienOn;
 	private String createdByPrincipalId;
-	private SafeHtml note;	
-		
+	private SafeHtml note;
+
 	public EntityGroupRecordDisplay() {
-		
+
 	}
-	
-	public EntityGroupRecordDisplay(String entityId, SafeHtml name, String nameLinkUrl,
-			String downloadUrl, SafeHtml description, SafeHtml version,
-			Date modifienOn, String createdByPrincipalId, SafeHtml note) {
+
+	public EntityGroupRecordDisplay(String entityId, SafeHtml name, String nameLinkUrl, String downloadUrl, SafeHtml description, SafeHtml version, Date modifienOn, String createdByPrincipalId, SafeHtml note) {
 		super();
 		this.entityId = entityId;
 		this.name = name;
@@ -49,7 +46,7 @@ public class EntityGroupRecordDisplay {
 	public void setName(SafeHtml name) {
 		this.name = name;
 	}
-	
+
 	public String getNameLinkUrl() {
 		return nameLinkUrl;
 	}
@@ -93,7 +90,7 @@ public class EntityGroupRecordDisplay {
 	public String getCreatedByPrincipalId() {
 		return createdByPrincipalId;
 	}
-	
+
 	public void setCreatedByPrincipalId(String createdByPrincipalId) {
 		this.createdByPrincipalId = createdByPrincipalId;
 	}
@@ -105,5 +102,5 @@ public class EntityGroupRecordDisplay {
 	public void setNote(SafeHtml note) {
 		this.note = note;
 	}
-	
+
 }

@@ -11,7 +11,7 @@ public class ParameterizedToken {
 	public ParameterizedToken(String token) {
 		params = getParamsMap(token);
 	}
-	
+
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		for (Iterator<String> iterator = params.keySet().iterator(); iterator.hasNext();) {
@@ -20,7 +20,7 @@ public class ParameterizedToken {
 			sb.append("=");
 			sb.append(params.get(key));
 			if (iterator.hasNext()) {
-				sb.append("&");	
+				sb.append("&");
 			}
 		}
 		if (sb.length() == 0) {
@@ -28,39 +28,39 @@ public class ParameterizedToken {
 		}
 		return sb.toString();
 	}
-	
+
 	private Map<String, String> getParamsMap(String token) {
 		Map<String, String> params = new HashMap<String, String>();
 		if (token != null && !DEFAULT_TOKEN.equals(token)) {
 			String[] paramList = token.split("&");
 			for (String keyValue : paramList) {
 				String[] keyValueArray = keyValue.split("=");
-				if (keyValueArray.length==2) {
-					params.put(keyValueArray[0], keyValueArray[1]);	
+				if (keyValueArray.length == 2) {
+					params.put(keyValueArray[0], keyValueArray[1]);
 				}
 			}
 		}
 		return params;
 	}
-	
+
 	public String get(String key) {
 		return params.get(key);
 	}
-	
+
 	public boolean containsKey(String key) {
 		return params.containsKey(key);
 	}
-	
+
 	public void remove(String key) {
 		params.remove(key);
 	}
-	
+
 	public void put(String key, String value) {
 		params.put(key, value);
 	}
-	
+
 	public void clear() {
 		params.clear();
 	}
-	
+
 }

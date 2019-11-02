@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.docker;
 import org.gwtbootstrap3.client.ui.PanelBody;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -15,7 +14,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
+public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView {
 	@UiField
 	PanelBody dockerRepoWikiPageContainer;
 	@UiField
@@ -35,11 +34,13 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	@UiField
 	Div dockerCommitListContainer;
 
-	public interface Binder extends UiBinder<Widget, DockerRepoWidgetViewImpl> {}
+	public interface Binder extends UiBinder<Widget, DockerRepoWidgetViewImpl> {
+	}
+
 	Widget widget;
 
 	@Inject
-	public DockerRepoWidgetViewImpl(Binder binder, final SynapseJSNIUtils jsniUtils){
+	public DockerRepoWidgetViewImpl(Binder binder, final SynapseJSNIUtils jsniUtils) {
 		this.widget = binder.createAndBindUi(this);
 		dockerPullCommand.addClickHandler(new ClickHandler() {
 			@Override
@@ -90,7 +91,7 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	}
 
 	@Override
-	public void setDockerCommitListWidget(Widget widget){
+	public void setDockerCommitListWidget(Widget widget) {
 		dockerCommitListContainer.add(widget);
 	}
 

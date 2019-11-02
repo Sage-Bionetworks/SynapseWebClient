@@ -1,10 +1,9 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder
-		xmlns:ui="urn:ui:com.google.gwt.uibinder"
-		xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
->
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Span marginRight="15">
-		<bh:Span addStyleNames="boldText margin-right-5" text="Item count: " />
+		<bh:Span addStyleNames="boldText margin-right-5"
+			text="Item count: " />
 		<bh:Span ui:field="itemCountField" />
 	</bh:Span>
 </ui:UiBinder>

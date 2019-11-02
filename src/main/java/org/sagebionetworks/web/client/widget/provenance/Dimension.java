@@ -4,25 +4,29 @@ public class Dimension {
 
 	private int width;
 	private int height;
-	
+
 	public Dimension(int width, int height) {
 		super();
 		this.width = width;
 		this.height = height;
 	}
-	
+
 	public int getWidth() {
 		return width;
 	}
+
 	public void setWidth(int width) {
 		this.width = width;
 	}
+
 	public int getHeight() {
 		return height;
 	}
+
 	public void setHeight(int height) {
 		this.height = height;
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -31,6 +35,7 @@ public class Dimension {
 		result = prime * result + width;
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -46,6 +51,6 @@ public class Dimension {
 			return false;
 		return true;
 	}
-	
-	
+
+
 }

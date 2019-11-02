@@ -1,12 +1,10 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
@@ -28,15 +26,14 @@ import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ForumWidget implements ForumWidgetView.Presenter{
+public class ForumWidget implements ForumWidgetView.Presenter {
 	public final static Long MODERATOR_LIMIT = 20L;
 
-	//used to tell the discussion forum to show a single thread
+	// used to tell the discussion forum to show a single thread
 	public final static String THREAD_ID_KEY = "threadId";
 	public final static String REPLY_ID_KEY = "replyId";
 	ForumWidgetView view;
@@ -62,7 +59,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	ParameterizedToken params;
 	Topic forumTopic = new Topic();
 	ActionMenuWidget actionMenu;
-	
+
 	// From portal.properties, what thread should we show if no threads are available?
 	public static final String DEFAULT_THREAD_ID_KEY = "org.sagebionetworks.portal.default_thread_id";
 	public static DiscussionThreadBundle defaultThreadBundle;
@@ -70,23 +67,9 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	public SubscribersWidget forumSubscribersWidget;
 	public DiscussionThreadBundle currentThreadBundle;
 	boolean isForumConfigured;
+
 	@Inject
-	public ForumWidget(
-			final ForumWidgetView view,
-			StuAlert stuAlert,
-			DiscussionForumClientAsync discussionForumClient,
-			DiscussionThreadListWidget threadListWidget,
-			DiscussionThreadListWidget deletedThreadListWidget,
-			NewDiscussionThreadModal newThreadModal,
-			AuthenticationController authController,
-			GlobalApplicationState globalApplicationState,
-			SingleDiscussionThreadWidget singleThreadWidget,
-			SubscribeButtonWidget subscribeToForumButton,
-			SingleDiscussionThreadWidget defaultThreadWidget,
-			SubscribersWidget forumSubscribersWidget,
-			SynapseJavascriptClient jsClient,
-			SynapseProperties synapseProperties
-			) {
+	public ForumWidget(final ForumWidgetView view, StuAlert stuAlert, DiscussionForumClientAsync discussionForumClient, DiscussionThreadListWidget threadListWidget, DiscussionThreadListWidget deletedThreadListWidget, NewDiscussionThreadModal newThreadModal, AuthenticationController authController, GlobalApplicationState globalApplicationState, SingleDiscussionThreadWidget singleThreadWidget, SubscribeButtonWidget subscribeToForumButton, SingleDiscussionThreadWidget defaultThreadWidget, SubscribersWidget forumSubscribersWidget, SynapseJavascriptClient jsClient, SynapseProperties synapseProperties) {
 		this.view = view;
 		this.stuAlert = stuAlert;
 		this.threadListWidget = threadListWidget;
@@ -113,7 +96,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		String defaultThreadId = synapseProperties.getSynapseProperty(DEFAULT_THREAD_ID_KEY);
 		forumTopic.setObjectType(SubscriptionObjectType.FORUM);
 		initDefaultThread(defaultThreadId);
-		emptyListCallback = new CallbackP<Boolean>(){
+		emptyListCallback = new CallbackP<Boolean>() {
 			@Override
 			public void invoke(Boolean param) {
 				if (!isSingleThread) {
@@ -132,7 +115,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		};
 		subscribeToForumButton.setOnSubscribeCallback(refreshThreadsCallback);
 		subscribeToForumButton.setOnUnsubscribeCallback(refreshThreadsCallback);
-		
+
 		threadListWidget.setThreadIdClickedCallback(new CallbackP<DiscussionThreadBundle>() {
 			@Override
 			public void invoke(DiscussionThreadBundle bundle) {
@@ -157,26 +140,27 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			}
 		});
 	}
-	
+
 	public void initDefaultThread(String defaultThreadId) {
 		if (defaultThreadBundle == null) {
-			//get default thread bundle
+			// get default thread bundle
 			jsClient.getThread(defaultThreadId, new AsyncCallback<DiscussionThreadBundle>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					stuAlert.handleException(caught);
 				}
+
 				public void onSuccess(DiscussionThreadBundle threadBundle) {
 					defaultThreadBundle = createDefaultThread(threadBundle);
 					initDefaultThreadWidget();
 				};
 			});
 		} else {
-			//configure using default thread bundle
+			// configure using default thread bundle
 			initDefaultThreadWidget();
 		}
 	}
-	
+
 	public DiscussionThreadBundle createDefaultThread(DiscussionThreadBundle stuThread) {
 		DiscussionThreadBundle defaultThreadBundle = new DiscussionThreadBundle();
 		defaultThreadBundle.setProjectId(stuThread.getProjectId());
@@ -192,14 +176,14 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		defaultThreadBundle.setIsDeleted(false);
 		return defaultThreadBundle;
 	}
-	
+
 	public void resetDefaultThreadDates() {
 		Date now = new Date();
 		defaultThreadBundle.setCreatedOn(now);
 		defaultThreadBundle.setModifiedOn(now);
 		defaultThreadBundle.setLastActivity(now);
 	}
-	
+
 	public void initDefaultThreadWidget() {
 		Set<String> moderatorIds = new HashSet<String>();
 		Callback deleteCallback = null;
@@ -211,34 +195,29 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		defaultThreadWidget.setNewReplyContainerVisible(false);
 		defaultThreadWidget.setCommandsVisible(false);
 	}
-	
+
 	public void updatePlaceToSingleThread(String threadId) {
 		params.clear();
 		params.put(THREAD_ID_KEY, threadId);
 		paramChangeCallback.invoke(params);
 	}
-	
+
 	public void updatePlaceToReply(String replyId) {
 		if (replyId != null) {
-			params.put(REPLY_ID_KEY, replyId);	
+			params.put(REPLY_ID_KEY, replyId);
 		} else {
 			params.remove(REPLY_ID_KEY);
 		}
-		
+
 		paramChangeCallback.invoke(params);
 	}
-	
+
 	public void updatePlaceToForum() {
 		params.clear();
 		paramChangeCallback.invoke(params);
 	}
-	
-	public void configure(String entityId, 
-			final ParameterizedToken params,
-			Boolean isCurrentUserModerator,
-			ActionMenuWidget actionMenu,
-			CallbackP<ParameterizedToken> paramChangeCallback, 
-			Callback urlChangeCallback) {
+
+	public void configure(String entityId, final ParameterizedToken params, Boolean isCurrentUserModerator, ActionMenuWidget actionMenu, CallbackP<ParameterizedToken> paramChangeCallback, Callback urlChangeCallback) {
 		isForumConfigured = false;
 		this.entityId = entityId;
 		this.isCurrentUserModerator = isCurrentUserModerator;
@@ -250,10 +229,10 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		moderatorIds.clear();
 		resetView();
 		// get Forum and its moderators
-		loadForum(entityId, new Callback(){
+		loadForum(entityId, new Callback() {
 			@Override
 			public void invoke() {
-				//are we just showing a single thread, or the full list?
+				// are we just showing a single thread, or the full list?
 				if (params.containsKey(THREAD_ID_KEY)) {
 					showThread(params.get(THREAD_ID_KEY), params.get(REPLY_ID_KEY));
 				} else {
@@ -266,7 +245,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 
 	public void loadForum(String entityId, final Callback callback) {
 		stuAlert.clear();
-		jsClient.getForumByProjectId(entityId, new AsyncCallback<Forum>(){
+		jsClient.getForumByProjectId(entityId, new AsyncCallback<Forum>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				stuAlert.handleException(caught);
@@ -282,7 +261,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 
 	public void loadModerators(final String forumId, final Long offset, final Callback callback) {
 		stuAlert.clear();
-		jsClient.getModerators(forumId, MODERATOR_LIMIT, offset, new AsyncCallback<PaginatedIds>(){
+		jsClient.getModerators(forumId, MODERATOR_LIMIT, offset, new AsyncCallback<PaginatedIds>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -292,7 +271,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			@Override
 			public void onSuccess(PaginatedIds result) {
 				moderatorIds.addAll(result.getResults());
-				if (result.getTotalNumberOfResults() > offset+MODERATOR_LIMIT) {
+				if (result.getTotalNumberOfResults() > offset + MODERATOR_LIMIT) {
 					loadModerators(forumId, offset + MODERATOR_LIMIT, callback);
 				} else {
 					if (callback != null) {
@@ -322,7 +301,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		stuAlert.clear();
 		subscribeToForumButton.clear();
 		updatePlaceToSingleThread(threadId);
-		jsClient.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>(){
+		jsClient.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -332,7 +311,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
 				currentThreadBundle = result;
-				singleThreadWidget.configure(result, replyId, isCurrentUserModerator, moderatorIds, actionMenu, new Callback(){
+				singleThreadWidget.configure(result, replyId, isCurrentUserModerator, moderatorIds, actionMenu, new Callback() {
 					@Override
 					public void invoke() {
 						isForumConfigured = false;
@@ -357,11 +336,10 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		subscribeToForumButton.clear();
 		updatePlaceToForum();
 		subscribeToForumButton.configure(SubscriptionObjectType.FORUM, forumId, actionMenu);
-		newThreadModal.configure(forumId, new Callback(){
+		newThreadModal.configure(forumId, new Callback() {
 			@Override
 			public void invoke() {
-				threadListWidget.configure(forumId, isCurrentUserModerator,
-						moderatorIds, emptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
+				threadListWidget.configure(forumId, isCurrentUserModerator, moderatorIds, emptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 			}
 		});
 		view.setThreadListUIVisible(true);
@@ -371,14 +349,13 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		if (!isForumConfigured) {
 			isForumConfigured = true;
 			threadListWidget.clear();
-			threadListWidget.configure(forumId, isCurrentUserModerator,
-					moderatorIds, emptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
+			threadListWidget.configure(forumId, isCurrentUserModerator, moderatorIds, emptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 			forumTopic.setObjectId(forumId);
 			forumSubscribersWidget.configure(forumTopic);
 		}
 		updateActionMenuCommands();
 	}
-	
+
 	public void configureActionMenu() {
 		if (actionMenu != null) {
 			// add listener for forum commands
@@ -396,10 +373,10 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			});
 		}
 	}
-	
+
 	public void updateActionMenuCommands() {
 		if (actionMenu != null) {
-			//show thread commands if single thread, show forum commands if forum.
+			// show thread commands if single thread, show forum commands if forum.
 			actionMenu.setActionVisible(Action.FOLLOW, true);
 			actionMenu.setActionVisible(Action.CREATE_THREAD, !isSingleThread);
 			actionMenu.setActionVisible(Action.SHOW_DELETED_THREADS, !isSingleThread && isCurrentUserModerator);
@@ -407,7 +384,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			actionMenu.setActionVisible(Action.PIN_THREAD, isSingleThread && isCurrentUserModerator);
 			if (!isSingleThread) {
 				actionMenu.setActionVisible(Action.RESTORE_THREAD, false);
-				actionMenu.setActionVisible(Action.DELETE_THREAD, false);	
+				actionMenu.setActionVisible(Action.DELETE_THREAD, false);
 			}
 		}
 		updateActionMenuDeletedThreadsCommand();
@@ -433,12 +410,11 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	}
 
 	private void refreshThreads() {
-		threadListWidget.configure(forumId, isCurrentUserModerator, moderatorIds,
-				emptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
+		threadListWidget.configure(forumId, isCurrentUserModerator, moderatorIds, emptyListCallback, DiscussionFilter.EXCLUDE_DELETED);
 	}
 
 	@Override
-	public Widget asWidget(){
+	public Widget asWidget() {
 		return view.asWidget();
 	}
 
@@ -447,24 +423,23 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			view.setDeletedThreadListVisible(false);
 		} else {
 			view.setDeletedThreadListVisible(true);
-			deletedThreadListWidget.configure(forumId, isCurrentUserModerator,
-					moderatorIds, null, DiscussionFilter.DELETED_ONLY);
+			deletedThreadListWidget.configure(forumId, isCurrentUserModerator, moderatorIds, null, DiscussionFilter.DELETED_ONLY);
 		}
 		updateActionMenuDeletedThreadsCommand();
 	}
-	
+
 	private void updateActionMenuDeletedThreadsCommand() {
 		if (actionMenu != null) {
 			String commandName = view.isDeletedThreadListVisible() ? "Hide Deleted Threads" : "Show Deleted Threads";
 			actionMenu.setActionText(Action.SHOW_DELETED_THREADS, commandName);
 		}
 	}
-	
+
 	@Override
 	public void onSortReplies(boolean ascending) {
 		// no longer looking at a single reply if setting sort
 		updatePlaceToReply(null);
 		urlChangeCallback.invoke();
-		singleThreadWidget.setSortDirection(ascending);	
+		singleThreadWidget.setSortDirection(ascending);
 	}
 }

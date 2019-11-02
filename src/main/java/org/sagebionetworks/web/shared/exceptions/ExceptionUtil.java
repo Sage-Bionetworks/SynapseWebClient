@@ -23,9 +23,10 @@ public class ExceptionUtil {
 
 	static private Log log = LogFactory.getLog(ExceptionUtil.class);
 
-	
+
 	/**
 	 * Provides a mapping from Synapse Java client exceptions to their GWT IsSerializable equivalents
+	 * 
 	 * @param ex
 	 * @return
 	 */
@@ -36,19 +37,19 @@ public class ExceptionUtil {
 		}
 		ErrorResponseCode code = null;
 		if (ex instanceof SynapseServerException) {
-			code = ((SynapseServerException)ex).getErrorResponseCode();
+			code = ((SynapseServerException) ex).getErrorResponseCode();
 		}
-		if(ex instanceof SynapseForbiddenException) {
+		if (ex instanceof SynapseForbiddenException) {
 			return new ForbiddenException(ex.getMessage(), code);
-		} else if(ex instanceof SynapseBadRequestException) {
+		} else if (ex instanceof SynapseBadRequestException) {
 			return new BadRequestException(ex.getMessage(), code);
-		} else if(ex instanceof SynapseNotFoundException) {
+		} else if (ex instanceof SynapseNotFoundException) {
 			return new NotFoundException(ex.getMessage(), code);
-		} else if(ex instanceof SynapseUnauthorizedException) {
+		} else if (ex instanceof SynapseUnauthorizedException) {
 			return new UnauthorizedException(ex.getMessage(), code);
-		} else if(ex instanceof SynapseLockedException) {
+		} else if (ex instanceof SynapseLockedException) {
 			return new LockedException(ex.getMessage(), code);
-		} else if(ex instanceof SynapseTooManyRequestsException) {
+		} else if (ex instanceof SynapseTooManyRequestsException) {
 			return new TooManyRequestsException(ex.getMessage(), code);
 		} else if (ex instanceof SynapseConflictingUpdateException) {
 			return new ConflictingUpdateException(ex.getMessage(), code);
@@ -59,8 +60,8 @@ public class ExceptionUtil {
 		} else if (ex instanceof SynapseDeprecatedServiceException) {
 			return new DeprecatedServiceException(ex.getMessage(), code);
 		} else if (ex instanceof UnknownSynapseServerException) {
-			UnknownSynapseServerException sse = (UnknownSynapseServerException)ex;
-			if (sse.getStatusCode()==HttpStatus.SC_CONFLICT) {
+			UnknownSynapseServerException sse = (UnknownSynapseServerException) ex;
+			if (sse.getStatusCode() == HttpStatus.SC_CONFLICT) {
 				return new ConflictException(ex.getMessage(), code);
 			}
 		} else if (ex instanceof JSONException) {

@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnModelPage;
@@ -23,7 +21,6 @@ import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidge
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -51,24 +48,21 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	SynapseJavascriptClient jsClient;
 	CreateTableViewWizardStep2View view;
 	SynapseJSNIUtils jsniUtils;
-	
+
 	/*
-	 * Set to true to indicate that change selections are in progress.  This allows selection change events to be ignored during this period.
+	 * Set to true to indicate that change selections are in progress. This allows selection change
+	 * events to be ignored during this period.
 	 */
 	boolean changingSelection = false;
 	ViewDefaultColumns fileViewDefaultColumns;
+
 	/**
 	 * New presenter with its view.
+	 * 
 	 * @param view
 	 */
 	@Inject
-	public CreateTableViewWizardStep2(CreateTableViewWizardStep2View view,
-			ColumnModelsEditorWidget editor, 
-			SynapseClientAsync synapseClient, 
-			JobTrackingWidget jobTrackingWidget,
-			ViewDefaultColumns fileViewDefaultColumns,
-			SynapseJavascriptClient jsClient,
-			SynapseJSNIUtils jsniUtils){
+	public CreateTableViewWizardStep2(CreateTableViewWizardStep2View view, ColumnModelsEditorWidget editor, SynapseClientAsync synapseClient, JobTrackingWidget jobTrackingWidget, ViewDefaultColumns fileViewDefaultColumns, SynapseJavascriptClient jsClient, SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -98,9 +92,9 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		this.changingSelection = false;
 		this.entity = entity;
 		this.tableType = tableType;
-		
+
 		editor.configure(tableType, new ArrayList<ColumnModel>());
-		
+
 		boolean isView = !TableType.table.equals(tableType);
 		this.editor.setAddDefaultViewColumnsButtonVisible(isView);
 		this.editor.setAddAnnotationColumnsButtonVisible(isView);
@@ -109,23 +103,24 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 			getDefaultColumnsForView();
 		}
 	}
-	
+
 	public void getDefaultColumnsForView() {
 		boolean clearIds = true;
 		List<ColumnModel> defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.isIncludeFiles(), clearIds);
 		editor.addColumns(defaultColumns);
 	}
-	
+
 	public void getPossibleColumnModelsForViewScope(String nextPageToken) {
 		presenter.clearErrors();
 		ViewScope scope = new ViewScope();
-		scope.setScope(((EntityView)entity).getScopeIds());
+		scope.setScope(((EntityView) entity).getScopeIds());
 		scope.setViewTypeMask(tableType.getViewTypeMask().longValue());
 		synapseClient.getPossibleColumnModelsForViewScope(scope, nextPageToken, new AsyncCallback<ColumnModelPage>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				presenter.setError(caught);
 			}
+
 			@Override
 			public void onSuccess(ColumnModelPage columnPage) {
 				editor.addColumns(columnPage.getResults());
@@ -145,66 +140,68 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	public void setModalPresenter(ModalPresenter presenter) {
 		this.presenter = presenter;
 		presenter.setPrimaryButtonText(FINISH);
-		
-		((ModalWizardWidget)presenter).addCallback(new ModalWizardWidget.WizardCallback() {
+
+		((ModalWizardWidget) presenter).addCallback(new ModalWizardWidget.WizardCallback() {
 			@Override
-			public void onFinished() {
-			}
-			
+			public void onFinished() {}
+
 			@Override
 			public void onCanceled() {
 				onCancel();
 			}
 		});
 	}
-	
+
 	public void onCancel() {
-		//user decided not to create the table/view.  clean it up.
+		// user decided not to create the table/view. clean it up.
 		String entityId = entity.getId();
 		jsClient.deleteEntityById(entityId, true, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				jsniUtils.consoleError(DELETE_PLACEHOLDER_FAILURE_MESSAGE + entityId + ": " + caught.getMessage());
 			}
+
 			@Override
 			public void onSuccess(Void result) {
 				jsniUtils.consoleLog(DELETE_PLACEHOLDER_SUCCESS_MESSAGE + entityId);
 			}
 		});
 	}
-	
+
 	@Override
 	public void onPrimary() {
 		presenter.setLoading(true);
 		// Save it the data is valid
-		if(!editor.validate()){
+		if (!editor.validate()) {
 			presenter.setErrorMessage(ColumnModelsWidget.SEE_THE_ERROR_S_ABOVE);
 			return;
 		}
 		// Get the models from the view and save them
 		List<ColumnModel> newSchema = editor.getEditedColumnModels();
 		presenter.clearErrors();
-		synapseClient.getTableUpdateTransactionRequest(entity.getId(), new ArrayList<ColumnModel>(), newSchema, new AsyncCallback<TableUpdateTransactionRequest>(){
+		synapseClient.getTableUpdateTransactionRequest(entity.getId(), new ArrayList<ColumnModel>(), newSchema, new AsyncCallback<TableUpdateTransactionRequest>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				presenter.setError(caught);
 			}
-			
+
 			@Override
 			public void onSuccess(TableUpdateTransactionRequest request) {
 				if (request.getChanges().isEmpty()) {
 					finished();
 				} else {
-					startTrackingJob(request);	
+					startTrackingJob(request);
 				}
-			}}); 
+			}
+		});
 	}
+
 	public void finished() {
 		// Hide the dialog
 		presenter.setLoading(false);
 		presenter.onFinished();
 	}
-	
+
 	public void startTrackingJob(TableUpdateTransactionRequest request) {
 		view.setJobTrackerVisible(true);
 		presenter.setLoading(true);
@@ -215,11 +212,13 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 				view.setJobTrackerVisible(false);
 				presenter.setError(failure);
 			}
+
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
 				view.setJobTrackerVisible(false);
 				finished();
 			}
+
 			@Override
 			public void onCancel() {
 				view.setJobTrackerVisible(false);

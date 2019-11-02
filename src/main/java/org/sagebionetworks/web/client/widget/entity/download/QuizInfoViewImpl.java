@@ -7,20 +7,20 @@ import com.google.inject.Inject;
 
 public class QuizInfoViewImpl extends Composite implements QuizInfoWidgetView {
 	private Presenter presenter;
-	public interface Binder extends UiBinder<Widget, QuizInfoViewImpl> {}
-	
+
+	public interface Binder extends UiBinder<Widget, QuizInfoViewImpl> {
+	}
+
 	@Inject
 	public QuizInfoViewImpl(Binder uiBinder) {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
-	
+
 	@Override
-	public void clear() {
-	}
-	
+	public void clear() {}
+
 	@Override
-	public void configure() {
-	}
+	public void configure() {}
 
 	@Override
 	public Widget asWidget() {
@@ -28,17 +28,14 @@ public class QuizInfoViewImpl extends Composite implements QuizInfoWidgetView {
 	}
 
 	@Override
-	public void showLoading() {
-	}
+	public void showLoading() {}
 
 	@Override
-	public void showInfo(String message) {
-	}
+	public void showInfo(String message) {}
 
 	@Override
-	public void showErrorMessage(String message) {
-	}
-	
+	public void showErrorMessage(String message) {}
+
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;

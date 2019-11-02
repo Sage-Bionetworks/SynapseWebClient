@@ -3,33 +3,38 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
-	
-   <!-- <g:HTMLPanel ui:field="mainContainer" addStyleNames="panel panel-default"> -->
-   <bh:Div>
-   		<b:Heading size="H5" text="Add More People" addStyleNames="margin-top-40"/>
-   		<g:Label text="Search for a Synapse user or team below.  Click on the user or team name, then adjust their access level above before clicking Save." addStyleNames="margin-bottom-10"/>
-        <b:Panel>
-	        <b:PanelBody>
-	            <!-- <b:Container> -->
-					<b:FormGroup>
-						<b:FormLabel>Name</b:FormLabel>
-						<bh:Div ui:field="suggestBoxPanel" />
-					</b:FormGroup>
-	            <!-- </b:Container> -->
-	        </b:PanelBody>
-	        <b:PanelFooter>
-	            <b:Row>
-	                <b:Column size="MD_1">
-	                    <b:Button ui:field="makePublicButton" icon="GLOBE" size="EXTRA_SMALL">Make Public</b:Button>
-	                </b:Column>
-	                <b:Column size="MD_3" addStyleNames="pull-right">
-	                    <b:Tooltip placement="BOTTOM" ui:field="notifyTooltip">
-	                    	<b:CheckBox ui:field="notifyPeopleCheckBox" addStyleNames="margin-0-imp" >Notify people via email</b:CheckBox>
-	                    </b:Tooltip>
-	                </b:Column>
-	            </b:Row>
-	        </b:PanelFooter>
-        </b:Panel>
-    </bh:Div>
-    <!-- </g:HTMLPanel> -->
+
+	<!-- <g:HTMLPanel ui:field="mainContainer" addStyleNames="panel panel-default"> -->
+	<bh:Div>
+		<b:Heading size="H5" text="Add More People"
+			addStyleNames="margin-top-40" />
+		<g:Label
+			text="Search for a Synapse user or team below.  Click on the user or team name, then adjust their access level above before clicking Save."
+			addStyleNames="margin-bottom-10" />
+		<b:Panel>
+			<b:PanelBody>
+				<!-- <b:Container> -->
+				<b:FormGroup>
+					<b:FormLabel>Name</b:FormLabel>
+					<bh:Div ui:field="suggestBoxPanel" />
+				</b:FormGroup>
+				<!-- </b:Container> -->
+			</b:PanelBody>
+			<b:PanelFooter>
+				<b:Row>
+					<b:Column size="MD_1">
+						<b:Button ui:field="makePublicButton" icon="GLOBE"
+							size="EXTRA_SMALL">Make Public</b:Button>
+					</b:Column>
+					<b:Column size="MD_3" addStyleNames="pull-right">
+						<b:Tooltip placement="BOTTOM" ui:field="notifyTooltip">
+							<b:CheckBox ui:field="notifyPeopleCheckBox"
+								addStyleNames="margin-0-imp">Notify people via email</b:CheckBox>
+						</b:Tooltip>
+					</b:Column>
+				</b:Row>
+			</b:PanelFooter>
+		</b:Panel>
+	</bh:Div>
+	<!-- </g:HTMLPanel> -->
 </ui:UiBinder>

@@ -2,25 +2,22 @@ package org.sagebionetworks.web.unitclient.widget.docker;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -29,8 +26,8 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
@@ -38,7 +35,6 @@ import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.pagination.countbased.BasicPaginationWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.http.client.Request;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -65,22 +61,17 @@ public class DockerRepoListWidgetTest {
 	@Mock
 	Request mockRequest;
 	List<EntityHeader> searchResults;
-	
+
 	DockerRepoListWidget dockerRepoListWidget;
 	String projectId;
 
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		dockerRepoListWidget = new DockerRepoListWidget(
-				mockView,
-				mockMembersContainer,
-				mockSynAlert, 
-				mockSynapseJavascriptClient);
+		dockerRepoListWidget = new DockerRepoListWidget(mockView, mockMembersContainer, mockSynAlert, mockSynapseJavascriptClient);
 		projectId = "syn123";
 		when(mockProject.getId()).thenReturn(projectId);
-		AsyncMockStubber.callSuccessWith(mockResults).when(mockSynapseJavascriptClient)
-			.getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockResults).when(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		searchResults = new ArrayList<EntityHeader>();
 		when(mockResults.getPage()).thenReturn(searchResults);
 	}
@@ -122,8 +113,7 @@ public class DockerRepoListWidgetTest {
 		DockerRepository repo2 = new DockerRepository();
 		EntityBundle bundle2 = new EntityBundle();
 		bundle2.setEntity(repo2);
-		AsyncMockStubber.callSuccessWith(bundle1, bundle2)
-			.when(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(bundle1, bundle2).when(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
 		dockerRepoListWidget.configure(projectId);
 		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		verify(mockView).clear();
@@ -131,7 +121,7 @@ public class DockerRepoListWidgetTest {
 		verify(mockView).addRepo(header2);
 		verify(mockSynapseJavascriptClient).getEntityBundleFromCache(eq(id1), any(AsyncCallback.class));
 		verify(mockSynapseJavascriptClient).getEntityBundleFromCache(eq(id2), any(AsyncCallback.class));
-		
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -145,8 +135,7 @@ public class DockerRepoListWidgetTest {
 	@Test
 	public void testConfigurationQueryFailure() {
 		Throwable error = new Throwable();
-		AsyncMockStubber.callFailureWith(error)
-			.when(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(error).when(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		dockerRepoListWidget.configure(projectId);
 		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		verify(mockView).clear();
@@ -167,11 +156,9 @@ public class DockerRepoListWidgetTest {
 		DockerRepository repo1 = new DockerRepository();
 		EntityBundle bundle1 = new EntityBundle();
 		bundle1.setEntity(repo1);
-		AsyncMockStubber.callSuccessWith(bundle1)
-			.when(mockSynapseJavascriptClient).getEntityBundleFromCache(eq(id1), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(bundle1).when(mockSynapseJavascriptClient).getEntityBundleFromCache(eq(id1), any(AsyncCallback.class));
 		Throwable error = new Throwable();
-		AsyncMockStubber.callFailureWith(error)
-			.when(mockSynapseJavascriptClient).getEntityBundleFromCache(eq(id2), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(error).when(mockSynapseJavascriptClient).getEntityBundleFromCache(eq(id2), any(AsyncCallback.class));
 		dockerRepoListWidget.configure(projectId);
 		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		verify(mockView).clear();
@@ -196,11 +183,9 @@ public class DockerRepoListWidgetTest {
 		EntityBundle bundle2 = new EntityBundle();
 		bundle2.setEntity(repo2);
 
-		AsyncMockStubber.callSuccessWith(bundle2)
-			.when(mockSynapseJavascriptClient).getEntityBundleFromCache(eq(id2), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(bundle2).when(mockSynapseJavascriptClient).getEntityBundleFromCache(eq(id2), any(AsyncCallback.class));
 		Throwable error = new Throwable();
-		AsyncMockStubber.callFailureWith(error)
-			.when(mockSynapseJavascriptClient).getEntityBundleFromCache(eq(id1), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(error).when(mockSynapseJavascriptClient).getEntityBundleFromCache(eq(id1), any(AsyncCallback.class));
 		dockerRepoListWidget.configure(projectId);
 		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		verify(mockView).addRepo(header1);
@@ -222,34 +207,34 @@ public class DockerRepoListWidgetTest {
 		verify(mockSynapseJavascriptClient, times(2)).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		verify(mockMembersContainer).setIsMore(false);
 	}
-	
+
 	@Test
 	public void testReconfigureCancels() {
 		// Do not test async response, only test the Request
 		reset(mockSynapseJavascriptClient);
 		when(mockSynapseJavascriptClient.getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class))).thenReturn(mockRequest);
 		dockerRepoListWidget.configure(projectId);
-		
+
 		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		verify(mockRequest, never()).cancel();
-		
+
 		dockerRepoListWidget.configure(projectId);
-		
+
 		verify(mockRequest).cancel();
 		verify(mockSynapseJavascriptClient, times(2)).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 	}
-	
+
 	@Test
 	public void testEntityClickHandler() {
 		String entityId = "syn9992";
 		dockerRepoListWidget.setEntityClickedHandler(mockCallbackP);
 		verify(mockView).setEntityClickedHandler(callbackPCaptor.capture());
 		verify(mockView, never()).setLoadingVisible(true);
-		
-		//simulate click
+
+		// simulate click
 		CallbackP<String> callbackP = callbackPCaptor.getValue();
 		callbackP.invoke(entityId);
-		
+
 		verify(mockView).clear();
 		verify(mockView).setLoadingVisible(true);
 		verify(mockCallbackP).invoke(entityId);

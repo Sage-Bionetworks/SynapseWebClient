@@ -2,36 +2,35 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ReferenceConfigViewImpl implements ReferenceConfigView {
-	public interface ReferenceConfigViewImplUiBinder extends UiBinder<Widget, ReferenceConfigViewImpl> {}
+	public interface ReferenceConfigViewImplUiBinder extends UiBinder<Widget, ReferenceConfigViewImpl> {
+	}
+
 	private Presenter presenter;
 	private Widget widget;
 	@UiField
 	TextBox referenceField;
-	
+
 	@Inject
 	public ReferenceConfigViewImpl(ReferenceConfigViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
 	}
 
 	@Override
-	public void initView() {
-	}
-	
+	public void initView() {}
+
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
-	
+
 	@Override
-	public void checkParams() throws IllegalArgumentException {
-	}
+	public void checkParams() throws IllegalArgumentException {}
 
 	@Override
 	public void showLoading() {

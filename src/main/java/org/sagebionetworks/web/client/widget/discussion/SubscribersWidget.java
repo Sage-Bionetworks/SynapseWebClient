@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import java.util.List;
-
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -10,7 +9,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -25,14 +23,9 @@ public class SubscribersWidget implements SubscribersWidgetView.Presenter, IsWid
 	String nextPageToken;
 	PortalGinInjector ginInjector;
 	SynapseJavascriptClient jsClient;
+
 	@Inject
-	public SubscribersWidget(
-			SubscribersWidgetView view,
-			PortalGinInjector ginInjector,
-			SynapseAlert synAlert,
-			LoadMoreWidgetContainer loadMoreWidgetContainer,
-			SynapseJavascriptClient jsClient
-			) {
+	public SubscribersWidget(SubscribersWidgetView view, PortalGinInjector ginInjector, SynapseAlert synAlert, LoadMoreWidgetContainer loadMoreWidgetContainer, SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.synAlert = synAlert;
@@ -48,12 +41,12 @@ public class SubscribersWidget implements SubscribersWidgetView.Presenter, IsWid
 		synAlert.clear();
 		// get the count
 		view.setSubscribersLinkVisible(false);
-		jsClient.getSubscribersCount(topic, new AsyncCallback<Long>(){
+		jsClient.getSubscribersCount(topic, new AsyncCallback<Long>() {
 			private void countIsUnavailable() {
 				view.clearSubscriberCount();
 				view.setSubscribersLinkVisible(true);
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				// unable to get the count, ignore
@@ -66,7 +59,7 @@ public class SubscribersWidget implements SubscribersWidgetView.Presenter, IsWid
 					view.setSubscriberCount(count);
 					view.setSubscribersLinkVisible(count > 0);
 				} else {
-					countIsUnavailable();	
+					countIsUnavailable();
 				}
 			}
 		});
@@ -86,10 +79,10 @@ public class SubscribersWidget implements SubscribersWidgetView.Presenter, IsWid
 		loadMoreSubscribers();
 		view.showDialog();
 	}
-	
+
 	public void loadMoreSubscribers() {
 		synAlert.clear();
-		jsClient.getSubscribers(topic, nextPageToken, new AsyncCallback<SubscriberPagedResults>(){
+		jsClient.getSubscribers(topic, nextPageToken, new AsyncCallback<SubscriberPagedResults>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
@@ -114,13 +107,14 @@ public class SubscribersWidget implements SubscribersWidgetView.Presenter, IsWid
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	
+
 	/**
 	 * for testing purposes only
+	 * 
 	 * @return
 	 */
 	public String getNextPageToken() {
 		return nextPageToken;
 	}
-	
+
 }

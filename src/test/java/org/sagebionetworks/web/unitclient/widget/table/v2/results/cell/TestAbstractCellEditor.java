@@ -9,7 +9,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorVie
  * @author John
  *
  */
-public class TestAbstractCellEditor extends AbstractCellEditor{
+public class TestAbstractCellEditor extends AbstractCellEditor {
 
 	public TestAbstractCellEditor(CellEditorView view) {
 		super(view);

@@ -8,7 +8,6 @@ import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
-
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -16,9 +15,10 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class BigPromptModalViewImpl implements BigPromptModalView {
-	
-	public interface Binder extends UiBinder<Modal, BigPromptModalViewImpl> {}
-	
+
+	public interface Binder extends UiBinder<Modal, BigPromptModalViewImpl> {
+	}
+
 	@UiField
 	Modal modal;
 	@UiField
@@ -33,8 +33,9 @@ public class BigPromptModalViewImpl implements BigPromptModalView {
 	Button defaultButton;
 	Widget widget;
 	Callback callback;
+
 	@Inject
-	public BigPromptModalViewImpl(Binder binder){
+	public BigPromptModalViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 		modal.addShownHandler(evt -> {
 			nameField.setFocus(true);
@@ -48,7 +49,7 @@ public class BigPromptModalViewImpl implements BigPromptModalView {
 		});
 		primaryButton.addDomHandler(DisplayUtils.getPreventTabHandler(primaryButton), KeyDownEvent.getType());
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
@@ -85,17 +86,18 @@ public class BigPromptModalViewImpl implements BigPromptModalView {
 
 	@Override
 	public void setLoading(boolean isLoading) {
-		if(isLoading){
+		if (isLoading) {
 			this.primaryButton.state().loading();
-		}else{
+		} else {
 			this.primaryButton.state().reset();
-		}	
+		}
 	}
 
 	@Override
 	public void configure(String title, String label, String value) {
 		configure(title, label, value, null);
 	}
+
 	@Override
 	public void configure(String title, String label, String value, Callback callback) {
 		this.modal.setTitle(title);
@@ -106,10 +108,12 @@ public class BigPromptModalViewImpl implements BigPromptModalView {
 		ButtonType cancelButtonType = callback == null ? ButtonType.DEFAULT : ButtonType.LINK;
 		defaultButton.setType(cancelButtonType);
 	}
+
 	@Override
 	public void addStyleToModal(String styles) {
 		modal.addStyleName(styles);
 	}
+
 	@Override
 	public void setTextAreaHeight(String height) {
 		nameField.setHeight(height);

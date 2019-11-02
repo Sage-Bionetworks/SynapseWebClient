@@ -21,14 +21,13 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, SynapseWidgetPresenter, SelectableListItem {
-	
+
 	public static final String N_A = "N/A";
 	private EntityListRowBadgeView view;
 	private UserBadge createdByUserBadge;
@@ -42,15 +41,9 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	PopupUtilsView popupUtils;
 	EventBus eventBus;
 	SynapseJSNIUtils jsniUtils;
+
 	@Inject
-	public EntityListRowBadge(EntityListRowBadgeView view, 
-			UserBadge userBadge,
-			SynapseJavascriptClient jsClient,
-			LazyLoadHelper lazyLoadHelper,
-			DateTimeUtils dateTimeUtils,
-			PopupUtilsView popupUtils,
-			EventBus eventBus,
-			SynapseJSNIUtils jsniUtils) {
+	public EntityListRowBadge(EntityListRowBadgeView view, UserBadge userBadge, SynapseJavascriptClient jsClient, LazyLoadHelper lazyLoadHelper, DateTimeUtils dateTimeUtils, PopupUtilsView popupUtils, EventBus eventBus, SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.createdByUserBadge = userBadge;
 		this.dateTimeUtils = dateTimeUtils;
@@ -67,26 +60,30 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 				getEntityBundle();
 			}
 		};
-		
+
 		lazyLoadHelper.configure(loadDataCallback, view);
 	}
-	
+
 	public void setNote(String note) {
 		view.setNote(note);
 	}
+
 	public void setDescriptionVisible(boolean visible) {
 		view.setDescriptionVisible(visible);
 	}
+
 	public void setIsSelectable(boolean isSelectable) {
 		view.setIsSelectable(isSelectable);
 	}
+
 	public boolean isSelected() {
 		return view.isSelected();
 	}
+
 	public void setSelected(boolean isSelected) {
 		view.setSelected(isSelected);
 	}
-	
+
 	public void getEntityBundle() {
 		EntityBundleRequest request = new EntityBundleRequest();
 		request.setIncludeEntity(true);
@@ -98,22 +95,23 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 				view.setEntityLink(entityId, DisplayUtils.getSynapseHistoryToken(entityId, version));
 				view.showErrorIcon(caught.getMessage());
 			}
+
 			public void onSuccess(EntityBundle eb) {
 				setEntityBundle(eb);
 			};
 		};
 		if (version == null) {
-			jsClient.getEntityBundle(entityId, request, callback);	
+			jsClient.getEntityBundle(entityId, request, callback);
 		} else {
 			jsClient.getEntityBundleForVersion(entityId, version, request, callback);
 		}
 	}
-	
-	
+
+
 	public void configure(Reference reference) {
 		this.entityId = reference.getTargetId();
 		this.version = reference.getTargetVersionNumber();
-		
+
 		lazyLoadHelper.setIsConfigured();
 	}
 
@@ -121,7 +119,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	
+
 	public void setEntityBundle(EntityBundle eb) {
 		view.setIcon(EntityTypeUtils.getIconTypeForEntity(eb.getEntity()));
 		entityName = eb.getEntity().getName();
@@ -130,7 +128,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 			createdByUserBadge.configure(eb.getEntity().getCreatedBy());
 			createdByUserBadge.setOpenInNewWindow();
 		}
-		
+
 		if (eb.getEntity().getCreatedOn() != null) {
 			String dateString = dateTimeUtils.getDateTimeString(eb.getEntity().getCreatedOn());
 			view.setCreatedOn(dateString);
@@ -138,12 +136,12 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 			view.setCreatedOn("");
 		}
 		view.setDescription(eb.getEntity().getDescription());
-		
+
 		if (eb.getEntity() instanceof FileEntity) {
 			dataFileHandle = EntityBadge.getDataFileHandle(eb.getFileHandles());
 			view.showAddToDownloadList();
 		}
-		
+
 		if (eb.getEntity() instanceof Versionable) {
 			Versionable versionable = (Versionable) eb.getEntity();
 			view.setVersion(versionable.getVersionNumber().toString());
@@ -152,10 +150,10 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 		}
 		view.showRow();
 	}
-	
+
 	public EntityGroupRecord getRecord() {
 		Reference ref = new Reference();
-		ref.setTargetId(entityId);			
+		ref.setTargetId(entityId);
 		ref.setTargetVersionNumber(version);
 
 		EntityGroupRecord record = new EntityGroupRecord();
@@ -163,34 +161,36 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 		record.setNote(view.getNote());
 		return record;
 	}
-	
+
 	public String getNote() {
 		return view.getNote();
 	}
-	
+
 	public String getEntityId() {
 		return entityId;
 	}
-	
+
 	public void setSelectionChangedCallback(Callback selectionChangedCallback) {
 		this.selectionChangedCallback = selectionChangedCallback;
 	}
-	
+
 	@Override
 	public void onSelectionChanged() {
 		if (selectionChangedCallback != null) {
 			selectionChangedCallback.invoke();
 		}
 	}
-	
+
 	@Override
 	public void onAddToDownloadList() {
-		// TODO: add special popup to report how many items are in the current download list, and link to download list.
+		// TODO: add special popup to report how many items are in the current download list, and link to
+		// download list.
 		jsClient.addFileToDownloadList(dataFileHandle.getId(), entityId, new AsyncCallback<DownloadList>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorIcon(caught.getMessage());
 			}
+
 			@Override
 			public void onSuccess(DownloadList result) {
 				jsniUtils.sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, "1");

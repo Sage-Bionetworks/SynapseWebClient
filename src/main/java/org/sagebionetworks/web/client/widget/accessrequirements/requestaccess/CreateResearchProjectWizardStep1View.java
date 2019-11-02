@@ -9,13 +9,18 @@ import com.google.gwt.user.client.ui.IsWidget;
  *
  */
 public interface CreateResearchProjectWizardStep1View extends IsWidget {
-	
+
 	String getProjectLead();
-	
+
 	void setProjectLead(String text);
+
 	String getInstitution();
+
 	void setInstitution(String text);
+
 	String getIntendedDataUseStatement();
+
 	void setIntendedDataUseStatement(String text);
+
 	void setIDUPublicNoteVisible(boolean visible);
 }

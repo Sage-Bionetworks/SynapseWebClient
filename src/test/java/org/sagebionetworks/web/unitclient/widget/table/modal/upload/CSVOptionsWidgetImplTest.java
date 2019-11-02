@@ -2,8 +2,8 @@ package org.sagebionetworks.web.unitclient.widget.table.modal.upload;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.*;
-
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,17 +25,17 @@ public class CSVOptionsWidgetImplTest {
 	CSVOptionsView mockView;
 	@Mock
 	CSVOptionsWidget widget;
-	
+
 	String fileHandleId;
-	
+
 	@Before
-	public void before(){
+	public void before() {
 		fileHandleId = "123456";
 		widget = new CSVOptionsWidget(mockView);
 	}
 
 	@Test
-	public void testOptionsRoundTripOther(){
+	public void testOptionsRoundTripOther() {
 		String separatorValue = "p";
 		String escapeCharacter = "`";
 		UploadToTablePreviewRequest inRequest = new UploadToTablePreviewRequest();
@@ -48,7 +48,7 @@ public class CSVOptionsWidgetImplTest {
 		inRequest.setDoFullFileScan(true);
 
 		widget.configure(inRequest, mockHandler);
-		
+
 		// set up expected view responses
 		verify(mockView).setSeparator(Delimiter.OTHER);
 		verify(mockView).setOtherSeparatorValue(separatorValue);
@@ -59,14 +59,14 @@ public class CSVOptionsWidgetImplTest {
 		when(mockView.getOtherSeparatorValue()).thenReturn(separatorValue);
 		when(mockView.getOtherEscapeCharacterValue()).thenReturn(escapeCharacter);
 		when(mockView.getIsFristLineHeader()).thenReturn(true);
-		
+
 		UploadToTablePreviewRequest outRequest = widget.getCurrentOptions();
 		assertNotNull(outRequest);
 		assertEquals(inRequest, outRequest);
 	}
-	
+
 	@Test
-	public void testOptionsRoundTripCommaBackslash(){
+	public void testOptionsRoundTripCommaBackslash() {
 		String separator = ",";
 		String escapeCharacter = "\\";
 		UploadToTablePreviewRequest inRequest = new UploadToTablePreviewRequest();
@@ -76,15 +76,15 @@ public class CSVOptionsWidgetImplTest {
 		csvTableDescriptor.setEscapeCharacter(escapeCharacter);
 		inRequest.setCsvTableDescriptor(csvTableDescriptor);
 		inRequest.setUploadFileHandleId(fileHandleId);
-		
+
 		widget.configure(inRequest, mockHandler);
-		
+
 		verify(mockView).setSeparator(Delimiter.CSV);
 		verify(mockView).setEscapeCharacter(EscapeCharacter.BACKSLASH);
 		when(mockView.getEscapeCharacter()).thenReturn(EscapeCharacter.BACKSLASH);
 		when(mockView.getSeparator()).thenReturn(Delimiter.CSV);
 		when(mockView.getIsFristLineHeader()).thenReturn(false);
-		
+
 		UploadToTablePreviewRequest outRequest = widget.getCurrentOptions();
 		assertNotNull(outRequest);
 		assertEquals(inRequest, outRequest);

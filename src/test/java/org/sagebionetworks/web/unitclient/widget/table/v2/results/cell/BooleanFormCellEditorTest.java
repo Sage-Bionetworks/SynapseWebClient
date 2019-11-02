@@ -1,75 +1,73 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results.cell;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor.FALSE;
-import static org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor.NOTHING_SELECTED;
 import static org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor.TRUE;
-
 import java.util.Arrays;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanFormCellEditor;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEdtiorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.RadioCellEditorView;
 
 public class BooleanFormCellEditorTest {
 
 	RadioCellEditorView mockView;
 	BooleanFormCellEditor editor;
-	
+
 	@Before
-	public void before(){
+	public void before() {
 		mockView = Mockito.mock(RadioCellEditorView.class);
 		editor = new BooleanFormCellEditor(mockView);
 	}
 
 	@Test
-	public void testConfigure(){
+	public void testConfigure() {
 		verify(mockView).configure(Arrays.asList(TRUE, FALSE));
 	}
-	
+
 	@Test
-	public void testSetNull(){
+	public void testSetNull() {
 		editor.setValue(null);
 		verify(mockView, never()).setValue(anyInt());
 	}
-	
+
 	@Test
-	public void testSetEmpty(){
+	public void testSetEmpty() {
 		editor.setValue("");
 		verify(mockView, never()).setValue(anyInt());
 	}
-	
+
 	@Test
-	public void testSetTrue(){
+	public void testSetTrue() {
 		editor.setValue("True");
 		verify(mockView).setValue(0);
 	}
-	
+
 	@Test
-	public void testSetFalse(){
+	public void testSetFalse() {
 		editor.setValue("False");
 		verify(mockView).setValue(1);
 	}
-	
+
 	@Test
-	public void testGetNothingSelected(){
+	public void testGetNothingSelected() {
 		when(mockView.getValue()).thenReturn(null);
 		assertEquals(null, editor.getValue());
 	}
-	
+
 	@Test
-	public void testGetTrue(){
+	public void testGetTrue() {
 		when(mockView.getValue()).thenReturn(0);
 		assertEquals("true", editor.getValue());
 	}
-	
+
 	@Test
-	public void testGetFalse(){
+	public void testGetFalse() {
 		when(mockView.getValue()).thenReturn(1);
 		assertEquals("false", editor.getValue());
 	}

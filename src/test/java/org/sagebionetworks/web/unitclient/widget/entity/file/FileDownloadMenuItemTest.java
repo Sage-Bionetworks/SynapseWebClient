@@ -7,20 +7,18 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
@@ -46,7 +44,6 @@ import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FormPanel;
@@ -62,7 +59,7 @@ public class FileDownloadMenuItemTest {
 	SynapseProperties mockSynapseProperties;
 	@Mock
 	PortalGinInjector mockGinInjector;
-	
+
 	@Mock
 	EntityBundle mockEntityBundle;
 	@Mock
@@ -93,20 +90,20 @@ public class FileDownloadMenuItemTest {
 	JavaScriptObject mockS3;
 	@Captor
 	ArgumentCaptor<CallbackP> callbackPCaptor;
-	
+
 	FileDownloadMenuItem widget;
 	List<FileHandle> fileHandles;
-	
+
 	public static final String SFTP_ENDPOINT = "https://sftp.org/sftp";
 	public static final String SFTP_HOST = "my.sftp.server";
 	public static final String ENTITY_ID = "syn210";
 	public static final Long VERSION = 32L;
-	public static final String fileHandleAssociationUrl="http://mytestfilehandleassociationurl/filehandleassociation";
+	public static final String fileHandleAssociationUrl = "http://mytestfilehandleassociationurl/filehandleassociation";
+
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new FileDownloadMenuItem(mockView, mockSynapseClient, mockLoginModalWidget, mockGinInjector,
-				mockSynapseJavascriptClient, mockAuthController, mockJsniUtils, mockGwt, mockCookies, mockAwsSdk, mockPopupUtilsView);
+		widget = new FileDownloadMenuItem(mockView, mockSynapseClient, mockLoginModalWidget, mockGinInjector, mockSynapseJavascriptClient, mockAuthController, mockJsniUtils, mockGwt, mockCookies, mockAwsSdk, mockPopupUtilsView);
 		when(mockSynapseProperties.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(SFTP_ENDPOINT);
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
 		when(mockFileEntity.getId()).thenReturn(ENTITY_ID);
@@ -118,7 +115,7 @@ public class FileDownloadMenuItemTest {
 		when(mockJsniUtils.getFileHandleAssociationUrl(anyString(), any(FileHandleAssociateType.class), anyString())).thenReturn(fileHandleAssociationUrl);
 		when(mockRestrictionInformation.getHasUnmetAccessRequirement()).thenReturn(false);
 	}
-	
+
 	@Test
 	public void testConstruction() {
 		verify(mockView).setPresenter(widget);
@@ -134,7 +131,7 @@ public class FileDownloadMenuItemTest {
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
 		assertNull(widget.getFileHandle());
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testLoadFileDownloadUrlAnonymous() throws RestServiceException {
@@ -144,7 +141,7 @@ public class FileDownloadMenuItemTest {
 		verify(mockView).setIsDirectDownloadLink(FileDownloadMenuItem.LOGIN_PLACE_LINK);
 		assertNull(widget.getFileHandle());
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testLoadFileDownloadUrlSuccess() throws RestServiceException {
@@ -163,7 +160,7 @@ public class FileDownloadMenuItemTest {
 		assertNotNull(widget.getFileHandle());
 		verify(mockView).setIsDirectDownloadLink(fileHandleAssociationUrl);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testLoadFileDownloadUrlExternal() throws RestServiceException {
@@ -174,7 +171,7 @@ public class FileDownloadMenuItemTest {
 		externalFileHandle.setId(fileHandleId);
 		String url = "http://getbootstrap.com/javascript/";
 		externalFileHandle.setExternalURL(url);
-		
+
 		fileHandles = new ArrayList<FileHandle>();
 		fileHandles.add(externalFileHandle);
 		when(mockEntityBundle.getFileHandles()).thenReturn(fileHandles);
@@ -184,7 +181,7 @@ public class FileDownloadMenuItemTest {
 		assertNotNull(widget.getFileHandle());
 		verify(mockView).setIsDirectDownloadLink(url);
 	}
-	
+
 	@Test
 	public void testConfigureSftpLink() {
 		String dataFileHandleId = "3333";
@@ -196,11 +193,11 @@ public class FileDownloadMenuItemTest {
 		when(mockFileHandle.getExternalURL()).thenReturn(fileUrl);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
 		verify(mockView).setIsAuthorizedDirectDownloadLink();
-		verify(mockLoginModalWidget).configure(fileUrl,  FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
+		verify(mockLoginModalWidget).configure(fileUrl, FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
 		verify(mockSynapseClient).getHost(anyString(), any(AsyncCallback.class));
 		verify(mockLoginModalWidget).setInstructionMessage(DisplayConstants.DOWNLOAD_CREDENTIALS_REQUIRED + SFTP_HOST);
 	}
-	
+
 	@Test
 	public void testConfigureExternalObjectStoreFileHandle() {
 		String dataFileHandleId = "3333";
@@ -208,7 +205,7 @@ public class FileDownloadMenuItemTest {
 		String bucket = "bucket";
 		String fileKey = "9876/test.txt";
 		String fileName = "file.txt";
-		
+
 		when(mockFileEntity.getDataFileHandleId()).thenReturn(dataFileHandleId);
 		when(mockObjectStoreFileHandle.getId()).thenReturn(dataFileHandleId);
 		when(mockObjectStoreFileHandle.getEndpointUrl()).thenReturn(endpointUrl);
@@ -219,35 +216,35 @@ public class FileDownloadMenuItemTest {
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
 		verify(mockView).setIsUnauthenticatedS3DirectDownload();
-		
-		//under this configuration, try clicking the download button (verify login dialog shown)
+
+		// under this configuration, try clicking the download button (verify login dialog shown)
 		widget.onUnauthenticatedS3DirectDownloadClicked();
 		verify(mockView).showLoginS3DirectDownloadDialog(endpointUrl);
-		
-		//after login
+
+		// after login
 		String accessKeyId = "87652";
 		String secretAccessKey = "12345";
 		widget.onLoginS3DirectDownloadClicked(accessKeyId, secretAccessKey);
-		
+
 		verify(mockAwsSdk).getS3(eq(accessKeyId), eq(secretAccessKey), eq(bucket), eq(endpointUrl), callbackPCaptor.capture());
 		callbackPCaptor.getValue().invoke(mockS3);
-		//after s3 connection is established, show the final DOWNLOAD button
+		// after s3 connection is established, show the final DOWNLOAD button
 		verify(mockView).showS3DirectDownloadDialog();
-		
-		//simulate user clicking the last button
+
+		// simulate user clicking the last button
 		String presignedUrl = "https://yourstorage/test.txt?signature=a&expiration=b";
 		when(mockAwsSdk.getPresignedURL(anyString(), anyString(), anyString(), any(JavaScriptObject.class))).thenReturn(presignedUrl);
 		widget.onAuthenticatedS3DirectDownloadClicked();
 		verify(mockAwsSdk).getPresignedURL(fileKey, bucket, fileName, mockS3);
 		verify(mockPopupUtilsView).openInNewWindow(presignedUrl);
 	}
-	
+
 	@Test
 	public void testLicensedDownloadLink() {
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockRestrictionInformation.getHasUnmetAccessRequirement()).thenReturn(true);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
-		
+
 		verify(mockView).setIsDirectDownloadLink(FileDownloadMenuItem.ACCESS_REQUIREMENTS_LINK + ENTITY_ID + "&" + AccessRequirementsPlace.TYPE_PARAM + "=" + RestrictableObjectType.ENTITY.toString());
 		assertNull(widget.getFileHandle());
 	}

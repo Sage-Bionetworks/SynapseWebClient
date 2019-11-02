@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
-
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -27,8 +26,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
-	
-	public interface JoinTeamWidgetViewImplUiBinder extends UiBinder<Widget, JoinTeamWidgetViewImpl> {}
+
+	public interface JoinTeamWidgetViewImplUiBinder extends UiBinder<Widget, JoinTeamWidgetViewImpl> {
+	}
 
 	@UiField
 	Dialog joinWizard;
@@ -62,7 +62,7 @@ public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
 	Div synAlertContainer;
 	@UiField
 	Button actRequestAccessButton;
-	
+
 	private JoinTeamWidgetView.Presenter presenter;
 	private MarkdownWidget wikiPage;
 	private FlowPanel currentWizardContent;
@@ -70,23 +70,22 @@ public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
 	private Widget widget;
 
 	@Inject
-	public JoinTeamWidgetViewImpl(JoinTeamWidgetViewImplUiBinder binder,
-			MarkdownWidget wikiPage) {
+	public JoinTeamWidgetViewImpl(JoinTeamWidgetViewImplUiBinder binder, MarkdownWidget wikiPage) {
 		widget = binder.createAndBindUi(this);
 		this.wikiPage = wikiPage;
 		anonUserButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				//redirect to login page
+				// redirect to login page
 				showAnonymousMessage();
 			}
-		});		
+		});
 		acceptInviteButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.sendJoinRequest("");
 			}
-		});		
+		});
 		simpleRequestButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -122,12 +121,12 @@ public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
 			}
 		});
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
-	
+
 	@Override
 	public void clear() {
 		// default button text and state
@@ -147,10 +146,12 @@ public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
 		requestButton.setVisible(false);
 		requestUIPanel.hide();
 	}
+
 	@Override
 	public void open(String url) {
 		DisplayUtils.newWindow(url, "_blank", "");
 	}
+
 	private void showAnonymousMessage() {
 		Callback okCallback = new Callback() {
 			@Override
@@ -160,12 +161,11 @@ public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
 		};
 		Callback cancelCallback = new Callback() {
 			@Override
-			public void invoke() {
-			}	
+			public void invoke() {}
 		};
 		DisplayUtils.showPopup("Login or Register", DisplayConstants.ANONYMOUS_JOIN, MessagePopup.INFO, okCallback, cancelCallback);
 	}
-	
+
 	@Override
 	public void setButtonsEnabled(boolean enable) {
 		requestButton.setEnabled(enable);
@@ -173,7 +173,7 @@ public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
 		acceptInviteButton.setEnabled(enable);
 		simpleRequestButton.setEnabled(enable);
 	}
-	
+
 	@Override
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message);
@@ -184,7 +184,7 @@ public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
 		synAlertContainer.clear();
 		synAlertContainer.add(widget);
 	}
-	
+
 	@Override
 	public void hideJoinWizard() {
 		if (joinWizard != null && joinWizard.isVisible()) {
@@ -196,7 +196,7 @@ public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-	
+
 	@Override
 	public void showJoinWizard() {
 		joinWizard.configure("Join", "Continue", DisplayConstants.BUTTON_CANCEL, new Dialog.Callback() {
@@ -204,7 +204,7 @@ public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
 			public void onPrimary() {
 				okButtonCallback.invoke();
 			}
-			
+
 			@Override
 			public void onDefault() {
 				joinWizard.hide();
@@ -213,39 +213,39 @@ public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
 		joinWizard.show();
 		enablePrimaryButton();
 	}
-	
+
 	@Override
 	public void setJoinWizardCallback(Callback callback) {
 		okButtonCallback = callback;
 	}
-	
+
 	@Override
 	public void setJoinWizardPrimaryButtonText(String primaryButtonText) {
 		joinWizard.getPrimaryButton().setText(primaryButtonText);
 	}
-	
+
 	@Override
 	public void setAccessRequirementHTML(String html) {
 		accessRequirementHTML.setHTML(html);
 	}
-	
+
 	@Override
 	public void setCurrentWizardPanelVisible(boolean isVisible) {
 		currentWizardContentPanel.setVisible(isVisible);
 	}
-	
+
 	@Override
 	public void setCurrentWizardContent(IsWidget isWidget) {
 		currentWizardContentPanel.setWidget(isWidget);
 	}
-	
+
 	private void showAccessRequirement(Widget arTextWidget, Callback callback, String primaryButtonText) {
 		joinWizard.getPrimaryButton().setText(primaryButtonText);
 		currentWizardContent.clear();
-        currentWizardContent.add(arTextWidget);
-        okButtonCallback = callback;
+		currentWizardContent.add(arTextWidget);
+		okButtonCallback = callback;
 	}
-	
+
 	/**
 	 * Called when message is received from iframe (via postMessage)
 	 */
@@ -254,20 +254,21 @@ public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
 	}
 
 	private static native boolean _isSuccessMessage(JavaScriptObject event) /*-{
-		console.log("event received: "+event);
-		console.log("event.data received: "+event.data);
-		return (event !== undefined && event.data !== undefined && typeof event.data === 'string'  && 'success' === event.data.toLowerCase());
-    }-*/;
-	
-	private static native boolean _isSetHeightMessage(JavaScriptObject event) /*-{
-		return (event !== undefined && event.data !== undefined && 
-			Object.prototype.toString.call( event.data ) === '[object Array]' &&
-			'setHeight' === event.data[0]
-			);
+		console.log("event received: " + event);
+		console.log("event.data received: " + event.data);
+		return (event !== undefined && event.data !== undefined
+				&& typeof event.data === 'string' && 'success' === event.data
+				.toLowerCase());
 	}-*/;
-	
+
+	private static native boolean _isSetHeightMessage(JavaScriptObject event) /*-{
+		return (event !== undefined
+				&& event.data !== undefined
+				&& Object.prototype.toString.call(event.data) === '[object Array]' && 'setHeight' === event.data[0]);
+	}-*/;
+
 	private static native String _getSetHeight(JavaScriptObject event) /*-{
-		return event.data[1]; 
+		return event.data[1];
 	}-*/;
 
 	@Override
@@ -284,22 +285,22 @@ public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
 	public void setRequestMessageVisible(boolean isVisible) {
 		requestOpenMessageSpan.setVisible(isVisible);
 	}
-	
+
 	@Override
 	public void setSimpleRequestButtonVisible(boolean isVisible) {
 		simpleRequestButton.setVisible(isVisible);
 	}
-	
+
 	@Override
 	public void setRequestButtonVisible(boolean isVisible) {
 		requestButton.setVisible(isVisible);
 	}
-	
+
 	@Override
 	public void setAcceptInviteButtonVisible(boolean isVisible) {
 		acceptInviteButton.setVisible(isVisible);
 	}
-	
+
 	@Override
 	public void setAnonUserButtonVisible(boolean isVisible) {
 		anonUserButton.setVisible(isVisible);
@@ -316,7 +317,7 @@ public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
 	public void setRequestOpenText(String requestOpenText) {
 		requestOpenMessageSpan.setText(requestOpenText);
 	}
-	
+
 	@Override
 	public void setIsMemberMessageVisible(boolean isVisible) {
 		isMemberMessageSpan.setVisible(isVisible);
@@ -326,10 +327,12 @@ public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
 	public void setProgressWidget(WizardProgressWidget progressWidget) {
 		progressWidgetPanel.setWidget(progressWidget);
 	}
+
 	@Override
 	public void setAccessRequirementsLinkVisible(boolean visible) {
 		actRequestAccessButton.setVisible(visible);
 	}
+
 	@Override
 	public void setButtonSize(ButtonSize size) {
 		anonUserButton.setSize(size);

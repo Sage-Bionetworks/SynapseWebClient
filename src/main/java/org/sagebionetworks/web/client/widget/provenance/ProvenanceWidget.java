@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.provenance.Activity;
@@ -35,7 +34,6 @@ import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -74,9 +72,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	SynapseAlert synAlert;
 
 	@Inject
-	public ProvenanceWidget(ProvenanceWidgetView view, SynapseJSNIUtils synapseJSNIUtils, JsoProvider jsoProvider,
-			ClientCache clientCache, DateTimeUtils dateTimeUtils, SynapseJavascriptClient jsClient,
-			SynapseAlert synAlert) {
+	public ProvenanceWidget(ProvenanceWidgetView view, SynapseJSNIUtils synapseJSNIUtils, JsoProvider jsoProvider, ClientCache clientCache, DateTimeUtils dateTimeUtils, SynapseJavascriptClient jsClient, SynapseAlert synAlert) {
 		this.view = view;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.jsoProvider = jsoProvider;
@@ -93,8 +89,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	}
 
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired,
-			Long wikiVersionInView) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		view.setPresenter(this);
 		view.showLoading();
 		// set up view based on descriptor parameters
@@ -130,15 +125,9 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		}
 
 		// Set max depth (default 1), undefined (false) and expand (false)
-		maxDepth = descriptor.containsKey(WidgetConstants.PROV_WIDGET_DEPTH_KEY)
-				? Integer.parseInt(descriptor.get(WidgetConstants.PROV_WIDGET_DEPTH_KEY))
-				: 1;
-		showUndefinedAndErrorActivity = descriptor.get(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY) != null
-				? Boolean.parseBoolean(descriptor.get(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY))
-				: true;
-		showExpand = descriptor.get(WidgetConstants.PROV_WIDGET_EXPAND_KEY) != null
-				? Boolean.parseBoolean(descriptor.get(WidgetConstants.PROV_WIDGET_EXPAND_KEY))
-				: false;
+		maxDepth = descriptor.containsKey(WidgetConstants.PROV_WIDGET_DEPTH_KEY) ? Integer.parseInt(descriptor.get(WidgetConstants.PROV_WIDGET_DEPTH_KEY)) : 1;
+		showUndefinedAndErrorActivity = descriptor.get(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY) != null ? Boolean.parseBoolean(descriptor.get(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY)) : true;
+		showExpand = descriptor.get(WidgetConstants.PROV_WIDGET_EXPAND_KEY) != null ? Boolean.parseBoolean(descriptor.get(WidgetConstants.PROV_WIDGET_EXPAND_KEY)) : false;
 		if (descriptor.containsKey(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY)) {
 			setHeight(Integer.parseInt(descriptor.get(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY)));
 		} else {
@@ -210,8 +199,8 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	 */
 
 	/**
-	 * Recursively look up versions, adding the references to the startRefs until
-	 * the lookupVersion stack is empty
+	 * Recursively look up versions, adding the references to the startRefs until the lookupVersion
+	 * stack is empty
 	 * 
 	 * @param doneCallback
 	 */
@@ -270,35 +259,34 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		}
 
 		// lookup generatedBy activity for ref
-		jsClient.getActivityForEntityVersion(item.getReference().getTargetId(),
-				item.getReference().getTargetVersionNumber(), new AsyncCallback<Activity>() {
-					@Override
-					public void onSuccess(Activity activity) {
-						addActivityToStack(activity);
-					}
+		jsClient.getActivityForEntityVersion(item.getReference().getTargetId(), item.getReference().getTargetVersionNumber(), new AsyncCallback<Activity>() {
+			@Override
+			public void onSuccess(Activity activity) {
+				addActivityToStack(activity);
+			}
 
-					@Override
-					public void onFailure(Throwable caught) {
-						if (caught instanceof NotFoundException && showExpand) {
-							noExpandNode.add(item.getReference());
-						}
+			@Override
+			public void onFailure(Throwable caught) {
+				if (caught instanceof NotFoundException && showExpand) {
+					noExpandNode.add(item.getReference());
+				}
 
-						Activity activity = null;
-						if (showUndefinedAndErrorActivity)
-							activity = createErrorActivity(caught); // Display empty, fake provenance record
-						addActivityToStack(activity);
-					}
+				Activity activity = null;
+				if (showUndefinedAndErrorActivity)
+					activity = createErrorActivity(caught); // Display empty, fake provenance record
+				addActivityToStack(activity);
+			}
 
-					private void addActivityToStack(Activity activity) {
-						if (activity != null) {
-							// add entry to generatedByActivityId
-							generatedByActivityId.put(item.getReference(), activity.getId());
-							// add activity to toProcess and process it as next level in the depth of graph
-							toProcess.push(new ActivityProcessItem(activity, item.getDepth() + 1));
-						}
-						processNext();
-					}
-				});
+			private void addActivityToStack(Activity activity) {
+				if (activity != null) {
+					// add entry to generatedByActivityId
+					generatedByActivityId.put(item.getReference(), activity.getId());
+					// add activity to toProcess and process it as next level in the depth of graph
+					toProcess.push(new ActivityProcessItem(activity, item.getDepth() + 1));
+				}
+				processNext();
+			}
+		});
 
 	}
 
@@ -323,45 +311,44 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		}
 
 		// Lookup entities generated by this activity
-		jsClient.getEntitiesGeneratedBy(item.getActivity().getId(), Integer.MAX_VALUE, 0,
-				new AsyncCallback<ArrayList<Reference>>() {
-					@Override
-					public void onSuccess(ArrayList<Reference> results) {
-						// add references to generatedByActivityId & references
-						if (results != null) {
-							for (Reference ref : results) {
-								generatedByActivityId.put(ref, item.getActivity().getId());
-								references.add(ref);
+		jsClient.getEntitiesGeneratedBy(item.getActivity().getId(), Integer.MAX_VALUE, 0, new AsyncCallback<ArrayList<Reference>>() {
+			@Override
+			public void onSuccess(ArrayList<Reference> results) {
+				// add references to generatedByActivityId & references
+				if (results != null) {
+					for (Reference ref : results) {
+						generatedByActivityId.put(ref, item.getActivity().getId());
+						references.add(ref);
+					}
+				}
+				addUsedToStack();
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				addUsedToStack();
+			}
+
+			// process used list
+			private void addUsedToStack() {
+				// add used references to process stack
+				if (item.getActivity().getUsed() != null) {
+					Set<Used> used = item.getActivity().getUsed();
+					for (Used u : used) {
+						if (u instanceof UsedEntity) { // ignore UsedUrl, nothing to process
+							UsedEntity ue = (UsedEntity) u;
+							if (ue.getReference() != null) {
+								toProcess.push(new ReferenceProcessItem(ue.getReference(), item.getDepth())); // same
+								// depth
+								// as
+								// activity
 							}
 						}
-						addUsedToStack();
 					}
-
-					@Override
-					public void onFailure(Throwable caught) {
-						addUsedToStack();
-					}
-
-					// process used list
-					private void addUsedToStack() {
-						// add used references to process stack
-						if (item.getActivity().getUsed() != null) {
-							Set<Used> used = item.getActivity().getUsed();
-							for (Used u : used) {
-								if (u instanceof UsedEntity) { // ignore UsedUrl, nothing to process
-									UsedEntity ue = (UsedEntity) u;
-									if (ue.getReference() != null) {
-										toProcess.push(new ReferenceProcessItem(ue.getReference(), item.getDepth())); // same
-																														// depth
-																														// as
-																														// activity
-									}
-								}
-							}
-						}
-						processNext();
-					}
-				});
+				}
+				processNext();
+			}
+		});
 	}
 
 	public void cleanupCycles(ActivityProcessItem item, Set<Reference> references) {
@@ -375,8 +362,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			for (Used u : used) {
 				if (u instanceof UsedEntity) { // ignore UsedUrl, nothing to process
 					UsedEntity ue = (UsedEntity) u;
-					if (ue.getReference() != null
-							&& (references.contains(ue.getReference()) || ue.getReference().getTargetId() == null)) {
+					if (ue.getReference() != null && (references.contains(ue.getReference()) || ue.getReference().getTargetId() == null)) {
 						previouslyProcessed.add(u);
 					}
 				}
@@ -391,19 +377,18 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			view.clear();
 			return;
 		}
-		jsClient.getEntityHeaderBatchFromReferences(new ArrayList<Reference>(references),
-				new AsyncCallback<ArrayList<EntityHeader>>() {
-					@Override
-					public void onSuccess(ArrayList<EntityHeader> headers) {
-						refToHeader = ProvUtils.mapReferencesToHeaders(headers);
-						buildGraphLayoutSendToView();
-					}
+		jsClient.getEntityHeaderBatchFromReferences(new ArrayList<Reference>(references), new AsyncCallback<ArrayList<EntityHeader>>() {
+			@Override
+			public void onSuccess(ArrayList<EntityHeader> headers) {
+				refToHeader = ProvUtils.mapReferencesToHeaders(headers);
+				buildGraphLayoutSendToView();
+			}
 
-					@Override
-					public void onFailure(Throwable caught) {
-						buildGraphLayoutSendToView();
-					}
-				});
+			@Override
+			public void onFailure(Throwable caught) {
+				buildGraphLayoutSendToView();
+			}
+		});
 	}
 
 	private void buildGraphLayoutSendToView() {
@@ -420,8 +405,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 
 		// build the tree, layout and render
 		idToNode = new HashMap<String, ProvGraphNode>();
-		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader,
-				showExpand, startRefs, noExpandNode);
+		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, showExpand, startRefs, noExpandNode);
 		currentGraph = graph;
 
 		NChartCharacters characters = NChartUtil.createNChartCharacters(jsoProvider, graph.getNodes());
@@ -524,38 +508,35 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		// batch request all entity ids to get current version. Notify view of non
 		// current versions
 		synAlert.clear();
-		jsClient.getEntityHeaderBatchFromReferences(new ArrayList<Reference>(entityIds),
-				new AsyncCallback<ArrayList<EntityHeader>>() {
-					@Override
-					public void onSuccess(ArrayList<EntityHeader> currentVersions) {
-						Map<String, Long> entityToCurrentVersion = new HashMap<String, Long>();
-						for (EntityHeader header : currentVersions) {
-							entityToCurrentVersion.put(header.getId(), header.getVersionNumber());
-						}
+		jsClient.getEntityHeaderBatchFromReferences(new ArrayList<Reference>(entityIds), new AsyncCallback<ArrayList<EntityHeader>>() {
+			@Override
+			public void onSuccess(ArrayList<EntityHeader> currentVersions) {
+				Map<String, Long> entityToCurrentVersion = new HashMap<String, Long>();
+				for (EntityHeader header : currentVersions) {
+					entityToCurrentVersion.put(header.getId(), header.getVersionNumber());
+				}
 
-						// find graph nodes that should be marked as not current version
-						List<String> notCurrentNodeIds = new ArrayList<String>();
-						for (Reference ref : refToNodeId.keySet()) {
-							Long currrentVersion = entityToCurrentVersion.get(ref.getTargetId());
-							if (ref.getTargetVersionNumber() != null && currrentVersion != null
-									&& !ref.getTargetVersionNumber().equals(currrentVersion)) {
-								notCurrentNodeIds.add(refToNodeId.get(ref));
-							}
-						}
-						view.markOldVersions(notCurrentNodeIds);
+				// find graph nodes that should be marked as not current version
+				List<String> notCurrentNodeIds = new ArrayList<String>();
+				for (Reference ref : refToNodeId.keySet()) {
+					Long currrentVersion = entityToCurrentVersion.get(ref.getTargetId());
+					if (ref.getTargetVersionNumber() != null && currrentVersion != null && !ref.getTargetVersionNumber().equals(currrentVersion)) {
+						notCurrentNodeIds.add(refToNodeId.get(ref));
 					}
+				}
+				view.markOldVersions(notCurrentNodeIds);
+			}
 
-					@Override
-					public void onFailure(Throwable caught) {
-						if (caught instanceof NotFoundException) {
-							// SWC-1843: do not redirect home. log full exception to the console
-							synapseJSNIUtils
-									.consoleError(caught.getMessage() + "\n" + DisplayUtils.getStackTrace(caught));
-						} else {
-							synAlert.handleException(caught);
-						}
-					}
-				});
+			@Override
+			public void onFailure(Throwable caught) {
+				if (caught instanceof NotFoundException) {
+					// SWC-1843: do not redirect home. log full exception to the console
+					synapseJSNIUtils.consoleError(caught.getMessage() + "\n" + DisplayUtils.getStackTrace(caught));
+				} else {
+					synAlert.handleException(caught);
+				}
+			}
+		});
 	}
 
 	public static Map<String, String> getDefaultWidgetDescriptor() {

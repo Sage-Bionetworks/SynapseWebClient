@@ -3,9 +3,7 @@ package org.sagebionetworks.web.client.presenter;
 import org.sagebionetworks.web.client.view.MapView;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
-
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -15,6 +13,7 @@ public class MapPresenter extends AbstractActivity implements Presenter<org.sage
 	GoogleMap map;
 	MapView view;
 	TeamBadge teamBadge;
+
 	@Inject
 	public MapPresenter(MapView view, GoogleMap map, TeamBadge teamBadge) {
 		this.view = view;
@@ -45,10 +44,10 @@ public class MapPresenter extends AbstractActivity implements Presenter<org.sage
 			view.setTeamBadgeVisible(true);
 		}
 	}
-	
+
 	@Override
-    public String mayStop() {
-        return null;
-    }
+	public String mayStop() {
+		return null;
+	}
 }
 
