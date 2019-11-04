@@ -520,6 +520,14 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 	@include box-shadow(0px 1px 2px #aaa);
 	margin: 10px 0px;
 	border: none;
+	.close {
+		color: white;
+		font-size: 18px;
+		opacity: .6;
+	}
+	.close:hover, .close:visited, .close:focus {
+		opacity: 1;
+	}
 }
 
 .heading {
