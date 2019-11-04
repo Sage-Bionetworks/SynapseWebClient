@@ -8,3 +8,5 @@ gwt-unitCache/
 war/
 .DS_Store
 extras/
+/.externalToolBuilders/
+/.sass-cache/
