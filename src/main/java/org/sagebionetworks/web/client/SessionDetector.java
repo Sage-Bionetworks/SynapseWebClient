@@ -28,7 +28,14 @@ public class SessionDetector {
 	}
 
 	public void start() {
-		gwt.scheduleFixedDelay(() -> {
+		// SWC-4947: check for user change immediately (don't wait 10 seconds to discover the existing
+		// session token).
+		authController.checkForUserChange();
+		checkForUserChangeLater();
+	}
+
+	public void checkForUserChangeLater() {
+		gwt.scheduleExecution(() -> {
 			// compare the local user id to the one in the cache (across browser, current value)
 			String currentSessionUserId = getSessionMarker();
 			if (!Objects.equals(authController.getCurrentUserPrincipalId(), currentSessionUserId)) {
@@ -36,12 +43,14 @@ public class SessionDetector {
 				// detecting app reload)
 				authController.checkForUserChange();
 			}
+			// continue this loop until a new build is deployed (then stop checking in this window)
+			// new build may be pointing to different set of repo endpoints!
+			if (!globalAppState.isShowingVersionAlert()) {
+				checkForUserChangeLater();
+			}
 		}, INTERVAL_MS);
-		// SWC-4947: check for user change immediately (don't wait 10 seconds to discover the existing
-		// session token).
-		authController.checkForUserChange();
 	}
-
+	
 	public void initializeSessionTokenState() {
 		// Re-initialize session token state
 		if (authController.isLoggedIn()) {
