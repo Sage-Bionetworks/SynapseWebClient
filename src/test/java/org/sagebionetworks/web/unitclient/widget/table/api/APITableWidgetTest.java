@@ -64,6 +64,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 @RunWith(MockitoJUnitRunner.class)
 public class APITableWidgetTest {
+	public static final String COL_1_RESULT_VALUE_1 = "result1 value 1";
+
 	private static final String TESTSERVICE_PATH = "/testservice";
 
 	APITableWidget widget;
@@ -86,8 +88,8 @@ public class APITableWidgetTest {
 	Map<String, String> descriptor;
 	JSONObjectAdapter testReturnJSONObject;
 	WikiPageKey testWikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
-	String col1Name = "column 1";
-	String col2Name = "column 2";
+	String col1Name = "column_1";
+	String col2Name = "column_2";
 	public static final int COLUMN_ROW_COUNT = 10;
 	@Mock
 	SynapseAlert mockSynAlert;
@@ -97,6 +99,7 @@ public class APITableWidgetTest {
 	ArgumentCaptor<String> stringCaptor;
 	@Mock
 	Cell mockCell;
+	
 
 	@Before
 	public void setup() throws JSONObjectAdapterException {
@@ -107,9 +110,9 @@ public class APITableWidgetTest {
 		testReturnJSONObject.put("totalNumberOfResults", 100);
 		// and create some results
 		JSONObjectAdapter result1 = testReturnJSONObject.createNew();
-		fillInResult(result1, new String[] {"field1", "field2"}, new String[] {"result1 value 1", "result1 value 2"});
+		fillInResult(result1, new String[] {col1Name, col2Name}, new String[] {COL_1_RESULT_VALUE_1, "result1 value 2"});
 		JSONObjectAdapter result2 = testReturnJSONObject.createNew();
-		fillInResult(result2, new String[] {"field1", "field2"}, new String[] {"result2 value 1", "result2 value 2"});
+		fillInResult(result2, new String[] {col1Name, col2Name}, new String[] {"result2 value 1", "result2 value 2"});
 		JSONArrayAdapter results = new JSONArrayAdapterImpl();
 		results.put(0, result2);
 		results.put(0, result1);
@@ -151,8 +154,7 @@ public class APITableWidgetTest {
 	public void testConfigureWithTableConfigValidColumnName() {
 		List<APITableColumnConfig> columnConfigs = new ArrayList<>();
 		APITableColumnConfig columnConfig = new APITableColumnConfig();
-		String columnName = "valid_column_name";
-		columnConfig.setInputColumnNames(Collections.singleton(columnName));
+		columnConfig.setInputColumnNames(Collections.singleton(col1Name));
 		columnConfig.setSort(COLUMN_SORT_TYPE.NONE);
 		columnConfigs.add(columnConfig);
 		APITableConfigEditor.updateDescriptorWithColumnConfigs(descriptor, columnConfigs);
@@ -164,8 +166,10 @@ public class APITableWidgetTest {
 		// verify selects column name only
 		verify(mockSynapseJavascriptClient).getJSON(stringCaptor.capture(), any(AsyncCallback.class));
 		String actualUri = stringCaptor.getValue();
-		assertTrue(actualUri.contains(columnName));
+		assertTrue(actualUri.contains(col1Name));
 		assertFalse(actualUri.contains("*"));
+		verify(mockView).addRow(anyList());
+		verify(mockCell).setValue(COL_1_RESULT_VALUE_1);
 	}
 
 	@Test
@@ -185,6 +189,8 @@ public class APITableWidgetTest {
 		verify(mockSynapseJavascriptClient).getJSON(stringCaptor.capture(), any(AsyncCallback.class));
 		String actualUri = stringCaptor.getValue();
 		assertTrue(actualUri.contains(uri));
+		verify(mockView).addRow(anyList());
+		verify(mockCell).setValue("");
 	}
 
 	@Test
@@ -332,21 +338,6 @@ public class APITableWidgetTest {
 		verify(mockView).clear();
 		verify(mockView, never()).setColumnHeaders(anyList());
 		verify(mockView, never()).addRow(anyList());
-	}
-
-	private Set<String> getTestColumnNameSet() {
-		Set<String> testSet = new HashSet<String>();
-		testSet.add(col1Name);
-		testSet.add(col2Name);
-		return testSet;
-	}
-
-	private List<String> getTestColumnValues(String columnName) {
-		List<String> testColumnValues = new ArrayList<String>();
-		for (int i = 0; i < COLUMN_ROW_COUNT; i++) {
-			testColumnValues.add(columnName + " data item " + i);
-		}
-		return testColumnValues;
 	}
 
 	private APITableConfig getTableConfig() {
