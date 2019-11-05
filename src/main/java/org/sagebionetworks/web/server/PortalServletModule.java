@@ -27,6 +27,7 @@ import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserProfileClientImpl;
+import org.sagebionetworks.web.server.servlet.VersionsServlet;
 import org.sagebionetworks.web.server.servlet.filter.DigitalHealthFilter;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
 import org.sagebionetworks.web.server.servlet.filter.MHealthFilter;
@@ -122,6 +123,10 @@ public class PortalServletModule extends ServletModule {
 		// Slack handler
 		bind(SlackServlet.class).in(Singleton.class);
 		serve("/Portal/"+WebConstants.SLACK_SERVLET).with(SlackServlet.class);
+
+		// Versions handler
+		bind(VersionsServlet.class).in(Singleton.class);
+		serve("/Portal/" + WebConstants.VERSIONS_SERVLET).with(VersionsServlet.class);
 
 		// Alias resolution
 		bind(AliasRedirectorServlet.class).in(Singleton.class);

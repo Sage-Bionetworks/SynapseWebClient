@@ -1688,5 +1688,13 @@ public class SynapseJavascriptClient {
 		username.setEmail(emailAddress);
 		doPost(url, username, OBJECT_TYPE.None, false, cb);
 	}
+	
+	public void getSynapseVersions(AsyncCallback<String> cb) {
+		// getting the Synapse versions is one GET request that should not be cancelled.
+		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
+		requestBuilder.configure(GET, jsniUtils.getVersionsServletUrl());
+		boolean canCancel = false;
+		sendRequest(requestBuilder, null, OBJECT_TYPE.String, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, cb);
+	}
 }
 

@@ -31,32 +31,6 @@ public class StackConfigServiceImpl extends SynapseClientBase implements StackCo
 	static private Log log = LogFactory.getLog(StackConfigServiceImpl.class);
 	public static final long serialVersionUID = 46893767375462651L;
 
-	private final Supplier<SynapseVersionInfo> synapseVersionCache = Suppliers.memoizeWithExpiration(versionSupplier(), 5, TimeUnit.MINUTES);
-
-	public SynapseVersionInfo getSynapseVersionInfo() {
-		return synapseVersionCache.get();
-	}
-
-	private Supplier<SynapseVersionInfo> versionSupplier() {
-		return new Supplier<SynapseVersionInfo>() {
-			public SynapseVersionInfo get() {
-				try {
-					org.sagebionetworks.client.SynapseClient synapseClient = createAnonymousSynapseClient();
-					return synapseClient.getVersionInfo();
-				} catch (SynapseException e) {
-					log.error(e);
-					return null;
-				}
-			}
-		};
-	}
-	
-	@Override
-	public String getSynapseVersions() throws RestServiceException {
-		return PortalVersionHolder.getVersionInfo() + ","
-				+ getSynapseVersionInfo().getVersion();
-	}
-	
 	@Override
 	public StackStatus getCurrentStatus() throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createAnonymousSynapseClient();
