@@ -11,9 +11,6 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  */
 @RemoteServiceRelativePath("stackConfig")
 public interface StackConfigService extends RemoteService {
-	String getSynapseVersions() throws RestServiceException;
-
 	HashMap<String, String> getSynapseProperties() throws RestServiceException;
-
 	StackStatus getCurrentStatus() throws RestServiceException;
 }

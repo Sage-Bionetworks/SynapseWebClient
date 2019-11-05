@@ -294,7 +294,7 @@ public class SynapseJavascriptClient {
 
 	public Map<String, List<Request>> requestsMap;
 
-	public String repoServiceUrl, fileServiceUrl, authServiceUrl, synapseVersionInfo;
+	public String synapseVersionInfo;
 
 	@Inject
 	public SynapseJavascriptClient(JSONObjectAdapter jsonObjectAdapter, SynapseProperties synapseProperties, GWTWrapper gwt, SynapseJavascriptFactory jsFactory, PortalGinInjector ginInjector, SynapseJSNIUtils jsniUtils, EntityId2BundleCache entityIdBundleCache) {
@@ -351,25 +351,15 @@ public class SynapseJavascriptClient {
 	}
 
 	private String getRepoServiceUrl() {
-		if (repoServiceUrl == null) {
-			repoServiceUrl = synapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY);
-		}
-		return repoServiceUrl;
+		return synapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY);
 	}
 
 	private String getAuthServiceUrl() {
-		if (authServiceUrl == null) {
-
-			authServiceUrl = synapseProperties.getSynapseProperty(AUTH_PUBLIC_SERVICE_URL_KEY);
-		}
-		return authServiceUrl;
+		return synapseProperties.getSynapseProperty(AUTH_PUBLIC_SERVICE_URL_KEY);
 	}
 
 	private String getFileServiceUrl() {
-		if (fileServiceUrl == null) {
-			fileServiceUrl = synapseProperties.getSynapseProperty(FILE_SERVICE_URL_KEY);
-		}
-		return fileServiceUrl;
+		return synapseProperties.getSynapseProperty(FILE_SERVICE_URL_KEY);
 	}
 
 	private String getSynapseVersionInfo() {
@@ -1668,6 +1658,14 @@ public class SynapseJavascriptClient {
 		Username username = new Username();
 		username.setEmail(emailAddress);
 		doPost(url, username, OBJECT_TYPE.None, false, cb);
+	}
+	
+	public void getSynapseVersions(AsyncCallback<String> cb) {
+		// getting the Synapse versions is one GET request that should not be cancelled.
+		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
+		requestBuilder.configure(GET, jsniUtils.getVersionsServletUrl());
+		boolean canCancel = false;
+		sendRequest(requestBuilder, null, OBJECT_TYPE.String, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, cb);
 	}
 }
 
