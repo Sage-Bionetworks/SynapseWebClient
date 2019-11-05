@@ -43,7 +43,7 @@ public class SessionDetectorTest {
 	public void testSessionChanges() {
 		sessionDetector.start();
 
-		verify(mockGWT).scheduleFixedDelay(callbackCaptor.capture(), eq(SessionDetector.INTERVAL_MS));
+		verify(mockGWT).scheduleExecution(callbackCaptor.capture(), eq(SessionDetector.INTERVAL_MS));
 		// SWC-4947
 		verify(mockAuthController).checkForUserChange();
 

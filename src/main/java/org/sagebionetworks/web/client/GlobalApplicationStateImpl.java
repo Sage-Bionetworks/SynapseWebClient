@@ -258,7 +258,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		// don't check for the next minute
 		localStorage.put(RECENTLY_CHECKED_SYNAPSE_VERSION, Boolean.TRUE.toString(), new Date(System.currentTimeMillis() + 1000 * 60).getTime());
 
-		stackConfigService.getSynapseVersions(new AsyncCallback<String>() {
+		jsClient.getSynapseVersions(new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String versions) {
 				if (synapseVersion == null) {
@@ -270,6 +270,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 					if (!isShowingVersionAlert) {
 						view.showVersionOutOfDateGlobalMessage();
 						isShowingVersionAlert = true;
+						// update the synapse properties (including endpoints)
+						init(null);
 					}
 					isVersionChange = true;
 				}
@@ -482,11 +484,18 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		if (showInUTC != null) {
 			setShowUTCTime(Boolean.parseBoolean(showInUTC));
 		}
-		finalCallback.invoke();
+		if (finalCallback != null) {
+			finalCallback.invoke();	
+		}
 	}
 
 	@Override
 	public void back() {
 		view.back();
+	}
+
+	@Override
+	public boolean isShowingVersionAlert() {
+		return isShowingVersionAlert;
 	}
 }
