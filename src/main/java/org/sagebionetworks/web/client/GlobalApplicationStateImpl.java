@@ -277,6 +277,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 					if (!isShowingVersionAlert) {
 						view.showVersionOutOfDateGlobalMessage();
 						isShowingVersionAlert = true;
+						// update the synapse properties (including endpoints)
+						init(null);
 					}
 					isVersionChange = true;
 				}
@@ -480,10 +482,17 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		if (showInUTC != null) {
 			setShowUTCTime(Boolean.parseBoolean(showInUTC));
 		}
-		finalCallback.invoke();
+		if (finalCallback != null) {
+			finalCallback.invoke();	
+		}
 	}
 	@Override
 	public void back() {
 		view.back();
+	}
+
+	@Override
+	public boolean isShowingVersionAlert() {
+		return isShowingVersionAlert;
 	}
 }

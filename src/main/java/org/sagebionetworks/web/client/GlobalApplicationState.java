@@ -114,4 +114,6 @@ public interface GlobalApplicationState {
 	 * Programmatic equivalent to the user pressing the browser's 'back' button.
 	 */
 	void back();
+	
+	boolean isShowingVersionAlert();
 }

@@ -16,38 +16,49 @@ public class SessionDetector {
 	GlobalApplicationState globalAppState;
 	GWTWrapper gwt;
 	public static final String SESSION_MARKER = "SESSION_MARKER";
+
 	@Inject
-	public SessionDetector(
-			AuthenticationController authController,
-			GlobalApplicationState globalAppState,
-			GWTWrapper gwt,
-			ClientCache clientCache) {
+	public SessionDetector(AuthenticationController authController, GlobalApplicationState globalAppState, GWTWrapper gwt, ClientCache clientCache) {
 		this.clientCache = clientCache;
 		this.authController = authController;
 		this.globalAppState = globalAppState;
 		this.gwt = gwt;
 		initializeSessionTokenState();
 	}
-	
+
 	private String getSessionMarker() {
 		return clientCache.get(SESSION_MARKER);
 	}
-	
+
 	public void start() {
-		gwt.scheduleFixedDelay(() -> {
+		// SWC-4947: check for user change immediately (don't wait 10 seconds to discover the existing
+		// session token).
+		authController.checkForUserChange();
+		checkForUserChangeLater();
+	}
+
+	public void checkForUserChangeLater() {
+		gwt.scheduleExecution(() -> {
 			// compare the local user id to the one in the cache (across browser, current value)
 			String currentSessionUserId = getSessionMarker();
 			if (!Objects.equals(authController.getCurrentUserPrincipalId(), currentSessionUserId)) {
-				// session token state mismatch, update the app state by reloading (refresh leads to auth controller detecting app reload)
+				// session token state mismatch, update the app state by reloading (refresh leads to auth controller
+				// detecting app reload)
 				authController.checkForUserChange();
 			}
+			// continue this loop until a new build is deployed (then stop checking in this window)
+			// new build may be pointing to different set of repo endpoints!
+			if (!globalAppState.isShowingVersionAlert()) {
+				checkForUserChangeLater();
+			}
 		}, INTERVAL_MS);
-		// SWC-4947: check for user change immediately (don't wait 10 seconds to discover the existing session token).
-		authController.checkForUserChange();
+(??)		// SWC-4947: check for user change immediately (don't wait 10 seconds to discover the existing
+(??)		// session token).
+(??)		authController.checkForUserChange();
 	}
 	
 	public void initializeSessionTokenState() {
-		//Re-initialize session token state
+		// Re-initialize session token state
 		if (authController.isLoggedIn()) {
 			// when a session is given, keep state until logout (or invalid session token is detected)
 			clientCache.put(SESSION_MARKER, authController.getCurrentUserPrincipalId(), DateTimeUtilsImpl.getYearFromNow().getTime());

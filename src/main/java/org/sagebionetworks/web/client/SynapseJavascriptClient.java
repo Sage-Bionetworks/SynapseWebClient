@@ -20,14 +20,12 @@ import static org.sagebionetworks.web.shared.WebConstants.CONTENT_TYPE;
 import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.SYNAPSE_VERSION_KEY;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
@@ -150,7 +148,6 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
-
 import com.google.common.base.Joiner;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.gwt.http.client.Request;
@@ -296,8 +293,9 @@ public class SynapseJavascriptClient {
 	public static final int LIMIT_50 = 50;
 	
 	public Map<String, List<Request>> requestsMap;
-	
-	public String repoServiceUrl,fileServiceUrl, authServiceUrl, synapseVersionInfo; 
+
+	public String synapseVersionInfo;
+
 	@Inject
 	public SynapseJavascriptClient(
 			JSONObjectAdapter jsonObjectAdapter,
@@ -359,25 +357,15 @@ public class SynapseJavascriptClient {
 	}
 	
 	private String getRepoServiceUrl() {
-		if (repoServiceUrl == null) {
-			repoServiceUrl = synapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY);
-		}
-		return repoServiceUrl;
+		return synapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY);
 	}
 	
 	private String getAuthServiceUrl() {
-		if (authServiceUrl == null) {
-			
-			authServiceUrl = synapseProperties.getSynapseProperty(AUTH_PUBLIC_SERVICE_URL_KEY);
-		}
-		return authServiceUrl;
+		return synapseProperties.getSynapseProperty(AUTH_PUBLIC_SERVICE_URL_KEY);
 	}
 	
 	private String getFileServiceUrl() {
-		if (fileServiceUrl == null) {
-			fileServiceUrl = synapseProperties.getSynapseProperty(FILE_SERVICE_URL_KEY);
-		}
-		return fileServiceUrl;
+		return synapseProperties.getSynapseProperty(FILE_SERVICE_URL_KEY);
 	}
 	
 	private String getSynapseVersionInfo() {
