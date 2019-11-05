@@ -9,8 +9,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  *
  */
 public interface StackConfigServiceAsync {
-	void getSynapseVersions(AsyncCallback<String> callback);
-
 	void getSynapseProperties(AsyncCallback<HashMap<String, String>> callback);
 
 	// SWC-4116: CORS preflight failing for the request for stack status (in some cases), use gwt rpc

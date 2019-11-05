@@ -258,7 +258,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		// don't check for the next minute
 		localStorage.put(RECENTLY_CHECKED_SYNAPSE_VERSION, Boolean.TRUE.toString(), new Date(System.currentTimeMillis() + 1000 * 60).getTime());
 
-		stackConfigService.getSynapseVersions(new AsyncCallback<String>() {
+		jsClient.getSynapseVersions(new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String versions) {
 				if (synapseVersion == null) {

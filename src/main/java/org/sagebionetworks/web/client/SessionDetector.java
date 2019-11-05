@@ -43,8 +43,7 @@ public class SessionDetector {
 				// detecting app reload)
 				authController.checkForUserChange();
 			}
-			// continue this loop until a new build is deployed (then stop checking in this window)
-			// new build may be pointing to different set of repo endpoints!
+			// continue this loop until a new build is deployed (then stop checking for a user change in this window)
 			if (!globalAppState.isShowingVersionAlert()) {
 				checkForUserChangeLater();
 			}

@@ -89,7 +89,7 @@ public class GlobalApplicationStateImplTest {
 		mockAppPlaceHistoryMapper = mock(AppPlaceHistoryMapper.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockView = mock(GlobalApplicationStateView.class);
-		AsyncMockStubber.callSuccessWith("v1").when(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("v1").when(mockJsClient).getSynapseVersions(any(AsyncCallback.class));
 
 		globalApplicationState = new GlobalApplicationStateImpl(mockView, mockCookieProvider, mockEventBus, mockStackConfigService, mockSynapseJSNIUtils, mockLocalStorage, mockGWT, mockDateTimeUtils, mockJsClient, mockSynapseProperties, mockSessionStorage);
 		globalApplicationState.setPlaceController(mockPlaceController);
@@ -199,7 +199,7 @@ public class GlobalApplicationStateImplTest {
 
 		AsyncCallback<VersionState> callback = mock(AsyncCallback.class);
 		globalApplicationState.checkVersionCompatibility(callback);
-		verify(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
+		verify(mockJsClient).getSynapseVersions(any(AsyncCallback.class));
 		verify(mockView, never()).showVersionOutOfDateGlobalMessage();
 		// verify callback was given the correct version
 		ArgumentCaptor<VersionState> captor = ArgumentCaptor.forClass(VersionState.class);
@@ -207,18 +207,18 @@ public class GlobalApplicationStateImplTest {
 		assertEquals("v1", captor.getValue().getVersion());
 
 		// simulate change repo version
-		reset(mockStackConfigService);
-		AsyncMockStubber.callSuccessWith("v2").when(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
+		reset(mockJsClient);
+		AsyncMockStubber.callSuccessWith("v2").when(mockJsClient).getSynapseVersions(any(AsyncCallback.class));
 		callback = mock(AsyncCallback.class);
 		globalApplicationState.checkVersionCompatibility(callback);
-		verify(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
+		verify(mockJsClient).getSynapseVersions(any(AsyncCallback.class));
 		verify(mockView).showVersionOutOfDateGlobalMessage();
 		// verify callback was given the currently loaded version (not the current version)
 		captor = ArgumentCaptor.forClass(VersionState.class);
 		verify(callback).onSuccess(captor.capture());
 		assertEquals("v1", captor.getValue().getVersion());
 
-		AsyncMockStubber.callSuccessWith("v3").when(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("v3").when(mockJsClient).getSynapseVersions(any(AsyncCallback.class));
 		globalApplicationState.checkVersionCompatibility(callback);
 		// showVersionOutOfDateGlobalMessage() has still only been called once, despite detecting another
 		// version change
@@ -229,13 +229,13 @@ public class GlobalApplicationStateImplTest {
 	@Test
 	public void testCheckVersionCompatibilityFailure() {
 		Exception ex = new Exception("couldn't get version");
-		AsyncMockStubber.callFailureWith(ex).when(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).getSynapseVersions(any(AsyncCallback.class));
 		globalApplicationState.init(() -> {
 		});
 		verifyAndInvokeSynapsePropertiesInitCallback();
 		AsyncCallback<VersionState> callback = mock(AsyncCallback.class);
 		globalApplicationState.checkVersionCompatibility(callback);
-		verify(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
+		verify(mockJsClient).getSynapseVersions(any(AsyncCallback.class));
 		verify(mockView).showGetVersionError(ex.getMessage());
 		verify(callback).onFailure(ex);
 	}
@@ -249,10 +249,10 @@ public class GlobalApplicationStateImplTest {
 		});
 		globalApplicationState.checkVersionCompatibility(mock(AsyncCallback.class));
 		verifyAndInvokeSynapsePropertiesInitCallback();
-		reset(mockStackConfigService);
+		reset(mockJsClient);
 		globalApplicationState.checkVersionCompatibility(callback);
 
-		verify(mockStackConfigService, never()).getSynapseVersions(any(AsyncCallback.class));
+		verify(mockJsClient, never()).getSynapseVersions(any(AsyncCallback.class));
 		verify(mockView, never()).showVersionOutOfDateGlobalMessage();
 		// verify callback was given the correct version
 		ArgumentCaptor<VersionState> captor = ArgumentCaptor.forClass(VersionState.class);

@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.unitserver;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import javax.servlet.http.HttpServletRequest;
 import org.junit.Before;
@@ -82,18 +80,5 @@ public class StackConfigServiceTest {
 		String defaultStorageId = stackConfigService.getSynapseProperties().get(SynapseClientImpl.DEFAULT_STORAGE_ID_PROPERTY_KEY);
 		assertNotNull(defaultStorageId);
 	}
-
-	@Test
-	public void getGetSynapseVersion() throws SynapseException, RestServiceException {
-		String versions = stackConfigService.getSynapseVersions();
-
-		assertTrue(versions.contains(REPO_VERSION));
-		verify(mockSynapse).getVersionInfo();
-
-		// verify cache. call again, and verify that it only made one rpc.
-		stackConfigService.getSynapseVersions();
-		verify(mockSynapse).getVersionInfo();
-	}
-
 
 }
