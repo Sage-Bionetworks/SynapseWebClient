@@ -217,7 +217,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 						List<String> columnValues = row.getValues();
 						for (int i = 0; i < columnIndices.size(); i++) {
 							int index = columnIndices.get(i);
-							String colValue = columnValues.get(index);
+							String colValue = index > -1 ? columnValues.get(index) : "";
 							columnWidgets.add(getNewCell(columnTypes.get(i), colValue));
 						}
 						view.addRow(columnWidgets);
