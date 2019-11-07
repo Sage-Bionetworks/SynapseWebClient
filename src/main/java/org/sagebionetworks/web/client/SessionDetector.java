@@ -13,6 +13,8 @@ public class SessionDetector {
 	GlobalApplicationState globalAppState;
 	GWTWrapper gwt;
 	public static final String SESSION_MARKER = "SESSION_MARKER";
+	public static final int FORCE_CHECK_EVERY_X_ITERATIONS = 7;
+	private int loopCount = 0;
 
 	@Inject
 	public SessionDetector(AuthenticationController authController, GlobalApplicationState globalAppState, GWTWrapper gwt, ClientCache clientCache) {
@@ -36,9 +38,11 @@ public class SessionDetector {
 
 	public void checkForUserChangeLater() {
 		gwt.scheduleExecution(() -> {
-			// compare the local user id to the one in the cache (across browser, current value)
+			// SWC-5037: regardless of the current browser state, validate the session token once in a while (in case the current session was removed in another client/instance)
+			loopCount++;
+			// compare the local user id to the one in the cache (across the current browser tabs)
 			String currentSessionUserId = getSessionMarker();
-			if (!Objects.equals(authController.getCurrentUserPrincipalId(), currentSessionUserId)) {
+			if ((authController.isLoggedIn() && loopCount%FORCE_CHECK_EVERY_X_ITERATIONS == 0) || !Objects.equals(authController.getCurrentUserPrincipalId(), currentSessionUserId)) {
 				// session token state mismatch, update the app state by reloading (refresh leads to auth controller
 				// detecting app reload)
 				authController.checkForUserChange();

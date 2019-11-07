@@ -54,21 +54,59 @@ public class SessionDetectorTest {
 		verify(mockAuthController, times(1)).checkForUserChange();
 
 		// Was no session, is now logged in. Should check for user change.
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn("1");
 		cb.invoke();
 		verify(mockAuthController, times(2)).checkForUserChange();
 
 		// Was a session, now is no session. Should check for user change.
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(null);
 		when(mockClientCache.get(SessionDetector.SESSION_MARKER)).thenReturn("1");
 		cb.invoke();
 		verify(mockAuthController, times(3)).checkForUserChange();
 
 		// Was a session, now has same session. No need to check for user change.
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn("1");
 		when(mockClientCache.get(SessionDetector.SESSION_MARKER)).thenReturn("1");
 		cb.invoke();
 		verify(mockAuthController, times(3)).checkForUserChange();
 	}
 
+	@Test
+	public void testForceCheck() {
+		// user is logged in, and there's no indication (from the local set of browser instances) that there's been a change of session.
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn("1");
+		when(mockClientCache.get(SessionDetector.SESSION_MARKER)).thenReturn("1");
+		sessionDetector.start();
+		verify(mockGWT).scheduleExecution(callbackCaptor.capture(), eq(SessionDetector.INTERVAL_MS));
+		Callback cb = callbackCaptor.getValue();
+		// verify that if we call back enough times, the client will eventually run the servlet call to validate the session.
+		for (int i = 1; i < SessionDetector.FORCE_CHECK_EVERY_X_ITERATIONS; i++) {
+			cb.invoke();
+			verify(mockAuthController, times(1)).checkForUserChange();
+		}
+		for (int i = 1; i < SessionDetector.FORCE_CHECK_EVERY_X_ITERATIONS; i++) {
+			cb.invoke();
+			verify(mockAuthController, times(2)).checkForUserChange();
+		}
+	}
+	
+	@Test
+	public void testForceCheckNeverCalledForAnonymous() {
+		// user is logged in, and there's no indication (from the local set of browser instances) that there's been a change of session.
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		sessionDetector.start();
+		verify(mockAuthController, times(1)).checkForUserChange();
+		
+		verify(mockGWT).scheduleExecution(callbackCaptor.capture(), eq(SessionDetector.INTERVAL_MS));
+		Callback cb = callbackCaptor.getValue();
+		for (int i = 0; i < 2* SessionDetector.FORCE_CHECK_EVERY_X_ITERATIONS; i++) {
+			cb.invoke();
+		}
+		
+		verify(mockAuthController, times(1)).checkForUserChange();
+	}
 }
