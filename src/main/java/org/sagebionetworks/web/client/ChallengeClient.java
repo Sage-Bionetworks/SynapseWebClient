@@ -11,7 +11,6 @@ import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.UserProfilePagedResults;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -19,11 +18,6 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("challengeclient")
 public interface ChallengeClient extends RemoteService {
-
-	PaginatedResults<Evaluation> getAvailableEvaluations() throws RestServiceException;
-
-	PaginatedResults<Evaluation> getAvailableEvaluations(Set<String> targetEvaluationIds) throws RestServiceException;
-
 	List<Evaluation> getSharableEvaluations(String entityId) throws RestServiceException;
 
 	public Submission createIndividualSubmission(Submission submission, String etag, String hostPageBaseURL) throws RestServiceException;

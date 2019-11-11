@@ -2,6 +2,8 @@ package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -30,6 +32,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
@@ -63,6 +66,8 @@ public class SubmitToEvaluationWidgetTest {
 	EvaluationSubmitter mockEvaluationSubmitter;
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
 	@Captor
 	ArgumentCaptor<FormParams> formParamsCaptor;
 	SubmitToEvaluationWidget widget;
@@ -74,7 +79,7 @@ public class SubmitToEvaluationWidgetTest {
 	@Before
 	public void before() throws RestServiceException, JSONObjectAdapterException {
 		when(mockPortalGinInjector.getEvaluationSubmitter()).thenReturn(mockEvaluationSubmitter);
-		widget = new SubmitToEvaluationWidget(mockView, mockChallengeClient, mockAuthenticationController, mockGlobalApplicationState, mockPortalGinInjector);
+		widget = new SubmitToEvaluationWidget(mockView, mockJsClient, mockChallengeClient, mockAuthenticationController, mockGlobalApplicationState, mockPortalGinInjector);
 		verify(mockView).setPresenter(widget);
 		targetEvaluations = new HashSet<String>();
 
@@ -87,8 +92,6 @@ public class SubmitToEvaluationWidgetTest {
 		targetEvaluations.add(EVAL_ID_1);
 		targetEvaluations.add(EVAL_ID_2);
 
-		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
-		availableEvaluations.setTotalNumberOfResults(2);
 		evaluationList = new ArrayList<Evaluation>();
 		Evaluation e1 = new Evaluation();
 		e1.setId(EVAL_ID_1);
@@ -100,14 +103,13 @@ public class SubmitToEvaluationWidgetTest {
 		e2.setName("Test Evaluation 2");
 		e2.setSubmissionReceiptMessage(EVALUATION_2_SUBMISSION_RECEIPT_MESSAGE);
 		evaluationList.add(e2);
-		availableEvaluations.setResults(evaluationList);
-		AsyncMockStubber.callSuccessWith(availableEvaluations).when(mockChallengeClient).getAvailableEvaluations(anySet(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(evaluationList).when(mockJsClient).getAvailableEvaluations(anySet(), anyBoolean(), anyInt(), anyInt(), any(AsyncCallback.class));
 	}
 
 	@Test
 	public void testHappyCaseConfigure() throws Exception {
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
-		verify(mockChallengeClient).getAvailableEvaluations(eq(targetEvaluations), any(AsyncCallback.class));
+		verify(mockJsClient).getAvailableEvaluations(eq(targetEvaluations), eq(true), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).configure(anyString());
 	}
 
@@ -191,9 +193,9 @@ public class SubmitToEvaluationWidgetTest {
 
 	@Test
 	public void testConfigureServiceFailure() throws Exception {
-		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockChallengeClient).getAvailableEvaluations(anySet(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockJsClient).getAvailableEvaluations(anySet(), anyBoolean(), anyInt(), anyInt(), any(AsyncCallback.class));
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
-		verify(mockChallengeClient).getAvailableEvaluations(eq(targetEvaluations), any(AsyncCallback.class));
+		verify(mockJsClient).getAvailableEvaluations(eq(targetEvaluations), anyBoolean(), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).showUnavailable(anyString());
 	}
 
