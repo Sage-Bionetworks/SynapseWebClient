@@ -10,16 +10,11 @@ import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.UserProfilePagedResults;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface ChallengeClientAsync {
-	void getAvailableEvaluations(AsyncCallback<PaginatedResults<Evaluation>> callback) throws RestServiceException;
-
-	void getAvailableEvaluations(Set<String> targetEvaluationIds, AsyncCallback<PaginatedResults<Evaluation>> callback) throws RestServiceException;
-
 	void getSharableEvaluations(String entityId, AsyncCallback<List<Evaluation>> asyncCallback);
 
 	/**

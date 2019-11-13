@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.sagebionetworks.evaluation.model.Evaluation;
@@ -9,6 +10,7 @@ import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -16,11 +18,9 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.shared.FormParams;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -39,15 +39,16 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 	private String formUiSchemaId;
 	PortalGinInjector ginInjector;
 	private String evaluationUnavailableMessage;
-
+	private SynapseJavascriptClient jsClient;
 	@Inject
-	public SubmitToEvaluationWidget(SubmitToEvaluationWidgetView view, ChallengeClientAsync challengeClient, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, PortalGinInjector ginInjector) {
+	public SubmitToEvaluationWidget(SubmitToEvaluationWidgetView view, SynapseJavascriptClient jsClient, ChallengeClientAsync challengeClient, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, PortalGinInjector ginInjector) {
 		this.view = view;
 		view.setPresenter(this);
 		this.challengeClient = challengeClient;
 		fixServiceEntryPoint(challengeClient);
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
+		this.jsClient = jsClient;
 		this.ginInjector = ginInjector;
 	}
 
@@ -70,29 +71,25 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 				evaluationIds = evalIds;
 				final String buttonText = descriptor.get(WidgetConstants.BUTTON_TEXT_KEY);
 				// figure out if we should show anything
-				try {
-					challengeClient.getAvailableEvaluations(evaluationIds, new AsyncCallback<PaginatedResults<Evaluation>>() {
-						@Override
-						public void onSuccess(PaginatedResults<Evaluation> results) {
-							if (results.getTotalNumberOfResults() == 0) {
-								view.showUnavailable(evaluationUnavailableMessage);
-							} else {
-								view.configure(buttonText);
-							}
+				jsClient.getAvailableEvaluations(evaluationIds, true, Integer.MAX_VALUE, 0, new AsyncCallback<List<Evaluation>>() {
+					@Override
+					public void onSuccess(List<Evaluation> results) {
+						if (results.size() == 0) {
+							view.showUnavailable(evaluationUnavailableMessage);
+						} else {
+							view.configure(buttonText);
 						}
+					}
 
-						@Override
-						public void onFailure(Throwable caught) {
-							// if the user can't read the evaluation, then don't show the join button. if there was some other
-							// error, then report it...
-							if (!(caught instanceof ForbiddenException)) {
-								view.showUnavailable(DisplayConstants.EVALUATION_SUBMISSION_ERROR + caught.getMessage());
-							}
+					@Override
+					public void onFailure(Throwable caught) {
+						// if the user can't read the evaluation, then don't show the join button. if there was some other
+						// error, then report it...
+						if (!(caught instanceof ForbiddenException)) {
+							view.showUnavailable(DisplayConstants.EVALUATION_SUBMISSION_ERROR + caught.getMessage());
 						}
-					});
-				} catch (RestServiceException e) {
-					view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + e.getMessage());
-				}
+					}
+				});
 			}
 		});
 	}

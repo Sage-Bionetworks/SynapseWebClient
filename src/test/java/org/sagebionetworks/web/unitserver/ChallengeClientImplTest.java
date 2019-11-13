@@ -14,9 +14,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -65,7 +63,6 @@ import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.UserProfilePagedResults;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -318,18 +315,6 @@ public class ChallengeClientImplTest {
 		verify(mockSynapse).listUserProfiles(anyList());
 		assertTrue(results.getTotalNumberOfResults() == 1);
 		assertEquals(mockUserProfile, results.getResults().get(0));
-	}
-
-	@Test
-	public void testGetAvailableEvaluations() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
-		org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> testResults = new org.sagebionetworks.reflection.model.PaginatedResults<Evaluation>();
-		Evaluation e = new Evaluation();
-		e.setId("A test ID");
-		testResults.setResults(Arrays.asList(e));
-		when(mockSynapse.getAvailableEvaluationsPaginated(anyInt(), anyInt())).thenReturn(testResults);
-		PaginatedResults<Evaluation> evaluations = synapseClient.getAvailableEvaluations();
-		verify(mockSynapse).getAvailableEvaluationsPaginated(anyInt(), anyInt());
-		assertEquals(testResults.getResults(), evaluations.getResults());
 	}
 
 	@Test(expected = NotFoundException.class)

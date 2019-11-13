@@ -57,28 +57,6 @@ public class ChallengeClientImpl extends SynapseClientBase implements ChallengeC
 	// before we hit this limit we will use another mechanism to find groups
 	private static final Long GROUPS_PAGINATION_LIMIT = 1000L;
 
-	@Override
-	public PaginatedResults<Evaluation> getAvailableEvaluations() throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return convertPaginated(synapseClient.getAvailableEvaluationsPaginated(EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT));
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public PaginatedResults<Evaluation> getAvailableEvaluations(Set<String> targetEvaluationIds) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			List<String> targetEvaluationIdsList = new ArrayList<String>();
-			targetEvaluationIdsList.addAll(targetEvaluationIds);
-			return convertPaginated(synapseClient.getAvailableEvaluationsPaginated(EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT, targetEvaluationIdsList));
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
 	/**
 	 * Return all evaluations associated to a particular entity, for which the caller can change
 	 * permissions

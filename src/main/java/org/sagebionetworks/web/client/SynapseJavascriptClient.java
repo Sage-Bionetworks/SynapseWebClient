@@ -26,6 +26,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
@@ -206,6 +208,7 @@ public class SynapseJavascriptClient {
 	public static final String PRINCIPAL = "/principal";
 	public static final String DOI = "/doi";
 	public static final String DOI_ASSOCIATION = DOI + "/association";
+	public static final String EVALUATION_AVAILABLE = "/evaluation/available";
 	public static final String ID_PARAMETER = "id=";
 	public static final String TYPE_PARAMETER = "type=";
 	public static final String VERSION_PARAMETER = "version=";
@@ -1666,6 +1669,24 @@ public class SynapseJavascriptClient {
 		requestBuilder.configure(GET, jsniUtils.getVersionsServletUrl());
 		boolean canCancel = false;
 		sendRequest(requestBuilder, null, OBJECT_TYPE.String, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, cb);
+	}
+	
+	public void getAvailableEvaluations(Set<String> targetEvaluationIds, boolean isActiveOnly, Integer limit, Integer offset, AsyncCallback<List<Evaluation>> cb) {
+		String url = getRepoServiceUrl() + EVALUATION_AVAILABLE + "?activeOnly=" + isActiveOnly;
+		if (targetEvaluationIds != null && targetEvaluationIds.size() > 0) {
+			List<String> targetEvaluationIdsList = new ArrayList<>();
+			targetEvaluationIdsList.addAll(targetEvaluationIds);
+			String targetEvalIdsString = listToString(targetEvaluationIdsList);
+			url += "&evaluationIds=" + gwt.encodeQueryString(targetEvalIdsString);
+		}
+		if (limit != null) {
+			url += '&' + LIMIT_PARAMETER + limit;
+		}
+		if (offset != null) {
+			url += '&' + OFFSET_PARAMETER + offset;
+		}
+
+		doGet(url, OBJECT_TYPE.PaginatedResultsEvaluations, cb);
 	}
 }
 

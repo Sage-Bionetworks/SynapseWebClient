@@ -33,7 +33,6 @@ import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterView.Presenter;
 import org.sagebionetworks.web.shared.FormParams;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -138,14 +137,7 @@ public class EvaluationSubmitter implements Presenter {
 	}
 
 	private void configureWithEvaluations() {
-		try {
-			if (evaluationIds == null)
-				challengeClient.getAvailableEvaluations(getEvalCallback());
-			else
-				challengeClient.getAvailableEvaluations(evaluationIds, getEvalCallback());
-		} catch (RestServiceException e) {
-			view.showErrorMessage(e.getMessage());
-		}
+		jsClient.getAvailableEvaluations(evaluationIds, true, Integer.MAX_VALUE, 0, getEvalCallback());
 	}
 
 	@Override
@@ -166,12 +158,11 @@ public class EvaluationSubmitter implements Presenter {
 		}
 	}
 
-	private AsyncCallback<PaginatedResults<Evaluation>> getEvalCallback() {
+	private AsyncCallback<List<Evaluation>> getEvalCallback() {
 		challengeListSynAlert.clear();
-		AsyncCallback<PaginatedResults<Evaluation>> callback = new AsyncCallback<PaginatedResults<Evaluation>>() {
+		AsyncCallback<List<Evaluation>> callback = new AsyncCallback<List<Evaluation>>() {
 			@Override
-			public void onSuccess(PaginatedResults<Evaluation> results) {
-				List<Evaluation> evaluations = results.getResults();
+			public void onSuccess(List<Evaluation> evaluations) {
 				if (evaluations == null || evaluations.size() == 0) {
 					// no available evaluations, pop up an info dialog
 					view.showErrorMessage(DisplayConstants.NOT_PARTICIPATING_IN_ANY_EVALUATIONS);

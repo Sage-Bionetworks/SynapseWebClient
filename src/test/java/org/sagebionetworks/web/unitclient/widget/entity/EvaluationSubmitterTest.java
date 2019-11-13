@@ -6,7 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -120,8 +120,6 @@ public class EvaluationSubmitterTest {
 		AsyncMockStubber.callSuccessWith(returnSubmission).when(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(returnSubmission).when(mockChallengeClient).createTeamSubmission(any(Submission.class), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 
-		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
-		availableEvaluations.setTotalNumberOfResults(2);
 		ArrayList<Evaluation> evaluationList = new ArrayList<Evaluation>();
 		e1 = new Evaluation();
 		e1.setId("1");
@@ -133,8 +131,7 @@ public class EvaluationSubmitterTest {
 		e2.setName("Test Evaluation 2");
 		e2.setSubmissionReceiptMessage(EVALUATION_2_SUBMISSION_RECEIPT_MESSAGE);
 		evaluationList.add(e2);
-		availableEvaluations.setResults(evaluationList);
-		AsyncMockStubber.callSuccessWith(availableEvaluations).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(evaluationList).when(mockSynapseJavascriptClient).getAvailableEvaluations(anySet(), anyBoolean(), anyInt(), anyInt(), any(AsyncCallback.class));
 
 		entity = new FileEntity();
 		entity.setVersionNumber(5l);
@@ -226,41 +223,32 @@ public class EvaluationSubmitterTest {
 
 	@Test
 	public void testShowSingleAvailableEvaluation() throws RestServiceException, JSONObjectAdapterException {
-		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
-		availableEvaluations.setTotalNumberOfResults(1);
 		List<Evaluation> evaluationList = new ArrayList<Evaluation>();
 		evaluationList.add(new Evaluation());
-		availableEvaluations.setResults(evaluationList);
-		AsyncMockStubber.callSuccessWith(availableEvaluations).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(evaluationList).when(mockSynapseJavascriptClient).getAvailableEvaluations(anySet(), anyBoolean(), anyInt(), anyInt(), any(AsyncCallback.class));
 		submitter.configure(entity, null, null);
-		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getAvailableEvaluations(anySet(), anyBoolean(), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).showModal1(anyBoolean(), any(FormParams.class), any(List.class));
 	}
 
 	@Test
 	public void testShowAvailableEvaluations() throws RestServiceException, JSONObjectAdapterException {
-		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
-		availableEvaluations.setTotalNumberOfResults(2);
 		List<Evaluation> evaluationList = new ArrayList<Evaluation>();
 		evaluationList.add(new Evaluation());
 		evaluationList.add(new Evaluation());
-		availableEvaluations.setResults(evaluationList);
-		AsyncMockStubber.callSuccessWith(availableEvaluations).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(evaluationList).when(mockSynapseJavascriptClient).getAvailableEvaluations(anySet(), anyBoolean(), anyInt(), anyInt(), any(AsyncCallback.class));
 		submitter.configure(entity, null, null);
-		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getAvailableEvaluations(anySet(), anyBoolean(), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).showModal1(anyBoolean(), any(FormParams.class), any(List.class));
 	}
 
 	@Test
 	public void testShowAvailableEvaluationsNoResults() throws RestServiceException, JSONObjectAdapterException {
 		// mock empty evaluation list
-		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
-		availableEvaluations.setTotalNumberOfResults(0);
 		List<Evaluation> evaluationList = new ArrayList<Evaluation>();
-		availableEvaluations.setResults(evaluationList);
-		AsyncMockStubber.callSuccessWith(availableEvaluations).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(evaluationList).when(mockSynapseJavascriptClient).getAvailableEvaluations(anySet(), anyBoolean(), anyInt(), anyInt(), any(AsyncCallback.class));
 		submitter.configure(entity, null, null);
-		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getAvailableEvaluations(anySet(), anyBoolean(), anyInt(), anyInt(), any(AsyncCallback.class));
 		// no evaluations to join error message
 		verify(mockView).showErrorMessage(anyString());
 	}
@@ -268,9 +256,9 @@ public class EvaluationSubmitterTest {
 	@Test
 	public void testShowAvailableEvaluationsFailure1() throws RestServiceException, JSONObjectAdapterException {
 		Exception caught = new ForbiddenException("this is forbidden");
-		AsyncMockStubber.callFailureWith(caught).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(caught).when(mockSynapseJavascriptClient).getAvailableEvaluations(anySet(), anyBoolean(), anyInt(), anyInt(), any(AsyncCallback.class));
 		submitter.configure(entity, null, null);
-		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getAvailableEvaluations(anySet(), anyBoolean(), anyInt(), anyInt(), any(AsyncCallback.class));
 		// no evaluations to join error message
 		verify(mockSynAlert).handleException(caught);
 	}
