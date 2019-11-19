@@ -6,6 +6,8 @@ import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -37,6 +39,9 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	HelpBlock nameHelp;
 	@UiField
 	ListBox type;
+	// TODO: replace "type" with "alphaType" once multi-value list types are released out of alpha mode
+	@UiField
+	ListBox alphaType;
 	@UiField
 	FormGroup sizeGroup;
 	@UiField
@@ -59,10 +64,13 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 
 	String id;
 	TypePresenter presenter;
-
+	boolean isInAlphaMode;
 	@Inject
-	public ColumnModelTableRowEditorViewImpl(Binder uiBinder) {
+	public ColumnModelTableRowEditorViewImpl(Binder uiBinder, CookieProvider cookies) {
 		row = uiBinder.createAndBindUi(this);
+		isInAlphaMode = DisplayUtils.isInTestWebsite(cookies);
+		type.setVisible(!isInAlphaMode);
+		alphaType.setVisible(isInAlphaMode);
 	}
 
 	@Override
@@ -77,7 +85,8 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 
 	@Override
 	public ColumnTypeViewEnum getColumnType() {
-		return ColumnTypeViewEnum.valueOf(type.getSelectedValue());
+		ListBox listBox = isInAlphaMode ? alphaType : type;
+		return ColumnTypeViewEnum.valueOf(listBox.getSelectedValue());
 	}
 
 	@Override
@@ -117,16 +126,17 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	}
 
 	@Override
-	public void setColumnType(ColumnTypeViewEnum type) {
+	public void setColumnType(ColumnTypeViewEnum columnType) {
+		ListBox listBox = isInAlphaMode ? alphaType : type;
 		int index = 0;
-		String targetName = type.name();
-		for (int i = 0; i < this.type.getItemCount(); i++) {
-			if (this.type.getValue(i).equals(targetName)) {
+		String targetName = columnType.name();
+		for (int i = 0; i < listBox.getItemCount(); i++) {
+			if (listBox.getValue(i).equals(targetName)) {
 				index = i;
 				break;
 			}
 		}
-		this.type.setSelectedIndex(index);
+		listBox.setSelectedIndex(index);
 	}
 
 	@Override
