@@ -448,17 +448,6 @@ public class SynapseClientImplTest {
 		when(mockSynapse.sendMessage(any(MessageToUser.class))).thenReturn(sentMessage);
 		when(mockSynapse.sendMessage(any(MessageToUser.class), anyString())).thenReturn(sentMessage);
 
-		// getMyProjects getUserProjects
-		PaginatedResults headers = new PaginatedResults<ProjectHeader>();
-		headers.setTotalNumberOfResults(1100);
-		List<ProjectHeader> projectHeaders = new ArrayList();
-		List<UserProfile> userProfile = new ArrayList();
-		projectHeaders.add(new ProjectHeader());
-		headers.setResults(projectHeaders);
-		when(mockSynapse.getMyProjects(any(ProjectListType.class), any(ProjectListSortColumn.class), any(SortDirection.class), anyInt(), anyInt())).thenReturn(headers);
-		when(mockSynapse.getProjectsFromUser(anyLong(), any(ProjectListSortColumn.class), any(SortDirection.class), anyInt(), anyInt())).thenReturn(headers);
-		when(mockSynapse.getProjectsForTeam(anyLong(), any(ProjectListSortColumn.class), any(SortDirection.class), anyInt(), anyInt())).thenReturn(headers);
-
 		testUserProfile = new UserProfile();
 		testUserProfile.setUserName("Test User");
 		when(mockSynapse.getUserProfile(eq(testUserId))).thenReturn(testUserProfile);

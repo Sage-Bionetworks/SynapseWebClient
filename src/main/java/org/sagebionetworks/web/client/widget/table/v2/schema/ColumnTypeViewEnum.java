@@ -10,7 +10,20 @@ import org.sagebionetworks.repo.model.table.ColumnType;
  */
 public enum ColumnTypeViewEnum {
 
-	String(ColumnType.STRING), Boolean(ColumnType.BOOLEAN), Integer(ColumnType.INTEGER), Double(ColumnType.DOUBLE), Date(ColumnType.DATE), File(ColumnType.FILEHANDLEID), Entity(ColumnType.ENTITYID), Link(ColumnType.LINK), LargeText(ColumnType.LARGETEXT), User(ColumnType.USERID);
+	String(ColumnType.STRING), 
+	Boolean(ColumnType.BOOLEAN), 
+	Integer(ColumnType.INTEGER), 
+	Double(ColumnType.DOUBLE), 
+	Date(ColumnType.DATE), 
+	File(ColumnType.FILEHANDLEID), 
+	Entity(ColumnType.ENTITYID), 
+	Link(ColumnType.LINK), 
+	LargeText(ColumnType.LARGETEXT), 
+	User(ColumnType.USERID),
+	StringList(ColumnType.STRING_LIST),
+	IntegerList(ColumnType.INTEGER_LIST),
+	DateList(ColumnType.DATE_LIST),
+	BooleanList(ColumnType.BOOLEAN_LIST);
 
 	private ColumnType type;
 
