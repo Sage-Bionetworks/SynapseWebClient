@@ -57,8 +57,14 @@ public class TableModelTestUtils {
 					case BOOLEAN:
 						defaultValue = "true";
 						break;
+					case BOOLEAN_LIST:
+						defaultValue = "true, false";
+						break;
 					case DATE:
 						defaultValue = "978307200000";
+						break;
+					case DATE_LIST:
+						defaultValue = "978307200000,978307200001";
 						break;
 					case DOUBLE:
 						defaultValue = "1.3";
@@ -69,8 +75,14 @@ public class TableModelTestUtils {
 					case INTEGER:
 						defaultValue = "-10000000000000";
 						break;
+					case INTEGER_LIST:
+						defaultValue = "-10000000000000,-10000000001";
+						break;
 					case STRING:
 						defaultValue = "defaultString";
+						break;
+					case STRING_LIST:
+						defaultValue = "defaultString1,defaultString2";
 						break;
 					case ENTITYID:
 						defaultValue = "syn123";
@@ -256,10 +268,21 @@ public class TableModelTestUtils {
 		if (cm.getColumnType() == null)
 			throw new IllegalArgumentException("ColumnType cannot be null");
 		switch (cm.getColumnType()) {
+			case STRING_LIST:
+				return (isUpdate ? "updatestring, updatestring2" : "string1, string2") + i;
 			case STRING:
 				return (isUpdate ? "updatestring" : "string") + i;
+			case INTEGER_LIST:
+				return (i + 3000) + "," + (i + 3001);
 			case INTEGER:
 				return "" + (i + 3000);
+			case DATE_LIST:
+				if (!isExpected && useDateStrings && i % 2 == 0) {
+					return gmtDateFormatter.format(new Date(i + 4000 + (isUpdate ? 10000 : 0))) + "," +
+							gmtDateFormatter.format(new Date(i + 4001 + (isUpdate ? 10001 : 0)));
+				} else {
+					return (i + 4000 + (isUpdate ? 10000 : 0)) + ","+(i + 4001 + (isUpdate ? 10001 : 0));
+				}
 			case DATE:
 				if (!isExpected && useDateStrings && i % 2 == 0) {
 					return gmtDateFormatter.format(new Date(i + 4000 + (isUpdate ? 10000 : 0)));
@@ -274,6 +297,13 @@ public class TableModelTestUtils {
 				} else {
 					return Boolean.FALSE.toString();
 				}
+			case BOOLEAN_LIST:
+				if (i % 2 > 0 ^ isUpdate) {
+					return Boolean.TRUE.toString() + "," + Boolean.FALSE.toString();
+				} else {
+					return Boolean.FALSE.toString() + "," + Boolean.TRUE.toString();
+				}
+
 			case DOUBLE:
 				return "" + (i * 3.41 + 3.12 + (isUpdate ? 10000 : 0));
 			case ENTITYID:
