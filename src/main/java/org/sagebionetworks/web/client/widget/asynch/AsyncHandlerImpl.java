@@ -12,9 +12,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public abstract class AsyncHandlerImpl {
-	private Map<String, List<AsyncCallback>> reference2Callback = new HashMap<String, List<AsyncCallback>>();
+	private Map<Object, List<AsyncCallback>> reference2Callback = new HashMap<Object, List<AsyncCallback>>();
 
-	public abstract void doCall(List<String> ids, AsyncCallback<List> callback);
+	public abstract void doCall(List ids, AsyncCallback<List> callback);
 
 	public abstract String getId(Object singleItem);
 
@@ -41,21 +41,21 @@ public abstract class AsyncHandlerImpl {
 
 	public void executeRequests() {
 		if (!reference2Callback.isEmpty()) {
-			final Map<String, List<AsyncCallback>> reference2CallbackCopy = new HashMap<String, List<AsyncCallback>>();
+			final Map<Object, List<AsyncCallback>> reference2CallbackCopy = new HashMap<Object, List<AsyncCallback>>();
 			reference2CallbackCopy.putAll(reference2Callback);
 			reference2Callback.clear();
-			List<String> ids = new ArrayList<String>();
+			List ids = new ArrayList();
 			ids.addAll(reference2CallbackCopy.keySet());
 			doCall(ids, new AsyncCallback<List>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					// go through all requested objects, and inform them of the error
-					for (String fileHandleId : reference2CallbackCopy.keySet()) {
-						callOnFailure(fileHandleId, caught);
+					for (Object id : reference2CallbackCopy.keySet()) {
+						callOnFailure(id, caught);
 					}
 				}
 
-				private void callOnFailure(String id, Throwable ex) {
+				private void callOnFailure(Object id, Throwable ex) {
 					List<AsyncCallback> callbacks = reference2CallbackCopy.get(id);
 					if (callbacks != null) {
 						for (AsyncCallback callback : callbacks) {
@@ -75,9 +75,9 @@ public abstract class AsyncHandlerImpl {
 						}
 					}
 					NotFoundException notReturnedException = new NotFoundException(DisplayConstants.ERROR_LOADING);
-					for (String userId : reference2CallbackCopy.keySet()) {
+					for (Object id : reference2CallbackCopy.keySet()) {
 						// not returned
-						callOnFailure(userId, notReturnedException);
+						callOnFailure(id, notReturnedException);
 					}
 				};
 			});

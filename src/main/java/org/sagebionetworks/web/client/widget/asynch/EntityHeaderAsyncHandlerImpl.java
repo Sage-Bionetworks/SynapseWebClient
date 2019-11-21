@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -14,7 +15,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class EntityHeaderAsyncHandlerImpl implements EntityHeaderAsyncHandler {
-	private Map<String, List<AsyncCallback<EntityHeader>>> reference2Callback = new HashMap<String, List<AsyncCallback<EntityHeader>>>();
+	private Map<Reference, List<AsyncCallback<EntityHeader>>> reference2Callback = new HashMap<Reference, List<AsyncCallback<EntityHeader>>>();
 	SynapseJavascriptClient jsClient;
 
 	@Inject
@@ -31,31 +32,40 @@ public class EntityHeaderAsyncHandlerImpl implements EntityHeaderAsyncHandler {
 
 	@Override
 	public void getEntityHeader(String entityId, AsyncCallback<EntityHeader> callback) {
+		getEntityHeader(entityId, null, callback);
+	}
+	
+	@Override
+	public void getEntityHeader(String entityId, Long versionNumber, AsyncCallback<EntityHeader> callback) {
 		List<AsyncCallback<EntityHeader>> list = reference2Callback.get(entityId);
 		if (list == null) {
 			list = new ArrayList<AsyncCallback<EntityHeader>>();
-			reference2Callback.put(entityId, list);
+			Reference ref = new Reference();
+			ref.setTargetId(entityId);
+			ref.setTargetVersionNumber(versionNumber);
+			reference2Callback.put(ref, list);
 		}
 		list.add(callback);
 	}
 
+
 	public void executeRequests() {
 		if (!reference2Callback.isEmpty()) {
-			final Map<String, List<AsyncCallback<EntityHeader>>> reference2CallbackCopy = new HashMap<String, List<AsyncCallback<EntityHeader>>>();
+			final Map<Reference, List<AsyncCallback<EntityHeader>>> reference2CallbackCopy = new HashMap<Reference, List<AsyncCallback<EntityHeader>>>();
 			reference2CallbackCopy.putAll(reference2Callback);
 			reference2Callback.clear();
-			List<String> entityIdsList = new ArrayList<String>();
+			List<Reference> entityIdsList = new ArrayList<Reference>();
 			entityIdsList.addAll(reference2CallbackCopy.keySet());
-			jsClient.getEntityHeaderBatch(entityIdsList, new AsyncCallback<ArrayList<EntityHeader>>() {
+			jsClient.getEntityHeaderBatchFromReferences(entityIdsList, new AsyncCallback<ArrayList<EntityHeader>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					// go through all requested objects, and inform them of the error
-					for (String entityId : reference2CallbackCopy.keySet()) {
+					for (Reference entityId : reference2CallbackCopy.keySet()) {
 						callOnFailure(entityId, caught);
 					}
 				}
 
-				private void callOnFailure(String entityId, Throwable ex) {
+				private void callOnFailure(Reference entityId, Throwable ex) {
 					List<AsyncCallback<EntityHeader>> callbacks = reference2CallbackCopy.get(entityId);
 					if (callbacks != null) {
 						for (AsyncCallback<EntityHeader> callback : callbacks) {
@@ -67,7 +77,10 @@ public class EntityHeaderAsyncHandlerImpl implements EntityHeaderAsyncHandler {
 				public void onSuccess(ArrayList<EntityHeader> results) {
 					// go through all results, and inform the proper callback of the success
 					for (EntityHeader entityHeader : results) {
-						List<AsyncCallback<EntityHeader>> callbacks = reference2CallbackCopy.remove(entityHeader.getId());
+						Reference ref = new Reference();
+						ref.setTargetId(entityHeader.getId());
+						ref.setTargetVersionNumber(entityHeader.getVersionNumber());
+						List<AsyncCallback<EntityHeader>> callbacks = reference2CallbackCopy.remove(ref);
 						if (callbacks != null) {
 							for (AsyncCallback<EntityHeader> callback : callbacks) {
 								callback.onSuccess(entityHeader);
@@ -75,7 +88,7 @@ public class EntityHeaderAsyncHandlerImpl implements EntityHeaderAsyncHandler {
 						}
 					}
 					NotFoundException notReturnedException = new NotFoundException(DisplayConstants.ERROR_LOADING);
-					for (String entityId : reference2CallbackCopy.keySet()) {
+					for (Reference entityId : reference2CallbackCopy.keySet()) {
 						// not returned
 						callOnFailure(entityId, notReturnedException);
 

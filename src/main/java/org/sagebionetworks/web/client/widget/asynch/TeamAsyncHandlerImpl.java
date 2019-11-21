@@ -24,7 +24,7 @@ public class TeamAsyncHandlerImpl extends AsyncHandlerImpl implements TeamAsyncH
 	}
 
 	@Override
-	public void doCall(List<String> ids, final AsyncCallback<List> callback) {
+	public void doCall(List ids, final AsyncCallback<List> callback) {
 		jsClient.listTeams(ids).addCallback(new FutureCallback<List<Team>>() {
 			@Override
 			public void onSuccess(List<Team> teams) {

@@ -22,7 +22,7 @@ public class UserProfileAsyncHandlerImpl extends AsyncHandlerImpl implements Use
 	}
 
 	@Override
-	public void doCall(List<String> ids, AsyncCallback<List> callback) {
+	public void doCall(List ids, AsyncCallback<List> callback) {
 		jsClient.listUserProfiles(ids, (AsyncCallback<List>) callback);
 	}
 
