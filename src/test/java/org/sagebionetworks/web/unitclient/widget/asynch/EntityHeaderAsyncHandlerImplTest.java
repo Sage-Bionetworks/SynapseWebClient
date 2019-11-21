@@ -38,7 +38,7 @@ public class EntityHeaderAsyncHandlerImplTest {
 		MockitoAnnotations.initMocks(this);
 		entityHeaderAsyncHandler = new EntityHeaderAsyncHandlerImpl(mockSynapseJavascriptClient, mockGwt);
 		entityHeaderList = new ArrayList<EntityHeader>();
-		AsyncMockStubber.callSuccessWith(entityHeaderList).when(mockSynapseJavascriptClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(entityHeaderList).when(mockSynapseJavascriptClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
 		when(mockEntityHeader.getId()).thenReturn(entityId);
 	}
 
@@ -58,7 +58,7 @@ public class EntityHeaderAsyncHandlerImplTest {
 		entityHeaderList.add(mockEntityHeader);
 
 		entityHeaderAsyncHandler.executeRequests();
-		verify(mockSynapseJavascriptClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
 		verify(mockCallback).onSuccess(mockEntityHeader);
 	}
 
@@ -66,7 +66,7 @@ public class EntityHeaderAsyncHandlerImplTest {
 	public void testFailure() {
 		// simulate exception response
 		Exception ex = new Exception("problem loading batch of entity headers");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
 		entityHeaderAsyncHandler.getEntityHeader(entityId, mockCallback);
 		entityHeaderAsyncHandler.executeRequests();
 
@@ -81,7 +81,7 @@ public class EntityHeaderAsyncHandlerImplTest {
 		entityHeaderList.add(mockEntityHeader);
 
 		entityHeaderAsyncHandler.executeRequests();
-		verify(mockSynapseJavascriptClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
 		verify(mockCallback).onFailure(any(Throwable.class));
 	}
 

@@ -22,6 +22,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
@@ -78,7 +79,6 @@ public class EntityPresenterTest {
 	@Mock
 	EntityPageTop mockEntityPageTop;
 	String EntityId = "1";
-	Synapse place = new Synapse("Synapse:" + EntityId);
 	Entity EntityModel1;
 	EntityBundle eb;
 	String entityId = "syn43344";
@@ -95,6 +95,10 @@ public class EntityPresenterTest {
 	EntityId2BundleCache mockEntityId2BundleCache;
 	@Mock
 	EventBus mockEventBus;
+	@Mock
+	Synapse mockPlace;
+	@Mock
+	FileEntity mockFileEntity;
 
 	@Before
 	public void setup() throws Exception {
@@ -110,6 +114,7 @@ public class EntityPresenterTest {
 		eb.setPath(path);
 		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), any(EntityBundleRequest.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testEntity).when(mockSynapseJavascriptClient).getEntity(anyString(),any(AsyncCallback.class));
 		id = 0L;
 	}
 
@@ -122,11 +127,10 @@ public class EntityPresenterTest {
 	@Test
 	public void testSetPlaceAndRefreshWithVersion() {
 		Long versionNumber = 1L;
-		Synapse place = Mockito.mock(Synapse.class);
-		when(place.getVersionNumber()).thenReturn(1L);
-		when(place.getEntityId()).thenReturn(entityId);
+		when(mockPlace.getVersionNumber()).thenReturn(1L);
+		when(mockPlace.getEntityId()).thenReturn(entityId);
 
-		entityPresenter.setPlace(place);
+		entityPresenter.setPlace(mockPlace);
 		// verify that background image is cleared
 		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), eq(EntityPageTop.ALL_PARTS_REQUEST), any(AsyncCallback.class));
 		verify(mockView, times(2)).setLoadingVisible(Mockito.anyBoolean());
@@ -139,6 +143,20 @@ public class EntityPresenterTest {
 		verify(mockHeaderWidget).configure(any(EntityHeader.class));
 		verify(mockSynAlert, times(3)).clear();
 	}
+	
+	@Test
+	public void testRefreshWithCurrentFileVersion() {
+		Long versionNumber = 3L;
+		when(mockPlace.getVersionNumber()).thenReturn(versionNumber);
+		when(mockPlace.getEntityId()).thenReturn(entityId);
+		when(mockFileEntity.getVersionNumber()).thenReturn(versionNumber);
+		AsyncMockStubber.callSuccessWith(mockFileEntity).when(mockSynapseJavascriptClient).getEntity(anyString(),any(AsyncCallback.class));
+
+		entityPresenter.setPlace(mockPlace);
+		
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), eq(EntityPageTop.ALL_PARTS_REQUEST), any(AsyncCallback.class));
+	}
+
 
 	@Test
 	public void testSetPlaceAndRefreshWithoutVersion() {
@@ -175,7 +193,7 @@ public class EntityPresenterTest {
 
 	@Test
 	public void testStart() {
-		entityPresenter.setPlace(place);
+		entityPresenter.setPlace(mockPlace);
 		AcceptsOneWidget panel = mock(AcceptsOneWidget.class);
 		EventBus eventBus = mock(EventBus.class);
 		entityPresenter.start(panel, eventBus);
@@ -208,11 +226,11 @@ public class EntityPresenterTest {
 
 	@Test
 	public void testIsValidEntityId() {
-		assertFalse(entityPresenter.isValidEntityId(""));
-		assertFalse(entityPresenter.isValidEntityId(null));
-		assertFalse(entityPresenter.isValidEntityId("syn"));
-		assertFalse(entityPresenter.isValidEntityId("sy"));
-		assertFalse(entityPresenter.isValidEntityId("synFOOBAR"));
-		assertTrue(entityPresenter.isValidEntityId("SyN198327"));
+		assertFalse(EntityPresenter.isValidEntityId(""));
+		assertFalse(EntityPresenter.isValidEntityId(null));
+		assertFalse(EntityPresenter.isValidEntityId("syn"));
+		assertFalse(EntityPresenter.isValidEntityId("sy"));
+		assertFalse(EntityPresenter.isValidEntityId("synFOOBAR"));
+		assertTrue(EntityPresenter.isValidEntityId("SyN198327"));
 	}
 }
