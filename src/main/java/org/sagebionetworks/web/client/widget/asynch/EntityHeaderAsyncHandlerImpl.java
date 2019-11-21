@@ -14,10 +14,10 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
-public class EntityHeaderAsyncHandlerImpl implements EntityHeaderAsyncHandler {
+public class EntityHeaderAsyncHandlerImpl implements EntityHeaderAsyncHandler, VersionedEntityHeaderAsyncHandler {
 	private Map<Reference, List<AsyncCallback<EntityHeader>>> reference2Callback = new HashMap<Reference, List<AsyncCallback<EntityHeader>>>();
 	SynapseJavascriptClient jsClient;
-
+	boolean isUsingVersion;
 	@Inject
 	public EntityHeaderAsyncHandlerImpl(SynapseJavascriptClient jsClient, GWTWrapper gwt) {
 		this.jsClient = jsClient;
@@ -30,24 +30,28 @@ public class EntityHeaderAsyncHandlerImpl implements EntityHeaderAsyncHandler {
 		gwt.scheduleFixedDelay(callback, 200 + gwt.nextInt(150));
 	}
 
-	@Override
 	public void getEntityHeader(String entityId, AsyncCallback<EntityHeader> callback) {
-		getEntityHeader(entityId, null, callback);
+		isUsingVersion = false;
+		getEntityHeaderShared(entityId, null, callback);
 	}
 	
-	@Override
 	public void getEntityHeader(String entityId, Long versionNumber, AsyncCallback<EntityHeader> callback) {
-		List<AsyncCallback<EntityHeader>> list = reference2Callback.get(entityId);
+		isUsingVersion = true;
+		getEntityHeaderShared(entityId, versionNumber, callback);
+	}
+	
+	private void getEntityHeaderShared(String entityId, Long versionNumber, AsyncCallback<EntityHeader> callback) {
+		Reference ref = new Reference();
+		ref.setTargetId(entityId);
+		ref.setTargetVersionNumber(versionNumber);
+		
+		List<AsyncCallback<EntityHeader>> list = reference2Callback.get(ref);
 		if (list == null) {
 			list = new ArrayList<AsyncCallback<EntityHeader>>();
-			Reference ref = new Reference();
-			ref.setTargetId(entityId);
-			ref.setTargetVersionNumber(versionNumber);
 			reference2Callback.put(ref, list);
 		}
 		list.add(callback);
 	}
-
 
 	public void executeRequests() {
 		if (!reference2Callback.isEmpty()) {
@@ -79,7 +83,11 @@ public class EntityHeaderAsyncHandlerImpl implements EntityHeaderAsyncHandler {
 					for (EntityHeader entityHeader : results) {
 						Reference ref = new Reference();
 						ref.setTargetId(entityHeader.getId());
-						ref.setTargetVersionNumber(entityHeader.getVersionNumber());
+						if (isUsingVersion) {
+							ref.setTargetVersionNumber(entityHeader.getVersionNumber());	
+						} else {
+							ref.setTargetVersionNumber(null);
+						}
 						List<AsyncCallback<EntityHeader>> callbacks = reference2CallbackCopy.remove(ref);
 						if (callbacks != null) {
 							for (AsyncCallback<EntityHeader> callback : callbacks) {

@@ -4,7 +4,9 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
+import org.sagebionetworks.web.client.widget.asynch.VersionedEntityHeaderAsyncHandler;
 import org.sagebionetworks.web.shared.table.CellAddress;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -14,6 +16,7 @@ public class EntityIdCellRenderer implements Cell, TakesAddressCell {
 
 	EntityIdCellRendererView view;
 	EntityHeaderAsyncHandler entityHeaderAsyncHandler;
+	VersionedEntityHeaderAsyncHandler versionedHeaderAsyncHandler;
 	SynapseJSNIUtils jsniUtils;
 	String entityId, entityName;
 	Long entityVersion = null;
@@ -22,9 +25,13 @@ public class EntityIdCellRenderer implements Cell, TakesAddressCell {
 	boolean hideIfLoadError;
 
 	@Inject
-	public EntityIdCellRenderer(EntityIdCellRendererView view, EntityHeaderAsyncHandler entityHeaderAsyncHandler, SynapseJSNIUtils jsniUtils) {
+	public EntityIdCellRenderer(EntityIdCellRendererView view, 
+			EntityHeaderAsyncHandler entityHeaderAsyncHandler,
+			VersionedEntityHeaderAsyncHandler versionedHeaderAsyncHandler,
+			SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.entityHeaderAsyncHandler = entityHeaderAsyncHandler;
+		this.versionedHeaderAsyncHandler = versionedHeaderAsyncHandler;
 		this.jsniUtils = jsniUtils;
 	}
 
@@ -34,7 +41,7 @@ public class EntityIdCellRenderer implements Cell, TakesAddressCell {
 			String requestEntityId = entityId.toLowerCase().startsWith("syn") ? entityId : "syn" + entityId;
 			if (address != null && address.getColumn().getName().equals("id")) {
 				// This Entity type column is named "id". 
-				// if the row matches the synapse ID, set the version based on the address row_version 
+				// if the row matches the synapse ID, set the version based on the cell address row_version 
 				if (requestEntityId.equals("syn" + address.getRowId())) {
 					entityVersion = address.getRowVersion();	
 				}
@@ -44,8 +51,7 @@ public class EntityIdCellRenderer implements Cell, TakesAddressCell {
 			if (customClickHandler != null) {
 				view.setClickHandler(customClickHandler);
 			}
-
-			entityHeaderAsyncHandler.getEntityHeader(requestEntityId, entityVersion, new AsyncCallback<EntityHeader>() {
+			AsyncCallback<EntityHeader> callback = new AsyncCallback<EntityHeader>() {
 				@Override
 				public void onSuccess(EntityHeader entity) {
 					entityName = entity.getName();
@@ -63,7 +69,12 @@ public class EntityIdCellRenderer implements Cell, TakesAddressCell {
 						view.showErrorIcon(caught.getMessage());
 					}
 				}
-			});
+			};
+			if (entityVersion != null) {
+				versionedHeaderAsyncHandler.getEntityHeader(requestEntityId, entityVersion, callback);	
+			} else {
+				entityHeaderAsyncHandler.getEntityHeader(requestEntityId, callback);	
+			}
 		}
 	}
 

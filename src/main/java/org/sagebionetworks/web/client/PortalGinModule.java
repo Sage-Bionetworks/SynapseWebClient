@@ -171,6 +171,7 @@ import org.sagebionetworks.web.client.widget.asynch.UserGroupHeaderFromAliasAsyn
 import org.sagebionetworks.web.client.widget.asynch.UserGroupHeaderFromAliasAsyncHandlerImpl;
 import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandlerImpl;
+import org.sagebionetworks.web.client.widget.asynch.VersionedEntityHeaderAsyncHandler;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidgetView;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditorView;
@@ -1298,6 +1299,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(LazyLoadWikiWidgetWrapperView.class).to(LazyLoadWikiWidgetWrapperViewImpl.class);
 
 		bind(EntityHeaderAsyncHandler.class).to(EntityHeaderAsyncHandlerImpl.class).in(Singleton.class);
+		bind(VersionedEntityHeaderAsyncHandler.class).to(EntityHeaderAsyncHandlerImpl.class).in(Singleton.class);
 
 		bind(GoogleMapView.class).to(GoogleMapViewImpl.class);
 
