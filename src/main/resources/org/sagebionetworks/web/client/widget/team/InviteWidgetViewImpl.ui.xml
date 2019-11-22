@@ -9,7 +9,7 @@
 		closable="true" dataBackdrop="STATIC" dataKeyboard="true">
 		<b:ModalBody>
 			<b:FormGroup>
-				<b:FormLabel>User Name or Email Address</b:FormLabel>
+				<b:FormLabel addStyleNames="user-name-or-email-address-label">User Name</b:FormLabel>
 				<g:SimplePanel ui:field="suggestBoxPanel" />
 			</b:FormGroup>
 			<bh:Div ui:field="inviteesContainer" />

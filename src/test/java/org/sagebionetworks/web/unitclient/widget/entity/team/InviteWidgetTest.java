@@ -134,14 +134,15 @@ public class InviteWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testSendInvitationFailure() throws Exception {
-		Exception caught = new Exception("unhandled exception");
+		String errorMessage = "unhandled exception";
+		Exception caught = new Exception(errorMessage);
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClient).isTeamMember(anyString(), anyLong(), any(AsyncCallback.class));
 		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).inviteMember(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(mockSuggestion);
 		when(mockSuggestion.getHeader()).thenReturn(mockHeader);
 		inviteWidget.doSendInvites("You are invited!");
 		verify(mockSynapseClient).inviteMember(eq(userId), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
-		verify(mockSynAlert).handleException(caught);
+		verify(mockSynAlert).showError(errorMessage);
 	}
 
 	@Test
