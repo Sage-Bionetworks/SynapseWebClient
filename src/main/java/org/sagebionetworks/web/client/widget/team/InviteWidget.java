@@ -66,7 +66,7 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
+				synAlert.showError(caught.getMessage());
 				refreshInvitees();
 			}
 		};
