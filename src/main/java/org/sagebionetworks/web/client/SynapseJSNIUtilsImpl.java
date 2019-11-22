@@ -375,14 +375,13 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 
 	private final static native void _getFileMd5(JavaScriptObject file, MD5Callback md5Callback) /*-{
 		if ($wnd.Worker) {
-			if (!$wnd.w) {
-			  $wnd.w = new $wnd.Worker("js/calculateFileMd5Worker.js");
-			}
-			$wnd.w.onmessage = function(event) {
-				md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback:: setMD5(Ljava/lang/String;) (event.data);
-				$wnd.w = undefined;
+			if (!$wnd.calculateFileMd5Worker) {
+			  $wnd.calculateFileMd5Worker = new $wnd.Worker("js/calculateFileMd5Worker.js");
 			};
-			$wnd.w.postMessage(file);
+			$wnd.calculateFileMd5Worker.onmessage = function(event) {
+				md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback:: setMD5(Ljava/lang/String;) (event.data);
+			};
+			$wnd.calculateFileMd5Worker.postMessage(file);
 	  } else {
 			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback:: setMD5(Ljava/lang/String;) (null);
   	}
@@ -397,29 +396,21 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 
 	private final static native void _getFilePartMd5(JavaScriptObject file, int currentChunk, double chunkSize, MD5Callback md5Callback) /*-{
-			var blobSlice = file.slice || file.mozSlice || file.webkitSlice;
-			spark = new $wnd.SparkMD5.ArrayBuffer();
-			$wnd.frOnload = function (e) {
-			  spark.append(e.target.result); // append array buffer
-			  // Call instance method setMD5() on md5Callback with the final md5
-			  md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback:: setMD5(Ljava/lang/String;) (spark.end());
+		if ($wnd.Worker) {
+			if (!$wnd.calculateFilePartMd5Worker) {
+			  $wnd.calculateFilePartMd5Worker = new $wnd.Worker("js/calculateFilePartMd5Worker.js");
 			};
-			$wnd.frOnerror = function () {
-			  console.warn("unable to calculate file part md5");
-			  md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback:: setMD5(Ljava/lang/String;) (null);
+			$wnd.calculateFilePartMd5Worker.onmessage = function(event) {
+				md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback:: setMD5(Ljava/lang/String;) (event.data);
 			};
-			
-			$wnd.loadPart = function () {
-			  var fileReader = new FileReader();
-			  fileReader.onload = $wnd.frOnload;
-			  fileReader.onerror = $wnd.frOnerror;
-			  var start = currentChunk * chunkSize,
-				end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
-			
-			  console.log("MD5 file part: loading chunk: start=", start, " end=", end);
-			  fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
-			};
-			$wnd.loadPart();
+			$wnd.calculateFilePartMd5Worker.postMessage({
+				file: file,
+				currentChunk: currentChunk,
+				chunkSize: chunkSize
+			});
+	  } else {
+			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback:: setMD5(Ljava/lang/String;) (null);
+  	}
 	}-*/;
 
 	@Override
