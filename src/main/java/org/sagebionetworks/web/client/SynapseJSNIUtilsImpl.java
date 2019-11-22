@@ -270,25 +270,25 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 
 	private final static native void _directUploadBlob(String contentType, JavaScriptObject fileToUpload, Long startByte, Long endByte, String url, XMLHttpRequest xhr) /*-{
-																																																																																			var start = parseInt(startByte) || 0;
-																																																																																			var end = parseInt(endByte) || fileToUpload.size - 1;
-																																																																																			var fileSliceToUpload;
-																																																																																			//in versions later than Firefox 13 and Chrome 21, Blob.slice() is not prefixed (and the vendor prefixed methods are deprecated)
-																																																																																			if (fileToUpload.slice) {
-																																																																																			fileSliceToUpload = fileToUpload.slice(start, end+1, contentType);
-																																																																																			}else if (fileToUpload.mozSlice) {
-																																																																																			fileSliceToUpload = fileToUpload.mozSlice(start, end+1, contentType);
-																																																																																			} else if (fileToUpload.webkitSlice) {
-																																																																																			fileSliceToUpload = fileToUpload.webkitSlice(start, end+1, contentType);
-																																																																																			} else {
-																																																																																			throw new Error("Unable to slice file.");
-																																																																																			}
-																																																																																			xhr.upload.onprogress = $entry(@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::updateProgress(Lcom/google/gwt/core/client/JavaScriptObject;));
-																																																																																			xhr.open('PUT', url, true);
-																																																																																			//explicitly set content type
-																																																																																			xhr.setRequestHeader('Content-type', contentType);
-																																																																																			xhr.send(fileSliceToUpload);
-																																																																																			}-*/;
+		var start = parseInt(startByte) || 0;
+		var end = parseInt(endByte) || fileToUpload.size - 1;
+		var fileSliceToUpload;
+		//in versions later than Firefox 13 and Chrome 21, Blob.slice() is not prefixed (and the vendor prefixed methods are deprecated)
+		if (fileToUpload.slice) {
+			fileSliceToUpload = fileToUpload.slice(start, end + 1, contentType);
+		} else if (fileToUpload.mozSlice) {
+			fileSliceToUpload = fileToUpload.mozSlice(start, end + 1, contentType);
+		} else if (fileToUpload.webkitSlice) {
+			fileSliceToUpload = fileToUpload.webkitSlice(start, end + 1, contentType);
+		} else {
+			throw new Error("Unable to slice file.");
+		}
+		xhr.upload.onprogress = $entry(@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl:: updateProgress(Lcom / google / gwt / core / client / JavaScriptObject;));
+		xhr.open('PUT', url, true);
+		//explicitly set content type
+		xhr.setRequestHeader('Content-type', contentType);
+		xhr.send(fileSliceToUpload);
+	}-*/;
 
 
 	public static void updateProgress(JavaScriptObject evt) {
@@ -376,7 +376,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private final static native void _getFileMd5(JavaScriptObject file, MD5Callback md5Callback) /*-{
 		if ($wnd.Worker) {
 			if (!$wnd.calculateFileMd5Worker) {
-			  $wnd.calculateFileMd5Worker = new $wnd.Worker("js/calculateFileMd5Worker.js");
+			  $wnd.calculateFileMd5Worker = new $wnd.Worker("workers/calculateFileMd5Worker.js");
 			};
 			$wnd.calculateFileMd5Worker.onmessage = function(event) {
 				md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback:: setMD5(Ljava/lang/String;) (event.data);
@@ -398,7 +398,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private final static native void _getFilePartMd5(JavaScriptObject file, int currentChunk, double chunkSize, MD5Callback md5Callback) /*-{
 		if ($wnd.Worker) {
 			if (!$wnd.calculateFilePartMd5Worker) {
-			  $wnd.calculateFilePartMd5Worker = new $wnd.Worker("js/calculateFilePartMd5Worker.js");
+			  $wnd.calculateFilePartMd5Worker = new $wnd.Worker("workers/calculateFilePartMd5Worker.js");
 			};
 			$wnd.calculateFilePartMd5Worker.onmessage = function(event) {
 				md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback:: setMD5(Ljava/lang/String;) (event.data);
