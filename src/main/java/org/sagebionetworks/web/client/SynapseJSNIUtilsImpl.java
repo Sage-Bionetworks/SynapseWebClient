@@ -283,7 +283,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		} else {
 			throw new Error("Unable to slice file.");
 		}
-		xhr.upload.onprogress = $entry(@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl:: updateProgress(Lcom / google / gwt / core / client / JavaScriptObject;));
+		xhr.upload.onprogress = $entry(@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::updateProgress(Lcom/google/gwt/core/client/JavaScriptObject;));
 		xhr.open('PUT', url, true);
 		//explicitly set content type
 		xhr.setRequestHeader('Content-type', contentType);
@@ -379,11 +379,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 			  $wnd.calculateFileMd5Worker = new $wnd.Worker("workers/calculateFileMd5Worker.js");
 			};
 			$wnd.calculateFileMd5Worker.onmessage = function(event) {
-				md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback:: setMD5(Ljava/lang/String;) (event.data);
+				md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(event.data);
 			};
 			$wnd.calculateFileMd5Worker.postMessage(file);
 	  } else {
-			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback:: setMD5(Ljava/lang/String;) (null);
+			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(null);
   	}
 	}-*/;
 
