@@ -4,7 +4,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,14 +15,13 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.asynch.BaseEntityHeaderAsyncHandlerImpl;
-import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandlerImpl;
+import org.sagebionetworks.web.client.widget.asynch.VersionedEntityHeaderAsyncHandlerImpl;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-public class EntityHeaderAsyncHandlerImplTest {
-	EntityHeaderAsyncHandlerImpl entityHeaderAsyncHandler;
+public class VersionedEntityHeaderAsyncHandlerImplTest {
+	VersionedEntityHeaderAsyncHandlerImpl entityHeaderAsyncHandler;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
@@ -39,7 +37,7 @@ public class EntityHeaderAsyncHandlerImplTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		entityHeaderAsyncHandler = new EntityHeaderAsyncHandlerImpl(mockSynapseJavascriptClient, mockGwt);
+		entityHeaderAsyncHandler = new VersionedEntityHeaderAsyncHandlerImpl(mockSynapseJavascriptClient, mockGwt);
 		entityHeaderList = new ArrayList<EntityHeader>();
 		AsyncMockStubber.callSuccessWith(entityHeaderList).when(mockSynapseJavascriptClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
 		when(mockEntityHeader.getId()).thenReturn(entityId);
@@ -49,43 +47,27 @@ public class EntityHeaderAsyncHandlerImplTest {
 	public void testConstructor() {
 		verify(mockGwt).scheduleFixedDelay(any(Callback.class), anyInt());
 	}
-
+	
 	@Test
-	public void testSuccess() {
-		// verify no rpc if no entity headers have been requested.
-		entityHeaderAsyncHandler.executeRequests();
-		verifyZeroInteractions(mockSynapseJavascriptClient);
-
-		// add one, simulate single entity header response
-		entityHeaderAsyncHandler.getEntityHeader(entityId, mockCallback);
+	public void testVersionedSuccess() {
+		entityHeaderAsyncHandler.getEntityHeader(entityId, entityVersion, mockCallback);
+		when(mockEntityHeader.getVersionNumber()).thenReturn(entityVersion);
 		entityHeaderList.add(mockEntityHeader);
-
+		
 		entityHeaderAsyncHandler.executeRequests();
 		verify(mockSynapseJavascriptClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
 		verify(mockCallback).onSuccess(mockEntityHeader);
 	}
-	
-	@Test
-	public void testFailure() {
-		// simulate exception response
-		Exception ex = new Exception("problem loading batch of entity headers");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
-		entityHeaderAsyncHandler.getEntityHeader(entityId, mockCallback);
-		entityHeaderAsyncHandler.executeRequests();
-
-		verify(mockCallback).onFailure(ex);
-	}
 
 	@Test
-	public void testNotFound() {
-		when(mockEntityHeader.getId()).thenReturn("another entity id");
-		// add one, simulate single entity header response
-		entityHeaderAsyncHandler.getEntityHeader(entityId, mockCallback);
+	public void testVersionedNotFound() {
+		entityHeaderAsyncHandler.getEntityHeader(entityId, entityVersion, mockCallback);
+		// different version
+		when(mockEntityHeader.getVersionNumber()).thenReturn(entityVersion + 1);
 		entityHeaderList.add(mockEntityHeader);
-
+		
 		entityHeaderAsyncHandler.executeRequests();
 		verify(mockSynapseJavascriptClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
-		verify(mockCallback).onFailure(any(Throwable.class));
+		verify(mockCallback).onFailure(any(NotFoundException.class));
 	}
-
 }
