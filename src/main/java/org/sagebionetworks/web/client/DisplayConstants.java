@@ -140,7 +140,6 @@ public class DisplayConstants {
 
 	public static final String PROVENANCE_BASIC_HELP = "Provenance tracks the relationship between data, code and analytical results.";
 	public static final String ERROR_NO_LINK_DEFINED = "Warning: No target reference is defined for this link.";
-	public static final String DATA_USE = "Conditions For Use";
 	public static final String MEMBERS = "Members";
 	public static final String PENDING_TEAM_INVITATIONS = "Pending Team Invitations";
 	public static final String PENDING_JOIN_REQUESTS_TOOLTIP = "Team has a pending join request";

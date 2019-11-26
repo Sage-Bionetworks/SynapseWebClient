@@ -178,7 +178,7 @@ public class PortalServletModule extends ServletModule {
 		Class<? extends PlaceTokenizer<?>>[] placeClasses = AppPlaceHistoryMapper.class.getAnnotation(WithTokenizers.class).value();
 		for (Class<? extends PlaceTokenizer<?>> c : placeClasses) {
 			String simpleName = c.getEnclosingClass().getSimpleName();
-			String filterRegEx = "/" + simpleName + ":*";
+			String filterRegEx = "/+([#][!])?" + simpleName + ":*";
 			filter(filterRegEx).through(PlacesRedirectFilter.class);
 		}
 	}

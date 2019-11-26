@@ -89,7 +89,6 @@ public class EntityMetadataTest {
 		verify(mockView, never()).setVersionHistoryWidget(any(IsWidget.class)); // lazily created
 		verify(mockView).setRestrictionWidgetV2(any(IsWidget.class));
 		verify(mockRestrictionWidgetV2).setShowChangeLink(true);
-		verify(mockRestrictionWidgetV2).setShowIfProject(false);
 		verify(mockRestrictionWidgetV2).setShowFlagLink(true);
 		verify(mockView).setRestrictionWidgetV2Visible(true);
 	}
