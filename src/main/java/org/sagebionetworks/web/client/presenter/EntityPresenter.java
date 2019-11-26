@@ -2,7 +2,9 @@ package org.sagebionetworks.web.client.presenter;
 
 
 import java.util.List;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
@@ -35,7 +37,6 @@ import com.google.web.bindery.event.shared.binder.EventHandler;
 
 public class EntityPresenter extends AbstractActivity implements EntityView.Presenter, Presenter<Synapse>, IsWidget {
 
-	private Synapse place;
 	private EntityView view;
 	private AuthenticationController authenticationController;
 	private StuAlert synAlert;
@@ -75,7 +76,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 
 	@Override
 	public void setPlace(Synapse place) {
-		this.place = place;
 		this.entityId = place.getEntityId();
 		this.versionNumber = place.getVersionNumber();
 		this.area = place.getArea();
@@ -122,6 +122,52 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		view.setSynAlertWidget(synAlert.asWidget());
 		// Hide the view panel contents until async callback completes
 		view.setLoadingVisible(true);
+		checkEntityIdAndVersion();
+	}
+
+	/**
+	 * First step of loading the page.  Check for a valid entity ID, and check it's version.
+	 * If this is a File and the version number specified is the latest,
+	 * then clear the version to allow user to operate on the current FileEntity.
+	 */
+	public void checkEntityIdAndVersion() {
+		// before anything else, figure out the latest version to determine if it should be nulled out here (so user can operate on the latest version of the entity)
+		if (isValidEntityId(entityId)) {
+			if (versionNumber == null) {
+				// version is already null, continue loading...
+				getEntityBundleAndLoadPageTop();
+			} else {
+				jsClient.getEntity(entityId, new AsyncCallback<Entity>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						onError(caught);
+					}
+					@Override
+					public void onSuccess(Entity entity) {
+						if (entity instanceof FileEntity) {
+							if (versionNumber.equals(((FileEntity)entity).getVersionNumber())) {
+								// we've been asked to load the current file version
+								versionNumber = null;	
+							}
+						}
+						// continue loading...
+						getEntityBundleAndLoadPageTop();
+					}
+				});
+				
+			}
+		} else {
+			// invalid entity detected, indicate that the page was not found
+			gwt.scheduleDeferred(new Callback() {
+				@Override
+				public void invoke() {
+					onError(new NotFoundException());
+				}
+			});
+		}
+	}
+	
+	public void getEntityBundleAndLoadPageTop() {
 		final AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
@@ -155,36 +201,30 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setLoadingVisible(false);
-				headerWidget.configure();
-				if (caught instanceof NotFoundException) {
-					show404();
-				} else if (caught instanceof ForbiddenException && authenticationController.isLoggedIn()) {
-					show403();
-				} else {
-					view.clear();
-					synAlert.handleException(caught);
-				}
+				onError(caught);
 			}
 		};
 
-		if (isValidEntityId(entityId)) {
-			if (versionNumber == null) {
-				jsClient.getEntityBundle(entityId, EntityPageTop.ALL_PARTS_REQUEST, callback);
-			} else {
-				jsClient.getEntityBundleForVersion(entityId, versionNumber, EntityPageTop.ALL_PARTS_REQUEST, callback);
-			}
+		if (versionNumber == null) {
+			jsClient.getEntityBundle(entityId, EntityPageTop.ALL_PARTS_REQUEST, callback);
 		} else {
-			// invalid entity detected, indicate that the page was not found
-			gwt.scheduleDeferred(new Callback() {
-				@Override
-				public void invoke() {
-					callback.onFailure(new NotFoundException());
-				}
-			});
+			jsClient.getEntityBundleForVersion(entityId, versionNumber, EntityPageTop.ALL_PARTS_REQUEST, callback);
 		}
 	}
-
+	
+	public void onError(Throwable caught) {
+		view.setLoadingVisible(false);
+		headerWidget.configure();
+		if (caught instanceof NotFoundException) {
+			show404();
+		} else if (caught instanceof ForbiddenException && authenticationController.isLoggedIn()) {
+			show403();
+		} else {
+			view.clear();
+			synAlert.handleException(caught);
+		}
+	}
+	
 	public void show403() {
 		if (entityId != null) {
 			synAlert.show403(entityId);

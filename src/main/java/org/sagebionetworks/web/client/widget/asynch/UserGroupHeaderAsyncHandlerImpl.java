@@ -28,7 +28,7 @@ public class UserGroupHeaderAsyncHandlerImpl extends AsyncHandlerImpl implements
 	}
 
 	@Override
-	public void doCall(List<String> ids, final AsyncCallback<List> callback) {
+	public void doCall(List ids, final AsyncCallback<List> callback) {
 		jsClient.getUserGroupHeadersById(ids, new AsyncCallback<UserGroupHeaderResponsePage>() {
 			@Override
 			public void onFailure(Throwable caught) {
