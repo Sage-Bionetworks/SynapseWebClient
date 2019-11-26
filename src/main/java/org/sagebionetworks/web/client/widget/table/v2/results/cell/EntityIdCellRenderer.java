@@ -6,7 +6,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.VersionedEntityHeaderAsyncHandler;
 import org.sagebionetworks.web.shared.table.CellAddress;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -32,7 +31,6 @@ public class EntityIdCellRenderer implements Cell, TakesAddressCell {
 		this.view = view;
 		this.entityHeaderAsyncHandler = entityHeaderAsyncHandler;
 		this.versionedHeaderAsyncHandler = versionedHeaderAsyncHandler;
-		GWT.debugger();
 		this.jsniUtils = jsniUtils;
 	}
 
