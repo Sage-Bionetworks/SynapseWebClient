@@ -1,12 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.restriction.v2;
 
 import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -27,7 +26,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	Span linkUI;
 
 	@UiField
-	Button changeLink;
+	Anchor changeLink;
 	
 	@UiField
 	Span flagUI;
@@ -50,14 +49,16 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	Widget widget;
 	RestrictionWidgetModalsViewImpl modals;
 	AuthenticationController authController;
+	SynapseJSNIUtils jsniUtils;
 	@Inject
 	public RestrictionWidgetViewImpl(Binder binder,
 			RestrictionWidgetModalsViewImpl modals,
-			PortalGinInjector ginInjector,
+			SynapseJSNIUtils jsniUtils,
 			AuthenticationController authController) {
 		this.widget = binder.createAndBindUi(this);
 		this.modals = modals;
 		this.authController = authController;
+		this.jsniUtils = jsniUtils;
 		modalsContainer.add(modals);
 
 		changeLink.addClickHandler(event -> {
@@ -69,10 +70,14 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		widget.addAttachHandler(event -> {
 			if (!event.isAttached()) {
 				// detach event, clean up react component
-				ginInjector.getSynapseJSNIUtils().unmountComponentAtNode(hasAccessContainer.getElement());
+				cleanupOldReactComponent();
 			}
 		});
-
+	}
+	
+	private void cleanupOldReactComponent() {
+		// detach event, clean up react component
+		jsniUtils.unmountComponentAtNode(hasAccessContainer.getElement());
 	}
 
 	@Override
@@ -179,6 +184,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	@Override
 	public void setEntityId(String entityId) {
 		String sessionToken = authController.getCurrentUserSessionToken();
+		cleanupOldReactComponent();
 		_showHasAccess(hasAccessContainer.getElement(), entityId, sessionToken);
 	}
 	private static native void _showHasAccess(Element el, String entityId, String sessionToken) /*-{

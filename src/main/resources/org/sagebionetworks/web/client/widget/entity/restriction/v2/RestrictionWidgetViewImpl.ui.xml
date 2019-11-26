@@ -10,7 +10,9 @@
  	<bh:Span addStyleNames="restrictionWidget">
  		<bh:Span ui:field="hasAccessContainer"/>
 		<bh:Span ui:field="linkUI">
-			<b:Button addStyleNames="moveup-1" ui:field="changeLink" type="LINK" size="EXTRA_SMALL" text="(Change)"/>
+			<b:Tooltip placement="BOTTOM" title="Click here to add conditions for use of this content">
+				<b:Anchor ui:field="changeLink" text="(Change)" />
+			</b:Tooltip>
 		</bh:Span>
 		
 		<bh:Span ui:field="flagUI">
