@@ -5,7 +5,9 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -27,7 +29,8 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 
 	@UiField
 	Anchor changeLink;
-	
+	@UiField
+	Anchor signInLink;
 	@UiField
 	Span flagUI;
 	@UiField
@@ -54,7 +57,8 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	public RestrictionWidgetViewImpl(Binder binder,
 			RestrictionWidgetModalsViewImpl modals,
 			SynapseJSNIUtils jsniUtils,
-			AuthenticationController authController) {
+			AuthenticationController authController,
+			GlobalApplicationState globalAppState) {
 		this.widget = binder.createAndBindUi(this);
 		this.modals = modals;
 		this.authController = authController;
@@ -67,6 +71,9 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		reportIssueLink.addClickHandler(event -> {
 			presenter.reportIssueClicked();
 		});
+		signInLink.addClickHandler(event -> {
+			globalAppState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+		});
 		widget.addAttachHandler(event -> {
 			if (!event.isAttached()) {
 				// detach event, clean up react component
@@ -78,6 +85,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	private void cleanupOldReactComponent() {
 		// detach event, clean up react component
 		jsniUtils.unmountComponentAtNode(hasAccessContainer.getElement());
+		hasAccessContainer.clear();
 	}
 
 	@Override
@@ -183,9 +191,12 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	
 	@Override
 	public void setEntityId(String entityId) {
-		String sessionToken = authController.getCurrentUserSessionToken();
 		cleanupOldReactComponent();
-		_showHasAccess(hasAccessContainer.getElement(), entityId, sessionToken);
+		if (authController.isLoggedIn()) {
+			String sessionToken = authController.getCurrentUserSessionToken();
+			_showHasAccess(hasAccessContainer.getElement(), entityId, sessionToken);
+		}
+		signInLink.setVisible(!authController.isLoggedIn());
 	}
 	private static native void _showHasAccess(Element el, String entityId, String sessionToken) /*-{
 		try {
