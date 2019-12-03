@@ -51,4 +51,7 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 
 		void notHumanDataClicked();
 	}
+
+
+	void showAnonymousUI();
 }

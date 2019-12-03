@@ -71,7 +71,13 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		this.entity = entity;
 		this.canChangePermissions = canChangePermissions;
 		loadRestrictionInformation();
-		view.setEntityId(entity.getId());
+		// TODO: when "tier 0" is supported, 
+		// remove view.showAnonymousUI() and always configure with entity ID (backend getRestrictionInformation() should no longer fail)
+		if (authenticationController.isLoggedIn()) {
+			view.setEntityId(entity.getId());	
+		} else {
+			view.showAnonymousUI();
+		}
 	}
 
 	public void setShowChangeLink(boolean showChangeLink) {

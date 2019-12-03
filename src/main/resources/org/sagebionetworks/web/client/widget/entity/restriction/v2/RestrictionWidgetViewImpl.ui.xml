@@ -12,7 +12,7 @@
  		<b:Anchor ui:field="signInLink" text="Sign in" visible="false"/>
 		<bh:Span ui:field="linkUI">
 			<b:Tooltip placement="BOTTOM" title="Click here to add conditions for use">
-				<b:Anchor ui:field="changeLink" text="(Change)" />
+				<b:Anchor ui:field="changeLink" text="Add Conditions for Use" />
 			</b:Tooltip>
 		</bh:Span>
 		

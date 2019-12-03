@@ -192,11 +192,17 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	@Override
 	public void setEntityId(String entityId) {
 		cleanupOldReactComponent();
+		String sessionToken = null;
 		if (authController.isLoggedIn()) {
-			String sessionToken = authController.getCurrentUserSessionToken();
-			_showHasAccess(hasAccessContainer.getElement(), entityId, sessionToken);
+			sessionToken = authController.getCurrentUserSessionToken();
 		}
-		signInLink.setVisible(!authController.isLoggedIn());
+		_showHasAccess(hasAccessContainer.getElement(), entityId, sessionToken);
+		signInLink.setVisible(false);
+	}
+	@Override
+	public void showAnonymousUI() {
+		cleanupOldReactComponent();
+		signInLink.setVisible(true);
 	}
 	private static native void _showHasAccess(Element el, String entityId, String sessionToken) /*-{
 		try {
