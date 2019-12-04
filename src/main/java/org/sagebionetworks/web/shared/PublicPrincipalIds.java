@@ -3,14 +3,12 @@ package org.sagebionetworks.web.shared;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 
-public class PublicPrincipalIds implements IsSerializable{
+public class PublicPrincipalIds implements IsSerializable {
 	private Long publicAclPrincipalId, authenticatedAclPrincipalId, anonymousUserId;
 
-	public PublicPrincipalIds() {
-	}
-	
-	public PublicPrincipalIds(Long publicAclPrincipalId,
-			Long authenticatedAclPrincipalId, Long anonymousUserId) {
+	public PublicPrincipalIds() {}
+
+	public PublicPrincipalIds(Long publicAclPrincipalId, Long authenticatedAclPrincipalId, Long anonymousUserId) {
 		super();
 		this.publicAclPrincipalId = publicAclPrincipalId;
 		this.authenticatedAclPrincipalId = authenticatedAclPrincipalId;
@@ -21,15 +19,15 @@ public class PublicPrincipalIds implements IsSerializable{
 	public Long getAuthenticatedAclPrincipalId() {
 		return authenticatedAclPrincipalId;
 	}
-	
+
 	public void setAuthenticatedAclPrincipalId(Long authenticatedAclPrincipalId) {
 		this.authenticatedAclPrincipalId = authenticatedAclPrincipalId;
 	}
-	
+
 	public Long getPublicAclPrincipalId() {
 		return publicAclPrincipalId;
 	}
-	
+
 	public void setPublicAclPrincipalId(Long publicAclPrincipalId) {
 		this.publicAclPrincipalId = publicAclPrincipalId;
 	}
@@ -37,13 +35,14 @@ public class PublicPrincipalIds implements IsSerializable{
 	public Long getAnonymousUserPrincipalId() {
 		return anonymousUserId;
 	}
-	
+
 	public void setAnonymousUserId(Long anonymousUserId) {
 		this.anonymousUserId = anonymousUserId;
 	}
-	
+
 	public boolean isPublic(Long principalId) {
-		if (principalId == null) return false;
+		if (principalId == null)
+			return false;
 		return principalId.equals(getPublicAclPrincipalId()) || principalId.equals(getAuthenticatedAclPrincipalId()) || principalId.equals(getAnonymousUserPrincipalId());
 	}
 
@@ -51,16 +50,9 @@ public class PublicPrincipalIds implements IsSerializable{
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((anonymousUserId == null) ? 0 : anonymousUserId.hashCode());
-		result = prime
-				* result
-				+ ((authenticatedAclPrincipalId == null) ? 0
-						: authenticatedAclPrincipalId.hashCode());
-		result = prime
-				* result
-				+ ((publicAclPrincipalId == null) ? 0 : publicAclPrincipalId
-						.hashCode());
+		result = prime * result + ((anonymousUserId == null) ? 0 : anonymousUserId.hashCode());
+		result = prime * result + ((authenticatedAclPrincipalId == null) ? 0 : authenticatedAclPrincipalId.hashCode());
+		result = prime * result + ((publicAclPrincipalId == null) ? 0 : publicAclPrincipalId.hashCode());
 		return result;
 	}
 
@@ -81,8 +73,7 @@ public class PublicPrincipalIds implements IsSerializable{
 		if (authenticatedAclPrincipalId == null) {
 			if (other.authenticatedAclPrincipalId != null)
 				return false;
-		} else if (!authenticatedAclPrincipalId
-				.equals(other.authenticatedAclPrincipalId))
+		} else if (!authenticatedAclPrincipalId.equals(other.authenticatedAclPrincipalId))
 			return false;
 		if (publicAclPrincipalId == null) {
 			if (other.publicAclPrincipalId != null)
@@ -94,10 +85,7 @@ public class PublicPrincipalIds implements IsSerializable{
 
 	@Override
 	public String toString() {
-		return "PublicPrincipalIds [publicAclPrincipalId="
-				+ publicAclPrincipalId + ", authenticatedAclPrincipalId="
-				+ authenticatedAclPrincipalId + ", anonymousUserId="
-				+ anonymousUserId + "]";
+		return "PublicPrincipalIds [publicAclPrincipalId=" + publicAclPrincipalId + ", authenticatedAclPrincipalId=" + authenticatedAclPrincipalId + ", anonymousUserId=" + anonymousUserId + "]";
 	}
-	
+
 }

@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.upload;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import java.util.Arrays;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -18,25 +19,25 @@ import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewWid
 
 
 public class UploadPreviewWidgetImplTest {
-	
+
 	UploadPreviewView mockView;
 	UploadPreviewWidgetImpl widget;
-	
+
 	@Before
-	public void before(){
+	public void before() {
 		mockView = Mockito.mock(UploadPreviewView.class);
 		widget = new UploadPreviewWidgetImpl(mockView);
 	}
-	
+
 	@Test
-	public void testTruncateString(){
+	public void testTruncateString() {
 		assertEquals(null, UploadPreviewWidgetImpl.truncateValues(null));
 		assertEquals("small", UploadPreviewWidgetImpl.truncateValues("small"));
 		assertEquals("not so sm...", UploadPreviewWidgetImpl.truncateValues("not so small"));
 	}
-	
+
 	@Test
-	public void testConfigureNullPreivew(){
+	public void testConfigureNullPreivew() {
 		UploadToTablePreviewResult preview = null;
 		widget.configure(preview);
 		verify(mockView).setPreviewMessage("");
@@ -45,9 +46,9 @@ public class UploadPreviewWidgetImplTest {
 		verify(mockView, never()).setHeaders(any(List.class));
 		verify(mockView, never()).addRow(any(List.class));
 	}
-	
+
 	@Test
-	public void testConfigureNullColumnName(){
+	public void testConfigureNullColumnName() {
 		ColumnModel cm = new ColumnModel();
 		cm.setName(null);
 		cm.setColumnType(ColumnType.STRING);
@@ -56,13 +57,13 @@ public class UploadPreviewWidgetImplTest {
 		preview.setSuggestedColumns(Arrays.asList(cm));
 		preview.setSampleRows(null);
 		widget.configure(preview);
-		verify(mockView).setPreviewMessage(UploadPreviewWidgetImpl.PREVIEW_MESSAGE_PREFIX+preview.getRowsScanned()+UploadPreviewWidgetImpl.PREVIEW_MESSAGE_SUFFIX);
+		verify(mockView).setPreviewMessage(UploadPreviewWidgetImpl.PREVIEW_MESSAGE_PREFIX + preview.getRowsScanned() + UploadPreviewWidgetImpl.PREVIEW_MESSAGE_SUFFIX);
 		verify(mockView).setHeaders(Arrays.asList("BLANK (STRING)"));
 		verify(mockView, never()).addRow(any(List.class));
 	}
-	
+
 	@Test
-	public void testConfigureWithColumnName(){
+	public void testConfigureWithColumnName() {
 		ColumnModel cm = new ColumnModel();
 		cm.setName("Some Column");
 		cm.setColumnType(ColumnType.BOOLEAN);
@@ -71,13 +72,13 @@ public class UploadPreviewWidgetImplTest {
 		preview.setSuggestedColumns(Arrays.asList(cm));
 		preview.setSampleRows(null);
 		widget.configure(preview);
-		verify(mockView).setPreviewMessage(UploadPreviewWidgetImpl.PREVIEW_MESSAGE_PREFIX+preview.getRowsScanned()+UploadPreviewWidgetImpl.PREVIEW_MESSAGE_SUFFIX);
+		verify(mockView).setPreviewMessage(UploadPreviewWidgetImpl.PREVIEW_MESSAGE_PREFIX + preview.getRowsScanned() + UploadPreviewWidgetImpl.PREVIEW_MESSAGE_SUFFIX);
 		verify(mockView).setHeaders(Arrays.asList("Some Column (BOOLEAN)"));
 		verify(mockView, never()).addRow(any(List.class));
 	}
-	
+
 	@Test
-	public void testConfigureNullNoValues(){
+	public void testConfigureNullNoValues() {
 		ColumnModel cm = new ColumnModel();
 		cm.setName("Some Column");
 		cm.setColumnType(ColumnType.BOOLEAN);
@@ -90,9 +91,9 @@ public class UploadPreviewWidgetImplTest {
 		verify(mockView).setEmptyMessageVisible(true);
 		verify(mockView, never()).addRow(any(List.class));
 	}
-	
+
 	@Test
-	public void testConfigureNullEmptyRow(){
+	public void testConfigureNullEmptyRow() {
 		ColumnModel cm = new ColumnModel();
 		cm.setName("Some Column");
 		cm.setColumnType(ColumnType.BOOLEAN);
@@ -107,9 +108,9 @@ public class UploadPreviewWidgetImplTest {
 		verify(mockView).setEmptyMessageVisible(true);
 		verify(mockView, never()).addRow(any(List.class));
 	}
-	
+
 	@Test
-	public void testConfigureWithSchemaAndRow(){
+	public void testConfigureWithSchemaAndRow() {
 		ColumnModel cm = new ColumnModel();
 		cm.setName("Some Column");
 		cm.setColumnType(ColumnType.BOOLEAN);

@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
@@ -13,7 +12,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -33,12 +31,9 @@ public class ConvertACTAccessRequirementButton implements IsWidget, ClickHandler
 	PopupUtilsView popupUtils;
 	DataAccessClientAsync dataAccessClient;
 	Callback refreshCallback;
-	
+
 	@Inject
-	public ConvertACTAccessRequirementButton(Button button, 
-			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
-			PopupUtilsView popupUtilsView,
-			DataAccessClientAsync dataAccessClient) {
+	public ConvertACTAccessRequirementButton(Button button, IsACTMemberAsyncHandler isACTMemberAsyncHandler, PopupUtilsView popupUtilsView, DataAccessClientAsync dataAccessClient) {
 		this.button = button;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.popupUtils = popupUtilsView;
@@ -50,14 +45,14 @@ public class ConvertACTAccessRequirementButton implements IsWidget, ClickHandler
 		button.setIcon(IconType.HAND_SPOCK_O);
 		button.setText(CONVERT_TO_MANAGED);
 		button.addClickHandler(this);
-	}	
-	
+	}
+
 	public void configure(ACTAccessRequirement ar, Callback refreshCallback) {
 		this.ar = ar;
 		this.refreshCallback = refreshCallback;
-		showIfACTMember();	
+		showIfACTMember();
 	}
-	
+
 	private void showIfACTMember() {
 		isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
 			@Override
@@ -66,15 +61,14 @@ public class ConvertACTAccessRequirementButton implements IsWidget, ClickHandler
 			}
 		});
 	}
-	
+
 	@Override
 	public void onClick(ClickEvent event) {
 		if (ar.getActContactInfo() != null && ar.getActContactInfo().trim().length() > 0) {
-			popupUtils.showErrorMessage(DELETE_OLD_INSTRUCTIONS_MESSAGE);			
+			popupUtils.showErrorMessage(DELETE_OLD_INSTRUCTIONS_MESSAGE);
 		} else {
 			// confirm
-			popupUtils.showConfirmDialog(CONVERT_AR_CONFIRM_TITLE, CONVERT_AR_CONFIRM_MESSAGE, 
-					new Callback() {
+			popupUtils.showConfirmDialog(CONVERT_AR_CONFIRM_TITLE, CONVERT_AR_CONFIRM_MESSAGE, new Callback() {
 				@Override
 				public void invoke() {
 					// confirmed
@@ -83,29 +77,29 @@ public class ConvertACTAccessRequirementButton implements IsWidget, ClickHandler
 			});
 		}
 	}
-	
+
 	public void convertAccessRequirement() {
 		AccessRequirementConversionRequest request = new AccessRequirementConversionRequest();
 		request.setAccessRequirementId(ar.getId().toString());
 		request.setCurrentVersion(ar.getVersionNumber());
 		request.setEtag(ar.getEtag());
 		dataAccessClient.convertAccessRequirement(request, new AsyncCallback<AccessRequirement>() {
-			
+
 			@Override
 			public void onSuccess(AccessRequirement result) {
 				popupUtils.showInfo(SUCCESS_MESSAGE);
 				refreshCallback.invoke();
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				popupUtils.showErrorMessage(caught.getMessage());
 			}
 		});
 	}
-	
+
 	public Widget asWidget() {
 		return button.asWidget();
 	}
-	
+
 }

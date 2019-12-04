@@ -12,13 +12,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,7 +59,6 @@ import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -113,6 +110,7 @@ public class EntityBadgeTest {
 	@Mock
 	AuthenticationController mockAuthController;
 	Set<ResourceAccess> resourceAccessSet;
+
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -127,14 +125,8 @@ public class EntityBadgeTest {
 		mockBenefactorAcl = mock(AccessControlList.class);
 		when(mockBenefactorAcl.getId()).thenReturn("not the current entity id");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer,
-				mockSynapseJavascriptClient,
-				mockLazyLoadHelper,
-				mockPopupUtils, mockSynapseProperties, 
-				mockEventBus,
-				mockAuthController,
-				mockSynapseJSNIUtils);
-		
+		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer, mockSynapseJavascriptClient, mockLazyLoadHelper, mockPopupUtils, mockSynapseProperties, mockEventBus, mockAuthController, mockSynapseJSNIUtils);
+
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockSynapseProperties.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
 		rootWikiKeyId = "123";
@@ -149,7 +141,7 @@ public class EntityBadgeTest {
 		when(mockAnnotations.getAnnotations()).thenReturn(annotationsMap);
 		when(mockTransformer.getFriendlyValues(any(AnnotationsValue.class))).thenReturn(TRANSFORMED_FRIENDLY_VALUE);
 	}
-	
+
 	private EntityBundle setupEntity(Entity entity) {
 		EntityBundle bundle = mock(EntityBundle.class);
 		when(bundle.getEntity()).thenReturn(entity);
@@ -160,10 +152,10 @@ public class EntityBadgeTest {
 		when(bundle.getThreadCount()).thenReturn(entityThreadCount);
 		when(bundle.getFileHandles()).thenReturn(Collections.singletonList(mockDataFileHandle));
 		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
-		
+
 		return bundle;
 	}
-	
+
 	private EntityHeader configure() {
 		EntityHeader header = new EntityHeader();
 		header.setId(entityId);
@@ -171,7 +163,7 @@ public class EntityBadgeTest {
 		widget.configure(header);
 		return header;
 	}
-	
+
 	@Test
 	public void testConfigure() throws Exception {
 		EntityHeader header = configure();
@@ -179,11 +171,11 @@ public class EntityBadgeTest {
 	}
 
 	/**
-	 * This tests the standard case when the badge is outside the viewport and scrolled into view.  
+	 * This tests the standard case when the badge is outside the viewport and scrolled into view.
 	 */
 	@Test
 	public void testCheckForInViewAndLoadData() {
-		//set up entity
+		// set up entity
 		when(mockPublicPrincipalIds.isPublic(anyLong())).thenReturn(true);
 		String entityId = "syn12345";
 		Project testProject = new Project();
@@ -191,24 +183,24 @@ public class EntityBadgeTest {
 		entityThreadCount = 0L;
 		setupEntity(testProject);
 		setupAnnotations();
-		
-		//configure
+
+		// configure
 		configure();
-		
+
 		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
 		verify(mockLazyLoadHelper).configure(captor.capture(), eq(mockView));
 		captor.getValue().invoke();
-		
+
 		verify(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
 		verify(mockView).showPublicIcon();
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).showHasWikiIcon();
 		verify(mockView, never()).showAddToDownloadList();
 	}
-	
+
 	@Test
 	public void testGetFileEntityBundle() {
-		//verify download button is configured and shown
+		// verify download button is configured and shown
 		String entityId = "syn12345";
 		FileEntity testFile = new FileEntity();
 		testFile.setId(entityId);
@@ -217,10 +209,10 @@ public class EntityBadgeTest {
 		entityThreadCount = 1L;
 		setupEntity(testFile);
 		setupAnnotations();
-		
+
 		configure();
 		widget.getEntityBundle();
-		
+
 		verify(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
 		verify(mockView).showPublicIcon();
 		verify(mockView).setAnnotations(anyString());
@@ -228,16 +220,16 @@ public class EntityBadgeTest {
 		verify(mockView).showDiscussionThreadIcon();
 		verify(mockView).showAddToDownloadList();
 	}
-	
+
 	@Test
 	public void testCheckForInViewAndLoadDataFailure() {
 		configure();
-		//test failure response from getEntityBundle
+		// test failure response from getEntityBundle
 		String errorMessage = "problem occurred while asking for entity bundle";
 		Exception ex = new Exception(errorMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
 		widget.getEntityBundle();
-		
+
 		verify(mockView).setError(errorMessage);
 	}
 
@@ -248,7 +240,7 @@ public class EntityBadgeTest {
 		widget.setClickHandler(mockEntityClicked);
 		verify(mockView).addClickHandler(mockEntityClicked);
 	}
-	
+
 	@Test
 	public void testGetEntity() {
 		EntityHeader header = new EntityHeader();
@@ -256,13 +248,13 @@ public class EntityBadgeTest {
 		widget.configure(header);
 		assertTrue(header == widget.getHeader());
 	}
-	
+
 	@Test
 	public void testAnnotationsEmpty() throws Exception {
 		String result = widget.getAnnotationsHTML(annotationsMap);
 		assertTrue("".equals(result));
 	}
-	
+
 	private void setupAnnotations() {
 		AnnotationsValue value = new AnnotationsValue();
 		value.setType(AnnotationsValueType.STRING);
@@ -271,7 +263,7 @@ public class EntityBadgeTest {
 		annotationsMap.put(KEY2, value);
 		annotationsMap.put(KEY3, value);
 	}
-	
+
 	@Test
 	public void testAnnotations() throws Exception {
 		setupAnnotations();
@@ -289,23 +281,23 @@ public class EntityBadgeTest {
 		widget.setEntityBundle(bundle);
 		verify(mockView, never()).showHasWikiIcon();
 	}
-	
+
 	@Test
 	public void testPrivate() throws Exception {
 		configure();
 		when(mockPermissions.getCanPublicRead()).thenReturn(false);
 		EntityBundle bundle = setupEntity(new Project());
-		
+
 		widget.setEntityBundle(bundle);
 		verify(mockView).showPrivateIcon();
 	}
-	
+
 	@Test
 	public void testCanUnlink() {
 		configure();
 		EntityBundle bundle = setupEntity(new Link());
 		when(mockPermissions.getCanDelete()).thenReturn(true);
-		
+
 		widget.setEntityBundle(bundle);
 		verify(mockView).showUnlinkIcon();
 	}
@@ -315,38 +307,38 @@ public class EntityBadgeTest {
 		configure();
 		EntityBundle bundle = setupEntity(new Link());
 		when(mockPermissions.getCanDelete()).thenReturn(false);
-		
+
 		widget.setEntityBundle(bundle);
 		verify(mockView, never()).showUnlinkIcon();
 	}
-	
+
 	@Test
 	public void testUnlinkNotALink() {
 		configure();
 		EntityBundle bundle = setupEntity(new Project());
 		when(mockPermissions.getCanDelete()).thenReturn(true);
-		
+
 		widget.setEntityBundle(bundle);
 		verify(mockView, never()).showUnlinkIcon();
 	}
-	
+
 	@Test
 	public void testOnUnlink() {
-		//simulate successful delete of Link entity
+		// simulate successful delete of Link entity
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).deleteEntityById(anyString(), any(AsyncCallback.class));
 		configure();
 		EntityBundle bundle = setupEntity(new Link());
 		when(mockPermissions.getCanDelete()).thenReturn(true);
 		widget.setEntityBundle(bundle);
-		
+
 		widget.onUnlink();
 		verify(mockSynapseJavascriptClient).deleteEntityById(eq(entityId), any(AsyncCallback.class));
 		verify(mockPopupUtils).showInfo(EntityBadge.LINK_SUCCESSFULLY_DELETED);
 	}
-	
+
 	@Test
 	public void testOnUnlinkFailure() {
-		//simulate failure to delete of Link entity
+		// simulate failure to delete of Link entity
 		String errorMessage = "error occurred";
 		Exception ex = new Exception(errorMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).deleteEntityById(anyString(), any(AsyncCallback.class));
@@ -354,51 +346,51 @@ public class EntityBadgeTest {
 		EntityBundle bundle = setupEntity(new Link());
 		when(mockPermissions.getCanDelete()).thenReturn(true);
 		widget.setEntityBundle(bundle);
-		
+
 		widget.onUnlink();
 		verify(mockSynapseJavascriptClient).deleteEntityById(eq(entityId), any(AsyncCallback.class));
 		verify(mockPopupUtils).showErrorMessage(errorMessage);
 	}
 
-	
+
 	@Test
 	public void testLocalSharingSettings() throws Exception {
 		configure();
 		EntityBundle bundle = setupEntity(new Project());
 		when(mockBenefactorAcl.getId()).thenReturn(entityId);
-		
+
 		widget.setEntityBundle(bundle);
 		verify(mockView).showSharingSetIcon();
 	}
-	
-	
+
+
 	@Test
 	public void testContentSize() {
 		String friendlySize = "44MB";
 		when(mockView.getFriendlySize(anyLong(), anyBoolean())).thenReturn(friendlySize);
 		String result = widget.getContentSize(null);
 		assertTrue("".equals(result));
-		
+
 		FileHandle s3FileHandle = new S3FileHandle();
 		s3FileHandle.setContentSize(500L);
-		
+
 		result = widget.getContentSize(s3FileHandle);
 		assertEquals(friendlySize, result);
 	}
-	
+
 	@Test
 	public void testContentMd5() {
 		String result = widget.getContentMd5(null);
 		assertTrue("".equals(result));
-		
+
 		FileHandle s3FileHandle = new S3FileHandle();
 		String contentMd5 = "fghij";
 		s3FileHandle.setContentMd5(contentMd5);
-		
+
 		result = widget.getContentMd5(s3FileHandle);
 		assertEquals(contentMd5, result);
 	}
-	
+
 	@Test
 	public void testOnAddToDownloadList() {
 		String fileHandleId = "9999";
@@ -408,17 +400,17 @@ public class EntityBadgeTest {
 		testFile.setDataFileHandleId(fileHandleId);
 		setupEntity(testFile);
 		EntityHeader header = configure();
-		
+
 		widget.getEntityBundle();
-		
+
 		widget.onAddToDownloadList();
-		
+
 		verify(mockSynapseJavascriptClient).addFileToDownloadList(eq(fileHandleId), eq(entityId), any(AsyncCallback.class));
-		verify(mockPopupUtils).showInfo(header.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST, "#!Profile:"+USER_ID+"/downloads", EntityBadge.VIEW_DOWNLOAD_LIST, IconType.CHECK_CIRCLE);
+		verify(mockPopupUtils).showInfo(header.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST, "#!Profile:" + USER_ID + "/downloads", EntityBadge.VIEW_DOWNLOAD_LIST, IconType.CHECK_CIRCLE);
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
 		verify(mockSynapseJSNIUtils).sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, Integer.toString(1));
 	}
-	
+
 	@Test
 	public void testOnAddToDownloadListError() {
 		String errorMessage = "a simulated error";
@@ -431,9 +423,9 @@ public class EntityBadgeTest {
 		setupEntity(testFile);
 		configure();
 		widget.getEntityBundle();
-		
+
 		widget.onAddToDownloadList();
-		
+
 		verify(mockSynapseJavascriptClient).addFileToDownloadList(eq(fileHandleId), eq(entityId), any(AsyncCallback.class));
 		verifyZeroInteractions(mockPopupUtils, mockEventBus);
 		verify(mockView).setError(errorMessage);

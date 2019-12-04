@@ -2,10 +2,10 @@ package org.sagebionetworks.web.unitclient.widget.profile;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -34,13 +34,13 @@ public class UserProfileEditorWidgetImplTest {
 	@Mock
 	Callback mockCallback;
 	UserProfile profile;
-	
+
 	@Before
-	public void before(){
+	public void before() {
 		MockitoAnnotations.initMocks(this);
 		when(mockPortalGinInjector.getCroppedImageUploadView()).thenReturn(mockCroppedImageUploadViewImpl);
 		widget = new UserProfileEditorWidgetImpl(mockView, mockImageWidget, mockfileHandleUploadWidget, mockPortalGinInjector);
-		
+
 		profile = new UserProfile();
 		profile.setOwnerId("123");
 		profile.setUserName("a-user-name");
@@ -55,14 +55,14 @@ public class UserProfileEditorWidgetImplTest {
 		profile.setSummary("My live story...");
 		profile.setProfilePicureFileHandleId("45678");
 	}
-	
+
 	@Test
 	public void testConstruction() {
 		verify(mockfileHandleUploadWidget).setView(mockCroppedImageUploadViewImpl);
 	}
-	
+
 	@Test
-	public void testConfigure(){
+	public void testConfigure() {
 		widget.configure(profile);
 		verify(mockView).hideLinkError();
 		verify(mockView).hideUsernameError();
@@ -77,34 +77,34 @@ public class UserProfileEditorWidgetImplTest {
 		verify(mockView).setBio(profile.getSummary());
 		verify(mockImageWidget).configure(profile.getProfilePicureFileHandleId());
 	}
-	
+
 	@Test
 	public void testSetNewFileHandle() {
 		String newFileHandle = "293";
 		widget.setUploadingCompleteCallback(mockCallback);
 		verify(mockCallback, never()).invoke();
-		
+
 		widget.setNewFileHandle(newFileHandle);
-		
+
 		verify(mockImageWidget).configure(newFileHandle);
 		verify(mockCallback).invoke();
 	}
-	
+
 	@Test
 	public void testSetUploadingCallback() {
 		widget.setUploadingCallback(mockCallback);
 		verify(mockfileHandleUploadWidget).setUploadingCallback(mockCallback);
 	}
-	
+
 	@Test
-	public void testConfigureNoProfileImage(){
+	public void testConfigureNoProfileImage() {
 		profile.setProfilePicureFileHandleId(null);
 		widget.configure(profile);
 		verify(mockImageWidget).configure(null);
 	}
-	
+
 	@Test
-	public void testIsValid(){
+	public void testIsValid() {
 		widget.configure(profile);
 		reset(mockView);
 		when(mockView.getUsername()).thenReturn("valid");
@@ -112,9 +112,9 @@ public class UserProfileEditorWidgetImplTest {
 		verify(mockView).hideLinkError();
 		verify(mockView).hideUsernameError();
 	}
-	
+
 	@Test
-	public void testIsValidShortUsername(){
+	public void testIsValidShortUsername() {
 		widget.configure(profile);
 		reset(mockView);
 		when(mockView.getUsername()).thenReturn("12");
@@ -123,9 +123,9 @@ public class UserProfileEditorWidgetImplTest {
 		verify(mockView).hideUsernameError();
 		verify(mockView).showUsernameError(UserProfileEditorWidgetImpl.MUST_BE_AT_LEAST_3_CHARACTERS);
 	}
-	
+
 	@Test
-	public void testIsValidUsernameBadChars(){
+	public void testIsValidUsernameBadChars() {
 		widget.configure(profile);
 		reset(mockView);
 		when(mockView.getUsername()).thenReturn("ABC@");
@@ -134,5 +134,5 @@ public class UserProfileEditorWidgetImplTest {
 		verify(mockView).hideUsernameError();
 		verify(mockView).showUsernameError(UserProfileEditorWidgetImpl.CAN_ONLY_INCLUDE);
 	}
-	
+
 }

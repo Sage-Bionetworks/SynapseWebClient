@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.googlemap;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -10,7 +9,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.ScriptInjector;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -30,13 +28,9 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 	SynapseAlert synAlert;
 	PortalGinInjector ginInjector;
 	LazyLoadHelper lazyLoadHelper;
+
 	@Inject
-	public GoogleMap(GoogleMapView view, 
-			SynapseJSNIUtils utils, 
-			SynapseJavascriptClient jsClient, 
-			SynapseAlert synAlert, 
-			PortalGinInjector ginInjector, 
-			LazyLoadHelper lazyLoadHelper) {
+	public GoogleMap(GoogleMapView view, SynapseJSNIUtils utils, SynapseJavascriptClient jsClient, SynapseAlert synAlert, PortalGinInjector ginInjector, LazyLoadHelper lazyLoadHelper) {
 		this.view = view;
 		this.utils = utils;
 		this.jsClient = jsClient;
@@ -52,17 +46,17 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
 	}
-	
+
 	public void configure(String teamId) {
 		this.jsonURL = S3_PREFIX + teamId + ".json";
 		lazyLoadHelper.setIsConfigured();
 	}
-	
+
 	public void configure() {
 		this.jsonURL = ALL_POINTS_URL;
 		lazyLoadHelper.setIsConfigured();
 	}
-	
+
 	public void initMap() {
 		if (isLoaded && jsonURL != null) {
 			getFileContents(jsonURL, new CallbackP<String>() {
@@ -73,7 +67,7 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 			});
 		}
 	}
-	
+
 	public void getFileContents(final String url, final CallbackP<String> c) {
 		boolean forceAnonymous = true;
 		jsClient.doGetString(url, forceAnonymous, new AsyncCallback<String>() {
@@ -81,12 +75,13 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 			public void onFailure(Throwable ex) {
 				synAlert.handleException(ex);
 			}
+
 			public void onSuccess(String result) {
 				c.invoke(result);
 			};
 		});
 	}
-	
+
 	public static void initGoogleLibrary(SynapseJavascriptClient jsClient, AsyncCallback<Void> callback) {
 		if (!isLoaded) {
 			boolean forceAnonymous = true;
@@ -94,27 +89,27 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 				@Override
 				public void onFailure(Throwable ex) {
 					if (callback != null) {
-						callback.onFailure(ex);	
+						callback.onFailure(ex);
 					}
 				}
+
 				public void onSuccess(String key) {
-					ScriptInjector.fromUrl("https://maps.googleapis.com/maps/api/js?key=" + key + "&libraries=places").setCallback(
-						     new Callback<Void, Exception>() {
-								@Override
-								public void onSuccess(Void result) {
-									isLoaded = true;
-									if (callback != null) {
-										callback.onSuccess(null);
-									}
-								}
-								
-								@Override
-								public void onFailure(Exception reason) {
-									if (callback != null) {
-										callback.onFailure(reason);
-									}
-								}
-							}).inject();
+					ScriptInjector.fromUrl("https://maps.googleapis.com/maps/api/js?key=" + key + "&libraries=places").setCallback(new Callback<Void, Exception>() {
+						@Override
+						public void onSuccess(Void result) {
+							isLoaded = true;
+							if (callback != null) {
+								callback.onSuccess(null);
+							}
+						}
+
+						@Override
+						public void onFailure(Exception reason) {
+							if (callback != null) {
+								callback.onFailure(reason);
+							}
+						}
+					}).inject();
 				};
 			});
 		} else {
@@ -123,12 +118,14 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 			}
 		}
 	}
+
 	private void loadData() {
 		initGoogleLibrary(jsClient, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
+
 			@Override
 			public void onSuccess(Void result) {
 				initMap();
@@ -140,10 +137,10 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	
+
 	@Override
 	public void markerClicked(String location, List<String> userIds) {
-		//create user badges
+		// create user badges
 		List<Widget> userBadges = new ArrayList<Widget>();
 		for (String userId : userIds) {
 			UserBadge userBadge = ginInjector.getUserBadgeWidget();
@@ -153,10 +150,11 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 		}
 		view.showUsers(location, userBadges);
 	}
-	
+
 	public void setHeight(String height) {
 		view.setHeight(height);
 	}
+
 	public void setVisible(boolean visible) {
 		view.setVisible(visible);
 	}

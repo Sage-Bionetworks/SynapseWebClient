@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.cookie;
 
 /**
- * The cookie key master.  Don't tell the cookie monster!
+ * The cookie key master. Don't tell the cookie monster!
  *
  * @author jmhill
  *
@@ -9,22 +9,17 @@ package org.sagebionetworks.web.client.cookie;
 public class CookieKeys {
 
 	public static String USER_LOGGED_IN_RECENTLY = "org.sagebionetworks.security.user.login.recently";
-	
+
 	/**
 	 * Login token
 	 */
 	public static String USER_LOGIN_TOKEN = "org.sagebionetworks.security.user.login.token";
 
 	/**
-	 * Last Place in the app
-	 */
-	public static String LAST_PLACE = "org.sagebionetworks.synapse.place.last.place";
-
-	/**
 	 * LinkedIn requestToken key
 	 */
 	public static String LINKEDIN = "org.sagebionetworks.synapse.linkedin";
-	
+
 	/**
 	 * Showing UTC?
 	 */

@@ -1,15 +1,15 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.FormControlStatic;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
-
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -27,8 +27,10 @@ import com.google.inject.Inject;
  *
  */
 public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableRow implements ColumnModelTableRowEditorView {
-	
-	public interface Binder extends UiBinder<TableRow, ColumnModelTableRowEditorViewImpl> {	}
+
+	public interface Binder extends UiBinder<TableRow, ColumnModelTableRowEditorViewImpl> {
+	}
+
 	@UiField
 	FormGroup nameGroup;
 	@UiField
@@ -37,12 +39,15 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	HelpBlock nameHelp;
 	@UiField
 	ListBox type;
+	// TODO: replace "type" with "alphaType" once multi-value list types are released out of alpha mode
+	@UiField
+	ListBox alphaType;
 	@UiField
 	FormGroup sizeGroup;
 	@UiField
 	TextBox maxSize;
 	@UiField
-	HelpBlock sizeHelp;	
+	HelpBlock sizeHelp;
 	@UiField
 	SimplePanel defaultPanel;
 	CellEditor defaultWidget;
@@ -56,15 +61,18 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	FormControlStatic typeStatic;
 	@UiField
 	FormControlStatic maxSizeStatic;
-	
+
 	String id;
 	TypePresenter presenter;
-	
+	boolean isInAlphaMode;
 	@Inject
-	public ColumnModelTableRowEditorViewImpl(Binder uiBinder){
+	public ColumnModelTableRowEditorViewImpl(Binder uiBinder, CookieProvider cookies) {
 		row = uiBinder.createAndBindUi(this);
+		isInAlphaMode = DisplayUtils.isInTestWebsite(cookies);
+		type.setVisible(!isInAlphaMode);
+		alphaType.setVisible(isInAlphaMode);
 	}
-	
+
 	@Override
 	public String getId() {
 		return id;
@@ -77,9 +85,10 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 
 	@Override
 	public ColumnTypeViewEnum getColumnType() {
-		return ColumnTypeViewEnum.valueOf(type.getSelectedValue());
+		ListBox listBox = isInAlphaMode ? alphaType : type;
+		return ColumnTypeViewEnum.valueOf(listBox.getSelectedValue());
 	}
-	
+
 	@Override
 	public ColumnFacetTypeViewEnum getFacetType() {
 		return ColumnFacetTypeViewEnum.getEnumForFriendlyName(facet.getSelectedValue());
@@ -117,25 +126,26 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	}
 
 	@Override
-	public void setColumnType(ColumnTypeViewEnum type) {
+	public void setColumnType(ColumnTypeViewEnum columnType) {
+		ListBox listBox = isInAlphaMode ? alphaType : type;
 		int index = 0;
-		String targetName = type.name();
-		for (int i = 0; i < this.type.getItemCount(); i++) {
-			if (this.type.getValue(i).equals(targetName)){
+		String targetName = columnType.name();
+		for (int i = 0; i < listBox.getItemCount(); i++) {
+			if (listBox.getValue(i).equals(targetName)) {
 				index = i;
 				break;
 			}
 		}
-		this.type.setSelectedIndex(index);
+		listBox.setSelectedIndex(index);
 	}
-	
+
 	@Override
 	public void setFacetType(ColumnFacetTypeViewEnum type) {
 		int index = 0;
 		String targetName = type.toString();
 		typeStatic.setText(targetName);
 		for (int i = 0; i < this.facet.getItemCount(); i++) {
-			if (this.facet.getValue(i).equals(targetName)){
+			if (this.facet.getValue(i).equals(targetName)) {
 				index = i;
 				break;
 			}
@@ -178,20 +188,20 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	@Override
 	public IsWidget getWidget(int index) {
 		switch (index) {
-		case 0:
-			return name;
-		case 1:
-			return type;
-		case 2:
-			return maxSize;
-		case 3:
-			return defaultWidget;
-		case 4:
-			return restrictValues;
-		case 5:
-			return facet;
-		default:
-			throw new IllegalArgumentException("Unknown index: "+index);
+			case 0:
+				return name;
+			case 1:
+				return type;
+			case 2:
+				return maxSize;
+			case 3:
+				return defaultWidget;
+			case 4:
+				return restrictValues;
+			case 5:
+				return facet;
+			default:
+				throw new IllegalArgumentException("Unknown index: " + index);
 		}
 	}
 
@@ -206,6 +216,7 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 		defaultPanel.clear();
 		defaultPanel.add(defaultEditor);
 	}
+
 	@Override
 	public void setDefaultEditorVisible(boolean visible) {
 		defaultPanel.setVisible(visible);
@@ -249,11 +260,12 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 		this.restrictValues.setVisible(showRestrictValues);
 		this.restrictValues.clear();
 	}
-	
+
 	@Override
 	public void setFacetVisible(boolean showFacetTypes) {
 		facet.setVisible(showFacetTypes);
 	}
+
 	@Override
 	public void setFacetValues(String... items) {
 		facet.clear();
@@ -261,13 +273,13 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 			facet.addItem(item);
 		}
 	}
-	
+
 	@Override
 	public void setToBeDefaultFileViewColumn() {
 		nameGroup.setVisible(false);
 		sizeGroup.setVisible(false);
 		type.setVisible(false);
-		
+
 		nameStatic.setVisible(true);
 		typeStatic.setVisible(true);
 		maxSizeStatic.setVisible(true);

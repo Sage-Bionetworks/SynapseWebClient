@@ -1,13 +1,14 @@
 package org.sagebionetworks.web.client.security;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.Objects;
-
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
+import org.sagebionetworks.repo.model.principal.EmailQuarantineReason;
+import org.sagebionetworks.repo.model.principal.EmailQuarantineStatus;
+import org.sagebionetworks.repo.model.principal.NotificationEmail;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DateTimeUtilsImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -21,7 +22,6 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -38,19 +38,14 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private static final String AUTHENTICATION_MESSAGE = "Invalid username or password.";
 	private static String currentUserSessionToken;
 	private static UserProfile currentUserProfile;
-	private UserAccountServiceAsync userAccountService;	
+	private UserAccountServiceAsync userAccountService;
 	private ClientCache localStorage;
 	private PortalGinInjector ginInjector;
 	private SynapseJSNIUtils jsniUtils;
 	private CookieProvider cookies;
-	
+
 	@Inject
-	public AuthenticationControllerImpl(
-			UserAccountServiceAsync userAccountService,
-			ClientCache localStorage,
-			CookieProvider cookies,
-			PortalGinInjector ginInjector,
-			SynapseJSNIUtils jsniUtils){
+	public AuthenticationControllerImpl(UserAccountServiceAsync userAccountService, ClientCache localStorage, CookieProvider cookies, PortalGinInjector ginInjector, SynapseJSNIUtils jsniUtils) {
 		this.userAccountService = userAccountService;
 		fixServiceEntryPoint(userAccountService);
 		this.localStorage = localStorage;
@@ -61,7 +56,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 	@Override
 	public void loginUser(final String username, String password, final AsyncCallback<UserProfile> callback) {
-		if(username == null || password == null) callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
+		if (username == null || password == null)
+			callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 		LoginRequest loginRequest = getLoginRequest(username, password);
 		ginInjector.getSynapseJavascriptClient().login(loginRequest, new AsyncCallback<LoginResponse>() {
 			@Override
@@ -69,18 +65,18 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				storeAuthenticationReceipt(session.getAuthenticationReceipt());
 				setNewSessionToken(session.getSessionToken(), callback);
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				callback.onFailure(caught);
 			}
 		});
 	}
-	
+
 	public void storeAuthenticationReceipt(String receipt) {
 		localStorage.put(USER_AUTHENTICATION_RECEIPT, receipt, DateTimeUtilsImpl.getYearFromNow().getTime());
 	}
-	
+
 	public LoginRequest getLoginRequest(String username, String password) {
 		LoginRequest request = new LoginRequest();
 		request.setUsername(username);
@@ -89,15 +85,16 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		request.setAuthenticationReceipt(authenticationReceipt);
 		return request;
 	}
-	
+
 	/**
 	 * Called to update the session token.
+	 * 
 	 * @param token
 	 * @param callback
 	 */
 	public void setNewSessionToken(String token, AsyncCallback<UserProfile> callback) {
-		if(token == null) {
-			callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));	
+		if (token == null) {
+			callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 			return;
 		}
 		ginInjector.getSynapseJavascriptClient().initSession(token, new AsyncCallback<Void>() {
@@ -110,23 +107,26 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					callback.onFailure(caught);
 				}
 			}
+
 			@Override
 			public void onSuccess(Void result) {
 				initializeFromExistingSessionCookie(callback);
 			}
 		});
 	}
-	
+
 	/**
-	 * Session cookie should be set before this call 
+	 * Session cookie should be set before this call
+	 * 
 	 * @param callback
 	 */
 	public void initializeFromExistingSessionCookie(AsyncCallback<UserProfile> callback) {
 		userAccountService.getCurrentUserSessionData(new AsyncCallback<UserSessionData>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);	
+				callback.onFailure(caught);
 			}
+
 			@Override
 			public void onSuccess(UserSessionData newData) {
 				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
@@ -137,12 +137,33 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
 				} else {
 					jsniUtils.setAnalyticsUserId(getCurrentUserPrincipalId());
-					callback.onSuccess(newData.getProfile());	
+					callback.onSuccess(newData.getProfile());
 				}
 			}
 		});
 	}
-	
+
+	public void checkForQuarantinedEmail() {
+		ginInjector.getSynapseJavascriptClient().getNotificationEmail(new AsyncCallback<NotificationEmail>() {
+			@Override
+			public void onSuccess(NotificationEmail notificationEmailStatus) {
+				EmailQuarantineStatus status = notificationEmailStatus.getQuarantineStatus();
+				if (isQuarantined(status)) {
+					ginInjector.getQuarantinedEmailModal().show(status.getReasonDetails());
+				}
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				jsniUtils.consoleError(caught);
+			}
+		});
+	}
+
+	public static boolean isQuarantined(EmailQuarantineStatus status) {
+		return status != null && EmailQuarantineReason.PERMANENT_BOUNCE.equals(status.getReason());
+	}
+
 	@Override
 	public void logoutUser() {
 		// terminate the session, remove the cookie
@@ -157,9 +178,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		ginInjector.getSynapseJavascriptClient().initSession(WebConstants.EXPIRE_SESSION_TOKEN);
 		ginInjector.getGlobalApplicationState().refreshPage();
 	}
-	
+
 	@Override
-	public void updateCachedProfile(UserProfile updatedProfile){
+	public void updateCachedProfile(UserProfile updatedProfile) {
 		currentUserProfile = updatedProfile;
 	}
 
@@ -170,12 +191,12 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 	@Override
 	public String getCurrentUserPrincipalId() {
-		if(currentUserProfile != null) {
+		if (currentUserProfile != null) {
 			return currentUserProfile.getOwnerId();
-		} 
+		}
 		return null;
 	}
-	
+
 	@Override
 	public UserProfile getCurrentUserProfile() {
 		return currentUserProfile;
@@ -185,12 +206,12 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	public String getCurrentUserSessionToken() {
 		return currentUserSessionToken;
 	}
-	
+
 	@Override
 	public void signTermsOfUse(boolean accepted, AsyncCallback<Void> callback) {
 		userAccountService.signTermsOfUse(getCurrentUserSessionToken(), accepted, callback);
 	}
-	
+
 	@Override
 	public void checkForUserChange() {
 		userAccountService.getCurrentSessionToken(new AsyncCallback<String>() {
@@ -199,6 +220,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				jsniUtils.consoleError(caught);
 				logoutUser();
 			}
+
 			@Override
 			public void onSuccess(String token) {
 				String localSession = getCurrentUserSessionToken();
@@ -213,22 +235,27 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 							public void onFailure(Throwable caught) {
 								jsniUtils.consoleError(caught);
 							}
+
 							@Override
 							public void onSuccess(UserProfile result) {
-								// we've reinitialized the app with the correct session, refresh the page (do not get rid of js state)!
+								// we've reinitialized the app with the correct session, refresh the page (do not get rid of js
+								// state)!
 								ginInjector.getGlobalApplicationState().refreshPage();
+								checkForQuarantinedEmail();
 							}
 						});
 					}
 				} else {
 					ginInjector.getHeader().refresh();
 					if (isLoggedIn()) {
-						// we've determined that the session has not changed, update the cookie expiration for the session token
+						// we've determined that the session has not changed, update the cookie expiration for the session
+						// token
 						setNewSessionToken(currentUserSessionToken, new AsyncCallback<UserProfile>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								jsniUtils.consoleError(caught);
 							}
+
 							@Override
 							public void onSuccess(UserProfile result) {
 								// the set-cookie response header has updated the expiration of the session token cookie
@@ -239,7 +266,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			}
 		});
 	}
-	
+
 	@Override
 	public void refreshSessionToken() {
 		ginInjector.getSynapseJavascriptClient().refreshCurrentSessionToken();

@@ -1,76 +1,61 @@
 package org.sagebionetworks.web.client.widget.login;
 
-import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
-
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.SynapseProperties;
-
-import com.google.gwt.http.client.URL;
+import org.sagebionetworks.web.client.view.users.RegisterAccountViewImpl;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
-	public static final String ROOT_PORTAL_URL = Window.Location.getProtocol() + "//" + Window.Location.getHost() + "/";
-	public static final String GOOGLE_OAUTH_CALLBACK_URL = ROOT_PORTAL_URL + "Portal/oauth2callback?oauth2provider=GOOGLE_OAUTH_2_0";
-	public static final String GOOGLE_OAUTH_WITH_STATE_CALLBACK_URL = GOOGLE_OAUTH_CALLBACK_URL + "&state=";
-	
-	public interface LoginWidgetViewImplUiBinder extends UiBinder<Widget, LoginWidgetViewImpl> {}
+	public interface LoginWidgetViewImplUiBinder extends UiBinder<Widget, LoginWidgetViewImpl> {
+	}
+
 	@UiField
 	Div srcLoginContainer;
 	Widget widget;
 	SynapseJSNIUtils jsniUtils;
-	
+
 	@Inject
-	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder, SynapseJSNIUtils jsniUtils, SynapseProperties synapseProperties) {
+	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder, SynapseJSNIUtils jsniUtils) {
 		widget = binder.createAndBindUi(this);
 		this.jsniUtils = jsniUtils;
 		widget.addAttachHandler(event -> {
 			if (event.isAttached()) {
-				String endpoint = synapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY);
-				_createSRCLogin(srcLoginContainer.getElement(), ROOT_PORTAL_URL, GOOGLE_OAUTH_CALLBACK_URL, endpoint);
+				_createSRCLogin(srcLoginContainer.getElement(), RegisterAccountViewImpl.GOOGLE_OAUTH_CALLBACK_URL);
 			} else {
-				//detach event, clean up react component
+				// detach event, clean up react component
 				jsniUtils.unmountComponentAtNode(srcLoginContainer.getElement());
 			}
 		});
 	}
-	
-	private static native void _createSRCLogin(Element el, String rootPortalURL, String googleSSORedirectUrl, String fullRepoEndpoint) /*-{
+
+	private static native void _createSRCLogin(Element el, String googleSSORedirectUrl) /*-{
 		try {
-			// URL.host returns the domain (that is the hostname) followed by (if a port was specified) a ':' and the port of the URL
-			var repoURL = new URL(fullRepoEndpoint);
-			var rootRepoEndpoint = repoURL.protocol + '//' + repoURL.host;
 			var props = {
-				theme:'light',
-				icon:true,
-				googleRedirectUrl: googleSSORedirectUrl,
-				repoEndpoint:rootRepoEndpoint,
-				swcEndpoint:rootPortalURL
+				theme : 'light',
+				icon : true,
+				googleRedirectUrl : googleSSORedirectUrl
 			};
-			
-			$wnd.ReactDOM.render(
-				$wnd.React.createElement($wnd.SRC.SynapseComponents.Login, props, null), 
-				el
-			);
+
+			$wnd.ReactDOM.render($wnd.React.createElement(
+					$wnd.SRC.SynapseComponents.Login, props, null), el);
 		} catch (err) {
 			console.error(err);
 		}
 	}-*/;
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
 
 	@Override
-	public void clear() {
-	}
+	public void clear() {}
+
 	@Override
 	public void setVisible(boolean visible) {
 		widget.setVisible(visible);

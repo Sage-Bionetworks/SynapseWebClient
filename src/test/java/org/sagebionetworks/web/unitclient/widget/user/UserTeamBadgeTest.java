@@ -6,10 +6,8 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.HashMap;
 import java.util.Map;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +24,6 @@ import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.junit.GWTMockUtilities;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -54,8 +51,9 @@ public class UserTeamBadgeTest {
 	UserGroupHeader mockUserGroupHeader;
 	@Mock
 	DivView mockDiv;
+
 	@Before
-	public void before() throws JSONObjectAdapterException{
+	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
 		GWTMockUtilities.disarm();
 		Widget mockView = mock(Widget.class);
@@ -63,11 +61,8 @@ public class UserTeamBadgeTest {
 		when(mockGinInjector.getTeamBadgeWidget()).thenReturn(mockTeamBadge);
 		when(mockUserBadge.asWidget()).thenReturn(mockView);
 		when(mockTeamBadge.asWidget()).thenReturn(mockView);
-		
-		badge = new UserTeamBadge(mockGinInjector, 
-				mockUserGroupHeaderFromIdAsyncHandler, 
-				mockUserGroupHeaderAsyncHandler, 
-				mockDiv);
+
+		badge = new UserTeamBadge(mockGinInjector, mockUserGroupHeaderFromIdAsyncHandler, mockUserGroupHeaderAsyncHandler, mockDiv);
 		widgetDescriptor = new HashMap<String, String>();
 		widgetDescriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY, "true");
 		widgetDescriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_ID_KEY, principalId);
@@ -76,20 +71,20 @@ public class UserTeamBadgeTest {
 	}
 
 	@After
-	public void tearDown(){
+	public void tearDown() {
 		// Be nice to the next test
 		GWTMockUtilities.restore();
 	}
 
 	@Test
-	public void testConfigure(){
+	public void testConfigure() {
 		badge.configure(null, widgetDescriptor, null, null);
 		verify(mockGinInjector).getUserBadgeWidget();
 		verify(mockUserBadge).configure(eq(principalId));
 	}
-	
+
 	@Test
-	public void testConfigureIgnoreClick(){
+	public void testConfigureIgnoreClick() {
 		widgetDescriptor.put(WidgetConstants.IS_TOC_KEY, "true");
 		badge.configure(null, widgetDescriptor, null, null);
 		verify(mockGinInjector).getUserBadgeWidget();
@@ -97,9 +92,9 @@ public class UserTeamBadgeTest {
 		verify(mockUserBadge).setDoNothingOnClick();
 	}
 
-	
+
 	@Test
-	public void testConfigureWithUsername(){
+	public void testConfigureWithUsername() {
 		String username = "Potter";
 		widgetDescriptor.remove(WidgetConstants.USER_TEAM_BADGE_WIDGET_ID_KEY);
 		widgetDescriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_USERNAME_KEY, username);
@@ -110,43 +105,43 @@ public class UserTeamBadgeTest {
 		verify(mockUserGroupHeaderAsyncHandler).getUserGroupHeader(eq(username), any(AsyncCallback.class));
 		verify(mockUserBadge).configure(ownerId);
 	}
-	
+
 	@Test
-	public void testConfigureUserProfileFromId(){
+	public void testConfigureUserProfileFromId() {
 		boolean isIndividual = true;
 		String ownerId = "userId";
 		when(mockUserGroupHeader.getIsIndividual()).thenReturn(isIndividual);
 		when(mockUserGroupHeader.getOwnerId()).thenReturn(ownerId);
-		
+
 		badge.configure(ownerId);
-		
+
 		verify(mockGinInjector).getUserBadgeWidget();
 		verify(mockUserBadge).configure(ownerId);
 	}
-	
+
 	@Test
-	public void testConfigureTeamFromId(){
+	public void testConfigureTeamFromId() {
 		boolean isIndividual = false;
 		String ownerId = "teamId";
 		when(mockUserGroupHeader.getIsIndividual()).thenReturn(isIndividual);
 		when(mockUserGroupHeader.getOwnerId()).thenReturn(ownerId);
-		
+
 		badge.configure(ownerId);
-		
+
 		verify(mockGinInjector).getTeamBadgeWidget();
-		verify(mockTeamBadge).configure(ownerId, (ClickHandler)null);
+		verify(mockTeamBadge).configure(ownerId, (ClickHandler) null);
 	}
-	
+
 	@Test
-	public void testConfigureTeam(){
+	public void testConfigureTeam() {
 		widgetDescriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY, "false");
 		badge.configure(null, widgetDescriptor, null, null);
 		verify(mockGinInjector).getTeamBadgeWidget();
-		verify(mockTeamBadge).configure(principalId, (ClickHandler)null);
+		verify(mockTeamBadge).configure(principalId, (ClickHandler) null);
 	}
-	
+
 	@Test
-	public void testConfigureTeamIgnoreClick(){
+	public void testConfigureTeamIgnoreClick() {
 		widgetDescriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY, "false");
 		widgetDescriptor.put(WidgetConstants.IS_TOC_KEY, "true");
 		badge.configure(null, widgetDescriptor, null, null);
@@ -154,21 +149,21 @@ public class UserTeamBadgeTest {
 		verify(mockTeamBadge).configure(principalId, UserBadge.DO_NOTHING_ON_CLICK);
 	}
 
-	
+
 	@Test
-	public void testConfigureNullIsIndividual(){
+	public void testConfigureNullIsIndividual() {
 		widgetDescriptor.remove(WidgetConstants.USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY);
 		badge.configure(null, widgetDescriptor, null, null);
 		verify(mockGinInjector).getTeamBadgeWidget();
-		verify(mockTeamBadge).configure(principalId, (ClickHandler)null);
+		verify(mockTeamBadge).configure(principalId, (ClickHandler) null);
 	}
-	
+
 	@Test
 	public void testConfigureNullPrincipalId() {
-		//userbadge or teambadge widget deals with null principal id, this should pass along
+		// userbadge or teambadge widget deals with null principal id, this should pass along
 		widgetDescriptor.remove(WidgetConstants.USER_TEAM_BADGE_WIDGET_ID_KEY);
 		badge.configure(null, widgetDescriptor, null, null);
-		verify(mockUserBadge).configure(eq((String)null));
+		verify(mockUserBadge).configure(eq((String) null));
 	}
 
 	@Test
@@ -184,7 +179,7 @@ public class UserTeamBadgeTest {
 		verify(mockUserGroupHeaderAsyncHandler).getUserGroupHeader(eq(alias), any(AsyncCallback.class));
 		verify(mockUserBadge).configure(ownerId);
 	}
-	
+
 	@Test
 	public void testConfigureFromTeamAlias() {
 		widgetDescriptor.clear();
@@ -196,7 +191,7 @@ public class UserTeamBadgeTest {
 		when(mockUserGroupHeader.getOwnerId()).thenReturn(ownerId);
 		badge.configure(null, widgetDescriptor, null, null);
 		verify(mockUserGroupHeaderAsyncHandler).getUserGroupHeader(eq(alias), any(AsyncCallback.class));
-		verify(mockTeamBadge).configure(ownerId, (ClickHandler)null);
-		
+		verify(mockTeamBadge).configure(ownerId, (ClickHandler) null);
+
 	}
 }

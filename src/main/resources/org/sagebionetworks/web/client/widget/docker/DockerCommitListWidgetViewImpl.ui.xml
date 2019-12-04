@@ -6,16 +6,18 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<g:HTMLPanel>
-		<t:Table width="100%" addStyleNames="margin-top-5 margin-bottom-5">
+		<t:Table width="100%"
+			addStyleNames="margin-top-5 margin-bottom-5">
 			<t:TableRow>
-				<t:TableHeader width="30px"/>
+				<t:TableHeader width="30px" />
 				<t:TableHeader>
 					<bh:Span>Tag</bh:Span>
 				</t:TableHeader>
 				<t:TableHeader width="200px">
 					<bh:Span>Digest</bh:Span>
 				</t:TableHeader>
-				<t:TableHeader width="200px" addStyleNames="visible-lg">
+				<t:TableHeader width="200px"
+					addStyleNames="visible-lg">
 					<bh:Span>Last Updated</bh:Span>
 				</t:TableHeader>
 			</t:TableRow>

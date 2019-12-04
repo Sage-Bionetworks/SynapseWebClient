@@ -1,12 +1,9 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
-import org.sagebionetworks.web.client.utils.Callback;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface ReplyWidgetView extends IsWidget{
+public interface ReplyWidgetView extends IsWidget {
 
 	public interface Presenter {
 
@@ -15,7 +12,7 @@ public interface ReplyWidgetView extends IsWidget{
 		void onClickDeleteReply();
 
 		void onClickEditReply();
-		
+
 		void onClickReplyLink();
 	}
 
@@ -44,10 +41,10 @@ public interface ReplyWidgetView extends IsWidget{
 	void setMessageVisible(boolean visible);
 
 	void showSuccess(String title, String message);
-	
+
 	void setIsAuthorModerator(boolean isModerator);
 
 	void setCommandsContainerVisible(boolean visible);
-	
+
 	void setCopyTextModal(Widget widget);
 }

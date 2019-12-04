@@ -8,10 +8,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,7 +44,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumn
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -67,7 +64,7 @@ public class FacetsWidgetTest {
 	FacetColumnResultValues mockFacetColumnResultValues;
 	@Mock
 	FacetColumnResultValueCount mockFacetResultValueCount;
-	
+
 	@Mock
 	FacetColumnResultValuesWidget mockFacetColumnResultValuesWidget;
 	@Mock
@@ -102,6 +99,7 @@ public class FacetsWidgetTest {
 	List<ColumnModel> columnModels;
 	List<FacetColumnResultValueCount> facetValues;
 	public static final String COLUMN_NAME = "a column";
+
 	@Before
 	public void setUp() throws Exception {
 		when(mockGinInjector.creatNewAsynchronousProgressWidget()).thenReturn(mockJobTrackingWidget);
@@ -115,14 +113,14 @@ public class FacetsWidgetTest {
 		when(mockFacetColumnResultValues.getFacetValues()).thenReturn(facetValues);
 		when(mockFacetColumnResultValues.getFacetType()).thenReturn(FacetType.enumeration);
 		when(mockFacetColumnResultRange.getFacetType()).thenReturn(FacetType.range);
-		
+
 		when(mockGinInjector.getFacetColumnResultValuesWidget()).thenReturn(mockFacetColumnResultValuesWidget);
 		when(mockGinInjector.getFacetColumnResultRangeWidget()).thenReturn(mockFacetColumnResultRangeWidget);
-		
+
 		when(mockGinInjector.getFacetColumnResultRangeViewImpl()).thenReturn(mockFacetColumnResultRangeView);
 		when(mockGinInjector.getFacetColumnResultSliderRangeViewImpl()).thenReturn(mockFacetColumnResultSliderView);
 		when(mockGinInjector.getFacetColumnResultDateRangeViewImpl()).thenReturn(mockFacetColumnResultDateView);
-		
+
 		when(mockFacetColumnResultRange.getColumnMin()).thenReturn("3");
 		when(mockFacetColumnResultRange.getColumnMax()).thenReturn("120");
 		when(mockColumnModel.getName()).thenReturn(COLUMN_NAME);
@@ -132,86 +130,86 @@ public class FacetsWidgetTest {
 		when(mockQueryResultBundle.getColumnModels()).thenReturn(columnModels);
 		when(mockQuery.getSql()).thenReturn(TEST_SQL);
 	}
-	
+
 	@Test
 	public void testConfigureFromQuery() {
-		//set up a single facet being returned
+		// set up a single facet being returned
 		facets.add(mockFacetColumnResultValues);
 		facetValues.add(mockFacetResultValueCount);
 		when(mockColumnModel.getColumnType()).thenReturn(ColumnType.ENTITYID);
-		
+
 		widget.configure(mockQuery, mockFacetChangedHandler, mockResetFacetsHandler);
-		
+
 		verify(mockView).add(mockJobTrackingWidget);
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), qbrCaptor.capture(), asyncProgressHandlerCaptor.capture());
-		//verify request
+		// verify request
 		QueryBundleRequest request = qbrCaptor.getValue();
 		assertEquals(new Long(TableQueryResultWidget.BUNDLE_MASK_QUERY_FACETS | TableQueryResultWidget.BUNDLE_MASK_QUERY_COLUMN_MODELS), request.getPartMask());
 		assertEquals(mockQuery, request.getQuery());
-		
+
 		// test on complete
 		AsynchronousProgressHandler progressHandler = asyncProgressHandlerCaptor.getValue();
 		progressHandler.onComplete(mockQueryResultBundle);
 		verify(mockFacetColumnResultValuesWidget).configure(mockFacetColumnResultValues, ColumnType.ENTITYID, mockFacetChangedHandler);
-		
+
 		Exception ex = new Exception("an error");
 		progressHandler.onFailure(ex);
 		verify(mockView).add(mockSynAlert);
 		verify(mockSynAlert).handleException(ex);
 	}
-	
+
 	@Test
 	public void testClearFacets() {
 		widget.configure(facets, mockFacetChangedHandler, columnModels, mockResetFacetsHandler);
 		verify(mockClearFacetsButton).setPresenter(clearButtonCallbackCaptor.capture());
-		
+
 		clearButtonCallbackCaptor.getValue().onClick();
-		
+
 		verify(mockResetFacetsHandler).invoke();
 	}
 
 	@Test
 	public void testConfigureNoFacets() {
 		widget.configure(facets, mockFacetChangedHandler, columnModels, mockResetFacetsHandler);
-		
+
 		verify(mockView).clear();
 		verifyNoMoreInteractions(mockView);
 	}
-	
+
 	@Test
 	public void testConfigureResultValuesFacetValueEmpty() {
 		facets.add(mockFacetColumnResultValues);
 		widget.configure(facets, mockFacetChangedHandler, columnModels, mockResetFacetsHandler);
-		
+
 		verify(mockView).clear();
 		verify(mockView).add(mockClearFacetsButton);
 		verifyNoMoreInteractions(mockView);
 	}
-	
+
 	@Test
 	public void testConfigureResultValuesFacet() {
 		facets.add(mockFacetColumnResultValues);
 		facetValues.add(mockFacetResultValueCount);
 		when(mockColumnModel.getColumnType()).thenReturn(ColumnType.ENTITYID);
 		widget.configure(facets, mockFacetChangedHandler, columnModels, mockResetFacetsHandler);
-		
+
 		verify(mockView).clear();
 		verify(mockView, times(2)).add(any(IsWidget.class));
 		verify(mockFacetColumnResultValuesWidget).configure(mockFacetColumnResultValues, ColumnType.ENTITYID, mockFacetChangedHandler);
 	}
-	
+
 	@Test
 	public void testConfigureResultUserIdsValuesFacet() {
 		facets.add(mockFacetColumnResultValues);
 		facetValues.add(mockFacetResultValueCount);
 		when(mockColumnModel.getColumnType()).thenReturn(ColumnType.USERID);
 		widget.configure(facets, mockFacetChangedHandler, columnModels, mockResetFacetsHandler);
-		
+
 		verify(mockView).clear();
 		verify(mockView, times(2)).add(any(IsWidget.class));
 		verify(mockFacetColumnResultValuesWidget).configure(mockFacetColumnResultValues, ColumnType.USERID, mockFacetChangedHandler);
 	}
-	
+
 
 	@Test
 	public void testConfigureFacetColumnMissing() {
@@ -220,30 +218,30 @@ public class FacetsWidgetTest {
 		when(mockColumnModel.getColumnType()).thenReturn(ColumnType.USERID);
 		columnModels.clear();
 		widget.configure(facets, mockFacetChangedHandler, columnModels, mockResetFacetsHandler);
-		
+
 		verify(mockView).clear();
 		verify(mockView).add(mockClearFacetsButton);
 		verifyNoMoreInteractions(mockView);
 	}
-	
+
 	@Test
 	public void testRangeFacetColumnValuesUndefined() {
 		when(mockFacetColumnResultRange.getColumnMin()).thenReturn(null);
 		when(mockFacetColumnResultRange.getColumnMax()).thenReturn(null);
 		facets.add(mockFacetColumnResultRange);
 		widget.configure(facets, mockFacetChangedHandler, columnModels, mockResetFacetsHandler);
-		
+
 		verify(mockView).clear();
 		verify(mockView).add(mockClearFacetsButton);
 		verifyNoMoreInteractions(mockView);
 	}
-	
+
 	@Test
 	public void testRangeFacetColumnValuesInteger() {
 		when(mockColumnModel.getColumnType()).thenReturn(ColumnType.INTEGER);
 		facets.add(mockFacetColumnResultRange);
 		widget.configure(facets, mockFacetChangedHandler, columnModels, mockResetFacetsHandler);
-		
+
 		verify(mockView).clear();
 		verify(mockView, times(2)).add(any(IsWidget.class));
 		verify(mockFacetColumnResultRangeWidget).configure(mockFacetColumnResultSliderView, mockFacetColumnResultRange, mockFacetChangedHandler);
@@ -254,18 +252,18 @@ public class FacetsWidgetTest {
 		when(mockColumnModel.getColumnType()).thenReturn(ColumnType.DOUBLE);
 		facets.add(mockFacetColumnResultRange);
 		widget.configure(facets, mockFacetChangedHandler, columnModels, mockResetFacetsHandler);
-		
+
 		verify(mockView).clear();
 		verify(mockView, times(2)).add(any(IsWidget.class));
 		verify(mockFacetColumnResultRangeWidget).configure(mockFacetColumnResultRangeView, mockFacetColumnResultRange, mockFacetChangedHandler);
 	}
-	
+
 	@Test
 	public void testRangeFacetColumnValuesDate() {
 		when(mockColumnModel.getColumnType()).thenReturn(ColumnType.DATE);
 		facets.add(mockFacetColumnResultRange);
 		widget.configure(facets, mockFacetChangedHandler, columnModels, mockResetFacetsHandler);
-		
+
 		verify(mockView).clear();
 		verify(mockView, times(2)).add(any(IsWidget.class));
 		verify(mockFacetColumnResultRangeWidget).configure(mockFacetColumnResultDateView, mockFacetColumnResultRange, mockFacetChangedHandler);

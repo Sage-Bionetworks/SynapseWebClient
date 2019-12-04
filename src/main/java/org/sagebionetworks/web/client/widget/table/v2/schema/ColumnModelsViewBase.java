@@ -1,13 +1,12 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface ColumnModelsViewBase extends IsWidget {
-	
+
 	public interface Presenter {
-		
+
 		/**
 		 * Configure a newly created view.
 		 * 
@@ -16,7 +15,7 @@ public interface ColumnModelsViewBase extends IsWidget {
 		 * @param isEditabl
 		 */
 		public void configure(EntityBundle bundle, boolean isEditable);
-		
+
 		/**
 		 * Called when the save button is pressed
 		 */
@@ -28,8 +27,11 @@ public interface ColumnModelsViewBase extends IsWidget {
 	public void setViewer(ColumnModelsView viewer);
 
 	public void setEditor(IsWidget editor);
+
 	public void setJobTrackingWidget(IsWidget jobTrackingWidget);
+
 	public void setJobTrackingWidgetVisible(boolean visible);
+
 	/**
 	 * Show the editor.
 	 */
@@ -39,12 +41,13 @@ public interface ColumnModelsViewBase extends IsWidget {
 	 * Hide the editor
 	 */
 	public void hideEditor();
-	
+
 	/**
 	 * Called before any service call.
 	 */
 	public void setLoading();
 
 	void setSynAlert(IsWidget w);
+
 	void resetSaveButton();
 }

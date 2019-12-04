@@ -18,7 +18,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.InfoAlert;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.SpanElement;
@@ -35,14 +34,14 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	Presenter presenter;
 	private Md5Link md5Link;
 	private FavoriteWidget favoriteWidget;
-	
+
 	@UiField
 	HTMLPanel panel;
 	@UiField
 	HTMLPanel fileFoundContainer;
 	@UiField
 	HTMLPanel fileNameContainer;
-	
+
 	@UiField
 	SimplePanel md5LinkContainer;
 	@UiField
@@ -87,24 +86,21 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	HelpWidget viewOnlyHelp;
 	@UiField
 	Button downloadOptionsButton;
-	
+
 	interface FileTitleBarViewImplUiBinder extends UiBinder<Widget, FileTitleBarViewImpl> {
 	}
+
 	private String currentEntityId;
-	private static FileTitleBarViewImplUiBinder uiBinder = GWT
-			.create(FileTitleBarViewImplUiBinder.class);
+	private static FileTitleBarViewImplUiBinder uiBinder = GWT.create(FileTitleBarViewImplUiBinder.class);
+
 	@Inject
-	public FileTitleBarViewImpl(
-			FavoriteWidget favoriteWidget,
-			Md5Link md5Link, 
-			GlobalApplicationState globalAppState,
-			AuthenticationController authController) {
+	public FileTitleBarViewImpl(FavoriteWidget favoriteWidget, Md5Link md5Link, GlobalApplicationState globalAppState, AuthenticationController authController) {
 		this.favoriteWidget = favoriteWidget;
 		this.md5Link = md5Link;
-		
+
 		initWidget(uiBinder.createAndBindUi(this));
 		md5LinkContainer.addStyleName("inline-block margin-left-5");
-		
+
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
 		currentVersionLink.addClickHandler(event -> {
@@ -113,10 +109,10 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 				globalAppState.getPlaceChanger().goTo(new Synapse(currentEntityId));
 			}
 		});
-		addToDownloadListLink.addClickHandler(event->{
+		addToDownloadListLink.addClickHandler(event -> {
 			presenter.onAddToDownloadList();
 		});
-		programmaticOptionsLink.addClickHandler(event->{
+		programmaticOptionsLink.addClickHandler(event -> {
 			presenter.onProgrammaticDownloadOptions();
 		});
 		addedToDownloadListAlert.addClickHandler(event -> {
@@ -124,10 +120,12 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			globalAppState.getPlaceChanger().goTo(place);
 		});
 	}
+
 	@Override
 	public void setPresenter(Presenter p) {
 		this.presenter = p;
 	}
+
 	@Override
 	public void createTitlebar(Entity entity) {
 		addedToDownloadListAlert.setVisible(false);
@@ -136,51 +134,56 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		md5Link.clear();
 		md5LinkContainer.setWidget(md5Link);
 		entityIcon.setType(EntityTypeUtils.getIconTypeForEntity(entity));
-		currentVersionLink.setHref("#!Synapse:"+currentEntityId);
+		currentVersionLink.setHref("#!Synapse:" + currentEntityId);
 	}
-	
+
 	@Override
 	public void setExternalUrlUIVisible(boolean visible) {
-		UIObject.setVisible(externalUrlUI, visible);	
+		UIObject.setVisible(externalUrlUI, visible);
 	}
+
 	@Override
 	public void setFilenameContainerVisible(boolean visible) {
 		fileNameContainer.setVisible(visible);
 	}
+
 	@Override
 	public void setFilename(String fileNameString) {
-		fileName.setInnerText(fileNameString);	
+		fileName.setInnerText(fileNameString);
 	}
+
 	@Override
 	public void setFileSize(String fileSizeString) {
 		fileSize.setInnerText(fileSizeString);
 	}
+
 	@Override
 	public void setMd5(String md5) {
-		md5Link.configure(md5);	
+		md5Link.configure(md5);
 	}
+
 	@Override
 	public void setEntityName(String name) {
 		entityName.setText(name);
 	}
+
 	@Override
 	public void setExternalUrl(String url) {
 		externalUrl.setInnerText(url);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return this;
-	}	
-		
+	}
+
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override
-	public void showLoading() {
-	}
+	public void showLoading() {}
 
 	@Override
 	public void showInfo(String message) {
@@ -188,8 +191,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	}
 
 	@Override
-	public void clear() {
-	}
+	public void clear() {}
 
 	@Override
 	public void setFileLocation(String location) {
@@ -200,29 +202,35 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	public void setFileDownloadMenuItem(Widget w) {
 		dropdownMenu.insert(w, 0);
 	}
+
 	@Override
 	public void setExternalObjectStoreUIVisible(boolean visible) {
 		externalObjectStoreUI.setVisible(visible);
 	}
+
 	@Override
 	public void setExternalObjectStoreInfo(String endpointValue, String bucketValue, String fileKeyValue) {
 		endpoint.setText(endpointValue);
 		bucket.setText(bucketValue);
 		fileKey.setText(fileKeyValue);
 	}
+
 	@Override
 	public void setVersionUIVisible(boolean visible) {
 		versionInfoUI.setVisible(visible);
 	}
+
 	@Override
 	public void setVersion(Long versionNumber) {
 		version.setText(versionNumber.toString());
 	}
+
 	@Override
 	public void showAddedToDownloadListAlert(String message) {
 		addedToDownloadListAlert.setMessage(message);
-		addedToDownloadListAlert.setVisible(true);	
+		addedToDownloadListAlert.setVisible(true);
 	}
+
 	@Override
 	public void setCanDownload(boolean canDownload) {
 		downloadOptionsButton.setEnabled(canDownload);

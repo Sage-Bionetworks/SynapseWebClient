@@ -10,14 +10,13 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
-
 import com.google.inject.Inject;
 
 public class WikiTab {
 	Tab tab;
 	private WikiPageWidget wikiPageWidget;
 	PortalGinInjector ginInjector;
-	
+
 	//TODO: add action menu to view!
 	
 	@Inject
@@ -26,7 +25,7 @@ public class WikiTab {
 		this.tab = tab;
 		tab.configure("Wiki", "Build narrative content to describe your project in the Wiki.", WebConstants.DOCS_URL + "wikis.html", EntityArea.WIKI);
 	}
-	
+
 	public void lazyInject() {
 		if (wikiPageWidget == null) {
 			this.wikiPageWidget = ginInjector.getWikiPageWidget();
@@ -34,10 +33,11 @@ public class WikiTab {
 			tab.setContent(wikiPageWidget.asWidget());
 		}
 	}
+
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
 		tab.addTabClickedCallback(onClickCallback);
 	}
-	
+
 	public void setWikiReloadHandler(CallbackP<String> wikiReloadHandler) {
 		wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
 	}
@@ -51,19 +51,19 @@ public class WikiTab {
 		wikiPageWidget.showSubpages(tab.getEntityActionMenu());
 		setEntityNameAndPlace(entityId, entityName, wikiPageId);
 	}
-	
+
 	public void setEntityNameAndPlace(String entityId, String entityName, String wikiPageId) {
-		Long versionNumber = null; //version is always null for project
+		Long versionNumber = null; // version is always null for project
 		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, versionNumber, EntityArea.WIKI, wikiPageId));
 	}
-	
+
 	public void clear() {
 		if (wikiPageWidget != null) {
-			wikiPageWidget.clear();	
+			wikiPageWidget.clear();
 		}
 	}
-	
-	public Tab asTab(){
+
+	public Tab asTab() {
 		return tab;
 	}
 }

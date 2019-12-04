@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.List;
 import java.util.Set;
-
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
@@ -33,7 +31,6 @@ import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
-
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -42,7 +39,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidgetView.Presenter{
+public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidgetView.Presenter {
 
 	public static final String PIN_THREAD_ACTION_TEXT = "Pin Thread";
 	public static final String UNPIN_THREAD_ACTION_TEXT = "Unpin Thread";
@@ -75,7 +72,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	NewReplyWidget newReplyWidget;
 	NewReplyWidget secondNewReplyWidget;
 	private CallbackP<String> threadIdClickedCallback, replyIdCallback;
-	
+
 	private Long offset;
 	private DiscussionReplyOrder order;
 	private Boolean ascending;
@@ -96,28 +93,9 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	PopupUtilsView popupUtils;
 	ClientCache clientCache;
 	String message;
-	
+
 	@Inject
-	public SingleDiscussionThreadWidget(
-			SingleDiscussionThreadWidgetView view,
-			SynapseAlert synAlert,
-			UserBadge authorWidget,
-			DiscussionForumClientAsync discussionForumClientAsync,
-			PortalGinInjector ginInjector,
-			DateTimeUtils dateTimeUtils,
-			RequestBuilderWrapper requestBuilder,
-			AuthenticationController authController,
-			GlobalApplicationState globalApplicationState,
-			MarkdownWidget markdownWidget,
-			LoadMoreWidgetContainer loadMoreWidgetContainer,
-			SubscribeButtonWidget subscribeButtonWidget,
-			NewReplyWidget newReplyWidget,
-			NewReplyWidget secondNewReplyWidget,
-			SubscribersWidget threadSubscribersWidget,
-			SynapseJavascriptClient jsClient,
-			PopupUtilsView popupUtils,
-			ClientCache clientCache
-			) {
+	public SingleDiscussionThreadWidget(SingleDiscussionThreadWidgetView view, SynapseAlert synAlert, UserBadge authorWidget, DiscussionForumClientAsync discussionForumClientAsync, PortalGinInjector ginInjector, DateTimeUtils dateTimeUtils, RequestBuilderWrapper requestBuilder, AuthenticationController authController, GlobalApplicationState globalApplicationState, MarkdownWidget markdownWidget, LoadMoreWidgetContainer loadMoreWidgetContainer, SubscribeButtonWidget subscribeButtonWidget, NewReplyWidget newReplyWidget, NewReplyWidget secondNewReplyWidget, SubscribersWidget threadSubscribersWidget, SynapseJavascriptClient jsClient, PopupUtilsView popupUtils, ClientCache clientCache) {
 		this.ginInjector = ginInjector;
 		this.view = view;
 		this.dateTimeUtils = dateTimeUtils;
@@ -128,7 +106,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.requestBuilder = requestBuilder;
 		this.authController = authController;
 		this.globalApplicationState = globalApplicationState;
-		
+
 		this.markdownWidget = markdownWidget;
 		this.repliesContainer = loadMoreWidgetContainer;
 		this.subscribeButtonWidget = subscribeButtonWidget;
@@ -138,7 +116,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.jsClient = jsClient;
 		this.popupUtils = popupUtils;
 		this.clientCache = clientCache;
-		
+
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setAuthor(authorWidget.asWidget());
@@ -153,7 +131,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 				SingleDiscussionThreadWidget.this.threadSubscribersWidget.configure(threadTopic);
 			}
 		};
-		
+
 		subscribeButtonWidget.setOnUnsubscribeCallback(refreshSubscribersCallback);
 		subscribeButtonWidget.setOnSubscribeCallback(refreshSubscribersCallback);
 		loadMoreWidgetContainer.configure(new Callback() {
@@ -180,11 +158,11 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		unpinActionListener = action -> {
 			onClickUnpinThread();
 		};
-		
+
 		deleteActionListener = action -> {
 			onClickDeleteThread();
 		};
-		
+
 		restoreActionListener = action -> {
 			onClickRestore();
 		};
@@ -236,7 +214,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	}
 
 	/**
-	 * After configuring this widget, call this method to pop up an alert when the thread etag changes upstream.
+	 * After configuring this widget, call this method to pop up an alert when the thread etag changes
+	 * upstream.
 	 */
 	public void watchReplyCount() {
 		ReplyCountAlert refreshAlert = ginInjector.getReplyCountAlert();
@@ -249,7 +228,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		view.clear();
 		repliesContainer.clear();
 		view.setTitle(title);
-		view.setCreatedOn(CREATED_ON_PREFIX+dateTimeUtils.getRelativeTime(bundle.getCreatedOn()));
+		view.setCreatedOn(CREATED_ON_PREFIX + dateTimeUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setEditedLabelVisible(bundle.getIsEdited());
 		boolean isDeleted = bundle.getIsDeleted();
 		view.setDeletedThreadVisible(isDeleted);
@@ -279,7 +258,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		}
 		configureActionMenu();
 	}
-	
+
 	public void configureActionMenu() {
 		if (actionMenu != null) {
 			actionMenu.setActionListener(Action.EDIT_THREAD, editActionListener);
@@ -295,27 +274,27 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			}
 		}
 	}
-	
+
 	@Override
 	public void onClickThread() {
 		if (threadIdClickedCallback == null) {
-			globalApplicationState.getPlaceChanger().goTo(TopicUtils.getThreadPlace(projectId, threadId));	
+			globalApplicationState.getPlaceChanger().goTo(TopicUtils.getThreadPlace(projectId, threadId));
 		} else {
 			threadIdClickedCallback.invoke(threadId);
 		}
 	}
-	
+
 	public void setThreadIdClickedCallback(CallbackP<String> threadIdClickedCallback) {
 		this.threadIdClickedCallback = threadIdClickedCallback;
 	}
-	
+
 	public void setReplyIdCallback(CallbackP<String> replyIdCallback) {
 		this.replyIdCallback = replyIdCallback;
 	}
 
 	public void reconfigureThread() {
 		synAlert.clear();
-		jsClient.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>(){
+		jsClient.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -333,14 +312,14 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		synAlert.clear();
 		markdownWidget.clear();
 		subscribeButtonWidget.configure(SubscriptionObjectType.THREAD, threadId, actionMenu);
-		//check cache for message
+		// check cache for message
 		if (clientCache.contains(messageKey + WebConstants.MESSAGE_SUFFIX)) {
-			//cache hit
+			// cache hit
 			setMessage(clientCache.get(messageKey + WebConstants.MESSAGE_SUFFIX));
 		} else {
-			//cache miss
+			// cache miss
 			view.setLoadingMessageVisible(true);
-			jsClient.getThreadUrl(messageKey, new AsyncCallback<String>(){
+			jsClient.getThreadUrl(messageKey, new AsyncCallback<String>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -363,8 +342,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			requestBuilder.sendRequest(null, new RequestCallback() {
 
 				@Override
-				public void onResponseReceived(Request request,
-						Response response) {
+				public void onResponseReceived(Request request, Response response) {
 					int statusCode = response.getStatusCode();
 					if (statusCode == Response.SC_OK) {
 						String message = response.getText();
@@ -386,7 +364,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			synAlert.handleException(e);
 		}
 	}
-	
+
 	public void setMessage(String message) {
 		this.message = message;
 		markdownWidget.configure(message);
@@ -406,43 +384,40 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		loadMore();
 		watchReplyCount();
 	}
-	
+
 	public void setSortDirection(Boolean ascending) {
 		this.ascending = ascending;
 		configureReplies();
 	}
-	
+
 	@Override
 	public void loadMore() {
 		synAlert.clear();
-		jsClient.getRepliesForThread(threadId, LIMIT, offset,
-				order, ascending, DEFAULT_FILTER,
-				new AsyncCallback<List<DiscussionReplyBundle>>(){
+		jsClient.getRepliesForThread(threadId, LIMIT, offset, order, ascending, DEFAULT_FILTER, new AsyncCallback<List<DiscussionReplyBundle>>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						repliesContainer.setIsMore(false);
-						synAlert.handleException(caught);
-					}
+			@Override
+			public void onFailure(Throwable caught) {
+				repliesContainer.setIsMore(false);
+				synAlert.handleException(caught);
+			}
 
-					@Override
-					public void onSuccess(
-							List<DiscussionReplyBundle> results) {
-						boolean isEmpty = results.isEmpty() && offset == 0; //no replies
-						offset += LIMIT;
-						if (!results.isEmpty()) {
-							for (DiscussionReplyBundle bundle : results) {
-								ReplyWidget replyWidget = ginInjector.createReplyWidget();
-								replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, refreshCallback, isThreadDeleted);
-								repliesContainer.add(replyWidget.asWidget());
-							}
-						}
-						repliesContainer.setIsMore(results.size() == LIMIT);
-						view.setSecondNewReplyContainerVisible(!isEmpty);
+			@Override
+			public void onSuccess(List<DiscussionReplyBundle> results) {
+				boolean isEmpty = results.isEmpty() && offset == 0; // no replies
+				offset += LIMIT;
+				if (!results.isEmpty()) {
+					for (DiscussionReplyBundle bundle : results) {
+						ReplyWidget replyWidget = ginInjector.createReplyWidget();
+						replyWidget.configure(bundle, isCurrentUserModerator, moderatorIds, refreshCallback, isThreadDeleted);
+						repliesContainer.add(replyWidget.asWidget());
 					}
+				}
+				repliesContainer.setIsMore(results.size() == LIMIT);
+				view.setSecondNewReplyContainerVisible(!isEmpty);
+			}
 		});
 	}
-	
+
 	public void configureReply(String replyId) {
 		synAlert.clear();
 		repliesContainer.clear();
@@ -469,14 +444,14 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		setReplyId(null);
 		configureReplies();
 	}
-	
+
 	private void setReplyId(String replyId) {
 		this.replyId = replyId;
 		if (replyIdCallback != null) {
-			replyIdCallback.invoke(replyId);	
+			replyIdCallback.invoke(replyId);
 		}
 	}
-	
+
 	@Override
 	public void onClickDeleteThread() {
 		popupUtils.showConfirmDelete(DELETE_CONFIRM_MESSAGE, () -> {
@@ -486,7 +461,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 	public void deleteThread() {
 		synAlert.clear();
-		discussionForumClientAsync.markThreadAsDeleted(threadId, new AsyncCallback<Void>(){
+		discussionForumClientAsync.markThreadAsDeleted(threadId, new AsyncCallback<Void>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -515,7 +490,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 	public void onClickPinThread() {
 		synAlert.clear();
-		discussionForumClientAsync.pinThread(threadId, new AsyncCallback<Void>(){
+		discussionForumClientAsync.pinThread(threadId, new AsyncCallback<Void>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -534,8 +509,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 	public void onClickUnpinThread() {
 		synAlert.clear();
-		discussionForumClientAsync.unpinThread(threadId, new AsyncCallback<Void>(){
-			
+		discussionForumClientAsync.unpinThread(threadId, new AsyncCallback<Void>() {
+
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
@@ -550,11 +525,11 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			}
 		});
 	}
-	
+
 	public void setNewReplyContainerVisible(boolean visible) {
 		view.setReplyContainersVisible(visible);;
 	}
-	
+
 	public void setCommandsVisible(boolean visible) {
 		view.setCommandsVisible(visible);
 	}
@@ -574,7 +549,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 	public void restoreThread() {
 		synAlert.clear();
-		discussionForumClientAsync.restoreThread(threadId, new AsyncCallback<Void>(){
+		discussionForumClientAsync.restoreThread(threadId, new AsyncCallback<Void>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

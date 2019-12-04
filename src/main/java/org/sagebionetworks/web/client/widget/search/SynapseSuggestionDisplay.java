@@ -1,13 +1,11 @@
 package org.sagebionetworks.web.client.widget.search;
 
 import java.util.Collection;
-
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
-
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -26,16 +24,16 @@ public class SynapseSuggestionDisplay extends SuggestBox.DefaultSuggestionDispla
 	private ButtonGroup buttonGroup;
 	private Button prevButton;
 	private Button nextButton;
-	
+
 	private Widget popupContents; // to save when loading.
-	
+
 	private Div loadingPanel;
-	
+
 	public SynapseSuggestionDisplay() {
 		super();
 		getPopupPanel().addStyleName("userGroupSuggestBoxPopup");
 	}
-	
+
 	/**
 	 * Decorates the SuggestBox Popup
 	 */
@@ -44,7 +42,7 @@ public class SynapseSuggestionDisplay extends SuggestBox.DefaultSuggestionDispla
 		setUpFields();
 		FlowPanel suggestList = new FlowPanel();
 		suggestList.add(suggestionList);
-		
+
 		FlowPanel pagingArea = new FlowPanel();
 		pagingArea.addStyleName("userGroupSuggestionPagingArea");
 		pagingArea.add(buttonGroup);
@@ -52,12 +50,23 @@ public class SynapseSuggestionDisplay extends SuggestBox.DefaultSuggestionDispla
 		suggestList.add(pagingArea);
 		return suggestList;
 	}
-	
-	public Label getResultsLabel()	{	return resultsLabel;	}
-	public Button getPrevButton()	{	return prevButton;		}
-	public Button getNextButton()	{	return nextButton;		}
-	public Widget getPopupContents(){	return popupContents;	}
-	
+
+	public Label getResultsLabel() {
+		return resultsLabel;
+	}
+
+	public Button getPrevButton() {
+		return prevButton;
+	}
+
+	public Button getNextButton() {
+		return nextButton;
+	}
+
+	public Widget getPopupContents() {
+		return popupContents;
+	}
+
 	public void showLoading(UIObject suggestBox) {
 		if (loadingPanel == null) {
 			loadingPanel = new Div();
@@ -68,25 +77,27 @@ public class SynapseSuggestionDisplay extends SuggestBox.DefaultSuggestionDispla
 			popupContents = getPopupPanel().getWidget();
 			getPopupPanel().setWidget(loadingPanel);
 		}
-		//When in a bootstrap modal, the popup panel only has the correct top position when the window is scrolled up.
-		//When the modal is scrolled down in the page, the gwt PopupPanel gets confused (because the suggestBox always reports the same top position).
+		// When in a bootstrap modal, the popup panel only has the correct top position when the window is
+		// scrolled up.
+		// When the modal is scrolled down in the page, the gwt PopupPanel gets confused (because the
+		// suggestBox always reports the same top position).
 		if (isInModal(suggestBox.getElement())) {
 			DisplayUtils.scrollToTop();
 		}
 	}
-	
+
 	public void hideLoading() {
 		getPopupPanel().setWidget(popupContents);
 	}
-	
+
 	private void setUpFields() {
 		resultsLabel = new Label();
 		resultsLabel.addStyleName("userGroupSuggesionResultsLabel");
-		
+
 		prevButton = new Button("Prev");
 		prevButton.setEnabled(false);
 		nextButton = new Button("Next");
-		
+
 		buttonGroup = new ButtonGroup();
 		buttonGroup.addStyleName("btn-group btn-group-xs userGroupSuggestionPager");
 		buttonGroup.add(prevButton);
@@ -94,9 +105,7 @@ public class SynapseSuggestionDisplay extends SuggestBox.DefaultSuggestionDispla
 	}
 
 	@Override
-	protected void showSuggestions(final com.google.gwt.user.client.ui.SuggestBox suggestBox,
-			final Collection<? extends Suggestion> suggestions, final boolean isDisplayStringHTML,
-			final boolean isAutoSelectEnabled, final SuggestionCallback callback) {
+	protected void showSuggestions(final com.google.gwt.user.client.ui.SuggestBox suggestBox, final Collection<? extends Suggestion> suggestions, final boolean isDisplayStringHTML, final boolean isAutoSelectEnabled, final SuggestionCallback callback) {
 		int scrollTop = Window.getScrollTop();
 		int scrollLeft = Window.getScrollLeft();
 		Window.scrollTo(0, 0);

@@ -2,10 +2,6 @@ package org.sagebionetworks.web.client.cookie;
 
 import java.util.Collection;
 import java.util.Date;
-
-import org.sagebionetworks.web.client.DisplayUtils;
-
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 
@@ -16,7 +12,7 @@ import com.google.gwt.user.client.Window;
  *
  */
 public class GWTCookieImpl implements CookieProvider {
-	
+
 	@Override
 	public String getCookie(String name) {
 		return Cookies.getCookie(name);
@@ -43,7 +39,7 @@ public class GWTCookieImpl implements CookieProvider {
 		String domain = CookieUtils.getDomain(Window.Location.getHostName());
 		setCookie(name, value, expires, domain, null, isSecure);
 	}
-	
+
 	@Override
 	public void setCookie(String name, String value, Date expires, String domain, String path, boolean secure) {
 		Cookies.setCookie(name, value, expires, domain, path, secure);

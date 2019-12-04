@@ -7,7 +7,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageNavigationTree.SubpageNavTreeNode;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
@@ -57,9 +56,9 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 		w.setWidth("100%");
 		Anchor l = new Anchor(root.getPageTitle());
 		l.addStyleName("subpage-link " + styleName);
-		l.setHref("#!Synapse:" + ((Synapse)root.getTargetPlace()).toToken());
+		l.setHref("#!Synapse:" + ((Synapse) root.getTargetPlace()).toToken());
 		w.add(l);
-		
+
 		ul.add(w, styleName);
 		if (!root.getChildren().isEmpty()) {
 			UnorderedListPanel subList = new UnorderedListPanel();
@@ -73,7 +72,7 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 			final org.gwtbootstrap3.client.ui.Anchor expandAnchor = new org.gwtbootstrap3.client.ui.Anchor();
 			expandAnchor.setIcon(IconType.ANGLE_RIGHT);
 			expandAnchor.setPull(Pull.RIGHT);
-			
+
 			ClickHandler collapseClickHandler = new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -92,7 +91,7 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 					expandAnchor.setVisible(false);
 					root.setCollapsed(false);
 				}
-			}; 
+			};
 			expandAnchor.addClickHandler(expandClickHandler);
 			w.add(collapseAnchor);
 			w.add(expandAnchor);

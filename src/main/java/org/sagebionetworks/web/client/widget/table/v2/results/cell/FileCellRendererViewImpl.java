@@ -5,16 +5,16 @@ import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class FileCellRendererViewImpl implements FileCellRendererView {
-	
-	public interface Binder extends UiBinder<Widget, FileCellRendererViewImpl> {}
-	
+
+	public interface Binder extends UiBinder<Widget, FileCellRendererViewImpl> {
+	}
+
 	@UiField
 	Span loadingUI;
 	@UiField
@@ -26,10 +26,10 @@ public class FileCellRendererViewImpl implements FileCellRendererView {
 	Widget widget;
 
 	@Inject
-	public FileCellRendererViewImpl(Binder binder){
+	public FileCellRendererViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;

@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.presenter.users;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -14,7 +13,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -24,19 +22,15 @@ import com.google.inject.Inject;
 public class RegisterAccountPresenter extends AbstractActivity implements RegisterAccountView.Presenter, Presenter<RegisterAccount> {
 	private RegisterAccount place;
 	private RegisterAccountView view;
-	
+
 	private RegisterWidget registerWidget;
 	private AuthenticationController authController;
 	private GlobalApplicationState globalAppState;
 	SynapseAlert googleSynAlert;
 	private SynapseClientAsync synapseClient;
+
 	@Inject
-	public RegisterAccountPresenter(RegisterAccountView view,
-			SynapseClientAsync synapseClient,
-			RegisterWidget registerWidget,
-			AuthenticationController authController,
-			GlobalApplicationState globalAppState,
-			SynapseAlert googleSynAlert) {
+	public RegisterAccountPresenter(RegisterAccountView view, SynapseClientAsync synapseClient, RegisterWidget registerWidget, AuthenticationController authController, GlobalApplicationState globalAppState, SynapseAlert googleSynAlert) {
 		this.view = view;
 		this.registerWidget = registerWidget;
 		this.authController = authController;
@@ -53,13 +47,13 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 		// Install the view
 		panel.setWidget(view);
 	}
-	
+
 	@Override
 	public void setPlace(RegisterAccount place) {
 		this.place = place;
 		String token = place.toToken();
 		String email = "";
-		if(token != null && !ClientProperties.DEFAULT_PLACE_TOKEN.equals(token)){
+		if (token != null && !ClientProperties.DEFAULT_PLACE_TOKEN.equals(token)) {
 			email = token.trim();
 		}
 		registerWidget.setEmail(email);
@@ -69,9 +63,10 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 			globalAppState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_TOKEN));
 		}
 	}
-	
+
 	/**
 	 * Check that the username/alias is available
+	 * 
 	 * @param username
 	 */
 	public void checkUsernameAvailable(String username) {
@@ -85,6 +80,7 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 					view.setGoogleRegisterButtonEnabled(true);
 				}
 			}
+
 			@Override
 			public void onFailure(Throwable e) {
 				googleSynAlert.handleException(e);

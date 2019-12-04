@@ -8,7 +8,7 @@ public class RegisterAccountFilter extends RedirectFilter {
 	protected String getTargetPage() {
 		return "#!RegisterAccount:0";
 	}
-	
+
 	@Override
 	protected String getUrlPath() {
 		return URL_PATH;

@@ -3,18 +3,21 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
+	<ui:with field='icons'
+		type='org.sagebionetworks.web.client.IconsImageBundle' />
 	<b:Panel marginBottom="0">
 		<b:PanelBody>
 			<bh:Div ui:field="approvedHeading" visible="false">
-				<g:InlineLabel styleName="boldText" text="You have accepted the following terms in order to access these data:" />
+				<g:InlineLabel styleName="boldText"
+					text="You have accepted the following terms in order to access these data:" />
 			</bh:Div>
 			<bh:Div ui:field="unapprovedHeading">
-				<g:InlineLabel styleName="boldText" text="Access to the data requires that you are a registered Synapse user and agree to the following terms and conditions:" />
+				<g:InlineLabel styleName="boldText"
+					text="Access to the data requires that you are a registered Synapse user and agree to the following terms and conditions:" />
 			</bh:Div>
 			<!-- terms -->
 			<b:BlockQuote ui:field="wikiTermsUI" visible="false">
-				<g:SimplePanel ui:field="wikiContainer" />	
+				<g:SimplePanel ui:field="wikiContainer" />
 			</b:BlockQuote>
 			<b:BlockQuote ui:field="termsUI" visible="false">
 				<bh:Paragraph>
@@ -23,15 +26,25 @@
 			</b:BlockQuote>
 			<bh:ClearFix />
 			<bh:Div addStyleNames="margin-top-5">
-				<bh:Div ui:field="manageAccessContainer" pull="RIGHT" addStyleNames="margin-right-5" />
-				<b:Button ui:field="signTermsButton" type="PRIMARY" text="Accept Terms of Use" pull="RIGHT" visible="false" addStyleNames="margin-right-5"/>
-				<b:Button ui:field="loginButton" type="PRIMARY" text="Accept Terms of Use" pull="RIGHT" visible="false" addStyleNames="margin-right-5"/>
-				<bh:Div ui:field="subjectsWidgetContainer" pull="LEFT" addStyleNames="margin-left-5 margin-right-5" />
-				<bh:Div ui:field="editAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5"/>
-				<bh:Div ui:field="deleteAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5" />
-				<b:Alert ui:field="approvedAlert" type="SUCCESS" pull="RIGHT" addStyleNames="padding-5" marginRight="35">
+				<bh:Div ui:field="manageAccessContainer" pull="RIGHT"
+					addStyleNames="margin-right-5" />
+				<b:Button ui:field="signTermsButton" type="PRIMARY"
+					text="Accept Terms of Use" pull="RIGHT" visible="false"
+					addStyleNames="margin-right-5" />
+				<b:Button ui:field="loginButton" type="PRIMARY"
+					text="Accept Terms of Use" pull="RIGHT" visible="false"
+					addStyleNames="margin-right-5" />
+				<bh:Div ui:field="subjectsWidgetContainer" pull="LEFT"
+					addStyleNames="margin-left-5 margin-right-5" />
+				<bh:Div ui:field="editAccessRequirementContainer"
+					pull="RIGHT" addStyleNames="margin-right-5" />
+				<bh:Div ui:field="deleteAccessRequirementContainer"
+					pull="RIGHT" addStyleNames="margin-right-5" />
+				<b:Alert ui:field="approvedAlert" type="SUCCESS"
+					pull="RIGHT" addStyleNames="padding-5" marginRight="35">
 					<bh:Span>
-						<b:Icon ui:field="icon" addStyleNames="font-size-17 black-25-percent" type="CHECK_CIRCLE" />
+						<b:Icon ui:field="icon"
+							addStyleNames="font-size-17 black-25-percent" type="CHECK_CIRCLE" />
 						<bh:Span marginRight="10">
 							Terms of Use Accepted
 						</bh:Span>

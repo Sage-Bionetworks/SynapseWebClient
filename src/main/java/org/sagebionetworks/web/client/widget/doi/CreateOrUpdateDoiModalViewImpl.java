@@ -8,7 +8,6 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.doi.v2.DoiResourceTypeGeneral;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -17,7 +16,8 @@ import com.google.inject.Inject;
 
 public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalView {
 
-	public interface CreateOrUpdateDoiModalViewImplUiBinder extends UiBinder<Widget, CreateOrUpdateDoiModalViewImpl> {}
+	public interface CreateOrUpdateDoiModalViewImplUiBinder extends UiBinder<Widget, CreateOrUpdateDoiModalViewImpl> {
+	}
 
 	private CreateOrUpdateDoiModalView.Presenter presenter;
 	private Widget widget;
@@ -47,7 +47,7 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 	@UiField
 	Div doiOverwriteWarning;
 
-	
+
 	@Inject
 	public CreateOrUpdateDoiModalViewImpl(CreateOrUpdateDoiModalViewImplUiBinder binder) {
 		this.widget = binder.createAndBindUi(this);
@@ -61,7 +61,8 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 
 	private void initializeResourceTypeGeneralSelect() {
 		// SWC-4445
-		// initialize the resource type general select field by adding typical types to the top and adding a separator.
+		// initialize the resource type general select field by adding typical types to the top and adding a
+		// separator.
 		resourceTypeGeneralSelect.addItem(DoiResourceTypeGeneral.Dataset.name());
 		resourceTypeGeneralSelect.addItem(DoiResourceTypeGeneral.Collection.name());
 		resourceTypeGeneralSelect.addItem("────────────────────");
@@ -88,7 +89,7 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 		jobTrackingWidget.setVisible(isLoading);
 		mintDoiButton.setEnabled(!isLoading);
 	}
-	
+
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -153,12 +154,12 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 	public void show() {
 		doiModal.show();
 	}
-	
+
 	@Override
 	public void hide() {
 		doiModal.hide();
 	}
-	
+
 	@Override
 	public void setModalTitle(String newTitle) {
 		title.setText(newTitle);

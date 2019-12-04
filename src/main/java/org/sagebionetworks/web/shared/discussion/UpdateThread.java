@@ -2,7 +2,7 @@ package org.sagebionetworks.web.shared.discussion;
 
 import java.io.Serializable;
 
-public class UpdateThread implements Serializable{
+public class UpdateThread implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	String title;
@@ -12,6 +12,7 @@ public class UpdateThread implements Serializable{
 	public String toString() {
 		return "UpdateThread [title=" + title + ", message=" + message + "]";
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -20,6 +21,7 @@ public class UpdateThread implements Serializable{
 		result = prime * result + ((title == null) ? 0 : title.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -41,15 +43,19 @@ public class UpdateThread implements Serializable{
 			return false;
 		return true;
 	}
+
 	public String getTitle() {
 		return title;
 	}
+
 	public void setTitle(String title) {
 		this.title = title;
 	}
+
 	public String getMessage() {
 		return message;
 	}
+
 	public void setMessage(String message) {
 		this.message = message;
 	}

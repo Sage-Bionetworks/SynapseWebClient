@@ -1,12 +1,9 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryExecutionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -18,17 +15,16 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, QueryExecutionListener{
-	
+public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, QueryExecutionListener {
+
 	public static final String AN_EMPTY_QUERY_IS_NOT_VALID = "An empty query is not valid.";
 	QueryInputView view;
 	SynapseClientAsync synapseClient;
 	QueryInputListener queryInputListener;
 	String startQuery;
-	
+
 	@Inject
-	public QueryInputWidget(QueryInputView view, 
-			SynapseClientAsync synapseClient){
+	public QueryInputWidget(QueryInputView view, SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -37,10 +33,11 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 
 	/**
 	 * Configure this widget.
+	 * 
 	 * @param startQuery
 	 * @param queryInputListener
 	 */
-	public void configure(String startQuery, QueryInputListener queryInputListener, boolean isEditable){
+	public void configure(String startQuery, QueryInputListener queryInputListener, boolean isEditable) {
 		this.startQuery = startQuery;
 		this.queryInputListener = queryInputListener;
 		this.view.setEditVisible(isEditable);
@@ -62,20 +59,21 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 
 	/**
 	 * Validate the given query.
+	 * 
 	 * @param sql
 	 */
 	private void validateAndSendQuery(final String sql) {
-		if(sql == null || "".equals(sql.trim())){
+		if (sql == null || "".equals(sql.trim())) {
 			view.showInputError(true);
 			view.setInputErrorMessage(AN_EMPTY_QUERY_IS_NOT_VALID);
-		}else{
+		} else {
 			// validate the query
 			synapseClient.validateTableQuery(sql, new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
 					setQuery(sql);
 				}
-				
+
 				@Override
 				public void onFailure(Throwable caught) {
 					setFailed(caught);
@@ -84,18 +82,20 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 			});
 		}
 	}
-	
+
 	/**
 	 * Set a valid or modified query
+	 * 
 	 * @param sql
 	 */
-	private void setQuery(String sql){
+	private void setQuery(String sql) {
 		view.showInputError(false);
 		queryInputListener.onExecuteQuery(sql);
 	}
-	
+
 	/**
 	 * Service failure
+	 * 
 	 * @param caught
 	 */
 	private void setFailed(Throwable caught) {
@@ -103,7 +103,7 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 		view.showInputError(true);
 		view.setInputErrorMessage(caught.getMessage());
 	}
-	
+
 	@Override
 	public void queryExecutionStarted() {
 		view.setQueryInputLoading(true);
@@ -140,20 +140,20 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 	public String getInputSQL() {
 		return view.getInputQueryString();
 	}
-	
+
 	@Override
 	public void onShowQuery() {
 		queryInputListener.onShowQuery();
 	}
-	
+
 	public void setQueryInputVisible(boolean visible) {
 		view.setQueryInputVisible(visible);
 	}
-	
+
 	public void setShowQueryVisible(boolean visible) {
 		view.setShowQueryVisible(visible);
 	}
-	
+
 	public void setDownloadFilesVisible(boolean visible) {
 		view.setDownloadFilesVisible(visible);
 	}
@@ -162,12 +162,12 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 	public void onDownloadFilesProgrammatically() {
 		queryInputListener.onShowDownloadFilesProgrammatically();
 	}
-	
+
 	@Override
 	public void onAddToDownloadList() {
 		queryInputListener.onAddToDownloadList();
 	}
-	
+
 	public void setVisible(boolean visible) {
 		view.asWidget().setVisible(visible);
 	}

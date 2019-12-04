@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.login;
 
 import org.gwtbootstrap3.client.ui.ModalSize;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface LoginModalView extends IsWidget {
@@ -15,6 +14,7 @@ public interface LoginModalView extends IsWidget {
 		 * Called when the primary button is pressed.
 		 */
 		void onPrimary();
+
 		void onSubmitComplete(String results);
 	}
 
@@ -43,7 +43,7 @@ public interface LoginModalView extends IsWidget {
 	 * @param error
 	 */
 	public void showErrorMessage(String error);
-	
+
 	/**
 	 * Show an error message.
 	 * 
@@ -72,27 +72,31 @@ public interface LoginModalView extends IsWidget {
 
 	/**
 	 * Set the modal title.
+	 * 
 	 * @param title
 	 */
 	public void setTitle(String title);
 
 	/**
 	 * Set the modal size.
+	 * 
 	 * @param size
 	 */
 	public void setSize(ModalSize size);
-	
+
 	/**
 	 * Set the instructions for the login dialog form
+	 * 
 	 * @param message
 	 */
 	public void setInstructionsMessage(String message);
-	
+
 	/**
 	 * Set the form action url, method, and submit
+	 * 
 	 * @param action
 	 */
 	public void submitForm(String actionUrl, String method, String encodingType);
-	
+
 	void clearForm();
 }

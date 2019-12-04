@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements;
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
 
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 import java.util.Collections;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -22,7 +22,7 @@ import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 
 public class SubjectsWidgetTest {
 	SubjectsWidget widget;
-	
+
 	@Mock
 	DivView mockView;
 	@Mock
@@ -40,13 +40,11 @@ public class SubjectsWidgetTest {
 	@Captor
 	ArgumentCaptor<CallbackP<SubjectWidget>> subjectWidgetCallbackCaptor;
 	public static final String ID = "876787";
-	
+
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new SubjectsWidget(mockView, 
-				mockGinInjector,
-				mockIsACTMemberAsyncHandler);
+		widget = new SubjectsWidget(mockView, mockGinInjector, mockIsACTMemberAsyncHandler);
 		when(mockGinInjector.getSubjectWidget()).thenReturn(mockSubjectWidget);
 		when(mockRestrictableObjectDescriptor.getId()).thenReturn(ID);
 	}
@@ -59,22 +57,22 @@ public class SubjectsWidgetTest {
 	@Test
 	public void testConfigureEntity() {
 		when(mockRestrictableObjectDescriptor.getType()).thenReturn(RestrictableObjectType.ENTITY);
-		
+
 		widget.configure(Collections.singletonList(mockRestrictableObjectDescriptor));
-		
+
 		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackCaptor.capture());
 		CallbackP<Boolean> callback = callbackCaptor.getValue();
 
-		//verify no widget created if not ACT
+		// verify no widget created if not ACT
 		callback.invoke(false);
 		verifyZeroInteractions(mockGinInjector);
-		
-		//verify widget created if ACT
+
+		// verify widget created if ACT
 		callback.invoke(true);
 		verify(mockGinInjector).getSubjectWidget();
 		verify(mockSubjectWidget).configure(mockRestrictableObjectDescriptor, null);
 	}
-	
+
 	@Test
 	public void testConfigureTeamWithDeleteCallback() {
 		when(mockRestrictableObjectDescriptor.getType()).thenReturn(RestrictableObjectType.TEAM);
@@ -84,12 +82,12 @@ public class SubjectsWidgetTest {
 		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackCaptor.capture());
 		CallbackP<Boolean> callback = callbackCaptor.getValue();
 		callback.invoke(true);
-		
+
 		verify(mockGinInjector).getSubjectWidget();
 		verify(mockSubjectWidget).configure(eq(mockRestrictableObjectDescriptor), subjectWidgetCallbackCaptor.capture());
 		CallbackP<SubjectWidget> callbackP = subjectWidgetCallbackCaptor.getValue();
-		
-		//simulate subject deleted by the subjects widget
+
+		// simulate subject deleted by the subjects widget
 		callbackP.invoke(mockSubjectWidget);
 		verify(mockView).remove(mockSubjectWidget);
 		verify(mockDeleteCallback).invoke(mockRestrictableObjectDescriptor);

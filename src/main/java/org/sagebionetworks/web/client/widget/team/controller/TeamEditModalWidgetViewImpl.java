@@ -11,7 +11,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
@@ -27,50 +26,51 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 
 	@UiField
 	TextBox editNameField;
-	
+
 	@UiField
 	TextArea editDescriptionField;
-	
+
 	@UiField
 	CheckBox publicJoinCheckbox;
 	@UiField
 	CheckBox authenticatedUsersCanSendCheckbox;
-	
+
 	@UiField
 	Button primaryButton;
-	
+
 	@UiField
 	Button secondaryButton;
-	
+
 	@UiField
 	Modal modal;
-	
+
 	@UiField
 	SimplePanel synAlertPanel;
-	
+
 	@UiField
 	SimplePanel uploadWidgetPanel;
-	
+
 	@UiField
 	Icon defaultIcon;
-	
+
 	@UiField
 	Image previewImage;
-	
+
 	@UiField
 	LoadingSpinner teamImageLoading;
-	
+
 	@UiField
 	Div iconContainer;
 	@UiField
 	Button removePicture;
-	
-	public interface Binder extends UiBinder<Widget, TeamEditModalWidgetViewImpl> {}
-	
+
+	public interface Binder extends UiBinder<Widget, TeamEditModalWidgetViewImpl> {
+	}
+
 	Widget widget;
 	Presenter presenter;
 	Team team;
-	
+
 	@Inject
 	public TeamEditModalWidgetViewImpl(Binder uiBinder) {
 		this.widget = uiBinder.createAndBindUi(this);
@@ -82,7 +82,7 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 		};
 		secondaryButton.addClickHandler(onCancel);
 		KeyDownHandler saveInfo = event -> {
-			if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+			if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
 				primaryButton.click();
 			}
 		};
@@ -92,7 +92,7 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 		editNameField.addKeyDownHandler(saveInfo);
 		modal.addDomHandler(DisplayUtils.getESCKeyDownHandler(onCancel), KeyDownEvent.getType());
 	}
-	
+
 	@Override
 	public void configure(Team team) {
 		this.team = team;
@@ -105,7 +105,7 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
@@ -115,12 +115,12 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 	public void setAlertWidget(Widget synAlert) {
 		synAlertPanel.setWidget(synAlert);
 	}
-	
+
 	@Override
 	public void setUploadWidget(Widget uploader) {
 		uploadWidgetPanel.setWidget(uploader);
 	}
-	
+
 	@Override
 	public void showLoading() {
 		primaryButton.setText("Uploading");
@@ -129,7 +129,7 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 		teamImageLoading.setVisible(true);
 		removePicture.setVisible(false);
 	}
-	
+
 	@Override
 	public void hideLoading() {
 		primaryButton.setText("Save");
@@ -137,42 +137,42 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 		iconContainer.setVisible(true);
 		teamImageLoading.setVisible(false);
 	}
-	
+
 	@Override
 	public String getName() {
 		return editNameField.getValue();
 	}
-	
+
 	@Override
 	public String getDescription() {
 		return editDescriptionField.getValue();
 	}
-	
+
 	@Override
 	public boolean getPublicJoin() {
 		return publicJoinCheckbox.getValue();
 	}
-	
+
 	@Override
 	public void show() {
 		modal.show();
 		DisplayUtils.focusOnChildInput(modal);
 	}
-	
+
 	@Override
 	public void hide() {
 		modal.hide();
 	}
-	
+
 	@Override
 	public void clear() {
 		editNameField.setValue("");
 		editDescriptionField.setValue("");
-		//defaults to the checkbox unchecked, as it's the most common case
+		// defaults to the checkbox unchecked, as it's the most common case
 		publicJoinCheckbox.setValue(false);
 		setDefaultIconVisible();
 	}
-	
+
 	@Override
 	public void setImageURL(String url) {
 		defaultIcon.setVisible(false);
@@ -180,8 +180,8 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 		teamImageLoading.setVisible(false);
 		previewImage.setUrl(url);
 		removePicture.setVisible(true);
-	}	
-	
+	}
+
 	@Override
 	public void setDefaultIconVisible() {
 		defaultIcon.setVisible(true);
@@ -189,15 +189,17 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 		teamImageLoading.setVisible(false);
 		removePicture.setVisible(false);
 	}
-	
+
 	@Override
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message);
 	}
+
 	@Override
 	public boolean canAuthenticatedUsersSendMessageToTeam() {
 		return authenticatedUsersCanSendCheckbox.getValue();
 	}
+
 	@Override
 	public void setAuthenticatedUsersCanSendMessageToTeam(boolean canSendMessage) {
 		authenticatedUsersCanSendCheckbox.setValue(canSendMessage);

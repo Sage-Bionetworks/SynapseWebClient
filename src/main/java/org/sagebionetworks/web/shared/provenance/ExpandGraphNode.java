@@ -6,9 +6,9 @@ public class ExpandGraphNode extends ProvGraphNode implements IsSerializable {
 	private String id;
 	private String entityId;
 	private Long versionNumber;
-	
-	public ExpandGraphNode() { }
-	
+
+	public ExpandGraphNode() {}
+
 	public ExpandGraphNode(String id, String entityId, Long versionNumber) {
 		super();
 		this.id = id;
@@ -33,11 +33,9 @@ public class ExpandGraphNode extends ProvGraphNode implements IsSerializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result
-				+ ((entityId == null) ? 0 : entityId.hashCode());
+		result = prime * result + ((entityId == null) ? 0 : entityId.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result
-				+ ((versionNumber == null) ? 0 : versionNumber.hashCode());
+		result = prime * result + ((versionNumber == null) ? 0 : versionNumber.hashCode());
 		return result;
 	}
 
@@ -70,10 +68,9 @@ public class ExpandGraphNode extends ProvGraphNode implements IsSerializable {
 
 	@Override
 	public String toString() {
-		return "ExpandTreeNode [id=" + id + ", entityId=" + entityId
-				+ ", versionNumber=" + versionNumber + "]";
+		return "ExpandTreeNode [id=" + id + ", entityId=" + entityId + ", versionNumber=" + versionNumber + "]";
 	}
 
-	
-	
+
+
 }

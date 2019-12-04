@@ -7,7 +7,6 @@ import org.sagebionetworks.repo.model.table.TableConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -21,11 +20,12 @@ public class FacetColumnResultRangeWidget implements IsWidget, FacetColumnResult
 	FacetColumnResultRange facet;
 	CallbackP<FacetColumnRequest> onFacetRequest;
 	SynapseAlert synAlert;
+
 	@Inject
 	public FacetColumnResultRangeWidget(SynapseAlert synAlert) {
 		this.synAlert = synAlert;
 	}
-	
+
 	public void configure(FacetColumnResultRangeView view, FacetColumnResultRange facet, CallbackP<FacetColumnRequest> onFacetRequest) {
 		this.view = view;
 		view.setSynAlert(synAlert.asWidget());
@@ -36,12 +36,11 @@ public class FacetColumnResultRangeWidget implements IsWidget, FacetColumnResult
 		view.setColumnName(facet.getColumnName());
 		view.setLowerBound(facet.getColumnMin());
 		view.setUpperBound(facet.getColumnMax());
-		//by default, set the range to the lowerbound/upperbound
+		// by default, set the range to the lowerbound/upperbound
 		view.setMin(facet.getColumnMin());
 		view.setMax(facet.getColumnMax());
 		boolean isAny = facet.getSelectedMin() == null && facet.getSelectedMax() == null;
-		boolean isNotSetFilter = (facet.getSelectedMin() != null && facet.getSelectedMin().equals(TableConstants.NULL_VALUE_KEYWORD)) ||
-				(facet.getSelectedMax() != null && facet.getSelectedMax().equals(TableConstants.NULL_VALUE_KEYWORD));
+		boolean isNotSetFilter = (facet.getSelectedMin() != null && facet.getSelectedMin().equals(TableConstants.NULL_VALUE_KEYWORD)) || (facet.getSelectedMax() != null && facet.getSelectedMax().equals(TableConstants.NULL_VALUE_KEYWORD));
 		if (isAny) {
 			view.setIsAnyValue();
 		} else if (isNotSetFilter) {
@@ -56,7 +55,7 @@ public class FacetColumnResultRangeWidget implements IsWidget, FacetColumnResult
 			view.setIsRange();
 		}
 	}
-	
+
 	public String getNewMin() {
 		String newMin = view.getMin();
 		if (!DisplayUtils.isDefined(newMin)) {
@@ -65,7 +64,7 @@ public class FacetColumnResultRangeWidget implements IsWidget, FacetColumnResult
 			return newMin;
 		}
 	}
-	
+
 	public String getNewMax() {
 		String newMax = view.getMax();
 		if (!DisplayUtils.isDefined(newMax)) {
@@ -74,7 +73,7 @@ public class FacetColumnResultRangeWidget implements IsWidget, FacetColumnResult
 			return newMax;
 		}
 	}
-	
+
 	@Override
 	public void onFacetChange() {
 		FacetColumnRangeRequest facetColumnRangeRequest = new FacetColumnRangeRequest();
@@ -85,7 +84,7 @@ public class FacetColumnResultRangeWidget implements IsWidget, FacetColumnResult
 		} else if (!view.isAnyValue()) {
 			String newMin = getNewMin();
 			if (newMin != null) {
-				facetColumnRangeRequest.setMin(newMin);	
+				facetColumnRangeRequest.setMin(newMin);
 			}
 			String newMax = getNewMax();
 			if (newMax != null) {
@@ -95,8 +94,8 @@ public class FacetColumnResultRangeWidget implements IsWidget, FacetColumnResult
 		// note, if isAnyValue, request contains null min and null max
 		onFacetRequest.invoke(facetColumnRangeRequest);
 	}
-	
-	
+
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();

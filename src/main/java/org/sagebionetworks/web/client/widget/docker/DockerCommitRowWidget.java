@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.docker;
 
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.web.client.utils.CallbackP;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -14,8 +13,7 @@ public class DockerCommitRowWidget implements IsWidget, DockerCommitRowWidgetVie
 	private CallbackP<DockerCommit> callback;
 
 	@Inject
-	public DockerCommitRowWidget(
-			DockerCommitRowWidgetView view){
+	public DockerCommitRowWidget(DockerCommitRowWidgetView view) {
 		this.view = view;
 		view.setPresenter(this);
 	}

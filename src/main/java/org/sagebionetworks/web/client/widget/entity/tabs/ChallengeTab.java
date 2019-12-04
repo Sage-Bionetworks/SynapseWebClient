@@ -7,24 +7,22 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidget;
-
 import com.google.inject.Inject;
 
-public class ChallengeTab implements ChallengeTabView.Presenter{
+public class ChallengeTab implements ChallengeTabView.Presenter {
 	Tab tab;
 	ChallengeTabView view;
 	AdministerEvaluationsList evaluationList;
 	ChallengeWidget challengeWidget;
 	PortalGinInjector ginInjector;
-	//TODO: add action menu to view!
 	
 	@Inject
-	public ChallengeTab(Tab tab, PortalGinInjector ginInjector){
+	public ChallengeTab(Tab tab, PortalGinInjector ginInjector) {
 		this.tab = tab;
 		this.ginInjector = ginInjector;
 		tab.configure("Challenge", "Challenges are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.", "http://sagebionetworks.org/platforms/", EntityArea.CHALLENGE);
 	}
-	
+
 	public void lazyInject() {
 		if (view == null) {
 			this.view = ginInjector.getChallengeTabView();
@@ -35,10 +33,11 @@ public class ChallengeTab implements ChallengeTabView.Presenter{
 			tab.setContent(view.asWidget());
 		}
 	}
+
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
 		tab.addTabClickedCallback(onClickCallback);
 	}
-	
+
 	public void configure(String entityId, String entityName, EntityBundle projectBundle) {
 		lazyInject();
 		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, null, EntityArea.CHALLENGE, null));
@@ -46,8 +45,8 @@ public class ChallengeTab implements ChallengeTabView.Presenter{
 		evaluationList.configure(entityId);
 		tab.configureEntityActionController(projectBundle, true, null);
 	}
-	
-	public Tab asTab(){
+
+	public Tab asTab() {
 		return tab;
 	}
 }

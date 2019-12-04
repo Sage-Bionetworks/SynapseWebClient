@@ -3,18 +3,24 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
+	<ui:with field='icons'
+		type='org.sagebionetworks.web.client.IconsImageBundle' />
 	<b:Panel marginBottom="0">
 		<b:PanelBody>
 			<bh:Div styleName="margin-bottom-20">
-				<g:Image styleName="displayInline moveup-2 margin-right-5" resource='{icons.shieldRed16}' />
-		       	<b:Icon styleName="displayInline moveup-2 margin-right-5" type="SHIELD" emphasis="DANGER" />
-		       	<g:InlineLabel styleName="font-size-18" text="Access restricted pending review by Synapse Access and Compliance Team." />
+				<g:Image styleName="displayInline moveup-2 margin-right-5"
+					resource='{icons.shieldRed16}' />
+				<b:Icon styleName="displayInline moveup-2 margin-right-5"
+					type="SHIELD" emphasis="DANGER" />
+				<g:InlineLabel styleName="font-size-18"
+					text="Access restricted pending review by Synapse Access and Compliance Team." />
 			</bh:Div>
 			<bh:ClearFix />
 			<bh:Div>
-				<bh:Div ui:field="subjectsWidgetContainer" pull="LEFT" addStyleNames="margin-left-5 margin-right-5" />
-				<bh:Div ui:field="deleteAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5" />
+				<bh:Div ui:field="subjectsWidgetContainer" pull="LEFT"
+					addStyleNames="margin-left-5 margin-right-5" />
+				<bh:Div ui:field="deleteAccessRequirementContainer"
+					pull="RIGHT" addStyleNames="margin-right-5" />
 			</bh:Div>
 			<bh:ClearFix />
 		</b:PanelBody>

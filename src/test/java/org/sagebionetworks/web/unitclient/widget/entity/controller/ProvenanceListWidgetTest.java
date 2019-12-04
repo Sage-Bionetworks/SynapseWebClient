@@ -1,11 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.entity.controller;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.AdditionalMatchers;
@@ -22,8 +25,6 @@ import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWid
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceURLDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryView;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-
 public class ProvenanceListWidgetTest {
 
 	ProvenanceListWidgetView mockView;
@@ -33,14 +34,14 @@ public class ProvenanceListWidgetTest {
 	ProvenanceListWidget presenter;
 	Reference mockRef;
 	EntityRefProvEntryView mockEntityProvEntry;
-	URLProvEntryView mockURLProvEntry; 
-	
+	URLProvEntryView mockURLProvEntry;
+
 	String urlName = "test";
 	String urlAddress = "test.com";
 	String targetId = "syn123";
 	Long version = 1L;
 	List<ProvenanceEntry> rows = new LinkedList<ProvenanceEntry>();
-	
+
 	@Before
 	public void setup() {
 		mockView = mock(ProvenanceListWidgetView.class);
@@ -62,12 +63,12 @@ public class ProvenanceListWidgetTest {
 		rows.add(mockEntityProvEntry);
 		rows.add(mockURLProvEntry);
 	}
-	
+
 	@Test
 	public void testConstruction() {
 		verify(mockView).setPresenter(presenter);
 	}
-	
+
 	@Test
 	public void testConfigure() {
 		presenter.configure(rows);
@@ -75,7 +76,7 @@ public class ProvenanceListWidgetTest {
 		verify(mockEntityProvEntry).setRemoveCallback(any(Callback.class));
 		verify(mockURLProvEntry).setRemoveCallback(any(Callback.class));
 	}
-	
+
 	@Test
 	public void testAddEntityRow() {
 		presenter.addEntityRow();
@@ -90,7 +91,7 @@ public class ProvenanceListWidgetTest {
 		verify(mockView).addRow(mockEntityProvEntry);
 		verify(mockEntityFinder).hide();
 	}
-	
+
 	@Test
 	public void testAddURLRow() {
 		presenter.addURLRow();

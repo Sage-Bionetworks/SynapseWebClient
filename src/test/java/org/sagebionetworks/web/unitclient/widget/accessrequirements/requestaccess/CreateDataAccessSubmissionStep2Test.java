@@ -13,10 +13,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessSubmissionStep2.SUCCESSFULLY_SUBMITTED_MESSAGE;
 import static org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessSubmissionStep2.SUCCESSFULLY_SUBMITTED_TITLE;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -58,7 +56,6 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -110,14 +107,14 @@ public class CreateDataAccessSubmissionStep2Test {
 	ResearchProject mockResearchProject;
 	@Mock
 	ManagedACTAccessRequirement mockACTAccessRequirement;
-	
+
 	@Mock
 	List<AccessorChange> mockAccessorChanges;
 	@Mock
 	List<String> mockOtherFileHandleIds;
 	@Captor
 	ArgumentCaptor<FileHandleAssociation> fhaCaptor;
-	
+
 	@Captor
 	ArgumentCaptor<ModalWizardWidget.WizardCallback> wizardCallbackCaptor;
 	@Captor
@@ -132,7 +129,7 @@ public class CreateDataAccessSubmissionStep2Test {
 	RestrictableObjectDescriptor mockSubject;
 	@Captor
 	ArgumentCaptor<CreateSubmissionRequest> submissionRequestCaptor;
-	
+
 	public static final String FILE_HANDLE_ID = "543345";
 	public static final String FILE_HANDLE_ID2 = "2";
 	public static final String UPLOADED_FILE_NAME = "important-signed.pdf";
@@ -142,10 +139,10 @@ public class CreateDataAccessSubmissionStep2Test {
 	public static final String CURRENT_USER_ID = "9878987";
 	public static final String USER_ID2 = "7777777";
 	public static final String DATA_ACCESS_REQUEST_ETAG = "xxxxxx";
-	
+
 	public static final String TARGET_SUBJECT_ID = "syn1";
 	public static final RestrictableObjectType TARGET_SUBJECT_TYPE = RestrictableObjectType.ENTITY;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
@@ -153,22 +150,10 @@ public class CreateDataAccessSubmissionStep2Test {
 		when(mockOtherDocuments.setUploadButtonText(anyString())).thenReturn(mockOtherDocuments);
 		when(mockOtherDocuments.setCanDelete(anyBoolean())).thenReturn(mockOtherDocuments);
 		when(mockOtherDocuments.setCanUpload(anyBoolean())).thenReturn(mockOtherDocuments);
-		
-		widget = new CreateDataAccessSubmissionStep2(mockView, 
-				mockClient, 
-				mockTemplateFileRenderer, 
-				mockDucUploader, 
-				mockIrbUploader, 
-				mockJsniUtils, 
-				mockAuthController, 
-				mockGinInjector, 
-				mockAccessorsList, 
-				mockPeopleSuggestBox, 
-				mockProvider, 
-				mockOtherDocuments,
-				mockPopupUtils);
+
+		widget = new CreateDataAccessSubmissionStep2(mockView, mockClient, mockTemplateFileRenderer, mockDucUploader, mockIrbUploader, mockJsniUtils, mockAuthController, mockGinInjector, mockAccessorsList, mockPeopleSuggestBox, mockProvider, mockOtherDocuments, mockPopupUtils);
 		widget.setModalPresenter(mockModalPresenter);
-		AsyncMockStubber.callSuccessWith(mockDataAccessRequest).when(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockDataAccessRequest).when(mockClient).getDataAccessRequest(anyLong(), any(AsyncCallback.class));
 		when(mockFileUpload.getFileMeta()).thenReturn(mockFileMetadata);
 		when(mockFileUpload.getFileHandleId()).thenReturn(FILE_HANDLE_ID);
 		when(mockFileMetadata.getFileName()).thenReturn(UPLOADED_FILE_NAME);
@@ -183,7 +168,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		AsyncMockStubber.callSuccessWith(mockDataAccessRequest).when(mockClient).updateDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockClient).submitDataAccessRequest(any(CreateSubmissionRequest.class), anyLong(), any(AsyncCallback.class));
 	}
-	
+
 	@Test
 	public void testConstruction() {
 		verify(mockView).setAccessorListWidget(any(IsWidget.class));
@@ -198,32 +183,33 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockOtherDocuments).setCanDelete(true);
 		verify(mockOtherDocuments).setCanUpload(true);
 	}
-	
+
 	@Test
 	public void testUploadDuc() {
 		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
 		verify(mockDucUploader).configure(anyString(), callbackPCaptor.capture());
 		CallbackP<FileUpload> callback = callbackPCaptor.getValue();
 		callback.invoke(mockFileUpload);
-		
+
 		verify(mockDataAccessRequest).setDucFileHandleId(FILE_HANDLE_ID);
 		verify(mockGinInjector).getFileHandleWidget();
 		verify(mockFileHandleWidget).configure(UPLOADED_FILE_NAME, FILE_HANDLE_ID);
 		verify(mockView).setDUCUploadedFileWidget(mockFileHandleWidget);
 	}
+
 	@Test
 	public void testUploadIrb() {
 		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
 		verify(mockIrbUploader).configure(anyString(), callbackPCaptor.capture());
 		CallbackP<FileUpload> callback = callbackPCaptor.getValue();
 		callback.invoke(mockFileUpload);
-		
+
 		verify(mockDataAccessRequest).setIrbFileHandleId(FILE_HANDLE_ID);
 		verify(mockGinInjector).getFileHandleWidget();
 		verify(mockFileHandleWidget).configure(UPLOADED_FILE_NAME, FILE_HANDLE_ID);
 		verify(mockView).setIRBUploadedFileWidget(mockFileHandleWidget);
 	}
-	
+
 	@Test
 	public void testUserSynapseSuggestion() {
 		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
@@ -235,7 +221,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		assertEquals(SUGGESTED_USER_ID, change.getUserId());
 		assertEquals(AccessType.GAIN_ACCESS, change.getType());
 	}
-	
+
 	@Test
 	public void testConfigure() {
 		when(mockACTAccessRequirement.getIsValidatedProfileRequired()).thenReturn(true);
@@ -259,29 +245,29 @@ public class CreateDataAccessSubmissionStep2Test {
 		assertEquals(FILE_HANDLE_ID, fha.getFileHandleId());
 		assertEquals(FileHandleAssociateType.AccessRequirementAttachment, fha.getAssociateObjectType());
 		assertEquals(ACCESS_REQUIREMENT_ID.toString(), fha.getAssociateObjectId());
-		verify(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
+		verify(mockClient).getDataAccessRequest(anyLong(), any(AsyncCallback.class));
 	}
-	
+
 	@Test
 	public void testConfigureFailure() {
 		String error = "error getting data access request";
 		Exception ex = new Exception(error);
-		AsyncMockStubber.callFailureWith(ex).when(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockClient).getDataAccessRequest(anyLong(), any(AsyncCallback.class));
 		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
-		verify(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
+		verify(mockClient).getDataAccessRequest(anyLong(), any(AsyncCallback.class));
 		verify(mockModalPresenter).setErrorMessage(error);
 	}
-	
+
 	@Test
 	public void testConfigureWithRenewal() {
-		AsyncMockStubber.callSuccessWith(mockDataAccessRenewal).when(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockDataAccessRenewal).when(mockClient).getDataAccessRequest(anyLong(), any(AsyncCallback.class));
 		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
-		
+
 		verify(mockView).setPublicationsVisible(true);
 		verify(mockView).setSummaryOfUseVisible(true);
 		verify(mockView).setPublications(anyString());
 		verify(mockView).setSummaryOfUse(anyString());
-		
+
 		String publications = "publications";
 		when(mockView.getPublications()).thenReturn(publications);
 		String summary = "summary of use";
@@ -292,7 +278,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockDataAccessRenewal).setPublication(publications);
 		verify(mockDataAccessRenewal).setSummaryOfUse(summary);
 	}
-	
+
 	@Test
 	public void testConfigureWithDuc() {
 		when(mockACTAccessRequirement.getIsValidatedProfileRequired()).thenReturn(false);
@@ -306,8 +292,8 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockView, times(2)).setSummaryOfUseVisible(false);
 		verify(mockView).setOtherDocumentUploadVisible(false);
 		verify(mockView).setDUCTemplateVisible(false);
-		verify(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
-		
+		verify(mockClient).getDataAccessRequest(anyLong(), any(AsyncCallback.class));
+
 		verify(mockGinInjector).getFileHandleWidget();
 		verify(mockFileHandleWidget).configure(fhaCaptor.capture());
 		FileHandleAssociation fha = fhaCaptor.getValue();
@@ -316,7 +302,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		assertEquals(DATA_ACCESS_REQUEST_ID, fha.getAssociateObjectId());
 		verify(mockView).setDUCUploadedFileWidget(mockFileHandleWidget);
 	}
-	
+
 	@Test
 	public void testConfigureWithIrb() {
 		when(mockDataAccessRequest.getIrbFileHandleId()).thenReturn(FILE_HANDLE_ID);
@@ -328,8 +314,8 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockView, times(2)).setSummaryOfUseVisible(false);
 		verify(mockView).setOtherDocumentUploadVisible(false);
 		verify(mockView).setDUCTemplateVisible(false);
-		verify(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
-		
+		verify(mockClient).getDataAccessRequest(anyLong(), any(AsyncCallback.class));
+
 		verify(mockGinInjector).getFileHandleWidget();
 		verify(mockFileHandleWidget).configure(fhaCaptor.capture());
 		FileHandleAssociation fha = fhaCaptor.getValue();
@@ -338,7 +324,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		assertEquals(DATA_ACCESS_REQUEST_ID, fha.getAssociateObjectId());
 		verify(mockView).setIRBUploadedFileWidget(mockFileHandleWidget);
 	}
-	
+
 	@Test
 	public void testConfigureWithAttachments() {
 		List<String> otherDocumentIds = new ArrayList<String>();
@@ -353,18 +339,18 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockView, times(2)).setSummaryOfUseVisible(false);
 		verify(mockView).setOtherDocumentUploadVisible(true);
 		verify(mockView).setDUCTemplateVisible(false);
-		verify(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
+		verify(mockClient).getDataAccessRequest(anyLong(), any(AsyncCallback.class));
 		verify(mockOtherDocuments, times(2)).addFileLink(fhaCaptor.capture());
 		List<FileHandleAssociation> fhas = fhaCaptor.getAllValues();
 		assertEquals(FILE_HANDLE_ID, fhas.get(0).getFileHandleId());
 		assertEquals(FileHandleAssociateType.DataAccessRequestAttachment, fhas.get(0).getAssociateObjectType());
 		assertEquals(DATA_ACCESS_REQUEST_ID, fhas.get(0).getAssociateObjectId());
-		
+
 		assertEquals(FILE_HANDLE_ID2, fhas.get(1).getFileHandleId());
 		assertEquals(FileHandleAssociateType.DataAccessRequestAttachment, fhas.get(1).getAssociateObjectType());
 		assertEquals(DATA_ACCESS_REQUEST_ID, fhas.get(1).getAssociateObjectId());
 	}
-	
+
 	@Test
 	public void testConfigureWithAccessorChanges() {
 		List<AccessorChange> accessorUserIds = new ArrayList<AccessorChange>();
@@ -378,37 +364,37 @@ public class CreateDataAccessSubmissionStep2Test {
 		accessorUserIds.add(change2);
 		when(mockDataAccessRequest.getAccessorChanges()).thenReturn(accessorUserIds);
 		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
-		verify(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
+		verify(mockClient).getDataAccessRequest(anyLong(), any(AsyncCallback.class));
 		verify(mockAccessorsList).addSubmitterAccessorChange(change1);
 		verify(mockAccessorsList).addAccessorChange(change2);
 	}
-	
+
 	@Test
 	public void testSubmit() {
 		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
 		when(mockAccessorsList.getAccessorChanges()).thenReturn(mockAccessorChanges);
 		when(mockOtherDocuments.getFileHandleIds()).thenReturn(mockOtherFileHandleIds);
 		widget.onPrimary();
-		
+
 		verify(mockDataAccessRequest).setAccessorChanges(mockAccessorChanges);
 		verify(mockDataAccessRequest).setAttachments(mockOtherFileHandleIds);
 		verify(mockClient).updateDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
-		
-		//submitted (primary button was clicked)
+
+		// submitted (primary button was clicked)
 		verify(mockClient).submitDataAccessRequest(submissionRequestCaptor.capture(), eq(ACCESS_REQUIREMENT_ID), any(AsyncCallback.class));
 		CreateSubmissionRequest submissionRequest = submissionRequestCaptor.getValue();
 		assertEquals(TARGET_SUBJECT_ID, submissionRequest.getSubjectId());
 		assertEquals(TARGET_SUBJECT_TYPE, submissionRequest.getSubjectType());
 		assertEquals(DATA_ACCESS_REQUEST_ID, submissionRequest.getRequestId());
 		assertEquals(DATA_ACCESS_REQUEST_ETAG, submissionRequest.getRequestEtag());
-		
+
 		verify(mockPopupUtils).showInfoDialog(SUCCESSFULLY_SUBMITTED_TITLE, SUCCESSFULLY_SUBMITTED_MESSAGE, null);
 		InOrder order = inOrder(mockModalPresenter);
 		order.verify(mockModalPresenter).setLoading(true);
 		order.verify(mockModalPresenter).setLoading(false);
 		verify(mockModalPresenter).onFinished();
 	}
-	
+
 
 	@Test
 	public void testSubmitFailure() {
@@ -420,7 +406,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockClient).updateDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
 		verify(mockModalPresenter).setErrorMessage(error);
 	}
-	
+
 	@Test
 	public void testSave() {
 		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
@@ -429,17 +415,17 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockModalPresenter).addCallback(wizardCallbackCaptor.capture());
 		// simulate user cancel
 		wizardCallbackCaptor.getValue().onCanceled();
-		
+
 		verify(mockPopupUtils).showConfirmDialog(anyString(), eq(CreateDataAccessSubmissionStep2.SAVE_CHANGES_MESSAGE), callbackCaptor.capture());
-		
-		//simulate user clicks Yes to save
+
+		// simulate user clicks Yes to save
 		callbackCaptor.getValue().invoke();
-		
+
 		verify(mockDataAccessRequest).setAccessorChanges(mockAccessorChanges);
 		verify(mockDataAccessRequest).setAttachments(mockOtherFileHandleIds);
 		verify(mockClient).updateDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
 		verify(mockClient, never()).submitDataAccessRequest(any(CreateSubmissionRequest.class), anyLong(), any(AsyncCallback.class));
-		
+
 		verify(mockPopupUtils).showInfo(CreateDataAccessSubmissionStep2.SAVED_PROGRESS_MESSAGE);
 		InOrder order = inOrder(mockModalPresenter);
 		order.verify(mockModalPresenter).setLoading(true);

@@ -1,13 +1,11 @@
 package org.sagebionetworks.web.client.presenter;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.sagebionetworks.repo.model.quiz.MultichoiceResponse;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Question;
@@ -26,7 +24,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.QuizView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
@@ -45,16 +42,9 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	private PortalGinInjector ginInjector;
 	private Map<Long, QuestionContainerWidget> questionIndexToQuestionWidget;
 	private SynapseAlert synAlert;
-	
+
 	@Inject
-	public QuizPresenter(QuizView view,  
-			AuthenticationController authenticationController, 
-			GlobalApplicationState globalApplicationState,
-			SynapseClientAsync synapseClient,
-			AdapterFactory adapterFactory,
-			JSONObjectAdapter jsonObjectAdapter,
-			PortalGinInjector ginInjector,
-			SynapseAlert synAlert){
+	public QuizPresenter(QuizView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient, AdapterFactory adapterFactory, JSONObjectAdapter jsonObjectAdapter, PortalGinInjector ginInjector, SynapseAlert synAlert) {
 		this.view = view;
 		// Set the presenter on the view
 		this.authenticationController = authenticationController;
@@ -68,7 +58,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		view.setSynAlertWidget(synAlert.asWidget());
 		questionIndexToQuestionWidget = new HashMap<Long, QuestionContainerWidget>();
 	}
-	
+
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
 		panel.setWidget(this.view.asWidget());
@@ -78,13 +68,13 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	public void goTo(Place place) {
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
-	
+
 	@Override
 	public void goToLastPlace() {
 		view.hideLoading();
 		globalApplicationState.gotoLastPlace();
 	}
-	
+
 	@Override
 	public void showQuiz(Quiz quiz) {
 		view.clear();
@@ -99,10 +89,10 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			newQuestion.configure(questionNumber, question, null);
 			view.addQuestionContainerWidget(newQuestion.asWidget());
 			questionNumber++;
-		}	
+		}
 		view.reset();
 	}
-	
+
 	private boolean checkAllAnswered() {
 		for (Long questionIndex : questionIndexToQuestionWidget.keySet()) {
 			if (questionIndexToQuestionWidget.get(questionIndex).getAnswers().isEmpty()) {
@@ -111,17 +101,17 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		}
 		return true;
 	}
-	
+
 	// For testing only
 	public void setQuestionIndexToQuestionWidgetMap(Map<Long, QuestionContainerWidget> ans) {
 		this.questionIndexToQuestionWidget = ans;
 	}
-	
+
 	@Override
 	public void submitAnswers() {
 		synAlert.clear();
-		//submit question/answer combinations for approval
-		//create response object from answers
+		// submit question/answer combinations for approval
+		// create response object from answers
 		QuizResponse submission = new QuizResponse();
 		List<QuestionResponse> questionResponses = new ArrayList<QuestionResponse>();
 
@@ -143,7 +133,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 				else
 					showFailure(passingRecord);
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
@@ -151,29 +141,29 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		};
 		synapseClient.submitCertificationQuizResponse(submission, callback);
 	}
-	
+
 	@Override
 	public void showSuccess(PassingRecord passingRecord) {
 		showQuizFromPassingRecord(passingRecord);
 		scoreQuiz(passingRecord);
-		//show success UI (certificate) and quiz
+		// show success UI (certificate) and quiz
 		view.showSuccess(passingRecord);
 	}
-	
+
 	@Override
 	public void showFailure(PassingRecord passingRecord) {
 		showQuizFromPassingRecord(passingRecord);
 		scoreQuiz(passingRecord);
-		//show failure message and quiz
+		// show failure message and quiz
 		view.showFailure(passingRecord);
 	}
-	
+
 	@Override
 	public void showQuizFromPassingRecord(PassingRecord passingRecord) {
 		view.clear();
 		List<ResponseCorrectness> responseCorrections = passingRecord.getCorrections();
 		Long questionNumber = Long.valueOf(1);
-		for (ResponseCorrectness response: responseCorrections) {
+		for (ResponseCorrectness response : responseCorrections) {
 			QuestionContainerWidget newQuestion = ginInjector.getQuestionContainerWidget();
 			questionIndexToQuestionWidget.put(questionNumber, newQuestion);
 			newQuestion.configure(questionNumber, response.getQuestion(), (MultichoiceResponse) response.getResponse());
@@ -181,26 +171,26 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			questionNumber++;
 		}
 	}
-	
+
 	private void scoreQuiz(PassingRecord passingRecord) {
 		if (passingRecord.getCorrections() == null)
 			return;
 		Long questionNumber = Long.valueOf(1);
-		for (ResponseCorrectness correctness : passingRecord.getCorrections()) {			
-			//indicate success/failure
+		for (ResponseCorrectness correctness : passingRecord.getCorrections()) {
+			// indicate success/failure
 			if (correctness.getQuestion() != null) {
 				QuestionContainerWidget question = questionIndexToQuestionWidget.get(questionNumber++);
 				question.addCorrectnessStyle(correctness.getIsCorrect());
 				question.setEnabled(false);
 			}
 		}
-		//scored quiz cannot be resubmitted
-		view.setSubmitVisible(false);		
+		// scored quiz cannot be resubmitted
+		view.setSubmitVisible(false);
 		if (passingRecord.getCorrections() != null) {
 			view.showScore("Score: " + passingRecord.getScore() + "/" + passingRecord.getCorrections().size());
 		}
 	}
-	
+
 	@Override
 	public void submitClicked() {
 		if (!checkAllAnswered()) {
@@ -210,12 +200,12 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			submitAnswers();
 		}
 	}
-	
+
 	@Override
-    public String mayStop() {
-        view.clear();
-        return null;
-    }
+	public String mayStop() {
+		view.clear();
+		return null;
+	}
 
 	@Override
 	public void setPlace(org.sagebionetworks.web.client.place.Quiz place) {
@@ -224,7 +214,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		questionIndexToQuestionWidget.clear();
 		getIsCertified();
 	}
-	
+
 	public void getIsCertified() {
 		synAlert.clear();
 		view.showLoading();
@@ -232,8 +222,8 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			@Override
 			public void onSuccess(String passingRecordJson) {
 				try {
-					//if certified, show the certificate
-					//otherwise, show the quiz
+					// if certified, show the certificate
+					// otherwise, show the quiz
 					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
 					view.hideLoading();
 					showSuccess(passingRecord);
@@ -241,6 +231,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 					onFailure(e);
 				}
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				view.hideLoading();
@@ -253,7 +244,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		};
 		synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), callback);
 	}
-	
+
 	public void getQuiz() {
 		synAlert.clear();
 		view.showLoading();
@@ -268,7 +259,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 					onFailure(e);
 				}
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				view.hideLoading();

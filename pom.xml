@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 
@@ -16,7 +17,7 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
-		<synapse.version>282.0</synapse.version>
+		<synapse.version>288.0-5-g23cec2e</synapse.version>
 		<gwtVersion>2.8.2</gwtVersion>
 		<org.springframework.version>4.3.18.RELEASE</org.springframework.version>
 		<guiceVersion>3.0</guiceVersion>
@@ -96,20 +97,20 @@
 
 	<build>
 		<resources>
-		  <resource>
-			<directory>src/main/resources</directory>
-			<filtering>true</filtering>
-			<includes>
-			  <include>**/*.properties</include>
-			</includes>
-		  </resource>
-		  <resource>
-			<directory>src/main/resources</directory>
-			<filtering>false</filtering>
-			<excludes>
-			  <exclude>**/*.properties</exclude>
-			</excludes>
-		  </resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>**/*.properties</exclude>
+				</excludes>
+			</resource>
 		</resources>
 
 		<!-- Generate compiled stuff in the folder used for developing mode -->
@@ -165,7 +166,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore/>
+										<ignore />
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -201,8 +202,8 @@
 					<module>org.sagebionetworks.web.Portal${gwt.module.suffix}</module>
 					<!-- GWT compiler options -->
 					<compileReport>true</compileReport>
-					<!-- Disabled because it causes an EmptyStackException on GWT 2.8.1
-					<soycDetailed>true</soycDetailed> -->
+					<!-- Disabled because it causes an EmptyStackException on GWT 2.8.1 
+						<soycDetailed>true</soycDetailed> -->
 					<encoding>${project.build.sourceEncoding}</encoding>
 					<!-- <compilerMetrics>true</compilerMetrics> -->
 					<logLevel>INFO</logLevel>
@@ -232,7 +233,8 @@
 							<attachClasses>true</attachClasses>
 						</configuration>
 					</execution>
-					<!-- This next section is to copy the source maps into the WEB-INF directory (during the package phase, from junit output) -->
+					<!-- This next section is to copy the source maps into the WEB-INF directory 
+						(during the package phase, from junit output) -->
 					<execution>
 						<id>execution2</id>
 						<phase>package</phase>
@@ -250,7 +252,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<!-- We use this assembly to package the GWT RPC dependencies so they 
 				are aviablible fore integration testing. -->
 			<plugin>
@@ -328,7 +330,7 @@
 			<artifactId>gwtvisualizationwrappers</artifactId>
 			<version>${gwtvisualizationwrappers.version}</version>
 		</dependency>
-				
+
 		<!-- Sage Bionetworks Dependencies -->
 		<dependency>
 			<groupId>javax.mail</groupId>
@@ -350,12 +352,12 @@
 			<artifactId>lib-table-query</artifactId>
 			<version>${synapse.version}</version>
 		</dependency>
-				<!-- Provides the S3 log sweeper -->
+		<!-- Provides the S3 log sweeper -->
 		<dependency>
 			<groupId>org.sagebionetworks</groupId>
 			<artifactId>lib-logging</artifactId>
 			<version>${synapse.version}</version>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>org.sagebionetworks</groupId>
 			<artifactId>lib-communicationUtilities</artifactId>
@@ -383,8 +385,8 @@
 			<artifactId>markdown</artifactId>
 			<version>${markdown.version}</version>
 		</dependency>
-		
-		
+
+
 		<!-- Make sure all the Jackson libraries are of the same version -->
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
@@ -423,7 +425,7 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aspects</artifactId>
 			<version>${org.springframework.version}</version>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
@@ -440,10 +442,10 @@
 			<version>${org.springframework.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- Used for timer triggers (cron-like)
-		Note: spring-context-support also depends on this libary as an optional dependancy.
-		Since spring-context-support version 4.0.2-RELEASE uses quartz version 1.8.6 that
-		is the version of quartz we are using.  See the  spring-context-support pom.xml.-->
+		<!-- Used for timer triggers (cron-like) Note: spring-context-support also 
+			depends on this libary as an optional dependancy. Since spring-context-support 
+			version 4.0.2-RELEASE uses quartz version 1.8.6 that is the version of quartz 
+			we are using. See the spring-context-support pom.xml. -->
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz</artifactId>
@@ -580,7 +582,7 @@
 			<artifactId>guava-gwt</artifactId>
 			<version>25.0-jre</version>
 		</dependency>
-		
+
 		<!-- Prov Tree layout -->
 		<dependency>
 			<groupId>org.abego.treelayout</groupId>
@@ -588,7 +590,8 @@
 			<version>1.0.3</version>
 		</dependency>
 
-		<!-- note: This refers to a custom POM in the SageBionetworks artifactory, omitting Guice 2.0 -->
+		<!-- note: This refers to a custom POM in the SageBionetworks artifactory, 
+			omitting Guice 2.0 -->
 		<dependency>
 			<groupId>org.openid4java</groupId>
 			<artifactId>openid4java-nodeps</artifactId>

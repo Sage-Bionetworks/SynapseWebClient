@@ -2,8 +2,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
->
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
 		<b:Panel ui:field="challengeUI">
 			<bh:Div addStyleNames="highlight-title margin-left-5">
@@ -11,19 +10,23 @@
 			</bh:Div>
 			<bh:Div addStyleNames="margin-left-15 padding-bottom-15">
 				<bh:Div>
-					<b:Heading size="H5" text="Challenge ID:" addStyleNames="displayInlineBlock margin-right-10" />
-					<b:Heading size="H5" ui:field="challengeIdHeading" addStyleNames="displayInlineBlock" />
+					<b:Heading size="H5" text="Challenge ID:"
+						addStyleNames="displayInlineBlock margin-right-10" />
+					<b:Heading size="H5" ui:field="challengeIdHeading"
+						addStyleNames="displayInlineBlock" />
 				</bh:Div>
 				<bh:Div>
 					<bh:Div ui:field="submitToChallengeContainer" />
-					<b:Heading size="H5" text="Registered participants team" addStyleNames="displayInlineBlock margin-right-10" />
-					<b:Button ui:field="editTeamButton" type="DEFAULT" text="Edit" icon="EDIT" size="EXTRA_SMALL"/>
+					<b:Heading size="H5" text="Registered participants team"
+						addStyleNames="displayInlineBlock margin-right-10" />
+					<b:Button ui:field="editTeamButton" type="DEFAULT"
+						text="Edit" icon="EDIT" size="EXTRA_SMALL" />
 					<bh:Div ui:field="teamWidgetContainer" />
 				</bh:Div>
 			</bh:Div>
 		</b:Panel>
 		<bh:Div ui:field="selectTeamModalContainer" />
-		<bh:Div ui:field="widgetsContainer"/>
+		<bh:Div ui:field="widgetsContainer" />
 	</bh:Div>
-	
+
 </ui:UiBinder>

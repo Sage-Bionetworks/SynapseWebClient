@@ -2,13 +2,11 @@ package org.sagebionetworks.web.client.widget.team;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.HasNotificationUI;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
-
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -20,24 +18,24 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 	private PortalGinInjector ginInjector;
 	private Map<String, HasNotificationUI> team2Badge = new HashMap<String, HasNotificationUI>();
 	Widget emptyHTML;
-	
+
 	@Inject
 	public TeamListWidgetViewImpl(PortalGinInjector ginInjector) {
 		this.ginInjector = ginInjector;
 		this.emptyHTML = new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY + "</div>").asString());
 	}
-	
+
 	@Override
 	public void clear() {
 		super.clear();
 		team2Badge = new HashMap<String, HasNotificationUI>();
 	}
-	
+
 	@Override
 	public void showEmpty() {
 		add(emptyHTML);
 	}
-	
+
 	@Override
 	public void showLoading() {
 		clear();
@@ -53,7 +51,7 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
-	
+
 	@Override
 	public void addTeam(Team team) {
 		emptyHTML.setVisible(false);
@@ -66,7 +64,7 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 		container.setWidget(teamRendererWidget);
 		add(container);
 	}
-	
+
 	@Override
 	public void setNotificationValue(String teamId, Long notificationCount) {
 		if (notificationCount != null && notificationCount > 0) {

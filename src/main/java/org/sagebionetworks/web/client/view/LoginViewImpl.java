@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.widget.InfoAlert;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -27,8 +26,8 @@ public class LoginViewImpl extends Composite implements LoginView {
 	SimplePanel loginWidgetPanel;
 	@UiField
 	HTMLPanel loginView;
-	
-	//terms of service view
+
+	// terms of service view
 	@UiField
 	Div termsOfServiceView;
 	@UiField
@@ -55,18 +54,19 @@ public class LoginViewImpl extends Composite implements LoginView {
 	Div synAlertContainer;
 	@UiField
 	InfoAlert acceptedTermsOfUse;
-	
+
 	private Presenter presenter;
 	private LoginWidget loginWidget;
 	private Header headerWidget;
-	public interface Binder extends UiBinder<Widget, LoginViewImpl> {}
+
+	public interface Binder extends UiBinder<Widget, LoginViewImpl> {
+	}
+
 	boolean toUInitialized;
-	
-	
+
+
 	@Inject
-	public LoginViewImpl(Binder uiBinder,
-			Header headerWidget,
-			LoginWidget loginWidget) {
+	public LoginViewImpl(Binder uiBinder, Header headerWidget, LoginWidget loginWidget) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.loginWidget = loginWidget;
 		this.headerWidget = headerWidget;
@@ -101,20 +101,19 @@ public class LoginViewImpl extends Composite implements LoginView {
 		hideViews();
 		loginView.setVisible(true);
 		headerWidget.refresh();
-	  	
+
 		// Add the widget to the panel
 		loginWidget.asWidget().removeFromParent();
 		loginWidgetPanel.setWidget(loginWidget.asWidget());
 	}
-	
+
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override
-	public void showLoading() {
-	}
+	public void showLoading() {}
 
 
 	@Override
@@ -128,13 +127,13 @@ public class LoginViewImpl extends Composite implements LoginView {
 		loginWidget.clear();
 		loginWidgetPanel.clear();
 	}
-	
+
 	@Override
 	public void showTermsOfUse(boolean hasAccepted, Callback callback) {
 		hideViews();
 		acceptedTermsOfUse.setVisible(hasAccepted);
-		
-		//initialize checkboxes
+
+		// initialize checkboxes
 		actEthicallyCb.setValue(hasAccepted);
 		actEthicallyCb.setEnabled(!hasAccepted);
 		protectPrivacyCb.setValue(hasAccepted);
@@ -151,15 +150,15 @@ public class LoginViewImpl extends Composite implements LoginView {
 		responsibleDataUseCb.setEnabled(!hasAccepted);
 
 		takePledgeButton.setVisible(!hasAccepted);
-		
+
 		termsOfServiceView.setVisible(true);
-		//initialize if necessary
+		// initialize if necessary
 		if (!toUInitialized) {
 			toUInitialized = true;
 			takePledgeButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					if(validatePledge()) {
+					if (validatePledge()) {
 						callback.invoke();
 					} else {
 						showErrorMessage("To accept these Terms and Conditions for Use, you must first agree to all of the statements.");
@@ -167,11 +166,12 @@ public class LoginViewImpl extends Composite implements LoginView {
 				}
 			});
 		}
-     }
-	
+	}
+
 	private boolean validatePledge() {
 		return actEthicallyCb.getValue() && protectPrivacyCb.getValue() && noHackCb.getValue() && shareCb.getValue() && responsibilityCb.getValue() && lawsCb.getValue() && responsibleDataUseCb.getValue();
 	}
+
 	private void hideViews() {
 		loadingUi.setVisible(false);
 		loadingUiText.setVisible(false);
@@ -179,6 +179,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 		termsOfServiceView.setVisible(false);
 		acceptedTermsOfUse.setVisible(false);
 	}
+
 	@Override
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();

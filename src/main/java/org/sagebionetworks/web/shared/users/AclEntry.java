@@ -1,19 +1,17 @@
 package org.sagebionetworks.web.shared.users;
 
 import java.util.Set;
-
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
-
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class AclEntry implements IsSerializable {
 	private Set<ACCESS_TYPE> accessTypes;
 	private boolean isIndividual;
 	private String ownerId, title, subtitle;
-	
+
 	public AclEntry() {}
 
-	
+
 	public AclEntry(String ownerId, Set<ACCESS_TYPE> accessTypes, String title, String subtitle, boolean isIndividual) {
 		super();
 		this.ownerId = ownerId;
@@ -26,7 +24,7 @@ public class AclEntry implements IsSerializable {
 	public Set<ACCESS_TYPE> getAccessTypes() {
 		return accessTypes;
 	}
-	
+
 	public boolean isIndividual() {
 		return isIndividual;
 	}
@@ -34,27 +32,27 @@ public class AclEntry implements IsSerializable {
 	public void setAccessTypes(Set<ACCESS_TYPE> accessTypes) {
 		this.accessTypes = accessTypes;
 	}
-	
+
 	public String getOwnerId() {
 		return ownerId;
 	}
-	
+
 	public void setOwnerId(String ownerId) {
 		this.ownerId = ownerId;
 	}
-	
+
 	public String getTitle() {
 		return title;
 	}
-	
+
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	
+
 	public String getSubtitle() {
 		return subtitle;
 	}
-	
+
 	public void setSubtitle(String subtitle) {
 		this.subtitle = subtitle;
 	}
@@ -64,12 +62,10 @@ public class AclEntry implements IsSerializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((accessTypes == null) ? 0 : accessTypes.hashCode());
+		result = prime * result + ((accessTypes == null) ? 0 : accessTypes.hashCode());
 		result = prime * result + (isIndividual ? 1231 : 1237);
 		result = prime * result + ((ownerId == null) ? 0 : ownerId.hashCode());
-		result = prime * result
-				+ ((subtitle == null) ? 0 : subtitle.hashCode());
+		result = prime * result + ((subtitle == null) ? 0 : subtitle.hashCode());
 		result = prime * result + ((title == null) ? 0 : title.hashCode());
 		return result;
 	}
@@ -112,10 +108,8 @@ public class AclEntry implements IsSerializable {
 
 	@Override
 	public String toString() {
-		return "AclEntry [accessTypes=" + accessTypes
-				+ ", isIndividual=" + isIndividual + ", ownerId=" + ownerId
-				+ ", title=" + title + ", subtitle=" + subtitle + "]";
+		return "AclEntry [accessTypes=" + accessTypes + ", isIndividual=" + isIndividual + ", ownerId=" + ownerId + ", title=" + title + ", subtitle=" + subtitle + "]";
 	}
-	
-	
+
+
 }

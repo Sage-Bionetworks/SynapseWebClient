@@ -6,7 +6,6 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -20,10 +19,9 @@ public class TeamLeaveModalWidget implements IsWidget, TeamLeaveModalWidgetView.
 	Callback refreshCallback;
 	TeamLeaveModalWidgetView view;
 	Team team;
-	
+
 	@Inject
-	public TeamLeaveModalWidget(SynapseAlert synAlert, SynapseJavascriptClient jsClient,
-			AuthenticationController authenticationController, TeamLeaveModalWidgetView view) {
+	public TeamLeaveModalWidget(SynapseAlert synAlert, SynapseJavascriptClient jsClient, AuthenticationController authenticationController, TeamLeaveModalWidgetView view) {
 		this.authenticationController = authenticationController;
 		this.synAlert = synAlert;
 		this.jsClient = jsClient;
@@ -31,12 +29,12 @@ public class TeamLeaveModalWidget implements IsWidget, TeamLeaveModalWidgetView.
 		view.setPresenter(this);
 		view.setSynAlertWidget(synAlert.asWidget());
 	}
-	
+
 	@Override
 	public void setRefreshCallback(Callback refreshCallback) {
 		this.refreshCallback = refreshCallback;
 	}
-	
+
 	@Override
 	public void onConfirm() {
 		synAlert.clear();
@@ -49,13 +47,14 @@ public class TeamLeaveModalWidget implements IsWidget, TeamLeaveModalWidgetView.
 					refreshCallback.invoke();
 				view.hide();
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
 		});
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();

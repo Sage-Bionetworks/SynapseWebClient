@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.profile;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.utils.Callback;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -11,10 +10,11 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author jhill
  *
  */
-public interface UserProfileModalWidget extends IsWidget, UserProfileModalView.Presenter  {
+public interface UserProfileModalWidget extends IsWidget, UserProfileModalView.Presenter {
 
 	/**
 	 * Show the modal profile editor.
+	 * 
 	 * @param userId The ID of the user to edit.
 	 * @param callback This callback is invoked if the profile changes.
 	 */
@@ -22,6 +22,7 @@ public interface UserProfileModalWidget extends IsWidget, UserProfileModalView.P
 
 	/**
 	 * Show the modal profile editor.
+	 * 
 	 * @param importedProfile
 	 * @param callback
 	 */

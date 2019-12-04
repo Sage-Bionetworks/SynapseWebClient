@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
-
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -14,13 +13,15 @@ public class DiscussionTabViewImpl implements DiscussionTabView {
 	private Presenter presenter;
 
 	Widget widget;
-	public interface TabsViewImplUiBinder extends UiBinder<Widget, DiscussionTabViewImpl> {}
+
+	public interface TabsViewImplUiBinder extends UiBinder<Widget, DiscussionTabViewImpl> {
+	}
 
 	public DiscussionTabViewImpl() {
 		TabsViewImplUiBinder binder = GWT.create(TabsViewImplUiBinder.class);
 		widget = binder.createAndBindUi(this);
 	}
-	
+
 	@Override
 	public void setForum(Widget w) {
 		forumContainer.add(w);

@@ -8,12 +8,12 @@ public class FileDownload implements IsSerializable {
 	private String display;
 	private String checksum;
 	private String contentType;
-	
+
 	/**
 	 * Default constructor
 	 */
 	public FileDownload() {
-		
+
 	}
 
 	public FileDownload(String url, String display, String checksum, String contentType) {
@@ -60,10 +60,8 @@ public class FileDownload implements IsSerializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((checksum == null) ? 0 : checksum.hashCode());
-		result = prime * result
-				+ ((contentType == null) ? 0 : contentType.hashCode());
+		result = prime * result + ((checksum == null) ? 0 : checksum.hashCode());
+		result = prime * result + ((contentType == null) ? 0 : contentType.hashCode());
 		result = prime * result + ((display == null) ? 0 : display.hashCode());
 		result = prime * result + ((url == null) ? 0 : url.hashCode());
 		return result;
@@ -103,10 +101,8 @@ public class FileDownload implements IsSerializable {
 
 	@Override
 	public String toString() {
-		return "FileDownload [url=" + url + ", display=" + display
-				+ ", checksum=" + checksum + ", contentType=" + contentType
-				+ "]";
+		return "FileDownload [url=" + url + ", display=" + display + ", checksum=" + checksum + ", contentType=" + contentType + "]";
 	}
 
-	
+
 }

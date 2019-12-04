@@ -1,6 +1,7 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
@@ -8,23 +9,25 @@
 		dataBackdrop="STATIC" dataKeyboard="false" size="LARGE">
 		<b:ModalBody>
 			<g:SimplePanel ui:field="bodyPanel" />
-			<w:LoadingSpinner size="31px" ui:field="loadingPanel"/>
+			<w:LoadingSpinner size="31px"
+				ui:field="loadingPanel" />
 			<bh:Div styleName="margin-top-15" />
 			<b:Alert ui:field="alert" type="DANGER" visible="false"></b:Alert>
 			<g:FlowPanel addStyleNames="help-panel">
 				<b:BlockQuote styleName="panel scroll-auto">
-					<bh:Text text="To change your&nbsp;"/>
-					<bh:Strong text="email address&nbsp;"/>
+					<bh:Text text="To change your&nbsp;" />
+					<bh:Strong text="email address&nbsp;" />
 					<bh:Text text="or&nbsp;" />
-					<bh:Strong text="password"/>
+					<bh:Strong text="password" />
 					<bh:Text text=", please visit your Synapse account&nbsp;" />
-					<b:Anchor text="Settings" target="_blank" href="#!Profile:v/settings"/>
+					<b:Anchor text="Settings" target="_blank"
+						href="#!Profile:v/settings" />
 					<bh:Text text="&nbsp;page." />
 				</b:BlockQuote>
 			</g:FlowPanel>
 		</b:ModalBody>
 		<b:ModalFooter>
-			<b:Button ui:field="defaultButton" type="LINK" >Cancel</b:Button>
+			<b:Button ui:field="defaultButton" type="LINK">Cancel</b:Button>
 			<b:Button ui:field="primaryButton" type="PRIMARY"
 				dataLoadingText="Processing...">Save</b:Button>
 		</b:ModalFooter>

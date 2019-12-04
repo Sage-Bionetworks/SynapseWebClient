@@ -5,10 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
 import java.util.LinkedList;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.test.helper.examples.ExamplePresenter;
@@ -25,32 +23,32 @@ import org.sagebionetworks.web.test.helper.examples.SampleDTO;
  *
  */
 
-@SuppressWarnings({"rawtypes","unused"})
+@SuppressWarnings({"rawtypes", "unused"})
 public class AsyncServiceRecorderTest {
-	
+
 	ExampleService serviceStub = null;
 	AsyncServiceRecorder<ExampleService, ExampleServiceAsync> recorder = null;
 	ExampleServiceAsync asychProxy = null;
 	ExamplePresenter presenter = null;
-	
+
 	/**
 	 * Create all new objects before each test.
 	 */
 	@Before
-	public void setUp(){
+	public void setUp() {
 		serviceStub = new ExampleServiceStub();
 		// Create our recorder
 		recorder = new AsyncServiceRecorder<ExampleService, ExampleServiceAsync>(serviceStub, ExampleServiceAsync.class);
-		// Create the asynchronous proxy 
+		// Create the asynchronous proxy
 		asychProxy = recorder.createAsyncProxyToRecord();
 		// Create our test presenter
 		presenter = new ExamplePresenter(asychProxy);
 	}
-	
+
 	@Test
-	public void testGetAsyncCallbackTypeFromSynchReturnType(){
+	public void testGetAsyncCallbackTypeFromSynchReturnType() {
 		// Test all eight primitive types
-		
+
 		// int
 		Class inType = int.class;
 		Class expectedOut = Integer.class;
@@ -91,7 +89,7 @@ public class AsyncServiceRecorderTest {
 		expectedOut = Boolean.class;
 		actualOut = AsyncServiceRecorder.getAsyncCallbackTypeFromSynchReturnType(inType);
 		assertEquals(expectedOut, actualOut);
-		
+
 		// Now a few non-primitives
 		// Object
 		inType = Object.class;
@@ -103,19 +101,20 @@ public class AsyncServiceRecorderTest {
 		expectedOut = Exception.class;
 		actualOut = AsyncServiceRecorder.getAsyncCallbackTypeFromSynchReturnType(inType);
 		assertEquals(expectedOut, actualOut);
-		
+
 	}
-	
+
 	/**
 	 * Test a method with no arguments.
-	 * @throws Exception 
+	 * 
+	 * @throws Exception
 	 */
 	@Test
-	public void testNoArgs() throws Exception{
+	public void testNoArgs() throws Exception {
 		// Add some test data to the service stub before we start
 		int idOne = serviceStub.createSample("one", "description for one");
 		int idTwo = serviceStub.createSample("two", "description for two");
-		
+
 		// before we start the recoured should have zero calls
 		assertEquals(0, recorder.getRecoredCallCount());
 		// Now tell the presenter to call the noAgrs method which
@@ -139,19 +138,19 @@ public class AsyncServiceRecorderTest {
 		assertNotNull(two);
 		assertEquals(idTwo, two.getId());
 	}
-	
+
 	@Test
-	public void testWithArgs() throws Exception{
+	public void testWithArgs() throws Exception {
 		// Add some test data to the service stub before we start
 		int id1 = serviceStub.createSample("A", "description for A");
 		int id2 = serviceStub.createSample("B", "description for B");
 		int id3 = serviceStub.createSample("C", "description for C");
-		
+
 		// Create the parameters
 		List<Integer> idList = new LinkedList<Integer>();
 		idList.add(id1);
 		idList.add(id3);
-		
+
 		// Now make the call
 		presenter.doWithArgs(idList);
 		// At this point the presenter should not have any data
@@ -172,9 +171,9 @@ public class AsyncServiceRecorderTest {
 		assertNotNull(two);
 		assertEquals(id3, two.getId());
 	}
-	
+
 	@Test
-	public void testNullReturn() throws Exception{
+	public void testNullReturn() throws Exception {
 		// We do not need any data for this test.
 		// Now make the call
 		presenter.doNullReturn();
@@ -189,9 +188,9 @@ public class AsyncServiceRecorderTest {
 		List<SampleDTO> results = presenter.getNullReturnSuccess();
 		assertNull(results);
 	}
-	
+
 	@Test
-	public void testVoidReturn() throws Exception{
+	public void testVoidReturn() throws Exception {
 		// We do not need any data for this test.
 		// Now make the call
 		presenter.doVoidReturn(12);
@@ -200,12 +199,12 @@ public class AsyncServiceRecorderTest {
 		assertEquals(1, recorder.getRecoredCallCount());
 		// Now play a success
 		recorder.playOnSuccess(0);
-		// 
+		//
 		assertTrue(presenter.isVoidReturnSuccess());
 	}
-	
+
 	@Test
-	public void testCreate() throws Exception{
+	public void testCreate() throws Exception {
 		presenter.doCreateSample("createName", "createDescription");
 		assertNull(presenter.getCreateSucces());
 		// Play should create the sample
@@ -218,8 +217,8 @@ public class AsyncServiceRecorderTest {
 		assertNotNull(created);
 		// Now compare it with the Id the presenter was handed
 		assertNotNull(presenter.getCreateSucces());
-		assertEquals(created.getId(),presenter.getCreateSucces().intValue());
-	
+		assertEquals(created.getId(), presenter.getCreateSucces().intValue());
+
 	}
 
 }

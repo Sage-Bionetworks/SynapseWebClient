@@ -4,8 +4,8 @@ import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface UserProfileEditorWidgetView extends IsWidget {
-	
-	public interface Presenter{
+
+	public interface Presenter {
 	}
 
 	void setUsername(String userName);
@@ -31,7 +31,7 @@ public interface UserProfileEditorWidgetView extends IsWidget {
 	void addImageWidget(IsWidget image);
 
 	void addFileInputWidget(IsWidget fileInputWidget);
-	
+
 	public void setPresenter(Presenter presenter);
 
 	String getLink();

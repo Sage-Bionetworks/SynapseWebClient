@@ -6,7 +6,6 @@ import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION
 import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_2;
 import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_PRIORITY;
 import static org.sagebionetworks.web.shared.WebConstants.REVIEW_DATA_REQUEST_COMPONENT_ID;
-
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -28,7 +27,6 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WebConstants;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -48,16 +46,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	SynapseJSNIUtils jsniUtils;
 
 	@Inject
-	public RestrictionWidget(
-			RestrictionWidgetView view,
-			AuthenticationController authenticationController,
-			DataAccessClientAsync dataAccessClient,
-			SynapseAlert synAlert,
-			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
-			SynapseJavascriptClient jsClient,
-			GWTWrapper gwt,
-			SynapseJSNIUtils jsniUtils
-) {
+	public RestrictionWidget(RestrictionWidgetView view, AuthenticationController authenticationController, DataAccessClientAsync dataAccessClient, SynapseAlert synAlert, IsACTMemberAsyncHandler isACTMemberAsyncHandler, SynapseJavascriptClient jsClient, GWTWrapper gwt, SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.dataAccessClient = dataAccessClient;
@@ -70,33 +59,33 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
 	}
-	
+
 	public void configure(Entity entity, boolean canChangePermissions) {
 		this.entity = entity;
 		this.canChangePermissions = canChangePermissions;
 		loadRestrictionInformation();
 	}
-	
+
 	public void setShowChangeLink(boolean showChangeLink) {
 		this.showChangeLink = showChangeLink;
 	}
-	
+
 	public void setShowIfProject(boolean showIfProject) {
 		this.showIfProject = showIfProject;
 	}
-	
+
 	public void setShowFlagLink(boolean showFlagLink) {
 		this.showFlagLink = showFlagLink;
 	}
-	
+
 	public void showFolderRestrictionUI() {
 		view.showFolderRestrictionUI();
 	}
-	
+
 	public boolean includeRestrictionWidget() {
 		return (entity instanceof FileEntity) || (entity instanceof TableEntity) || (entity instanceof Folder) || (showIfProject && entity instanceof Project);
 	}
-	
+
 	public boolean isAnonymous() {
 		return !authenticationController.isLoggedIn();
 	}
@@ -105,7 +94,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	
+
 	public void loadRestrictionInformation() {
 		view.clear();
 		synAlert.clear();
@@ -114,7 +103,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			public void onSuccess(RestrictionInformationResponse restrictionInformation) {
 				configureUI(restrictionInformation);
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
@@ -122,16 +111,16 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		});
 
 	}
-	
+
 	public void configureUI(RestrictionInformationResponse restrictionInformation) {
 		boolean isAnonymous = isAnonymous();
 		boolean hasAdministrativeAccess = false;
-		
+
 		if (!isAnonymous) {
 			hasAdministrativeAccess = canChangePermissions;
 		}
 		RestrictionLevel restrictionLevel = restrictionInformation.getRestrictionLevel();
-		
+
 		switch (restrictionLevel) {
 			case OPEN:
 				view.showNoRestrictionsUI();
@@ -147,10 +136,11 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			default:
 				throw new IllegalArgumentException(restrictionLevel.toString());
 		}
-		
-		//show the info link if there are any restrictions, or if we are supposed to show the flag link (to allow people to flag or  admin to "change" the data access level).
-		boolean isChangeLink = restrictionLevel==RestrictionLevel.OPEN && hasAdministrativeAccess;
-		boolean isRestricted = restrictionLevel!=RestrictionLevel.OPEN;
+
+		// show the info link if there are any restrictions, or if we are supposed to show the flag link (to
+		// allow people to flag or admin to "change" the data access level).
+		boolean isChangeLink = restrictionLevel == RestrictionLevel.OPEN && hasAdministrativeAccess;
+		boolean isRestricted = restrictionLevel != RestrictionLevel.OPEN;
 		if ((isChangeLink && showChangeLink) || isRestricted) {
 			if (isChangeLink)
 				view.showChangeLink();
@@ -162,33 +152,34 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 				}
 			}
 		}
-		
+
 		if (showFlagLink) {
 			view.showFlagUI();
 		}
 	}
-	
+
 	@Override
 	public void imposeRestrictionOkClicked() {
 		Boolean isYesSelected = view.isYesHumanDataRadioSelected();
 		Boolean isNoSelected = view.isNoHumanDataRadioSelected();
-		
+
 		if (isNoSelected != null && isNoSelected) {
 			// no-op, just hide the dialog
 			imposeRestrictionCancelClicked();
 		} else if ((isYesSelected == null || !isYesSelected) && (isNoSelected == null || !isNoSelected)) {
-			//no selection
+			// no selection
 			view.showErrorMessage("You must make a selection before continuing.");
 		} else {
 			view.showLoading();
 			view.setImposeRestrictionModalVisible(false);
-			
-			dataAccessClient.createLockAccessRequirement(entity.getId(), new AsyncCallback<Void>(){
+
+			dataAccessClient.createLockAccessRequirement(entity.getId(), new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
 					view.showInfo("Successfully imposed restriction");
 					loadRestrictionInformation();
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					synAlert.handleException(caught);
@@ -201,7 +192,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	public void imposeRestrictionCancelClicked() {
 		view.setImposeRestrictionModalVisible(false);
 	}
-	
+
 	@Override
 	public void reportIssueClicked() {
 		// report abuse via Jira issue collector
@@ -212,37 +203,30 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			displayName = DisplayUtils.getDisplayName(userProfile);
 			email = DisplayUtils.getPrimaryEmail(userProfile);
 		}
-		
-		jsniUtils.showJiraIssueCollector(
-				"", // summary
-				FLAG_ISSUE_DESCRIPTION_PART_1 + gwt.getCurrentURL() + FLAG_ISSUE_DESCRIPTION_PART_2,
-				FLAG_ISSUE_COLLECTOR_URL,
-				userId,
-				displayName,
-				email,
-				synId, // Synapse data object ID 
-				REVIEW_DATA_REQUEST_COMPONENT_ID,
-				null, //AR ID
+
+		jsniUtils.showJiraIssueCollector("", // summary
+				FLAG_ISSUE_DESCRIPTION_PART_1 + gwt.getCurrentURL() + FLAG_ISSUE_DESCRIPTION_PART_2, FLAG_ISSUE_COLLECTOR_URL, userId, displayName, email, synId, // Synapse data object ID
+				REVIEW_DATA_REQUEST_COMPONENT_ID, null, // AR ID
 				FLAG_ISSUE_PRIORITY);
 	}
-	
+
 	@Override
 	public void notHumanDataClicked() {
-		//and show the warning message
-		view.setNotSensitiveHumanDataMessageVisible(true);		
+		// and show the warning message
+		view.setNotSensitiveHumanDataMessageVisible(true);
 	}
-	
+
 	@Override
 	public void yesHumanDataClicked() {
-		//and hide the warning message
+		// and hide the warning message
 		view.setNotSensitiveHumanDataMessageVisible(false);
 	}
-	
+
 	@Override
 	public void linkClicked() {
 		view.open("#!AccessRequirements:" + AccessRequirementsPlace.ID_PARAM + "=" + entity.getId() + "&" + AccessRequirementsPlace.TYPE_PARAM + "=" + RestrictableObjectType.ENTITY.toString());
 	}
-	
+
 	@Override
 	public void changeClicked() {
 		isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {

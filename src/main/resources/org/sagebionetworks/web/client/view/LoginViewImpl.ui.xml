@@ -4,66 +4,89 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-	
+
 	<ui:style>
-		div.center {   
-			margin-left: auto;   
-			margin-right: auto;   
-			width: 8em;
-			padding:15px; 
+		div.center {
+		margin-left: auto;
+		margin-right: auto;
+		width: 8em;
+		padding:15px;
 		}
 	</ui:style>
 	<g:HTMLPanel>
 		<div class="clear"></div>
-				<div class="container margin-top-15">
-					<bh:Div ui:field="synAlertContainer"/>
-				<g:HTMLPanel ui:field="loginView" visible="true">
-					<!-- LoginView -->
-					<div class="panel padding-10 col-sm-offset-4 col-sm-4">
-						<div class="padding-15">
-							<g:SimplePanel ui:field="loginWidgetPanel" />
-						</div>
+		<div class="container margin-top-15">
+			<bh:Div ui:field="synAlertContainer" />
+			<g:HTMLPanel ui:field="loginView" visible="true">
+				<!-- LoginView -->
+				<div class="panel padding-10 col-sm-offset-4 col-sm-4">
+					<div class="padding-15">
+						<g:SimplePanel ui:field="loginWidgetPanel" />
 					</div>
-					<br/>
-				</g:HTMLPanel>
-				<w:LoadingSpinner ui:field="loadingUi" visible="false" size="31px" addStyleNames="moveup-2 margin-150 center center-block"/>
-				<b:Heading ui:field="loadingUiText" size="H4" text="Logging you in..." addStyleNames="displayInline center center-block margin-left-5"/>
-				<bh:Div ui:field="termsOfServiceView" visible="false" addStyleNames="max-width-800 center-in-div">
-					<w:InfoAlert ui:field="acceptedTermsOfUse" alertType="SUCCESS" icon="CHECK_SQUARE" linkText="You've accepted the Terms and Conditions for Use" linkTarget="_blank" linkHref="https://s3.amazonaws.com/static.synapse.org/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf?v=5" visible="false" />
-					<bh:Div addStyleNames="light-border padding-10">
-						<bh:Div addStyleNames="highlight-title">
-							<bh:Text>Awareness and Ethics Pledge</bh:Text>
-						</bh:Div>
-						<bh:Div marginLeft="10">
-							<b:Heading size="H5" text="I agree to the following Synapse Operating Ethics Principles:"/>
-							<bh:Div marginBottom="20" marginTop="15">
-								<b:CheckBox ui:field="actEthicallyCb" text="Act ethically and responsibly."/>
-							</bh:Div>
-							<bh:Div marginBottom="20">
-								<b:CheckBox ui:field="protectPrivacyCb" text="Protect and respect data participant's privacy and confidentiality."/>
-							</bh:Div>
-							<bh:Div marginBottom="20">
-								<b:CheckBox ui:field="responsibleDataUseCb" text="Abide by the principles for responsible data use and handling as described in the Synapse Governance Documents."/>
-							</bh:Div>
-							<bh:Div marginBottom="20">
-								<b:CheckBox ui:field="responsibilityCb" text="Take full responsibility for my use of data, software and other Synapse content."/>
-							</bh:Div>
-							<bh:Div marginBottom="20">
-								<b:CheckBox ui:field="shareCb" text="Share content only when I have authority to do so and sharing does not violate any applicable laws or contracts."/>
-							</bh:Div>
-							<bh:Div marginBottom="20">
-								<b:CheckBox ui:field="noHackCb" text="Not hack Synapse."/>
-							</bh:Div>
-							<bh:Div marginBottom="20">
-								<b:CheckBox ui:field="lawsCb" text="Abide by all applicable laws and regulations."/>
-							</bh:Div>
-						</bh:Div>
+				</div>
+				<br />
+			</g:HTMLPanel>
+			<w:LoadingSpinner ui:field="loadingUi"
+				visible="false" size="31px"
+				addStyleNames="moveup-2 margin-150 center center-block" />
+			<b:Heading ui:field="loadingUiText" size="H4"
+				text="Logging you in..."
+				addStyleNames="displayInline center center-block margin-left-5" />
+			<bh:Div ui:field="termsOfServiceView" visible="false"
+				addStyleNames="max-width-800 center-in-div">
+				<w:InfoAlert ui:field="acceptedTermsOfUse"
+					alertType="SUCCESS" icon="CHECK_SQUARE"
+					linkText="You've accepted the Terms and Conditions for Use"
+					linkTarget="_blank"
+					linkHref="https://s3.amazonaws.com/static.synapse.org/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf?v=5"
+					visible="false" />
+				<bh:Div addStyleNames="light-border padding-10">
+					<bh:Div addStyleNames="highlight-title">
+						<bh:Text>Awareness and Ethics Pledge</bh:Text>
 					</bh:Div>
-					<bh:Div>
-						<b:Anchor styleName="link left margin-top-10" text="View complete Terms and Conditions for Use" href="https://s3.amazonaws.com/static.synapse.org/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf?v=5" target="_blank"/>
-						<g:Button ui:field="takePledgeButton" styleName="btn btn-lg btn-primary margin-top-10 right" text="Accept Terms and Conditions for Use"/>
+					<bh:Div marginLeft="10">
+						<b:Heading size="H5"
+							text="I agree to the following Synapse Operating Ethics Principles:" />
+						<bh:Div marginBottom="20" marginTop="15">
+							<b:CheckBox ui:field="actEthicallyCb"
+								text="Act ethically and responsibly." />
+						</bh:Div>
+						<bh:Div marginBottom="20">
+							<b:CheckBox ui:field="protectPrivacyCb"
+								text="Protect and respect data participant's privacy and confidentiality." />
+						</bh:Div>
+						<bh:Div marginBottom="20">
+							<b:CheckBox ui:field="responsibleDataUseCb"
+								text="Abide by the principles for responsible data use and handling as described in the Synapse Governance Documents." />
+						</bh:Div>
+						<bh:Div marginBottom="20">
+							<b:CheckBox ui:field="responsibilityCb"
+								text="Take full responsibility for my use of data, software and other Synapse content." />
+						</bh:Div>
+						<bh:Div marginBottom="20">
+							<b:CheckBox ui:field="shareCb"
+								text="Share content only when I have authority to do so and sharing does not violate any applicable laws or contracts." />
+						</bh:Div>
+						<bh:Div marginBottom="20">
+							<b:CheckBox ui:field="noHackCb"
+								text="Not hack Synapse." />
+						</bh:Div>
+						<bh:Div marginBottom="20">
+							<b:CheckBox ui:field="lawsCb"
+								text="Abide by all applicable laws and regulations." />
+						</bh:Div>
 					</bh:Div>
 				</bh:Div>
-			</div> <!-- close class="container" -->
+				<bh:Div>
+					<b:Anchor styleName="link left margin-top-10"
+						text="View complete Terms and Conditions for Use"
+						href="https://s3.amazonaws.com/static.synapse.org/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf?v=5"
+						target="_blank" />
+					<g:Button ui:field="takePledgeButton"
+						styleName="btn btn-lg btn-primary margin-top-10 right"
+						text="Accept Terms and Conditions for Use" />
+				</bh:Div>
+			</bh:Div>
+		</div> <!-- close class="container" -->
 	</g:HTMLPanel>
 </ui:UiBinder> 

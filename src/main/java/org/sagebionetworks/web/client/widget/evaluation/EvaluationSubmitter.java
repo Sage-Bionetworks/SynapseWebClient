@@ -1,12 +1,10 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.MemberSubmissionEligibility;
 import org.sagebionetworks.evaluation.model.Submission;
@@ -35,11 +33,9 @@ import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterView.Presenter;
 import org.sagebionetworks.web.shared.FormParams;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -72,16 +68,9 @@ public class EvaluationSubmitter implements Presenter {
 	private Set<String> evaluationIds;
 	private SynapseAlert dockerCommitSynAlert;
 	private FormParams formParams;
-	
+
 	@Inject
-	public EvaluationSubmitter(EvaluationSubmitterView view,
-			SynapseJavascriptClient jsClient,
-			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController,
-			ChallengeClientAsync challengeClient,
-			GWTWrapper gwt,
-			PortalGinInjector ginInjector,
-			DockerCommitListWidget dockerCommitList) {
+	public EvaluationSubmitter(EvaluationSubmitterView view, SynapseJavascriptClient jsClient, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController, ChallengeClientAsync challengeClient, GWTWrapper gwt, PortalGinInjector ginInjector, DockerCommitListWidget dockerCommitList) {
 		this.view = view;
 		this.view.setPresenter(this);
 		this.jsClient = jsClient;
@@ -101,7 +90,7 @@ public class EvaluationSubmitter implements Presenter {
 		this.view.setDockerCommitSynAlert(dockerCommitSynAlert.asWidget());
 		this.view.setDockerCommitList(dockerCommitList.asWidget());
 	}
-	
+
 	/**
 	 * 
 	 * @param submissionEntity set to null if an entity finder should be shown
@@ -112,7 +101,7 @@ public class EvaluationSubmitter implements Presenter {
 		challenge = null;
 		evaluation = null;
 		selectedTeam = null;
-		//initialize as an individual submission
+		// initialize as an individual submission
 		isIndividualSubmission = true;
 		teams = new ArrayList<Team>();
 		selectedTeamEligibleMembers = new ArrayList<Long>();
@@ -135,7 +124,7 @@ public class EvaluationSubmitter implements Presenter {
 
 	public void configureWithDockerCommit(Entity submissionEntity) {
 		dockerDigest = null;
-		dockerCommitList.setEmptyListCallback(new Callback(){
+		dockerCommitList.setEmptyListCallback(new Callback() {
 
 			@Override
 			public void invoke() {
@@ -148,14 +137,7 @@ public class EvaluationSubmitter implements Presenter {
 	}
 
 	private void configureWithEvaluations() {
-		try {
-			if (evaluationIds == null)
-				challengeClient.getAvailableEvaluations(getEvalCallback());
-			else
-				challengeClient.getAvailableEvaluations(evaluationIds, getEvalCallback());
-		} catch (RestServiceException e) {
-			view.showErrorMessage(e.getMessage());
-		}
+		jsClient.getAvailableEvaluations(evaluationIds, true, Integer.MAX_VALUE, 0, getEvalCallback());
 	}
 
 	@Override
@@ -164,7 +146,7 @@ public class EvaluationSubmitter implements Presenter {
 		view.setIndividualSubmissionActive();
 		view.hideTeamsUI();
 	}
-	
+
 	@Override
 	public void onTeamSubmissionOptionClicked() {
 		isIndividualSubmission = false;
@@ -175,22 +157,20 @@ public class EvaluationSubmitter implements Presenter {
 			view.showTeamsUI(teams);
 		}
 	}
-	
-	private AsyncCallback<PaginatedResults<Evaluation>> getEvalCallback() {
+
+	private AsyncCallback<List<Evaluation>> getEvalCallback() {
 		challengeListSynAlert.clear();
-		AsyncCallback<PaginatedResults<Evaluation>> callback = new AsyncCallback<PaginatedResults<Evaluation>>() {
+		AsyncCallback<List<Evaluation>> callback = new AsyncCallback<List<Evaluation>>() {
 			@Override
-			public void onSuccess(PaginatedResults<Evaluation> results) {
-				List<Evaluation> evaluations = results.getResults();
+			public void onSuccess(List<Evaluation> evaluations) {
 				if (evaluations == null || evaluations.size() == 0) {
-					//no available evaluations, pop up an info dialog
+					// no available evaluations, pop up an info dialog
 					view.showErrorMessage(DisplayConstants.NOT_PARTICIPATING_IN_ANY_EVALUATIONS);
-				} 
-				else {
+				} else {
 					view.showModal1(submissionEntity != null, formParams, evaluations);
 				}
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				// modal 1
@@ -199,25 +179,26 @@ public class EvaluationSubmitter implements Presenter {
 		};
 		return callback;
 	}
-	
-		
+
+
 	@Override
 	public void onNextClicked(Reference selectedReference, String submissionName, Evaluation evaluation) {
-		//in any case look up the entity (to make sure we have the most recent version, for the current etag
+		// in any case look up the entity (to make sure we have the most recent version, for the current
+		// etag
 		submissionEntityVersion = null;
 		if (submissionEntity != null) {
 			submissionEntityId = submissionEntity.getId();
 			if (submissionEntity instanceof Versionable)
-				submissionEntityVersion = ((Versionable)submissionEntity).getVersionNumber();
-		}
-		else {
+				submissionEntityVersion = ((Versionable) submissionEntity).getVersionNumber();
+		} else {
 			submissionEntityId = selectedReference.getTargetId();
 			submissionEntityVersion = selectedReference.getTargetVersionNumber();
 		}
 		this.submissionName = submissionName;
 		this.evaluation = evaluation;
-		//The standard is to attach access requirements to the associated team, and show them when joining the team.
-		//So access requirements are not checked again here.
+		// The standard is to attach access requirements to the associated team, and show them when joining
+		// the team.
+		// So access requirements are not checked again here.
 		queryForChallenge();
 	}
 
@@ -232,39 +213,41 @@ public class EvaluationSubmitter implements Presenter {
 				challenge = result;
 				refreshRegisteredTeams();
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				view.resetNextButton();
-				//if challenge is not found, or if user has access to the evaluation queue but not the project (messy setup)
+				// if challenge is not found, or if user has access to the evaluation queue but not the project
+				// (messy setup)
 				if (caught instanceof NotFoundException || caught instanceof ForbiddenException) {
-					//no need to show second page, this is a submission to a non-challenge eval queue.
+					// no need to show second page, this is a submission to a non-challenge eval queue.
 					onDoneClicked();
 				} else {
-					view.showErrorMessage("Error querying for associated challenge: " + caught.getMessage());	
+					view.showErrorMessage("Error querying for associated challenge: " + caught.getMessage());
 				}
 			}
 		});
 	}
-	
+
 	@Override
 	public void refreshRegisteredTeams() {
 		challengeClient.getSubmissionTeams(authenticationController.getCurrentUserPrincipalId(), challenge.getId(), getTeamsCallback());
 	}
-	
+
 	@Override
 	public void onNewTeamClicked() {
 		if (authenticationController.isLoggedIn())
-			globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()+Profile.DELIMITER + Synapse.ProfileArea.TEAMS));
+			globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId() + Profile.DELIMITER + Synapse.ProfileArea.TEAMS));
 		else {
 			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		}
 	}
-	
+
 	@Override
 	public void onRegisterTeamClicked() {
 		view.showRegisterTeamDialog(challenge.getId());
 	}
-	
+
 	private AsyncCallback<List<Team>> getTeamsCallback() {
 		teamSelectSynAlert.clear();
 		AsyncCallback<List<Team>> callback = new AsyncCallback<List<Team>>() {
@@ -278,11 +261,11 @@ public class EvaluationSubmitter implements Presenter {
 				} else {
 					onIndividualSubmissionOptionClicked();
 				}
-				
+
 				view.hideModal1();
 				view.showModal2();
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				// modal 2
@@ -291,13 +274,13 @@ public class EvaluationSubmitter implements Presenter {
 		};
 		return callback;
 	}
-	
+
 	@Override
 	public void onDoneClicked() {
 		view.hideModal1();
 		view.setSubmitButtonLoading();
 		if (!isIndividualSubmission) {
-			//team submission
+			// team submission
 			if (selectedTeam == null) {
 				view.showErrorMessage("Please select a team.");
 				return;
@@ -308,6 +291,7 @@ public class EvaluationSubmitter implements Presenter {
 		}
 		lookupEtagAndCreateSubmission(submissionEntityId, submissionEntityVersion);
 	}
+
 	@Override
 	public void onTeamSelected(int selectedIndex) {
 		selectedTeam = null;
@@ -315,26 +299,26 @@ public class EvaluationSubmitter implements Presenter {
 		selectedTeamEligibleMembers.clear();
 		view.clearContributors();
 		view.setTeamInEligibleError("");
-		//resolve team from team name
-		if (selectedIndex >= 0 && selectedIndex<teams.size()) {
+		// resolve team from team name
+		if (selectedIndex >= 0 && selectedIndex < teams.size()) {
 			selectedTeam = teams.get(selectedIndex);
 			getContributorList(evaluation, selectedTeam);
 		}
 	}
-	
+
 	public void getContributorList(final Evaluation evaluation, final Team selectedTeam) {
 		contributorSynAlert.clear();
-		//get contributor list for this team
+		// get contributor list for this team
 		view.setContributorsLoading(true);
 		AsyncCallback<TeamSubmissionEligibility> callback = new AsyncCallback<TeamSubmissionEligibility>() {
 			@Override
 			public void onSuccess(TeamSubmissionEligibility teamEligibility) {
 				view.setContributorsLoading(false);
-				//is the team eligible???
+				// is the team eligible???
 				SubmissionEligibility teamSubmissionEligibility = teamEligibility.getTeamEligibility();
 				if (!teamSubmissionEligibility.getIsEligible()) {
-					//show the error
-					String reason = ""; //unknown reason
+					// show the error
+					String reason = ""; // unknown reason
 					if (!teamSubmissionEligibility.getIsRegistered()) {
 						reason = selectedTeam.getName() + " is not registered for this challenge. Please register this team, or select a different team.";
 					} else if (teamSubmissionEligibility.getIsQuotaFilled()) {
@@ -343,13 +327,13 @@ public class EvaluationSubmitter implements Presenter {
 					view.setTeamInEligibleError(reason);
 				} else {
 					selectedTeamMemberStateHash = teamEligibility.getEligibilityStateHash().toString();
-					
+
 					for (MemberSubmissionEligibility memberEligibility : teamEligibility.getMembersEligibility()) {
 						if (memberEligibility.getIsEligible()) {
 							selectedTeamEligibleMembers.add(memberEligibility.getPrincipalId());
 							view.addEligibleContributor(memberEligibility.getPrincipalId().toString());
 						} else {
-							String reason = ""; //unknown reason
+							String reason = ""; // unknown reason
 							if (!memberEligibility.getIsRegistered()) {
 								reason = "Not registered for the challenge.";
 							} else if (memberEligibility.getIsQuotaFilled()) {
@@ -362,6 +346,7 @@ public class EvaluationSubmitter implements Presenter {
 					}
 				}
 			};
+
 			@Override
 			public void onFailure(Throwable caught) {
 				// modal 2
@@ -371,9 +356,9 @@ public class EvaluationSubmitter implements Presenter {
 		};
 		challengeClient.getTeamSubmissionEligibility(evaluation.getId(), selectedTeam.getId(), callback);
 	}
-	
+
 	public void lookupEtagAndCreateSubmission(final String id, final Long ver) {
-		//look up entity for the current etag
+		// look up entity for the current etag
 		jsClient.getEntity(id, new AsyncCallback<Entity>() {
 			public void onSuccess(Entity result) {
 				Entity entity;
@@ -382,30 +367,30 @@ public class EvaluationSubmitter implements Presenter {
 				if (ver != null)
 					v = ver;
 				else if (entity instanceof Versionable)
-					v = ((Versionable)entity).getVersionNumber();
-				 else {
-					 //entity is not versionable, the service will not accept null, but will accept a version of 1
+					v = ((Versionable) entity).getVersionNumber();
+				else {
+					// entity is not versionable, the service will not accept null, but will accept a version of 1
 					v = 1L;
-				 }
-					 
+				}
+
 				submitToEvaluation(id, v, entity.getEtag());
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(caught.getMessage());
 			}
 		});
 	}
-	
+
 	public void submitToEvaluation(String entityId, Long versionNumber, final String etag) {
-		//set up shared values across all submissions
+		// set up shared values across all submissions
 		Submission newSubmission = getNewSubmission(entityId, versionNumber);
 		submitToEvaluation(newSubmission, etag);
 	}
-	
+
 	public Submission getNewSubmission(String entityId, Long versionNumber) {
-		//set up shared values across all submissions
+		// set up shared values across all submissions
 		Submission newSubmission = new Submission();
 		newSubmission.setEntityId(entityId);
 		newSubmission.setUserId(authenticationController.getCurrentUserPrincipalId());
@@ -426,16 +411,16 @@ public class EvaluationSubmitter implements Presenter {
 		}
 		return newSubmission;
 	}
-	
+
 	public void submitToEvaluation(final Submission newSubmission, final String etag) {
-		//and create a new submission for each evaluation
+		// and create a new submission for each evaluation
 		newSubmission.setEvaluationId(evaluation.getId());
 		try {
 			String memberStateHash = null;
 			if (isIndividualSubmission) {
 				challengeClient.createIndividualSubmission(newSubmission, etag, gwt.getHostPageBaseURL(), getSubmissionCallback());
 			} else {
-				//team submission
+				// team submission
 				newSubmission.setTeamId(selectedTeam.getId());
 				memberStateHash = selectedTeamMemberStateHash;
 				challengeClient.createTeamSubmission(newSubmission, etag, memberStateHash, gwt.getHostPageBaseURL(), getSubmissionCallback());
@@ -444,50 +429,52 @@ public class EvaluationSubmitter implements Presenter {
 			view.showErrorMessage(e.getMessage());
 		}
 	}
-	
+
 	public AsyncCallback<Submission> getSubmissionCallback() {
-		return new AsyncCallback<Submission>() {			
+		return new AsyncCallback<Submission>() {
 			@Override
 			public void onSuccess(Submission result) {
-				//result is the updated submission
+				// result is the updated submission
 				String message = evaluation.getSubmissionReceiptMessage();
-				if (message == null || message.length()==0)
+				if (message == null || message.length() == 0)
 					message = DisplayConstants.SUBMISSION_RECEIVED_TEXT;
 				view.hideModal2();
 				view.showSubmissionAcceptedDialogs(message);
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(caught.getMessage());
 			}
 		};
 	}
-	
+
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	
+
 	/***************************
 	 * Exposed for unit tests
+	 * 
 	 * @return
 	 ****************************/
-	
+
 	public Challenge getChallenge() {
 		return challenge;
 	}
-	
+
 	public Team getSelectedTeam() {
 		return selectedTeam;
 	}
-	
+
 	public String getSelectedTeamMemberStateHash() {
 		return selectedTeamMemberStateHash;
 	}
-	
+
 	public List<Long> getSelectedTeamEligibleMembers() {
 		return selectedTeamEligibleMembers;
 	}
+
 	public boolean getIsIndividualSubmission() {
 		return isIndividualSubmission;
 	}

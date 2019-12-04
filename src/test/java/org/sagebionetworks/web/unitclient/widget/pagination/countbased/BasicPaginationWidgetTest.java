@@ -1,28 +1,29 @@
 package org.sagebionetworks.web.unitclient.widget.pagination.countbased;
 
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 import org.junit.Before;
 import org.junit.Test;
-import static org.mockito.Mockito.*;
 import org.mockito.Mockito;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationView;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.pagination.countbased.BasicPaginationWidget;
 
 public class BasicPaginationWidgetTest {
-	
+
 	PageChangeListener mockPageChangeListener;
 	BasicPaginationView mockView;
 	BasicPaginationWidget widget;
-	
+
 	@Before
-	public void before(){
+	public void before() {
 		mockView = Mockito.mock(BasicPaginationView.class);
 		mockPageChangeListener = Mockito.mock(PageChangeListener.class);
 		widget = new BasicPaginationWidget(mockView);
 	}
-	
+
 	@Test
-	public void testCountZero(){
+	public void testCountZero() {
 		long limit = 10;
 		long offset = 0;
 		long count = 0;
@@ -32,9 +33,9 @@ public class BasicPaginationWidgetTest {
 		long currentPageNumber = 1;
 		verify(mockView).setCurrentPage(currentPageNumber);
 	}
-	
+
 	@Test
-	public void testOnePage(){
+	public void testOnePage() {
 		long limit = 10;
 		long offset = 0;
 		long count = 10;
@@ -44,11 +45,11 @@ public class BasicPaginationWidgetTest {
 		long currentPageNumber = 1;
 		verify(mockView).setCurrentPage(currentPageNumber);
 	}
-	
+
 	@Test
-	public void testOneOfThreePages(){
+	public void testOneOfThreePages() {
 		long limit = 10;
-		long offset = limit*0;
+		long offset = limit * 0;
 		long count = 21;
 		widget.configure(limit, offset, count, mockPageChangeListener);
 		verify(mockView).setNextVisible(true);
@@ -58,9 +59,9 @@ public class BasicPaginationWidgetTest {
 	}
 
 	@Test
-	public void testTwoOfThreePages(){
+	public void testTwoOfThreePages() {
 		long limit = 10;
-		long offset = limit*1;
+		long offset = limit * 1;
 		long count = 21;
 		widget.configure(limit, offset, count, mockPageChangeListener);
 		verify(mockView).setNextVisible(true);
@@ -68,11 +69,11 @@ public class BasicPaginationWidgetTest {
 		long currentPageNumber = 2;
 		verify(mockView).setCurrentPage(currentPageNumber);
 	}
-	
+
 	@Test
-	public void testThreeOfThreePages(){
+	public void testThreeOfThreePages() {
 		long limit = 10;
-		long offset = limit*2;
+		long offset = limit * 2;
 		long count = 21;
 		widget.configure(limit, offset, count, mockPageChangeListener);
 		verify(mockView).setNextVisible(false);
@@ -80,11 +81,11 @@ public class BasicPaginationWidgetTest {
 		long currentPageNumber = 3;
 		verify(mockView).setCurrentPage(currentPageNumber);
 	}
-	
+
 	@Test
-	public void testOnNext(){
+	public void testOnNext() {
 		long limit = 10;
-		long offset = limit*1;
+		long offset = limit * 1;
 		long count = 21;
 		widget.configure(limit, offset, count, mockPageChangeListener);
 		verify(mockView).setNextVisible(true);
@@ -96,11 +97,11 @@ public class BasicPaginationWidgetTest {
 		verify(mockView).setPreviousVisible(false);
 		verify(mockPageChangeListener).onPageChange(20L);
 	}
-	
+
 	@Test
-	public void testOnPrevious(){
+	public void testOnPrevious() {
 		long limit = 10;
-		long offset = limit*1;
+		long offset = limit * 1;
 		long count = 21;
 		widget.configure(limit, offset, count, mockPageChangeListener);
 		verify(mockView).setNextVisible(true);

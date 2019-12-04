@@ -4,7 +4,9 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<b:Panel>
 		<b:PanelBody>
-			<b:Badge addStyleNames="synapse-purple-bg movedown-9 margin-right-10" pull="RIGHT">
+			<b:Badge
+				addStyleNames="synapse-purple-bg movedown-9 margin-right-10"
+				pull="RIGHT">
 				<bh:Span addStyleNames="font-size-24">
 					<bh:Span ui:field="numberOfSubmissions"></bh:Span>
 					<bh:Span> requests </bh:Span>

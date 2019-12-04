@@ -18,7 +18,9 @@ public class DockerTabViewImpl implements DockerTabView {
 
 	Presenter presenter;
 	Widget widget;
-	public interface TabsViewImplUiBinder extends UiBinder<Widget, DockerTabViewImpl> {}
+
+	public interface TabsViewImplUiBinder extends UiBinder<Widget, DockerTabViewImpl> {
+	}
 
 	public DockerTabViewImpl() {
 		TabsViewImplUiBinder binder = GWT.create(TabsViewImplUiBinder.class);

@@ -2,21 +2,21 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import java.util.Arrays;
 import java.util.List;
-
 import org.sagebionetworks.web.client.StringUtils;
-
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+
 /**
  * The boolean cell editor allows for nothing, true, and false.
+ * 
  * @author Jay
  *
  */
 public class BooleanFormCellEditor implements CellEditor {
-	
+
 	public static final String FALSE = "false";
 	public static final String TRUE = "true";
 
@@ -24,9 +24,9 @@ public class BooleanFormCellEditor implements CellEditor {
 	 * The possible values for this editor.
 	 */
 	private static final List<String> VALUES = Arrays.asList(TRUE, FALSE);
-		
+
 	RadioCellEditorView view;
-	
+
 	@Inject
 	public BooleanFormCellEditor(RadioCellEditorView view) {
 		this.view = view;
@@ -47,10 +47,10 @@ public class BooleanFormCellEditor implements CellEditor {
 	@Override
 	public void setValue(String value) {
 		value = StringUtils.emptyAsNull(value);
-		if(value != null){
-			if(Boolean.parseBoolean(value)){
+		if (value != null) {
+			if (Boolean.parseBoolean(value)) {
 				view.setValue(0);
-			}else{
+			} else {
 				view.setValue(1);
 			}
 		}
@@ -62,7 +62,7 @@ public class BooleanFormCellEditor implements CellEditor {
 		if (value == null) {
 			return null;
 		}
-		switch (value){
+		switch (value) {
 			case 0:
 				return TRUE;
 			default:

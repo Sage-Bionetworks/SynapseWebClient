@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -40,8 +39,7 @@ public class SynapseFormConfigViewImpl implements SynapseFormConfigView {
 	}
 
 	@Override
-	public void checkParams() throws IllegalArgumentException {
-	}
+	public void checkParams() throws IllegalArgumentException {}
 
 	@Override
 	public Widget asWidget() {
@@ -59,8 +57,7 @@ public class SynapseFormConfigViewImpl implements SynapseFormConfigView {
 	}
 
 	@Override
-	public void showLoading() {
-	}
+	public void showLoading() {}
 
 	@Override
 	public void showInfo(String message) {
@@ -68,8 +65,7 @@ public class SynapseFormConfigViewImpl implements SynapseFormConfigView {
 	}
 
 	@Override
-	public void clear() {
-	}
+	public void clear() {}
 
 	@Override
 	public String getEntityId() {

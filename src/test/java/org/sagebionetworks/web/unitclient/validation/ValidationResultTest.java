@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.unitclient.validation;
 
-import static org.sagebionetworks.web.client.validation.ValidationResult.*;
-import static org.junit.Assert.*;
-
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.sagebionetworks.web.client.validation.ValidationResult.IS_REQUIRED;
 import org.junit.Test;
 import org.sagebionetworks.web.client.validation.ValidationResult;
 

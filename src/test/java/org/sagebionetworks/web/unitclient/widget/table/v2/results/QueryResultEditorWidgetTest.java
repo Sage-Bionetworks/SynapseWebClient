@@ -1,15 +1,21 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-import static org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget.*;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +47,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.asynch.JobTrackingWidgetStub;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
-
 import com.google.gwt.event.shared.EventBus;
 
 /**
@@ -65,7 +70,7 @@ public class QueryResultEditorWidgetTest {
 	RowSet rowSet;
 
 	SelectColumn select;
-	
+
 	Row rowOne;
 	Row rowTwo;
 	List<ColumnModel> schema;
@@ -91,25 +96,26 @@ public class QueryResultEditorWidgetTest {
 	List<TableUpdateResponse> tableUpdateResults;
 	TableType tableType;
 	public static final String ENTITY_ID = "syn999";
+
 	@Before
-	public void before() throws JSONObjectAdapterException{
+	public void before() throws JSONObjectAdapterException {
 		jobTrackingStub = new JobTrackingWidgetStub();
-		widget = new QueryResultEditorWidget(mockView, mockPageWidget, jobTrackingStub, mockGlobalState,mockClientCache, mockEventBus);
+		widget = new QueryResultEditorWidget(mockView, mockPageWidget, jobTrackingStub, mockGlobalState, mockClientCache, mockEventBus);
 
 		schema = TableModelTestUtils.createColumsWithNames("one", "two");
 		headers = TableModelTestUtils.buildSelectColumns(schema);
 		rowOne = new Row();
 		rowOne.setRowId(1L);
-		rowOne.setValues(Arrays.asList("1,1","1,2"));
+		rowOne.setValues(Arrays.asList("1,1", "1,2"));
 		rowTwo = new Row();
 		rowTwo.setRowId(2L);
-		rowTwo.setValues(Arrays.asList("2,1","2,2"));
-		
+		rowTwo.setValues(Arrays.asList("2,1", "2,2"));
+
 		rowSet = new RowSet();
 		rowSet.setTableId(ENTITY_ID);
 		rowSet.setRows(Arrays.asList(rowOne, rowTwo));
 		updates = TableModelTestUtils.cloneObject(rowSet.getRows(), Row.class);
-		
+
 		results = new QueryResult();
 		results.setQueryResults(rowSet);
 		bundle = new QueryResultBundle();
@@ -124,48 +130,48 @@ public class QueryResultEditorWidgetTest {
 		// by default, edit Table results (not a view)
 		tableType = TableType.table;
 	}
-	
+
 	@Test
-	public void testOnSelectionChangedNone(){
+	public void testOnSelectionChangedNone() {
 		when(mockPageWidget.isOneRowOrMoreRowsSelected()).thenReturn(false);
 		widget.onSelectionChanged();
 		verify(mockView).setDeleteButtonEnabled(false);
 	}
-	
+
 	@Test
-	public void testOnSelectionChangedOne(){
+	public void testOnSelectionChangedOne() {
 		when(mockPageWidget.isOneRowOrMoreRowsSelected()).thenReturn(true);
 		widget.onSelectionChanged();
 		verify(mockView).setDeleteButtonEnabled(true);
 	}
-	
+
 	@Test
-	public void testOnDeleteSelected(){
+	public void testOnDeleteSelected() {
 		widget.onDeleteSelected();
 		verify(mockPageWidget).onDeleteSelected();
 	}
-	
+
 	@Test
-	public void testOnSelectAll(){
+	public void testOnSelectAll() {
 		widget.onSelectAll();
 		verify(mockPageWidget).onSelectAll();
 	}
-	
+
 	@Test
-	public void testOnSelectNone(){
+	public void testOnSelectNone() {
 		widget.onSelectNone();
 		verify(mockPageWidget).onSelectNone();
 	}
-	
+
 	@Test
-	public void testOnToggleSelect(){
+	public void testOnToggleSelect() {
 		widget.onToggleSelect();
 		verify(mockPageWidget).onToggleSelect();
 	}
-	
-	
+
+
 	@Test
-	public void testOnEdit(){
+	public void testOnEdit() {
 		widget.showEditor(bundle, tableType);
 		verify(mockView).setErrorMessageVisible(false);
 		verify(mockView).hideProgress();
@@ -176,18 +182,18 @@ public class QueryResultEditorWidgetTest {
 		verify(mockGlobalState).setIsEditing(true);
 		verify(mockGlobalState, never()).setIsEditing(false);
 	}
-	
+
 	@Test
-	public void testOnEditView(){
+	public void testOnEditView() {
 		tableType = TableType.files;
 		widget.showEditor(bundle, tableType);
 		verify(mockView).setAddRowButtonVisible(false);
 		verify(mockView).setButtonToolbarVisible(false);
 	}
 
-	
+
 	@Test
-	public void testOnCancelNoChanges(){
+	public void testOnCancelNoChanges() {
 		widget.showEditor(bundle, tableType);
 		reset(mockView);
 		reset(mockGlobalState);
@@ -196,45 +202,45 @@ public class QueryResultEditorWidgetTest {
 		verify(mockGlobalState).setIsEditing(false);
 		verify(mockView).hideEditor();
 	}
-	
+
 	@Test
-	public void testOnCancelWithChangesConfirmOkay(){
+	public void testOnCancelWithChangesConfirmOkay() {
 		widget.showEditor(bundle, tableType);
 		reset(mockView);
 		reset(mockGlobalState);
-		
-		updates.get(0).setValues(Arrays.asList("update1","update2"));
+
+		updates.get(0).setValues(Arrays.asList("update1", "update2"));
 		// Invoking the callback occurs on okay;
 		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDialog(anyString(), any(Callback.class));
-		
+
 		widget.onCancel();
 		verify(mockGlobalState).setIsEditing(false);
 		verify(mockView).hideEditor();
 		verify(mockView).showConfirmDialog(anyString(), any(Callback.class));
 	}
-	
+
 	@Test
-	public void testOnCancelWithChangesConfirmCanceld(){
+	public void testOnCancelWithChangesConfirmCanceld() {
 		widget.showEditor(bundle, tableType);
 		reset(mockView);
 		reset(mockGlobalState);
-		
-		updates.get(0).setValues(Arrays.asList("update1","update2"));
+
+		updates.get(0).setValues(Arrays.asList("update1", "update2"));
 		// no invoke
 		AsyncMockStubber.callNoInvovke().when(mockView).showConfirmDialog(anyString(), any(Callback.class));
-	
+
 		widget.onCancel();
 		verify(mockGlobalState, never()).setIsEditing(false);
 		verify(mockView, never()).hideEditor();
 		verify(mockView).showConfirmDialog(anyString(), any(Callback.class));
 	}
-	
+
 	@Test
-	public void testOnSaveNoChanges(){
+	public void testOnSaveNoChanges() {
 		widget.showEditor(bundle, tableType);
 		reset(mockView);
 		reset(mockGlobalState);
-		
+
 		widget.onSave();
 		verify(mockView).setSaveButtonLoading(true);
 		verify(mockView).setErrorMessageVisible(false);
@@ -245,14 +251,14 @@ public class QueryResultEditorWidgetTest {
 		// update should not be invoked
 		verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
 	}
-	
+
 	@Test
-	public void testOnSaveWithChagnesNotValid(){
+	public void testOnSaveWithChagnesNotValid() {
 		widget.showEditor(bundle, tableType);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
-		updates.get(0).setValues(Arrays.asList("update1","update2"));
+		updates.get(0).setValues(Arrays.asList("update1", "update2"));
 		// not valid
 		when(mockPageWidget.isValid()).thenReturn(false);
 		// the call
@@ -268,14 +274,14 @@ public class QueryResultEditorWidgetTest {
 		// update should not be invoked
 		verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
 	}
-	
+
 	@Test
-	public void testOnSaveWithChangesValidJobSuccessful(){
+	public void testOnSaveWithChangesValidJobSuccessful() {
 		widget.showEditor(bundle, tableType);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
-		updates.get(0).setValues(Arrays.asList("update1","update2"));
+		updates.get(0).setValues(Arrays.asList("update1", "update2"));
 		// not valid
 		when(mockPageWidget.isValid()).thenReturn(true);
 		// setup successful job
@@ -293,26 +299,26 @@ public class QueryResultEditorWidgetTest {
 		verify(mockView, times(2)).hideEditor();
 		// progress should be visible while the job runs.
 		verify(mockView).showProgress();
-		
+
 		// The editor should be hidden and the callback invoked
 		// end false
 		verify(mockGlobalState).setIsEditing(false);
-		
+
 		// The callback should be invoked
 		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
-		
+
 		verify(mockClientCache, never()).put(anyString(), anyString(), anyLong());
 	}
-	
+
 
 	@Test
-	public void testOnSaveWithChangesValidJobSuccessfulIsView(){
+	public void testOnSaveWithChangesValidJobSuccessfulIsView() {
 		tableType = TableType.projects;
 		widget.showEditor(bundle, tableType);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
-		updates.get(0).setValues(Arrays.asList("update1","update2"));
+		updates.get(0).setValues(Arrays.asList("update1", "update2"));
 		// not valid
 		when(mockPageWidget.isValid()).thenReturn(true);
 		// setup successful job
@@ -333,25 +339,25 @@ public class QueryResultEditorWidgetTest {
 		verify(mockView, times(2)).hideEditor();
 		// progress should be visible while the job runs.
 		verify(mockView).showProgress();
-		
+
 		// The editor should be hidden and the callback invoked
 		// end false
 		verify(mockGlobalState).setIsEditing(false);
-		
+
 		// The event should be sent
 		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
-		
+
 		verify(mockClientCache).put(eq(ENTITY_ID + VIEW_RECENTLY_CHANGED_KEY), anyString(), anyLong());
 	}
-	
-	
+
+
 	@Test
-	public void testOnSaveWithChagnesValidJobFailed(){
+	public void testOnSaveWithChagnesValidJobFailed() {
 		widget.showEditor(bundle, tableType);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
-		updates.get(0).setValues(Arrays.asList("update1","update2"));
+		updates.get(0).setValues(Arrays.asList("update1", "update2"));
 		// not valid
 		when(mockPageWidget.isValid()).thenReturn(true);
 		// setup failed job
@@ -369,24 +375,24 @@ public class QueryResultEditorWidgetTest {
 		verify(mockView).hideEditor();
 		// After the job fails the progress should not be visible
 		verify(mockView).hideProgress();
-		
+
 		verify(mockView).setErrorMessageVisible(true);
 		verify(mockView).showErrorMessage(error);
 		// The save button must be re-enabled on error
 		verify(mockView).setSaveButtonLoading(false);
-		
+
 		// still editing when fails.
 		verify(mockGlobalState, never()).setIsEditing(false);
 		verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
 	}
-	
+
 	@Test
-	public void testOnSaveWithChagnesValidJobCanceled(){
+	public void testOnSaveWithChagnesValidJobCanceled() {
 		widget.showEditor(bundle, tableType);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
-		updates.get(0).setValues(Arrays.asList("update1","update2"));
+		updates.get(0).setValues(Arrays.asList("update1", "update2"));
 		// not valid
 		when(mockPageWidget.isValid()).thenReturn(true);
 		// setup job cancel
@@ -400,36 +406,36 @@ public class QueryResultEditorWidgetTest {
 		verify(mockView, times(2)).hideEditor();
 		// progress should be visible while the job runs.
 		verify(mockView).showProgress();
-		
+
 		// The editor should be hidden and the event sent
 		// end false
 		verify(mockGlobalState).setIsEditing(false);
 		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 	}
-	
+
 	@Test
 	public void testGetEntityUpdateResultsEmpty() {
 		assertNull(QueryResultEditorWidget.getEntityUpdateResults(mockTableUpdateTransactionResponse));
 	}
-	
+
 	@Test
 	public void testGetEntityUpdateResultsWrongType() {
 		assertNull(QueryResultEditorWidget.getEntityUpdateResults(mockWrongType));
 	}
-	
+
 	@Test
 	public void testGetEntityUpdateResultsSingleValue() {
 		tableUpdateResults.add(mockEntityUpdateResults);
 		assertEquals(mockEntityUpdateResults, QueryResultEditorWidget.getEntityUpdateResults(mockTableUpdateTransactionResponse));
 	}
-	
+
 	@Test
 	public void testGetEntityUpdateResultsMultipleValues() {
 		tableUpdateResults.add(mockTableSchemaChangeResponse);
 		tableUpdateResults.add(mockEntityUpdateResults);
 		assertEquals(mockEntityUpdateResults, QueryResultEditorWidget.getEntityUpdateResults(mockTableUpdateTransactionResponse));
 	}
-	
+
 	@Test
 	public void testGetEntityUpdateResultsFailureSuccessIndex() {
 		EntityUpdateResults results = new EntityUpdateResults();
@@ -444,7 +450,7 @@ public class QueryResultEditorWidgetTest {
 		assertEquals("<p>syn29292 (NOT_FOUND): Not there, buddy</p>", QueryResultEditorWidget.getEntityUpdateResultsFailures(mockTableUpdateTransactionResponse));
 		assertEquals(1, QueryResultEditorWidget.getFirstIndexOfEntityUpdateResultSuccess(mockTableUpdateTransactionResponse));
 	}
-	
+
 	@Test
 	public void testGetEntityUpdateResultsNoFailures() {
 		EntityUpdateResults results = new EntityUpdateResults();
@@ -454,7 +460,7 @@ public class QueryResultEditorWidgetTest {
 		when(mockEntityUpdateResult1.getEntityId()).thenReturn("syn29292");
 		assertEquals("", QueryResultEditorWidget.getEntityUpdateResultsFailures(mockTableUpdateTransactionResponse));
 	}
-	
+
 	@Test
 	public void testGetEntityUpdateResultsNoSuccess() {
 		EntityUpdateResults results = new EntityUpdateResults();

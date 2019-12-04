@@ -6,7 +6,10 @@ import com.google.gwt.user.client.ui.Widget;
 
 public interface UserIdCellEditorView extends IsWidget {
 	void setSynapseSuggestBoxWidget(Widget w);
+
 	void setUserIdCellRenderer(Widget w);
+
 	void showEditor(boolean visible);
+
 	void setUserIdCellRendererClickHandler(ClickHandler clickHandler);
 }

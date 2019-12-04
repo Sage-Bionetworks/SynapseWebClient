@@ -8,9 +8,7 @@ import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_COLLECTOR_U
 import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_1;
 import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_PRIORITY;
 import static org.sagebionetworks.web.shared.WebConstants.REVIEW_ABUSIVE_CONTENT_REQUEST_COMPONENT_ID;
-
 import java.util.Collections;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +25,6 @@ import org.sagebionetworks.web.client.widget.footer.FooterView;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -50,10 +47,10 @@ public class FooterTest {
 	public static final String LAST_NAME = "Vance";
 	public static final String USERNAME = "bvance";
 	public static final String EMAIL = "bob@vancerefrigeration.com";
-	public static final String CURRENT_URL = "https://www.synapse.org/flag-this-data"; 
-	
+	public static final String CURRENT_URL = "https://www.synapse.org/flag-this-data";
+
 	@Before
-	public void setup(){		
+	public void setup() {
 		footer = new Footer(mockView, mockGlobalAppState, mockAuthController, mockGwt, mockJsniUtils);
 		VersionState versionState = new VersionState("v,v", true);
 		AsyncMockStubber.callSuccessWith(versionState).when(mockGlobalAppState).checkVersionCompatibility(any(AsyncCallback.class));
@@ -67,13 +64,13 @@ public class FooterTest {
 	}
 
 	@Test
-	public void testConstruction(){
+	public void testConstruction() {
 		verify(mockGlobalAppState).checkVersionCompatibility(any(AsyncCallback.class));
 		verify(mockView).refresh();
 	}
 
 	@Test
-	public void testConstructionNullVersion(){
+	public void testConstructionNullVersion() {
 		VersionState versionState = new VersionState(null, false);
 		AsyncMockStubber.callSuccessWith(versionState).when(mockGlobalAppState).checkVersionCompatibility(any(AsyncCallback.class));
 		footer = new Footer(mockView, mockGlobalAppState, mockAuthController, mockGwt, mockJsniUtils);
@@ -81,46 +78,30 @@ public class FooterTest {
 	}
 
 	@Test
-	public void testAsWidget(){
+	public void testAsWidget() {
 		footer.asWidget();
 		verify(mockView).asWidget();
 	}
-	
+
 	@Test
 	public void testOnReportAbuse() {
 		when(mockAuthController.getCurrentUserProfile()).thenReturn(mockUserProfile);
 		footer.onReportAbuseClicked();
-		verify(mockJsniUtils).showJiraIssueCollector(
-				"", //summary
-				FLAG_ISSUE_DESCRIPTION_PART_1 +
-					CURRENT_URL + 
-					WebConstants.FLAG_ISSUE_DESCRIPTION_PART_2, //description
-				FLAG_ISSUE_COLLECTOR_URL,
-				OWNER_ID,
-				DisplayUtils.getDisplayName(FIRST_NAME, LAST_NAME, USERNAME),
-				EMAIL,
-				null, //Synapse data object ID
-				REVIEW_ABUSIVE_CONTENT_REQUEST_COMPONENT_ID,
-				null, //Access requirement ID
+		verify(mockJsniUtils).showJiraIssueCollector("", // summary
+				FLAG_ISSUE_DESCRIPTION_PART_1 + CURRENT_URL + WebConstants.FLAG_ISSUE_DESCRIPTION_PART_2, // description
+				FLAG_ISSUE_COLLECTOR_URL, OWNER_ID, DisplayUtils.getDisplayName(FIRST_NAME, LAST_NAME, USERNAME), EMAIL, null, // Synapse data object ID
+				REVIEW_ABUSIVE_CONTENT_REQUEST_COMPONENT_ID, null, // Access requirement ID
 				FLAG_ISSUE_PRIORITY);
 	}
-	
+
 	@Test
 	public void testOnReportAbuseAnonymous() {
-		//current user profile is null
+		// current user profile is null
 		footer.onReportAbuseClicked();
-		verify(mockJsniUtils).showJiraIssueCollector(
-				"", //summary
-				FLAG_ISSUE_DESCRIPTION_PART_1 +
-					CURRENT_URL + 
-					WebConstants.FLAG_ISSUE_DESCRIPTION_PART_2, //description
-				FLAG_ISSUE_COLLECTOR_URL,
-				ANONYMOUS,
-				ANONYMOUS,
-				ANONYMOUS,
-				null, //Synapse data object ID
-				REVIEW_ABUSIVE_CONTENT_REQUEST_COMPONENT_ID,
-				null, //Access requirement ID
+		verify(mockJsniUtils).showJiraIssueCollector("", // summary
+				FLAG_ISSUE_DESCRIPTION_PART_1 + CURRENT_URL + WebConstants.FLAG_ISSUE_DESCRIPTION_PART_2, // description
+				FLAG_ISSUE_COLLECTOR_URL, ANONYMOUS, ANONYMOUS, ANONYMOUS, null, // Synapse data object ID
+				REVIEW_ABUSIVE_CONTENT_REQUEST_COMPONENT_ID, null, // Access requirement ID
 				FLAG_ISSUE_PRIORITY);
 	}
 }

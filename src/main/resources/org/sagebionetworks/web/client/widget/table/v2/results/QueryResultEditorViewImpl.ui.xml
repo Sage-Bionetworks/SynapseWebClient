@@ -1,19 +1,22 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<!-- This modal dialog will contain the editor for query results -->
 	<bh:Div>
-		<b:Modal ui:field="editRowsModal" title="Edit Rows" closable="true"
-			dataBackdrop="STATIC" dataKeyboard="true" b:id="editRowsModal"
-			size="LARGE" addStyleNames="queryResultEditor modal-fullscreen">
+		<b:Modal ui:field="editRowsModal" title="Edit Rows"
+			closable="true" dataBackdrop="STATIC" dataKeyboard="true"
+			b:id="editRowsModal" size="LARGE"
+			addStyleNames="queryResultEditor modal-fullscreen">
 			<b:ModalBody>
 				<g:HTMLPanel>
 					<g:HTMLPanel ui:field="editorPanel">
 						<b:ButtonToolBar ui:field="buttonToolbar">
 							<b:ButtonGroup>
 								<b:Button ui:field="selectTogglebutton" icon="SQUARE_O" />
-								<b:Button ui:field="selectDropDown" dataToggle="DROPDOWN"/>
+								<b:Button ui:field="selectDropDown"
+									dataToggle="DROPDOWN" />
 								<b:DropDownMenu>
 									<b:DropDownHeader>Select</b:DropDownHeader>
 									<b:AnchorListItem ui:field="selectAllItem">All</b:AnchorListItem>
@@ -23,12 +26,12 @@
 							<b:ButtonGroup>
 								<b:Button ui:field="addRowToolButton" icon="PLUS"
 									enabled="true" type="INFO" />
-								<b:Button ui:field="deleteSelectedButton" icon="TRASH_O"
-									enabled="false" />
+								<b:Button ui:field="deleteSelectedButton"
+									icon="TRASH_O" enabled="false" />
 							</b:ButtonGroup>
 						</b:ButtonToolBar>
 						<g:SimplePanel ui:field="tablePanel" />
-	
+
 						<b:Button ui:field="addRowButton" icon="PLUS" type="INFO">Add
 							Row</b:Button>
 					</g:HTMLPanel>
@@ -41,9 +44,9 @@
 					dataLoadingText="Saving...">Save</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
-		<b:Modal ui:field="inProgressModal" title="Edit Rows" closable="true"
-			dataBackdrop="STATIC" dataKeyboard="true" b:id="editRowsModal"
-			size="LARGE" addStyleNames="modal-fullscreen">
+		<b:Modal ui:field="inProgressModal" title="Edit Rows"
+			closable="true" dataBackdrop="STATIC" dataKeyboard="true"
+			b:id="editRowsModal" size="LARGE" addStyleNames="modal-fullscreen">
 			<b:ModalBody>
 				<g:SimplePanel ui:field="progressPanel" />
 			</b:ModalBody>
@@ -52,5 +55,5 @@
 			</b:ModalFooter>
 		</b:Modal>
 	</bh:Div>
-	
+
 </ui:UiBinder>

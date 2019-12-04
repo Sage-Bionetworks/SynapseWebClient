@@ -27,12 +27,10 @@ import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TYPE;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,16 +58,15 @@ import org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigView;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class PlotlyConfigEditorTest {
-		
+
 	PlotlyConfigEditor editor;
 	@Mock
 	PlotlyConfigView mockView;
-	
+
 	@Mock
 	EntityFinder mockFinder;
 	@Mock
@@ -99,9 +96,9 @@ public class PlotlyConfigEditorTest {
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	public static String TABLE_NAME = "my table to plot";
-	
+
 	@Before
-	public void setup(){
+	public void setup() {
 		MockitoAnnotations.initMocks(this);
 		editor = new PlotlyConfigEditor(mockView, mockFinder, mockSynAlert, mockShowHideAdvancedButton, mockSynapseJavascriptClient);
 		columnModels = new ArrayList<ColumnModel>();
@@ -114,35 +111,35 @@ public class PlotlyConfigEditorTest {
 		when(mockView.getXAxisType()).thenReturn(AxisType.AUTO);
 		when(mockView.getYAxisType()).thenReturn(AxisType.AUTO);
 	}
-	
+
 	@Test
 	public void testConstruction() {
 		verify(mockView).setSynAlert(mockSynAlert);
 		verify(mockView).setPresenter(editor);
 		verify(mockView).setShowHideButton(mockShowHideAdvancedButton);
-		
+
 		verify(mockView).setAdvancedUIVisible(false);
 		verify(mockView, never()).setAdvancedUIVisible(true);
 		verify(mockShowHideAdvancedButton).setText(SHOW);
 		verify(mockShowHideAdvancedButton).setIcon(IconType.TOGGLE_RIGHT);
-		
-		//test showHideAdvancedButton, simulate click
+
+		// test showHideAdvancedButton, simulate click
 		verify(mockShowHideAdvancedButton).addClickHandler(clickHandlerCaptor.capture());
 		clickHandlerCaptor.getValue().onClick(null);
 		verify(mockView).setAdvancedUIVisible(true);
 		verify(mockShowHideAdvancedButton).setText(HIDE);
 		verify(mockShowHideAdvancedButton).setIcon(IconType.TOGGLE_DOWN);
 	}
-	
+
 	@Test
 	public void testConfigure() {
-		// verifies that params are reflected in view.  also tests basic sql parsing
+		// verifies that params are reflected in view. also tests basic sql parsing
 		String tableSynId = "syn987";
 		String advancedClause = "where \"x Column\" > 2 group by \'y column\'";
 		String sql = "select \"" + X_COLUMN_NAME + "\", \'" + Y_COLUMN_NAME + "\' from " + tableSynId + " " + advancedClause;
 		columnModels.add(mockXColumnModel);
 		columnModels.add(mockYColumnModel);
-		
+
 		String plotTitle = "My Plot";
 		GraphType type = GraphType.BAR;
 		BarMode barMode = BarMode.STACK;
@@ -150,7 +147,7 @@ public class PlotlyConfigEditorTest {
 		String yAxisTitle = "Y";
 		boolean showLegend = true;
 		boolean isHorizontalBarChart = true;
-		
+
 		Map<String, String> params = new HashMap<>();
 		params.put(TABLE_QUERY_KEY, sql);
 		params.put(TITLE, plotTitle);
@@ -160,11 +157,11 @@ public class PlotlyConfigEditorTest {
 		params.put(BAR_MODE, barMode.name());
 		params.put(SHOW_LEGEND, Boolean.toString(showLegend));
 		params.put(IS_HORIZONTAL, Boolean.toString(isHorizontalBarChart));
-		
+
 		WikiPageKey wikiKey = null;
 		DialogCallback callback = null;
 		editor.configure(wikiKey, params, callback);
-		
+
 		verify(mockView).setTableName(TABLE_NAME);
 		verify(mockView, atLeastOnce()).setXAxisColumnName(X_COLUMN_NAME);
 		verify(mockView).addYAxisColumn(Y_COLUMN_NAME);
@@ -175,7 +172,7 @@ public class PlotlyConfigEditorTest {
 		verify(mockView).setShowLegend(showLegend);
 		verify(mockView).setBarOrientationHorizontal(isHorizontalBarChart);
 	}
-	
+
 	@Test
 	public void testGetXColumnFromSql() {
 		assertNull(getXColumnFromSql("X_column from missing_select"));
@@ -185,16 +182,16 @@ public class PlotlyConfigEditorTest {
 		assertEquals("x column", getXColumnFromSql("SELECT \'x column\', y1, y2 from syn1"));
 		assertEquals("x column", getXColumnFromSql("SELECT \"x column\", y1, y2 from syn1"));
 	}
-	
+
 	@Test
 	public void testGetYColumnsFromSql() {
 		assertNull(getYColumnsFromSql("select missing_from, y"));
 		assertNull(getYColumnsFromSql(null));
 		assertNull(getYColumnsFromSql("SELECT x FROM syn2")); // graph requires more than one column
-		assertArrayEquals(new String[]{"y1"}, getYColumnsFromSql("SeLeCt MY_x_column, y1 FrOM syn2"));
-		assertArrayEquals(new String[]{"y1 Column", "y2 COLUMN"},  getYColumnsFromSql("SELECT \'x column\', \'y1 Column\',  \"   y2 COLUMN\" from syn1"));
+		assertArrayEquals(new String[] {"y1"}, getYColumnsFromSql("SeLeCt MY_x_column, y1 FrOM syn2"));
+		assertArrayEquals(new String[] {"y1 Column", "y2 COLUMN"}, getYColumnsFromSql("SELECT \'x column\', \'y1 Column\',  \"   y2 COLUMN\" from syn1"));
 	}
-	
+
 	@Test
 	public void testGetAdvancedClauseFromQuery() {
 		assertNull(getAdvancedClauseFromQuery("select missing_from, y"));
@@ -204,14 +201,14 @@ public class PlotlyConfigEditorTest {
 		assertEquals("GrOUP BY x", getAdvancedClauseFromQuery("select x from syn1 GrOUP BY x"));
 		assertEquals("where x>2 group by x", getAdvancedClauseFromQuery("select x from syn1 where x>2 group by x"));
 	}
-	
+
 	@Test
 	public void testUpdateDescriptorFromView() {
 		Map<String, String> params = new HashMap<>();
 		WikiPageKey wikiKey = null;
 		DialogCallback callback = null;
 		editor.configure(wikiKey, params, callback);
-		
+
 		// user changed axis type
 		AxisType xAxisType = AxisType.CATEGORY;
 		AxisType yAxisType = AxisType.LINEAR;
@@ -232,7 +229,7 @@ public class PlotlyConfigEditorTest {
 		editor.setTableId(newSynId);
 		editor.onXColumnChanged();
 		editor.onAddYColumn(newY1);
-		
+
 		String advancedClause = "WHERE x>1 GROUP BY X";
 		when(mockView.getAdvancedClause()).thenReturn(advancedClause);
 		String title = "my plot title";
@@ -243,10 +240,10 @@ public class PlotlyConfigEditorTest {
 		when(mockView.getYAxisLabel()).thenReturn(yAxisLabel);
 		GraphType type = GraphType.SCATTER;
 		when(mockView.getGraphType()).thenReturn(type);
-		
+
 		editor.updateDescriptorFromView();
-		
-		//verify
+
+		// verify
 		assertEquals("select \"new X\", \"new Y1\" from syn999999 " + advancedClause, params.get(TABLE_QUERY_KEY));
 		assertEquals(title, params.get(TITLE));
 		assertEquals(xAxisLabel, params.get(X_AXIS_TITLE));
@@ -256,7 +253,7 @@ public class PlotlyConfigEditorTest {
 		assertEquals(xAxisType.toString(), params.get(X_AXIS_TYPE));
 		assertEquals(yAxisType.toString(), params.get(Y_AXIS_TYPE));
 	}
-	
+
 	@Test
 	public void testUpdateDescriptorFromViewBarChart() {
 		Map<String, String> params = new HashMap<>();
@@ -284,10 +281,10 @@ public class PlotlyConfigEditorTest {
 		when(mockView.getBarMode()).thenReturn(mode);
 		GraphType type = GraphType.BAR;
 		when(mockView.getGraphType()).thenReturn(type);
-		
+
 		editor.updateDescriptorFromView();
-		
-		//verify
+
+		// verify
 		assertEquals(GraphType.BAR.toString(), params.get(TYPE));
 		assertEquals(Boolean.toString(isHorizontalBarChart), params.get(IS_HORIZONTAL));
 		assertEquals(mode.toString(), params.get(BAR_MODE));
@@ -295,17 +292,17 @@ public class PlotlyConfigEditorTest {
 		assertNull(params.get(X_AXIS_TYPE));
 		assertNull(params.get(Y_AXIS_TYPE));
 	}
-	
-	@Test (expected=IllegalArgumentException.class)
+
+	@Test(expected = IllegalArgumentException.class)
 	public void testUpdateDescriptorFromViewFailure() {
 		Map<String, String> params = new HashMap<>();
 		WikiPageKey wikiKey = null;
 		DialogCallback callback = null;
 		editor.configure(wikiKey, params, callback);
-		
+
 		editor.updateDescriptorFromView();
 	}
-	
+
 	@Test
 	public void testSetTableIdFailure() {
 		Exception ex = new Exception();
@@ -315,7 +312,7 @@ public class PlotlyConfigEditorTest {
 		order.verify(mockSynAlert).clear();
 		order.verify(mockSynAlert).handleException(ex);
 	}
-	
+
 	@Test
 	public void testAvailableColumns() {
 		columnModels.add(mockXColumnModel);
@@ -326,8 +323,9 @@ public class PlotlyConfigEditorTest {
 		DialogCallback callback = null;
 		editor.configure(wikiKey, params, callback);
 		verify(mockSynapseJavascriptClient, never()).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
-		
-		// no columns defined, so it will pick the first column from the column models as the x column, and leave the rest for the available columns
+
+		// no columns defined, so it will pick the first column from the column models as the x column, and
+		// leave the rest for the available columns
 		editor.setTableId("syn2222");
 		verify(mockSynapseJavascriptClient).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
 		verify(mockView).setAvailableColumns(availableColumnNamesCaptor.capture());
@@ -336,8 +334,8 @@ public class PlotlyConfigEditorTest {
 		assertTrue(availableColumnNames.contains(Y_COLUMN_NAME));
 		assertTrue(availableColumnNames.contains(Y2_COLUMN_NAME));
 		verify(mockView).setXAxisColumnName(X_COLUMN_NAME);
-		
-		//change the x-column to the second column (Y_COLUMN_NAME)
+
+		// change the x-column to the second column (Y_COLUMN_NAME)
 		reset(mockView);
 		when(mockView.getXAxisColumnName()).thenReturn(Y_COLUMN_NAME);
 		editor.onXColumnChanged();
@@ -346,8 +344,8 @@ public class PlotlyConfigEditorTest {
 		assertEquals(2, availableColumnNames.size());
 		assertTrue(availableColumnNames.contains(X_COLUMN_NAME));
 		assertTrue(availableColumnNames.contains(Y2_COLUMN_NAME));
-		
-		//add the y2 column to the y list
+
+		// add the y2 column to the y list
 		reset(mockView);
 		when(mockView.getXAxisColumnName()).thenReturn(Y_COLUMN_NAME);
 		editor.onAddYColumn(Y2_COLUMN_NAME);
@@ -356,13 +354,13 @@ public class PlotlyConfigEditorTest {
 		assertEquals(1, availableColumnNames.size());
 		assertTrue(availableColumnNames.contains(X_COLUMN_NAME));
 	}
-	
+
 	@Test
 	public void testAsWidget() {
 		editor.asWidget();
 		verify(mockView).asWidget();
 	}
-	
+
 	@Test
 	public void testOnFindTable() {
 		editor.onFindTable();

@@ -10,26 +10,26 @@ public class PeopleSearchPlaceTest {
 	PeopleSearch.Tokenizer tokenizer = new PeopleSearch.Tokenizer();
 	String searchTerm;
 	Integer start;
-	
+
 	@Before
-	public void setup(){
+	public void setup() {
 		searchTerm = "testing 123";
 		start = 20;
-	}	
-	
+	}
+
 	@Test
 	public void testStandardCase() {
-		//without start
+		// without start
 		String testToken = searchTerm;
 		PeopleSearch place = tokenizer.getPlace(testToken);
 		Assert.assertEquals(searchTerm, place.getSearchTerm());
 		Assert.assertNull(place.getStart());
 		Assert.assertEquals(testToken, tokenizer.getToken(place));
 	}
-	
+
 	@Test
 	public void testStartCase() {
-		//with start
+		// with start
 		String testToken = searchTerm + Search.START_DELIMITER + start;
 		PeopleSearch place = tokenizer.getPlace(testToken);
 		Assert.assertEquals(searchTerm, place.getSearchTerm());

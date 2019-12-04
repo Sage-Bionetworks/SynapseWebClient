@@ -2,12 +2,10 @@ package org.sagebionetworks.web.client.widget.googlemap;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
-
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.logical.shared.AttachEvent;
@@ -40,6 +38,7 @@ public class GoogleMapViewImpl implements GoogleMapView {
 	Widget widget;
 	Callback onAttachCallback;
 	JavaScriptObject currentInfoWindow;
+
 	@Inject
 	public GoogleMapViewImpl(GoogleMapViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
@@ -102,8 +101,8 @@ public class GoogleMapViewImpl implements GoogleMapView {
 		Element markerPopupContentEl = markerPopupContent.getElement();
 		Element el = googleMapCanvas.getElement();
 		JavaScriptObject map = _createMap(el);
-		JavaScriptObject bounds  = _getBounds();
-		
+		JavaScriptObject bounds = _getBounds();
+
 		for (int i = 0; i < jsonArray.size(); i++) {
 			JSONObject markerJson = (JSONObject) jsonArray.get(i);
 			JSONArray latLngArray = (JSONArray) markerJson.get("latLng");
@@ -122,19 +121,19 @@ public class GoogleMapViewImpl implements GoogleMapView {
 		setVisible(jsonArray.size() > 0);
 		DisplayUtils.scrollToTop();
 	}
-	
+
 	private static native JavaScriptObject _getBounds() /*-{
 		return new google.maps.LatLngBounds();
 	}-*/;
-	
+
 	private static native JavaScriptObject _createMap(Element el) /*-{
 		return new google.maps.Map(el, {
 			scrollwheel : true,
-			mapTypeControl: false,
-			streetViewControl: false,
-			draggable: true,
+			mapTypeControl : false,
+			streetViewControl : false,
+			draggable : true,
 			maxZoom : 10,
-			controlSize: 22
+			controlSize : 22
 		});
 	}-*/;
 
@@ -142,14 +141,7 @@ public class GoogleMapViewImpl implements GoogleMapView {
 		presenter.markerClicked(location, userIdsList);
 	}
 
-	private static native void _addMarker(GoogleMapViewImpl x, 
-			JavaScriptObject mapJsObject, 
-			String locationString,
-			double lat, 
-			double lng, 
-			List<String> userIdsList,
-			Element markerPopupContent,
-			JavaScriptObject bounds) /*-{
+	private static native void _addMarker(GoogleMapViewImpl x, JavaScriptObject mapJsObject, String locationString, double lat, double lng, List<String> userIdsList, Element markerPopupContent, JavaScriptObject bounds) /*-{
 
 		var image = {
 			url : 'images/synapse-map-marker.png',
@@ -166,16 +158,18 @@ public class GoogleMapViewImpl implements GoogleMapView {
 			content : markerPopupContent
 		});
 		bounds.extend(marker.getPosition());
-		marker.addListener('click',
-			function() {
-				x.@org.sagebionetworks.web.client.widget.googlemap.GoogleMapViewImpl::markerClicked(Ljava/lang/String;Ljava/util/List;)(locationString, userIdsList);
-				var currentInfoWindow = x.@org.sagebionetworks.web.client.widget.googlemap.GoogleMapViewImpl::currentInfoWindow;
-				if (currentInfoWindow) {
-					currentInfoWindow.close();
-				}
-				x.@org.sagebionetworks.web.client.widget.googlemap.GoogleMapViewImpl::currentInfoWindow = infowindow;
-				infowindow.open(mapJsObject, marker);
-			});
+		marker
+				.addListener(
+						'click',
+						function() {
+							x.@org.sagebionetworks.web.client.widget.googlemap.GoogleMapViewImpl::markerClicked(Ljava/lang/String;Ljava/util/List;)(locationString, userIdsList);
+							var currentInfoWindow = x.@org.sagebionetworks.web.client.widget.googlemap.GoogleMapViewImpl::currentInfoWindow;
+							if (currentInfoWindow) {
+								currentInfoWindow.close();
+							}
+							x.@org.sagebionetworks.web.client.widget.googlemap.GoogleMapViewImpl::currentInfoWindow = infowindow;
+							infowindow.open(mapJsObject, marker);
+						});
 		marker.setClickable(true);
 		mapJsObject.fitBounds(bounds);
 		mapJsObject.setCenter(bounds.getCenter());

@@ -5,7 +5,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -20,12 +19,11 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityMetadataViewImpl extends Composite implements EntityMetadataView {
-	
+
 	interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
 	}
-	
-	private static EntityMetadataViewImplUiBinder uiBinder = GWT
-			.create(EntityMetadataViewImplUiBinder.class);
+
+	private static EntityMetadataViewImplUiBinder uiBinder = GWT.create(EntityMetadataViewImplUiBinder.class);
 
 	@UiField
 	HTMLPanel detailedMetadata;
@@ -51,7 +49,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	Span uploadDestinationField;
 	@UiField
 	Text annotationsTitleText;
-		
+
 	@Inject
 	public EntityMetadataViewImpl(final SynapseJSNIUtils jsniUtils) {
 		initWidget(uiBinder.createAndBindUi(this));
@@ -68,7 +66,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		containerItemCountContainer.clear();
 		containerItemCountContainer.add(w);
 	}
-	
+
 	@Override
 	public void setDoiWidget(IsWidget doiWidget) {
 		doiPanel.clear();
@@ -77,14 +75,14 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	@Override
 	public void setAnnotationsRendererWidget(IsWidget annotationsWidget) {
-		annotationsContainer.setWidget(annotationsWidget);		
+		annotationsContainer.setWidget(annotationsWidget);
 	}
-	
+
 	@Override
 	public void setUploadDestinationPanelVisible(boolean isVisible) {
 		uploadDestinationPanel.setVisible(isVisible);
 	}
-	
+
 	@Override
 	public void setUploadDestinationText(String text) {
 		uploadDestinationField.setText(text);
@@ -98,13 +96,13 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			annotationsContent.hide();
 		}
 	}
-	
+
 	@Override
 	public void setVersionHistoryWidget(IsWidget fileHistoryWidget) {
 		fileHistoryContainer.clear();
 		fileHistoryContainer.add(fileHistoryWidget);
 	}
-	
+
 	@Override
 	public void clear() {
 		dataUseContainer.setVisible(false);
@@ -112,7 +110,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		uploadDestinationField.setText("");
 		uploadDestinationPanel.setVisible(false);
 	}
-	
+
 	@Override
 	public void setDetailedMetadataVisible(boolean visible) {
 		detailedMetadata.setVisible(visible);
@@ -127,6 +125,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	public void setRestrictionPanelVisible(boolean visible) {
 		dataUseContainer.setVisible(visible);
 	}
+
 	@Override
 	public void setRestrictionWidgetV2(IsWidget restrictionWidget) {
 		restrictionPanelV2.clear();
@@ -137,6 +136,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	public void setRestrictionWidgetV2Visible(boolean visible) {
 		restrictionPanelV2.setVisible(visible);
 	}
+
 	@Override
 	public void setAnnotationsTitleText(String text) {
 		annotationsTitleText.setText(text);

@@ -6,7 +6,6 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
@@ -17,7 +16,8 @@ import com.google.inject.Inject;
 
 public class DiscussionThreadModalViewImpl implements DiscussionThreadModalView {
 
-	public interface Binder extends UiBinder<Widget, DiscussionThreadModalViewImpl> {}
+	public interface Binder extends UiBinder<Widget, DiscussionThreadModalViewImpl> {
+	}
 
 	@UiField
 	Button saveButton;
@@ -119,8 +119,7 @@ public class DiscussionThreadModalViewImpl implements DiscussionThreadModalView 
 	}
 
 	@Override
-	public void showConfirmDialog(String restoreTitle, String restoreMessage, Callback yesCallback,
-			Callback noCallback) {
+	public void showConfirmDialog(String restoreTitle, String restoreMessage, Callback yesCallback, Callback noCallback) {
 		DisplayUtils.showConfirmDialog(restoreTitle, restoreMessage, yesCallback, noCallback);
 	}
 }

@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_CERTIFIED;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_VERIFIED;
-
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
@@ -22,7 +21,6 @@ import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -46,21 +44,9 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 	ReviewAccessorsButton manageAccessButton;
 	Callback refreshCallback;
 	SynapseJavascriptClient jsClient;
-	
+
 	@Inject
-	public SelfSignAccessRequirementWidget(SelfSignAccessRequirementWidgetView view,
-			AuthenticationController authController,
-			DataAccessClientAsync dataAccessClient,
-			SynapseClientAsync synapseClient,
-			WikiPageWidget wikiPageWidget,
-			SynapseAlert synAlert,
-			SubjectsWidget subjectsWidget,
-			CreateAccessRequirementButton createAccessRequirementButton,
-			DeleteAccessRequirementButton deleteAccessRequirementButton,
-			LazyLoadHelper lazyLoadHelper,
-			ReviewAccessorsButton manageAccessButton,
-			PopupUtilsView popupUtils,
-			SynapseJavascriptClient jsClient) {
+	public SelfSignAccessRequirementWidget(SelfSignAccessRequirementWidgetView view, AuthenticationController authController, DataAccessClientAsync dataAccessClient, SynapseClientAsync synapseClient, WikiPageWidget wikiPageWidget, SynapseAlert synAlert, SubjectsWidget subjectsWidget, CreateAccessRequirementButton createAccessRequirementButton, DeleteAccessRequirementButton deleteAccessRequirementButton, LazyLoadHelper lazyLoadHelper, ReviewAccessorsButton manageAccessButton, PopupUtilsView popupUtils, SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -89,11 +75,11 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 				refreshApprovalState();
 			}
 		};
-		
+
 		lazyLoadHelper.configure(loadDataCallback, view);
 	}
-	
-	
+
+
 	public void setRequirement(final SelfSignAccessRequirement ar, Callback refreshCallback) {
 		this.ar = ar;
 		this.refreshCallback = refreshCallback;
@@ -101,14 +87,15 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 			@Override
 			public void onFailure(Throwable caught) {
 				if (!(caught instanceof NotFoundException)) {
-					synAlert.handleException(caught);	
+					synAlert.handleException(caught);
 				}
 			}
+
 			@Override
 			public void onSuccess(String rootWikiId) {
-				//get wiki terms
-	 			WikiPageKey wikiKey = new WikiPageKey(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), rootWikiId);
-	 			wikiPageWidget.configure(wikiKey, false, null);
+				// get wiki terms
+				WikiPageKey wikiKey = new WikiPageKey(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), rootWikiId);
+				wikiPageWidget.configure(wikiKey, false, null);
 			}
 		});
 		createAccessRequirementButton.configure(ar, refreshCallback);
@@ -117,7 +104,7 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 		manageAccessButton.configure(ar);
 		lazyLoadHelper.setIsConfigured();
 	}
-	
+
 	public void setDataAccessSubmissionStatus(BasicAccessRequirementStatus status) {
 		// set up view based on DataAccessSubmission state
 		if (status.getIsApproved()) {
@@ -133,6 +120,7 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 					public void onFailure(Throwable caught) {
 						synAlert.handleException(caught);
 					}
+
 					@Override
 					public void onSuccess(UserBundle userBundle) {
 						if (ar.getIsCertifiedUserRequired() && !userBundle.getIsCertified()) {
@@ -151,7 +139,7 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 			}
 		}
 	}
-	
+
 	public void showAnonymous() {
 		view.showUnapprovedHeading();
 		view.showLoginButton();
@@ -168,13 +156,14 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
+
 			@Override
 			public void onSuccess(AccessRequirementStatus status) {
-				setDataAccessSubmissionStatus((BasicAccessRequirementStatus)status);
+				setDataAccessSubmissionStatus((BasicAccessRequirementStatus) status);
 			}
 		});
 	}
-	
+
 	@Override
 	public void onSignTerms() {
 		// create the self-signed access approval, then update this object
@@ -184,6 +173,7 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 			public void onFailure(Throwable t) {
 				synAlert.handleException(t);
 			}
+
 			@Override
 			public void onSuccess(AccessApproval result) {
 				refreshCallback.invoke();
@@ -195,21 +185,21 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 		approval.setRequirementVersion(ar.getVersionNumber());
 		synapseClient.createAccessApproval(approval, callback);
 	}
-	
+
 	public void addStyleNames(String styleNames) {
 		view.addStyleNames(styleNames);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	
+
 	@Override
 	public void onCertify() {
 		popupUtils.openInNewWindow(WebConstants.DOCS_URL + GET_CERTIFIED_PAGE);
 	}
-	
+
 	@Override
 	public void onValidateProfile() {
 		popupUtils.openInNewWindow(WebConstants.DOCS_URL + GET_VALIDATED_PROFILE_PAGE);

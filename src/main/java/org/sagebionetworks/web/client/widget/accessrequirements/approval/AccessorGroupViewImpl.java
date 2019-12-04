@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.widget.TextBoxWithCopyToClipboardWidget;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -32,19 +31,21 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 	Label expiresOnField;
 	@UiField
 	Button closeButton;
-	
+
 	@UiField
 	Modal dialog;
 	@UiField
 	Div accessRequirementWidgetContainer;
-	
+
 	Presenter presenter;
-	
-	public interface Binder extends UiBinder<Widget, AccessorGroupViewImpl> {}
+
+	public interface Binder extends UiBinder<Widget, AccessorGroupViewImpl> {
+	}
+
 	Widget w;
-	
+
 	@Inject
-	public AccessorGroupViewImpl(Binder binder){
+	public AccessorGroupViewImpl(Binder binder) {
 		this.w = binder.createAndBindUi(this);
 		showAccessRequirementButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -65,45 +66,49 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 			}
 		});
 	}
-	
+
 	@Override
 	public void addStyleNames(String styleNames) {
 		w.addStyleName(styleNames);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return w;
 	}
-	
+
 	@Override
 	public void setVisible(boolean visible) {
 		w.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
 	}
-	
+
 	@Override
 	public void addAccessor(IsWidget w) {
 		accessorsContainer.add(w);
 	}
+
 	@Override
 	public void clearAccessors() {
 		accessorsContainer.clear();
 	}
+
 	@Override
 	public void setSubmittedBy(IsWidget w) {
 		submittedByContainer.clear();
 		submittedByContainer.add(w);
 	}
+
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
+
 	@Override
 	public void showAccessRequirementDialog() {
 		accessRequirementWidgetContainer.setVisible(true);
@@ -115,14 +120,17 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 		accessRequirementWidgetContainer.clear();
 		accessRequirementWidgetContainer.add(w);
 	}
+
 	@Override
 	public void setExpiresOn(String expiresOnString) {
 		expiresOnField.setText(expiresOnString);
 	}
+
 	@Override
 	public void clearEmails() {
 		emailsContainer.clear();
 	}
+
 	@Override
 	public void addEmail(String username) {
 		TextBoxWithCopyToClipboardWidget emailTextBox = new TextBoxWithCopyToClipboardWidget();

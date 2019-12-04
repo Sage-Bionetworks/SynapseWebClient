@@ -3,14 +3,11 @@ package org.sagebionetworks.web.client.widget.table.v2.schema;
 import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnFacetTypeViewEnum.None;
 import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnFacetTypeViewEnum.Range;
 import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnFacetTypeViewEnum.Values;
-
 import java.util.List;
-
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -32,36 +29,37 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 	CellFactory factory;
 	String maxSize = null;
 	boolean canHaveDefault = true;
-	
+
 	@Inject
-	public ColumnModelTableRowEditorWidgetImpl(ColumnModelTableRowEditorView view, CellFactory factory){
+	public ColumnModelTableRowEditorWidgetImpl(ColumnModelTableRowEditorView view, CellFactory factory) {
 		this.view = view;
 		this.factory = factory;
 		view.setTypePresenter(this);
 	}
-	
+
 	@Override
 	public void onTypeChanged() {
 		// Is this a change
 		ColumnTypeViewEnum newType = view.getColumnType();
-		if(!currentType.equals(newType)){
+		if (!currentType.equals(newType)) {
 			configureViewForType(newType);
 		}
 	}
 
 	/**
 	 * Setup the view for the given type.
+	 * 
 	 * @param newType
 	 */
 	public void configureViewForType(ColumnTypeViewEnum newType) {
-		if(canHaveSize(newType)){
+		if (canHaveSize(newType)) {
 			view.setMaxSize(getMaxSizeForType(newType));
 			view.setSizeFieldVisible(true);
-		}else{
+		} else {
 			view.setMaxSize(null);
 			view.setSizeFieldVisible(false);
 		}
-		
+
 		configureFacetsForType(newType);
 		view.setRestrictValuesVisible(canHaveRestrictedValues(newType));
 		view.clearSizeError();
@@ -70,71 +68,75 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		view.setDefaultEditor(defaultEditor);
 		view.setDefaultEditorVisible(canHaveDefault(newType));
 	}
-	
+
 	@Override
 	public void setCanHaveDefault(boolean canHaveDefault) {
 		this.canHaveDefault = canHaveDefault;
 	}
-	
+
 	public boolean canHaveDefault(ColumnTypeViewEnum type) {
 		if (canHaveDefault) {
-			switch(type.getType()){
+			switch (type.getType()) {
 				case ENTITYID:
 				case FILEHANDLEID:
 				case USERID:
 				case LARGETEXT:
 					return false;
 				default:
-					return true;		
+					return true;
 			}
 		} else {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Can the given type have a size?
+	 * 
 	 * @param type
 	 * @return
 	 */
-	public boolean canHaveSize(ColumnTypeViewEnum type){
-		switch(type){
-		case String:
-			return true;
-		case Link:
-			return true;
-		default:
-			// all other are false
-			return false;
+	public boolean canHaveSize(ColumnTypeViewEnum type) {
+		switch (type) {
+			case String:
+				return true;
+			case Link:
+				return true;
+			default:
+				// all other are false
+				return false;
 		}
-		
+
 	}
+
 	/**
 	 * Can the given type have a restricted value?
+	 * 
 	 * @param type
 	 * @return
 	 */
-	public boolean canHaveRestrictedValues(ColumnTypeViewEnum type){
-		switch(type){
-		case String:
-			return true;
-		case Integer:
-			return true;
-		case Entity:
-			return true;
-		default:
-			// all other are false
-			return false;
+	public boolean canHaveRestrictedValues(ColumnTypeViewEnum type) {
+		switch (type) {
+			case String:
+				return true;
+			case Integer:
+				return true;
+			case Entity:
+				return true;
+			default:
+				// all other are false
+				return false;
 		}
 	}
-	
+
 	/**
 	 * Configure the facet selection based on the column type
+	 * 
 	 * @param type
 	 * @return
 	 */
-	public void configureFacetsForType(ColumnTypeViewEnum type){
-		switch(type){
+	public void configureFacetsForType(ColumnTypeViewEnum type) {
+		switch (type) {
 			case Integer:
 				view.setFacetValues(None.toString(), Values.toString(), Range.toString());
 				view.setFacetVisible(true);
@@ -155,9 +157,9 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 				view.setFacetVisible(false);
 		}
 	}
-	
-	public boolean canHaveFacet(ColumnTypeViewEnum type){
-		switch(type){
+
+	public boolean canHaveFacet(ColumnTypeViewEnum type) {
+		switch (type) {
 			case String:
 			case Integer:
 			case Boolean:
@@ -173,6 +175,7 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 
 	/**
 	 * Get the default cell editor to be used for a type.
+	 * 
 	 * @param newType
 	 * @return
 	 */
@@ -180,28 +183,28 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		ColumnModel forFactory = new ColumnModel();
 		forFactory.setColumnType(newType.getType());
 		CellEditor defaultEditor = factory.createEditor(forFactory);
-		return defaultEditor;		
+		return defaultEditor;
 	}
-	
+
 	/**
 	 * Get the default max size for a given type.
+	 * 
 	 * @param type
 	 * @return
 	 */
-	private String getMaxSizeForType(ColumnTypeViewEnum type){
-		switch(type){
-		case String:
-			return ""+DEFAULT_STRING_SIZE;
-		case Link:
-			return ""+MAX_STRING_SIZE;
-		default:
-			throw new IllegalArgumentException("Unknown type: "+type);
+	private String getMaxSizeForType(ColumnTypeViewEnum type) {
+		switch (type) {
+			case String:
+				return "" + DEFAULT_STRING_SIZE;
+			case Link:
+				return "" + MAX_STRING_SIZE;
+			default:
+				throw new IllegalArgumentException("Unknown type: " + type);
 		}
 	}
 
 	@Override
-	public void configure(ColumnModel model,
-			SelectionPresenter selectionPresenter) {
+	public void configure(ColumnModel model, SelectionPresenter selectionPresenter) {
 		view.setSelectionPresenter(selectionPresenter);
 		// this will setup the view with the correct widgets.
 		configureViewForType(ColumnTypeViewEnum.getViewForType(model.getColumnType()));
@@ -209,7 +212,7 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		ColumnModelUtils.applyColumnModelToRow(model, view);
 	}
 
-	
+
 	@Override
 	public IsWidget getWidget(int index) {
 		return view.getWidget(index);
@@ -278,18 +281,18 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 	@Override
 	public ColumnFacetTypeViewEnum getFacetType() {
 		if (canHaveFacet(view.getColumnType())) {
-			return view.getFacetType();	
+			return view.getFacetType();
 		} else {
 			return ColumnFacetTypeViewEnum.None;
 		}
-		
+
 	}
-	
+
 	@Override
 	public void setFacetType(ColumnFacetTypeViewEnum type) {
 		view.setFacetType(type);
 	}
-	
+
 	@Override
 	public String getMaxSize() {
 		return view.getMaxSize();
@@ -328,13 +331,13 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 	@Override
 	public boolean validate() {
 		boolean isValid = true;
-		if(!validateName()){
+		if (!validateName()) {
 			isValid = false;
 		}
-		if(!validateSize()){
+		if (!validateSize()) {
 			isValid = false;
 		}
-		if(!view.validateDefault()){
+		if (!view.validateDefault()) {
 			isValid = false;
 		}
 		return isValid;
@@ -342,16 +345,17 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 
 	/**
 	 * Validate the name
+	 * 
 	 * @param isValid
 	 * @return
 	 */
 	public boolean validateName() {
 		boolean isValid = true;
 		String name = StringUtils.emptyAsNull(view.getColumnName());
-		if(name == null){
+		if (name == null) {
 			view.setNameError(NAME_CANNOT_BE_EMPTY);
 			isValid = false;
-		}else{
+		} else {
 			view.clearNameError();
 		}
 		return isValid;
@@ -359,16 +363,17 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 
 	/**
 	 * Validate the size
+	 * 
 	 * @return
 	 */
 	public boolean validateSize() {
 		boolean isValid = true;
 		ColumnTypeViewEnum type = view.getColumnType();
-		if(canHaveSize(type)){
+		if (canHaveSize(type)) {
 			String sizeString = view.getMaxSize();
 			try {
 				int size = Integer.parseInt(sizeString);
-				if(size < 1 || size > MAX_STRING_SIZE){
+				if (size < 1 || size > MAX_STRING_SIZE) {
 					view.setSizeError(MUST_BE_A_NUMBER);
 					isValid = false;
 				}
@@ -377,12 +382,12 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 				isValid = false;
 			}
 		}
-		if(isValid){
+		if (isValid) {
 			view.clearSizeError();
 		}
 		return isValid;
 	}
-	
+
 	@Override
 	public void setToBeDefaultFileViewColumn() {
 		view.setToBeDefaultFileViewColumn();

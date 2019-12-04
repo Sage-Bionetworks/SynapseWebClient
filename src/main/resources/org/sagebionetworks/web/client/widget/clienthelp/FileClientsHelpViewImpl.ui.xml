@@ -1,52 +1,85 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<bh:Span>
-		<b:Modal ui:field="modal" closable="true" dataBackdrop="STATIC" dataKeyboard="true">
+		<b:Modal ui:field="modal" closable="true"
+			dataBackdrop="STATIC" dataKeyboard="true">
 			<b:ModalHeader>
-			    <b:Heading size="H4" text="Programmatic Download Options" addStyleNames="displayInline"/>
-			    <w:HelpWidget helpMarkdown="Synapse is built on a number of RESTful web APIs that allow users to interact with the system via a number of clients. The [Synapse API documentation](http://docs.synapse.org/articles/api_documentation.html) is available online." 
-								href="http://docs.synapse.org/articles/getting_started.html#installing-synapse-clients" addStyleNames="margin-left-5" placement="BOTTOM"/>
+				<b:Heading size="H4" text="Programmatic Download Options"
+					addStyleNames="displayInline" />
+				<w:HelpWidget
+					helpMarkdown="Synapse is built on a number of RESTful web APIs that allow users to interact with the system via a number of clients. The [Synapse API documentation](http://docs.synapse.org/articles/api_documentation.html) is available online."
+					href="http://docs.synapse.org/articles/getting_started.html#installing-synapse-clients"
+					addStyleNames="margin-left-5" placement="BOTTOM" />
 			</b:ModalHeader>
 			<b:ModalBody>
 				<b:TabPanel>
 					<b:NavTabs>
-						<b:TabListItem ui:field="pythonTabListItem" text="Python" active="true" />
+						<b:TabListItem ui:field="pythonTabListItem"
+							text="Python" active="true" />
 						<b:TabListItem ui:field="rTabListItem" text="R" />
-						<b:TabListItem ui:field="cliTabListItem" text="Command Line" />
-						
+						<b:TabListItem ui:field="cliTabListItem"
+							text="Command Line" />
+
 					</b:NavTabs>
 					<b:TabContent>
 						<b:TabPane ui:field="pythonTabPane" active="true">
 							<g:HTMLPanel>
 								<pre>
 									<code class="nohighlight">
-					  					import synapseclient<br/>
-										<br/>
-										syn = synapseclient.Synapse()<br/>
-										syn.login('synapse_username','password')<br/>
-										<br/>
-										# Obtain a pointer and download the data<br/>
-										<span ui:field="id2"/> = syn.get(entity='<span ui:field="id3"/>'<span ui:field="versionUI2">, version=<span ui:field="version2"/></span>)<br/>
-										<br/>
-										# Get the path to the local copy of the data file<br/>
-										filepath = <span ui:field="id4"/>.path
+										import synapseclient
+										<br />
+										<br />
+										syn = synapseclient.Synapse()
+										<br />
+										syn.login('synapse_username','password')
+										<br />
+										<br />
+										# Obtain a pointer and download the data
+										<br />
+										<span ui:field="id2" />
+										= syn.get(entity='
+										<span ui:field="id3" />
+										'
+										<span ui:field="versionUI2">
+											, version=
+											<span ui:field="version2" />
+										</span>
+										)
+										<br />
+										<br />
+										# Get the path to the local copy of the data file
+										<br />
+										filepath =
+										<span ui:field="id4" />
+										.path
 									</code>
 								</pre>
 							</g:HTMLPanel>
 						</b:TabPane>
 						<b:TabPane ui:field="rTabPane">
-				  			<g:HTMLPanel>
-				  				<pre>
+							<g:HTMLPanel>
+								<pre>
 									<code class="nohighlight">
-					  					library(synapser)<br/>
-										synLogin('username','password')<br/>
-										<br/>
-										# Obtain a pointer and download the data<br/>
-										<span ui:field="id5"/> &#60;- synGet(entity='<span ui:field="id6"/>'<span ui:field="versionUI3">, version=<span ui:field="version3"/></span>)
+										library(synapser)
+										<br />
+										synLogin('username','password')
+										<br />
+										<br />
+										# Obtain a pointer and download the data
+										<br />
+										<span ui:field="id5" />
+										&#60;- synGet(entity='
+										<span ui:field="id6" />
+										'
+										<span ui:field="versionUI3">
+											, version=
+											<span ui:field="version3" />
+										</span>
+										)
 									</code>
 								</pre>
 							</g:HTMLPanel>
@@ -55,17 +88,22 @@
 							<g:HTMLPanel>
 								<pre>
 									<code class="nohighlight">
-										synapse get <span ui:field="id1"/> <span ui:field="versionUI1">--version <span ui:field="version1"/></span>
+										synapse get
+										<span ui:field="id1" />
+										<span ui:field="versionUI1">
+											--version
+											<span ui:field="version1" />
+										</span>
 									</code>
 								</pre>
 							</g:HTMLPanel>
 						</b:TabPane>
-						
+
 					</b:TabContent>
 				</b:TabPanel>
 			</b:ModalBody>
 			<b:ModalFooter>
-			    <b:Button type="PRIMARY" text="OK" dataDismiss="MODAL"/>
+				<b:Button type="PRIMARY" text="OK" dataDismiss="MODAL" />
 			</b:ModalFooter>
 		</b:Modal>
 	</bh:Span>

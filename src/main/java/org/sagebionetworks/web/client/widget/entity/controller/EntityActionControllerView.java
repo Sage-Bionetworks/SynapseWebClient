@@ -1,36 +1,37 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
 import java.util.List;
-
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.web.client.ShowsErrors;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
-
 import com.google.gwt.user.client.ui.IsWidget;
+
 /**
- * Abstraction for the view 
+ * Abstraction for the view
+ * 
  * @author John
  *
  */
 public interface EntityActionControllerView extends ShowsErrors, IsWidget {
-	
+
 
 	/**
 	 * Show the user a confirm dialog.
+	 * 
 	 * @param string
 	 * @param action
 	 */
 	void showConfirmDeleteDialog(String message, Callback callback);
-	
+
 
 	/**
 	 * Show info to the user.
+	 * 
 	 * @param string
 	 */
 	void showInfo(String message);
-	
+
 	/**
 	 * Show info dialog to the user.
 	 */
@@ -38,11 +39,22 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 
 	/**
 	 * Prompt the user to enter a string value.
+	 * 
 	 * @param prompt
 	 * @param callback
 	 */
 	void showPromptDialog(String title, PromptCallback callback);
+
 	void setUploadDialogWidget(IsWidget w);
+
 	void addWidget(IsWidget asWidget);
+
 	void showMultiplePromptDialog(String title, List<String> prompts, List<String> initialValues, CallbackP<List<String>> newValuesCallback);
+
+	void setCreateVersionDialogJobTrackingWidget(IsWidget w);
+
+	void showCreateVersionDialog();
+
+	void hideCreateVersionDialog();
+
 }

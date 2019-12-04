@@ -5,7 +5,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.Portal;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
@@ -20,6 +19,7 @@ public class UserGroupSuggestion implements IsSerializable, SuggestOracle.Sugges
 	private int width;
 	public static final String DATA_USER_GROUP_ID = "data-user-group-id";
 	public static final String DATA_IS_INDIVIDUAL = "data-is-individual";
+
 	public UserGroupSuggestion() {}
 
 	public UserGroupSuggestion(UserGroupHeader header, String prefix, int width) {
@@ -32,7 +32,7 @@ public class UserGroupSuggestion implements IsSerializable, SuggestOracle.Sugges
 	public String getDisplayString() {
 		StringBuilder result = new StringBuilder();
 		String uniqueId = HTMLPanel.createUniqueId();
-		result.append("<div id=\""+uniqueId+"\" "+DATA_IS_INDIVIDUAL+"=\""+header.getIsIndividual()+"\" "+DATA_USER_GROUP_ID+"=\""+header.getOwnerId()+"\" class=\"padding-left-5 userGroupSuggestion\" style=\"height:28px; width:" + width + "px;\"></div>");
+		result.append("<div id=\"" + uniqueId + "\" " + DATA_IS_INDIVIDUAL + "=\"" + header.getIsIndividual() + "\" " + DATA_USER_GROUP_ID + "=\"" + header.getOwnerId() + "\" class=\"padding-left-5 userGroupSuggestion\" style=\"height:28px; width:" + width + "px;\"></div>");
 		loadBadge(uniqueId);
 		return result.toString();
 	}
@@ -60,10 +60,11 @@ public class UserGroupSuggestion implements IsSerializable, SuggestOracle.Sugges
 			}
 		});
 	}
+
 	@Override
 	public String getReplacementString() {
 		// Example output:
-		// Pac Man  |  114085
+		// Pac Man | 114085
 		StringBuilder sb = new StringBuilder();
 		if (!header.getIsIndividual())
 			sb.append("(Team) ");

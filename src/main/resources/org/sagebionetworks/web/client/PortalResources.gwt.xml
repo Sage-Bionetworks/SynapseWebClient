@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module>
-    <public path="resource">
-        <include name="css/*.css"/>
-        <include name="images/*"/>
-    </public>
+	<public path="resource">
+		<include name="css/*.css" />
+		<include name="images/*" />
+	</public>
 </module>

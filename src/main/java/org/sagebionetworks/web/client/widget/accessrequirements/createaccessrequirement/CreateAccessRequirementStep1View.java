@@ -9,23 +9,33 @@ import com.google.gwt.user.client.ui.IsWidget;
  *
  */
 public interface CreateAccessRequirementStep1View extends IsWidget {
-	
+
 	void setSubjects(IsWidget w);
+
 	boolean isManagedACTAccessRequirementType();
-	boolean isACTAccessRequirementType(); 
+
+	boolean isACTAccessRequirementType();
+
 	boolean isTermsOfUseAccessRequirementType();
+
 	void setPresenter(Presenter p);
+
 	String getEntityIds();
+
 	void setEntityIdsString(String ids);
+
 	String getTeamIds();
+
 	void setTeamIdsString(String ids);
+
 	void setAccessRequirementTypeSelectionVisible(boolean visible);
-	
+
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
 		void onAddEntities();
+
 		void onAddTeams();
 	}
 }

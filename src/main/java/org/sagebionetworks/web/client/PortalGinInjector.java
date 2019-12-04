@@ -43,6 +43,7 @@ import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
+import org.sagebionetworks.web.client.widget.QuarantinedEmailModal;
 import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
@@ -257,7 +258,6 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionModalViewImpl;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionRowViewImpl;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
-
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
@@ -280,6 +280,7 @@ public interface PortalGinInjector extends Ginjector {
 	EntityPresenter getEntityPresenter();
 
 	LoginPresenter getLoginPresenter();
+
 	PasswordResetSignedTokenPresenter getPasswordResetSignedTokenPresenter();
 
 	AuthenticationController getAuthenticationController();
@@ -309,6 +310,7 @@ public interface PortalGinInjector extends Ginjector {
 	QuizPresenter getQuizPresenter();
 
 	AccountPresenter getAccountPresenter();
+
 	NewAccountPresenter getNewAccountPresenter();
 
 	SignedTokenPresenter getSignedTokenPresenter();
@@ -326,283 +328,503 @@ public interface PortalGinInjector extends Ginjector {
 	SynapseStandaloneWikiPresenter getSynapseStandaloneWikiPresenter();
 
 	EventBus getEventBus();
+
 	MarkdownWidget getMarkdownWidget();
+
 	ACTPresenter getACTPresenter();
+
 	AccessRequirementsPresenter getAccessRequirementsPresenter();
+
 	ACTDataAccessSubmissionsPresenter getACTDataAccessSubmissionsPresenter();
+
 	ACTDataAccessSubmissionDashboardPresenter getACTDataAccessSubmissionDashboardPresenter();
+
 	SynapseForumPresenter getSynapseForumPresenter();
+
 	SubscriptionPresenter getSubscriptionPresenter();
+
 	ACTAccessApprovalsPresenter getACTAccessApprovalsPresenter();
+
 	WikiDiffPresenter getWikiDiffPresenter();
 
 	EmailInvitationPresenter getEmailInvitationPresenter();
 
 	/*
-	 *  Markdown Widgets
+	 * Markdown Widgets
 	 */
 	////// Editors
 	ReferenceConfigEditor getReferenceConfigEditor();
+
 	ProvenanceConfigEditor getProvenanceConfigEditor();
+
 	ImageConfigEditor getImageConfigEditor();
+
 	ImageLinkConfigEditor getImageLinkConfigEditor();
+
 	AttachmentConfigEditor getAttachmentConfigEditor();
+
 	LinkConfigEditor getLinkConfigEditor();
+
 	DetailsSummaryConfigEditor getDetailsSummaryConfigEditor();
+
 	APITableConfigEditor getSynapseAPICallConfigEditor();
+
 	QueryTableConfigEditor getSynapseQueryConfigEditor();
+
 	LeaderboardConfigEditor getLeaderboardConfigEditor();
+
 	TabbedTableConfigEditor getTabbedTableConfigEditor();
+
 	EntityTreeBrowser getEntityTreeBrowser();
+
 	EntityListConfigEditor getEntityListConfigEditor();
+
 	ShinySiteConfigEditor getShinySiteConfigEditor();
+
 	ButtonLinkConfigEditor getButtonLinkConfigEditor();
+
 	EvaluationSubmissionConfigEditor getEvaluationSubmissionConfigEditor();
+
 	UserTeamConfigEditor getUserTeamConfigEditor();
+
 	VideoConfigEditor getVideoConfigEditor();
+
 	TableQueryResultWikiEditor getSynapseTableQueryResultEditor();
+
 	PreviewConfigEditor getPreviewConfigEditor();
+
 	SynapseFormConfigEditor getSynapseFormConfigEditor();
+
 	BiodallianceEditor getBiodallianceEditor();
+
 	BiodallianceSourceEditor getBiodallianceSourceEditor();
+
 	CytoscapeConfigEditor getCytoscapeConfigEditor();
+
 	PlotlyConfigEditor getPlotlyConfigEditor();
+
 	TeamSelectEditor getTeamSelectEditor();
-	
+
 	////// Renderers
 	BookmarkWidget getBookmarkRenderer();
+
 	ReferenceWidget getReferenceRenderer();
+
 	TutorialWizard getTutorialWidgetRenderer();
+
 	ProvenanceWidget getProvenanceRenderer();
+
 	AdministerEvaluationsList getAdministerEvaluationsList();
+
 	ImageWidget getImageRenderer();
+
 	AttachmentPreviewWidget getAttachmentPreviewRenderer();
+
 	APITableWidget getSynapseAPICallRenderer();
+
 	TableOfContentsWidget getTableOfContentsRenderer();
+
 	WikiFilesPreviewWidget getWikiFilesPreviewRenderer();
+
 	EntityListWidget getEntityListRenderer();
+
 	ShinySiteWidget getShinySiteRenderer();
+
 	JoinTeamWidget getJoinTeamWidget();
+
 	SubmitToEvaluationWidget getEvaluationSubmissionWidget();
+
 	EmptyWidget getEmptyWidget();
+
 	ButtonLinkWidget getButtonLinkWidget();
+
 	VideoWidget getVideoWidget();
+
 	TableQueryResultWikiWidget getSynapseTableQueryResultWikiWidget();
+
 	RegisterChallengeTeamWidget getRegisterChallengeTeamWidget();
+
 	ChallengeTeamsWidget getChallengeTeamsWidget();
+
 	ChallengeParticipantsWidget getChallengeParticipantsWidget();
+
 	BiodallianceWidget getBiodallianceRenderer();
+
 	CytoscapeWidget getCytoscapeRenderer();
+
 	SynapseTableFormWidget getSynapseTableFormWidget();
+
 	TeamMembersWidget getTeamMembersWidget();
+
 	TeamMemberCountWidget getTeamMemberCountWidget();
+
 	PlotlyWidget getPlotlyWidget();
+
 	LazyLoadWikiWidgetWrapper getLazyLoadWikiWidgetWrapper();
 
-	//////API Table Column Editor
+	////// API Table Column Editor
 	APITableColumnConfigView getAPITableColumnConfigView();
-	
+
 	// Other widgets
 	UserBadge getUserBadgeWidget();
+
 	EmailInvitationBadge getEmailInvitationBadgeWidget();
+
 	VersionTimer getVersionTimer();
+
 	SessionDetector getSessionDetector();
+
 	SynapseStatusDetector getSynapseStatusDetector();
+
 	QuestionContainerWidget getQuestionContainerWidget();
+
 	SynapseAlert getSynapseAlertWidget();
+
 	EntityRefProvEntryView getEntityRefEntry();
+
 	URLProvEntryView getURLEntry();
+
 	ProvenanceListWidget getProvenanceListWidget();
+
 	PreviewWidget getPreviewWidget();
+
 	UserBadgeItem getUserBadgeItem();
-	
+
 	// TableEntity V2
 	ColumnModelsView createNewColumnModelsView();
+
 	ImportTableViewColumnsButton getImportTableViewColumnsButton();
+
 	ColumnModelsWidget createNewColumnModelsWidget();
+
 	ColumnModelTableRowViewer createNewColumnModelTableRowViewer();
+
 	ColumnModelTableRowEditorWidget createColumnModelEditorWidget();
+
 	TableEntityWidget createNewTableEntityWidget();
+
 	RowWidget createRowWidget();
+
 	TablePageWidget createNewTablePageWidget();
+
 	QueryResultEditorWidget createNewQueryResultEditorWidget();
-	
+
 	// TableEntity V2 cells
 	StringRendererCellView createStringRendererCellView();
+
 	StringEditorCell createStringEditorCell();
+
 	EntityIdCellEditor createEntityIdCellEditor();
+
 	EntityIdCellRenderer createEntityIdCellRenderer();
+
 	EnumCellEditor createEnumCellEditor();
+
 	EnumFormCellEditor createEnumFormCellEditor();
+
 	BooleanCellEditor createBooleanCellEditor();
+
 	BooleanFormCellEditor createBooleanFormCellEditor();
+
 	DateCellEditor createDateCellEditor();
+
 	DateCellRenderer createDateCellRenderer();
+
 	DoubleCellEditor createDoubleCellEditor();
+
 	IntegerCellEditor createIntegerCellEditor();
+
 	LinkCellRendererView createLinkCellRenderer();
+
 	FileCellEditor createFileCellEditor();
+
 	FileCellRenderer createFileCellRenderer();
+
 	UserIdCellRenderer createUserIdCellRenderer();
+
 	UserIdCellEditor createUserIdCellEditor();
+
 	LargeStringCellEditor createLargeTextFormCellEditor();
 
 	// Asynchronous
 	AsynchronousProgressWidget creatNewAsynchronousProgressWidget();
+
 	InlineAsynchronousProgressViewImpl getInlineAsynchronousProgressView();
 
 	UserTeamBadge getUserTeamBadgeWidget();
+
 	TeamBadge getTeamBadgeWidget();
+
 	BigTeamBadge getBigTeamBadgeWidget();
 
 	ChallengeBadge getChallengeBadgeWidget();
 
 	ProjectBadge getProjectBadgeWidget();
+
 	EntityTreeItem getEntityTreeItemWidget();
+
 	MoreTreeItem getMoreTreeWidget();
+
 	TableListWidget getTableListWidget();
+
 	CookieProvider getCookieProvider();
 
 	KeyboardNavigationHandler createKeyboardNavigationHandler();
+
 	Header getHeader();
+
 	Footer getFooter();
 
 	SortableTableHeader createSortableTableHeader();
+
 	StaticTableHeader createStaticTableHeader();
+
 	EvaluationSubmitter getEvaluationSubmitter();
+
 	RegisterTeamDialog getRegisterTeamDialog();
+
 	AnnotationEditor getAnnotationEditor();
+
 	VersionHistoryRowView getFileHistoryRow();
+
 	VersionHistoryWidget getVersionHistoryWidget();
-	
+
 	JoinTeamConfigEditor getJoinTeamConfigEditor();
+
 	ModifiedCreatedByWidget getModifiedCreatedByWidget();
+
 	FileHandleLink getFileHandleLink();
+
 	VerificationSubmissionWidget getVerificationSubmissionWidget();
+
 	VerificationSubmissionModalViewImpl getVerificationSubmissionModalViewImpl();
+
 	VerificationSubmissionRowViewImpl getVerificationSubmissionRowViewImpl();
 
 	// discussion
 	DiscussionThreadListItemWidget createThreadListItemWidget();
+
 	ReplyWidget createReplyWidget();
 
 	TopicRowWidget getTopicRowWidget();
+
 	EntityRefreshAlert getEntityRefreshAlert();
+
 	ReplyCountAlert getReplyCountAlert();
+
 	DiscussionThreadCountAlert getDiscussionThreadCountAlert();
 
 	// docker
 	DockerRepoWidget createNewDockerRepoWidget();
+
 	DockerCommitRowWidget createNewDockerCommitRowWidget();
 
 	LoginWidget getLoginWidget();
+
 	FileClientsHelp getFileClientsHelp();
+
 	LoadMoreWidgetContainer getLoadMoreProjectsWidgetContainer();
+
 	RadioWidget createNewRadioWidget();
+
 	EntityListRowBadge getEntityListRowBadge();
+
 	CancelControlWidget getCancelControlWidget();
-	
+
 	FacetColumnResultRangeWidget getFacetColumnResultRangeWidget();
+
 	FacetColumnResultValuesWidget getFacetColumnResultValuesWidget();
-	
+
 	// facet range views
 	FacetColumnResultRangeViewImpl getFacetColumnResultRangeViewImpl();
+
 	FacetColumnResultDateRangeViewImpl getFacetColumnResultDateRangeViewImpl();
+
 	FacetColumnResultSliderRangeViewImpl getFacetColumnResultSliderRangeViewImpl();
-	
+
 	DiscussionTabView getDiscussionTabView();
+
 	ForumWidget getForumWidget();
+
 	DockerTabView getDockerTabView();
+
 	DockerRepoListWidget getDockerRepoListWidget();
+
 	Breadcrumb getBreadcrumb();
+
 	SynapseClientAsync getSynapseClientAsync();
+
 	SynapseJavascriptClient getSynapseJavascriptClient();
+
 	StuAlert getStuAlert();
+
 	FilesTabView getFilesTabView();
+
 	FileTitleBar getFileTitleBar();
+
 	BasicTitleBar getBasicTitleBar();
+
 	EntityMetadata getEntityMetadata();
+
 	FilesBrowser getFilesBrowser();
+
 	WikiPageWidget getWikiPageWidget();
+
 	DiscussionThreadListWidget getDiscussionThreadListWidget();
+
 	ChallengeTabView getChallengeTabView();
+
 	ChallengeWidget getChallengeWidget();
+
 	TablesTabView getTablesTabView();
+
 	QueryTokenProvider getQueryTokenProvider();
+
 	SettingsPresenter getSettingsPresenter();
+
 	AccessControlListModalWidget getAccessControlListModalWidget();
+
 	RenameEntityModalWidget getRenameEntityModalWidget();
+
 	EditFileMetadataModalWidget getEditFileMetadataModalWidget();
+
 	EditProjectMetadataModalWidget getEditProjectMetadataModalWidget();
+
 	EntityFinder getEntityFinder();
+
 	UploadDialogWidget getUploadDialogWidget();
+
 	WikiMarkdownEditor getWikiMarkdownEditor();
+
 	AddFolderDialogWidget getAddFolderDialogWidget();
+
 	ProvenanceEditorWidget getProvenanceEditorWidget();
+
 	StorageLocationWidget getStorageLocationWidget();
+
 	EvaluationEditorModal getEvaluationEditorModal();
+
 	SelectTeamModal getSelectTeamModal();
+
 	CreateOrUpdateDoiModal getCreateOrUpdateDoiModal();
+
 	ApproveUserAccessModal getApproveUserAccessModal();
+
 	ChallengeClientAsync getChallengeClientAsync();
+
 	EntityIdCellRenderer getEntityIdCellRenderer();
+
 	UserIdCellRenderer getUserIdCellRenderer();
 
 	CreateDataAccessRequestWizard getCreateDataAccessRequestWizard();
+
 	ManagedACTAccessRequirementWidget getManagedACTAccessRequirementWidget();
+
 	ACTAccessRequirementWidget getACTAccessRequirementWidget();
+
 	LockAccessRequirementWidget getLockAccessRequirementWidget();
+
 	TermsOfUseAccessRequirementWidget getTermsOfUseAccessRequirementWidget();
+
 	FileHandleWidget getFileHandleWidget();
+
 	CreateAccessRequirementWizard getCreateAccessRequirementWizard();
+
 	ProfileCertifiedValidatedWidget getProfileCertifiedValidatedWidget();
+
 	ACTDataAccessSubmissionWidget getACTDataAccessSubmissionWidget();
+
 	OpenSubmissionWidget getOpenSubmissionWidget();
+
 	DateTimeUtils getDateTimeUtils();
+
 	AccessorGroupWidget getAccessorGroupWidget();
+
 	AccessRequirementWidget getAccessRequirementWidget();
+
 	SelfSignAccessRequirementWidget getSelfSignAccessRequirementWidget();
 
 	SubjectWidget getSubjectWidget();
+
 	TeamMemberRowWidget getTeamMemberRowWidget();
+
 	RequestBuilderWrapper getRequestBuilder();
+
 	EditAnnotationsDialog getEditAnnotationsDialog();
+
 	CreateTableViewWizard getCreateTableViewWizard();
+
 	UploadTableModalWidget getUploadTableModalWidget();
+
 	AddExternalRepoModal getAddExternalRepoModal();
+
 	PDFPreviewWidget getPDFPreviewWidget();
+
 	HtmlPreviewWidget getHtmlPreviewWidget();
+
 	NbConvertPreviewWidget getNbConvertPreviewWidget();
+
 	S3DirectLoginDialog getS3DirectLoginDialog();
+
 	DownloadTableQueryModalWidget getDownloadTableQueryModalWidget();
+
 	CopyTextModal getCopyTextModal();
+
 	UserProfileModalWidget getUserProfileModalWidget();
+
 	PromptForValuesModalView getPromptForValuesModal();
+
 	CroppedImageUploadViewImpl getCroppedImageUploadView();
+
 	ImageUploadView getImageUploadView();
+
 	LazyLoadHelper getLazyLoadHelper();
+
 	SharingPermissionsGrid getSharingPermissionsGrid();
+
 	AclAddPeoplePanel getAclAddPeoplePanel();
+
 	FileHandleUploadWidget getFileHandleUploadWidget();
+
 	WikiPageDeleteConfirmationDialog getWikiPageDeleteConfirmationDialog();
-	
+
 	WikiVersionAnchorListItem getWikiVersionAnchorListItem();
+
 	SynapseProperties getSynapseProperties();
+
 	QuizInfoDialog getQuizInfoDialog();
+
 	EvaluationRowWidget getEvaluationRowWidget();
+
 	EditDiscussionThreadModal getEditDiscussionThreadModal();
+
 	DownloadListWidget getDownloadListWidget();
-	FileHandleAssociationRow getFileHandleAssociationRow(); 
+
+	FileHandleAssociationRow getFileHandleAssociationRow();
+
 	TableEntityListGroupItem getTableEntityListGroupItem();
+
 	SynapseJSNIUtilsImpl getSynapseJSNIUtils();
+
 	OpenUserInvitationWidget getOpenUserInvitationWidget();
+
 	OpenMembershipRequestWidget getOpenMembershipRequestWidget();
+
 	OpenTeamInvitationWidget getOpenTeamInvitationWidget();
+
 	DivView getDiv();
+
 	DoiWidgetV2 getDoiWidget();
+
 	TeamDeleteModalWidget getTeamDeleteModalWidget();
+
 	TeamLeaveModalWidget getTeamLeaveModalWidget();
+
 	TeamEditModalWidget getTeamEditModalWidget();
+
 	TeamProjectsModalWidget getTeamProjectsModalWidget();
+
 	StatisticsPlotWidget getStatisticsPlotWidget();
+
+	QuarantinedEmailModal getQuarantinedEmailModal();
 }

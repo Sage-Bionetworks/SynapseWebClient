@@ -5,7 +5,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -19,11 +18,10 @@ import org.sagebionetworks.web.client.view.users.RegisterWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class RegisterWidgetTest {
-	
+
 	@Mock
 	RegisterWidgetView mockView;
 	@Mock
@@ -32,7 +30,7 @@ public class RegisterWidgetTest {
 	GWTWrapper mockGWTWrapper;
 	@Mock
 	SynapseAlert mockSynAlert;
-	
+
 	RegisterWidget widget;
 	String email = "test@test.com";
 	NewUser newUser;
@@ -43,12 +41,12 @@ public class RegisterWidgetTest {
 		newUser.setEmail(email);
 		MockitoAnnotations.initMocks(this);
 		mockGWTWrapper = mock(GWTWrapper.class);
-		widget = new RegisterWidget(mockView, mockUserService, mockGWTWrapper, mockSynAlert);			
+		widget = new RegisterWidget(mockView, mockUserService, mockGWTWrapper, mockSynAlert);
 		verify(mockView).setPresenter(widget);
 
 		AsyncMockStubber.callSuccessWith(null).when(mockUserService).createUserStep1(any(NewUser.class), anyString(), any(AsyncCallback.class));
 	}
-	
+
 	@Test
 	public void testRegisterUser() {
 		widget.registerUser(email);
@@ -71,7 +69,7 @@ public class RegisterWidgetTest {
 		Exception ex = new Exception("unknown");
 		AsyncMockStubber.callFailureWith(ex).when(mockUserService).createUserStep1(any(NewUser.class), anyString(), any(AsyncCallback.class));
 		widget.registerUser(email);
-		
+
 		verify(mockSynAlert).handleException(ex);
 	}
 

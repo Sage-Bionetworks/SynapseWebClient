@@ -152,6 +152,10 @@ end sticky footer
 	.btn-default {
 		background-color: #ebebeb;
 	}
+	.dropdown button.btn {
+		padding: 6px 12px;
+		margin: 0px 0px;
+	}
 	.btn-default:hover, .open .dropdown-toggle.btn-default, .btn-default:hover a {
 		color: white;
 		background-color: $synapse-blue;
@@ -516,6 +520,14 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 	@include box-shadow(0px 1px 2px #aaa);
 	margin: 10px 0px;
 	border: none;
+	.close {
+		color: white;
+		font-size: 18px;
+		opacity: .6;
+	}
+	.close:hover, .close:visited, .close:focus {
+		opacity: 1;
+	}
 }
 
 .heading {

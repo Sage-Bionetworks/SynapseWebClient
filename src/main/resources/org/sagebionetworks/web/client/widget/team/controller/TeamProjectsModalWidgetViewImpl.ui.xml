@@ -5,19 +5,25 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	
 
-	<b:Modal ui:field="modal" title="Projects" closable="true" dataBackdrop="STATIC" dataKeyboard="true" size="LARGE">
+
+	<b:Modal ui:field="modal" title="Projects" closable="true"
+		dataBackdrop="STATIC" dataKeyboard="true" size="LARGE">
 		<b:ModalBody>
-			<t:Table ui:field="columnHeaders" width="100%" addStyleNames="margin-top-10"> <!-- Project list table headers -->
+			<t:Table ui:field="columnHeaders" width="100%"
+				addStyleNames="margin-top-10"> <!-- Project list table headers -->
 				<t:TableRow>
-					<tr:SortableTableHeaderImpl ui:field="projectNameColumnHeader" text="Name" />
-					<tr:SortableTableHeaderImpl width="140px" ui:field="lastActivityOnColumnHeader" text="Last Activity On" addStyleNames="hidden-xs" />
+					<tr:SortableTableHeaderImpl
+						ui:field="projectNameColumnHeader" text="Name" />
+					<tr:SortableTableHeaderImpl
+						width="140px" ui:field="lastActivityOnColumnHeader"
+						text="Last Activity On" addStyleNames="hidden-xs" />
 				</t:TableRow>
 			</t:Table>
 			<bh:Hr addStyleNames="margin-top-5 margin-bottom-5" />
-			<bh:Div ui:field="projectsContainer" addStyleNames="margin-top-10" />
-			<bh:Div ui:field="synAlertContainer"/>
+			<bh:Div ui:field="projectsContainer"
+				addStyleNames="margin-top-10" />
+			<bh:Div ui:field="synAlertContainer" />
 		</b:ModalBody>
 		<b:ModalFooter>
 			<b:Button ui:field="cancelButton" type="LINK">Close</b:Button>

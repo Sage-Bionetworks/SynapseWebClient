@@ -9,10 +9,9 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -23,8 +22,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class AclAddPeoplePanel extends Composite implements SynapseView {
-	public interface AclAddPeoplePanelUiBinder extends UiBinder<Widget, AclAddPeoplePanel> {};
-	
+	public interface AclAddPeoplePanelUiBinder extends UiBinder<Widget, AclAddPeoplePanel> {
+	};
+
 	@UiField
 	Div suggestBoxPanel;
 	@UiField
@@ -33,14 +33,13 @@ public class AclAddPeoplePanel extends Composite implements SynapseView {
 	CheckBox notifyPeopleCheckBox;
 	@UiField
 	Tooltip notifyTooltip;
-	
+
 	private SynapseSuggestBox suggestBox;
-	
+
 	private HandlerRegistration makePublicReg;
-	
+
 	@Inject
-	public AclAddPeoplePanel(AclAddPeoplePanelUiBinder uiBinder,
-			SynapseSuggestBox suggestBox, UserGroupSuggestionProvider provider) {
+	public AclAddPeoplePanel(AclAddPeoplePanelUiBinder uiBinder, SynapseSuggestBox suggestBox, UserGroupSuggestionProvider provider) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.suggestBox = suggestBox;
 		this.suggestBox.setSuggestionProvider(provider);
@@ -48,21 +47,20 @@ public class AclAddPeoplePanel extends Composite implements SynapseView {
 		suggestBoxPanel.add(suggestBox);
 		notifyTooltip.setTitle(DisplayConstants.NOTIFY_PEOPLE_TOOLTIP);
 	}
-	
+
 	public SynapseSuggestBox getSuggestBox() {
 		return suggestBox;
 	}
-	
+
 	public CheckBox getNotifyPeopleCheckBox() {
 		return notifyPeopleCheckBox;
 	}
-	
-	public void configure(PermissionLevel[] permLevels, final CallbackP<UserGroupSuggestion> addPersonCallback,
-						final CallbackP<Void> makePublicCallback, Boolean isPubliclyVisible) {
+
+	public void configure(PermissionLevel[] permLevels, final CallbackP<UserGroupSuggestion> addPersonCallback, final CallbackP<Void> makePublicCallback, Boolean isPubliclyVisible) {
 		clear();
-		
+
 		suggestBox.addItemSelectedHandler(addPersonCallback);
-		
+
 		if (makePublicReg != null) {
 			makePublicReg.removeHandler();
 		}
@@ -72,15 +70,15 @@ public class AclAddPeoplePanel extends Composite implements SynapseView {
 			public void onClick(ClickEvent event) {
 				makePublicCallback.invoke(null);
 			}
-			
+
 		});
-		
+
 		if (isPubliclyVisible != null) {
 			setMakePublicButtonDisplay(!isPubliclyVisible);
 		}
-		
+
 	}
-	
+
 	public void setMakePublicButtonDisplay(boolean isPubliclyVisible) {
 		if (!isPubliclyVisible) {
 			makePublicButton.setText("Make Public");
@@ -90,29 +88,26 @@ public class AclAddPeoplePanel extends Composite implements SynapseView {
 			makePublicButton.setIcon(IconType.LOCK);
 		}
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return this;
 	}
-	
+
 	@Override
 	public void clear() {
 		suggestBox.clear();
 	}
 
 	@Override
-	public void showLoading() {
-	}
+	public void showLoading() {}
 
 	@Override
-	public void showInfo(String message) {
-	}
+	public void showInfo(String message) {}
 
 	@Override
-	public void showErrorMessage(String message) {
-	}
-	
+	public void showErrorMessage(String message) {}
+
 	public void setPublicPrivateButtonVisible(boolean isVisible) {
 		makePublicButton.setVisible(isVisible);
 	}

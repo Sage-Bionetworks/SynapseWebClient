@@ -7,6 +7,7 @@ public interface UploadController {
 
 	/**
 	 * Check that the user can upload data to a container.
+	 * 
 	 * @param parentId The ID entity upload destination.
 	 * @param entityClassName The full class name of the entity to be created.
 	 * @param callback

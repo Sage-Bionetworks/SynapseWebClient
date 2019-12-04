@@ -1,32 +1,23 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
-import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Container;
 import org.gwtbootstrap3.client.ui.ProgressBar;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
-
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * The view portion of the AsynchronousProgressWidget. There is zero business
- * logic in this class.
+ * The view portion of the AsynchronousProgressWidget. There is zero business logic in this class.
  * 
  * @author John
  * 
  */
 public class InlineAsynchronousProgressViewImpl implements AsynchronousProgressView {
 
-	public interface Binder extends
-			UiBinder<Div, InlineAsynchronousProgressViewImpl> {
+	public interface Binder extends UiBinder<Div, InlineAsynchronousProgressViewImpl> {
 	}
 
 	@UiField
@@ -41,7 +32,7 @@ public class InlineAsynchronousProgressViewImpl implements AsynchronousProgressV
 	Div message;
 	@UiField
 	LoadingSpinner spinner;
-	
+
 	Presenter presenter;
 	Div container;
 
@@ -73,13 +64,12 @@ public class InlineAsynchronousProgressViewImpl implements AsynchronousProgressV
 	}
 
 	@Override
-	public void setDeterminateProgress(double percent, String text,
-			String message) {
+	public void setDeterminateProgress(double percent, String text, String message) {
 		progressBar.setPercent(percent);
 		progressBar.setText(text);
 		this.message.clear();
 		if (message != null) {
-			this.message.add(new Text(message));	
+			this.message.add(new Text(message));
 		}
 	}
 
@@ -87,7 +77,7 @@ public class InlineAsynchronousProgressViewImpl implements AsynchronousProgressV
 	public void setIndetermianteProgress(String message) {
 		this.message.clear();
 		if (message != null) {
-			this.message.add(new Text(message));	
+			this.message.add(new Text(message));
 		}
 	}
 
@@ -95,10 +85,12 @@ public class InlineAsynchronousProgressViewImpl implements AsynchronousProgressV
 	public boolean isAttached() {
 		return progressBar.isAttached();
 	}
+
 	@Override
 	public void showWhiteSpinner() {
 		spinner.setIsWhite(true);
 	}
+
 	@Override
 	public void setProgressMessageVisible(boolean visible) {
 		message.setVisible(visible);

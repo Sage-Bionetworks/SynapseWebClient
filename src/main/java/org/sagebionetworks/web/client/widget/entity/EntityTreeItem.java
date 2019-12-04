@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsTreeItem;
 import com.google.gwt.user.client.ui.TreeItem;
@@ -16,13 +14,13 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 	private EntityBadge entityBadge;
 	private boolean isExpandable;
 	private int height = 0;
-	
+
 	@Inject
-	public EntityTreeItem(EntityBadge entityBadge) { 
+	public EntityTreeItem(EntityBadge entityBadge) {
 		this.entityBadge = entityBadge;
 	}
-	
-	public void configure(EntityHeader header,  boolean isRootItem, boolean isExpandable) {
+
+	public void configure(EntityHeader header, boolean isRootItem, boolean isExpandable) {
 		entityBadge.configure(header);
 		entityBadge.asWidget().addStyleName("padding-2 light-border-bottom");
 		treeItem = new TreeItem(asWidget());
@@ -31,9 +29,9 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 			treeItem.addStyleName("entityTreeItem padding-left-0-imp");
 		else
 			treeItem.addStyleName("entityTreeItem");
-		
+
 	}
-	
+
 	public boolean isExpandable() {
 		return isExpandable;
 	}
@@ -47,33 +45,34 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 	public TreeItem asTreeItem() {
 		return treeItem;
 	}
-	
+
 	public EntityHeader getHeader() {
 		return entityBadge.getHeader();
 	}
-	
+
 	public void setClickHandler(ClickHandler handler) {
 		entityBadge.setClickHandler(handler);
 	}
-	
+
 	public void setModifiedByUserBadgeClickHandler(ClickHandler handler) {
 		entityBadge.setModifiedByUserBadgeClickHandler(handler);
 	}
-	
+
 	public void setState(boolean open, boolean fireEvents) {
 		treeItem.setState(open, fireEvents);
 	}
-	
+
 	public void showMinimalColumnSet() {
 		entityBadge.showMinimalColumnSet();
 	}
-	
+
 	public void setHeight(int height) {
 		this.height = height;
 		// set the entity badge name width based on the height
 		int entityNameWidthPx = 400 - (height * 16);
 		entityBadge.setEntityNameWidthPx(entityNameWidthPx);
 	}
+
 	public int getHeight() {
 		return height;
 	}

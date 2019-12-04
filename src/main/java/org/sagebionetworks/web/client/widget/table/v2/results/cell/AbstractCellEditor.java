@@ -7,17 +7,18 @@ import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Abstract base class for table cell editors.
+ * 
  * @author jhill
  *
  */
 public abstract class AbstractCellEditor implements CellEditor {
 
 	CellEditorView view;
-	
-	public AbstractCellEditor(CellEditorView view){
+
+	public AbstractCellEditor(CellEditorView view) {
 		this.view = view;
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();

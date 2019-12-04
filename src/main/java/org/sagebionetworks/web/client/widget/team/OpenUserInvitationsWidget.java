@@ -2,10 +2,8 @@ package org.sagebionetworks.web.client.widget.team;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget.DELETED_INVITATION_MESSAGE;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -19,7 +17,6 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -42,15 +39,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	private PopupUtilsView popupUtils;
 
 	@Inject
-	public OpenUserInvitationsWidget(OpenUserInvitationsWidgetView view, 
-			SynapseClientAsync synapseClient, 
-			GlobalApplicationState globalApplicationState,
-			SynapseAlert synAlert,
-			GWTWrapper gwt,
-			DateTimeUtils dateTimeUtils,
-			SynapseJavascriptClient jsClient,
-			PopupUtilsView popupUtils,
-			PortalGinInjector ginInjector) {
+	public OpenUserInvitationsWidget(OpenUserInvitationsWidgetView view, SynapseClientAsync synapseClient, GlobalApplicationState globalApplicationState, SynapseAlert synAlert, GWTWrapper gwt, DateTimeUtils dateTimeUtils, SynapseJavascriptClient jsClient, PopupUtilsView popupUtils, PortalGinInjector ginInjector) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.gwt = gwt;
@@ -64,7 +53,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 		this.popupUtils = popupUtils;
 		this.ginInjector = ginInjector;
 	}
-	
+
 	public void clear() {
 		view.clear();
 	}
@@ -72,7 +61,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	public void refresh() {
 		configure(teamId, teamRefreshCallback);
 	}
-	
+
 	@Override
 	public void removeInvitation(String invitationId) {
 		gwt.saveWindowPosition();
@@ -83,7 +72,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 				popupUtils.showInfo(DELETED_INVITATION_MESSAGE);
 				refresh();
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
@@ -91,7 +80,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 			}
 		});
 	}
-	
+
 	public void configure(String teamId, Callback teamRefreshCallback) {
 		this.teamId = teamId;
 		this.teamRefreshCallback = teamRefreshCallback;
@@ -114,14 +103,14 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 				updateMoreButton(result.size());
 				gwt.restoreWindowPosition();
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught instanceof NotFoundException) {
 					view.hideMoreButton();
 				} else {
 					synAlert.handleException(caught);
-				} 
+				}
 			}
 		});
 	}
@@ -150,7 +139,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	private void updateMoreButton(int resultSize) {
 		if (resultSize == INVITATION_BATCH_LIMIT) {
 			view.showMoreButton();
-		} else if (resultSize < INVITATION_BATCH_LIMIT){
+		} else if (resultSize < INVITATION_BATCH_LIMIT) {
 			view.hideMoreButton();
 		} else {
 			synAlert.showError("Result size can't be greater than " + INVITATION_BATCH_LIMIT);
@@ -161,15 +150,15 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	public void goTo(Place place) {
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
-	
+
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	
+
 	public void setVisible(boolean visible) {
 		view.asWidget().setVisible(visible);
 	}
-	
+
 	@Override
 	public void resendInvitation(String membershipInvitationId) {
 		gwt.saveWindowPosition();
@@ -179,7 +168,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 				popupUtils.showInfo(RESENT_INVITATION);
 				refresh();
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);

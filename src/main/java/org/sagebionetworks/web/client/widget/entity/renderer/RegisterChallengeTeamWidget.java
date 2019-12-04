@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
-
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -15,26 +13,22 @@ import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
-
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class RegisterChallengeTeamWidget implements SingleButtonView.Presenter, WidgetRendererPresenter {
-	
+
 	private SingleButtonView view;
-	private Map<String,String> descriptor;
+	private Map<String, String> descriptor;
 	private PortalGinInjector ginInjector;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	public static final String DEFAULT_BUTTON_TEXT = "Register Team";
 	String challengeId;
 	Callback widgetRefreshRequired;
-	
+
 	@Inject
-	public RegisterChallengeTeamWidget(SingleButtonView view, 
-			PortalGinInjector ginInjector, 
-			AuthenticationController authenticationController, 
-			GlobalApplicationState globalApplicationState) {
+	public RegisterChallengeTeamWidget(SingleButtonView view, PortalGinInjector ginInjector, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.authenticationController = authenticationController;
@@ -43,7 +37,7 @@ public class RegisterChallengeTeamWidget implements SingleButtonView.Presenter, 
 		view.setButtonSize(ButtonSize.LARGE);
 		view.setButtonType(ButtonType.PRIMARY);
 	}
-	
+
 	@Override
 	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		this.descriptor = widgetDescriptor;
@@ -52,14 +46,14 @@ public class RegisterChallengeTeamWidget implements SingleButtonView.Presenter, 
 		String buttonText = descriptor.get(WidgetConstants.BUTTON_TEXT_KEY);
 		if (buttonText == null)
 			buttonText = DEFAULT_BUTTON_TEXT;
-		
+
 		view.setButtonText(buttonText);
 		descriptor = widgetDescriptor;
 	}
-	
+
 	@Override
 	public void onClick() {
-		//if logged in, then show register team dialog
+		// if logged in, then show register team dialog
 		if (authenticationController.isLoggedIn()) {
 			RegisterTeamDialog dialog = ginInjector.getRegisterTeamDialog();
 			view.clearWidgets();
@@ -69,12 +63,13 @@ public class RegisterChallengeTeamWidget implements SingleButtonView.Presenter, 
 			view.showConfirmDialog(DisplayConstants.ANONYMOUS_JOIN, getConfirmCallback());
 		}
 	}
-	
+
 	public Callback getConfirmCallback() {
 		return () -> {
 			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		};
 	}
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();

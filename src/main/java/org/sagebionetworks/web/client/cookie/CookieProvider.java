@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.Date;
 
 /**
- * A simple layer of abstraction around cookies. This lets us test cookies
- * without depending on the GWT client implementation.
+ * A simple layer of abstraction around cookies. This lets us test cookies without depending on the
+ * GWT client implementation.
  * 
  * @author jmhill
  * 
@@ -22,7 +22,6 @@ public interface CookieProvider {
 
 	public void setCookie(String key, String value, Date expires);
 
-	public void setCookie(String name, String value, Date expires,
-			String domain, String path, boolean secure);
-	
+	public void setCookie(String name, String value, Date expires, String domain, String path, boolean secure);
+
 }

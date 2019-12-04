@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.shared.provenance;
 
 import java.util.Date;
-
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class ActivityGraphNode extends ProvGraphNode implements IsSerializable {
@@ -13,8 +12,8 @@ public class ActivityGraphNode extends ProvGraphNode implements IsSerializable {
 	private String modifiedBy;
 	private Date modifiedOn;
 
-	public ActivityGraphNode() {	}
-	
+	public ActivityGraphNode() {}
+
 	public ActivityGraphNode(String id, String activityId, String activityName, ActivityType type, String modifiedBy, Date modifiedOn, Boolean startingNode) {
 		super();
 		this.id = id;
@@ -78,15 +77,11 @@ public class ActivityGraphNode extends ProvGraphNode implements IsSerializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result
-				+ ((activityId == null) ? 0 : activityId.hashCode());
-		result = prime * result
-				+ ((activityName == null) ? 0 : activityName.hashCode());
+		result = prime * result + ((activityId == null) ? 0 : activityId.hashCode());
+		result = prime * result + ((activityName == null) ? 0 : activityName.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result
-				+ ((modifiedBy == null) ? 0 : modifiedBy.hashCode());
-		result = prime * result
-				+ ((modifiedOn == null) ? 0 : modifiedOn.hashCode());
+		result = prime * result + ((modifiedBy == null) ? 0 : modifiedBy.hashCode());
+		result = prime * result + ((modifiedOn == null) ? 0 : modifiedOn.hashCode());
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		return result;
 	}
@@ -132,10 +127,7 @@ public class ActivityGraphNode extends ProvGraphNode implements IsSerializable {
 
 	@Override
 	public String toString() {
-		return "ActivityGraphNode [id=" + id + ", activityId=" + activityId
-				+ ", activityName=" + activityName + ", type=" + type
-				+ ", modifiedBy=" + modifiedBy + ", modifiedOn=" + modifiedOn
-				+ "]";
+		return "ActivityGraphNode [id=" + id + ", activityId=" + activityId + ", activityName=" + activityName + ", type=" + type + ", modifiedBy=" + modifiedBy + ", modifiedOn=" + modifiedOn + "]";
 	}
 
 }

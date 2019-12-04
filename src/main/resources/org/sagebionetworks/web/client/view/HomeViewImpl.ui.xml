@@ -1,26 +1,32 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
- 	
- 	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
- 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
- 	
+
+	<ui:with field='icons'
+		type='org.sagebionetworks.web.client.IconsImageBundle' />
+	<ui:with field='sageImageBundle'
+		type='org.sagebionetworks.web.client.SageImageBundle' />
+
 	<g:HTMLPanel>
 		<b:Container fluid="true">
 			<b:Row>
 				<b:Column size="SM_4" addStyleNames="margin-top-40 ">
 					<g:FocusPanel ui:field="organizeResearchAssetsBox">
-						<bh:Div addStyleNames="imageButton margin-left-10 margin-right-10">
-							<g:Image resource='{sageImageBundle.directory}' addStyleNames="center-in-div" />
+						<bh:Div
+							addStyleNames="imageButton margin-left-10 margin-right-10">
+							<g:Image resource='{sageImageBundle.directory}'
+								addStyleNames="center-in-div" />
 							<bh:Div addStyleNames="center-in-div max-width-350">
-								<b:Heading size="H4" addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp"
-									text="Organize your digital research assets"
-								></b:Heading>
-								<bh:Paragraph addStyleNames="margin-top-3" text="Create a free Synapse Project to store your research data, code, and results." />
+								<b:Heading size="H4"
+									addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp"
+									text="Organize your digital research assets"></b:Heading>
+								<bh:Paragraph addStyleNames="margin-top-3"
+									text="Create a free Synapse Project to store your research data, code, and results." />
 							</bh:Div>
 						</bh:Div>
 					</g:FocusPanel>
@@ -28,55 +34,70 @@
 				<b:Column size="SM_4" addStyleNames="margin-top-40 ">
 					<g:FocusPanel ui:field="creditForResearchBox">
 						<bh:Div addStyleNames="imageButton">
-							<g:Image resource='{sageImageBundle.prov}' addStyleNames="center-in-div" />
+							<g:Image resource='{sageImageBundle.prov}'
+								addStyleNames="center-in-div" />
 							<bh:Div addStyleNames="center-in-div max-width-350">
-								<b:Heading size="H4" addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp"
-									text="Get credit for your research"
-								></b:Heading>
-								<bh:Paragraph addStyleNames="margin-top-3" text="Mint a DOI for your work - and describe exactly what you did using Synapse provenance." />
+								<b:Heading size="H4"
+									addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp"
+									text="Get credit for your research"></b:Heading>
+								<bh:Paragraph addStyleNames="margin-top-3"
+									text="Mint a DOI for your work - and describe exactly what you did using Synapse provenance." />
 							</bh:Div>
 						</bh:Div>
 					</g:FocusPanel>
 				</b:Column>
 				<b:Column size="SM_4" addStyleNames="margin-top-40 ">
 					<g:FocusPanel ui:field="collaborateBox">
-						<bh:Div addStyleNames="imageButton margin-left-10 margin-right-10">
-							<g:Image resource='{sageImageBundle.collaborate}' addStyleNames="center-in-div" />
+						<bh:Div
+							addStyleNames="imageButton margin-left-10 margin-right-10">
+							<g:Image resource='{sageImageBundle.collaborate}'
+								addStyleNames="center-in-div" />
 							<bh:Div addStyleNames="center-in-div max-width-350">
-								<b:Heading size="H4" addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp" 
-									text="Collaborate"
-								></b:Heading>
-								<bh:Paragraph addStyleNames="margin-top-3" text="Share your Project with your collaborators, or make it Public!" />
+								<b:Heading size="H4"
+									addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp"
+									text="Collaborate"></b:Heading>
+								<bh:Paragraph addStyleNames="margin-top-3"
+									text="Share your Project with your collaborators, or make it Public!" />
 							</bh:Div>
 						</bh:Div>
 					</g:FocusPanel>
 				</b:Column>
 			</b:Row>
 		</b:Container>
-		<b:Container fluid="true" addStyleNames="light-border" marginLeft="10" marginTop="20">
+		<b:Container fluid="true" addStyleNames="light-border"
+			marginLeft="10" marginTop="20">
 			<b:Row>
 				<b:Column size="SM_6" offset="SM_3">
-					<bh:Div ui:field="dashboardUI" addStyleNames="padding-30" visible="false" marginBottom="15" marginTop="15">
+					<bh:Div ui:field="dashboardUI" addStyleNames="padding-30"
+						visible="false" marginBottom="15" marginTop="15">
 						<bh:Div>
-							<b:Heading size="H3" addStyleNames="margin-top-5 displayInline margin-right-5" text="WELCOME BACK,"></b:Heading>
-							<b:Heading ui:field="userDisplayName" size="H3" addStyleNames="margin-top-5 displayInline" text=""></b:Heading>
+							<b:Heading size="H3"
+								addStyleNames="margin-top-5 displayInline margin-right-5"
+								text="WELCOME BACK,"></b:Heading>
+							<b:Heading ui:field="userDisplayName" size="H3"
+								addStyleNames="margin-top-5 displayInline" text=""></b:Heading>
 						</bh:Div>
-						<b:Button ui:field="dashboardBtn" size="LARGE" block="true" marginTop="20" marginBottom="33" />
+						<b:Button ui:field="dashboardBtn" size="LARGE"
+							block="true" marginTop="20" marginBottom="33" />
 					</bh:Div>
-					<bh:Div ui:field="registerUI" addStyleNames="margin-bottom-15 padding-15">
-						<b:Heading size="H3" text="CREATE SYNAPSE ACCOUNT" marginLeft="10" marginTop="5" marginBottom="15"/>
-						<bh:Div ui:field="registerWidgetContainer" addStyleNames="margin-10" />
+					<bh:Div ui:field="registerUI"
+						addStyleNames="margin-bottom-15 padding-15">
+						<b:Heading size="H3" text="CREATE SYNAPSE ACCOUNT"
+							marginLeft="10" marginTop="5" marginBottom="15" />
+						<bh:Div ui:field="registerWidgetContainer"
+							addStyleNames="margin-10" />
 					</bh:Div>
 				</b:Column>
 			</b:Row>
-			<bh:Div ui:field="loginUI" addStyleNames="padding-30 margin-bottom-15" />
+			<bh:Div ui:field="loginUI"
+				addStyleNames="padding-30 margin-bottom-15" />
 		</b:Container>
 		<b:Container fluid="true">
 			<b:Row addStyleNames="synapse-blue-bg margin-top-20">
 				<b:Column size="SM_12">
-					<b:Heading size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
-							text="HELP"
-					></b:Heading>
+					<b:Heading size="H3"
+						addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
+						text="HELP"></b:Heading>
 				</b:Column>
 			</b:Row>
 		</b:Container>
@@ -84,22 +105,31 @@
 			<b:Row>
 				<b:Column size="SM_3" addStyleNames="margin-top-30">
 					<g:FocusPanel ui:field="gettingStartedBox">
-						<b:Panel addStyleNames="padding-15 imageButton margin-left-10 margin-right-10">
-							<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Getting Started" />
-							<bh:Paragraph text="Synapse is an open source software platform that data scientists can use to carry out, track, and communicate their research in real time. "/>
+						<b:Panel
+							addStyleNames="padding-15 imageButton margin-left-10 margin-right-10">
+							<b:Heading size="H4" addStyleNames="font-weight-bolder"
+								text="Getting Started" />
+							<bh:Paragraph
+								text="Synapse is an open source software platform that data scientists can use to carry out, track, and communicate their research in real time. " />
 							<b:Button text="Open the guide" />
 						</b:Panel>
 					</g:FocusPanel>
 				</b:Column>
 				<b:Column size="SM_9" addStyleNames="margin-top-30">
-					<b:Panel addStyleNames="padding-15 margin-left-10 margin-right-10">
-						<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Programmatic Clients" />
-						<bh:Paragraph text="Synapse is designed to easily integrate into your current work. That's why we've created the following clients so that you can
+					<b:Panel
+						addStyleNames="padding-15 margin-left-10 margin-right-10">
+						<b:Heading size="H4" addStyleNames="font-weight-bolder"
+							text="Programmatic Clients" />
+						<bh:Paragraph
+							text="Synapse is designed to easily integrate into your current work. That's why we've created the following clients so that you can
 						   interact with all of Synapse's functionality programmatically. Create projects, upload &amp; download files, generate provenance, query, create wikis and more
-						   all from the comfort of your own code."/>
+						   all from the comfort of your own code." />
 						<bh:Paragraph>
-							<bh:Text>Don't see your language of choice here? Check out our full</bh:Text>
-							<b:Anchor href="http://docs.synapse.org/rest/" text="REST API documentation" target="_blank" addStyleNames="margin-left-5"/>
+							<bh:Text>Don't see your language of choice here? Check out our
+								full</bh:Text>
+							<b:Anchor href="http://docs.synapse.org/rest/"
+								text="REST API documentation" target="_blank"
+								addStyleNames="margin-left-5" />
 						</bh:Paragraph>
 						<b:Row>
 							<b:Column size="SM_3">
@@ -107,11 +137,14 @@
 									<t:Table>
 										<t:TableRow>
 											<t:TableData addStyleNames="vertical-align-top">
-												<g:Image resource='{sageImageBundle.logoR45}' addStyleNames="margin-right-5"/>
+												<g:Image resource='{sageImageBundle.logoR45}'
+													addStyleNames="margin-right-5" />
 											</t:TableData>
 											<t:TableData>
-												<b:Heading size="H5" addStyleNames="font-weight-bolder">
-													<b:Anchor href="http://docs.synapse.org/r/" target="_blank" text="R client"/>
+												<b:Heading size="H5"
+													addStyleNames="font-weight-bolder">
+													<b:Anchor href="https://r-docs.synapse.org"
+														target="_blank" text="R client" />
 												</b:Heading>
 											</t:TableData>
 										</t:TableRow>
@@ -123,11 +156,14 @@
 									<t:Table>
 										<t:TableRow>
 											<t:TableData addStyleNames="vertical-align-top">
-												<g:Image resource='{sageImageBundle.logoPython45}' addStyleNames="margin-right-5"/>
+												<g:Image resource='{sageImageBundle.logoPython45}'
+													addStyleNames="margin-right-5" />
 											</t:TableData>
 											<t:TableData>
-												<b:Heading size="H5" addStyleNames="font-weight-bolder">
-													<b:Anchor href="http://docs.synapse.org/python/" target="_blank" text="Python client"/>
+												<b:Heading size="H5"
+													addStyleNames="font-weight-bolder">
+													<b:Anchor href="https://python-docs.synapse.org"
+														target="_blank" text="Python client" />
 												</b:Heading>
 											</t:TableData>
 										</t:TableRow>
@@ -139,11 +175,16 @@
 									<t:Table>
 										<t:TableRow>
 											<t:TableData addStyleNames="vertical-align-top">
-												<g:Image resource='{sageImageBundle.logoCommandLine45}' addStyleNames="margin-right-5"/>
+												<g:Image
+													resource='{sageImageBundle.logoCommandLine45}'
+													addStyleNames="margin-right-5" />
 											</t:TableData>
 											<t:TableData>
-												<b:Heading size="H5" addStyleNames="font-weight-bolder">
-													<b:Anchor href="http://docs.synapse.org/python/build/html/CommandLineClient.html" target="_blank" text="Command line client"/>												
+												<b:Heading size="H5"
+													addStyleNames="font-weight-bolder">
+													<b:Anchor
+														href="https://python-docs.synapse.org/build/html/CommandLineClient.html"
+														target="_blank" text="Command line client" />
 												</b:Heading>
 											</t:TableData>
 										</t:TableRow>
@@ -155,17 +196,21 @@
 									<t:Table>
 										<t:TableRow>
 											<t:TableData addStyleNames="vertical-align-top">
-												<g:Image resource='{sageImageBundle.logoJava45}' addStyleNames="margin-right-5"/>
+												<g:Image resource='{sageImageBundle.logoJava45}'
+													addStyleNames="margin-right-5" />
 											</t:TableData>
 											<t:TableData>
-												<b:Heading size="H5" addStyleNames="font-weight-bolder">
-													<b:Anchor href="https://github.com/Sage-Bionetworks/Synapse-Repository-Services/blob/develop/client/synapseJavaClient/src/main/java/org/sagebionetworks/client/SynapseClient.java" target="_blank" text="Java client"/>
+												<b:Heading size="H5"
+													addStyleNames="font-weight-bolder">
+													<b:Anchor
+														href="https://github.com/Sage-Bionetworks/Synapse-Repository-Services/blob/develop/client/synapseJavaClient/src/main/java/org/sagebionetworks/client/SynapseClient.java"
+														target="_blank" text="Java client" />
 												</b:Heading>
 											</t:TableData>
 										</t:TableRow>
 									</t:Table>
 								</bh:Div>
-							</b:Column>						
+							</b:Column>
 						</b:Row>
 					</b:Panel>
 				</b:Column>
@@ -175,9 +220,9 @@
 		<b:Container fluid="true">
 			<b:Row addStyleNames="synapse-blue-bg margin-top-20">
 				<b:Column size="SM_12">
-					<b:Heading size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
-							text="EXPLORE HOW RESEARCHERS ARE USING SYNAPSE"
-					></b:Heading>
+					<b:Heading size="H3"
+						addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
+						text="EXPLORE HOW RESEARCHERS ARE USING SYNAPSE"></b:Heading>
 				</b:Column>
 			</b:Row>
 		</b:Container>
@@ -185,45 +230,64 @@
 			<b:Row>
 				<b:Column size="SM_4" addStyleNames="margin-top-40 ">
 					<g:FocusPanel ui:field="researchCommunitiesBox">
-						<bh:Div addStyleNames="synapse-yellow-bg padding-10 imageButton margin-left-10 margin-right-10" height="200px">
+						<bh:Div
+							addStyleNames="synapse-yellow-bg padding-10 imageButton margin-left-10 margin-right-10"
+							height="200px">
 							<t:Table>
 								<t:TableRow>
 									<t:TableData paddingRight="2">
-										<g:Image resource='{sageImageBundle.people}' addStyleNames="margin-top-left-10" />
+										<g:Image resource='{sageImageBundle.people}'
+											addStyleNames="margin-top-left-10" />
 									</t:TableData>
 									<t:TableData paddingRight="2">
-										<b:Heading size="H4" addStyleNames="color-white font-weight-bolder" text="RESEARCH COMMUNITIES"></b:Heading>
+										<b:Heading size="H4"
+											addStyleNames="color-white font-weight-bolder"
+											text="RESEARCH COMMUNITIES"></b:Heading>
 									</t:TableData>
 								</t:TableRow>
 							</t:Table>
-							<bh:Paragraph addStyleNames="color-white" text="See the communities working on shared data hosted on Synapse. >" marginTop="10"/>
+							<bh:Paragraph addStyleNames="color-white"
+								text="See the communities working on shared data hosted on Synapse. >"
+								marginTop="10" />
 						</bh:Div>
 					</g:FocusPanel>
 				</b:Column>
 				<b:Column size="SM_4" addStyleNames="margin-top-40 ">
 					<g:FocusPanel ui:field="openResearchProjectsBox">
-						<bh:Div addStyleNames="synapse-green-bg padding-10 imageButton margin-left-10 margin-right-10" height="200px">
+						<bh:Div
+							addStyleNames="synapse-green-bg padding-10 imageButton margin-left-10 margin-right-10"
+							height="200px">
 							<t:Table>
 								<t:TableRow>
 									<t:TableData paddingRight="2">
-										<g:Image resource='{sageImageBundle.unlock}' addStyleNames="margin-10" />
+										<g:Image resource='{sageImageBundle.unlock}'
+											addStyleNames="margin-10" />
 									</t:TableData>
 									<t:TableData paddingRight="2">
-										<b:Heading size="H4" addStyleNames="color-white font-weight-bolder" text="OPEN RESOURCES"></b:Heading>
+										<b:Heading size="H4"
+											addStyleNames="color-white font-weight-bolder"
+											text="OPEN RESOURCES"></b:Heading>
 									</t:TableData>
 								</t:TableRow>
 							</t:Table>
-							<bh:Paragraph addStyleNames="color-white" text="See the open research projects hosted on Synapse. >" marginTop="10"/>
+							<bh:Paragraph addStyleNames="color-white"
+								text="See the open research projects hosted on Synapse. >"
+								marginTop="10" />
 						</bh:Div>
 					</g:FocusPanel>
 				</b:Column>
 				<b:Column size="SM_4" addStyleNames="margin-top-40 ">
 					<g:FocusPanel ui:field="dreamChallengesBox">
-						<bh:Div addStyleNames="synapse-purple-bg padding-10 imageButton margin-left-10 margin-right-10" height="200px">
+						<bh:Div
+							addStyleNames="synapse-purple-bg padding-10 imageButton margin-left-10 margin-right-10"
+							height="200px">
 							<bh:Div addStyleNames="margin-10">
-								<g:Image resource='{sageImageBundle.dream}' addStyleNames="center-in-div" />
+								<g:Image resource='{sageImageBundle.dream}'
+									addStyleNames="center-in-div" />
 							</bh:Div>
-							<bh:Paragraph addStyleNames="color-white" text="Synapse is the platform on which DREAM operates.  Learn more. >" marginTop="10"/>
+							<bh:Paragraph addStyleNames="color-white"
+								text="Synapse is the platform on which DREAM operates.  Learn more. >"
+								marginTop="10" />
 						</bh:Div>
 					</g:FocusPanel>
 				</b:Column>
@@ -233,71 +297,90 @@
 		<b:Container fluid="true">
 			<b:Row addStyleNames="synapse-purple-bg margin-top-20">
 				<b:Column size="SM_12">
-					<b:Heading size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
-							text="GOVERNANCE"
-					></b:Heading>
+					<b:Heading size="H3"
+						addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
+						text="GOVERNANCE"></b:Heading>
 				</b:Column>
 			</b:Row>
 		</b:Container>
 		<b:Container fluid="true">
 			<b:Row>
 				<b:Column size="SM_6" addStyleNames="margin-top-30">
-						<g:FocusPanel ui:field="termsOfUseBox">
-							<b:Panel addStyleNames="padding-15 imageButton margin-left-10 margin-right-10">
-								<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Terms of Use"></b:Heading>
-								<bh:Paragraph text="Synapse operates under a complete governance process that includes well-documented Terms and Conditions of Use, guide- lines and operating procedures, privacy enhancing technologies, as well as the right of audit and external reviews." />
-								<b:Button text="Learn about Synapse Use and Oversight" />
-							</b:Panel>
-						</g:FocusPanel>
-					</b:Column>
+					<g:FocusPanel ui:field="termsOfUseBox">
+						<b:Panel
+							addStyleNames="padding-15 imageButton margin-left-10 margin-right-10">
+							<b:Heading size="H4" addStyleNames="font-weight-bolder"
+								text="Terms of Use"></b:Heading>
+							<bh:Paragraph
+								text="Synapse operates under a complete governance process that includes well-documented Terms and Conditions of Use, guide- lines and operating procedures, privacy enhancing technologies, as well as the right of audit and external reviews." />
+							<b:Button text="Learn about Synapse Use and Oversight" />
+						</b:Panel>
+					</g:FocusPanel>
+				</b:Column>
 				<b:Column size="SM_6" addStyleNames="margin-top-30">
-						<g:FocusPanel ui:field="becomeCertifiedBox">
-							<b:Panel addStyleNames="padding-15 imageButton margin-left-10 margin-right-10">
-								<t:Table>
-									<t:TableRow>
-										<t:TableData paddingRight="10">
-											<g:Image resource='{sageImageBundle.certificate}' addStyleNames="margin-10" />
-										</t:TableData>
-										<t:TableData paddingRight="2">
-											<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Become a Certified User!"></b:Heading>
-											<bh:Paragraph text="Synapse is a collaborative data sharing platform approved for storing data from human subjects research. This requires special care and thought. To upload files, Synapse requires you demonstrate awareness of privacy and security issues." />
-											<b:Button text="Learn more about certification" />
-										</t:TableData>
-									</t:TableRow>
-								</t:Table>
-							</b:Panel>
-						</g:FocusPanel>
-					</b:Column>
+					<g:FocusPanel ui:field="becomeCertifiedBox">
+						<b:Panel
+							addStyleNames="padding-15 imageButton margin-left-10 margin-right-10">
+							<t:Table>
+								<t:TableRow>
+									<t:TableData paddingRight="10">
+										<g:Image resource='{sageImageBundle.certificate}'
+											addStyleNames="margin-10" />
+									</t:TableData>
+									<t:TableData paddingRight="2">
+										<b:Heading size="H4"
+											addStyleNames="font-weight-bolder"
+											text="Become a Certified User!"></b:Heading>
+										<bh:Paragraph
+											text="Synapse is a collaborative data sharing platform approved for storing data from human subjects research. This requires special care and thought. To upload files, Synapse requires you demonstrate awareness of privacy and security issues." />
+										<b:Button text="Learn more about certification" />
+									</t:TableData>
+								</t:TableRow>
+							</t:Table>
+						</b:Panel>
+					</g:FocusPanel>
+				</b:Column>
 			</b:Row>
 		</b:Container>
-		
+
 		<b:Container fluid="true">
 			<b:Row addStyleNames="synapse-yellow-bg margin-top-20">
 				<b:Column size="SM_12">
-					<b:Heading ui:field="organizeDigitalResearchAssetsHeading" size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
-							text="ORGANIZE YOUR DIGITAL RESEARCH ASSETS"
-					></b:Heading>
+					<b:Heading
+						ui:field="organizeDigitalResearchAssetsHeading" size="H3"
+						addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
+						text="ORGANIZE YOUR DIGITAL RESEARCH ASSETS"></b:Heading>
 				</b:Column>
 			</b:Row>
 		</b:Container>
 		<b:Container fluid="true">
 			<b:Row>
 				<b:Column size="SM_6" addStyleNames="margin-top-30">
-					<b:Panel addStyleNames="padding-15 margin-left-10 margin-right-10">
+					<b:Panel
+						addStyleNames="padding-15 margin-left-10 margin-right-10">
 						<t:Table>
 							<t:TableRow>
 								<t:TableData paddingRight="10">
-									<g:Image resource='{sageImageBundle.directory}' addStyleNames="margin-10" height="63px" width="75px"/>
+									<g:Image resource='{sageImageBundle.directory}'
+										addStyleNames="margin-10" height="63px" width="75px" />
 								</t:TableData>
 								<t:TableData paddingRight="2">
-									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Access your data anywhere"></b:Heading>
+									<b:Heading size="H4"
+										addStyleNames="font-weight-bolder"
+										text="Access your data anywhere"></b:Heading>
 									<bh:Paragraph>
-										<bh:Text>Synapse provides APIs to store or access your data from the web or programmatically via one of our supported analytical clients (</bh:Text>
-										<b:Anchor target="_blank" href="http://docs.synapse.org/r/" text="R"/>
+										<bh:Text>Synapse provides APIs to store or access your data
+											from the web or programmatically via one of our supported
+											analytical clients (</bh:Text>
+										<b:Anchor target="_blank"
+											href="https://r-docs.synapse.org" text="R" />
 										<bh:Text>,&nbsp;</bh:Text>
-										<b:Anchor target="_blank" href="http://docs.synapse.org/python/" text="Python"/>
+										<b:Anchor target="_blank"
+											href="https://python-docs.synapse.org" text="Python" />
 										<bh:Text>,&nbsp;</bh:Text>
-										<b:Anchor target="_blank" href="http://docs.synapse.org/python/build/html/CommandLineClient.html" text="command line"/>
+										<b:Anchor target="_blank"
+											href="https://python-docs.synapse.org/build/html/CommandLineClient.html"
+											text="command line" />
 										<bh:Text>)</bh:Text>
 									</bh:Paragraph>
 								</t:TableData>
@@ -306,15 +389,20 @@
 					</b:Panel>
 				</b:Column>
 				<b:Column size="SM_6" addStyleNames="margin-top-30">
-					<b:Panel addStyleNames="padding-15 margin-left-10 margin-right-10">
+					<b:Panel
+						addStyleNames="padding-15 margin-left-10 margin-right-10">
 						<t:Table>
 							<t:TableRow>
 								<t:TableData paddingRight="10">
-									<g:Image resource='{sageImageBundle.directory}' addStyleNames="margin-10" height="63px" width="75px"/>
+									<g:Image resource='{sageImageBundle.directory}'
+										addStyleNames="margin-10" height="63px" width="75px" />
 								</t:TableData>
 								<t:TableData paddingRight="2">
-									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Query structured data"></b:Heading>
-									<bh:Paragraph text="Use Synapse Tables to query structured data right from your web browser, or from any analytical client!" />
+									<b:Heading size="H4"
+										addStyleNames="font-weight-bolder"
+										text="Query structured data"></b:Heading>
+									<bh:Paragraph
+										text="Use Synapse Tables to query structured data right from your web browser, or from any analytical client!" />
 								</t:TableData>
 							</t:TableRow>
 						</t:Table>
@@ -322,43 +410,51 @@
 				</b:Column>
 			</b:Row>
 		</b:Container>
-		
+
 		<b:Container fluid="true">
 			<b:Row addStyleNames="synapse-green-bg margin-top-20">
 				<b:Column size="SM_12">
-					<b:Heading ui:field="getCreditHeading" size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
-							text="GET CREDIT FOR YOUR RESEARCH"
-					></b:Heading>
+					<b:Heading ui:field="getCreditHeading" size="H3"
+						addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
+						text="GET CREDIT FOR YOUR RESEARCH"></b:Heading>
 				</b:Column>
 			</b:Row>
 		</b:Container>
 		<b:Container fluid="true">
 			<b:Row>
 				<b:Column size="SM_6" addStyleNames="margin-top-30">
-					<b:Panel addStyleNames="padding-15 margin-left-10 margin-right-10">
+					<b:Panel
+						addStyleNames="padding-15 margin-left-10 margin-right-10">
 						<t:Table>
 							<t:TableRow>
 								<t:TableData paddingRight="10">
-									<g:Image resource='{sageImageBundle.prov}' addStyleNames="margin-10" height="74px" width="75px"/>
+									<g:Image resource='{sageImageBundle.prov}'
+										addStyleNames="margin-10" height="74px" width="75px" />
 								</t:TableData>
 								<t:TableData paddingRight="2">
-									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Record provenance"></b:Heading>
-									<bh:Paragraph text="Synapse provides tools to record and display provenance of your analysis - giving you credit for each step of the work you do!" />
+									<b:Heading size="H4"
+										addStyleNames="font-weight-bolder" text="Record provenance"></b:Heading>
+									<bh:Paragraph
+										text="Synapse provides tools to record and display provenance of your analysis - giving you credit for each step of the work you do!" />
 								</t:TableData>
 							</t:TableRow>
 						</t:Table>
 					</b:Panel>
 				</b:Column>
 				<b:Column size="SM_6" addStyleNames="margin-top-30">
-					<b:Panel addStyleNames="padding-15 margin-left-10 margin-right-10">
+					<b:Panel
+						addStyleNames="padding-15 margin-left-10 margin-right-10">
 						<t:Table>
 							<t:TableRow>
 								<t:TableData paddingRight="10">
-									<g:Image resource='{sageImageBundle.prov}' addStyleNames="margin-10" height="74px" width="75px"/>
+									<g:Image resource='{sageImageBundle.prov}'
+										addStyleNames="margin-10" height="74px" width="75px" />
 								</t:TableData>
 								<t:TableData paddingRight="2">
-									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Mint a DOI"></b:Heading>
-									<bh:Paragraph text="A digital object identifier (DOI) provides provides a persistent and easy way to reference your digital assets in publications - including data, code, or analysis results." />
+									<b:Heading size="H4"
+										addStyleNames="font-weight-bolder" text="Mint a DOI"></b:Heading>
+									<bh:Paragraph
+										text="A digital object identifier (DOI) provides provides a persistent and easy way to reference your digital assets in publications - including data, code, or analysis results." />
 								</t:TableData>
 							</t:TableRow>
 						</t:Table>
@@ -369,56 +465,108 @@
 		<b:Container fluid="true">
 			<b:Row addStyleNames="synapse-purple-bg margin-top-20">
 				<b:Column size="SM_12">
-					<b:Heading ui:field="collaborateHeading" size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
-							text="COLLABORATE"
-					></b:Heading>
+					<b:Heading ui:field="collaborateHeading" size="H3"
+						addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
+						text="COLLABORATE"></b:Heading>
 				</b:Column>
 			</b:Row>
 		</b:Container>
 		<b:Container fluid="true">
 			<b:Row>
 				<b:Column size="SM_6" addStyleNames="margin-top-30">
-					<b:Panel addStyleNames="padding-15 margin-left-10 margin-right-10">
+					<b:Panel
+						addStyleNames="padding-15 margin-left-10 margin-right-10">
 						<t:Table>
 							<t:TableRow>
 								<t:TableData paddingRight="10">
-									<g:Image resource='{sageImageBundle.collaborate}' addStyleNames="margin-10" height="60px" width="75px"/>
+									<g:Image resource='{sageImageBundle.collaborate}'
+										addStyleNames="margin-10" height="60px" width="75px" />
 								</t:TableData>
 								<t:TableData paddingRight="2">
-									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Communicate your findings"></b:Heading>
-									<bh:Paragraph text="Use the Synapse Wiki services to communicate your Project's research findings by embedding rich content such as images, Tables, Provenance, and even LaTeX equations." />
+									<b:Heading size="H4"
+										addStyleNames="font-weight-bolder"
+										text="Communicate your findings"></b:Heading>
+									<bh:Paragraph
+										text="Use the Synapse Wiki services to communicate your Project's research findings by embedding rich content such as images, Tables, Provenance, and even LaTeX equations." />
 								</t:TableData>
 							</t:TableRow>
 						</t:Table>
 					</b:Panel>
 				</b:Column>
 				<b:Column size="SM_6" addStyleNames="margin-top-30">
-					<b:Panel addStyleNames="padding-15 margin-left-10 margin-right-10">
+					<b:Panel
+						addStyleNames="padding-15 margin-left-10 margin-right-10">
 						<t:Table>
 							<t:TableRow>
 								<t:TableData paddingRight="10">
-									<g:Image resource='{sageImageBundle.collaborate}' addStyleNames="margin-10" height="60px" width="75px"/>
+									<g:Image resource='{sageImageBundle.collaborate}'
+										addStyleNames="margin-10" height="60px" width="75px" />
 								</t:TableData>
 								<t:TableData paddingRight="2">
-									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Share your research"></b:Heading>
-									<bh:Paragraph text="New Synapse Projects are private by default - share with your colleagues, collaborators, and even make your work public! Create Synapse Teams to manage your collaborations." />
+									<b:Heading size="H4"
+										addStyleNames="font-weight-bolder" text="Share your research"></b:Heading>
+									<bh:Paragraph
+										text="New Synapse Projects are private by default - share with your colleagues, collaborators, and even make your work public! Create Synapse Teams to manage your collaborations." />
 								</t:TableData>
 							</t:TableRow>
 						</t:Table>
 					</b:Panel>
-				</b:Column>		
+				</b:Column>
 				<bh:Div ui:field="sponsorsUI">
 					<bh:Hr />
-	        		<b:Column size="SM_12" addStyleNames="margin-bottom-20">
-	        			<bh:Span text="OUR PARTNERS" addStyleNames="partnersHeading displayBlock" />
+					<b:Column size="SM_12" addStyleNames="margin-bottom-20">
+						<bh:Span text="OUR PARTNERS"
+							addStyleNames="partnersHeading displayBlock" />
 						<g:HTMLPanel addStyleNames="center">
-							<span class="margin-bottom-5 margin-right-15"><a href="http://www.nhlbi.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/nih-heart.svg' width="13%" /></a></span>                            
-							<span class="margin-bottom-5 margin-right-15"><a href="http://www.nimh.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/nih-mental.png' width="10%" /></a></span>                                                       
-							<span class="margin-bottom-5 margin-right-15"><a href="http://www.sloan.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/sloan.svg' width="13%" /></a></span>
-							<span class="margin-bottom-5 margin-right-15"><a href="http://www.nia.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/nih-aging.svg' width="13%" /></a></span>
-							<span class="margin-bottom-5 margin-right-15"><a href="http://www.lsdfa.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/life-sciences.svg' width="13%" /></a></span>
-							<span class="margin-bottom-5 margin-right-15"><a href="http://www.ctf.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/ctf.svg' width="13%" /></a></span>
-							<span class="margin-bottom-5 margin-right-15"><a href="http://www.n-tap.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/ntap.png' width="8%" /></a></span>
+							<span class="margin-bottom-5 margin-right-15">
+								<a href="http://www.nhlbi.nih.gov/" target="_new">
+									<g:Image
+										url='https://s3.amazonaws.com/static.synapse.org/images/nih-heart.svg'
+										width="13%" />
+								</a>
+							</span>
+							<span class="margin-bottom-5 margin-right-15">
+								<a href="http://www.nimh.nih.gov/" target="_new">
+									<g:Image
+										url='https://s3.amazonaws.com/static.synapse.org/images/nih-mental.png'
+										width="10%" />
+								</a>
+							</span>
+							<span class="margin-bottom-5 margin-right-15">
+								<a href="http://www.sloan.org/" target="_new">
+									<g:Image
+										url='https://s3.amazonaws.com/static.synapse.org/images/sloan.svg'
+										width="13%" />
+								</a>
+							</span>
+							<span class="margin-bottom-5 margin-right-15">
+								<a href="http://www.nia.nih.gov/" target="_new">
+									<g:Image
+										url='https://s3.amazonaws.com/static.synapse.org/images/nih-aging.svg'
+										width="13%" />
+								</a>
+							</span>
+							<span class="margin-bottom-5 margin-right-15">
+								<a href="http://www.lsdfa.org/" target="_new">
+									<g:Image
+										url='https://s3.amazonaws.com/static.synapse.org/images/life-sciences.svg'
+										width="13%" />
+								</a>
+							</span>
+							<span class="margin-bottom-5 margin-right-15">
+								<a href="http://www.ctf.org/" target="_new">
+									<g:Image
+										url='https://s3.amazonaws.com/static.synapse.org/images/ctf.svg'
+										width="13%" />
+								</a>
+							</span>
+							<span class="margin-bottom-5 margin-right-15">
+								<a href="http://www.n-tap.org/" target="_new">
+									<g:Image
+										url='https://s3.amazonaws.com/static.synapse.org/images/ntap.png'
+										width="8%" />
+								</a>
+							</span>
 						</g:HTMLPanel>
 					</b:Column>
 				</bh:Div>

@@ -6,15 +6,24 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<bh:Span>
-		<b:Modal ui:field="infoDialog" closable="true" dataBackdrop="STATIC" dataKeyboard="true" addStyleNames="modal-fullscreen">
+		<b:Modal ui:field="infoDialog" closable="true"
+			dataBackdrop="STATIC" dataKeyboard="true"
+			addStyleNames="modal-fullscreen">
 			<b:ModalBody>
-				<b:Pre ui:field="infoDialogText" /> 		
+				<b:Pre ui:field="infoDialogText" />
 			</b:ModalBody>
 			<b:ModalFooter>
-				<b:Button ui:field="okButton" type="PRIMARY"  dataDismiss="MODAL">OK</b:Button>
+				<b:Button ui:field="okButton" type="PRIMARY"
+					dataDismiss="MODAL">OK</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
 		<bh:Div ui:field="uploadDialogWidgetContainer" />
+		<b:Modal ui:field="createVersionDialog" closable="false"
+			dataBackdrop="STATIC" dataKeyboard="true" size="SMALL">
+			<b:ModalBody>
+				<bh:Div ui:field="createVersionJobTrackingWidgetContainer" />
+			</b:ModalBody>
+		</b:Modal>
 		<bh:Div ui:field="extraWidgetsContainer" />
 	</bh:Span>
 </ui:UiBinder>

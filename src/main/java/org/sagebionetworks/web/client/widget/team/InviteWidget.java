@@ -2,10 +2,8 @@ package org.sagebionetworks.web.client.widget.team;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.ValidationUtils.isValidEmail;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -14,7 +12,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -33,12 +30,9 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	private List<String> inviteEmails, inviteUsers;
 	private String currentlyProcessingEmail, currentlyProcessingUser, invitationMessage;
 	private AsyncCallback<Void> inviteCallback;
+
 	@Inject
-	public InviteWidget(InviteWidgetView view,
-						SynapseClientAsync synapseClient,
-						GWTWrapper gwt, SynapseAlert synAlert,
-						SynapseSuggestBox peopleSuggestBox,
-						UserGroupSuggestionProvider provider) {
+	public InviteWidget(InviteWidgetView view, SynapseClientAsync synapseClient, GWTWrapper gwt, SynapseAlert synAlert, SynapseSuggestBox peopleSuggestBox, UserGroupSuggestionProvider provider) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -69,17 +63,19 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 				}
 				doSendInvites();
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
+				synAlert.showError(caught.getMessage());
 				refreshInvitees();
 			}
 		};
 		view.setPresenter(this);
 	}
-	
+
 	/**
-	 * @return true if successfully added an item (or no item was to be added), false if the input suggestion was invalid
+	 * @return true if successfully added an item (or no item was to be added), false if the input
+	 *         suggestion was invalid
 	 */
 	public boolean addSuggestion() {
 		synAlert.clear();
@@ -99,7 +95,7 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public void configure(Team team) {
 		clear();
@@ -108,13 +104,13 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 		this.team = team;
 		peopleSuggestWidget.setPlaceholderText("Enter a user name...");
 	}
-	
+
 	public void clear() {
-		view.clear();	
+		view.clear();
 		peopleSuggestWidget.clear();
 		synAlert.clear();
 	}
-	
+
 	public Widget asWidget() {
 		return view.asWidget();
 	}
@@ -122,7 +118,7 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	public void setRefreshCallback(Callback teamUpdatedCallback) {
 		this.teamUpdatedCallback = teamUpdatedCallback;
 	}
-	
+
 	@Override
 	public void doSendInvites(String invitationMessage) {
 		// if anything is in the invitation field, then pick it up before processing
@@ -133,12 +129,12 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 				return;
 			}
 			view.setLoading(true);
-			
+
 			this.invitationMessage = invitationMessage;
 			doSendInvites();
 		}
 	}
-	
+
 	/**
 	 * Recursively process the user invitations (emails, then Synapse users).
 	 */
@@ -160,13 +156,13 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 			view.setLoading(false);
 		}
 	}
-	
+
 	@Override
 	public void show() {
 		clear();
 		view.show();
 	}
-	
+
 	@Override
 	public void hide() {
 		view.hide();
@@ -176,12 +172,12 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	public void removeEmailToInvite(String email) {
 		inviteEmails.remove(email);
 	}
-	
+
 	@Override
 	public void removeUserToInvite(String userId) {
 		inviteUsers.remove(userId);
 	}
-	
+
 	public void refreshInvitees() {
 		view.clear();
 		view.setLoading(false);

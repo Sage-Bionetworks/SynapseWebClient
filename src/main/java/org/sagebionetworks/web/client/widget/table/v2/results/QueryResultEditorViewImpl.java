@@ -9,7 +9,6 @@ import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
@@ -28,8 +27,9 @@ import com.google.inject.Inject;
  *
  */
 public class QueryResultEditorViewImpl implements QueryResultEditorView {
-	
-	public interface Binder extends UiBinder<Widget, QueryResultEditorViewImpl> {}
+
+	public interface Binder extends UiBinder<Widget, QueryResultEditorViewImpl> {
+	}
 
 	@UiField
 	HTMLPanel editorPanel;
@@ -67,9 +67,9 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	Button cancelProgressButton;
 	Presenter presenter;
 	Widget widget;
-	
+
 	@Inject
-	public QueryResultEditorViewImpl(Binder binder){
+	public QueryResultEditorViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 	}
 
@@ -82,7 +82,7 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	public void setPresenter(Presenter presenterin) {
 		this.presenter = presenterin;
 		this.addRowButton.addClickHandler(new ClickHandler() {
-			
+
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onAddRow();
@@ -124,7 +124,7 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 				presenter.onSave();
 			}
 		});
-		//SWC-1748: prevent TAB out of modal
+		// SWC-1748: prevent TAB out of modal
 		saveRowsButton.addDomHandler(DisplayUtils.getPreventTabHandler(saveRowsButton), KeyDownEvent.getType());
 		// Track clicks to the close button at the top of the dialog
 		editRowsModal.addCloseHandler(new ClickHandler() {
@@ -142,7 +142,7 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 		cancelProgressButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onCancel();	
+				presenter.onCancel();
 			}
 		});
 	}
@@ -154,10 +154,10 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 
 	@Override
 	public void setDeleteButtonEnabled(boolean enabled) {
-		if(enabled){
+		if (enabled) {
 			this.deleteSelectedButton.setEnabled(true);
 			this.deleteSelectedButton.setType(ButtonType.DANGER);
-		}else{
+		} else {
 			this.deleteSelectedButton.setEnabled(false);
 			this.deleteSelectedButton.setType(ButtonType.DEFAULT);
 		}
@@ -172,12 +172,12 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	public void setErrorMessageVisible(boolean visible) {
 		errorAlert.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setAddRowButtonVisible(boolean visible) {
 		addRowButton.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setButtonToolbarVisible(boolean visible) {
 		buttonToolbar.setVisible(visible);
@@ -211,20 +211,22 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	public void hideEditor() {
 		editRowsModal.hide();
 	}
-	
+
 	@Override
 	public void hideProgress() {
 		inProgressModal.hide();
 	}
+
 	@Override
 	public void showProgress() {
-		inProgressModal.show();	
+		inProgressModal.show();
 	}
-	
+
 	@Override
 	public void showErrorDialog(String message) {
 		Bootbox.alert(message);
 	}
+
 	@Override
 	public void showMessage(String title, String message) {
 		DisplayUtils.showInfo(message);

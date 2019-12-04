@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.presenter;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.sagebionetworks.web.client.AppLoadingView;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -51,7 +50,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
-
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
@@ -63,16 +61,15 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 /**
- * A block of presenters in the same code split that dynamically starts the
- * correct presenter given the place
+ * A block of presenters in the same code split that dynamically starts the correct presenter given
+ * the place
  * 
  * @author Dave
  * 
  */
 public class BulkPresenterProxy extends AbstractActivity {
 
-	private static Logger log = Logger.getLogger(BulkPresenterProxy.class
-			.getName());
+	private static Logger log = Logger.getLogger(BulkPresenterProxy.class.getName());
 	Place place;
 	PortalGinInjector ginjector;
 	AppLoadingView loading;
@@ -82,14 +79,9 @@ public class BulkPresenterProxy extends AbstractActivity {
 	SynapseJSNIUtils jsniUtils;
 	AsyncCallback<VersionState> versionCheckCallback;
 	AuthenticationController authController;
-	
+
 	@Inject
-	public BulkPresenterProxy(
-			GlobalApplicationState globalApplicationState,
-			GWTWrapper gwt,
-			SynapseJSNIUtils jsniUtils,
-			AuthenticationController authController,
-			Footer footer) {
+	public BulkPresenterProxy(GlobalApplicationState globalApplicationState, GWTWrapper gwt, SynapseJSNIUtils jsniUtils, AuthenticationController authController, Footer footer) {
 		this.globalApplicationState = globalApplicationState;
 		this.gwt = gwt;
 		this.jsniUtils = jsniUtils;
@@ -98,33 +90,38 @@ public class BulkPresenterProxy extends AbstractActivity {
 		versionCheckCallback = new AsyncCallback<VersionState>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				//do nothing
+				// do nothing
 			}
+
 			@Override
 			public void onSuccess(VersionState result) {
 				if (result.isVersionChange()) {
-					//Going to a new place but the version is not up to date.
-					//Update the app version first.
+					// Going to a new place but the version is not up to date.
+					// Update the app version first.
 					Window.Location.reload();
 				}
 			}
 		};
 	}
-	
+
 	@Override
 	public void start(final AcceptsOneWidget panel, final EventBus eventBus) {
 		globalApplicationState.checkVersionCompatibility(versionCheckCallback);
 		if (!(place instanceof LoginPlace)) {
-			authController.checkForUserChange();
+			// Note, SessionDetector checks for a user change every 10 seconds (and on initial app load). Do not
+			// call authController.checkForUserChange();
 			// refresh session
 			authController.refreshSessionToken();
 		}
 		globalApplicationState.setIsEditing(false);
 		// detect prefetch
-		if (panel == null && eventBus == null) return;
-		if (loading != null) loading.hide();
-		
-		//NOTE:  DO NOT USE SHARED METHOD FOR runAsync().  GWT split points defined by GWT.runAsync() line (attempt to pull out into shared method results in a single fragment! 
+		if (panel == null && eventBus == null)
+			return;
+		if (loading != null)
+			loading.hide();
+
+		// NOTE: DO NOT USE SHARED METHOD FOR runAsync(). GWT split points defined by GWT.runAsync() line
+		// (attempt to pull out into shared method results in a single fragment!
 		if (place instanceof Home) {
 			GWT.runAsync(Home.class, new RunAsyncCallback() {
 				@Override
@@ -133,6 +130,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((Home) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -146,6 +144,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((Synapse) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -159,6 +158,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((Profile) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -172,6 +172,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((PasswordReset) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -185,6 +186,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((RegisterAccount) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -198,6 +200,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((ComingSoon) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -211,6 +214,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((Challenges) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -224,6 +228,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((Help) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -237,6 +242,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((Search) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -250,6 +256,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((Wiki) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -263,6 +270,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((Down) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -276,6 +284,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((Team) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -289,6 +298,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((MapPlace) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -302,6 +312,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((TeamSearch) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -315,6 +326,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((PeopleSearch) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -328,6 +340,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((Quiz) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -341,6 +354,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((Account) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -354,6 +368,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((ChangeUsername) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -367,6 +382,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((Trash) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -380,6 +396,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((NewAccount) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -393,6 +410,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((StandaloneWiki) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -406,6 +424,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((SignedToken) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -419,6 +438,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((ErrorPlace) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -432,6 +452,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((ACTPlace) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -445,6 +466,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((AccessRequirementsPlace) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -458,6 +480,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((ACTDataAccessSubmissionsPlace) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -472,6 +495,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.start(panel, eventBus);
 
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -485,6 +509,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((SubscriptionPlace) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -498,6 +523,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((WikiDiff) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -511,6 +537,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((LoginPlace) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -524,6 +551,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((PasswordResetSignedTokenPlace) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -536,7 +564,8 @@ public class BulkPresenterProxy extends AbstractActivity {
 					ACTDataAccessSubmissionDashboardPresenter presenter = ginjector.getACTDataAccessSubmissionDashboardPresenter();
 					presenter.setPlace((ACTDataAccessSubmissionDashboardPlace) place);
 					presenter.start(panel, eventBus);
-					}
+				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -551,6 +580,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.start(panel, eventBus);
 
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -564,6 +594,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((EmailInvitation) place);
 					presenter.start(panel, eventBus);
 				}
+
 				@Override
 				public void onFailure(Throwable caught) {
 					loadError(caught);
@@ -578,18 +609,18 @@ public class BulkPresenterProxy extends AbstractActivity {
 			return;
 		}
 	}
-	
+
 	public void loadError(Throwable caught) {
-		//SWC-2444: if there is a problem getting the code, try to reload the app
+		// SWC-2444: if there is a problem getting the code, try to reload the app
 		jsniUtils.consoleError(caught.getMessage());
 		gwt.scheduleExecution(new Callback() {
 			@Override
 			public void invoke() {
-				Window.Location.reload();		
+				Window.Location.reload();
 			}
 		}, Portal.CODE_LOAD_DELAY);
 	}
-	
+
 	public void setPlace(Place place) {
 		// This will get forwarded to the presenter when we get it in start()
 		this.place = place;

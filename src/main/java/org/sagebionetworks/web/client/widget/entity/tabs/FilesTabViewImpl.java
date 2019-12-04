@@ -11,7 +11,6 @@ import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -48,7 +47,7 @@ public class FilesTabViewImpl implements FilesTabView {
 	SimplePanel fileTitlebarContainer;
 	@UiField
 	SimplePanel folderTitlebarContainer;
-	
+
 	@UiField
 	SimplePanel fileMetadataContainer;
 	@UiField
@@ -70,22 +69,23 @@ public class FilesTabViewImpl implements FilesTabView {
 	Anchor expandPreviewLink;
 	Widget provenanceGraphWidget, previewWidget;
 	HandlerRegistration expandPreviewHandlerRegistration, expandProvHandlerRegistration;
-	public interface TabsViewImplUiBinder extends UiBinder<Widget, FilesTabViewImpl> {}
+
+	public interface TabsViewImplUiBinder extends UiBinder<Widget, FilesTabViewImpl> {
+	}
+
 	Widget widget;
 	UserBadge createdByBadge, modifiedByBadge;
-	public static final String DEFAULT_WIDGET_HEIGHT = 197+"px";
+	public static final String DEFAULT_WIDGET_HEIGHT = 197 + "px";
+
 	@Inject
-	public FilesTabViewImpl(
-			UserBadge createdByBadge,
-			UserBadge modifiedByBadge
-			) {
-		//empty constructor, you can include this widget in the ui xml
+	public FilesTabViewImpl(UserBadge createdByBadge, UserBadge modifiedByBadge) {
+		// empty constructor, you can include this widget in the ui xml
 		TabsViewImplUiBinder binder = GWT.create(TabsViewImplUiBinder.class);
 		widget = binder.createAndBindUi(this);
 		this.createdByBadge = createdByBadge;
 		this.modifiedByBadge = modifiedByBadge;
 	}
-	
+
 	private ClickHandler getExpandClickHandler(final Widget w) {
 		return new ClickHandler() {
 			@Override
@@ -93,7 +93,7 @@ public class FilesTabViewImpl implements FilesTabView {
 				final Modal window = new Modal();
 				window.addStyleName("modal-fullscreen");
 				final ModalBody body = new ModalBody();
-				final Div oldParent = (Div)w.getParent();
+				final Div oldParent = (Div) w.getParent();
 				w.removeFromParent();
 				body.add(new ScrollPanel(w));
 				w.setHeight(new Double(com.google.gwt.user.client.Window.getClientHeight()).intValue() - 170 + "px");
@@ -109,33 +109,33 @@ public class FilesTabViewImpl implements FilesTabView {
 				window.addCloseHandler(closeHandler);
 				window.add(body);
 				ModalFooter footer = new ModalFooter();
-				Button closeButton = new Button(DisplayConstants.CLOSE,closeHandler);
+				Button closeButton = new Button(DisplayConstants.CLOSE, closeHandler);
 				footer.add(closeButton);
 				window.add(footer);
 				window.show();
 			}
 		};
 	}
-	
+
 	@Override
 	public void setFileTitlebar(Widget w) {
 		fileTitlebarContainer.setWidget(w);
 	}
-	
+
 	@Override
 	public void setFolderTitlebar(Widget w) {
 		folderTitlebarContainer.setWidget(w);
 	}
-	
+
 	@Override
 	public void setBreadcrumb(Widget w) {
-		fileBreadcrumbContainer.setWidget(w);		
+		fileBreadcrumbContainer.setWidget(w);
 	}
 
-	
+
 	@Override
 	public void setFileBrowser(Widget w) {
-		fileBrowserContainer.setWidget(w);		
+		fileBrowserContainer.setWidget(w);
 	}
 
 	@Override
@@ -164,16 +164,19 @@ public class FilesTabViewImpl implements FilesTabView {
 
 	@Override
 	public void setMetadata(Widget w) {
-		fileMetadataContainer.setWidget(w);		
+		fileMetadataContainer.setWidget(w);
 	}
+
 	@Override
 	public void setFileFolderUIVisible(boolean visible) {
 		fileMetadataContainer.setVisible(visible);
 	}
+
 	@Override
 	public void setActionMenu(Widget w) {
-		fileActionMenuContainer.setWidget(w);		
+		fileActionMenuContainer.setWidget(w);
 	}
+
 	@Override
 	public void clearActionMenuContainer() {
 		fileActionMenuContainer.clear();
@@ -183,39 +186,42 @@ public class FilesTabViewImpl implements FilesTabView {
 	public Widget asWidget() {
 		return widget;
 	}
-	
+
 	@Override
 	public void setWikiPage(Widget w) {
-		filesWikiPageContainer.setWidget(w);	
+		filesWikiPageContainer.setWidget(w);
 	}
-	
+
 	@Override
 	public void setProvenanceVisible(boolean visible) {
 		fileProvenanceContainer.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setWikiPageWidgetVisible(boolean visible) {
 		filesWikiPageContainer.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setFileBrowserVisible(boolean visible) {
 		fileBrowserContainer.setVisible(visible);
 	}
+
 	@Override
 	public void setPreviewVisible(boolean visible) {
 		filePreviewContainer.setVisible(visible);
 	}
+
 	@Override
 	public void setSynapseAlert(Widget w) {
 		synapseAlertContainer.setWidget(w);
 	}
-	
+
 	@Override
 	public void setFolderTitlebarVisible(boolean visible) {
 		folderTitlebarContainer.setVisible(visible);
 	}
+
 	@Override
 	public void setFileTitlebarVisible(boolean visible) {
 		fileTitlebarContainer.setVisible(visible);
@@ -225,17 +231,19 @@ public class FilesTabViewImpl implements FilesTabView {
 	public void setModifiedCreatedBy(IsWidget modifiedCreatedBy) {
 		fileModifiedAndCreatedContainer.setWidget(modifiedCreatedBy);
 	}
+
 	@Override
 	public void setRefreshAlert(Widget w) {
 		refreshAlertContainer.setWidget(w);
 	};
+
 	@Override
 	public void clearRefreshAlert() {
 		refreshAlertContainer.clear();
 	}
 
 	@Override
-	public void setDiscussionThreadListWidget(Widget widget){
+	public void setDiscussionThreadListWidget(Widget widget) {
 		discussionThreadsContainer.clear();
 		discussionThreadsContainer.add(widget);
 	}
@@ -249,10 +257,10 @@ public class FilesTabViewImpl implements FilesTabView {
 	public void setDiscussionText(String entityName) {
 		discussionText.setText(DISCUSSION_ABOUT + entityName);
 	}
-	
+
 	@Override
 	public void showLoading(boolean value) {
 		loading.setVisible(value);
 	}
-	
+
 }

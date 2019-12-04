@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.auth.ChangePasswordWithToken;
 import org.sagebionetworks.repo.model.auth.PasswordResetSignedToken;
@@ -15,7 +14,6 @@ import org.sagebionetworks.web.client.place.PasswordResetSignedTokenPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.PasswordResetSignedTokenView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -31,13 +29,9 @@ public class PasswordResetSignedTokenPresenter extends AbstractActivity implemen
 	PasswordResetSignedToken signedToken;
 	AuthenticationController authController;
 	GlobalApplicationState globalAppState;
+
 	@Inject
-	public PasswordResetSignedTokenPresenter(PasswordResetSignedTokenView view,
-			SynapseClientAsync synapseClient,
-			SynapseJavascriptClient jsClient,
-			SynapseAlert synAlert,
-			AuthenticationController authController,
-			GlobalApplicationState globalAppState){
+	public PasswordResetSignedTokenPresenter(PasswordResetSignedTokenView view, SynapseClientAsync synapseClient, SynapseJavascriptClient jsClient, SynapseAlert synAlert, AuthenticationController authController, GlobalApplicationState globalAppState) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -65,7 +59,7 @@ public class PasswordResetSignedTokenPresenter extends AbstractActivity implemen
 		signedToken = null;
 		synAlert.clear();
 		view.clear();
-		//hex decode the token
+		// hex decode the token
 		synapseClient.hexDecodeAndDeserialize(signedEncodedToken, new AsyncCallback<SignedTokenInterface>() {
 			@Override
 			public void onSuccess(SignedTokenInterface result) {
@@ -73,15 +67,17 @@ public class PasswordResetSignedTokenPresenter extends AbstractActivity implemen
 					synAlert.showError(INVALID_PASSWORD_RESET_SIGNED_TOKEN);
 					return;
 				}
-				signedToken = (PasswordResetSignedToken)result;
-				
+				signedToken = (PasswordResetSignedToken) result;
+
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
 		});
 	}
+
 	private boolean checkPasswordDefined(String password) {
 		return password != null && !password.isEmpty();
 	}
@@ -91,7 +87,7 @@ public class PasswordResetSignedTokenPresenter extends AbstractActivity implemen
 		synAlert.clear();
 		String password1 = view.getPassword1Field();
 		String password2 = view.getPassword2Field();
-		if (!checkPasswordDefined(password1) || !checkPasswordDefined(password2)){
+		if (!checkPasswordDefined(password1) || !checkPasswordDefined(password2)) {
 			synAlert.showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
 		} else if (!password1.equals(password2)) {
 			synAlert.showError(DisplayConstants.PASSWORDS_MISMATCH);
@@ -106,6 +102,7 @@ public class PasswordResetSignedTokenPresenter extends AbstractActivity implemen
 					view.setChangePasswordEnabled(true);
 					synAlert.handleException(caught);
 				}
+
 				@Override
 				public void onSuccess(Void result) {
 					view.showPasswordChangeSuccess();

@@ -8,14 +8,14 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author jhill
  *
  */
-public interface FileInputView extends IsWidget{
-	
+public interface FileInputView extends IsWidget {
+
 	/**
 	 * Business logic for the file input view.
 	 *
 	 */
 	public interface Presenter {
-		
+
 	}
 
 	/**
@@ -24,9 +24,10 @@ public interface FileInputView extends IsWidget{
 	 * @param presenter
 	 */
 	void setPresenter(Presenter presenter);
-	
+
 	/**
 	 * Get the ID of the file input DOM.
+	 * 
 	 * @return
 	 */
 	String getInputId();
@@ -41,10 +42,11 @@ public interface FileInputView extends IsWidget{
 
 	/**
 	 * Show/hide the progress bar.
+	 * 
 	 * @param b
 	 */
 	void showProgress(boolean visible);
-	
+
 	/**
 	 * Reset the form back to its original state.
 	 */
@@ -52,9 +54,10 @@ public interface FileInputView extends IsWidget{
 
 	/**
 	 * Enable/disable the input box.
+	 * 
 	 * @param b
 	 */
 	void setInputEnabled(boolean b);
-	
+
 
 }

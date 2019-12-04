@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Panel;
@@ -19,7 +18,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.header.Header;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Element;
@@ -31,7 +29,9 @@ import com.google.inject.Inject;
 
 public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 
-	public interface ACTViewImplUiBinder extends UiBinder<Widget, ACTAccessApprovalsViewImpl> {}
+	public interface ACTViewImplUiBinder extends UiBinder<Widget, ACTAccessApprovalsViewImpl> {
+	}
+
 	@UiField
 	DateTimePicker expiresBeforeDatePicker;
 	@UiField
@@ -63,18 +63,15 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 	DateTimeUtils dateTimeUtils;
 	SynapseJavascriptClient jsClient;
 	Widget widget;
+
 	@Inject
-	public ACTAccessApprovalsViewImpl(ACTViewImplUiBinder binder,
-			Header headerWidget,
-			SynapseJavascriptClient jsClient,
-			DateTimeUtils dateTimeUtils
-			) {
+	public ACTAccessApprovalsViewImpl(ACTViewImplUiBinder binder, Header headerWidget, SynapseJavascriptClient jsClient, DateTimeUtils dateTimeUtils) {
 		widget = binder.createAndBindUi(this);
 		this.jsClient = jsClient;
 		this.dateTimeUtils = dateTimeUtils;
 		this.headerWidget = headerWidget;
 		headerWidget.configure();
-		
+
 		clearDateFilter.addClickHandler(event -> {
 			presenter.onClearExpireBeforeFilter();
 		});
@@ -84,7 +81,7 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 		clearAccessRequirementFilter.addClickHandler(event -> {
 			presenter.onClearAccessRequirementFilter();
 		});
-		
+
 		expiresBeforeDatePicker.addChangeDateHandler(event -> {
 			presenter.onExpiresBeforeDateSelected(expiresBeforeDatePicker.getValue());
 		});
@@ -92,12 +89,12 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 			export(presenter.getExportData());
 		});
 	}
-	
+
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		headerWidget.configure();
-		headerWidget.refresh();	
+		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
 
@@ -105,18 +102,19 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 	public void setAccessRequirementUIVisible(boolean visible) {
 		accessRequirementUI.setVisible(visible);
 	}
+
 	@Override
 	public void setClearAccessRequirementFilterButtonVisible(boolean visible) {
 		clearAccessRequirementFilter.setVisible(visible);
 	}
+
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override
-	public void showLoading() {
-	}
+	public void showLoading() {}
 
 	@Override
 	public void showInfo(String message) {
@@ -131,37 +129,40 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 		downloadLink.setVisible(false);
 		_revokeObjectUrl(downloadLink.getElement());
 	}
-	
+
 	@Override
 	public void clear() {
 		resetExportButton();
 	}
+
 	@Override
 	public void setExpiresBeforeDate(Date date) {
 		expiresBeforeDatePicker.setValue(date);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
-	
+
 	@Override
 	public void setLoadMoreContainer(IsWidget w) {
 		tableData.clear();
 		tableData.add(w);
 	}
+
 	@Override
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
 	}
-	
+
 	@Override
 	public void setAccessRequirementWidget(IsWidget w) {
 		accessRequirementContainer.clear();
 		accessRequirementContainer.add(w);
 	}
+
 	@Override
 	public void setShowHideButton(IsWidget button) {
 		showHideAccessRequirementButtonContainer.clear();
@@ -173,7 +174,7 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 		userSelectContainer.clear();
 		userSelectContainer.add(w);
 	}
-	
+
 	@Override
 	public void setSelectedUserBadge(IsWidget w) {
 		currentUserContainer.clear();
@@ -184,7 +185,7 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 	public void setSelectedUserBadgeVisible(boolean visible) {
 		currentUserContainer.setVisible(visible);
 	}
-	
+
 	public void export(ArrayList<AccessorGroup> exportData) {
 		// create the csv content
 		StringBuilder csvContent = new StringBuilder();
@@ -203,6 +204,7 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 			public void onFailure(Throwable caught) {
 				SynapseJSNIUtilsImpl._consoleError(caught.getMessage());
 			}
+
 			@Override
 			public void onSuccess(List profiles) {
 				HashMap<String, UserProfile> id2Profile = new HashMap<>();
@@ -220,7 +222,7 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 					}
 					csvContent.append(",");
 					if (accessorGroup.getExpiredOn() != null && accessorGroup.getExpiredOn().getTime() > 0) {
-						csvContent.append(dateTimeUtils.getDateTimeString(accessorGroup.getExpiredOn()));	
+						csvContent.append(dateTimeUtils.getDateTimeString(accessorGroup.getExpiredOn()));
 					}
 					csvContent.append("\n");
 				}
@@ -230,11 +232,11 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 			}
 		});
 	}
-	
+
 	private static native String _setDownloadContent(Element anchorElement, String csvContent) /*-{
 		try {
-			var blob = new Blob([csvContent], {
-				type: 'text/plain'
+			var blob = new Blob([ csvContent ], {
+				type : 'text/plain'
 			});
 			anchorElement.href = URL.createObjectURL(blob);
 			anchorElement.download = "accessApprovals.csv";

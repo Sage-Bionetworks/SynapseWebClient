@@ -3,20 +3,19 @@ package org.sagebionetworks.web.client.widget.table.modal.upload;
 import org.sagebionetworks.repo.model.table.CsvTableDescriptor;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewRequest;
 import org.sagebionetworks.web.client.utils.Callback;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class CSVOptionsWidget implements CSVOptionsView.Presenter, IsWidget {
-	
+
 	CSVOptionsView view;
 
 	String fileHandleId;
 	Boolean doFullScan;
-	
+
 	Callback handler;
-	
+
 	@Inject
 	public CSVOptionsWidget(CSVOptionsView view) {
 		super();
@@ -34,18 +33,18 @@ public class CSVOptionsWidget implements CSVOptionsView.Presenter, IsWidget {
 		CsvTableDescriptor descriptor = options.getCsvTableDescriptor();
 		Delimiter delimiter = Delimiter.findDelimiter(descriptor.getSeparator());
 		view.setSeparator(delimiter);
-		if(Delimiter.OTHER.equals(delimiter)){
+		if (Delimiter.OTHER.equals(delimiter)) {
 			view.setOtherSeparatorValue(descriptor.getSeparator());
 		}
 		EscapeCharacter escapeCharacter = EscapeCharacter.findCharacter(descriptor.getEscapeCharacter());
 		view.setEscapeCharacter(escapeCharacter);
-		if(EscapeCharacter.OTHER.equals(escapeCharacter)){
+		if (EscapeCharacter.OTHER.equals(escapeCharacter)) {
 			view.setOtherEscapeCharacterValue(descriptor.getEscapeCharacter());
 		}
 
-		if(descriptor.getIsFirstLineHeader() == null){
+		if (descriptor.getIsFirstLineHeader() == null) {
 			view.setFirsLineIsHeader(true);
-		}else{
+		} else {
 			view.setFirsLineIsHeader(descriptor.getIsFirstLineHeader());
 		}
 		this.fileHandleId = options.getUploadFileHandleId();
@@ -59,19 +58,19 @@ public class CSVOptionsWidget implements CSVOptionsView.Presenter, IsWidget {
 		CsvTableDescriptor descriptor = new CsvTableDescriptor();
 		request.setCsvTableDescriptor(descriptor);
 		Delimiter delimiter = view.getSeparator();
-		if(Delimiter.OTHER.equals(delimiter)){
+		if (Delimiter.OTHER.equals(delimiter)) {
 			descriptor.setSeparator(view.getOtherSeparatorValue());
-		}else{
+		} else {
 			descriptor.setSeparator(delimiter.getDelimiter());
 		}
-		
+
 		EscapeCharacter escapeCharacter = view.getEscapeCharacter();
-		if(EscapeCharacter.OTHER.equals(escapeCharacter)){
+		if (EscapeCharacter.OTHER.equals(escapeCharacter)) {
 			descriptor.setEscapeCharacter(view.getOtherEscapeCharacterValue());
-		}else{
+		} else {
 			descriptor.setEscapeCharacter(escapeCharacter.getCharacter());
 		}
-		
+
 		request.setUploadFileHandleId(this.fileHandleId);
 		descriptor.setIsFirstLineHeader(view.getIsFristLineHeader());
 		request.setDoFullFileScan(this.doFullScan);
@@ -80,19 +79,19 @@ public class CSVOptionsWidget implements CSVOptionsView.Presenter, IsWidget {
 
 	@Override
 	public void onSeparatorChanged() {
-		if(Delimiter.OTHER.equals(view.getSeparator())){
+		if (Delimiter.OTHER.equals(view.getSeparator())) {
 			view.setOtherSeparatorTextEnabled(true);
-		}else{
+		} else {
 			view.setOtherSeparatorTextEnabled(false);
 			view.clearOtherSeparatorText();
 		}
 	}
-	
+
 	@Override
 	public void onEscapeCharacterChanged() {
-		if(EscapeCharacter.OTHER.equals(view.getEscapeCharacter())){
+		if (EscapeCharacter.OTHER.equals(view.getEscapeCharacter())) {
 			view.setOtherEscapeCharacterTextEnabled(true);
-		}else{
+		} else {
 			view.setOtherEscapeCharacterTextEnabled(false);
 			view.clearOtherEscapeCharacterText();
 		}

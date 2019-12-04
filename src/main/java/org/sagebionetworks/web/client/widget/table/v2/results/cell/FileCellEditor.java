@@ -6,7 +6,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.shared.WebConstants;
-
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -14,20 +13,20 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class FileCellEditor implements CellEditor, FileCellEditorView.Presenter {
-	
+
 	public static final String MUST_BE_A_FILE_ID_NUMBER = "Must be a File ID number";
 	public static final String PLEASE_SELECT_A_FILE_TO_UPLOAD = "Please select a file to upload.";
 	FileCellEditorView view;
 	FileHandleUploadWidget fileInputWidget;
 	PortalGinInjector ginInjector;
-	
+
 	@Inject
-	public FileCellEditor(final FileCellEditorView view, PortalGinInjector ginInjector){
+	public FileCellEditor(final FileCellEditorView view, PortalGinInjector ginInjector) {
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.view.setPresenter(this);
 	}
-	
+
 	public void initFileInputWidget() {
 		if (fileInputWidget == null) {
 			fileInputWidget = ginInjector.getFileHandleUploadWidget();
@@ -42,12 +41,12 @@ public class FileCellEditor implements CellEditor, FileCellEditorView.Presenter 
 			this.view.addFileInputWidget(fileInputWidget);
 		}
 	}
-	
+
 
 	@Override
 	public boolean isValid() {
 		String value = StringUtils.emptyAsNull(view.getValue());
-		if(value != null){
+		if (value != null) {
 			try {
 				Long.parseLong(value);
 			} catch (NumberFormatException e) {

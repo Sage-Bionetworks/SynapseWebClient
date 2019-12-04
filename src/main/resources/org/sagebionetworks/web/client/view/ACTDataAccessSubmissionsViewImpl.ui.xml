@@ -1,66 +1,88 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:bd="urn:import:org.gwtbootstrap3.extras.datetimepicker.client.ui">
 	<bh:Div>
-		<b:NavPills addStyleNames="margin-left-35 margin-right-10 margin-top-5">
-			<b:AnchorListItem text="ACT data access dashboard" href="#!ACTDataAccessSubmissionDashboard:default"/>
+		<b:NavPills
+			addStyleNames="margin-left-35 margin-right-10 margin-top-5">
+			<b:AnchorListItem text="ACT data access dashboard"
+				href="#!ACTDataAccessSubmissionDashboard:default" />
 		</b:NavPills>
-		<bh:Div ui:field="showHideAccessRequirementButtonContainer" pull="RIGHT"/>
-		<b:Heading ui:field="title" size="H3" addStyleNames="margin-top-30 margin-left-35 margin-right-10">
+		<bh:Div ui:field="showHideAccessRequirementButtonContainer"
+			pull="RIGHT" />
+		<b:Heading ui:field="title" size="H3"
+			addStyleNames="margin-top-30 margin-left-35 margin-right-10">
 			<bh:Text>Review requests for access: </bh:Text>
-			<bh:Div ui:field="subjectsContainer" />	 
+			<bh:Div ui:field="subjectsContainer" />
 		</b:Heading>
 		<bh:Div ui:field="synAlertContainer" />
-		<b:Panel ui:field="accessRequirementUI" addStyleNames="margin-top-30 margin-left-35 margin-right-10 light-border padding-10">
+		<b:Panel ui:field="accessRequirementUI"
+			addStyleNames="margin-top-30 margin-left-35 margin-right-10 light-border padding-10">
 			<bh:Div ui:field="accessRequirementContainer" />
 			<bh:Div>
 				<b:FormGroup>
-					<b:CheckBox ui:field="certifiedCheckbox" text="Accessors must be certified." enabled="false"/>
+					<b:CheckBox ui:field="certifiedCheckbox"
+						text="Accessors must be certified." enabled="false" />
 					<b:CheckBox ui:field="validatedCheckbox"
-						text="Accessors must have a validated profile." enabled="false"/>
+						text="Accessors must have a validated profile." enabled="false" />
 				</b:FormGroup>
 				<b:FormGroup>
-					<b:CheckBox ui:field="ducCheckbox" text="DUC is required." enabled="false" />
+					<b:CheckBox ui:field="ducCheckbox"
+						text="DUC is required." enabled="false" />
 					<bh:Div ui:field="ducTemplateFileContainer" />
 				</b:FormGroup>
-				<b:CheckBox ui:field="irbCheckbox" text="IRB approval is required." enabled="false" />
-				<b:CheckBox ui:field="otherAttachmentsCheckbox" text="Other documents are required." enabled="false" />
+				<b:CheckBox ui:field="irbCheckbox"
+					text="IRB approval is required." enabled="false" />
+				<b:CheckBox ui:field="otherAttachmentsCheckbox"
+					text="Other documents are required." enabled="false" />
 				<b:FormGroup>
 					<b:FormLabel>Expiration Period (Days)</b:FormLabel>
-					<b:TextBox ui:field="expirationPeriodTextbox" readOnly="true"/>
+					<b:TextBox ui:field="expirationPeriodTextbox"
+						readOnly="true" />
 				</b:FormGroup>
 				<b:CheckBox ui:field="intendedDataUsePublicCheckbox"
-					text="Intended Data Use statements will be publicly available." enabled="false" />
+					text="Intended Data Use statements will be publicly available."
+					enabled="false" />
 			</bh:Div>
 		</b:Panel>
-		<b:Well size="SMALL" ui:field="expirationDateUI" addStyleNames="margin-left-35">
+		<b:Well size="SMALL" ui:field="expirationDateUI"
+			addStyleNames="margin-left-35">
 			<bh:Text>If approved, access will expire on:</bh:Text>
-			<bh:Strong addStyleNames="margin-left-10" ui:field="expirationDate"/>
+			<bh:Strong addStyleNames="margin-left-10"
+				ui:field="expirationDate" />
 		</b:Well>
-		<bh:Div addStyleNames="margin-top-30 margin-left-35 min-height-400 margin-right-10 light-border">
+		<bh:Div
+			addStyleNames="margin-top-30 margin-left-35 min-height-400 margin-right-10 light-border">
 			<bh:Div width="265px">
-				<b:Panel addStyleNames="margin-left-10 margin-right-10 margin-bottom-20 margin-top-10">
+				<b:Panel
+					addStyleNames="margin-left-10 margin-right-10 margin-bottom-20 margin-top-10">
 					<b:PanelHeader>
 						<b:Heading size="H3" text="State Filter" />
-						<bh:Span ui:field="currentState"/>
-						<b:Button ui:field="clearStateFilter" type="DANGER" pull="RIGHT" addStyleNames="moveup-18" size="EXTRA_SMALL" text="Clear" />
+						<bh:Span ui:field="currentState" />
+						<b:Button ui:field="clearStateFilter" type="DANGER"
+							pull="RIGHT" addStyleNames="moveup-18" size="EXTRA_SMALL"
+							text="Clear" />
 					</b:PanelHeader>
 					<b:PanelBody>
 						<b:ButtonGroup>
-							<b:Button dataToggle="DROPDOWN" text="Filter by submission state..."/>
+							<b:Button dataToggle="DROPDOWN"
+								text="Filter by submission state..." />
 							<b:DropDownMenu ui:field="stateDropdownMenu" />
 						</b:ButtonGroup>
 					</b:PanelBody>
 				</b:Panel>
 			</bh:Div>
 			<b:Column size="SM_6" visible="false">
-				<b:Panel addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
+				<b:Panel
+					addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
 					<b:PanelHeader>
 						<b:Heading size="H3" text="Date range filter" />
-						<b:Button ui:field="clearDateFilter" type="DANGER" pull="RIGHT" addStyleNames="moveup-18" size="EXTRA_SMALL" text="Clear" />
+						<b:Button ui:field="clearDateFilter" type="DANGER"
+							pull="RIGHT" addStyleNames="moveup-18" size="EXTRA_SMALL"
+							text="Clear" />
 					</b:PanelHeader>
 					<b:PanelBody>
 						<b:FormLabel>from</b:FormLabel>
@@ -76,16 +98,19 @@
 					</b:PanelBody>
 				</b:Panel>
 			</b:Column>
-			
+
 			<!-- table header -->
-			<t:Table addStyleNames="table-layout-fixed margin-left-10 margin-bottom-20" width="100%" >
+			<t:Table
+				addStyleNames="table-layout-fixed margin-left-10 margin-bottom-20"
+				width="100%">
 				<t:TableRow>
 					<t:TableHeader width="100px" />
 					<t:TableHeader width="115px">
 						<bh:Span text="State" />
 					</t:TableHeader>
 					<t:TableHeader width="175px">
-						<b:Anchor ui:field="createdOnColumnHeader" text="Submitted On"/>
+						<b:Anchor ui:field="createdOnColumnHeader"
+							text="Submitted On" />
 					</t:TableHeader>
 					<t:TableHeader width="50%">
 						<bh:Span text="Submitted By" />

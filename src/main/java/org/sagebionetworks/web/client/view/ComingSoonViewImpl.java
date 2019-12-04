@@ -14,7 +14,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.SRCDemoWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.header.Header;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -25,7 +24,8 @@ import com.google.inject.Inject;
 
 public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 
-	public interface ComingSoonViewImplUiBinder extends UiBinder<Widget, ComingSoonViewImpl> {}
+	public interface ComingSoonViewImplUiBinder extends UiBinder<Widget, ComingSoonViewImpl> {
+	}
 
 	@UiField
 	Div widgetContainer;
@@ -37,24 +37,15 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	Button testDownloadSpeedButton;
 	@UiField
 	Heading downloadSpeedResult;
-	
+
 	private Presenter presenter;
-	
+
 	private Header headerWidget;
 	JSONObjectAdapter jsonObjectAdapter;
 	SRCDemoWidget srcTableWidget;
-	
+
 	@Inject
-	public ComingSoonViewImpl(ComingSoonViewImplUiBinder binder,
-			Header headerWidget, Footer footerWidget,
-			SynapseJSNIUtils synapseJSNIUtils,
-			PortalGinInjector ginInjector,
-			AuthenticationController authenticationController,
-			GoogleMap map,
-			RejectReasonWidget rejectReasonWidget,
-			JSONObjectAdapter jsonObjectAdapter,
-			DownloadSpeedTester downloadSpeedTester,
-			SRCDemoWidget srcTableWidget) {
+	public ComingSoonViewImpl(ComingSoonViewImplUiBinder binder, Header headerWidget, Footer footerWidget, SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector, AuthenticationController authenticationController, GoogleMap map, RejectReasonWidget rejectReasonWidget, JSONObjectAdapter jsonObjectAdapter, DownloadSpeedTester downloadSpeedTester, SRCDemoWidget srcTableWidget) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.jsonObjectAdapter = jsonObjectAdapter;
@@ -67,7 +58,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 			public void onFailure(Throwable caught) {
 				downloadSpeedResult.setText("Use SynapseAlert to handle error: " + caught.getMessage());
 			}
-			
+
 			@Override
 			public void onSuccess(Double result) {
 				DisplayUtils.getFriendlySize(result, true);
@@ -78,26 +69,25 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 			downloadSpeedTester.testDownloadSpeed(downloadSpeedCallback);
 		});
 	}
-	
+
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		//provenanceWidget.setHeight(400);
-//		((LayoutContainer)provenanceWidget.asWidget()).setAutoHeight(true);
-		
+		// provenanceWidget.setHeight(400);
+		// ((LayoutContainer)provenanceWidget.asWidget()).setAutoHeight(true);
+
 		headerWidget.configure();
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
-	
+
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override
-	public void showLoading() {
-	}
+	public void showLoading() {}
 
 	@Override
 	public void showInfo(String message) {
@@ -105,11 +95,10 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	}
 
 	@Override
-	public void clear() {		
-	}
-	
+	public void clear() {}
+
 	@Override
 	public void showSRCComponent() {
-		srcTableWidget.showDemo();	
+		srcTableWidget.showDemo();
 	}
 }

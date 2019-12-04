@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.statistics;
 
 import org.sagebionetworks.web.client.security.AuthenticationController;
-
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -9,10 +8,9 @@ public class StatisticsPlotWidget {
 
 	private StatisticsPlotWidgetView view;
 	private AuthenticationController authController;
+
 	@Inject
-	public StatisticsPlotWidget(StatisticsPlotWidgetView view, 
-			AuthenticationController authController 
-			) {
+	public StatisticsPlotWidget(StatisticsPlotWidgetView view, AuthenticationController authController) {
 		this.view = view;
 		this.authController = authController;
 	}
@@ -21,13 +19,13 @@ public class StatisticsPlotWidget {
 		view.setVisible(!authController.isLoggedIn());
 		return view.asWidget();
 	}
-	
+
 	public void configureAndShow(String projectId) {
 		if (authController.isLoggedIn()) {
-			view.configureAndShow(projectId, authController.getCurrentUserSessionToken());	
+			view.configureAndShow(projectId, authController.getCurrentUserSessionToken());
 		}
 	}
-	
+
 	public void clear() {
 		view.clear();
 	}

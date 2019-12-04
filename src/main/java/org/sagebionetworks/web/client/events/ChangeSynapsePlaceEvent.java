@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.events;
 
 import org.sagebionetworks.web.client.place.Synapse;
-
 import com.google.web.bindery.event.shared.binder.GenericEvent;
 
 public class ChangeSynapsePlaceEvent extends GenericEvent {

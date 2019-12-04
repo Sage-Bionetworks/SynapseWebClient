@@ -1,12 +1,10 @@
 package org.sagebionetworks.web.client.widget.breadcrumb;
 
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.place.Synapse;
-
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -16,7 +14,7 @@ import com.google.inject.Inject;
 
 public class BreadcrumbViewImpl implements BreadcrumbView {
 	private static final int MAX_BREADCRUMB_LENGTH = 25;
-	
+
 	FlowPanel panel;
 	private Presenter presenter;
 
@@ -54,7 +52,7 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
 			anchor.setIcon(data.getIconType());
 			anchor.addStyleName("displayInline");
 			if (data.getPlace() instanceof Synapse) {
-				Synapse synapsePlace = (Synapse)data.getPlace();
+				Synapse synapsePlace = (Synapse) data.getPlace();
 				anchor.setHref("#" + DisplayUtils.getSynapseHistoryTokenNoHash(synapsePlace.getEntityId(), synapsePlace.getVersionNumber(), synapsePlace.getArea(), synapsePlace.getAreaToken()));
 			}
 			anchor.addClickHandler(event -> {
@@ -94,19 +92,19 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
 
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message); 
+		DisplayUtils.showErrorMessage(message);
 	}
 
 	/*
 	 * Private Methods
 	 */
 	private String stubString(String text) {
-		if(text.length() > MAX_BREADCRUMB_LENGTH) {
-			text = text.substring(0, MAX_BREADCRUMB_LENGTH-1) + "...";
+		if (text.length() > MAX_BREADCRUMB_LENGTH) {
+			text = text.substring(0, MAX_BREADCRUMB_LENGTH - 1) + "...";
 		}
 		return text;
 	}
 
 
-	
+
 }

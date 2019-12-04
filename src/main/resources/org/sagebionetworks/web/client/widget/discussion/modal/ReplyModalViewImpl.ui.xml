@@ -3,14 +3,17 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	<b:Modal ui:field="replyModal" closable="true" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal-fullscreen">
+	<b:Modal ui:field="replyModal" closable="true"
+		dataBackdrop="STATIC" dataKeyboard="false"
+		addStyleNames="modal-fullscreen">
 		<b:ModalBody>
 			<bh:Div ui:field="markdownEditorContainer"></bh:Div>
 			<bh:Div ui:field="synAlertContainer"></bh:Div>
 		</b:ModalBody>
 		<b:ModalFooter>
 			<b:Button ui:field="cancelButton" type="LINK">Cancel</b:Button>
-			<b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Saving...">Save</b:Button>
+			<b:Button ui:field="saveButton" type="PRIMARY"
+				dataLoadingText="Saving...">Save</b:Button>
 		</b:ModalFooter>
 	</b:Modal>
 </ui:UiBinder> 

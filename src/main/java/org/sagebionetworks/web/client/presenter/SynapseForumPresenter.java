@@ -10,7 +10,6 @@ import org.sagebionetworks.web.client.view.SynapseForumView;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WebConstants;
-
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -26,12 +25,7 @@ public class SynapseForumPresenter extends AbstractActivity implements Presenter
 	SynapseProperties synapseProperties;
 
 	@Inject
-	public SynapseForumPresenter(
-			SynapseForumView view,
-			GlobalApplicationState globalApplicationState,
-			ForumWidget forumWidget,
-			SynapseProperties synapseProperties
-			) {
+	public SynapseForumPresenter(SynapseForumView view, GlobalApplicationState globalApplicationState, ForumWidget forumWidget, SynapseProperties synapseProperties) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.forumWidget = forumWidget;
@@ -47,7 +41,7 @@ public class SynapseForumPresenter extends AbstractActivity implements Presenter
 	}
 
 	public void showForum(String entityId) {
-		CallbackP<ParameterizedToken> paramChangeCallback = new CallbackP<ParameterizedToken>(){
+		CallbackP<ParameterizedToken> paramChangeCallback = new CallbackP<ParameterizedToken>() {
 			@Override
 			public void invoke(ParameterizedToken token) {
 				// handle token changes
@@ -64,12 +58,12 @@ public class SynapseForumPresenter extends AbstractActivity implements Presenter
 		ActionMenuWidget actionMenu = null;
 		forumWidget.configure(entityId, place.getParameterizedToken(), DEFAULT_IS_MODERATOR, actionMenu, paramChangeCallback, urlChangeCallback);
 	}
-	
+
 	@Override
 	public void setPlace(SynapseForumPlace place) {
 		this.place = place;
 	}
-	
+
 	public String getCurrentAreaToken() {
 		return place.getParameterizedToken().toString();
 	}

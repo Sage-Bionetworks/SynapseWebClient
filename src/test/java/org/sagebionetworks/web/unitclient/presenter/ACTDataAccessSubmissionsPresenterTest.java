@@ -14,11 +14,9 @@ import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace
 import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.MAX_DATE_PARAM;
 import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.MIN_DATE_PARAM;
 import static org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionsPresenter.SHOW_AR_TEXT;
-
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -48,7 +46,6 @@ import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
@@ -57,12 +54,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public class ACTDataAccessSubmissionsPresenterTest {
-	
+
 	ACTDataAccessSubmissionsPresenter presenter;
-	
+
 	@Mock
 	ACTDataAccessSubmissionsPlace mockPlace;
-	
+
 	@Mock
 	ACTDataAccessSubmissionsView mockView;
 	@Mock
@@ -79,7 +76,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	FileHandleWidget mockDucTemplateFileHandleWidget;
 	@Mock
 	DataAccessClientAsync mockDataAccessClient;
-	
+
 	@Mock
 	ManagedACTAccessRequirement mockACTAccessRequirement;
 	@Mock
@@ -103,9 +100,9 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	public static final String FILE_HANDLE_ID = "9999";
 	public static final Long AR_ID = 76555L;
 	public static final String NEXT_PAGE_TOKEN = "abc678";
-	
+
 	@Before
-	public void setup(){
+	public void setup() {
 		MockitoAnnotations.initMocks(this);
 		when(mockGWT.getDateTimeFormat(any(PredefinedFormat.class))).thenReturn(mockDateTimeFormat);
 		presenter = new ACTDataAccessSubmissionsPresenter(mockView, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockACTAccessRequirementWidget, mockButton, mockDucTemplateFileHandleWidget, mockDataAccessClient, mockSubjectsWidget, mockGWT);
@@ -117,8 +114,8 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		when(mockACTAccessRequirement.getId()).thenReturn(AR_ID);
 		when(mockGinInjector.getACTDataAccessSubmissionWidget()).thenReturn(mockACTDataAccessSubmissionWidget);
 		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjects);
-	}	
-	
+	}
+
 	@Test
 	public void testConstruction() {
 		verify(mockView).setStates(anyList());
@@ -132,7 +129,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		verify(mockLoadMoreContainer).configure(any(Callback.class));
 		verify(mockButton).addClickHandler(any(ClickHandler.class));
 	}
-	
+
 	@Test
 	public void testLoadData() {
 		String time1 = "8765";
@@ -140,7 +137,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		when(mockPlace.getParam(MIN_DATE_PARAM)).thenReturn(time1);
 		when(mockPlace.getParam(MAX_DATE_PARAM)).thenReturn(time2);
 		when(mockPlace.getParam(ACCESS_REQUIREMENT_ID_PARAM)).thenReturn(AR_ID.toString());
-		
+
 		when(mockACTAccessRequirement.getDucTemplateFileHandleId()).thenReturn(FILE_HANDLE_ID);
 		when(mockACTAccessRequirement.getAreOtherAttachmentsRequired()).thenReturn(true);
 		Long expirationPeriod = 0L;
@@ -150,11 +147,11 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		when(mockACTAccessRequirement.getIsIDUPublic()).thenReturn(true);
 		when(mockACTAccessRequirement.getIsIRBApprovalRequired()).thenReturn(false);
 		when(mockACTAccessRequirement.getIsValidatedProfileRequired()).thenReturn(true);
-		
+
 		presenter.setPlace(mockPlace);
 		verify(mockDataAccessClient).getAccessRequirement(eq(AR_ID), any(AsyncCallback.class));
-		
-		//verify duc template file handle widget is configured properly (basd on act duc file handle id)
+
+		// verify duc template file handle widget is configured properly (basd on act duc file handle id)
 		verify(mockDucTemplateFileHandleWidget).configure(fhaCaptor.capture());
 		FileHandleAssociation fha = fhaCaptor.getValue();
 		assertEquals(FileHandleAssociateType.AccessRequirementAttachment, fha.getAssociateObjectType());
@@ -168,20 +165,21 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		verify(mockView).setIsIDUPublic(true);
 		verify(mockView).setIsIRBApprovalRequired(false);
 		verify(mockView).setIsValidatedProfileRequired(true);
-		
+
 		verify(mockACTAccessRequirementWidget).setRequirement(eq(mockACTAccessRequirement), any(Callback.class));
 		verify(mockLoadMoreContainer).setIsProcessing(true);
-		verify(mockDataAccessClient).getDataAccessSubmissions(anyLong(), eq((String)null), any(SubmissionState.class), any(SubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockDataAccessClient).getDataAccessSubmissions(anyLong(), eq((String) null), any(SubmissionState.class), any(SubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
 
-		//verify DataAccessSubmission widget is created/configured for the submission (based on the mockACTAccessRequirement configuration)
+		// verify DataAccessSubmission widget is created/configured for the submission (based on the
+		// mockACTAccessRequirement configuration)
 		verify(mockGinInjector).getACTDataAccessSubmissionWidget();
 		verify(mockACTDataAccessSubmissionWidget).setDucColumnVisible(false);
 		verify(mockACTDataAccessSubmissionWidget).setIrbColumnVisible(false);
 		verify(mockACTDataAccessSubmissionWidget).setOtherAttachmentsColumnVisible(true);
 		verify(mockLoadMoreContainer).setIsMore(true);
 		verify(mockLoadMoreContainer).setIsProcessing(false);
-		
-		//verify final load of empty page
+
+		// verify final load of empty page
 		when(mockDataAccessSubmissionPage.getResults()).thenReturn(Collections.EMPTY_LIST);
 		when(mockDataAccessSubmissionPage.getNextPageToken()).thenReturn(null);
 		presenter.loadMore();
@@ -190,13 +188,13 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		verify(mockView).setProjectedExpirationDateVisible(false);
 		verify(mockView, never()).setProjectedExpirationDateVisible(true);
 	}
-	
+
 	@Test
 	public void testProjectedExpiration() {
 		String formattedDateTime = "In the future";
 		when(mockDateTimeFormat.format(any(Date.class))).thenReturn(formattedDateTime);
 		when(mockPlace.getParam(ACCESS_REQUIREMENT_ID_PARAM)).thenReturn(AR_ID.toString());
-		
+
 		Long expirationPeriod = 1111L;
 		when(mockACTAccessRequirement.getExpirationPeriod()).thenReturn(expirationPeriod);
 		presenter.setPlace(mockPlace);
@@ -204,7 +202,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		verify(mockView).setProjectedExpirationDateVisible(true);
 		verify(mockView).setProjectedExpirationDate(formattedDateTime);
 	}
-	
+
 	@Test
 	public void testLoadDataFailure() {
 		Exception ex = new Exception();

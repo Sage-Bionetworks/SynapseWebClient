@@ -3,9 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.Date;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -32,7 +30,7 @@ public class ModifiedCreatedByWidgetTest {
 		MockitoAnnotations.initMocks(this);
 		presenter = new ModifiedCreatedByWidget(mockView, mockCreatedByBadge, mockModifiedByBadge, mockDateTimeUtils);
 	}
-	
+
 	@Test
 	public void testConfigure() {
 		Date date = new Date();
@@ -41,10 +39,10 @@ public class ModifiedCreatedByWidgetTest {
 		presenter.configure(date, "createdBy", date, "modifiedBy");
 		verify(mockCreatedByBadge).configure("createdBy");
 		verify(mockModifiedByBadge).configure("modifiedBy");
-		
+
 		verify(mockView).setVisible(true);
 		verify(mockView).setCreatedOnText(" on " + formattedDate);
 		verify(mockView).setModifiedOnText(" on " + formattedDate);
 	}
-	
+
 }

@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
@@ -11,7 +10,6 @@ import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.DisplayUtils;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -22,17 +20,17 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class WikiAttachmentsViewImpl implements WikiAttachmentsView {
-	
+
 	private static final String FILENAMES = "filenames";
 
-	interface WikiAttachmentsViewImplUiBinder extends UiBinder<Widget, WikiAttachmentsViewImpl> {}
-	
-	private static WikiAttachmentsViewImplUiBinder uiBinder = GWT
-			.create(WikiAttachmentsViewImplUiBinder.class);
+	interface WikiAttachmentsViewImplUiBinder extends UiBinder<Widget, WikiAttachmentsViewImpl> {
+	}
+
+	private static WikiAttachmentsViewImplUiBinder uiBinder = GWT.create(WikiAttachmentsViewImplUiBinder.class);
 
 	private Presenter presenter;
 	private Widget widget;
-	
+
 	@UiField
 	FlowPanel attachmentsPanel;
 	@UiField
@@ -40,29 +38,30 @@ public class WikiAttachmentsViewImpl implements WikiAttachmentsView {
 	@UiField
 	Alert alert;
 	List<InlineRadio> radioButtons = new ArrayList<InlineRadio>();
+
 	@Inject
 	public WikiAttachmentsViewImpl() {
 		widget = uiBinder.createAndBindUi(this);
 	}
-	
-	public void reset(){
+
+	public void reset() {
 		attachmentsPanel.clear();
 		alert.setVisible(false);
 		noAttachmentsUI.setVisible(false);
 	}
-	
+
 	@Override
 	public void showNoAttachmentRow() {
 		noAttachmentsUI.setVisible(true);
 	}
-	
+
 	@Override
 	public void addFileHandles(List<FileHandle> attachments) {
 		radioButtons.clear();
 		for (int i = 0; i < attachments.size(); i++) {
 			FlowPanel row = new FlowPanel();
 			attachmentsPanel.add(row);
-			
+
 			FileHandle data = attachments.get(i);
 			final String fileName = data.getFileName();
 			InlineRadio attachmentLink = new InlineRadio(FILENAMES, data.getFileName());
@@ -73,17 +72,17 @@ public class WikiAttachmentsViewImpl implements WikiAttachmentsView {
 					presenter.setSelectedFilename(fileName);
 				}
 			});
-			
+
 			if (i == 0) {
-				attachmentLink.setValue(true,  true);
+				attachmentLink.setValue(true, true);
 			}
-			
+
 			row.add(attachmentLink);
-			
+
 			Button button = new Button("", IconType.TIMES, new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					presenter.deleteAttachment(fileName);		
+					presenter.deleteAttachment(fileName);
 				}
 			});
 			button.setSize(ButtonSize.EXTRA_SMALL);
@@ -113,13 +112,13 @@ public class WikiAttachmentsViewImpl implements WikiAttachmentsView {
 	@Override
 	public void showLoading() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void clear() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override

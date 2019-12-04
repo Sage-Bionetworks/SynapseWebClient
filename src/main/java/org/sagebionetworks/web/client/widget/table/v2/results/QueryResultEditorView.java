@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import org.sagebionetworks.web.client.utils.Callback;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -11,7 +10,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  *
  */
 public interface QueryResultEditorView extends IsWidget {
-	
+
 	/**
 	 * All business logic for this widget goes here.
 	 *
@@ -52,11 +51,12 @@ public interface QueryResultEditorView extends IsWidget {
 		 * Called when the user clicks the close button.
 		 */
 		void onCancel();
-		
+
 	}
-	
+
 	/**
 	 * Bind the presenter to the view.
+	 * 
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
@@ -70,6 +70,7 @@ public interface QueryResultEditorView extends IsWidget {
 
 	/**
 	 * Enable or disable the delete button.
+	 * 
 	 * @param enabled
 	 */
 	public void setDeleteButtonEnabled(boolean enabled);
@@ -83,12 +84,14 @@ public interface QueryResultEditorView extends IsWidget {
 
 	/**
 	 * Show or hide the error message alert box.
+	 * 
 	 * @param b
 	 */
 	public void setErrorMessageVisible(boolean visible);
 
 	/**
 	 * Widget that displays append progress.
+	 * 
 	 * @param progress
 	 */
 	public void setProgressWidget(IsWidget progress);
@@ -98,12 +101,13 @@ public interface QueryResultEditorView extends IsWidget {
 	 * 
 	 */
 	public void showProgress();
+
 	/**
 	 * Hide the progress dialog.
 	 * 
 	 */
 	public void hideProgress();
-	
+
 	/**
 	 * Show a confirm dialog.
 	 * 
@@ -112,7 +116,7 @@ public interface QueryResultEditorView extends IsWidget {
 	 * @param okayCallback
 	 */
 	void showConfirmDialog(String message, Callback callback);
-	
+
 	/**
 	 * Show the editor dialog.
 	 * 
@@ -130,13 +134,13 @@ public interface QueryResultEditorView extends IsWidget {
 	 * Hide the editor.
 	 */
 	void hideEditor();
-	
+
 	void showErrorDialog(String message);
-	
+
 	void showMessage(String title, String message);
 
 	void setAddRowButtonVisible(boolean visible);
 
 	void setButtonToolbarVisible(boolean visible);
-	
+
 }

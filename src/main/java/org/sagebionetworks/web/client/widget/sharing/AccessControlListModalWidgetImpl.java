@@ -4,7 +4,6 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.HasChangesHandler;
-
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -15,11 +14,9 @@ public class AccessControlListModalWidgetImpl implements AccessControlListModalW
 	AccessControlListModalWidgetView view;
 	AccessControlListEditor editor;
 	Callback changeCallback;
-	
+
 	@Inject
-	public AccessControlListModalWidgetImpl(
-			AccessControlListModalWidgetView view,
-			AccessControlListEditor editor) {
+	public AccessControlListModalWidgetImpl(AccessControlListModalWidgetView view, AccessControlListEditor editor) {
 		super();
 		this.view = view;
 		this.editor = editor;
@@ -40,10 +37,10 @@ public class AccessControlListModalWidgetImpl implements AccessControlListModalW
 		editor.configure(entity, canChangePermission, this);
 		String entityTypeName = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entity.getClass()));
 		view.setTitle(entityTypeName + " Sharing Settings");
-		if(canChangePermission){
+		if (canChangePermission) {
 			view.setPrimaryButtonVisible(true);
 			view.setDefaultButtonText(CANCEL);
-		}else{
+		} else {
 			view.setPrimaryButtonVisible(false);
 			view.setDefaultButtonText(OK);
 		}

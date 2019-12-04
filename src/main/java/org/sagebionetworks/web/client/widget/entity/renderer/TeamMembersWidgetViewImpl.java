@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -19,9 +18,11 @@ public class TeamMembersWidgetViewImpl implements TeamMembersWidgetView {
 	Div synAlertContainer;
 	@UiField
 	LoadingSpinner loadingUI;
-	
+
 	private Widget widget;
-	public interface Binder extends UiBinder<Widget, TeamMembersWidgetViewImpl> {}
+
+	public interface Binder extends UiBinder<Widget, TeamMembersWidgetViewImpl> {
+	}
 
 	@Inject
 	public TeamMembersWidgetViewImpl(Binder binder) {
@@ -32,10 +33,12 @@ public class TeamMembersWidgetViewImpl implements TeamMembersWidgetView {
 	public Widget asWidget() {
 		return widget;
 	}
+
 	@Override
 	public void addRow(IsWidget w) {
-		table.add(w);	
+		table.add(w);
 	}
+
 	@Override
 	public void clearRows() {
 		// remove all widgets except for the first one (the table header row)
@@ -43,14 +46,17 @@ public class TeamMembersWidgetViewImpl implements TeamMembersWidgetView {
 			table.remove(i);
 		}
 	}
+
 	@Override
 	public void setPaginationWidget(IsWidget w) {
-		paginationWidgetContainer.add(w);	
+		paginationWidgetContainer.add(w);
 	}
+
 	@Override
 	public void setSynapseAlert(IsWidget w) {
 		synAlertContainer.add(w);
 	}
+
 	@Override
 	public void setLoadingVisible(boolean visible) {
 		loadingUI.setVisible(visible);

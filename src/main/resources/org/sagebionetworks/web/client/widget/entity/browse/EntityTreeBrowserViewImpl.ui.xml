@@ -1,53 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" 
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.entity.menu.v2"
-	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" 
+	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:tr="urn:import:org.sagebionetworks.web.client.widget.table.v2.results"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<bh:Div marginTop="12" marginBottom="12">
-		<bh:Div ui:field="synAlertContainer"/>
-		<bh:Span ui:field="emptyUI" text="&#8212; Empty"/>
+		<bh:Div ui:field="synAlertContainer" />
+		<bh:Span ui:field="emptyUI" text="&#8212; Empty" />
 		<!-- File browser tree "table" header -->
-		<t:Table ui:field="entityTreeHeader" width="100%" addStyleNames="overflow-x-hidden">
+		<t:Table ui:field="entityTreeHeader" width="100%"
+			addStyleNames="overflow-x-hidden">
 			<t:TableRow>
-				<t:TableHeader width="42px" addStyleNames="min-width-42"/> <!-- expand/contract icon + entity icon -->
-				<tr:SortableTableHeaderImpl ui:field="nameColumnHeader" text="Name" width="400px" addStyleNames="min-width-400" />
-				<t:TableHeader ui:field="nameColumnHeaderUnsortable" visible="false" width="400px" addStyleNames="min-width-400" >
+				<t:TableHeader width="42px"
+					addStyleNames="min-width-42" /> <!-- expand/contract icon + entity icon -->
+				<tr:SortableTableHeaderImpl
+					ui:field="nameColumnHeader" text="Name" width="400px"
+					addStyleNames="min-width-400" />
+				<t:TableHeader ui:field="nameColumnHeaderUnsortable"
+					visible="false" width="400px" addStyleNames="min-width-400">
 					<bh:Span text="Name" />
 				</t:TableHeader>
 				<t:TableHeader addStyleNames="min-width-140" /> <!-- icons -->
-				<t:TableHeader ui:field="sizeColumnHeader" addStyleNames="hidden-xs text-align-right min-width-140">
-					<bh:Span text="Size" addStyleNames="margin-right-30"/>
+				<t:TableHeader ui:field="sizeColumnHeader"
+					addStyleNames="hidden-xs text-align-right min-width-140">
+					<bh:Span text="Size" addStyleNames="margin-right-30" />
 				</t:TableHeader>
-				<t:TableHeader ui:field="modifiedOnColumnHeader" addStyleNames="visible-md visible-lg min-width-165">
+				<t:TableHeader ui:field="modifiedOnColumnHeader"
+					addStyleNames="visible-md visible-lg min-width-165">
 					<bh:Span text="Modified On" />
 				</t:TableHeader>
-				<tr:SortableTableHeaderImpl ui:field="createdOnColumnHeader" addStyleNames="visible-xl min-width-165" text="Created On" />
-				<t:TableHeader ui:field="createdOnColumnHeaderUnsortable" addStyleNames="visible-xl min-width-165" visible="false">
+				<tr:SortableTableHeaderImpl
+					ui:field="createdOnColumnHeader"
+					addStyleNames="visible-xl min-width-165" text="Created On" />
+				<t:TableHeader
+					ui:field="createdOnColumnHeaderUnsortable"
+					addStyleNames="visible-xl min-width-165" visible="false">
 					<bh:Span text="Created On" />
 				</t:TableHeader>
-				<t:TableHeader ui:field="idColumnHeader" addStyleNames="visible-lg min-width-150">
+				<t:TableHeader ui:field="idColumnHeader"
+					addStyleNames="visible-lg min-width-150">
 					<bh:Span text="ID" />
-					<b:Tooltip title="Copy IDs to the clipboard" placement="BOTTOM">
-						<b:Icon ui:field="copyIDToClipboardIcon" addStyleNames="imageButton margin-left-5 link" type="CLIPBOARD" />
+					<b:Tooltip title="Copy IDs to the clipboard"
+						placement="BOTTOM">
+						<b:Icon ui:field="copyIDToClipboardIcon"
+							addStyleNames="imageButton margin-left-5 link" type="CLIPBOARD" />
 					</b:Tooltip>
 				</t:TableHeader>
-				<t:TableHeader ui:field="md5ColumnHeader" addStyleNames="visible-xl min-width-150">
-					<bh:Span text="MD5"/>
+				<t:TableHeader ui:field="md5ColumnHeader"
+					addStyleNames="visible-xl min-width-150">
+					<bh:Span text="MD5" />
 				</t:TableHeader>
-				<t:TableHeader ui:field="modifiedByColumnHeader" addStyleNames="visible-xl min-width-310">
-					<bh:Span text="Modified By"/>
+				<t:TableHeader ui:field="modifiedByColumnHeader"
+					addStyleNames="visible-xl min-width-310">
+					<bh:Span text="Modified By" />
 				</t:TableHeader>
-				<t:TableHeader ui:field="downloadColumnHeader" addStyleNames="hidden-xs min-width-70">
-					<bh:Span text="Download"/>
+				<t:TableHeader ui:field="downloadColumnHeader"
+					addStyleNames="hidden-xs min-width-70">
+					<bh:Span text="Download" />
 				</t:TableHeader>
 			</t:TableRow>
 		</t:Table>
-		<bh:Hr ui:field="hrUnderTableHeaders" addStyleNames="margin-top-5 margin-bottom-5" />
+		<bh:Hr ui:field="hrUnderTableHeaders"
+			addStyleNames="margin-top-5 margin-bottom-5" />
 		<bh:Div ui:field="mainContainer" />
 	</bh:Div>
 </ui:UiBinder>

@@ -5,16 +5,13 @@ import static org.sagebionetworks.repo.model.EntityType.file;
 import static org.sagebionetworks.repo.model.EntityType.folder;
 import static org.sagebionetworks.repo.model.EntityType.link;
 import static org.sagebionetworks.repo.model.EntityType.table;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -38,11 +35,11 @@ public class ContainerItemCountWidget implements IsWidget {
 		entityTypes.add(table);
 		entityTypes.add(entityview);
 	}
-	
+
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	
+
 	public void configure(String entityId) {
 		clear();
 		EntityChildrenRequest request = new EntityChildrenRequest();
@@ -58,6 +55,7 @@ public class ContainerItemCountWidget implements IsWidget {
 					view.showCount(childCount);
 				}
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				utils.consoleError(caught);

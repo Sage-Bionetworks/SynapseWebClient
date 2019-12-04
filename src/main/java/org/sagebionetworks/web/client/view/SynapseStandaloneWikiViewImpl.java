@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WikiPageKey;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -14,21 +13,22 @@ import com.google.inject.Inject;
 
 public class SynapseStandaloneWikiViewImpl implements SynapseStandaloneWikiView {
 
-	public interface SynapseStandaloneWikiViewImplUiBinder extends UiBinder<Widget, SynapseStandaloneWikiViewImpl> {}
+	public interface SynapseStandaloneWikiViewImplUiBinder extends UiBinder<Widget, SynapseStandaloneWikiViewImpl> {
+	}
+
 	@UiField
 	Div markdownContainer;
 	@UiField
 	Div synAlertContainer;
 	Widget widget;
-	
+
 	private Header headerWidget;
 	private MarkdownWidget markdownWidget;
-	
+
 	@Inject
-	public SynapseStandaloneWikiViewImpl(SynapseStandaloneWikiViewImplUiBinder binder, MarkdownWidget markdownWidget,
-			Header headerWidget) {		
+	public SynapseStandaloneWikiViewImpl(SynapseStandaloneWikiViewImplUiBinder binder, MarkdownWidget markdownWidget, Header headerWidget) {
 		widget = binder.createAndBindUi(this);
-		
+
 		this.headerWidget = headerWidget;
 		this.markdownWidget = markdownWidget;
 		headerWidget.configure();
@@ -43,11 +43,13 @@ public class SynapseStandaloneWikiViewImpl implements SynapseStandaloneWikiView 
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
+
 	@Override
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
 	}
+
 	@Override
 	public Widget asWidget() {
 		return widget;

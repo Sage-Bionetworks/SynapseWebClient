@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.sagebionetworks.web.client.DisplayUtils;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -12,20 +10,22 @@ import com.google.inject.Inject;
 
 /**
  * Implementation with no business logic.
+ * 
  * @author John
  *
  */
 public class UploadCSVAppendPageViewImpl implements UploadCSVAppendPageView {
 
-	public interface Binder extends UiBinder<Widget, UploadCSVAppendPageViewImpl> {}
-	
+	public interface Binder extends UiBinder<Widget, UploadCSVAppendPageViewImpl> {
+	}
+
 	@UiField
 	SimplePanel trackerPanel;
-	
+
 	Widget widget;
-	
+
 	@Inject
-	public UploadCSVAppendPageViewImpl(Binder binder){
+	public UploadCSVAppendPageViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 	}
 

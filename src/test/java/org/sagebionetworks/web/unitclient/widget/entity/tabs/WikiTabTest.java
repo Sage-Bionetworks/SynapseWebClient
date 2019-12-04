@@ -7,7 +7,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -41,7 +40,7 @@ public class WikiTabTest {
 	SynapseJavascriptClient mockJsClient;
 
 	WikiTab tab;
-	
+
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
@@ -50,7 +49,7 @@ public class WikiTabTest {
 		when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
 		tab.lazyInject();
 	}
-	
+
 	@Test
 	public void testSetTabClickedCallback() {
 		tab.setTabClickedCallback(mockOnClickCallback);
@@ -71,7 +70,7 @@ public class WikiTabTest {
 		Boolean canEdit = true;
 		WikiPageWidget.Callback callback = mock(WikiPageWidget.Callback.class);
 		tab.configure(entityId, entityName, wikiPageId, canEdit, callback, mockActionMenuWidget);
-		
+
 		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), eq(callback));
 		verify(mockWikiPageWidget).showSubpages(mockActionMenuWidget);
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);

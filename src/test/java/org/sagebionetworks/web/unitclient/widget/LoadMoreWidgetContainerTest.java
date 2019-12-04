@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget;
 
 import static org.mockito.Mockito.verify;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,8 +16,9 @@ public class LoadMoreWidgetContainerTest {
 	LoadMoreWidgetContainerView mockView;
 	@Mock
 	Callback mockLoadMoreCallback;
-	
+
 	LoadMoreWidgetContainer widget;
+
 	@Before
 	public void before() {
 		widget = new LoadMoreWidgetContainer(mockView);
@@ -32,7 +32,7 @@ public class LoadMoreWidgetContainerTest {
 		verify(mockView).setIsProcessing(false);
 		verify(mockView).setLoadMoreVisibility(isMore);
 	}
-	
+
 	@Test
 	public void testSetIsNoMore() {
 		boolean isMore = false;

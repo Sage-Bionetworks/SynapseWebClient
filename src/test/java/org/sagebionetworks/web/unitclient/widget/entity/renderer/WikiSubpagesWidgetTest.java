@@ -12,13 +12,11 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,7 +45,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -77,12 +74,12 @@ public class WikiSubpagesWidgetTest {
 	Project mockWikiProject;
 	@Mock
 	V2WikiHeader mockWikiHeader;
-	
+
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		adapterFactory = new AdapterFactoryImpl();
 		widget = new WikiSubpagesWidget(mockView, mockAuthenticationController, mockSynapseJavascriptClient);
-		
+
 		EntityBundle bundle = new EntityBundle();
 		permissions = new UserEntityPermissions();
 		permissions.setCanEdit(true);
@@ -140,7 +137,7 @@ public class WikiSubpagesWidgetTest {
 		String targetWikiId = "888";
 		Place targetPlace = WikiSubpagesWidget.getLinkPlace(targetEntityId, targetEntityVersion, targetWikiId, embeddedInOwnerPage);
 		assertTrue(targetPlace instanceof Synapse);
-		Synapse targetSynapsePlace = (Synapse)targetPlace;
+		Synapse targetSynapsePlace = (Synapse) targetPlace;
 		assertEquals(targetEntityId, targetSynapsePlace.getEntityId());
 		assertEquals(targetEntityVersion, targetSynapsePlace.getVersionNumber());
 		assertEquals(Synapse.EntityArea.WIKI, targetSynapsePlace.getArea());
@@ -156,7 +153,7 @@ public class WikiSubpagesWidgetTest {
 		String targetWikiId = "888";
 		Place targetPlace = WikiSubpagesWidget.getLinkPlace(targetEntityId, targetEntityVersion, targetWikiId, embeddedInOwnerPage);
 		assertTrue(targetPlace instanceof Wiki);
-		Wiki targetWikiPlace = (Wiki)targetPlace;
+		Wiki targetWikiPlace = (Wiki) targetPlace;
 		assertEquals(targetEntityId, targetWikiPlace.getOwnerId());
 		assertEquals(ObjectType.ENTITY.toString(), targetWikiPlace.getOwnerType());
 		assertEquals(targetWikiId, targetWikiPlace.getWikiId());
@@ -169,7 +166,7 @@ public class WikiSubpagesWidgetTest {
 	}
 
 	@Test
-	public void testEditOrderButtonVisibilityForCannotEdit(){
+	public void testEditOrderButtonVisibilityForCannotEdit() {
 		permissions.setCanEdit(false);
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), false, null, mockActionMenuWidget);
 		verify(mockView).setEditOrderButtonVisible(false);
@@ -181,7 +178,7 @@ public class WikiSubpagesWidgetTest {
 	}
 
 	@Test
-	public void testEditOrderButtonVisibilityForLogin(){
+	public void testEditOrderButtonVisibilityForLogin() {
 		permissions.setCanEdit(true);
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), false, null, mockActionMenuWidget);
 		verify(mockView).setEditOrderButtonVisible(true);
@@ -191,77 +188,81 @@ public class WikiSubpagesWidgetTest {
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), false, null, mockActionMenuWidget);
 		verify(mockView, Mockito.times(3)).setEditOrderButtonVisible(true);
 	}
-	
+
 	@Test
 	public void testConfigureDifferentEntity() throws Exception {
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), false, null, mockActionMenuWidget);
 		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		
+
 		String entityId2 = "syn9834";
 		widget.configure(new WikiPageKey(entityId2, ObjectType.ENTITY.toString(), null), false, null, mockActionMenuWidget);
 		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId2), any(EntityBundleRequest.class), any(AsyncCallback.class));
 	}
-	
+
 	@Test
 	public void testConfigureSameEntityViewContainsWikiPageId() throws Exception {
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), false, null, mockActionMenuWidget);
 		verify(mockView, times(2)).clear();
-		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), any(EntityBundleRequest.class), any(AsyncCallback.class));		
-		
-		//widget has been configured for this entity id, let's reconfigure with a different page (same entity)
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), any(EntityBundleRequest.class), any(AsyncCallback.class));
+
+		// widget has been configured for this entity id, let's reconfigure with a different page (same
+		// entity)
 		String wikiPageId = "123";
 		when(mockView.contains(eq(wikiPageId))).thenReturn(true);
 		verify(mockView).configure(anyList(), eq(projectName), any(Place.class), any(), anyBoolean(), any(CallbackP.class), any(ActionMenuWidget.class));
-		//hidden initially in configure, and called again because only a single WikiPage is in the header tree.
+		// hidden initially in configure, and called again because only a single WikiPage is in the header
+		// tree.
 		verify(mockView, times(2)).hideSubpages();
-		
+
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), wikiPageId), false, null, mockActionMenuWidget);
-		
-		//verify using existing tree (since wiki page is in the subpages nav tree)
+
+		// verify using existing tree (since wiki page is in the subpages nav tree)
 		verify(mockView).setPage(wikiPageId);
 		// no additional calls to clear or configure the view
 		verify(mockView, times(2)).clear();
 		verify(mockView).configure(anyList(), eq(projectName), any(Place.class), any(), anyBoolean(), any(CallbackP.class), any(ActionMenuWidget.class));
 	}
-	
+
 	@Test
 	public void testConfigureViewContainsWikiPageIdChangeEntityName() throws Exception {
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), false, null, mockActionMenuWidget);
 		verify(mockView, times(2)).clear();
-		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), any(EntityBundleRequest.class), any(AsyncCallback.class));		
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		verify(mockView).configure(anyList(), eq(projectName), any(Place.class), any(), anyBoolean(), any(CallbackP.class), any(ActionMenuWidget.class));
-		
-		//widget has been configured for this entity id, let's reconfigure with a different page.  same entity, but the entity name has changed.
+
+		// widget has been configured for this entity id, let's reconfigure with a different page. same
+		// entity, but the entity name has changed.
 		String wikiPageId = "123";
 		when(mockView.contains(eq(wikiPageId))).thenReturn(true);
 		String newProjectName = "project name has changed";
 		when(mockWikiProject.getName()).thenReturn(newProjectName);
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), wikiPageId), false, null, mockActionMenuWidget);
-		
-		//verify using existing tree (since wiki page is in the subpages nav tree)
+
+		// verify using existing tree (since wiki page is in the subpages nav tree)
 		verify(mockView).setPage(wikiPageId);
 		// additional call to clear and reconfigure the view (with the new project name)
 		verify(mockView, times(3)).clear();
 		verify(mockView).configure(anyList(), eq(newProjectName), any(Place.class), any(), anyBoolean(), any(CallbackP.class), any(ActionMenuWidget.class));
 	}
-	
+
 	@Test
 	public void testConfigureViewContainsWikiPageAndTreeChanged() throws Exception {
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), false, null, mockActionMenuWidget);
-		
+
 		verify(mockView, times(2)).clear();
-		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), any(EntityBundleRequest.class), any(AsyncCallback.class));		
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		verify(mockView).configure(anyList(), eq(projectName), any(Place.class), any(), anyBoolean(), any(CallbackP.class), any(ActionMenuWidget.class));
-		
-		//widget has been configured for this entity id, let's reconfigure with a different page that's in the view.
+
+		// widget has been configured for this entity id, let's reconfigure with a different page that's in
+		// the view.
 		// tree has changed though (different wiki headers list), so it should reconfigure.
 		String wikiPageId = "123";
 		when(mockView.contains(eq(wikiPageId))).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(Collections.singletonList(mockWikiHeader)).when(mockSynapseJavascriptClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-		
+
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), wikiPageId), false, null, mockActionMenuWidget);
-		
-		//verify initially using existing tree (since wiki page is in the subpages nav tree)
+
+		// verify initially using existing tree (since wiki page is in the subpages nav tree)
 		verify(mockView).setPage(wikiPageId);
 		// additional call to clear and reconfigure the view (with the updated wiki header tree)
 		verify(mockView, times(3)).clear();

@@ -5,24 +5,21 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.view.ComingSoonView;
-
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class ComingSoonPresenter extends AbstractActivity implements ComingSoonView.Presenter, Presenter<ComingSoon> {
-		
+
 	private ComingSoon place;
 	private ComingSoonView view;
 	SynapseJSNIUtils jsniUtils;
 	SynapseJavascriptClient jsClient;
 	ResourceLoader resourceLoader;
+
 	@Inject
-	public ComingSoonPresenter(ComingSoonView view,
-			SynapseJSNIUtils jsniUtils,
-			SynapseJavascriptClient jsClient,
-			ResourceLoader resourceLoader) {
+	public ComingSoonPresenter(ComingSoonView view, SynapseJSNIUtils jsniUtils, SynapseJavascriptClient jsClient, ResourceLoader resourceLoader) {
 		this.view = view;
 		this.jsClient = jsClient;
 		this.jsniUtils = jsniUtils;
@@ -45,9 +42,9 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
 	}
 
 	@Override
-    public String mayStop() {
-        view.clear();
-        return null;
-        
-    }
+	public String mayStop() {
+		view.clear();
+		return null;
+
+	}
 }

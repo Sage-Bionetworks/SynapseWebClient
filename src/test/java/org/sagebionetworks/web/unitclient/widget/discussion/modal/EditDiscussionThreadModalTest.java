@@ -1,13 +1,12 @@
 package org.sagebionetworks.web.unitclient.widget.discussion.modal;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -20,13 +19,12 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalView;
+import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.discussion.UpdateThread;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -58,8 +56,7 @@ public class EditDiscussionThreadModalTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		modal = new EditDiscussionThreadModal(mockView, mockDiscussionForumClient,
-				mockSynAlert, mockMarkdownEditor, mockPopupUtilsView, mockGlobalApplicationState);
+		modal = new EditDiscussionThreadModal(mockView, mockDiscussionForumClient, mockSynAlert, mockMarkdownEditor, mockPopupUtilsView, mockGlobalApplicationState);
 		modal.configure(threadId, title, message, mockCallback);
 		when(mockMarkdownEditor.getMarkdown()).thenReturn(message);
 	}
@@ -113,16 +110,13 @@ public class EditDiscussionThreadModalTest {
 	public void testOnSaveSuccess() {
 		when(mockView.getThreadTitle()).thenReturn("title");
 		when(mockMarkdownEditor.getMarkdown()).thenReturn("message");
-		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle)
-			.when(mockDiscussionForumClient).updateThread(eq(threadId), any(UpdateThread.class),
-					any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle).when(mockDiscussionForumClient).updateThread(eq(threadId), any(UpdateThread.class), any(AsyncCallback.class));
 		modal.onSave();
 		verify(mockSynAlert).clear();
 		verify(mockView).showSaving();
 		verify(mockView).hideDialog();
 		verify(mockView).showSuccess(anyString(), anyString());
-		verify(mockDiscussionForumClient).updateThread(eq(threadId), any(UpdateThread.class),
-				any(AsyncCallback.class));
+		verify(mockDiscussionForumClient).updateThread(eq(threadId), any(UpdateThread.class), any(AsyncCallback.class));
 		verify(mockCallback).invoke();
 	}
 
@@ -131,39 +125,36 @@ public class EditDiscussionThreadModalTest {
 	public void testOnSaveFailure() {
 		when(mockView.getThreadTitle()).thenReturn("title");
 		when(mockMarkdownEditor.getMarkdown()).thenReturn("message");
-		AsyncMockStubber.callFailureWith(new Exception())
-			.when(mockDiscussionForumClient).updateThread(eq(threadId), any(UpdateThread.class),
-					any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockDiscussionForumClient).updateThread(eq(threadId), any(UpdateThread.class), any(AsyncCallback.class));
 		modal.onSave();
 		verify(mockSynAlert).clear();
 		verify(mockView).showSaving();
-		verify(mockDiscussionForumClient).updateThread(eq(threadId), any(UpdateThread.class),
-				any(AsyncCallback.class));
+		verify(mockDiscussionForumClient).updateThread(eq(threadId), any(UpdateThread.class), any(AsyncCallback.class));
 		verifyZeroInteractions(mockCallback);
 		verify(mockView).resetButton();
 		verify(mockSynAlert).handleException(any(Throwable.class));
 	}
-	
+
 	@Test
 	public void testOnClickCancel() {
 		modal.onCancel();
-		
-		//since no changes were made, verify confirmation dialog was not shown
+
+		// since no changes were made, verify confirmation dialog was not shown
 		verify(mockPopupUtilsView, never()).showConfirmDialog(eq(DisplayConstants.UNSAVED_CHANGES), eq(DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE), callbackCaptor.capture());
 		verify(mockView).hideDialog();
 	}
-	
+
 	@Test
 	public void testOnClickCancelWithUnsavedChanges() {
 		when(mockMarkdownEditor.getMarkdown()).thenReturn("unsaved changes");
 		modal.onCancel();
-		
-		//since no changes were made, verify confirmation dialog was not shown
+
+		// since no changes were made, verify confirmation dialog was not shown
 		verify(mockPopupUtilsView).showConfirmDialog(eq(DisplayConstants.UNSAVED_CHANGES), eq(DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE), callbackCaptor.capture());
 		verify(mockView, never()).hideDialog();
 		// simulate user confirmed
 		callbackCaptor.getValue().invoke();
-		
+
 		verify(mockView).hideDialog();
 	}
 

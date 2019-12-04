@@ -2,7 +2,6 @@ package org.sagebionetworks.web.unitclient.cookie;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-
 import org.junit.Test;
 import org.sagebionetworks.web.client.cookie.CookieUtils;
 

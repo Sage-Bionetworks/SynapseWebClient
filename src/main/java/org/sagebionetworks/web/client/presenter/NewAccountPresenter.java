@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
@@ -14,7 +13,6 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.NewAccountView;
-
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -30,11 +28,7 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 	private AccountCreationToken accountCreationToken;
 
 	@Inject
-	public NewAccountPresenter(NewAccountView view, 
-			SynapseClientAsync synapseClient, 
-			GlobalApplicationState globalAppState,
-			UserAccountServiceAsync userAccountService,
-			AuthenticationController authController){
+	public NewAccountPresenter(NewAccountView view, SynapseClientAsync synapseClient, GlobalApplicationState globalAppState, UserAccountServiceAsync userAccountService, AuthenticationController authController) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -93,7 +87,7 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 			@Override
 			public void onSuccess(String sessionToken) {
 				view.setLoading(false);
-				//success, send to login place to continue login process (sign terms of use...)
+				// success, send to login place to continue login process (sign terms of use...)
 				view.showInfo(DisplayConstants.ACCOUNT_CREATED);
 				if (accountCreationToken.getEncodedMembershipInvtnSignedToken() != null) {
 					globalAppState.setLastPlace(new EmailInvitation(accountCreationToken.getEncodedMembershipInvtnSignedToken()));
@@ -108,10 +102,11 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 			}
 		});
 	}
-	
+
 
 	/**
 	 * check that the email is available
+	 * 
 	 * @param email
 	 */
 	public void checkEmailAvailable(String email) {
@@ -123,10 +118,10 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 					globalAppState.gotoLastPlace();
 				}
 			}
-			
+
 			@Override
 			public void onFailure(Throwable e) {
-				//do nothing.  validation has failed, but updating the email will fail if it's already taken.
+				// do nothing. validation has failed, but updating the email will fail if it's already taken.
 				e.printStackTrace();
 			}
 		});
@@ -134,6 +129,7 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 
 	/**
 	 * Check that the username/alias is available
+	 * 
 	 * @param username
 	 */
 	public void checkUsernameAvailable(String username) {
@@ -144,16 +140,16 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 					if (!isAvailable)
 						view.markUsernameUnavailable();
 				}
-				
+
 				@Override
 				public void onFailure(Throwable e) {
-					//do nothing.  validation has failed, but updating the username will fail if it's already taken.
+					// do nothing. validation has failed, but updating the username will fail if it's already taken.
 					e.printStackTrace();
 				}
 			});
 		}
 	}
-	
+
 	@Override
 	public String mayStop() {
 		view.clear();

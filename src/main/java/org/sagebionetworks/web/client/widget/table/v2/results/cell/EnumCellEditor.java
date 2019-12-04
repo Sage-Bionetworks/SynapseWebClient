@@ -2,10 +2,8 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -46,8 +44,7 @@ public class EnumCellEditor implements CellEditor {
 			return;
 		}
 		/*
-		 * Find the index matching the value. Note: Linear search for less than
-		 * 100 items is reasonable.
+		 * Find the index matching the value. Note: Linear search for less than 100 items is reasonable.
 		 */
 		for (int i = 0; i < items.size(); i++) {
 			if (value.equals(items.get(i))) {
@@ -55,7 +52,7 @@ public class EnumCellEditor implements CellEditor {
 				return;
 			}
 		}
-		
+
 		// we did not match a value, invalid value given
 		view.setValue(0);
 		jsniUtils.consoleError("Unknown value: " + value);
@@ -66,7 +63,7 @@ public class EnumCellEditor implements CellEditor {
 	public String getValue() {
 		int index = view.getValue();
 		if (index == 0) {
-			 //The first item 'nothing selected' means null.
+			// The first item 'nothing selected' means null.
 			return null;
 		} else {
 			return this.items.get(index);
@@ -105,8 +102,8 @@ public class EnumCellEditor implements CellEditor {
 
 	public void configure(List<String> validValues) {
 		/*
-		 * The items include all passed values plus the first item is 'nothing
-		 * selected' for null and empty values.
+		 * The items include all passed values plus the first item is 'nothing selected' for null and empty
+		 * values.
 		 */
 		this.items = new ArrayList<String>(validValues.size() + 1);
 		this.items.add(NOTHING_SELECTED);

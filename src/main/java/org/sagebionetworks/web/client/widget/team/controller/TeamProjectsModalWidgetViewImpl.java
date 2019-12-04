@@ -6,7 +6,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -27,12 +26,13 @@ public class TeamProjectsModalWidgetViewImpl implements TeamProjectsModalWidgetV
 	SortableTableHeaderImpl lastActivityOnColumnHeader;
 	@UiField
 	Div projectsContainer;
-	
-	public interface Binder extends UiBinder<Widget, TeamProjectsModalWidgetViewImpl> {}
-	
+
+	public interface Binder extends UiBinder<Widget, TeamProjectsModalWidgetViewImpl> {
+	}
+
 	Widget widget;
 	Presenter presenter;
-	
+
 	@Inject
 	public TeamProjectsModalWidgetViewImpl(Binder uiBinder) {
 		this.widget = uiBinder.createAndBindUi(this);
@@ -46,7 +46,7 @@ public class TeamProjectsModalWidgetViewImpl implements TeamProjectsModalWidgetV
 			presenter.sort(ProjectListSortColumn.LAST_ACTIVITY);
 		});
 	}
-	
+
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -68,20 +68,22 @@ public class TeamProjectsModalWidgetViewImpl implements TeamProjectsModalWidgetV
 		projectsContainer.clear();
 		projectsContainer.add(projectsContent);
 	}
+
 	@Override
 	public void show() {
 		this.modal.show();
 	}
-	
+
 	@Override
 	public void hide() {
 		this.modal.hide();
 	}
+
 	@Override
 	public void setTitle(String title) {
 		modal.setTitle(title);
 	}
-	
+
 	@Override
 	public void setSortDirection(ProjectListSortColumn column, SortDirection direction) {
 		org.sagebionetworks.repo.model.table.SortDirection tableSortDirection = SortDirection.ASC.equals(direction) ? org.sagebionetworks.repo.model.table.SortDirection.ASC : org.sagebionetworks.repo.model.table.SortDirection.DESC;

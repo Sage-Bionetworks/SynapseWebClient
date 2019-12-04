@@ -10,11 +10,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -44,12 +42,11 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public class ACTDataAccessSubmissionWidgetTest {
-	
+
 	ACTDataAccessSubmissionWidget widget;
 	@Mock
 	ACTDataAccessSubmissionWidgetView mockView;
@@ -93,12 +90,12 @@ public class ACTDataAccessSubmissionWidgetTest {
 	public static final String INTENDED_DATA_USE = "lorem ipsum";
 	public static final String PROJECT_LEAD = "Mr. Rogers";
 	public static final String SMALL_DATE_STRING = "1/2/33";
-	
-	
+
+
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		
+
 		when(mockDataAccessSubmission.getResearchProjectSnapshot()).thenReturn(mockResearchProjectSnapshot);
 		when(mockFileHandleList.configure()).thenReturn(mockFileHandleList);
 		when(mockFileHandleList.setCanDelete(anyBoolean())).thenReturn(mockFileHandleList);
@@ -110,21 +107,11 @@ public class ACTDataAccessSubmissionWidgetTest {
 		when(mockResearchProjectSnapshot.getIntendedDataUseStatement()).thenReturn(INTENDED_DATA_USE);
 		when(mockResearchProjectSnapshot.getProjectLead()).thenReturn(PROJECT_LEAD);
 		when(mockDateTimeUtils.getDateTimeString(any(Date.class))).thenReturn(SMALL_DATE_STRING);
-		
-		widget = new ACTDataAccessSubmissionWidget(mockView, 
-				mockSynapseAlert, 
-				mockClient,
-				mockPromptModalWidget,
-				mockDucFileRenderer, 
-				mockIrbFileRenderer, 
-				mockFileHandleList, 
-				mockJSNIUtils, 
-				mockGinInjector, 
-				mockDateTimeUtils, 
-				mockUserProfileAsyncHandler);
+
+		widget = new ACTDataAccessSubmissionWidget(mockView, mockSynapseAlert, mockClient, mockPromptModalWidget, mockDucFileRenderer, mockIrbFileRenderer, mockFileHandleList, mockJSNIUtils, mockGinInjector, mockDateTimeUtils, mockUserProfileAsyncHandler);
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmission).when(mockClient).updateDataAccessSubmissionState(anyString(), any(SubmissionState.class), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockUserProfileAsyncHandler).getUserProfile(anyString(), any(AsyncCallback.class));
-		verify(mockPromptModalWidget).configure(anyString(),  anyString(), anyString(),  promptModalPresenterCaptor.capture());
+		verify(mockPromptModalWidget).configure(anyString(), anyString(), anyString(), promptModalPresenterCaptor.capture());
 		confirmRejectionCallback = promptModalPresenterCaptor.getValue();
 	}
 
@@ -135,7 +122,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 		verify(mockFileHandleList).setCanUpload(false);
 		verify(mockView).setPresenter(widget);
 	}
-	
+
 	@Test
 	public void testConfigure() {
 		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadge);
@@ -151,7 +138,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 		AccessorChange change2 = new AccessorChange();
 		change2.setUserId(userId2);
 		change2.setType(AccessType.GAIN_ACCESS);
-		
+
 		changes.add(change1);
 		changes.add(change2);
 		when(mockDataAccessSubmission.getAccessorChanges()).thenReturn(changes);
@@ -167,18 +154,18 @@ public class ACTDataAccessSubmissionWidgetTest {
 		when(mockDataAccessSubmission.getDucFileHandleId()).thenReturn(fileHandleId3);
 		String fileHandleId4 = "1111112";
 		when(mockDataAccessSubmission.getIrbFileHandleId()).thenReturn(fileHandleId4);
-		
+
 		widget.configure(mockDataAccessSubmission);
 		widget.onMoreInfo();
-		
+
 		verify(mockView).hideActions();
 		// verify accessors
 		verify(mockView).clearAccessors();
 		verify(mockGinInjector, times(2)).getUserBadgeItem();
-		
+
 		verify(mockUserBadge).configure(change1, mockUserProfile);
 		verify(mockUserBadge).configure(change2, mockUserProfile);
-		
+
 		verify(mockView, times(2)).addAccessors(any(IsWidget.class), anyString());
 		// verify other documents
 		verify(mockFileHandleList).clear();
@@ -210,7 +197,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 		verify(mockView).setProjectLead(PROJECT_LEAD);
 		verify(mockView).setSubmittedOn(SMALL_DATE_STRING);
 	}
-	
+
 	@Test
 	public void testConfigureRenewal() {
 		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadge);
@@ -222,15 +209,15 @@ public class ACTDataAccessSubmissionWidgetTest {
 		changes.add(change1);
 		when(mockDataAccessSubmission.getAccessorChanges()).thenReturn(changes);
 		when(mockDataAccessSubmission.getIsRenewalSubmission()).thenReturn(true);
-		
+
 		widget.configure(mockDataAccessSubmission);
-		
+
 		verify(mockView, never()).clearAccessors();
 		verify(mockGinInjector, never()).getUserBadgeItem();
 		verify(mockView, never()).addAccessors(any(IsWidget.class), anyString());
-		
+
 		widget.onMoreInfo();
-		
+
 		verify(mockView).hideActions();
 		// verify accessors
 		verify(mockView).clearAccessors();
@@ -241,7 +228,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 		verify(mockView).setIsRenewal(true);
 		verify(mockView).setRenewalColumnsVisible(true);
 	}
-	
+
 	@Test
 	public void testConfigureSubmitted() {
 		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.SUBMITTED);
@@ -250,19 +237,19 @@ public class ACTDataAccessSubmissionWidgetTest {
 		verify(mockView).showApproveButton();
 		verify(mockView).showRejectButton();
 		verify(mockView).setRejectedReasonVisible(false);
-		
+
 		widget.onMoreInfo();
 		// no duc or irb, verify they are hidden
 		verify(mockIrbFileRenderer).setVisible(false);
 		verify(mockDucFileRenderer).setVisible(false);
 	}
-	
+
 	@Test
 	public void testConfigureOtherStates() {
 		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.CANCELLED);
 		widget.configure(mockDataAccessSubmission);
 		verify(mockView).setRejectedReasonVisible(false);
-		
+
 		// rejected, with null reason
 		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.REJECTED);
 		String rejectedReason = null;
@@ -270,32 +257,32 @@ public class ACTDataAccessSubmissionWidgetTest {
 		widget.configure(mockDataAccessSubmission);
 		verify(mockView).setRejectedReasonVisible(true);
 		verify(mockView).setRejectedReason("");
-		
+
 		// rejected, with a reason
 		rejectedReason = "missing required signature";
 		when(mockDataAccessSubmission.getRejectedReason()).thenReturn(rejectedReason);
 		widget.configure(mockDataAccessSubmission);
 		verify(mockView, times(2)).setRejectedReasonVisible(true);
 		verify(mockView).setRejectedReason(rejectedReason);
-		
+
 		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.APPROVED);
 		widget.configure(mockDataAccessSubmission);
-		
+
 		verify(mockView, times(4)).hideActions();
 		verify(mockView, never()).showApproveButton();
 		verify(mockView, never()).showRejectButton();
 	}
-	
+
 	@Test
 	public void testUpdateDataAccessSubmissionState() {
-	    // initially they are not rejected
+		// initially they are not rejected
 		widget.configure(mockDataAccessSubmission);
 		String rejectionReason = "missing info";
 		when(mockPromptModalWidget.getValue()).thenReturn(rejectionReason);
 		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.REJECTED);
-		
+
 		confirmRejectionCallback.invoke();
-		
+
 		verify(mockPromptModalWidget).hide();
 		verify(mockClient).updateDataAccessSubmissionState(eq(SUBMISSION_ID), eq(SubmissionState.REJECTED), eq(rejectionReason), any(AsyncCallback.class));
 		verify(mockView).setState(SubmissionState.REJECTED.name());

@@ -11,7 +11,7 @@ public interface FileUploadHandler {
 	/**
 	 * Called upon a successful file upload.
 	 * 
-	 * @param uploadedFile The ID of the newly created file handle.  This is the result of the upload.
+	 * @param uploadedFile The ID of the newly created file handle. This is the result of the upload.
 	 */
 	void uploadSuccess(String fileHandleId);
 
