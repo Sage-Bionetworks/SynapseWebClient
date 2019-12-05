@@ -37,6 +37,7 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
 		tab.addTabClickedCallback(onClickCallback);
 	}
 
+	public void configure(String entityId, String entityName, EntityBundle projectBundle) {
 		lazyInject();
 		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, null, EntityArea.CHALLENGE, null));
 		challengeWidget.configure(entityId);

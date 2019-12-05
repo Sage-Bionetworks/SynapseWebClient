@@ -38,6 +38,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -676,7 +677,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 					}
 				}
 			};
-
+			wikiTab.configure(projectHeader.getId(), projectHeader.getName(), projectBundle, wikiId, canEdit, callback);
 			if (isWikiTabShown) {
 				tabs.showTab(wikiTab.asTab(), false);
 				projectMetadata.setVisible(true);
