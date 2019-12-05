@@ -26,6 +26,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter {
 	GlobalApplicationState globalAppState;
 	SynapseProperties synapseProperties;
 	PortalGinInjector ginInjector;
+
 	@Inject
 	public DiscussionTab(Tab tab, PortalGinInjector ginInjector) {
 		this.tab = tab;

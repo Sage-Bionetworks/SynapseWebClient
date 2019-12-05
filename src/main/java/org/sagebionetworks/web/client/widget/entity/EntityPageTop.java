@@ -677,8 +677,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 				}
 			};
 
-			wikiTab.configure(projectHeader.getId(), projectHeader.getName(), projectBundle, wikiId, 
-					canEdit, callback);
 			if (isWikiTabShown) {
 				tabs.showTab(wikiTab.asTab(), false);
 				projectMetadata.setVisible(true);
