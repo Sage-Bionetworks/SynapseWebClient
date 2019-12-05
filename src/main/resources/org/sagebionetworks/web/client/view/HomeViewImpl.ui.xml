@@ -143,7 +143,7 @@
 											<t:TableData>
 												<b:Heading size="H5"
 													addStyleNames="font-weight-bolder">
-													<b:Anchor href="http://docs.synapse.org/r/"
+													<b:Anchor href="https://r-docs.synapse.org"
 														target="_blank" text="R client" />
 												</b:Heading>
 											</t:TableData>
@@ -162,7 +162,7 @@
 											<t:TableData>
 												<b:Heading size="H5"
 													addStyleNames="font-weight-bolder">
-													<b:Anchor href="http://docs.synapse.org/python/"
+													<b:Anchor href="https://python-docs.synapse.org"
 														target="_blank" text="Python client" />
 												</b:Heading>
 											</t:TableData>
@@ -183,7 +183,7 @@
 												<b:Heading size="H5"
 													addStyleNames="font-weight-bolder">
 													<b:Anchor
-														href="http://docs.synapse.org/python/build/html/CommandLineClient.html"
+														href="https://python-docs.synapse.org/build/html/CommandLineClient.html"
 														target="_blank" text="Command line client" />
 												</b:Heading>
 											</t:TableData>
@@ -373,13 +373,13 @@
 											from the web or programmatically via one of our supported
 											analytical clients (</bh:Text>
 										<b:Anchor target="_blank"
-											href="http://docs.synapse.org/r/" text="R" />
+											href="https://r-docs.synapse.org" text="R" />
 										<bh:Text>,&nbsp;</bh:Text>
 										<b:Anchor target="_blank"
-											href="http://docs.synapse.org/python/" text="Python" />
+											href="https://python-docs.synapse.org" text="Python" />
 										<bh:Text>,&nbsp;</bh:Text>
 										<b:Anchor target="_blank"
-											href="http://docs.synapse.org/python/build/html/CommandLineClient.html"
+											href="https://python-docs.synapse.org/build/html/CommandLineClient.html"
 											text="command line" />
 										<bh:Text>)</bh:Text>
 									</bh:Paragraph>
