@@ -16,7 +16,6 @@ import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import com.google.gwt.place.shared.Place;
 import com.google.inject.Inject;
@@ -62,6 +61,7 @@ public class DockerTab implements DockerTabView.Presenter {
 			view.setBreadcrumb(breadcrumb.asWidget());
 			view.setDockerRepoList(dockerRepoListWidget.asWidget());
 			view.setSynapseAlert(synAlert.asWidget());
+			view.setActionMenuContainer(tab.getEntityActionMenu());
 			tab.setContent(view.asWidget());
 			initClickHandler();
 		}
@@ -128,6 +128,7 @@ public class DockerTab implements DockerTabView.Presenter {
 			view.setBreadcrumbVisible(isRepo);
 			view.setDockerRepoListVisible(isProject);
 			view.setDockerRepoUIVisible(isRepo);
+			tab.configureEntityActionController(bundle, true, null);
 			if (isRepo) {
 				tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(bundle.getEntity().getId(), null, null, null));
 				List<LinkData> links = new ArrayList<LinkData>();
@@ -137,7 +138,6 @@ public class DockerTab implements DockerTabView.Presenter {
 				DockerRepoWidget repoWidget = ginInjector.createNewDockerRepoWidget();
 				view.setDockerRepoWidget(repoWidget.asWidget());
 				repoWidget.configure(bundle, tab.getEntityActionMenu());
-				tab.configureEntityActionController(bundle, true, null);
 			} else if (isProject) {
 				areaToken = null;
 				showProjectLevelUI();

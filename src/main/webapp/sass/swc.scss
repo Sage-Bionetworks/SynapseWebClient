@@ -127,7 +127,9 @@ end sticky footer
 		box-shadow: none;
 	}
 	.nav-tabs > li.active > a, #rootPanel .nav-tabs > li > a:hover {
-		box-shadow: inset 0 -2px 0 #1e7098
+		box-shadow: inset 0 -2px 0 #1e7098;
+		background-color: unset;
+		border: none;
 	}
 	@media (min-width: 768px) {
 		.lead {
