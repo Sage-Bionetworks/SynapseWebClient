@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.entity.team;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -12,14 +12,22 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
@@ -29,39 +37,55 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.entity.EvaluationSubmitterTest;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+@RunWith(MockitoJUnitRunner.class)
 public class InviteWidgetTest {
-
+	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
 	InviteWidgetView mockView;
+	@Mock
 	SynapseAlert mockSynAlert;
+	@Mock
 	SynapseSuggestBox mockSuggestBox;
+	@Mock
 	SynapseJSNIUtils mockJSNIUtils;
+	@Mock
 	Team mockTeam;
 	String teamId = "123";
-	String userId = "testId";
+	String userId = "873873";
 	InviteWidget inviteWidget;
+	@Mock
 	UserGroupHeader mockHeader;
+	@Mock
 	UserGroupSuggestionProvider mockSuggestionProvider;
+	@Mock
 	UserGroupSuggestion mockSuggestion;
+	@Mock
 	Callback mockRefreshCallback;
+	@Mock
 	GWTWrapper mockGWTWrapper;
+	@Mock
+	QuizInfoDialog mockQuizInfoDialog;
+	@Mock
+	PortalGinInjector mockGinInjector;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
+	@Mock
+	AuthenticationController mockAuthController;
+	@Mock
+	UserBundle mockUserBundle;
 
 	String invitationMessage = "You are invited!";
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockView = mock(InviteWidgetView.class);
-		mockGWTWrapper = mock(GWTWrapper.class);
-		mockSynAlert = mock(SynapseAlert.class);
-		mockSuggestBox = mock(SynapseSuggestBox.class);
-		mockSuggestion = mock(UserGroupSuggestion.class);
-		mockJSNIUtils = mock(SynapseJSNIUtils.class);
-		mockHeader = mock(UserGroupHeader.class);
-		mockTeam = mock(Team.class);
-		mockSuggestionProvider = mock(UserGroupSuggestionProvider.class);
-		inviteWidget = new InviteWidget(mockView, mockSynapseClient, mockGWTWrapper, mockSynAlert, mockSuggestBox, mockSuggestionProvider);
-		mockRefreshCallback = mock(Callback.class);
+		when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
+		when(mockGinInjector.getQuizInfoDialog()).thenReturn(mockQuizInfoDialog);
+		when(mockGinInjector.getAuthenticationController()).thenReturn(mockAuthController);
+		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(userId);
+		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockJsClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
+		when(mockUserBundle.getIsCertified()).thenReturn(true);
+		inviteWidget = new InviteWidget(mockView, mockSynapseClient, mockGWTWrapper, mockSynAlert, mockSuggestBox, mockSuggestionProvider, mockGinInjector);
 		inviteWidget.configure(mockTeam);
 		inviteWidget.setRefreshCallback(mockRefreshCallback);
 		when(mockGWTWrapper.getHostPageBaseURL()).thenReturn(EvaluationSubmitterTest.HOST_PAGE_URL);
@@ -181,5 +205,20 @@ public class InviteWidgetTest {
 		verify(mockSynapseClient).inviteMember(eq(userId), eq(teamId), eq(invitationMessage), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
 		verify(mockRefreshCallback).invoke();
 		verify(mockView).hide();
+	}
+	
+	@Test
+	public void testUncertifiedAddEmail() {
+		when(mockUserBundle.getIsCertified()).thenReturn(false);
+		inviteWidget.configure(mockTeam);
+		
+		// add an email, and verify that it shows you the Get Certified UI instead
+		String email = "emailAddress1@synapse.org";
+		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(null);
+		when(mockSuggestBox.getText()).thenReturn(email);
+		inviteWidget.addSuggestion();
+		
+		verify(mockView).hide();
+		verify(mockQuizInfoDialog).show();
 	}
 }

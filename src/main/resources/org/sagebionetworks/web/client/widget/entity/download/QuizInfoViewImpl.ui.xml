@@ -5,7 +5,7 @@
 
 	<g:HTMLPanel>
 		<div class="margin-10">
-			Synapse is a collaborative data sharing platform approved for storing data from human subjects research. This requires special care and thought. To upload files, Synapse requires you demonstrate awareness of privacy and security issues. You can complete this by taking a short quiz to become a "Certified User". The short quiz is available at the link below. 
+			Synapse is a collaborative data sharing platform approved for storing data from human subjects research. This requires special care and thought. To upload files or send an email invitation, Synapse requires you demonstrate awareness of privacy and security issues. You can complete this by taking a short quiz to become a "Certified User". The short quiz is available at the link below. 
 		</div>
 	</g:HTMLPanel>
 </ui:UiBinder>
