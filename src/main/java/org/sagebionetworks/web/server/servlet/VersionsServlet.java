@@ -80,6 +80,7 @@ public class VersionsServlet extends HttpServlet {
 		// instruct not to cache
 		response.setHeader(WebConstants.CACHE_CONTROL_KEY, WebConstants.CACHE_CONTROL_VALUE_NO_CACHE); // Set standard HTTP/1.1 no-cache headers.
 		response.setHeader(WebConstants.PRAGMA_KEY, WebConstants.NO_CACHE_VALUE); // Set standard HTTP/1.0 no-cache header.
+		response.setContentType(WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		response.setDateHeader(WebConstants.EXPIRES_KEY, 0L); // Proxy
 
 		response.setStatus(HttpServletResponse.SC_OK);
