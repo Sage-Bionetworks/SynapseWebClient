@@ -39,7 +39,7 @@ public class ChallengeTabViewImpl implements ChallengeTabView {
 	}
 	
 	@Override
-	public void setActionMenuContainer(IsWidget w) {
+	public void setActionMenu(IsWidget w) {
 		actionMenuContainer.clear();
 		actionMenuContainer.add(w);
 	}

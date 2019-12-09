@@ -27,5 +27,5 @@ public interface DockerTabView extends IsWidget {
 
 	void clearDockerRepoWidget();
 
-	void setActionMenuContainer(IsWidget w);
+	void setActionMenu(IsWidget w);
 }

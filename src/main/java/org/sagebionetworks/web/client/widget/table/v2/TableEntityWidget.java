@@ -150,6 +150,7 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 		this.entityBundle = bundle;
 		Entity table = bundle.getEntity();
 		this.tableType = TableType.getTableType(table);
+		queryInputWidget.setActionMenu(actionMenu);
 		queryInputWidget.setDownloadFilesVisible(tableType.isIncludeFiles());
 		this.tableId = bundle.getEntity().getId();
 		this.tableVersionNumber = versionNumber;

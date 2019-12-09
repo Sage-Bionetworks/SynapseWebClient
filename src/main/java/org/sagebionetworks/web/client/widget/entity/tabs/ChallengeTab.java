@@ -30,7 +30,7 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
 			view.setEvaluationList(evaluationList.asWidget());
 			view.setChallengeWidget(challengeWidget.asWidget());
 			tab.setContent(view.asWidget());
-			view.setActionMenuContainer(tab.getEntityActionMenu());
+			view.setActionMenu(tab.getEntityActionMenu());
 		}
 	}
 

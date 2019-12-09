@@ -170,7 +170,6 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler {
 			view.setBreadcrumbVisible(false);
 			view.setTableListVisible(false);
 			view.setTitlebarVisible(false);
-			view.clearActionMenuContainer();
 			view.clearTableEntityWidget();
 			modifiedCreatedBy.setVisible(false);
 			view.setTableUIVisible(false);
@@ -193,10 +192,10 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler {
 		view.setBreadcrumbVisible(isTable);
 		view.setTableListVisible(isProject);
 		view.setTitlebarVisible(isTable);
-		view.clearActionMenuContainer();
 		view.clearTableEntityWidget();
 		modifiedCreatedBy.setVisible(false);
 		view.setTableUIVisible(isTable);
+		
 		if (isTable) {
 			updateVersionAndAreaToken(entity.getId(), version, areaToken);
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
@@ -205,13 +204,14 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler {
 			v2TableWidget = ginInjector.createNewTableEntityWidget();
 			view.setTableEntityWidget(v2TableWidget.asWidget());
 			v2TableWidget.configure(bundle, version, bundle.getPermissions().getCanCertifiedUserEdit(), this, tab.getEntityActionMenu());
-			boolean isCurrentVersion = version == null;
-			tab.configureEntityActionController(bundle, isCurrentVersion, null);
 		} else if (isProject) {
+			view.setActionMenu(tab.getEntityActionMenu());
 			areaToken = null;
 			tableListWidget.configure(bundle);
 			showProjectLevelUI();
 		}
+		boolean isCurrentVersion = version == null;
+		tab.configureEntityActionController(bundle, isCurrentVersion, null);
 	}
 
 	public Tab asTab() {

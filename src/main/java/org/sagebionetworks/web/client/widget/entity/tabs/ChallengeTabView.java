@@ -11,5 +11,5 @@ public interface ChallengeTabView extends IsWidget {
 
 	void setEvaluationList(Widget w);
 
-	void setActionMenuContainer(IsWidget w);
+	void setActionMenu(IsWidget w);
 }
