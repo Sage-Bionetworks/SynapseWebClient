@@ -85,6 +85,7 @@ public class DockerTabViewImpl implements DockerTabView {
 	}
 	@Override
 	public void setActionMenuContainer(IsWidget w) {
+		w.asWidget().removeFromParent();
 		actionMenuContainer.clear();
 		actionMenuContainer.add(w);
 	}

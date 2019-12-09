@@ -61,7 +61,6 @@ public class DockerTab implements DockerTabView.Presenter {
 			view.setBreadcrumb(breadcrumb.asWidget());
 			view.setDockerRepoList(dockerRepoListWidget.asWidget());
 			view.setSynapseAlert(synAlert.asWidget());
-			view.setActionMenuContainer(tab.getEntityActionMenu());
 			tab.setContent(view.asWidget());
 			initClickHandler();
 		}
@@ -139,6 +138,7 @@ public class DockerTab implements DockerTabView.Presenter {
 				view.setDockerRepoWidget(repoWidget.asWidget());
 				repoWidget.configure(bundle, tab.getEntityActionMenu());
 			} else if (isProject) {
+				view.setActionMenuContainer(tab.getEntityActionMenu());
 				areaToken = null;
 				showProjectLevelUI();
 			}
