@@ -560,4 +560,8 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	public void onAddToDownloadList() {
 		addToDownloadList.addToDownloadList(entityBundle.getEntity().getId(), currentQuery);
 	}
+	
+	public void hideActionMenu() {
+		queryInputWidget.hideActionMenu();
+	}
 }

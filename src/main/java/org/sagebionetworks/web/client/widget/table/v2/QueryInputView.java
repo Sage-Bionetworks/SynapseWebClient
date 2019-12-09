@@ -117,4 +117,6 @@ public interface QueryInputView extends IsWidget {
 	public void setDownloadFilesVisible(boolean visible);
 	
 	public void setActionMenu(IsWidget w);
+
+	public void hideActionMenu();
 }

@@ -48,6 +48,7 @@ public class WikiTab {
 		tab.configureEntityActionController(projectBundle, true, wikiPageId);
 		WikiPageKey wikiPageKey = new WikiPageKey(entityId, ObjectType.ENTITY.name(), wikiPageId);
 		wikiPageWidget.configure(wikiPageKey, canEdit, callback);
+		wikiPageWidget.setActionMenu(tab.getEntityActionMenu());
 		wikiPageWidget.showSubpages(tab.getEntityActionMenu());
 		setEntityNameAndPlace(entityId, entityName, wikiPageId);
 	}

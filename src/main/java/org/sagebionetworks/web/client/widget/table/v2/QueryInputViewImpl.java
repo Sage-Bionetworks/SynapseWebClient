@@ -169,6 +169,10 @@ public class QueryInputViewImpl implements QueryInputView {
 		actionMenuContainer.add(w);
 	}
 	@Override
+	public void hideActionMenu() {
+		actionMenuContainer.setVisible(false);
+	}
+	@Override
 	public void setDownloadFilesVisible(boolean visible) {
 		addToDownloadListLink.setVisible(visible);
 		programmaticOptionsLink.setVisible(visible);

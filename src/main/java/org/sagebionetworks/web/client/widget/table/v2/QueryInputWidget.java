@@ -175,4 +175,8 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 	public void setActionMenu(IsWidget w) {
 		view.setActionMenu(w);
 	}
+
+	public void hideActionMenu() {
+		view.hideActionMenu();
+	}
 }
