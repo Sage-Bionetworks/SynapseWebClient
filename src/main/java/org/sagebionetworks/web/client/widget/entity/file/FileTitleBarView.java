@@ -40,6 +40,8 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 
 	void setCanDownload(boolean canDownload);
 
+	void setActionMenu(IsWidget w);
+
 	/**
 	 * Presenter interface
 	 */

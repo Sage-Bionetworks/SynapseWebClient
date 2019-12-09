@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -62,5 +63,8 @@ public class FilesBrowser implements SynapseWidgetPresenter, FilesBrowserView.Pr
 	@Override
 	public void onAddToDownloadList() {
 		addToDownloadList.addToDownloadList(entityId);
+	}
+	public void setActionMenu(IsWidget w) {
+		view.setActionMenu(w);
 	}
 }

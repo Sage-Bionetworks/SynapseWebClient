@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -36,6 +37,8 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	Button downloadOptionsButton;
 	@UiField
 	HelpWidget downloadHelp;
+	@UiField
+	Span actionMenuContainer;
 
 	@Inject
 	public FilesBrowserViewImpl(FilesBrowserViewImplUiBinder binder, EntityTreeBrowser entityTreeBrowser, AuthenticationController authController) {
@@ -117,5 +120,12 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	public void setAddToDownloadList(IsWidget w) {
 		addToDownloadListContainer.clear();
 		addToDownloadListContainer.add(w);
+	}
+	
+	@Override
+	public void setActionMenu(IsWidget w) {
+		w.asWidget().removeFromParent();
+		actionMenuContainer.clear();
+		actionMenuContainer.add(w);
 	}
 }

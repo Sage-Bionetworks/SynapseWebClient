@@ -141,7 +141,6 @@ public class FilesTab {
 			view.setFileFolderUIVisible(false);
 			view.setWikiPageWidgetVisible(false);
 			view.setFileBrowserVisible(false);
-			view.clearActionMenuContainer();
 			view.clearRefreshAlert();
 			breadcrumb.clear();
 			view.setProvenanceVisible(false);
@@ -220,14 +219,13 @@ public class FilesTab {
 		}
 
 		view.showLoading(false);
-		view.clearActionMenuContainer();
 		// Preview
 		view.setPreviewVisible(isFile && !bundle.getFileHandles().isEmpty());
 
 		// File title bar
 		view.setFileTitlebarVisible(isFile);
 		if (isFile) {
-			fileTitleBar.configure(bundle);
+			fileTitleBar.configure(bundle, tab.getEntityActionMenu());
 			previewWidget.configure(bundle);
 			discussionThreadListWidget.configure(currentEntityId, null, null);
 			view.setDiscussionText(currentEntity.getName());
@@ -243,9 +241,9 @@ public class FilesTab {
 		view.setFileFolderUIVisible(isFileOrFolder);
 		if (isFileOrFolder) {
 			metadata.configure(bundle, versionNumber, tab.getEntityActionMenu());
-			boolean isCurrentVersion = versionNumber == null;
-			tab.configureEntityActionController(bundle, isCurrentVersion, null);
 		}
+		boolean isCurrentVersion = versionNumber == null;
+		tab.configureEntityActionController(bundle, isCurrentVersion, null);
 		
 		EntityArea area = isProject ? EntityArea.FILES : null;
 		tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(currentEntityId, versionNumber, area, null));
@@ -255,6 +253,7 @@ public class FilesTab {
 		view.setFileBrowserVisible(isFilesBrowserVisible);
 		if (isFilesBrowserVisible) {
 			filesBrowser.configure(currentEntityId);
+			filesBrowser.setActionMenu(tab.getEntityActionMenu());
 		}
 
 		// Provenance

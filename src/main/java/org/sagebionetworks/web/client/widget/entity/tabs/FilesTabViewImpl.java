@@ -51,8 +51,6 @@ public class FilesTabViewImpl implements FilesTabView {
 	@UiField
 	SimplePanel fileMetadataContainer;
 	@UiField
-	SimplePanel fileActionMenuContainer;
-	@UiField
 	SimplePanel synapseAlertContainer;
 	@UiField
 	SimplePanel refreshAlertContainer;
@@ -170,16 +168,6 @@ public class FilesTabViewImpl implements FilesTabView {
 	@Override
 	public void setFileFolderUIVisible(boolean visible) {
 		fileMetadataContainer.setVisible(visible);
-	}
-
-	@Override
-	public void setActionMenu(Widget w) {
-		fileActionMenuContainer.setWidget(w);
-	}
-
-	@Override
-	public void clearActionMenuContainer() {
-		fileActionMenuContainer.clear();
 	}
 
 	@Override

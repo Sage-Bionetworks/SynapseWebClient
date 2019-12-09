@@ -11,6 +11,7 @@
 	<bh:Div addStyleNames="filesBrowser">
 		<bh:Div ui:field="commandsContainer"
 			addStyleNames="displayInlineBlock" width="100%">
+			<bh:Span ui:field="actionMenuContainer" addStyleNames="right" />
 			<w:HelpWidget ui:field="downloadHelp"
 				addStyleNames="margin-left-5 right movedown-5" visible="false"
 				placement="LEFT" />

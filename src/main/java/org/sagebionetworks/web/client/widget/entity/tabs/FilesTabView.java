@@ -24,8 +24,6 @@ public interface FilesTabView extends IsWidget {
 
 	void setFileFolderUIVisible(boolean visible);
 
-	void setActionMenu(Widget w);
-
 	void setWikiPage(Widget w);
 
 	void setSynapseAlert(Widget w);
@@ -37,8 +35,6 @@ public interface FilesTabView extends IsWidget {
 	void setFileBrowserVisible(boolean visible);
 
 	void setPreviewVisible(boolean visible);
-
-	void clearActionMenuContainer();
 
 	void setModifiedCreatedBy(IsWidget modifiedCreatedBy);
 
