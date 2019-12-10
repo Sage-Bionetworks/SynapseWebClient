@@ -137,7 +137,7 @@ public class DockerTabTest {
 		verify(mockView).setBreadcrumb(any(Widget.class));
 		verify(mockView).setDockerRepoList(any(Widget.class));
 		verify(mockView).setSynapseAlert(any(Widget.class));
-		verify(mockTab).configure(anyString(), anyString(), anyString());
+		verify(mockTab).configure(anyString(), anyString(), anyString(), any(EntityArea.class));
 		verify(mockBreadcrumb).setLinkClickedHandler(callbackPCaptor.capture());
 		verify(mockTab).setContent(any(Widget.class));
 
@@ -164,7 +164,7 @@ public class DockerTabTest {
 		String areaToken = null;
 		tab.setEntitySelectedCallback(mockUpdateEntityCallback);
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockProjectEntityBundle, areaToken, mockActionMenuWidget);
+		tab.configure(mockProjectEntityBundle, areaToken);
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockTab).setEntityNameAndPlace(eq(projectName), any(Synapse.class));
 		verify(mockView, times(2)).setBreadcrumbVisible(false);
@@ -180,7 +180,7 @@ public class DockerTabTest {
 		mockProjectEntityBundle = null;
 		tab.setEntitySelectedCallback(mockUpdateEntityCallback);
 		tab.setProject(projectEntityId, mockProjectEntityBundle, mockProjectBundleLoadError);
-		tab.configure(mockProjectEntityBundle, areaToken, mockActionMenuWidget);
+		tab.configure(mockProjectEntityBundle, areaToken);
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockTab).setEntityNameAndPlace(eq(projectEntityId), any(Synapse.class));
 		verify(mockDockerRepoListWidget, never()).configure(projectEntityId);
@@ -193,7 +193,7 @@ public class DockerTabTest {
 		String areaToken = null;
 		tab.setEntitySelectedCallback(mockUpdateEntityCallback);
 		tab.setProject(projectEntityId, mockProjectEntityBundle, mockProjectBundleLoadError);
-		tab.configure(mockDockerRepoEntityBundle, areaToken, mockActionMenuWidget);
+		tab.configure(mockDockerRepoEntityBundle, areaToken);
 		verify(mockTab).setEntityNameAndPlace(eq(dockerRepoName), any(Synapse.class));
 		verify(mockTab).showTab();
 		verify(mockView).setBreadcrumbVisible(true);

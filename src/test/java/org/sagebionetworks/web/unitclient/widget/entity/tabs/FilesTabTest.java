@@ -215,7 +215,7 @@ public class FilesTabTest {
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockProjectEntityBundle, version, mockActionMenuWidget);
+		tab.configure(mockProjectEntityBundle, version);
 
 		verify(mockView, times(2)).setFileTitlebarVisible(false);
 		verify(mockView, times(2)).setFolderTitlebarVisible(false);
@@ -225,7 +225,6 @@ public class FilesTabTest {
 
 		// note: breadcrumbs are not shown on the project level
 		// show project info
-		verify(mockView, times(2)).clearActionMenuContainer();
 		verify(mockView, times(2)).setProvenanceVisible(false);
 		verify(mockView).clearRefreshAlert();
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
@@ -249,8 +248,8 @@ public class FilesTabTest {
 	public void testConfigureWithFileNoFileHandles() {
 		Long version = 4L;
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
-		tab.configure(mockEntityBundle, version, mockActionMenuWidget);
-
+		tab.configure(mockEntityBundle, version);
+		
 		verify(mockView, times(2)).setPreviewVisible(false);
 		verify(mockView, never()).setPreviewVisible(true);
 	}
@@ -267,7 +266,7 @@ public class FilesTabTest {
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
 
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockEntityBundle, version, mockActionMenuWidget);
+		tab.configure(mockEntityBundle, version);
 
 		verify(mockView).setFileTitlebarVisible(false);
 		verify(mockView).setFileTitlebarVisible(true);
@@ -279,14 +278,13 @@ public class FilesTabTest {
 		verify(mockView).setWikiPageWidgetVisible(false);
 		verify(mockView).setWikiPageWidgetVisible(true);
 
-		verify(mockFileTitleBar).configure(mockEntityBundle);
+		verify(mockFileTitleBar).configure(mockEntityBundle, mockActionMenuWidget);
 		verify(mockPreviewWidget).configure(mockEntityBundle);
 
 		verify(mockEntityMetadata).configure(mockEntityBundle, version, mockActionMenuWidget);
 
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.FILES));
 
-		verify(mockView, times(2)).clearActionMenuContainer();
 		verify(mockView).setProvenanceVisible(true);
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockView).setWikiPageWidgetVisible(true);
@@ -322,7 +320,7 @@ public class FilesTabTest {
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockEntityBundle, version, mockActionMenuWidget);
+		tab.configure(mockEntityBundle, version);
 
 		verify(mockView, times(2)).setFileTitlebarVisible(false);
 		verify(mockView).setFolderTitlebarVisible(false);
@@ -343,7 +341,6 @@ public class FilesTabTest {
 
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.FILES));
 
-		verify(mockView, times(2)).clearActionMenuContainer();
 		verify(mockView, times(2)).setProvenanceVisible(false);
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockView).setWikiPageWidgetVisible(true);
@@ -390,7 +387,6 @@ public class FilesTabTest {
 		verify(mockView).setFileFolderUIVisible(false);
 		verify(mockView).setWikiPageWidgetVisible(false);
 		verify(mockView).setFileBrowserVisible(false);
-		verify(mockView).clearActionMenuContainer();
 		verify(mockBreadcrumb).clear();
 		verify(mockView).setProvenanceVisible(false);
 		verify(mockModifiedCreatedBy).setVisible(false);

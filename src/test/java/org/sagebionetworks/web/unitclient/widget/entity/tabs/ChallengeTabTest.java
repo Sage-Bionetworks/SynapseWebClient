@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -35,6 +36,8 @@ public class ChallengeTabTest {
 	ChallengeWidget mockChallengeWidget;
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
+	@Mock
+	EntityBundle mockProjectEntityBundle;
 	ChallengeTab tab;
 
 	@Before
@@ -63,7 +66,7 @@ public class ChallengeTabTest {
 	public void testConfigure() {
 		String entityId = "syn1";
 		String entityName = "challenge project test";
-		tab.configure(entityId, entityName);
+		tab.configure(entityId, entityName, mockProjectEntityBundle);
 
 		verify(mockAdministerEvaluationsList).configure(eq(entityId));
 		verify(mockChallengeWidget).configure(eq(entityId));

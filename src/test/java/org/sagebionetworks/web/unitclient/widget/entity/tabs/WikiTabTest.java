@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -36,6 +37,8 @@ public class WikiTabTest {
 	PortalGinInjector mockPortalGinInjector;
 	@Mock
 	ActionMenuWidget mockActionMenuWidget;
+	@Mock
+	EntityBundle mockProjectEntityBundle;
 	@Mock
 	SynapseJavascriptClient mockJsClient;
 
@@ -69,7 +72,7 @@ public class WikiTabTest {
 		String wikiPageId = "9";
 		Boolean canEdit = true;
 		WikiPageWidget.Callback callback = mock(WikiPageWidget.Callback.class);
-		tab.configure(entityId, entityName, wikiPageId, canEdit, callback, mockActionMenuWidget);
+		tab.configure(entityId, entityName, mockProjectEntityBundle, wikiPageId, canEdit, callback);
 
 		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), eq(callback));
 		verify(mockWikiPageWidget).showSubpages(mockActionMenuWidget);

@@ -207,7 +207,7 @@ public class TablesTabTest {
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockTableEntityBundle, version, areaToken, mockActionMenuWidget);
+		tab.configure(mockTableEntityBundle, version, areaToken);
 
 		verifyTableConfiguration(version);
 	}
@@ -224,7 +224,7 @@ public class TablesTabTest {
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockTableEntityBundle, version, areaToken, mockActionMenuWidget);
+		tab.configure(mockTableEntityBundle, version, areaToken);
 
 		verifyTableConfiguration(version);
 	}
@@ -247,7 +247,6 @@ public class TablesTabTest {
 		verify(mockView).setBreadcrumbVisible(true);
 		verify(mockView).setTableListVisible(false);
 		verify(mockView).setTitlebarVisible(true);
-		verify(mockView).clearActionMenuContainer();
 		verify(mockView).clearTableEntityWidget();
 		verify(mockModifiedCreatedBy).setVisible(false);
 
@@ -274,13 +273,12 @@ public class TablesTabTest {
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockProjectEntityBundle, version, areaToken, mockActionMenuWidget);
+		tab.configure(mockProjectEntityBundle, version, areaToken);
 		verify(mockModifiedCreatedBy, Mockito.never()).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockView).setEntityMetadataVisible(false);
 		verify(mockView).setBreadcrumbVisible(false);
 		verify(mockView).setTableListVisible(true);
 		verify(mockView).setTitlebarVisible(false);
-		verify(mockView).clearActionMenuContainer();
 		verify(mockView).clearTableEntityWidget();
 		verify(mockModifiedCreatedBy).setVisible(false);
 		verify(mockView).setTableUIVisible(false);
@@ -310,7 +308,7 @@ public class TablesTabTest {
 	public void testSetTableQueryWithNoToken() {
 		Long version = null;
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockTableEntityBundle, version, null, mockActionMenuWidget);
+		tab.configure(mockTableEntityBundle, version, null);
 
 		reset(mockTab);
 		when(mockTab.isTabPaneVisible()).thenReturn(true);
@@ -326,7 +324,7 @@ public class TablesTabTest {
 	public void testSetQueryPaneNotVisible() {
 		Long version = null;
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockTableEntityBundle, version, null, mockActionMenuWidget);
+		tab.configure(mockTableEntityBundle, version, null);
 		reset(mockTab);
 		when(mockTab.isTabPaneVisible()).thenReturn(false);
 		when(mockTableEntityWidget.getDefaultQuery()).thenReturn(query);
@@ -340,7 +338,7 @@ public class TablesTabTest {
 	public void testSetTableQueryChangeVersion() {
 		Long version = 9229L;
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockTableEntityBundle, version, null, mockActionMenuWidget);
+		tab.configure(mockTableEntityBundle, version, null);
 
 		reset(mockTab);
 		when(mockTab.isTabPaneVisible()).thenReturn(true);
@@ -360,7 +358,7 @@ public class TablesTabTest {
 	public void testSetTableQueryChangeTableId() {
 		Long version = null;
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockTableEntityBundle, version, null, mockActionMenuWidget);
+		tab.configure(mockTableEntityBundle, version, null);
 
 		reset(mockTab);
 		when(mockTab.isTabPaneVisible()).thenReturn(true);
@@ -387,7 +385,7 @@ public class TablesTabTest {
 		String encodedToken = "encoded token";
 		when(mockQueryTokenProvider.queryToToken(any(Query.class))).thenReturn(encodedToken);
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockTableEntityBundle, version, TablesTab.TABLE_QUERY_PREFIX + startToken, mockActionMenuWidget);
+		tab.configure(mockTableEntityBundle, version, TablesTab.TABLE_QUERY_PREFIX + startToken);
 
 		reset(mockTab);
 		when(mockTab.isTabPaneVisible()).thenReturn(true);
@@ -407,24 +405,24 @@ public class TablesTabTest {
 		String queryAreaToken;
 		Query query1 = null;
 		queryAreaToken = null;
-		tab.configure(mockTableEntityBundle, version, queryAreaToken, mockActionMenuWidget);
+		tab.configure(mockTableEntityBundle, version, queryAreaToken);
 		query1 = tab.getQueryString();
 		assertNull(query1);
 
 		queryAreaToken = "something else";
-		tab.configure(mockTableEntityBundle, version, queryAreaToken, mockActionMenuWidget);
+		tab.configure(mockTableEntityBundle, version, queryAreaToken);
 		query1 = tab.getQueryString();
 		assertNull(query1);
 		String token = "encoded query token";
 		queryAreaToken = "query/" + token;
 		when(mockQueryTokenProvider.tokenToQuery(anyString())).thenReturn(query);
-		tab.configure(mockTableEntityBundle, version, queryAreaToken, mockActionMenuWidget);
+		tab.configure(mockTableEntityBundle, version, queryAreaToken);
 		query1 = tab.getQueryString();
 		assertEquals(query, query1);
 		query.setSql("SELECT 'query/' FROM syn123 LIMIT 1");
 		token = "encoded query token 2";
 		queryAreaToken = "query/" + token;
-		tab.configure(mockTableEntityBundle, version, queryAreaToken, mockActionMenuWidget);
+		tab.configure(mockTableEntityBundle, version, queryAreaToken);
 		query1 = tab.getQueryString();
 		assertEquals(query, query1);
 	}
@@ -437,9 +435,7 @@ public class TablesTabTest {
 		verify(mockView).setBreadcrumbVisible(false);
 		verify(mockView).setTableListVisible(false);
 		verify(mockView).setTitlebarVisible(false);
-		verify(mockView).clearActionMenuContainer();
 		verify(mockView).clearTableEntityWidget();
-		verify(mockView).clearActionMenuContainer();
 		verify(mockModifiedCreatedBy).setVisible(false);
 		verify(mockView).setTableUIVisible(false);
 	}
