@@ -31,36 +31,33 @@
 			</b:Row>
 		</bh:Div>
 		<bh:Div ui:field="mainContainer"
-			addStyleNames="highlight-box padding-top-0-imp margin-bottom-20 ">
+			addStyleNames="padding-top-0-imp margin-bottom-20 ">
 			<b:Row>
 				<b:Column size="XS_12">
-					<b:Button ui:field="showAllThreadsButton" type="DEFAULT"
-						size="SMALL" icon="ARROW_LEFT" addStyleNames="margin-top-10"
-						visible="false">Show all threads</b:Button>
-					<b:ButtonGroup pull="RIGHT">
-						<b:Button ui:field="repliesSortButton"
-							dataToggle="DROPDOWN" size="SMALL" visible="false"
-							text="Date posted" addStyleNames="margin-top-10" />
-						<b:DropDownMenu ui:field="sortRepliesDropDownMenu">
-							<b:AnchorListItem
-								ui:field="sortRepliesAscending" text="Date posted" />
-							<b:AnchorListItem
-								ui:field="sortRepliesDescending" text="Most recent" />
-						</b:DropDownMenu>
-					</b:ButtonGroup>
+					<b:Button ui:field="showAllThreadsButton" type="LINK"
+						icon="ARROW_LEFT" addStyleNames="margin-top-10"
+						visible="false">Show All Threads</b:Button>
 				</b:Column>
 			</b:Row>
 			<b:Row>
 				<b:Column size="XS_12">
-					<g:SimplePanel addStyleNames="margin-top-10"
+					<g:SimplePanel addStyleNames="margin-top-10 light-border"
 						ui:field="threadListContainer" />
 				</b:Column>
 				<b:Column size="XS_12">
-					<g:SimplePanel addStyleNames="margin-top-10"
-						ui:field="singleThreadContainer" />
+					<bh:Div ui:field="singleThreadAndSortContainer" addStyleNames="light-border" paddingTop="15" paddingRight="30" paddingBottom="15" paddingLeft="30">
+						<b:ButtonGroup ui:field="repliesSortButtonGroup" addStyleNames="flexcontainer-row flexcontainer-justify-center" visible="false">
+							<b:Button ui:field="sortRepliesAscendingButton"
+								text="Date Posted" addStyleNames="margin-top-10" />
+							<b:Button ui:field="sortRepliesDescendingButton"
+								text="Most Recent" addStyleNames="margin-top-10" />
+						</b:ButtonGroup>
+						<g:SimplePanel addStyleNames="margin-top-10"
+							ui:field="singleThreadContainer" />
+					</bh:Div>
 				</b:Column>
 				<b:Column size="XS_12">
-					<g:SimplePanel addStyleNames="margin-top-10"
+					<g:SimplePanel addStyleNames="margin-top-10 light-border"
 						ui:field="defaultThreadContainer" visible="false" />
 				</b:Column>
 			</b:Row>

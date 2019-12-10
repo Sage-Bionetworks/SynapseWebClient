@@ -1,13 +1,10 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -27,9 +24,7 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	@UiField
 	Button showAllThreadsButton;
 	@UiField
-	Button repliesSortButton;
-	@UiField
-	DropDownMenu sortRepliesDropDownMenu;
+	ButtonGroup repliesSortButtonGroup;
 	@UiField
 	SimplePanel singleThreadContainer;
 	@UiField
@@ -45,9 +40,11 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	@UiField
 	Span subscribersContainer;
 	@UiField
-	AnchorListItem sortRepliesAscending;
+	Button sortRepliesAscendingButton;
 	@UiField
-	AnchorListItem sortRepliesDescending;
+	Button sortRepliesDescendingButton;
+	@UiField
+	Div singleThreadAndSortContainer;
 
 	private Presenter presenter;
 
@@ -59,32 +56,27 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	@Inject
 	public ForumWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		newThreadButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onClickNewThread();
-			}
+		newThreadButton.addClickHandler(event -> {
+			presenter.onClickNewThread();
 		});
-		showAllThreadsButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onClickShowAllThreads();
-			}
+		showAllThreadsButton.addClickHandler(event -> {
+			presenter.onClickShowAllThreads();
 		});
-		sortRepliesAscending.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				repliesSortButton.setText(sortRepliesAscending.getText());
-				presenter.onSortReplies(true);
-			}
+		sortRepliesAscendingButton.addClickHandler(event -> {
+			clearSelectedSort();
+			sortRepliesAscendingButton.setActive(true);
+			presenter.onSortReplies(true);
 		});
-		sortRepliesDescending.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				repliesSortButton.setText(sortRepliesDescending.getText());
-				presenter.onSortReplies(false);
-			}
+		sortRepliesDescendingButton.addClickHandler(event -> {
+			clearSelectedSort();
+			sortRepliesDescendingButton.setActive(true);
+			presenter.onSortReplies(false);
 		});
+	}
+
+	private void clearSelectedSort() {
+		sortRepliesAscendingButton.setActive(false);
+		sortRepliesDescendingButton.setActive(false);
 	}
 
 	@Override
@@ -125,7 +117,7 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 
 	@Override
 	public void setSingleThreadUIVisible(boolean visible) {
-		singleThreadContainer.setVisible(visible);
+		singleThreadAndSortContainer.setVisible(visible);
 	}
 
 	@Override
@@ -145,7 +137,12 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 
 	@Override
 	public void setSortRepliesButtonVisible(boolean visible) {
-		repliesSortButton.setVisible(visible);
+		repliesSortButtonGroup.setVisible(visible);
+		if (!visible) {
+			// reset
+			clearSelectedSort();
+			sortRepliesAscendingButton.setActive(true);
+		}
 	}
 
 	@Override
