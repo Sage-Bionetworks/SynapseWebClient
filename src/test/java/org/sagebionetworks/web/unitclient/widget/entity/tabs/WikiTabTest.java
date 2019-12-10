@@ -9,9 +9,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -24,6 +26,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+@RunWith(MockitoJUnitRunner.class)
 public class WikiTabTest {
 	@Mock
 	Tab mockTab;
@@ -46,8 +49,9 @@ public class WikiTabTest {
 
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
 		tab = new WikiTab(mockTab, mockPortalGinInjector);
+		
+		when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
 		when(mockPortalGinInjector.getWikiPageWidget()).thenReturn(mockWikiPageWidget);
 		when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
 		tab.lazyInject();

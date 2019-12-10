@@ -132,6 +132,7 @@ public class TablesTabTest {
 	@Before
 	public void setUp() {
 		tab = new TablesTab(mockTab, mockPortalGinInjector);
+		when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		when(mockPortalGinInjector.getCookieProvider()).thenReturn(mockCookies);
 		when(mockPortalGinInjector.getTablesTabView()).thenReturn(mockView);

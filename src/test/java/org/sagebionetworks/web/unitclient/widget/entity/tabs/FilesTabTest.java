@@ -14,10 +14,12 @@ import java.util.Date;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -55,6 +57,7 @@ import org.sagebionetworks.web.client.widget.refresh.EntityRefreshAlert;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class FilesTabTest {
 	@Mock
 	Tab mockTab;
@@ -135,12 +138,13 @@ public class FilesTabTest {
 
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
 		when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);
 		when(mockProjectEntity.getId()).thenReturn(projectEntityId);
 		when(mockProjectEntity.getName()).thenReturn(projectName);
 		when(mockProjectEntityBundle.getPermissions()).thenReturn(mockPermissions);
 		when(mockPortalGinInjector.getEntityRefreshAlert()).thenReturn(mockEntityRefreshAlert);
+		when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
+		
 		tab = new FilesTab(mockTab, mockPortalGinInjector);
 
 		when(mockPortalGinInjector.getFilesTabView()).thenReturn(mockView);
@@ -267,7 +271,7 @@ public class FilesTabTest {
 
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockEntityBundle, version);
-
+		
 		verify(mockView).setFileTitlebarVisible(false);
 		verify(mockView).setFileTitlebarVisible(true);
 		verify(mockView, times(2)).setFolderTitlebarVisible(false);

@@ -14,10 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
@@ -40,6 +42,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.DockerTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class DockerTabTest {
 	@Mock
 	Tab mockTab;
@@ -89,9 +92,9 @@ public class DockerTabTest {
 
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
 		tab = new DockerTab(mockTab, mockGinInjector);
 
+		when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
 		when(mockGinInjector.getDockerTabView()).thenReturn(mockView);
 		when(mockGinInjector.getDockerRepoListWidget()).thenReturn(mockDockerRepoListWidget);
 		when(mockGinInjector.getBreadcrumb()).thenReturn(mockBreadcrumb);

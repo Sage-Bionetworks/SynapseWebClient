@@ -122,10 +122,6 @@ public class EntityPageTopTest {
 	@Mock
 	UserEntityPermissions mockPermissions;
 	@Mock
-	EntityActionController mockEntityActionController;
-	@Mock
-	ActionMenuWidget mockActionMenuWidget;
-	@Mock
 	EntityActionController mockProjectActionController;
 	@Mock
 	ActionMenuWidget mockProjectActionMenuWidget;
@@ -220,7 +216,6 @@ public class EntityPageTopTest {
 	public void testConstruction() {
 		verify(mockView).setTabs(any(Widget.class));
 		verify(mockView).setProjectMetadata(any(Widget.class));
-		verify(mockActionMenuWidget).addControllerWidget(any(Widget.class));
 		verify(mockView).setProjectActionMenu(any(Widget.class));
 		verify(mockTabs).addTab(mockFilesInnerTab);
 		verify(mockTabs).addTab(mockWikiInnerTab);
@@ -347,17 +342,6 @@ public class EntityPageTopTest {
 	}
 
 	@Test
-	public void testConfigureWithProjectWikiToken() {
-		Synapse.EntityArea area = EntityArea.WIKI;
-		// verify this wiki id area token is passed to the wiki tab configuration and the entity action
-		// controller configuration
-		String areaToken = "1234";
-		Long versionNumber = null;
-		pageTop.configure(mockProjectBundle, versionNumber, mockProjectHeader, area, areaToken);
-		verify(mockEntityActionController).configure(eq(mockActionMenuWidget), eq(mockProjectBundle), eq(true), eq(areaToken), eq(area));
-	}
-
-	@Test
 	public void testClear() {
 		pageTop.clearState();
 		verify(mockView).clear();
@@ -480,11 +464,11 @@ public class EntityPageTopTest {
 		// project bundle is null, unable to get wiki id or canEdit.
 		String wikiId = null;
 		canEdit = false;
-		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(mockProjectBundle), eq(wikiId), eq(canEdit), any(WikiPageWidget.Callback.class));
+		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(null), eq(wikiId), eq(canEdit), any(WikiPageWidget.Callback.class));
 		verify(mockTablesTab).setProject(projectEntityId, null, projectLoadError);
 		verify(mockTablesTab).configure(any(EntityBundle.class), eq(null), eq(areaToken));
-		verify(mockChallengeTab).configure(projectEntityId, projectName, mockProjectBundle);
-		verify(mockDiscussionTab).configure(projectEntityId, projectName, mockProjectBundle, null, canModerate);
+		verify(mockChallengeTab).configure(projectEntityId, projectName, null);
+		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, null, canModerate);
 		verify(mockDockerTab).configure(null, null);
 	}
 
@@ -835,8 +819,6 @@ public class EntityPageTopTest {
 		pageTop.onChangeSynapsePlace(new ChangeSynapsePlaceEvent(newPlace));
 
 		verify(mockPlaceChanger, never()).goTo(newPlace);
-		// reconfigures tools menu with the correct area
-		verify(mockEntityActionController).configure(eq(mockActionMenuWidget), eq(mockProjectBundle), eq(true), eq(areaToken), eq(EntityArea.DISCUSSION));
 		// configured the discussion tab
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, mockProjectBundle, areaToken, canModerate);
 	}
@@ -860,6 +842,5 @@ public class EntityPageTopTest {
 
 		// verify we did not change place, but instead reconfigured for target entity under the same project
 		verify(mockPlaceChanger, never()).goTo(newPlace);
-		verify(mockEntityActionController, times(2)).configure(eq(mockActionMenuWidget), eq(mockProjectBundle), eq(true), eq(areaToken), eq(EntityArea.WIKI));
 	}
 }

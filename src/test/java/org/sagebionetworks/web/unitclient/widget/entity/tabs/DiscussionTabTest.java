@@ -13,9 +13,10 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -35,6 +36,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.shared.WebConstants;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class DiscussionTabTest {
 	@Mock
 	Tab mockTab;
@@ -62,8 +64,8 @@ public class DiscussionTabTest {
 
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
 		tab = new DiscussionTab(mockTab, mockPortalGinInjector);
+		when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
 		when(mockSynapseProperties.getSynapseProperty(WebConstants.FORUM_SYNAPSE_ID_PROPERTY)).thenReturn(FORUM_SYNAPSE_ID);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockPortalGinInjector.getDiscussionTabView()).thenReturn(mockView);
