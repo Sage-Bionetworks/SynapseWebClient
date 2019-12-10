@@ -64,8 +64,6 @@ public class FilesTab {
 	String projectEntityId;
 	EntityBundle entityBundle;
 	CallbackP<String> entitySelectedCallback;
-
-	//TODO: add action menu to view!
 	
 	@Inject
 	public FilesTab(Tab tab, PortalGinInjector ginInjector) {

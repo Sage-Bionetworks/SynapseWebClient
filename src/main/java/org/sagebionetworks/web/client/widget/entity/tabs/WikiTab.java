@@ -17,8 +17,6 @@ public class WikiTab {
 	private WikiPageWidget wikiPageWidget;
 	PortalGinInjector ginInjector;
 
-	//TODO: add action menu to view!
-	
 	@Inject
 	public WikiTab(Tab tab, PortalGinInjector ginInjector) {
 		this.ginInjector = ginInjector;

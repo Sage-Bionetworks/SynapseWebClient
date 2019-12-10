@@ -64,8 +64,6 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler {
 	public static final String TABLES_HELP_URL = WebConstants.DOCS_URL + "tables.html";
 	Long version;
 
-	//TODO: add action menu to view!
-	
 	@Inject
 	public TablesTab(Tab tab, PortalGinInjector ginInjector) {
 		this.tab = tab;

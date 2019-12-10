@@ -38,8 +38,6 @@ public class DockerTab implements DockerTabView.Presenter {
 	String areaToken;
 	CallbackP<String> entitySelectedCallback;
 
-	//TODO: add action menu to view!
-	
 	@Inject
 	public DockerTab(Tab tab, PortalGinInjector ginInjector) {
 		this.tab = tab;
