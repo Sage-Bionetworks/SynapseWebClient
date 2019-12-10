@@ -5,9 +5,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
 		<b:Panel ui:field="challengeUI">
-			<bh:Div addStyleNames="highlight-title margin-left-5">
-				<bh:Text text="Challenge" />
-			</bh:Div>
+			<b:Heading size="H3" text="Challenge" addStyleNames="margin-left-15"/>
 			<bh:Div addStyleNames="margin-left-15 padding-bottom-15">
 				<bh:Div>
 					<b:Heading size="H5" text="Challenge ID:"
