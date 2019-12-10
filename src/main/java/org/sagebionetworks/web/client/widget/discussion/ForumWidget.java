@@ -349,6 +349,7 @@ public class ForumWidget implements ForumWidgetView.Presenter {
 
 	public void configureActionMenu() {
 		if (actionMenu != null) {
+			view.setActionMenu(actionMenu);
 			// add listener for forum commands
 			actionMenu.setActionListener(Action.CREATE_THREAD, new ActionMenuWidget.ActionListener() {
 				@Override

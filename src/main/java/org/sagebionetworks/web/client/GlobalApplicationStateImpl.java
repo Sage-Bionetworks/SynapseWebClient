@@ -67,7 +67,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		SAFE_TO_IGNORE_ERRORS.add("script error. (:0)");
 		SAFE_TO_IGNORE_ERRORS.add("unspecified error");
 		SAFE_TO_IGNORE_ERRORS.add("unbekannter fehler");
-		// DOM has changed such that insert of widget fails
+		// DOM has changed such that insert of widget fails.  IconTextMixin.render() defers init, but the element is gone by the time it is called.
 		SAFE_TO_IGNORE_ERRORS.add("the node before which the new node is to be inserted is not a child of this node.");
 		SAFE_TO_IGNORE_ERRORS.add("die eigenschaft \"removechild\" eines undefinierten oder nullverweises kann nicht abgerufen werden.");
 
@@ -115,14 +115,15 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 
 	public void handleUncaughtException(Throwable e) {
 		try {
-			GWT.debugger();
 			if (!isIgnoredErrorMessage(e.getMessage())) {
+				GWT.debugger();
 				jsClient.logError(unwrap(e));
+				synapseJSNIUtils.consoleError(e);
+			} else {
+				synapseJSNIUtils.consoleLog("Ignoring error: " + e.getMessage());
 			}
 		} catch (Throwable t) {
 			synapseJSNIUtils.consoleError("Unable to log uncaught exception to server: " + t.getMessage());
-		} finally {
-			synapseJSNIUtils.consoleError(e);
 		}
 	}
 
