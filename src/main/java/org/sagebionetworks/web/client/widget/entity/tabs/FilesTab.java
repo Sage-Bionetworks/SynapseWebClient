@@ -234,6 +234,7 @@ public class FilesTab {
 		view.setFolderTitlebarVisible(isFolder);
 		if (isFolder) {
 			folderTitleBar.configure(bundle);
+			folderTitleBar.setActionMenu(tab.getEntityActionMenu());
 		}
 
 		// Metadata
@@ -253,7 +254,10 @@ public class FilesTab {
 		view.setFileBrowserVisible(isFilesBrowserVisible);
 		if (isFilesBrowserVisible) {
 			filesBrowser.configure(currentEntityId);
-			filesBrowser.setActionMenu(tab.getEntityActionMenu());
+			// the action menu is added to the title bar if Folder, to the browser if Project
+			if (isProject) {
+				filesBrowser.setActionMenu(tab.getEntityActionMenu());	
+			}
 		}
 
 		// Provenance

@@ -7,14 +7,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public interface BasicTitleBarView extends IsWidget, SynapseView {
 
-	/**
-	 * Set the presenter.
-	 * 
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
-
-	public void setFavoritesWidget(Widget favoritesWidget);
+	void setFavoritesWidget(Widget favoritesWidget);
 
 	void setFavoritesWidgetVisible(boolean visible);
 
@@ -22,9 +15,5 @@ public interface BasicTitleBarView extends IsWidget, SynapseView {
 
 	void setIconType(IconType iconType);
 
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-	}
+	void setActionMenu(IsWidget w);
 }

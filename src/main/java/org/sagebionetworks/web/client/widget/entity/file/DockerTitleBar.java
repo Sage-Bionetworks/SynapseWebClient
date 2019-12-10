@@ -8,7 +8,7 @@ import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class DockerTitleBar implements BasicTitleBarView.Presenter, SynapseWidgetPresenter {
+public class DockerTitleBar implements SynapseWidgetPresenter {
 
 	private BasicTitleBarView view;
 	private AuthenticationController authenticationController;
@@ -19,8 +19,6 @@ public class DockerTitleBar implements BasicTitleBarView.Presenter, SynapseWidge
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.favWidget = favWidget;
-
-		view.setPresenter(this);
 		view.setFavoritesWidget(favWidget.asWidget());
 	}
 
@@ -35,9 +33,6 @@ public class DockerTitleBar implements BasicTitleBarView.Presenter, SynapseWidge
 		view.clear();
 	}
 
-	/**
-	 * Does nothing. Use asWidget(Entity)
-	 */
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();

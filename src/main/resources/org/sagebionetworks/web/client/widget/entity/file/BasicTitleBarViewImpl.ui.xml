@@ -11,6 +11,7 @@
 		 	<b:Icon ui:field="entityIcon" addStyleNames="margin-right-5 lightGreyText" type="FOLDER"/>
 		 	<bh:Span ui:field="fileName"/>
 		 	<g:SimplePanel ui:field="favoritePanel" addStyleNames="margin-left-5"/>
+		 	<bh:Span ui:field="actionMenuContainer" addStyleNames="moveup-5" marginLeft="10"/>
 		</b:Heading>
 	</bh:Div>
 </ui:UiBinder>
