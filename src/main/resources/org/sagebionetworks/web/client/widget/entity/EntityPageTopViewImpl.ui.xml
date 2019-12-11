@@ -5,13 +5,11 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
-	<g:HTMLPanel styleName="margin-left-15 margin-right-15">
+	<g:HTMLPanel>
 		<!--Project level information -->
-		<bh:Div addStyleNames="min-height-48">
+		<bh:Div addStyleNames="min-height-48 lightGreyBackground padding-left-15 padding-right-15">
 			<b:Row addStyleNames="padding-top-15 projectMetadata">
 				<b:Column size="XS_12">
-					<bh:Span ui:field="entityActionMenuContainer"
-						addStyleNames="right" />
 					<bh:Span ui:field="projectActionMenuContainer"
 						addStyleNames="right" />
 					<bh:Div addStyleNames="margin-left-15 margin-right-15">
@@ -22,7 +20,7 @@
 				</b:Column>
 			</b:Row>
 		</bh:Div>
-		<bh:Div ui:field="tabsUI" />
+		<bh:Div ui:field="tabsUI"/>
 	</g:HTMLPanel>
 </ui:UiBinder>
 

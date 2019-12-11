@@ -16,7 +16,6 @@ import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import com.google.gwt.place.shared.Place;
 import com.google.inject.Inject;
@@ -32,8 +31,7 @@ public class DockerTab implements DockerTabView.Presenter {
 	Breadcrumb breadcrumb;
 	PortalGinInjector ginInjector;
 	StuAlert synAlert;
-	ActionMenuWidget actionMenu;
-
+	
 	EntityBundle projectBundle;
 	Throwable projectBundleLoadError;
 	String projectEntityId;
@@ -44,7 +42,7 @@ public class DockerTab implements DockerTabView.Presenter {
 	public DockerTab(Tab tab, PortalGinInjector ginInjector) {
 		this.tab = tab;
 		this.ginInjector = ginInjector;
-		tab.configure(DOCKER_TAB_TITLE, "A [Docker](https://www.docker.com/what-docker) container is a convenient way to bundle up code and dependencies into a lightweight virtual machine to support reusable and reproducible analysis.", WebConstants.DOCS_URL + "docker.html");
+		tab.configure(DOCKER_TAB_TITLE, "A [Docker](https://www.docker.com/what-docker) container is a convenient way to bundle up code and dependencies into a lightweight virtual machine to support reusable and reproducible analysis.", WebConstants.DOCS_URL + "docker.html", EntityArea.DOCKER);
 
 		// Necessary for "beta" badge. Remove when bringing out of beta.
 		tab.addTabListItemStyle("min-width-150");
@@ -85,9 +83,8 @@ public class DockerTab implements DockerTabView.Presenter {
 		tab.addTabClickedCallback(onClickCallback);
 	}
 
-	public void configure(EntityBundle entityBundle, String areaToken, ActionMenuWidget actionMenu) {
+	public void configure(EntityBundle entityBundle, String areaToken) {
 		lazyInject();
-		this.actionMenu = actionMenu;
 		this.areaToken = areaToken;
 		synAlert.clear();
 		setTargetBundle(entityBundle);
@@ -109,7 +106,7 @@ public class DockerTab implements DockerTabView.Presenter {
 		view.setBreadcrumbVisible(false);
 		view.setDockerRepoListVisible(false);
 		view.clearDockerRepoWidget();
-		view.setDockerRepoWidgetVisible(false);
+		view.setDockerRepoUIVisible(false);
 	}
 
 	public void showError(Throwable error) {
@@ -127,7 +124,8 @@ public class DockerTab implements DockerTabView.Presenter {
 			boolean isProject = entity instanceof Project;
 			view.setBreadcrumbVisible(isRepo);
 			view.setDockerRepoListVisible(isProject);
-			view.setDockerRepoWidgetVisible(isRepo);
+			view.setDockerRepoUIVisible(isRepo);
+			tab.configureEntityActionController(bundle, true, null);
 			if (isRepo) {
 				tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(bundle.getEntity().getId(), null, null, null));
 				List<LinkData> links = new ArrayList<LinkData>();
@@ -136,8 +134,9 @@ public class DockerTab implements DockerTabView.Presenter {
 				breadcrumb.configure(links, ((DockerRepository) entity).getRepositoryName());
 				DockerRepoWidget repoWidget = ginInjector.createNewDockerRepoWidget();
 				view.setDockerRepoWidget(repoWidget.asWidget());
-				repoWidget.configure(bundle, actionMenu);
+				repoWidget.configure(bundle, tab.getEntityActionMenu());
 			} else if (isProject) {
+				view.setActionMenu(tab.getEntityActionMenu());
 				areaToken = null;
 				showProjectLevelUI();
 			}

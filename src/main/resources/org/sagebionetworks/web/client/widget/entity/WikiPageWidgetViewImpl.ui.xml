@@ -14,9 +14,12 @@
 		<g:FlowPanel ui:field="mainPanel">
 			<g:FlowPanel ui:field="wikiSubpagesPanel" />
 			<g:FlowPanel ui:field="wikiPagePanel">
+				<bh:Div addStyleNames="flexcontainer-row margin-bottom-10">
+					<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width" />
+					<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70" ui:field="actionMenuContainer"/>
+				</bh:Div>
 				<w:LoadingSpinner ui:field="loadingPanel"
 					size="31px" />
-
 				<bh:Div ui:field="wikiHeadingContainer"></bh:Div>
 				<b:Alert ui:field="diffVersionAlert" visible="false">
 					<g:HTMLPanel>

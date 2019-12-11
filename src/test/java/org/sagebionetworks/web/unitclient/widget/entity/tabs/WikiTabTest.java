@@ -9,9 +9,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -23,6 +26,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+@RunWith(MockitoJUnitRunner.class)
 public class WikiTabTest {
 	@Mock
 	Tab mockTab;
@@ -37,14 +41,17 @@ public class WikiTabTest {
 	@Mock
 	ActionMenuWidget mockActionMenuWidget;
 	@Mock
+	EntityBundle mockProjectEntityBundle;
+	@Mock
 	SynapseJavascriptClient mockJsClient;
 
 	WikiTab tab;
 
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
 		tab = new WikiTab(mockTab, mockPortalGinInjector);
+		
+		when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
 		when(mockPortalGinInjector.getWikiPageWidget()).thenReturn(mockWikiPageWidget);
 		when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
 		tab.lazyInject();
@@ -69,7 +76,7 @@ public class WikiTabTest {
 		String wikiPageId = "9";
 		Boolean canEdit = true;
 		WikiPageWidget.Callback callback = mock(WikiPageWidget.Callback.class);
-		tab.configure(entityId, entityName, wikiPageId, canEdit, callback, mockActionMenuWidget);
+		tab.configure(entityId, entityName, mockProjectEntityBundle, wikiPageId, canEdit, callback);
 
 		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), eq(callback));
 		verify(mockWikiPageWidget).showSubpages(mockActionMenuWidget);

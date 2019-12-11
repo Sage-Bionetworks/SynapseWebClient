@@ -86,6 +86,8 @@ public interface WikiPageWidgetView extends IsWidget {
 	void expandWikiSubpages();
 
 	void collapseWikiSubpages();
+	
+	void setActionMenu(IsWidget w);
 
 	EventBinder<WikiPageWidget> getEventBinder();
 }

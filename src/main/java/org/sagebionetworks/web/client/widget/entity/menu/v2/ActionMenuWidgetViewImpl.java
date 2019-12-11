@@ -4,8 +4,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.ButtonToolBar;
 import org.gwtbootstrap3.client.ui.Divider;
+import org.gwtbootstrap3.client.ui.DropDown;
 import org.gwtbootstrap3.client.ui.DropDownHeader;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -28,7 +28,7 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	}
 
 	@UiField
-	ButtonToolBar buttonToolBar;
+	DropDown dropdown;
 	@UiField
 	Div controllerContainer;
 	@UiField
@@ -61,7 +61,7 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	@Override
 	public Iterable<ActionView> listActionViews() {
 		List<ActionView> list = new LinkedList<ActionView>();
-		recursiveSearch(list, buttonToolBar);
+		recursiveSearch(list, dropdown);
 		return list;
 	}
 

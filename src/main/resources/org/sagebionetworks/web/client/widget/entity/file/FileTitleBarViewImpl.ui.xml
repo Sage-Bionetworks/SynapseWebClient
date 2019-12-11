@@ -24,6 +24,7 @@
 				</b:DropDownMenu>
 			</b:DropDown>
 			<w:HelpWidget ui:field="viewOnlyHelp" helpMarkdown="You do not have download access for this item." addStyleNames="margin-left-5 moveup-5" visible="false"/>
+			<bh:Span ui:field="actionMenuContainer" addStyleNames="moveup-8"/>
 			<bh:Div ui:field="versionInfoUI" visible="false">
 				<bh:Span addStyleNames="boldText" text="Version:"/>
 				<bh:Span addStyleNames="margin-left-5" ui:field="version"/>

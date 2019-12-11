@@ -28,8 +28,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	SimplePanel projectMetadataContainer;
 	@UiField
 	Span projectActionMenuContainer;
-	@UiField
-	Span entityActionMenuContainer;
 
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder) {
@@ -39,11 +37,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@Override
 	public void setProjectActionMenu(Widget w) {
 		projectActionMenuContainer.add(w);
-	}
-
-	@Override
-	public void setEntityActionMenu(Widget w) {
-		entityActionMenuContainer.add(w);
 	}
 
 	@Override

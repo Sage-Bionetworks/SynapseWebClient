@@ -56,6 +56,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		if (tableEntityWidget == null) {
 			tableEntityWidget = ginInjector.createNewTableEntityWidget();
 			view.setTableQueryResultWidget(tableEntityWidget.asWidget());
+			tableEntityWidget.hideActionMenu();
 		}
 		return tableEntityWidget;
 	}

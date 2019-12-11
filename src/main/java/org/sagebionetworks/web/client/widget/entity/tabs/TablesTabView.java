@@ -27,15 +27,14 @@ public interface TablesTabView extends IsWidget {
 
 	void setEntityMetadataVisible(boolean visible);
 
-	void setActionMenu(Widget w);
-
 	void setSynapseAlert(Widget w);
-
-	void clearActionMenuContainer();
 
 	void setModifiedCreatedBy(IsWidget modifiedCreatedBy);
 
 	void setProvenance(IsWidget w);
 
-	void setProvenanceVisible(boolean visible);
+	void setTableUIVisible(boolean visible);
+
+	void setActionMenu(IsWidget w);
+
 }

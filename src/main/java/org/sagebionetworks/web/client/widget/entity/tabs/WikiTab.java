@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget.Callback;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.inject.Inject;
@@ -21,7 +21,7 @@ public class WikiTab {
 	public WikiTab(Tab tab, PortalGinInjector ginInjector) {
 		this.ginInjector = ginInjector;
 		this.tab = tab;
-		tab.configure("Wiki", "Build narrative content to describe your project in the Wiki.", WebConstants.DOCS_URL + "wikis.html");
+		tab.configure("Wiki", "Build narrative content to describe your project in the Wiki.", WebConstants.DOCS_URL + "wikis.html", EntityArea.WIKI);
 	}
 
 	public void lazyInject() {
@@ -39,12 +39,15 @@ public class WikiTab {
 	public void setWikiReloadHandler(CallbackP<String> wikiReloadHandler) {
 		wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
 	}
-
-	public void configure(String entityId, String entityName, String wikiPageId, Boolean canEdit, Callback callback, ActionMenuWidget actionMenu) {
+	
+	public void configure(String entityId, String entityName, EntityBundle projectBundle, String wikiPageId, Boolean canEdit,
+			Callback callback) {
 		lazyInject();
+		tab.configureEntityActionController(projectBundle, true, wikiPageId);
 		WikiPageKey wikiPageKey = new WikiPageKey(entityId, ObjectType.ENTITY.name(), wikiPageId);
 		wikiPageWidget.configure(wikiPageKey, canEdit, callback);
-		wikiPageWidget.showSubpages(actionMenu);
+		wikiPageWidget.setActionMenu(tab.getEntityActionMenu());
+		wikiPageWidget.showSubpages(tab.getEntityActionMenu());
 		setEntityNameAndPlace(entityId, entityName, wikiPageId);
 	}
 

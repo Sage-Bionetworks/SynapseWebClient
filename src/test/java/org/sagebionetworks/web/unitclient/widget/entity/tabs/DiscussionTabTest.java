@@ -13,9 +13,11 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -34,6 +36,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.shared.WebConstants;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class DiscussionTabTest {
 	@Mock
 	Tab mockTab;
@@ -53,13 +56,16 @@ public class DiscussionTabTest {
 	ActionMenuWidget mockActionMenuWidget;
 	@Mock
 	SynapseProperties mockSynapseProperties;
+	@Mock
+	EntityBundle mockProjectEntityBundle;
+
 	DiscussionTab tab;
 	public static final String FORUM_SYNAPSE_ID = "syn99990";
 
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
 		tab = new DiscussionTab(mockTab, mockPortalGinInjector);
+		when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
 		when(mockSynapseProperties.getSynapseProperty(WebConstants.FORUM_SYNAPSE_ID_PROPERTY)).thenReturn(FORUM_SYNAPSE_ID);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockPortalGinInjector.getDiscussionTabView()).thenReturn(mockView);
@@ -87,7 +93,7 @@ public class DiscussionTabTest {
 		String entityName = "discussion project test";
 		String areaToken = "a=b&c=d";
 		boolean canModerate = false;
-		tab.configure(entityId, entityName, areaToken, canModerate, mockActionMenuWidget);
+		tab.configure(entityId, entityName, mockProjectEntityBundle, areaToken, canModerate);
 
 		ArgumentCaptor<CallbackP> paramCaptor = ArgumentCaptor.forClass(CallbackP.class);
 		verify(mockForumWidget).configure(anyString(), any(ParameterizedToken.class), anyBoolean(), eq(mockActionMenuWidget), paramCaptor.capture(), any(Callback.class));
@@ -119,7 +125,7 @@ public class DiscussionTabTest {
 		String entityName = "discussion project test";
 		String areaToken = "a=b&c=d";
 		boolean canModerate = false;
-		tab.configure(entityId, entityName, areaToken, canModerate, mockActionMenuWidget);
+		tab.configure(entityId, entityName, mockProjectEntityBundle, areaToken, canModerate);
 
 		ArgumentCaptor<SynapseForumPlace> captor = ArgumentCaptor.forClass(SynapseForumPlace.class);
 		verify(mockPlaceChanger).goTo(captor.capture());

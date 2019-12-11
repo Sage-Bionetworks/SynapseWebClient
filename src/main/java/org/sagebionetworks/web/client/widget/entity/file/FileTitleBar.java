@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -48,7 +49,7 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 		view.setPresenter(this);
 	}
 
-	public void configure(EntityBundle bundle) {
+	public void configure(EntityBundle bundle, ActionMenuWidget actionMenu) {
 		this.entityBundle = bundle;
 		view.setCanDownload(entityBundle.getPermissions().getCanDownload());
 		view.setVersionUIVisible(false);
@@ -65,6 +66,7 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 		view.setEntityName(bundle.getEntity().getName());
 		view.setVersion(((FileEntity) entityBundle.getEntity()).getVersionNumber());
 		getLatestVersion();
+		view.setActionMenu(actionMenu);
 		if (isFilenamePanelVisible) {
 			if (fileHandle.getContentMd5() != null) {
 				view.setMd5(fileHandle.getContentMd5());

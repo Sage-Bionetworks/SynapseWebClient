@@ -14,10 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
@@ -40,6 +42,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.DockerTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class DockerTabTest {
 	@Mock
 	Tab mockTab;
@@ -89,9 +92,9 @@ public class DockerTabTest {
 
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
 		tab = new DockerTab(mockTab, mockGinInjector);
 
+		when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
 		when(mockGinInjector.getDockerTabView()).thenReturn(mockView);
 		when(mockGinInjector.getDockerRepoListWidget()).thenReturn(mockDockerRepoListWidget);
 		when(mockGinInjector.getBreadcrumb()).thenReturn(mockBreadcrumb);
@@ -137,7 +140,7 @@ public class DockerTabTest {
 		verify(mockView).setBreadcrumb(any(Widget.class));
 		verify(mockView).setDockerRepoList(any(Widget.class));
 		verify(mockView).setSynapseAlert(any(Widget.class));
-		verify(mockTab).configure(anyString(), anyString(), anyString());
+		verify(mockTab).configure(anyString(), anyString(), anyString(), any(EntityArea.class));
 		verify(mockBreadcrumb).setLinkClickedHandler(callbackPCaptor.capture());
 		verify(mockTab).setContent(any(Widget.class));
 
@@ -164,7 +167,7 @@ public class DockerTabTest {
 		String areaToken = null;
 		tab.setEntitySelectedCallback(mockUpdateEntityCallback);
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockProjectEntityBundle, areaToken, mockActionMenuWidget);
+		tab.configure(mockProjectEntityBundle, areaToken);
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockTab).setEntityNameAndPlace(eq(projectName), any(Synapse.class));
 		verify(mockView, times(2)).setBreadcrumbVisible(false);
@@ -180,7 +183,7 @@ public class DockerTabTest {
 		mockProjectEntityBundle = null;
 		tab.setEntitySelectedCallback(mockUpdateEntityCallback);
 		tab.setProject(projectEntityId, mockProjectEntityBundle, mockProjectBundleLoadError);
-		tab.configure(mockProjectEntityBundle, areaToken, mockActionMenuWidget);
+		tab.configure(mockProjectEntityBundle, areaToken);
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockTab).setEntityNameAndPlace(eq(projectEntityId), any(Synapse.class));
 		verify(mockDockerRepoListWidget, never()).configure(projectEntityId);
@@ -193,12 +196,12 @@ public class DockerTabTest {
 		String areaToken = null;
 		tab.setEntitySelectedCallback(mockUpdateEntityCallback);
 		tab.setProject(projectEntityId, mockProjectEntityBundle, mockProjectBundleLoadError);
-		tab.configure(mockDockerRepoEntityBundle, areaToken, mockActionMenuWidget);
+		tab.configure(mockDockerRepoEntityBundle, areaToken);
 		verify(mockTab).setEntityNameAndPlace(eq(dockerRepoName), any(Synapse.class));
 		verify(mockTab).showTab();
 		verify(mockView).setBreadcrumbVisible(true);
 		verify(mockView, times(2)).setDockerRepoListVisible(false);
-		verify(mockView).setDockerRepoWidgetVisible(true);
+		verify(mockView).setDockerRepoUIVisible(true);
 		verify(mockView, atLeastOnce()).clearDockerRepoWidget();
 		ArgumentCaptor<List> listCaptor = ArgumentCaptor.forClass(List.class);
 		verify(mockBreadcrumb).configure(listCaptor.capture(), eq(dockerRepoName));
@@ -226,7 +229,7 @@ public class DockerTabTest {
 		tab.resetView();
 		verify(mockView).setBreadcrumbVisible(false);
 		verify(mockView).setDockerRepoListVisible(false);
-		verify(mockView).setDockerRepoWidgetVisible(false);
+		verify(mockView).setDockerRepoUIVisible(false);
 		verify(mockView).clearDockerRepoWidget();
 		verify(mockSynAlert, never()).handleException(any(Throwable.class));
 	}
