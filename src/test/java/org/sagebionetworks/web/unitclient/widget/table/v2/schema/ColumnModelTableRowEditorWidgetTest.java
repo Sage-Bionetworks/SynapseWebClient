@@ -123,7 +123,7 @@ public class ColumnModelTableRowEditorWidgetTest {
 
 	@Test
 	public void testCanHaveSize() {
-		Set<ColumnTypeViewEnum> expectedTrue = new HashSet<ColumnTypeViewEnum>(Arrays.asList(ColumnTypeViewEnum.String, ColumnTypeViewEnum.Link));
+		Set<ColumnTypeViewEnum> expectedTrue = new HashSet<ColumnTypeViewEnum>(Arrays.asList(ColumnTypeViewEnum.String, ColumnTypeViewEnum.StringList, ColumnTypeViewEnum.Link));
 		for (ColumnTypeViewEnum type : ColumnTypeViewEnum.values()) {
 			assertEquals("Unexpected for type: " + type, expectedTrue.contains(type), editor.canHaveSize(type));
 		}
