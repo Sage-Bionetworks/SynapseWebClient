@@ -142,27 +142,27 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		if (entityHeader == null)
 			throw new IllegalArgumentException("Entity is required");
 
-		if (entityHeader != null) {
-			entityAnchor = new Anchor();
-			clickHandlerRegistration = entityAnchor.addClickHandler(STANDARD_CLICKHANDLER);
-			entityAnchor.setText(entityHeader.getName());
-			entityAnchor.setWidth("400px");
-			entityAnchor.addStyleName("link text-overflow-ellipsis inline-block whitespace-nowrap overflowHidden");
-			entityAnchor.setHref("#!Synapse:" + entityHeader.getId());
-			entityAnchor.getElement().setAttribute(ENTITY_ID_ATTRIBUTE, entityHeader.getId());
-			iconContainer.setWidget(icon);
-			entityContainer.add(entityAnchor);
-			idField.setText(entityHeader.getId());
-			if (entityHeader.getModifiedBy() != null) {
-				modifiedByBadge.configure(entityHeader.getModifiedBy());
-				modifiedByField.add(modifiedByBadge);
+		entityAnchor = new Anchor();
+		clickHandlerRegistration = entityAnchor.addClickHandler(STANDARD_CLICKHANDLER);
+		entityAnchor.setText(entityHeader.getName());
+		entityAnchor.setWidth("400px");
+		entityAnchor.addStyleName("link text-overflow-ellipsis inline-block whitespace-nowrap overflowHidden");
+		entityAnchor.setHref("#!Synapse:" + entityHeader.getId());
+		entityAnchor.getElement().setAttribute(ENTITY_ID_ATTRIBUTE, entityHeader.getId());
+		iconContainer.setWidget(icon);
+		entityContainer.add(entityAnchor);
+		idField.setText(entityHeader.getId());
+		if (entityHeader.getModifiedBy() != null) {
+			modifiedByBadge.configure(entityHeader.getModifiedBy());
+			if (!modifiedByBadge.asWidget().equals(modifiedByField.getWidget())) {
+				modifiedByField.add(modifiedByBadge);	
 			}
-			if (entityHeader.getModifiedOn() != null) {
-				modifiedOnField.setText(dateTimeUtils.getDateTimeString(entityHeader.getModifiedOn()));
-			}
-			if (entityHeader.getCreatedOn() != null) {
-				createdOnField.setText(dateTimeUtils.getDateTimeString(entityHeader.getCreatedOn()));
-			}
+		}
+		if (entityHeader.getModifiedOn() != null) {
+			modifiedOnField.setText(dateTimeUtils.getDateTimeString(entityHeader.getModifiedOn()));
+		}
+		if (entityHeader.getCreatedOn() != null) {
+			createdOnField.setText(dateTimeUtils.getDateTimeString(entityHeader.getCreatedOn()));
 		}
 	}
 

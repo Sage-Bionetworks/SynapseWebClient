@@ -214,6 +214,7 @@ public class EntityBadgeTest {
 		widget.getEntityBundle();
 
 		verify(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
+		verify(mockView).clear();
 		verify(mockView).showPublicIcon();
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).showHasWikiIcon();
