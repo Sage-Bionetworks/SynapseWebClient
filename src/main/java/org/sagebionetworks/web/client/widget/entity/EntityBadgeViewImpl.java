@@ -155,6 +155,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		if (entityHeader.getModifiedBy() != null) {
 			modifiedByBadge.configure(entityHeader.getModifiedBy());
 			if (!modifiedByBadge.asWidget().equals(modifiedByField.getWidget())) {
+				modifiedByField.clear();
 				modifiedByField.add(modifiedByBadge);	
 			}
 		}
