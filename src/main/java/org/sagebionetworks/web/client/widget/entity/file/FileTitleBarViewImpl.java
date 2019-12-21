@@ -88,7 +88,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@UiField
 	Button downloadOptionsButton;
 	@UiField
-	Span actionMenuContainer;
+	Div actionMenuContainer;
 
 	interface FileTitleBarViewImplUiBinder extends UiBinder<Widget, FileTitleBarViewImpl> {
 	}
