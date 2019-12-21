@@ -191,7 +191,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	}
 
 	@Override
-	public void addClickHandler(final ClickHandler handler) {
+	public void setClickHandler(final ClickHandler handler) {
 		if (clickHandlerRegistration != null) {
 			clickHandlerRegistration.removeHandler();
 		}
