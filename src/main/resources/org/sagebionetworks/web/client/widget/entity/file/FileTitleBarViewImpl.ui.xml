@@ -10,21 +10,29 @@
 
 	<g:HTMLPanel ui:field="panel">
 		<g:HTMLPanel ui:field="fileFoundContainer">
-			<b:Heading size="H2" addStyleNames="displayInlineBlock">
-			 	<b:Icon ui:field="entityIcon" addStyleNames="lightGreyText margin-right-5" type="FILE"/>
-			 	<bh:Text ui:field="entityName" />
-			 	<g:SimplePanel ui:field="favoritePanel" addStyleNames="margin-left-5 margin-right-10"/>
-			</b:Heading>
-			<b:DropDown addStyleNames="displayInlineBlock">
-				<b:Button dataToggle="DROPDOWN" type="PRIMARY" text="Download Options" ui:field="downloadOptionsButton" addStyleNames="moveup-8"/>
-				<b:DropDownMenu ui:field="dropdownMenu">
-					<b:AnchorListItem ui:field="addToDownloadListLink">Add to Download List</b:AnchorListItem>
-					<b:Divider/>
-					<b:AnchorListItem ui:field="programmaticOptionsLink">Programmatic Options</b:AnchorListItem>
-				</b:DropDownMenu>
-			</b:DropDown>
-			<w:HelpWidget ui:field="viewOnlyHelp" helpMarkdown="You do not have download access for this item." addStyleNames="margin-left-5 moveup-5" visible="false"/>
-			<bh:Span ui:field="actionMenuContainer" addStyleNames="moveup-8"/>
+			<bh:Div addStyleNames="flexcontainer-row margin-bottom-10">
+				<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width overflow-x-auto">
+					<b:Heading size="H2" addStyleNames="displayInlineBlock">
+					 	<b:Icon ui:field="entityIcon" addStyleNames="lightGreyText margin-right-5" type="FILE"/>
+					 	<bh:Text ui:field="entityName" />
+					 	<g:SimplePanel ui:field="favoritePanel" addStyleNames="margin-left-5 margin-right-10"/>
+					</b:Heading>
+				</bh:Div>
+				<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end">
+					<b:DropDown addStyleNames="displayInlineBlock">
+						<b:Button dataToggle="DROPDOWN" type="PRIMARY" text="Download Options" ui:field="downloadOptionsButton" marginRight="5" />
+						<b:DropDownMenu ui:field="dropdownMenu">
+							<b:AnchorListItem ui:field="addToDownloadListLink">Add to Download List</b:AnchorListItem>
+							<b:Divider/>
+							<b:AnchorListItem ui:field="programmaticOptionsLink">Programmatic Options</b:AnchorListItem>
+						</b:DropDownMenu>
+					</b:DropDown>
+				</bh:Div>
+				<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end">
+					<w:HelpWidget ui:field="viewOnlyHelp" helpMarkdown="You do not have download access for this item." addStyleNames="margin-right-10 margin-top-5" visible="false" placement="LEFT"/>
+				</bh:Div>
+				<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end" ui:field="actionMenuContainer"/>
+			</bh:Div>
 			<bh:Div ui:field="versionInfoUI" visible="false">
 				<bh:Span addStyleNames="boldText" text="Version:"/>
 				<bh:Span addStyleNames="margin-left-5" ui:field="version"/>

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.gwt.core.client.GWT;
@@ -21,7 +22,7 @@ public class BasicTitleBarViewImpl implements BasicTitleBarView {
 	@UiField
 	Icon entityIcon;
 	@UiField
-	Span actionMenuContainer;
+	Div actionMenuContainer;
 
 	interface BasicTitleBarViewImplUiBinder extends UiBinder<Widget, BasicTitleBarViewImpl> {
 	}
