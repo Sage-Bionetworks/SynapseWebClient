@@ -1944,7 +1944,6 @@ ol.lowerroman {
 .table-layout-fixed {
     table-layout: fixed;
 }
-
 .padding-right-2, #body .padding-right-2 {
 	padding-right: 2px;
 }
@@ -2216,13 +2215,6 @@ div.input-group > input.search-textbox {
 .nav>li>a>div {
 	padding: 1em 2em .5em 2em;
 	margin: -1em -2em -.5em -2em;
-}
-
-.text-align-right {
-	text-align: right;
-}
-.text-align-left {
-	text-align: left;
 }
 
 /**Override JQuery table styles **/
@@ -2788,6 +2780,12 @@ div.border {
 		}
 	}
 	.katex { font-size: 1em; }
+	.text-align-right {
+		text-align: right;
+	}
+	.text-align-left {
+		text-align: left;
+	}
 	.text-danger {
 		color: #d9534f;
 	}

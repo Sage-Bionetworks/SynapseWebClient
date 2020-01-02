@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import static org.sagebionetworks.web.client.DisplayUtils.TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER;
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.Emphasis;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
@@ -87,7 +89,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 
 
 	Callback onAttachCallback;
-	Anchor entityAnchor;
+	Button entityAnchor;
 	public static PlaceChanger placeChanger = null;
 	HandlerRegistration clickHandlerRegistration;
 	public static final String ENTITY_ID_ATTRIBUTE = "data-entity-id";
@@ -142,13 +144,18 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		if (entityHeader == null)
 			throw new IllegalArgumentException("Entity is required");
 
-		entityAnchor = new Anchor();
+		entityAnchor = new Button();
 		clickHandlerRegistration = entityAnchor.addClickHandler(STANDARD_CLICKHANDLER);
 		entityAnchor.setText(entityHeader.getName());
 		entityAnchor.setWidth("400px");
-		entityAnchor.addStyleName("link text-overflow-ellipsis inline-block whitespace-nowrap overflowHidden");
+		entityAnchor.addStyleName("text-align-left text-overflow-ellipsis inline-block whitespace-nowrap overflowHidden");
 		entityAnchor.setHref("#!Synapse:" + entityHeader.getId());
 		entityAnchor.getElement().setAttribute(ENTITY_ID_ATTRIBUTE, entityHeader.getId());
+		entityAnchor.setType(ButtonType.LINK);
+		entityAnchor.setPaddingLeft(0);
+		entityAnchor.setPaddingRight(0);
+		entityAnchor.setPaddingTop(0);
+		entityAnchor.setPaddingBottom(0);
 		iconContainer.setWidget(icon);
 		entityContainer.add(entityAnchor);
 		idField.setText(entityHeader.getId());
