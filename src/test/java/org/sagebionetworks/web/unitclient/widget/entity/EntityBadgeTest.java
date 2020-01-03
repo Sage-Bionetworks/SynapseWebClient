@@ -20,10 +20,11 @@ import java.util.Set;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -63,6 +64,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+@RunWith(MockitoJUnitRunner.class)
 public class EntityBadgeTest {
 
 	private static final String TRANSFORMED_FRIENDLY_VALUE = "friendly value";
@@ -70,22 +72,29 @@ public class EntityBadgeTest {
 	private static final String KEY1 = "key1";
 	private static final String KEY2 = "key2";
 	private static final String USER_ID = "12430";
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	PlaceChanger mockPlaceChanger;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
+	@Mock
 	ClientCache mockClientCache;
 	AsyncCallback<KeyValueDisplay<String>> getInfoCallback;
+	@Mock
 	EntityBadgeView mockView;
 	String entityId = "syn123";
 	String entityName = "An Entity";
 	Long entityThreadCount;
 	EntityBadge widget;
+	@Mock
 	AnnotationTransformer mockTransformer;
 	String rootWikiKeyId;
 	Map<String, AnnotationsValue> annotationsMap;
 	@Mock
 	Annotations mockAnnotations;
+	@Mock
 	UserEntityPermissions mockPermissions;
+	@Mock
 	AccessControlList mockBenefactorAcl;
 	@Mock
 	LazyLoadHelper mockLazyLoadHelper;
@@ -109,20 +118,13 @@ public class EntityBadgeTest {
 	S3FileHandle mockDataFileHandle;
 	@Mock
 	AuthenticationController mockAuthController;
+	@Mock
+	ClickHandler mockClickHandler;
 	Set<ResourceAccess> resourceAccessSet;
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
-		MockitoAnnotations.initMocks(this);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockView = mock(EntityBadgeView.class);
-		mockClientCache = mock(ClientCache.class);
-		getInfoCallback = mock(AsyncCallback.class);
-		mockPlaceChanger = mock(PlaceChanger.class);
-		mockTransformer = mock(AnnotationTransformer.class);
-		mockPermissions = mock(UserEntityPermissions.class);
 		when(mockPermissions.getCanPublicRead()).thenReturn(true);
-		mockBenefactorAcl = mock(AccessControlList.class);
 		when(mockBenefactorAcl.getId()).thenReturn("not the current entity id");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer, mockSynapseJavascriptClient, mockLazyLoadHelper, mockPopupUtils, mockSynapseProperties, mockEventBus, mockAuthController, mockSynapseJSNIUtils);
@@ -235,11 +237,14 @@ public class EntityBadgeTest {
 	}
 
 	@Test
-	public void testEntityClickedCustomHandler() throws Exception {
+	public void testEntityClickedCustomHandler() {
+		widget.setClickHandler(mockClickHandler);
+		// verify click handler is set when the view is configured 
+		verify(mockView, never()).setClickHandler(any(ClickHandler.class));
+		
 		configure();
-		ClickHandler mockEntityClicked = mock(ClickHandler.class);
-		widget.setClickHandler(mockEntityClicked);
-		verify(mockView).addClickHandler(mockEntityClicked);
+		
+		verify(mockView).setClickHandler(mockClickHandler);
 	}
 
 	@Test
