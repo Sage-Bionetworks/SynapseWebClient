@@ -16,6 +16,8 @@ public class WikiTab {
 	Tab tab;
 	private WikiPageWidget wikiPageWidget;
 	PortalGinInjector ginInjector;
+	String entityId, entityName;
+	EntityBundle projectBundle;
 
 	@Inject
 	public WikiTab(Tab tab, PortalGinInjector ginInjector) {
@@ -28,6 +30,10 @@ public class WikiTab {
 		if (wikiPageWidget == null) {
 			this.wikiPageWidget = ginInjector.getWikiPageWidget();
 			wikiPageWidget.addStyleName("panel panel-default panel-body margin-bottom-0-imp");
+			wikiPageWidget.setWikiReloadHandler(wikiPageId -> {
+				tab.configureEntityActionController(projectBundle, true, wikiPageId);
+				setEntityNameAndPlace(entityId, entityName, wikiPageId);
+			});
 			tab.setContent(wikiPageWidget.asWidget());
 		}
 	}
@@ -36,13 +42,12 @@ public class WikiTab {
 		tab.addTabClickedCallback(onClickCallback);
 	}
 
-	public void setWikiReloadHandler(CallbackP<String> wikiReloadHandler) {
-		wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
-	}
-	
 	public void configure(String entityId, String entityName, EntityBundle projectBundle, String wikiPageId, Boolean canEdit,
 			Callback callback) {
 		lazyInject();
+		this.entityId = entityId;
+		this.entityName = entityName;
+		this.projectBundle = projectBundle;
 		tab.configureEntityActionController(projectBundle, true, wikiPageId);
 		WikiPageKey wikiPageKey = new WikiPageKey(entityId, ObjectType.ENTITY.name(), wikiPageId);
 		wikiPageWidget.configure(wikiPageKey, canEdit, callback);
