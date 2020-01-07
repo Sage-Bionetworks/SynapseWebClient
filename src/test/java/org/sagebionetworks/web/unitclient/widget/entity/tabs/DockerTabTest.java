@@ -140,6 +140,7 @@ public class DockerTabTest {
 		verify(mockView).setBreadcrumb(any(Widget.class));
 		verify(mockView).setDockerRepoList(any(Widget.class));
 		verify(mockView).setSynapseAlert(any(Widget.class));
+		verify(mockView).setActionMenu(any(Widget.class));
 		verify(mockTab).configure(anyString(), anyString(), anyString(), any(EntityArea.class));
 		verify(mockBreadcrumb).setLinkClickedHandler(callbackPCaptor.capture());
 		verify(mockTab).setContent(any(Widget.class));
