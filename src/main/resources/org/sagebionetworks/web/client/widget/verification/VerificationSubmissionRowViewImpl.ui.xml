@@ -54,7 +54,7 @@
 						type="DANGER" marginRight="5">Suspend</b:Button>
 					<b:Button ui:field="deleteButton" size="EXTRA_SMALL"
 						type="DANGER" marginRight="5">Delete</b:Button>
-					<b:Button ui:field="popupModalButton" size="EXTRA_SMALL" type="PRIMARY">More</b:Button>
+					<b:Button ui:field="popupModalButton" size="EXTRA_SMALL" type="PRIMARY">More Info</b:Button>
 				</t:TableData>
 			</t:TableRow>
 		</t:Table>
