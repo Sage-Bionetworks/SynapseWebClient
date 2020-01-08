@@ -11,7 +11,7 @@
 		</b:ModalBody>
 		<b:ModalFooter>
 			<b:Button ui:field="defaultButton" type="DEFAULT"
-				dataDismiss="MODAL">Cancel</b:Button>
+				>Cancel</b:Button>
 			<b:Button ui:field="primaryButton" type="PRIMARY"
 				dataLoadingText="Saving...">OK</b:Button>
 		</b:ModalFooter>

@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -29,6 +30,8 @@ public class FileHandleLink implements IsWidget, SelectableListItem {
 	CheckBox select;
 	@UiField
 	Span fileHandleWidgetContainer;
+	@UiField
+	TableData selectTableData;
 
 	Widget widget;
 
@@ -74,6 +77,7 @@ public class FileHandleLink implements IsWidget, SelectableListItem {
 	}
 
 	public void setSelectVisible(boolean visible) {
+		selectTableData.setVisible(visible);
 		select.setVisible(visible);
 	}
 

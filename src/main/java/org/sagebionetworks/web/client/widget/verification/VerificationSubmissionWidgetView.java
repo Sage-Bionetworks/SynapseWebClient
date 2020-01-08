@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.verification;
 
 import java.util.List;
+import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.web.client.SynapseView;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -66,6 +67,12 @@ public interface VerificationSubmissionWidgetView extends SynapseView, IsWidget 
 	void setSuspendedAlertVisible(boolean visible);
 
 	void setState(VerificationStateEnum state);
+	
+	void setACTStateHistoryVisible(boolean visible);
+	void setACTStateHistory(List<VerificationState> stateHistory);
+	void setShowSubmissionInModalButtonVisible(boolean visible);
+	
+	void setUploadedFilesUIVisible(boolean visible);
 
 	void popupError(String message);
 
@@ -90,5 +97,7 @@ public interface VerificationSubmissionWidgetView extends SynapseView, IsWidget 
 		void deleteVerification();
 
 		void recreateVerification();
+		
+		void showSubmissionInModal();
 	}
 }
