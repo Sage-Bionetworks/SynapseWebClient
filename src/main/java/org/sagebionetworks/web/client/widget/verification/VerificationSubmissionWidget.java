@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -43,6 +44,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	private VerificationStateEnum actRejectState;
 	private boolean isACTMember;
 	private boolean isNewSubmission;
+	private boolean isModal;
 	private Callback resubmitCallback;
 
 	@Inject
@@ -88,6 +90,18 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		view.setProfileLink(verificationSubmission.getCreatedBy(), "#!Profile:" + verificationSubmission.getCreatedBy());
 		return this;
 	}
+	
+	@Override
+	public void showSubmissionInModal() {
+		VerificationSubmissionWidget widget = ginInjector.getVerificationSubmissionWidget();
+		boolean isModal = true;
+		if (isNewSubmission) {
+			widget.configure(profile, orcId, isModal, existingAttachments);
+		} else {
+			widget.configure(submission, isACTMember, isModal);
+		}
+		widget.show();
+	}
 
 	public VerificationSubmissionWidget setResubmitCallback(Callback c) {
 		this.resubmitCallback = c;
@@ -109,6 +123,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		this.orcId = orcId;
 		this.submission = null;
 		this.existingAttachments = existingAttachments;
+		this.isModal = isModal;
 		initView(isModal);
 		return this;
 	}
@@ -137,6 +152,8 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			view.setEmails(profile.getEmails());
 			view.setTitle("Profile Validation");
 			view.setProfileFieldsEditable(true);
+			view.setACTStateHistoryVisible(false);
+			view.setUploadedFilesUIVisible(true);
 			initAttachments();
 			view.show();
 		}
@@ -157,6 +174,14 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 
 		VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size() - 1);
 		view.setState(currentState.getState());
+		view.setACTStateHistoryVisible(isACTMember);
+		if (isACTMember) {
+			view.setACTStateHistory(submission.getStateHistory());
+		}
+		view.setShowSubmissionInModalButtonVisible(isACTMember && !isModal);
+		// only show the uploaded files if in submitted state
+		view.setUploadedFilesUIVisible(VerificationStateEnum.SUBMITTED.equals(currentState.getState()));
+		
 		if (VerificationStateEnum.SUBMITTED.equals(currentState.getState())) {
 			// pending
 			view.setApproveButtonVisible(isACTMember);

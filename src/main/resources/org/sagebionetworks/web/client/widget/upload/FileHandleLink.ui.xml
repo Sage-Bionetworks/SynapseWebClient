@@ -7,7 +7,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<t:TableRow>
-		<t:TableData width="35px">
+		<t:TableData width="35px" ui:field="selectTableData">
 			<b:CheckBox ui:field="select" />
 		</t:TableData>
 		<t:TableData>

@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -52,6 +53,8 @@ public class VerificationSubmissionRowViewImpl implements VerificationSubmission
 	Button suspendButton;
 	@UiField
 	Button deleteButton;
+	@UiField
+	Button popupModalButton;
 
 	@UiField
 	Span reasonAlertText;
@@ -69,31 +72,21 @@ public class VerificationSubmissionRowViewImpl implements VerificationSubmission
 	public VerificationSubmissionRowViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 
-		approveButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.approveVerification();
-			}
+		approveButton.addClickHandler(event -> {
+			presenter.approveVerification();
 		});
-		rejectButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.rejectVerification();
-			}
+		rejectButton.addClickHandler(event -> {
+			presenter.rejectVerification();
 		});
-		suspendButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.suspendVerification();
-			}
+		suspendButton.addClickHandler(event -> {
+			presenter.suspendVerification();
 		});
-		deleteButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.deleteVerification();
-			}
+		deleteButton.addClickHandler(event -> {
+			presenter.deleteVerification();
 		});
-
+		popupModalButton.addClickHandler(event -> {
+			presenter.showSubmissionInModal();
+		});
 	}
 
 	@Override
@@ -297,5 +290,23 @@ public class VerificationSubmissionRowViewImpl implements VerificationSubmission
 	@Override
 	public void setCloseButtonVisible(boolean visible) {
 		// Not used in this view implementation
+	}
+	
+	@Override
+	public void setACTStateHistory(List<VerificationState> stateHistory) {
+		// Not used in this view implementation
+	}
+	@Override
+	public void setACTStateHistoryVisible(boolean visible) {
+		// Not used in this view implementation
+	}
+	@Override
+	public void setShowSubmissionInModalButtonVisible(boolean visible) {
+		popupModalButton.setVisible(visible);
+	}
+	
+	@Override
+	public void setUploadedFilesUIVisible(boolean visible) {
+		// Not used in this view implementation		
 	}
 }
