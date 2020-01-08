@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -254,6 +255,8 @@ public class VerificationSubmissionWidgetTest {
 		verify(mockView).setEmails(profile.getEmails());
 		verify(mockFileHandleList, times(submissionAttachments.size())).addFileLink(anyString(), anyString());
 		verify(mockFileHandleList).refreshLinkUI();
+		verify(mockView).setACTStateHistoryVisible(false);
+		verify(mockView).setUploadedFilesUIVisible(true);
 		verify(mockView).show();
 	}
 
@@ -280,9 +283,14 @@ public class VerificationSubmissionWidgetTest {
 		verify(mockView).setCloseButtonVisible(true);
 
 		// in the configureWithMockSubmission, the current user is not a member of the ACT
+		verify(mockView).setACTStateHistoryVisible(false);
+		verify(mockView, never()).setACTStateHistory(anyList());
+		verify(mockView).setShowSubmissionInModalButtonVisible(false);
+		// is in Submitted state, so show the file list
+		verify(mockView).setUploadedFilesUIVisible(true);
 		verify(mockView).setApproveButtonVisible(false);
 		verify(mockView).setRejectButtonVisible(false);
-
+		
 		verify(mockFileHandleList).configure();
 		verify(mockFileHandleList).setCanDelete(false);
 		verify(mockFileHandleList).setCanUpload(false);
@@ -293,7 +301,7 @@ public class VerificationSubmissionWidgetTest {
 	}
 
 	@Test
-	public void testShowExistingSubmittedVerificationSubmissionAsACT() {
+	public void testShowExistingSubmittedVerificationSubmissionAsACTAsModal() {
 		boolean isACTMember = true;
 		boolean isModal = true;
 		widget.configure(mockSubmission, isACTMember, isModal);
@@ -301,7 +309,27 @@ public class VerificationSubmissionWidgetTest {
 		widget.show();
 		verify(mockView).setApproveButtonVisible(true);
 		verify(mockView).setRejectButtonVisible(true);
+		verify(mockView).setACTStateHistoryVisible(true);
+		verify(mockView).setACTStateHistory(anyList());
+		verify(mockView).setShowSubmissionInModalButtonVisible(false);
+		verify(mockView).setUploadedFilesUIVisible(true);
 	}
+	
+	@Test
+	public void testShowExistingSubmittedVerificationSubmissionAsACTAsRow() {
+		boolean isACTMember = true;
+		boolean isModal = false;
+		widget.configure(mockSubmission, isACTMember, isModal);
+		setCurrentMockState(VerificationStateEnum.SUBMITTED, null);
+		widget.show();
+		verify(mockRowView).setApproveButtonVisible(true);
+		verify(mockRowView).setRejectButtonVisible(true);
+		verify(mockRowView).setACTStateHistoryVisible(true);
+		verify(mockRowView).setACTStateHistory(anyList());
+		verify(mockRowView).setShowSubmissionInModalButtonVisible(true);
+		verify(mockRowView).setUploadedFilesUIVisible(true);
+	}
+
 
 	@Test
 	public void testShowExistingApprovedVerificationSubmission() {

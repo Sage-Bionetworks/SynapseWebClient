@@ -84,6 +84,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		this.existingAttachments = verificationSubmission.getAttachments();
 		this.orcId = null;
 		this.profile = null;
+		this.isModal = isModal;
 		initView(isModal);
 		view.setProfileLink(verificationSubmission.getCreatedBy(), "#!Profile:" + verificationSubmission.getCreatedBy());
 		return this;
