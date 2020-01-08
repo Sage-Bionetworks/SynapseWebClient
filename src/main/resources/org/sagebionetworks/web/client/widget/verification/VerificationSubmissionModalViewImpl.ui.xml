@@ -106,7 +106,7 @@
 				<bh:Div ui:field="actStateHistoryContainer" addStyleNames="margin-bottom-10 margin-top-10">
 					<b:FormGroup>
 						<b:FormLabel>History</b:FormLabel>
-						<t:Table ui:field="actStateHistoryTable" addStyleNames="markdowntable" width="100%" />
+						<t:Table ui:field="actStateHistoryTable" addStyleNames="markdowntable whiteBackground" width="100%" />
 					</b:FormGroup>
 				</bh:Div>
 			</bh:Div>

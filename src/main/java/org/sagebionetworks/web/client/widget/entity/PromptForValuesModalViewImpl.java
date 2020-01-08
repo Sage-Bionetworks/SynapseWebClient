@@ -34,6 +34,8 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 	Div synAlertContainer;
 	@UiField
 	Button primaryButton;
+	@UiField
+	Button defaultButton;
 	CallbackP<List<String>> newValuesCallback;
 	List<TextBox> textBoxes;
 	SynapseAlert synAlert;
@@ -53,6 +55,10 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 
 		this.primaryButton.addClickHandler(event -> {
 			onPrimary();
+		});
+		defaultButton.addClickHandler(event -> {
+			// cancelled
+			modal.hide();
 		});
 		handler = event -> {
 			if (KeyCodes.KEY_ENTER == event.getNativeKeyCode()) {

@@ -97,6 +97,7 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDi
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiVersionAnchorListItem;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
+import org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialog;
@@ -829,5 +830,7 @@ public interface PortalGinInjector extends Ginjector {
 
 	QuarantinedEmailModal getQuarantinedEmailModal();
 	
-	ViewDefaultColumns getViewDefaultColumns(); 
+	ViewDefaultColumns getViewDefaultColumns();
+	
+	RejectReasonWidget getRejectReasonWidget();
 }
