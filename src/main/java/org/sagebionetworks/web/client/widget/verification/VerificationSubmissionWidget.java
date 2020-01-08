@@ -240,9 +240,9 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		return true;
 	}
 
-	private String getConfirmationDialogTitle(VerificationStateEnum state) {
+	private String getConfirmationDialogTitle(VerificationStateEnum newState) {
 		String verb = "";
-		switch (state) {
+		switch (newState) {
 			case SUSPENDED : 
 				verb = "Suspend";
 				break;
@@ -252,6 +252,9 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			case APPROVED :
 				verb = "Approve";
 				break;
+			case SUBMITTED:
+			default :
+				// should be unreachable
 		}
 		return "Are you sure you want to " + verb + " this User Profile Validation Submission?";
 	}
