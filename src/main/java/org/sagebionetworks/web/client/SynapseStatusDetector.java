@@ -60,12 +60,12 @@ public class SynapseStatusDetector {
 	}
 
 	private static native void _getCurrentStatus(SynapseStatusDetector x) /*-{
-		var sp = new $wnd.StatusPage.page(
+		if ($wnd.StatusPage) {
+			var sp = new $wnd.StatusPage.page(
 				{
 					page : @org.sagebionetworks.web.client.SynapseStatusDetector::STATUS_PAGE_IO_PAGE
 				});
-		sp
-				.status({
+			sp.status({
 					success : function(data) {
 						if (data.status.indicator !== 'none') {
 							// Houston, we have a problem...
@@ -74,48 +74,53 @@ public class SynapseStatusDetector {
 						}
 					}
 				});
+		}
 	}-*/;
 
 	private static native void _getUnresolvedIncidents(SynapseStatusDetector x) /*-{
-		var sp = new $wnd.StatusPage.page(
-				{
-					page : @org.sagebionetworks.web.client.SynapseStatusDetector::STATUS_PAGE_IO_PAGE
-				});
-		sp
-				.incidents({
-					filter : 'unresolved',
-					success : function(data) {
-						if (data.incidents[0]) {
-							var incident = data.incidents[0];
-							var description = incident.name;
-							x.@org.sagebionetworks.web.client.SynapseStatusDetector::showOutage(Ljava/lang/String;)(description);
+		if ($wnd.StatusPage) {
+			var sp = new $wnd.StatusPage.page(
+					{
+						page : @org.sagebionetworks.web.client.SynapseStatusDetector::STATUS_PAGE_IO_PAGE
+					});
+			sp.incidents({
+						filter : 'unresolved',
+						success : function(data) {
+							if (data.incidents[0]) {
+								var incident = data.incidents[0];
+								var description = incident.name;
+								x.@org.sagebionetworks.web.client.SynapseStatusDetector::showOutage(Ljava/lang/String;)(description);
+							}
 						}
-					}
-				})
+					})
+		}
 	}-*/;
 
 	private static native void _getScheduledMaintenance(SynapseStatusDetector x) /*-{
-		var sp = new $wnd.StatusPage.page(
-				{
-					page : @org.sagebionetworks.web.client.SynapseStatusDetector::STATUS_PAGE_IO_PAGE
-				});
-		sp
-				.scheduled_maintenances({
-					filter : 'upcoming',
-					success : function(data) {
-						if (data.scheduled_maintenances[0]) {
-							var scheduledMaintenance = data.scheduled_maintenances[0];
-							var scheduledFor = scheduledMaintenance.scheduled_for;
-							var scheduledUntil = scheduledMaintenance.scheduled_until;
-							var name = scheduledMaintenance.name;
-							// there's a scheduled maintenance. invoke alert with info.
-							x.@org.sagebionetworks.web.client.SynapseStatusDetector::showScheduledMaintenance(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)(name, scheduledFor, scheduledUntil);
-						} else {
-							// no scheduled maintenance found, check again later
-							x.@org.sagebionetworks.web.client.SynapseStatusDetector::checkForScheduledMaintenanceLater()();
+		if ($wnd.StatusPage) {
+			var sp = new $wnd.StatusPage.page(
+					{
+						page : @org.sagebionetworks.web.client.SynapseStatusDetector::STATUS_PAGE_IO_PAGE
+					});
+			sp.scheduled_maintenances({
+						filter : 'upcoming',
+						success : function(data) {
+							if (data.scheduled_maintenances[0]) {
+								var scheduledMaintenance = data.scheduled_maintenances[0];
+								var scheduledFor = scheduledMaintenance.scheduled_for;
+								var scheduledUntil = scheduledMaintenance.scheduled_until;
+								var name = scheduledMaintenance.name;
+								// there's a scheduled maintenance. invoke alert with info.
+								x.@org.sagebionetworks.web.client.SynapseStatusDetector::showScheduledMaintenance(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)(name, scheduledFor, scheduledUntil);
+							} else {
+								// no scheduled maintenance found, check again later
+								x.@org.sagebionetworks.web.client.SynapseStatusDetector::checkForScheduledMaintenanceLater()();
+							}
 						}
-					}
-				});
+					});
+		} else {
+			// status page script not ready, check again later
+			x.@org.sagebionetworks.web.client.SynapseStatusDetector::checkForScheduledMaintenanceLater()();
+		}
 	}-*/;
-
 }
