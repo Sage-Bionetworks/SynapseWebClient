@@ -32,8 +32,5 @@ public interface ActionMenuWidgetView extends IsWidget {
 
 	void setNoActionsAvailableVisible(boolean visible);
 
-	void setPresenter(Presenter p);
-
-	public interface Presenter {
-	}
+	void setTableDownloadOptionsVisible(boolean visible);
 }

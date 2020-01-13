@@ -194,6 +194,9 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler {
 		modifiedCreatedBy.setVisible(false);
 		view.setTableUIVisible(isTable);
 		view.setActionMenu(tab.getEntityActionMenu());
+		tab.getEntityActionMenu().setTableDownloadOptionsVisible(isTable);
+		boolean isCurrentVersion = version == null;
+		tab.configureEntityActionController(bundle, isCurrentVersion, null);
 		if (isTable) {
 			updateVersionAndAreaToken(entity.getId(), version, areaToken);
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
@@ -207,8 +210,6 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler {
 			tableListWidget.configure(bundle);
 			showProjectLevelUI();
 		}
-		boolean isCurrentVersion = version == null;
-		tab.configureEntityActionController(bundle, isCurrentVersion, null);
 	}
 
 	public Tab asTab() {

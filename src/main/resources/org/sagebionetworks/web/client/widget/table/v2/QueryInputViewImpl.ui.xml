@@ -9,51 +9,20 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<g:HTMLPanel addStyleNames="queryInput">
-		<t:Table width="100%" height="30px">
-			<t:TableRow>
-				<t:TableData>
-					<b:InputGroup ui:field="queryInputGroup"
-						visible="false">
-						<b:FormGroup ui:field="inputFormGroup">
-							<b:TextBox ui:field="queryInput" />
-						</b:FormGroup>
-						<b:InputGroupButton>
-							<b:Button ui:field="queryButton" icon="SEARCH"
-								type="INFO" dataLoadingText="Executing...">Query</b:Button>
-						</b:InputGroupButton>
-						<w:HelpWidget
-							helpMarkdown="The data contained within a Synapse `Table` can be retrieved by using a SQL-like query language either through the web portal or through the analytical clients."
-							href="http://docs.synapse.org/articles/tables.html#table-data"
-							placement="LEFT" addStyleNames="margin-left-5 moveup-18" />
-					</b:InputGroup>
-				</t:TableData>
-				<t:TableData paddingRight="5">
-					<b:DropDown addStyleNames="displayInlineBlock right">
-						<b:Button dataToggle="DROPDOWN" type="PRIMARY"
-							text="Download Options" marginRight="5" marginLeft="5"
-							height="34px" />
-						<b:DropDownMenu ui:field="dropdownMenu"
-							addStyleNames="dropdown-menu-right">
-							<b:AnchorListItem ui:field="exportTableLink">Export Table</b:AnchorListItem>
-							<b:AnchorListItem
-								ui:field="addToDownloadListLink">Add to Download List</b:AnchorListItem>
-							<b:Divider ui:field="downloadOptionsDivider" />
-							<b:AnchorListItem
-								ui:field="programmaticOptionsLink">Programmatic Options</b:AnchorListItem>
-						</b:DropDownMenu>
-					</b:DropDown>
-					<b:Tooltip title="Edit query results">
-						<b:Button ui:field="editResultsButton" icon="EDIT"
-							height="34px" addStyleNames="margin-left-5" pull="RIGHT" />
-					</b:Tooltip>
-					<b:Tooltip title="Show query">
-						<b:Button ui:field="showQueryButton" icon="DATABASE"
-							height="34px" addStyleNames="margin-left-5" pull="RIGHT"
-							visible="false" />
-					</b:Tooltip>
-				</t:TableData>
-			</t:TableRow>
-		</t:Table>
+		<b:InputGroup ui:field="queryInputGroup" visible="false">
+			<b:FormGroup ui:field="inputFormGroup">
+				<b:TextBox ui:field="queryInput" />
+			</b:FormGroup>
+			<b:InputGroupButton>
+				<b:Button ui:field="queryButton" icon="SEARCH"
+					type="INFO" dataLoadingText="Executing...">Query</b:Button>
+			</b:InputGroupButton>
+			<w:HelpWidget
+				helpMarkdown="The data contained within a Synapse `Table` can be retrieved by using a SQL-like query language either through the web portal or through the analytical clients."
+				href="http://docs.synapse.org/articles/tables.html#table-data"
+				width="22px"
+				placement="LEFT" addStyleNames="margin-left-5 moveup-18 displayTableCell" />
+		</b:InputGroup>
 		<w:InfoAlert ui:field="queryResultsMessage"
 			visible="false" alertType="DANGER" icon="EXCLAMATION_CIRCLE"
 			message="" linkText="Reset query" />

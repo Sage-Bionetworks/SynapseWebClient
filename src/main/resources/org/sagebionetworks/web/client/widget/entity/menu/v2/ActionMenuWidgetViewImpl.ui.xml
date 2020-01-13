@@ -9,9 +9,17 @@
 		<b:Tooltip title="Show advanced search">
 			<a:ActionButton visible="false" icon="COG" addStyleNames="margin-right-5" action="SHOW_ADVANCED_SEARCH" />
 		</b:Tooltip>
-		<b:DropDown addStyleNames="displayInlineBlock" visible="false">
-			<b:Button dataToggle="DROPDOWN" type="PRIMARY"
-				text="Download Options" marginRight="5" />
+		<b:Tooltip title="Show simple search">
+			<a:ActionButton visible="false" icon="COG" addStyleNames="margin-right-5" action="SHOW_SIMPLE_SEARCH" />
+		</b:Tooltip>
+		<b:Tooltip title="Show query">
+			<a:ActionButton visible="false" icon="DATABASE" addStyleNames="margin-right-5" action="SHOW_QUERY" />
+		</b:Tooltip>
+		<b:Tooltip title="Edit query results">
+			<a:ActionButton visible="false" icon="EDIT" addStyleNames="margin-right-5" action="EDIT_TABLE_DATA" />
+		</b:Tooltip>
+		<b:DropDown addStyleNames="displayInlineBlock">
+			<b:Button dataToggle="DROPDOWN" type="PRIMARY" text="Download Options" marginRight="5" visible="false" ui:field="tableDownloadOptions"/>
 			<b:DropDownMenu addStyleNames="dropdown-menu-right">
 				<a:ActionMenuItem action="DOWNLOAD_TABLE_QUERY_RESULTS">Export Table</a:ActionMenuItem>
 				<a:ActionMenuItem action="ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST">Add to Download List</a:ActionMenuItem>
@@ -19,12 +27,6 @@
 				<a:ActionMenuItem action="TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS">Programmatic Options</a:ActionMenuItem>
 			</b:DropDownMenu>
 		</b:DropDown>
-		<b:Tooltip title="Edit query results">
-			<a:ActionButton visible="false" icon="EDIT" addStyleNames="margin-right-5" action="EDIT_TABLE_DATA" />
-		</b:Tooltip>
-		<b:Tooltip title="Show query">
-			<a:ActionButton visible="false" icon="DATABASE" addStyleNames="margin-right-5" action="SHOW_QUERY" />
-		</b:Tooltip>
 		<b:DropDown ui:field="dropdown" addStyleNames="displayInlineBlock">
 			<b:Button icon="GEARS" ui:field="toolsMenu" dataToggle="DROPDOWN">Tools</b:Button>
 			<b:DropDownMenu ui:field="toolsDropDown"

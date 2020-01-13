@@ -42,16 +42,12 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	DropDownHeader noActionsAvailable;
 	@UiField
 	DropDownHeader actHeader;
-	Presenter presenter;
+	@UiField
+	Button tableDownloadOptions;
 
 	@Inject
 	public ActionMenuWidgetViewImpl(Binder binder) {
 		widget = (FlowPanel)binder.createAndBindUi(this);
-	}
-
-	@Override
-	public void setPresenter(Presenter p) {
-		presenter = p;
 	}
 
 	@Override
@@ -97,7 +93,12 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 		actDivider.setVisible(visible);
 		actHeader.setVisible(visible);
 	}
-
+	
+	@Override
+	public void setTableDownloadOptionsVisible(boolean visible) {
+		tableDownloadOptions.setVisible(visible);
+	}
+	
 	@Override
 	public void setToolsButtonIcon(String text, IconType icon) {
 		toolsMenu.setText(text);
