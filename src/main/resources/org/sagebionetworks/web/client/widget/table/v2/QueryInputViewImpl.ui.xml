@@ -28,7 +28,6 @@
 					</b:InputGroup>
 				</t:TableData>
 				<t:TableData paddingRight="5">
-					<bh:Span ui:field="actionMenuContainer" addStyleNames="right"/>
 					<b:DropDown addStyleNames="displayInlineBlock right">
 						<b:Button dataToggle="DROPDOWN" type="PRIMARY"
 							text="Download Options" marginRight="5" marginLeft="5"

@@ -193,7 +193,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler {
 		view.clearTableEntityWidget();
 		modifiedCreatedBy.setVisible(false);
 		view.setTableUIVisible(isTable);
-		
+		view.setActionMenu(tab.getEntityActionMenu());
 		if (isTable) {
 			updateVersionAndAreaToken(entity.getId(), version, areaToken);
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
@@ -203,7 +203,6 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler {
 			view.setTableEntityWidget(v2TableWidget.asWidget());
 			v2TableWidget.configure(bundle, version, bundle.getPermissions().getCanCertifiedUserEdit(), this, tab.getEntityActionMenu());
 		} else if (isProject) {
-			view.setActionMenu(tab.getEntityActionMenu());
 			areaToken = null;
 			tableListWidget.configure(bundle);
 			showProjectLevelUI();

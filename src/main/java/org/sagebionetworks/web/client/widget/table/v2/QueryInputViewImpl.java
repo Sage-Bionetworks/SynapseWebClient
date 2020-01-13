@@ -7,13 +7,11 @@ import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.widget.InfoAlert;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -52,8 +50,6 @@ public class QueryInputViewImpl implements QueryInputView {
 	AnchorListItem exportTableLink;
 	@UiField
 	Divider downloadOptionsDivider;
-	@UiField
-	Span actionMenuContainer;
 
 	HTMLPanel panel;
 	Presenter presenter;
@@ -162,16 +158,6 @@ public class QueryInputViewImpl implements QueryInputView {
 		showQueryButton.setVisible(visible);
 	}
 
-	@Override
-	public void setActionMenu(IsWidget w) {
-		w.asWidget().removeFromParent();
-		actionMenuContainer.clear();
-		actionMenuContainer.add(w);
-	}
-	@Override
-	public void hideActionMenu() {
-		actionMenuContainer.setVisible(false);
-	}
 	@Override
 	public void setDownloadFilesVisible(boolean visible) {
 		addToDownloadListLink.setVisible(visible);

@@ -72,7 +72,7 @@ public class TablesTabTest {
 	@Mock
 	TableListWidget mockTableListWidget;
 	@Mock
-	BasicTitleBar mockBasicTitleBar;
+	BasicTitleBar mockTitleBar;
 	@Mock
 	Breadcrumb mockBreadcrumb;
 	@Mock
@@ -137,7 +137,7 @@ public class TablesTabTest {
 		when(mockPortalGinInjector.getCookieProvider()).thenReturn(mockCookies);
 		when(mockPortalGinInjector.getTablesTabView()).thenReturn(mockView);
 		when(mockPortalGinInjector.getTableListWidget()).thenReturn(mockTableListWidget);
-		when(mockPortalGinInjector.getBasicTitleBar()).thenReturn(mockBasicTitleBar);
+		when(mockPortalGinInjector.getBasicTitleBar()).thenReturn(mockTitleBar);
 		when(mockPortalGinInjector.getBreadcrumb()).thenReturn(mockBreadcrumb);
 		when(mockPortalGinInjector.getEntityMetadata()).thenReturn(mockEntityMetadata);
 		when(mockPortalGinInjector.getQueryTokenProvider()).thenReturn(mockQueryTokenProvider);
@@ -232,7 +232,7 @@ public class TablesTabTest {
 
 	private void verifyTableConfiguration(Long version) {
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.TABLES));
-		verify(mockBasicTitleBar).configure(mockTableEntityBundle);
+		verify(mockTitleBar).configure(mockTableEntityBundle);
 		verify(mockEntityMetadata).configure(mockTableEntityBundle, version, mockActionMenuWidget);
 		verify(mockTableEntityWidget).configure(mockTableEntityBundle, version, true, tab, mockActionMenuWidget);
 		verify(mockView).setTableEntityWidget(any(Widget.class));

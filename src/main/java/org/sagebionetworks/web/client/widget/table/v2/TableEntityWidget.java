@@ -150,7 +150,6 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 		this.entityBundle = bundle;
 		Entity table = bundle.getEntity();
 		this.tableType = TableType.getTableType(table);
-		queryInputWidget.setActionMenu(actionMenu);
 		queryInputWidget.setDownloadFilesVisible(tableType.isIncludeFiles());
 		this.tableId = bundle.getEntity().getId();
 		this.tableVersionNumber = versionNumber;
@@ -559,9 +558,5 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	@Override
 	public void onAddToDownloadList() {
 		addToDownloadList.addToDownloadList(entityBundle.getEntity().getId(), currentQuery);
-	}
-	
-	public void hideActionMenu() {
-		queryInputWidget.hideActionMenu();
 	}
 }
