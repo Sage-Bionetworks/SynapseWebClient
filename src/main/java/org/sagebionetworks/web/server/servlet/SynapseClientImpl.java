@@ -266,16 +266,6 @@ public class SynapseClientImpl extends SynapseClientBase implements SynapseClien
 	}
 
 	@Override
-	public void purgeTrashForUser() throws RestServiceException {
-		try {
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			synapseClient.purgeTrashForUser();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
 	public void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
