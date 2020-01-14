@@ -375,6 +375,35 @@ public class TableEntityWidgetTest {
 	}
 
 	@Test
+	public void testFileCommands() {
+		configureBundleWithView(ViewType.file);
+		boolean canEdit = true;
+		
+		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		
+		verify(mockActionMenu).setActionVisible(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, true);
+		verify(mockActionMenu).setActionVisible(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, true);
+		
+		//also verify other commands have been hooked up
+		verify(mockActionMenu).setActionListener(eq(Action.SHOW_ADVANCED_SEARCH), any());
+		verify(mockActionMenu).setActionListener(eq(Action.SHOW_SIMPLE_SEARCH), any());
+		verify(mockActionMenu).setActionListener(eq(Action.SHOW_QUERY), any());
+		verify(mockActionMenu).setActionListener(eq(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS), any());
+		verify(mockActionMenu).setActionListener(eq(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST), any());
+	}
+	
+	@Test
+	public void testFileCommandsHidden() {
+		configureBundleWithView(ViewType.project);
+		boolean canEdit = true;
+		
+		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		
+		verify(mockActionMenu).setActionVisible(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, false);
+		verify(mockActionMenu).setActionVisible(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, false);
+	}
+	
+	@Test
 	public void testOnExecuteViewQuery() {
 		TableType tableType = TableType.projects;
 		configureBundleWithView(ViewType.project);
