@@ -293,6 +293,7 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 		queryResultsWidget.setFacetsVisible(true);
 		actionMenu.setActionVisible(Action.SHOW_QUERY, true);
 		queryInputWidget.setQueryInputVisible(false);
+		queryInputWidget.setShowSimpleSearchButtonVisible(false);
 	}
 
 	public void hideFiltering() {
@@ -309,8 +310,10 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 		queryResultsWidget.setFacetsVisible(false);
 		actionMenu.setActionVisible(Action.SHOW_QUERY, false);
 		queryInputWidget.setQueryInputVisible(true);
+		queryInputWidget.setShowSimpleSearchButtonVisible(true);
 	}
 
+	@Override
 	public void onShowSimpleSearch() {
 		if (isFacets()) {
 			// does the current query have a where clause?
