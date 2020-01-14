@@ -35,8 +35,8 @@ public class ViewDefaultColumns {
 		FluentFuture<List<ColumnModel>> fileViewColumnsFuture = jsClient.getDefaultColumnsForView(ViewType.file);
 		FluentFuture<List<ColumnModel>> projectViewColumnsFuture = jsClient.getDefaultColumnsForView(ViewType.project);
 		FluentFuture.from(whenAllComplete(fileViewColumnsFuture, projectViewColumnsFuture).call(() -> {
-			defaultFileViewColumns = fileViewColumnsFuture.get();
-			defaultProjectViewColumns = projectViewColumnsFuture.get();
+			defaultFileViewColumns = clearIds(fileViewColumnsFuture.get());
+			defaultProjectViewColumns = clearIds(projectViewColumnsFuture.get());
 			return null;
 		}, directExecutor())).catching(Throwable.class, e -> {
 			popupUtils.showErrorMessage(e.getMessage());
@@ -60,11 +60,11 @@ public class ViewDefaultColumns {
 		}
 	}
 
-	public List<ColumnModel> getDefaultViewColumns(boolean includesFiles, boolean isClearIds) {
+	public List<ColumnModel> getDefaultViewColumns(boolean includesFiles) {
 		if (includesFiles) {
-			return isClearIds ? clearIds(defaultFileViewColumns) : defaultFileViewColumns;
+			return defaultFileViewColumns;
 		} else {
-			return isClearIds ? clearIds(defaultProjectViewColumns) : defaultProjectViewColumns;
+			return defaultProjectViewColumns;
 		}
 	}
 
@@ -80,5 +80,15 @@ public class ViewDefaultColumns {
 			popupUtils.showErrorMessage(e.getMessage());
 		}
 		return newColumns;
+	}
+	
+	public ColumnModel deepColumnModel(ColumnModel cm) {
+		try {
+			ColumnModel cmCopy = new ColumnModel(cm.writeToJSONObject(adapterFactory.createNew()));
+			return cmCopy;
+		} catch (JSONObjectAdapterException e) {
+			popupUtils.showErrorMessage(e.getMessage());
+		}
+		return null;
 	}
 }

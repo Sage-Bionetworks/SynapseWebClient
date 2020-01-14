@@ -105,8 +105,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	}
 
 	public void getDefaultColumnsForView() {
-		boolean clearIds = true;
-		List<ColumnModel> defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.isIncludeFiles(), clearIds);
+		List<ColumnModel> defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.isIncludeFiles());
 		editor.addColumns(defaultColumns);
 	}
 
