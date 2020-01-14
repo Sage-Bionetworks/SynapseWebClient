@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.Popover;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.MarkdownIt;
 import org.sagebionetworks.web.client.MarkdownItImpl;
@@ -54,7 +55,7 @@ public class HelpWidget implements IsWidget {
 	@UiField
 	SpanElement innerIconSpan;
 
-	Widget widget;
+	Span widget;
 	private String popoverElementId;
 	private String closePopoverJs;
 	private IconType iconType = IconType.QUESTION_CIRCLE;
@@ -68,7 +69,7 @@ public class HelpWidget implements IsWidget {
 	String text = "", basicHelpText = "", moreHelpHTML = "", iconStyles = "lightGreyText", closeHTML = "";
 
 	public HelpWidget() {
-		widget = uiBinder.createAndBindUi(this);
+		widget = (Span)uiBinder.createAndBindUi(this);
 		anchor.getElement().setAttribute("tabindex", "0");
 		popoverElementId = HTMLPanel.createUniqueId();
 		helpPopover.getWidget().getElement().setId(popoverElementId);
@@ -87,6 +88,9 @@ public class HelpWidget implements IsWidget {
 		}), KeyDownEvent.getType());
 	}
 
+	public void setWidth(String width) {
+		widget.setWidth(width);
+	}
 	public void setText(String text) {
 		this.text = text;
 		updateContent();

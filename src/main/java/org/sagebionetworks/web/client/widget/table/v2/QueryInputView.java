@@ -24,28 +24,6 @@ public interface QueryInputView extends IsWidget {
 		 * Called to rest the query.
 		 */
 		void onReset();
-
-		/**
-		 * Called when the user clicks edit results.
-		 */
-		void onEditResults();
-
-		/**
-		 * Called when the user clicks download results.
-		 */
-		void onExportTable();
-
-		/**
-		 * Called when the user clicks show query.
-		 */
-		void onShowQuery();
-
-		/**
-		 * Called when the user clicks download files.
-		 */
-		void onDownloadFilesProgrammatically();
-
-		void onAddToDownloadList();
 	}
 
 	/**
@@ -89,34 +67,5 @@ public interface QueryInputView extends IsWidget {
 	 */
 	public void setInputErrorMessage(String string);
 
-	/**
-	 * Enable/disable the edit query results button.
-	 * 
-	 * @param wasSuccessful
-	 */
-	public void setEditEnabled(boolean enabled);
-
-	/**
-	 * Enable/disable the download query results button.
-	 * 
-	 * @param enabled
-	 */
-	public void setDownloadEnabled(boolean enabled);
-
-	/**
-	 * Show/hide the edit results button.
-	 * 
-	 * @param isEditable
-	 */
-	public void setEditVisible(boolean visibile);
-
 	public void setQueryInputVisible(boolean visible);
-
-	public void setShowQueryVisible(boolean visible);
-
-	public void setDownloadFilesVisible(boolean visible);
-	
-	public void setActionMenu(IsWidget w);
-
-	public void hideActionMenu();
 }

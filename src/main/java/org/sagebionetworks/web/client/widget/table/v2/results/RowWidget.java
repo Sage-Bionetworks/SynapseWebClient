@@ -62,13 +62,14 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 		// Setup each cell
 		List<ColumnModel> defaultColumns = null;
 		if (isEditor) {
-			boolean clearIds = false;
-			defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.isIncludeFiles(), clearIds);
+			defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.isIncludeFiles());
 		}
 		for (ColumnModel type : types) {
 			// Create each cell
 			Cell cell = null;
-			if (isEditor && (TableType.table.equals(tableType) || !defaultColumns.contains(type))) {
+			ColumnModel deepCopyCM = fileViewDefaultColumns.deepColumnModel(type);
+			deepCopyCM.setId(null);
+			if (isEditor && (TableType.table.equals(tableType) || !defaultColumns.contains(deepCopyCM))) {
 				cell = cellFactory.createEditor(type);
 			} else {
 				cell = cellFactory.createRenderer(type);

@@ -12,6 +12,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.ComplexPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -34,23 +35,19 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	@UiField
 	Button toolsMenu;
 
-	Widget widget;
+	FlowPanel widget;
 	@UiField
 	Divider actDivider;
 	@UiField
 	DropDownHeader noActionsAvailable;
 	@UiField
 	DropDownHeader actHeader;
-	Presenter presenter;
+	@UiField
+	Button tableDownloadOptions;
 
 	@Inject
 	public ActionMenuWidgetViewImpl(Binder binder) {
-		widget = binder.createAndBindUi(this);
-	}
-
-	@Override
-	public void setPresenter(Presenter p) {
-		presenter = p;
+		widget = (FlowPanel)binder.createAndBindUi(this);
 	}
 
 	@Override
@@ -61,7 +58,7 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	@Override
 	public Iterable<ActionView> listActionViews() {
 		List<ActionView> list = new LinkedList<ActionView>();
-		recursiveSearch(list, dropdown);
+		recursiveSearch(list, widget);
 		return list;
 	}
 
@@ -96,7 +93,12 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 		actDivider.setVisible(visible);
 		actHeader.setVisible(visible);
 	}
-
+	
+	@Override
+	public void setTableDownloadOptionsVisible(boolean visible) {
+		tableDownloadOptions.setVisible(visible);
+	}
+	
 	@Override
 	public void setToolsButtonIcon(String text, IconType icon) {
 		toolsMenu.setText(text);

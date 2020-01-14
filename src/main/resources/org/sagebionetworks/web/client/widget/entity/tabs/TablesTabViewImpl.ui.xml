@@ -10,12 +10,13 @@
 			<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width">
 				<g:SimplePanel ui:field="tableBreadcrumbContainer" visible="false"/>
 				<g:SimplePanel ui:field="tableTitlebarContainer" visible="false"/>
-				<g:SimplePanel ui:field="tableMetadataContainer" visible="false"/>
-				<b:Heading size="H3" ui:field="title" text="Tables" addStyleNames="margin-bottom-20"/>
 			</bh:Div>
 			<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end min-width-70" ui:field="actionMenuContainer"/>
 		</bh:Div>
-		
+		<bh:Div addStyleNames="margin-left-15 margin-right-15">
+			<g:SimplePanel ui:field="tableMetadataContainer" visible="false"/>
+			<b:Heading size="H3" ui:field="title" text="Tables" addStyleNames="margin-bottom-20"/>
+		</bh:Div>
 		<b:Column size="XS_12">
 			<g:SimplePanel ui:field="tableListWidgetContainer" visible="false"/>
 			<g:SimplePanel addStyleNames="margin-top-15" ui:field="tableWidgetContainer"/>

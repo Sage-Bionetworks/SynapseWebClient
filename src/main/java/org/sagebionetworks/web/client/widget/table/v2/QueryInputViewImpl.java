@@ -1,19 +1,15 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
-import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Divider;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.widget.InfoAlert;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -40,21 +36,6 @@ public class QueryInputViewImpl implements QueryInputView {
 	Button queryButton;
 	@UiField
 	InfoAlert queryResultsMessage;
-	@UiField
-	Button editResultsButton;
-	@UiField
-	Button showQueryButton;
-	@UiField
-	AnchorListItem addToDownloadListLink;
-	@UiField
-	AnchorListItem programmaticOptionsLink;
-	@UiField
-	AnchorListItem exportTableLink;
-	@UiField
-	Divider downloadOptionsDivider;
-	@UiField
-	Span actionMenuContainer;
-
 	HTMLPanel panel;
 	Presenter presenter;
 
@@ -77,21 +58,6 @@ public class QueryInputViewImpl implements QueryInputView {
 			if (KeyCodes.KEY_ENTER == event.getNativeKeyCode()) {
 				presenter.onExecuteQuery();
 			}
-		});
-		editResultsButton.addClickHandler(event -> {
-			presenter.onEditResults();
-		});
-		exportTableLink.addClickHandler(event -> {
-			presenter.onExportTable();
-		});
-		showQueryButton.addClickHandler(event -> {
-			presenter.onShowQuery();
-		});
-		programmaticOptionsLink.addClickHandler(event -> {
-			presenter.onDownloadFilesProgrammatically();
-		});
-		addToDownloadListLink.addClickHandler(event -> {
-			presenter.onAddToDownloadList();
 		});
 	}
 
@@ -137,45 +103,7 @@ public class QueryInputViewImpl implements QueryInputView {
 	}
 
 	@Override
-	public void setEditEnabled(boolean enabled) {
-		this.editResultsButton.setEnabled(enabled);
-	}
-
-	@Override
-	public void setEditVisible(boolean visibile) {
-		this.editResultsButton.setVisible(visibile);
-	}
-
-	@Override
-	public void setDownloadEnabled(boolean enabled) {
-		exportTableLink.setEnabled(enabled);
-	}
-
-
-	@Override
 	public void setQueryInputVisible(boolean visible) {
 		queryInputGroup.setVisible(visible);
-	}
-
-	@Override
-	public void setShowQueryVisible(boolean visible) {
-		showQueryButton.setVisible(visible);
-	}
-
-	@Override
-	public void setActionMenu(IsWidget w) {
-		w.asWidget().removeFromParent();
-		actionMenuContainer.clear();
-		actionMenuContainer.add(w);
-	}
-	@Override
-	public void hideActionMenu() {
-		actionMenuContainer.setVisible(false);
-	}
-	@Override
-	public void setDownloadFilesVisible(boolean visible) {
-		addToDownloadListLink.setVisible(visible);
-		programmaticOptionsLink.setVisible(visible);
-		downloadOptionsDivider.setVisible(visible);
 	}
 }

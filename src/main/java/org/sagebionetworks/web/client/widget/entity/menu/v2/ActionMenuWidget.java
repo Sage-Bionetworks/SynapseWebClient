@@ -87,4 +87,5 @@ public interface ActionMenuWidget extends IsWidget {
 
 	void setACTDividerVisible(boolean visible);
 
+	void setTableDownloadOptionsVisible(boolean visible);
 }
