@@ -55,11 +55,14 @@ public class RowWidgetTest {
 	TableType tableType;
 	@Mock
 	ViewDefaultColumns mockFileViewDefaultColumns;
+	@Mock
+	ColumnModel mockColumnModel;
 	List<ColumnModel> defaultColumnModels;
 
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
+		when(mockFileViewDefaultColumns.deepColumnModel(any(ColumnModel.class))).thenReturn(mockColumnModel);
 		cellStubs = new LinkedList<CellStub>();
 		tableId = "syn123";
 		// Use stubs for all cells.
@@ -74,7 +77,7 @@ public class RowWidgetTest {
 		when(mockCellFactory.createEditor(any(ColumnModel.class))).thenAnswer(answer);
 		when(mockCellFactory.createRenderer(any(ColumnModel.class))).thenAnswer(answer);
 		defaultColumnModels = new ArrayList<ColumnModel>();
-		when(mockFileViewDefaultColumns.getDefaultViewColumns(anyBoolean(), anyBoolean())).thenReturn(defaultColumnModels);
+		when(mockFileViewDefaultColumns.getDefaultViewColumns(anyBoolean())).thenReturn(defaultColumnModels);
 		types = TableModelTestUtils.createOneOfEachType();
 		// Create a row that matches the type.
 		aRow = TableModelTestUtils.createRows(types, 1).get(0);
@@ -160,9 +163,12 @@ public class RowWidgetTest {
 
 	@Test
 	public void testEditDefaultColumnModelsIsView() {
-		defaultColumnModels.addAll(types);
+		defaultColumnModels.add(types.get(0));
+		defaultColumnModels.add(types.get(1));
+		defaultColumnModels.add(types.get(2));
 		tableType = TableType.files;
 		boolean isEditor = true;
+		when(mockFileViewDefaultColumns.deepColumnModel(any(ColumnModel.class))).thenReturn(defaultColumnModels.get(0), defaultColumnModels.get(1), defaultColumnModels.get(2));
 		rowWidget.configure(tableId, types, isEditor, tableType, aRow, mockListner);
 		verify(mockCellFactory, times(types.size())).createRenderer(any(ColumnModel.class));
 		verify(mockCellFactory, never()).createEditor(any(ColumnModel.class));

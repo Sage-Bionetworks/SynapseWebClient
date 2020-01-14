@@ -13,19 +13,6 @@ import com.google.gwt.user.client.ui.IsWidget;
  */
 public interface TableEntityWidgetView extends IsWidget {
 
-	public interface Presenter {
-		void onShowSimpleSearch();
-
-		void onShowAdvancedSearch();
-	}
-
-	/**
-	 * Bind this view to the presenter.
-	 * 
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
-
 	/**
 	 * Configure the view with the table data.
 	 * 
@@ -94,10 +81,6 @@ public interface TableEntityWidgetView extends IsWidget {
 	void showErrorMessage(String message);
 
 	void showConfirmDialog(String title, String confirmationMessage, Callback yesCallback);
-
-	void setSimpleSearchLinkVisible(boolean visible);
-
-	void setAdvancedSearchLinkVisible(boolean visible);
 
 	void setAddToDownloadList(IsWidget w);
 }

@@ -193,7 +193,10 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler {
 		view.clearTableEntityWidget();
 		modifiedCreatedBy.setVisible(false);
 		view.setTableUIVisible(isTable);
-		
+		view.setActionMenu(tab.getEntityActionMenu());
+		tab.getEntityActionMenu().setTableDownloadOptionsVisible(isTable);
+		boolean isCurrentVersion = version == null;
+		tab.configureEntityActionController(bundle, isCurrentVersion, null);
 		if (isTable) {
 			updateVersionAndAreaToken(entity.getId(), version, areaToken);
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
@@ -203,13 +206,10 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler {
 			view.setTableEntityWidget(v2TableWidget.asWidget());
 			v2TableWidget.configure(bundle, version, bundle.getPermissions().getCanCertifiedUserEdit(), this, tab.getEntityActionMenu());
 		} else if (isProject) {
-			view.setActionMenu(tab.getEntityActionMenu());
 			areaToken = null;
 			tableListWidget.configure(bundle);
 			showProjectLevelUI();
 		}
-		boolean isCurrentVersion = version == null;
-		tab.configureEntityActionController(bundle, isCurrentVersion, null);
 	}
 
 	public Tab asTab() {

@@ -32,15 +32,8 @@
 		<b:Alert ui:field="tableMessage" type="INFO" visible="false" />
 		<bh:Div ui:field="tableToolbar">
 			<bh:Div>
-				<b:Anchor ui:field="showSimpleSearch"
-					text="Show simple search" visible="false" />
-			</bh:Div>
-			<bh:Div>
 				<g:SimplePanel ui:field="queryInputPanel"
 					addStyleNames="displayInline" />
-				<b:Anchor ui:field="showAdvancedSearch"
-					text="Show advanced search" addStyleNames="moveup-18"
-					visible="false" />
 			</bh:Div>
 		</bh:Div>
 
