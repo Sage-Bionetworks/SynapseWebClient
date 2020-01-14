@@ -88,6 +88,8 @@ public class TablePageWidgetTest {
 	CallbackP<FacetColumnRequest> mockFacetChangedHandler;
 	@Mock
 	ViewDefaultColumns mockFileViewDefaultColumns;
+	@Mock
+	ColumnModel mockColumnModel;
 	List<ColumnModel> defaultColumnModels;
 	public static final String ENTITY_ID = "syn123";
 
@@ -132,7 +134,8 @@ public class TablePageWidgetTest {
 			}
 		});
 		defaultColumnModels = new ArrayList<ColumnModel>();
-		when(mockFileViewDefaultColumns.getDefaultViewColumns(anyBoolean(), anyBoolean())).thenReturn(defaultColumnModels);
+		when(mockFileViewDefaultColumns.getDefaultViewColumns(anyBoolean())).thenReturn(defaultColumnModels);
+		when(mockFileViewDefaultColumns.deepColumnModel(any(ColumnModel.class))).thenReturn(mockColumnModel);
 		widget = new TablePageWidget(mockView, mockGinInjector, mockPaginationWidget);
 
 		schema = TableModelTestUtils.createOneOfEachType();
