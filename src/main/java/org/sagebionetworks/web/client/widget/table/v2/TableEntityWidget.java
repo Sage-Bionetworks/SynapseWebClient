@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.table.v2;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
@@ -28,7 +27,6 @@ import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidge
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -294,10 +292,10 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 	private void showSimpleSearchUI() {
 		actionMenu.setActionVisible(Action.SHOW_ADVANCED_SEARCH, true);
 		actionMenu.setActionVisible(Action.SHOW_SIMPLE_SEARCH, false);
+		queryInputWidget.setShowSimpleSearchButtonVisible(false);
 		queryResultsWidget.setFacetsVisible(true);
 		actionMenu.setActionVisible(Action.SHOW_QUERY, true);
 		queryInputWidget.setQueryInputVisible(false);
-		queryInputWidget.setShowSimpleSearchButtonVisible(false);
 	}
 
 	public void hideFiltering() {
@@ -305,6 +303,7 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 		queryResultsWidget.setFacetsVisible(false);
 		actionMenu.setActionVisible(Action.SHOW_ADVANCED_SEARCH, false);
 		actionMenu.setActionVisible(Action.SHOW_SIMPLE_SEARCH, false);
+		queryInputWidget.setShowSimpleSearchButtonVisible(false);
 	}
 
 	private void showAdvancedSearchUI() {
@@ -312,10 +311,10 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 		// SWC-3762: show the simple search link if facets exist, or if the user can set up facets.
 		boolean showSimpleSearch = isFacets() || canEdit;
 		actionMenu.setActionVisible(Action.SHOW_SIMPLE_SEARCH, showSimpleSearch);
+		queryInputWidget.setShowSimpleSearchButtonVisible(showSimpleSearch);
 		queryResultsWidget.setFacetsVisible(false);
 		actionMenu.setActionVisible(Action.SHOW_QUERY, false);
 		queryInputWidget.setQueryInputVisible(true);
-		queryInputWidget.setShowSimpleSearchButtonVisible(showSimpleSearch);
 	}
 
 	@Override
