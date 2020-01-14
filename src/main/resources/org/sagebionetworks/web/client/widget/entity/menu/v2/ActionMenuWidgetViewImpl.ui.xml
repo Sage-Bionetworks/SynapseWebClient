@@ -7,10 +7,10 @@
 
 	<g:FlowPanel>
 		<b:Tooltip title="Show advanced search">
-			<a:ActionButton visible="false" icon="COG" addStyleNames="margin-right-5" action="SHOW_ADVANCED_SEARCH" />
+			<a:ActionButton visible="false" icon="SYN_ADVANCED_SEARCH" addStyleNames="margin-right-5" action="SHOW_ADVANCED_SEARCH" />
 		</b:Tooltip>
 		<b:Tooltip title="Show simple search">
-			<a:ActionButton visible="false" icon="COG" addStyleNames="margin-right-5" action="SHOW_SIMPLE_SEARCH" />
+			<a:ActionButton visible="false" icon="SYN_ADVANCED_SEARCH" addStyleNames="margin-right-5" action="SHOW_SIMPLE_SEARCH" />
 		</b:Tooltip>
 		<b:Tooltip title="Show query">
 			<a:ActionButton visible="false" icon="DATABASE" addStyleNames="margin-right-5" action="SHOW_QUERY" />

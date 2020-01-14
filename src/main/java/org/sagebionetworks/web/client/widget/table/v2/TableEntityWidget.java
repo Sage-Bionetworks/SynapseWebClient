@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.table.v2;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
