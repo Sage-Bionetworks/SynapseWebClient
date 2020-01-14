@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.InputGroup;
@@ -36,6 +37,8 @@ public class QueryInputViewImpl implements QueryInputView {
 	Button queryButton;
 	@UiField
 	InfoAlert queryResultsMessage;
+	@UiField
+	Anchor simpleModeLink;
 	HTMLPanel panel;
 	Presenter presenter;
 
@@ -58,6 +61,9 @@ public class QueryInputViewImpl implements QueryInputView {
 			if (KeyCodes.KEY_ENTER == event.getNativeKeyCode()) {
 				presenter.onExecuteQuery();
 			}
+		});
+		simpleModeLink.addClickHandler(event -> {
+			presenter.onShowSimpleSearch();
 		});
 	}
 
@@ -105,5 +111,9 @@ public class QueryInputViewImpl implements QueryInputView {
 	@Override
 	public void setQueryInputVisible(boolean visible) {
 		queryInputGroup.setVisible(visible);
+	}
+	@Override
+	public void setShowSimpleSearchButtonVisible(boolean visible) {
+		simpleModeLink.setVisible(visible);		
 	}
 }

@@ -17,11 +17,14 @@
 				<b:Button ui:field="queryButton" icon="SEARCH"
 					type="INFO" dataLoadingText="Executing...">Query</b:Button>
 			</b:InputGroupButton>
+			<b:Tooltip title="Show simple search">
+				<b:Anchor icon="TIMES" ui:field="simpleModeLink" addStyleNames="font-size-24 moveup-10 displayTableCell" width="25px" paddingLeft="3" />
+			</b:Tooltip>
 			<w:HelpWidget
 				helpMarkdown="The data contained within a Synapse `Table` can be retrieved by using a SQL-like query language either through the web portal or through the analytical clients."
 				href="http://docs.synapse.org/articles/tables.html#table-data"
 				width="22px"
-				placement="LEFT" addStyleNames="margin-left-5 moveup-18 displayTableCell" />
+				placement="LEFT" addStyleNames="margin-left-5 moveup-15 displayTableCell" />
 		</b:InputGroup>
 		<w:InfoAlert ui:field="queryResultsMessage"
 			visible="false" alertType="DANGER" icon="EXCLAMATION_CIRCLE"
