@@ -310,11 +310,12 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 	private void showAdvancedSearchUI() {
 		actionMenu.setActionVisible(Action.SHOW_ADVANCED_SEARCH, false);
 		// SWC-3762: show the simple search link if facets exist, or if the user can set up facets.
-		actionMenu.setActionVisible(Action.SHOW_SIMPLE_SEARCH, isFacets() || canEdit);
+		boolean showSimpleSearch = isFacets() || canEdit;
+		actionMenu.setActionVisible(Action.SHOW_SIMPLE_SEARCH, showSimpleSearch);
 		queryResultsWidget.setFacetsVisible(false);
 		actionMenu.setActionVisible(Action.SHOW_QUERY, false);
 		queryInputWidget.setQueryInputVisible(true);
-		queryInputWidget.setShowSimpleSearchButtonVisible(true);
+		queryInputWidget.setShowSimpleSearchButtonVisible(showSimpleSearch);
 	}
 
 	@Override
