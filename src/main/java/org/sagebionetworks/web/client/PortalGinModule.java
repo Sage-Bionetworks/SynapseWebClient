@@ -928,7 +928,7 @@ public class PortalGinModule extends AbstractGinModule {
 		// FileBox
 		bind(FileTitleBarView.class).to(FileTitleBarViewImpl.class).in(Singleton.class);
 		bind(BasicTitleBarView.class).to(BasicTitleBarViewImpl.class);
-		
+
 		// Search Box
 		bind(SearchBoxView.class).to(SearchBoxViewImpl.class).in(Singleton.class);
 

@@ -215,6 +215,9 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 		this.actionMenu.setActionListener(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, action -> {
 			onShowDownloadFilesProgrammatically();
 		});
+		this.actionMenu.setActionListener(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, action -> {
+			onAddToDownloadList();
+		});
 	}
 
 	/**
