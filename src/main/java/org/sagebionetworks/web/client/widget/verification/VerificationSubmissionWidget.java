@@ -196,7 +196,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			view.setTitle("Profile Validation Suspended");
 			view.setSuspendedReason(currentState.getReason());
 			view.setSuspendedAlertVisible(true);
-			view.setResubmitButtonVisible(true);
+			view.setResubmitButtonVisible(!isACTMember);
 			view.setCloseButtonVisible(true);
 		}
 		fileHandleList.configure().setCanDelete(false).setCanUpload(false);

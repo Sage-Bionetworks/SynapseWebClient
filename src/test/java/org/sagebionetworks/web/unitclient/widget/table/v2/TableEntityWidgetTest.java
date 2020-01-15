@@ -532,6 +532,7 @@ public class TableEntityWidgetTest {
 	private void verifySimpleSearchUI() {
 		verify(mockActionMenu).setActionVisible(Action.SHOW_ADVANCED_SEARCH, true);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_SIMPLE_SEARCH, false);
+		verify(mockQueryInputWidget).setShowSimpleSearchButtonVisible(false);
 		verify(mockQueryResultsWidget).setFacetsVisible(true);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_QUERY, true);
 		verify(mockQueryInputWidget).setQueryInputVisible(false);
@@ -540,6 +541,7 @@ public class TableEntityWidgetTest {
 	private void verifyAdvancedSearchUI() {
 		verify(mockActionMenu).setActionVisible(Action.SHOW_ADVANCED_SEARCH, false);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_SIMPLE_SEARCH, true);
+		verify(mockQueryInputWidget).setShowSimpleSearchButtonVisible(true);
 		verify(mockQueryResultsWidget).setFacetsVisible(false);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_QUERY, false);
 		verify(mockQueryInputWidget).setQueryInputVisible(true);
@@ -662,6 +664,7 @@ public class TableEntityWidgetTest {
 		// verifyAdvancedSearchUI, but simple search link is not shown
 		verify(mockActionMenu).setActionVisible(Action.SHOW_ADVANCED_SEARCH, false);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_SIMPLE_SEARCH, false);
+		verify(mockQueryInputWidget).setShowSimpleSearchButtonVisible(false);
 		verify(mockQueryResultsWidget).setFacetsVisible(false);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_QUERY, false);
 		verify(mockQueryInputWidget).setQueryInputVisible(true);
@@ -690,6 +693,7 @@ public class TableEntityWidgetTest {
 		verify(mockQueryResultsWidget, atLeastOnce()).setFacetsVisible(false);
 		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.SHOW_ADVANCED_SEARCH, false);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_SIMPLE_SEARCH, false);
+		verify(mockQueryInputWidget).setShowSimpleSearchButtonVisible(false);
 	}
 
 	@Test
