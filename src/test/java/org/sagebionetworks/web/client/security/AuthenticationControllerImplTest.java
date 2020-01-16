@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -55,6 +56,8 @@ public class AuthenticationControllerImplTest {
 	UserAccountServiceAsync mockUserAccountService;
 	@Mock
 	ClientCache mockClientCache;
+	@Mock
+	SessionStorage mockSessionStorage;
 	@Mock
 	PortalGinInjector mockGinInjector;
 	@Mock
@@ -83,6 +86,9 @@ public class AuthenticationControllerImplTest {
 	QuarantinedEmailModal mockQuarantinedEmailModal;
 	@Mock
 	EmailQuarantineStatus mockEmailQuarantineStatus;
+	@Mock
+	Place mockPlace;
+	
 	UserProfile profile;
 	UserSessionData usd;
 	public static final String USER_ID = "98208";
@@ -105,7 +111,7 @@ public class AuthenticationControllerImplTest {
 		AsyncMockStubber.callSuccessWith(usd).when(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockNotificationEmail).when(mockJsClient).getNotificationEmail(any(AsyncCallback.class));
 		when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
-		authenticationController = new AuthenticationControllerImpl(mockUserAccountService, mockClientCache, mockCookieProvider, mockGinInjector, mockSynapseJSNIUtils);
+		authenticationController = new AuthenticationControllerImpl(mockUserAccountService, mockClientCache, mockSessionStorage, mockCookieProvider, mockGinInjector, mockSynapseJSNIUtils);
 		when(mockGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockGinInjector.getHeader()).thenReturn(mockHeader);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -116,6 +122,7 @@ public class AuthenticationControllerImplTest {
 
 	@Test
 	public void testLogout() {
+		when(mockGlobalApplicationState.getLastPlace()).thenReturn(mockPlace);
 		when(mockClientCache.get(USER_AUTHENTICATION_RECEIPT)).thenReturn(USER_AUTHENTICATION_RECEIPT_VALUE);
 
 		authenticationController.logoutUser();
@@ -123,8 +130,11 @@ public class AuthenticationControllerImplTest {
 		// sets session cookie
 		verify(mockJsClient).initSession(eq(WebConstants.EXPIRE_SESSION_TOKEN));
 		verify(mockClientCache).clear();
+		verify(mockSessionStorage).clear();
 		// verify that authentication receipt is restored
 		verify(mockClientCache).put(eq(USER_AUTHENTICATION_RECEIPT), eq(USER_AUTHENTICATION_RECEIPT_VALUE), anyLong());
+		// verify last place is restored
+		verify(mockGlobalApplicationState).setLastPlace(mockPlace);
 		verify(mockSessionDetector).initializeSessionTokenState();
 		verify(mockGlobalApplicationState).refreshPage();
 		verify(mockJsClient).logout();

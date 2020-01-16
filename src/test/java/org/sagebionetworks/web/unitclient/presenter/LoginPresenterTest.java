@@ -86,6 +86,7 @@ public class LoginPresenterTest {
 		when(mockLoginPlace.toToken()).thenReturn(LoginPlace.LOGOUT_TOKEN);
 		loginPresenter.setPlace(mockLoginPlace);
 		verify(mockAuthenticationController).logoutUser();
+		verify(mockGlobalApplicationState).clearLastPlace();
 		verify(mockPlaceChanger).goTo(any(Home.class));
 	}
 
