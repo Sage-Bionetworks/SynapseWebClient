@@ -35,6 +35,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -147,7 +148,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		entityAnchor = new Button();
 		clickHandlerRegistration = entityAnchor.addClickHandler(STANDARD_CLICKHANDLER);
 		entityAnchor.setText(entityHeader.getName());
-		entityAnchor.setWidth("400px");
+		entityAnchor.setWidth("100%");
 		entityAnchor.addStyleName("text-align-left text-overflow-ellipsis inline-block whitespace-nowrap overflowHidden");
 		entityAnchor.setHref("#!Synapse:" + entityHeader.getId());
 		entityAnchor.getElement().setAttribute(ENTITY_ID_ATTRIBUTE, entityHeader.getId());
@@ -176,8 +177,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 
 	@Override
 	public void setEntityNameWidthPx(int width) {
-		entityTableData.setWidth(width + "px");
-		entityAnchor.setWidth(width + "px");
+		entityTableData.getElement().setAttribute("style", "max-width:" + width+"px; min-width:"+width+"px");
 	}
 
 	@Override
