@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import static org.sagebionetworks.web.client.DisplayUtils.replaceWithNullIfEmptyTrimmedString;
+import static org.sagebionetworks.web.client.DisplayUtils.*;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import java.util.List;
 import org.sagebionetworks.repo.model.Entity;
@@ -87,30 +87,30 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 				// if null, then still show the default UI
 				if (location != null) {
 					// set up the view
-					String banner = replaceWithNullIfEmptyTrimmedString(location.getBanner());
+					String banner = trim(location.getBanner());
 					if (location instanceof ExternalS3StorageLocationSetting) {
 						ExternalS3StorageLocationSetting setting = (ExternalS3StorageLocationSetting) location;
-						view.setS3BaseKey(replaceWithNullIfEmptyTrimmedString(setting.getBaseKey()));
-						view.setS3Bucket(replaceWithNullIfEmptyTrimmedString(setting.getBucket()));
+						view.setS3BaseKey(trim(setting.getBaseKey()));
+						view.setS3Bucket(trim(setting.getBucket()));
 						view.setExternalS3Banner(banner);
 						view.selectExternalS3Storage();
 					} else if (location instanceof ExternalGoogleCloudStorageLocationSetting) {
 						view.setGoogleCloudVisible(true);
 						ExternalGoogleCloudStorageLocationSetting setting = (ExternalGoogleCloudStorageLocationSetting) location;
-						view.setGoogleCloudBaseKey(replaceWithNullIfEmptyTrimmedString(setting.getBaseKey()));
-						view.setGoogleCloudBucket(replaceWithNullIfEmptyTrimmedString(setting.getBucket()));
+						view.setGoogleCloudBaseKey(trim(setting.getBaseKey()));
+						view.setGoogleCloudBucket(trim(setting.getBucket()));
 						view.setExternalGoogleCloudBanner(banner);
 						view.selectExternalGoogleCloudStorage();
 					} else if (location instanceof ExternalObjectStorageLocationSetting) {
 						ExternalObjectStorageLocationSetting setting = (ExternalObjectStorageLocationSetting) location;
 						view.setExternalObjectStoreBanner(banner);
-						view.setExternalObjectStoreBucket(replaceWithNullIfEmptyTrimmedString(setting.getBucket()));
-						view.setExternalObjectStoreEndpointUrl(replaceWithNullIfEmptyTrimmedString(setting.getEndpointUrl()));
+						view.setExternalObjectStoreBucket(trim(setting.getBucket()));
+						view.setExternalObjectStoreEndpointUrl(trim(setting.getEndpointUrl()));
 						view.selectExternalObjectStore();
 					} else if (location instanceof ExternalStorageLocationSetting) {
 						view.setSFTPVisible(true);
 						ExternalStorageLocationSetting setting = (ExternalStorageLocationSetting) location;
-						view.setSFTPUrl(replaceWithNullIfEmptyTrimmedString(setting.getUrl()));
+						view.setSFTPUrl(trim(setting.getUrl()));
 						view.setSFTPBanner(banner);
 						view.selectSFTPStorage();
 					}
@@ -167,29 +167,29 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 	public StorageLocationSetting getStorageLocationSettingFromView() {
 		if (view.isExternalS3StorageSelected()) {
 			ExternalS3StorageLocationSetting setting = new ExternalS3StorageLocationSetting();
-			setting.setBanner(view.getExternalS3Banner().trim());
-			setting.setBucket(view.getS3Bucket().trim());
-			setting.setBaseKey(view.getS3BaseKey().trim());
+			setting.setBanner(replaceWithNullIfEmptyTrimmedString(view.getExternalS3Banner()));
+			setting.setBucket(replaceWithNullIfEmptyTrimmedString(view.getS3Bucket()));
+			setting.setBaseKey(replaceWithNullIfEmptyTrimmedString(view.getS3BaseKey()));
 			setting.setUploadType(UploadType.S3);
 			return setting;
 		} else if (view.isExternalGoogleCloudStorageSelected()) {
 			ExternalGoogleCloudStorageLocationSetting setting = new ExternalGoogleCloudStorageLocationSetting();
-			setting.setBanner(view.getExternalGoogleCloudBanner().trim());
-			setting.setBucket(view.getGoogleCloudBucket().trim());
-			setting.setBaseKey(view.getGoogleCloudBaseKey().trim());
+			setting.setBanner(replaceWithNullIfEmptyTrimmedString(view.getExternalGoogleCloudBanner()));
+			setting.setBucket(replaceWithNullIfEmptyTrimmedString(view.getGoogleCloudBucket()));
+			setting.setBaseKey(replaceWithNullIfEmptyTrimmedString(view.getGoogleCloudBaseKey()));
 			setting.setUploadType(UploadType.GOOGLECLOUDSTORAGE);
 			return setting;
 		} else if (view.isExternalObjectStoreSelected()) {
 			ExternalObjectStorageLocationSetting setting = new ExternalObjectStorageLocationSetting();
-			setting.setBanner(view.getExternalObjectStoreBanner().trim());
-			setting.setBucket(view.getExternalObjectStoreBucket().trim());
-			setting.setEndpointUrl(view.getExternalObjectStoreEndpointUrl().trim());
+			setting.setBanner(replaceWithNullIfEmptyTrimmedString(view.getExternalObjectStoreBanner()));
+			setting.setBucket(replaceWithNullIfEmptyTrimmedString(view.getExternalObjectStoreBucket()));
+			setting.setEndpointUrl(replaceWithNullIfEmptyTrimmedString(view.getExternalObjectStoreEndpointUrl()));
 			setting.setUploadType(UploadType.S3);
 			return setting;
 		} else if (view.isSFTPStorageSelected()) {
 			ExternalStorageLocationSetting setting = new ExternalStorageLocationSetting();
-			setting.setUrl(view.getSFTPUrl().trim());
-			setting.setBanner(view.getSFTPBanner().trim());
+			setting.setUrl(replaceWithNullIfEmptyTrimmedString(view.getSFTPUrl()));
+			setting.setBanner(replaceWithNullIfEmptyTrimmedString(view.getSFTPBanner()));
 			setting.setUploadType(UploadType.SFTP);
 			return setting;
 		} else {
