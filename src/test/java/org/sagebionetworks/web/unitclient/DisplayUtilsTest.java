@@ -3,7 +3,7 @@ package org.sagebionetworks.web.unitclient;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.sagebionetworks.web.client.DisplayUtils.trim;
+import static org.sagebionetworks.web.client.DisplayUtils.replaceWithNullIfEmptyTrimmedString;
 import java.util.Arrays;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -316,10 +316,11 @@ public class DisplayUtilsTest {
 	}
 
 	@Test
-	public void testTrim() {
-		assertEquals("", trim(null));
-		assertEquals("", trim(" \t"));
-		assertEquals("test", trim("  test     \t"));
+	public void testReplaceWithNullIfEmptyString() {
+		assertEquals(null, replaceWithNullIfEmptyTrimmedString(""));
+		assertEquals(null, replaceWithNullIfEmptyTrimmedString(null));
+		assertEquals(null, replaceWithNullIfEmptyTrimmedString(" \t"));
+		assertEquals("test", replaceWithNullIfEmptyTrimmedString("  test     \t"));
 	}
 }
 

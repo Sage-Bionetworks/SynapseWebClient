@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import static org.sagebionetworks.web.client.DisplayUtils.trim;
+import static org.sagebionetworks.web.client.DisplayUtils.replaceWithNullIfEmptyTrimmedString;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import java.util.List;
 import org.sagebionetworks.repo.model.Entity;
@@ -87,30 +87,30 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 				// if null, then still show the default UI
 				if (location != null) {
 					// set up the view
-					String banner = trim(location.getBanner());
+					String banner = replaceWithNullIfEmptyTrimmedString(location.getBanner());
 					if (location instanceof ExternalS3StorageLocationSetting) {
 						ExternalS3StorageLocationSetting setting = (ExternalS3StorageLocationSetting) location;
-						view.setS3BaseKey(trim(setting.getBaseKey()));
-						view.setS3Bucket(trim(setting.getBucket()));
+						view.setS3BaseKey(replaceWithNullIfEmptyTrimmedString(setting.getBaseKey()));
+						view.setS3Bucket(replaceWithNullIfEmptyTrimmedString(setting.getBucket()));
 						view.setExternalS3Banner(banner);
 						view.selectExternalS3Storage();
 					} else if (location instanceof ExternalGoogleCloudStorageLocationSetting) {
 						view.setGoogleCloudVisible(true);
 						ExternalGoogleCloudStorageLocationSetting setting = (ExternalGoogleCloudStorageLocationSetting) location;
-						view.setGoogleCloudBaseKey(trim(setting.getBaseKey()));
-						view.setGoogleCloudBucket(trim(setting.getBucket()));
+						view.setGoogleCloudBaseKey(replaceWithNullIfEmptyTrimmedString(setting.getBaseKey()));
+						view.setGoogleCloudBucket(replaceWithNullIfEmptyTrimmedString(setting.getBucket()));
 						view.setExternalGoogleCloudBanner(banner);
 						view.selectExternalGoogleCloudStorage();
 					} else if (location instanceof ExternalObjectStorageLocationSetting) {
 						ExternalObjectStorageLocationSetting setting = (ExternalObjectStorageLocationSetting) location;
 						view.setExternalObjectStoreBanner(banner);
-						view.setExternalObjectStoreBucket(trim(setting.getBucket()));
-						view.setExternalObjectStoreEndpointUrl(trim(setting.getEndpointUrl()));
+						view.setExternalObjectStoreBucket(replaceWithNullIfEmptyTrimmedString(setting.getBucket()));
+						view.setExternalObjectStoreEndpointUrl(replaceWithNullIfEmptyTrimmedString(setting.getEndpointUrl()));
 						view.selectExternalObjectStore();
 					} else if (location instanceof ExternalStorageLocationSetting) {
 						view.setSFTPVisible(true);
 						ExternalStorageLocationSetting setting = (ExternalStorageLocationSetting) location;
-						view.setSFTPUrl(trim(setting.getUrl()));
+						view.setSFTPUrl(replaceWithNullIfEmptyTrimmedString(setting.getUrl()));
 						view.setSFTPBanner(banner);
 						view.selectSFTPStorage();
 					}

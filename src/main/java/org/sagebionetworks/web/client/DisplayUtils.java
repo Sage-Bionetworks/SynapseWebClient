@@ -1014,16 +1014,6 @@ public class DisplayUtils {
 	}
 
 	/**
-	 * return empty string if null, trimmed if not null
-	 * 
-	 * @param s
-	 * @return
-	 */
-	public static String trim(String s) {
-		return replaceWithEmptyStringIfNull(s).trim();
-	}
-
-	/**
 	 * just return the empty string if input string parameter s is null, otherwise returns s.
 	 */
 	public static String replaceWithEmptyStringIfNull(String s) {
@@ -1031,6 +1021,21 @@ public class DisplayUtils {
 			return "";
 		else
 			return s;
+	}
+	
+	/**
+	 * return null if the input string is empty, otherwise return the input string trimmed.
+	 */
+	public static String replaceWithNullIfEmptyTrimmedString(String s) {
+		if (s == null) {
+			return null;
+		}
+		// else
+		String trimmedString = s.trim();
+		if (trimmedString.isEmpty()) {
+			return null;
+		}
+		return trimmedString;
 	}
 
 	/**
