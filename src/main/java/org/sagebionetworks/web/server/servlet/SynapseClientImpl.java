@@ -1598,26 +1598,9 @@ public class SynapseClientImpl extends SynapseClientBase implements SynapseClien
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			// first, try to find a matching storage location setting for this user, and reuse
-			List<StorageLocationSetting> existingStorageLocations = synapseClient.getMyStorageLocationSettings();
 			Long locationId = null;
 			if (setting != null) {
-				for (StorageLocationSetting existingStorageLocationSetting : existingStorageLocations) {
-					Long existingLocationId = existingStorageLocationSetting.getStorageLocationId();
-					existingStorageLocationSetting.setCreatedOn(null);
-					existingStorageLocationSetting.setEtag(null);
-					existingStorageLocationSetting.setStorageLocationId(null);
-					existingStorageLocationSetting.setCreatedBy(null);
-					existingStorageLocationSetting.setDescription(null);
-					if (setting.equals(existingStorageLocationSetting)) {
-						// found matching storage location setting
-						locationId = existingLocationId;
-						break;
-					}
-				}
-				if (locationId == null) {
-					// not found, create a new one
 					locationId = synapseClient.createStorageLocationSetting(setting).getStorageLocationId();
-				}
 			} else {
 				locationId = defaultStorageLocation;
 			}

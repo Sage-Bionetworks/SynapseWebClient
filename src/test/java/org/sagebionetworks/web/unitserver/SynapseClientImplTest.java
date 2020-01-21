@@ -1341,7 +1341,7 @@ public class SynapseClientImplTest {
 	@Test
 	public void testCreateStorageLocationSettingFoundStorageAndProjectSetting() throws SynapseException, RestServiceException {
 		setupGetMyLocationSettings();
-
+		Long storageLocationId = 2L;
 		UploadDestinationListSetting projectSetting = new UploadDestinationListSetting();
 		projectSetting.setLocations(Collections.EMPTY_LIST);
 		when(mockSynapse.getProjectSetting(entityId, ProjectSettingsType.upload)).thenReturn(projectSetting);
@@ -1350,17 +1350,24 @@ public class SynapseClientImplTest {
 		ExternalStorageLocationSetting setting = new ExternalStorageLocationSetting();
 		setting.setBanner(BANNER_2);
 		setting.setUrl("sftp://www.jayhodgson.com");
+		
+		ExternalStorageLocationSetting foundSetting = new ExternalStorageLocationSetting();
+		foundSetting.setBanner(BANNER_2);
+		foundSetting.setUrl("sftp://www.jayhodgson.com");
+		foundSetting.setStorageLocationId(storageLocationId);
+		
+		when(mockSynapse.createStorageLocationSetting(any(StorageLocationSetting.class))).thenReturn(foundSetting);
 
 		synapseClient.createStorageLocationSetting(entityId, setting);
-		// should have found the duplicate storage location, so this is never called
-		verify(mockSynapse, Mockito.never()).createStorageLocationSetting(any(StorageLocationSetting.class));
+		// backend found the duplicate storage location, so this call returns the existing
+		verify(mockSynapse).createStorageLocationSetting(any(StorageLocationSetting.class));
 		// verify updates project setting, and the new location list is a single value (id of existing
 		// storage location)
 		ArgumentCaptor<ProjectSetting> captor = ArgumentCaptor.forClass(ProjectSetting.class);
 		verify(mockSynapse).updateProjectSetting(captor.capture());
 		UploadDestinationListSetting updatedProjectSetting = (UploadDestinationListSetting) captor.getValue();
 		List<Long> locations = updatedProjectSetting.getLocations();
-		assertEquals(new Long(2), locations.get(0));
+		assertEquals(storageLocationId, locations.get(0));
 	}
 
 	@Test
