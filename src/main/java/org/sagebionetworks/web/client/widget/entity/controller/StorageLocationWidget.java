@@ -209,17 +209,17 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		if (setting != null) {
 			if (setting instanceof ExternalS3StorageLocationSetting) {
 				ExternalS3StorageLocationSetting externalS3StorageLocationSetting = (ExternalS3StorageLocationSetting) setting;
-				if (externalS3StorageLocationSetting.getBucket().trim().isEmpty()) {
+				if (externalS3StorageLocationSetting.getBucket() == null || externalS3StorageLocationSetting.getBucket().trim().isEmpty()) {
 					return "Bucket is required.";
 				}
 			} else if (setting instanceof ExternalGoogleCloudStorageLocationSetting) {
 				ExternalGoogleCloudStorageLocationSetting externalGoogleCloudStorageLocationSetting = (ExternalGoogleCloudStorageLocationSetting) setting;
-				if (externalGoogleCloudStorageLocationSetting.getBucket().trim().isEmpty()) {
+				if (externalGoogleCloudStorageLocationSetting.getBucket() == null || externalGoogleCloudStorageLocationSetting.getBucket().trim().isEmpty()) {
 					return "Bucket is required.";
 				}
 			} else if (setting instanceof ExternalStorageLocationSetting) {
 				ExternalStorageLocationSetting externalStorageLocationSetting = (ExternalStorageLocationSetting) setting;
-				if (!isValidSftpUrl(externalStorageLocationSetting.getUrl().trim())) {
+				if (!isValidSftpUrl(externalStorageLocationSetting.getUrl())) {
 					return "A valid SFTP URL is required.";
 				}
 			}
