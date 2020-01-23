@@ -4,19 +4,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_COLUMN_MODELS;
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.*;
 import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_RESULTS;
 import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_SELECT_COLUMNS;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +40,7 @@ import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -128,7 +130,7 @@ public class TableQueryResultWidgetTest {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.creatNewAsynchronousProgressWidget()).thenReturn(mockJobTrackingWidget, mockJobTrackingWidget2);
 		when(mockGinInjector.createNewTablePageWidget()).thenReturn(mockPageWidget);
-		when(mockGinInjector.createNewQueryResultEditorWidget()).thenReturn(mockQueryResultEditor);
+		when(mockGinInjector.createNewQueryResultEditorWidget()).thenReturn(mockQueryResultEditor);		
 		widget = new TableQueryResultWidget(mockView, mockSynapseClient, mockGinInjector, mockSynapseAlert, mockClientCache, mockGWT, mockFacetsWidget, mockPopupUtils);
 		query = new Query();
 		query.setSql("select * from " + ENTITY_ID);
@@ -149,7 +151,7 @@ public class TableQueryResultWidgetTest {
 		bundle.setFacets(Collections.singletonList(mockFacetColumnResult));
 		bundle.setColumnModels(Collections.singletonList(mockColumnModel));
 		bundle.setSelectColumns(Collections.singletonList(mockSelectColumn));
-
+		
 		when(mockNewPageQueryResultBundle.getQueryResult()).thenReturn(results);
 		sortList = new ArrayList<SortItem>();
 		SortItem sort = new SortItem();
@@ -199,6 +201,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockListner).queryExecutionFinished(true, true);
 		verify(mockView).setProgressWidgetVisible(false);
 		verify(mockView).setSynapseAlertWidget(any(Widget.class));
+		// last updated is shown 
 
 		// test facetChangeRequestHandler
 		CallbackP<FacetColumnRequest> facetChangeRequestHandler = mockFacetChangedHandlerCaptor.getValue();
@@ -232,7 +235,7 @@ public class TableQueryResultWidgetTest {
 
 		// verify all parts are initially asked for
 		Long partsMask = qbrCaptor.getValue().getPartMask();
-		Long expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS;
+		Long expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_LAST_UPDATED;
 		assertEquals(expectedPartsMask, partsMask);
 
 		// simulate complete table query async job
@@ -248,7 +251,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockJobTrackingWidget2).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), qbrCaptor.capture(), asyncProgressHandlerCaptor.capture());
 		// verify we are not asking for the cached result values (column models, select columns, facets)
 		partsMask = qbrCaptor.getValue().getPartMask();
-		expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS;
+		expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_LAST_UPDATED;
 		assertEquals(expectedPartsMask, partsMask);
 		AsynchronousProgressHandler progressHandler2 = asyncProgressHandlerCaptor.getValue();
 		progressHandler2.onComplete(mockNewPageQueryResultBundle);
@@ -283,7 +286,7 @@ public class TableQueryResultWidgetTest {
 
 		// verify all parts are initially asked for
 		Long partsMask = qbrCaptor.getValue().getPartMask();
-		Long expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS;
+		Long expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_LAST_UPDATED;
 		assertEquals(expectedPartsMask, partsMask);
 	}
 
