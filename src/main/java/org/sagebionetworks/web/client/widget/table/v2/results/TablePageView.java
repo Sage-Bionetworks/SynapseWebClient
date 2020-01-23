@@ -58,4 +58,5 @@ public interface TablePageView extends IsWidget {
 	void showLoading();
 
 	void hideLoading();
+	void setLastUpdatedOn(String lastUpdatedOn);
 }

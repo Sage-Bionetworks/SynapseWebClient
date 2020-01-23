@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.List;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
@@ -50,7 +51,9 @@ public class TablePageViewImpl implements TablePageView {
 	Div topScrollDiv;
 	@UiField
 	Div tableDiv;
-
+	@UiField
+	Span lastUpdatedOnSpan;
+	
 	@Inject
 	public TablePageViewImpl(Binder binder, final GWTWrapper gwt) {
 		widget = (Div) binder.createAndBindUi(this);
@@ -63,7 +66,7 @@ public class TablePageViewImpl implements TablePageView {
 					topScrollDiv.setWidth(tableDiv.getElement().getScrollWidth() + "px");
 					boolean isScrollBarShowing = tableDiv.getElement().getScrollWidth() > tableDiv.getElement().getClientWidth();
 					topScrollBar.setVisible(isScrollBarShowing && tableScrollPanel.getOffsetHeight() > 600);
-					paginationPanel.setMarginLeft(tableScrollPanel.getAbsoluteLeft() - 20);
+					paginationPanel.setMarginLeft(tableScrollPanel.getAbsoluteLeft() - tablePanel.getAbsoluteLeft());
 					gwt.scheduleExecution(this, 400);
 				}
 			}
@@ -141,5 +144,9 @@ public class TablePageViewImpl implements TablePageView {
 	public void showLoading() {
 		loadingUI.setVisible(true);
 		tablePanel.removeFromParent();
+	}
+	@Override
+	public void setLastUpdatedOn(String lastUpdatedOn) {
+		lastUpdatedOnSpan.setText(lastUpdatedOn);
 	}
 }

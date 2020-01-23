@@ -29,6 +29,7 @@ import com.google.inject.Inject;
  */
 public class TablePageWidget implements IsWidget, RowSelectionListener {
 
+	public static final String LAST_UPDATED_ON = "Last updated on ";
 	TablePageView view;
 	PortalGinInjector ginInjector;
 	List<ColumnModel> types;
@@ -38,7 +39,7 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 	KeyboardNavigationHandler keyboardNavigationHandler;
 	String tableId;
 	TableType tableType;
-
+	
 	/*
 	 * This flag is used to ignore selection event while this widget is causing selection changes.
 	 */
@@ -67,6 +68,11 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 		this.rowSelectionListener = rowSelectionListener;
 		view.showLoading();
 		Integer rowCount = bundle.getQueryResult().getQueryResults().getRows().size();
+		String lastUpdatedOn = "";
+		if (bundle.getLastUpdatedOn() != null) {
+			lastUpdatedOn = LAST_UPDATED_ON + ginInjector.getDateTimeUtils().getDateTimeString(bundle.getLastUpdatedOn());
+		}
+		view.setLastUpdatedOn(lastUpdatedOn);
 		// The pagination widget is only visible if a listener was provider
 		if (pageChangeListener != null) {
 			this.paginationWidget.configure(query.getLimit(), query.getOffset(), rowCount.longValue(), pageChangeListener);
