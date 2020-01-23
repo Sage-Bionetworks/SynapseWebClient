@@ -191,7 +191,7 @@ public class TableQueryResultWikiWidgetTest {
 
 		Query query = widget.getQueryString();
 		assertEquals(sql, query.getSql());
-		verify(mockTableEntityWidget, times(2)).hideFiltering();
+		verify(mockTableEntityWidget).hideFiltering();
 	}
 
 	@Test
