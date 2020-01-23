@@ -91,7 +91,6 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 			isQueryVisible = Boolean.parseBoolean(descriptor.get(WidgetConstants.QUERY_VISIBLE));
 		}
 
-		hideEditActions();
 		query = new Query();
 		query.setLimit(limit);
 		query.setOffset(offset);
