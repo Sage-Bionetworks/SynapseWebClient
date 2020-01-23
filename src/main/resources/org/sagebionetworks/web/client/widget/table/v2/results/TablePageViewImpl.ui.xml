@@ -30,7 +30,12 @@
 						</g:SimplePanel>
 					</bh:Div>
 				</g:ScrollPanel>
-				<bh:Div ui:field="paginationPanel" />
+				<bh:Div addStyleNames="flexcontainer-row">
+					<bh:Div ui:field="paginationPanel" addStyleNames="flexcontainer-column flexcontainer-column-fill-width" />
+					<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end">
+						<bh:Span addStyleNames="em" ui:field="lastUpdatedOnSpan" />
+					</bh:Div>
+				</bh:Div>
 			</bh:Div>
 		</bh:Div>
 	</bh:Div>
