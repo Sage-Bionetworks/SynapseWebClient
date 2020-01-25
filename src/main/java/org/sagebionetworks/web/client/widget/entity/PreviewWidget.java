@@ -182,11 +182,8 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	public void configure(EntityBundle bundle) {
 		this.bundle = bundle;
 		view.clear();
-		// if not logged in, don't even try to load the preview. Just direct user to log in.
-		if (!synapseAlert.isUserLoggedIn()) {
-			view.addSynapseAlertWidget(synapseAlert.asWidget());
-			synapseAlert.showLogin();
-		} else if (bundle != null) {
+		
+		if (bundle != null) {
 			// SWC-2652: follow Link
 			if (bundle.getEntity() instanceof Link) {
 				// configure based on target
@@ -200,7 +197,13 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				view.addSynapseAlertWidget(synapseAlert.asWidget());
 				synapseAlert.showError("Preview unavailable for \"" + bundle.getEntity().getName() + "\" (" + bundle.getEntity().getId() + ")");
 			} else {
-				renderFilePreview(bundle);
+				// if there's a file handle that we can access, then try to render
+				if(DisplayUtils.getFileHandle(bundle) != null || synapseAlert.isUserLoggedIn()) {
+					renderFilePreview(bundle);	
+				} else {
+					view.addSynapseAlertWidget(synapseAlert.asWidget());
+					synapseAlert.showLogin();
+				}
 			}
 		}
 	}
