@@ -25,10 +25,14 @@ import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.GoogleCloudFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
@@ -75,14 +79,20 @@ public class FileTitleBarTest {
 	EventBus mockEventBus;
 	@Mock
 	UserEntityPermissions mockPermissions;
-
+	@Mock
+	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
+	PlaceChanger mockPlaceChanger;
+	@Mock
+	AuthenticationController mockAuthController;
 	public static final String DATA_FILE_HANDLE_ID = "872";
 	public static final Long FILE_VERSION = 3L;
 	public static final String FILE_NAME = "afile.txt";
 
 	@Before
 	public void setup() {
-		fileTitleBar = new FileTitleBar(mockView, mockSynapseProperties, mockFileDownloadButton, mockJsClient, mockFileClientsHelp, mockEventBus, mockSynapseJSNIUtils);
+		fileTitleBar = new FileTitleBar(mockView, mockSynapseProperties, mockFileDownloadButton, mockJsClient, mockFileClientsHelp, mockEventBus, mockSynapseJSNIUtils, mockGlobalApplicationState, mockAuthController);
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockFileEntity.getId()).thenReturn(ENTITY_ID);
 		when(mockFileEntity.getName()).thenReturn(FILE_NAME);
 		when(mockFileEntity.getDataFileHandleId()).thenReturn(DATA_FILE_HANDLE_ID);
@@ -161,6 +171,7 @@ public class FileTitleBarTest {
 
 	@Test
 	public void testAddToDownloadList() {
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
 		fileTitleBar.onAddToDownloadList();
 
@@ -169,9 +180,10 @@ public class FileTitleBarTest {
 		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
 		verify(mockSynapseJSNIUtils).sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, Integer.toString(1));
 	}
-
+	
 	@Test
 	public void testAddToDownloadListFailure() {
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		String errorMessage = "unable to add";
 		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockJsClient).addFileToDownloadList(anyString(), anyString(), any(AsyncCallback.class));
 
@@ -180,6 +192,16 @@ public class FileTitleBarTest {
 
 		verify(mockJsClient).addFileToDownloadList(eq(DATA_FILE_HANDLE_ID), eq(ENTITY_ID), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(errorMessage);
+	}
+
+	@Test
+	public void testAddToDownloadListAnonymous() {
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		fileTitleBar.configure(mockBundle, mockActionMenuWidget);
+		fileTitleBar.onAddToDownloadList();
+
+		verify(mockJsClient, never()).addFileToDownloadList(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
 	}
 
 	@Test
