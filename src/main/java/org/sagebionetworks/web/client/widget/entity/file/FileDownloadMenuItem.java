@@ -91,16 +91,13 @@ public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter,
 	public void configure(EntityBundle bundle, RestrictionInformationResponse restrictionInformation) {
 		view.clear();
 		this.entityBundle = bundle;
-		dataFileHandle = null;
+		dataFileHandle = getFileHandle();
 		s3 = null;
 
-		if (!authController.isLoggedIn()) {
-			view.setIsDirectDownloadLink(LOGIN_PLACE_LINK);
-		} else if (restrictionInformation.getHasUnmetAccessRequirement()) {
+		if (restrictionInformation.getHasUnmetAccessRequirement()) {
 			// if in alpha, send to access requirements
 			view.setIsDirectDownloadLink(ACCESS_REQUIREMENTS_LINK + bundle.getEntity().getId() + "&" + AccessRequirementsPlace.TYPE_PARAM + "=" + RestrictableObjectType.ENTITY.toString());
 		} else {
-			dataFileHandle = getFileHandle();
 			if (dataFileHandle != null) {
 				if (dataFileHandle instanceof ExternalObjectStoreFileHandle) {
 					view.setIsUnauthenticatedS3DirectDownload();
@@ -120,6 +117,8 @@ public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter,
 						view.setIsDirectDownloadLink(directDownloadUrl);
 					}
 				}
+			} else if (!authController.isLoggedIn()) {
+				view.setIsDirectDownloadLink(LOGIN_PLACE_LINK);
 			}
 		}
 	}
@@ -131,9 +130,7 @@ public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter,
 	public FileHandle getFileHandle() {
 		if (entityBundle != null && entityBundle.getEntity() != null) {
 			if (entityBundle.getEntity() instanceof FileEntity) {
-				if (authController.isLoggedIn()) {
 					return DisplayUtils.getFileHandle(entityBundle);
-				}
 			}
 		}
 		return null;
