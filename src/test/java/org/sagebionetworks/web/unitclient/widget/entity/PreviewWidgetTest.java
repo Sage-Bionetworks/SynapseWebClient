@@ -556,4 +556,27 @@ public class PreviewWidgetTest {
 		verify(mockView).addSynapseAlertWidget(any(Widget.class));
 		verify(mockSynapseAlert).handleException(ex);
 	}
+	
+	@Test
+	public void testAnonymousCloseData() {
+		testBundle.setFileHandles(null);
+		when(mockSynapseAlert.isUserLoggedIn()).thenReturn(false);
+		
+		previewWidget.configure(testBundle);
+		
+		verify(mockView).addSynapseAlertWidget(any(IsWidget.class));
+		verify(mockSynapseAlert).showLogin();
+	}
+
+	@Test
+	public void testAnonymousOpenData() {
+		when(mockSynapseAlert.isUserLoggedIn()).thenReturn(false);
+		mainFileHandle.setContentType("image/svg+xml");
+		mainFileHandle.setFileName("original.svg");
+
+		previewWidget.configure(testBundle);
+		
+		verify(mockView).setImagePreview(anyString());
+	}
+
 }
