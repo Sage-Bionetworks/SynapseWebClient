@@ -13,7 +13,7 @@
 		<g:HTMLPanel>
 			<div class="margin-10">
 				<div class="margin-top-5">
-					<div ui:field="dashboardUI" class="inline-block">
+					<div ui:field="dashboardUI" class="inline-block" style="width:100%;">
 						<b:Alert ui:field="loginAlert" type="INFO" visible="false"
 							addStyleNames="fullWidthAlert">
 							<bh:Strong text="Please login to access this resource." />
