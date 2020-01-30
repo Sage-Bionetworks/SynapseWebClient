@@ -455,62 +455,6 @@ public class SynapseClientImpl extends SynapseClientBase implements SynapseClien
 		}
 	}
 
-	private List<AccessRequirement> getAllAccessRequirements(boolean unmetOnly, RestrictableObjectDescriptor subjectId, ACCESS_TYPE accessType, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
-		List<AccessRequirement> allAccessRequirements = new ArrayList<AccessRequirement>();
-		long offset = ZERO_OFFSET;
-		boolean isDone = false;
-		while (!isDone) {
-			List<AccessRequirement> accessRequirments;
-			if (unmetOnly) {
-				accessRequirments = synapseClient.getUnmetAccessRequirements(subjectId, accessType, LIMIT_50, offset).getResults();
-			} else {
-				accessRequirments = synapseClient.getAccessRequirements(subjectId, LIMIT_50, offset).getResults();
-			}
-			isDone = accessRequirments.size() < LIMIT_50;
-			allAccessRequirements.addAll(accessRequirments);
-			offset += LIMIT_50;
-		}
-		return allAccessRequirements;
-	}
-
-	@Override
-	public List<AccessRequirement> getTeamAccessRequirements(String teamId) throws RestServiceException {
-		return getTeamAccessRequirements(teamId, false);
-	}
-
-	private List<AccessRequirement> getTeamAccessRequirements(String teamId, boolean unmetOnly) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
-			subjectId.setId(teamId);
-			subjectId.setType(RestrictableObjectType.TEAM);
-			List<AccessRequirement> accessRequirements = getAllAccessRequirements(unmetOnly, subjectId, ACCESS_TYPE.PARTICIPATE, synapseClient);
-
-			return accessRequirements;
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	public PaginatedResults<AccessRequirement> getEntityAccessRequirements(String entityId, boolean unmetOnly, ACCESS_TYPE targetAccessType) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
-			subjectId.setId(entityId);
-			subjectId.setType(RestrictableObjectType.ENTITY);
-			List<AccessRequirement> accessRequirements = getAllAccessRequirements(unmetOnly, subjectId, targetAccessType, synapseClient);
-
-			// filter to the targetAccessType
-			if (targetAccessType != null) {
-				accessRequirements = AccessRequirementUtils.filterAccessRequirements(accessRequirements, targetAccessType);
-			}
-
-			return new PaginatedResults<AccessRequirement>(accessRequirements, accessRequirements.size());
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
 	@Override
 	public AccessApproval createAccessApproval(AccessApproval aaEW) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
