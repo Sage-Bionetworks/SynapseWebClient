@@ -1,14 +1,12 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
-import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface ColumnModelsViewBase extends IsWidget {
-	
+
 	public interface Presenter {
-		
+
 		/**
 		 * Configure a newly created view.
 		 * 
@@ -16,8 +14,8 @@ public interface ColumnModelsViewBase extends IsWidget {
 		 * @param models
 		 * @param isEditabl
 		 */
-		public void configure(EntityBundle bundle, boolean isEditable, EntityUpdatedHandler updateHandler);
-		
+		public void configure(EntityBundle bundle, boolean isEditable);
+
 		/**
 		 * Called when the save button is pressed
 		 */
@@ -29,8 +27,11 @@ public interface ColumnModelsViewBase extends IsWidget {
 	public void setViewer(ColumnModelsView viewer);
 
 	public void setEditor(IsWidget editor);
+
 	public void setJobTrackingWidget(IsWidget jobTrackingWidget);
+
 	public void setJobTrackingWidgetVisible(boolean visible);
+
 	/**
 	 * Show the editor.
 	 */
@@ -40,21 +41,13 @@ public interface ColumnModelsViewBase extends IsWidget {
 	 * Hide the editor
 	 */
 	public void hideEditor();
-	
+
 	/**
 	 * Called before any service call.
 	 */
 	public void setLoading();
 
-	/**
-	 * Show error message.
-	 * @param message
-	 */
-	void showError(String message);
+	void setSynAlert(IsWidget w);
 
-	/**
-	 * Hide the alert.
-	 */
-	public void hideErrors();
-	
+	void resetSaveButton();
 }

@@ -8,17 +8,14 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -54,7 +51,7 @@ public class FileHandleServletTest {
 	@Mock
 	ServletOutputStream responseOutputStream;
 	FileHandleServlet servlet;
-	
+
 	@Before
 	public void setup() throws IOException, SynapseException {
 		MockitoAnnotations.initMocks(this);
@@ -84,30 +81,30 @@ public class FileHandleServletTest {
 		when(mockResponse.getOutputStream()).thenReturn(responseOutputStream);
 		SynapseClientBaseTest.setupTestEndpoints();
 	}
-	
+
 	private void setupWiki() {
 		when(mockRequest.getParameter(WebConstants.WIKI_OWNER_ID_PARAM_KEY)).thenReturn("syn296531");
 		when(mockRequest.getParameter(WebConstants.WIKI_OWNER_TYPE_PARAM_KEY)).thenReturn(ObjectType.ENTITY.toString());
 		when(mockRequest.getParameter(WebConstants.WIKI_ID_PARAM_KEY)).thenReturn("2");
 		when(mockRequest.getParameter(WebConstants.WIKI_FILENAME_PARAM_KEY)).thenReturn("file.png");
 	}
-	
+
 	private void setupFileEntity() {
 		when(mockRequest.getParameter(WebConstants.ENTITY_PARAM_KEY)).thenReturn("syn296531");
 		when(mockRequest.getParameter(WebConstants.ENTITY_VERSION_PARAM_KEY)).thenReturn("20");
 	}
-	
+
 	private void setupTableEntityRow() {
 		when(mockRequest.getParameter(WebConstants.ENTITY_PARAM_KEY)).thenReturn("syn296531");
 		when(mockRequest.getParameter(WebConstants.TABLE_COLUMN_ID)).thenReturn("123");
 		when(mockRequest.getParameter(WebConstants.TABLE_ROW_ID)).thenReturn("456");
 		when(mockRequest.getParameter(WebConstants.TABLE_ROW_VERSION_NUMBER)).thenReturn("789");
 	}
-	
+
 	private void setupTeam() {
 		when(mockRequest.getParameter(WebConstants.TEAM_PARAM_KEY)).thenReturn("36");
 	}
-	
+
 	@Test
 	public void testDoGetLoggedInWikiAttachmentPreview() throws Exception {
 		setupWiki();
@@ -117,13 +114,13 @@ public class FileHandleServletTest {
 		servlet.doGet(mockRequest, mockResponse);
 		verify(mockSynapse).getV2WikiAttachmentPreviewTemporaryUrl(any(WikiPageKey.class), anyString());
 		verify(mockResponse).sendRedirect(anyString());
-		
+
 		when(mockRequest.getParameter(WebConstants.WIKI_VERSION_PARAM_KEY)).thenReturn("1");
 		servlet.doGet(mockRequest, mockResponse);
 		verify(mockSynapse).getVersionOfV2WikiAttachmentPreviewTemporaryUrl(any(WikiPageKey.class), anyString(), anyLong());
 		verify(mockResponse).sendRedirect(anyString());
 	}
-	
+
 	@Test
 	public void testDoGetLoggedInWikiAttachment() throws Exception {
 		setupWiki();
@@ -133,7 +130,7 @@ public class FileHandleServletTest {
 		servlet.doGet(mockRequest, mockResponse);
 		verify(mockSynapse).getV2WikiAttachmentTemporaryUrl(any(WikiPageKey.class), anyString());
 		verify(mockResponse).sendRedirect(anyString());
-	
+
 		when(mockRequest.getParameter(WebConstants.WIKI_VERSION_PARAM_KEY)).thenReturn("1");
 		servlet.doGet(mockRequest, mockResponse);
 		verify(mockSynapse).getVersionOfV2WikiAttachmentTemporaryUrl(any(WikiPageKey.class), anyString(), anyLong());
@@ -144,26 +141,26 @@ public class FileHandleServletTest {
 	@Test
 	public void testDoGetLoggedInFileEntityPreview() throws Exception {
 		String sessionToken = "fake";
-		//set up general synapse client configuration test
-		
+		// set up general synapse client configuration test
+
 		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
-		
+
 		setupFileEntity();
-		
+
 		when(mockRequest.getParameter(WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY)).thenReturn("true");
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};
 		when(mockRequest.getCookies()).thenReturn(cookies);
 		servlet.doGet(mockRequest, mockResponse);
 		verify(mockSynapse).getFileEntityPreviewTemporaryUrlForVersion(anyString(), anyLong());
 		verify(mockResponse).sendRedirect(anyString());
-		
-		//as an additional test, verify that synapse client is set up
+
+		// as an additional test, verify that synapse client is set up
 		verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
 		verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
 		verify(mockSynapse).setFileEndpoint(anyString());
 		verify(mockSynapse).setSessionToken(sessionToken);
 	}
-	
+
 	@Test
 	public void testDoGetLoggedInFileEntity() throws Exception {
 		setupFileEntity();
@@ -174,7 +171,7 @@ public class FileHandleServletTest {
 		verify(mockSynapse).getFileEntityTemporaryUrlForVersion(anyString(), anyLong());
 		verify(mockResponse).sendRedirect(anyString());
 	}
-	
+
 	@Test
 	public void testDoGetLoggedInFileEntityPreviewCurrentVersion() throws Exception {
 		setupFileEntity();
@@ -186,7 +183,7 @@ public class FileHandleServletTest {
 		verify(mockSynapse).getFileEntityPreviewTemporaryUrlForCurrentVersion(anyString());
 		verify(mockResponse).sendRedirect(anyString());
 	}
-	
+
 	@Test
 	public void testDoGetLoggedInFileEntityCurrentVersion() throws Exception {
 		setupFileEntity();
@@ -209,7 +206,7 @@ public class FileHandleServletTest {
 		verify(mockResponse).sendRedirect(anyString());
 	}
 
-	
+
 	@Test
 	public void testDoGetLoggedOut() throws Exception {
 		Cookie[] cookies = {};
@@ -218,9 +215,9 @@ public class FileHandleServletTest {
 
 		verify(mockResponse, Mockito.times(0)).sendRedirect(anyString());
 	}
-	
+
 	@Test
-	public void testDoGetLoggedInTableRowPreview() throws Exception {		
+	public void testDoGetLoggedInTableRowPreview() throws Exception {
 		setupTableEntityRow();
 		when(mockRequest.getParameter(WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY)).thenReturn("true");
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, "fake")};
@@ -231,7 +228,7 @@ public class FileHandleServletTest {
 	}
 
 	@Test
-	public void testDoGetLoggedInTableRow() throws Exception {		
+	public void testDoGetLoggedInTableRow() throws Exception {
 		setupTableEntityRow();
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, "fake")};
 		when(mockRequest.getCookies()).thenReturn(cookies);
@@ -241,7 +238,7 @@ public class FileHandleServletTest {
 	}
 
 	@Test
-	public void testDoGetLoggedInTableRowPreviewNotFullySpecifiedParams() throws Exception {		
+	public void testDoGetLoggedInTableRowPreviewNotFullySpecifiedParams() throws Exception {
 		setupTableEntityRow();
 		when(mockRequest.getParameter(WebConstants.TABLE_COLUMN_ID)).thenReturn(null);
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, "fake")};
@@ -249,13 +246,13 @@ public class FileHandleServletTest {
 		try {
 			servlet.doGet(mockRequest, mockResponse);
 			fail();
-		} catch(ServletException e) {
+		} catch (ServletException e) {
 			assertTrue(e.getMessage().contains("must be defined"));
 		}
 	}
 
 	@Test
-	public void testDoGetLoggedInTableRowPreviewIllegalArgument() throws Exception {		
+	public void testDoGetLoggedInTableRowPreviewIllegalArgument() throws Exception {
 		setupTableEntityRow();
 		when(mockRequest.getParameter(WebConstants.TABLE_ROW_ID)).thenReturn("a problem");
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, "fake")};
@@ -263,11 +260,11 @@ public class FileHandleServletTest {
 		try {
 			servlet.doGet(mockRequest, mockResponse);
 			fail();
-		} catch(ServletException e) {
+		} catch (ServletException e) {
 			assertTrue(e.getMessage().contains("must be Long values"));
 		}
 	}
-	
+
 	@Test
 	public void testNoCacheHeaders() throws Exception {
 		setupFileEntity();
@@ -275,13 +272,13 @@ public class FileHandleServletTest {
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, "fake")};
 		when(mockRequest.getCookies()).thenReturn(cookies);
 		servlet.doGet(mockRequest, mockResponse);
-		
+
 		verify(mockResponse).setHeader(eq(WebConstants.CACHE_CONTROL_KEY), eq(WebConstants.CACHE_CONTROL_VALUE_NO_CACHE));
 		verify(mockResponse).setHeader(eq(WebConstants.PRAGMA_KEY), eq(WebConstants.NO_CACHE_VALUE));
 		verify(mockResponse).setDateHeader(eq(WebConstants.EXPIRES_KEY), eq(0L));
 	}
 
-	
+
 	@Test
 	public void testDoGetError() throws Exception {
 		String errorMessage = "An error from the service call";
@@ -294,13 +291,13 @@ public class FileHandleServletTest {
 		when(mockRequest.getContextPath()).thenReturn("");
 		servlet.doGet(mockRequest, mockResponse);
 		verify(mockSynapse).getFileEntityTemporaryUrlForVersion(anyString(), anyLong());
-		//now redirects to an error place
+		// now redirects to an error place
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockResponse).sendRedirect(captor.capture());
 		String v = captor.getValue();
 		assertTrue(v.contains("#!Error:"));
 	}
 
-	
-}	
+
+}
 

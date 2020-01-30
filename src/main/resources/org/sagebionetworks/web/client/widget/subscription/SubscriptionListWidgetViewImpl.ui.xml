@@ -12,16 +12,21 @@
 				<b:RadioButton name="filters" ui:field="threadFilter">Threads</b:RadioButton>
 			</b:ButtonGroup>
 			<b:ButtonGroup pull="RIGHT">
-				<b:Button ui:field="sortButton" dataToggle="DROPDOWN" size="SMALL" text="Date posted"/>
+				<b:Button ui:field="sortButton" dataToggle="DROPDOWN"
+					size="SMALL" text="Date posted" />
 				<b:DropDownMenu ui:field="sortDropDown">
-					<b:AnchorListItem ui:field="sortAscending" text="Date posted"/>
-					<b:AnchorListItem ui:field="sortDescending" text="Most recent"/>
+					<b:AnchorListItem ui:field="sortAscending"
+						text="Date posted" />
+					<b:AnchorListItem ui:field="sortDescending"
+						text="Most recent" />
 				</b:DropDownMenu>
 			</b:ButtonGroup>
 		</bh:Div>
-		<w:LoadingSpinner ui:field="loadingUI" visible="false" size="16px"/>
-		<bh:Div ui:field="synAlertContainer"/>
-		<g:SimplePanel ui:field="emptyUI" addStyleNames="smallGreyText padding-15" visible="false">
+		<w:LoadingSpinner ui:field="loadingUI"
+			visible="false" size="16px" />
+		<bh:Div ui:field="synAlertContainer" />
+		<g:SimplePanel ui:field="emptyUI"
+			addStyleNames="smallGreyText padding-15" visible="false">
 			<bh:Text>- No items found</bh:Text>
 		</g:SimplePanel>
 

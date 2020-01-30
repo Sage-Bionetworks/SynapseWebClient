@@ -9,13 +9,11 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -27,7 +25,6 @@ import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfigV
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnManager;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnManagerView;
 import org.sagebionetworks.web.shared.WidgetConstants;
-
 import com.google.gwt.user.client.ui.Widget;
 
 public class APITableColumnManagerTest {
@@ -46,9 +43,9 @@ public class APITableColumnManagerTest {
 	APITableColumnConfig mockConfig2;
 	@Mock
 	APITableColumnConfigView mockColumnConfigEditor;
-	
+
 	@Before
-	public void setup(){
+	public void setup() {
 		MockitoAnnotations.initMocks(this);
 		manager = new APITableColumnManager(mockView, mockGinInjector);
 		configs = new ArrayList<APITableColumnConfig>();
@@ -59,135 +56,136 @@ public class APITableColumnManagerTest {
 		when(mockGinInjector.getAPITableColumnConfigView()).thenReturn(mockColumnConfigEditor);
 		when(mockColumnConfigEditor.getConfig()).thenReturn(mockConfig1);
 	}
-	
+
 	@Test
 	public void testAsWidget() {
 		verify(mockView).setPresenter(manager);
 		manager.asWidget();
 		verify(mockView).asWidget();
 	}
-	
+
 	@Test
 	public void testConfigure() {
 		configs.add(mockConfig1);
 		configs.add(mockConfig2);
 		manager.configure(configs);
-		
+
 		verify(mockView).clearColumns();
 		verify(mockView, times(2)).addColumn(any(Widget.class));
 		verify(mockView).setButtonToolbarVisible(true);
 		verify(mockView).setHeaderColumnsVisible(true);
 		verify(mockView).setNoColumnsUIVisible(false);
 	}
-	
+
 	@Test
 	public void testConfigureNoColumnConfigs() {
 		manager.configure(configs);
-		
+
 		verify(mockView).clearColumns();
 		verify(mockView, never()).addColumn(any(Widget.class));
 		verify(mockView).setButtonToolbarVisible(false);
 		verify(mockView).setHeaderColumnsVisible(false);
 		verify(mockView).setNoColumnsUIVisible(true);
 	}
-	
+
 	@Test
 	public void testAddDelete() {
 		manager.configure(configs);
-		//before assert it's empty
-		assertTrue(manager.getColumnConfigs().isEmpty());  //sanity test
+		// before assert it's empty
+		assertTrue(manager.getColumnConfigs().isEmpty()); // sanity test
 		manager.addColumnConfig();
-		assertTrue(manager.getColumnConfigs().size() == 1);  //sanity test
+		assertTrue(manager.getColumnConfigs().size() == 1); // sanity test
 		verify(mockColumnConfigEditor).setSelectionChangedCallback(any(Callback.class));
 		verify(mockColumnConfigEditor).configure(any(APITableColumnConfig.class));
-		
+
 		verify(mockView).addColumn(any(Widget.class));
 		verify(mockView).setButtonToolbarVisible(true);
 		verify(mockView).setHeaderColumnsVisible(true);
 		verify(mockView).setNoColumnsUIVisible(false);
-		
+
 		// try delete with nothing selected
 		when(mockColumnConfigEditor.isSelected()).thenReturn(false);
 		manager.deleteSelected();
 		assertTrue(manager.getColumnConfigs().size() == 1);
-		
-		//now select it and delete
+
+		// now select it and delete
 		when(mockColumnConfigEditor.isSelected()).thenReturn(true);
 		manager.deleteSelected();
 		assertTrue(manager.getColumnConfigs().size() == 0);
 	}
-	
+
 	private APITableColumnConfigView setupColumnEditor(boolean isSelected) {
-		APITableColumnConfigView mockSourceEditor= mock(APITableColumnConfigView.class);
+		APITableColumnConfigView mockSourceEditor = mock(APITableColumnConfigView.class);
 		when(mockSourceEditor.isSelected()).thenReturn(isSelected);
 		return mockSourceEditor;
 	}
+
 	@Test
 	public void testMoveAndDelete() {
 		manager.configure(configs);
-		//set up 3 columns, where the second reports that it's selected
+		// set up 3 columns, where the second reports that it's selected
 		APITableColumnConfigView s1 = setupColumnEditor(false);
 		APITableColumnConfigView s2 = setupColumnEditor(true);
 		APITableColumnConfigView s3 = setupColumnEditor(false);
-		
+
 		when(mockGinInjector.getAPITableColumnConfigView()).thenReturn(s1, s2, s3);
-		//add the 3 columns
+		// add the 3 columns
 		manager.addColumnConfig();
 		manager.addColumnConfig();
 		manager.addColumnConfig();
-		
-		//check source order with move up, delete, and down
+
+		// check source order with move up, delete, and down
 		List<APITableColumnConfigView> sourceEditors = manager.getColumnEditors();
 		assertEquals(Arrays.asList(s1, s2, s3), sourceEditors);
-		
-		//move up clicked.  move s2 to index 0
+
+		// move up clicked. move s2 to index 0
 		manager.onMoveUp();
 		assertEquals(Arrays.asList(s2, s1, s3), sourceEditors);
-		
+
 		manager.deleteSelected();
 		assertEquals(Arrays.asList(s1, s3), sourceEditors);
-		
+
 		when(s1.isSelected()).thenReturn(true);
 		manager.onMoveDown();
 		assertEquals(Arrays.asList(s3, s1), sourceEditors);
 	}
-	
+
 	@Test
 	public void testSelectionToolbarState() {
 		manager.configure(configs);
-		//set up 2 columns, nothing selected
+		// set up 2 columns, nothing selected
 		APITableColumnConfigView s1 = setupColumnEditor(false);
 		APITableColumnConfigView s2 = setupColumnEditor(false);
-		
+
 		when(mockGinInjector.getAPITableColumnConfigView()).thenReturn(s1, s2);
-		//add the columns
+		// add the columns
 		manager.addColumnConfig();
 		manager.addColumnConfig();
-		
+
 		reset(mockView);
 		manager.checkSelectionState();
-		
+
 		verify(mockView).setCanDelete(false);
 		verify(mockView).setCanMoveUp(false);
 		verify(mockView).setCanMoveDown(false);
-		
-		//1 is selected, should now be able to move down or delete
+
+		// 1 is selected, should now be able to move down or delete
 		reset(mockView);
 		when(s1.isSelected()).thenReturn(true);
 		manager.checkSelectionState();
 		verify(mockView).setCanDelete(true);
 		verify(mockView).setCanMoveUp(false);
 		verify(mockView).setCanMoveDown(true);
-		
-		//both are selected, should be able to delete only
+
+		// both are selected, should be able to delete only
 		reset(mockView);
 		when(s2.isSelected()).thenReturn(true);
 		manager.checkSelectionState();
 		verify(mockView).setCanDelete(true);
 		verify(mockView).setCanMoveUp(false);
 		verify(mockView).setCanMoveDown(false);
-		
-		//column 2 is selected, should be able to delete or move up
+
+		// column 2 is selected, should be able to delete or move up
 		reset(mockView);
 		when(s1.isSelected()).thenReturn(false);
 		manager.checkSelectionState();
@@ -195,5 +193,5 @@ public class APITableColumnManagerTest {
 		verify(mockView).setCanMoveUp(true);
 		verify(mockView).setCanMoveDown(false);
 	}
-	
+
 }

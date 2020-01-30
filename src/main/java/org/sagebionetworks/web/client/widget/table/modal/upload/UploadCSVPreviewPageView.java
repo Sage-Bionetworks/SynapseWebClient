@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Abstraction between the UploadCSVPreviewWidget and its view.
@@ -10,13 +9,13 @@ import com.google.gwt.user.client.ui.Widget;
  *
  */
 public interface UploadCSVPreviewPageView extends IsWidget {
-	
+
 	/**
 	 * Business logic goes here.
 	 *
 	 */
-	interface Presenter{
-		
+	interface Presenter {
+
 	}
 
 	/**
@@ -28,24 +27,28 @@ public interface UploadCSVPreviewPageView extends IsWidget {
 
 	/**
 	 * Add the tracking widget to the view.
+	 * 
 	 * @param tracker
 	 */
 	public void setTrackingWidget(IsWidget tracker);
 
 	/**
 	 * Show or hide the tracker widget
+	 * 
 	 * @param visible
 	 */
 	public void setTrackerVisible(boolean visible);
 
 	/**
 	 * Show or hide the preview table.
+	 * 
 	 * @param b
 	 */
 	public void setPreviewVisible(boolean visible);
 
 	/**
 	 * Add the preview widget to the view.
+	 * 
 	 * @param uploadPreviewWidget
 	 */
 	public void setPreviewWidget(IsWidget uploadPreviewWidget);
@@ -56,6 +59,6 @@ public interface UploadCSVPreviewPageView extends IsWidget {
 	 * @param asWidget
 	 */
 	public void setCSVOptionsWidget(IsWidget asWidget);
-	
+
 
 }

@@ -10,7 +10,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.ServiceEntryPointUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -23,14 +22,11 @@ public class CancelControlWidget implements SingleButtonView.Presenter, IsWidget
 	SynapseAlert synAlert;
 	AdapterFactory adapterFactory;
 	CancelControl cancelControl;
-	
+
 	public static final String CONFIRM_CANCEL = "Are you sure that you want to request that this be cancelled?";
+
 	@Inject
-	public CancelControlWidget(SingleButtonView view, 
-			ChallengeClientAsync challengeClient,
-			AuthenticationController authController, 
-			SynapseAlert synAlert,
-			AdapterFactory adapterFactory) {
+	public CancelControlWidget(SingleButtonView view, ChallengeClientAsync challengeClient, AuthenticationController authController, SynapseAlert synAlert, AdapterFactory adapterFactory) {
 		this.view = view;
 		this.challengeClient = challengeClient;
 		ServiceEntryPointUtils.fixServiceEntryPoint(challengeClient);
@@ -44,7 +40,7 @@ public class CancelControlWidget implements SingleButtonView.Presenter, IsWidget
 		view.setPresenter(this);
 		view.addWidget(synAlert.asWidget());
 	}
-	
+
 	public void configure(String json) {
 		view.setButtonVisible(false);
 		view.setLoading(false);
@@ -66,7 +62,7 @@ public class CancelControlWidget implements SingleButtonView.Presenter, IsWidget
 			synAlert.handleException(e);
 		}
 	}
-	
+
 	@Override
 	public void onClick() {
 		synAlert.clear();
@@ -74,7 +70,7 @@ public class CancelControlWidget implements SingleButtonView.Presenter, IsWidget
 			requestToCancelSubmission();
 		});
 	}
-	
+
 	public void requestToCancelSubmission() {
 		// request to cancel the submission
 		// put into a processing state
@@ -85,7 +81,7 @@ public class CancelControlWidget implements SingleButtonView.Presenter, IsWidget
 				// cancel successfully requested
 				view.setLoading(true);
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
@@ -93,7 +89,7 @@ public class CancelControlWidget implements SingleButtonView.Presenter, IsWidget
 			}
 		});
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();

@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Collapse;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -19,12 +19,11 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityMetadataViewImpl extends Composite implements EntityMetadataView {
-	
+
 	interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
 	}
-	
-	private static EntityMetadataViewImplUiBinder uiBinder = GWT
-			.create(EntityMetadataViewImplUiBinder.class);
+
+	private static EntityMetadataViewImplUiBinder uiBinder = GWT.create(EntityMetadataViewImplUiBinder.class);
 
 	@UiField
 	HTMLPanel detailedMetadata;
@@ -39,28 +38,33 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	SimplePanel annotationsContainer;
 	@UiField
+	Span containerItemCountContainer;
+	@UiField
 	Span restrictionPanelV2;
 	@UiField
-	Collapse fileHistoryContent;
-	@UiField
-	SimplePanel fileHistoryContainer;
+	Div fileHistoryContainer;
 	@UiField
 	Span uploadDestinationPanel;
 	@UiField
 	Span uploadDestinationField;
 	@UiField
 	Text annotationsTitleText;
-		
+
 	@Inject
 	public EntityMetadataViewImpl(final SynapseJSNIUtils jsniUtils) {
 		initWidget(uiBinder.createAndBindUi(this));
-		fileHistoryContainer.getElement().setAttribute("highlight-box-title", "File History");
 		idField.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				idField.selectAll();
 			}
 		});
+	}
+
+	@Override
+	public void setContainerItemCountWidget(IsWidget w) {
+		containerItemCountContainer.clear();
+		containerItemCountContainer.add(w);
 	}
 
 	@Override
@@ -71,14 +75,14 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	@Override
 	public void setAnnotationsRendererWidget(IsWidget annotationsWidget) {
-		annotationsContainer.setWidget(annotationsWidget);		
+		annotationsContainer.setWidget(annotationsWidget);
 	}
-	
+
 	@Override
 	public void setUploadDestinationPanelVisible(boolean isVisible) {
 		uploadDestinationPanel.setVisible(isVisible);
 	}
-	
+
 	@Override
 	public void setUploadDestinationText(String text) {
 		uploadDestinationField.setText(text);
@@ -92,30 +96,21 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			annotationsContent.hide();
 		}
 	}
-	
+
 	@Override
-	public void setFileHistoryWidget(IsWidget fileHistoryWidget) {
-		fileHistoryContainer.setWidget(fileHistoryWidget);
+	public void setVersionHistoryWidget(IsWidget fileHistoryWidget) {
+		fileHistoryContainer.clear();
+		fileHistoryContainer.add(fileHistoryWidget);
 	}
-	
-	@Override
-	public void setFileHistoryVisible(boolean visible) {
-		if (visible) {
-			fileHistoryContent.show();
-		} else {
-			fileHistoryContent.hide();
-		}
-	}
-	
+
 	@Override
 	public void clear() {
-		fileHistoryContent.hide();
 		dataUseContainer.setVisible(false);
 		annotationsContent.hide();
 		uploadDestinationField.setText("");
 		uploadDestinationPanel.setVisible(false);
 	}
-	
+
 	@Override
 	public void setDetailedMetadataVisible(boolean visible) {
 		detailedMetadata.setVisible(visible);
@@ -130,6 +125,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	public void setRestrictionPanelVisible(boolean visible) {
 		dataUseContainer.setVisible(visible);
 	}
+
 	@Override
 	public void setRestrictionWidgetV2(IsWidget restrictionWidget) {
 		restrictionPanelV2.clear();
@@ -140,6 +136,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	public void setRestrictionWidgetV2Visible(boolean visible) {
 		restrictionPanelV2.setVisible(visible);
 	}
+
 	@Override
 	public void setAnnotationsTitleText(String text) {
 		annotationsTitleText.setText(text);

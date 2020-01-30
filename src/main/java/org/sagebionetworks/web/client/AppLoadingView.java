@@ -17,9 +17,8 @@ public class AppLoadingView extends PopupPanel {
 
 	public AppLoadingView() {
 		/**
-		 * DO NOT ADD THIS TO THE MAIN IMAGE BUNGLE!
-		 * This is shown while the image bundle is being download to the browser
-		 * so putting it in the bundle defeats the whole purpose of this image.
+		 * DO NOT ADD THIS TO THE MAIN IMAGE BUNGLE! This is shown while the image bundle is being download
+		 * to the browser so putting it in the bundle defeats the whole purpose of this image.
 		 */
 		final Image ajaxImage = new Image("images/main-page-load.gif");
 		final Grid grid = new Grid(1, 2);

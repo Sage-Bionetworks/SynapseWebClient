@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -14,7 +13,8 @@ import com.google.inject.Inject;
 
 public class DiscussionThreadListItemWidgetViewImpl implements DiscussionThreadListItemWidgetView {
 
-	public interface Binder extends UiBinder<Widget, DiscussionThreadListItemWidgetViewImpl> {}
+	public interface Binder extends UiBinder<Widget, DiscussionThreadListItemWidgetViewImpl> {
+	}
 
 	@UiField
 	Span threadAuthor;
@@ -87,7 +87,7 @@ public class DiscussionThreadListItemWidgetViewImpl implements DiscussionThreadL
 	}
 
 	@Override
-	public void setThreadAuthor(Widget widget){
+	public void setThreadAuthor(Widget widget) {
 		threadAuthor.add(widget);
 	}
 
@@ -99,6 +99,7 @@ public class DiscussionThreadListItemWidgetViewImpl implements DiscussionThreadL
 			threadLink.setIcon(null);
 		}
 	}
+
 	@Override
 	public void setThreadUrl(String url) {
 		threadLink.setHref(url);

@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.docker;
 
 import static org.mockito.Mockito.verify;
-
 import java.util.Date;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

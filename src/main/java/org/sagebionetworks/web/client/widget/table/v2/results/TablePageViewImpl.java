@@ -1,18 +1,13 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.List;
-
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
-
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ScrollEvent;
 import com.google.gwt.event.dom.client.ScrollHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -25,12 +20,16 @@ import com.google.inject.Inject;
 
 /**
  * UiBound implementation of a TableView with zero business logic.
+ * 
  * @author John
  *
  */
+
 public class TablePageViewImpl implements TablePageView {
-	
-	public interface Binder extends UiBinder<Widget, TablePageViewImpl> {}
+
+	public interface Binder extends UiBinder<Widget, TablePageViewImpl> {
+	}
+
 	@UiField
 	Div loadingUI;
 	@UiField
@@ -38,19 +37,12 @@ public class TablePageViewImpl implements TablePageView {
 	@UiField
 	TBody body;
 	@UiField
-	SimplePanel paginationPanel;
+	Div paginationPanel;
 	@UiField
 	SimplePanel editorPopupBuffer;
 	@UiField
-	Div facetsWidgetPanel;
-	@UiField
-	ScrollPanel facetsWidgetContainer;
-	@UiField
 	Div tablePanel;
 	Div widget;
-	Presenter presenter;
-	@UiField
-	Button clearFacetsButton;
 	@UiField
 	ScrollPanel topScrollBar;
 	@UiField
@@ -59,22 +51,13 @@ public class TablePageViewImpl implements TablePageView {
 	Div topScrollDiv;
 	@UiField
 	Div tableDiv;
+	@UiField
+	Span lastUpdatedOnSpan;
 	
-	public static final String ACTIVE_FACET_WIDGET_STYLES = "pull-left-unless-xs margin-right-10 panel panel-default padding-10 facetsWidget-active";
-	public static final String INACTIVE_FACET_WIDGET_STYLES = "pull-left-unless-xs facetsWidget-inactive";
-
 	@Inject
-	public TablePageViewImpl(
-			Binder binder, 
-			final GWTWrapper gwt){
-		widget = (Div)binder.createAndBindUi(this);
-		
-		clearFacetsButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onClearFacets();
-			}
-		});
+	public TablePageViewImpl(Binder binder, final GWTWrapper gwt) {
+		widget = (Div) binder.createAndBindUi(this);
+
 		gwt.scheduleExecution(new Callback() {
 			@Override
 			public void invoke() {
@@ -83,6 +66,7 @@ public class TablePageViewImpl implements TablePageView {
 					topScrollDiv.setWidth(tableDiv.getElement().getScrollWidth() + "px");
 					boolean isScrollBarShowing = tableDiv.getElement().getScrollWidth() > tableDiv.getElement().getClientWidth();
 					topScrollBar.setVisible(isScrollBarShowing && tableScrollPanel.getOffsetHeight() > 600);
+					paginationPanel.setMarginLeft(tableScrollPanel.getAbsoluteLeft() - tablePanel.getAbsoluteLeft());
 					gwt.scheduleExecution(this, 400);
 				}
 			}
@@ -101,12 +85,7 @@ public class TablePageViewImpl implements TablePageView {
 			}
 		});
 	}
-	
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
@@ -118,7 +97,7 @@ public class TablePageViewImpl implements TablePageView {
 		body.clear();
 		// Blank header for the selection.
 		header.add(new TableHeader());
-		for(IsWidget inHeader: headers){
+		for (IsWidget inHeader : headers) {
 			header.add(inHeader);
 		}
 	}
@@ -149,35 +128,25 @@ public class TablePageViewImpl implements TablePageView {
 	}
 
 	@Override
-	public void setFacetsWidget(Widget w) {
-		facetsWidgetPanel.clear();
-		facetsWidgetPanel.add(w);
-	}
-	
-	@Override
-	public void setFacetsVisible(boolean visible) {
-		String styles = visible ? ACTIVE_FACET_WIDGET_STYLES : INACTIVE_FACET_WIDGET_STYLES;
-		facetsWidgetContainer.setStyleName(styles);;
-	}
-	
-	@Override
 	public void setTableVisible(boolean visible) {
 		tablePanel.setVisible(visible);
 	}
+
 	@Override
 	public void hideLoading() {
 		loadingUI.setVisible(false);
-		if (!facetsWidgetContainer.isAttached()) {
-			widget.add(facetsWidgetContainer);
-		}
 		if (!tablePanel.isAttached()) {
 			widget.add(tablePanel);
 		}
 	}
+
 	@Override
 	public void showLoading() {
 		loadingUI.setVisible(true);
 		tablePanel.removeFromParent();
-		facetsWidgetContainer.removeFromParent();
+	}
+	@Override
+	public void setLastUpdatedOn(String lastUpdatedOn) {
+		lastUpdatedOnSpan.setText(lastUpdatedOn);
 	}
 }

@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.utils.Callback;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -14,23 +13,23 @@ import com.google.inject.Inject;
 
 public class URLProvEntryViewImpl implements URLProvEntryView {
 
-	public interface URLProvEntryUIBinder
-			extends UiBinder<Widget, URLProvEntryViewImpl> {}
-	
+	public interface URLProvEntryUIBinder extends UiBinder<Widget, URLProvEntryViewImpl> {
+	}
+
 	@UiField
 	Text urlNameField;
 
 	@UiField
 	Anchor urlAddressField;
-	
+
 	@UiField
 	Button removeButton;
-	
+
 	Widget widget;
 	String title;
 	String url;
 	Callback removalCallback;
-	
+
 	@Inject
 	public URLProvEntryViewImpl(URLProvEntryUIBinder binder) {
 		this.widget = binder.createAndBindUi(this);
@@ -42,7 +41,7 @@ public class URLProvEntryViewImpl implements URLProvEntryView {
 			}
 		});
 	}
-	
+
 	@Override
 	public void configure(String title, String url) {
 		this.title = title;
@@ -50,17 +49,17 @@ public class URLProvEntryViewImpl implements URLProvEntryView {
 		urlNameField.setText(title);
 		urlAddressField.setText(url);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
-	
+
 	@Override
 	public String getTitle() {
 		return title;
 	}
-	
+
 	@Override
 	public String getURL() {
 		return url;
@@ -70,7 +69,7 @@ public class URLProvEntryViewImpl implements URLProvEntryView {
 	public void setRemoveCallback(Callback removalCallback) {
 		this.removalCallback = removalCallback;
 	}
-	
+
 	@Override
 	public void setAnchorTarget(String targetURL) {
 		urlAddressField.setHref(targetURL);

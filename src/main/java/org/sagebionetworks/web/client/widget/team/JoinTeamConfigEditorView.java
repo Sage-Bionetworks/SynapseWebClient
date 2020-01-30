@@ -3,9 +3,9 @@ package org.sagebionetworks.web.client.widget.team;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface JoinTeamConfigEditorView extends IsWidget {
-	
+
 	public interface Presenter extends IsWidget {
-		
+
 	}
 
 	void setIsChallenge(boolean isChallengeSignup);

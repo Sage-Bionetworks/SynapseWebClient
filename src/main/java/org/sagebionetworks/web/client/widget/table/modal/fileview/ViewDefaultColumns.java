@@ -2,34 +2,29 @@ package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
 import static com.google.common.util.concurrent.Futures.whenAllComplete;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.inject.Inject;
 
 public class ViewDefaultColumns {
 	private SynapseJavascriptClient jsClient;
-	private List<ColumnModel> defaultFileViewColumns, 
-		defaultProjectViewColumns;
-		
+	private List<ColumnModel> defaultFileViewColumns, defaultProjectViewColumns;
+
 
 	private AdapterFactory adapterFactory;
 	PopupUtilsView popupUtils;
 
 	@Inject
-	public ViewDefaultColumns(SynapseJavascriptClient jsClient, AdapterFactory adapterFactory,
-			PopupUtilsView popupUtils) {
+	public ViewDefaultColumns(SynapseJavascriptClient jsClient, AdapterFactory adapterFactory, PopupUtilsView popupUtils) {
 		this.jsClient = jsClient;
 		this.adapterFactory = adapterFactory;
 		this.popupUtils = popupUtils;
@@ -39,21 +34,14 @@ public class ViewDefaultColumns {
 	public void init() {
 		FluentFuture<List<ColumnModel>> fileViewColumnsFuture = jsClient.getDefaultColumnsForView(ViewType.file);
 		FluentFuture<List<ColumnModel>> projectViewColumnsFuture = jsClient.getDefaultColumnsForView(ViewType.project);
-		FluentFuture.from(whenAllComplete(fileViewColumnsFuture, projectViewColumnsFuture)
-				.call(() -> {
-						defaultFileViewColumns = fileViewColumnsFuture.get();
-						defaultProjectViewColumns = projectViewColumnsFuture.get();
-						return null;
-					},
-					directExecutor())
-				).catching(
-					Throwable.class,
-					e -> {
-						popupUtils.showErrorMessage(e.getMessage());
-						return null;
-					},
-					directExecutor()
-				);
+		FluentFuture.from(whenAllComplete(fileViewColumnsFuture, projectViewColumnsFuture).call(() -> {
+			defaultFileViewColumns = clearIds(fileViewColumnsFuture.get());
+			defaultProjectViewColumns = clearIds(projectViewColumnsFuture.get());
+			return null;
+		}, directExecutor())).catching(Throwable.class, e -> {
+			popupUtils.showErrorMessage(e.getMessage());
+			return null;
+		}, directExecutor());
 	}
 
 	private Set<String> getColumnNames(List<ColumnModel> columns) {
@@ -72,14 +60,14 @@ public class ViewDefaultColumns {
 		}
 	}
 
-	public List<ColumnModel> getDefaultViewColumns(boolean includesFiles, boolean isClearIds) {
+	public List<ColumnModel> getDefaultViewColumns(boolean includesFiles) {
 		if (includesFiles) {
-			return isClearIds ? clearIds(defaultFileViewColumns) : defaultFileViewColumns;
+			return defaultFileViewColumns;
 		} else {
-			return isClearIds ? clearIds(defaultProjectViewColumns) : defaultProjectViewColumns;
+			return defaultProjectViewColumns;
 		}
 	}
-	
+
 	private List<ColumnModel> clearIds(List<ColumnModel> columns) {
 		List<ColumnModel> newColumns = new ArrayList<ColumnModel>(columns.size());
 		try {
@@ -92,5 +80,15 @@ public class ViewDefaultColumns {
 			popupUtils.showErrorMessage(e.getMessage());
 		}
 		return newColumns;
+	}
+	
+	public ColumnModel deepColumnModel(ColumnModel cm) {
+		try {
+			ColumnModel cmCopy = new ColumnModel(cm.writeToJSONObject(adapterFactory.createNew()));
+			return cmCopy;
+		} catch (JSONObjectAdapterException e) {
+			popupUtils.showErrorMessage(e.getMessage());
+		}
+		return null;
 	}
 }

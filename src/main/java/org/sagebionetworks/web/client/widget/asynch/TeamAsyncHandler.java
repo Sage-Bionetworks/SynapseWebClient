@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
 import org.sagebionetworks.repo.model.Team;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface TeamAsyncHandler {

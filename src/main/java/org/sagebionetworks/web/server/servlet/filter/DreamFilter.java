@@ -6,7 +6,7 @@ public class DreamFilter extends RedirectFilter {
 	protected String getTargetPage() {
 		return "#!Challenges:DREAM";
 	}
-	
+
 	@Override
 	protected String getUrlPath() {
 		return "dream";

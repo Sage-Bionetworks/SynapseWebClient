@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -25,15 +24,17 @@ public class ModifiedCreatedByWidgetViewImpl implements ModifiedCreatedByWidgetV
 	Span createdByUI;
 	@UiField
 	Span modifiedByUI;
-	public interface ModifiedCreatedByWidgetViewImplUiBinder extends UiBinder<Widget, ModifiedCreatedByWidgetViewImpl> {}
+
+	public interface ModifiedCreatedByWidgetViewImplUiBinder extends UiBinder<Widget, ModifiedCreatedByWidgetViewImpl> {
+	}
 
 	private Widget widget;
-	
+
 	@Inject
 	public ModifiedCreatedByWidgetViewImpl(ModifiedCreatedByWidgetViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
@@ -48,13 +49,13 @@ public class ModifiedCreatedByWidgetViewImpl implements ModifiedCreatedByWidgetV
 	public void setModifiedOnText(String text) {
 		modifiedOnText.setText(text);
 	}
-	
+
 	@Override
 	public void setModifiedBadge(IsWidget modifiedBadge) {
 		modifiedBadgePanel.clear();
 		modifiedBadgePanel.add(modifiedBadge);
 	}
-	
+
 	@Override
 	public void setCreatedBadge(IsWidget createdBadge) {
 		createdBadgePanel.clear();
@@ -65,10 +66,12 @@ public class ModifiedCreatedByWidgetViewImpl implements ModifiedCreatedByWidgetV
 	public void setVisible(boolean isVisible) {
 		container.setVisible(isVisible);
 	}
+
 	@Override
 	public void setCreatedByUIVisible(boolean visible) {
 		createdByUI.setVisible(visible);
 	}
+
 	@Override
 	public void setModifiedByUIVisible(boolean visible) {
 		modifiedByUI.setVisible(visible);

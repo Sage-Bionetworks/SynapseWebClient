@@ -6,7 +6,7 @@ package org.sagebionetworks.web.client.utils;
  * @author brucehoff
  *
  */
-public 	interface Callback {
+public interface Callback {
 	void invoke();
 }
 

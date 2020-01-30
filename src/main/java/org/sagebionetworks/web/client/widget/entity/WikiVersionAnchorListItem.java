@@ -1,12 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -18,16 +16,15 @@ public class WikiVersionAnchorListItem implements IsWidget {
 	private UserBadge modifiedByBadge;
 	private DateTimeUtils dateTimeUtils;
 	private FocusPanel fp = new FocusPanel();
+
 	@Inject
-	public WikiVersionAnchorListItem(
-			UserBadge modifiedByBadge,
-			DateTimeUtils dateTimeUtils) {
+	public WikiVersionAnchorListItem(UserBadge modifiedByBadge, DateTimeUtils dateTimeUtils) {
 		this.modifiedByBadge = modifiedByBadge;
 		this.dateTimeUtils = dateTimeUtils;
 		modifiedByBadge.setDoNothingOnClick();
 		fp.addStyleName("imageButton");
 	}
-	
+
 	public void setV2WikiHistorySnapshot(V2WikiHistorySnapshot version) {
 		fp.clear();
 		modifiedByBadge.configure(version.getModifiedBy());
@@ -37,8 +34,9 @@ public class WikiVersionAnchorListItem implements IsWidget {
 		p.add(new Span("v.<strong>" + version.getVersion() + "</strong> created on " + dateTime + " by "));
 		p.add(modifiedByBadge);
 		fp.getElement().setAttribute(WIKI_VERSION_ATTRIBUTE, version.getVersion());
-		fp.add(p);
+		fp.setWidget(p);
 	}
+
 	@Override
 	public Widget asWidget() {
 		return fp;

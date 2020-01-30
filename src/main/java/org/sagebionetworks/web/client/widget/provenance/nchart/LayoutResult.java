@@ -5,5 +5,5 @@ import java.util.List;
 public interface LayoutResult {
 
 	public List<XYPoint> getPointsForId(String provGraphNodeId);
-	
+
 }

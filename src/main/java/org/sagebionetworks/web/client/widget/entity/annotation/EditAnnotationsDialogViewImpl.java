@@ -4,9 +4,6 @@ import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.sagebionetworks.web.client.DisplayUtils;
-
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -14,9 +11,10 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView{
-	
-	public interface Binder extends UiBinder<Widget, EditAnnotationsDialogViewImpl> {	}
+public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView {
+
+	public interface Binder extends UiBinder<Widget, EditAnnotationsDialogViewImpl> {
+	}
 
 	@UiField
 	FlowPanel editorsPanel;
@@ -28,15 +26,15 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView{
 	Button cancelButton;
 	@UiField
 	Button addAnnotationButton;
-	
+
 	@UiField
 	Alert alert;
 	Presenter presenter;
-	
+
 	Widget widget;
-	
+
 	@Inject
-	public EditAnnotationsDialogViewImpl(final Binder uiBinder){
+	public EditAnnotationsDialogViewImpl(final Binder uiBinder) {
 		widget = uiBinder.createAndBindUi(this);
 		saveButton.addClickHandler(event -> {
 			presenter.onSave();
@@ -68,7 +66,7 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView{
 	public void setLoading() {
 		saveButton.state().loading();
 	}
-	
+
 	@Override
 	public void showError(String message) {
 		alert.setText(message);
@@ -82,26 +80,27 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView{
 		alert.clear();
 		alert.setVisible(false);
 	}
-	
+
 	@Override
 	public void addAnnotationEditor(Widget editor) {
 		editorsPanel.add(editor);
 	}
+
 	@Override
 	public void removeAnnotationEditor(Widget editor) {
 		editorsPanel.remove(editor);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
-	
+
 	@Override
 	public void clearAnnotationEditors() {
 		editorsPanel.clear();
 	}
-	
+
 	@Override
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message);

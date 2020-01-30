@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.view.bootstrap.ButtonUtils;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -21,12 +20,14 @@ import com.google.inject.Inject;
 
 /**
  * A table view of a list of ColumnModels
+ * 
  * @author jmhill
  *
  */
 public class ColumnModelsViewImpl extends Composite implements ColumnModelsView {
-	
-	public interface Binder extends UiBinder<Widget, ColumnModelsViewImpl> {	}
+
+	public interface Binder extends UiBinder<Widget, ColumnModelsViewImpl> {
+	}
 
 	@UiField
 	ButtonToolBar buttonToolbar;
@@ -60,10 +61,10 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	Span extraButtonsContainer;
 	ViewType viewType;
 	Presenter presenter;
-	
-	
+
+
 	@Inject
-	public ColumnModelsViewImpl(final Binder uiBinder){
+	public ColumnModelsViewImpl(final Binder uiBinder) {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 
@@ -77,7 +78,7 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 			}
 		});
 	}
-	
+
 	@Override
 	public void setPresenter(Presenter setPresenter) {
 		this.presenter = setPresenter;
@@ -131,16 +132,16 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 			}
 		});
 		addDefaultViewColumnsButton.addClickHandler(new ClickHandler() {
-			 @Override
-			 public void onClick(ClickEvent event) {
-				 presenter.onAddDefaultViewColumns();
-			 }
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onAddDefaultViewColumns();
+			}
 		});
 		addAnnotationColumnsButton.addClickHandler(new ClickHandler() {
-			 @Override
-			 public void onClick(ClickEvent event) {
-				 presenter.onAddAnnotationColumns();
-			 }
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onAddAnnotationColumns();
+			}
 		});
 	}
 
@@ -152,10 +153,10 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 		// hide the toolbar until data is added
 		buttonToolbar.setVisible(false);
 		this.viewType = type;
-		if(ViewType.VIEWER.equals(type)){
+		if (ViewType.VIEWER.equals(type)) {
 			editColumnsButton.setVisible(isEditable);
 			addColumnButton.setVisible(false);
-		}else{
+		} else {
 			editColumnsButton.setVisible(false);
 			addColumnButton.setVisible(true);
 		}
@@ -164,8 +165,8 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	@Override
 	public void addColumn(ColumnModelTableRow row) {
 		tableBody.add(row);
-		if(ViewType.EDITOR.equals(this.viewType)){
-			if(!this.buttonToolbar.isVisible()){
+		if (ViewType.EDITOR.equals(this.viewType)) {
+			if (!this.buttonToolbar.isVisible()) {
 				this.buttonToolbar.setVisible(true);
 			}
 		}
@@ -206,19 +207,22 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	public boolean isMoveDownEnabled() {
 		return this.moveDownButton.isEnabled();
 	}
+
 	@Override
 	public void setAddDefaultViewColumnsButtonVisible(boolean visible) {
 		addDefaultViewColumnsButton.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setAddAnnotationColumnsButtonVisible(boolean visible) {
 		addAnnotationColumnsButton.setVisible(visible);
 	}
+
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
+
 	@Override
 	public void addButton(IsWidget widget) {
 		extraButtonsContainer.add(widget);

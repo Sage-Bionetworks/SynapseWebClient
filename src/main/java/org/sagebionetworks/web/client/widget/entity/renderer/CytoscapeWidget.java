@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
-
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -12,7 +11,6 @@ import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
-
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -21,9 +19,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class CytoscapeWidget implements CytoscapeView.Presenter, WidgetRendererPresenter {
-	
+
 	private CytoscapeView view;
-	private Map<String,String> descriptor;
+	private Map<String, String> descriptor;
 	AuthenticationController authenticationController;
 	RequestBuilderWrapper requestBuilder;
 	SynapseAlert synAlert;
@@ -31,13 +29,9 @@ public class CytoscapeWidget implements CytoscapeView.Presenter, WidgetRendererP
 	String entityId, styleEntityId, height;
 	String mainFileContents, styleFileContents;
 	public static final String DEFAULT_HEIGHT = "500";
-	
+
 	@Inject
-	public CytoscapeWidget(CytoscapeView view, 
-			AuthenticationController authenticationController,
-			RequestBuilderWrapper requestBuilder,
-			SynapseAlert synAlert,
-			SynapseJSNIUtils synapseJsniUtils) {
+	public CytoscapeWidget(CytoscapeView view, AuthenticationController authenticationController, RequestBuilderWrapper requestBuilder, SynapseAlert synAlert, SynapseJSNIUtils synapseJsniUtils) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.requestBuilder = requestBuilder;
@@ -46,7 +40,7 @@ public class CytoscapeWidget implements CytoscapeView.Presenter, WidgetRendererP
 		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
 	}
-	
+
 	@Override
 	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		view.setGraphVisible(false);
@@ -61,7 +55,7 @@ public class CytoscapeWidget implements CytoscapeView.Presenter, WidgetRendererP
 		styleFileContents = null;
 		getMainFileContents();
 	}
-	
+
 	public void getMainFileContents() {
 		CallbackP<String> callback = new CallbackP<String>() {
 			public void invoke(String fileContents) {
@@ -71,7 +65,7 @@ public class CytoscapeWidget implements CytoscapeView.Presenter, WidgetRendererP
 		};
 		getFileContents(entityId, callback);
 	}
-	
+
 	public void getStyleFileContents() {
 		if (DisplayUtils.isDefined(styleEntityId)) {
 			CallbackP<String> callback = new CallbackP<String>() {
@@ -82,16 +76,16 @@ public class CytoscapeWidget implements CytoscapeView.Presenter, WidgetRendererP
 			};
 			getFileContents(styleEntityId, callback);
 		} else {
-			//no style file defined, we're ready to show the graph
+			// no style file defined, we're ready to show the graph
 			showGraph();
 		}
 	}
-	
+
 	public void showGraph() {
 		view.setGraphVisible(true);
 		view.configure(mainFileContents, styleFileContents, height);
 	}
-	
+
 	public void getFileContents(final String entityId, final CallbackP<String> fileContentCallback) {
 		Long version = null;
 		synAlert.clear();
@@ -102,8 +96,9 @@ public class CytoscapeWidget implements CytoscapeView.Presenter, WidgetRendererP
 				public void onError(final Request request, final Throwable e) {
 					synAlert.handleException(e);
 				}
+
 				public void onResponseReceived(final Request request, final Response response) {
-					//add the response text
+					// add the response text
 					int statusCode = response.getStatusCode();
 					if (statusCode == Response.SC_OK) {
 						String responseText = response.getText();
@@ -119,17 +114,16 @@ public class CytoscapeWidget implements CytoscapeView.Presenter, WidgetRendererP
 			synAlert.handleException(e);
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public void clearState() {
-	}
+	public void clearState() {}
 
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
 
-		/*
+	/*
 	 * Private Methods
 	 */
 }

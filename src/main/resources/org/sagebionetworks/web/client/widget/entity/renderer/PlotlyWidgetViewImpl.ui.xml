@@ -8,9 +8,9 @@
 		<w:LoadingSpinner size="16px" ui:field="loadingUI"/>
 		<bh:Span ui:field="loadingMessage" />
 		<bh:Div>
-			<bh:Div ui:field="chartContainer" height="410px" width="100%" />
+			<bh:Div ui:field="chartContainer" height="500px" width="100%" />
 		</bh:Div>
-		<bh:Div addStyleNames="margin-left-55 moveup-35">
+		<bh:Div addStyleNames="margin-left-55">
 			<b:Anchor ui:field="sourceDataAnchor" text="View Source Data" icon="SHARE" iconPosition="RIGHT"/>
 		</bh:Div>
 		<bh:Div ui:field="synAlertContainer"/>

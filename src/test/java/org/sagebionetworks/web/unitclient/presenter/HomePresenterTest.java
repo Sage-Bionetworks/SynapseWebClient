@@ -1,18 +1,12 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -21,8 +15,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -33,8 +26,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -42,7 +33,6 @@ import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -65,20 +55,20 @@ public class HomePresenterTest {
 	CookieProvider mockCookies;
 	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
-	
+
 	List<EntityHeader> testEvaluationResults;
 	List<OpenUserInvitationBundle> openInvitations;
-	
-	UserSessionData testSessionData;
+
+	UserProfile testProfile;
 	@Mock
 	ResourceLoader mockResourceLoader;
 	@Captor
 	ArgumentCaptor<Place> placeCaptor;
-	
+
 	@Before
-	public void setup() throws RestServiceException, JSONObjectAdapterException{
+	public void setup() throws RestServiceException, JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
-		
+
 		org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> testBatchResults = new org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader>();
 		testEvaluationResults = new ArrayList<EntityHeader>();
 		EntityHeader testEvaluation = new EntityHeader();
@@ -87,73 +77,30 @@ public class HomePresenterTest {
 		testEvaluationResults.add(testEvaluation);
 		testBatchResults.setTotalNumberOfResults(1);
 		testBatchResults.setResults(testEvaluationResults);
-		
+
 		openInvitations = new ArrayList<OpenUserInvitationBundle>();
 		AsyncMockStubber.callSuccessWith(openInvitations).when(mockSynapseClient).getOpenInvitations(anyString(), any(AsyncCallback.class));
-		
+
 		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		homePresenter = new HomePresenter(mockView, 
-				mockAuthenticationController, 
-				mockGlobalApplicationState,
-				mockCookies,
-				mockResourceLoader,
-				mockSynapseJSNIUtils
-				);
-		verify(mockView).setPresenter(homePresenter);
-		
+		homePresenter = new HomePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockCookies);
+
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		testSessionData = new UserSessionData();
-		Session testSession = new Session();
-		testSession.setAcceptsTermsOfUse(true);
-		testSessionData.setSession(testSession);
-		testSessionData.setIsSSO(false);
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(testSessionData);
-		
-		AsyncMockStubber.callSuccessWith(null).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(),  any(AsyncCallback.class));
+		testProfile = new UserProfile();
+		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(testProfile);
+
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
-	}	
-	
+	}
+
 	@Test
 	public void testSetPlace() {
 		Home place = Mockito.mock(Home.class);
 		homePresenter.setPlace(place);
 		verify(mockView).refresh();
 	}
-	
-	
-	@Test
-	public void testCheckAcceptToUAnonymous() {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		homePresenter.checkAcceptToU();
-		//should not ask for the session information, or try to log you out
-		verify(mockAuthenticationController, never()).getCurrentUserSessionData();
-		verify(mockAuthenticationController, never()).logoutUser();
-	}
 
-	@Test
-	public void testCheckAcceptToULoggedInToUSigned() {
-		homePresenter.checkAcceptToU();
-		verify(mockAuthenticationController).getCurrentUserSessionData();
-		//should not log you out
-		verify(mockAuthenticationController, never()).logoutUser();
-	}
-	
-	@Test
-	public void testCheckAcceptToULoggedInToUUnsigned() {
-		testSessionData.getSession().setAcceptsTermsOfUse(false);
-		homePresenter.checkAcceptToU();
-		
-		verify(mockAuthenticationController).getCurrentUserSessionData();
-		//should automatically log you out
-		verify(mockPlaceChanger).goTo(placeCaptor.capture());
-		Place targetPlace = placeCaptor.getValue();
-		assertTrue(targetPlace instanceof LoginPlace);
-		assertEquals(((LoginPlace)targetPlace).toToken(), LoginPlace.SHOW_TOU);
-	}
-	
 	@Test
 	public void testAnonymousNotLoggedInRecently() {
 		when(mockCookies.getCookie(CookieKeys.USER_LOGGED_IN_RECENTLY)).thenReturn(null);
@@ -162,7 +109,7 @@ public class HomePresenterTest {
 		homePresenter.setPlace(place);
 		verify(mockView).showRegisterUI();
 	}
-	
+
 	@Test
 	public void testAnonymousLoggedInRecently() {
 		when(mockCookies.getCookie(eq(CookieKeys.USER_LOGGED_IN_RECENTLY))).thenReturn("true");
@@ -170,13 +117,5 @@ public class HomePresenterTest {
 		Home place = Mockito.mock(Home.class);
 		homePresenter.setPlace(place);
 		verify(mockView).showLoginUI();
-	}
-
-	@Test
-	public void testOnUserChange() {
-		String userId = "77776";
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
-		homePresenter.onUserChange();
-		verify(mockPlaceChanger).goTo(isA(Profile.class));
 	}
 }

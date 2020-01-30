@@ -11,7 +11,7 @@ import com.google.gwt.i18n.client.NumberFormat;
 public class NumberFormatProviderImpl implements NumberFormatProvider {
 
 	NumberFormat format;
-	
+
 	@Override
 	public void setFormat(String format) {
 		this.format = NumberFormat.getFormat(format);

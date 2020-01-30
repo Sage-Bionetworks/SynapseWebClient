@@ -13,10 +13,8 @@ import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.EXPIR
 import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.SUBMITTER_ID_PARAM;
 import static org.sagebionetworks.web.client.presenter.ACTAccessApprovalsPresenter.HIDE_AR_TEXT;
 import static org.sagebionetworks.web.client.presenter.ACTAccessApprovalsPresenter.SHOW_AR_TEXT;
-
 import java.util.Collections;
 import java.util.Date;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -48,16 +46,15 @@ import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ACTAccessApprovalsPresenterTest {
-	
+
 	ACTAccessApprovalsPresenter presenter;
-	
+
 	@Mock
 	ACTAccessApprovalsPlace mockPlace;
 	@Mock
@@ -100,26 +97,16 @@ public class ACTAccessApprovalsPresenterTest {
 	PlaceChanger mockPlaceChanger;
 	@Captor
 	ArgumentCaptor<Place> placeCaptor;
-	
+
 	public static final String AR_ID = "765";
 	public static final String SUBMITTER_ID = "88888";
 	public static final String NEXT_PAGE_TOKEN = "9876789876";
 	public static final String USER_ID_SELECTED = "42";
+
 	@Before
-	public void setup(){
+	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		presenter = new ACTAccessApprovalsPresenter(
-				mockView, 
-				mockSynAlert, 
-				mockGinInjector, 
-				mockLoadMoreContainer, 
-				mockShowHideAccessRequirementButton,
-				mockDataAccessClient, 
-				mockPeopleSuggestWidget, 
-				mockProvider, 
-				mockSelectedUserBadge, 
-				mockAccessRequirementWidget,
-				mockGlobalAppState);
+		presenter = new ACTAccessApprovalsPresenter(mockView, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockShowHideAccessRequirementButton, mockDataAccessClient, mockPeopleSuggestWidget, mockProvider, mockSelectedUserBadge, mockAccessRequirementWidget, mockGlobalAppState);
 		AsyncMockStubber.callSuccessWith(mockAccessorGroupResponse).when(mockDataAccessClient).listAccessorGroup(any(AccessorGroupRequest.class), any(AsyncCallback.class));
 		when(mockAccessorGroupResponse.getResults()).thenReturn(Collections.singletonList(mockAccessorGroup));
 		when(mockAccessorGroupResponse.getNextPageToken()).thenReturn(NEXT_PAGE_TOKEN);
@@ -127,8 +114,8 @@ public class ACTAccessApprovalsPresenterTest {
 		when(mockUserGroupSuggestion.getHeader()).thenReturn(mockUserGroupHeader);
 		when(mockUserGroupHeader.getOwnerId()).thenReturn(USER_ID_SELECTED);
 		when(mockGlobalAppState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-	}	
-	
+	}
+
 	@Test
 	public void testConstruction() {
 		verify(mockPeopleSuggestWidget).setSuggestionProvider(mockProvider);
@@ -149,16 +136,16 @@ public class ACTAccessApprovalsPresenterTest {
 		verify(mockPeopleSuggestWidget).addItemSelectedHandler(any(CallbackP.class));
 		verify(mockLoadMoreContainer).configure(any(Callback.class));
 	}
-	
+
 	@Test
 	public void testSetPlace() {
 		Date now = new Date();
 		when(mockPlace.getParam(ACCESS_REQUIREMENT_ID_PARAM)).thenReturn(AR_ID);
 		when(mockPlace.getParam(EXPIRES_BEFORE_PARAM)).thenReturn(Long.toString(now.getTime()));
 		when(mockPlace.getParam(SUBMITTER_ID_PARAM)).thenReturn(SUBMITTER_ID);
-		
+
 		presenter.setPlace(mockPlace);
-		
+
 		verify(mockSynAlert, atLeast(1)).clear();
 		verify(mockView).setExpiresBeforeDate(now);
 		// not requesting access to any subject in particular.
@@ -172,7 +159,7 @@ public class ACTAccessApprovalsPresenterTest {
 		verify(mockAccessorGroupWidget).configure(mockAccessorGroup);
 		assertEquals(NEXT_PAGE_TOKEN, request.getNextPageToken());
 	}
-	
+
 	@Test
 	public void testClearExpireBefore() {
 		Date now = new Date();
@@ -180,24 +167,24 @@ public class ACTAccessApprovalsPresenterTest {
 		presenter.setPlace(mockPlace);
 		verify(mockView).setExpiresBeforeDate(now);
 		reset(mockDataAccessClient);
-		
+
 		presenter.onClearExpireBeforeFilter();
-		
+
 		verify(mockView).setExpiresBeforeDate(null);
 		verify(mockPlace).removeParam(EXPIRES_BEFORE_PARAM);
 		verify(mockDataAccessClient).listAccessorGroup(accessorGroupRequestCaptor.capture(), any(AsyncCallback.class));
 		AccessorGroupRequest request = accessorGroupRequestCaptor.getValue();
 		assertNull(request.getExpireBefore());
 	}
-	
+
 	@Test
 	public void testClearUserFilter() {
 		when(mockPlace.getParam(SUBMITTER_ID_PARAM)).thenReturn(SUBMITTER_ID);
 		presenter.setPlace(mockPlace);
 		reset(mockDataAccessClient);
-		
+
 		presenter.onClearUserFilter();
-		
+
 		verify(mockView).setSelectedUserBadgeVisible(false);
 		verify(mockPlace).removeParam(SUBMITTER_ID_PARAM);
 		verify(mockDataAccessClient).listAccessorGroup(accessorGroupRequestCaptor.capture(), any(AsyncCallback.class));
@@ -210,9 +197,9 @@ public class ACTAccessApprovalsPresenterTest {
 		when(mockPlace.getParam(ACCESS_REQUIREMENT_ID_PARAM)).thenReturn(AR_ID);
 		presenter.setPlace(mockPlace);
 		reset(mockDataAccessClient);
-		
+
 		presenter.onClearAccessRequirementFilter();
-		
+
 		verify(mockView, times(2)).setAccessRequirementUIVisible(false);
 		verify(mockShowHideAccessRequirementButton).setVisible(false);
 		verify(mockPlace).removeParam(ACCESS_REQUIREMENT_ID_PARAM);
@@ -220,28 +207,28 @@ public class ACTAccessApprovalsPresenterTest {
 		AccessorGroupRequest request = accessorGroupRequestCaptor.getValue();
 		assertNull(request.getAccessRequirementId());
 	}
-	
+
 	@Test
 	public void testOnSetExpiresBeforeDateSelected() {
 		presenter.setPlace(mockPlace);
 		reset(mockDataAccessClient);
 		Date now = new Date();
-		
+
 		presenter.onExpiresBeforeDateSelected(now);
-		
+
 		verify(mockDataAccessClient).listAccessorGroup(accessorGroupRequestCaptor.capture(), any(AsyncCallback.class));
 		AccessorGroupRequest request = accessorGroupRequestCaptor.getValue();
 		assertEquals(now, request.getExpireBefore());
 		verify(mockPlace).putParam(EXPIRES_BEFORE_PARAM, Long.toString(now.getTime()));
 	}
-	
+
 	@Test
 	public void testOnUserSelected() {
 		presenter.setPlace(mockPlace);
 		reset(mockDataAccessClient);
-		
+
 		presenter.onUserSelected(mockUserGroupSuggestion);
-		
+
 		verify(mockPlace).putParam(SUBMITTER_ID_PARAM, USER_ID_SELECTED);
 		verify(mockSelectedUserBadge).configure(USER_ID_SELECTED);
 		verify(mockDataAccessClient).listAccessorGroup(accessorGroupRequestCaptor.capture(), any(AsyncCallback.class));

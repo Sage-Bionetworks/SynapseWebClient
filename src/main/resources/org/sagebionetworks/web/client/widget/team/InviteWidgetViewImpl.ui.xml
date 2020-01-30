@@ -1,28 +1,33 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-             xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
-             xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-	
-	<b:Modal ui:field="inviteUIModal" title="Invite User" closable="true"
-		dataBackdrop="STATIC" dataKeyboard="true">
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
+
+	<b:Modal ui:field="inviteUIModal" title="Invite User"
+		closable="true" dataBackdrop="STATIC" dataKeyboard="true">
 		<b:ModalBody>
 			<b:FormGroup>
-				<b:FormLabel>User Name or Email Address</b:FormLabel>
-				<g:SimplePanel ui:field="suggestBoxPanel"/>
+				<b:FormLabel addStyleNames="user-name-or-email-address-label">User Name</b:FormLabel>
+				<g:SimplePanel ui:field="suggestBoxPanel" />
 			</b:FormGroup>
 			<bh:Div ui:field="inviteesContainer" />
 			<b:FormGroup addStyleNames="margin-top-10">
 				<b:FormLabel for="inviteText">Invitation Message (Optional)</b:FormLabel>
-				<b:TextArea b:id="inviteText" ui:field="inviteTextArea" addStyleNames=" margin-top-5 hide-resize" width="100%">Enter optional invitation message...</b:TextArea>
+				<b:TextArea b:id="inviteText" ui:field="inviteTextArea"
+					addStyleNames=" margin-top-5 hide-resize" width="100%">Enter optional
+					invitation message...</b:TextArea>
 			</b:FormGroup>
-			<g:SimplePanel ui:field="synAlertPanel"/>
-			<w:LoadingSpinner ui:field="loadingUI" size="31px" visible="false"/>
+			<g:SimplePanel ui:field="synAlertPanel" />
+			<w:LoadingSpinner ui:field="loadingUI" size="31px"
+				visible="false" />
 		</b:ModalBody>
 		<b:ModalFooter>
-			<b:Button text="Cancel" ui:field="cancelButton" type="LINK" addStyleNames="margin-right-5"/>
-			<b:Button ui:field="sendInviteButton" text="Send Invitation(s)" type="PRIMARY"/>
+			<b:Button text="Cancel" ui:field="cancelButton" type="LINK"
+				addStyleNames="margin-right-5" />
+			<b:Button ui:field="sendInviteButton"
+				text="Send Invitation(s)" type="PRIMARY" />
 		</b:ModalFooter>
 	</b:Modal>
 

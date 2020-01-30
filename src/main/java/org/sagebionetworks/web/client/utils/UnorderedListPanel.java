@@ -9,20 +9,20 @@ import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class UnorderedListPanel extends ComplexPanel {
-	final UListElement ul = Document.get().createULElement();	
+	final UListElement ul = Document.get().createULElement();
 
 	public UnorderedListPanel() {
 		setElement(ul);
 	}
-	
+
 	public void addStyleName(String style) {
 		ul.setClassName(ul.getClassName() + " " + style);
 	}
-	
+
 	public void setAttribute(String name, String value) {
 		ul.setAttribute(name, value);
 	}
-	
+
 	public void add(Widget w) {
 		addLi(w);
 	}
@@ -30,21 +30,21 @@ public class UnorderedListPanel extends ComplexPanel {
 	public void add(String styleName) {
 		add(null, styleName);
 	}
-	
+
 	public void add(Widget w, String styleName) {
 		LIElement li = addLi(w);
 		li.setClassName(styleName);
 	}
-	
+
 	public int indexOf(Widget w) {
 		return this.getWidgetIndex(w);
 	}
-	
+
 	private LIElement addLi(Widget w) {
-		LIElement li = Document.get().createLIElement();		
+		LIElement li = Document.get().createLIElement();
 		ul.appendChild(li);
-		if(w != null)
-			add(w, (Element) li.cast());	
+		if (w != null)
+			add(w, (Element) li.cast());
 		return li;
 	}
 
@@ -64,15 +64,14 @@ public class UnorderedListPanel extends ComplexPanel {
 		}
 		return removed;
 	}
-	
+
 	/**
-	 * Adds the the given style name to the list item that corresponds
-	 * to the given widget.
+	 * Adds the the given style name to the list item that corresponds to the given widget.
+	 * 
 	 * @param w
 	 * @param styleName
-	 * @return If there is no list item that corresponds to the given widget
-	 *  or the list item already had the given style name, returns false. 
-	 *  Else, returns true.
+	 * @return If there is no list item that corresponds to the given widget or the list item already
+	 *         had the given style name, returns false. Else, returns true.
 	 */
 	public static boolean addStyleNameToListItem(Widget w, String styleName) {
 		Element li = DOM.getParent(w.getElement());
@@ -81,15 +80,14 @@ public class UnorderedListPanel extends ComplexPanel {
 		}
 		return li.addClassName(styleName);
 	}
-	
+
 	/**
-	 * Removes the the given style name to the list item that corresponds
-	 * to the given widget.
+	 * Removes the the given style name to the list item that corresponds to the given widget.
+	 * 
 	 * @param w
 	 * @param styleName
-	 * @return If there is no list item that corresponds to the given widget
-	 *  or the list item already had the given style name, returns false. 
-	 *  Else, returns true.
+	 * @return If there is no list item that corresponds to the given widget or the list item already
+	 *         had the given style name, returns false. Else, returns true.
 	 */
 	public static boolean removeStyleNameFromListItem(Widget w, String styleName) {
 		Element li = DOM.getParent(w.getElement());

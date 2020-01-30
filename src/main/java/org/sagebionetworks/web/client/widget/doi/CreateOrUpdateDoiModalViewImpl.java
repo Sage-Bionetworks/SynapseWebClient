@@ -8,7 +8,6 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.doi.v2.DoiResourceTypeGeneral;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -17,11 +16,12 @@ import com.google.inject.Inject;
 
 public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalView {
 
-	public interface CreateOrUpdateDoiModalViewImplUiBinder extends UiBinder<Widget, CreateOrUpdateDoiModalViewImpl> {}
+	public interface CreateOrUpdateDoiModalViewImplUiBinder extends UiBinder<Widget, CreateOrUpdateDoiModalViewImpl> {
+	}
 
 	private CreateOrUpdateDoiModalView.Presenter presenter;
-	
 	private Widget widget;
+
 	@UiField
 	Button mintDoiButton;
 	@UiField
@@ -44,8 +44,10 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 	Div jobTrackingWidget;
 	@UiField
 	Div synAlert;
+	@UiField
+	Div doiOverwriteWarning;
 
-	
+
 	@Inject
 	public CreateOrUpdateDoiModalViewImpl(CreateOrUpdateDoiModalViewImplUiBinder binder) {
 		this.widget = binder.createAndBindUi(this);
@@ -53,9 +55,22 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 		mintDoiButton.addClickHandler(event -> presenter.onSaveDoi());
 		mintDoiButton.setEnabled(true);
 		cancelButton.addClickHandler(event -> doiModal.hide());
-		// initialize the resource type general
+
+		initializeResourceTypeGeneralSelect();
+	}
+
+	private void initializeResourceTypeGeneralSelect() {
+		// SWC-4445
+		// initialize the resource type general select field by adding typical types to the top and adding a
+		// separator.
+		resourceTypeGeneralSelect.addItem(DoiResourceTypeGeneral.Dataset.name());
+		resourceTypeGeneralSelect.addItem(DoiResourceTypeGeneral.Collection.name());
+		resourceTypeGeneralSelect.addItem("────────────────────");
+		resourceTypeGeneralSelect.getElement().getElementsByTagName("option").getItem(2).setAttribute("disabled", "disabled");
 		for (DoiResourceTypeGeneral rtg : DoiResourceTypeGeneral.values()) {
-			resourceTypeGeneralSelect.addItem(rtg.name());
+			if (!rtg.equals(DoiResourceTypeGeneral.Dataset) && !rtg.equals(DoiResourceTypeGeneral.Collection)) {
+				resourceTypeGeneralSelect.addItem(rtg.name());
+			}
 		}
 	}
 
@@ -64,7 +79,7 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 		jobTrackingWidget.setVisible(false);
 		creatorsField.clear();
 		titlesField.clear();
-		resourceTypeGeneralSelect.setSelectedIndex(0);
+		resourceTypeGeneralSelect.setTitle(DoiResourceTypeGeneral.Dataset.name());
 		publicationYearField.reset();
 		mintDoiButton.setEnabled(true);
 	}
@@ -74,7 +89,7 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 		jobTrackingWidget.setVisible(isLoading);
 		mintDoiButton.setEnabled(!isLoading);
 	}
-	
+
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -107,15 +122,12 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 
 	@Override
 	public void setResourceTypeGeneral(String resourceTypeGeneral) {
-		// Not preferred to have this logic here but it's the most clear workaround
-		int index = 0, i = 0;
-		for (DoiResourceTypeGeneral rtg : DoiResourceTypeGeneral.values()) {
-			if (resourceTypeGeneral.equals(rtg.name())) {
-				index = i;
+		for (int i = 0; i < resourceTypeGeneralSelect.getItemCount(); i++) {
+			if (resourceTypeGeneral.equals(resourceTypeGeneralSelect.getValue(i))) {
+				resourceTypeGeneralSelect.setSelectedIndex(i);
+				break;
 			}
-			i++;
 		}
-		resourceTypeGeneralSelect.setSelectedIndex(index);
 	}
 
 	@Override
@@ -132,17 +144,22 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 	public Widget asWidget() {
 		return widget;
 	}
-	
+
+	@Override
+	public void showOverwriteWarning(boolean showWarning) {
+		doiOverwriteWarning.setVisible(showWarning);
+	}
+
 	@Override
 	public void show() {
 		doiModal.show();
 	}
-	
+
 	@Override
 	public void hide() {
 		doiModal.hide();
 	}
-	
+
 	@Override
 	public void setModalTitle(String newTitle) {
 		title.setText(newTitle);

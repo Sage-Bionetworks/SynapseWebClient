@@ -29,7 +29,7 @@
 				<TimeBasedTriggeringPolicy interval="1" />
 				<SizeBasedTriggeringPolicy size="250 MB" />
 			</Policies>
-		</RollingFile>	
+		</RollingFile>
 		<RollingFile name="portal-profile"
 			fileName="${org.sagebionetworks.local.logging.dir}/portal-profile.log"
 			filePattern="${org.sagebionetworks.local.logging.dir}/portal-profile.%d{yyyy-MM-dd-hh-mm}.log.gz">
@@ -40,18 +40,22 @@
 				<TimeBasedTriggeringPolicy interval="1" />
 				<SizeBasedTriggeringPolicy size="250 MB" />
 			</Policies>
-		</RollingFile>			
+		</RollingFile>
 	</appenders>
 	<loggers>
 		<!-- This allows us to track outgoing http connection issues. See: http://blog.nigelsim.org/2011/06/17/debugging-connection-pool-leak-in-apache-http-client/ -->
-		<logger name="org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager" level="debug" additivity="false">
+		<logger
+			name="org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager"
+			level="debug" additivity="false">
 			<appender-ref ref="portal-http-out" />
 		</logger>
-		<logger name="org.sagebionetworks.client.SynapseProfileProxy" level="trace" additivity="false">
+		<logger name="org.sagebionetworks.client.SynapseProfileProxy"
+			level="trace" additivity="false">
 			<appender-ref ref="portal-profile" />
-		</logger>	
-			
-		<logger name="org.sagebionetworks" level="info" additivity="true">
+		</logger>
+
+		<logger name="org.sagebionetworks" level="info"
+			additivity="true">
 			<appender-ref ref="portal" />
 		</logger>
 		<root level="error">

@@ -3,15 +3,25 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Span>
-		<b:Button ui:field="followButton" type="PRIMARY" visible="false" dataLoadingText="Updating...">Follow</b:Button>
-		<b:Button ui:field="unfollowButton" type="DEFAULT" visible="false" dataLoadingText="Updating...">Unfollow</b:Button>
-		<b:Tooltip title="You are not following this topic. Click to follow." placement="LEFT" ui:field="followIconTooltip">
-			<b:Icon ui:field="followIcon" type="EYE_SLASH" size="LARGE" addStyleNames="imageButton margin-right-10 line-height-1em" visible="false"/>
+		<b:Button ui:field="followButton" type="PRIMARY"
+			visible="false" dataLoadingText="Updating...">Follow</b:Button>
+		<b:Button ui:field="unfollowButton" type="DEFAULT"
+			visible="false" dataLoadingText="Updating...">Unfollow</b:Button>
+		<b:Tooltip
+			title="You are not following this topic. Click to follow."
+			placement="LEFT" ui:field="followIconTooltip">
+			<b:Icon ui:field="followIcon" type="EYE_SLASH" size="LARGE"
+				addStyleNames="imageButton margin-right-10 line-height-1em"
+				visible="false" />
 		</b:Tooltip>
-		<b:Tooltip title="You are following this topic.  Click to stop following." placement="LEFT" ui:field="unfollowIconTooltip">
-			<b:Icon ui:field="unfollowIcon" type="EYE" size="LARGE" addStyleNames="imageButton margin-right-10 line-height-1em" visible="false"/>
+		<b:Tooltip
+			title="You are following this topic.  Click to stop following."
+			placement="LEFT" ui:field="unfollowIconTooltip">
+			<b:Icon ui:field="unfollowIcon" type="EYE" size="LARGE"
+				addStyleNames="imageButton margin-right-10 line-height-1em"
+				visible="false" />
 		</b:Tooltip>
 
-		<bh:Div ui:field="synAlertContainer"/>
+		<bh:Div ui:field="synAlertContainer" />
 	</bh:Span>
 </ui:UiBinder>

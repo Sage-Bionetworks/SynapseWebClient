@@ -4,15 +4,12 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.io.IOException;
 import java.net.URL;
-
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -21,7 +18,6 @@ import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.server.servlet.DiscussionMessageServlet;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
@@ -60,7 +56,7 @@ public class DiscussionMessageServletTest {
 
 		SynapseClientBaseTest.setupTestEndpoints();
 	}
-	
+
 	@Test
 	public void testDoGetThreadMessage() throws Exception {
 		String sessionToken = "fake";
@@ -76,7 +72,7 @@ public class DiscussionMessageServletTest {
 		verify(mockSynapse).getThreadUrl(anyString());
 		verify(mockResponse).sendRedirect(anyString());
 
-		//as an additional test, verify that synapse client is set up
+		// as an additional test, verify that synapse client is set up
 		verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
 		verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
 		verify(mockSynapse).setFileEndpoint(SynapseClientBaseTest.FILE_BASE);
@@ -87,7 +83,7 @@ public class DiscussionMessageServletTest {
 	public void testDoGetReplyMessage() throws Exception {
 		String sessionToken = "fake";
 
-		//set up general synapse client configuration test
+		// set up general synapse client configuration test
 		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
 
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};
@@ -99,7 +95,7 @@ public class DiscussionMessageServletTest {
 		verify(mockSynapse).getReplyUrl(anyString());
 		verify(mockResponse).sendRedirect(anyString());
 
-		//as an additional test, verify that synapse client is set up
+		// as an additional test, verify that synapse client is set up
 		verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
 		verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
 		verify(mockSynapse).setFileEndpoint(SynapseClientBaseTest.FILE_BASE);
@@ -110,7 +106,7 @@ public class DiscussionMessageServletTest {
 	public void testDoGetUnsupportedType() throws Exception {
 		String sessionToken = "fake";
 
-		//set up general synapse client configuration test
+		// set up general synapse client configuration test
 		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
 
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};
@@ -125,7 +121,7 @@ public class DiscussionMessageServletTest {
 	public void testDoGetError() throws Exception {
 		String sessionToken = "fake";
 
-		//set up general synapse client configuration test
+		// set up general synapse client configuration test
 		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
 
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};

@@ -13,11 +13,13 @@
 							<b:Row>
 								<b:Column size="MD_9">
 									<b:InputGroup width="100%">
-										<b:TextBox ui:field="searchField" addStyleNames="form-control input-lg search-textbox" />
+										<b:TextBox ui:field="searchField"
+											addStyleNames="form-control input-lg search-textbox" />
 									</b:InputGroup>
 								</b:Column>
 								<b:Column size="MD_3">
-									<b:Button ui:field="searchButton" block="true" size="LARGE" text="Search" icon="SEARCH" />
+									<b:Button ui:field="searchButton" block="true"
+										size="LARGE" text="Search" icon="SEARCH" />
 								</b:Column>
 							</b:Row>
 						</div>
@@ -27,13 +29,18 @@
 							<g:SimplePanel ui:field="currentFacetsPanel" />
 						</div>
 					</div>
-					<g:SimplePanel ui:field="synAlertPanel"/>
-					<g:SimplePanel ui:field="resultsPanel" styleName="margin-top-10"/>
+					<g:SimplePanel ui:field="synAlertPanel" />
+					<g:SimplePanel ui:field="resultsPanel"
+						styleName="margin-top-10" />
 				</div>
-				<g:HTMLPanel ui:field="narrowResultsPanel" addStyleNames="col-md-3 col-md-pull-9">
+				<g:HTMLPanel ui:field="narrowResultsPanel"
+					addStyleNames="col-md-3 col-md-pull-9">
 					<div class="well">
 						<h5>Narrow Results</h5>
-						<bh:Italic>Searching for a user profile?  Try our </bh:Italic><b:Anchor href="#!PeopleSearch:" addStyleNames="margin-left-5 font-italic">People Search</b:Anchor><bh:Italic>.</bh:Italic>
+						<bh:Italic>Searching for a user profile? Try our </bh:Italic>
+						<b:Anchor href="#!PeopleSearch:"
+							addStyleNames="margin-left-5 font-italic">People Search</b:Anchor>
+						<bh:Italic>.</bh:Italic>
 						<g:SimplePanel ui:field="facetPanel" />
 					</div>
 				</g:HTMLPanel>

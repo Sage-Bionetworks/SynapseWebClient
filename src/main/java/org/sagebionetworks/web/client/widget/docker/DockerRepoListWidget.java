@@ -2,8 +2,6 @@ package org.sagebionetworks.web.client.widget.docker;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -11,13 +9,13 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
+import com.google.gwt.http.client.Request;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -29,14 +27,10 @@ public class DockerRepoListWidget {
 	private EntityChildrenRequest query;
 	private LoadMoreWidgetContainer membersContainer;
 	private SynapseJavascriptClient jsClient;
-	
+	private Request currentRequest = null;
+
 	@Inject
-	public DockerRepoListWidget(
-			DockerRepoListWidgetView view,
-			LoadMoreWidgetContainer membersContainer,
-			SynapseAlert synAlert,
-			SynapseJavascriptClient jsClient
-			) {
+	public DockerRepoListWidget(DockerRepoListWidgetView view, LoadMoreWidgetContainer membersContainer, SynapseAlert synAlert, SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.membersContainer = membersContainer;
@@ -57,43 +51,50 @@ public class DockerRepoListWidget {
 
 	/**
 	 * Configure this widget before use.
+	 * 
 	 * @param projectBundle
 	 */
 	public void configure(String projectId) {
+		if (currentRequest != null) {
+			currentRequest.cancel();
+		}
 		this.query = createDockerRepoEntityQuery(projectId);
 		view.clear();
 		view.setLoadingVisible(false);
 		query.setNextPageToken(null);
-		membersContainer.setIsMore(true);
+		loadMore();
 	}
-	
+
 	public void loadMore() {
 		synAlert.clear();
-		jsClient.getEntityChildren(query, new AsyncCallback<EntityChildrenResponse>() {
+		currentRequest = jsClient.getEntityChildren(query, new AsyncCallback<EntityChildrenResponse>() {
 			public void onSuccess(EntityChildrenResponse results) {
 				query.setNextPageToken(results.getNextPageToken());
 				membersContainer.setIsMore(results.getNextPageToken() != null);
 				setResults(results.getPage());
 			};
+
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
-			
+
 		});
 	}
-	
+
 	private void setResults(List<EntityHeader> results) {
 		synAlert.clear();
-		for (EntityHeader header: results) {
-			jsClient.getEntity(header.getId(), OBJECT_TYPE.DockerRepository, new AsyncCallback<Entity>(){
+		for (EntityHeader header : results) {
+			view.addRepo(header);
+			jsClient.getEntityBundleFromCache(header.getId(), new AsyncCallback<EntityBundle>() {
 				@Override
-				public void onSuccess(Entity dockerRepository) {
-					view.addRepo((DockerRepository)dockerRepository);
-				}
+				public void onSuccess(EntityBundle result) {
+					view.setDockerRepository((DockerRepository) result.getEntity());
+				};
+
 				@Override
-				public void onFailure(Throwable error) {
-					synAlert.handleException(error);
+				public void onFailure(Throwable caught) {
+					synAlert.handleException(caught);
 				}
 			});
 		}
@@ -101,6 +102,7 @@ public class DockerRepoListWidget {
 
 	/**
 	 * Create a new query.
+	 * 
 	 * @param parentId
 	 * @return
 	 */
@@ -114,7 +116,7 @@ public class DockerRepoListWidget {
 		newQuery.setIncludeTypes(types);
 		return newQuery;
 	}
-	
+
 	public void setEntityClickedHandler(CallbackP<String> entityClickedHandler) {
 		view.setEntityClickedHandler(entityId -> {
 			view.clear();

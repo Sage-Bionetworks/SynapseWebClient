@@ -1,4 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.entity.tabs;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
@@ -9,25 +10,24 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -40,9 +40,9 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.DockerTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DockerTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
-
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class DockerTabTest {
 	@Mock
 	Tab mockTab;
@@ -68,8 +68,6 @@ public class DockerTabTest {
 	@Mock
 	EntityBundle mockProjectEntityBundle;
 	@Mock
-	EntityUpdatedHandler mockEntityUpdatedHandler;
-	@Mock
 	DockerRepository mockDockerRepoEntity;
 	@Mock
 	Project mockProjectEntity;
@@ -94,14 +92,14 @@ public class DockerTabTest {
 
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
 		tab = new DockerTab(mockTab, mockGinInjector);
-		
+
+		when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
 		when(mockGinInjector.getDockerTabView()).thenReturn(mockView);
 		when(mockGinInjector.getDockerRepoListWidget()).thenReturn(mockDockerRepoListWidget);
 		when(mockGinInjector.getBreadcrumb()).thenReturn(mockBreadcrumb);
 		when(mockGinInjector.getStuAlert()).thenReturn(mockSynAlert);
-		
+
 		when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);
 		when(mockProjectEntityBundle.getPermissions()).thenReturn(mockPermissions);
 		when(mockProjectEntity.getName()).thenReturn(projectName);
@@ -113,22 +111,22 @@ public class DockerTabTest {
 		when(mockGinInjector.createNewDockerRepoWidget()).thenReturn(mockDockerRepoWidget);
 
 		List<EntityHeader> pathHeaders = new ArrayList<EntityHeader>();
-		
+
 		EntityHeader rootHeader = new EntityHeader();
 		rootHeader.setId("1");
 		rootHeader.setName("root");
 		pathHeaders.add(rootHeader);
-		
+
 		EntityHeader projHeader = new EntityHeader();
 		projHeader.setId("123");
 		projHeader.setName(projectName);
 		pathHeaders.add(projHeader);
-		
+
 		EntityHeader dsHeader = new EntityHeader();
 		dsHeader.setId("170");
 		dsHeader.setName("syn170");
 		pathHeaders.add(dsHeader);
-		
+
 		path = new EntityPath();
 		path.setPath(pathHeaders);
 		when(mockDockerRepoEntityBundle.getPath()).thenReturn(path);
@@ -142,10 +140,11 @@ public class DockerTabTest {
 		verify(mockView).setBreadcrumb(any(Widget.class));
 		verify(mockView).setDockerRepoList(any(Widget.class));
 		verify(mockView).setSynapseAlert(any(Widget.class));
-		verify(mockTab).configure(anyString(), anyString(), anyString());
+		verify(mockView).setActionMenu(any(Widget.class));
+		verify(mockTab).configure(anyString(), anyString(), anyString(), any(EntityArea.class));
 		verify(mockBreadcrumb).setLinkClickedHandler(callbackPCaptor.capture());
 		verify(mockTab).setContent(any(Widget.class));
-		
+
 		// test click on breadcrumb
 		String newEntityId = "syn9898989822";
 		tab.setEntitySelectedCallback(mockEntitySelectedCallback);
@@ -169,7 +168,7 @@ public class DockerTabTest {
 		String areaToken = null;
 		tab.setEntitySelectedCallback(mockUpdateEntityCallback);
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockProjectEntityBundle, mockEntityUpdatedHandler, areaToken, mockActionMenuWidget);
+		tab.configure(mockProjectEntityBundle, areaToken);
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockTab).setEntityNameAndPlace(eq(projectName), any(Synapse.class));
 		verify(mockView, times(2)).setBreadcrumbVisible(false);
@@ -185,7 +184,7 @@ public class DockerTabTest {
 		mockProjectEntityBundle = null;
 		tab.setEntitySelectedCallback(mockUpdateEntityCallback);
 		tab.setProject(projectEntityId, mockProjectEntityBundle, mockProjectBundleLoadError);
-		tab.configure(mockProjectEntityBundle, mockEntityUpdatedHandler, areaToken, mockActionMenuWidget);
+		tab.configure(mockProjectEntityBundle, areaToken);
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockTab).setEntityNameAndPlace(eq(projectEntityId), any(Synapse.class));
 		verify(mockDockerRepoListWidget, never()).configure(projectEntityId);
@@ -198,12 +197,12 @@ public class DockerTabTest {
 		String areaToken = null;
 		tab.setEntitySelectedCallback(mockUpdateEntityCallback);
 		tab.setProject(projectEntityId, mockProjectEntityBundle, mockProjectBundleLoadError);
-		tab.configure(mockDockerRepoEntityBundle, mockEntityUpdatedHandler, areaToken, mockActionMenuWidget);
+		tab.configure(mockDockerRepoEntityBundle, areaToken);
 		verify(mockTab).setEntityNameAndPlace(eq(dockerRepoName), any(Synapse.class));
 		verify(mockTab).showTab();
 		verify(mockView).setBreadcrumbVisible(true);
 		verify(mockView, times(2)).setDockerRepoListVisible(false);
-		verify(mockView).setDockerRepoWidgetVisible(true);
+		verify(mockView).setDockerRepoUIVisible(true);
 		verify(mockView, atLeastOnce()).clearDockerRepoWidget();
 		ArgumentCaptor<List> listCaptor = ArgumentCaptor.forClass(List.class);
 		verify(mockBreadcrumb).configure(listCaptor.capture(), eq(dockerRepoName));
@@ -221,7 +220,7 @@ public class DockerTabTest {
 	@Test
 	public void testShowError() {
 		Throwable error = new Throwable();
-		tab.showError(error );
+		tab.showError(error);
 		verify(mockSynAlert).clear();
 		verify(mockSynAlert).handleException(error);
 	}
@@ -231,7 +230,7 @@ public class DockerTabTest {
 		tab.resetView();
 		verify(mockView).setBreadcrumbVisible(false);
 		verify(mockView).setDockerRepoListVisible(false);
-		verify(mockView).setDockerRepoWidgetVisible(false);
+		verify(mockView).setDockerRepoUIVisible(false);
 		verify(mockView).clearDockerRepoWidget();
 		verify(mockSynAlert, never()).handleException(any(Throwable.class));
 	}

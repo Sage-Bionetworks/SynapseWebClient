@@ -1,12 +1,11 @@
 package org.sagebionetworks.web.client.widget;
 
 import java.util.Iterator;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface RadioWidget {
-	public interface Presenter{
+	public interface Presenter {
 	}
 
 	Widget asWidget();

@@ -1,30 +1,9 @@
 package org.sagebionetworks.web.client.widget.login;
 
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface LoginWidgetView extends IsWidget {
+	void clear();
 
-	/**
-	 * Set the presenter.
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
-	
-	
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		
-		public void setUsernameAndPassword(String username, String password);
-		
-		public void goTo(Place place);
-	}
-
-	void clearUsername();
-	
-	void setSynAlert(IsWidget w);
-	public void clear();
-
+	void setVisible(boolean visible);
 }

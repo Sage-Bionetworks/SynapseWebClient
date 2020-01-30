@@ -1,27 +1,13 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:d="urn:import:com.google.gwt.dom.client"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<bh:Div addStyleNames="max-width-350 center-in-div">
 		<bh:ClearFix />
-		<g:SimplePanel ui:field="googleSSOContainer">
-			<b:Button icon="GOOGLE" ui:field="googleSignInButton" iconSize="LARGE" size="LARGE" iconFixedWidth="true" width="100%" addStyleNames="lightGreyBackground no-background">Sign
-				in with Google</b:Button>
-		</g:SimplePanel>
-		<b:Heading size="H4" subText="or" addStyleNames="text-align-center margin-top-20"/>
-		<b:Heading size="H4" subText="Sign in with your Synapse account" addStyleNames="text-align-center margin-top-20"/>
-		<bh:Div ui:field="loginFormContainer" />
-		<b:Row>
-				<bh:Div ui:field="synAlertContainer" />
-			</b:Row>
-		<b:Heading size="H5" addStyleNames="margin-top-20">
-			<b:Anchor text="Forgot password?" addStyleNames="synapse-green left" href="#!PasswordReset:0"/>
-			<bh:Span  addStyleNames="right lightGreyText">It's free!</bh:Span>
-			<b:Anchor text="Register" addStyleNames="synapse-green right margin-right-10" href="#!RegisterAccount:0"/>
-		</b:Heading>
+		<bh:Div ui:field="srcLoginContainer" />
 		<bh:ClearFix />
 	</bh:Div>
 </ui:UiBinder>

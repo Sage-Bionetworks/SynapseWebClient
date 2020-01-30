@@ -1,19 +1,21 @@
 package org.sagebionetworks.web.unitclient.widget.provenance.nchart;
 
 import java.util.List;
-
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayer;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 
 public class NChartLayersArrayTestImpl implements NChartLayersArray {
 	List<NChartLayer> layers;
+
 	@Override
 	public void setLayers(List<NChartLayer> layers) {
 		this.layers = layers;
 	}
+
 	public List<NChartLayer> getLayers() {
 		return layers;
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -21,6 +23,7 @@ public class NChartLayersArrayTestImpl implements NChartLayersArray {
 		result = prime * result + ((layers == null) ? 0 : layers.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -37,5 +40,5 @@ public class NChartLayersArrayTestImpl implements NChartLayersArray {
 			return false;
 		return true;
 	}
-	
+
 }

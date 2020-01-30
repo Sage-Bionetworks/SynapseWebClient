@@ -13,13 +13,14 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  */
 public class IsWidgetStub implements IsWidget, HasKeyDownHandlers {
-	
+
 	KeyDownHandler handler;
 	int rowIndex;
 	int colIndex;
 
 	/**
 	 * Create with an address.
+	 * 
 	 * @param rowIndex
 	 * @param colIndex
 	 */
@@ -36,7 +37,7 @@ public class IsWidgetStub implements IsWidget, HasKeyDownHandlers {
 
 	@Override
 	public void fireEvent(GwtEvent<?> event) {
-		if(this.handler != null){
+		if (this.handler != null) {
 			this.handler.onKeyDown((KeyDownEvent) event);
 		}
 	}
@@ -44,17 +45,17 @@ public class IsWidgetStub implements IsWidget, HasKeyDownHandlers {
 	@Override
 	public HandlerRegistration addKeyDownHandler(KeyDownHandler handler) {
 		this.handler = handler;
-		return new HandlerRegistration(){
+		return new HandlerRegistration() {
 			@Override
 			public void removeHandler() {
 				IsWidgetStub.this.handler = null;
-			}};
+			}
+		};
 	}
 
 	@Override
 	public String toString() {
-		return "IsWidgetStub [rowIndex=" + rowIndex + ", colIndex=" + colIndex
-				+ "]";
+		return "IsWidgetStub [rowIndex=" + rowIndex + ", colIndex=" + colIndex + "]";
 	}
 
 }

@@ -2,23 +2,21 @@ package org.sagebionetworks.web.shared;
 
 import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.UserProfile;
-
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class MembershipRequestBundle implements IsSerializable {
 
 	private UserProfile userProfile;
 	private MembershipRequest membershipRequest;
-	
+
 	/**
 	 * Default constructor
 	 */
 	public MembershipRequestBundle() {
-		
+
 	}
 
-	public MembershipRequestBundle(UserProfile userProfile,
-			MembershipRequest membershipRequest) {
+	public MembershipRequestBundle(UserProfile userProfile, MembershipRequest membershipRequest) {
 		super();
 		this.userProfile = userProfile;
 		this.membershipRequest = membershipRequest;
@@ -44,12 +42,8 @@ public class MembershipRequestBundle implements IsSerializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime
-				* result
-				+ ((membershipRequest == null) ? 0 : membershipRequest
-						.hashCode());
-		result = prime * result
-				+ ((userProfile == null) ? 0 : userProfile.hashCode());
+		result = prime * result + ((membershipRequest == null) ? 0 : membershipRequest.hashCode());
+		result = prime * result + ((userProfile == null) ? 0 : userProfile.hashCode());
 		return result;
 	}
 
@@ -77,8 +71,7 @@ public class MembershipRequestBundle implements IsSerializable {
 
 	@Override
 	public String toString() {
-		return "MembershipRequestBundle [userProfile=" + userProfile
-				+ ", membershipRequest=" + membershipRequest + "]";
+		return "MembershipRequestBundle [userProfile=" + userProfile + ", membershipRequest=" + membershipRequest + "]";
 	}
 
 }

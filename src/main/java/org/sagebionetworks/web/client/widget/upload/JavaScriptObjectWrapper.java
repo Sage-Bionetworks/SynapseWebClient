@@ -8,6 +8,7 @@ public class JavaScriptObjectWrapper {
 	public JavaScriptObjectWrapper(JavaScriptObject jsObject) {
 		this.jsObject = jsObject;
 	}
+
 	JavaScriptObject get() {
 		return jsObject;
 	}

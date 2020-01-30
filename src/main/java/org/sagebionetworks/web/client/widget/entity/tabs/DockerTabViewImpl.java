@@ -1,8 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
+import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.html.Div;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -15,10 +18,15 @@ public class DockerTabViewImpl implements DockerTabView {
 	SimplePanel dockerRepoWidgetContainer;
 	@UiField
 	SimplePanel synapseAlertContainer;
-
+	@UiField
+	Div actionMenuContainer;
+	@UiField
+	Heading title;
 	Presenter presenter;
 	Widget widget;
-	public interface TabsViewImplUiBinder extends UiBinder<Widget, DockerTabViewImpl> {}
+
+	public interface TabsViewImplUiBinder extends UiBinder<Widget, DockerTabViewImpl> {
+	}
 
 	public DockerTabViewImpl() {
 		TabsViewImplUiBinder binder = GWT.create(TabsViewImplUiBinder.class);
@@ -37,26 +45,27 @@ public class DockerTabViewImpl implements DockerTabView {
 
 	@Override
 	public void setDockerRepoList(Widget widget) {
-		dockerRepoListWidgetContainer.add(widget);
+		dockerRepoListWidgetContainer.setWidget(widget);
 	}
 
 	@Override
 	public void setBreadcrumb(Widget widget) {
-		dockerBreadcrumbContainer.add(widget);
+		dockerBreadcrumbContainer.setWidget(widget);
 	}
 
 	@Override
 	public void setSynapseAlert(Widget widget) {
-		synapseAlertContainer.add(widget);
+		synapseAlertContainer.setWidget(widget);
 	}
 
 	@Override
 	public void setDockerRepoWidget(Widget widget) {
-		dockerRepoWidgetContainer.add(widget);
+		dockerRepoWidgetContainer.setWidget(widget);
 	}
 
 	@Override
 	public void setBreadcrumbVisible(boolean visible) {
+		title.setVisible(!visible);
 		dockerBreadcrumbContainer.setVisible(visible);
 	}
 
@@ -66,12 +75,19 @@ public class DockerTabViewImpl implements DockerTabView {
 	}
 
 	@Override
-	public void setDockerRepoWidgetVisible(boolean visible) {
+	public void setDockerRepoUIVisible(boolean visible) {
 		dockerRepoWidgetContainer.setVisible(visible);
 	}
 
 	@Override
 	public void clearDockerRepoWidget() {
 		dockerRepoWidgetContainer.clear();
+	}
+
+	@Override
+	public void setActionMenu(IsWidget w) {
+		w.asWidget().removeFromParent();
+		actionMenuContainer.clear();
+		actionMenuContainer.add(w);
 	}
 }

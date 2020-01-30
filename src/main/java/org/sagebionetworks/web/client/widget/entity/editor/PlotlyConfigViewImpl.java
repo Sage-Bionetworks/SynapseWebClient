@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.FormGroup;
@@ -14,7 +13,6 @@ import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
-
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -67,10 +65,12 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	ListBox xAxisTypeDropdownMenu;
 	@UiField
 	ListBox yAxisTypeDropdownMenu;
-	
-	public interface PlotlyConfigViewImplUiBinder extends UiBinder<Widget, PlotlyConfigViewImpl> {}
+
+	public interface PlotlyConfigViewImplUiBinder extends UiBinder<Widget, PlotlyConfigViewImpl> {
+	}
+
 	Widget widget;
-	
+
 	@Inject
 	public PlotlyConfigViewImpl(PlotlyConfigViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
@@ -80,20 +80,20 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 				presenter.onFindTable();
 			}
 		});
-		
+
 		for (GraphType type : GraphType.values()) {
 			typeDropdownMenu.addItem(type.getDisplayName(), type.name());
 		}
-		
+
 		for (BarMode mode : BarMode.values()) {
 			barModeDropdownMenu.addItem(mode.getDisplayName(), mode.name());
 		}
-		
+
 		for (AxisType axisType : AxisType.values()) {
 			xAxisTypeDropdownMenu.addItem(axisType.getDisplayName(), axisType.name());
 			yAxisTypeDropdownMenu.addItem(axisType.getDisplayName(), axisType.name());
 		}
-		
+
 		typeDropdownMenu.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
@@ -113,18 +113,19 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 			}
 		});
 	}
+
 	private void updateBarModeVisibility() {
 		boolean isBar = GraphType.BAR.equals(getGraphType());
 		setBarModeVisible(isBar);
 		setBarOrientationVisible(isBar);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
-	}	
+	}
 
-	@Override 
+	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
@@ -144,43 +145,43 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	public BarMode getBarMode() {
 		return BarMode.valueOf(barModeDropdownMenu.getSelectedValue().toUpperCase());
 	}
-	
+
 	@Override
 	public void setBarOrientationVisible(boolean visible) {
 		isHorizontalBarCb.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setBarOrientationHorizontal(boolean isHorizontal) {
 		isHorizontalBarCb.setValue(isHorizontal);
 	}
-	
+
 	@Override
 	public boolean isBarOrientationHorizontal() {
 		return isHorizontalBarCb.getValue();
 	}
-	
+
 	@Override
 	public void setBarMode(BarMode barMode) {
 		for (int i = 0; i < barModeDropdownMenu.getItemCount(); i++) {
 			if (barMode.name().equals(barModeDropdownMenu.getValue(i))) {
-				//found
+				// found
 				barModeDropdownMenu.setSelectedIndex(i);
 				break;
 			}
 		}
 	}
-	
+
 	@Override
 	public AxisType getXAxisType() {
 		return AxisType.valueOf(xAxisTypeDropdownMenu.getSelectedValue().toUpperCase());
 	}
-	
+
 	@Override
 	public AxisType getYAxisType() {
 		return AxisType.valueOf(yAxisTypeDropdownMenu.getSelectedValue().toUpperCase());
 	}
-	
+
 	@Override
 	public void setXAxisType(AxisType axisType) {
 		setAxisType(axisType, xAxisTypeDropdownMenu);
@@ -194,31 +195,31 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	private void setAxisType(AxisType axisType, ListBox menu) {
 		for (int i = 0; i < menu.getItemCount(); i++) {
 			if (axisType.name().equals(menu.getValue(i))) {
-				//found
+				// found
 				menu.setSelectedIndex(i);
 				break;
 			}
 		}
 	}
 
-	
+
 	@Override
 	public GraphType getGraphType() {
 		return GraphType.valueOf(typeDropdownMenu.getSelectedValue().toUpperCase());
 	}
-	
+
 	@Override
 	public void setGraphType(GraphType graphType) {
 		for (int i = 0; i < typeDropdownMenu.getItemCount(); i++) {
 			if (graphType.name().equals(typeDropdownMenu.getValue(i))) {
-				//found
+				// found
 				typeDropdownMenu.setSelectedIndex(i);
 				break;
 			}
 		}
 		updateBarModeVisibility();
 	}
-	
+
 	@Override
 	public String getXAxisLabel() {
 		return xAxisLabel.getValue();
@@ -277,12 +278,12 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 		});
 		yAxisColumnsContainer.add(yColumnContainer);
 	}
-	
+
 	@Override
 	public void setTableName(String value) {
 		tableViewSynId.setValue(value);
 	}
-	
+
 	@Override
 	public void setAvailableColumns(List<String> names) {
 		xColumnNamesMenu.clear();
@@ -293,16 +294,17 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 			yColumnNamesMenu.addItem(name);
 		}
 	}
-	
+
 	@Override
 	public void resetSelectedYColumn() {
 		yColumnNamesMenu.setSelectedIndex(0);
 	}
-	
+
 	@Override
 	public String getXAxisColumnName() {
 		return xColumnNamesMenu.getSelectedValue();
 	}
+
 	@Override
 	public void setXAxisColumnName(String value) {
 		boolean found = false;
@@ -323,29 +325,34 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	public void setAdvancedUIVisible(boolean visible) {
 		advancedUI.setVisible(visible);
 	}
+
 	@Override
 	public void setBarModeVisible(boolean visible) {
 		barChartModeUI.setVisible(visible);
 	}
-	
+
 	@Override
 	public void add(IsWidget w) {
 		extraWidgets.add(w);
 	}
+
 	@Override
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
 	}
+
 	@Override
 	public void setShowHideButton(IsWidget w) {
 		showHideAdvancedButtonContainer.clear();
 		showHideAdvancedButtonContainer.add(w);
 	}
+
 	@Override
 	public boolean isShowLegend() {
 		return showLegendCb.getValue();
 	}
+
 	@Override
 	public void setShowLegend(boolean value) {
 		showLegendCb.setValue(value);

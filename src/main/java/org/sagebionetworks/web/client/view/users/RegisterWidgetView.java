@@ -7,9 +7,11 @@ public interface RegisterWidgetView extends IsWidget {
 
 	/**
 	 * Set the presenter.
+	 * 
 	 * @param presenter
 	 */
 	void setPresenter(Presenter presenter);
+
 	void setSynAlert(Widget w);
 
 	void enableEmailAddressField(boolean enabled);
@@ -22,10 +24,14 @@ public interface RegisterWidgetView extends IsWidget {
 
 		String getEncodedMembershipInvtnSignedToken();
 	}
+
 	void enableRegisterButton(boolean enable);
+
 	void setVisible(boolean isVisible);
 
 	void setEmail(String email);
+
 	void clear();
+
 	void showInfo(String message);
 }

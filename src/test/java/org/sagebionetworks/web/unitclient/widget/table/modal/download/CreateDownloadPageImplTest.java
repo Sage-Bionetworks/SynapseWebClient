@@ -1,17 +1,16 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.download;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.sagebionetworks.repo.model.table.CsvTableDescriptor;
 import org.sagebionetworks.repo.model.table.DownloadFromTableRequest;
 import org.sagebionetworks.repo.model.table.DownloadFromTableResult;
@@ -35,8 +34,9 @@ public class CreateDownloadPageImplTest {
 	List<FacetColumnRequest> selectedFacets;
 	@Mock
 	FacetColumnRequest mockFacetColumnRequest;
+
 	@Before
-	public void before(){
+	public void before() {
 		MockitoAnnotations.initMocks(this);
 		mockView = Mockito.mock(CreateDownloadPageView.class);
 		jobTrackingWidgetStub = new JobTrackingWidgetStub();
@@ -48,9 +48,9 @@ public class CreateDownloadPageImplTest {
 		sql = "select * from " + tableId;
 		page.configure(sql, tableId, selectedFacets);
 	}
-	
+
 	@Test
-	public void testSetModalPresenter(){
+	public void testSetModalPresenter() {
 		// This is the main entry to the page
 		page.setModalPresenter(mockModalPresenter);
 		verify(mockModalPresenter).setPrimaryButtonText(CreateDownloadPageImpl.NEXT);
@@ -59,9 +59,9 @@ public class CreateDownloadPageImplTest {
 		verify(mockView).setIncludeRowMetadata(true);
 		verify(mockView).setTrackerVisible(false);
 	}
-	
+
 	@Test
-	public void testgetDownloadFromTableRequest(){
+	public void testgetDownloadFromTableRequest() {
 		selectedFacets.add(mockFacetColumnRequest);
 		page.setModalPresenter(mockModalPresenter);
 		DownloadFromTableRequest expected = new DownloadFromTableRequest();
@@ -75,22 +75,22 @@ public class CreateDownloadPageImplTest {
 		when(mockView.getFileType()).thenReturn(FileType.TSV);
 		when(mockView.getIncludeHeaders()).thenReturn(true);
 		when(mockView.getIncludeRowMetadata()).thenReturn(false);
-		
+
 		DownloadFromTableRequest request = page.getDownloadFromTableRequest();
 		assertEquals(expected, request);
 	}
-	
+
 	@Test
-	public void testOnPrimarySuccess(){
+	public void testOnPrimarySuccess() {
 		page.setModalPresenter(mockModalPresenter);
 		when(mockView.getFileType()).thenReturn(FileType.TSV);
 		when(mockView.getIncludeHeaders()).thenReturn(true);
 		when(mockView.getIncludeRowMetadata()).thenReturn(false);
-	
+
 		String fileHandle = "45678";
 		DownloadFromTableResult results = new DownloadFromTableResult();
 		results.setResultsFileHandleId(fileHandle);
-	
+
 		jobTrackingWidgetStub.setResponse(results);
 		page.onPrimary();
 		verify(mockModalPresenter).setLoading(true);
@@ -98,18 +98,18 @@ public class CreateDownloadPageImplTest {
 		verify(mockNextPage).configure(fileHandle);
 		verify(mockModalPresenter).setNextActivePage(mockNextPage);
 	}
-	
+
 	@Test
-	public void testOnPrimaryCancel(){
+	public void testOnPrimaryCancel() {
 		page.setModalPresenter(mockModalPresenter);
 		when(mockView.getFileType()).thenReturn(FileType.TSV);
 		when(mockView.getIncludeHeaders()).thenReturn(true);
 		when(mockView.getIncludeRowMetadata()).thenReturn(false);
-	
+
 		String fileHandle = "45678";
 		DownloadFromTableResult results = new DownloadFromTableResult();
 		results.setResultsFileHandleId(fileHandle);
-	
+
 		jobTrackingWidgetStub.setOnCancel(true);
 		page.onPrimary();
 		verify(mockModalPresenter).setLoading(true);
@@ -117,14 +117,14 @@ public class CreateDownloadPageImplTest {
 		verify(mockNextPage, never()).configure(fileHandle);
 		verify(mockModalPresenter).onCancel();
 	}
-	
+
 	@Test
-	public void testOnPrimaryFailure(){
+	public void testOnPrimaryFailure() {
 		page.setModalPresenter(mockModalPresenter);
 		when(mockView.getFileType()).thenReturn(FileType.TSV);
 		when(mockView.getIncludeHeaders()).thenReturn(true);
 		when(mockView.getIncludeRowMetadata()).thenReturn(false);
-	
+
 		String fileHandle = "45678";
 		DownloadFromTableResult results = new DownloadFromTableResult();
 		results.setResultsFileHandleId(fileHandle);

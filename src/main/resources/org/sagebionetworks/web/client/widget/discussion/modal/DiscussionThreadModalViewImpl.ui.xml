@@ -3,15 +3,19 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	<b:Modal ui:field="threadModal" closable="true" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal-fullscreen">
+	<b:Modal ui:field="threadModal" closable="true"
+		dataBackdrop="STATIC" dataKeyboard="false"
+		addStyleNames="modal-fullscreen">
 		<b:ModalBody>
-			<b:TextBox ui:field="threadTitle" placeholder="Title" addStyleNames="font-size-24 margin-bottom-10" height="50px" />
+			<b:TextBox ui:field="threadTitle" placeholder="Title"
+				addStyleNames="font-size-24 margin-bottom-10" height="50px" />
 			<bh:Div ui:field="markdownEditorContainer"></bh:Div>
 			<bh:Div ui:field="synAlertContainer"></bh:Div>
 		</b:ModalBody>
 		<b:ModalFooter>
 			<b:Button ui:field="cancelButton" type="LINK" text="Cancel" />
-			<b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Posting..." text="Post" />
+			<b:Button ui:field="saveButton" type="PRIMARY"
+				dataLoadingText="Posting..." text="Post" />
 		</b:ModalFooter>
 	</b:Modal>
 </ui:UiBinder> 

@@ -3,15 +3,17 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	
-	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
-	
+
+	<ui:with field='sageImageBundle'
+		type='org.sagebionetworks.web.client.SageImageBundle' />
+
 	<bh:Div>
 		<b:Container>
 			<b:Container fluid="true">
 				<b:Row>
 					<b:Column size="XS_12">
-						<bh:Div ui:field="markdownContainer" addStyleNames="min-height-400"></bh:Div>
+						<bh:Div ui:field="markdownContainer"
+							addStyleNames="min-height-400"></bh:Div>
 						<bh:Div ui:field="synAlertContainer" />
 					</b:Column>
 				</b:Row>

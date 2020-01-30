@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.team.controller;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.sagebionetworks.web.client.DisplayUtils;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -17,21 +16,22 @@ public class TeamLeaveModalWidgetViewImpl implements IsWidget, TeamLeaveModalWid
 
 	@UiField
 	Modal modal;
-	
+
 	@UiField
 	Button primaryButton;
-	
+
 	@UiField
 	Button cancelButton;
-	
+
 	@UiField
 	SimplePanel synAlertPanel;
-	
-	public interface Binder extends UiBinder<Widget, TeamLeaveModalWidgetViewImpl> {}
-	
+
+	public interface Binder extends UiBinder<Widget, TeamLeaveModalWidgetViewImpl> {
+	}
+
 	Widget widget;
 	Presenter presenter;
-	
+
 	@Inject
 	public TeamLeaveModalWidgetViewImpl(Binder uiBinder) {
 		this.widget = uiBinder.createAndBindUi(this);
@@ -48,7 +48,7 @@ public class TeamLeaveModalWidgetViewImpl implements IsWidget, TeamLeaveModalWid
 			}
 		});
 	}
-	
+
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -68,12 +68,12 @@ public class TeamLeaveModalWidgetViewImpl implements IsWidget, TeamLeaveModalWid
 	public void show() {
 		this.modal.show();
 	}
-	
+
 	@Override
 	public void hide() {
 		this.modal.hide();
 	}
-	
+
 	@Override
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message);

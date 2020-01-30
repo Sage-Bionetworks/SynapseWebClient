@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseProperties;
@@ -12,27 +13,27 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WebConstants;
-
 import com.google.inject.Inject;
 
-public class DiscussionTab implements DiscussionTabView.Presenter{
+public class DiscussionTab implements DiscussionTabView.Presenter {
 	private final static Long PROJECT_VERSION_NUMBER = null;
 	Tab tab;
 	DiscussionTabView view;
-	//use this token to navigate between threads within the discussion tab
+	// use this token to navigate between threads within the discussion tab
 	ParameterizedToken params;
 	ForumWidget forumWidget;
 	String entityName, entityId;
 	GlobalApplicationState globalAppState;
 	SynapseProperties synapseProperties;
 	PortalGinInjector ginInjector;
+
 	@Inject
 	public DiscussionTab(Tab tab, PortalGinInjector ginInjector) {
 		this.tab = tab;
 		this.ginInjector = ginInjector;
-		tab.configure("Discussion", "Engage your collaborators in project specific Discussions.", WebConstants.DOCS_URL + "discussion.html");
+		tab.configure("Discussion", "Engage your collaborators in project specific Discussions.", WebConstants.DOCS_URL + "discussion.html", EntityArea.DISCUSSION);
 	}
-	
+
 	public void lazyInject() {
 		if (view == null) {
 			this.view = ginInjector.getDiscussionTabView();
@@ -44,12 +45,12 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 			tab.setContent(view.asWidget());
 		}
 	}
-	
+
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
 		tab.addTabClickedCallback(onClickCallback);
 	}
 
-	public void configure(final String entityId, String entityName, String areaToken, Boolean isCurrentUserModerator, ActionMenuWidget actionMenu) {
+	public void configure(final String entityId, String entityName, EntityBundle projectBundle, String areaToken, Boolean isCurrentUserModerator) {
 		lazyInject();
 		this.entityId = entityId;
 		this.entityName = entityName;
@@ -64,7 +65,8 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 				tab.showTab();
 			}
 		};
-		forumWidget.configure(entityId, params, isCurrentUserModerator, actionMenu, updateParamsCallback, updateURLCallback);
+		tab.configureEntityActionController(projectBundle, true, null);
+		forumWidget.configure(entityId, params, isCurrentUserModerator, tab.getEntityActionMenu(), updateParamsCallback, updateURLCallback);
 		// SWC-3994: initialize tab Place to set the initial area token
 		updateParamsCallback.invoke(params);
 	}
@@ -72,7 +74,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 	public void updateActionMenuCommands() {
 		forumWidget.updateActionMenuCommands();
 	}
-	
+
 	public void checkForSynapseForum() {
 		String forumSynapseId = synapseProperties.getSynapseProperty(WebConstants.FORUM_SYNAPSE_ID_PROPERTY);
 		if (forumSynapseId.equals(entityId)) {
@@ -81,14 +83,16 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 			globalAppState.getPlaceChanger().goTo(forumPlace);
 		}
 	}
+
 	/**
-	 * Based on the current area parameters, update the address bar (push the url in to the browser history).
+	 * Based on the current area parameters, update the address bar (push the url in to the browser
+	 * history).
 	 */
-	public void updatePlace(Synapse newPlace){
+	public void updatePlace(Synapse newPlace) {
 		tab.setEntityNameAndPlace(entityName, newPlace);
 	}
 
-	public Tab asTab(){
+	public Tab asTab() {
 		return tab;
 	}
 

@@ -4,8 +4,7 @@ import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface FileCellEditorView extends IsWidget, TakesValue<String>,
-		Focusable {
+public interface FileCellEditorView extends IsWidget, TakesValue<String>, Focusable {
 
 	/**
 	 * Contract between the view and presenter business logic.
@@ -50,6 +49,7 @@ public interface FileCellEditorView extends IsWidget, TakesValue<String>,
 
 	/**
 	 * Set an error message.
+	 * 
 	 * @param string
 	 */
 	public void showErrorMessage(String message);
@@ -61,6 +61,7 @@ public interface FileCellEditorView extends IsWidget, TakesValue<String>,
 
 	/**
 	 * Set an error message for a value.
+	 * 
 	 * @param string
 	 */
 	public void setValueError(String string);

@@ -1,24 +1,24 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityTypeUtils;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
+import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
@@ -27,7 +27,6 @@ import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidge
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
-
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -36,20 +35,18 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * TableEntity widget provides viewing and editing of both a table's schema and
- * row data. It also allows a user to execute a query against the table by
- * writing SQL.
+ * TableEntity widget provides viewing and editing of both a table's schema and row data. It also
+ * allows a user to execute a query against the table by writing SQL.
  * 
  * @author John
  * 
  */
-public class TableEntityWidget implements IsWidget,
-		TableEntityWidgetView.Presenter, QueryResultsListener,
-		QueryInputListener{
+public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryInputListener {
 
+	public static final String IS_INVOKING_DOWNLOAD_TABLE = "isInvokingDownloadTable";
 	public static final String NO_FACETS_SIMPLE_SEARCH_UNSUPPORTED = "In order to use simple search, you must first set columns to be facets in the schema editor.";
 	public static final String RESET_SEARCH_QUERY_MESSAGE = "The search query will be reset. Are you sure that you would like to switch to simple search mode?";
-	
+
 	public static final String RESET_SEARCH_QUERY = "Reset search query?";
 	public static final long DEFAULT_OFFSET = 0L;
 	public static final String SELECT_FROM = "SELECT * FROM ";
@@ -57,18 +54,22 @@ public class TableEntityWidget implements IsWidget,
 	public static final String NO_COLUMNS_NOT_EDITABLE = "This table does not have any columns.";
 	public static final long DEFAULT_LIMIT = 25;
 	public static final int MAX_SORT_COLUMNS = 3;
-	// Look for: 
-	// beginning of the line, any character, whitespace, "from", whitespace, "syn<number>", optional "dot notation", whitespace, end of line.
-	public static final RegExp SIMPLE_QUERY_REGEX = RegExp.compile("^.*(\\s+from\\s+syn([0-9]+[.]?[0-9]*)+)\\s*$", "i");
+	// Look for:
+	// beginning of the line, any character, whitespace, "from", whitespace, "syn<number>", optional
+	// "dot notation", optional whitespace, optional order by statement, end of line.
+	public static final RegExp SIMPLE_QUERY_REGEX = RegExp.compile("^.*(\\s+from\\s+syn([0-9]+[.]?[0-9]*)+)\\s*(order by .*)?$", "i");
 
 	DownloadTableQueryModalWidget downloadTableQueryModalWidget;
 	UploadTableModalWidget uploadTableModalWidget;
 	TableEntityWidgetView view;
 	ActionMenuWidget actionMenu;
 	PreflightController preflightController;
+	SessionStorage sessionStorage;
 
 	EntityBundle entityBundle;
 	String tableId;
+	Long tableVersionNumber = null;
+	boolean isCurrentVersion = true;
 	TableBundle tableBundle;
 	boolean canEdit, canEditResults;
 	TableType tableType;
@@ -86,15 +87,10 @@ public class TableEntityWidget implements IsWidget,
 	public static final String SCHEMA = " Schema";
 	String entityTypeDisplay;
 	PortalGinInjector ginInjector;
-	
+	AddToDownloadList addToDownloadList;
+
 	@Inject
-	public TableEntityWidget(TableEntityWidgetView view,
-			TableQueryResultWidget queryResultsWidget,
-			QueryInputWidget queryInputWidget,
-			PreflightController preflightController,
-			SynapseClientAsync synapseClient,
-			FileViewClientsHelp fileViewClientsHelp,
-			PortalGinInjector ginInjector) {
+	public TableEntityWidget(TableEntityWidgetView view, TableQueryResultWidget queryResultsWidget, QueryInputWidget queryInputWidget, PreflightController preflightController, SynapseClientAsync synapseClient, FileViewClientsHelp fileViewClientsHelp, AddToDownloadList addToDownloadList, PortalGinInjector ginInjector, SessionStorage sessionStorage) {
 		this.view = view;
 		this.queryResultsWidget = queryResultsWidget;
 		this.queryInputWidget = queryInputWidget;
@@ -102,12 +98,14 @@ public class TableEntityWidget implements IsWidget,
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.fileViewClientsHelp = fileViewClientsHelp;
+		this.addToDownloadList = addToDownloadList;
 		this.ginInjector = ginInjector;
-		this.view.setPresenter(this);
+		this.sessionStorage = sessionStorage;
 		this.view.setQueryResultsWidget(this.queryResultsWidget);
 		this.view.setQueryInputWidget(this.queryInputWidget);
+		view.setAddToDownloadList(addToDownloadList);
 	}
-	
+
 	public DownloadTableQueryModalWidget getDownloadTableQueryModalWidget() {
 		if (downloadTableQueryModalWidget == null) {
 			downloadTableQueryModalWidget = ginInjector.getDownloadTableQueryModalWidget();
@@ -115,7 +113,7 @@ public class TableEntityWidget implements IsWidget,
 		}
 		return downloadTableQueryModalWidget;
 	}
-	
+
 	public UploadTableModalWidget getUploadTableModalWidget() {
 		if (uploadTableModalWidget == null) {
 			uploadTableModalWidget = ginInjector.getUploadTableModalWidget();
@@ -123,7 +121,7 @@ public class TableEntityWidget implements IsWidget,
 		}
 		return uploadTableModalWidget;
 	}
-	
+
 	public CopyTextModal getCopyTextModal() {
 		if (copyTextModal == null) {
 			copyTextModal = ginInjector.getCopyTextModal();
@@ -139,33 +137,34 @@ public class TableEntityWidget implements IsWidget,
 	}
 
 	/**
-	 * Configure this widget with new data. Calling this method will replace all
-	 * widget state to the passed parameters.
+	 * Configure this widget with new data. Calling this method will replace all widget state to the
+	 * passed parameters.
 	 * 
 	 * @param bundle
 	 * @param canEdit
 	 * @param queryString
 	 * @param qch
 	 */
-	public void configure(EntityBundle bundle, boolean canEdit,
-			QueryChangeHandler qch, ActionMenuWidget actionMenu) {
+	public void configure(EntityBundle bundle, Long versionNumber, boolean canEdit, QueryChangeHandler qch, ActionMenuWidget actionMenu) {
 		this.entityBundle = bundle;
 		Entity table = bundle.getEntity();
 		this.tableType = TableType.getTableType(table);
-		queryInputWidget.setDownloadFilesVisible(tableType.isIncludeFiles());
 		this.tableId = bundle.getEntity().getId();
+		this.tableVersionNumber = versionNumber;
+		this.isCurrentVersion = tableVersionNumber == null;
 		this.tableBundle = bundle.getTableBundle();
 		this.canEdit = canEdit;
 		this.canEditResults = canEdit;
 		this.queryChangeHandler = qch;
-		this.view.configure(bundle, this.canEdit);
+		this.view.configure(bundle, this.canEdit && isCurrentVersion);
 		this.actionMenu = actionMenu;
 		this.entityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass()));
+		addToDownloadList.clear();
 		configureActions();
 		checkState();
 		initSimpleAdvancedQueryState();
 	}
-	
+
 	/**
 	 * Setup the actions for this widget.
 	 */
@@ -175,44 +174,47 @@ public class TableEntityWidget implements IsWidget,
 		isShowingSchema = false;
 		view.setScopeVisible(false);
 		view.setSchemaVisible(false);
-		actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, SHOW+entityTypeDisplay+SCHEMA);
+		actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, SHOW + entityTypeDisplay + SCHEMA);
 		actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, SHOW + SCOPE + entityTypeDisplay);
-		this.actionMenu.setActionListener(Action.UPLOAD_TABLE_DATA, new ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				onUploadTableData();
-			}
+		this.actionMenu.setActionListener(Action.UPLOAD_TABLE_DATA, action -> {
+			onUploadTableData();
 		});
-		this.actionMenu.setActionListener(Action.DOWNLOAD_TABLE_QUERY_RESULTS, new ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				onDownloadResults();
-			}
+		this.actionMenu.setActionListener(Action.DOWNLOAD_TABLE_QUERY_RESULTS, action -> {
+			onDownloadResults();
 		});
-		this.actionMenu.setActionListener(Action.EDIT_TABLE_DATA, new ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				onEditResults();
-			}
+		this.actionMenu.setActionListener(Action.EDIT_TABLE_DATA, action -> {
+			onEditResults();
 		});
-		this.actionMenu.setActionListener(Action.SHOW_TABLE_SCHEMA, new ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				isShowingSchema = !isShowingSchema;
-				view.setSchemaVisible(isShowingSchema);
-				String showHide = isShowingSchema ? HIDE : SHOW;
-				actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, showHide+entityTypeDisplay+SCHEMA);
-			}
+		this.actionMenu.setActionListener(Action.SHOW_TABLE_SCHEMA, action -> {
+			isShowingSchema = !isShowingSchema;
+			view.setSchemaVisible(isShowingSchema);
+			String showHide = isShowingSchema ? HIDE : SHOW;
+			actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, showHide + entityTypeDisplay + SCHEMA);
+		});
+
+		this.actionMenu.setActionListener(Action.SHOW_VIEW_SCOPE, action -> {
+			isShowingScope = !isShowingScope;
+			view.setScopeVisible(isShowingScope);
+			String showHide = isShowingScope ? HIDE : SHOW;
+			actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, showHide + SCOPE + entityTypeDisplay);
 		});
 		
-		this.actionMenu.setActionListener(Action.SHOW_VIEW_SCOPE, new ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				isShowingScope = !isShowingScope;
-				view.setScopeVisible(isShowingScope);
-				String showHide = isShowingScope ? HIDE : SHOW;
-				actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, showHide + SCOPE + entityTypeDisplay);
-			}
+		this.actionMenu.setActionVisible(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, tableType.isIncludeFiles());
+		this.actionMenu.setActionVisible(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, tableType.isIncludeFiles());
+		this.actionMenu.setActionListener(Action.SHOW_ADVANCED_SEARCH, action -> {
+			onShowAdvancedSearch();
+		});
+		this.actionMenu.setActionListener(Action.SHOW_SIMPLE_SEARCH, action -> {
+			onShowSimpleSearch();
+		});
+		this.actionMenu.setActionListener(Action.SHOW_QUERY, action -> {
+			onShowQuery();
+		});
+		this.actionMenu.setActionListener(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, action -> {
+			onShowDownloadFilesProgrammatically();
+		});
+		this.actionMenu.setActionListener(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, action -> {
+			onAddToDownloadList();
 		});
 	}
 
@@ -242,10 +244,10 @@ public class TableEntityWidget implements IsWidget,
 	 */
 	private void setQuery(Query query, boolean isFromResults) {
 		this.currentQuery = query;
-		this.queryInputWidget.configure(query.getSql(), this, this.canEditResults);
+		this.queryInputWidget.configure(query.getSql(), this);
 		this.view.setQueryResultsVisible(true);
 		this.view.setTableMessageVisible(false);
-		if(!isFromResults){
+		if (!isFromResults) {
 			this.queryResultsWidget.configure(query, this.canEditResults, tableType, this);
 		}
 	}
@@ -264,7 +266,7 @@ public class TableEntityWidget implements IsWidget,
 			showAdvancedSearchUI();
 		}
 	}
-	
+
 	private boolean isFacets() {
 		if (tableBundle == null || tableBundle.getColumnModels() == null || tableBundle.getColumnModels().isEmpty()) {
 			return false;
@@ -276,7 +278,7 @@ public class TableEntityWidget implements IsWidget,
 		}
 		return false;
 	}
-	
+
 	private boolean isAdvancedQuery() {
 		if (currentQuery == null || currentQuery.getSql() == null) {
 			return false;
@@ -286,37 +288,41 @@ public class TableEntityWidget implements IsWidget,
 		// if match is null, then this sql is more complex
 		return match == null;
 	}
-	
+
 	private void showSimpleSearchUI() {
-		view.setAdvancedSearchLinkVisible(true);
-		view.setSimpleSearchLinkVisible(false);
+		actionMenu.setActionVisible(Action.SHOW_ADVANCED_SEARCH, true);
+		actionMenu.setActionVisible(Action.SHOW_SIMPLE_SEARCH, false);
+		queryInputWidget.setShowSimpleSearchButtonVisible(false);
 		queryResultsWidget.setFacetsVisible(true);
-		queryInputWidget.setShowQueryVisible(true);
+		actionMenu.setActionVisible(Action.SHOW_QUERY, true);
 		queryInputWidget.setQueryInputVisible(false);
 	}
-	
+
 	public void hideFiltering() {
 		queryInputWidget.setVisible(false);
 		queryResultsWidget.setFacetsVisible(false);
-		view.setSimpleSearchLinkVisible(false);
-		view.setAdvancedSearchLinkVisible(false);
+		actionMenu.setActionVisible(Action.SHOW_ADVANCED_SEARCH, false);
+		actionMenu.setActionVisible(Action.SHOW_SIMPLE_SEARCH, false);
+		queryInputWidget.setShowSimpleSearchButtonVisible(false);
 	}
-	
+
 	private void showAdvancedSearchUI() {
-		view.setAdvancedSearchLinkVisible(false);
+		actionMenu.setActionVisible(Action.SHOW_ADVANCED_SEARCH, false);
 		// SWC-3762: show the simple search link if facets exist, or if the user can set up facets.
-		view.setSimpleSearchLinkVisible(isFacets() || canEdit);
+		boolean showSimpleSearch = isFacets() || canEdit;
+		actionMenu.setActionVisible(Action.SHOW_SIMPLE_SEARCH, showSimpleSearch);
+		queryInputWidget.setShowSimpleSearchButtonVisible(showSimpleSearch);
 		queryResultsWidget.setFacetsVisible(false);
-		queryInputWidget.setShowQueryVisible(false);
+		actionMenu.setActionVisible(Action.SHOW_QUERY, false);
 		queryInputWidget.setQueryInputVisible(true);
 	}
-	
+
 	@Override
 	public void onShowSimpleSearch() {
 		if (isFacets()) {
 			// does the current query have a where clause?
 			if (isAdvancedQuery()) {
-				// we must wipe it out.  Confirm with the user that this is acceptable.
+				// we must wipe it out. Confirm with the user that this is acceptable.
 				view.showConfirmDialog(RESET_SEARCH_QUERY, RESET_SEARCH_QUERY_MESSAGE, new Callback() {
 					@Override
 					public void invoke() {
@@ -332,8 +338,7 @@ public class TableEntityWidget implements IsWidget,
 			view.showErrorMessage(NO_FACETS_SIMPLE_SEARCH_UNSUPPORTED);
 		}
 	}
-	
-	@Override
+
 	public void onShowAdvancedSearch() {
 		// set query based on selected facets
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
@@ -342,10 +347,10 @@ public class TableEntityWidget implements IsWidget,
 				Query q = getDefaultQuery();
 				q.setSql(sql);
 				showAdvancedSearchUI();
-				// set the current query. results have not changed, so set isFromResults=true 
-				setQuery(q, true);	
+				// set the current query. results have not changed, so set isFromResults=true
+				setQuery(q, true);
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(caught.getMessage());
@@ -353,15 +358,15 @@ public class TableEntityWidget implements IsWidget,
 		};
 		generateSqlWithFacets(callback);
 	}
-	
+
 	private void generateSqlWithFacets(AsyncCallback<String> callback) {
 		if (currentQuery.getSelectedFacets() == null || currentQuery.getSelectedFacets().isEmpty()) {
 			callback.onSuccess(currentQuery.getSql());
 		} else {
-			synapseClient.generateSqlWithFacets(currentQuery.getSql(), currentQuery.getSelectedFacets(), tableBundle.getColumnModels(), callback);	
+			synapseClient.generateSqlWithFacets(currentQuery.getSql(), currentQuery.getSelectedFacets(), tableBundle.getColumnModels(), callback);
 		}
 	}
-	
+
 	/**
 	 * Set the view to show no columns message.
 	 */
@@ -391,6 +396,9 @@ public class TableEntityWidget implements IsWidget,
 		StringBuilder builder = new StringBuilder();
 		builder.append(SELECT_FROM);
 		builder.append(this.tableId);
+		if (!isCurrentVersion) {
+			builder.append("." + this.tableVersionNumber);
+		}
 		Query query = new Query();
 		query.setIncludeEntityEtag(true);
 		query.setSql(builder.toString());
@@ -415,11 +423,6 @@ public class TableEntityWidget implements IsWidget,
 	}
 
 	@Override
-	public void onPersistSuccess(EntityUpdatedEvent event) {
-		this.queryChangeHandler.onPersistSuccess(event);
-	}
-
-	@Override
 	public void queryExecutionStarted() {
 		// Pass this along to the input widget.
 		this.queryInputWidget.queryExecutionStarted();
@@ -435,17 +438,31 @@ public class TableEntityWidget implements IsWidget,
 		this.queryInputWidget.queryExecutionFinished(wasSuccessful, resultsEditable);
 		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, wasSuccessful && canEditResults && resultsEditable);
 		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, wasSuccessful);
-	
+
 		// Set this as the query if it was successful
 		if (wasSuccessful) {
 			this.queryChangeHandler.onQueryChange(this.currentQuery);
+
+			// PORTALS-596: if being directed to Synapse.org to download a file set, then automatically show the
+			// "Add To Download List" UI.
+			if (Header.isShowingPortalAlert && ginInjector.getAuthenticationController().isLoggedIn()) {
+				try {
+					boolean isDownloadTable = Header.portalAlertJson.getBoolean(IS_INVOKING_DOWNLOAD_TABLE);
+					if (isDownloadTable) {
+						onAddToDownloadList();
+					}
+					Header.portalAlertJson.put(IS_INVOKING_DOWNLOAD_TABLE, false);
+				} catch (Exception e) {
+					ginInjector.getSynapseJSNIUtils().consoleError(e);
+				}
+			}
 		}
 		view.setTableToolbarVisible(true);
 	}
 
 	/**
-	 * Called when the user executes a new query from the query input box. When
-	 * the SQL changes reset back to the first page.
+	 * Called when the user executes a new query from the query input box. When the SQL changes reset
+	 * back to the first page.
 	 */
 	@Override
 	public void onExecuteQuery(String sql) {
@@ -457,18 +474,22 @@ public class TableEntityWidget implements IsWidget,
 
 	@Override
 	public void onEditResults() {
-		preflightController.checkUploadToEntity(this.entityBundle, new Callback() {
-			@Override
-			public void invoke() {
-				postCheckEditResults();
-			}
-		});
+		if (isCurrentVersion) {
+			preflightController.checkUploadToEntity(this.entityBundle, new Callback() {
+				@Override
+				public void invoke() {
+					postCheckEditResults();
+				}
+			});
+		} else {
+			view.showErrorMessage("Can only edit data in the most recent table/view version.");
+		}
 	}
-	
+
 	/**
 	 * Called only when all pre-flight checks on entity edit have been met.
 	 */
-	public void postCheckEditResults(){
+	public void postCheckEditResults() {
 		queryResultsWidget.onEditRows();
 	}
 
@@ -477,31 +498,38 @@ public class TableEntityWidget implements IsWidget,
 		getDownloadTableQueryModalWidget().configure(this.queryInputWidget.getInputSQL(), this.tableId, currentQuery.getSelectedFacets());
 		getDownloadTableQueryModalWidget().showModal();
 	}
-	
-	public void onUploadTableData(){
-		// proceed as long as the user has meet all upload pre-flight checks
-		this.preflightController.checkUploadToEntity(this.entityBundle, new Callback(){
-			@Override
-			public void invoke() {
-				postCheckonUploadTableData();
-			}});
+
+	public void onUploadTableData() {
+		if (isCurrentVersion) {
+			// proceed as long as the user has meet all upload pre-flight checks
+			this.preflightController.checkUploadToEntity(this.entityBundle, new Callback() {
+				@Override
+				public void invoke() {
+					postCheckonUploadTableData();
+				}
+			});
+		} else {
+			view.showErrorMessage("Can only upload data to the most recent table/view version.");
+		}
+
 	}
-	
+
 	/**
 	 * Called after all pre-flight checks for upload has passed.
 	 */
-	private void postCheckonUploadTableData(){
+	private void postCheckonUploadTableData() {
 		Entity table = entityBundle.getEntity();
 		getUploadTableModalWidget().configure(table.getParentId(), tableId);
 		getUploadTableModalWidget().showModal(new WizardCallback() {
 			@Override
 			public void onFinished() {
-				// SWC-3488: successfully uploaded data to table/view.  The current query may be invalid, so rerun with default query.
+				// SWC-3488: successfully uploaded data to table/view. The current query may be invalid, so rerun
+				// with default query.
 				setQuery(getDefaultQuery(), false);
 			}
+
 			@Override
-			public void onCanceled() {			
-			}
+			public void onCanceled() {}
 		});
 	}
 
@@ -509,7 +537,7 @@ public class TableEntityWidget implements IsWidget,
 	public void onStartingNewQuery(Query newQuery) {
 		setQuery(newQuery, true);
 	}
-	
+
 	@Override
 	public void onShowQuery() {
 		// show the sql executed
@@ -519,7 +547,7 @@ public class TableEntityWidget implements IsWidget,
 				getCopyTextModal().setText(sql);
 				getCopyTextModal().show();
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(caught.getMessage());
@@ -527,9 +555,9 @@ public class TableEntityWidget implements IsWidget,
 		};
 		generateSqlWithFacets(callback);
 	}
-	
+
 	@Override
-	public void onShowDownloadFiles() {
+	public void onShowDownloadFilesProgrammatically() {
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String sql) {
@@ -537,12 +565,17 @@ public class TableEntityWidget implements IsWidget,
 				fileViewClientsHelp.setQuery(escapedSql);
 				fileViewClientsHelp.show();
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(caught.getMessage());
 			}
 		};
 		generateSqlWithFacets(callback);
+	}
+
+	@Override
+	public void onAddToDownloadList() {
+		addToDownloadList.addToDownloadList(entityBundle.getEntity().getId(), currentQuery);
 	}
 }

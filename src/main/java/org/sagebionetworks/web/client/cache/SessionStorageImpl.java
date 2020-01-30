@@ -5,6 +5,7 @@ import com.google.gwt.storage.client.Storage;
 public class SessionStorageImpl implements SessionStorage {
 
 	private Storage storage;
+
 	public SessionStorageImpl() {
 		storage = Storage.getSessionStorageIfSupported();
 	}
@@ -35,11 +36,11 @@ public class SessionStorageImpl implements SessionStorage {
 			try {
 				storage.setItem(key, data);
 			} catch (Throwable e) {
-				//unlikely
+				// unlikely
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean isStorageSupported() {
 		return storage != null;

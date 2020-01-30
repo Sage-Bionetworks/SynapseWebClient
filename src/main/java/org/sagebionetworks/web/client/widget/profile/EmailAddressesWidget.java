@@ -1,10 +1,9 @@
 package org.sagebionetworks.web.client.widget.profile;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.List;
-
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.principal.NotificationEmail;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PopupUtilsView;
@@ -12,15 +11,15 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WebConstants;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-/** 
+/**
  * @author Jay
  *
  */
@@ -34,18 +33,14 @@ public class EmailAddressesWidget implements EmailAddressesWidgetView.Presenter,
 	UserProfile profile;
 	GWTWrapper gwt;
 	AsyncCallback<Void> refreshCallback;
+
 	/**
 	 * New presenter with its view.
+	 * 
 	 * @param view
 	 */
 	@Inject
-	public EmailAddressesWidget(EmailAddressesWidgetView view, 
-			SynapseClientAsync synapseClient,
-			SynapseJavascriptClient jsClient,
-			SynapseAlert synAlert,
-			AuthenticationController authenticationController,
-			PopupUtilsView popupUtils,
-			GWTWrapper gwt) {
+	public EmailAddressesWidget(EmailAddressesWidgetView view, SynapseClientAsync synapseClient, SynapseJavascriptClient jsClient, SynapseAlert synAlert, AuthenticationController authenticationController, PopupUtilsView popupUtils, GWTWrapper gwt) {
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.jsClient = jsClient;
@@ -61,6 +56,7 @@ public class EmailAddressesWidget implements EmailAddressesWidgetView.Presenter,
 			public void onSuccess(Void result) {
 				refresh();
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				EmailAddressesWidget.this.synAlert.handleException(caught);
@@ -72,23 +68,25 @@ public class EmailAddressesWidget implements EmailAddressesWidgetView.Presenter,
 		synAlert.clear();
 		view.clearEmails();
 	}
+
 	public void configure(final UserProfile profile) {
 		this.profile = profile;
 		clear();
 		if (authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(profile.getOwnerId())) {
 			view.setLoadingVisible(true);
-			synapseClient.getNotificationEmail(new AsyncCallback<String>() {
+			jsClient.getNotificationEmail(new AsyncCallback<NotificationEmail>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					view.setLoadingVisible(false);
 					synAlert.handleException(caught);
 				}
+
 				@Override
-				public void onSuccess(String notificationEmail) {
+				public void onSuccess(NotificationEmail notificationEmail) {
 					view.setLoadingVisible(false);
-					view.addPrimaryEmail(notificationEmail);
+					view.addPrimaryEmail(notificationEmail.getEmail(), AuthenticationControllerImpl.isQuarantined(notificationEmail.getQuarantineStatus()));
 					for (String email : profile.getEmails()) {
-						if (!notificationEmail.equals(email)) {
+						if (!notificationEmail.getEmail().equals(email)) {
 							view.addSecondaryEmail(email);
 						}
 					}
@@ -108,13 +106,14 @@ public class EmailAddressesWidget implements EmailAddressesWidgetView.Presenter,
 			public void onSuccess(UserProfile result) {
 				configure(result);
 			}
+
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
 		});
 	}
-	
+
 	@Override
 	public void onAddEmail(String emailAddress) {
 		emailAddress = emailAddress.trim();
@@ -137,7 +136,7 @@ public class EmailAddressesWidget implements EmailAddressesWidgetView.Presenter,
 
 	public void additionalEmailValidation(String emailAddress) {
 		// need to validate
-		//first, does it look like an email address?
+		// first, does it look like an email address?
 		emailAddress = emailAddress.trim();
 		if (!ValidationUtils.isValidEmail(emailAddress)) {
 			synAlert.showError(WebConstants.INVALID_EMAIL_MESSAGE);
@@ -145,36 +144,35 @@ public class EmailAddressesWidget implements EmailAddressesWidgetView.Presenter,
 		}
 
 		String callbackUrl = gwt.getHostPageBaseURL() + "#!Account:";
-		synapseClient.additionalEmailValidation(
-				authenticationController.getCurrentUserPrincipalId(),
-				emailAddress, callbackUrl, new AsyncCallback<Void>() {
-					@Override
-					public void onSuccess(Void result) {
-						popupUtils.showInfo(DisplayConstants.EMAIL_ADDED);
-					}
 
-					@Override
-					public void onFailure(Throwable caught) {
-						synAlert.handleException(caught);
-					}
-				});
+		jsClient.additionalEmailValidation(authenticationController.getCurrentUserPrincipalId(), emailAddress, callbackUrl, new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				popupUtils.showInfo(DisplayConstants.EMAIL_ADDED);
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		});
 	}
-	
+
 	@Override
 	public void onMakePrimary(String email) {
 		synAlert.clear();
 		synapseClient.setNotificationEmail(email, refreshCallback);
 	}
-	
+
 	@Override
 	public void onRemoveEmail(String email) {
 		synAlert.clear();
 		synapseClient.removeEmail(email.trim(), refreshCallback);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	
+
 }

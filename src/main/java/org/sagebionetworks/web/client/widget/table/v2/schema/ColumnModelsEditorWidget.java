@@ -8,7 +8,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -20,7 +19,6 @@ import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -28,7 +26,7 @@ import com.google.inject.Inject;
 public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, ColumnModelTableRow.SelectionPresenter, IsWidget {
 	public static final ColumnType DEFAULT_NEW_COLUMN_TYPE = ColumnType.STRING;
 	public static final long DEFAULT_STRING_MAX_SIZE = 50L;
-	
+
 	PortalGinInjector ginInjector;
 	ColumnModelsView editor;
 	List<ColumnModel> startingModels;
@@ -38,20 +36,20 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	Callback onAddDefaultViewColumnsCallback, onAddAnnotationColumnsCallback;
 	Set<String> columnModelIds;
 	CookieProvider cookies;
-	
+
 	/*
-	 * Set to true to indicate that change selections are in progress.  This allows selection change events to be ignored during this period.
+	 * Set to true to indicate that change selections are in progress. This allows selection change
+	 * events to be ignored during this period.
 	 */
 	boolean changingSelection = false;
 	ViewDefaultColumns fileViewDefaultColumns;
 	TableType tableType;
-	
+
 	public AdapterFactory adapterFactory;
 	public ImportTableViewColumnsButton addTableViewColumnsButton;
+
 	@Inject
-	public ColumnModelsEditorWidget(PortalGinInjector ginInjector, 
-			AdapterFactory adapterFactory,
-			ViewDefaultColumns fileViewDefaultColumns) {
+	public ColumnModelsEditorWidget(PortalGinInjector ginInjector, AdapterFactory adapterFactory, ViewDefaultColumns fileViewDefaultColumns) {
 		columnModelIds = new HashSet<String>();
 		this.ginInjector = ginInjector;
 		this.editor = ginInjector.createNewColumnModelsView();
@@ -69,7 +67,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 			}
 		});
 	}
-	
+
 	public void configure(TableType tableType, List<ColumnModel> startingModels) {
 		this.changingSelection = false;
 		this.startingModels = startingModels;
@@ -77,7 +75,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		keyboardNavigationHandler = ginInjector.createKeyboardNavigationHandler();
 		resetEditor();
 	}
-	
+
 	@Override
 	public List<ColumnModel> getEditedColumnModels() {
 		return ColumnModelUtils.extractColumnModels(this.editorRows);
@@ -103,11 +101,11 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		cm.setMaximumSize(DEFAULT_STRING_MAX_SIZE);
 		return createColumnModelEditorWidget(cm);
 	}
-	
+
 	private ColumnModelTableRowEditorWidget createColumnModelEditorWidget(ColumnModel cm) {
 		ColumnModelTableRowEditorWidget rowEditor = ginInjector.createColumnModelEditorWidget();
 		// bind this row for navigation.
-		if(this.keyboardNavigationHandler != null){
+		if (this.keyboardNavigationHandler != null) {
 			this.keyboardNavigationHandler.bindRow(rowEditor);
 		}
 		if (!TableType.table.equals(tableType)) {
@@ -122,11 +120,11 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		checkSelectionState();
 		return rowEditor;
 	}
-	
+
 	/**
 	 * Reset the editor.
 	 */
-	private void resetEditor(){
+	private void resetEditor() {
 		columnModelIds.clear();
 		// clear the current navigation editor
 		this.keyboardNavigationHandler.removeAllRows();
@@ -134,11 +132,11 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		editor.configure(ViewType.EDITOR, true);
 		addColumns(this.startingModels);
 	}
-	
+
 	private Set<String> getDefaultColumnNames() {
 		return fileViewDefaultColumns.getDefaultViewColumnNames(tableType.isIncludeFiles());
 	}
-	
+
 	public void addColumns(List<ColumnModel> models) {
 		List<ColumnModel> newColumns = new ArrayList<ColumnModel>(models.size());
 		newColumns.addAll(models);
@@ -158,17 +156,17 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 				newColumns.remove(newModels.get(newModelName));
 			}
 		}
-		
-		for(ColumnModel cm: newColumns){
+
+		for (ColumnModel cm : newColumns) {
 			String columnModelId = cm.getId();
 			if (columnModelId == null || !columnModelIds.contains(columnModelId)) {
-				createColumnModelEditorWidget(cm);	
+				createColumnModelEditorWidget(cm);
 				columnModelIds.add(columnModelId);
 			}
 		}
 		checkSelectionState();
 	}
-	
+
 	@Override
 	public void toggleSelect() {
 		changeAllSelection(!anyRowsSelected());
@@ -189,7 +187,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	public void onMoveUp() {
 		SelectedRow toMove = findFirstSelected();
 		this.editorRows.remove(toMove.row);
-		int newInex = toMove.index-1;
+		int newInex = toMove.index - 1;
 		this.editorRows.add(newInex, toMove.row);
 		this.editor.moveColumn(toMove.row, newInex);
 		checkSelectionState();
@@ -199,7 +197,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	public void onMoveDown() {
 		SelectedRow toMove = findFirstSelected();
 		this.editorRows.remove(toMove.index);
-		int newInex = toMove.index+1;
+		int newInex = toMove.index + 1;
 		this.editorRows.add(newInex, toMove.row);
 		this.editor.moveColumn(toMove.row, newInex);
 		checkSelectionState();
@@ -209,9 +207,9 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	public void deleteSelected() {
 		// delete all selected rows
 		Iterator<ColumnModelTableRow> it = editorRows.iterator();
-		while(it.hasNext()){
+		while (it.hasNext()) {
 			ColumnModelTableRow row = it.next();
-			if(row.isSelected()){
+			if (row.isSelected()) {
 				row.delete();
 				it.remove();
 				columnModelIds.remove(row.getId());
@@ -223,62 +221,64 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 
 	/**
 	 * Find the first selected row.
+	 * 
 	 * @return
 	 */
-	private SelectedRow findFirstSelected(){
+	private SelectedRow findFirstSelected() {
 		int index = 0;
-		for(ColumnModelTableRow row: editorRows){
-			if(row.isSelected()){
+		for (ColumnModelTableRow row : editorRows) {
+			if (row.isSelected()) {
 				return new SelectedRow(row, index);
 			}
 			index++;
 		}
 		throw new IllegalStateException("Nothing selected");
 	}
-	
-	public static class SelectedRow{
+
+	public static class SelectedRow {
 		public ColumnModelTableRow row;
 		public int index;
+
 		public SelectedRow(ColumnModelTableRow row, int index) {
 			super();
 			this.row = row;
 			this.index = index;
 		}
 	}
-	
+
 	@Override
 	public void selectionChanged(boolean isSelected) {
 		checkSelectionState();
 	}
-	
+
 	/**
 	 * Change the selection state of all rows to the passed value.
 	 * 
 	 * @param select
 	 */
-	private void changeAllSelection(boolean select){
-		try{
+	private void changeAllSelection(boolean select) {
+		try {
 			changingSelection = true;
-			// Select all 
-			for(ColumnModelTableRow row: editorRows){
+			// Select all
+			for (ColumnModelTableRow row : editorRows) {
 				row.setSelected(select);
 			}
-		}finally{
+		} finally {
 			changingSelection = false;
 		}
 		checkSelectionState();
 	}
-	
+
 	/**
 	 * The current selection state determines which buttons are enabled.
 	 */
-	private void checkSelectionState(){
-		if(!changingSelection){
+	private void checkSelectionState() {
+		if (!changingSelection) {
 			int index = 0;
 			int count = 0;
 			int lastIndex = 0;
-			for(ColumnModelTableRow row: editorRows){
-				if(row.isSelected()){
+			for (ColumnModelTableRow row : editorRows) {
+				if (row.isSelected()) {
 					count++;
 					lastIndex = index;
 				}
@@ -286,17 +286,18 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 			}
 			editor.setCanDelete(count > 0);
 			editor.setCanMoveUp(count == 1 && lastIndex > 0);
-			editor.setCanMoveDown(count == 1 && lastIndex < editorRows.size()-1);
+			editor.setCanMoveDown(count == 1 && lastIndex < editorRows.size() - 1);
 		}
 	}
-	
+
 	/**
 	 * Are any of the rows selected?
+	 * 
 	 * @return
 	 */
-	private boolean anyRowsSelected(){
-		for(ColumnModelTableRow row: editorRows){
-			if(row.isSelected()){
+	private boolean anyRowsSelected() {
+		for (ColumnModelTableRow row : editorRows) {
+			if (row.isSelected()) {
 				return true;
 			}
 		}
@@ -305,45 +306,46 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 
 	/**
 	 * Validate each editor.
+	 * 
 	 * @return
 	 */
 	public boolean validate() {
 		// Validate each editor row
 		boolean valid = true;
-		for(ColumnModelTableRow editor: editorRows){
-			if(editor instanceof ColumnModelTableRowEditorWidget){
+		for (ColumnModelTableRow editor : editorRows) {
+			if (editor instanceof ColumnModelTableRowEditorWidget) {
 				ColumnModelTableRowEditorWidget widget = (ColumnModelTableRowEditorWidget) editor;
-				if(!widget.validate()){
+				if (!widget.validate()) {
 					valid = false;
 				}
 			}
 		}
 		return valid;
 	}
-	
+
 	public void setAddDefaultViewColumnsButtonVisible(boolean visible) {
 		editor.setAddDefaultViewColumnsButtonVisible(visible);
 	}
-	
+
 	public void setOnAddDefaultViewColumnsCallback(Callback onAddDefaultViewColumnsCallback) {
 		this.onAddDefaultViewColumnsCallback = onAddDefaultViewColumnsCallback;
 	}
-	
+
 	@Override
-	 public void onAddDefaultViewColumns() {
+	public void onAddDefaultViewColumns() {
 		if (onAddDefaultViewColumnsCallback != null) {
 			onAddDefaultViewColumnsCallback.invoke();
 		}
-	 }
-	
+	}
+
 	public void setAddAnnotationColumnsButtonVisible(boolean visible) {
 		editor.setAddAnnotationColumnsButtonVisible(visible);
 	}
-	
+
 	public void setOnAddAnnotationColumnsCallback(Callback onAddAnnotationColumnsCallback) {
 		this.onAddAnnotationColumnsCallback = onAddAnnotationColumnsCallback;
 	}
-	
+
 	@Override
 	public void onAddAnnotationColumns() {
 		if (onAddAnnotationColumnsCallback != null) {

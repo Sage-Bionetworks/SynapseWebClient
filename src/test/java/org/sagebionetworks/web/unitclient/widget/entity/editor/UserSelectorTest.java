@@ -3,7 +3,6 @@ package org.sagebionetworks.web.unitclient.widget.entity.editor;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -21,11 +20,10 @@ import org.sagebionetworks.web.client.widget.entity.editor.UserTeamSelector;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-
 import com.google.gwt.user.client.ui.Widget;
 
 public class UserSelectorTest {
-		
+
 	UserTeamSelector widget;
 	@Mock
 	UserSelectorView mockView;
@@ -45,22 +43,22 @@ public class UserSelectorTest {
 	GWTWrapper mockGWT;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
-	
+
 	public static final String SUGGESTION_ID = "Maythe4thBeWithYou";
 	public static final String USERNAME = "Y0da";
-	
+
 	@Before
-	public void setup(){
+	public void setup() {
 		MockitoAnnotations.initMocks(this);
 		widget = new UserTeamSelector(mockView, mockSuggestBox, mockUserGroupSuggestionProvider, mockGWT);
 		widget.configure(mockUsernameCallback);
-		
+
 		when(mockSuggestion.getId()).thenReturn(SUGGESTION_ID);
 		when(mockSuggestion.getHeader()).thenReturn(mockUserGroupHeader);
 		when(mockUserGroupHeader.getIsIndividual()).thenReturn(true);
 		when(mockUserGroupHeader.getUserName()).thenReturn(USERNAME);
 	}
-	
+
 	@Test
 	public void testConstruction() {
 		verify(mockView).setPresenter(widget);
@@ -69,7 +67,7 @@ public class UserSelectorTest {
 		verify(mockView).setSelectBox(any(Widget.class));
 		verify(mockSuggestBox).addItemSelectedHandler(any(CallbackP.class));
 	}
-	
+
 	@Test
 	public void testOnSynapseSuggestSelected() {
 		widget.onSynapseSuggestSelected(mockSuggestion);
@@ -78,7 +76,7 @@ public class UserSelectorTest {
 		verify(mockUsernameCallback).invoke(USERNAME);
 		verify(mockView).hide();
 	}
-	
+
 	@Test
 	public void testOnSynapseSuggestTeamSelected() {
 		String teamName = "My Team";
@@ -87,27 +85,27 @@ public class UserSelectorTest {
 		when(mockUserGroupHeader.getUserName()).thenReturn(teamName);
 		when(mockGWT.getUniqueAliasName(teamName)).thenReturn(teamAlias);
 		widget.onSynapseSuggestSelected(mockSuggestion);
-		
+
 		verify(mockGWT).scheduleDeferred(callbackCaptor.capture());
 		callbackCaptor.getValue().invoke();
 		verify(mockUsernameCallback).invoke(teamAlias);
 		verify(mockView).hide();
 	}
-	
+
 	@Test
 	public void testOnModalShown() {
 		widget.onModalShown();
 		verify(mockSuggestBox).setFocus(true);
 	}
-	
+
 	@Test
 	public void testShow() {
 		widget.show();
 		verify(mockSuggestBox).clear();
 		verify(mockView).show();
 	}
-	
-	
+
+
 	@Test
 	public void testAsWidget() {
 		widget.asWidget();

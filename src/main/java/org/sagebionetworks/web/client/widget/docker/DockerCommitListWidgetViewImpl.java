@@ -8,7 +8,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class DockerCommitListWidgetViewImpl implements DockerCommitListWidgetView {
-	public interface Binder extends UiBinder<Widget, DockerCommitListWidgetViewImpl> {}
+	public interface Binder extends UiBinder<Widget, DockerCommitListWidgetViewImpl> {
+	}
 
 	@UiField
 	SimplePanel dockerCommitList;
@@ -41,7 +42,6 @@ public class DockerCommitListWidgetViewImpl implements DockerCommitListWidgetVie
 
 	@Override
 	public void setSynAlert(Widget widget) {
-		synAlertContainer.clear();
-		synAlertContainer.add(widget);
+		synAlertContainer.setWidget(widget);
 	}
 }

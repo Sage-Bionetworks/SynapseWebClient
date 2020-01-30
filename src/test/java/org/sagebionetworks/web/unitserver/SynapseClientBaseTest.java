@@ -4,38 +4,35 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.SynapseClientBase;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 
-@RunWith (MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class SynapseClientBaseTest {
-	
+
 	@Mock
 	SynapseProvider mockSynapseProvider;
-	
+
 	@Mock
 	SynapseClient mockSynapseClient;
-	
+
 	SynapseClientBase synapseClientBase;
-	
+
 	@Mock
 	ThreadLocal<HttpServletRequest> mockThreadLocal;
-	
-	@Mock 
+
+	@Mock
 	HttpServletRequest mockRequest;
-	
+
 	String userIp = "127.0.0.1";
 	public static final String ENDPOINT_PREFIX = "endpointprefix";
 	public static final String FILE_BASE = ENDPOINT_PREFIX + "/file/v1";
@@ -49,7 +46,7 @@ public class SynapseClientBaseTest {
 		StackEndpoints.clear();
 		StackEndpoints.skipLoadingSettingsFile();
 	}
-	
+
 	@Before
 	public void setUp() throws Exception {
 		synapseClientBase = new SynapseClientBase();
@@ -73,9 +70,9 @@ public class SynapseClientBaseTest {
 		verify(mockSynapseClient).setFileEndpoint(FILE_BASE);
 		verify(mockSynapseClient).appendUserAgent(SynapseClientBase.PORTAL_USER_AGENT);
 		verify(mockSynapseClient).setUserIpAddress(userIp);
-		
+
 	}
-	
+
 	@Test
 	public void testNullThreadLocalRequest() {
 		when(mockThreadLocal.get()).thenReturn(null);
@@ -85,14 +82,14 @@ public class SynapseClientBaseTest {
 	}
 
 	@Test
-	public void testGetIpAddressRequestHasHeader(){
+	public void testGetIpAddressRequestHasHeader() {
 		String otherIp = "42.42.42.42";
 		when(mockRequest.getHeader(SynapseClientBase.X_FORWARDED_FOR_HEADER)).thenReturn(otherIp);
-		assertEquals(otherIp,SynapseClientBase.getIpAddress(mockRequest));
+		assertEquals(otherIp, SynapseClientBase.getIpAddress(mockRequest));
 	}
 
 	@Test
-	public void testGetIpAddressRequestDoesNotHaveHeader(){
+	public void testGetIpAddressRequestDoesNotHaveHeader() {
 		when(mockRequest.getHeader(SynapseClientBase.X_FORWARDED_FOR_HEADER)).thenReturn(null);
 		assertEquals(userIp, SynapseClientBase.getIpAddress(mockRequest));
 	}

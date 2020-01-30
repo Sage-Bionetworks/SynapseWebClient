@@ -1,19 +1,25 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
-	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt"
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<g:HTMLPanel>
 		<g:SimplePanel ui:field="viewScopeContainer" />
-		<b:Button ui:field="editButton" icon="EDIT" addStyleNames="margin-top-10" visible="false" text="Edit Scope" type="INFO"/>
-		
-		<b:Modal ui:field="editModal" title="Edit Scope" closable="true"
-			dataBackdrop="STATIC" dataKeyboard="true" b:id="editScopeModal"
-			size="LARGE">
+		<b:Button ui:field="editButton" icon="EDIT"
+			addStyleNames="margin-top-10" visible="false" text="Edit Scope"
+			type="INFO" />
+
+		<b:Modal ui:field="editModal" title="Edit Scope"
+			closable="true" dataBackdrop="STATIC" dataKeyboard="true"
+			b:id="editScopeModal" size="LARGE">
 			<b:ModalBody>
-				<g:SimplePanel ui:field="editScopeContainer" addStyleNames="light-border padding-10" />
+				<g:SimplePanel ui:field="editScopeContainer"
+					addStyleNames="light-border padding-10" />
 				<g:SimplePanel ui:field="editScopeAlertContainer" />
 				<bh:Div ui:field="viewOptionsContainer" />
 			</b:ModalBody>

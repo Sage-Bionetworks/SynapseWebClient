@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client;
 
 import static org.junit.Assert.assertEquals;
-
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.EntityType;
@@ -22,7 +21,7 @@ public class EntityTypeUtilsTest {
 		assertEquals(TableEntity.class.getName(), EntityTypeUtils.getEntityClassNameForEntityType(EntityType.table.name()));
 		assertEquals(EntityView.class.getName(), EntityTypeUtils.getEntityClassNameForEntityType(EntityType.entityview.name()));
 		assertEquals(Link.class.getName(), EntityTypeUtils.getEntityClassNameForEntityType(EntityType.link.name()));
-		
+
 		assertEquals(FileEntity.class.getName(), EntityTypeUtils.getEntityClassNameForEntityType("default"));
 	}
 
@@ -34,10 +33,10 @@ public class EntityTypeUtilsTest {
 		assertEquals(EntityType.table, EntityTypeUtils.getEntityTypeForEntityClassName(TableEntity.class.getName()));
 		assertEquals(EntityType.entityview, EntityTypeUtils.getEntityTypeForEntityClassName(EntityView.class.getName()));
 		assertEquals(EntityType.link, EntityTypeUtils.getEntityTypeForEntityClassName(Link.class.getName()));
-		
+
 		assertEquals(EntityType.file, EntityTypeUtils.getEntityTypeForEntityClassName("default"));
 	}
-	
+
 	@Test
 	public void testGetIconTypeForEntityClassName() {
 		assertEquals(IconType.FILE, EntityTypeUtils.getIconTypeForEntityClassName(FileEntity.class.getName()));
@@ -46,7 +45,7 @@ public class EntityTypeUtilsTest {
 		assertEquals(IconType.TABLE, EntityTypeUtils.getIconTypeForEntityClassName(TableEntity.class.getName()));
 		assertEquals(IconType.TH_LIST, EntityTypeUtils.getIconTypeForEntityClassName(EntityView.class.getName()));
 		assertEquals(IconType.LINK, EntityTypeUtils.getIconTypeForEntityClassName(Link.class.getName()));
-		
+
 		assertEquals(IconType.FILE, EntityTypeUtils.getIconTypeForEntityClassName("default"));
 	}
 

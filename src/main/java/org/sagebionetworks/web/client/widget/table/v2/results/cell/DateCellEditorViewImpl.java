@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import java.util.Date;
-
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.DateTimePicker;
-
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -13,16 +11,17 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class DateCellEditorViewImpl implements DateCellEditorView {
-	
-	public interface Binder extends UiBinder<Widget, DateCellEditorViewImpl> {}
-	
+
+	public interface Binder extends UiBinder<Widget, DateCellEditorViewImpl> {
+	}
+
 	@UiField
 	DateTimePicker dateTimePicker;
-	
+
 	Widget widget;
-	
+
 	@Inject
-	public DateCellEditorViewImpl(Binder binder){
+	public DateCellEditorViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 	}
 

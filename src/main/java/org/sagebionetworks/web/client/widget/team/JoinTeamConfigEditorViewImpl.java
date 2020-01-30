@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.team;
 
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.TextBox;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -12,37 +11,38 @@ import com.google.inject.Inject;
 
 public class JoinTeamConfigEditorViewImpl implements JoinTeamConfigEditorView {
 
-	public interface JoinTeamConfigWidgetViewImplUiBinder extends UiBinder<Widget, JoinTeamConfigEditorViewImpl> {}
-	
+	public interface JoinTeamConfigWidgetViewImplUiBinder extends UiBinder<Widget, JoinTeamConfigEditorViewImpl> {
+	}
+
 	@UiField
 	SimplePanel suggestBoxPanel;
-	
+
 	@UiField
 	CheckBox isChallengeCheckbox;
-	
+
 	@UiField
 	TextBox memberMessageField;
-	
+
 	@UiField
 	TextBox joinButtonField;
-	
+
 	@UiField
 	TextBox joinSuccessField;
-	
+
 	@UiField
 	TextBox requestOpenInfoField;
-	
+
 	@UiField
 	CheckBox isPromptForMessageCheckbox;
-	
-	
+
+
 	Widget widget;
-	
+
 	@Inject
 	public JoinTeamConfigEditorViewImpl(JoinTeamConfigWidgetViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;

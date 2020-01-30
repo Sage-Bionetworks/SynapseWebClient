@@ -11,7 +11,7 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 public interface UpdatingAsynchProgressHandler extends AsynchronousProgressHandler {
 
 	public void onUpdate(AsynchronousJobStatus status);
-	
+
 	/**
 	 * The job tracker needs to stop tracking if the UI that started the job is no longer attached.
 	 * 

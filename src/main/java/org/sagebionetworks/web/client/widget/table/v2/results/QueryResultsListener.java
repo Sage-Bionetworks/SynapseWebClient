@@ -6,6 +6,7 @@ public interface QueryResultsListener extends QueryExecutionListener {
 
 	/**
 	 * Called before a new query is run.
+	 * 
 	 * @param newQuery
 	 */
 	public void onStartingNewQuery(Query newQuery);

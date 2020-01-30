@@ -13,16 +13,16 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
  * 
  */
 public class AddAttachmentHelper {
-	public static UploadResult getUploadResult(String html){
+	public static UploadResult getUploadResult(String html) {
 		UploadResult result = new UploadResult();
 		result.setUploadStatus(UploadStatus.SUCCESS);
-		if(html != null){
+		if (html != null) {
 			GwtAdapterFactory factory = new GwtAdapterFactory();
-			//search for the first ">" (end of the pre tag)
-			int closeIndex = html.indexOf(">")+1;
+			// search for the first ">" (end of the pre tag)
+			int closeIndex = html.indexOf(">") + 1;
 			String json = html;
 			if (html.contains("</pre>"))
-				json = html.substring(closeIndex, (html.length()-"</pre>".length()));
+				json = html.substring(closeIndex, (html.length() - "</pre>".length()));
 			JSONObjectAdapter adapter;
 			try {
 				adapter = factory.createNew(json);

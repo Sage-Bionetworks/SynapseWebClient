@@ -6,28 +6,27 @@ import java.util.Comparator;
 /**
  * Compares two objects based on a single field.
  * 
- * The provided field name will determine how the two objects will be compared.
- * Note: The field does not need to be accessible. The resulting FieldComparator
- * will then compare the two objects based on the value of the given field.
+ * The provided field name will determine how the two objects will be compared. Note: The field does
+ * not need to be accessible. The resulting FieldComparator will then compare the two objects based
+ * on the value of the given field.
  * 
  * @author jmhill
  * 
  * @param <T>
  */
-@SuppressWarnings({"rawtypes","unchecked"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class FieldComparator<T> implements Comparator<T> {
 
 	Field compareField = null;
 
 	/**
-	 * The provided field name will determine how the two objects will be
-	 * compared. Note: The field does not need to be accessible. The resulting
-	 * FieldComparator will then compare the two objects based on the value of
-	 * the given field. a getName() method.
+	 * The provided field name will determine how the two objects will be compared. Note: The field does
+	 * not need to be accessible. The resulting FieldComparator will then compare the two objects based
+	 * on the value of the given field. a getName() method.
 	 * 
 	 * @param fieldName
 	 */
-	public FieldComparator(Class<T> clazz, String fieldName)  {
+	public FieldComparator(Class<T> clazz, String fieldName) {
 		try {
 			compareField = clazz.getDeclaredField(fieldName);
 			// Make sure we can access it even if it is private
@@ -66,8 +65,7 @@ public class FieldComparator<T> implements Comparator<T> {
 			if (one instanceof Comparable) {
 				return ((Comparable) one).compareTo((Comparable) two);
 			} else {
-				throw new IllegalArgumentException("Unknown type: "
-						+ one.getClass().toString());
+				throw new IllegalArgumentException("Unknown type: " + one.getClass().toString());
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);

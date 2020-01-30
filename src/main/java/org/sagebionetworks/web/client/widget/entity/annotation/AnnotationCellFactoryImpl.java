@@ -1,9 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.annotation;
 
+import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
-
 import com.google.inject.Inject;
 
 /**
@@ -14,21 +13,21 @@ public class AnnotationCellFactoryImpl implements AnnotationCellFactory {
 	PortalGinInjector ginInjector;
 
 	@Inject
-	public AnnotationCellFactoryImpl(PortalGinInjector ginInjector){
+	public AnnotationCellFactoryImpl(PortalGinInjector ginInjector) {
 		this.ginInjector = ginInjector;
 	}
 
 	@Override
-	public CellEditor createEditor(Annotation annotation) {
+	public CellEditor createEditor(AnnotationsValue annotation) {
 		CellEditor editor;
-		switch(annotation.getType()) {
+		switch (annotation.getType()) {
 			case LONG:
 				editor = ginInjector.createIntegerCellEditor();
 				break;
 			case DOUBLE:
 				editor = ginInjector.createDoubleCellEditor();
 				break;
-			case DATE:
+			case TIMESTAMP_MS:
 				editor = ginInjector.createDateCellEditor();
 				break;
 			case STRING:

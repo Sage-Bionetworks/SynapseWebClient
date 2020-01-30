@@ -2,11 +2,9 @@ package org.sagebionetworks.web.client.widget.table.modal.upload;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewResult;
-
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -39,23 +37,23 @@ public class UploadPreviewWidgetImpl implements UploadPreviewWidget {
 
 	@Override
 	public void configure(UploadToTablePreviewResult preview) {
-		if(isPreviewSchemaEmpty(preview)){
+		if (isPreviewSchemaEmpty(preview)) {
 			view.showEmptyPreviewMessage(NO_DATA_WAS_FOUND_IN_THE_FILE);
 			view.setTableVisible(false);
 			view.setEmptyMessageVisible(true);
 			view.setPreviewMessage("");
-		}else{
+		} else {
 			// We at least have a header
 			view.setTableVisible(true);
-			view.setPreviewMessage(PREVIEW_MESSAGE_PREFIX+preview.getRowsScanned()+PREVIEW_MESSAGE_SUFFIX);
+			view.setPreviewMessage(PREVIEW_MESSAGE_PREFIX + preview.getRowsScanned() + PREVIEW_MESSAGE_SUFFIX);
 			columns = preview.getSuggestedColumns();
 			// Create a list of headers
 			List<String> headers = new ArrayList<String>();
-			for(ColumnModel cm: preview.getSuggestedColumns()){
+			for (ColumnModel cm : preview.getSuggestedColumns()) {
 				StringBuilder builder = new StringBuilder();
-				if(cm.getName() != null){
+				if (cm.getName() != null) {
 					builder.append(cm.getName());
-				}else{
+				} else {
 					builder.append("BLANK");
 				}
 				builder.append(" (");
@@ -65,10 +63,10 @@ public class UploadPreviewWidgetImpl implements UploadPreviewWidget {
 			}
 			view.setHeaders(headers);
 			// rows
-			if(isPreviewRowsEmpty(preview)){
+			if (isPreviewRowsEmpty(preview)) {
 				view.setEmptyMessageVisible(true);
 				view.showEmptyPreviewMessage(NO_ROWS_WERE_FOUND_IN_THE_FILE);
-			}else{
+			} else {
 				// We have rows.
 				view.setEmptyMessageVisible(false);
 				for (Row row : preview.getSampleRows()) {
@@ -81,49 +79,52 @@ public class UploadPreviewWidgetImpl implements UploadPreviewWidget {
 			}
 		}
 	}
-	
+
 	/**
 	 * Check for an empty preview.
+	 * 
 	 * @param preview
 	 * @return
 	 */
-	private boolean isPreviewRowsEmpty(UploadToTablePreviewResult preview){
-		if(preview.getSampleRows() == null || preview.getSampleRows().isEmpty()){
+	private boolean isPreviewRowsEmpty(UploadToTablePreviewResult preview) {
+		if (preview.getSampleRows() == null || preview.getSampleRows().isEmpty()) {
 			return true;
 		}
 		Row firstRow = preview.getSampleRows().get(0);
-		if(firstRow == null || firstRow.getValues() == null || firstRow.getValues().isEmpty()){
+		if (firstRow == null || firstRow.getValues() == null || firstRow.getValues().isEmpty()) {
 			return true;
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Is the preview schema empty.
+	 * 
 	 * @param preview
 	 * @return
 	 */
-	private boolean isPreviewSchemaEmpty(UploadToTablePreviewResult preview){
-		if(preview == null){
+	private boolean isPreviewSchemaEmpty(UploadToTablePreviewResult preview) {
+		if (preview == null) {
 			return true;
 		}
-		if(preview.getSuggestedColumns() == null || preview.getSuggestedColumns().isEmpty()){
+		if (preview.getSuggestedColumns() == null || preview.getSuggestedColumns().isEmpty()) {
 			return true;
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Truncate a string.
+	 * 
 	 * @param in
 	 * @return
 	 */
-	public static String truncateValues(String in){
-		if(in == null){
+	public static String truncateValues(String in) {
+		if (in == null) {
 			return null;
 		}
-		if(in.length() > MAX_CHARS_PER_CELL){
-			return in.substring(0, MAX_CHARS_PER_CELL-1)+"...";
+		if (in.length() > MAX_CHARS_PER_CELL) {
+			return in.substring(0, MAX_CHARS_PER_CELL - 1) + "...";
 		}
 		return in;
 	}

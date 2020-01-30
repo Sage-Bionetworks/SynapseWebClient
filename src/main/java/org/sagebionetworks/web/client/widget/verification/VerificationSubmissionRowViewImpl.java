@@ -1,15 +1,14 @@
 package org.sagebionetworks.web.client.widget.verification;
 
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.web.client.DisplayUtils;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -19,12 +18,13 @@ import com.google.inject.Inject;
 
 public class VerificationSubmissionRowViewImpl implements VerificationSubmissionWidgetView {
 
-	public interface Binder extends UiBinder<Widget, VerificationSubmissionRowViewImpl> {}
-	
+	public interface Binder extends UiBinder<Widget, VerificationSubmissionRowViewImpl> {
+	}
+
 	VerificationSubmissionWidgetView.Presenter presenter;
-	
+
 	Widget widget;
-	
+
 	@UiField
 	Span firstName;
 	@UiField
@@ -39,12 +39,12 @@ public class VerificationSubmissionRowViewImpl implements VerificationSubmission
 	Anchor profileAnchor;
 	@UiField
 	Span state;
-	
+
 	@UiField
 	Div emailAddresses;
 	@UiField
 	Div filesContainer;
-	
+
 	@UiField
 	Button approveButton;
 	@UiField
@@ -53,14 +53,16 @@ public class VerificationSubmissionRowViewImpl implements VerificationSubmission
 	Button suspendButton;
 	@UiField
 	Button deleteButton;
-	
+	@UiField
+	Button popupModalButton;
+
 	@UiField
 	Span reasonAlertText;
 	@UiField
 	Div synAlertContainer;
 	@UiField
 	Div promptModalContainer;
-	
+
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -69,32 +71,22 @@ public class VerificationSubmissionRowViewImpl implements VerificationSubmission
 	@Inject
 	public VerificationSubmissionRowViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		
-		approveButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.approveVerification();
-			}
+
+		approveButton.addClickHandler(event -> {
+			presenter.approveVerification();
 		});
-		rejectButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.rejectVerification();
-			}
+		rejectButton.addClickHandler(event -> {
+			presenter.rejectVerification();
 		});
-		suspendButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.suspendVerification();
-			}
+		suspendButton.addClickHandler(event -> {
+			presenter.suspendVerification();
 		});
-		deleteButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.deleteVerification();
-			}
+		deleteButton.addClickHandler(event -> {
+			presenter.deleteVerification();
 		});
-		
+		popupModalButton.addClickHandler(event -> {
+			presenter.showSubmissionInModal();
+		});
 	}
 
 	@Override
@@ -129,12 +121,12 @@ public class VerificationSubmissionRowViewImpl implements VerificationSubmission
 
 	@Override
 	public void show() {
-		//Not used in this view implementation
+		// Not used in this view implementation
 	}
 
 	@Override
 	public void hide() {
-		//Not used in this view implementation
+		// Not used in this view implementation
 	}
 
 	@Override
@@ -151,7 +143,7 @@ public class VerificationSubmissionRowViewImpl implements VerificationSubmission
 
 	@Override
 	public void setTitle(String title) {
-		//Not used in this view implementation
+		// Not used in this view implementation
 	}
 
 	@Override
@@ -192,17 +184,17 @@ public class VerificationSubmissionRowViewImpl implements VerificationSubmission
 
 	@Override
 	public void setSubmitButtonVisible(boolean visible) {
-		//Not used in this view implementation
+		// Not used in this view implementation
 	}
 
 	@Override
 	public void setCancelButtonVisible(boolean visible) {
-		//Not used in this view implementation
+		// Not used in this view implementation
 	}
 
 	@Override
 	public void setOKButtonVisible(boolean visible) {
-		//Not used in this view implementation
+		// Not used in this view implementation
 	}
 
 	@Override
@@ -221,13 +213,13 @@ public class VerificationSubmissionRowViewImpl implements VerificationSubmission
 	}
 
 	@Override
-	public void setSuspendedAlertVisible(boolean visible) {
-	}
+	public void setSuspendedAlertVisible(boolean visible) {}
+
 	@Override
 	public void setSuspendedReason(String reason) {
 		reasonAlertText.setText(reason);
 	}
-	
+
 	@Override
 	public void popupError(String message) {
 		DisplayUtils.showErrorMessage(message);
@@ -237,57 +229,84 @@ public class VerificationSubmissionRowViewImpl implements VerificationSubmission
 	public void openWindow(String url) {
 		DisplayUtils.newWindow(url, "_self", "");
 	}
-	
+
 	@Override
 	public void setPromptModal(Widget w) {
 		promptModalContainer.clear();
 		promptModalContainer.add(w);
 	}
+
 	@Override
 	public void setDeleteButtonVisible(boolean visible) {
 		deleteButton.setVisible(visible);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
+
 	@Override
 	public void setProfileLink(String profileId, String href) {
 		profileAnchor.setText(profileId);
 		profileAnchor.setHref(href);
 	}
-	
+
 	@Override
 	public void setState(VerificationStateEnum s) {
 		state.setText(s.toString());
 	}
+
 	@Override
 	public void setProfileFieldsEditable(boolean editable) {
-		//Not used in this view implementation
+		// Not used in this view implementation
 	}
+
 	@Override
 	public void setResubmitButtonVisible(boolean visible) {
-		//Not used in this view implementation
+		// Not used in this view implementation
 	}
+
 	@Override
 	public String getFirstName() {
 		return firstName.getText();
 	}
+
 	@Override
 	public String getLastName() {
 		return lastName.getText();
 	}
+
 	@Override
 	public String getLocation() {
 		return location.getText();
 	}
+
 	@Override
 	public String getOrganization() {
 		return currentAffiliation.getText();
 	}
+
 	@Override
 	public void setCloseButtonVisible(boolean visible) {
-		//Not used in this view implementation
+		// Not used in this view implementation
+	}
+	
+	@Override
+	public void setACTStateHistory(List<VerificationState> stateHistory) {
+		// Not used in this view implementation
+	}
+	@Override
+	public void setACTStateHistoryVisible(boolean visible) {
+		// Not used in this view implementation
+	}
+	@Override
+	public void setShowSubmissionInModalButtonVisible(boolean visible) {
+		popupModalButton.setVisible(visible);
+	}
+	
+	@Override
+	public void setUploadedFilesUIVisible(boolean visible) {
+		// Not used in this view implementation		
 	}
 }

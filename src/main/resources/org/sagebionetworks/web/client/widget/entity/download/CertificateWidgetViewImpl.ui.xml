@@ -1,23 +1,8 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:s="urn:import:org.sagebionetworks.web.client.widget">
-	
-	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
-	
-	<g:HTMLPanel>
-		<div class="row">
-		    <div class="double-border col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
-		        <br />
-		        <br />
-		        <h1 ui:field="userNameCertificate" class="font-family-cursive center"></h1>
-		        <br />
-		        <h3 class="center">has passed the Synapse Certification on</h3>
-		        <br />
-		        <h1 ui:field="datePassed" class="font-family-cursive center"></h1>
-		        
-		        <div class="margin-top-30 margin-bottom-60 center"> <g:Image resource='{sageImageBundle.certificate}' /> </div>
-		    </div>
-		</div>
-	</g:HTMLPanel>
+xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
+	<bh:Div>
+		<w:InfoAlert ui:field="alert" alertType="SUCCESS" icon="CERTIFICATE" linkText="" />
+	</bh:Div>
 </ui:UiBinder>

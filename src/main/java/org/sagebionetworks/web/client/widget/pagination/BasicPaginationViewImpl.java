@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.pagination;
 
 import org.gwtbootstrap3.client.ui.Anchor;
-
+import org.gwtbootstrap3.client.ui.html.ClearFix;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -15,18 +15,21 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class BasicPaginationViewImpl implements BasicPaginationView{
-	
-	public interface Binder extends UiBinder<Widget, BasicPaginationViewImpl> {}
-	
+public class BasicPaginationViewImpl implements BasicPaginationView {
+
+	public interface Binder extends UiBinder<Widget, BasicPaginationViewImpl> {
+	}
+
 	@UiField
 	Anchor previousButton;
 	@UiField
 	Anchor nextButton;
+	@UiField
+	ClearFix clearFix;
 	Widget widget;
-	
+
 	@Inject
-	public BasicPaginationViewImpl(Binder binder){
+	public BasicPaginationViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 	}
 
@@ -39,7 +42,7 @@ public class BasicPaginationViewImpl implements BasicPaginationView{
 			}
 		});
 		nextButton.addClickHandler(new ClickHandler() {
-			
+
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onNext();
@@ -63,6 +66,15 @@ public class BasicPaginationViewImpl implements BasicPaginationView{
 	}
 
 	@Override
-	public void setCurrentPage(long currentPageNumber) {
+	public void setCurrentPage(long currentPageNumber) {}
+
+	@Override
+	public void setVisible(boolean visible) {
+		widget.setVisible(visible);
+	}
+
+	@Override
+	public void hideClearFix() {
+		clearFix.setVisible(false);
 	}
 }

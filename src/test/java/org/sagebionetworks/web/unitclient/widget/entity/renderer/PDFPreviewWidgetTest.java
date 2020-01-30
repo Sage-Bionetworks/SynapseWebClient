@@ -7,7 +7,6 @@ import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -39,53 +38,50 @@ public class PDFPreviewWidgetTest {
 	FileHandle mockFileHandle;
 	private static final String URL = "fileHandleServlet?filehandleid=x";
 	public static final String FRIENDLY_FILE_SIZE = "a friendly file size";
-	
+
 	@Before
-	public void setup(){
+	public void setup() {
 		MockitoAnnotations.initMocks(this);
 		when(mockGWT.getFriendlySize(anyDouble(), anyBoolean())).thenReturn(FRIENDLY_FILE_SIZE);
-		widget = new PDFPreviewWidget(
-				mockView,
-				mockJSNIUtils,
-				mockGWT);
+		widget = new PDFPreviewWidget(mockView, mockJSNIUtils, mockGWT);
 		when(mockJSNIUtils.getFileHandleAssociationUrl(anyString(), any(FileHandleAssociateType.class), anyString())).thenReturn(URL);
 	}
-	
+
 	@Test
 	public void testConstructor() {
 		verify(mockView).addAttachHandler(any());
 	}
-	
+
 	@Test
 	public void testAsWidget() {
 		widget.asWidget();
 		verify(mockView).asWidget();
 	}
-	
+
 	@Test
 	public void testConfigure() {
 		int parentOffsetHeight = 200;
 		String synId = "syn1996";
 		String fileHandleId = "1812";
 		String encodedPresignedUrl = "http%3A%2F%2Fpath%2Fto%2Ffile.pdf";
-		
+
 		when(mockView.getParentOffsetHeight()).thenReturn(parentOffsetHeight);
 		when(mockGWT.encodeQueryString(URL)).thenReturn(encodedPresignedUrl);
 		when(mockFileHandle.getId()).thenReturn(fileHandleId);
 		when(mockFileHandle.getContentSize()).thenReturn(1L);
 		widget.configure(synId, mockFileHandle);
-		
+
 		verify(mockView).configure(PDFPreviewWidget.PDF_JS_VIEWER_PREFIX + encodedPresignedUrl, parentOffsetHeight);
 	}
-	
+
 	@Test
 	public void testMaxFileSizeExceeded() {
 		when(mockFileHandle.getId()).thenReturn("23");
 		when(mockFileHandle.getContentSize()).thenReturn(new Double(PDFPreviewWidget.MAX_PDF_FILE_SIZE + 10).longValue());
 
-		widget.configure("syn23",mockFileHandle);
-		
-		//verify an error was shown, relating to the file size
+		widget.configure("syn23", mockFileHandle);
+
+		// verify an error was shown, relating to the file size
 		verify(mockView).showError(stringCaptor.capture());
 		assertTrue(stringCaptor.getValue().contains(FRIENDLY_FILE_SIZE));
 	}

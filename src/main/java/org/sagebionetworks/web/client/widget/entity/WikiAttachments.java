@@ -1,24 +1,20 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.utils.FileHandleUtils;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class WikiAttachments implements WikiAttachmentsView.Presenter,
-		SynapseWidgetPresenter {
+public class WikiAttachments implements WikiAttachmentsView.Presenter, SynapseWidgetPresenter {
 
 	private WikiAttachmentsView view;
 	private SynapseClientAsync synapseClient;
@@ -26,7 +22,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 	private List<FileHandle> allFileHandles;
 	private List<String> toDeleteFileHandles;
 	private String selectedFilename;
-	
+
 	@Inject
 	public WikiAttachments(WikiAttachmentsView view, SynapseClientAsync synapseClient) {
 		this.view = view;
@@ -34,7 +30,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 		fixServiceEntryPoint(synapseClient);
 		view.setPresenter(this);
 	}
-	
+
 	@Override
 	public void configure(final WikiPageKey wikiKey) {
 		allFileHandles = null;
@@ -47,14 +43,14 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 				allFileHandles = fileHandleResults.getList();
 				updateFileList();
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(caught.getMessage());
 			}
 		});
 	}
-	
+
 	public void updateFileList() {
 		List<FileHandle> workingSet = getWorkingSet(allFileHandles);
 		view.reset();
@@ -64,55 +60,55 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 		} else {
 			view.addFileHandles(workingSet);
 			if (selectedFilename == null) {
-				selectedFilename = workingSet.get(0).getFileName(); 
+				selectedFilename = workingSet.get(0).getFileName();
 			}
 		}
-		
+
 		if (selectedFilename != null) {
-			//try to select the filename
+			// try to select the filename
 			view.setSelectedFilename(selectedFilename);
 		}
 	}
-	
-	private List<FileHandle> getWorkingSet(List<FileHandle> allFileHandles){
-		//only include non-preview file handles
+
+	private List<FileHandle> getWorkingSet(List<FileHandle> allFileHandles) {
+		// only include non-preview file handles
 		List<FileHandle> workingSet = new ArrayList<FileHandle>();
 		for (FileHandle fileHandle : allFileHandles) {
-			if (!(fileHandle instanceof PreviewFileHandle)){
+			if (!FileHandleUtils.isPreviewFileHandle(fileHandle)) {
 				workingSet.add(fileHandle);
 			}
 		}
 		return workingSet;
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	
+
 	public boolean isValid() {
 		return selectedFilename != null;
 	}
-	
+
 	@Override
 	public void setSelectedFilename(String fileName) {
 		selectedFilename = fileName;
 		view.setSelectedFilename(fileName);
 	}
-	
+
 	public String getSelectedFilename() {
 		return selectedFilename;
 	}
-	
+
 	public List<String> getFilesHandlesToDelete() {
 		return toDeleteFileHandles;
 	}
-	
+
 	@Override
 	public void deleteAttachment(final String fileName) {
-		if(fileName != null) {
+		if (fileName != null) {
 			List<FileHandle> attachmentsToDelete = new ArrayList<FileHandle>();
-			//find all file handles with this file name
+			// find all file handles with this file name
 			for (FileHandle fileHandle : allFileHandles) {
 				if (fileHandle.getFileName().equals(fileName)) {
 					attachmentsToDelete.add(fileHandle);

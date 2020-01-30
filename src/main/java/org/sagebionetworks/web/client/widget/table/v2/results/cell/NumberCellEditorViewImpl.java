@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
-
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.FocusEvent;
@@ -101,6 +100,7 @@ public class NumberCellEditorViewImpl implements NumberCellEditorView {
 	@Override
 	public void setHelpText(String help) {
 		this.helpBlock.setText(help);
+		helpBlock.setVisible(help != null && !help.trim().isEmpty());
 	}
 
 	@Override

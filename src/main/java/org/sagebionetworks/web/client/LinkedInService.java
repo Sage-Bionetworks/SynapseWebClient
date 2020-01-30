@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.shared.LinkedInInfo;
-
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -13,6 +12,7 @@ public interface LinkedInService extends RemoteService {
 
 	/**
 	 * Create a UserProfile using data provided by LinkedIn.
+	 * 
 	 * @param requestToken
 	 * @param secret
 	 * @param verifier

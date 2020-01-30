@@ -3,45 +3,51 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.widget"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" 
+	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<bh:Div>
 		<bh:Div>
-			<b:Anchor icon="QUESTION_CIRCLE" href="http://docs.synapse.org/articles/genome_browser.html" target="_blank" text="Help me configure" />
+			<b:Anchor icon="QUESTION_CIRCLE"
+				href="http://docs.synapse.org/articles/genome_browser.html"
+				target="_blank" text="Help me configure" />
 			<b:FieldSet addStyleNames="margin-top-20">
 				<b:FormGroup>
 					<b:FormLabel>Species</b:FormLabel>
 					<bh:Div>
 						<b:ButtonGroup dataToggle="BUTTONS">
-							<b:RadioButton name="species" active="true" ui:field="humanButton">Human</b:RadioButton>
-							<b:RadioButton name="species" ui:field="mouseButton">Mouse</b:RadioButton>
+							<b:RadioButton name="species" active="true"
+								ui:field="humanButton">Human</b:RadioButton>
+							<b:RadioButton name="species"
+								ui:field="mouseButton">Mouse</b:RadioButton>
 						</b:ButtonGroup>
-					</bh:Div>	
+					</bh:Div>
 				</b:FormGroup>
 				<b:FormGroup>
 					<b:FormLabel>chr</b:FormLabel>
-					<b:TextBox ui:field="chrField" placeholder="1"/>
+					<b:TextBox ui:field="chrField" placeholder="1" />
 				</b:FormGroup>
 				<b:FormGroup>
 					<b:FormLabel>View start</b:FormLabel>
-					<b:TextBox ui:field="viewStartField" placeholder=""/>
+					<b:TextBox ui:field="viewStartField" placeholder="" />
 				</b:FormGroup>
 				<b:FormGroup>
 					<b:FormLabel>View end</b:FormLabel>
-					<b:TextBox ui:field="viewEndField" placeholder=""/>
+					<b:TextBox ui:field="viewEndField" placeholder="" />
 				</b:FormGroup>
 			</b:FieldSet>
 			<b:Panel>
 				<b:PanelHeader>
-		            <b:Heading size="H3" text="Tracks"/>
-		        </b:PanelHeader>
-		        <b:PanelBody addStyleNames="margin-bottom-5-imp">
-		        	<s:SelectionToolbar ui:field="selectionToolbar"/>
-		        	<t:Table ui:field="trackColumnHeaders" width="100%" height="30px">
+					<b:Heading size="H3" text="Tracks" />
+				</b:PanelHeader>
+				<b:PanelBody addStyleNames="margin-bottom-5-imp">
+					<s:SelectionToolbar ui:field="selectionToolbar" />
+					<t:Table ui:field="trackColumnHeaders" width="100%"
+						height="30px">
 						<t:TableRow>
-							<t:TableHeader width="35px"/> <!-- select checkbox -->
-							<t:TableHeader width="150px" paddingRight="5" addStyleNames="hidden-xs">
+							<t:TableHeader width="35px" /> <!-- select checkbox -->
+							<t:TableHeader width="150px" paddingRight="5"
+								addStyleNames="hidden-xs">
 								<bh:Span text="Source name" />
 							</t:TableHeader>
 							<t:TableHeader width="180px" paddingRight="5">
@@ -50,18 +56,23 @@
 							<t:TableHeader width="180px" paddingRight="5">
 								<bh:Span text="Tabix File" />
 							</t:TableHeader>
-							<t:TableHeader width="75px" paddingRight="5" addStyleNames="hidden-sm hidden-xs">
+							<t:TableHeader width="75px" paddingRight="5"
+								addStyleNames="hidden-sm hidden-xs">
 								<bh:Span text="Height (px)" />
 							</t:TableHeader>
 							<t:TableHeader width="50px" paddingRight="5" /> <!-- color picker -->
-							
+
 						</t:TableRow>
 					</t:Table>
-		            <g:FlowPanel ui:field="tracksContainer"/>
-		            <b:Button ui:field="addTrackButton" icon="PLUS" type="INFO" addStyleNames="margin-10">Add Track</b:Button>
-		        </b:PanelBody>
+					<g:FlowPanel ui:field="tracksContainer" />
+					<b:Button ui:field="addTrackButton" icon="PLUS"
+						type="INFO" addStyleNames="margin-10">Add Track</b:Button>
+				</b:PanelBody>
 			</b:Panel>
 		</bh:Div>
-		<bh:Text text="Powered by" /> <b:Anchor text="Biodalliance" href="http://www.biodalliance.org" target="_blank" addStyleNames="margin-left-5"/>
+		<bh:Text text="Powered by" />
+		<b:Anchor text="Biodalliance"
+			href="http://www.biodalliance.org" target="_blank"
+			addStyleNames="margin-left-5" />
 	</bh:Div>
 </ui:UiBinder>

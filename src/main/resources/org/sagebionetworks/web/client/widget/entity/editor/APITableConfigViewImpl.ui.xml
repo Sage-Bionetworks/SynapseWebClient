@@ -11,13 +11,6 @@
 					<b:TextBox ui:field="urlField" name="urlField" b:id="urlField" />
 				</b:FormGroup>
 				<b:FormGroup>
-					<b:CheckBox ui:field="isRowVisibleField" text="Show row numbers"/>
-				</b:FormGroup>
-				<b:FormGroup>
-					<b:FormLabel for="rowNumbersColumnNameField">Row numbers column name</b:FormLabel>
-					<b:TextBox ui:field="rowNumbersColumnNameField" name="rowNumbersColumnNameField" b:id="rowNumbersColumnNameField" />
-				</b:FormGroup>
-				<b:FormGroup>
 					<b:CheckBox ui:field="isPagingField" text="Support pagination"/>
 				</b:FormGroup>
 				<b:FormGroup>

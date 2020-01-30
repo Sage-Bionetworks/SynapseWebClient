@@ -2,14 +2,12 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -18,13 +16,11 @@ import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WebConstants;
-
 import com.google.gwt.place.shared.Place;
 import com.google.inject.Inject;
 
-public class DockerTab implements DockerTabView.Presenter{
+public class DockerTab implements DockerTabView.Presenter {
 	public static final String DOCKER = "Docker";
 
 	private static final String DOCKER_TAB_TITLE = DOCKER;
@@ -35,24 +31,20 @@ public class DockerTab implements DockerTabView.Presenter{
 	Breadcrumb breadcrumb;
 	PortalGinInjector ginInjector;
 	StuAlert synAlert;
-	ActionMenuWidget actionMenu;
-
+	
 	EntityBundle projectBundle;
 	Throwable projectBundleLoadError;
 	String projectEntityId;
 	String areaToken;
-	EntityUpdatedHandler handler;
 	CallbackP<String> entitySelectedCallback;
-	
+
 	@Inject
-	public DockerTab(
-			Tab tab, 
-			PortalGinInjector ginInjector) {
+	public DockerTab(Tab tab, PortalGinInjector ginInjector) {
 		this.tab = tab;
 		this.ginInjector = ginInjector;
-		tab.configure(DOCKER_TAB_TITLE, "A [Docker](https://www.docker.com/what-docker) container is a convenient way to bundle up code and dependencies into a lightweight virtual machine to support reusable and reproducible analysis.", WebConstants.DOCS_URL + "docker.html");
+		tab.configure(DOCKER_TAB_TITLE, "A [Docker](https://www.docker.com/what-docker) container is a convenient way to bundle up code and dependencies into a lightweight virtual machine to support reusable and reproducible analysis.", WebConstants.DOCS_URL + "docker.html", EntityArea.DOCKER);
 
-		// Necessary for "beta" badge.  Remove when bringing out of beta.
+		// Necessary for "beta" badge. Remove when bringing out of beta.
 		tab.addTabListItemStyle("min-width-150");
 	}
 
@@ -67,33 +59,34 @@ public class DockerTab implements DockerTabView.Presenter{
 			view.setBreadcrumb(breadcrumb.asWidget());
 			view.setDockerRepoList(dockerRepoListWidget.asWidget());
 			view.setSynapseAlert(synAlert.asWidget());
+			view.setActionMenu(tab.getEntityActionMenu());
 			tab.setContent(view.asWidget());
 			initClickHandler();
 		}
 	}
+
 	private void initClickHandler() {
 		breadcrumb.setLinkClickedHandler(new CallbackP<Place>() {
 			public void invoke(Place place) {
-				//if this is the project id, then just reconfigure from the project bundle
-				Synapse synapse = (Synapse)place;
+				// if this is the project id, then just reconfigure from the project bundle
+				Synapse synapse = (Synapse) place;
 				String entityId = synapse.getEntityId();
 				entitySelectedCallback.invoke(entityId);
 			};
 		});
 	}
+
 	public void setEntitySelectedCallback(CallbackP<String> entitySelectedCallback) {
 		this.entitySelectedCallback = entitySelectedCallback;
 	}
-	
+
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
 		tab.addTabClickedCallback(onClickCallback);
 	}
 
-	public void configure(EntityBundle entityBundle, EntityUpdatedHandler handler, String areaToken, ActionMenuWidget actionMenu) {
+	public void configure(EntityBundle entityBundle, String areaToken) {
 		lazyInject();
-		this.actionMenu = actionMenu;
 		this.areaToken = areaToken;
-		this.handler = handler;
 		synAlert.clear();
 		setTargetBundle(entityBundle);
 	}
@@ -114,9 +107,9 @@ public class DockerTab implements DockerTabView.Presenter{
 		view.setBreadcrumbVisible(false);
 		view.setDockerRepoListVisible(false);
 		view.clearDockerRepoWidget();
-		view.setDockerRepoWidgetVisible(false);
+		view.setDockerRepoUIVisible(false);
 	}
-	
+
 	public void showError(Throwable error) {
 		resetView();
 		synAlert.handleException(error);
@@ -132,16 +125,17 @@ public class DockerTab implements DockerTabView.Presenter{
 			boolean isProject = entity instanceof Project;
 			view.setBreadcrumbVisible(isRepo);
 			view.setDockerRepoListVisible(isProject);
-			view.setDockerRepoWidgetVisible(isRepo);
+			view.setDockerRepoUIVisible(isRepo);
+			tab.configureEntityActionController(bundle, true, null);
 			if (isRepo) {
 				tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(bundle.getEntity().getId(), null, null, null));
 				List<LinkData> links = new ArrayList<LinkData>();
 				Place projectPlace = new Synapse(projectEntityId, null, EntityArea.DOCKER, null);
 				links.add(new LinkData(DOCKER, EntityTypeUtils.getIconTypeForEntityClassName(DockerRepository.class.getName()), projectPlace));
-				breadcrumb.configure(links, ((DockerRepository)entity).getRepositoryName());
+				breadcrumb.configure(links, ((DockerRepository) entity).getRepositoryName());
 				DockerRepoWidget repoWidget = ginInjector.createNewDockerRepoWidget();
 				view.setDockerRepoWidget(repoWidget.asWidget());
-				repoWidget.configure(bundle, handler, actionMenu);
+				repoWidget.configure(bundle, tab.getEntityActionMenu());
 			} else if (isProject) {
 				areaToken = null;
 				showProjectLevelUI();
@@ -151,7 +145,7 @@ public class DockerTab implements DockerTabView.Presenter{
 		}
 	}
 
-	public Tab asTab(){
+	public Tab asTab() {
 		return tab;
 	}
 

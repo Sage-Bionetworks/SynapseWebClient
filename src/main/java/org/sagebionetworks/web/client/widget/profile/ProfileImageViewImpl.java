@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Image;
 import org.sagebionetworks.web.client.utils.Callback;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -13,20 +12,21 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ProfileImageViewImpl implements ProfileImageView {
-	
-	public interface Binder extends UiBinder<Widget, ProfileImageViewImpl> {}
-	
+
+	public interface Binder extends UiBinder<Widget, ProfileImageViewImpl> {
+	}
+
 	@UiField
 	Icon defaultIcon;
 	@UiField
 	Image image;
 	@UiField
 	Button removePicture;
-	
+
 	ProfileImageWidget presenter;
 	Callback removePictureCallback;
 	Widget widget;
-	
+
 	@Inject
 	public ProfileImageViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
@@ -39,12 +39,12 @@ public class ProfileImageViewImpl implements ProfileImageView {
 			}
 		});
 	}
-	
+
 	@Override
 	public void setPresenter(ProfileImageWidget presenter) {
 		this.presenter = presenter;
 	}
-	
+
 	@Override
 	public void showDefault() {
 		image.setVisible(false);

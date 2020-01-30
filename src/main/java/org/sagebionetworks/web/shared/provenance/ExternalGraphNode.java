@@ -9,11 +9,10 @@ public class ExternalGraphNode extends ProvGraphNode implements IsSerializable {
 	private String name;
 	private String url;
 	private Boolean wasExecuted;
-	
-	public ExternalGraphNode() { }
 
-	public ExternalGraphNode(String id, String name, String url,
-			Boolean wasExecuted) {
+	public ExternalGraphNode() {}
+
+	public ExternalGraphNode(String id, String name, String url, Boolean wasExecuted) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -60,8 +59,7 @@ public class ExternalGraphNode extends ProvGraphNode implements IsSerializable {
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((url == null) ? 0 : url.hashCode());
-		result = prime * result
-				+ ((wasExecuted == null) ? 0 : wasExecuted.hashCode());
+		result = prime * result + ((wasExecuted == null) ? 0 : wasExecuted.hashCode());
 		return result;
 	}
 
@@ -99,8 +97,7 @@ public class ExternalGraphNode extends ProvGraphNode implements IsSerializable {
 
 	@Override
 	public String toString() {
-		return "ExternalGraphNode [id=" + id + ", name=" + name + ", url="
-				+ url + ", wasExecuted=" + wasExecuted + "]";
+		return "ExternalGraphNode [id=" + id + ", name=" + name + ", url=" + url + ", wasExecuted=" + wasExecuted + "]";
 	}
-	
+
 }

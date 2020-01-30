@@ -1,16 +1,18 @@
 package org.sagebionetworks.web.unitclient.widget.profile;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
-
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -22,7 +24,6 @@ import org.sagebionetworks.web.client.widget.profile.UserProfileModalView;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidgetImpl;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class UserProfileModalWidgetImplTest {
@@ -38,18 +39,18 @@ public class UserProfileModalWidgetImplTest {
 	ClientCache mockClientCache;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
-	
+
 	UserProfile profile;
-	
+
 	@Before
-	public void before(){
+	public void before() {
 		MockitoAnnotations.initMocks(this);
 		mockView = Mockito.mock(UserProfileModalView.class);
 		mockEditorWidget = Mockito.mock(UserProfileEditorWidget.class);
 		mockSynapse = Mockito.mock(SynapseClientAsync.class);
 		mockCallback = Mockito.mock(Callback.class);
 		widget = new UserProfileModalWidgetImpl(mockView, mockEditorWidget, mockSynapse, mockSynapseJavascriptClient, mockAuthController, mockClientCache);
-		
+
 		profile = new UserProfile();
 		profile.setOwnerId("123");
 		profile.setUserName("a-user-name");
@@ -63,12 +64,12 @@ public class UserProfileModalWidgetImplTest {
 		profile.setUrl("http://spys.r.us");
 		profile.setSummary("My live story...");
 		profile.setProfilePicureFileHandleId("45678");
-		
-		AsyncMockStubber.callSuccessWith(profile).when(mockSynapseJavascriptClient).getUserProfile(anyString(),any(AsyncCallback.class));
+
+		AsyncMockStubber.callSuccessWith(profile).when(mockSynapseJavascriptClient).getUserProfile(anyString(), any(AsyncCallback.class));
 	}
-	
+
 	@Test
-	public void testShowEditProfile(){
+	public void testShowEditProfile() {
 		String userId = "123";
 		widget.showEditProfile(userId, mockCallback);
 		verify(mockView).showModal();
@@ -78,11 +79,11 @@ public class UserProfileModalWidgetImplTest {
 		verify(mockEditorWidget).configure(profile);
 		verify(mockView).setLoading(false);
 	}
-	
+
 	@Test
-	public void testShowEditProfileError(){
+	public void testShowEditProfileError() {
 		String error = "An error";
-		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseJavascriptClient).getUserProfile(anyString(),any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseJavascriptClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		String userId = "123";
 		widget.showEditProfile(userId, mockCallback);
 		verify(mockView).showModal();
@@ -93,10 +94,10 @@ public class UserProfileModalWidgetImplTest {
 		verify(mockView).setLoading(false);
 		verify(mockView).showError(error);
 	}
-	
-	
+
+
 	@Test
-	public void testOnSaveNotValid(){
+	public void testOnSaveNotValid() {
 		when(mockEditorWidget.isValid()).thenReturn(false);
 		String userId = "123";
 		widget.showEditProfile(userId, mockCallback);
@@ -107,14 +108,14 @@ public class UserProfileModalWidgetImplTest {
 		verify(mockCallback, never()).invoke();
 		verify(mockView, never()).hideModal();
 	}
-	
+
 	@Test
-	public void testOnSave(){
+	public void testOnSave() {
 		when(mockEditorWidget.isValid()).thenReturn(true);
 		String userId = "123";
 		widget.showEditProfile(userId, mockCallback);
 		reset(mockView);
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapse).updateUserProfile(any(UserProfile.class),any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapse).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 		widget.onSave();
 		verify(mockView, never()).showError(anyString());
 		verify(mockView).hideError();
@@ -124,15 +125,15 @@ public class UserProfileModalWidgetImplTest {
 		verify(mockClientCache).remove(profile.getOwnerId() + WebConstants.USER_PROFILE_SUFFIX);
 		verify(mockAuthController).updateCachedProfile(profile);
 	}
-	
+
 	@Test
-	public void testOnSaveFailed(){
+	public void testOnSaveFailed() {
 		when(mockEditorWidget.isValid()).thenReturn(true);
 		String userId = "123";
 		widget.showEditProfile(userId, mockCallback);
 		reset(mockView);
 		String error = "An error";
-		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapse).updateUserProfile(any(UserProfile.class),any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapse).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 		widget.onSave();
 		verify(mockView).hideError();
 		verify(mockView).setProcessing(true);
@@ -141,9 +142,9 @@ public class UserProfileModalWidgetImplTest {
 		verify(mockView, never()).hideModal();
 		verify(mockView).showError(error);
 	}
-	
+
 	@Test
-	public void testUpdateProfileFromEditor(){
+	public void testUpdateProfileFromEditor() {
 		when(mockEditorWidget.isValid()).thenReturn(true);
 		String userId = "123";
 		widget.showEditProfile(userId, mockCallback);
@@ -172,13 +173,13 @@ public class UserProfileModalWidgetImplTest {
 		when(mockEditorWidget.getLocation()).thenReturn(changes.getLocation());
 		when(mockEditorWidget.getUrl()).thenReturn(changes.getUrl());
 		when(mockEditorWidget.getSummary()).thenReturn(changes.getSummary());
-		
+
 		UserProfile back = widget.updateProfileFromEditor();
 		assertEquals(changes, back);
 	}
-	
+
 	@Test
-	public void testMergeFirstIntoSecondNull(){
+	public void testMergeFirstIntoSecondNull() {
 		String startEtag = profile.getEtag();
 		UserProfile merged = UserProfileModalWidgetImpl.mergeFirstIntoSecond(null, profile);
 		assertNotNull(merged);
@@ -186,20 +187,20 @@ public class UserProfileModalWidgetImplTest {
 	}
 
 	@Test
-	public void testMergeFirstIntoSecondEmpty(){
+	public void testMergeFirstIntoSecondEmpty() {
 		String startEtag = profile.getEtag();
 		String first = profile.getFirstName();
 		String last = profile.getLastName();
 		String summary = profile.getSummary();
 		String position = profile.getPosition();
-		String location  = profile.getLocation();
+		String location = profile.getLocation();
 		String industry = profile.getIndustry();
 		String company = profile.getCompany();
 		String imageId = profile.getProfilePicureFileHandleId();
 		UserProfile merged = UserProfileModalWidgetImpl.mergeFirstIntoSecond(new UserProfile(), profile);
 		assertNotNull(merged);
 		// nothing should have changed.
-		assertEquals("The etag should not have changed.",startEtag, merged.getEtag());
+		assertEquals("The etag should not have changed.", startEtag, merged.getEtag());
 		assertEquals(first, merged.getFirstName());
 		assertEquals(last, merged.getLastName());
 		assertEquals(summary, merged.getSummary());
@@ -209,9 +210,9 @@ public class UserProfileModalWidgetImplTest {
 		assertEquals(company, merged.getCompany());
 		assertEquals(imageId, merged.getProfilePicureFileHandleId());
 	}
-	
+
 	@Test
-	public void testMergeFirstIntoSecond(){
+	public void testMergeFirstIntoSecond() {
 		String startEtag = profile.getEtag();
 		UserProfile imported = new UserProfile();
 		imported.setFirstName("importedFristName");
@@ -224,7 +225,7 @@ public class UserProfileModalWidgetImplTest {
 		imported.setProfilePicureFileHandleId("importedid");
 		UserProfile merged = UserProfileModalWidgetImpl.mergeFirstIntoSecond(imported, profile);
 		assertNotNull(merged);
-		assertEquals("The etag should not have changed.",startEtag, merged.getEtag());
+		assertEquals("The etag should not have changed.", startEtag, merged.getEtag());
 		assertEquals(imported.getFirstName(), merged.getFirstName());
 		assertEquals(imported.getLastName(), merged.getLastName());
 		assertEquals(imported.getSummary(), merged.getSummary());

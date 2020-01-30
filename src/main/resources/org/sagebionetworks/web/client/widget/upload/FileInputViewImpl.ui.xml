@@ -1,12 +1,14 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:b.html="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<g:HTMLPanel>
 		<b:Form visible="true" ui:field="form">
-			<b:Input ui:field="fileInput" b:id="fileInputWidget" type="FILE" />
+			<b:Input ui:field="fileInput" b:id="fileInputWidget"
+				type="FILE" />
 		</b:Form>
 		<bh:Div styleName="margin-top-15" />
 		<b:Progress ui:field="progressContainer" visible="false">

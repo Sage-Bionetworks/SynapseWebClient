@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.ListBox;
-
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -11,22 +9,25 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+
 /**
  * List editor view with zero business logic.
+ * 
  * @author John
  *
  */
 public class ListCellEditorViewImpl implements ListCellEdtiorView {
-	
-	public interface Binder extends UiBinder<Widget, ListCellEditorViewImpl> {}
-	
+
+	public interface Binder extends UiBinder<Widget, ListCellEditorViewImpl> {
+	}
+
 	@UiField
 	ListBox listBox;
-	
+
 	Widget widget;
-	
+
 	@Inject
-	public ListCellEditorViewImpl(Binder binder){
+	public ListCellEditorViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 	}
 
@@ -77,9 +78,9 @@ public class ListCellEditorViewImpl implements ListCellEdtiorView {
 
 	@Override
 	public void configure(List<String> items) {
-		for(String item: items){
+		for (String item : items) {
 			listBox.addItem(item);
 		}
 	}
-	
+
 }

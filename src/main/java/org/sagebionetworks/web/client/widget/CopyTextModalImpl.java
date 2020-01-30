@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client.widget;
 
+import static org.sagebionetworks.web.client.DisplayUtils.TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import static org.sagebionetworks.web.client.DisplayUtils.*;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -21,10 +21,12 @@ public class CopyTextModalImpl implements CopyTextModal {
 	@UiField
 	Modal modal;
 	Widget widget;
-	
-	public interface Binder extends UiBinder<Widget, CopyTextModalImpl> {}
+
+	public interface Binder extends UiBinder<Widget, CopyTextModalImpl> {
+	}
+
 	private static Binder uiBinder = GWT.create(Binder.class);
-	
+
 	@Inject
 	public CopyTextModalImpl(final SynapseJSNIUtils jsniUtils) {
 		widget = uiBinder.createAndBindUi(this);
@@ -40,16 +42,16 @@ public class CopyTextModalImpl implements CopyTextModal {
 	public void setTitle(String title) {
 		modal.setTitle(title);
 	}
-	
+
 	public void setText(String text) {
 		textBox.setText(text);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
-	
+
 	@Override
 	public void show() {
 		modal.show();

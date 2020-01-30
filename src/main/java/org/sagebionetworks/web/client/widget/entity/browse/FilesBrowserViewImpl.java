@@ -1,55 +1,87 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import org.gwtbootstrap3.client.ui.AnchorListItem;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.table.SortEntityChildrenDropdownButton;
-
+import org.sagebionetworks.web.client.widget.HelpWidget;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class FilesBrowserViewImpl implements FilesBrowserView {
 
-	public interface FilesBrowserViewImplUiBinder extends
-			UiBinder<Widget, FilesBrowserViewImpl> {
+	public interface FilesBrowserViewImplUiBinder extends UiBinder<Widget, FilesBrowserViewImpl> {
 	}
 
 	private EntityTreeBrowser entityTreeBrowser;
 	private Widget widget;
+	private Presenter presenter;
 
 	@UiField
 	Div files;
 	@UiField
-	Div sortButtonContainer;
-	SortEntityChildrenDropdownButton sortEntityChildrenDropdownButton;
-	
+	Div commandsContainer;
+	@UiField
+	AnchorListItem addToDownloadListLink;
+	@UiField
+	AnchorListItem programmaticOptionsLink;
+	@UiField
+	Div addToDownloadListContainer;
+	@UiField
+	Button downloadOptionsButton;
+	@UiField
+	HelpWidget downloadHelp;
+	@UiField
+	Div actionMenuContainer;
+	@UiField
+	Heading title;
+
 	@Inject
-	public FilesBrowserViewImpl(FilesBrowserViewImplUiBinder binder,
-			EntityTreeBrowser entityTreeBrowser,
-			SortEntityChildrenDropdownButton sortEntityChildrenDropdownButton) {
+	public FilesBrowserViewImpl(FilesBrowserViewImplUiBinder binder, EntityTreeBrowser entityTreeBrowser, AuthenticationController authController) {
 		widget = binder.createAndBindUi(this);
 		this.entityTreeBrowser = entityTreeBrowser;
 		Widget etbW = entityTreeBrowser.asWidget();
 		etbW.addStyleName("margin-top-10");
 		files.add(etbW);
-		this.sortEntityChildrenDropdownButton = sortEntityChildrenDropdownButton;
-		sortButtonContainer.add(sortEntityChildrenDropdownButton);
-		sortEntityChildrenDropdownButton.setListener(entityTreeBrowser);
-		sortEntityChildrenDropdownButton.setSortUI(EntityTreeBrowser.DEFAULT_SORT_BY, EntityTreeBrowser.DEFAULT_DIRECTION);
+		programmaticOptionsLink.addClickHandler(event -> {
+			presenter.onProgrammaticDownloadOptions();
+		});
+		addToDownloadListLink.addClickHandler(event -> {
+			presenter.onAddToDownloadList();
+		});
+		entityTreeBrowser.setIsEmptyCallback(isEmpty -> {
+			if (isEmpty) {
+				downloadHelp.setHelpMarkdown("There are no downloadable items in this folder.");
+				downloadHelp.setVisible(true);
+				downloadOptionsButton.setEnabled(false);
+			} else if (!authController.isLoggedIn()) {
+				downloadHelp.setHelpMarkdown("You must be logged in to download items in this folder.");
+				downloadHelp.setVisible(true);
+				downloadOptionsButton.setEnabled(false);
+			} else {
+				downloadHelp.setVisible(false);
+				downloadOptionsButton.setEnabled(true);
+			}
+		});
 	}
 
 	@Override
 	public void configure(String entityId) {
+		title.setVisible(false);
 		entityTreeBrowser.configure(entityId);
 	}
-	
+
 	public void setEntitySelectedHandler(org.sagebionetworks.web.client.events.EntitySelectedHandler handler) {
 		entityTreeBrowser.setEntitySelectedHandler(handler);
 	};
-	
+
 	@Override
 	public void setEntityClickedHandler(CallbackP<String> callback) {
 		entityTreeBrowser.setEntityClickedHandler(entityId -> {
@@ -57,7 +89,7 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 			callback.invoke(entityId);
 		});
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
@@ -81,5 +113,25 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	@Override
 	public void clear() {
 		entityTreeBrowser.clear();
+	}
+
+	@Override
+	public void setPresenter(Presenter p) {
+		this.presenter = p;
+	}
+
+	@Override
+	public void setAddToDownloadList(IsWidget w) {
+		addToDownloadListContainer.clear();
+		addToDownloadListContainer.add(w);
+	}
+	
+	@Override
+	public void setActionMenu(IsWidget w) {
+		w.asWidget().removeFromParent();
+		actionMenuContainer.clear();
+		actionMenuContainer.add(w);
+		// if showing action menu, then show title.
+		title.setVisible(true);
 	}
 }

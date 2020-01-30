@@ -7,7 +7,6 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -19,9 +18,10 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EditFileMetadataModalViewImpl implements EditFileMetadataModalView {
-	
-	public interface Binder extends UiBinder<Modal, EditFileMetadataModalViewImpl> {}
-	
+
+	public interface Binder extends UiBinder<Modal, EditFileMetadataModalViewImpl> {
+	}
+
 	@UiField
 	Modal modal;
 	@UiField
@@ -30,17 +30,17 @@ public class EditFileMetadataModalViewImpl implements EditFileMetadataModalView 
 	TextBox fileNameField;
 	@UiField
 	TextBox contentTypeField;
-	
+
 	@UiField
 	Alert alert;
 	@UiField
 	Button primaryButton;
-	
+
 	@Inject
-	public EditFileMetadataModalViewImpl(Binder binder){
+	public EditFileMetadataModalViewImpl(Binder binder) {
 		binder.createAndBindUi(this);
 		modal.addShownHandler(new ModalShownHandler() {
-			
+
 			@Override
 			public void onShown(ModalShownEvent evt) {
 				entityNameField.setFocus(true);
@@ -48,7 +48,7 @@ public class EditFileMetadataModalViewImpl implements EditFileMetadataModalView 
 			}
 		});
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return modal;
@@ -64,7 +64,7 @@ public class EditFileMetadataModalViewImpl implements EditFileMetadataModalView 
 		alert.setVisible(true);
 		alert.setText(error);
 	}
-	
+
 	@Override
 	public void showErrorPopup(String error) {
 		DisplayUtils.showErrorMessage(error);
@@ -81,7 +81,7 @@ public class EditFileMetadataModalViewImpl implements EditFileMetadataModalView 
 		this.entityNameField.addKeyDownHandler(new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
-				if(KeyCodes.KEY_ENTER == event.getNativeKeyCode()){
+				if (KeyCodes.KEY_ENTER == event.getNativeKeyCode()) {
 					presenter.onPrimary();
 				}
 			}
@@ -108,11 +108,11 @@ public class EditFileMetadataModalViewImpl implements EditFileMetadataModalView 
 
 	@Override
 	public void setLoading(boolean isLoading) {
-		if(isLoading){
+		if (isLoading) {
 			this.primaryButton.state().loading();
-		}else{
+		} else {
 			this.primaryButton.state().reset();
-		}	
+		}
 	}
 
 	@Override
@@ -121,12 +121,12 @@ public class EditFileMetadataModalViewImpl implements EditFileMetadataModalView 
 		this.fileNameField.setText(fileName);
 		this.contentTypeField.setText(contentType);
 	}
-	
+
 	@Override
 	public String getFileName() {
 		return fileNameField.getText();
 	};
-	
+
 	@Override
 	public String getContentType() {
 		return contentTypeField.getText();

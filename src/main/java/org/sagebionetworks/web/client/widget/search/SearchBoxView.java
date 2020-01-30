@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.client.widget.search;
 
 import org.sagebionetworks.web.client.SynapseView;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface SearchBoxView extends IsWidget, SynapseView {
 
 	/**
 	 * Set the presenter.
+	 * 
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);

@@ -6,7 +6,7 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<bh:Div>
 		<bh:Div ui:field="synAlertContainer" />
-		<t:Table width="100%" ui:field="table">
+		<t:Table ui:field="table" width="900px">
 			<t:TableRow>
 				<t:TableHeader text="Name" />
 				<t:TableHeader text="Institution" />

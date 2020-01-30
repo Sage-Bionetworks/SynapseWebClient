@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.table.modal.upload;
 import org.gwtbootstrap3.client.ui.ModalSize;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
-
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -14,7 +13,7 @@ import com.google.inject.Inject;
  *
  */
 public class UploadTableModalWidgetImpl implements UploadTableModalWidget {
-	
+
 	ModalWizardWidget modalWizarWidget;
 	UploadCSVFilePage uploadCSVFileWidget;
 

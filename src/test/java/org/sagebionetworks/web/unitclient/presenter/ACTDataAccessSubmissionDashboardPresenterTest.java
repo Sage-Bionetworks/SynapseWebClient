@@ -11,10 +11,8 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionDashboardPresenter.NO_RESULTS;
 import static org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionDashboardPresenter.TITLE;
-
 import java.util.Arrays;
 import java.util.LinkedList;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -34,7 +32,6 @@ import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.OpenSubmissionWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -63,8 +60,7 @@ public class ACTDataAccessSubmissionDashboardPresenterTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		presenter = new ACTDataAccessSubmissionDashboardPresenter(mockView,
-				mockDataAccessClient, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockNoResultsDiv);
+		presenter = new ACTDataAccessSubmissionDashboardPresenter(mockView, mockDataAccessClient, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockNoResultsDiv);
 	}
 
 	@Test
@@ -93,7 +89,7 @@ public class ACTDataAccessSubmissionDashboardPresenterTest {
 	}
 
 	@Test
-	public void testLoadMoreFailure(){
+	public void testLoadMoreFailure() {
 		Exception ex = new Exception();
 		AsyncMockStubber.callFailureWith(ex).when(mockDataAccessClient).getOpenSubmissions(anyString(), any(AsyncCallback.class));
 		presenter.loadMore();
@@ -105,10 +101,10 @@ public class ACTDataAccessSubmissionDashboardPresenterTest {
 	}
 
 	@Test
-	public void testLoadMoreSuccessNoResults(){
+	public void testLoadMoreSuccessNoResults() {
 		OpenSubmissionPage page = new OpenSubmissionPage();
 		page.setOpenSubmissionList(new LinkedList<OpenSubmission>());
-		AsyncMockStubber.callSuccessWith(page ).when(mockDataAccessClient).getOpenSubmissions(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(page).when(mockDataAccessClient).getOpenSubmissions(anyString(), any(AsyncCallback.class));
 		presenter.loadMore();
 		verify(mockDataAccessClient).getOpenSubmissions(anyString(), any(AsyncCallback.class));
 		verify(mockSynAlert).clear();
@@ -119,12 +115,12 @@ public class ACTDataAccessSubmissionDashboardPresenterTest {
 	}
 
 	@Test
-	public void testLoadMoreSuccess(){
+	public void testLoadMoreSuccess() {
 		OpenSubmissionPage page = new OpenSubmissionPage();
 		OpenSubmission openSubmission = new OpenSubmission();
 		page.setOpenSubmissionList(Arrays.asList(openSubmission));
 		page.setNextPageToken("there is a next page");
-		AsyncMockStubber.callSuccessWith(page ).when(mockDataAccessClient).getOpenSubmissions(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(page).when(mockDataAccessClient).getOpenSubmissions(anyString(), any(AsyncCallback.class));
 		when(mockGinInjector.getOpenSubmissionWidget()).thenReturn(mockOpenSubmissionWidget);
 		presenter.loadMore();
 		verify(mockDataAccessClient).getOpenSubmissions(anyString(), any(AsyncCallback.class));

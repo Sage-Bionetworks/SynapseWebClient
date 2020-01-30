@@ -8,12 +8,10 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -28,11 +26,10 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class ChallengeParticipantsWidgetTest {
-	
+
 	UserListView mockView;
 	BasicPaginationWidget mockPaginationWidget;
 	ChallengeClientAsync mockChallengeClient;
@@ -41,7 +38,7 @@ public class ChallengeParticipantsWidgetTest {
 	public static final String CHALLENGE_ID = "55555";
 	String entityId = "syn22";
 	UserProfile testProfile;
-	
+
 	@Before
 	public void before() throws RestServiceException, JSONObjectAdapterException {
 		mockView = mock(UserListView.class);
@@ -52,7 +49,7 @@ public class ChallengeParticipantsWidgetTest {
 		descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.CHALLENGE_ID_KEY, CHALLENGE_ID);
 		descriptor.put(WidgetConstants.IS_IN_CHALLENGE_TEAM_KEY, Boolean.toString(false));
-		
+
 		AsyncMockStubber.callSuccessWith(getTestUserProfilePagedResults()).when(mockChallengeClient).getChallengeParticipants(anyBoolean(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 	}
 
@@ -64,7 +61,7 @@ public class ChallengeParticipantsWidgetTest {
 		results.setTotalNumberOfResults(1L);
 		return results;
 	}
-	
+
 	public UserProfilePagedResults getEmptyUserProfilePagedResults() {
 		UserProfilePagedResults results = new UserProfilePagedResults();
 		List<UserProfile> emptyList = Collections.emptyList();
@@ -73,27 +70,27 @@ public class ChallengeParticipantsWidgetTest {
 		return results;
 	}
 
-	
+
 	@Test
 	public void testHappyCaseConfigure() throws Exception {
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
-		
+
 		verify(mockView).hideErrors();
 		verify(mockView).showLoading();
 		verify(mockView).clearUsers();
 		verify(mockChallengeClient).getChallengeParticipants(anyBoolean(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).hideLoading();
 		verify(mockPaginationWidget).configure(anyLong(), anyLong(), anyLong(), eq(widget));
-		
+
 		verify(mockView).addUser(testProfile);
 	}
-	
+
 
 	@Test
 	public void testHappyCaseNoParticipants() throws Exception {
 		AsyncMockStubber.callSuccessWith(getEmptyUserProfilePagedResults()).when(mockChallengeClient).getChallengeParticipants(anyBoolean(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
-		
+
 		verify(mockView).hideErrors();
 		verify(mockView).showLoading();
 		verify(mockView).clearUsers();
@@ -101,12 +98,12 @@ public class ChallengeParticipantsWidgetTest {
 		verify(mockView).hideLoading();
 		verify(mockView).showNoUsers();
 	}
-	
+
 	@Test
 	public void testGetChallengeTeamsFailure() throws Exception {
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockChallengeClient).getChallengeParticipants(anyBoolean(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
-		
+
 		verify(mockView).hideErrors();
 		verify(mockView).showLoading();
 		verify(mockView).clearUsers();
@@ -114,21 +111,12 @@ public class ChallengeParticipantsWidgetTest {
 		verify(mockView).hideLoading();
 		verify(mockView).showErrorMessage(anyString());
 	}
-	
+
 	@Test
 	public void testAsWidget() {
 		widget.asWidget();
 		verify(mockView).asWidget();
 	}
 }
-
-
-
-
-
-
-
-
-
 
 

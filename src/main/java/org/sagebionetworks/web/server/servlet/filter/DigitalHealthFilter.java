@@ -6,7 +6,7 @@ public class DigitalHealthFilter extends RedirectFilter {
 	protected String getTargetPage() {
 		return "#!StandaloneWiki:DigitalHealth";
 	}
-	
+
 	@Override
 	protected String getUrlPath() {
 		return "digitalhealth";

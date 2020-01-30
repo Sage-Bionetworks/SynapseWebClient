@@ -3,7 +3,6 @@ package org.sagebionetworks.web.shared.provenance;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class ProvTreeNode implements Iterable<ProvTreeNode>, IsSerializable {
@@ -16,7 +15,7 @@ public class ProvTreeNode implements Iterable<ProvTreeNode>, IsSerializable {
 	public ProvTreeNode() {
 		children = new HashSet<ProvTreeNode>();
 	}
-	
+
 	public String getId() {
 		return id;
 	}
@@ -26,7 +25,7 @@ public class ProvTreeNode implements Iterable<ProvTreeNode>, IsSerializable {
 	}
 
 	/*
-	 * Position Methods 
+	 * Position Methods
 	 */
 	public double getxPos() {
 		return xPos;
@@ -42,8 +41,8 @@ public class ProvTreeNode implements Iterable<ProvTreeNode>, IsSerializable {
 
 	public void setyPos(double yPos) {
 		this.yPos = yPos;
-	}	
-	
+	}
+
 	/*
 	 * Tree Methods
 	 */
@@ -58,5 +57,5 @@ public class ProvTreeNode implements Iterable<ProvTreeNode>, IsSerializable {
 	public Iterator<ProvTreeNode> iterator() {
 		return children.iterator();
 	}
-	
+
 }

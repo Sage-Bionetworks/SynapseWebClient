@@ -1,23 +1,26 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:b.html="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-	
+
 	<g:HTMLPanel>
 		<b:Form visible="false" ui:field="form">
 			<b:Input ui:field="fileInput" type="FILE" />
 		</b:Form>
-		<b:Button addStyleNames="margin-right-5" ui:field="uploadbutton" icon="UPLOAD">Upload</b:Button>
-		<bh:Span ui:field="uploadedFileNameField"/>
-		 
-		<w:LoadingSpinner ui:field="loadingUI" size="16px" addStyleNames="margin-right-5" visible="false"/>
-		
-		<g:HTMLPanel visible="false" >
+		<b:Button addStyleNames="margin-right-5"
+			ui:field="uploadbutton" icon="UPLOAD">Upload</b:Button>
+		<bh:Span ui:field="uploadedFileNameField" />
+
+		<w:LoadingSpinner ui:field="loadingUI" size="16px"
+			addStyleNames="margin-right-5" visible="false" />
+
+		<g:HTMLPanel visible="false">
 			<canvas ui:field="originalCanvas" />
 			<canvas ui:field="resizedCanvas" />
-		</g:HTMLPanel> 
+		</g:HTMLPanel>
 		<bh:Div styleName="margin-top-15" />
 		<b:Progress ui:field="progressContainer" visible="false">
 			<b:ProgressBar ui:field="progressBar" type="INFO"

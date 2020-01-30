@@ -2,12 +2,10 @@ package org.sagebionetworks.web.unitclient.widget.table.v2.schema;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.Test;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
@@ -18,16 +16,16 @@ import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
 
 public class ColumnModelUtilsTest {
-	
+
 	@Test
-	public void testTreatEmptyAsNull(){
+	public void testTreatEmptyAsNull() {
 		assertEquals(null, ColumnModelUtils.treatEmptyAsNull(""));
 		assertEquals(null, ColumnModelUtils.treatEmptyAsNull(" \n \t"));
 		assertEquals("one", ColumnModelUtils.treatEmptyAsNull("one"));
 	}
-	
+
 	@Test
-	public void testColumnModelTableRowRoundTrip(){
+	public void testColumnModelTableRowRoundTrip() {
 		// Start with a ColumnModel
 		ColumnModel model = new ColumnModel();
 		model.setName("James");
@@ -35,7 +33,7 @@ public class ColumnModelUtilsTest {
 		model.setColumnType(ColumnType.STRING);
 		model.setDefaultValue("foo and bar");
 		model.setMaximumSize(3L);
-		model.setEnumValues(Arrays.asList("one", "two","three"));
+		model.setEnumValues(Arrays.asList("one", "two", "three"));
 		model.setFacetType(FacetType.enumeration);
 		// stub the view
 		ColumnModelTableRowStub row = new ColumnModelTableRowStub();
@@ -45,9 +43,9 @@ public class ColumnModelUtilsTest {
 		assertEquals(model, clone);
 	}
 
-	
+
 	@Test
-	public void testColumnModelTableRowRoundTripWithNulls(){
+	public void testColumnModelTableRowRoundTripWithNulls() {
 		// Start with a ColumnModel
 		ColumnModel model = new ColumnModel();
 		model.setName(null);
@@ -63,13 +61,13 @@ public class ColumnModelUtilsTest {
 		ColumnModel clone = ColumnModelUtils.extractColumnModel(row);
 		assertEquals(model, clone);
 	}
-	
+
 	@Test
-	public void testColumnModelTableRowRoundTripAllTypes(){
+	public void testColumnModelTableRowRoundTripAllTypes() {
 		// Start with a ColumnModel
 		List<ColumnModel> models = new LinkedList<ColumnModel>();
 		List<ColumnModelTableRow> rows = new LinkedList<ColumnModelTableRow>();
-		for(ColumnType type: ColumnType.values()){
+		for (ColumnType type : ColumnType.values()) {
 			ColumnModel model = new ColumnModel();
 			model.setName("name");
 			model.setId("id");
@@ -86,51 +84,51 @@ public class ColumnModelUtilsTest {
 		List<ColumnModel> clones = ColumnModelUtils.extractColumnModels(rows);
 		assertEquals(models, clones);
 	}
-	
-	
+
+
 	@Test
-	public void testCSVRoundTripEmpty(){
+	public void testCSVRoundTripEmpty() {
 		List<String> list = new LinkedList<String>();
 		String csv = ColumnModelUtils.listToCSV(list);
 		assertEquals("", csv);
 		List<String> clone = ColumnModelUtils.csvToList(csv);
-		assertEquals(list, clone);	
+		assertEquals(list, clone);
 	}
-	
+
 	@Test
-	public void testCSVRoundTripOne(){
+	public void testCSVRoundTripOne() {
 		List<String> list = Arrays.asList("one");
 		String csv = ColumnModelUtils.listToCSV(list);
 		assertEquals("one", csv);
 		List<String> clone = ColumnModelUtils.csvToList(csv);
-		assertEquals(list, clone);	
+		assertEquals(list, clone);
 	}
-	
+
 	@Test
-	public void testCSVRoundTripMany(){
-		List<String> list = Arrays.asList("one","two");
+	public void testCSVRoundTripMany() {
+		List<String> list = Arrays.asList("one", "two");
 		String csv = ColumnModelUtils.listToCSV(list);
 		assertEquals("one, two", csv);
 		List<String> clone = ColumnModelUtils.csvToList(csv);
-		assertEquals(list, clone);	
+		assertEquals(list, clone);
 	}
-	
+
 	@Test
-	public void testbuildMapColumnIdtoModel(){
+	public void testbuildMapColumnIdtoModel() {
 		ColumnModel one = new ColumnModel();
 		one.setId("one");
 		ColumnModel two = new ColumnModel();
 		two.setId("two");
-		List<ColumnModel> models = Arrays.asList(one,two);
+		List<ColumnModel> models = Arrays.asList(one, two);
 		Map<String, ColumnModel> map = ColumnModelUtils.buildMapColumnIdtoModel(models);
 		assertNotNull(map);
 		assertEquals(2, map.size());
 		assertEquals(one, map.get(one.getId()));
 		assertEquals(two, map.get(two.getId()));
 	}
-	
+
 	@Test
-	public void testBuildTypesForQueryResults(){
+	public void testBuildTypesForQueryResults() {
 		ColumnModel one = new ColumnModel();
 		one.setId("1");
 		one.setName("one");
@@ -139,7 +137,7 @@ public class ColumnModelUtilsTest {
 		two.setId("2");
 		two.setName("two");
 		two.setColumnType(ColumnType.STRING);
-		List<ColumnModel> models = Arrays.asList(one,two);
+		List<ColumnModel> models = Arrays.asList(one, two);
 		// headers can includes the names of aggregation functions.
 		List<SelectColumn> headers = TableModelTestUtils.buildSelectColumns(models);
 		SelectColumn derived = new SelectColumn();
@@ -162,9 +160,9 @@ public class ColumnModelUtilsTest {
 		assertEquals(one, cm);
 	}
 
-	
+
 	@Test
-	public void testBuildTypesForQueryResultsNullHeaders(){
+	public void testBuildTypesForQueryResultsNullHeaders() {
 		ColumnModel one = new ColumnModel();
 		one.setId("1");
 		one.setName("one");
@@ -173,7 +171,7 @@ public class ColumnModelUtilsTest {
 		two.setId("2");
 		two.setName("two");
 		two.setColumnType(ColumnType.STRING);
-		List<ColumnModel> models = Arrays.asList(one,two);
+		List<ColumnModel> models = Arrays.asList(one, two);
 		List<ColumnModel> results = ColumnModelUtils.buildTypesForQueryResults(null, models);
 		// For this case the results should match the models
 		assertEquals(models, results);

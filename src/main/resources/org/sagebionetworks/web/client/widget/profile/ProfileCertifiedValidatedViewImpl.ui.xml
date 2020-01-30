@@ -1,12 +1,17 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle' />
+	<ui:with field='sageImageBundle'
+		type='org.sagebionetworks.web.client.SageImageBundle' />
 	<bh:Span>
-		<g:Image ui:field="certifiedIcon" addStyleNames="displayInline margin-right-2" height="19px" width="16px" 
-			resource='{sageImageBundle.certificate}' visible="false" />
-		<b:Icon ui:field="validatedIcon" type="CHECK_SQUARE_O" visible="false" addStyleNames="text-primary" size="LARGE" />
-		<bh:Paragraph ui:field="errorMessage" emphasis="DANGER" addStyleNames="displayInline" />
+		<g:Image ui:field="certifiedIcon"
+			addStyleNames="displayInline margin-right-2" height="19px"
+			width="16px" resource='{sageImageBundle.certificate}' visible="false" />
+		<b:Icon ui:field="validatedIcon" type="CHECK_SQUARE_O"
+			visible="false" addStyleNames="text-primary" size="LARGE" />
+		<bh:Paragraph ui:field="errorMessage" emphasis="DANGER"
+			addStyleNames="displayInline" />
 	</bh:Span>
 </ui:UiBinder>

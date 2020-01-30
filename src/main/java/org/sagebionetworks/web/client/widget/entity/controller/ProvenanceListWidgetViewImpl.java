@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -15,26 +14,27 @@ import com.google.inject.Inject;
 
 public class ProvenanceListWidgetViewImpl extends Composite implements ProvenanceListWidgetView {
 
-	public interface ProvenanceListWidgetViewImplUiBinder extends UiBinder<Widget, ProvenanceListWidgetViewImpl> {}
-	
+	public interface ProvenanceListWidgetViewImplUiBinder extends UiBinder<Widget, ProvenanceListWidgetViewImpl> {
+	}
+
 	@UiField
 	TBody provTableBody;
-	
+
 	@UiField
 	Button addEntityButton;
-	
+
 	@UiField
 	Button addURLButton;
-	
+
 	@UiField
 	SimplePanel entityFinderPanel;
-	
+
 	@UiField
 	SimplePanel urlDialogPanel;
-	
+
 	Presenter presenter;
 	Widget widget;
-	
+
 	@Inject
 	public ProvenanceListWidgetViewImpl(ProvenanceListWidgetViewImplUiBinder uiBinder) {
 		widget = uiBinder.createAndBindUi(this);
@@ -51,12 +51,12 @@ public class ProvenanceListWidgetViewImpl extends Composite implements Provenanc
 			}
 		});
 	}
-	
+
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
@@ -66,7 +66,7 @@ public class ProvenanceListWidgetViewImpl extends Composite implements Provenanc
 	public void addRow(IsWidget newRow) {
 		provTableBody.add(newRow);
 	}
-	
+
 	@Override
 	public void removeRow(IsWidget toRemove) {
 		provTableBody.remove(toRemove);

@@ -1,6 +1,7 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
 	<ui:style>
 		.important {
@@ -11,15 +12,17 @@
 		vertical-align: top;
 		}
 	</ui:style>
-	
+
 	<g:HTMLPanel>
-		<div class="row margin-top-left-10 margin-right-15 margin-bottom-20">
-	        <div class="row">
-		    	<g:FlowPanel ui:field="mainContainer" styleName="margin-left-35 margin-right-40"/>
-		   	</div>
-	    	
-		    <div class="clear"></div>
-        </div>
+		<div
+			class="row margin-top-left-10 margin-right-15 margin-bottom-20">
+			<div class="row">
+				<g:FlowPanel ui:field="mainContainer"
+					styleName="margin-left-35 margin-right-40" />
+			</div>
+
+			<div class="clear"></div>
+		</div>
 	</g:HTMLPanel>
 
 </ui:UiBinder> 

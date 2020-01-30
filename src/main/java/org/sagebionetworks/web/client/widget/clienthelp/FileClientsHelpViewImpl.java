@@ -1,14 +1,9 @@
 package org.sagebionetworks.web.client.widget.clienthelp;
 
-import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
-import org.gwtbootstrap3.client.ui.html.Span;
-
 import com.google.gwt.dom.client.SpanElement;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -42,8 +37,6 @@ public class FileClientsHelpViewImpl implements FileClientsHelpView {
 	@UiField
 	SpanElement version3;
 	@UiField
-	Anchor link;
-	@UiField
 	Modal modal;
 	@UiField
 	TabListItem cliTabListItem;
@@ -57,38 +50,33 @@ public class FileClientsHelpViewImpl implements FileClientsHelpView {
 	TabPane pythonTabPane;
 	@UiField
 	TabPane rTabPane;
-	
+
 	Widget widget;
-	public interface Binder extends UiBinder<Widget, FileClientsHelpViewImpl> {}
+
+	public interface Binder extends UiBinder<Widget, FileClientsHelpViewImpl> {
+	}
 
 	@Inject
 	public FileClientsHelpViewImpl(Binder binder) {
 		this.widget = binder.createAndBindUi(this);
-		link.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				modal.show();
-			}
-		});
-		
 		FileClientsHelpViewImpl.setId(cliTabListItem, cliTabPane);
 		FileClientsHelpViewImpl.setId(pythonTabListItem, pythonTabPane);
 		FileClientsHelpViewImpl.setId(rTabListItem, rTabPane);
 	}
-	
+
 	public static void setId(TabListItem tabListItem, TabPane tabPane) {
 		String id = HTMLPanel.createUniqueId();
-		tabListItem.setDataTarget("#"+id);
+		tabListItem.setDataTarget("#" + id);
 		tabPane.setId(id);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
-	
+
 	@Override
-	public void configure(String entityId, Long version) {
+	public void configureAndShow(String entityId, Long version) {
 		id1.setInnerHTML(entityId);
 		id2.setInnerHTML(entityId);
 		id3.setInnerHTML(entityId);
@@ -99,8 +87,9 @@ public class FileClientsHelpViewImpl implements FileClientsHelpView {
 		version1.setInnerHTML(versionString);
 		version2.setInnerHTML(versionString);
 		version3.setInnerHTML(versionString);
+		modal.show();
 	}
-	
+
 	@Override
 	public void setVersionVisible(boolean visible) {
 		UIObject.setVisible(versionUI1, visible);

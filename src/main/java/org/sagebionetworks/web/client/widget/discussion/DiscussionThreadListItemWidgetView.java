@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.discussion;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface DiscussionThreadListItemWidgetView extends IsWidget{
+public interface DiscussionThreadListItemWidgetView extends IsWidget {
 
 	public interface Presenter {
 
@@ -29,6 +29,6 @@ public interface DiscussionThreadListItemWidgetView extends IsWidget{
 	void setPinnedIconVisible(boolean visible);
 
 	void clearActiveAuthors();
-	
+
 	void setThreadUrl(String url);
 }

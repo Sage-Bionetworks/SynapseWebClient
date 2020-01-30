@@ -9,9 +9,10 @@ package org.sagebionetworks.web.client.cookie;
 public class CookieUtils {
 	/**
 	 * Return the domain based on the current hostname (which may be the subdomain).
+	 * 
 	 * @param hostName
-	 * @return Everything after the first occurrence of the character '.' (inclusive), if one exists.  
-	 * If host name is undefined or does not contain the character, then this will return null. 
+	 * @return Everything after the first occurrence of the character '.' (inclusive), if one exists. If
+	 *         host name is undefined or does not contain the character, then this will return null.
 	 */
 	public static String getDomain(String hostName) {
 		if (hostName == null || "127.0.0.1".equals(hostName)) {
@@ -23,5 +24,5 @@ public class CookieUtils {
 		}
 		return null;
 	}
-	
+
 }

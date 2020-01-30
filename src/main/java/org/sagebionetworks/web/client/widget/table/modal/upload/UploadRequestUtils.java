@@ -14,11 +14,12 @@ public class UploadRequestUtils {
 
 	/**
 	 * Create a deep clone of an UploadToTableRequest
+	 * 
 	 * @param in
 	 * @return
 	 */
-	public static UploadToTableRequest cloneUploadToTableRequest(UploadToTableRequest in){
-		if(in == null){
+	public static UploadToTableRequest cloneUploadToTableRequest(UploadToTableRequest in) {
+		if (in == null) {
 			return null;
 		}
 		UploadToTableRequest clone = new UploadToTableRequest();
@@ -29,14 +30,15 @@ public class UploadRequestUtils {
 		clone.setUploadFileHandleId(in.getUploadFileHandleId());
 		return clone;
 	}
-	
+
 	/**
 	 * Create a deep clone of a CsvTableDescriptor
+	 * 
 	 * @param in
 	 * @return
 	 */
-	public static CsvTableDescriptor cloneCsvTableDescriptor(CsvTableDescriptor in){
-		if(in == null){
+	public static CsvTableDescriptor cloneCsvTableDescriptor(CsvTableDescriptor in) {
+		if (in == null) {
 			return null;
 		}
 		CsvTableDescriptor clone = new CsvTableDescriptor();
@@ -47,14 +49,16 @@ public class UploadRequestUtils {
 		clone.setSeparator(in.getSeparator());
 		return clone;
 	}
-	
+
 	/**
-	 * The UploadToTableRequest and UploadToTablePreviewRequest are similar.  This method will create a UploadToTableRequest from an UploadToTablePreviewRequest.
+	 * The UploadToTableRequest and UploadToTablePreviewRequest are similar. This method will create a
+	 * UploadToTableRequest from an UploadToTablePreviewRequest.
+	 * 
 	 * @param preview
 	 * @return
 	 */
-	public static UploadToTableRequest createFromPreview(UploadToTablePreviewRequest preview){
-		if(preview == null){
+	public static UploadToTableRequest createFromPreview(UploadToTablePreviewRequest preview) {
+		if (preview == null) {
 			return null;
 		}
 		UploadToTableRequest out = new UploadToTableRequest();

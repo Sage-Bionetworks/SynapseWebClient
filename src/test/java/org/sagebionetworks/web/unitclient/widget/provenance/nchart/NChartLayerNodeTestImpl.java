@@ -1,13 +1,12 @@
 package org.sagebionetworks.web.unitclient.widget.provenance.nchart;
 
 import java.util.List;
-
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayerNode;
 
 public class NChartLayerNodeTestImpl implements NChartLayerNode {
 	List<String> subnodes;
 	String event;
-	
+
 	@Override
 	public void setSubnodes(List<String> subnodes) {
 		this.subnodes = subnodes;
@@ -31,8 +30,7 @@ public class NChartLayerNodeTestImpl implements NChartLayerNode {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((event == null) ? 0 : event.hashCode());
-		result = prime * result
-				+ ((subnodes == null) ? 0 : subnodes.hashCode());
+		result = prime * result + ((subnodes == null) ? 0 : subnodes.hashCode());
 		return result;
 	}
 
@@ -57,5 +55,5 @@ public class NChartLayerNodeTestImpl implements NChartLayerNode {
 			return false;
 		return true;
 	}
-	
+
 }

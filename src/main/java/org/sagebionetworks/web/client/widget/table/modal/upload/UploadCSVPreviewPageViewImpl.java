@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
 import org.gwtbootstrap3.client.ui.Button;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+
 /**
  * UploadCSVPreviewView with zero business logic.
  * 
@@ -16,8 +16,9 @@ import com.google.inject.Inject;
  */
 public class UploadCSVPreviewPageViewImpl implements UploadCSVPreviewPageView {
 
-	public interface Binder extends UiBinder<Widget, UploadCSVPreviewPageViewImpl> {}
-	
+	public interface Binder extends UiBinder<Widget, UploadCSVPreviewPageViewImpl> {
+	}
+
 	@UiField
 	SimplePanel previewPanel;
 	@UiField
@@ -28,15 +29,16 @@ public class UploadCSVPreviewPageViewImpl implements UploadCSVPreviewPageView {
 	Button optionsButton;
 	Widget widget;
 	Presenter presenter;
+
 	@Inject
-	public UploadCSVPreviewPageViewImpl(Binder binder){
+	public UploadCSVPreviewPageViewImpl(Binder binder) {
 		this.widget = binder.createAndBindUi(this);
 		optionsButton.addClickHandler(event -> {
 			// toggle visibility
 			optionsPanel.setVisible(!optionsPanel.isVisible());
 		});
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;

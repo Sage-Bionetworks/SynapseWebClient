@@ -1,73 +1,33 @@
 package org.sagebionetworks.web.client.presenter;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
-import org.sagebionetworks.repo.model.LogEntry;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.view.ErrorView;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class ErrorPresenter extends AbstractActivity implements ErrorView.Presenter, Presenter<org.sagebionetworks.web.client.place.ErrorPlace> {
+public class ErrorPresenter extends AbstractActivity implements Presenter<org.sagebionetworks.web.client.place.ErrorPlace> {
 
 	private ErrorView view;
-	private SynapseClientAsync synapseClient;
-	private SynapseAlert synAlert;
-	private SynapseJSNIUtils jsniUtils;
-	
+	private GWTWrapper gwt;
+
 	@Inject
-	public ErrorPresenter(ErrorView view, 
-			SynapseClientAsync synapseClient, 
-			SynapseAlert synAlert,
-			SynapseJSNIUtils jsniUtils) {
+	public ErrorPresenter(ErrorView view, GWTWrapper gwt) {
 		this.view = view;
-		fixServiceEntryPoint(synapseClient);
-		this.synapseClient = synapseClient;
-		this.synAlert = synAlert;
-		this.jsniUtils = jsniUtils;
-		view.setPresenter(this);
-		view.setSynAlertWidget(synAlert.asWidget());
-	} 
+		this.gwt = gwt;
+	}
 
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
 		panel.setWidget(view.asWidget());
 	}
-	
+
 	@Override
 	public void setPlace(final org.sagebionetworks.web.client.place.ErrorPlace place) {
 		String token = place.toToken();
-		showLogEntry(token);
+		view.refreshHeader();
+		// decode error
+		view.setErrorMessage(gwt.decodeQueryString(token));
 	}
-	
-	public void showLogEntry(String encodedLogEntry) {
-		view.clear();
-		view.setPresenter(this);
-		synAlert.clear();
-		//decode log entry
-		synapseClient.hexDecodeLogEntry(encodedLogEntry, new AsyncCallback<LogEntry>() {
-			@Override
-			public void onSuccess(LogEntry result) {
-				view.setEntry(result);
-				jsniUtils.consoleError(result.getLabel());
-				jsniUtils.consoleError(result.getMessage());
-				jsniUtils.consoleError(result.getStacktrace());
-				if (!synAlert.isUserLoggedIn()) {
-					synAlert.showLogin();
-				}
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
-		});
-	}
-	
 }

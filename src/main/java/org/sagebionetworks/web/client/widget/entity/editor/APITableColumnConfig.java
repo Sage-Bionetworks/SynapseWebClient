@@ -1,27 +1,25 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.Set;
-
 import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 
 /**
- * APITableColumnConfig Package information relating to a column in the API
- * Table (supertable)
+ * APITableColumnConfig Package information relating to a column in the API Table (supertable)
  */
 public class APITableColumnConfig {
-	
+
 	/**
 	 * Display Column Name
 	 * 
 	 */
 	private String displayColumnName;
-	
+
 	/**
 	 * Input Column Names
 	 * 
 	 */
 	private Set<String> inputColumnNames;
-	
+
 	/**
 	 * Renderer Name
 	 * 
@@ -29,11 +27,10 @@ public class APITableColumnConfig {
 	private String rendererName;
 
 	private COLUMN_SORT_TYPE sort;
-	
+
 	private Integer decimalPlaces;
-	
-	public APITableColumnConfig() {
-	}
+
+	public APITableColumnConfig() {}
 
 	/**
 	 * Display Column Name
@@ -113,15 +110,15 @@ public class APITableColumnConfig {
 	public COLUMN_SORT_TYPE getSort() {
 		return sort;
 	}
-	
+
 	public void setSort(COLUMN_SORT_TYPE sort) {
 		this.sort = sort;
 	}
-	
+
 	public Integer getDecimalPlaces() {
 		return decimalPlaces;
 	}
-	
+
 	public void setDecimalPlaces(Integer decimalPlaces) {
 		this.decimalPlaces = decimalPlaces;
 	}
@@ -130,21 +127,14 @@ public class APITableColumnConfig {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((decimalPlaces == null) ? 0 : decimalPlaces.hashCode());
-		result = prime
-				* result
-				+ ((displayColumnName == null) ? 0 : displayColumnName
-						.hashCode());
-		result = prime
-				* result
-				+ ((inputColumnNames == null) ? 0 : inputColumnNames.hashCode());
-		result = prime * result
-				+ ((rendererName == null) ? 0 : rendererName.hashCode());
+		result = prime * result + ((decimalPlaces == null) ? 0 : decimalPlaces.hashCode());
+		result = prime * result + ((displayColumnName == null) ? 0 : displayColumnName.hashCode());
+		result = prime * result + ((inputColumnNames == null) ? 0 : inputColumnNames.hashCode());
+		result = prime * result + ((rendererName == null) ? 0 : rendererName.hashCode());
 		result = prime * result + ((sort == null) ? 0 : sort.hashCode());
 		return result;
 	}
-	
+
 
 	@Override
 	public boolean equals(Object obj) {
@@ -182,9 +172,6 @@ public class APITableColumnConfig {
 
 	@Override
 	public String toString() {
-		return "APITableColumnConfig [displayColumnName=" + displayColumnName
-				+ ", inputColumnNames=" + inputColumnNames + ", rendererName="
-				+ rendererName + ", sort=" + sort + ", decimalPlaces="
-				+ decimalPlaces + "]";
+		return "APITableColumnConfig [displayColumnName=" + displayColumnName + ", inputColumnNames=" + inputColumnNames + ", rendererName=" + rendererName + ", sort=" + sort + ", decimalPlaces=" + decimalPlaces + "]";
 	}
 }

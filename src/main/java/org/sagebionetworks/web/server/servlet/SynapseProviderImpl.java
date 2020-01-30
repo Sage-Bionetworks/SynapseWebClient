@@ -6,6 +6,7 @@ import org.sagebionetworks.client.SynapseProfileProxy;
 
 /**
  * Very simple implementation.
+ * 
  * @author John
  *
  */

@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.team.controller;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.utils.Callback;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -17,7 +16,7 @@ public interface TeamDeleteModalWidgetView extends IsWidget {
 		void showDialog();
 
 		void configure(Team team);
-		
+
 	}
 
 	void setSynAlertWidget(Widget asWidget);

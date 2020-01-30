@@ -12,8 +12,8 @@ import org.sagebionetworks.web.shared.table.CellAddress;
 public interface TakesAddressCell extends Cell {
 
 	/**
-	 * The address will be set before the value.
-	 * s
+	 * The address will be set before the value. s
+	 * 
 	 * @param address
 	 */
 	public void setCellAddresss(CellAddress address);

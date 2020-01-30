@@ -1,13 +1,9 @@
 package org.sagebionetworks.web.client.widget.clienthelp;
 
-import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
-
 import com.google.gwt.dom.client.SpanElement;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -19,7 +15,7 @@ public class ContainerClientsHelpImpl implements ContainerClientsHelp {
 	@UiField
 	SpanElement id2;
 	@UiField
-	Anchor link;
+	SpanElement id3;
 	@UiField
 	Modal modal;
 	@UiField
@@ -27,35 +23,40 @@ public class ContainerClientsHelpImpl implements ContainerClientsHelp {
 	@UiField
 	TabListItem pythonTabListItem;
 	@UiField
+	TabListItem rTabListItem;
+	@UiField
 	TabPane cliTabPane;
 	@UiField
 	TabPane pythonTabPane;
-	
+	@UiField
+	TabPane rTabPane;
+
+
 	Widget widget;
 	String entityId = null;
-	public interface Binder extends UiBinder<Widget, ContainerClientsHelpImpl> {}
+
+	public interface Binder extends UiBinder<Widget, ContainerClientsHelpImpl> {
+	}
 
 	@Inject
 	public ContainerClientsHelpImpl(Binder binder) {
 		this.widget = binder.createAndBindUi(this);
-		link.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				modal.show();
-			}
-		});
 		FileClientsHelpViewImpl.setId(cliTabListItem, cliTabPane);
 		FileClientsHelpViewImpl.setId(pythonTabListItem, pythonTabPane);
+		FileClientsHelpViewImpl.setId(rTabListItem, rTabPane);
 	}
+
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
-	
+
 	@Override
-	public void configure(String entityId) {
+	public void configureAndShow(String entityId) {
 		this.entityId = entityId;
 		id1.setInnerHTML(entityId);
 		id2.setInnerHTML(entityId);
+		id3.setInnerHTML(entityId);
+		modal.show();
 	}
 }

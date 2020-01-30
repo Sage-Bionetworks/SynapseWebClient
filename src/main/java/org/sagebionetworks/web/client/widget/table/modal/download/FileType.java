@@ -8,20 +8,20 @@ package org.sagebionetworks.web.client.widget.table.modal.download;
  *
  */
 public enum FileType {
-	CSV(","),
-	TSV("\t");
+	CSV(","), TSV("\t");
 
 	private String separator;
-	
-	FileType(String separator){
+
+	FileType(String separator) {
 		this.separator = separator;
 	}
-	
+
 	/**
 	 * The actual separtor
+	 * 
 	 * @return
 	 */
-	public String getSeparator(){
+	public String getSeparator() {
 		return this.separator;
 	}
 }

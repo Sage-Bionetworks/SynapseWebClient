@@ -1,14 +1,12 @@
 package org.sagebionetworks.web.client.widget.docker;
 
 import java.util.Map;
-
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
@@ -18,7 +16,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
-
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -28,7 +26,6 @@ public class DockerRepoWidget {
 	private DockerRepoWidgetView view;
 	private WikiPageWidget wikiPageWidget;
 	private ProvenanceWidget provWidget;
-	private EntityUpdatedHandler handler;
 	private EntityMetadata metadata;
 	private ModifiedCreatedByWidget modifiedCreatedBy;
 	private DockerTitleBar dockerTitleBar;
@@ -36,18 +33,10 @@ public class DockerRepoWidget {
 	private CookieProvider cookies;
 	private boolean canEdit;
 	private DockerRepository entity;
+	private EventBus eventBus;
 
 	@Inject
-	public DockerRepoWidget(
-			DockerRepoWidgetView view,
-			WikiPageWidget wikiPageWidget,
-			ProvenanceWidget provWidget,
-			DockerTitleBar dockerTitleBar,
-			EntityMetadata metadata,
-			ModifiedCreatedByWidget modifiedCreatedBy,
-			DockerCommitListWidget dockerCommitListWidget,
-			CookieProvider cookies
-			) {
+	public DockerRepoWidget(DockerRepoWidgetView view, WikiPageWidget wikiPageWidget, ProvenanceWidget provWidget, DockerTitleBar dockerTitleBar, EntityMetadata metadata, ModifiedCreatedByWidget modifiedCreatedBy, DockerCommitListWidget dockerCommitListWidget, CookieProvider cookies, EventBus eventBus) {
 		this.view = view;
 		this.wikiPageWidget = wikiPageWidget;
 		this.provWidget = provWidget;
@@ -56,6 +45,7 @@ public class DockerRepoWidget {
 		this.modifiedCreatedBy = modifiedCreatedBy;
 		this.dockerCommitListWidget = dockerCommitListWidget;
 		this.cookies = cookies;
+		this.eventBus = eventBus;
 		view.setWikiPage(wikiPageWidget.asWidget());
 		view.setProvenance(provWidget.asWidget());
 		view.setTitlebar(dockerTitleBar.asWidget());
@@ -68,11 +58,9 @@ public class DockerRepoWidget {
 		return view.asWidget();
 	}
 
-	public void configure(EntityBundle bundle, final EntityUpdatedHandler handler, ActionMenuWidget actionMenu) {
-		this.entity = (DockerRepository)bundle.getEntity();
-		this.handler = handler;
+	public void configure(EntityBundle bundle, ActionMenuWidget actionMenu) {
+		this.entity = (DockerRepository) bundle.getEntity();
 		this.canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
-		metadata.setEntityUpdatedHandler(handler);
 		metadata.configure(bundle, null, actionMenu);
 		dockerTitleBar.configure(entity);
 		modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
@@ -94,14 +82,14 @@ public class DockerRepoWidget {
 		final WikiPageWidget.Callback wikiCallback = new WikiPageWidget.Callback() {
 			@Override
 			public void pageUpdated() {
-				handler.onPersistSuccess(new EntityUpdatedEvent());
+				eventBus.fireEvent(new EntityUpdatedEvent());
 			}
+
 			@Override
-			public void noWikiFound() {
-			}
+			public void noWikiFound() {}
 		};
 		wikiPageWidget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), bundle.getRootWikiId(), null), canEdit, wikiCallback);
-		CallbackP<String> wikiReloadHandler = new CallbackP<String>(){
+		CallbackP<String> wikiReloadHandler = new CallbackP<String>() {
 			@Override
 			public void invoke(String wikiPageId) {
 				wikiPageWidget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), wikiPageId, null), canEdit, wikiCallback);

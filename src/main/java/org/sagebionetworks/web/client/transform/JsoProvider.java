@@ -11,18 +11,19 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.XYPoint;
  * Generally used for JSNI Overlay types.
  * 
  * Class needed as Gin doesn't properly instantiate overlay types
+ * 
  * @author dburdick
  *
  */
 public interface JsoProvider {
 	NChartCharacters newNChartCharacters();
-	
+
 	NChartLayer newNChartLayer();
-	
+
 	NChartLayerNode newNChartLayerNode();
 
 	NChartLayersArray newNChartLayersArray();
-	
+
 	XYPoint newXYPoint();
-	
+
 }

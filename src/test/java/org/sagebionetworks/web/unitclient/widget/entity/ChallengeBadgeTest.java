@@ -6,7 +6,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -21,7 +20,6 @@ import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeView;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class ChallengeBadgeTest {
@@ -37,9 +35,9 @@ public class ChallengeBadgeTest {
 	Challenge mockTestChallenge;
 	@Mock
 	EntityHeader mockChallengeProjectHeader;
-	public static final String testProjectName= "my test challenge project";
+	public static final String testProjectName = "my test challenge project";
 	public static final String testProjectId = "syn123";
-	
+
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -48,13 +46,14 @@ public class ChallengeBadgeTest {
 		when(mockChallengeProjectHeader.getName()).thenReturn(testProjectName);
 		AsyncMockStubber.callSuccessWith(mockChallengeProjectHeader).when(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
 	}
-	
+
 	private void verifyNoProjectIdSet() {
 		verify(mockView, never()).setProjectId(anyString());
 	}
-	
+
 	/**
 	 * Verifies that setHref is called, and returns the value passed to the view
+	 * 
 	 * @return
 	 */
 	private String verifyProjectId() {
@@ -62,20 +61,20 @@ public class ChallengeBadgeTest {
 		verify(mockView).setProjectId(stringCaptor.capture());
 		return stringCaptor.getValue();
 	}
-	
+
 	@Test
 	public void testConfigure() {
 		widget.configure(mockTestChallenge);
 		String projectId = verifyProjectId();
 		assertEquals(testProjectId, projectId);
 	}
-	
+
 	@Test
 	public void testConfigureNullChallenge() {
 		widget.configure(null);
 		verifyNoProjectIdSet();
 	}
-	
+
 	@Test
 	public void testConfigureNullProjectHeader() {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));

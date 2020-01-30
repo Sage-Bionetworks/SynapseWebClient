@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -51,6 +50,7 @@ public interface RowView extends IsWidget {
 
 	/**
 	 * Show or hide the selection.
+	 * 
 	 * @param b
 	 */
 	public void setSelectVisible(boolean visible);

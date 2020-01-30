@@ -8,8 +8,6 @@ public interface EmailInvitationView extends IsWidget {
 
 	void setInvitationMessage(String message);
 
-	void setRegisterWidget(Widget w);
-
 	void setSynapseAlertContainer(Widget w);
 
 	void setPresenter(Presenter presenter);
@@ -20,11 +18,15 @@ public interface EmailInvitationView extends IsWidget {
 
 	void showInfo(String message);
 
+	void showErrorMessage(String message);
+
 	void clear();
 
 	void showNotLoggedInUI();
 
 	interface Presenter {
 		void onLoginClick();
+
+		void onRegisterClick();
 	}
 }

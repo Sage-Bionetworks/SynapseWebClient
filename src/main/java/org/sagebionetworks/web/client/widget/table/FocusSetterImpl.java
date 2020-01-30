@@ -11,23 +11,23 @@ import com.google.gwt.user.client.ui.ValueBoxBase;
  * @author John
  *
  */
-public class FocusSetterImpl implements FocusSetter{
+public class FocusSetterImpl implements FocusSetter {
 
 	@Override
-	public void attemptSetFocus(final IsWidget widget, final  boolean shouldSelectAll) {
+	public void attemptSetFocus(final IsWidget widget, final boolean shouldSelectAll) {
 		// Can only set focus on a focusable
-		if(widget instanceof Focusable){
+		if (widget instanceof Focusable) {
 			final Focusable focusableWidget = (Focusable) widget;
 			Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
-				@Override 
+				@Override
 				public void execute() {
 					// Set the focus on the widget.
 					focusableWidget.setFocus(true);
 					// Select all if requested.
-					if(shouldSelectAll){
+					if (shouldSelectAll) {
 						// Select all if we can.
-						if(widget instanceof ValueBoxBase){
-							((ValueBoxBase)widget).selectAll();
+						if (widget instanceof ValueBoxBase) {
+							((ValueBoxBase) widget).selectAll();
 						}
 					}
 				}

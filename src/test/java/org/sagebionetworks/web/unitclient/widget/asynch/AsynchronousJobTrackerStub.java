@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.asynch;
 
 import java.util.List;
-
 import org.sagebionetworks.repo.model.asynch.AsynchJobState;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
@@ -12,6 +11,7 @@ import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 /**
  * Stub to simulate a job tracker.
+ * 
  * @author John
  *
  */
@@ -22,8 +22,8 @@ public class AsynchronousJobTrackerStub implements AsynchronousJobTracker {
 	UpdatingAsynchProgressHandler handler;
 	Throwable error;
 	AsynchronousResponseBody response;
-	
-	public AsynchronousJobTrackerStub(List<AsynchronousJobStatus> states, Throwable error, AsynchronousResponseBody response){
+
+	public AsynchronousJobTrackerStub(List<AsynchronousJobStatus> states, Throwable error, AsynchronousResponseBody response) {
 		this.states = states;
 		this.error = error;
 		this.response = response;
@@ -36,17 +36,16 @@ public class AsynchronousJobTrackerStub implements AsynchronousJobTracker {
 	}
 
 	@Override
-	public void startAndTrack(AsynchType type, AsynchronousRequestBody requestBody,
-			int waitTimeMS, UpdatingAsynchProgressHandler handler) {
+	public void startAndTrack(AsynchType type, AsynchronousRequestBody requestBody, int waitTimeMS, UpdatingAsynchProgressHandler handler) {
 		this.waitTimeMS = waitTimeMS;
 		this.handler = handler;
-		if(error != null){
+		if (error != null) {
 			handler.onFailure(error);
-		}else{
+		} else {
 			// cycle through the states.
-			for(AsynchronousJobStatus state: states){
+			for (AsynchronousJobStatus state : states) {
 				handler.onUpdate(state);
-				if(!AsynchJobState.PROCESSING.equals(state.getJobState())){
+				if (!AsynchJobState.PROCESSING.equals(state.getJobState())) {
 					handler.onComplete(this.response);
 					break;
 				}

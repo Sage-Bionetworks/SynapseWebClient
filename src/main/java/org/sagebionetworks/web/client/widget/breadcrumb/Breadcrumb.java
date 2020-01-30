@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.breadcrumb;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -14,7 +13,6 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -25,7 +23,7 @@ public class Breadcrumb implements BreadcrumbView.Presenter, SynapseWidgetPresen
 	private BreadcrumbView view;
 	private GlobalApplicationState globalApplicationState;
 	private CallbackP<Place> callback;
-	
+
 	@Inject
 	public Breadcrumb(BreadcrumbView view, GlobalApplicationState globalApplicationState) {
 		this.view = view;
@@ -52,18 +50,18 @@ public class Breadcrumb implements BreadcrumbView.Presenter, SynapseWidgetPresen
 					String name = element.getName();
 					Synapse place = new Synapse(element.getId());
 					IconType icon = EntityTypeUtils.getIconTypeForEntityClassName(element.getType());
-					if(optionalArea == EntityArea.FILES && Project.class.getName().equals(element.getType())) {
+					if (optionalArea == EntityArea.FILES && Project.class.getName().equals(element.getType())) {
 						// show files as root
 						name = DisplayConstants.FILES;
-						place.setArea(EntityArea.FILES);					
-					} else  if(optionalArea == EntityArea.TABLES && Project.class.getName().equals(element.getType())) {
+						place.setArea(EntityArea.FILES);
+					} else if (optionalArea == EntityArea.TABLES && Project.class.getName().equals(element.getType())) {
 						// show tables as root
 						name = DisplayConstants.TABLES;
-						place.setArea(EntityArea.TABLES);					
+						place.setArea(EntityArea.TABLES);
 					}
 					links.add(new LinkData(name, icon, place));
 				}
-				currentPageName = path.get(path.size()-1).getName();
+				currentPageName = path.get(path.size() - 1).getName();
 			}
 		}
 		if (currentPageName != null) {
@@ -72,22 +70,24 @@ public class Breadcrumb implements BreadcrumbView.Presenter, SynapseWidgetPresen
 			view.setLinksList(links);
 		}
 	}
-	
+
 	/**
 	 * Create Breadcrumbs for an arbitrary set of link data, ending in the current page name
+	 * 
 	 * @param links
 	 * @param currentPageName
 	 */
-	public void configure(List<LinkData> links, String currentPageName){
+	public void configure(List<LinkData> links, String currentPageName) {
 		view.setPresenter(this);
 		view.setLinksList(links, currentPageName);
 	}
-	
-	
+
+
 	@Override
 	public void clear() {
 		view.clear();
 	}
+
 	/**
 	 * Not used
 	 */
@@ -95,7 +95,7 @@ public class Breadcrumb implements BreadcrumbView.Presenter, SynapseWidgetPresen
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	
+
 	public void setLinkClickedHandler(CallbackP<Place> callback) {
 		this.callback = callback;
 	}
@@ -103,11 +103,11 @@ public class Breadcrumb implements BreadcrumbView.Presenter, SynapseWidgetPresen
 	@Override
 	public void goTo(Place place) {
 		if (callback == null) {
-			globalApplicationState.getPlaceChanger().goTo(place);	
+			globalApplicationState.getPlaceChanger().goTo(place);
 		} else {
 			callback.invoke(place);
 		}
-		
+
 	}
 
 }

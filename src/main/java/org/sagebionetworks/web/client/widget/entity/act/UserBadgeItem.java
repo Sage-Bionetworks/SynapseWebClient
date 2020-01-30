@@ -3,7 +3,8 @@ package org.sagebionetworks.web.client.widget.entity.act;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
-import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dataaccess.AccessType;
 import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -12,7 +13,6 @@ import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.profile.ProfileCertifiedValidatedWidget;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -23,29 +23,31 @@ import com.google.inject.Inject;
 
 
 public class UserBadgeItem implements IsWidget, SelectableListItem {
-	public interface UserBadgeItemUiBinder extends UiBinder<Widget, UserBadgeItem> {}
-	
+	public interface UserBadgeItemUiBinder extends UiBinder<Widget, UserBadgeItem> {
+	}
+
 	@UiField
 	CheckBox select;
 	@UiField
-	Span userBadgeContainer;
+	Div userBadgeContainer;
 	@UiField
 	Button dropdown;
 	@UiField
 	AnchorListItem renew;
 	@UiField
 	AnchorListItem revoke;
-	
+
 	Widget widget;
-	
+
 	String userId;
 	Callback selectionChangedCallback;
 	PortalGinInjector portalGinInjector;
 	AccessType accessType;
+	AccessorChange change;
+	UserProfile profile;
 
 	@Inject
-	public UserBadgeItem(UserBadgeItemUiBinder binder,
-			PortalGinInjector portalGinInjector) {
+	public UserBadgeItem(UserBadgeItemUiBinder binder, PortalGinInjector portalGinInjector) {
 		widget = binder.createAndBindUi(this);
 		this.portalGinInjector = portalGinInjector;
 		select.addClickHandler(new ClickHandler() {
@@ -56,7 +58,7 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 				}
 			}
 		});
-		
+
 		renew.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -70,20 +72,23 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 			}
 		});
 	}
-	
+
 	private void showRenew() {
 		accessType = AccessType.RENEW_ACCESS;
 		dropdown.setText(renew.getText());
 		userBadgeContainer.removeStyleName("strikeout-links lightgrey-links");
 	}
-	
+
 	private void showRevoke() {
 		accessType = AccessType.REVOKE_ACCESS;
 		dropdown.setText(revoke.getText());
 		userBadgeContainer.addStyleName("strikeout-links lightgrey-links");
 	}
-	
-	public UserBadgeItem configure(AccessorChange change) {
+
+	public UserBadgeItem configure(AccessorChange change, UserProfile profile) {
+		this.change = change;
+		this.profile = profile;
+		userBadgeContainer.clear();
 		userId = change.getUserId();
 		accessType = change.getType();
 		boolean isGainAccess = AccessType.GAIN_ACCESS.equals(accessType);
@@ -91,8 +96,8 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 		if (!isGainAccess) {
 			select.setVisible(false);
 		}
-		
-		switch(accessType) {
+
+		switch (accessType) {
 			case RENEW_ACCESS:
 				showRenew();
 				break;
@@ -101,9 +106,13 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 				break;
 			default:
 		}
-		
+
 		UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
-		userBadge.configure(userId);
+		if (profile != null) {
+			userBadge.configure(profile);
+		} else {
+			userBadge.configure(userId);
+		}
 		userBadge.setSize(BadgeSize.DEFAULT);
 		userBadge.setCustomClickHandler(new ClickHandler() {
 			@Override
@@ -115,47 +124,58 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 			}
 		});
 		userBadgeContainer.add(userBadge.asWidget());
-		
+
 		ProfileCertifiedValidatedWidget w = portalGinInjector.getProfileCertifiedValidatedWidget();
 		w.configure(Long.parseLong(userId));
-		w.asWidget().addStyleName("moveup-8 margin-left-5");
+		w.asWidget().addStyleName("margin-left-5");
 		userBadgeContainer.add(w.asWidget());
-		
+
 		return this;
 	}
-	
+
+	public UserBadgeItem configure(AccessorChange change) {
+		return configure(change, null);
+	}
+
+	public void reconfigure() {
+		configure(change, profile);
+	}
+
 	public UserBadgeItem setSelectionChangedCallback(Callback callback) {
 		selectionChangedCallback = callback;
 		return this;
 	}
-	
+
 	public boolean isSelected() {
 		return select.getValue();
 	}
-	
-	public void setSelected(boolean selected){
+
+	public void setSelected(boolean selected) {
 		if (select.isVisible()) {
-			select.setValue(selected, true);	
+			select.setValue(selected, true);
 		}
 	}
-	
+
 	public void setSelectVisible(boolean visible) {
 		select.setVisible(visible);
+		if (!visible) {
+			userBadgeContainer.setMarginLeft(27);
+		}
 	}
-	
+
 	public String getUserId() {
 		return userId;
 	}
-	
+
 	public AccessType getAccessType() {
 		return accessType;
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
-	
+
 	public void setAccessTypeDropdownEnabled(boolean enabled) {
 		dropdown.setEnabled(enabled);
 	}

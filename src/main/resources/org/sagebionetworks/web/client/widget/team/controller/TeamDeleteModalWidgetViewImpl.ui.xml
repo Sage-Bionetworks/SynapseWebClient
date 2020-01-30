@@ -1,19 +1,24 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
-	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt"
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<b:Modal ui:field="modal" title="Delete Team?" closable="true"
 		dataBackdrop="STATIC" dataKeyboard="true">
 		<b:ModalBody>
-		    <bh:Text>Are you sure you want to delete this Team?</bh:Text>
-			<g:SimplePanel ui:field="synAlertPanel"/>
+			<bh:Text>Are you sure you want to delete this Team?</bh:Text>
+			<g:SimplePanel ui:field="synAlertPanel" />
 		</b:ModalBody>
 		<b:ModalFooter>
-			<b:Button ui:field="cancelButton" type="LINK" dataDismiss="MODAL">Cancel</b:Button>
-			<b:Button ui:field="primaryButton" type="DANGER" dataLoadingText="Deleting..." >Delete</b:Button>
+			<b:Button ui:field="cancelButton" type="LINK"
+				dataDismiss="MODAL">Cancel</b:Button>
+			<b:Button ui:field="primaryButton" type="DANGER"
+				dataLoadingText="Deleting...">Delete</b:Button>
 		</b:ModalFooter>
 	</b:Modal>
 </ui:UiBinder>

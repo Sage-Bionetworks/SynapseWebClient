@@ -2,13 +2,11 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -17,7 +15,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class APITableColumnConfigViewImpl implements APITableColumnConfigView {
-	public interface Binder extends UiBinder<Widget, APITableColumnConfigViewImpl> {}
+	public interface Binder extends UiBinder<Widget, APITableColumnConfigViewImpl> {
+	}
+
 	Widget widget;
 	@UiField
 	TextBox columnName;
@@ -31,15 +31,17 @@ public class APITableColumnConfigViewImpl implements APITableColumnConfigView {
 	CheckBox select;
 	APITableColumnConfig data;
 	Callback selectionChangedCallback;
+
 	@Inject
 	public APITableColumnConfigViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 	}
+
 	@Override
 	public void configure(APITableColumnConfig data) {
 		this.data = data;
 		if (data.getInputColumnNames() != null && data.getInputColumnNames().size() > 0) {
-			setColumnName(data.getInputColumnNames().iterator().next());	
+			setColumnName(data.getInputColumnNames().iterator().next());
 		}
 		setDisplayName(data.getDisplayColumnName());
 		setSort(data.getSort());
@@ -53,7 +55,7 @@ public class APITableColumnConfigViewImpl implements APITableColumnConfigView {
 			}
 		});
 	}
-	
+
 	private void updateFromView() {
 		data.setDisplayColumnName(displayName.getValue());
 		String[] inputColNamesArray = columnName.getValue().split(",");
@@ -65,10 +67,11 @@ public class APITableColumnConfigViewImpl implements APITableColumnConfigView {
 		data.setRendererFriendlyName(rendererField.getSelectedValue());
 		data.setSort(COLUMN_SORT_TYPE.valueOf(sortField.getSelectedValue().toUpperCase()));
 	}
+
 	public void setColumnName(String text) {
 		this.columnName.setValue(text);
 	}
-	
+
 	public void setDisplayName(String text) {
 		this.displayName.setValue(text);
 	}
@@ -84,6 +87,7 @@ public class APITableColumnConfigViewImpl implements APITableColumnConfigView {
 		}
 		sortField.setSelectedIndex(i);
 	}
+
 	public void setRenderer(String rendererName) {
 		int i = 0;
 		if (rendererName != null) {
@@ -95,24 +99,28 @@ public class APITableColumnConfigViewImpl implements APITableColumnConfigView {
 		}
 		rendererField.setSelectedIndex(i);
 	}
+
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
+
 	@Override
 	public boolean isSelected() {
 		return select.getValue();
 	}
+
 	@Override
 	public void setSelected(boolean selected) {
 		select.setValue(selected);
 	}
-	
+
 	@Override
 	public APITableColumnConfig getConfig() {
 		updateFromView();
 		return data;
 	}
+
 	@Override
 	public void setSelectionChangedCallback(Callback selectionChangedCallback) {
 		this.selectionChangedCallback = selectionChangedCallback;

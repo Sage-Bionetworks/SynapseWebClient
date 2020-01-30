@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.test.helper;
 
 import static org.mockito.Mockito.doAnswer;
-
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.mockito.stubbing.Stubber;

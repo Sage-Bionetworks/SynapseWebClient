@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import com.google.gwt.event.dom.client.HasKeyDownHandlers;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
@@ -15,8 +14,8 @@ import com.google.inject.Inject;
 
 /**
  * This implementation keeps track of the address of each widget and listens to key down events.
- * When navigation key event occurs, the address of the source widget is used to calculate
- * the new focus widget.
+ * When navigation key event occurs, the address of the source widget is used to calculate the new
+ * focus widget.
  * 
  * @author jhill
  *
@@ -47,10 +46,10 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 		// Listen to each row
 		columnCount = 0;
 		List<HandlerRegistration> registration = new ArrayList<HandlerRegistration>(row.getWidgetCount());
-		for (int i=0; i<row.getWidgetCount(); i++) {
+		for (int i = 0; i < row.getWidgetCount(); i++) {
 			IsWidget cell = row.getWidget(i);
 			HandlerRegistration hr = bindEditor(cell);
-			if(hr != null){
+			if (hr != null) {
 				registration.add(hr);
 			}
 			columnCount++;
@@ -59,15 +58,16 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 		this.registrationMap.put(row, registration);
 		needsRecalcualteAdressess = true;
 	}
-	
+
 	/**
-	 * Unbind a row.  Does nothing if the row is not currently bound.
+	 * Unbind a row. Does nothing if the row is not currently bound.
+	 * 
 	 * @param row
 	 */
-	private void unBindRow(RowOfWidgets row){
+	private void unBindRow(RowOfWidgets row) {
 		List<HandlerRegistration> current = this.registrationMap.remove(row);
-		if(current != null){
-			for(HandlerRegistration hr: current){
+		if (current != null) {
+			for (HandlerRegistration hr : current) {
 				hr.removeHandler();
 			}
 		}
@@ -75,12 +75,13 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 
 	/**
 	 * Register for key down events for this widget.
+	 * 
 	 * @param editor
 	 * @return
 	 */
 	private HandlerRegistration bindEditor(final IsWidget editor) {
 		// Can only listen to widget that implement HasKeyDownHandlers
-		if(editor instanceof HasKeyDownHandlers){
+		if (editor instanceof HasKeyDownHandlers) {
 			HasKeyDownHandlers keyDownCell = (HasKeyDownHandlers) editor;
 			return keyDownCell.addKeyDownHandler(new KeyDownHandler() {
 				@Override
@@ -103,26 +104,26 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 	@Override
 	public void removeAllRows() {
 		// Unbind all rows
-		for(RowOfWidgets row: rows){
+		for (RowOfWidgets row : rows) {
 			unBindRow(row);
 		}
 		this.rows.clear();
 		this.needsRecalcualteAdressess = true;
 	}
-	
+
 	/**
-	 * Recalculate the address of each cell if needed.
-	 * Recalculation is needed after rows are added or removed from the table.
+	 * Recalculate the address of each cell if needed. Recalculation is needed after rows are added or
+	 * removed from the table.
 	 */
 	private void recalculateAddressesIfNeeded() {
-		if(needsRecalcualteAdressess){
+		if (needsRecalcualteAdressess) {
 			// Start with a clean address map
 			cellAddressMap.clear();
 			// Walk cells and calculate their address.
 			int rowIndex = 0;
 			for (RowOfWidgets row : rows) {
 				int columnIndex = 0;
-				for (int i=0; i<row.getWidgetCount(); i++) {
+				for (int i = 0; i < row.getWidgetCount(); i++) {
 					IsWidget widget = row.getWidget(i);
 					Address address = cellAddressMap.get(widget);
 					if (address == null) {
@@ -151,37 +152,39 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 		recalculateAddressesIfNeeded();
 		// Event Switch.
 		switch (event.getNativeKeyCode()) {
-		case KeyCodes.KEY_ENTER:
-			onDown(editor);
-			break;
-		case KeyCodes.KEY_DOWN:
-			onDown(editor);
-			break;
-		case KeyCodes.KEY_UP:
-			onUp(editor);
-			break;
-		case KeyCodes.KEY_LEFT:
-			onLeft(editor);
-			break;
-		case KeyCodes.KEY_RIGHT:
-			onRight(editor);
-			break;
+			case KeyCodes.KEY_ENTER:
+				onDown(editor);
+				break;
+			case KeyCodes.KEY_DOWN:
+				onDown(editor);
+				break;
+			case KeyCodes.KEY_UP:
+				onUp(editor);
+				break;
+			case KeyCodes.KEY_LEFT:
+				onLeft(editor);
+				break;
+			case KeyCodes.KEY_RIGHT:
+				onRight(editor);
+				break;
 		}
 	}
 
 	/**
 	 * Give focus to the cell that is right of the passed cell.
+	 * 
 	 * @param editor
 	 */
 	private void onRight(IsWidget editor) {
 		Address current = cellAddressMap.get(editor);
-		if(current != null){
-			attemptSetFocus(current.columnIndex+1, current.rowIndex);
+		if (current != null) {
+			attemptSetFocus(current.columnIndex + 1, current.rowIndex);
 		}
 	}
 
 	/**
 	 * Give focus to the cell that is left of the passed cell.
+	 * 
 	 * @param editor
 	 */
 	private void onLeft(IsWidget editor) {
@@ -193,6 +196,7 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 
 	/**
 	 * Give focus to the cell that is bellow the passed cell.
+	 * 
 	 * @param editor
 	 */
 	private void onDown(IsWidget editor) {
@@ -201,9 +205,10 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 			attemptSetFocus(current.columnIndex, current.rowIndex + 1);
 		}
 	}
-	
+
 	/**
 	 * Give focus to the cell that is above the passed cell.
+	 * 
 	 * @param editor
 	 */
 	private void onUp(IsWidget editor) {
@@ -214,8 +219,9 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 	}
 
 	/**
-	 * Attempt to set the focus on the cell at the given address.
-	 * If the requested address is out-of-range of the table
+	 * Attempt to set the focus on the cell at the given address. If the requested address is
+	 * out-of-range of the table
+	 * 
 	 * @param columnIndex
 	 * @param rowIndex
 	 */
@@ -230,7 +236,7 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 			}
 		}
 	}
-	
+
 
 	/**
 	 * The address of a cell in the table.
@@ -239,10 +245,10 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 	private static class Address {
 		int columnIndex;
 		int rowIndex;
+
 		@Override
 		public String toString() {
-			return "Address [columnIndex=" + columnIndex + ", rowIndex="
-					+ rowIndex + "]";
+			return "Address [columnIndex=" + columnIndex + ", rowIndex=" + rowIndex + "]";
 		}
 	}
 

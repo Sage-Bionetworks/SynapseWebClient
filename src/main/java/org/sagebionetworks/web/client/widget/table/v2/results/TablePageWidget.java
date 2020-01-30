@@ -5,25 +5,18 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
-import org.sagebionetworks.repo.model.table.FacetColumnResult;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
-import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
-import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -34,8 +27,9 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSelectionListener {
+public class TablePageWidget implements IsWidget, RowSelectionListener {
 
+	public static final String LAST_UPDATED_ON = "Last updated on ";
 	TablePageView view;
 	PortalGinInjector ginInjector;
 	List<ColumnModel> types;
@@ -45,56 +39,45 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	KeyboardNavigationHandler keyboardNavigationHandler;
 	String tableId;
 	TableType tableType;
-	FacetsWidget facetsWidget;
-	Callback resetFacetsHandler;
-	boolean facetsVisible;
+	
 	/*
 	 * This flag is used to ignore selection event while this widget is causing selection changes.
 	 */
 	boolean isSelectionChanging;
-	
+
 	@Inject
-	public TablePageWidget(TablePageView view, 
-			PortalGinInjector ginInjector, 
-			BasicPaginationWidget paginationWidget, 
-			FacetsWidget facetsWidget){
+	public TablePageWidget(TablePageView view, PortalGinInjector ginInjector, BasicPaginationWidget paginationWidget) {
 		this.ginInjector = ginInjector;
 		this.paginationWidget = paginationWidget;
 		this.view = view;
 		this.view.setPaginationWidget(paginationWidget);
-		this.facetsWidget = facetsWidget;
-		view.setFacetsWidget(facetsWidget.asWidget());
-		view.setFacetsVisible(false);
-		view.setPresenter(this);
+		paginationWidget.hideClearFix();
 	}
-	
+
 	/**
 	 * Configure this page with query results.
+	 * 
 	 * @param bundle The query results.
 	 * @param query The query used to generate this page.
 	 * @param isEditable Is this page editable.
 	 * @param rowSelectionListener If null then selection will be disabled.
 	 * @param pageChangeListener If null then pagination will be disabled.
 	 */
-	public void configure(QueryResultBundle bundle, 
-			Query query, 
-			List<SortItem> sortList, 
-			boolean isEditable, 
-			TableType tableType, 
-			RowSelectionListener rowSelectionListener, 
-			final PagingAndSortingListener pageChangeListener,
-			CallbackP<FacetColumnRequest> facetChangedHandler,
-			Callback resetFacetsHandler){
+	public void configure(QueryResultBundle bundle, Query query, List<SortItem> sortList, boolean isEditable, TableType tableType, RowSelectionListener rowSelectionListener, final PagingAndSortingListener pageChangeListener, CallbackP<FacetColumnRequest> facetChangedHandler) {
 		this.tableType = tableType;
 		this.rowSelectionListener = rowSelectionListener;
-		this.resetFacetsHandler = resetFacetsHandler;
 		view.showLoading();
 		Integer rowCount = bundle.getQueryResult().getQueryResults().getRows().size();
+		String lastUpdatedOn = "";
+		if (bundle.getLastUpdatedOn() != null) {
+			lastUpdatedOn = LAST_UPDATED_ON + ginInjector.getDateTimeUtils().getDateTimeString(bundle.getLastUpdatedOn());
+		}
+		view.setLastUpdatedOn(lastUpdatedOn);
 		// The pagination widget is only visible if a listener was provider
-		if(pageChangeListener != null) {
+		if (pageChangeListener != null) {
 			this.paginationWidget.configure(query.getLimit(), query.getOffset(), rowCount.longValue(), pageChangeListener);
 			view.setPaginationWidgetVisible(true);
-		}else {
+		} else {
 			view.setPaginationWidgetVisible(false);
 		}
 		view.setEditorBufferVisible(isEditable);
@@ -107,63 +90,48 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		if (sortList != null) {
 			for (SortItem sort : sortList) {
 				sortedHeaders.put(sort.getColumn(), sort);
-			}	
+			}
 		}
-		for (ColumnModel type: types) {
+		for (ColumnModel type : types) {
 			// Create each header
 			String headerName = type.getName();
-			if(!isEditable){
+			if (!isEditable) {
 				// For sorting we need click handler and to set sort direction when needed.
 				SortableTableHeader sth = ginInjector.createSortableTableHeader();
 				sth.configure(type.getName(), pageChangeListener);
 				headers.add(sth);
-				if(sortedHeaders.containsKey(headerName)) {
+				if (sortedHeaders.containsKey(headerName)) {
 					SortItem sortItem = sortedHeaders.get(headerName);
-					if(SortDirection.DESC.equals(sortItem.getDirection())){
-						sth.setIcon(IconType.SORT_DESC);
-					}else{
-						sth.setIcon(IconType.SORT_ASC);
-					}
+					sth.setSortDirection(sortItem.getDirection());
+				} else {
+					sth.setSortDirection(null);
 				}
-			}else{
+			} else {
 				// For the static case we just set the header name.
 				StaticTableHeader sth = ginInjector.createStaticTableHeader();
 				sth.setHeader(headerName);
 				headers.add(sth);
 			}
 		}
-		
+
 		// Create a navigation handler
-		if(isEditable){
+		if (isEditable) {
 			// We only need key press navigation for editors.
 			keyboardNavigationHandler = ginInjector.createKeyboardNavigationHandler();
-		}else{
+		} else {
 			keyboardNavigationHandler = null;
 		}
-		List<FacetColumnResult> facets = bundle.getFacets();
-		
-		boolean isFacetsSupported = !isEditable && 
-				facetChangedHandler != null && 
-				facets != null && 
-				!facets.isEmpty()
-				&& facetsVisible;
-		
-		if (isFacetsSupported) {
-			facetsWidget.configure(facets, facetChangedHandler, types);
-			setFacetsVisible(facetsWidget.isShowingFacets());
-		} else {
-			setFacetsVisible(isFacetsSupported);
-		}
+
 		view.setTableHeaders(headers);
 		rows = new ArrayList<RowWidget>(rowCount);
 		// Build the rows for this table
-		for(Row row: bundle.getQueryResult().getQueryResults().getRows()){
-			// Create the row 
+		for (Row row : bundle.getQueryResult().getQueryResults().getRows()) {
+			// Create the row
 			addRow(row, isEditable);
 		}
 		view.hideLoading();
 	}
-	
+
 	/**
 	 * @param types
 	 * @param isSelectable
@@ -174,13 +142,13 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		RowWidget rowWidget = ginInjector.createRowWidget();
 		// We only listen to selection changes on the row if one was provided.
 		RowSelectionListener listner = null;
-		if(rowSelectionListener != null){
+		if (rowSelectionListener != null) {
 			listner = this;
 		}
 		rowWidget.configure(tableId, types, isEditor, tableType, row, listner);
 		rows.add(rowWidget);
 		view.addRow(rowWidget);
-		if(keyboardNavigationHandler != null){
+		if (keyboardNavigationHandler != null) {
 			this.keyboardNavigationHandler.bindRow(rowWidget);
 		}
 	}
@@ -201,9 +169,9 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	 * Toggle selection.
 	 */
 	public void onToggleSelect() {
-		if(isOneRowOrMoreRowsSelected()){
+		if (isOneRowOrMoreRowsSelected()) {
 			onSelectNone();
-		}else{
+		} else {
 			onSelectAll();
 		}
 	}
@@ -213,12 +181,12 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	 */
 	public void onDeleteSelected() {
 		Iterator<RowWidget> it = this.rows.iterator();
-		while(it.hasNext()){
+		while (it.hasNext()) {
 			RowWidget row = it.next();
-			if(row.isSelected()){
+			if (row.isSelected()) {
 				view.removeRow(row);
 				it.remove();
-				if(this.keyboardNavigationHandler != null){
+				if (this.keyboardNavigationHandler != null) {
 					this.keyboardNavigationHandler.removeRow(row);
 				}
 			}
@@ -239,94 +207,88 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	public void onSelectAll() {
 		setAllSelect(true);
 	}
-	
+
 	/**
 	 * Change all sections.
+	 * 
 	 * @param isSelected
 	 */
-	private void setAllSelect(boolean isSelected){
-		try{
+	private void setAllSelect(boolean isSelected) {
+		try {
 			this.isSelectionChanging = true;
-			for(RowWidget row: rows){
+			for (RowWidget row : rows) {
 				row.setSelected(isSelected);
 			}
-		}finally{
+		} finally {
 			this.isSelectionChanging = false;
 		}
 		onSelectionChanged();
 	}
-	
+
 	/**
 	 * Returns true if one or more rows are selected. False if no rows are selected.
+	 * 
 	 * @return
 	 */
-	public boolean isOneRowOrMoreRowsSelected(){
-		for(RowWidget row: rows){
-			if(row.isSelected()){
+	public boolean isOneRowOrMoreRowsSelected() {
+		for (RowWidget row : rows) {
+			if (row.isSelected()) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Extract a copy of the rows in this widget according to the current state.
 	 * 
 	 * @return
 	 */
-	public List<Row> extractRowSet(){
+	public List<Row> extractRowSet() {
 		List<Row> copy = new ArrayList<Row>(rows.size());
-		for(RowWidget rowWidget: rows){
+		for (RowWidget rowWidget : rows) {
 			Row row = rowWidget.getRow();
 			copy.add(row);
 		}
 		return copy;
 	}
-	
+
 	/**
-	 * Headers for this page.  If a ColumnModle has an ID then it is a real column.  If the ID is null then it is a derived column.
+	 * Headers for this page. If a ColumnModle has an ID then it is a real column. If the ID is null
+	 * then it is a derived column.
+	 * 
 	 * @return
 	 */
-	public List<ColumnModel> extractHeaders(){
+	public List<ColumnModel> extractHeaders() {
 		return types;
 	}
-	
+
 	/**
 	 * Called when a row changes its selection.
 	 */
-	public void onSelectionChanged(){
+	public void onSelectionChanged() {
 		// Only send out the message if selection is not in the process of changing.
-		if(!this.isSelectionChanging && this.rowSelectionListener != null){
+		if (!this.isSelectionChanging && this.rowSelectionListener != null) {
 			this.rowSelectionListener.onSelectionChanged();
 		}
 	}
 
 	/**
 	 * Is this page valid?
+	 * 
 	 * @return
 	 */
 	public boolean isValid() {
 		boolean isValid = true;
-		for(RowWidget row: rows){
-			if(!row.isValid()){
+		for (RowWidget row : rows) {
+			if (!row.isValid()) {
 				isValid = false;
 			}
 		}
 		return isValid;
 	}
-	
-	public void setFacetsVisible(boolean visible) {
-		facetsVisible = visible;
-		view.setFacetsVisible(visible);
-	}
-	@Override
-	public void onClearFacets() {
-		if (resetFacetsHandler != null) {
-			resetFacetsHandler.invoke();
-		}
-	}
+
 	public void setTableVisible(boolean visible) {
 		view.setTableVisible(visible);
-		view.setFacetsVisible(facetsWidget.isShowingFacets());
 	}
 }

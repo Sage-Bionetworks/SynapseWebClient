@@ -3,19 +3,23 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	<b:Modal ui:field="addExternalRepoModal" closable="true" dataBackdrop="STATIC" dataKeyboard="true" addStyleNames="modal">
+	<b:Modal ui:field="addExternalRepoModal" closable="true"
+		dataBackdrop="STATIC" dataKeyboard="true" addStyleNames="modal">
 		<b:ModalBody>
 			<b:Row>
 				<b:Column size="XS_12">
 					<bh:Span addStyleNames="font-size-18">Repository Name</bh:Span>
-					<b:TextBox ui:field="repoName" placeholder="index.docker.io:5000/library/ubuntu" addStyleNames="font-size-24 margin-bottom-10" />
+					<b:TextBox ui:field="repoName"
+						placeholder="index.docker.io:5000/library/ubuntu"
+						addStyleNames="font-size-24 margin-bottom-10" />
 				</b:Column>
 			</b:Row>
 			<bh:Div ui:field="synAlertContainer"></bh:Div>
 		</b:ModalBody>
 		<b:ModalFooter>
 			<b:Button ui:field="cancelButton" type="LINK">Cancel</b:Button>
-			<b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Saving...">Save</b:Button>
+			<b:Button ui:field="saveButton" type="PRIMARY"
+				dataLoadingText="Saving...">Save</b:Button>
 		</b:ModalFooter>
 	</b:Modal>
 </ui:UiBinder> 

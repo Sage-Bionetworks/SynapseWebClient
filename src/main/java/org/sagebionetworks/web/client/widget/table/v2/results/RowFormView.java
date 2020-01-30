@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -31,5 +30,6 @@ public interface RowFormView extends IsWidget {
 	 * @param cell
 	 */
 	void addCell(String labelText, Cell cell);
+
 	void clear();
 }

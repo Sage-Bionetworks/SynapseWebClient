@@ -1,17 +1,14 @@
 package org.sagebionetworks.web.client.widget.table.modal.wizard;
 
-import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalSize;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.HelpWidget;
-
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -22,8 +19,9 @@ import com.google.inject.Inject;
 
 public class ModalWizardViewImpl implements ModalWizardView {
 
-	public interface Binder extends UiBinder<Modal, ModalWizardViewImpl> {}
-	
+	public interface Binder extends UiBinder<Modal, ModalWizardViewImpl> {
+	}
+
 	@UiField
 	Button primaryButton;
 	@UiField
@@ -33,15 +31,16 @@ public class ModalWizardViewImpl implements ModalWizardView {
 	@UiField
 	SimplePanel bodyPanel;
 	@UiField
-	Alert alert;
-	@UiField
 	Heading modalTitle;
 	@UiField
 	Span helpContainer;
+	@UiField
+	Div synapseAlertContainer;
 	Modal modal;
 	Presenter presenter;
+
 	@Inject
-	public ModalWizardViewImpl(Binder binder){
+	public ModalWizardViewImpl(Binder binder) {
 		modal = binder.createAndBindUi(this);
 		primaryButton.addClickHandler(event -> {
 			presenter.onPrimary();
@@ -74,15 +73,6 @@ public class ModalWizardViewImpl implements ModalWizardView {
 		bodyPanel.add(body);
 	}
 
-	@Override
-	public void showAlert(boolean visible) {
-		this.alert.setVisible(visible);
-	}
-
-	@Override
-	public void showErrorMessage(String error) {
-		this.alert.setText(error);
-	}
 
 	@Override
 	public void setInstructionsMessage(String message) {
@@ -113,7 +103,7 @@ public class ModalWizardViewImpl implements ModalWizardView {
 	public void setSize(ModalSize size) {
 		modal.setSize(size);
 	}
-	
+
 	@Override
 	public void setHelp(String helpMarkdown, String helpUrl) {
 		helpContainer.clear();
@@ -122,5 +112,11 @@ public class ModalWizardViewImpl implements ModalWizardView {
 		help.setHelpMarkdown(helpMarkdown);
 		help.setAddStyleNames("margin-left-5");
 		helpContainer.add(help);
+	}
+
+	@Override
+	public void setSynAlert(IsWidget w) {
+		synapseAlertContainer.clear();
+		synapseAlertContainer.add(w);
 	}
 }

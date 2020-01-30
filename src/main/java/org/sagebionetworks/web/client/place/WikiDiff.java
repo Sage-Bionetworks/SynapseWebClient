@@ -1,11 +1,10 @@
 package org.sagebionetworks.web.client.place;
 
 import org.sagebionetworks.web.shared.WikiPageKey;
-
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
 
-public class WikiDiff extends ParameterizedPlace{
+public class WikiDiff extends ParameterizedPlace {
 	public static final String OWNER_ID = "ownerId";
 	public static final String OWNER_TYPE = "ownerType";
 	public static final String WIKI_ID = "wikiId";
@@ -15,7 +14,7 @@ public class WikiDiff extends ParameterizedPlace{
 	public WikiDiff(String token) {
 		super(token);
 	}
-	
+
 	public WikiDiff(WikiPageKey key) {
 		super(ParameterizedToken.DEFAULT_TOKEN);
 		putParam(OWNER_ID, key.getOwnerObjectId());
@@ -25,14 +24,14 @@ public class WikiDiff extends ParameterizedPlace{
 
 	@Prefix("!WikiDiff")
 	public static class Tokenizer implements PlaceTokenizer<WikiDiff> {
-        @Override
-        public String getToken(WikiDiff place) {
-            return place.toToken();
-        }
+		@Override
+		public String getToken(WikiDiff place) {
+			return place.toToken();
+		}
 
-        @Override
-        public WikiDiff getPlace(String token) {
-            return new WikiDiff(token);
-        }
-    }
+		@Override
+		public WikiDiff getPlace(String token) {
+			return new WikiDiff(token);
+		}
+	}
 }

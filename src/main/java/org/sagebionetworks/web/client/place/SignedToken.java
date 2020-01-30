@@ -4,34 +4,28 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
 
-public class SignedToken extends Place{
-	public static final String DELIMITER = "/"; 
-	
+public class SignedToken extends Place {
+	public static final String DELIMITER = "/";
+
 	private String token;
-	private String tokenType, signedEncodedToken;
-	
+	private String signedEncodedToken;
+
 	public SignedToken(String token) {
 		this.token = token;
-		if(token.contains(DELIMITER)) {
+		if (token.contains(DELIMITER)) {
 			String[] parts = token.split(DELIMITER);
-			if(parts.length == 2) {				
-				tokenType = parts[0];
+			if (parts.length == 2) {
+				// tokenType = parts[0];
 				signedEncodedToken = parts[1];
-			} 		
-		} 
-	}
-
-	public SignedToken(String tokenType, String signedEncodedToken) {	
-		this.token = tokenType + DELIMITER + signedEncodedToken;
-		this.tokenType = tokenType;
-		this.signedEncodedToken = signedEncodedToken;
+			}
+		} else {
+			signedEncodedToken = token;
+		}
 	}
 
 	public String toToken() {
 		return token;
 	}
-	
-	
 
 	public String getToken() {
 		return token;
@@ -39,14 +33,6 @@ public class SignedToken extends Place{
 
 	public void setToken(String token) {
 		this.token = token;
-	}
-
-	public String getTokenType() {
-		return tokenType;
-	}
-
-	public void setTokenType(String tokenType) {
-		this.tokenType = tokenType;
 	}
 
 	public String getSignedEncodedToken() {
@@ -57,20 +43,18 @@ public class SignedToken extends Place{
 		this.signedEncodedToken = signedEncodedToken;
 	}
 
-
-
 	@Prefix("!SignedToken")
 	public static class Tokenizer implements PlaceTokenizer<SignedToken> {
-        @Override
-        public String getToken(SignedToken place) {
-            return place.toToken();
-        }
+		@Override
+		public String getToken(SignedToken place) {
+			return place.toToken();
+		}
 
-        @Override
-        public SignedToken getPlace(String token) {
-            return new SignedToken(token);
-        }
-    }
+		@Override
+		public SignedToken getPlace(String token) {
+			return new SignedToken(token);
+		}
+	}
 
 	@Override
 	public int hashCode() {
@@ -97,5 +81,5 @@ public class SignedToken extends Place{
 		return true;
 	}
 
-	
+
 }

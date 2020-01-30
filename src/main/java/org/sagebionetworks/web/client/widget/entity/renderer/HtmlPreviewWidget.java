@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import static org.sagebionetworks.web.client.ClientProperties.MB;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
@@ -15,7 +14,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WebConstants;
-
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -26,7 +24,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * Widget used to show untrusted html preview content.  Has an option to open the untrusted html in a new window (after confirmation)
+ * Widget used to show untrusted html preview content. Has an option to open the untrusted html in a
+ * new window (after confirmation)
+ * 
  * @author jayhodgson
  *
  */
@@ -42,20 +42,12 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 	protected SynapseClientAsync synapseClient;
 	protected PopupUtilsView popupUtils;
 	protected GWTWrapper gwt;
-	
+
 	public static final double MAX_HTML_FILE_SIZE = 40 * MB;
 	public static String friendlyMaxFileSize = null;
-	
+
 	@Inject
-	public HtmlPreviewWidget(
-			HtmlPreviewView view,
-			PresignedURLAsyncHandler presignedURLAsyncHandler,
-			SynapseJSNIUtils jsniUtils,
-			RequestBuilderWrapper requestBuilder,
-			SynapseAlert synAlert,
-			SynapseClientAsync synapseClient,
-			PopupUtilsView popupUtils,
-			GWTWrapper gwt) {
+	public HtmlPreviewWidget(HtmlPreviewView view, PresignedURLAsyncHandler presignedURLAsyncHandler, SynapseJSNIUtils jsniUtils, RequestBuilderWrapper requestBuilder, SynapseAlert synAlert, SynapseClientAsync synapseClient, PopupUtilsView popupUtils, GWTWrapper gwt) {
 		this.view = view;
 		this.presignedURLAsyncHandler = presignedURLAsyncHandler;
 		this.jsniUtils = jsniUtils;
@@ -71,7 +63,7 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 			friendlyMaxFileSize = gwt.getFriendlySize(MAX_HTML_FILE_SIZE, true);
 		}
 	}
-	
+
 	public void renderHTML(final String rawHtml) {
 		synapseClient.isUserAllowedToRenderHTML(createdBy, new AsyncCallback<Boolean>() {
 			@Override
@@ -90,7 +82,7 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 					showSanitizedHtml();
 				}
 			}
-			
+
 			private void showSanitizedHtml() {
 				// is the sanitized version the same as the original??
 				String sanitizedHtml = jsniUtils.sanitizeHtml(rawHtml);
@@ -104,7 +96,7 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 			}
 		});
 	}
-	
+
 	public void configure(String synapseId, FileHandle fileHandle) {
 		this.createdBy = fileHandle.getCreatedBy();
 		fha = new FileHandleAssociation();
@@ -118,12 +110,12 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 			synAlert.showError("The preview was not shown because the size (" + gwt.getFriendlySize(fileHandle.getContentSize().doubleValue(), true) + ") exceeds the maximum preview size (" + friendlyMaxFileSize + ")");
 		}
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	
+
 	public void refreshContent() {
 		if (fha != null) {
 			synAlert.clear();
@@ -134,7 +126,7 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 				public void onSuccess(FileResult fileResult) {
 					setPresignedUrl(fileResult.getPreSignedURL());
 				}
-				
+
 				@Override
 				public void onFailure(Throwable ex) {
 					view.setLoadingVisible(false);
@@ -143,7 +135,7 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 			});
 		}
 	}
-	
+
 	public void setPresignedUrl(String url) {
 		// by default, get url.
 		requestBuilder.configure(RequestBuilder.GET, url.toString());
@@ -155,12 +147,11 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 			synAlert.handleException(e);
 		}
 	}
-	
+
 	protected RequestCallback getRequestCallback() {
 		return new RequestCallback() {
 			@Override
-			public void onResponseReceived(Request request,
-					Response response) {
+			public void onResponseReceived(Request request, Response response) {
 				int statusCode = response.getStatusCode();
 				if (statusCode == Response.SC_OK) {
 					renderHTML(response.getText());
@@ -176,12 +167,12 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 			}
 		};
 	}
-		
+
 	@Override
 	public void onShowFullContent() {
-		//confirm
+		// confirm
 		popupUtils.showConfirmDialog("", CONFIRM_OPEN_HTML_MESSAGE, () -> {
-			//user clicked yes
+			// user clicked yes
 			view.openRawHtmlInNewWindow();
 		});
 	}

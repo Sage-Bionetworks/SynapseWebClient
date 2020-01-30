@@ -7,7 +7,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -17,7 +16,6 @@ import org.sagebionetworks.web.client.widget.table.v2.QueryInputView;
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class QueryInputWidgetTest {
@@ -26,46 +24,29 @@ public class QueryInputWidgetTest {
 	SynapseClientAsync mockSynapseClient;
 	QueryInputListener mockQueryInputListener;
 	QueryInputWidget widget;
-	
+
 	@Before
-	public void before(){
+	public void before() {
 		mockView = Mockito.mock(QueryInputView.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockQueryInputListener = Mockito.mock(QueryInputListener.class);
 		widget = new QueryInputWidget(mockView, mockSynapseClient);
 	}
-	
+
 	@Test
-	public void testConfigure(){
-		boolean editable = true;
+	public void testConfigure() {
 		String sql = "select * from syn123";
-		widget.configure(sql, mockQueryInputListener, editable);
+		widget.configure(sql, mockQueryInputListener);
 		verify(mockView).setInputQueryString(sql);
 		verify(mockView).setQueryInputLoading(false);
 		verify(mockView).showInputError(false);
-		verify(mockView).setEditVisible(true);
-		verify(mockView).setEditEnabled(false);
-		verify(mockView).setDownloadEnabled(false);
 	}
-	
+
+
 	@Test
-	public void testConfigureNotEditable(){
-		boolean editable = false;
+	public void testExecuteValidateSuccess() {
 		String sql = "select * from syn123";
-		widget.configure(sql, mockQueryInputListener, editable);
-		verify(mockView).setInputQueryString(sql);
-		verify(mockView).setQueryInputLoading(false);
-		verify(mockView).showInputError(false);
-		verify(mockView).setEditVisible(false);
-		verify(mockView).setEditEnabled(false);
-		verify(mockView).setDownloadEnabled(false);
-	}
-	
-	@Test
-	public void testExecuteValidateSuccess(){
-		boolean editable = true;
-		String sql = "select * from syn123";
-		widget.configure(sql, mockQueryInputListener, editable);
+		widget.configure(sql, mockQueryInputListener);
 		when(mockView.getInputQueryString()).thenReturn(sql);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).validateTableQuery(anyString(), any(AsyncCallback.class));
 		widget.onExecuteQuery();
@@ -75,13 +56,12 @@ public class QueryInputWidgetTest {
 		// the listener should be passed the query
 		verify(mockQueryInputListener).onExecuteQuery(sql);
 	}
-	
-	
+
+
 	@Test
-	public void testExecuteValidateFailure(){
-		boolean editable = true;
+	public void testExecuteValidateFailure() {
 		String sql = "select * from syn123";
-		widget.configure(sql, mockQueryInputListener, editable);
+		widget.configure(sql, mockQueryInputListener);
 		when(mockView.getInputQueryString()).thenReturn(sql);
 		String errorMessage = "bad query";
 		AsyncMockStubber.callFailureWith(new ParseException(errorMessage)).when(mockSynapseClient).validateTableQuery(anyString(), any(AsyncCallback.class));
@@ -93,12 +73,11 @@ public class QueryInputWidgetTest {
 		// the listener should not be passed the query
 		verify(mockQueryInputListener, never()).onExecuteQuery(anyString());
 	}
-	
+
 	@Test
-	public void testEmptyQuery(){
-		boolean editable = true;
+	public void testEmptyQuery() {
 		String sql = "";
-		widget.configure(sql, mockQueryInputListener, editable);
+		widget.configure(sql, mockQueryInputListener);
 		when(mockView.getInputQueryString()).thenReturn(sql);
 		String errorMessage = "bad query";
 		AsyncMockStubber.callFailureWith(new ParseException(errorMessage)).when(mockSynapseClient).validateTableQuery(anyString(), any(AsyncCallback.class));
@@ -111,12 +90,11 @@ public class QueryInputWidgetTest {
 		verify(mockQueryInputListener, never()).onExecuteQuery(anyString());
 		verify(mockSynapseClient, never()).validateTableQuery(anyString(), any(AsyncCallback.class));
 	}
-	
+
 	@Test
-	public void testNullQuery(){
-		boolean editable = true;
+	public void testNullQuery() {
 		String sql = null;
-		widget.configure(sql, mockQueryInputListener, editable);
+		widget.configure(sql, mockQueryInputListener);
 		when(mockView.getInputQueryString()).thenReturn(sql);
 		String errorMessage = "bad query";
 		AsyncMockStubber.callFailureWith(new ParseException(errorMessage)).when(mockSynapseClient).validateTableQuery(anyString(), any(AsyncCallback.class));
@@ -129,12 +107,11 @@ public class QueryInputWidgetTest {
 		verify(mockQueryInputListener, never()).onExecuteQuery(anyString());
 		verify(mockSynapseClient, never()).validateTableQuery(anyString(), any(AsyncCallback.class));
 	}
-	
+
 	@Test
-	public void testOnReset(){
-		boolean editable = true;
+	public void testOnReset() {
 		String sql = "select * from syn123";
-		widget.configure(sql, mockQueryInputListener, editable);
+		widget.configure(sql, mockQueryInputListener);
 		verify(mockView).setInputQueryString(sql);
 		verify(mockView).setQueryInputLoading(false);
 		verify(mockView).showInputError(false);
@@ -143,76 +120,42 @@ public class QueryInputWidgetTest {
 		verify(mockView).setInputQueryString(sql);
 		verify(mockView).setQueryInputLoading(false);
 		verify(mockView).showInputError(false);
-		verify(mockView).setEditEnabled(false);
-		verify(mockView).setDownloadEnabled(false);
 	}
-	
+
 	@Test
-	public void testQueryExecutionFinished(){
-		boolean editable = true;
+	public void testQueryExecutionFinished() {
 		String sql = "select * from syn123";
-		widget.configure(sql, mockQueryInputListener, editable);
+		widget.configure(sql, mockQueryInputListener);
 		reset(mockView);
 		boolean success = true;
 		boolean resultsEditable = true;
 		widget.queryExecutionFinished(success, resultsEditable);
 		verify(mockView).setQueryInputLoading(false);
-		verify(mockView).setEditEnabled(true);
-		verify(mockView).setDownloadEnabled(true);
 	}
-	
+
 	@Test
-	public void testQueryExecutionFinishedResultsNotEditable(){
-		boolean editable = true;
+	public void testQueryExecutionFinishedResultsNotEditable() {
 		String sql = "select * from syn123";
-		widget.configure(sql, mockQueryInputListener, editable);
+		widget.configure(sql, mockQueryInputListener);
 		reset(mockView);
 		boolean success = true;
 		boolean resultsEditable = false;
 		widget.queryExecutionFinished(success, resultsEditable);
 		verify(mockView).setQueryInputLoading(false);
-		verify(mockView).setEditEnabled(false);
-		// donwload should still be enabled for this case
-		verify(mockView).setDownloadEnabled(true);
 	}
 
 	@Test
-	public void testExecutionFinished(){
-		boolean editable = true;
+	public void testExecutionFinished() {
 		String sql = "select * from syn123";
-		widget.configure(sql, mockQueryInputListener, editable);
+		widget.configure(sql, mockQueryInputListener);
 		reset(mockView);
 		widget.queryExecutionStarted();
 		verify(mockView).setQueryInputLoading(true);
-		verify(mockView).setEditEnabled(false);
-		verify(mockView).setDownloadEnabled(false);
-	}
-	
-	@Test
-	public void testQueryInputVisible(){
-		widget.setQueryInputVisible(true);
-		verify(mockView).setQueryInputVisible(true);
 	}
 
 	@Test
-	public void testShowQueryVisible(){
-		boolean visible = true;
-		widget.setShowQueryVisible(visible);
-		verify(mockView).setShowQueryVisible(visible);
-	}
-	
-	@Test
-	public void testOnShowQuery(){
-		String sql = "select * from syn123";
-		widget.configure(sql, mockQueryInputListener, false);
-		widget.onShowQuery();
-		verify(mockQueryInputListener).onShowQuery();
-	}
-	@Test
-	public void testOnDownlaod(){
-		String sql = "select * from syn123";
-		widget.configure(sql, mockQueryInputListener, false);
-		widget.onDownloadFiles();
-		verify(mockQueryInputListener).onShowDownloadFiles();
+	public void testQueryInputVisible() {
+		widget.setQueryInputVisible(true);
+		verify(mockView).setQueryInputVisible(true);
 	}
 }

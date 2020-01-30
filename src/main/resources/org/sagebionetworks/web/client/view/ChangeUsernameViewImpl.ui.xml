@@ -1,32 +1,38 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
-	
+
 	<g:HTMLPanel>
-		<div class="row margin-top-left-10 margin-right-15 margin-bottom-20">
-	        <div class="row">
-				<div class="well col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8">
+		<div
+			class="row margin-top-left-10 margin-right-15 margin-bottom-20">
+			<div class="row">
+				<div
+					class="well col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8">
 					<h2>Set Username </h2>
 					<div class="signin-panel panel panel-body margin-top-15">
-		   				<h4>Synapse now requires a username. Please take a moment to carefully choose yours.</h4>
-						<g:TextBox ui:field="username" addStyleNames="form-control"/>
+						<h4>Synapse now requires a username. Please take a moment to
+							carefully choose yours.</h4>
+						<g:TextBox ui:field="username"
+							addStyleNames="form-control" />
 						<b:Row>
-						    <b:Column size="XS_9">
-						    	<g:SimplePanel ui:field="errorContainer" addStyleNames="left margin-top-10"/>
-						    </b:Column>
-						    <b:Column size="XS_3">
-						    	<g:Button ui:field="changeUsernameButton" styleName="right btn btn-primary btn-lg margin-top-10" />
-						    </b:Column>
+							<b:Column size="XS_9">
+								<g:SimplePanel ui:field="errorContainer"
+									addStyleNames="left margin-top-10" />
+							</b:Column>
+							<b:Column size="XS_3">
+								<g:Button ui:field="changeUsernameButton"
+									styleName="right btn btn-primary btn-lg margin-top-10" />
+							</b:Column>
 						</b:Row>
-					</div>	
+					</div>
 				</div>
-		   	</div>
-	    	
-		    <div class="clear"></div>
-        </div>
+			</div>
+
+			<div class="clear"></div>
+		</div>
 	</g:HTMLPanel>
 
 </ui:UiBinder> 

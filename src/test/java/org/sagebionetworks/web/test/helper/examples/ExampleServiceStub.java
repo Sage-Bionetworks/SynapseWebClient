@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ExampleServiceStub implements ExampleService{
-	
+public class ExampleServiceStub implements ExampleService {
+
 	private List<SampleDTO> samples = new ArrayList<SampleDTO>();
 	private int sequence = 0;
 
@@ -17,10 +17,11 @@ public class ExampleServiceStub implements ExampleService{
 
 	@Override
 	public SampleDTO getSampleOverload(String name) {
-		if(name == null) return null;
+		if (name == null)
+			return null;
 		// Find the sample by name
-		for(SampleDTO sample: samples){
-			if(sample.getName().equals(name)){
+		for (SampleDTO sample : samples) {
+			if (sample.getName().equals(name)) {
 				return sample;
 			}
 		}
@@ -35,12 +36,13 @@ public class ExampleServiceStub implements ExampleService{
 
 	/**
 	 * Find a sample by id.
+	 * 
 	 * @param id
 	 * @return
 	 */
 	private SampleDTO findSampleById(int id) {
-		for(SampleDTO sample: samples){
-			if(sample.getId() == id){
+		for (SampleDTO sample : samples) {
+			if (sample.getId() == id) {
 				return sample;
 			}
 		}
@@ -66,12 +68,13 @@ public class ExampleServiceStub implements ExampleService{
 	@Override
 	public List<SampleDTO> withArgs(List<Integer> idList) {
 		// Find all of the samples by id.
-		if(idList == null) return null;
+		if (idList == null)
+			return null;
 		List<SampleDTO> results = new LinkedList<SampleDTO>();
 		// Find each sample
-		for(Integer idToFind: idList){
+		for (Integer idToFind : idList) {
 			SampleDTO found = findSampleById(idToFind);
-			if(found != null){
+			if (found != null) {
 				results.add(found);
 			}
 		}

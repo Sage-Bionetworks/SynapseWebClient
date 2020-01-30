@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -15,10 +12,6 @@ public interface ProvenanceEditorWidgetView {
 		void onSave();
 
 		void clear();
-
-		void configure(EntityBundle entityBundle,
-				EntityUpdatedHandler entityUpdateHandler);
-		
 	}
 
 	Widget asWidget();

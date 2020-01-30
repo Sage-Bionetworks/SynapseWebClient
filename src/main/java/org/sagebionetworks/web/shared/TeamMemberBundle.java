@@ -1,18 +1,16 @@
 package org.sagebionetworks.web.shared;
 
 import org.sagebionetworks.repo.model.UserProfile;
-
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class TeamMemberBundle implements IsSerializable{
-	
+public class TeamMemberBundle implements IsSerializable {
+
 	private UserProfile userProfile;
 	private Boolean isAdmin;
 	private String teamId;
-	
-	public TeamMemberBundle() {
-	}
-	
+
+	public TeamMemberBundle() {}
+
 	public TeamMemberBundle(UserProfile userProfile, Boolean isAdmin, String teamId) {
 		super();
 		this.userProfile = userProfile;
@@ -23,6 +21,7 @@ public class TeamMemberBundle implements IsSerializable{
 	public Boolean getIsTeamAdmin() {
 		return isAdmin;
 	}
+
 	public void setIsAdmin(Boolean isAdmin) {
 		this.isAdmin = isAdmin;
 	}
@@ -85,5 +84,5 @@ public class TeamMemberBundle implements IsSerializable{
 		return "TeamMemberBundle [userProfile=" + userProfile + ", isAdmin=" + isAdmin + ", teamId=" + teamId + "]";
 	}
 
-	
+
 }

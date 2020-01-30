@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.login;
 
-import static org.junit.Assert.*;
-
+import static org.mockito.Mockito.verify;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -11,21 +10,19 @@ import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.web.client.widget.login.LoginModalView;
 import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
 
-import static org.mockito.Mockito.*;
-
 public class LoginModalWidgetTest {
 
 	@Mock
 	LoginModalView mockView;
-	
+
 	LoginModalWidget widget;
-	
+
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		widget = new LoginModalWidget(mockView);
 	}
-	
+
 	@Test
 	public void testOnSubmitCompleteUploadResult() {
 		String errorMessage = "an error message";
@@ -33,7 +30,7 @@ public class LoginModalWidgetTest {
 		result.setUploadStatus(UploadStatus.FAILED);
 		result.setMessage(errorMessage);
 		widget.onSubmitComplete(result);
-		
+
 		verify(mockView).showErrorMessagePopup(errorMessage);
 	}
 

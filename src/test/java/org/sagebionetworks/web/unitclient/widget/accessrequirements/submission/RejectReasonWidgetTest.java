@@ -2,130 +2,74 @@ package org.sagebionetworks.web.unitclient.widget.accessrequirements.submission;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import static org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget.ERROR_MESSAGE;
+import static org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget.TEMPLATE_HEADER_SIGNATURE;
+import static org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget.TEMPLATE_HEADER_THANKS;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.web.client.presenter.RejectReasonWidget;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.RejectReasonView;
+import org.sagebionetworks.web.client.widget.entity.act.RejectReasonView;
+import org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class RejectReasonWidgetTest {
 
-    RejectReasonWidget widget;
-    @Mock
-    RejectReasonView mockView;
-    @Mock
-    CallbackP<String> getReasonCallback;
-    
-    public static final String USER_ID = "0";
-    public static final String CUSTOM_RESPONSE = "Fill out paperwork";
-    public static final String CANNED_RESPONSE = "canned response";
-    public static final String DISPLAY_NAME = "Bob Jones";
+	RejectReasonWidget widget;
+	@Mock
+	RejectReasonView mockView;
+	@Mock
+	CallbackP<String> getReasonCallback;
 
-    @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+	public static final String SELECTED_CHECKBOXES = "Must do this, and that, and the other thing.";
+	public static final String CANNED_RESPONSE = "canned response";
 
-        when(mockView.isOptionOneUsed()).thenReturn(false);
-        when(mockView.isOptionTwoUsed()).thenReturn(false);
-        when(mockView.isOptionThreeUsed()).thenReturn(false);
-        when(mockView.isOptionFourUsed()).thenReturn(false);
-        when(mockView.isOptionFiveUsed()).thenReturn(false);
+	@Before
+	public void setUp() throws Exception {
+		when(mockView.getSelectedCheckboxText()).thenReturn(SELECTED_CHECKBOXES);
+		widget = new RejectReasonWidget(mockView);
+	}
 
-        widget = new RejectReasonWidget(mockView);
-    }
+	@Test
+	public void testConstructor() {
+		verify(mockView).setPresenter(widget);
+	}
 
-    @Test
-    public void testConstructor() {
-        verify(mockView).setPresenter(widget);
-    }
+	@Test
+	public void testShowOnSuccess() {
+		// call
+		widget.show(getReasonCallback);
+		// verify/assert
+		verify(mockView).clear();
+		verify(mockView).show();
 
-    @Test
-    public void testShowOnSuccess() {
-        // call
-        widget.show(USER_ID, getReasonCallback);
-        // verify/assert
-        verify(mockView).clear();
-        verify(mockView).show();
-        
-        // verify save onSave callback
-        when(mockView.getValue()).thenReturn(CANNED_RESPONSE);
+		// verify save onSave callback
+		when(mockView.getValue()).thenReturn(CANNED_RESPONSE);
 
-        widget.onSave();
+		widget.onSave();
 
-        verify(mockView).hide();
-        verify(getReasonCallback).invoke(CANNED_RESPONSE);
-    }
+		verify(mockView).hide();
+		verify(getReasonCallback).invoke(CANNED_RESPONSE);
+	}
 
-    /*
-        Test functionality clicking single checkboxes
-    */
-    @Test
-    public void testUpdateResponseWithOneOptions() {
-        // setup
-        String exp = RejectReasonWidget.TEMPLATE_HEADER_HELLO  + "null" +  RejectReasonWidget.TEMPLATE_HEADER_THANKS;
-        // add response one
-        exp += "\n\t" + RejectReasonWidget.REJECT_TAKE_SYNAPSE_QZ  + "\n";
-        // add signature
-        exp += "\n" + RejectReasonWidget.TEMPLATE_HEADER_SIGNATURE;
-        // first checkbox used
-        when(mockView.isOptionOneUsed()).thenReturn(true);
-        when(mockView.getValue()).thenReturn(exp);
+	@Test
+	public void testUpdateResponse() {
+		widget.show(getReasonCallback);
+		String exp = TEMPLATE_HEADER_THANKS + SELECTED_CHECKBOXES + TEMPLATE_HEADER_SIGNATURE;
 
-        widget.updateResponse();
+		widget.updateResponse();
 
-        // verify that clear and get value were called
-        verify(mockView).setValue(exp);
-        verify(mockView).clearError();
-    }
+		verify(mockView).setValue(exp);
+	}
 
+	@Test
+	public void testOnSaveNoText() {
+		when(mockView.getValue()).thenReturn("");
 
-    /*
-        Test functionality clicking two checkboxes and filling out
-        the textarea
-     */
-    @Test
-    public void testUpdateResponseWithThreeOptions() {
-    	widget.show(DISPLAY_NAME, getReasonCallback);
-    	
-        String exp = RejectReasonWidget.TEMPLATE_HEADER_HELLO + DISPLAY_NAME +  RejectReasonWidget.TEMPLATE_HEADER_THANKS;
-        // add response one
-        exp += "\n\t" + RejectReasonWidget.REJECT_TAKE_SYNAPSE_QZ + "\n";
-        exp += "\n\t" + RejectReasonWidget.REJECT_ADD_INFO + "\n";
-        exp += "\n\t" + CUSTOM_RESPONSE + "\n";
-        // add signature
-        exp += "\n"  + RejectReasonWidget.TEMPLATE_HEADER_SIGNATURE;
-        // first two checkboxes are used
-        when(mockView.isOptionOneUsed()).thenReturn(true);
-        when(mockView.isOptionTwoUsed()).thenReturn(true);
-        when(mockView.isOptionFiveUsed()).thenReturn(true);
-        when(mockView.getCustomTextResponse()).thenReturn(CUSTOM_RESPONSE);
-        when(mockView.getValue()).thenReturn(exp);
+		widget.onSave();
 
-        widget.updateResponse();
-
-        verify(mockView).setValue(exp);
-        verify(mockView).clearError();
-    }
-
-    @Test
-    public void testUpdateResponseNone() {
-        when(mockView.getValue()).thenReturn("");
-
-        widget.updateResponse();
-
-        verify(mockView).showError(RejectReasonWidget.ERROR_MESSAGE);
-    }
-
-    @Test
-    public void testOnSaveNoText() {
-        when(mockView.getValue()).thenReturn("");
-
-        widget.onSave();
-
-        verify(mockView).showError(RejectReasonWidget.ERROR_MESSAGE);
-    }
-
+		verify(mockView).showError(ERROR_MESSAGE);
+	}
 }

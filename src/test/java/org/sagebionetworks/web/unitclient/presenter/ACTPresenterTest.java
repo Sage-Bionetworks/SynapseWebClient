@@ -8,9 +8,7 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.Collections;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -35,14 +33,13 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionRowViewImpl;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ACTPresenterTest {
 	@Mock
-	ACTView mockView; 
+	ACTView mockView;
 	@Mock
 	VerificationSubmissionRowViewImpl mockRowView;
 	@Mock
@@ -75,11 +72,12 @@ public class ACTPresenterTest {
 	LoadMoreWidgetContainer mockLoadMoreWidgetContainer;
 	private static final String OWNER_ID = "12345858";
 	ACTPresenter widget;
+
 	@Before
-	public void before(){
+	public void before() {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.getVerificationSubmissionRowViewImpl()).thenReturn(mockRowView);
-		
+
 		widget = new ACTPresenter(mockView, mockUserProfileClient, mockSynapseAlert, mockPeopleSuggestBox, mockUserGroupSuggestionProvider, mockGinInjector, mockGlobalApplicationState, mockUserBadge, mockLoadMoreWidgetContainer);
 		AsyncMockStubber.callSuccessWith(mockVerificationPagedResults).when(mockUserProfileClient).listVerificationSubmissions(any(VerificationStateEnum.class), anyLong(), anyLong(), anyLong(), any(AsyncCallback.class));
 		when(mockVerificationPagedResults.getResults()).thenReturn(Collections.singletonList(mockVerificationSubmission));
@@ -89,7 +87,7 @@ public class ACTPresenterTest {
 	}
 
 	@Test
-	public void testConstruction(){
+	public void testConstruction() {
 		verify(mockView).setPresenter(widget);
 		verify(mockView).setSynAlert(any(Widget.class));
 		verify(mockView).setStates(anyList());
@@ -97,6 +95,7 @@ public class ACTPresenterTest {
 		verify(mockView).setSelectedUserBadge(any(Widget.class));
 		verify(mockPeopleSuggestBox).setTypeFilter(TypeFilter.USERS_ONLY);
 	}
+
 	@Test
 	public void testLoadData() {
 		widget.loadData();
@@ -110,7 +109,7 @@ public class ACTPresenterTest {
 		verify(mockLoadMoreWidgetContainer).add(any(Widget.class));
 		verify(mockVerificationSubmissionWidget).show();
 	}
-	
+
 	@Test
 	public void testOnStateSelected() {
 		widget.setPlace(new ACTPlace(""));
@@ -119,7 +118,7 @@ public class ACTPresenterTest {
 		assertEquals(selectedState, widget.getPlace().getParam(ACTPlace.STATE_FILTER_PARAM));
 		verify(mockView).setSelectedStateText(selectedState);
 	}
-	
+
 	@Test
 	public void testClearStateFilter() {
 		widget.setPlace(new ACTPlace(""));
@@ -128,7 +127,7 @@ public class ACTPresenterTest {
 		assertNull(widget.getPlace().getParam(ACTPlace.STATE_FILTER_PARAM));
 		verify(mockView).setSelectedStateText("");
 	}
-	
+
 	@Test
 	public void testOnUserSelected() {
 		widget.setPlace(new ACTPlace(""));
@@ -139,7 +138,7 @@ public class ACTPresenterTest {
 		verify(mockPeopleSuggestBox).clear();
 		verify(mockView).setSelectedUserBadgeVisible(true);
 	}
-	
+
 	@Test
 	public void testClearUserFilter() {
 		widget.setPlace(new ACTPlace(""));

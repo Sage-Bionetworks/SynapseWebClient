@@ -12,15 +12,16 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
  *
  */
 public class CellAddress {
-	
+
 	String tableId;
 	ColumnModel column;
 	Long rowId;
 	Long rowVersion;
 	TableType tableType;
-	
+
 	/**
 	 * Create a new address.
+	 * 
 	 * @param tableId The ID of the table.
 	 * @param rowId The ID of the row.
 	 * @param rowVersion The version number of the row.
@@ -49,7 +50,7 @@ public class CellAddress {
 	public ColumnModel getColumn() {
 		return column;
 	}
-	
+
 	public TableType getTableType() {
 		return tableType;
 	}
@@ -102,10 +103,11 @@ public class CellAddress {
 
 	/**
 	 * A row key is a concatenation of the rowId and rowVerions;
+	 * 
 	 * @return
 	 */
-	public String getRowKey(){
-		return this.rowId +"-"+this.rowVersion;
+	public String getRowKey() {
+		return this.rowId + "-" + this.rowVersion;
 	}
 
 }

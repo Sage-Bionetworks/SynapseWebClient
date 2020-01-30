@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.gwtbootstrap3.client.ui.Column;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -11,17 +11,15 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class TablesTabViewImpl implements TablesTabView {
-	
+
 	@UiField
 	SimplePanel tableTitlebarContainer;
-	
-	//tables
+
+	// tables
 	@UiField
 	SimplePanel tableBreadcrumbContainer;
 	@UiField
 	SimplePanel tableMetadataContainer;
-	@UiField
-	SimplePanel tableActionMenuContainer;
 	@UiField
 	SimplePanel tableWidgetContainer;
 	@UiField
@@ -34,78 +32,80 @@ public class TablesTabViewImpl implements TablesTabView {
 	Column provenanceContainer;
 	@UiField
 	Div provenanceContainerHighlightBox;
-	
-	public interface TabsViewImplUiBinder extends UiBinder<Widget, TablesTabViewImpl> {}
-	
+	@UiField
+	Div actionMenuContainer;
+	@UiField
+	Heading title;
+
+	public interface TabsViewImplUiBinder extends UiBinder<Widget, TablesTabViewImpl> {
+	}
+
 	Widget widget;
-	
+
 	@Inject
 	public TablesTabViewImpl(TabsViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
 		initClickHandlers();
 	}
-	
-	private void initClickHandlers() {		
-	}
-	
+
+	private void initClickHandlers() {}
+
 	@Override
 	public void setBreadcrumb(Widget w) {
-		tableBreadcrumbContainer.add(w);
+		tableBreadcrumbContainer.setWidget(w);
 	}
-	
+
 	@Override
 	public void setTableList(Widget w) {
-		tableListWidgetContainer.add(w);
+		tableListWidgetContainer.setWidget(w);
 	}
+
 	@Override
 	public void setTitlebar(Widget w) {
-		tableTitlebarContainer.add(w);
+		tableTitlebarContainer.setWidget(w);
 	}
-	
+
 	@Override
 	public void setEntityMetadata(Widget w) {
-		tableMetadataContainer.add(w);
+		tableMetadataContainer.setWidget(w);
 	}
+
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
-	
+
 	@Override
 	public void setTableEntityWidget(Widget w) {
-		tableWidgetContainer.add(w);
+		tableWidgetContainer.setWidget(w);
 	}
+
 	@Override
 	public void clearTableEntityWidget() {
-		tableWidgetContainer.clear();	
+		tableWidgetContainer.clear();
 	}
-	
-	@Override
-	public void setActionMenu(Widget w) {
-		tableActionMenuContainer.add(w);
-	}
-	@Override
-	public void clearActionMenuContainer() {
-		tableActionMenuContainer.clear();
-	}
+
 	@Override
 	public void setSynapseAlert(Widget w) {
 		synapseAlertContainer.setWidget(w);
 	}
-	
+
 	@Override
 	public void setBreadcrumbVisible(boolean visible) {
+		title.setVisible(!visible);
 		tableBreadcrumbContainer.setVisible(visible);
 	}
-	
+
 	@Override
 	public void setEntityMetadataVisible(boolean visible) {
 		tableMetadataContainer.setVisible(visible);
 	}
+
 	@Override
 	public void setTableListVisible(boolean visible) {
 		tableListWidgetContainer.setVisible(visible);
 	}
+
 	@Override
 	public void setTitlebarVisible(boolean visible) {
 		tableTitlebarContainer.setVisible(visible);
@@ -113,16 +113,25 @@ public class TablesTabViewImpl implements TablesTabView {
 
 	@Override
 	public void setModifiedCreatedBy(IsWidget modifiedCreatedBy) {
-		tableModifiedAndCreatedContainer.setWidget(modifiedCreatedBy);		
+		tableModifiedAndCreatedContainer.setWidget(modifiedCreatedBy);
 	}
+
 	@Override
-	public void setProvenanceVisible(boolean visible) {
+	public void setTableUIVisible(boolean visible) {
 		provenanceContainer.setVisible(visible);
 	}
+
 	@Override
 	public void setProvenance(IsWidget w) {
 		provenanceContainerHighlightBox.clear();
-		provenanceContainerHighlightBox.add(w);		
+		provenanceContainerHighlightBox.add(w);
+	}
+
+	@Override
+	public void setActionMenu(IsWidget w) {
+		w.asWidget().removeFromParent();
+		actionMenuContainer.clear();
+		actionMenuContainer.add(w);
 	}
 }
 

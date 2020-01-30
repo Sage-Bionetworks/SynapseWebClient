@@ -7,11 +7,15 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<bh:Div>
-		<b:Heading size="H2" addStyleNames="displayInlineBlock margin-right-5 margin-bottom-0-imp">
-		 	<b:Icon ui:field="entityIcon" addStyleNames="margin-right-5 lightGreyText" type="FOLDER"/>
-		 	<bh:Span ui:field="fileName"/>
-		 	<g:SimplePanel ui:field="favoritePanel" addStyleNames="margin-left-5"/>
-		</b:Heading>
-		<bh:Span ui:field="containerHelpContainer"/>
+		<bh:Div addStyleNames="flexcontainer-row margin-bottom-10">
+			<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width">
+				<b:Heading size="H2" addStyleNames="displayInlineBlock margin-right-5 margin-bottom-0-imp">
+				 	<b:Icon ui:field="entityIcon" addStyleNames="margin-right-5 lightGreyText" type="FOLDER"/>
+				 	<bh:Span ui:field="fileName"/>
+				 	<g:SimplePanel ui:field="favoritePanel" addStyleNames="margin-left-5"/>
+				</b:Heading>
+			</bh:Div>
+			<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end" ui:field="actionMenuContainer"/>
+		</bh:Div>
 	</bh:Div>
 </ui:UiBinder>

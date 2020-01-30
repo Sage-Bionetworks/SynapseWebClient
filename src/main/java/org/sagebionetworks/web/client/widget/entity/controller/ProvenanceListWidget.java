@@ -2,14 +2,12 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import java.util.LinkedList;
 import java.util.List;
-
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -21,7 +19,7 @@ public class ProvenanceListWidget implements ProvenanceListWidgetView.Presenter,
 	List<ProvenanceEntry> rows;
 	EntityFinder entityFinder;
 	ProvenanceURLDialogWidget urlDialog;
-	
+
 	@Inject
 	public ProvenanceListWidget(final ProvenanceListWidgetView view, final PortalGinInjector ginInjector) {
 		this.view = view;
@@ -29,11 +27,11 @@ public class ProvenanceListWidget implements ProvenanceListWidgetView.Presenter,
 		rows = new LinkedList<ProvenanceEntry>();
 		this.view.setPresenter(this);
 	}
-	
+
 	@Override
 	public void configure(List<ProvenanceEntry> provEntries) {
 		rows = provEntries;
-		for (final ProvenanceEntry entry: rows) {
+		for (final ProvenanceEntry entry : rows) {
 			view.addRow(entry);
 			entry.setRemoveCallback(new Callback() {
 				@Override
@@ -44,7 +42,7 @@ public class ProvenanceListWidget implements ProvenanceListWidgetView.Presenter,
 			});
 		}
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
@@ -118,11 +116,11 @@ public class ProvenanceListWidget implements ProvenanceListWidgetView.Presenter,
 	}
 
 	public void setEntityFinder(final EntityFinder entityFinder) {
-		this.entityFinder = entityFinder;		
+		this.entityFinder = entityFinder;
 	}
 
 	public void setURLDialog(final ProvenanceURLDialogWidget urlDialog) {
 		this.urlDialog = urlDialog;
-		
+
 	}
 }

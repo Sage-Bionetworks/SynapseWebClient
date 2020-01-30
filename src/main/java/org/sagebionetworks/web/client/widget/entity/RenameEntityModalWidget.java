@@ -2,8 +2,6 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.table.TableCreatedHandler;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -12,9 +10,9 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author John
  *
  */
-public interface RenameEntityModalWidget extends IsWidget{
+public interface RenameEntityModalWidget extends IsWidget {
 
-	
+
 	/**
 	 * Show the create table modal dialog.
 	 */

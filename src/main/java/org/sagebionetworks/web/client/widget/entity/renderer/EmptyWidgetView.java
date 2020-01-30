@@ -6,10 +6,11 @@ public interface EmptyWidgetView extends IsWidget {
 
 	/**
 	 * Set the presenter.
+	 * 
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-	
+
 	/**
 	 * Presenter interface
 	 */

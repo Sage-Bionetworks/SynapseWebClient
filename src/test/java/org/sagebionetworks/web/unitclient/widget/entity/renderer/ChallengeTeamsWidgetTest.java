@@ -8,12 +8,10 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.ChallengeTeam;
@@ -32,18 +30,17 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class ChallengeTeamsWidgetTest {
-	
+
 	ChallengeTeamsView mockView;
 	EditRegisteredTeamDialog mockEditRegisterTeamDialog;
 	BasicPaginationWidget mockPaginationWidget;
 	ChallengeClientAsync mockChallengeClient;
-	
+
 	AuthenticationController mockAuthenticationController;
-	
+
 	ChallengeTeamsWidget widget;
 	Map<String, String> descriptor;
 	public static final String CHALLENGE_ID = "55555";
@@ -53,7 +50,7 @@ public class ChallengeTeamsWidgetTest {
 	public static final String TEST_TEAM_ID = "563";
 	public static final String TEST_TEAM_RECRUITMENT_MESSAGE = "Let's join already!";
 	boolean isAdminOfTestTeam;
-	
+
 	@Before
 	public void before() throws RestServiceException, JSONObjectAdapterException {
 		mockView = mock(ChallengeTeamsView.class);
@@ -82,7 +79,7 @@ public class ChallengeTeamsWidgetTest {
 		results.setTotalNumberOfResults(1L);
 		return results;
 	}
-	
+
 	public ChallengeTeamPagedResults getEmptyTestChallengeTeamPagedResults() {
 		ChallengeTeamPagedResults results = new ChallengeTeamPagedResults();
 		List<ChallengeTeamBundle> emptyList = Collections.emptyList();
@@ -91,31 +88,31 @@ public class ChallengeTeamsWidgetTest {
 		return results;
 	}
 
-	
+
 	@Test
 	public void testHappyCaseConfigure() throws Exception {
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
-		
+
 		verify(mockView).hideErrors();
 		verify(mockView).showLoading();
 		verify(mockView).clearTeams();
 		verify(mockChallengeClient).getChallengeTeams(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).hideLoading();
 		verify(mockPaginationWidget).configure(anyLong(), anyLong(), anyLong(), eq(widget));
-		
+
 		verify(mockView).addChallengeTeam(TEST_TEAM_ID, TEST_TEAM_RECRUITMENT_MESSAGE, isAdminOfTestTeam);
-		
-		//now edit test team
+
+		// now edit test team
 		widget.onEdit(TEST_TEAM_ID);
 		verify(mockEditRegisterTeamDialog).configure(eq(testChallengeTeam), any(Callback.class));
 	}
-	
+
 
 	@Test
 	public void testHappyCaseNoTeams() throws Exception {
 		AsyncMockStubber.callSuccessWith(getEmptyTestChallengeTeamPagedResults()).when(mockChallengeClient).getChallengeTeams(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
-		
+
 		verify(mockView).hideErrors();
 		verify(mockView).showLoading();
 		verify(mockView).clearTeams();
@@ -123,12 +120,12 @@ public class ChallengeTeamsWidgetTest {
 		verify(mockView).hideLoading();
 		verify(mockView).showNoTeams();
 	}
-	
+
 	@Test
 	public void testGetChallengeTeamsFailure() throws Exception {
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockChallengeClient).getChallengeTeams(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
-		
+
 		verify(mockView).hideErrors();
 		verify(mockView).showLoading();
 		verify(mockView).clearTeams();
@@ -136,21 +133,12 @@ public class ChallengeTeamsWidgetTest {
 		verify(mockView).hideLoading();
 		verify(mockView).showErrorMessage(anyString());
 	}
-	
+
 	@Test
 	public void testAsWidget() {
 		widget.asWidget();
 		verify(mockView).asWidget();
 	}
 }
-
-
-
-
-
-
-
-
-
 
 

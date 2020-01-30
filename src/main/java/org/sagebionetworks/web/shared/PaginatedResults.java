@@ -1,34 +1,29 @@
 package org.sagebionetworks.web.shared;
 
 import java.util.List;
-
 import org.sagebionetworks.schema.adapter.JSONEntity;
-
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
- * Generic class used to encapsulate a paginated list of results of objects of
- * any type.
+ * Generic class used to encapsulate a paginated list of results of objects of any type.
  * <p>
  * 
  * This class has been annotated to produce XML in addition to JSON.
  * <p>
  * 
- * @param <T>
- *            the type of result to paginate
+ * @param <T> the type of result to paginate
  */
 public class PaginatedResults<T extends JSONEntity> implements IsSerializable {
-	
-  	private static final long serialVersionUID = 1L;
+
+	private static final long serialVersionUID = 1L;
 
 	private long totalNumberOfResults;
 	private List<T> results;
-	
-	public PaginatedResults(){
-	}
+
+	public PaginatedResults() {}
 
 
-	public PaginatedResults(List<T> results,long totalNumberOfResults) {
+	public PaginatedResults(List<T> results, long totalNumberOfResults) {
 		super();
 		this.totalNumberOfResults = totalNumberOfResults;
 		this.results = results;
@@ -66,17 +61,15 @@ public class PaginatedResults<T extends JSONEntity> implements IsSerializable {
 
 	@Override
 	public String toString() {
-		return "PaginatedResults [totalNumberOfResults=" + totalNumberOfResults
-				+ ", results=" + results + "]";
-	}	
-	
+		return "PaginatedResults [totalNumberOfResults=" + totalNumberOfResults + ", results=" + results + "]";
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((results == null) ? 0 : results.hashCode());
-		result = prime * result
-				+ (int) (totalNumberOfResults ^ (totalNumberOfResults >>> 32));
+		result = prime * result + (int) (totalNumberOfResults ^ (totalNumberOfResults >>> 32));
 		return result;
 	}
 
@@ -98,6 +91,6 @@ public class PaginatedResults<T extends JSONEntity> implements IsSerializable {
 			return false;
 		return true;
 	}
-	
+
 
 }

@@ -9,9 +9,10 @@ import com.google.gwt.user.client.ui.IsWidget;
  *
  */
 public interface StaticTableHeader extends IsWidget {
-	
+
 	/**
 	 * Set the table header text.
+	 * 
 	 * @param headerText
 	 */
 	public void setHeader(String headerText);

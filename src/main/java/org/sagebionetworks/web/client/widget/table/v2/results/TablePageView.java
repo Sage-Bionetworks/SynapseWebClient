@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.List;
-
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * 
@@ -13,37 +11,34 @@ import com.google.gwt.user.client.ui.Widget;
  *
  */
 public interface TablePageView extends IsWidget {
-	
-	public interface Presenter {
-		void onClearFacets();
-	}
-	
 	/**
-	 * Set the headers for this table.
-	 * This will be extended to including column sorting data.
+	 * Set the headers for this table. This will be extended to including column sorting data.
+	 * 
 	 * @param headers
 	 */
 	public void setTableHeaders(List<IsWidget> headers);
-	
+
 	/**
 	 * Add a row to this table.o
+	 * 
 	 * @param rowWidget
 	 */
 	public void addRow(RowWidget rowWidget);
-	
+
 	/**
 	 * Remove this row from the view.
+	 * 
 	 * @param row
 	 */
 	public void removeRow(RowWidget row);
-	
+
 	/**
 	 * Set the pagination widget
 	 * 
 	 * @param paginationWidget
 	 */
 	public void setPaginationWidget(IsWidget paginationWidget);
-	
+
 	/**
 	 * Show or hide the pagination widgets
 	 * 
@@ -57,11 +52,11 @@ public interface TablePageView extends IsWidget {
 	 * @param isEditable
 	 */
 	public void setEditorBufferVisible(boolean isEditable);
-	
-	void setFacetsWidget(Widget w);
-	void setFacetsVisible(boolean visible);
+
 	void setTableVisible(boolean visible);
-	void setPresenter(Presenter presenter);
+
 	void showLoading();
+
 	void hideLoading();
+	void setLastUpdatedOn(String lastUpdatedOn);
 }

@@ -1,16 +1,27 @@
 package org.sagebionetworks.web.client.presenter;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_CERTIFIED;
+import static org.sagebionetworks.web.client.presenter.ProfilePresenter.ORC_ID;
+import static org.sagebionetworks.web.client.presenter.ProfilePresenter.PROFILE;
+import static org.sagebionetworks.web.client.presenter.ProfilePresenter.VERIFICATION_SUBMISSION;
+import java.util.ArrayList;
+import java.util.List;
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.auth.ChangePasswordWithCurrentPassword;
+import org.sagebionetworks.repo.model.oauth.OAuthProvider;
+import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
+import org.sagebionetworks.repo.model.verification.VerificationState;
+import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
+import org.sagebionetworks.repo.model.verification.VerificationSubmission;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
@@ -18,11 +29,10 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
 import org.sagebionetworks.web.client.widget.profile.EmailAddressesWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
-
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -30,9 +40,9 @@ import com.google.inject.Inject;
 
 public class SettingsPresenter implements SettingsView.Presenter {
 
+	public static final String MUST_BE_CERTIFIED_TO_SUBMIT_PROFILE_VALIDATION_MESSAGE = "Only Certified Users can apply to have their user profile validated.  Please get certified and try again.";
 	private SettingsView view;
 	private AuthenticationController authenticationController;
-	private UserAccountServiceAsync userService;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
 	private SynapseAlert apiSynAlert;
@@ -41,38 +51,33 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	private PortalGinInjector ginInjector;
 	private UserProfileModalWidget userProfileModalWidget;
 	private SubscriptionListWidget subscriptionListWidget;
-	private PasswordStrengthWidget passwordStrengthWidget;
 	private EmailAddressesWidget emailAddressesWidget;
 	private SynapseJavascriptClient jsClient;
+	public Callback resubmitVerificationCallback;
+	public VerificationSubmissionWidget verificationModal;
+	public UserBundle currentUserBundle;
+	private PopupUtilsView popupUtils;
+
 	@Inject
-	public SettingsPresenter(SettingsView view,
-			AuthenticationController authenticationController,
-			UserAccountServiceAsync userService,
-			GlobalApplicationState globalApplicationState,
-			SynapseClientAsync synapseClient,
-			PortalGinInjector ginInjector,
-			UserProfileModalWidget userProfileModalWidget,
-			SubscriptionListWidget subscriptionListWidget,
-			PasswordStrengthWidget passwordStrengthWidget,
-			EmailAddressesWidget emailAddressesWidget,
-			SynapseJavascriptClient jsClient) {
+	public SettingsPresenter(SettingsView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient, PortalGinInjector ginInjector, UserProfileModalWidget userProfileModalWidget, SubscriptionListWidget subscriptionListWidget, EmailAddressesWidget emailAddressesWidget, PopupUtilsView popupUtils, SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.authenticationController = authenticationController;
-		this.userService = userService;
-		fixServiceEntryPoint(userService);
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.ginInjector = ginInjector;
 		this.userProfileModalWidget = userProfileModalWidget;
 		this.subscriptionListWidget = subscriptionListWidget;
-		this.passwordStrengthWidget = passwordStrengthWidget;
 		this.emailAddressesWidget = emailAddressesWidget;
+		this.popupUtils = popupUtils;
 		this.jsClient = jsClient;
 		view.setSubscriptionsListWidget(subscriptionListWidget.asWidget());
-		view.setPasswordStrengthWidget(passwordStrengthWidget.asWidget());
 		view.setEmailAddressesWidget(emailAddressesWidget);
 		view.setPresenter(this);
+		resubmitVerificationCallback = () -> {
+			newVerificationSubmissionClicked();
+		};
+
 		setSynAlertWidgets();
 	}
 
@@ -104,52 +109,39 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	}
 
 	@Override
-	public void resetPassword(final String existingPassword,
-			final String newPassword) {
+	public void resetPassword(final String existingPassword, final String newPassword) {
 		clearPasswordErrors();
 		if (authenticationController.isLoggedIn()) {
-			if (authenticationController.getCurrentUserSessionData() != null
-					&& authenticationController.getCurrentUserSessionData().getProfile() != null
-					&& authenticationController.getCurrentUserSessionData().getProfile().getUserName() != null) {
-				final String username = authenticationController.getCurrentUserSessionData().getProfile().getUserName();
-				authenticationController.loginUser(username, existingPassword,
-						new AsyncCallback<UserSessionData>() {
+			if (authenticationController.getCurrentUserProfile() != null && authenticationController.getCurrentUserProfile().getUserName() != null) {
+				String username = authenticationController.getCurrentUserProfile().getUserName();
+				ChangePasswordWithCurrentPassword changePasswordRequest = new ChangePasswordWithCurrentPassword();
+				changePasswordRequest.setCurrentPassword(existingPassword);
+				changePasswordRequest.setNewPassword(newPassword);
+				changePasswordRequest.setUsername(authenticationController.getCurrentUserProfile().getUserName());
+				jsClient.changePassword(changePasswordRequest, new AsyncCallback<Void>() {
+					@Override
+					public void onSuccess(Void result) {
+						view.showPasswordChangeSuccess();
+						// login user as session token
+						// has changed
+						authenticationController.loginUser(username, newPassword, new AsyncCallback<UserProfile>() {
 							@Override
-							public void onSuccess(UserSessionData userSessionData) {
-								userService.changePassword(authenticationController.getCurrentUserSessionToken(),newPassword, new AsyncCallback<Void>() {
-									@Override
-									public void onSuccess(Void result) {
-										passwordStrengthWidget.setVisible(false);
-										view.showPasswordChangeSuccess();
-										// login user as session token
-										// has changed
-										authenticationController.loginUser(username, newPassword, new AsyncCallback<UserSessionData>() {
-											@Override
-											public void onSuccess(UserSessionData result) {
-											}
-											@Override
-											public void onFailure(Throwable caught) {
-												//if login fails, simple send them to the login page to get a new session
-												globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-											}
-										});
-									}
+							public void onSuccess(UserProfile result) {}
 
-									@Override
-									public void onFailure(
-											Throwable caught) {
-										passwordSynAlert.handleException(caught);
-										view.setChangePasswordEnabled(true);
-									}
-								});
-							}
 							@Override
 							public void onFailure(Throwable caught) {
-								passwordSynAlert.showError("Incorrect password. Please enter your existing Synapse password.");
-								view.setCurrentPasswordInError(true);
-								view.setChangePasswordEnabled(true);
+								// if login fails, simple send them to the login page to get a new session
+								globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 							}
 						});
+					}
+
+					@Override
+					public void onFailure(Throwable caught) {
+						passwordSynAlert.showError(caught.getMessage());
+						view.setChangePasswordEnabled(true);
+					}
+				});
 			} else {
 				view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 			}
@@ -166,16 +158,13 @@ public class SettingsPresenter implements SettingsView.Presenter {
 
 	// notification checkbox
 	@Override
-	public void updateMyNotificationSettings(
-			final boolean sendEmailNotifications,
-			final boolean markEmailedMessagesAsRead) {
+	public void updateMyNotificationSettings(final boolean sendEmailNotifications, final boolean markEmailedMessagesAsRead) {
 		notificationSynAlert.clear();
 		// get my profile
 		AsyncCallback<UserProfile> callback = new AsyncCallback<UserProfile>() {
 			@Override
 			public void onSuccess(final UserProfile myProfile) {
-				org.sagebionetworks.repo.model.message.Settings settings = myProfile
-						.getNotificationSettings();
+				org.sagebionetworks.repo.model.message.Settings settings = myProfile.getNotificationSettings();
 				if (settings == null) {
 					settings = new org.sagebionetworks.repo.model.message.Settings();
 					settings.setMarkEmailedMessagesAsRead(false);
@@ -206,36 +195,23 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		};
 		jsClient.getUserProfile(null, callback);
 	}
-	
+
 	public void clear() {
 		view.clear();
 		apiSynAlert.clear();
 		notificationSynAlert.clear();
 		emailAddressesWidget.clear();
 		passwordSynAlert.clear();
-		passwordStrengthWidget.setVisible(false);
 	}
-	
+
 	public void configure() {
 		clear();
 		if (authenticationController.isLoggedIn()) {
-			AsyncCallback<UserProfile> callback = new AsyncCallback<UserProfile>() {
-				@Override
-				public void onSuccess(UserProfile result) {
-					emailAddressesWidget.configure(result);
-					authenticationController.updateCachedProfile(result);
-					view.updateNotificationCheckbox(result);	
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					notificationSynAlert.handleException(caught);
-				}
-			};
-			jsClient.getUserProfile(null, callback);
-			
+			getUserProfile();
+
 			subscriptionListWidget.configure();
 			if (globalApplicationState.isShowingUTCTime()) {
-				view.setShowingUTCTime();	
+				view.setShowingUTCTime();
 			} else {
 				view.setShowingLocalTime();
 			}
@@ -243,16 +219,49 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		this.view.render();
 	}
 
+	private void getUserProfile() {
+		// ask for everything in the user bundle
+		currentUserBundle = null;
+		int mask = PROFILE | ORC_ID | VERIFICATION_SUBMISSION | IS_CERTIFIED;
+		view.setOrcIdVisible(false);
+		view.setUnbindOrcIdVisible(false);
+		jsClient.getUserBundle(Long.parseLong(authenticationController.getCurrentUserPrincipalId()), mask, new AsyncCallback<UserBundle>() {
+			@Override
+			public void onSuccess(UserBundle bundle) {
+				currentUserBundle = bundle;
+				emailAddressesWidget.configure(bundle.getUserProfile());
+				authenticationController.updateCachedProfile(bundle.getUserProfile());
+				view.updateNotificationCheckbox(bundle.getUserProfile());
+				initializeVerificationUI();
+				String orcId = bundle.getORCID();
+				if (orcId != null && orcId.length() > 0) {
+					view.setOrcId(orcId);
+					view.setOrcIdVisible(true);
+					view.setUnbindOrcIdVisible(true);
+					view.setOrcIDLinkButtonVisible(false);
+				} else {
+					view.setOrcIDLinkButtonVisible(true);
+				}
+				view.setIsCertified(bundle.getIsCertified());
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				notificationSynAlert.handleException(caught);
+			}
+		});
+	}
+
 	@Override
 	public void changeApiKey() {
 		apiSynAlert.clear();
 		Callback callback = () -> {
-			changeApiKeyPostConfirmation();	
+			changeApiKeyPostConfirmation();
 		};
 		view.showConfirm(DisplayConstants.API_KEY_CONFIRMATION, callback);
 	}
-	
-	public void changeApiKeyPostConfirmation(){
+
+	public void changeApiKeyPostConfirmation() {
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
@@ -267,11 +276,11 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		};
 		synapseClient.deleteApiKey(callback);
 	}
-	
+
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	
+
 	@Override
 	public void onEditProfile() {
 		userProfileModalWidget.showEditProfile(authenticationController.getCurrentUserPrincipalId(), new Callback() {
@@ -291,7 +300,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		if (!checkPasswordDefined(currentPassword)) {
 			view.setCurrentPasswordInError(true);
 			passwordSynAlert.showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
-		} else if (!checkPasswordDefined(password1)){
+		} else if (!checkPasswordDefined(password1)) {
 			view.setPassword1InError(true);
 			passwordSynAlert.showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
 		} else if (!checkPasswordDefined(password2)) {
@@ -305,25 +314,116 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			resetPassword(currentPassword, password1);
 		}
 	}
-	
+
 	public void clearPasswordErrors() {
 		passwordSynAlert.clear();
 		view.setCurrentPasswordInError(false);
 		view.setPassword1InError(false);
 		view.setPassword2InError(false);
 	}
-	
+
 	private boolean checkPasswordDefined(String password) {
 		return password != null && !password.isEmpty();
-	}
-	
-	@Override
-	public void passwordChanged(String password) {
-		passwordStrengthWidget.scorePassword(password);
 	}
 
 	@Override
 	public void setShowUTCTime(boolean isUTC) {
 		globalApplicationState.setShowUTCTime(isUTC);
+	}
+
+	public VerificationSubmissionWidget getVerificationSubmissionWidget() {
+		if (verificationModal == null) {
+			verificationModal = ginInjector.getVerificationSubmissionWidget();
+		}
+		return verificationModal;
+	}
+
+	@Override
+	public void editVerificationSubmissionClicked() {
+		// edit the existing submission
+		getVerificationSubmissionWidget().configure(currentUserBundle.getVerificationSubmission(), false, // is ACT
+				true) // isModal
+				.setResubmitCallback(resubmitVerificationCallback).show();
+	}
+
+	@Override
+	public void newVerificationSubmissionClicked() {
+		if (!currentUserBundle.getIsCertified()) {
+			view.showErrorMessage(MUST_BE_CERTIFIED_TO_SUBMIT_PROFILE_VALIDATION_MESSAGE);
+			return;
+		}
+		List<AttachmentMetadata> attachments = new ArrayList<AttachmentMetadata>();
+		if (currentUserBundle.getVerificationSubmission() != null) {
+			attachments = currentUserBundle.getVerificationSubmission().getAttachments();
+		}
+
+		// create a new submission
+		getVerificationSubmissionWidget().configure(currentUserBundle.getUserProfile(), currentUserBundle.getORCID(), true, // isModal
+				attachments).show();
+	}
+
+	@Override
+	public void linkOrcIdClicked() {
+		String orcId = currentUserBundle.getORCID();
+		if (orcId != null && orcId.length() > 0) {
+			// already set!
+			view.showErrorMessage("An ORC ID has already been linked to your Synapse account.");
+		} else {
+			DisplayUtils.newWindow("/Portal/oauth2AliasCallback?oauth2provider=ORCID", "_self", "");
+		}
+	}
+
+	public void initializeVerificationUI() {
+		// The UI is depends on the current state
+		VerificationSubmission submission = currentUserBundle.getVerificationSubmission();
+
+		if (submission == null) {
+			// no submission. if the owner, provide way to submit
+			view.showNotVerified();
+		} else {
+			// there's a submission in a state.
+			showVerificationUI(submission);
+		}
+	}
+
+	public void showVerificationUI(VerificationSubmission submission) {
+		VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size() - 1);
+		if (currentState.getState() == VerificationStateEnum.SUSPENDED) {
+			view.setVerificationSuspendedButtonVisible(true);
+			view.setResubmitVerificationButtonVisible(true);
+		} else if (currentState.getState() == VerificationStateEnum.REJECTED) {
+			view.setVerificationRejectedButtonVisible(true);
+			view.setResubmitVerificationButtonVisible(true);
+		} else if (currentState.getState() == VerificationStateEnum.SUBMITTED) {
+			view.setVerificationSubmittedButtonVisible(true);
+		} else if (currentState.getState() == VerificationStateEnum.APPROVED) {
+			view.setVerificationDetailsButtonVisible(true);
+		}
+	}
+
+	@Override
+	public void unbindOrcId() {
+		popupUtils.showConfirmDialog("Unlink", "Are you sure you want to unlink this ORCID from your Synapse user profile?", new Callback() {
+			@Override
+			public void invoke() {
+				unbindOrcIdAfterConfirmation();
+			}
+		});
+	}
+
+	public void unbindOrcIdAfterConfirmation() {
+		jsClient.unbindOAuthProvidersUserId(OAuthProvider.ORCID, currentUserBundle.getORCID(), new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				// ORCID successfully removed. refresh so that the user bundle and UI are up to date
+				view.showInfo("ORCID has been successfully unbound.");
+				globalApplicationState.refreshPage();
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				notificationSynAlert.handleException(caught);
+			}
+		});
 	}
 }
