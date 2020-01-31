@@ -455,6 +455,36 @@ public class SynapseClientImpl extends SynapseClientBase implements SynapseClien
 		}
 	}
 
+	private List<AccessRequirement> getAllAccessRequirements(RestrictableObjectDescriptor subjectId, ACCESS_TYPE accessType, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
+		List<AccessRequirement> allAccessRequirements = new ArrayList<AccessRequirement>();
+		long offset = ZERO_OFFSET;
+		boolean isDone = false;
+		while (!isDone) {
+			List<AccessRequirement> accessRequirments;
+			accessRequirments = synapseClient.getAccessRequirements(subjectId, LIMIT_50, offset).getResults();
+
+			isDone = accessRequirments.size() < LIMIT_50;
+			allAccessRequirements.addAll(accessRequirments);
+			offset += LIMIT_50;
+		}
+		return allAccessRequirements;
+	}
+
+	@Override
+	public List<AccessRequirement> getTeamAccessRequirements(String teamId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
+			subjectId.setId(teamId);
+			subjectId.setType(RestrictableObjectType.TEAM);
+			List<AccessRequirement> accessRequirements = getAllAccessRequirements(subjectId, ACCESS_TYPE.PARTICIPATE, synapseClient);
+
+			return accessRequirements;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
 	@Override
 	public AccessApproval createAccessApproval(AccessApproval aaEW) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
