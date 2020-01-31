@@ -19,7 +19,5 @@ public interface UserAccountService extends RemoteService {
 
 	PublicPrincipalIds getPublicAndAuthenticatedGroupPrincipalIds();
 
-	String getCurrentSessionToken() throws RestServiceException;
-
 	UserSessionData getCurrentUserSessionData() throws RestServiceException;
 }

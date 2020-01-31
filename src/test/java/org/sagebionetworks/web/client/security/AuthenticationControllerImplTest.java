@@ -9,6 +9,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.security.AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT;
@@ -99,7 +100,6 @@ public class AuthenticationControllerImplTest {
 		MockitoAnnotations.initMocks(this);
 		// by default, return a valid user session data if asked
 		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).initSession(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(SESSION_TOKEN).when(mockUserAccountService).getCurrentSessionToken(any(AsyncCallback.class));
 		usd = new UserSessionData();
 		profile = new UserProfile();
 		profile.setOwnerId(USER_ID);
@@ -232,11 +232,12 @@ public class AuthenticationControllerImplTest {
 		// if we invoke checkForUserChange(), if the user does not change we should update the session
 		// cookie expiration (via the initSession call).
 		authenticationController.initializeFromExistingSessionCookie(mockUserProfileCallback);
+		verify(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
 		verify(mockJsClient, never()).initSession(anyString(), any(AsyncCallback.class));
 
 		authenticationController.checkForUserChange();
 
-		verify(mockUserAccountService).getCurrentSessionToken(any(AsyncCallback.class));
+		verify(mockUserAccountService, times(2)).getCurrentUserSessionData(any(AsyncCallback.class));
 		verify(mockJsClient).initSession(eq(SESSION_TOKEN), any(AsyncCallback.class));
 	}
 
