@@ -30,6 +30,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.binder.EventHandler;
@@ -444,6 +445,10 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		isModifiedCreatedByHistoryVisible = isVisible;
 	}
 
+	public void setActionMenu(IsWidget w) {
+		view.setActionMenu(w);
+	}
+	
 	@Override
 	public void showWikiHistory() {
 		configureHistoryWidget(canEdit);
@@ -458,4 +463,5 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	public void onWikiSubpagesExpandEvent(WikiSubpagesExpandEvent event) {
 		view.expandWikiSubpages();
 	}
+
 }

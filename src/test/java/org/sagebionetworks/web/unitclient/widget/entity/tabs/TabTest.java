@@ -14,11 +14,15 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TabView;
 import com.google.gwt.place.shared.Place;
@@ -33,6 +37,13 @@ public class TabTest {
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	@Mock
 	GWTWrapper mockGWT;
+	@Mock
+	EntityActionController mockActionController;
+	@Mock
+	ActionMenuWidget mockActionMenu;
+	@Mock
+	EntityBundle mockEntityBundle;
+	
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
 	Tab tab;
@@ -40,7 +51,7 @@ public class TabTest {
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		tab = new Tab(mockView, mockGlobalAppState, mockSynapseJSNIUtils, mockGWT);
+		tab = new Tab(mockView, mockGlobalAppState, mockSynapseJSNIUtils, mockGWT, mockActionController, mockActionMenu);
 		when(mockView.isActive()).thenReturn(true);
 	}
 
@@ -58,11 +69,24 @@ public class TabTest {
 		// and configure
 		String tabTitle = "TestTab";
 		Widget content = null;
-		tab.configure(tabTitle, "help markdown", "link");
+		tab.configure(tabTitle, "help markdown", "link", EntityArea.FILES);
 		verify(mockView).configure(eq(tabTitle), anyString(), anyString());
 		tab.setContent(content);
 		verify(mockView).setContent(content);
 	}
+	
+	@Test
+	public void testConfigureEntityActionController() {
+		EntityArea area = EntityArea.FILES;
+		boolean isCurrentVersion = false;
+		String wikiPageKey = null;
+		
+		tab.configure("Files", "help markdown", "link", EntityArea.FILES);
+		tab.configureEntityActionController(mockEntityBundle, isCurrentVersion, wikiPageKey);
+		
+		verify(mockActionController).configure(mockActionMenu, mockEntityBundle, isCurrentVersion, wikiPageKey, area);
+	}
+
 
 	@Test
 	public void testSetEntityNameAndPlace() {

@@ -451,10 +451,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void configureStatisticsPlotAction() {
 		if (entityBundle.getEntity() instanceof Project && currentArea == null) {
 			// is a project, if the current user can view then show the command
-			// TODO: remove alpha mode check
-			boolean isAlphaMode = DisplayUtils.isInTestWebsite(cookies);
 			boolean canView = entityBundle.getPermissions().getCanView();
-			actionMenu.setActionVisible(Action.SHOW_PROJECT_STATS, canView && isAlphaMode);
+			actionMenu.setActionVisible(Action.SHOW_PROJECT_STATS, canView);
 			actionMenu.setActionListener(Action.SHOW_PROJECT_STATS, this);
 		} else {
 			actionMenu.setActionVisible(Action.SHOW_PROJECT_STATS, false);

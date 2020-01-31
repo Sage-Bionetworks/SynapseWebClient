@@ -1151,41 +1151,6 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testGetEntityUnmetAccessRequirements() throws Exception {
-		// verify it calls getUnmetAccessRequirements when unmet is true
-		synapseClient.getEntityAccessRequirements(entityId, true, null);
-		verify(mockSynapse).getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class), any(ACCESS_TYPE.class), anyLong(), anyLong());
-	}
-
-	@Test
-	public void testGetAllEntityAccessRequirements() throws Exception {
-		// verify it calls getAccessRequirements when unmet is false
-		synapseClient.getEntityAccessRequirements(entityId, false, null);
-		verify(mockSynapse).getAccessRequirements(any(RestrictableObjectDescriptor.class), anyLong(), anyLong());
-	}
-
-	@Test
-	public void testGetAllEntityAccessRequirementsTwoPage() throws Exception {
-		PaginatedResults<AccessRequirement> page1 = Mockito.mock(PaginatedResults.class);
-		PaginatedResults<AccessRequirement> page2 = Mockito.mock(PaginatedResults.class);
-		when(mockSynapse.getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class), any(ACCESS_TYPE.class), anyLong(), anyLong())).thenReturn(page1, page2);
-		List<AccessRequirement> page1Results = new ArrayList<AccessRequirement>();
-		for (int i = 0; i < SynapseClientImpl.LIMIT_50; i++) {
-			page1Results.add(Mockito.mock(AccessRequirement.class));
-		}
-		when(page1.getResults()).thenReturn(page1Results);
-		// second page has a single result
-		AccessRequirement singleAccessRequirement = Mockito.mock(AccessRequirement.class);
-		when(page2.getResults()).thenReturn(Collections.singletonList(singleAccessRequirement));
-		boolean unmetOnly = true;
-		org.sagebionetworks.web.shared.PaginatedResults<AccessRequirement> results = synapseClient.getEntityAccessRequirements(entityId, unmetOnly, null);
-		// 1 full page of results
-		assertEquals(SynapseClientImpl.LIMIT_50 + 1, results.getResults().size());
-		verify(mockSynapse).getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class), any(ACCESS_TYPE.class), eq(SynapseClientImpl.LIMIT_50), eq(SynapseClientImpl.ZERO_OFFSET.longValue()));
-		verify(mockSynapse).getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class), any(ACCESS_TYPE.class), eq(SynapseClientImpl.LIMIT_50), eq(SynapseClientImpl.LIMIT_50));
-	}
-
-	@Test
 	public void testAddEmail() throws Exception {
 		EmailValidationSignedToken emailValidationSignedToken = new EmailValidationSignedToken();
 		synapseClient.addEmail(emailValidationSignedToken);
@@ -1341,7 +1306,7 @@ public class SynapseClientImplTest {
 	@Test
 	public void testCreateStorageLocationSettingFoundStorageAndProjectSetting() throws SynapseException, RestServiceException {
 		setupGetMyLocationSettings();
-
+		Long storageLocationId = 2L;
 		UploadDestinationListSetting projectSetting = new UploadDestinationListSetting();
 		projectSetting.setLocations(Collections.EMPTY_LIST);
 		when(mockSynapse.getProjectSetting(entityId, ProjectSettingsType.upload)).thenReturn(projectSetting);
@@ -1350,17 +1315,24 @@ public class SynapseClientImplTest {
 		ExternalStorageLocationSetting setting = new ExternalStorageLocationSetting();
 		setting.setBanner(BANNER_2);
 		setting.setUrl("sftp://www.jayhodgson.com");
+		
+		ExternalStorageLocationSetting foundSetting = new ExternalStorageLocationSetting();
+		foundSetting.setBanner(BANNER_2);
+		foundSetting.setUrl("sftp://www.jayhodgson.com");
+		foundSetting.setStorageLocationId(storageLocationId);
+		
+		when(mockSynapse.createStorageLocationSetting(any(StorageLocationSetting.class))).thenReturn(foundSetting);
 
 		synapseClient.createStorageLocationSetting(entityId, setting);
-		// should have found the duplicate storage location, so this is never called
-		verify(mockSynapse, Mockito.never()).createStorageLocationSetting(any(StorageLocationSetting.class));
+		// backend found the duplicate storage location, so this call returns the existing
+		verify(mockSynapse).createStorageLocationSetting(any(StorageLocationSetting.class));
 		// verify updates project setting, and the new location list is a single value (id of existing
 		// storage location)
 		ArgumentCaptor<ProjectSetting> captor = ArgumentCaptor.forClass(ProjectSetting.class);
 		verify(mockSynapse).updateProjectSetting(captor.capture());
 		UploadDestinationListSetting updatedProjectSetting = (UploadDestinationListSetting) captor.getValue();
 		List<Long> locations = updatedProjectSetting.getLocations();
-		assertEquals(new Long(2), locations.get(0));
+		assertEquals(storageLocationId, locations.get(0));
 	}
 
 	@Test

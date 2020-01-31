@@ -11,14 +11,19 @@ import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.GoogleCloudFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -34,9 +39,11 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 	private FileClientsHelp fileClientsHelp;
 	private EventBus eventBus;
 	private SynapseJSNIUtils jsniUtils;
+	private GlobalApplicationState globalAppState;
+	private AuthenticationController authController;
 
 	@Inject
-	public FileTitleBar(FileTitleBarView view, SynapseProperties synapseProperties, FileDownloadMenuItem fileDownloadButton, SynapseJavascriptClient jsClient, FileClientsHelp fileClientsHelp, EventBus eventBus, SynapseJSNIUtils jsniUtils) {
+	public FileTitleBar(FileTitleBarView view, SynapseProperties synapseProperties, FileDownloadMenuItem fileDownloadButton, SynapseJavascriptClient jsClient, FileClientsHelp fileClientsHelp, EventBus eventBus, SynapseJSNIUtils jsniUtils, GlobalApplicationState globalAppState, AuthenticationController authController) {
 		this.view = view;
 		this.synapseProperties = synapseProperties;
 		this.fileDownloadMenuItem = fileDownloadButton;
@@ -44,11 +51,13 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 		this.fileClientsHelp = fileClientsHelp;
 		this.eventBus = eventBus;
 		this.jsniUtils = jsniUtils;
+		this.globalAppState = globalAppState;
+		this.authController = authController;
 		view.setFileDownloadMenuItem(fileDownloadButton.asWidget());
 		view.setPresenter(this);
 	}
 
-	public void configure(EntityBundle bundle) {
+	public void configure(EntityBundle bundle, ActionMenuWidget actionMenu) {
 		this.entityBundle = bundle;
 		view.setCanDownload(entityBundle.getPermissions().getCanDownload());
 		view.setVersionUIVisible(false);
@@ -65,6 +74,7 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 		view.setEntityName(bundle.getEntity().getName());
 		view.setVersion(((FileEntity) entityBundle.getEntity()).getVersionNumber());
 		getLatestVersion();
+		view.setActionMenu(actionMenu);
 		if (isFilenamePanelVisible) {
 			if (fileHandle.getContentMd5() != null) {
 				view.setMd5(fileHandle.getContentMd5());
@@ -168,22 +178,27 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 
 	@Override
 	public void onAddToDownloadList() {
-		// TODO: add special popup to report how many items are in the current download list, and link to
-		// download list.
-		FileEntity entity = (FileEntity) entityBundle.getEntity();
-		jsClient.addFileToDownloadList(entity.getDataFileHandleId(), entity.getId(), new AsyncCallback<DownloadList>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
-			}
-
-			@Override
-			public void onSuccess(DownloadList result) {
-				jsniUtils.sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, "1");
-				view.showAddedToDownloadListAlert(entity.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
-				eventBus.fireEvent(new DownloadListUpdatedEvent());
-			}
-		});
+		if (!authController.isLoggedIn()) {
+			view.showErrorMessage("You will need to sign in to add a file to the Download List.");
+			globalAppState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+		} else {
+			// TODO: add special popup to report how many items are in the current download list, and link to
+			// download list.
+			FileEntity entity = (FileEntity) entityBundle.getEntity();
+			jsClient.addFileToDownloadList(entity.getDataFileHandleId(), entity.getId(), new AsyncCallback<DownloadList>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(caught.getMessage());
+				}
+	
+				@Override
+				public void onSuccess(DownloadList result) {
+					jsniUtils.sendAnalyticsEvent(AddToDownloadList.DOWNLOAD_ACTION_EVENT_NAME, AddToDownloadList.FILES_ADDED_TO_DOWNLOAD_LIST_EVENT_NAME, "1");
+					view.showAddedToDownloadListAlert(entity.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
+					eventBus.fireEvent(new DownloadListUpdatedEvent());
+				}
+			});
+		}
 	}
 
 	@Override

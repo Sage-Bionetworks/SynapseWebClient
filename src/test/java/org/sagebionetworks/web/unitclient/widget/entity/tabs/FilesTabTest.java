@@ -14,10 +14,12 @@ import java.util.Date;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -55,6 +57,7 @@ import org.sagebionetworks.web.client.widget.refresh.EntityRefreshAlert;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class FilesTabTest {
 	@Mock
 	Tab mockTab;
@@ -135,12 +138,13 @@ public class FilesTabTest {
 
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
 		when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);
 		when(mockProjectEntity.getId()).thenReturn(projectEntityId);
 		when(mockProjectEntity.getName()).thenReturn(projectName);
 		when(mockProjectEntityBundle.getPermissions()).thenReturn(mockPermissions);
 		when(mockPortalGinInjector.getEntityRefreshAlert()).thenReturn(mockEntityRefreshAlert);
+		when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
+		
 		tab = new FilesTab(mockTab, mockPortalGinInjector);
 
 		when(mockPortalGinInjector.getFilesTabView()).thenReturn(mockView);
@@ -215,17 +219,16 @@ public class FilesTabTest {
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockProjectEntityBundle, version, mockActionMenuWidget);
+		tab.configure(mockProjectEntityBundle, version);
 
 		verify(mockView, times(2)).setFileTitlebarVisible(false);
 		verify(mockView, times(2)).setFolderTitlebarVisible(false);
 		verify(mockView, times(2)).setPreviewVisible(false);
-		verify(mockView, times(2)).setMetadataVisible(false);
+		verify(mockView, times(2)).setFileFolderUIVisible(false);
 		verify(mockView, times(2)).setWikiPageWidgetVisible(false);
 
 		// note: breadcrumbs are not shown on the project level
 		// show project info
-		verify(mockView, times(2)).clearActionMenuContainer();
 		verify(mockView, times(2)).setProvenanceVisible(false);
 		verify(mockView).clearRefreshAlert();
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
@@ -249,8 +252,8 @@ public class FilesTabTest {
 	public void testConfigureWithFileNoFileHandles() {
 		Long version = 4L;
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
-		tab.configure(mockEntityBundle, version, mockActionMenuWidget);
-
+		tab.configure(mockEntityBundle, version);
+		
 		verify(mockView, times(2)).setPreviewVisible(false);
 		verify(mockView, never()).setPreviewVisible(true);
 	}
@@ -267,26 +270,25 @@ public class FilesTabTest {
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
 
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockEntityBundle, version, mockActionMenuWidget);
-
+		tab.configure(mockEntityBundle, version);
+		
 		verify(mockView).setFileTitlebarVisible(false);
 		verify(mockView).setFileTitlebarVisible(true);
 		verify(mockView, times(2)).setFolderTitlebarVisible(false);
 		verify(mockView).setPreviewVisible(false);
 		verify(mockView).setPreviewVisible(true);
-		verify(mockView).setMetadataVisible(false);
-		verify(mockView).setMetadataVisible(true);
+		verify(mockView).setFileFolderUIVisible(false);
+		verify(mockView).setFileFolderUIVisible(true);
 		verify(mockView).setWikiPageWidgetVisible(false);
 		verify(mockView).setWikiPageWidgetVisible(true);
 
-		verify(mockFileTitleBar).configure(mockEntityBundle);
+		verify(mockFileTitleBar).configure(mockEntityBundle, mockActionMenuWidget);
 		verify(mockPreviewWidget).configure(mockEntityBundle);
 
 		verify(mockEntityMetadata).configure(mockEntityBundle, version, mockActionMenuWidget);
 
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.FILES));
 
-		verify(mockView, times(2)).clearActionMenuContainer();
 		verify(mockView).setProvenanceVisible(true);
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockView).setWikiPageWidgetVisible(true);
@@ -322,14 +324,14 @@ public class FilesTabTest {
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockEntityBundle, version, mockActionMenuWidget);
+		tab.configure(mockEntityBundle, version);
 
 		verify(mockView, times(2)).setFileTitlebarVisible(false);
 		verify(mockView).setFolderTitlebarVisible(false);
 		verify(mockView).setFolderTitlebarVisible(true);
 		verify(mockView, times(2)).setPreviewVisible(false);
-		verify(mockView).setMetadataVisible(false);
-		verify(mockView).setMetadataVisible(true);
+		verify(mockView).setFileFolderUIVisible(false);
+		verify(mockView).setFileFolderUIVisible(true);
 		verify(mockView).setWikiPageWidgetVisible(false);
 		verify(mockView).setWikiPageWidgetVisible(true);
 
@@ -343,7 +345,6 @@ public class FilesTabTest {
 
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.FILES));
 
-		verify(mockView, times(2)).clearActionMenuContainer();
 		verify(mockView, times(2)).setProvenanceVisible(false);
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockView).setWikiPageWidgetVisible(true);
@@ -387,10 +388,9 @@ public class FilesTabTest {
 		verify(mockView).setFileTitlebarVisible(false);
 		verify(mockView).setFolderTitlebarVisible(false);
 		verify(mockView).setPreviewVisible(false);
-		verify(mockView).setMetadataVisible(false);
+		verify(mockView).setFileFolderUIVisible(false);
 		verify(mockView).setWikiPageWidgetVisible(false);
 		verify(mockView).setFileBrowserVisible(false);
-		verify(mockView).clearActionMenuContainer();
 		verify(mockBreadcrumb).clear();
 		verify(mockView).setProvenanceVisible(false);
 		verify(mockModifiedCreatedBy).setVisible(false);

@@ -96,13 +96,19 @@
 						</b:FormGroup>
 					</b:Column>
 				</b:Row>
-				<b:FormGroup>
+				<b:FormGroup ui:field="uploadedFilesUI">
 					<b:FormLabel>Upload your signed and initialed oath AND your
 						documentation (e.g. a letter from a signing official at your
 						institution using your institution's letterhead) below</b:FormLabel>
 					<b:Panel ui:field="filesContainer"
 						addStyleNames="padding-10" />
 				</b:FormGroup>
+				<bh:Div ui:field="actStateHistoryContainer" addStyleNames="margin-bottom-10 margin-top-10">
+					<b:FormGroup>
+						<b:FormLabel>History</b:FormLabel>
+						<t:Table ui:field="actStateHistoryTable" addStyleNames="markdowntable whiteBackground" width="100%" />
+					</b:FormGroup>
+				</bh:Div>
 			</bh:Div>
 			<bh:Div ui:field="synAlertContainer"
 				addStyleNames="margin-top-10" />

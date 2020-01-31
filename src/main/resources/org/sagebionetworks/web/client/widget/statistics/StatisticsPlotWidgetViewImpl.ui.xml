@@ -5,10 +5,13 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
-	<b:Modal ui:field="statsPlotModal" title="" width="760px"
+	<b:Modal ui:field="statsPlotModal" title="" addStyleNames="modal-90-percent"
 		closable="true" dataBackdrop="STATIC" dataKeyboard="true">
 		<b:ModalBody>
 			<bh:Div ui:field="srcContainer" />
+			<bh:Div>
+				<bh:Paragraph addStyleNames="center">This data is collected and processed on a monthly basis.</bh:Paragraph>
+			</bh:Div>
 		</b:ModalBody>
 		<b:ModalFooter>
 			<b:Button ui:field="closeButton" type="DEFAULT" text="Close" />

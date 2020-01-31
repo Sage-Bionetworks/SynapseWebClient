@@ -37,10 +37,9 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 	 * @param startQuery
 	 * @param queryInputListener
 	 */
-	public void configure(String startQuery, QueryInputListener queryInputListener, boolean isEditable) {
+	public void configure(String startQuery, QueryInputListener queryInputListener) {
 		this.startQuery = startQuery;
 		this.queryInputListener = queryInputListener;
-		this.view.setEditVisible(isEditable);
 		onReset();
 	}
 
@@ -55,6 +54,15 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 		view.setQueryInputLoading(true);
 		String sql = view.getInputQueryString();
 		validateAndSendQuery(sql);
+	}
+	
+	@Override
+	public void onShowSimpleSearch() {
+			queryInputListener.onShowSimpleSearch();
+	}
+	
+	public void setShowSimpleSearchButtonVisible(boolean visible) {
+		view.setShowSimpleSearchButtonVisible(visible);
 	}
 
 	/**
@@ -107,15 +115,11 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 	@Override
 	public void queryExecutionStarted() {
 		view.setQueryInputLoading(true);
-		view.setEditEnabled(false);
-		view.setDownloadEnabled(false);
 	}
 
 	@Override
 	public void queryExecutionFinished(boolean wasSuccessful, boolean resultsEditable) {
 		view.setQueryInputLoading(false);
-		view.setEditEnabled(wasSuccessful && resultsEditable);
-		view.setDownloadEnabled(wasSuccessful);
 	}
 
 	@Override
@@ -123,50 +127,18 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 		view.setInputQueryString(startQuery);
 		view.showInputError(false);
 		view.setQueryInputLoading(false);
-		view.setEditEnabled(false);
-		view.setDownloadEnabled(false);
 	}
 
-	@Override
-	public void onEditResults() {
-		queryInputListener.onEditResults();
-	}
-
-	@Override
-	public void onExportTable() {
-		queryInputListener.onDownloadResults();
-	}
 
 	public String getInputSQL() {
 		return view.getInputQueryString();
-	}
-
-	@Override
-	public void onShowQuery() {
-		queryInputListener.onShowQuery();
 	}
 
 	public void setQueryInputVisible(boolean visible) {
 		view.setQueryInputVisible(visible);
 	}
 
-	public void setShowQueryVisible(boolean visible) {
-		view.setShowQueryVisible(visible);
-	}
 
-	public void setDownloadFilesVisible(boolean visible) {
-		view.setDownloadFilesVisible(visible);
-	}
-
-	@Override
-	public void onDownloadFilesProgrammatically() {
-		queryInputListener.onShowDownloadFilesProgrammatically();
-	}
-
-	@Override
-	public void onAddToDownloadList() {
-		queryInputListener.onAddToDownloadList();
-	}
 
 	public void setVisible(boolean visible) {
 		view.asWidget().setVisible(visible);

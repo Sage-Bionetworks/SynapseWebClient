@@ -17,7 +17,7 @@ import com.google.inject.Inject;
  * @author John
  * 
  */
-public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener, ActionMenuWidgetView.Presenter {
+public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 
 	ActionMenuWidgetView view;
 
@@ -29,7 +29,6 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener, A
 		this.view = view;
 		this.actionViewMap = new HashMap<Action, ActionView>();
 		this.actionListenerMap = new HashMap<Action, List<ActionListener>>();
-		view.setPresenter(this);
 		// synchronize with the view
 		for (ActionView av : this.view.listActionViews()) {
 			Action action = av.getAction();
@@ -144,5 +143,10 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener, A
 	@Override
 	public void setToolsButtonIcon(String text, IconType icon) {
 		view.setToolsButtonIcon(text, icon);
+	}
+	
+	@Override
+	public void setTableDownloadOptionsVisible(boolean visible) {
+		view.setTableDownloadOptionsVisible(visible);
 	}
 }

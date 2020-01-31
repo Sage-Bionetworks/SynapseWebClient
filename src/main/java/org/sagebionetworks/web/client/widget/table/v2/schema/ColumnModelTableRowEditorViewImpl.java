@@ -71,6 +71,14 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 		isInAlphaMode = DisplayUtils.isInTestWebsite(cookies);
 		type.setVisible(!isInAlphaMode);
 		alphaType.setVisible(isInAlphaMode);
+		ChangeHandler typeChangeHandler = new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				presenter.onTypeChanged();
+			}
+		};
+		alphaType.addChangeHandler(typeChangeHandler);
+		type.addChangeHandler(typeChangeHandler);
 	}
 
 	@Override
@@ -107,12 +115,6 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	@Override
 	public void setTypePresenter(TypePresenter presenterIn) {
 		this.presenter = presenterIn;
-		type.addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				presenter.onTypeChanged();
-			}
-		});
 	}
 
 	@Override
@@ -127,6 +129,7 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 
 	@Override
 	public void setColumnType(ColumnTypeViewEnum columnType) {
+		typeStatic.setText(columnType.name());
 		ListBox listBox = isInAlphaMode ? alphaType : type;
 		int index = 0;
 		String targetName = columnType.name();
@@ -143,7 +146,6 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	public void setFacetType(ColumnFacetTypeViewEnum type) {
 		int index = 0;
 		String targetName = type.toString();
-		typeStatic.setText(targetName);
 		for (int i = 0; i < this.facet.getItemCount(); i++) {
 			if (this.facet.getValue(i).equals(targetName)) {
 				index = i;
@@ -279,6 +281,7 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 		nameGroup.setVisible(false);
 		sizeGroup.setVisible(false);
 		type.setVisible(false);
+		alphaType.setVisible(false);
 
 		nameStatic.setVisible(true);
 		typeStatic.setVisible(true);

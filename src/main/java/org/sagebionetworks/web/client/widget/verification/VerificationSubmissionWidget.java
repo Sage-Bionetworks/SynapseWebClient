@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
@@ -25,6 +26,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class VerificationSubmissionWidget implements VerificationSubmissionWidgetView.Presenter, IsWidget {
+	private static final String ACT_NOTES_PROMPT = "ACT notes (optional)";
 	public static final String FILL_IN_PROFILE_FIELDS_MESSAGE = "Please edit your profile to fill in your first name, last name, affiliation, and city/country before requesting profile validation.";
 	private UserProfileClientAsync userProfileClient;
 	private SynapseAlert synAlert;
@@ -34,7 +36,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	private String orcId;
 	private List<AttachmentMetadata> existingAttachments;
 	private VerificationSubmissionWidgetView view;
-	private RejectReasonWidget promptModal;
 	private GlobalApplicationState globalAppState;
 	private PortalGinInjector ginInjector;
 	private GWTWrapper gwt;
@@ -43,16 +44,16 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	private VerificationStateEnum actRejectState;
 	private boolean isACTMember;
 	private boolean isNewSubmission;
+	private boolean isModal;
 	private Callback resubmitCallback;
 
 	@Inject
-	public VerificationSubmissionWidget(PortalGinInjector ginInjector, UserProfileClientAsync userProfileClient, SynapseAlert synAlert, FileHandleList fileHandleList, RejectReasonWidget promptModalView, GlobalApplicationState globalAppState, GWTWrapper gwt) {
+	public VerificationSubmissionWidget(PortalGinInjector ginInjector, UserProfileClientAsync userProfileClient, SynapseAlert synAlert, FileHandleList fileHandleList, GlobalApplicationState globalAppState, GWTWrapper gwt) {
 		this.ginInjector = ginInjector;
 		this.userProfileClient = userProfileClient;
 		fixServiceEntryPoint(userProfileClient);
 		this.synAlert = synAlert;
 		this.fileHandleList = fileHandleList;
-		this.promptModal = promptModalView;
 		this.globalAppState = globalAppState;
 		this.gwt = gwt;
 	}
@@ -64,7 +65,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			view = ginInjector.getVerificationSubmissionRowViewImpl();
 		}
 		view.setFileHandleList(fileHandleList.asWidget());
-		view.setPromptModal(promptModal.asWidget());
 		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
 	}
@@ -84,9 +84,22 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		this.existingAttachments = verificationSubmission.getAttachments();
 		this.orcId = null;
 		this.profile = null;
+		this.isModal = isModal;
 		initView(isModal);
 		view.setProfileLink(verificationSubmission.getCreatedBy(), "#!Profile:" + verificationSubmission.getCreatedBy());
 		return this;
+	}
+	
+	@Override
+	public void showSubmissionInModal() {
+		VerificationSubmissionWidget widget = ginInjector.getVerificationSubmissionWidget();
+		boolean isModal = true;
+		if (isNewSubmission) {
+			widget.configure(profile, orcId, isModal, existingAttachments);
+		} else {
+			widget.configure(submission, isACTMember, isModal);
+		}
+		widget.show();
 	}
 
 	public VerificationSubmissionWidget setResubmitCallback(Callback c) {
@@ -109,6 +122,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		this.orcId = orcId;
 		this.submission = null;
 		this.existingAttachments = existingAttachments;
+		this.isModal = isModal;
 		initView(isModal);
 		return this;
 	}
@@ -137,6 +151,8 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			view.setEmails(profile.getEmails());
 			view.setTitle("Profile Validation");
 			view.setProfileFieldsEditable(true);
+			view.setACTStateHistoryVisible(false);
+			view.setUploadedFilesUIVisible(true);
 			initAttachments();
 			view.show();
 		}
@@ -157,6 +173,14 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 
 		VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size() - 1);
 		view.setState(currentState.getState());
+		view.setACTStateHistoryVisible(isACTMember);
+		if (isACTMember) {
+			view.setACTStateHistory(submission.getStateHistory());
+		}
+		view.setShowSubmissionInModalButtonVisible(isACTMember && !isModal);
+		// only show the uploaded files if in submitted state
+		view.setUploadedFilesUIVisible(VerificationStateEnum.SUBMITTED.equals(currentState.getState()));
+		
 		if (VerificationStateEnum.SUBMITTED.equals(currentState.getState())) {
 			// pending
 			view.setApproveButtonVisible(isACTMember);
@@ -172,7 +196,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			view.setTitle("Profile Validation Suspended");
 			view.setSuspendedReason(currentState.getReason());
 			view.setSuspendedAlertVisible(true);
-			view.setResubmitButtonVisible(true);
+			view.setResubmitButtonVisible(!isACTMember);
 			view.setCloseButtonVisible(true);
 		}
 		fileHandleList.configure().setCanDelete(false).setCanUpload(false);
@@ -217,16 +241,41 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		return true;
 	}
 
+	private String getConfirmationDialogTitle(VerificationStateEnum newState) {
+		String verb = "";
+		switch (newState) {
+			case SUSPENDED : 
+				verb = "Suspend";
+				break;
+			case REJECTED : 
+				verb = "Reject";
+				break;
+			case APPROVED :
+				verb = "Approve";
+				break;
+			case SUBMITTED:
+			default :
+				// should be unreachable
+		}
+		return "Are you sure you want to " + verb + " this User Profile Validation Submission?";
+	}
+	
 	@Override
 	public void approveVerification() {
-		updateVerificationState(VerificationStateEnum.APPROVED, null);
+		PromptForValuesModalView promptForValuesModal = ginInjector.getPromptForValuesModal();
+		view.setPromptModal(promptForValuesModal.asWidget());
+		promptForValuesModal.configureAndShow(getConfirmationDialogTitle(VerificationStateEnum.APPROVED), ACT_NOTES_PROMPT, "", actNotes -> {
+			promptForValuesModal.hide();
+			updateVerificationState(VerificationStateEnum.APPROVED, null, actNotes);	
+		});
 	}
 
-	public void updateVerificationState(VerificationStateEnum state, String reason) {
+	public void updateVerificationState(VerificationStateEnum state, String reason, String notes) {
 		long verificationId = Long.parseLong(submission.getId());
 		VerificationState newState = new VerificationState();
 		newState.setState(state);
 		newState.setReason(reason);
+		newState.setNotes(notes);
 		userProfileClient.updateVerificationState(verificationId, newState, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
@@ -299,8 +348,15 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	}
 
 	private void rejectSuspendVerification() {
+		RejectReasonWidget promptModal = ginInjector.getRejectReasonWidget();
+		view.setPromptModal(promptModal.asWidget());
 		promptModal.show(rejectionReason -> {
-			updateVerificationState(actRejectState, rejectionReason);
+			PromptForValuesModalView promptForValuesModal = ginInjector.getPromptForValuesModal();
+			view.setPromptModal(promptForValuesModal.asWidget());
+			promptForValuesModal.configureAndShow(getConfirmationDialogTitle(actRejectState), ACT_NOTES_PROMPT, "", actNotes -> {
+				promptForValuesModal.hide();
+				updateVerificationState(actRejectState, rejectionReason, actNotes);	
+			});
 		});
 	}
 

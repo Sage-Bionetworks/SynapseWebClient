@@ -116,28 +116,19 @@ public class ForumWidget implements ForumWidgetView.Presenter {
 		subscribeToForumButton.setOnSubscribeCallback(refreshThreadsCallback);
 		subscribeToForumButton.setOnUnsubscribeCallback(refreshThreadsCallback);
 
-		threadListWidget.setThreadIdClickedCallback(new CallbackP<DiscussionThreadBundle>() {
-			@Override
-			public void invoke(DiscussionThreadBundle bundle) {
-				String replyId = null;
-				showThread(bundle.getId(), replyId);
-				urlChangeCallback.invoke();
-			}
+		threadListWidget.setThreadIdClickedCallback(bundle -> {
+			String replyId = null;
+			showThread(bundle.getId(), replyId);
+			urlChangeCallback.invoke();
 		});
-		deletedThreadListWidget.setThreadIdClickedCallback(new CallbackP<DiscussionThreadBundle>() {
-			@Override
-			public void invoke(DiscussionThreadBundle bundle) {
-				String replyId = null;
-				showThread(bundle.getId(), replyId);
-				urlChangeCallback.invoke();
-			}
+		deletedThreadListWidget.setThreadIdClickedCallback(bundle -> {
+			String replyId = null;
+			showThread(bundle.getId(), replyId);
+			urlChangeCallback.invoke();
 		});
-		singleThreadWidget.setReplyIdCallback(new CallbackP<String>() {
-			@Override
-			public void invoke(String replyId) {
-				updatePlaceToReply(replyId);
-				urlChangeCallback.invoke();
-			}
+		singleThreadWidget.setReplyIdCallback(replyId -> {
+			updatePlaceToReply(replyId);
+			urlChangeCallback.invoke();
 		});
 	}
 
@@ -358,6 +349,7 @@ public class ForumWidget implements ForumWidgetView.Presenter {
 
 	public void configureActionMenu() {
 		if (actionMenu != null) {
+			view.setActionMenu(actionMenu);
 			// add listener for forum commands
 			actionMenu.setActionListener(Action.CREATE_THREAD, new ActionMenuWidget.ActionListener() {
 				@Override

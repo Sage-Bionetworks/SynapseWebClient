@@ -58,6 +58,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	public static final long BUNDLE_MASK_QUERY_COLUMN_MODELS = 0x10;
 	public static final long BUNDLE_MASK_QUERY_FACETS = 0x20;
 	public static final long BUNDLE_MASK_QUERY_SUM_FILE_SIZES = 0x40;
+	public static final long BUNDLE_MASK_QUERY_LAST_UPDATED = 0x80;
 
 
 	private static final Long ALL_PARTS_MASK = new Long(255);
@@ -171,7 +172,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 
 			// run the job
 			QueryBundleRequest qbr = new QueryBundleRequest();
-			long partMask = BUNDLE_MASK_QUERY_RESULTS;
+			long partMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_LAST_UPDATED;
 			// do not ask for query count
 			if (cachedFullQueryResultBundle == null) {
 				partMask = partMask | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS;

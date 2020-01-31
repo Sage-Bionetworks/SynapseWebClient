@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.gwtbootstrap3.client.ui.Column;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -20,8 +21,6 @@ public class TablesTabViewImpl implements TablesTabView {
 	@UiField
 	SimplePanel tableMetadataContainer;
 	@UiField
-	SimplePanel tableActionMenuContainer;
-	@UiField
 	SimplePanel tableWidgetContainer;
 	@UiField
 	SimplePanel tableModifiedAndCreatedContainer;
@@ -33,6 +32,10 @@ public class TablesTabViewImpl implements TablesTabView {
 	Column provenanceContainer;
 	@UiField
 	Div provenanceContainerHighlightBox;
+	@UiField
+	Div actionMenuContainer;
+	@UiField
+	Heading title;
 
 	public interface TabsViewImplUiBinder extends UiBinder<Widget, TablesTabViewImpl> {
 	}
@@ -83,22 +86,13 @@ public class TablesTabViewImpl implements TablesTabView {
 	}
 
 	@Override
-	public void setActionMenu(Widget w) {
-		tableActionMenuContainer.setWidget(w);
-	}
-
-	@Override
-	public void clearActionMenuContainer() {
-		tableActionMenuContainer.clear();
-	}
-
-	@Override
 	public void setSynapseAlert(Widget w) {
 		synapseAlertContainer.setWidget(w);
 	}
 
 	@Override
 	public void setBreadcrumbVisible(boolean visible) {
+		title.setVisible(!visible);
 		tableBreadcrumbContainer.setVisible(visible);
 	}
 
@@ -123,7 +117,7 @@ public class TablesTabViewImpl implements TablesTabView {
 	}
 
 	@Override
-	public void setProvenanceVisible(boolean visible) {
+	public void setTableUIVisible(boolean visible) {
 		provenanceContainer.setVisible(visible);
 	}
 
@@ -131,6 +125,13 @@ public class TablesTabViewImpl implements TablesTabView {
 	public void setProvenance(IsWidget w) {
 		provenanceContainerHighlightBox.clear();
 		provenanceContainerHighlightBox.add(w);
+	}
+
+	@Override
+	public void setActionMenu(IsWidget w) {
+		w.asWidget().removeFromParent();
+		actionMenuContainer.clear();
+		actionMenuContainer.add(w);
 	}
 }
 

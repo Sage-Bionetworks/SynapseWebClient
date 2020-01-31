@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -35,6 +36,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
@@ -71,6 +73,8 @@ public class VerificationSubmissionWidgetTest {
 	GWTWrapper mockGWT;
 	@Mock
 	HashMap<String, WikiPageKey> mockWikiPageMap;
+	@Mock
+	PromptForValuesModalView mockPromptForValuesModal;
 	@Captor
 	ArgumentCaptor<CallbackP<String>> promptModalPresenterCaptor;
 	CallbackP<String> confirmRejectionCallback;
@@ -95,7 +99,9 @@ public class VerificationSubmissionWidgetTest {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.getVerificationSubmissionModalViewImpl()).thenReturn(mockView);
 		when(mockGinInjector.getVerificationSubmissionRowViewImpl()).thenReturn(mockRowView);
-		widget = new VerificationSubmissionWidget(mockGinInjector, mockUserProfileClient, mockSynapseAlert, mockFileHandleList, mockPromptModalWidget, mockGlobalApplicationState, mockGWT);
+		when(mockGinInjector.getRejectReasonWidget()).thenReturn(mockPromptModalWidget);
+		when(mockGinInjector.getPromptForValuesModal()).thenReturn(mockPromptForValuesModal);
+		widget = new VerificationSubmissionWidget(mockGinInjector, mockUserProfileClient, mockSynapseAlert, mockFileHandleList, mockGlobalApplicationState, mockGWT);
 
 		when(mockGWT.getHostPageBaseURL()).thenReturn(hostPageURL);
 		when(mockSubmission.getId()).thenReturn(submissionId);
@@ -160,7 +166,6 @@ public class VerificationSubmissionWidgetTest {
 		assertFalse(widget.isNewSubmission());
 		verify(mockGinInjector).getVerificationSubmissionModalViewImpl();
 		verify(mockView).setFileHandleList(any(Widget.class));
-		verify(mockView).setPromptModal(any(Widget.class));
 		verify(mockView).setSynAlert(any(Widget.class));
 		verify(mockView).setPresenter(widget);
 
@@ -177,7 +182,6 @@ public class VerificationSubmissionWidgetTest {
 		assertTrue(widget.isNewSubmission());
 		verify(mockGinInjector).getVerificationSubmissionModalViewImpl();
 		verify(mockView).setFileHandleList(any(Widget.class));
-		verify(mockView).setPromptModal(any(Widget.class));
 		verify(mockView).setSynAlert(any(Widget.class));
 		verify(mockView).setPresenter(widget);
 	}
@@ -190,7 +194,6 @@ public class VerificationSubmissionWidgetTest {
 		widget.configure(mockSubmission, isACTMember, isModal);
 		verify(mockGinInjector).getVerificationSubmissionRowViewImpl();
 		verify(mockRowView).setFileHandleList(any(Widget.class));
-		verify(mockRowView).setPromptModal(any(Widget.class));
 		verify(mockRowView).setSynAlert(any(Widget.class));
 		verify(mockRowView).setPresenter(widget);
 
@@ -252,6 +255,8 @@ public class VerificationSubmissionWidgetTest {
 		verify(mockView).setEmails(profile.getEmails());
 		verify(mockFileHandleList, times(submissionAttachments.size())).addFileLink(anyString(), anyString());
 		verify(mockFileHandleList).refreshLinkUI();
+		verify(mockView).setACTStateHistoryVisible(false);
+		verify(mockView).setUploadedFilesUIVisible(true);
 		verify(mockView).show();
 	}
 
@@ -278,9 +283,14 @@ public class VerificationSubmissionWidgetTest {
 		verify(mockView).setCloseButtonVisible(true);
 
 		// in the configureWithMockSubmission, the current user is not a member of the ACT
+		verify(mockView).setACTStateHistoryVisible(false);
+		verify(mockView, never()).setACTStateHistory(anyList());
+		verify(mockView).setShowSubmissionInModalButtonVisible(false);
+		// is in Submitted state, so show the file list
+		verify(mockView).setUploadedFilesUIVisible(true);
 		verify(mockView).setApproveButtonVisible(false);
 		verify(mockView).setRejectButtonVisible(false);
-
+		
 		verify(mockFileHandleList).configure();
 		verify(mockFileHandleList).setCanDelete(false);
 		verify(mockFileHandleList).setCanUpload(false);
@@ -291,7 +301,7 @@ public class VerificationSubmissionWidgetTest {
 	}
 
 	@Test
-	public void testShowExistingSubmittedVerificationSubmissionAsACT() {
+	public void testShowExistingSubmittedVerificationSubmissionAsACTAsModal() {
 		boolean isACTMember = true;
 		boolean isModal = true;
 		widget.configure(mockSubmission, isACTMember, isModal);
@@ -299,7 +309,27 @@ public class VerificationSubmissionWidgetTest {
 		widget.show();
 		verify(mockView).setApproveButtonVisible(true);
 		verify(mockView).setRejectButtonVisible(true);
+		verify(mockView).setACTStateHistoryVisible(true);
+		verify(mockView).setACTStateHistory(anyList());
+		verify(mockView).setShowSubmissionInModalButtonVisible(false);
+		verify(mockView).setUploadedFilesUIVisible(true);
 	}
+	
+	@Test
+	public void testShowExistingSubmittedVerificationSubmissionAsACTAsRow() {
+		boolean isACTMember = true;
+		boolean isModal = false;
+		widget.configure(mockSubmission, isACTMember, isModal);
+		setCurrentMockState(VerificationStateEnum.SUBMITTED, null);
+		widget.show();
+		verify(mockRowView).setApproveButtonVisible(true);
+		verify(mockRowView).setRejectButtonVisible(true);
+		verify(mockRowView).setACTStateHistoryVisible(true);
+		verify(mockRowView).setACTStateHistory(anyList());
+		verify(mockRowView).setShowSubmissionInModalButtonVisible(true);
+		verify(mockRowView).setUploadedFilesUIVisible(true);
+	}
+
 
 	@Test
 	public void testShowExistingApprovedVerificationSubmission() {
@@ -347,7 +377,8 @@ public class VerificationSubmissionWidgetTest {
 	public void testUpdateVerificationState() {
 		configureWithMockSubmission();
 		String reason = "suspending submission for this reason";
-		widget.updateVerificationState(VerificationStateEnum.SUSPENDED, reason);
+		String notes = "ACT internal notes";
+		widget.updateVerificationState(VerificationStateEnum.SUSPENDED, reason, notes);
 		verify(mockView).showInfo(anyString());
 		verify(mockView).hide();
 		verify(mockGlobalApplicationState).refreshPage();
@@ -357,10 +388,11 @@ public class VerificationSubmissionWidgetTest {
 	public void testUpdateVerificationStateFailure() {
 		configureWithMockSubmission();
 		String reason = "suspending submission for this reason";
+		String notes = "ACT internal notes";
 		Exception ex = new Exception("something went wrong");
 		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).updateVerificationState(anyLong(), any(VerificationState.class), anyString(), any(AsyncCallback.class));
 
-		widget.updateVerificationState(VerificationStateEnum.SUSPENDED, reason);
+		widget.updateVerificationState(VerificationStateEnum.SUSPENDED, reason, notes);
 		verify(mockSynapseAlert).handleException(ex);
 	}
 
@@ -378,9 +410,34 @@ public class VerificationSubmissionWidgetTest {
 		String rejectMessage = "wrong wrong wrong";
 		confirmRejectionCallback = promptModalPresenterCaptor.getValue();
 		confirmRejectionCallback.invoke(rejectMessage);
-
+		
+		String actNotes = "user missed something";
+		verify(mockPromptForValuesModal).configureAndShow(anyString(), anyString(), anyString(), promptModalPresenterCaptor.capture());
+		confirmRejectionCallback = promptModalPresenterCaptor.getValue();
+		confirmRejectionCallback.invoke(actNotes);
+		
 		verify(mockUserProfileClient).updateVerificationState(anyLong(), verificationStateCaptor.capture(), anyString(), any(AsyncCallback.class));
+		assertEquals(VerificationStateEnum.REJECTED, verificationStateCaptor.getValue().getState());
 		assertEquals(rejectMessage, verificationStateCaptor.getValue().getReason());
+		assertEquals(actNotes, verificationStateCaptor.getValue().getNotes());
+	}
+	
+	@Test
+	public void testApproveVerification() {
+		boolean isACTMember = true;
+		boolean isModal = true;
+		widget.configure(mockSubmission, isACTMember, isModal);
+
+		widget.approveVerification();
+		
+		String actNotes = "user is amazing";
+		verify(mockPromptForValuesModal).configureAndShow(anyString(), anyString(), anyString(), promptModalPresenterCaptor.capture());
+		confirmRejectionCallback = promptModalPresenterCaptor.getValue();
+		confirmRejectionCallback.invoke(actNotes);
+		
+		verify(mockUserProfileClient).updateVerificationState(anyLong(), verificationStateCaptor.capture(), anyString(), any(AsyncCallback.class));
+		assertEquals(VerificationStateEnum.APPROVED, verificationStateCaptor.getValue().getState());
+		assertEquals(actNotes, verificationStateCaptor.getValue().getNotes());
 	}
 
 	@Test

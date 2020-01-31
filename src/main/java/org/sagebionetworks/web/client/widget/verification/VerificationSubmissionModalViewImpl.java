@@ -4,18 +4,27 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
+import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.repo.model.table.ColumnType;
+import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.web.client.DisplayUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+import org.sagebionetworks.web.client.view.bootstrap.table.Table;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -80,59 +89,54 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	Alert reasonAlert;
 	@UiField
 	Paragraph reasonAlertText;
-
+	@UiField
+	Div actStateHistoryContainer;
+	@UiField
+	FormGroup uploadedFilesUI;
+	@UiField
+	Table actStateHistoryTable;
+	TableRow actStateHistoryTableHeaderRow;
+	CellFactory cellFactory;
+	
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
 
 	@Inject
-	public VerificationSubmissionModalViewImpl(Binder binder) {
+	public VerificationSubmissionModalViewImpl(Binder binder, CellFactory cellFactory) {
 		widget = binder.createAndBindUi(this);
+		this.cellFactory = cellFactory;
 
 		// click handlers
-		submitButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.submitVerification();
-			}
+		submitButton.addClickHandler(event -> {
+			presenter.submitVerification();
 		});
-		approveButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.approveVerification();
-			}
+		approveButton.addClickHandler(event -> {
+			presenter.approveVerification();
 		});
-		rejectButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.rejectVerification();
-			}
+		rejectButton.addClickHandler(event -> {
+			presenter.rejectVerification();
 		});
-		suspendButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.suspendVerification();
-			}
+		suspendButton.addClickHandler(event -> {
+			presenter.suspendVerification();
 		});
-		deleteButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.deleteVerification();
-			}
+		deleteButton.addClickHandler(event -> {
+			presenter.deleteVerification();
 		});
-		cancelButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
+		cancelButton.addClickHandler(event -> {
 				dialog.hide();
-			}
 		});
-		recreateSubmissionButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
+		recreateSubmissionButton.addClickHandler(event -> {
 				presenter.recreateVerification();
-			}
 		});
+		
+		actStateHistoryTableHeaderRow = new TableRow();
+		actStateHistoryTableHeaderRow.add(getTableHeader("Date"));
+		actStateHistoryTableHeaderRow.add(getTableHeader("User"));
+		actStateHistoryTableHeaderRow.add(getTableHeader("State"));
+		actStateHistoryTableHeaderRow.add(getTableHeader("Reason"));
+		actStateHistoryTableHeaderRow.add(getTableHeader("ACT Internal Notes"));
 	}
 
 	@Override
@@ -169,6 +173,7 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 		reasonAlert.setVisible(false);
 		recreateSubmissionButton.setVisible(false);
 		modalTitle.setText("");
+		actStateHistoryTable.clear();
 	}
 
 	@Override
@@ -346,5 +351,57 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	@Override
 	public void setCloseButtonVisible(boolean visible) {
 		closeButton.setVisible(visible);
+	}
+
+	@Override
+	public void setACTStateHistoryVisible(boolean visible) {
+		actStateHistoryContainer.setVisible(visible);
+	}
+	
+	private TableHeader getTableHeader(String text) {
+		TableHeader th = new TableHeader();
+		th.setText(text);
+		return th;
+	}
+	private TableData getNewTableData(IsWidget child) {
+		TableData td = new TableData();
+		td.add(child);
+		return td;
+	}
+	
+	private Text getTextWidget(String value) {
+		String v = value == null ? "" : value;
+		return new Text(v);
+	}
+	
+	@Override
+	public void setACTStateHistory(List<VerificationState> stateHistory) {
+		actStateHistoryTable.clear();
+		actStateHistoryTable.add(actStateHistoryTableHeaderRow);
+		
+		for (VerificationState state : stateHistory) {
+			TableRow row = new TableRow();
+			// date, user, state, reason, notes
+			Cell dateRenderer = cellFactory.createRenderer(ColumnType.DATE);
+			dateRenderer.setValue(state.getCreatedOn().getTime() + "");
+			row.add(getNewTableData(dateRenderer));
+			Cell userRenderer = cellFactory.createRenderer(ColumnType.USERID);
+			userRenderer.setValue(state.getCreatedBy());
+			row.add(getNewTableData(userRenderer));
+			row.add(getNewTableData(getTextWidget(state.getState().toString())));
+			row.add(getNewTableData(getTextWidget(state.getReason())));
+			row.add(getNewTableData(getTextWidget(state.getNotes())));
+			actStateHistoryTable.add(row);
+		}
+	}
+	
+	@Override
+	public void setShowSubmissionInModalButtonVisible(boolean visible) {
+		// does nothing in this implementation
+	}
+	
+	@Override
+	public void setUploadedFilesUIVisible(boolean visible) {
+		uploadedFilesUI.setVisible(visible);
 	}
 }

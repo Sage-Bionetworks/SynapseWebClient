@@ -97,6 +97,7 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDi
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiVersionAnchorListItem;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
+import org.sagebionetworks.web.client.widget.entity.act.RejectReasonWidget;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialog;
@@ -199,6 +200,7 @@ import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.api.APITableWidget;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
@@ -827,4 +829,8 @@ public interface PortalGinInjector extends Ginjector {
 	StatisticsPlotWidget getStatisticsPlotWidget();
 
 	QuarantinedEmailModal getQuarantinedEmailModal();
+	
+	ViewDefaultColumns getViewDefaultColumns();
+	
+	RejectReasonWidget getRejectReasonWidget();
 }

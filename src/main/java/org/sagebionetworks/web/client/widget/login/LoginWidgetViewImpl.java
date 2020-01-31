@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.client.widget.login;
 
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.view.users.RegisterAccountViewImpl;
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Element;
@@ -20,12 +24,15 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 	SynapseJSNIUtils jsniUtils;
 
 	@Inject
-	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder, SynapseJSNIUtils jsniUtils) {
+	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder, SynapseJSNIUtils jsniUtils, GlobalApplicationState globalAppState) {
 		widget = binder.createAndBindUi(this);
 		this.jsniUtils = jsniUtils;
 		widget.addAttachHandler(event -> {
 			if (event.isAttached()) {
-				_createSRCLogin(srcLoginContainer.getElement(), RegisterAccountViewImpl.GOOGLE_OAUTH_CALLBACK_URL);
+				Place defaultPlace = new Profile(Profile.VIEW_PROFILE_TOKEN, ProfileArea.PROJECTS);
+				String token = "#"+globalAppState.getAppPlaceHistoryMapper().getToken(globalAppState.getLastPlace(defaultPlace));
+				
+				_createSRCLogin(srcLoginContainer.getElement(), token, RegisterAccountViewImpl.GOOGLE_OAUTH_CALLBACK_URL);
 			} else {
 				// detach event, clean up react component
 				jsniUtils.unmountComponentAtNode(srcLoginContainer.getElement());
@@ -33,12 +40,13 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 		});
 	}
 
-	private static native void _createSRCLogin(Element el, String googleSSORedirectUrl) /*-{
+	private static native void _createSRCLogin(Element el, String token, String googleSSORedirectUrl) /*-{
 		try {
 			var props = {
 				theme : 'light',
 				icon : true,
-				googleRedirectUrl : googleSSORedirectUrl
+				googleRedirectUrl : googleSSORedirectUrl,
+				redirectUrl : token
 			};
 
 			$wnd.ReactDOM.render($wnd.React.createElement(

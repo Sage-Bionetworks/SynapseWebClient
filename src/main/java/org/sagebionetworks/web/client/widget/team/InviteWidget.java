@@ -2,14 +2,20 @@ package org.sagebionetworks.web.client.widget.team;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.ValidationUtils.isValidEmail;
+import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_CERTIFIED;
 import java.util.ArrayList;
 import java.util.List;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -29,15 +35,19 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	private SynapseSuggestBox peopleSuggestWidget;
 	private List<String> inviteEmails, inviteUsers;
 	private String currentlyProcessingEmail, currentlyProcessingUser, invitationMessage;
+	private PortalGinInjector ginInjector;
 	private AsyncCallback<Void> inviteCallback;
+	private boolean isCertified;
+	private QuizInfoDialog quizInfoDialog;
 
 	@Inject
-	public InviteWidget(InviteWidgetView view, SynapseClientAsync synapseClient, GWTWrapper gwt, SynapseAlert synAlert, SynapseSuggestBox peopleSuggestBox, UserGroupSuggestionProvider provider) {
+	public InviteWidget(InviteWidgetView view, SynapseClientAsync synapseClient, GWTWrapper gwt, SynapseAlert synAlert, SynapseSuggestBox peopleSuggestBox, UserGroupSuggestionProvider provider, PortalGinInjector ginInjector) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.gwt = gwt;
 		this.synAlert = synAlert;
+		this.ginInjector = ginInjector;
 		this.peopleSuggestWidget = peopleSuggestBox;
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		peopleSuggestWidget.setTypeFilter(TypeFilter.USERS_ONLY);
@@ -73,6 +83,13 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 		view.setPresenter(this);
 	}
 
+	public QuizInfoDialog getQuizInfoDialog() {
+		if (quizInfoDialog == null) {
+			quizInfoDialog = ginInjector.getQuizInfoDialog();
+		}
+		return quizInfoDialog;
+	}
+
 	/**
 	 * @return true if successfully added an item (or no item was to be added), false if the input
 	 *         suggestion was invalid
@@ -81,6 +98,11 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 		synAlert.clear();
 		String input = peopleSuggestWidget.getText();
 		if (isValidEmail(input)) {
+			if (!isCertified) {
+				view.hide();
+				getQuizInfoDialog().show();
+				return false;
+			}
 			inviteEmails.add(input);
 			view.addEmailToInvite(input);
 			peopleSuggestWidget.clear();
@@ -103,6 +125,20 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 		inviteUsers = new ArrayList<String>();
 		this.team = team;
 		peopleSuggestWidget.setPlaceholderText("Enter a user name...");
+		isCertified = false;
+		
+		ginInjector.getSynapseJavascriptClient().getUserBundle(Long.parseLong(ginInjector.getAuthenticationController().getCurrentUserPrincipalId()), IS_CERTIFIED, new AsyncCallback<UserBundle>() {
+			@Override
+			public void onSuccess(UserBundle bundle) {
+				isCertified = bundle.getIsCertified();
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		});
+
 	}
 
 	public void clear() {

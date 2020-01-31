@@ -17,7 +17,7 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
-		<synapse.version>288.0-5-g23cec2e</synapse.version>
+		<synapse.version>294.0</synapse.version>
 		<gwtVersion>2.8.2</gwtVersion>
 		<org.springframework.version>4.3.18.RELEASE</org.springframework.version>
 		<guiceVersion>3.0</guiceVersion>
@@ -28,7 +28,7 @@
 		<jackson.version>1.8.1</jackson.version>
 		<log4j.version>2.6.1</log4j.version>
 		<markdown.version>2016-01-22-a2731f7-19</markdown.version>
-		<gwtbootstrap3.version>1.5.9</gwtbootstrap3.version>
+		<gwtbootstrap3.version>1.5.10</gwtbootstrap3.version>
 		<gwtbootstrap3.extras.version>1.5.2</gwtbootstrap3.extras.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<gwtvisualizationwrappers.version>1.6-gwt-2.7.0</gwtvisualizationwrappers.version>

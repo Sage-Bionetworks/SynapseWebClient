@@ -25,6 +25,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
@@ -86,6 +87,8 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	HelpWidget viewOnlyHelp;
 	@UiField
 	Button downloadOptionsButton;
+	@UiField
+	Div actionMenuContainer;
 
 	interface FileTitleBarViewImplUiBinder extends UiBinder<Widget, FileTitleBarViewImpl> {
 	}
@@ -236,4 +239,12 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		downloadOptionsButton.setEnabled(canDownload);
 		viewOnlyHelp.setVisible(!canDownload);
 	}
+	
+	@Override
+	public void setActionMenu(IsWidget w) {
+		w.asWidget().removeFromParent();
+		actionMenuContainer.clear();
+		actionMenuContainer.add(w);
+	}
+
 }

@@ -1,8 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
-import org.gwtbootstrap3.client.ui.AnchorListItem;
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Divider;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.TextBox;
@@ -39,18 +38,7 @@ public class QueryInputViewImpl implements QueryInputView {
 	@UiField
 	InfoAlert queryResultsMessage;
 	@UiField
-	Button editResultsButton;
-	@UiField
-	Button showQueryButton;
-	@UiField
-	AnchorListItem addToDownloadListLink;
-	@UiField
-	AnchorListItem programmaticOptionsLink;
-	@UiField
-	AnchorListItem exportTableLink;
-	@UiField
-	Divider downloadOptionsDivider;
-
+	Anchor simpleModeLink;
 	HTMLPanel panel;
 	Presenter presenter;
 
@@ -74,20 +62,8 @@ public class QueryInputViewImpl implements QueryInputView {
 				presenter.onExecuteQuery();
 			}
 		});
-		editResultsButton.addClickHandler(event -> {
-			presenter.onEditResults();
-		});
-		exportTableLink.addClickHandler(event -> {
-			presenter.onExportTable();
-		});
-		showQueryButton.addClickHandler(event -> {
-			presenter.onShowQuery();
-		});
-		programmaticOptionsLink.addClickHandler(event -> {
-			presenter.onDownloadFilesProgrammatically();
-		});
-		addToDownloadListLink.addClickHandler(event -> {
-			presenter.onAddToDownloadList();
+		simpleModeLink.addClickHandler(event -> {
+			presenter.onShowSimpleSearch();
 		});
 	}
 
@@ -133,35 +109,11 @@ public class QueryInputViewImpl implements QueryInputView {
 	}
 
 	@Override
-	public void setEditEnabled(boolean enabled) {
-		this.editResultsButton.setEnabled(enabled);
-	}
-
-	@Override
-	public void setEditVisible(boolean visibile) {
-		this.editResultsButton.setVisible(visibile);
-	}
-
-	@Override
-	public void setDownloadEnabled(boolean enabled) {
-		exportTableLink.setEnabled(enabled);
-	}
-
-
-	@Override
 	public void setQueryInputVisible(boolean visible) {
 		queryInputGroup.setVisible(visible);
 	}
-
 	@Override
-	public void setShowQueryVisible(boolean visible) {
-		showQueryButton.setVisible(visible);
-	}
-
-	@Override
-	public void setDownloadFilesVisible(boolean visible) {
-		addToDownloadListLink.setVisible(visible);
-		programmaticOptionsLink.setVisible(visible);
-		downloadOptionsDivider.setVisible(visible);
+	public void setShowSimpleSearchButtonVisible(boolean visible) {
+		simpleModeLink.setVisible(visible);		
 	}
 }

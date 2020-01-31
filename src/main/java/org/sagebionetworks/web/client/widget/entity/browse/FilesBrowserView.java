@@ -18,7 +18,8 @@ public interface FilesBrowserView extends IsWidget, SynapseView {
 	void setPresenter(Presenter p);
 
 	void setAddToDownloadList(IsWidget w);
-
+	
+	void setActionMenu(IsWidget w);
 	/**
 	 * Presenter interface
 	 */

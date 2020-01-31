@@ -2,18 +2,18 @@ package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class BasicTitleBarViewImpl implements BasicTitleBarView {
-
-	private Presenter presenter;
 
 	@UiField
 	Span fileName;
@@ -21,6 +21,8 @@ public class BasicTitleBarViewImpl implements BasicTitleBarView {
 	SimplePanel favoritePanel;
 	@UiField
 	Icon entityIcon;
+	@UiField
+	Div actionMenuContainer;
 
 	interface BasicTitleBarViewImplUiBinder extends UiBinder<Widget, BasicTitleBarViewImpl> {
 	}
@@ -59,11 +61,6 @@ public class BasicTitleBarViewImpl implements BasicTitleBarView {
 	}
 
 	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
-
-	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
@@ -74,6 +71,13 @@ public class BasicTitleBarViewImpl implements BasicTitleBarView {
 	@Override
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message);
+	}
+
+	@Override
+	public void setActionMenu(IsWidget w) {
+		w.asWidget().removeFromParent();
+		actionMenuContainer.clear();
+		actionMenuContainer.add(w);
 	}
 
 	@Override

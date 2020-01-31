@@ -36,4 +36,6 @@ public interface QueryInputListener {
 	public void onShowDownloadFilesProgrammatically();
 
 	void onAddToDownloadList();
+	
+	void onShowSimpleSearch();
 }

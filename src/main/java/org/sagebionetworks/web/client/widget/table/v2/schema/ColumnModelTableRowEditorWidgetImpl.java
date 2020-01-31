@@ -99,7 +99,7 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 	public boolean canHaveSize(ColumnTypeViewEnum type) {
 		switch (type) {
 			case String:
-				return true;
+			case StringList:
 			case Link:
 				return true;
 			default:
@@ -118,9 +118,7 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 	public boolean canHaveRestrictedValues(ColumnTypeViewEnum type) {
 		switch (type) {
 			case String:
-				return true;
 			case Integer:
-				return true;
 			case Entity:
 				return true;
 			default:
@@ -138,6 +136,7 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 	public void configureFacetsForType(ColumnTypeViewEnum type) {
 		switch (type) {
 			case Integer:
+			case IntegerList:
 				view.setFacetValues(None.toString(), Values.toString(), Range.toString());
 				view.setFacetVisible(true);
 				break;
@@ -145,11 +144,14 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 			case Boolean:
 			case User:
 			case Entity:
+			case StringList:
+			case BooleanList:
 				view.setFacetValues(None.toString(), Values.toString());
 				view.setFacetVisible(true);
 				break;
 			case Double:
 			case Date:
+			case DateList:
 				view.setFacetValues(None.toString(), Range.toString());
 				view.setFacetVisible(true);
 				break;
@@ -167,6 +169,10 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 			case Date:
 			case User:
 			case Entity:
+			case StringList:
+			case IntegerList:
+			case BooleanList:
+			case DateList:
 				return true;
 			default:
 				return false;
@@ -195,6 +201,7 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 	private String getMaxSizeForType(ColumnTypeViewEnum type) {
 		switch (type) {
 			case String:
+			case StringList:
 				return "" + DEFAULT_STRING_SIZE;
 			case Link:
 				return "" + MAX_STRING_SIZE;

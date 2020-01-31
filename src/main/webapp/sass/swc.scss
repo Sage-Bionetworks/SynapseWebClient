@@ -127,7 +127,9 @@ end sticky footer
 		box-shadow: none;
 	}
 	.nav-tabs > li.active > a, #rootPanel .nav-tabs > li > a:hover {
-		box-shadow: inset 0 -2px 0 #1e7098
+		box-shadow: inset 0 -2px 0 #1e7098;
+		background-color: unset;
+		border: none;
 	}
 	@media (min-width: 768px) {
 		.lead {
@@ -156,7 +158,7 @@ end sticky footer
 		padding: 6px 12px;
 		margin: 0px 0px;
 	}
-	.btn-default:hover, .open .dropdown-toggle.btn-default, .btn-default:hover a {
+	.btn-default:hover, .open .dropdown-toggle.btn-default, .btn-default:hover a, .btn-group>.btn-default.btn.active {
 		color: white;
 		background-color: $synapse-blue;
 		border-color: #186292;
@@ -1539,6 +1541,9 @@ ol.lowerroman {
 	.displayBlock {
 		display: block;
 	}
+	.displayTableCell {
+		display: table-cell;
+	}
 	.center-in-div {
 		margin:auto; 
 		display:block;
@@ -1942,7 +1947,6 @@ ol.lowerroman {
 .table-layout-fixed {
     table-layout: fixed;
 }
-
 .padding-right-2, #body .padding-right-2 {
 	padding-right: 2px;
 }
@@ -2214,13 +2218,6 @@ div.input-group > input.search-textbox {
 .nav>li>a>div {
 	padding: 1em 2em .5em 2em;
 	margin: -1em -2em -.5em -2em;
-}
-
-.text-align-right {
-	text-align: right;
-}
-.text-align-left {
-	text-align: left;
 }
 
 /**Override JQuery table styles **/
@@ -2786,6 +2783,12 @@ div.border {
 		}
 	}
 	.katex { font-size: 1em; }
+	.text-align-right {
+		text-align: right;
+	}
+	.text-align-left {
+		text-align: left;
+	}
 	.text-danger {
 		color: #d9534f;
 	}

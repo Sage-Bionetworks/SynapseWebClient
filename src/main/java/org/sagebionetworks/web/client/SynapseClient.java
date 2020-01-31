@@ -53,8 +53,6 @@ public interface SynapseClient extends RemoteService {
 
 	PaginatedResults<TrashedEntity> viewTrashForUser(long offset, long limit) throws RestServiceException;
 
-	void purgeTrashForUser() throws RestServiceException;
-
 	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds) throws RestServiceException;
 
 	/**

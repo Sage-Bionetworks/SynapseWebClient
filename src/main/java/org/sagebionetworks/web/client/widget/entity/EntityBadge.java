@@ -52,6 +52,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	private EventBus eventBus;
 	private String dataFileHandleId;
 	private SynapseJSNIUtils jsniUtils;
+	private ClickHandler customClickHandler;
 
 	@Inject
 	public EntityBadge(EntityBadgeView view, GlobalApplicationState globalAppState, AnnotationTransformer transformer, SynapseJavascriptClient jsClient, LazyLoadHelper lazyLoadHelper, PopupUtilsView popupUtils, SynapseProperties synapseProperties, EventBus eventBus, AuthenticationController authController, SynapseJSNIUtils jsniUtils) {
@@ -92,9 +93,18 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 
 	public void configure(EntityHeader header) {
 		entityHeader = header;
-		view.setEntity(header);
-		view.setIcon(EntityTypeUtils.getIconTypeForEntityClassName(header.getType()));
+		configureViewWithEntityHeader();
 		lazyLoadHelper.setIsConfigured();
+	}
+	
+	public void configureViewWithEntityHeader() {
+		if (entityHeader != null) {
+			view.setEntity(entityHeader);
+			view.setIcon(EntityTypeUtils.getIconTypeForEntityClassName(entityHeader.getType()));
+			if (customClickHandler != null) {
+				view.setClickHandler(customClickHandler);
+			}
+		}
 	}
 
 	public void clearState() {}
@@ -105,6 +115,8 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	}
 
 	public void setEntityBundle(EntityBundle eb) {
+		view.clear();
+		configureViewWithEntityHeader();
 		Annotations annotations = eb.getAnnotations();
 		String rootWikiId = eb.getRootWikiId();
 		List<FileHandle> handles = eb.getFileHandles();
@@ -203,7 +215,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	}
 
 	public void setClickHandler(ClickHandler handler) {
-		view.addClickHandler(handler);
+		customClickHandler = handler;
 	}
 
 	public String getEntityId() {

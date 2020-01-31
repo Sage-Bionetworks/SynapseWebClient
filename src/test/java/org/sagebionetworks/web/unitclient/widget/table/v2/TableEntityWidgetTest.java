@@ -229,7 +229,7 @@ public class TableEntityWidgetTest {
 		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
 
 		// download files help not visible for Table, only Views
-		verify(mockQueryInputWidget).setDownloadFilesVisible(false);
+		verify(mockActionMenu).setActionVisible(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, false);
 	}
 
 	@Test
@@ -238,8 +238,9 @@ public class TableEntityWidgetTest {
 		configureBundleWithView(ViewType.file);
 
 		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		
 		// verify download help is shown for file views
-		verify(mockQueryInputWidget).setDownloadFilesVisible(true);
+		verify(mockActionMenu).setActionVisible(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, true);
 	}
 
 	@Test
@@ -374,6 +375,35 @@ public class TableEntityWidgetTest {
 	}
 
 	@Test
+	public void testFileCommands() {
+		configureBundleWithView(ViewType.file);
+		boolean canEdit = true;
+		
+		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		
+		verify(mockActionMenu).setActionVisible(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, true);
+		verify(mockActionMenu).setActionVisible(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, true);
+		
+		//also verify other commands have been hooked up
+		verify(mockActionMenu).setActionListener(eq(Action.SHOW_ADVANCED_SEARCH), any());
+		verify(mockActionMenu).setActionListener(eq(Action.SHOW_SIMPLE_SEARCH), any());
+		verify(mockActionMenu).setActionListener(eq(Action.SHOW_QUERY), any());
+		verify(mockActionMenu).setActionListener(eq(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS), any());
+		verify(mockActionMenu).setActionListener(eq(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST), any());
+	}
+	
+	@Test
+	public void testFileCommandsHidden() {
+		configureBundleWithView(ViewType.project);
+		boolean canEdit = true;
+		
+		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
+		
+		verify(mockActionMenu).setActionVisible(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, false);
+		verify(mockActionMenu).setActionVisible(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, false);
+	}
+	
+	@Test
 	public void testOnExecuteViewQuery() {
 		TableType tableType = TableType.projects;
 		configureBundleWithView(ViewType.project);
@@ -475,7 +505,7 @@ public class TableEntityWidgetTest {
 		newQuery.setSql("select 1,2,3 from syn123");
 		widget.onStartingNewQuery(newQuery);
 		// Should get passed to the input widget
-		verify(mockQueryInputWidget).configure(newQuery.getSql(), widget, canEdit);
+		verify(mockQueryInputWidget).configure(newQuery.getSql(), widget);
 		// Should not be sent to the results as that is where it came from.
 		verify(mockQueryResultsWidget, never()).configure(any(Query.class), anyBoolean(), any(TableType.class), any(QueryResultsListener.class));
 	}
@@ -495,23 +525,25 @@ public class TableEntityWidgetTest {
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
 		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
 
-		verify(mockQueryInputWidget).configure(startQuery.getSql(), widget, canEdit);
+		verify(mockQueryInputWidget).configure(startQuery.getSql(), widget);
 	}
 
 
 	private void verifySimpleSearchUI() {
-		verify(mockView).setAdvancedSearchLinkVisible(true);
-		verify(mockView).setSimpleSearchLinkVisible(false);
+		verify(mockActionMenu).setActionVisible(Action.SHOW_ADVANCED_SEARCH, true);
+		verify(mockActionMenu).setActionVisible(Action.SHOW_SIMPLE_SEARCH, false);
+		verify(mockQueryInputWidget).setShowSimpleSearchButtonVisible(false);
 		verify(mockQueryResultsWidget).setFacetsVisible(true);
-		verify(mockQueryInputWidget).setShowQueryVisible(true);
+		verify(mockActionMenu).setActionVisible(Action.SHOW_QUERY, true);
 		verify(mockQueryInputWidget).setQueryInputVisible(false);
 	}
 
 	private void verifyAdvancedSearchUI() {
-		verify(mockView).setAdvancedSearchLinkVisible(false);
-		verify(mockView).setSimpleSearchLinkVisible(true);
+		verify(mockActionMenu).setActionVisible(Action.SHOW_ADVANCED_SEARCH, false);
+		verify(mockActionMenu).setActionVisible(Action.SHOW_SIMPLE_SEARCH, true);
+		verify(mockQueryInputWidget).setShowSimpleSearchButtonVisible(true);
 		verify(mockQueryResultsWidget).setFacetsVisible(false);
-		verify(mockQueryInputWidget).setShowQueryVisible(false);
+		verify(mockActionMenu).setActionVisible(Action.SHOW_QUERY, false);
 		verify(mockQueryInputWidget).setQueryInputVisible(true);
 	}
 
@@ -630,10 +662,11 @@ public class TableEntityWidgetTest {
 		widget.configure(entityBundle, versionNumber, canEdit, mockQueryChangeHandler, mockActionMenu);
 
 		// verifyAdvancedSearchUI, but simple search link is not shown
-		verify(mockView).setAdvancedSearchLinkVisible(false);
-		verify(mockView).setSimpleSearchLinkVisible(false);
+		verify(mockActionMenu).setActionVisible(Action.SHOW_ADVANCED_SEARCH, false);
+		verify(mockActionMenu).setActionVisible(Action.SHOW_SIMPLE_SEARCH, false);
+		verify(mockQueryInputWidget).setShowSimpleSearchButtonVisible(false);
 		verify(mockQueryResultsWidget).setFacetsVisible(false);
-		verify(mockQueryInputWidget).setShowQueryVisible(false);
+		verify(mockActionMenu).setActionVisible(Action.SHOW_QUERY, false);
 		verify(mockQueryInputWidget).setQueryInputVisible(true);
 	}
 
@@ -658,8 +691,9 @@ public class TableEntityWidgetTest {
 
 		verify(mockQueryInputWidget).setVisible(false);
 		verify(mockQueryResultsWidget, atLeastOnce()).setFacetsVisible(false);
-		verify(mockView).setSimpleSearchLinkVisible(false);
-		verify(mockView, atLeastOnce()).setAdvancedSearchLinkVisible(false);
+		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.SHOW_ADVANCED_SEARCH, false);
+		verify(mockActionMenu).setActionVisible(Action.SHOW_SIMPLE_SEARCH, false);
+		verify(mockQueryInputWidget).setShowSimpleSearchButtonVisible(false);
 	}
 
 	@Test

@@ -54,4 +54,6 @@ public interface ForumWidgetView extends IsWidget {
 	void setSubscribersWidget(Widget w);
 
 	void setSubscribersWidgetVisible(boolean visible);
+
+	void setActionMenu(IsWidget w);
 }

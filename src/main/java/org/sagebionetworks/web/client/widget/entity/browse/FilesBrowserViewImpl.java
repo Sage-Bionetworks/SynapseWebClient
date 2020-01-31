@@ -2,7 +2,9 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -36,6 +38,10 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	Button downloadOptionsButton;
 	@UiField
 	HelpWidget downloadHelp;
+	@UiField
+	Div actionMenuContainer;
+	@UiField
+	Heading title;
 
 	@Inject
 	public FilesBrowserViewImpl(FilesBrowserViewImplUiBinder binder, EntityTreeBrowser entityTreeBrowser, AuthenticationController authController) {
@@ -68,6 +74,7 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 
 	@Override
 	public void configure(String entityId) {
+		title.setVisible(false);
 		entityTreeBrowser.configure(entityId);
 	}
 
@@ -117,5 +124,14 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	public void setAddToDownloadList(IsWidget w) {
 		addToDownloadListContainer.clear();
 		addToDownloadListContainer.add(w);
+	}
+	
+	@Override
+	public void setActionMenu(IsWidget w) {
+		w.asWidget().removeFromParent();
+		actionMenuContainer.clear();
+		actionMenuContainer.add(w);
+		// if showing action menu, then show title.
+		title.setVisible(true);
 	}
 }

@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Italic;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -99,6 +100,9 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 
 	@UiField
 	Div wikiHeadingContainer;
+	@UiField
+	Div actionMenuContainer;
+	
 	Heading wikiHeading;
 	Widget widget;
 	WikiPageKey key;
@@ -327,6 +331,14 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		this.key = key;
 		wikiCompareButton.setVisible(visible);
 	}
+	
+	@Override
+	public void setActionMenu(IsWidget w) {
+		w.asWidget().removeFromParent();
+		actionMenuContainer.clear();
+		actionMenuContainer.add(w);
+	}
+
 
 	/** Event binder code **/
 	interface EBinder extends EventBinder<WikiPageWidget> {

@@ -177,8 +177,6 @@ public interface SynapseClientAsync {
 	 */
 	void validateTableQuery(String sql, AsyncCallback<Void> callback);
 
-	void purgeTrashForUser(AsyncCallback<Void> callback);
-
 	void restoreFromTrash(String entityId, String newParentId, AsyncCallback<Void> callback);
 
 	void viewTrashForUser(long offset, long limit, AsyncCallback<PaginatedResults<TrashedEntity>> callback);

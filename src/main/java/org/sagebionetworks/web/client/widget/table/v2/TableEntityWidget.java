@@ -41,7 +41,7 @@ import com.google.inject.Inject;
  * @author John
  * 
  */
-public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presenter, QueryResultsListener, QueryInputListener {
+public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryInputListener {
 
 	public static final String IS_INVOKING_DOWNLOAD_TABLE = "isInvokingDownloadTable";
 	public static final String NO_FACETS_SIMPLE_SEARCH_UNSUPPORTED = "In order to use simple search, you must first set columns to be facets in the schema editor.";
@@ -101,7 +101,6 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 		this.addToDownloadList = addToDownloadList;
 		this.ginInjector = ginInjector;
 		this.sessionStorage = sessionStorage;
-		this.view.setPresenter(this);
 		this.view.setQueryResultsWidget(this.queryResultsWidget);
 		this.view.setQueryInputWidget(this.queryInputWidget);
 		view.setAddToDownloadList(addToDownloadList);
@@ -150,7 +149,6 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 		this.entityBundle = bundle;
 		Entity table = bundle.getEntity();
 		this.tableType = TableType.getTableType(table);
-		queryInputWidget.setDownloadFilesVisible(tableType.isIncludeFiles());
 		this.tableId = bundle.getEntity().getId();
 		this.tableVersionNumber = versionNumber;
 		this.isCurrentVersion = tableVersionNumber == null;
@@ -200,6 +198,24 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 			String showHide = isShowingScope ? HIDE : SHOW;
 			actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, showHide + SCOPE + entityTypeDisplay);
 		});
+		
+		this.actionMenu.setActionVisible(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, tableType.isIncludeFiles());
+		this.actionMenu.setActionVisible(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, tableType.isIncludeFiles());
+		this.actionMenu.setActionListener(Action.SHOW_ADVANCED_SEARCH, action -> {
+			onShowAdvancedSearch();
+		});
+		this.actionMenu.setActionListener(Action.SHOW_SIMPLE_SEARCH, action -> {
+			onShowSimpleSearch();
+		});
+		this.actionMenu.setActionListener(Action.SHOW_QUERY, action -> {
+			onShowQuery();
+		});
+		this.actionMenu.setActionListener(Action.TABLE_DOWNLOAD_PROGRAMMATIC_OPTIONS, action -> {
+			onShowDownloadFilesProgrammatically();
+		});
+		this.actionMenu.setActionListener(Action.ADD_TABLE_RESULTS_TO_DOWNLOAD_LIST, action -> {
+			onAddToDownloadList();
+		});
 	}
 
 	/**
@@ -228,7 +244,7 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	 */
 	private void setQuery(Query query, boolean isFromResults) {
 		this.currentQuery = query;
-		this.queryInputWidget.configure(query.getSql(), this, this.canEditResults);
+		this.queryInputWidget.configure(query.getSql(), this);
 		this.view.setQueryResultsVisible(true);
 		this.view.setTableMessageVisible(false);
 		if (!isFromResults) {
@@ -274,26 +290,30 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	}
 
 	private void showSimpleSearchUI() {
-		view.setAdvancedSearchLinkVisible(true);
-		view.setSimpleSearchLinkVisible(false);
+		actionMenu.setActionVisible(Action.SHOW_ADVANCED_SEARCH, true);
+		actionMenu.setActionVisible(Action.SHOW_SIMPLE_SEARCH, false);
+		queryInputWidget.setShowSimpleSearchButtonVisible(false);
 		queryResultsWidget.setFacetsVisible(true);
-		queryInputWidget.setShowQueryVisible(true);
+		actionMenu.setActionVisible(Action.SHOW_QUERY, true);
 		queryInputWidget.setQueryInputVisible(false);
 	}
 
 	public void hideFiltering() {
 		queryInputWidget.setVisible(false);
 		queryResultsWidget.setFacetsVisible(false);
-		view.setSimpleSearchLinkVisible(false);
-		view.setAdvancedSearchLinkVisible(false);
+		actionMenu.setActionVisible(Action.SHOW_ADVANCED_SEARCH, false);
+		actionMenu.setActionVisible(Action.SHOW_SIMPLE_SEARCH, false);
+		queryInputWidget.setShowSimpleSearchButtonVisible(false);
 	}
 
 	private void showAdvancedSearchUI() {
-		view.setAdvancedSearchLinkVisible(false);
+		actionMenu.setActionVisible(Action.SHOW_ADVANCED_SEARCH, false);
 		// SWC-3762: show the simple search link if facets exist, or if the user can set up facets.
-		view.setSimpleSearchLinkVisible(isFacets() || canEdit);
+		boolean showSimpleSearch = isFacets() || canEdit;
+		actionMenu.setActionVisible(Action.SHOW_SIMPLE_SEARCH, showSimpleSearch);
+		queryInputWidget.setShowSimpleSearchButtonVisible(showSimpleSearch);
 		queryResultsWidget.setFacetsVisible(false);
-		queryInputWidget.setShowQueryVisible(false);
+		actionMenu.setActionVisible(Action.SHOW_QUERY, false);
 		queryInputWidget.setQueryInputVisible(true);
 	}
 
@@ -319,7 +339,6 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 		}
 	}
 
-	@Override
 	public void onShowAdvancedSearch() {
 		// set query based on selected facets
 		AsyncCallback<String> callback = new AsyncCallback<String>() {

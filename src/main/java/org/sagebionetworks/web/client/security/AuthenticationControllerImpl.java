@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Down;
@@ -22,6 +23,7 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -40,15 +42,17 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private static UserProfile currentUserProfile;
 	private UserAccountServiceAsync userAccountService;
 	private ClientCache localStorage;
+	private SessionStorage sessionStorage;
 	private PortalGinInjector ginInjector;
 	private SynapseJSNIUtils jsniUtils;
 	private CookieProvider cookies;
 
 	@Inject
-	public AuthenticationControllerImpl(UserAccountServiceAsync userAccountService, ClientCache localStorage, CookieProvider cookies, PortalGinInjector ginInjector, SynapseJSNIUtils jsniUtils) {
+	public AuthenticationControllerImpl(UserAccountServiceAsync userAccountService, ClientCache localStorage, SessionStorage sessionStorage, CookieProvider cookies, PortalGinInjector ginInjector, SynapseJSNIUtils jsniUtils) {
 		this.userAccountService = userAccountService;
 		fixServiceEntryPoint(userAccountService);
 		this.localStorage = localStorage;
+		this.sessionStorage = sessionStorage;
 		this.cookies = cookies;
 		this.ginInjector = ginInjector;
 		this.jsniUtils = jsniUtils;
@@ -172,6 +176,10 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		String receipt = localStorage.get(USER_AUTHENTICATION_RECEIPT);
 		localStorage.clear();
 		storeAuthenticationReceipt(receipt);
+		// save last place but clear other session storage values on logout.
+		Place lastPlace = ginInjector.getGlobalApplicationState().getLastPlace();
+		sessionStorage.clear();
+		ginInjector.getGlobalApplicationState().setLastPlace(lastPlace);
 		currentUserSessionToken = null;
 		currentUserProfile = null;
 		ginInjector.getSessionDetector().initializeSessionTokenState();

@@ -1,13 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.entity.file;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.MockitoAnnotations;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
@@ -18,12 +19,17 @@ import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBarView;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class BasicTitleBarTest {
 
 	BasicTitleBar titleBar;
+	@Mock
 	BasicTitleBarView mockView;
+	@Mock
 	AuthenticationController mockAuthController;
+	@Mock
 	EntityBundle mockBundle;
+	@Mock
 	FavoriteWidget mockFavoriteWidget;
 	Entity entity;
 	String testEntityName = "Entity Name";
@@ -31,17 +37,11 @@ public class BasicTitleBarTest {
 
 	@Before
 	public void setup() {
-		MockitoAnnotations.initMocks(this);
-		mockView = mock(BasicTitleBarView.class);
-		mockAuthController = mock(AuthenticationController.class);
-		mockFavoriteWidget = mock(FavoriteWidget.class);
 		titleBar = new BasicTitleBar(mockView, mockAuthController, mockFavoriteWidget);
-		mockBundle = mock(EntityBundle.class);
 		entity = new Folder();
 		entity.setId(entityId);
 		entity.setName(testEntityName);
 		when(mockBundle.getEntity()).thenReturn(entity);
-		verify(mockView).setPresenter(titleBar);
 		verify(mockView).setFavoritesWidget(any(Widget.class));
 		verify(mockFavoriteWidget).asWidget();
 		when(mockAuthController.isLoggedIn()).thenReturn(true);

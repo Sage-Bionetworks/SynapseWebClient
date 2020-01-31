@@ -31,7 +31,6 @@ import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.EntityRefreshAlert;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -55,7 +54,6 @@ public class FilesTab {
 	SynapseClientAsync synapseClient;
 	GlobalApplicationState globalApplicationState;
 	DiscussionThreadListWidget discussionThreadListWidget;
-	ActionMenuWidget actionMenu;
 	ModifiedCreatedByWidget modifiedCreatedBy;
 
 	public static int WIDGET_HEIGHT_PX = 270;
@@ -66,12 +64,12 @@ public class FilesTab {
 	String projectEntityId;
 	EntityBundle entityBundle;
 	CallbackP<String> entitySelectedCallback;
-
+	
 	@Inject
 	public FilesTab(Tab tab, PortalGinInjector ginInjector) {
 		this.tab = tab;
 		this.ginInjector = ginInjector;
-		tab.configure("Files", "Organize your data by uploading files into a directory structure built in the Files section.", WebConstants.DOCS_URL + "versioning.html");
+		tab.configure("Files", "Organize your data by uploading files into a directory structure built in the Files section.", WebConstants.DOCS_URL + "versioning.html", EntityArea.FILES);
 	}
 
 	public void lazyInject() {
@@ -138,10 +136,9 @@ public class FilesTab {
 			view.setFileTitlebarVisible(false);
 			view.setFolderTitlebarVisible(false);
 			view.setPreviewVisible(false);
-			view.setMetadataVisible(false);
+			view.setFileFolderUIVisible(false);
 			view.setWikiPageWidgetVisible(false);
 			view.setFileBrowserVisible(false);
-			view.clearActionMenuContainer();
 			view.clearRefreshAlert();
 			breadcrumb.clear();
 			view.setProvenanceVisible(false);
@@ -157,9 +154,8 @@ public class FilesTab {
 		this.projectBundleLoadError = projectBundleLoadError;
 	}
 
-	public void configure(EntityBundle targetEntityBundle, Long versionNumber, ActionMenuWidget actionMenu) {
+	public void configure(EntityBundle targetEntityBundle, Long versionNumber) {
 		lazyInject();
-		this.actionMenu = actionMenu;
 		view.showLoading(true);
 		setTargetBundle(targetEntityBundle, versionNumber);
 	}
@@ -221,14 +217,13 @@ public class FilesTab {
 		}
 
 		view.showLoading(false);
-		view.clearActionMenuContainer();
 		// Preview
 		view.setPreviewVisible(isFile && !bundle.getFileHandles().isEmpty());
 
 		// File title bar
 		view.setFileTitlebarVisible(isFile);
 		if (isFile) {
-			fileTitleBar.configure(bundle);
+			fileTitleBar.configure(bundle, tab.getEntityActionMenu());
 			previewWidget.configure(bundle);
 			discussionThreadListWidget.configure(currentEntityId, null, null);
 			view.setDiscussionText(currentEntity.getName());
@@ -237,14 +232,18 @@ public class FilesTab {
 		view.setFolderTitlebarVisible(isFolder);
 		if (isFolder) {
 			folderTitleBar.configure(bundle);
+			folderTitleBar.setActionMenu(tab.getEntityActionMenu());
 		}
 
 		// Metadata
-		boolean isMetadataVisible = isFile || isFolder;
-		view.setMetadataVisible(isMetadataVisible);
-		if (isMetadataVisible) {
-			metadata.configure(bundle, versionNumber, actionMenu);
+		boolean isFileOrFolder = isFile || isFolder;
+		view.setFileFolderUIVisible(isFileOrFolder);
+		if (isFileOrFolder) {
+			metadata.configure(bundle, versionNumber, tab.getEntityActionMenu());
 		}
+		boolean isCurrentVersion = versionNumber == null;
+		tab.configureEntityActionController(bundle, isCurrentVersion, null);
+		
 		EntityArea area = isProject ? EntityArea.FILES : null;
 		tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(currentEntityId, versionNumber, area, null));
 
@@ -253,6 +252,10 @@ public class FilesTab {
 		view.setFileBrowserVisible(isFilesBrowserVisible);
 		if (isFilesBrowserVisible) {
 			filesBrowser.configure(currentEntityId);
+			// the action menu is added to the title bar if Folder, to the browser if Project
+			if (isProject) {
+				filesBrowser.setActionMenu(tab.getEntityActionMenu());	
+			}
 		}
 
 		// Provenance

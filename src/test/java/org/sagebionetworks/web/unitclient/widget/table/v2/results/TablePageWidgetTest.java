@@ -12,6 +12,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import org.junit.Before;
@@ -33,6 +34,7 @@ import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
@@ -88,8 +90,15 @@ public class TablePageWidgetTest {
 	CallbackP<FacetColumnRequest> mockFacetChangedHandler;
 	@Mock
 	ViewDefaultColumns mockFileViewDefaultColumns;
+	@Mock
+	ColumnModel mockColumnModel;
 	List<ColumnModel> defaultColumnModels;
 	public static final String ENTITY_ID = "syn123";
+	public static final String FRIENDLY_DATE_STRING = "01/23/2020 11:50 AM";
+	@Mock
+	DateTimeUtils mockDateTimeUtils;
+	@Mock
+	Date mockLastUpdatedDate;
 
 	@Before
 	public void before() {
@@ -112,6 +121,7 @@ public class TablePageWidgetTest {
 				return new RowWidget(new RowViewStub(), mockCellFactory, mockFileViewDefaultColumns);
 			}
 		});
+		when(mockGinInjector.getDateTimeUtils()).thenReturn(mockDateTimeUtils);
 		when(mockGinInjector.createKeyboardNavigationHandler()).thenReturn(mockKeyboardNavigationHandler);
 		sortHeaders = new LinkedList<SortableTableHeader>();
 		when(mockGinInjector.createSortableTableHeader()).thenAnswer(new Answer<SortableTableHeader>() {
@@ -132,7 +142,8 @@ public class TablePageWidgetTest {
 			}
 		});
 		defaultColumnModels = new ArrayList<ColumnModel>();
-		when(mockFileViewDefaultColumns.getDefaultViewColumns(anyBoolean(), anyBoolean())).thenReturn(defaultColumnModels);
+		when(mockFileViewDefaultColumns.getDefaultViewColumns(anyBoolean())).thenReturn(defaultColumnModels);
+		when(mockFileViewDefaultColumns.deepColumnModel(any(ColumnModel.class))).thenReturn(mockColumnModel);
 		widget = new TablePageWidget(mockView, mockGinInjector, mockPaginationWidget);
 
 		schema = TableModelTestUtils.createOneOfEachType();
@@ -160,6 +171,8 @@ public class TablePageWidgetTest {
 		bundle.setSelectColumns(headers);
 		bundle.setQueryCount(99L);
 		bundle.setColumnModels(schema);
+		bundle.setLastUpdatedOn(mockLastUpdatedDate);
+		when(mockDateTimeUtils.getDateTimeString(any(Date.class))).thenReturn(FRIENDLY_DATE_STRING);
 
 		query = new Query();
 		query.setIsConsistent(true);
@@ -185,6 +198,8 @@ public class TablePageWidgetTest {
 		assertEquals(expected, headers);
 		// are the rows registered?
 		verify(mockKeyboardNavigationHandler, times(extracted.size())).bindRow(any(RowOfWidgets.class));
+		// last updated date from bundle transformed and rendered?
+		verify(mockView).setLastUpdatedOn(TablePageWidget.LAST_UPDATED_ON + FRIENDLY_DATE_STRING);
 	}
 
 	@Test

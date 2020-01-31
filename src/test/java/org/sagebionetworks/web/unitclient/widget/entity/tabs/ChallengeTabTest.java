@@ -8,13 +8,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
@@ -22,6 +25,7 @@ import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsLis
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidget;
 import com.google.gwt.user.client.ui.Widget;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ChallengeTabTest {
 	@Mock
 	Tab mockTab;
@@ -35,12 +39,16 @@ public class ChallengeTabTest {
 	ChallengeWidget mockChallengeWidget;
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
+	@Mock
+	EntityBundle mockProjectEntityBundle;
+	@Mock
+	ActionMenuWidget mockActionMenuWidget;
 	ChallengeTab tab;
 
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
 		tab = new ChallengeTab(mockTab, mockPortalGinInjector);
+		when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
 		when(mockPortalGinInjector.getChallengeTabView()).thenReturn(mockView);
 		when(mockPortalGinInjector.getAdministerEvaluationsList()).thenReturn(mockAdministerEvaluationsList);
 		when(mockPortalGinInjector.getChallengeWidget()).thenReturn(mockChallengeWidget);
@@ -63,7 +71,7 @@ public class ChallengeTabTest {
 	public void testConfigure() {
 		String entityId = "syn1";
 		String entityName = "challenge project test";
-		tab.configure(entityId, entityName);
+		tab.configure(entityId, entityName, mockProjectEntityBundle);
 
 		verify(mockAdministerEvaluationsList).configure(eq(entityId));
 		verify(mockChallengeWidget).configure(eq(entityId));
