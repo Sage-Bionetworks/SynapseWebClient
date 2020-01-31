@@ -53,21 +53,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 
 	@Override
-	public String getCurrentSessionToken() throws RestServiceException {
-		validateService();
-		String sessionToken = tokenProvider.getSessionToken();
-		try {
-			if (sessionToken != null) {
-				// validate
-				createSynapseClient(sessionToken).getUserSessionData();
-			}
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-		return sessionToken;
-	}
-
-	@Override
 	public void signTermsOfUse(String sessionToken, boolean acceptsTerms) throws RestServiceException {
 		validateService();
 
