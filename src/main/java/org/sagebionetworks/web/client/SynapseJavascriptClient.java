@@ -394,6 +394,12 @@ public class SynapseJavascriptClient {
 	}
 
 	private Request doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, String sessionToken, AsyncCallback callback) {
+		// can almost always cancel a GET request
+		boolean canCancel = true;
+		return doGet(url, responseType, acceptedResponseType, sessionToken, canCancel, callback);
+	}
+	
+	private Request doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, String sessionToken, boolean canCancel, AsyncCallback callback) {
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
 		requestBuilder.configure(GET, url);
 		if (acceptedResponseType != null) {
@@ -402,8 +408,6 @@ public class SynapseJavascriptClient {
 		if (sessionToken != null) {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, sessionToken);
 		}
-		// can always cancel a GET request
-		boolean canCancel = true;
 		return sendRequest(requestBuilder, null, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, callback);
 	}
 
@@ -436,7 +440,7 @@ public class SynapseJavascriptClient {
 	private Request doPut(String url, JSONEntity requestObject, OBJECT_TYPE responseType, AsyncCallback callback) {
 		// never cancel a PUT request
 		boolean canCancel = false;
-		return doPostOrPut(PUT, url, requestObject, responseType, false, callback);
+		return doPostOrPut(PUT, url, requestObject, responseType, canCancel, callback);
 	}
 
 
@@ -1123,7 +1127,8 @@ public class SynapseJavascriptClient {
 
 	public FluentFuture<List<ColumnModel>> getDefaultColumnsForView(ViewType viewType) {
 		String url = getRepoServiceUrl() + COLUMN_VIEW_DEFAULT + viewType.name();
-		return getFuture(cb -> doGet(url, OBJECT_TYPE.ListWrapperColumnModel, cb));
+		boolean canCancel = false;
+		return getFuture(cb -> doGet(url, OBJECT_TYPE.ListWrapperColumnModel, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserSessionToken(), canCancel, cb));
 	}
 
 	public FluentFuture<Void> deleteMembershipRequest(String requestId) {
@@ -1664,11 +1669,8 @@ public class SynapseJavascriptClient {
 	}
 	
 	public void getSynapseVersions(AsyncCallback<String> cb) {
-		// getting the Synapse versions is one GET request that should not be cancelled.
-		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
-		requestBuilder.configure(GET, jsniUtils.getVersionsServletUrl());
-		boolean canCancel = false;
-		sendRequest(requestBuilder, null, OBJECT_TYPE.String, INITIAL_RETRY_REQUEST_DELAY_MS, canCancel, cb);
+		// GET versions, cannot cancel
+		doGet(jsniUtils.getVersionsServletUrl(), OBJECT_TYPE.String, null, null, false, cb);
 	}
 	
 	public void getAvailableEvaluations(Set<String> targetEvaluationIds, boolean isActiveOnly, Integer limit, Integer offset, AsyncCallback<List<Evaluation>> cb) {
