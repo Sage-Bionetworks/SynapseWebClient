@@ -1127,7 +1127,8 @@ public class SynapseJavascriptClient {
 
 	public FluentFuture<List<ColumnModel>> getDefaultColumnsForView(ViewType viewType) {
 		String url = getRepoServiceUrl() + COLUMN_VIEW_DEFAULT + viewType.name();
-		return getFuture(cb -> doGet(url, OBJECT_TYPE.ListWrapperColumnModel, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserSessionToken(), false, cb));
+		boolean canCancel = false;
+		return getFuture(cb -> doGet(url, OBJECT_TYPE.ListWrapperColumnModel, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserSessionToken(), canCancel, cb));
 	}
 
 	public FluentFuture<Void> deleteMembershipRequest(String requestId) {
