@@ -23,8 +23,10 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.rpc.StatusCodeException;
 import com.google.inject.Inject;
 
 /**
@@ -226,7 +228,10 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		initializeFromExistingSessionCookie(new AsyncCallback<UserProfile>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				logoutUser();
+				// if the exception was not due to a network failure, then log the user out
+				if (!(caught instanceof UnknownErrorException || caught instanceof StatusCodeException)) {
+					logoutUser();	
+				}
 				jsniUtils.consoleError(caught);
 			}
 
