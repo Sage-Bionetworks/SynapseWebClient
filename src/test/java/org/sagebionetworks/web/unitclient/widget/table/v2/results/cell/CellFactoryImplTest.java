@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
@@ -29,6 +30,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEd
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LargeStringCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRenderer;
@@ -75,6 +77,10 @@ public class CellFactoryImplTest {
 	UserIdCellRenderer mockUserIdCellRenderer;
 	@Mock
 	LargeStringCellEditor mockLargeStringCellEditor;
+	@Mock
+	StringListRendererCellView mockStringListRenderer;
+	@Mock
+	DateListRendererCellView mockDateListRenderer;
 
 	@Before
 	public void before() {
@@ -97,6 +103,8 @@ public class CellFactoryImplTest {
 		when(mockInjector.createUserIdCellEditor()).thenReturn(mockUserIdCellEditor);
 		when(mockInjector.createUserIdCellRenderer()).thenReturn(mockUserIdCellRenderer);
 		when(mockInjector.createLargeTextFormCellEditor()).thenReturn(mockLargeStringCellEditor);
+		when(mockInjector.createStringListRendererCellView()).thenReturn(mockStringListRenderer);
+		when(mockInjector.createDateListRendererCellView()).thenReturn(mockDateListRenderer);
 		cellFactory = new CellFactory(mockInjector);
 	}
 
@@ -152,6 +160,30 @@ public class CellFactoryImplTest {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.LINK);
 		assertEquals(mockLinkCellRenderer, cellFactory.createRenderer(cm));
+	}
+	@Test
+	public void testGetStringListRenderer() {
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.STRING_LIST);
+		assertEquals(mockStringListRenderer, cellFactory.createRenderer(cm));
+	}
+	@Test
+	public void testGetIntegerListRenderer() {
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.INTEGER_LIST);
+		assertEquals(mockStringListRenderer, cellFactory.createRenderer(cm));
+	}
+	@Test
+	public void testGetBooleanListRenderer() {
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.BOOLEAN_LIST);
+		assertEquals(mockStringListRenderer, cellFactory.createRenderer(cm));
+	}
+	@Test
+	public void testGetDateListRenderer() {
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.DATE_LIST);
+		assertEquals(mockDateListRenderer, cellFactory.createRenderer(cm));
 	}
 
 	@Test
