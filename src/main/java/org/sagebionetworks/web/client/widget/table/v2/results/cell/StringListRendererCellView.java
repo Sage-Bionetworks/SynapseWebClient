@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 /**
- * Abstraction for StringRendererCell
+ * Abstraction for StringListRendererCell
  * 
- * @author John
- *
  */
 public interface StringListRendererCellView extends Cell {
 

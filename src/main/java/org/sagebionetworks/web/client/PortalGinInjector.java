@@ -214,6 +214,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEd
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanFormCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
@@ -515,6 +516,7 @@ public interface PortalGinInjector extends Ginjector {
 	// TableEntity V2 cells
 	StringRendererCellView createStringRendererCellView();
 	StringListRendererCellView createStringListRendererCellView();
+	DateListRendererCellView createDateListRendererCellView();
 
 	StringEditorCell createStringEditorCell();
 

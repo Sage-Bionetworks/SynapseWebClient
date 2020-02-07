@@ -40,6 +40,9 @@ public class CellFactory {
 			case BOOLEAN_LIST:
 			case INTEGER_LIST:
 				return ginInjector.createStringListRendererCellView();
+			case DATE_LIST:
+				return ginInjector.createDateListRendererCellView();
+			
 			default:
 				return ginInjector.createStringRendererCellView();
 		}
