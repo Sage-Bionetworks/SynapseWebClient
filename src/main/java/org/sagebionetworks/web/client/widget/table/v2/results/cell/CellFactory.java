@@ -36,6 +36,10 @@ public class CellFactory {
 				return ginInjector.createFileCellRenderer();
 			case USERID:
 				return ginInjector.createUserIdCellRenderer();
+			case STRING_LIST:
+			case BOOLEAN_LIST:
+			case INTEGER_LIST:
+				return ginInjector.createStringListRendererCellView();
 			default:
 				return ginInjector.createStringRendererCellView();
 		}

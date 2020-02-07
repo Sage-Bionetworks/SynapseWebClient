@@ -658,6 +658,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.NumberCellEdi
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.NumberCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.RadioCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.RadioCellEditorViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringListRendererCellView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringListRendererCellViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorView;
@@ -1113,6 +1115,7 @@ public class PortalGinModule extends AbstractGinModule {
 		 */
 		bind(LinkCellRendererView.class).to(LinkCellRendererViewImpl.class);
 		bind(StringRendererCellView.class).to(StringRendererCellViewImpl.class);
+		bind(StringListRendererCellView.class).to(StringListRendererCellViewImpl.class);
 		bind(CellEditorView.class).to(CellEditorViewImpl.class);
 		bind(NumberCellEditorView.class).to(NumberCellEditorViewImpl.class);
 		bind(ListCellEdtiorView.class).to(ListCellEditorViewImpl.class);
