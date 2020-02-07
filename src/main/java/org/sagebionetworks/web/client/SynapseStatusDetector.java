@@ -14,6 +14,9 @@ public class SynapseStatusDetector {
 	DateTimeFormat iso8601DateFormat = DateTimeFormat.getFormat(PredefinedFormat.ISO_8601);
 	DateTimeUtils dateTimeUtils;
 
+	// how long the popup should be shown (in ms)
+	public static final int POPUP_DELAY_MS = 5000;
+
 	@Inject
 	public SynapseStatusDetector(GWTWrapper gwt, PopupUtilsView popupUtils, DateTimeUtils dateTimeUtils) {
 		this.gwt = gwt;
@@ -41,8 +44,7 @@ public class SynapseStatusDetector {
 	public void showScheduledMaintenance(String name, String scheduledFor, String scheduledUntil) {
 		Date startDate = getDate(scheduledFor);
 		String startTime = dateTimeUtils.getDateTimeString(startDate);
-		// setting the delay to 0 to show until dismissed
-		popupUtils.showInfo("<a href=\"http://status.synapse.org/\" target=\"_blank\" class=\"color-white\">Maintenance on " + startTime + " - " + name + "</a>", 0);
+		popupUtils.showInfo("<a href=\"http://status.synapse.org/\" target=\"_blank\" class=\"color-white\">Maintenance on " + startTime + " - " + name + "</a>", POPUP_DELAY_MS);
 	}
 
 	public Date getDate(String iso8601DateString) {
