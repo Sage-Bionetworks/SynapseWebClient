@@ -642,6 +642,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorVie
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditorViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateListRendererCellView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateListRendererCellViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorView;
@@ -658,6 +660,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.NumberCellEdi
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.NumberCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.RadioCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.RadioCellEditorViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringListRendererCellView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringListRendererCellViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorView;
@@ -1113,6 +1117,8 @@ public class PortalGinModule extends AbstractGinModule {
 		 */
 		bind(LinkCellRendererView.class).to(LinkCellRendererViewImpl.class);
 		bind(StringRendererCellView.class).to(StringRendererCellViewImpl.class);
+		bind(StringListRendererCellView.class).to(StringListRendererCellViewImpl.class);
+		bind(DateListRendererCellView.class).to(DateListRendererCellViewImpl.class);
 		bind(CellEditorView.class).to(CellEditorViewImpl.class);
 		bind(NumberCellEditorView.class).to(NumberCellEditorViewImpl.class);
 		bind(ListCellEdtiorView.class).to(ListCellEditorViewImpl.class);
