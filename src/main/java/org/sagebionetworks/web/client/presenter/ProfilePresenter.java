@@ -204,11 +204,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 
 	public void viewMyProfile(String area) {
-		Place gotoPlace = null;
 		if (authenticationController.isLoggedIn()) {
-			// replace url with most recently logged in user id
-			gotoPlace = new Profile(authenticationController.getCurrentUserPrincipalId() + area);
-			globalApplicationState.getPlaceChanger().goTo(gotoPlace);
+			// view the current user profile
+			place.setUserId(authenticationController.getCurrentUserPrincipalId());
+			updateProfileView(place.getUserId());
+			// and replace url with most recently logged in user id
+			globalApplicationState.replaceCurrentPlace(place);
 		} else {
 			view.showLoginAlert();
 		}
