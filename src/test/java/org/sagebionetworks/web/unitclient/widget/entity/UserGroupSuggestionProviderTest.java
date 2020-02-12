@@ -19,6 +19,7 @@ import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
+import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestionBundle;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -36,6 +37,8 @@ public class UserGroupSuggestionProviderTest {
 	SynapseProperties mockSynapseProperties;
 	@Mock
 	PublicPrincipalIds mockPublicPrincipalIds;
+	@Mock
+	UserProfileAsyncHandler mockUserProfileAsyncHandler;
 	int offset = 0;
 	int pageSize = 10;
 	int width = 568;
@@ -51,7 +54,7 @@ public class UserGroupSuggestionProviderTest {
 		when(mockPublicPrincipalIds.getAnonymousUserPrincipalId()).thenReturn(ANONYMOUS_USER_ID);
 		when(mockPublicPrincipalIds.getAuthenticatedAclPrincipalId()).thenReturn(AUTHENTICATED_USERS_ID);
 		when(mockPublicPrincipalIds.getPublicAclPrincipalId()).thenReturn(PUBLIC_ACL_ID);
-		presenter = new UserGroupSuggestionProvider(mockSynapseJavascriptClient, mockSynapseProperties);
+		presenter = new UserGroupSuggestionProvider(mockSynapseJavascriptClient, mockSynapseProperties, mockUserProfileAsyncHandler);
 	}
 
 	@Test
