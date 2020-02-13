@@ -563,6 +563,10 @@ public class SynapseJavascriptClient {
 		}
 	}
 
+	public FluentFuture<EntityBundle> getEntityBundle(String entityId, EntityBundleRequest request) {
+		return getFuture(cb -> getEntityBundleForVersion(entityId, null, request, cb));
+	}
+
 	public void getEntityBundle(String entityId, EntityBundleRequest request, final AsyncCallback<EntityBundle> callback) {
 		getEntityBundleForVersion(entityId, null, request, callback);
 	}
