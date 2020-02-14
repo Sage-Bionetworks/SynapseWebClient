@@ -20,7 +20,6 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
-import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -48,18 +47,16 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	private SynapseJavascriptClient jsClient;
 	private FavoriteWidget favWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private PendoSdk pendoSdk;
 	PortalGinInjector portalGinInjector;
 	CookieProvider cookies;
 	public static boolean isShowingPortalAlert = false;
 	public static JSONObjectAdapter portalAlertJson = null;
 
 	@Inject
-	public Header(HeaderView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, SynapseJavascriptClient jsClient, FavoriteWidget favWidget, SynapseJSNIUtils synapseJSNIUtils, PendoSdk pendoSdk, PortalGinInjector portalGinInjector, EventBus eventBus, CookieProvider cookies, JSONObjectAdapter jsonObjectAdapter) {
+	public Header(HeaderView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, SynapseJavascriptClient jsClient, FavoriteWidget favWidget, SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector portalGinInjector, EventBus eventBus, CookieProvider cookies, JSONObjectAdapter jsonObjectAdapter) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
-
 		this.jsClient = jsClient;
 		this.favWidget = favWidget;
 		this.cookies = cookies;
@@ -67,7 +64,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.portalGinInjector = portalGinInjector;
 		view.clear();
-		this.pendoSdk = pendoSdk;
+		
 		view.setPresenter(this);
 		initStagingAlert();
 		view.getEventBinder().bindEventHandlers(this, eventBus);
@@ -130,12 +127,9 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		view.setSearchVisible(true);
 		view.setProjectFavoriteWidget(favWidget);
 		if (authenticationController.isLoggedIn() && profile != null) {
-			String userName = profile.getUserName();
-			pendoSdk.initialize(authenticationController.getCurrentUserPrincipalId(), userName + SYNAPSE_ORG);
 			refreshFavorites();
 			onDownloadListUpdatedEvent(null);
 		} else {
-			pendoSdk.initialize(ANONYMOUS, N_A);
 			view.setDownloadListUIVisible(false);
 		}
 	}

@@ -93,8 +93,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	AnchorListItem helpForumLink;
 	@UiField
-	AnchorListItem sendFeedbackLink;
-	@UiField
 	AnchorListItem emailSynapseSupportLink;
 	@UiField
 	AnchorListItem xsFavoritesLink;
@@ -281,10 +279,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			SynapseForumPlace place = new SynapseForumPlace("default");
 			globalAppState.getPlaceChanger().goTo(place);
 		});
-		sendFeedbackLink.addClickHandler(event -> {
-			// pendo should also listen for click event on this element
-		});
-
 		xsFavoritesLink.addClickHandler(event -> {
 			Profile place = new Profile(userId + "/projects/favorites");
 			globalAppState.getPlaceChanger().goTo(place);

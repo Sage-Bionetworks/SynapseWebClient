@@ -111,9 +111,6 @@
 						<b:Divider />
 						<b:AnchorListItem ui:field="mySettingsLink">Settings</b:AnchorListItem>
 						<b:Divider />
-						<b:AnchorListItem
-							addStyleNames="submit-feedback-command"
-							ui:field="sendFeedbackLink">Send Feedback</b:AnchorListItem>
 						<b:AnchorListItem ui:field="documentationLink"
 							icon="EXTERNAL_LINK" iconFixedWidth="true" iconPosition="RIGHT"
 							href="http://docs.synapse.org">Documentation</b:AnchorListItem>
