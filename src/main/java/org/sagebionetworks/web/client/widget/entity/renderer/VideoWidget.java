@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
+import static org.sagebionetworks.web.client.DisplayConstants.*;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -21,8 +22,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class VideoWidget implements WidgetRendererPresenter {
-
-	public static final String PLEASE_LOGIN_TO_VIEW_THIS_RESOURCE = "Please login to view this resource.";
 	public static final String VIMEO_URL_PREFIX = "https://player.vimeo.com/video/";
 	public static final String YOUTUBE_URL_PREFIX = "https://www.youtube.com/embed/";
 	private VideoWidgetView view;
@@ -65,16 +64,6 @@ public class VideoWidget implements WidgetRendererPresenter {
 	}
 	
 	private void configureFromSynapseFile(String mp4SynapseId, String oggSynapseId, String webmSynapseId, String width, String height) {
-		// Must be logged in in order to download the Synapse video file, unless it's open data.
-		if (!authenticationController.isLoggedIn()) {
-			// Try to get the file handle information.  if successful, then show the video.
-			renderIfCanAccessAllFileHandles(mp4SynapseId, oggSynapseId, webmSynapseId, width, height);
-		} else {
-			view.configure(mp4SynapseId, oggSynapseId, webmSynapseId, width, height);
-		}
-	}
-	
-	private void renderIfCanAccessAllFileHandles(String mp4SynapseId, String oggSynapseId, String webmSynapseId, String width, String height) {
 		EntityBundleRequest request = new EntityBundleRequest();
 		request.setIncludeFileHandles(true);
 		List<ListenableFuture<EntityBundle>> entityBundleCalls = new ArrayList<ListenableFuture<EntityBundle>>();
@@ -93,7 +82,8 @@ public class VideoWidget implements WidgetRendererPresenter {
 			for (ListenableFuture<EntityBundle> future : entityBundleCalls) {
 				EntityBundle bundle = getDone(future);
 				if (bundle.getFileHandles().isEmpty()) {
-					view.showError(PLEASE_LOGIN_TO_VIEW_THIS_RESOURCE);
+					String errorMessage = authenticationController.isLoggedIn() ? ERROR_FAILURE_PRIVLEDGES : ERROR_LOGIN_REQUIRED;
+					view.showError(errorMessage);
 					return null;
 				}
 			}
