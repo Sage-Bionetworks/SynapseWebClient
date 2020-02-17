@@ -16,12 +16,5 @@ public interface UserAccountServiceAsync {
 
 	void getPublicAndAuthenticatedGroupPrincipalIds(AsyncCallback<PublicPrincipalIds> callback);
 
-	/**
-	 * If the session token is set for this site
-	 * 
-	 * @param callback
-	 */
-	void getCurrentSessionToken(AsyncCallback<String> callback);
-
 	void getCurrentUserSessionData(AsyncCallback<UserSessionData> callback);
 }

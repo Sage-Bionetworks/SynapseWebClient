@@ -23,8 +23,10 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.rpc.StatusCodeException;
 import com.google.inject.Inject;
 
 /**
@@ -222,54 +224,38 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 	@Override
 	public void checkForUserChange() {
-		userAccountService.getCurrentSessionToken(new AsyncCallback<String>() {
+		String oldUserSessionToken = currentUserSessionToken;
+		initializeFromExistingSessionCookie(new AsyncCallback<UserProfile>() {
 			@Override
 			public void onFailure(Throwable caught) {
+				// if the exception was not due to a network failure, then log the user out
+				if (!(caught instanceof UnknownErrorException || caught instanceof StatusCodeException)) {
+					logoutUser();	
+				}
 				jsniUtils.consoleError(caught);
-				logoutUser();
 			}
 
 			@Override
-			public void onSuccess(String token) {
-				String localSession = getCurrentUserSessionToken();
-				// if the local session does not match the actual session, reload the app
-				if (!Objects.equals(token, localSession)) {
-					// reinit
-					if (token == null) {
-						logoutUser();
-					} else {
-						initializeFromExistingSessionCookie(new AsyncCallback<UserProfile>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								jsniUtils.consoleError(caught);
-							}
-
-							@Override
-							public void onSuccess(UserProfile result) {
-								// we've reinitialized the app with the correct session, refresh the page (do not get rid of js
-								// state)!
-								ginInjector.getGlobalApplicationState().refreshPage();
-								checkForQuarantinedEmail();
-							}
-						});
-					}
+			public void onSuccess(UserProfile result) {
+				// is this a user session change?  if so, refresh the page.
+				if (!Objects.equals(currentUserSessionToken, oldUserSessionToken)) {
+					// we've reinitialized the app with the correct session, refresh the page (do not get rid of js state)!
+					ginInjector.getGlobalApplicationState().refreshPage();
+					checkForQuarantinedEmail();
 				} else {
 					ginInjector.getHeader().refresh();
-					if (isLoggedIn()) {
-						// we've determined that the session has not changed, update the cookie expiration for the session
-						// token
-						setNewSessionToken(currentUserSessionToken, new AsyncCallback<UserProfile>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								jsniUtils.consoleError(caught);
-							}
+					// we've determined that the session has not changed, update the cookie expiration for the session token
+					ginInjector.getSynapseJavascriptClient().initSession(currentUserSessionToken, new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							jsniUtils.consoleError(caught);
+						}
 
-							@Override
-							public void onSuccess(UserProfile result) {
-								// the set-cookie response header has updated the expiration of the session token cookie
-							}
-						});
-					}
+						@Override
+						public void onSuccess(Void result) {
+							// the set-cookie response header has updated the expiration of the session token cookie
+						}
+					});
 				}
 			}
 		});

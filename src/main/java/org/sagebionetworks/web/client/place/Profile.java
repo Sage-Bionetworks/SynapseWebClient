@@ -71,7 +71,7 @@ public class Profile extends Place {
 		this.area = area;
 		this.projectFilter = projectFilter;
 		this.teamId = teamId;
-		calculateToken(userId, area, projectFilter, teamId);
+		recalulateToken();
 	}
 
 	public String getUserId() {
@@ -80,6 +80,7 @@ public class Profile extends Place {
 
 	public void setUserId(String userId) {
 		this.userId = userId;
+		recalulateToken();
 	}
 
 	public String getTeamId() {
@@ -99,6 +100,10 @@ public class Profile extends Place {
 		}
 	}
 
+	private void recalulateToken() {
+		calculateToken(userId, area, projectFilter, teamId);
+	}
+	
 	private void calculateToken(String userId, Synapse.ProfileArea area, ProjectFilterEnum projectFilter, String teamId) {
 		this.token = userId;
 		if (area != null) {

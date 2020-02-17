@@ -9,6 +9,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.security.AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT;
@@ -42,9 +43,11 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.QuarantinedEmailModal;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.rpc.StatusCodeException;
 
 public class AuthenticationControllerImplTest {
 
@@ -99,7 +102,6 @@ public class AuthenticationControllerImplTest {
 		MockitoAnnotations.initMocks(this);
 		// by default, return a valid user session data if asked
 		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).initSession(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(SESSION_TOKEN).when(mockUserAccountService).getCurrentSessionToken(any(AsyncCallback.class));
 		usd = new UserSessionData();
 		profile = new UserProfile();
 		profile.setOwnerId(USER_ID);
@@ -232,12 +234,36 @@ public class AuthenticationControllerImplTest {
 		// if we invoke checkForUserChange(), if the user does not change we should update the session
 		// cookie expiration (via the initSession call).
 		authenticationController.initializeFromExistingSessionCookie(mockUserProfileCallback);
+		verify(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
 		verify(mockJsClient, never()).initSession(anyString(), any(AsyncCallback.class));
 
 		authenticationController.checkForUserChange();
 
-		verify(mockUserAccountService).getCurrentSessionToken(any(AsyncCallback.class));
+		verify(mockUserAccountService, times(2)).getCurrentUserSessionData(any(AsyncCallback.class));
 		verify(mockJsClient).initSession(eq(SESSION_TOKEN), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testCheckForUserChangeWithoutNetwork() {
+		// if we invoke checkForUserChange(), if the user does not change we should update the session
+		authenticationController.initializeFromExistingSessionCookie(mockUserProfileCallback);
+		verify(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
+		verify(mockJsClient, never()).initSession(anyString(), any(AsyncCallback.class));
+		Exception scEx = new StatusCodeException(0, "0 ");
+		AsyncMockStubber.callFailureWith(scEx).when(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
+		
+		authenticationController.checkForUserChange();
+
+		verify(mockUserAccountService, times(2)).getCurrentUserSessionData(any(AsyncCallback.class));
+		verify(mockSynapseJSNIUtils).consoleError(scEx);
+		verify(mockJsClient, never()).logout();
+		
+		Exception unknownEx = new UnknownErrorException("Unexpected transient error");
+		AsyncMockStubber.callFailureWith(unknownEx).when(mockUserAccountService).getCurrentUserSessionData(any(AsyncCallback.class));
+		
+		authenticationController.checkForUserChange();
+		verify(mockSynapseJSNIUtils).consoleError(unknownEx);
+		verify(mockJsClient, never()).logout();
 	}
 
 	// Note. If login when the stack is in READ_ONLY mode, then the widgets SynapseAlert should send

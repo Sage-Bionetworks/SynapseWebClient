@@ -11,9 +11,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.header.Header.ANONYMOUS;
-import static org.sagebionetworks.web.client.widget.header.Header.N_A;
-import static org.sagebionetworks.web.client.widget.header.Header.SYNAPSE_ORG;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,7 +46,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
-import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.junit.GWTMockUtilities;
@@ -76,8 +72,6 @@ public class HeaderTest {
 	List<EntityHeader> entityHeaders;
 	@Mock
 	CookieProvider mockCookies;
-	@Mock
-	PendoSdk mockPendoSdk;
 	@Mock
 	UserProfile mockUserProfile;
 	@Mock
@@ -107,7 +101,7 @@ public class HeaderTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		// by default, mock that we are on the production website
 		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn(Header.WWW_SYNAPSE_ORG);
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPendoSdk, mockPortalGinInjector, mockEventBus, mockCookies, jsonObjectAdapter);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPortalGinInjector, mockEventBus, mockCookies, jsonObjectAdapter);
 		entityHeaders = new ArrayList<EntityHeader>();
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);
@@ -261,8 +255,6 @@ public class HeaderTest {
 		verify(mockView).setUser(mockUserProfile);
 		verify(mockView).refresh();
 		verify(mockView).setSearchVisible(true);
-
-		verify(mockPendoSdk).initialize(userId, userName + SYNAPSE_ORG);
 	}
 
 
@@ -275,7 +267,6 @@ public class HeaderTest {
 		verify(mockView).setUser(null);
 		verify(mockView).refresh();
 		verify(mockView).setSearchVisible(true);
-		verify(mockPendoSdk).initialize(ANONYMOUS, N_A);
 	}
 
 	@Test
@@ -293,7 +284,6 @@ public class HeaderTest {
 		verify(mockView).setUser(null);
 		verify(mockView).refresh();
 		verify(mockView).setSearchVisible(true);
-		verify(mockPendoSdk).initialize(ANONYMOUS, N_A);
 	}
 
 	@Test
@@ -334,7 +324,7 @@ public class HeaderTest {
 		reset(mockView);
 		when(mockView.getEventBinder()).thenReturn(mockEventBinder);
 
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPendoSdk, mockPortalGinInjector, mockEventBus, mockCookies, jsonObjectAdapter);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPortalGinInjector, mockEventBus, mockCookies, jsonObjectAdapter);
 
 		verify(mockView).setCookieNotificationVisible(false);
 	}
@@ -351,7 +341,7 @@ public class HeaderTest {
 		String cookieValue = null;
 		when(mockCookies.getCookie(CookieKeys.PORTAL_CONFIG)).thenReturn(cookieValue);
 
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPendoSdk, mockPortalGinInjector, mockEventBus, mockCookies, jsonObjectAdapter);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPortalGinInjector, mockEventBus, mockCookies, jsonObjectAdapter);
 
 		// should be hidden
 		boolean isVisible = false;
@@ -363,7 +353,7 @@ public class HeaderTest {
 		String cookieValue = "{\"isInvokingDownloadTable\":true,\"foregroundColor\":\"rgb(255, 255, 255)\",\"backgroundColor\":\"rgb(77, 84, 145)\",\"callbackUrl\":\"https://staging.adknowledgeportal.synapse.org/#/Explore/Data\",\"logoUrl\":\"https://staging.adknowledgeportal.synapse.org/static/media/amp-footer-logo.0e5d7cab.svg\",\"portalName\":\"  \"}";
 		when(mockCookies.getCookie(CookieKeys.PORTAL_CONFIG)).thenReturn(cookieValue);
 
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPendoSdk, mockPortalGinInjector, mockEventBus, mockCookies, jsonObjectAdapter);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPortalGinInjector, mockEventBus, mockCookies, jsonObjectAdapter);
 
 		// should be shown
 		boolean isVisible = true;

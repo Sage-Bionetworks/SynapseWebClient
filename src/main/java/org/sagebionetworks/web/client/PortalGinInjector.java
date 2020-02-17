@@ -214,6 +214,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEd
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanFormCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
@@ -225,6 +226,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEd
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LargeStringCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRenderer;
@@ -513,6 +515,8 @@ public interface PortalGinInjector extends Ginjector {
 
 	// TableEntity V2 cells
 	StringRendererCellView createStringRendererCellView();
+	StringListRendererCellView createStringListRendererCellView();
+	DateListRendererCellView createDateListRendererCellView();
 
 	StringEditorCell createStringEditorCell();
 

@@ -989,21 +989,6 @@ public class ProfilePresenterTest {
 	}
 
 	@Test
-	public void testViewMyProfile() {
-		String testUserId = "9981";
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(testUserId);
-
-		profilePresenter.viewMyProfile("");
-		// verify updateView shows Settings as the initial tab
-		ArgumentCaptor<Profile> captor = ArgumentCaptor.forClass(Profile.class);
-		verify(mockPlaceChanger).goTo(captor.capture());
-		Profile capturedPlace = captor.getValue();
-		assertEquals(ProfileArea.PROFILE, capturedPlace.getArea());
-		assertEquals(testUserId, capturedPlace.getUserId());
-	}
-
-	@Test
 	public void testViewMyProfileAsAnonymous() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 
@@ -1277,24 +1262,8 @@ public class ProfilePresenterTest {
 		when(place.toToken()).thenReturn(token);
 		profilePresenter.setPlace(place);
 		verify(mockView).showLoginAlert();
-		verify(mockPlaceChanger, never()).goTo(any(Place.class));
-	}
-
-	@Test
-	public void testVTokenLoggedIn() {
-		// go home if trying to access Profile:v while anonymous
-		String token = "v";
-		String currentUserId = "94837";
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
-		when(place.toToken()).thenReturn(token);
-		profilePresenter.setPlace(place);
-		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
-		verify(mockPlaceChanger).goTo(captor.capture());
-		Profile capturedPlace = (Profile) captor.getValue();
-		assertEquals(currentUserId, capturedPlace.getUserId());
-		// default area, profile
-		assertEquals(ProfileArea.PROFILE, capturedPlace.getArea());
+		verify(place, never()).setUserId(anyString());
+		verify(mockGlobalApplicationState, never()).replaceCurrentPlace(any(Place.class));
 	}
 
 	@Test
@@ -1305,11 +1274,10 @@ public class ProfilePresenterTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
 		when(place.toToken()).thenReturn(token);
+		
 		profilePresenter.setPlace(place);
-		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
-		verify(mockPlaceChanger).goTo(captor.capture());
-		Profile capturedPlace = (Profile) captor.getValue();
-		assertEquals(currentUserId, capturedPlace.getUserId());
-		assertEquals(ProfileArea.SETTINGS, capturedPlace.getArea());
+		
+		verify(place).setUserId(currentUserId);
+		verify(mockGlobalApplicationState, atLeastOnce()).replaceCurrentPlace(place);
 	}
 }

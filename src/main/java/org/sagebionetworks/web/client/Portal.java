@@ -26,6 +26,7 @@ public class Portal implements EntryPoint {
 	// If there's a failure to load the code from the server, how long (in ms) should we wait before
 	// trying again...
 	public static final int CODE_LOAD_DELAY = 5000;
+	
 	// We are using gin to create all of our objects
 	private static final PortalGinInjector ginjector = GWT.create(PortalGinInjector.class);
 	private SimplePanel appWidget = new SimplePanel();
@@ -63,9 +64,14 @@ public class Portal implements EntryPoint {
 				@Override
 				public void onSuccess() {
 					try {
+						// start timer to check for user session state change (session expired, or user explicitly logged
+						// out)
+						ginjector.getSessionDetector().start();
+
 						// previous session will be detected on place change (if there is one). do not block app load to
 						// check.
 						// make sure jsni utils code is available to the client
+						
 						ginjector.getSynapseJSNIUtils();
 						EventBus eventBus = ginjector.getEventBus();
 						PlaceController placeController = new PlaceController(eventBus);
@@ -93,6 +99,8 @@ public class Portal implements EntryPoint {
 						final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
 						globalApplicationState.setPlaceController(placeController);
 						globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
+						
+
 						globalApplicationState.init(new Callback() {
 							@Override
 							public void invoke() {
@@ -102,9 +110,6 @@ public class Portal implements EntryPoint {
 
 								// start version timer
 								ginjector.getVersionTimer().start();
-								// start timer to check for user session state change (session expired, or user explicitly logged
-								// out)
-								ginjector.getSessionDetector().start();
 								// start timer to check for Synapse outage or scheduled maintenance
 								ginjector.getSynapseStatusDetector().start();
 								// Goes to place represented on URL or default place

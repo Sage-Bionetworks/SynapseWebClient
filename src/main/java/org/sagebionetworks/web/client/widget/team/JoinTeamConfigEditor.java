@@ -25,12 +25,10 @@ public class JoinTeamConfigEditor implements WidgetEditorPresenter, JoinTeamConf
 	private Map<String, String> descriptor;
 	private SynapseSuggestBox teamSuggestBox;
 	private SynapseJavascriptClient jsClient;
-	private UserGroupSuggestionProvider provider;
 	private SynapseJSNIUtils jsniUtils;
 
 	@Inject
 	public JoinTeamConfigEditor(JoinTeamConfigEditorView view, SynapseSuggestBox teamSuggestBox, UserGroupSuggestionProvider provider, SynapseJavascriptClient jsClient, SynapseJSNIUtils jsniUtils) {
-		this.provider = provider;
 		this.jsClient = jsClient;
 		this.teamSuggestBox = teamSuggestBox;
 		this.jsniUtils = jsniUtils;
@@ -62,7 +60,7 @@ public class JoinTeamConfigEditor implements WidgetEditorPresenter, JoinTeamConf
 					ugh.setDisplayName(team.getName());
 					ugh.setIsIndividual(false);
 					ugh.setOwnerId(team.getId());
-					UserGroupSuggestion suggestion = new UserGroupSuggestion(ugh, team.getName(), teamSuggestBox.getWidth());
+					UserGroupSuggestion suggestion = new UserGroupSuggestion(ugh, team.getName(), teamSuggestBox.getWidth(), null);
 					teamSuggestBox.setSelectedSuggestion(suggestion);
 					teamSuggestBox.setText(team.getName());
 				}
