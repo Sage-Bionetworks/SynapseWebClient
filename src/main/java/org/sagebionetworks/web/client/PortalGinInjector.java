@@ -142,7 +142,6 @@ import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialog;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidget;
-import org.sagebionetworks.web.client.widget.entity.file.downloadlist.FileHandleAssociationRow;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidget;
@@ -806,8 +805,7 @@ public interface PortalGinInjector extends Ginjector {
 
 	DownloadListWidget getDownloadListWidget();
 
-	FileHandleAssociationRow getFileHandleAssociationRow();
-
+	
 	TableEntityListGroupItem getTableEntityListGroupItem();
 
 	SynapseJSNIUtilsImpl getSynapseJSNIUtils();

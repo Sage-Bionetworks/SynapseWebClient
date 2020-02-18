@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.RestrictionLevel;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -71,13 +72,11 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		this.entity = entity;
 		this.canChangePermissions = canChangePermissions;
 		loadRestrictionInformation();
-		// TODO: when "tier 0" is supported, 
-		// remove view.showAnonymousUI() and always configure with entity ID (backend getRestrictionInformation() should no longer fail)
-		if (authenticationController.isLoggedIn()) {
-			view.setEntityId(entity.getId());	
-		} else {
-			view.showAnonymousUI();
+		Long versionNumber = null;
+		if (entity instanceof Versionable) {
+			versionNumber = ((Versionable)entity).getVersionNumber();
 		}
+		view.setEntityId(entity.getId(), versionNumber);	
 	}
 
 	public void setShowChangeLink(boolean showChangeLink) {

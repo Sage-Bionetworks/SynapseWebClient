@@ -8,14 +8,12 @@
 	
 	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
  	<bh:Span addStyleNames="restrictionWidget">
- 		<bh:Span ui:field="hasAccessContainer"/>
- 		<b:Anchor ui:field="signInLink" text="Sign in" visible="false"/>
-		<bh:Span ui:field="linkUI">
+ 		<bh:Span ui:field="hasAccessContainer" addStyleNames="displayInlineBlock min-width-42" height="30px"/>
+ 		<bh:Span ui:field="linkUI">
 			<b:Tooltip placement="BOTTOM" title="Click here to add conditions for use">
 				<b:Anchor ui:field="changeLink" text="Add Conditions for Use" />
 			</b:Tooltip>
 		</bh:Span>
-		
 		<bh:Span ui:field="flagUI">
 			<g:Image styleName="displayInline moveup-2 moveright-5" resource='{icons.flagSmall16}' />
 			<b:Tooltip placement="BOTTOM" title="Click here to learn more about flagging these data for review by the Synapse Access and Compliance Team">

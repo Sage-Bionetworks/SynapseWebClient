@@ -7,7 +7,6 @@ import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -29,8 +28,6 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 
 	@UiField
 	Anchor changeLink;
-	@UiField
-	Anchor signInLink;
 	@UiField
 	Span flagUI;
 	@UiField
@@ -70,9 +67,6 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		});
 		reportIssueLink.addClickHandler(event -> {
 			presenter.reportIssueClicked();
-		});
-		signInLink.addClickHandler(event -> {
-			globalAppState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		});
 		widget.addAttachHandler(event -> {
 			if (!event.isAttached()) {
@@ -190,24 +184,17 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	}
 	
 	@Override
-	public void setEntityId(String entityId) {
+	public void setEntityId(String entityId, Long versionNumber) {
 		cleanupOldReactComponent();
-		String sessionToken = null;
-		if (authController.isLoggedIn()) {
-			sessionToken = authController.getCurrentUserSessionToken();
-		}
-		_showHasAccess(hasAccessContainer.getElement(), entityId, sessionToken);
-		signInLink.setVisible(false);
+		String versionNumberString = versionNumber == null ? null : versionNumber.toString();
+		_showHasAccess(hasAccessContainer.getElement(), entityId, versionNumberString, authController.getCurrentUserSessionToken());
 	}
-	@Override
-	public void showAnonymousUI() {
-		cleanupOldReactComponent();
-		signInLink.setVisible(true);
-	}
-	private static native void _showHasAccess(Element el, String entityId, String sessionToken) /*-{
+	
+	private static native void _showHasAccess(Element el, String synapseEntityId, String versionNumber, String sessionToken) /*-{
 		try {
 			var props = {
-				synapseId: entityId,
+				entityId: synapseEntityId,
+				entityVersionNumber: versionNumber,
 				token: sessionToken
 			};
 	

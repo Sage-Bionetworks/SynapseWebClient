@@ -380,7 +380,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
 	@Override
 	public void setDownloadListWidget(IsWidget w) {
-		downloadsTabContent.clear();
 		downloadsTabContent.add(w);
 	}
 
@@ -516,9 +515,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.hide(navtabContainer);
 		// init with loading widget
 		projectsTabContent.add(DisplayUtils.getSmallLoadingWidget());
-
-		settingsTabContent.clear();
-		downloadsTabContent.clear();
 		challengesTabContent.clear();
 		hideTabContainers();
 

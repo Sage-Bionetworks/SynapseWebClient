@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -57,7 +58,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		addAttachHandler(event -> {
 			if (!event.isAttached()) {
 				// detach event, clean up react component
-				jsniUtils.unmountComponentAtNode(userBadgeContainer.getElement());
+				jsniUtils.unmountComponentAtNode(userBadgeContainer.getElement());	
 			}
 		});
 		userBadgeContainer.addClickHandler(event -> {

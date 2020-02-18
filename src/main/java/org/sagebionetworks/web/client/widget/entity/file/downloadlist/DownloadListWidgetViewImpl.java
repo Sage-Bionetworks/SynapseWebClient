@@ -1,143 +1,74 @@
 package org.sagebionetworks.web.client.widget.entity.file.downloadlist;
 
-import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.widget.InfoAlert;
+import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Window;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWidget {
-	@UiField
-	Div synAlertContainer;
-	@UiField
-	Anchor clearAllLink;
-	@UiField
-	Div fileHandleAssociationTableContainer;
-	@UiField
-	Div packageSummaryContainer;
-	@UiField
-	Button createPackageButton;
-	@UiField
-	TextBox fileName;
-	@UiField
-	Div progressTrackingContainer;
-
-	Presenter presenter;
-	@UiField
-	Span createPackageReadyUI;
-	@UiField
-	Span downloadPackageReadyUI;
-	@UiField
-	Button downloadPackageButton;
-	@UiField
-	InfoAlert multiplePackagesRequiredAlert;
-	@UiField
-	InfoAlert filesDownloadedAlert;
-	String downloadUrl;
-	Widget w;
-
-	interface DownloadListWidgetViewImplUiBinder extends UiBinder<Widget, DownloadListWidgetViewImpl> {
-	}
-
-	private static DownloadListWidgetViewImplUiBinder uiBinder = GWT.create(DownloadListWidgetViewImplUiBinder.class);
-
+	Div mainContainer = new Div();
+	Div downloadListContainer = new Div();
+	AuthenticationController authController;
+	SynapseJSNIUtils jsniUtils;
+	EventBus eventBus;
+	GWTWrapper gwt;
+	boolean isViewingDownloadList = false;
+	
 	@Inject
-	public DownloadListWidgetViewImpl() {
-		w = uiBinder.createAndBindUi(this);
-		clearAllLink.addClickHandler(event -> {
-			presenter.onClearDownloadList();
+	public DownloadListWidgetViewImpl(AuthenticationController authController, SynapseJSNIUtils jsniUtils, EventBus eventBus, GWTWrapper gwt) {
+		this.authController = authController;
+		this.jsniUtils = jsniUtils;
+		this.eventBus = eventBus;
+		this.gwt = gwt;
+		mainContainer.addStyleName("mainContainer");
+		mainContainer.add(downloadListContainer);
+		downloadListContainer.addAttachHandler(event -> {
+			if (!event.isAttached() && isViewingDownloadList) {
+				jsniUtils.unmountComponentAtNode(downloadListContainer.getElement());
+				isViewingDownloadList = false;
+			}
 		});
-		createPackageButton.addClickHandler(event -> {
-			presenter.onCreatePackage(fileName.getText());
-		});
-		downloadPackageButton.addClickHandler(event -> {
-			Window.open(downloadUrl, "_self", "");
-			presenter.onDownloadPackage();
-		});
+		downloadListContainer.addStyleName("downloadListContainer");
+		gwt.scheduleFixedDelay(() -> {
+			// update the DownloadList when this react component is being shown (let the header know that something might be changing)
+			if (isViewingDownloadList) {
+				eventBus.fireEvent(new DownloadListUpdatedEvent());
+			}
+		}, 5000);
 	}
-
+	
 	@Override
-	public void setPresenter(Presenter p) {
-		this.presenter = p;
+	public void refreshView() {
+		isViewingDownloadList = false;
+		if (authController.isLoggedIn()) {
+			_showDownloadList(downloadListContainer.getElement(), authController.getCurrentUserSessionToken());
+			isViewingDownloadList = true;	
+		}
 	}
 
+	private static native void _showDownloadList(Element el, String sessionToken) /*-{
+		try {
+			var props = {
+				token : sessionToken
+			};
+			$wnd.ReactDOM.render($wnd.React.createElement(
+					$wnd.SRC.SynapseComponents.DownloadListTable, props, null),
+					el);
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
+	
+	
 	@Override
 	public Widget asWidget() {
-		return w;
-	}
-
-	@Override
-	public void setSynAlert(IsWidget w) {
-		synAlertContainer.clear();
-		synAlertContainer.add(w);
-	}
-
-	@Override
-	public void setFileHandleAssociationTable(IsWidget w) {
-		fileHandleAssociationTableContainer.clear();
-		fileHandleAssociationTableContainer.add(w);
-	}
-
-	@Override
-	public void setPackageSizeSummary(IsWidget w) {
-		packageSummaryContainer.clear();
-		packageSummaryContainer.add(w);
-	}
-
-	@Override
-	public void setProgressTrackingWidget(IsWidget w) {
-		progressTrackingContainer.clear();
-		progressTrackingContainer.add(w);
-	}
-
-	@Override
-	public void setProgressTrackingWidgetVisible(boolean visible) {
-		progressTrackingContainer.setVisible(visible);
-	}
-
-	@Override
-	public void setCreatePackageUIVisible(boolean visible) {
-		createPackageReadyUI.setVisible(visible);
-		createPackageButton.setVisible(visible);
-	}
-
-	@Override
-	public void setDownloadPackageUIVisible(boolean visible) {
-		downloadPackageReadyUI.setVisible(visible);
-		downloadPackageButton.setVisible(visible);
-	}
-
-	@Override
-	public void setPackageDownloadURL(String downloadUrl) {
-		this.downloadUrl = downloadUrl;
-	}
-
-	@Override
-	public void setMultiplePackagesRequiredVisible(boolean visible) {
-		multiplePackagesRequiredAlert.setVisible(visible);
-	}
-
-	@Override
-	public void showFilesDownloadedAlert(int fileCount) {
-		filesDownloadedAlert.setMessage(fileCount + " files were downloaded and removed from the list.");
-		filesDownloadedAlert.setVisible(true);
-	}
-
-	@Override
-	public void hideFilesDownloadedAlert() {
-		filesDownloadedAlert.setVisible(false);
-	}
-
-	@Override
-	public void setPackageName(String zipFileName) {
-		fileName.setText(zipFileName);
+		return mainContainer.asWidget();
 	}
 }
