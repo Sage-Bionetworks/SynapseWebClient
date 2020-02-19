@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.users.RegisterAccountViewImpl;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -22,31 +23,41 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 	Div srcLoginContainer;
 	Widget widget;
 	SynapseJSNIUtils jsniUtils;
-
+	GlobalApplicationState globalAppState;
+	AuthenticationController authController;
 	@Inject
-	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder, SynapseJSNIUtils jsniUtils, GlobalApplicationState globalAppState) {
+	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder, SynapseJSNIUtils jsniUtils, GlobalApplicationState globalAppState, AuthenticationController authController) {
 		widget = binder.createAndBindUi(this);
 		this.jsniUtils = jsniUtils;
+		this.globalAppState = globalAppState;
+		this.authController = authController;
 		widget.addAttachHandler(event -> {
 			if (event.isAttached()) {
-				Place defaultPlace = new Profile(Profile.VIEW_PROFILE_TOKEN, ProfileArea.PROJECTS);
-				String token = "#"+globalAppState.getAppPlaceHistoryMapper().getToken(globalAppState.getLastPlace(defaultPlace));
-				
-				_createSRCLogin(srcLoginContainer.getElement(), token, RegisterAccountViewImpl.GOOGLE_OAUTH_CALLBACK_URL);
+				_createSRCLogin(srcLoginContainer.getElement(), this, RegisterAccountViewImpl.GOOGLE_OAUTH_CALLBACK_URL);
 			} else {
 				// detach event, clean up react component
 				jsniUtils.unmountComponentAtNode(srcLoginContainer.getElement());
 			}
 		});
 	}
+	
+	public void postLogin() {
+		Place defaultPlace = new Profile(Profile.VIEW_PROFILE_TOKEN, ProfileArea.PROJECTS);
+		globalAppState.gotoLastPlace(defaultPlace);
+		authController.checkForUserChange();
+	}
 
-	private static native void _createSRCLogin(Element el, String token, String googleSSORedirectUrl) /*-{
+	private static native void _createSRCLogin(Element el, LoginWidgetViewImpl loginWidgetView, String googleSSORedirectUrl) /*-{
 		try {
+			function sessionCallback() {
+			  loginWidgetView.@org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl::postLogin()();
+			}
+				
 			var props = {
 				theme : 'light',
 				icon : true,
 				googleRedirectUrl : googleSSORedirectUrl,
-				redirectUrl : token
+				sessionCallback: sessionCallback
 			};
 
 			$wnd.ReactDOM.render($wnd.React.createElement(

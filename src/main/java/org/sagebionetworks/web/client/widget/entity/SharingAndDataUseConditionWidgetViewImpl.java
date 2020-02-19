@@ -40,7 +40,6 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 		this.restrictionWidgetV2 = restrictionWidgetV2;
 		restrictionWidgetV2.showFolderRestrictionUI();
 		this.cookies = cookies;
-		restrictionWidgetV2.setShowIfProject(true);
 		restrictionWidgetV2.setShowFlagLink(false);
 		this.accessControlListModalWidget = accessControlListModalWidget;
 		this.addStyleName("sharingAndDataUseConditions");
@@ -86,7 +85,7 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 		helpWidget.setHref(WebConstants.DOCS_URL + "access_controls.html#conditions-for-use");
 		container.add(helpWidget.asWidget());
 
-		container.add(new InlineHTML("<h5 class=\"inline-block\">" + DisplayConstants.DATA_USE + "</h5>"));
+		container.add(new InlineHTML("<h5 class=\"inline-block margin-right-10\">Access</h5>"));
 		restrictionWidgetV2.setShowChangeLink(false);
 		restrictionWidgetV2.configure(bundle.getEntity(), bundle.getPermissions().getCanChangePermissions());
 		container.add(restrictionWidgetV2);

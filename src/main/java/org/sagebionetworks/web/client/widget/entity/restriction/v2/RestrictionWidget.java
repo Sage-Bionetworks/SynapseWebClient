@@ -7,17 +7,15 @@ import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION
 import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_PRIORITY;
 import static org.sagebionetworks.web.shared.WebConstants.REVIEW_DATA_REQUEST_COMPONENT_ID;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.RestrictionLevel;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
@@ -35,7 +33,7 @@ import com.google.inject.Inject;
 public class RestrictionWidget implements RestrictionWidgetView.Presenter, SynapseWidgetPresenter, IsWidget {
 	private AuthenticationController authenticationController;
 	private RestrictionWidgetView view;
-	private boolean showChangeLink, showIfProject, showFlagLink;
+	private boolean showChangeLink, showFlagLink;
 	private Entity entity;
 	private boolean canChangePermissions;
 	private DataAccessClientAsync dataAccessClient;
@@ -44,9 +42,18 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	private SynapseJavascriptClient jsClient;
 	GWTWrapper gwt;
 	SynapseJSNIUtils jsniUtils;
+	GlobalApplicationState globalAppState;
 
 	@Inject
-	public RestrictionWidget(RestrictionWidgetView view, AuthenticationController authenticationController, DataAccessClientAsync dataAccessClient, SynapseAlert synAlert, IsACTMemberAsyncHandler isACTMemberAsyncHandler, SynapseJavascriptClient jsClient, GWTWrapper gwt, SynapseJSNIUtils jsniUtils) {
+	public RestrictionWidget(RestrictionWidgetView view,
+			AuthenticationController authenticationController,
+			DataAccessClientAsync dataAccessClient,
+			SynapseAlert synAlert,
+			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
+			SynapseJavascriptClient jsClient,
+			GWTWrapper gwt,
+			SynapseJSNIUtils jsniUtils,
+			GlobalApplicationState globalAppState) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.dataAccessClient = dataAccessClient;
@@ -56,6 +63,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		this.jsClient = jsClient;
 		this.gwt = gwt;
 		this.jsniUtils = jsniUtils;
+		this.globalAppState = globalAppState;
 		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
 	}
@@ -64,14 +72,15 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		this.entity = entity;
 		this.canChangePermissions = canChangePermissions;
 		loadRestrictionInformation();
+		Long versionNumber = null;
+		if (entity instanceof Versionable) {
+			versionNumber = ((Versionable)entity).getVersionNumber();
+		}
+		view.setEntityId(entity.getId(), versionNumber);	
 	}
 
 	public void setShowChangeLink(boolean showChangeLink) {
 		this.showChangeLink = showChangeLink;
-	}
-
-	public void setShowIfProject(boolean showIfProject) {
-		this.showIfProject = showIfProject;
 	}
 
 	public void setShowFlagLink(boolean showFlagLink) {
@@ -80,10 +89,6 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 
 	public void showFolderRestrictionUI() {
 		view.showFolderRestrictionUI();
-	}
-
-	public boolean includeRestrictionWidget() {
-		return (entity instanceof FileEntity) || (entity instanceof TableEntity) || (entity instanceof Folder) || (showIfProject && entity instanceof Project);
 	}
 
 	public boolean isAnonymous() {
@@ -128,10 +133,6 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			case RESTRICTED_BY_TERMS_OF_USE:
 			case CONTROLLED_BY_ACT:
 				view.showControlledUseUI();
-				if (restrictionInformation.getHasUnmetAccessRequirement())
-					view.showUnmetRequirementsIcon();
-				else
-					view.showMetRequirementsIcon();
 				break;
 			default:
 				throw new IllegalArgumentException(restrictionLevel.toString());
@@ -144,13 +145,6 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		if ((isChangeLink && showChangeLink) || isRestricted) {
 			if (isChangeLink)
 				view.showChangeLink();
-			else {
-				if (restrictionInformation.getHasUnmetAccessRequirement()) {
-					view.showShowUnmetLink();
-				} else {
-					view.showShowLink();
-				}
-			}
 		}
 
 		if (showFlagLink) {
@@ -223,18 +217,16 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	}
 
 	@Override
-	public void linkClicked() {
-		view.open("#!AccessRequirements:" + AccessRequirementsPlace.ID_PARAM + "=" + entity.getId() + "&" + AccessRequirementsPlace.TYPE_PARAM + "=" + RestrictableObjectType.ENTITY.toString());
-	}
-
-	@Override
 	public void changeClicked() {
 		isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
 			@Override
 			public void invoke(Boolean isACT) {
 				if (isACT) {
 					// go to access requirements place where they can modify access requirements
-					linkClicked();
+					AccessRequirementsPlace place = new AccessRequirementsPlace("");
+					place.putParam(AccessRequirementsPlace.ID_PARAM, entity.getId());
+					place.putParam(AccessRequirementsPlace.TYPE_PARAM, RestrictableObjectType.ENTITY.toString());
+					globalAppState.getPlaceChanger().goTo(place);
 				} else {
 					view.showVerifyDataSensitiveDialog();
 				}

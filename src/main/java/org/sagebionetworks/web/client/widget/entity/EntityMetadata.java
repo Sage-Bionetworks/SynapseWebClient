@@ -58,7 +58,6 @@ public class EntityMetadata implements Presenter {
 		this.view.setRestrictionWidgetV2(restrictionWidgetV2);
 		this.view.setContainerItemCountWidget(containerItemCountWidget);
 		restrictionWidgetV2.setShowChangeLink(true);
-		restrictionWidgetV2.setShowIfProject(false);
 		restrictionWidgetV2.setShowFlagLink(true);
 		view.setRestrictionWidgetV2Visible(true);
 	}

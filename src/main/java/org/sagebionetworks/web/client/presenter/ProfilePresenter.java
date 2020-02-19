@@ -156,6 +156,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public SettingsPresenter getSettingsPresenter() {
 		if (settingsPresenter == null) {
 			settingsPresenter = ginInjector.getSettingsPresenter();
+			view.setSettingsWidget(settingsPresenter.asWidget());
 		}
 		return settingsPresenter;
 	}
@@ -163,6 +164,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public DownloadListWidget getDownloadListWidget() {
 		if (downloadListWidget == null) {
 			downloadListWidget = ginInjector.getDownloadListWidget();
+			view.setDownloadListWidget(downloadListWidget.asWidget());
 		}
 		return downloadListWidget;
 	}
@@ -928,14 +930,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				break;
 			case SETTINGS:
 				getSettingsPresenter().configure();
-				view.setSettingsWidget(getSettingsPresenter().asWidget());
 				break;
 			case CHALLENGES:
 				refreshChallenges();
 				break;
 			case DOWNLOADS:
 				getDownloadListWidget().refresh();
-				view.setDownloadListWidget(getDownloadListWidget().asWidget());
 				break;
 			default:
 				break;

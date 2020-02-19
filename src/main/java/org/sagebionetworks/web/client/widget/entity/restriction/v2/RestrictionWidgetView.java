@@ -11,24 +11,10 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-
-	public void open(String url);
-
-	void showControlledUseUI();
-
-	void showUnmetRequirementsIcon();
-
-	void showMetRequirementsIcon();
-
-	void showNoRestrictionsUI();
-
+	void setEntityId(String entityId, Long versionNumber);
 	void showFlagUI();
 
 	void showChangeLink();
-
-	void showShowLink();
-
-	void showShowUnmetLink();
 
 	void showVerifyDataSensitiveDialog();
 
@@ -43,6 +29,11 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	public void setImposeRestrictionModalVisible(boolean visible);
 
 	void showFolderRestrictionUI();
+
+	void showNoRestrictionsUI();
+
+	void showControlledUseUI();
+
 
 	/**
 	 * Presenter interface
@@ -59,7 +50,5 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 		void yesHumanDataClicked();
 
 		void notHumanDataClicked();
-
-		void linkClicked();
 	}
 }

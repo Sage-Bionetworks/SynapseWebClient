@@ -21,7 +21,7 @@
 				<bh:Br addStyleNames="visible-xs visible-sm" />
 				<bh:Span ui:field="dataUseContainer"
 					addStyleNames="margin-right-5">
-					<bh:Span addStyleNames="margin-right-5 boldText">Conditions for use:</bh:Span>
+					<bh:Span addStyleNames="margin-right-5 boldText">Access:</bh:Span>
 					<bh:Span ui:field="restrictionPanelV2" />
 					<w:HelpWidget
 						helpMarkdown="Conditions for use describes data use requirements that must be fulfilled before downloading."

@@ -27,8 +27,11 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
@@ -68,6 +71,10 @@ public class RestrictionWidgetTest {
 	GWTWrapper mockGwt;
 	@Mock
 	SynapseJSNIUtils mockJsniUtils;
+	@Mock
+	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
+	PlaceChanger mockPlaceChanger;
 
 	public static final String OWNER_ID = "282711";
 	public static final String FIRST_NAME = "Bob";
@@ -78,7 +85,8 @@ public class RestrictionWidgetTest {
 
 	@Before
 	public void before() {
-		widget = new RestrictionWidget(mockView, mockAuthenticationController, mockDataAccessClient, mockSynAlert, mockIsACTMemberAsyncHandler, mockSynapseJavascriptClient, mockGwt, mockJsniUtils);
+		widget = new RestrictionWidget(mockView, mockAuthenticationController, mockDataAccessClient, mockSynAlert, mockIsACTMemberAsyncHandler, mockSynapseJavascriptClient, mockGwt, mockJsniUtils, mockGlobalApplicationState);
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(mockUserProfile);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(mockRestrictionInformation).when(mockSynapseJavascriptClient).getRestrictionInformation(anyString(), any(RestrictableObjectType.class), any(AsyncCallback.class));
@@ -153,9 +161,6 @@ public class RestrictionWidgetTest {
 
 		verify(mockView).clear();
 		verify(mockView).showControlledUseUI();
-		verify(mockView).showUnmetRequirementsIcon();
-		// has existing terms, has "show" link
-		verify(mockView).showShowUnmetLink();
 		verify(mockView).showFlagUI();
 	}
 
@@ -172,9 +177,6 @@ public class RestrictionWidgetTest {
 
 		verify(mockView).clear();
 		verify(mockView).showControlledUseUI();
-		verify(mockView).showUnmetRequirementsIcon();
-
-		verify(mockView).showShowUnmetLink();
 		verify(mockView).showFlagUI();
 	}
 
@@ -188,11 +190,6 @@ public class RestrictionWidgetTest {
 
 		verify(mockView).clear();
 		verify(mockView).showControlledUseUI();
-		verify(mockView).showMetRequirementsIcon();
-		verify(mockView).showShowLink();
-
-		widget.linkClicked();
-		verify(mockView).open(anyString());
 	}
 
 	@Test
@@ -323,6 +320,6 @@ public class RestrictionWidgetTest {
 
 		widget.changeClicked();
 		verifyIsACTMember(true);
-		verify(mockView).open(anyString());
+		verify(mockPlaceChanger).goTo(any(AccessRequirementsPlace.class));
 	}
 }
