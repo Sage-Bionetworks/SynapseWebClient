@@ -46,9 +46,6 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	private NumberFormat percentFormat;
 	private CookieProvider cookies;
 
-	// string builder to capture upload information. sends to output if any errors occur during direct
-	// upload.
-	private StringBuilder uploadLog;
 	// This class will create a multipart upload request (containing information specific to the file
 	// that the user wants to upload).
 	private MultipartUploadRequest request;
@@ -101,7 +98,6 @@ public class MultipartUploaderImpl implements MultipartUploader {
 			return;
 		}
 
-		uploadLog = new StringBuilder();
 		log(gwt.getUserAgent() + "\n" + gwt.getAppVersion() + "\nDirectly uploading " + fileName + "\n");
 		long partSizeBytes = PartUtils.choosePartSize(fileSize);
 		// create request
@@ -112,13 +108,6 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		request.setPartSizeBytes(partSizeBytes);
 		request.setStorageLocationId(storageLocationId);
 		startMultipartUpload();
-	}
-
-	/**
-	 * Restart from the beginning.
-	 */
-	private void retryUpload() {
-		uploadFile(request.getFileName(), request.getContentType(), blob, handler, request.getStorageLocationId(), view);
 	}
 
 	/**
@@ -139,7 +128,6 @@ public class MultipartUploaderImpl implements MultipartUploader {
 					startMultipartUpload(md5);
 				}
 			});
-
 		}
 	}
 
@@ -226,14 +214,14 @@ public class MultipartUploaderImpl implements MultipartUploader {
 							public void onReadyStateChange(XMLHttpRequest xhr) {
 								log("XMLHttpRequest.setOnReadyStateChange: readyState=" + xhr.getReadyState() + " status=" + xhr.getStatus() + "\n");
 								if (xhr.getReadyState() == 4) { // XMLHttpRequest.DONE=4, posts suggest this value is not resolved in some browsers
+									xhr.clearOnReadyStateChange();
 									if (xhr.getStatus() == 200) { // OK
 										log("XMLHttpRequest.setOnReadyStateChange: OK\n");
 										// add part number to the upload (and potentially complete)
 										addCurrentPartToMultipartUpload();
 									} else {
 										log("XMLHttpRequest.setOnReadyStateChange: Failure\n" + xhr.getStatusText());
-										logFullUpload();
-										partFailure(uploadLog.toString());
+										partFailure(xhr.getStatus() + ": " + xhr.getStatusText());
 									}
 								}
 							}
@@ -336,7 +324,6 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	}
 
 	public void completeMultipartUploadAfterMd5Verification() {
-		logFullUpload();
 		// combine
 		jsClient.completeMultipartUpload(currentStatus.getUploadId(), new AsyncCallback<MultipartUploadStatus>() {
 			@Override
@@ -382,22 +369,11 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		if (isDebugLevelLogging) {
 			synapseJsniUtils.consoleLog(message);
 		}
-		uploadLog.append(message);
 	}
 
 	public void logError(String message) {
-		uploadLog.append(message + "\n");
-		// and to the console
+		// to the console
 		synapseJsniUtils.consoleError(message);
-	}
-
-
-	/**
-	 * Logs entire upload (and resets the upload log).
-	 */
-	private void logFullUpload() {
-		log(uploadLog.toString());
-		uploadLog = new StringBuilder();
 	}
 
 	@Override
