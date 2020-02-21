@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.restriction.v2;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -322,4 +323,20 @@ public class RestrictionWidgetTest {
 		verifyIsACTMember(true);
 		verify(mockPlaceChanger).goTo(any(AccessRequirementsPlace.class));
 	}
+	
+	@Test
+	public void testShowFolderRestrictionUI() {
+		//ability to hide what access the current user has to the entity,
+		//since this UI is out of place when uploading files into a container or creating a new sub-folder.
+		when(mockRestrictionInformation.getRestrictionLevel()).thenReturn(RestrictionLevel.RESTRICTED_BY_TERMS_OF_USE);
+		widget.setShowCurrentAccessUI(false);
+		widget.showFolderRestrictionUI();
+		boolean canChangePermissions = false;
+		
+		widget.configure(mockEntity, canChangePermissions);
+
+		verify(mockView, never()).configureCurrentAccessComponent(anyString(), anyLong());
+		verify(mockView).showFolderRestrictionsLink(ENTITY_ID);
+	}
+	
 }

@@ -4,9 +4,11 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -32,6 +34,8 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	Span flagUI;
 	@UiField
 	Anchor reportIssueLink;
+	@UiField
+	Anchor folderViewTermsLink;
 
 	@UiField
 	Div folderRestrictionUI;
@@ -135,6 +139,13 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		folderRestrictedMessage.setVisible(false);
 		folderUnrestrictedMessage.setVisible(true);
 	}
+	
+	@Override
+	public void showFolderRestrictionsLink(String entityId) {
+		folderViewTermsLink.setVisible(true);
+		folderViewTermsLink.setHref("#!AccessRequirements:TYPE=ENTITY&ID="+entityId);
+		folderViewTermsLink.setTarget("_blank");
+	}
 
 	@Override
 	public void clear() {
@@ -184,7 +195,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	}
 	
 	@Override
-	public void setEntityId(String entityId, Long versionNumber) {
+	public void configureCurrentAccessComponent(String entityId, Long versionNumber) {
 		cleanupOldReactComponent();
 		String versionNumberString = versionNumber == null ? null : versionNumber.toString();
 		_showHasAccess(hasAccessContainer.getElement(), entityId, versionNumberString, authController.getCurrentUserSessionToken());

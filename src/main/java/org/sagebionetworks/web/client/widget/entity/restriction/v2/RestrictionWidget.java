@@ -33,7 +33,7 @@ import com.google.inject.Inject;
 public class RestrictionWidget implements RestrictionWidgetView.Presenter, SynapseWidgetPresenter, IsWidget {
 	private AuthenticationController authenticationController;
 	private RestrictionWidgetView view;
-	private boolean showChangeLink, showFlagLink;
+	private boolean showChangeLink, showFlagLink, showCurrentAccessUI, showFolderRestrictionsUI;
 	private Entity entity;
 	private boolean canChangePermissions;
 	private DataAccessClientAsync dataAccessClient;
@@ -66,17 +66,23 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		this.globalAppState = globalAppState;
 		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
+		//by default, show the current users access to the given entity.
+		showCurrentAccessUI = true;
+		// by default, we are not showing the folder restrictions UI
+		showFolderRestrictionsUI = false;
 	}
 
 	public void configure(Entity entity, boolean canChangePermissions) {
 		this.entity = entity;
 		this.canChangePermissions = canChangePermissions;
 		loadRestrictionInformation();
-		Long versionNumber = null;
-		if (entity instanceof Versionable) {
-			versionNumber = ((Versionable)entity).getVersionNumber();
+		if (showCurrentAccessUI) {
+			Long versionNumber = null;
+			if (entity instanceof Versionable) {
+				versionNumber = ((Versionable)entity).getVersionNumber();
+			}
+			view.configureCurrentAccessComponent(entity.getId(), versionNumber);
 		}
-		view.setEntityId(entity.getId(), versionNumber);	
 	}
 
 	public void setShowChangeLink(boolean showChangeLink) {
@@ -88,6 +94,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	}
 
 	public void showFolderRestrictionUI() {
+		showFolderRestrictionsUI = true;
 		view.showFolderRestrictionUI();
 	}
 
@@ -133,6 +140,10 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			case RESTRICTED_BY_TERMS_OF_USE:
 			case CONTROLLED_BY_ACT:
 				view.showControlledUseUI();
+				if (showFolderRestrictionsUI) {
+					// also show the link to the terms
+					view.showFolderRestrictionsLink(entity.getId());
+				}
 				break;
 			default:
 				throw new IllegalArgumentException(restrictionLevel.toString());
@@ -232,5 +243,9 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 				}
 			}
 		});
+	}
+	
+	public void setShowCurrentAccessUI(boolean showCurrentAccessUI) {
+		this.showCurrentAccessUI = showCurrentAccessUI;
 	}
 }
