@@ -38,6 +38,7 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 		this.iconsImageBundle = iconsImageBundle;
 		this.publicPrivateBadge = publicPrivateBadge;
 		this.restrictionWidgetV2 = restrictionWidgetV2;
+		restrictionWidgetV2.setShowCurrentAccessUI(false);
 		restrictionWidgetV2.showFolderRestrictionUI();
 		this.cookies = cookies;
 		restrictionWidgetV2.setShowFlagLink(false);

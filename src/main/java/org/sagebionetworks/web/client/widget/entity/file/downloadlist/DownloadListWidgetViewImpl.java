@@ -1,11 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.file.downloadlist;
 
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -18,45 +16,40 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 	AuthenticationController authController;
 	SynapseJSNIUtils jsniUtils;
 	EventBus eventBus;
-	GWTWrapper gwt;
-	boolean isViewingDownloadList = false;
 	
 	@Inject
-	public DownloadListWidgetViewImpl(AuthenticationController authController, SynapseJSNIUtils jsniUtils, EventBus eventBus, GWTWrapper gwt) {
+	public DownloadListWidgetViewImpl(AuthenticationController authController, SynapseJSNIUtils jsniUtils, EventBus eventBus) {
 		this.authController = authController;
 		this.jsniUtils = jsniUtils;
 		this.eventBus = eventBus;
-		this.gwt = gwt;
 		mainContainer.addStyleName("mainContainer");
 		mainContainer.add(downloadListContainer);
 		downloadListContainer.addAttachHandler(event -> {
-			if (!event.isAttached() && isViewingDownloadList) {
+			if (!event.isAttached()) {
 				jsniUtils.unmountComponentAtNode(downloadListContainer.getElement());
-				isViewingDownloadList = false;
 			}
 		});
 		downloadListContainer.addStyleName("downloadListContainer");
-		gwt.scheduleFixedDelay(() -> {
-			// update the DownloadList when this react component is being shown (let the header know that something might be changing)
-			if (isViewingDownloadList) {
-				eventBus.fireEvent(new DownloadListUpdatedEvent());
-			}
-		}, 5000);
+	}
+	public void fireDownloadListUpdatedEvent() {
+		eventBus.fireEvent(new DownloadListUpdatedEvent());	
 	}
 	
 	@Override
 	public void refreshView() {
-		isViewingDownloadList = false;
 		if (authController.isLoggedIn()) {
-			_showDownloadList(downloadListContainer.getElement(), authController.getCurrentUserSessionToken());
-			isViewingDownloadList = true;	
+			_showDownloadList(downloadListContainer.getElement(), authController.getCurrentUserSessionToken(), this);
 		}
 	}
 
-	private static native void _showDownloadList(Element el, String sessionToken) /*-{
+	private static native void _showDownloadList(Element el, String sessionToken, DownloadListWidgetViewImpl w) /*-{
 		try {
+			function onUpdateDownloadList() {
+				w.@org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidgetViewImpl::fireDownloadListUpdatedEvent()();
+			}
 			var props = {
-				token : sessionToken
+				token: sessionToken,
+				listUpdatedCallback: onUpdateDownloadList
 			};
 			$wnd.ReactDOM.render($wnd.React.createElement(
 					$wnd.SRC.SynapseComponents.DownloadListTable, props, null),
