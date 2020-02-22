@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.file.MultipartUploadRequest;
 import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
 import org.sagebionetworks.repo.model.file.PartPresignedUrl;
 import org.sagebionetworks.repo.model.file.PartUtils;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -69,15 +70,18 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	JavaScriptObject blob;
 	HasAttachHandlers view;
 	boolean isCanceled;
+	private long fileLastModifiedMs = -1;
+	DateTimeUtils dateTimeUtils;
 
 	@Inject
-	public MultipartUploaderImpl(GWTWrapper gwt, SynapseJSNIUtils synapseJsniUtils, SynapseJavascriptClient jsClient, CookieProvider cookies) {
+	public MultipartUploaderImpl(GWTWrapper gwt, SynapseJSNIUtils synapseJsniUtils, SynapseJavascriptClient jsClient, CookieProvider cookies, DateTimeUtils dateTimeUtils) {
 		super();
 		this.gwt = gwt;
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.jsClient = jsClient;
 		this.percentFormat = gwt.getNumberFormat("##");;
 		this.cookies = cookies;
+		this.dateTimeUtils = dateTimeUtils;
 	}
 
 	@Override
@@ -116,7 +120,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	public void startMultipartUpload() {
 		if (isStillUploading()) {
 			retryRequired = false;
-
+			fileLastModifiedMs = synapseJsniUtils.getLastModified(blob);
 			synapseJsniUtils.getFileMd5(blob, md5 -> {
 				if (md5 == null) {
 					handler.uploadFailed(DisplayConstants.MD5_CALCULATION_ERROR);
@@ -177,6 +181,12 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		// for each chunk that still needs to be uploaded, get the presigned url and upload to it
 		currentPartNumber++;
 
+		// sanity check - if last modified has changed, then fail.
+		long lastModifiedOn = synapseJsniUtils.getLastModified(blob);
+		if (lastModifiedOn != fileLastModifiedMs) {
+			uploadFailedDueToFileModification(new Date(lastModifiedOn));
+			return;
+		}
 		if (currentStatus.getPartsState().charAt(currentPartNumber - 1) == '0') {
 			attemptUploadCurrentPart();
 		} else {
@@ -320,7 +330,10 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	}
 
 	private void uploadFailedDueToFileModification(String startMd5, String newMd5) {
-		handler.uploadFailed("Unable to upload the file \"" + request.getFileName() + "\" because it's been modified during the upload.  The starting md5 of the file (" + startMd5 + ") differs from the current md5 (" + newMd5 + ").");
+		handler.uploadFailed("Unable to upload the file \"" + request.getFileName() + "\" because it's been modified during the upload.  \n\nThe starting md5 of the file (" + startMd5 + ") differs from the current md5 (" + newMd5 + ").");
+	}
+	private void uploadFailedDueToFileModification(Date lastModifiedDate) {
+		handler.uploadFailed("Unable to upload the file \"" + request.getFileName() + "\" because it's been modified during the upload.  \n\nThe file was last modified " + dateTimeUtils.getRelativeTime(lastModifiedDate) + ".");
 	}
 
 	public void completeMultipartUploadAfterMd5Verification() {

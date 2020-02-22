@@ -117,4 +117,6 @@ public interface SynapseJSNIUtils {
 	void showJiraIssueCollector(String issueSummary, String issueDescription, String jiraIssueCollectorURL, String principalId, String userDisplayName, String userEmailAddress, String synapseDataObjectId, String componentID, String accessRequirementId, String issuePriority);
 
 	String getVersionsServletUrl();
+
+	long getLastModified(JavaScriptObject blob);
 }

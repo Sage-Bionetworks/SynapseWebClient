@@ -38,6 +38,7 @@ import org.sagebionetworks.repo.model.file.PartPresignedUrl;
 import org.sagebionetworks.repo.model.file.PartUtils;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.ProgressCallback;
@@ -87,6 +88,8 @@ public class MultipartUploaderTest {
 	AddPartResponse mockAddPartResponse;
 	@Mock
 	HasAttachHandlers mockView;
+	@Mock
+	DateTimeUtils mockDateTimeUtils;
 	@Captor
 	ArgumentCaptor<ProgressCallback> progressCaptor;
 	@Mock
@@ -150,7 +153,7 @@ public class MultipartUploaderTest {
 		fileNames = new String[] {file1};
 		when(synapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(fileNames);
 
-		uploader = new MultipartUploaderImpl(gwt, synapseJsniUtils, mockJsClient, mockCookies);
+		uploader = new MultipartUploaderImpl(gwt, synapseJsniUtils, mockJsClient, mockCookies, mockDateTimeUtils);
 
 		when(mockView.isAttached()).thenReturn(true);
 	}
