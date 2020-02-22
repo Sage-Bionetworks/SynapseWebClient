@@ -185,6 +185,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		long lastModifiedOn = synapseJsniUtils.getLastModified(blob);
 		if (lastModifiedOn != fileLastModifiedMs) {
 			uploadFailedDueToFileModification(new Date(lastModifiedOn));
+			return;
 		}
 		if (currentStatus.getPartsState().charAt(currentPartNumber - 1) == '0') {
 			attemptUploadCurrentPart();
