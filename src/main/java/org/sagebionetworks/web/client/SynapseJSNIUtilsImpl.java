@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import java.util.Date;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
@@ -364,6 +365,22 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		return Document.get().getElementById(elementId);
 	};
 
+	/**
+	 * Return the last modified time of the File (in milliseconds since the UNIX epoch).  -1 if undefined.
+	 */
+	@Override
+	public long getLastModified(JavaScriptObject blob) {
+		return new Double(_getLastModified(blob)).longValue();
+	}
+
+	private final static native double _getLastModified(JavaScriptObject file) /*-{
+		if (file.lastModified) {
+			return file.lastModified;
+		}
+		return -1;
+	}-*/;
+
+	
 	/**
 	 * Using SparkMD5 (https://github.com/satazor/SparkMD5) to (progressively by slicing the file)
 	 * calculate the md5.
