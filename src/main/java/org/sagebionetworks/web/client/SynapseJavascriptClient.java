@@ -196,6 +196,7 @@ public class SynapseJavascriptClient {
 	public static final String SUBSCRIPTION = "/subscription";
 	public static final String ALL = "/all";
 	public static final String FILE_HANDLE_BATCH = "/fileHandle/batch";
+	public static final String FILE_HANDLE = "/fileHandle/";
 	public static final String THREAD_COUNTS = "/threadcounts";
 	public static final String ATTACHMENT_HANDLES = "attachmenthandles";
 	private static final String PROFILE_IMAGE = "/image";
@@ -1032,6 +1033,17 @@ public class SynapseJavascriptClient {
 	public void getFileHandleAndUrlBatch(BatchFileRequest request, AsyncCallback<BatchFileResult> callback) {
 		String url = getFileServiceUrl() + FILE_HANDLE_BATCH;
 		doPost(url, request, OBJECT_TYPE.BatchFileResult, true, callback);
+	}
+	
+	/**
+	 * http://rest-docs.synapse.org/rest/GET/fileHandle/handleId/url.html
+	 * 
+	 * Note: This call will result in a HTTP temporary redirect (307), to the actual file URL if the caller meets all of the download requirements.
+	 * Note: Only the user that created the FileHandle can use this method for download.
+	 */
+	public void getTemporaryFileHandleURL(String fileHandleId, AsyncCallback<String> callback) {
+		String url = getFileServiceUrl() + FILE_HANDLE + fileHandleId + "/url?redirect=false";
+		doGetString(url, false, callback);
 	}
 
 	public void getEntityHeaderBatch(List<String> entityIds, AsyncCallback<ArrayList<EntityHeader>> callback) {

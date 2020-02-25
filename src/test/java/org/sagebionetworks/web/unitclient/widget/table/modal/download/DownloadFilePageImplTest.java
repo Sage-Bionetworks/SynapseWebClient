@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadFilePageImpl;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadFilePageView;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
@@ -19,7 +19,7 @@ public class DownloadFilePageImplTest {
 
 	ModalPresenter mockPresenter;
 	DownloadFilePageView mockView;
-	SynapseClientAsync mockSynapseClient;
+	SynapseJavascriptClient mockJsClient;
 	GWTWrapper mockGWTWrapper;
 	DownloadFilePageImpl page;
 	String fileHandleId;
@@ -28,9 +28,9 @@ public class DownloadFilePageImplTest {
 	public void before() {
 		mockPresenter = Mockito.mock(ModalPresenter.class);
 		mockView = Mockito.mock(DownloadFilePageView.class);
-		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
+		mockJsClient = Mockito.mock(SynapseJavascriptClient.class);
 		mockGWTWrapper = Mockito.mock(GWTWrapper.class);
-		page = new DownloadFilePageImpl(mockView, mockSynapseClient, mockGWTWrapper);
+		page = new DownloadFilePageImpl(mockView, mockJsClient, mockGWTWrapper);
 		fileHandleId = "6789";
 		page.configure(fileHandleId);
 	}
@@ -45,7 +45,7 @@ public class DownloadFilePageImplTest {
 	public void testOnPrimaryFailure() {
 		page.setModalPresenter(mockPresenter);
 		String error = "an error";
-		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).createFileHandleURL(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockJsClient).getTemporaryFileHandleURL(anyString(), any(AsyncCallback.class));
 		page.onPrimary();
 		verify(mockPresenter).setLoading(true);
 		verify(mockPresenter, never()).onFinished();
@@ -56,7 +56,7 @@ public class DownloadFilePageImplTest {
 	public void testOnPrimarySuccess() {
 		page.setModalPresenter(mockPresenter);
 		String url = "a URL";
-		AsyncMockStubber.callSuccessWith(url).when(mockSynapseClient).createFileHandleURL(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(url).when(mockJsClient).getTemporaryFileHandleURL(anyString(), any(AsyncCallback.class));
 		page.onPrimary();
 		verify(mockPresenter).setLoading(true);
 		verify(mockGWTWrapper).assignThisWindowWith(url);

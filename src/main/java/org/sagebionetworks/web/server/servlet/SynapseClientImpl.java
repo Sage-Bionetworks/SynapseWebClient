@@ -103,7 +103,6 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.table.query.TableQueryParser;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.SynapseClient;
-import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
@@ -1484,19 +1483,6 @@ public class SynapseClientImpl extends SynapseClientBase implements SynapseClien
 			return synapseClient.getEntityChildren(request);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public String createFileHandleURL(String fileHandleId) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			URL url = synapseClient.getFileHandleTemporaryUrl(fileHandleId);
-			return url.toString();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} catch (IOException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
