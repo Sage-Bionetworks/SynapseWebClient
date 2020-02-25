@@ -166,8 +166,6 @@ public interface SynapseClient extends RemoteService {
 	 */
 	void validateTableQuery(String sql) throws RestServiceException;
 
-	String createFileHandleURL(String fileHandleId) throws RestServiceException;
-
 	/**
 	 * Create a list of columns.
 	 * 
