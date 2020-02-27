@@ -73,8 +73,8 @@ public class GlobalApplicationStateImplTest {
 	SynapseJavascriptClient mockJsClient;
 	@Mock
 	SynapseProperties mockSynapseProperties;
-	@Captor
-	ArgumentCaptor<Callback> synapsePropertiesInitCallbackCaptor;
+	@Mock
+	Callback mockCallback;
 	@Mock
 	SessionStorage mockSessionStorage;
 	public static final String REPO_ENDPOINT = "https://repo-staging.prod.sagebase.org/";
@@ -183,20 +183,11 @@ public class GlobalApplicationStateImplTest {
 		verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
 	}
 
-	private void verifyAndInvokeSynapsePropertiesInitCallback() {
-		verify(mockSynapseProperties).initSynapseProperties(synapsePropertiesInitCallbackCaptor.capture());
-		synapsePropertiesInitCallbackCaptor.getValue().invoke();
-	}
-
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testCheckVersionCompatibility() {
-		globalApplicationState.init(new Callback() {
-			@Override
-			public void invoke() {}
-		});
-		verifyAndInvokeSynapsePropertiesInitCallback();
-
+		globalApplicationState.init(mockCallback);
+		
 		AsyncCallback<VersionState> callback = mock(AsyncCallback.class);
 		globalApplicationState.checkVersionCompatibility(callback);
 		verify(mockJsClient).getSynapseVersions(any(AsyncCallback.class));
@@ -230,9 +221,7 @@ public class GlobalApplicationStateImplTest {
 	public void testCheckVersionCompatibilityFailure() {
 		Exception ex = new Exception("couldn't get version");
 		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).getSynapseVersions(any(AsyncCallback.class));
-		globalApplicationState.init(() -> {
-		});
-		verifyAndInvokeSynapsePropertiesInitCallback();
+		globalApplicationState.init(mockCallback);
 		AsyncCallback<VersionState> callback = mock(AsyncCallback.class);
 		globalApplicationState.checkVersionCompatibility(callback);
 		verify(mockJsClient).getSynapseVersions(any(AsyncCallback.class));
@@ -245,10 +234,9 @@ public class GlobalApplicationStateImplTest {
 	public void testCheckVersionCompatibilityCheckedRecently() {
 		when(mockLocalStorage.get(GlobalApplicationStateImpl.RECENTLY_CHECKED_SYNAPSE_VERSION)).thenReturn(Boolean.TRUE.toString());
 		AsyncCallback<VersionState> callback = mock(AsyncCallback.class);
-		globalApplicationState.init(() -> {
-		});
+		globalApplicationState.init(mockCallback);
 		globalApplicationState.checkVersionCompatibility(mock(AsyncCallback.class));
-		verifyAndInvokeSynapsePropertiesInitCallback();
+		
 		reset(mockJsClient);
 		globalApplicationState.checkVersionCompatibility(callback);
 
@@ -262,12 +250,8 @@ public class GlobalApplicationStateImplTest {
 
 	@Test
 	public void testInitSynapseProperties() {
-		Callback mockCallback = mock(Callback.class);
 		globalApplicationState.init(mockCallback);
-
-		verify(mockCallback, never()).invoke();
-		verifyAndInvokeSynapsePropertiesInitCallback();
-
+		
 		verify(mockView).initGlobalViewProperties();
 		verify(mockView).initSRCEndpoints(REPO_ENDPOINT, SWC_ENDPOINT);
 		verify(mockCallback).invoke();
