@@ -8,7 +8,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class SynapsePropertiesImpl implements SynapseProperties {
-	private static final HashMap<String, String> synapseProperties = new HashMap<>();
+	private HashMap<String, String> synapseProperties = new HashMap<>();
 	private PublicPrincipalIds publicPrincipalIds;
 	private StackConfigServiceAsync stackConfigService;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -24,7 +24,6 @@ public class SynapsePropertiesImpl implements SynapseProperties {
 		stackConfigService.getSynapseProperties(new AsyncCallback<HashMap<String, String>>() {
 			@Override
 			public void onSuccess(HashMap<String, String> properties) {
-				synapseProperties.clear();
 				for (String key : properties.keySet()) {
 					synapseProperties.put(key, properties.get(key));
 				}
@@ -33,7 +32,6 @@ public class SynapsePropertiesImpl implements SynapseProperties {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				synapseProperties.clear();
 				synapseJSNIUtils.consoleError(caught.getMessage());
 				c.invoke();
 			}
