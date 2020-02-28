@@ -182,7 +182,8 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 				@Override
 				public void onSuccess(Void result) {
 					view.showInfo("Successfully imposed restriction");
-					loadRestrictionInformation();
+					// reconfigure (reload restriction information and reconfigure HasAccess)
+					configure(entity, canChangePermissions);
 				}
 
 				@Override
