@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import static org.sagebionetworks.web.client.DisplayUtils.TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER;
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
@@ -27,7 +28,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -90,7 +90,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 
 
 	Callback onAttachCallback;
-	Button entityAnchor;
+	Anchor entityAnchor;
 	public static PlaceChanger placeChanger = null;
 	HandlerRegistration clickHandlerRegistration;
 	public static final String ENTITY_ID_ATTRIBUTE = "data-entity-id";
@@ -145,14 +145,13 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		if (entityHeader == null)
 			throw new IllegalArgumentException("Entity is required");
 
-		entityAnchor = new Button();
+		entityAnchor = new Anchor();
 		clickHandlerRegistration = entityAnchor.addClickHandler(STANDARD_CLICKHANDLER);
 		entityAnchor.setText(entityHeader.getName());
 		entityAnchor.setWidth("100%");
 		entityAnchor.addStyleName("text-align-left text-overflow-ellipsis inline-block whitespace-nowrap overflowHidden");
 		entityAnchor.setHref("#!Synapse:" + entityHeader.getId());
 		entityAnchor.getElement().setAttribute(ENTITY_ID_ATTRIBUTE, entityHeader.getId());
-		entityAnchor.setType(ButtonType.LINK);
 		entityAnchor.setPaddingLeft(0);
 		entityAnchor.setPaddingRight(0);
 		entityAnchor.setPaddingTop(0);
