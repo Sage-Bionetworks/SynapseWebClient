@@ -168,6 +168,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		if (entityTree == null) {
 			// On open, it will call expandTreeItemOnOpen, which starts a loading message.
 			entityTree = new Tree(new EntityTreeResources());
+			entityTree.setScrollOnSelectEnabled(false);
 			entityTree.addOpenHandler(event -> {
 				final EntityTreeItem target = getTreeItem2entityTreeItem().get(event.getTarget());
 				presenter.expandTreeItemOnOpen(target);
