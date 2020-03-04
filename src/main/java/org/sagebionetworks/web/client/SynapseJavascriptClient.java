@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
@@ -280,7 +281,7 @@ public class SynapseJavascriptClient {
 	public static final String DOWNLOAD_LIST_ADD = DOWNLOAD_LIST + "/add";
 	public static final String DOWNLOAD_LIST_REMOVE = DOWNLOAD_LIST + "/remove";
 	public static final String DOWNLOAD_LIST_CLEAR = DOWNLOAD_LIST + "/clear";
-
+	public static final String ACCESS_REQUIREMENT = "/accessRequirement/";
 	public static final String DOWNLOAD_ORDER = "/download/order";
 	public static final String DOWNLOAD_ORDER_HISTORY = DOWNLOAD_ORDER + "/history";
 	public static final String STORAGE_REPORT = "/storageReport";
@@ -1375,6 +1376,11 @@ public class SynapseJavascriptClient {
 		doPost(url, request, OBJECT_TYPE.EntityId, true, callback);
 	}
 
+	public void getAccessRequirement(String requirementId, AsyncCallback<AccessRequirement> callback) {
+		String url = getRepoServiceUrl() + ACCESS_REQUIREMENT + requirementId;
+		doGet(url, OBJECT_TYPE.AccessRequirement, callback);
+	}
+	
 	public void getUploadDestinations(String parentEntityId, AsyncCallback<List<UploadDestination>> callback) {
 		String url = getFileServiceUrl() + ENTITY + "/" + parentEntityId + UPLOAD_DESTINATIONS;
 		doGet(url, OBJECT_TYPE.ListWrapperUploadDestinations, callback);
