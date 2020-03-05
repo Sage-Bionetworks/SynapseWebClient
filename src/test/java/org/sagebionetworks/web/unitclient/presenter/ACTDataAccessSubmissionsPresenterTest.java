@@ -34,6 +34,7 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionsPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -76,6 +77,8 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	FileHandleWidget mockDucTemplateFileHandleWidget;
 	@Mock
 	DataAccessClientAsync mockDataAccessClient;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
 
 	@Mock
 	ManagedACTAccessRequirement mockACTAccessRequirement;
@@ -98,20 +101,20 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	@Captor
 	ArgumentCaptor<Place> placeCaptor;
 	public static final String FILE_HANDLE_ID = "9999";
-	public static final Long AR_ID = 76555L;
+	public static final String AR_ID = "76555";
 	public static final String NEXT_PAGE_TOKEN = "abc678";
 
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
 		when(mockGWT.getDateTimeFormat(any(PredefinedFormat.class))).thenReturn(mockDateTimeFormat);
-		presenter = new ACTDataAccessSubmissionsPresenter(mockView, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockACTAccessRequirementWidget, mockButton, mockDucTemplateFileHandleWidget, mockDataAccessClient, mockSubjectsWidget, mockGWT);
-		AsyncMockStubber.callSuccessWith(mockACTAccessRequirement).when(mockDataAccessClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
+		presenter = new ACTDataAccessSubmissionsPresenter(mockView, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockACTAccessRequirementWidget, mockButton, mockDucTemplateFileHandleWidget, mockJsClient, mockDataAccessClient, mockSubjectsWidget, mockGWT);
+		AsyncMockStubber.callSuccessWith(mockACTAccessRequirement).when(mockJsClient).getAccessRequirement(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionPage).when(mockDataAccessClient).getDataAccessSubmissions(anyLong(), anyString(), any(SubmissionState.class), any(SubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
 		when(mockDataAccessSubmissionPage.getResults()).thenReturn(Collections.singletonList(mockDataAccessSubmission));
 		when(mockDataAccessSubmissionPage.getNextPageToken()).thenReturn(NEXT_PAGE_TOKEN);
 		when(mockACTAccessRequirement.getDucTemplateFileHandleId()).thenReturn(FILE_HANDLE_ID);
-		when(mockACTAccessRequirement.getId()).thenReturn(AR_ID);
+		when(mockACTAccessRequirement.getId()).thenReturn(Long.parseLong(AR_ID));
 		when(mockGinInjector.getACTDataAccessSubmissionWidget()).thenReturn(mockACTDataAccessSubmissionWidget);
 		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjects);
 	}
@@ -136,7 +139,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		String time2 = "5678";
 		when(mockPlace.getParam(MIN_DATE_PARAM)).thenReturn(time1);
 		when(mockPlace.getParam(MAX_DATE_PARAM)).thenReturn(time2);
-		when(mockPlace.getParam(ACCESS_REQUIREMENT_ID_PARAM)).thenReturn(AR_ID.toString());
+		when(mockPlace.getParam(ACCESS_REQUIREMENT_ID_PARAM)).thenReturn(AR_ID);
 
 		when(mockACTAccessRequirement.getDucTemplateFileHandleId()).thenReturn(FILE_HANDLE_ID);
 		when(mockACTAccessRequirement.getAreOtherAttachmentsRequired()).thenReturn(true);
@@ -149,13 +152,13 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		when(mockACTAccessRequirement.getIsValidatedProfileRequired()).thenReturn(true);
 
 		presenter.setPlace(mockPlace);
-		verify(mockDataAccessClient).getAccessRequirement(eq(AR_ID), any(AsyncCallback.class));
+		verify(mockJsClient).getAccessRequirement(eq(AR_ID), any(AsyncCallback.class));
 
 		// verify duc template file handle widget is configured properly (basd on act duc file handle id)
 		verify(mockDucTemplateFileHandleWidget).configure(fhaCaptor.capture());
 		FileHandleAssociation fha = fhaCaptor.getValue();
 		assertEquals(FileHandleAssociateType.AccessRequirementAttachment, fha.getAssociateObjectType());
-		assertEquals(AR_ID.toString(), fha.getAssociateObjectId());
+		assertEquals(AR_ID, fha.getAssociateObjectId());
 		assertEquals(FILE_HANDLE_ID, fha.getFileHandleId());
 		verify(mockSubjectsWidget).configure(mockSubjects);
 		verify(mockView).setAreOtherAttachmentsRequired(true);
@@ -193,7 +196,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	public void testProjectedExpiration() {
 		String formattedDateTime = "In the future";
 		when(mockDateTimeFormat.format(any(Date.class))).thenReturn(formattedDateTime);
-		when(mockPlace.getParam(ACCESS_REQUIREMENT_ID_PARAM)).thenReturn(AR_ID.toString());
+		when(mockPlace.getParam(ACCESS_REQUIREMENT_ID_PARAM)).thenReturn(AR_ID);
 
 		Long expirationPeriod = 1111L;
 		when(mockACTAccessRequirement.getExpirationPeriod()).thenReturn(expirationPeriod);

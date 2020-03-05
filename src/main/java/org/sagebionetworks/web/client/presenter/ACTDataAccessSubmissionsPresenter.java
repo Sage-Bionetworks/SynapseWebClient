@@ -74,6 +74,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		this.ginInjector = ginInjector;
 		this.dataAccessClient = dataAccessClient;
 		fixServiceEntryPoint(dataAccessClient);
+		this.jsClient = jsClient;
 		this.loadMoreContainer = loadMoreContainer;
 		this.actAccessRequirementWidget = actAccessRequirementWidget;
 		actAccessRequirementWidget.setReviewAccessRequestsVisible(false);
