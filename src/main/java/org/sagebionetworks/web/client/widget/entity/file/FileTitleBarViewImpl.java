@@ -35,7 +35,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	Presenter presenter;
 	private Md5Link md5Link;
 	private FavoriteWidget favoriteWidget;
-
+	AuthenticationController authController;
 	@UiField
 	HTMLPanel panel;
 	@UiField
@@ -100,6 +100,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	public FileTitleBarViewImpl(FavoriteWidget favoriteWidget, Md5Link md5Link, GlobalApplicationState globalAppState, AuthenticationController authController) {
 		this.favoriteWidget = favoriteWidget;
 		this.md5Link = md5Link;
+		this.authController = authController;
 
 		initWidget(uiBinder.createAndBindUi(this));
 		md5LinkContainer.addStyleName("inline-block margin-left-5");
@@ -138,6 +139,8 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		md5LinkContainer.setWidget(md5Link);
 		entityIcon.setType(EntityTypeUtils.getIconTypeForEntity(entity));
 		currentVersionLink.setHref("#!Synapse:" + currentEntityId);
+		String viewOnlyHelpText = authController.isLoggedIn() ? "You do not have download access for this item." : "You need to log in to download this file.";
+		viewOnlyHelp.setHelpMarkdown(viewOnlyHelpText);
 	}
 
 	@Override
