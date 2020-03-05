@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.accessrequirements.submission;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
@@ -16,7 +17,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmission;
-import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.OpenSubmissionWidget;
@@ -28,7 +29,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class OpenSubmissionWidgetTest {
 	@Mock
-	DataAccessClientAsync mockClient;
+	SynapseJavascriptClient mockClient;
 	@Mock
 	SynapseAlert mockSynapseAlert;
 	@Mock
@@ -58,15 +59,15 @@ public class OpenSubmissionWidgetTest {
 
 		Callback callback = captor.getValue();
 		callback.invoke();
-		verify(mockClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
+		verify(mockClient).getAccessRequirement(anyString(), any(AsyncCallback.class));
 	}
 
 	@Test
 	public void testLoadAccessRequirementFailure() {
 		Exception ex = new Exception();
-		AsyncMockStubber.callFailureWith(ex).when(mockClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockClient).getAccessRequirement(anyString(), any(AsyncCallback.class));
 		widget.loadAccessRequirement();
-		verify(mockClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
+		verify(mockClient).getAccessRequirement(anyString(), any(AsyncCallback.class));
 		InOrder inOrder = inOrder(mockSynapseAlert);
 		inOrder.verify(mockSynapseAlert).clear();
 		inOrder.verify(mockSynapseAlert).handleException(ex);
@@ -75,9 +76,9 @@ public class OpenSubmissionWidgetTest {
 	@Test
 	public void testLoadAccessRequirementSuccessWithACTAccessRequirement() {
 		ManagedACTAccessRequirement actAccessRequirement = new ManagedACTAccessRequirement();
-		AsyncMockStubber.callSuccessWith(actAccessRequirement).when(mockClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(actAccessRequirement).when(mockClient).getAccessRequirement(anyString(), any(AsyncCallback.class));
 		widget.loadAccessRequirement();
-		verify(mockClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
+		verify(mockClient).getAccessRequirement(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseAlert).clear();
 		verify(mockAccessRequirementWidget).setRequirement(eq(actAccessRequirement), any(Callback.class));
 	}
@@ -85,9 +86,9 @@ public class OpenSubmissionWidgetTest {
 	@Test
 	public void testLoadAccessRequirementSuccessWithTermsOfUseAccessRequirement() {
 		TermsOfUseAccessRequirement touAccessRequirement = new TermsOfUseAccessRequirement();
-		AsyncMockStubber.callSuccessWith(touAccessRequirement).when(mockClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(touAccessRequirement).when(mockClient).getAccessRequirement(anyString(), any(AsyncCallback.class));
 		widget.loadAccessRequirement();
-		verify(mockClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
+		verify(mockClient).getAccessRequirement(anyString(), any(AsyncCallback.class));
 		InOrder inOrder = inOrder(mockSynapseAlert);
 		inOrder.verify(mockSynapseAlert).clear();
 		ArgumentCaptor<Exception> captor = ArgumentCaptor.forClass(Exception.class);
@@ -102,10 +103,10 @@ public class OpenSubmissionWidgetTest {
 	@Test
 	public void testConfigure() {
 		Long numberOfSubmissions = 2L;
-		Long accessRequirementId = 10000L;
+		String accessRequirementId = "10000";
 		OpenSubmission openSubmission = new OpenSubmission();
 		openSubmission.setNumberOfSubmittedSubmission(numberOfSubmissions);
-		openSubmission.setAccessRequirementId(accessRequirementId.toString());
+		openSubmission.setAccessRequirementId(accessRequirementId);
 		widget.configure(openSubmission);
 		verify(mockView).setNumberOfSubmissions(numberOfSubmissions);
 		verify(mockLazyLoadHelper).setIsConfigured();

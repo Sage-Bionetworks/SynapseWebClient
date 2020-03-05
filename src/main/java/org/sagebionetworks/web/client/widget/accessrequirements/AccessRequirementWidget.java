@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.LockAccessRequirement;
@@ -8,8 +7,8 @@ import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.exceptions.IllegalArgumentException;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.DivView;
@@ -21,21 +20,20 @@ import com.google.inject.Inject;
 
 public class AccessRequirementWidget implements IsWidget {
 	PortalGinInjector ginInjector;
-	DataAccessClientAsync dataAccessClient;
+	SynapseJavascriptClient jsClient;
 	DivView div;
 	boolean isHideButtons = false;
 
 	@Inject
-	public AccessRequirementWidget(PortalGinInjector ginInjector, DataAccessClientAsync dataAccessClient, DivView div) {
+	public AccessRequirementWidget(PortalGinInjector ginInjector, SynapseJavascriptClient jsClient, DivView div) {
 		this.ginInjector = ginInjector;
-		this.dataAccessClient = dataAccessClient;
-		fixServiceEntryPoint(dataAccessClient);
+		this.jsClient = jsClient;
 		this.div = div;
 		div.addStyleName("border-bottom-1 margin-bottom-15");
 	}
 
 	public void configure(final String accessRequirementId, final RestrictableObjectDescriptor targetSubject) {
-		dataAccessClient.getAccessRequirement(Long.parseLong(accessRequirementId), new AsyncCallback<AccessRequirement>() {
+		jsClient.getAccessRequirement(accessRequirementId, new AsyncCallback<AccessRequirement>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				handleException(caught);

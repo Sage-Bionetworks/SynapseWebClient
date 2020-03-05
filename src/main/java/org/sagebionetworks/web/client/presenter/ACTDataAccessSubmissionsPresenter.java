@@ -21,6 +21,7 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.ACTDataAccessSubmissionsView;
@@ -48,6 +49,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	private PortalGinInjector ginInjector;
 	private SynapseAlert synAlert;
 	DataAccessClientAsync dataAccessClient;
+	SynapseJavascriptClient jsClient;
 	LoadMoreWidgetContainer loadMoreContainer;
 	ManagedACTAccessRequirementWidget actAccessRequirementWidget;
 	boolean isAccessRequirementVisible;
@@ -66,12 +68,13 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	Callback refreshCallback;
 
 	@Inject
-	public ACTDataAccessSubmissionsPresenter(final ACTDataAccessSubmissionsView view, SynapseAlert synAlert, PortalGinInjector ginInjector, LoadMoreWidgetContainer loadMoreContainer, ManagedACTAccessRequirementWidget actAccessRequirementWidget, final Button showHideAccessRequirementButton, FileHandleWidget ducTemplateFileHandleWidget, DataAccessClientAsync dataAccessClient, SubjectsWidget subjectsWidget, GWTWrapper gwt) {
+	public ACTDataAccessSubmissionsPresenter(final ACTDataAccessSubmissionsView view, SynapseAlert synAlert, PortalGinInjector ginInjector, LoadMoreWidgetContainer loadMoreContainer, ManagedACTAccessRequirementWidget actAccessRequirementWidget, final Button showHideAccessRequirementButton, FileHandleWidget ducTemplateFileHandleWidget, SynapseJavascriptClient jsClient, DataAccessClientAsync dataAccessClient, SubjectsWidget subjectsWidget, GWTWrapper gwt) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
 		this.dataAccessClient = dataAccessClient;
 		fixServiceEntryPoint(dataAccessClient);
+		this.jsClient = jsClient;
 		this.loadMoreContainer = loadMoreContainer;
 		this.actAccessRequirementWidget = actAccessRequirementWidget;
 		actAccessRequirementWidget.setReviewAccessRequestsVisible(false);
@@ -143,8 +146,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		synAlert.clear();
 		view.setProjectedExpirationDateVisible(false);
 		if (actAccessRequirementIdString != null) {
-			actAccessRequirementId = Long.parseLong(actAccessRequirementIdString);
-			dataAccessClient.getAccessRequirement(actAccessRequirementId, new AsyncCallback<AccessRequirement>() {
+			jsClient.getAccessRequirement(actAccessRequirementIdString, new AsyncCallback<AccessRequirement>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					synAlert.showError(INVALID_AR_ID);

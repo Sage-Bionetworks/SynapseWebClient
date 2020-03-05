@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionDashboardPlace;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.place.ACTPlace;
+import org.sagebionetworks.web.client.place.AccessRequirementPlace;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.Account;
 import org.sagebionetworks.web.client.place.Challenges;
@@ -472,6 +473,20 @@ public class BulkPresenterProxy extends AbstractActivity {
 					loadError(caught);
 				}
 			});
+		} else if (place instanceof AccessRequirementPlace) {
+			GWT.runAsync(AccessRequirementPlace.class, new RunAsyncCallback() {
+				@Override
+				public void onSuccess() {
+					AccessRequirementPresenter presenter = ginjector.getAccessRequirementPresenter();
+					presenter.setPlace((AccessRequirementPlace) place);
+					presenter.start(panel, eventBus);
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					loadError(caught);
+				}
+			});
+
 		} else if (place instanceof ACTDataAccessSubmissionsPlace) {
 			GWT.runAsync(ACTDataAccessSubmissionsPlace.class, new RunAsyncCallback() {
 				@Override

@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.presenter.ACTAccessApprovalsPresenter;
 import org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionDashboardPresenter;
 import org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionsPresenter;
 import org.sagebionetworks.web.client.presenter.ACTPresenter;
+import org.sagebionetworks.web.client.presenter.AccessRequirementPresenter;
 import org.sagebionetworks.web.client.presenter.AccessRequirementsPresenter;
 import org.sagebionetworks.web.client.presenter.AccountPresenter;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
@@ -337,6 +338,7 @@ public interface PortalGinInjector extends Ginjector {
 	ACTPresenter getACTPresenter();
 
 	AccessRequirementsPresenter getAccessRequirementsPresenter();
+	AccessRequirementPresenter getAccessRequirementPresenter();
 
 	ACTDataAccessSubmissionsPresenter getACTDataAccessSubmissionsPresenter();
 
