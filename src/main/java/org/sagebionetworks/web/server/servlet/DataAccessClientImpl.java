@@ -85,16 +85,6 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 	}
 
 	@Override
-	public AccessRequirement getAccessRequirement(Long requirementId) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return synapseClient.getAccessRequirement(requirementId);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
 	public SubmissionPage getDataAccessSubmissions(Long accessRequirementId, String nextPageToken, SubmissionState stateFilter, SubmissionOrder order, boolean isAsc) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {

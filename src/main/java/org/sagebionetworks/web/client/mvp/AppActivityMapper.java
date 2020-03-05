@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.AccessRequirementPlace;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ChangeUsername;
@@ -93,6 +94,7 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(SynapseForumPlace.class);
 		openAccessPlaces.add(EmailInvitation.class);
 		openAccessPlaces.add(AccessRequirementsPlace.class);
+		openAccessPlaces.add(AccessRequirementPlace.class);
 
 		excludeFromLastPlace = new ArrayList<Class>();
 		excludeFromLastPlace.add(Home.class);

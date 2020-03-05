@@ -23,7 +23,6 @@ public class AccessRequirementPresenter extends AbstractActivity implements Pres
 		arDiv.addStyleName("markdown");
 		arDiv.add(arWidget.asWidget());
 		view.add(arDiv.asWidget());
-		view.addTitle("Access");
 	}
 
 	@Override

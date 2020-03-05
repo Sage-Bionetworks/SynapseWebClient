@@ -1,10 +1,9 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.submission;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmission;
-import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -18,17 +17,16 @@ public class OpenSubmissionWidget implements OpenSubmissionWidgetView.Presenter,
 
 	private OpenSubmissionWidgetView view;
 	private ManagedACTAccessRequirementWidget accessRequirementWidget;
-	private DataAccessClientAsync dataAccessClient;
+	private SynapseJavascriptClient jsClient;
 	private SynapseAlert synAlert;
 	private LazyLoadHelper lazyLoadHelper;
-	private long accessRequirementId;
+	private String accessRequirementId;
 
 	@Inject
-	public OpenSubmissionWidget(OpenSubmissionWidgetView view, ManagedACTAccessRequirementWidget accessRequirementWidget, DataAccessClientAsync dataAccessClient, SynapseAlert synAlert, LazyLoadHelper lazyLoadHelper) {
+	public OpenSubmissionWidget(OpenSubmissionWidgetView view, ManagedACTAccessRequirementWidget accessRequirementWidget, SynapseJavascriptClient jsClient, SynapseAlert synAlert, LazyLoadHelper lazyLoadHelper) {
 		this.view = view;
 		this.accessRequirementWidget = accessRequirementWidget;
-		this.dataAccessClient = dataAccessClient;
-		fixServiceEntryPoint(dataAccessClient);
+		this.jsClient = jsClient;
 		this.synAlert = synAlert;
 		this.lazyLoadHelper = lazyLoadHelper;
 		view.setSynAlert(synAlert);
@@ -48,7 +46,7 @@ public class OpenSubmissionWidget implements OpenSubmissionWidgetView.Presenter,
 
 	public void loadAccessRequirement() {
 		synAlert.clear();
-		dataAccessClient.getAccessRequirement(accessRequirementId, new AsyncCallback<AccessRequirement>() {
+		jsClient.getAccessRequirement(accessRequirementId, new AsyncCallback<AccessRequirement>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
@@ -74,7 +72,7 @@ public class OpenSubmissionWidget implements OpenSubmissionWidgetView.Presenter,
 
 	public void configure(OpenSubmission openSubmission) {
 		view.setNumberOfSubmissions(openSubmission.getNumberOfSubmittedSubmission());
-		accessRequirementId = Long.parseLong(openSubmission.getAccessRequirementId());
+		accessRequirementId = openSubmission.getAccessRequirementId();
 		lazyLoadHelper.setIsConfigured();
 	}
 
