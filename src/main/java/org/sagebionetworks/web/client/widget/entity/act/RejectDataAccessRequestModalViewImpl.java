@@ -46,6 +46,7 @@ public class RejectDataAccessRequestModalViewImpl implements RejectDataAccessReq
 	@UiField
 	CheckBox customTextOption;
 
+	CheckBox[] checkboxes = new CheckBox[] {wrongDucOption, everyPageDucOption, executeDucOption, notOwnSigningOfficialOption, requestorsMismatchSignedOption, projectLeadMissingOption, institutionNameMissingOption, missingBasicInfoOption, missingApprovalLetterOption};
 
 	// Generate response button
 	@UiField
@@ -125,11 +126,9 @@ public class RejectDataAccessRequestModalViewImpl implements RejectDataAccessReq
 		this.defaultButton.state().reset();
 		this.customText.clear();
 		this.nameField.clear();
-		this.synapseQuizOption.setValue(false);
-		this.addInfoOption.setValue(false);
-		this.orcIDPublicOption.setValue(false);
-		this.physicallyInitialOption.setValue(false);
-		this.submitDocsOption.setValue(false);
+		for (CheckBox cb : checkboxes) {
+			cb.setValue(false);
+		}
 		this.customTextOption.setValue(false);
 		this.customText.setVisible(false);
 	}
@@ -141,9 +140,6 @@ public class RejectDataAccessRequestModalViewImpl implements RejectDataAccessReq
 
 	@Override
 	public String getSelectedCheckboxText() {
-		// add your textbox here if we have a new option
-		CheckBox[] checkboxes = new CheckBox[] {synapseQuizOption, addInfoOption, orcIDPublicOption, physicallyInitialOption, submitDocsOption};
-
 		String output = "";
 		for (CheckBox checkBox : checkboxes) {
 			if (checkBox.getValue()) {
