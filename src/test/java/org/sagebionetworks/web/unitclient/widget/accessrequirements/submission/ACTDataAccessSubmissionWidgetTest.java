@@ -31,12 +31,12 @@ import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidgetView;
 import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
-import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
+import org.sagebionetworks.web.client.widget.entity.act.RejectDataAccessRequestModal;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
@@ -55,7 +55,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 	@Mock
 	DataAccessClientAsync mockClient;
 	@Mock
-	BigPromptModalView mockPromptModalWidget;
+	RejectDataAccessRequestModal mockPromptModalWidget;
 	@Mock
 	FileHandleWidget mockDucFileRenderer;
 	@Mock
@@ -71,8 +71,8 @@ public class ACTDataAccessSubmissionWidgetTest {
 	@Mock
 	ResearchProject mockResearchProjectSnapshot;
 	@Captor
-	ArgumentCaptor<Callback> promptModalPresenterCaptor;
-	Callback confirmRejectionCallback;
+	ArgumentCaptor<CallbackP<String>> promptModalPresenterCaptor;
+	CallbackP<String> confirmRejectionCallback;
 	@Captor
 	ArgumentCaptor<FileHandleAssociation> fhaCaptor;
 	@Mock
@@ -111,8 +111,6 @@ public class ACTDataAccessSubmissionWidgetTest {
 		widget = new ACTDataAccessSubmissionWidget(mockView, mockSynapseAlert, mockClient, mockPromptModalWidget, mockDucFileRenderer, mockIrbFileRenderer, mockFileHandleList, mockJSNIUtils, mockGinInjector, mockDateTimeUtils, mockUserProfileAsyncHandler);
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmission).when(mockClient).updateDataAccessSubmissionState(anyString(), any(SubmissionState.class), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockUserProfileAsyncHandler).getUserProfile(anyString(), any(AsyncCallback.class));
-		verify(mockPromptModalWidget).configure(anyString(), anyString(), anyString(), promptModalPresenterCaptor.capture());
-		confirmRejectionCallback = promptModalPresenterCaptor.getValue();
 	}
 
 	@Test
@@ -278,12 +276,15 @@ public class ACTDataAccessSubmissionWidgetTest {
 		// initially they are not rejected
 		widget.configure(mockDataAccessSubmission);
 		String rejectionReason = "missing info";
-		when(mockPromptModalWidget.getValue()).thenReturn(rejectionReason);
+		
+		widget.onReject();
+		
+		verify(mockPromptModalWidget).show(promptModalPresenterCaptor.capture());
+		confirmRejectionCallback = promptModalPresenterCaptor.getValue();
 		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.REJECTED);
 
-		confirmRejectionCallback.invoke();
+		confirmRejectionCallback.invoke(rejectionReason);
 
-		verify(mockPromptModalWidget).hide();
 		verify(mockClient).updateDataAccessSubmissionState(eq(SUBMISSION_ID), eq(SubmissionState.REJECTED), eq(rejectionReason), any(AsyncCallback.class));
 		verify(mockView).setState(SubmissionState.REJECTED.name());
 	}

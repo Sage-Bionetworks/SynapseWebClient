@@ -9,7 +9,7 @@ import com.google.inject.Inject;
 public class RejectDataAccessRequestModal implements RejectDataAccessRequestModalView.Presenter, IsWidget {
 
 	// Template rejection format
-	public static String TEMPLATE_HEADER_THANKS = "Thank you for submitting your data access request. Before I can accept your request:\n";
+	public static String TEMPLATE_HEADER_THANKS = "Thank you for submitting your data access request. Before I can accept your request, please address the following issues:\n";
 	public static String TEMPLATE_HEADER_SIGNATURE = "\nPlease contact us at act@sagebionetworks.org if you have any questions.\n" + "\n" + "Regards,\n" + "Access and Compliance Team (ACT)\n" + "act@sagebionetworks.org";
 
 	// If no options are shown for rejected reason

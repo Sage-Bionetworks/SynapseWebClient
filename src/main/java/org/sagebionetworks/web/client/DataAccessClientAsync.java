@@ -30,8 +30,6 @@ public interface DataAccessClientAsync {
 
 	void submitDataAccessRequest(CreateSubmissionRequest dataAccessRequest, Long arId, AsyncCallback<Void> asyncCallback);
 
-	void getDataAccessSubmissions(Long accessRequirementId, String nextPageToken, SubmissionState stateFilter, SubmissionOrder order, boolean isAsc, AsyncCallback<SubmissionPage> callback);
-
 	void getAccessRequirements(RestrictableObjectDescriptor subject, Long limit, Long offset, AsyncCallback<List<AccessRequirement>> callback);
 
 	void getAccessRequirementStatus(String accessRequirementId, AsyncCallback<AccessRequirementStatus> callback);

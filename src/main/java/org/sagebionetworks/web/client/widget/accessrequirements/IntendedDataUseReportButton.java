@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,9 +12,9 @@ import org.sagebionetworks.repo.model.dataaccess.Submission;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
-import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
@@ -33,22 +32,21 @@ public class IntendedDataUseReportButton implements IsWidget {
 	public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	RestrictableObjectDescriptor subject;
 	AccessRequirement ar;
-	DataAccessClientAsync dataAccessClient;
+	SynapseJavascriptClient jsClient;
 	PopupUtilsView popupUtils;
 	BigPromptModalView copyTextModal;
 	Map<String, Submission> researchProjectId2Submission;
 	DateTimeUtils dateTimeUtils;
 
 	@Inject
-	public IntendedDataUseReportButton(Button button, IsACTMemberAsyncHandler isACTMemberAsyncHandler, DataAccessClientAsync dataAccessClient, PopupUtilsView popupUtils, BigPromptModalView copyTextModal, DateTimeUtils dateTimeUtils) {
+	public IntendedDataUseReportButton(Button button, IsACTMemberAsyncHandler isACTMemberAsyncHandler, SynapseJavascriptClient jsClient, PopupUtilsView popupUtils, BigPromptModalView copyTextModal, DateTimeUtils dateTimeUtils) {
 		this.button = button;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.popupUtils = popupUtils;
 		this.copyTextModal = copyTextModal;
 		copyTextModal.addStyleToModal("modal-fullscreen");
 		copyTextModal.setTextAreaHeight("450px");
-		this.dataAccessClient = dataAccessClient;
-		fixServiceEntryPoint(dataAccessClient);
+		this.jsClient = jsClient;
 		this.dateTimeUtils = dateTimeUtils;
 		button.setVisible(false);
 		button.addStyleName("margin-left-10");
@@ -59,7 +57,7 @@ public class IntendedDataUseReportButton implements IsWidget {
 	}
 
 	public void gatherAllSubmissions(String nextPageToken) {
-		dataAccessClient.getDataAccessSubmissions(ar.getId(), nextPageToken, SubmissionState.APPROVED, SubmissionOrder.CREATED_ON, true, new AsyncCallback<SubmissionPage>() {
+		jsClient.getDataAccessSubmissions(ar.getId().toString(), nextPageToken, SubmissionState.APPROVED, SubmissionOrder.CREATED_ON, true, new AsyncCallback<SubmissionPage>() {
 			@Override
 			public void onSuccess(SubmissionPage page) {
 				List<Submission> newSubmissions = page.getResults();

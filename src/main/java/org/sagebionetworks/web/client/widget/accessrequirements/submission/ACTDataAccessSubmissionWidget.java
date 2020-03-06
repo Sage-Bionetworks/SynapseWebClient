@@ -12,10 +12,10 @@ import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
-import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
+import org.sagebionetworks.web.client.widget.entity.act.RejectDataAccessRequestModal;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
@@ -31,7 +31,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	DataAccessClientAsync dataAccessClient;
 	SynapseAlert synAlert;
 	Submission submission;
-	BigPromptModalView promptDialog;
+	RejectDataAccessRequestModal promptDialog;
 	FileHandleList otherDocuments;
 	FileHandleWidget ducFileRenderer;
 	FileHandleWidget irbFileRenderer;
@@ -39,9 +39,9 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	PortalGinInjector ginInjector;
 	DateTimeUtils dateTimeUtils;
 	UserProfileAsyncHandler userProfileAsyncHandler;
-
+	CallbackP<String> rejectionCallback;
 	@Inject
-	public ACTDataAccessSubmissionWidget(ACTDataAccessSubmissionWidgetView view, SynapseAlert synAlert, DataAccessClientAsync dataAccessClient, BigPromptModalView promptDialog, FileHandleWidget ducFileRenderer, FileHandleWidget irbFileRenderer, FileHandleList otherDocuments, SynapseJSNIUtils jsniUtils, PortalGinInjector ginInjector, DateTimeUtils dateTimeUtils, UserProfileAsyncHandler userProfileAsyncHandler) {
+	public ACTDataAccessSubmissionWidget(ACTDataAccessSubmissionWidgetView view, SynapseAlert synAlert, DataAccessClientAsync dataAccessClient, RejectDataAccessRequestModal promptDialog, FileHandleWidget ducFileRenderer, FileHandleWidget irbFileRenderer, FileHandleList otherDocuments, SynapseJSNIUtils jsniUtils, PortalGinInjector ginInjector, DateTimeUtils dateTimeUtils, UserProfileAsyncHandler userProfileAsyncHandler) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.dataAccessClient = dataAccessClient;
@@ -63,13 +63,10 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		view.setPromptModal(promptDialog);
 		view.setOtherAttachmentWidget(otherDocuments);
 		view.setSynAlert(synAlert);
-		promptDialog.configure("Reason", "Rejection reason:", "", new Callback() {
-			@Override
-			public void invoke() {
-				updateDataAccessSubmissionState(SubmissionState.REJECTED, promptDialog.getValue());
-				promptDialog.hide();
-			}
-		});
+		
+		rejectionCallback = reason -> {
+			updateDataAccessSubmissionState(SubmissionState.REJECTED, reason);
+		};
 	}
 
 	public void configure(Submission submission) {
@@ -184,7 +181,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	@Override
 	public void onReject() {
 		// prompt for reason
-		promptDialog.show();
+		promptDialog.show(rejectionCallback);
 	}
 
 	public void addStyleNames(String styleNames) {

@@ -22,7 +22,7 @@ public class RejectDataAccessRequestModalViewImpl implements RejectDataAccessReq
 
 	// Generated Response Preview
 	@UiField
-	TextArea nameField;
+	TextArea responseField;
 
 	// Checkboxes
 	@UiField
@@ -46,8 +46,6 @@ public class RejectDataAccessRequestModalViewImpl implements RejectDataAccessReq
 	@UiField
 	CheckBox customTextOption;
 
-	CheckBox[] checkboxes = new CheckBox[] {wrongDucOption, everyPageDucOption, executeDucOption, notOwnSigningOfficialOption, requestorsMismatchSignedOption, projectLeadMissingOption, institutionNameMissingOption, missingBasicInfoOption, missingApprovalLetterOption};
-
 	// Generate response button
 	@UiField
 	Button generateButton;
@@ -70,7 +68,7 @@ public class RejectDataAccessRequestModalViewImpl implements RejectDataAccessReq
 
 	// Presenter
 	Presenter presenter;
-
+	
 	@Inject
 	public RejectDataAccessRequestModalViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
@@ -87,8 +85,11 @@ public class RejectDataAccessRequestModalViewImpl implements RejectDataAccessReq
 		this.presenter = presenter;
 	}
 
+	private CheckBox[] getCheckBoxes() {
+		return new CheckBox[] {wrongDucOption, everyPageDucOption, executeDucOption, notOwnSigningOfficialOption, requestorsMismatchSignedOption, projectLeadMissingOption, institutionNameMissingOption, missingBasicInfoOption, missingApprovalLetterOption};
+	}
 	public void setValue(String value) {
-		nameField.setText(value);
+		responseField.setText(value);
 	}
 
 	@Override
@@ -98,7 +99,7 @@ public class RejectDataAccessRequestModalViewImpl implements RejectDataAccessReq
 
 	@Override
 	public String getValue() {
-		return nameField.getText();
+		return responseField.getText();
 	}
 
 	@Override
@@ -115,7 +116,7 @@ public class RejectDataAccessRequestModalViewImpl implements RejectDataAccessReq
 	@Override
 	public void show() {
 		modal.show();
-		nameField.setFocus(true);
+		responseField.setFocus(true);
 	}
 
 	@Override
@@ -125,8 +126,8 @@ public class RejectDataAccessRequestModalViewImpl implements RejectDataAccessReq
 		this.defaultButton.state().reset();
 		this.defaultButton.state().reset();
 		this.customText.clear();
-		this.nameField.clear();
-		for (CheckBox cb : checkboxes) {
+		this.responseField.clear();
+		for (CheckBox cb : getCheckBoxes()) {
 			cb.setValue(false);
 		}
 		this.customTextOption.setValue(false);
@@ -141,7 +142,7 @@ public class RejectDataAccessRequestModalViewImpl implements RejectDataAccessReq
 	@Override
 	public String getSelectedCheckboxText() {
 		String output = "";
-		for (CheckBox checkBox : checkboxes) {
+		for (CheckBox checkBox : getCheckBoxes()) {
 			if (checkBox.getValue()) {
 				output += "\n" + checkBox.getText() + "\n";
 			}

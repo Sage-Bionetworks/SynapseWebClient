@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.presenter;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.ACCESS_REQUIREMENT_ID_PARAM;
 import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.MAX_DATE_PARAM;
 import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.MIN_DATE_PARAM;
@@ -18,7 +17,6 @@ import org.sagebionetworks.repo.model.dataaccess.SubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
-import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -48,7 +46,6 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	private ACTDataAccessSubmissionsView view;
 	private PortalGinInjector ginInjector;
 	private SynapseAlert synAlert;
-	DataAccessClientAsync dataAccessClient;
 	SynapseJavascriptClient jsClient;
 	LoadMoreWidgetContainer loadMoreContainer;
 	ManagedACTAccessRequirementWidget actAccessRequirementWidget;
@@ -57,7 +54,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	public static final String SHOW_AR_TEXT = "Show Access Requirement";
 	public static final String INVALID_AR_ID = "Invalid Access Requirement ID";
 	Date fromDate, toDate;
-	Long actAccessRequirementId;
+	String actAccessRequirementId;
 	FileHandleWidget ducTemplateFileHandleWidget;
 	List<String> states;
 	boolean isSortedAsc;
@@ -68,12 +65,10 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	Callback refreshCallback;
 
 	@Inject
-	public ACTDataAccessSubmissionsPresenter(final ACTDataAccessSubmissionsView view, SynapseAlert synAlert, PortalGinInjector ginInjector, LoadMoreWidgetContainer loadMoreContainer, ManagedACTAccessRequirementWidget actAccessRequirementWidget, final Button showHideAccessRequirementButton, FileHandleWidget ducTemplateFileHandleWidget, SynapseJavascriptClient jsClient, DataAccessClientAsync dataAccessClient, SubjectsWidget subjectsWidget, GWTWrapper gwt) {
+	public ACTDataAccessSubmissionsPresenter(final ACTDataAccessSubmissionsView view, SynapseAlert synAlert, PortalGinInjector ginInjector, LoadMoreWidgetContainer loadMoreContainer, ManagedACTAccessRequirementWidget actAccessRequirementWidget, final Button showHideAccessRequirementButton, FileHandleWidget ducTemplateFileHandleWidget, SynapseJavascriptClient jsClient,SubjectsWidget subjectsWidget, GWTWrapper gwt) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
-		this.dataAccessClient = dataAccessClient;
-		fixServiceEntryPoint(dataAccessClient);
 		this.jsClient = jsClient;
 		this.loadMoreContainer = loadMoreContainer;
 		this.actAccessRequirementWidget = actAccessRequirementWidget;
@@ -130,9 +125,8 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	@Override
 	public void setPlace(ACTDataAccessSubmissionsPlace place) {
 		this.place = place;
-		actAccessRequirementId = null;
 		isSortedAsc = true;
-		String actAccessRequirementIdString = place.getParam(ACCESS_REQUIREMENT_ID_PARAM);
+		actAccessRequirementId = place.getParam(ACCESS_REQUIREMENT_ID_PARAM);
 		String fromTime = place.getParam(MIN_DATE_PARAM);
 		if (fromTime != null) {
 			fromDate = new Date(Long.parseLong(fromTime));
@@ -145,8 +139,8 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		}
 		synAlert.clear();
 		view.setProjectedExpirationDateVisible(false);
-		if (actAccessRequirementIdString != null) {
-			jsClient.getAccessRequirement(actAccessRequirementIdString, new AsyncCallback<AccessRequirement>() {
+		if (actAccessRequirementId != null) {
+			jsClient.getAccessRequirement(actAccessRequirementId, new AsyncCallback<AccessRequirement>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					synAlert.showError(INVALID_AR_ID);
@@ -209,7 +203,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		loadMoreContainer.setIsProcessing(true);
 		synAlert.clear();
 		// ask for data access submissions once call is available, and create a widget to render.
-		dataAccessClient.getDataAccessSubmissions(actAccessRequirementId, nextPageToken, stateFilter, SubmissionOrder.CREATED_ON, isSortedAsc, new AsyncCallback<SubmissionPage>() {
+		jsClient.getDataAccessSubmissions(actAccessRequirementId, nextPageToken, stateFilter, SubmissionOrder.CREATED_ON, isSortedAsc, new AsyncCallback<SubmissionPage>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);

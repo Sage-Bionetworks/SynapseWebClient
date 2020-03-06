@@ -31,8 +31,6 @@ public interface DataAccessClient extends RemoteService {
 
 	RequestInterface updateDataAccessRequest(RequestInterface dataAccessRequest) throws RestServiceException;
 
-	SubmissionPage getDataAccessSubmissions(Long accessRequirementId, String nextPageToken, SubmissionState stateFilter, SubmissionOrder order, boolean isAsc) throws RestServiceException;
-
 	List<AccessRequirement> getAccessRequirements(RestrictableObjectDescriptor subject, Long limit, Long offset) throws RestServiceException;
 
 	AccessRequirementStatus getAccessRequirementStatus(String accessRequirementId) throws RestServiceException;
