@@ -13,7 +13,7 @@
 		<b:ModalBody>
 			<bh:Div>
 				<b:CheckBox ui:field="wrongDucOption"
-					text="You have uploaded the wrong DUC. Please use the DUC template for ROSMAP/AMP-AD provided in this request tool. " />
+					text="You have uploaded the wrong DUC. Please use the DUC template provided in this request tool. " />
 				<b:CheckBox addStyleNames="margin-top-20"
 					ui:field="everyPageDucOption"
 					text="Please upload every page of the DUC. " />
