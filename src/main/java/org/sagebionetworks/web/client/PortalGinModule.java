@@ -285,6 +285,8 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModalView;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModalViewImpl;
+import org.sagebionetworks.web.client.widget.entity.act.RejectDataAccessRequestModalView;
+import org.sagebionetworks.web.client.widget.entity.act.RejectDataAccessRequestModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.act.RejectReasonView;
 import org.sagebionetworks.web.client.widget.entity.act.RejectReasonViewImpl;
 import org.sagebionetworks.web.client.widget.entity.act.RevokeUserAccessModalView;
@@ -931,6 +933,9 @@ public class PortalGinModule extends AbstractGinModule {
 
 		// Search Box
 		bind(SearchBoxView.class).to(SearchBoxViewImpl.class).in(Singleton.class);
+
+		// Reject Data Access Request Dialog
+		bind(RejectDataAccessRequestModalView.class).to(RejectDataAccessRequestModalViewImpl.class);
 
 		// User Suggest Box
 		bind(SynapseSuggestBoxView.class).to(SynapseSuggestBoxViewImpl.class);

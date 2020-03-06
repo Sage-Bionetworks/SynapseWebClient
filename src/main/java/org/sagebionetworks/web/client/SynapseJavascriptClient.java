@@ -68,6 +68,10 @@ import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.auth.Username;
+import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
+import org.sagebionetworks.repo.model.dataaccess.SubmissionPage;
+import org.sagebionetworks.repo.model.dataaccess.SubmissionPageRequest;
+import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
@@ -282,6 +286,7 @@ public class SynapseJavascriptClient {
 	public static final String DOWNLOAD_LIST_REMOVE = DOWNLOAD_LIST + "/remove";
 	public static final String DOWNLOAD_LIST_CLEAR = DOWNLOAD_LIST + "/clear";
 	public static final String ACCESS_REQUIREMENT = "/accessRequirement/";
+	public static final String SUBMISSIONS = "/submissions";
 	public static final String DOWNLOAD_ORDER = "/download/order";
 	public static final String DOWNLOAD_ORDER_HISTORY = DOWNLOAD_ORDER + "/history";
 	public static final String STORAGE_REPORT = "/storageReport";
@@ -1379,6 +1384,17 @@ public class SynapseJavascriptClient {
 	public void getAccessRequirement(String requirementId, AsyncCallback<AccessRequirement> callback) {
 		String url = getRepoServiceUrl() + ACCESS_REQUIREMENT + requirementId;
 		doGet(url, OBJECT_TYPE.AccessRequirement, callback);
+	}
+	
+	public void getDataAccessSubmissions(String requirementId, String nextPageToken, SubmissionState filter, SubmissionOrder order, boolean isAscending, AsyncCallback<SubmissionPage> callback) {
+		String url = getRepoServiceUrl() + ACCESS_REQUIREMENT + "/" + requirementId + SUBMISSIONS;
+		SubmissionPageRequest request = new SubmissionPageRequest();
+		request.setAccessRequirementId(requirementId);
+		request.setFilterBy(filter);
+		request.setOrderBy(order);
+		request.setIsAscending(isAscending);
+		request.setNextPageToken(nextPageToken);
+		doPost(url, request, OBJECT_TYPE.SubmissionPage, true, callback);
 	}
 	
 	public void getUploadDestinations(String parentEntityId, AsyncCallback<List<UploadDestination>> callback) {

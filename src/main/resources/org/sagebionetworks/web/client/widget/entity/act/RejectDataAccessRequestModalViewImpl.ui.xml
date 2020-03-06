@@ -1,0 +1,63 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
+	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
+	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt"
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+
+	<b:Modal ui:field="modal" title="Response" closable="true"
+		dataBackdrop="STATIC" dataKeyboard="true" size="LARGE">
+		<b:ModalBody>
+			<bh:Div>
+				<b:CheckBox ui:field="wrongDucOption"
+					text="You have uploaded the wrong DUC. Please use the DUC template provided in this request tool. " />
+				<b:CheckBox addStyleNames="margin-top-20"
+					ui:field="everyPageDucOption"
+					text="Please upload every page of the DUC. " />
+				<b:CheckBox addStyleNames="margin-top-20"
+					ui:field="executeDucOption"
+					text="Please fully execute your DUC including a signing official. " />
+				<b:CheckBox addStyleNames="margin-top-20"
+					ui:field="notOwnSigningOfficialOption"
+					text="You may not act as your own signing official. Please have someone at your institution who can attest to your affiliation and good standing sign your DUC. " />
+				<b:CheckBox addStyleNames="margin-top-20"
+					ui:field="requestorsMismatchSignedOption"
+					text="The data requestor(s) you are requesting access for must match the data requestor(s) on your signed DUC. Please ensure that everyone on the DUC is listed as a data requester with their own Synapse ID. " />
+				<b:CheckBox addStyleNames="margin-top-20"
+					ui:field="projectLeadMissingOption"
+					text="Please put the name of your project lead in the appropriate field. " />
+				<b:CheckBox addStyleNames="margin-top-20"
+					ui:field="institutionNameMissingOption"
+					text="Please put the full name of your institution in the appropriate field. " />
+				<b:CheckBox addStyleNames="margin-top-20"
+					ui:field="missingBasicInfoOption"
+					text="Please add more information to your Intended Data Use statement. Your Intended Data Use statement should be 1-3 paragraphs address the following points: What do you want to do? Why are you doing it? How do you want to do it? " />
+				<b:CheckBox addStyleNames="margin-top-20"
+					ui:field="missingApprovalLetterOption"
+					text="Please submit an ethics/IRB approval letter that indicates approval for you to use this dataset. Your letter must mention the dataset by name. If your approval letter does not mention the dataset by name, please combine your submitted research protocol or proposal and the approval letter into one document and upload. " />
+				<b:CheckBox addStyleNames="margin-top-20"
+					ui:field="customTextOption" text="Custom text" />
+				<bh:Div>
+					<b:TextArea addStyleNames="margin-bottom-20"
+						ui:field="customText" visibleLines="6" visible="false"
+						placeholder="Custom text to insert" />
+				</bh:Div>
+			</bh:Div>
+			<bh:Div>
+				<b:FormGroup>
+					<b:Button addStyleNames="margin-bottom-5"
+						ui:field="generateButton" type="PRIMARY" text="Generate Response"></b:Button>
+					<b:TextArea ui:field="responseField" visibleLines="9" />
+				</b:FormGroup>
+			</bh:Div>
+			<b:Alert ui:field="alert" type="DANGER" visible="false"></b:Alert>
+		</b:ModalBody>
+		<b:ModalFooter>
+			<b:Button ui:field="defaultButton" type="LINK" text="Cancel"></b:Button>
+			<b:Button ui:field="primaryButton" type="PRIMARY" text="Send"></b:Button>
+		</b:ModalFooter>
+	</b:Modal>
+</ui:UiBinder>

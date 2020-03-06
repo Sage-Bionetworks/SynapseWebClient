@@ -3,7 +3,6 @@ package org.sagebionetworks.web.unitclient.widget.accessrequirements;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
@@ -25,9 +24,9 @@ import org.sagebionetworks.repo.model.dataaccess.Submission;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
-import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.accessrequirements.IntendedDataUseReportButton;
@@ -63,7 +62,7 @@ public class IntendedDataUseReportButtonTest {
 	ArgumentCaptor<ClickHandler> clickHandlerCaptor;
 	ClickHandler onButtonClickHandler;
 	@Mock
-	DataAccessClientAsync mockDataAccessClient;
+	SynapseJavascriptClient mockJsClient;
 	@Mock
 	PopupUtilsView mockPopupUtils;
 	@Mock
@@ -96,10 +95,10 @@ public class IntendedDataUseReportButtonTest {
 		page1.add(mockSubmission2InPage1);
 		when(mockSubmissionPage1.getResults()).thenReturn(page1);
 		when(mockSubmissionPage2.getResults()).thenReturn(Collections.singletonList(mockSubmissionInPage2));
-		widget = new IntendedDataUseReportButton(mockButton, mockIsACTMemberAsyncHandler, mockDataAccessClient, mockPopupUtils, mockBigPromptModal, mockDateTimeUtils);
+		widget = new IntendedDataUseReportButton(mockButton, mockIsACTMemberAsyncHandler, mockJsClient, mockPopupUtils, mockBigPromptModal, mockDateTimeUtils);
 		verify(mockButton).addClickHandler(clickHandlerCaptor.capture());
 		onButtonClickHandler = clickHandlerCaptor.getValue();
-		AsyncMockStubber.callSuccessWith(mockSubmissionPage1, mockSubmissionPage2).when(mockDataAccessClient).getDataAccessSubmissions(anyLong(), anyString(), any(SubmissionState.class), any(SubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockSubmissionPage1, mockSubmissionPage2).when(mockJsClient).getDataAccessSubmissions(anyString(), anyString(), any(SubmissionState.class), any(SubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
 
 		when(mockSubmission1InPage1.getResearchProjectSnapshot()).thenReturn(mockResearchProject1);
 		when(mockSubmission2InPage1.getResearchProjectSnapshot()).thenReturn(mockResearchProject1);
@@ -138,8 +137,8 @@ public class IntendedDataUseReportButtonTest {
 		// configured with an AR, when clicked it should get all approved submissions (for research
 		// projects) and show IDUs
 		onButtonClickHandler.onClick(null);
-		verify(mockDataAccessClient).getDataAccessSubmissions(eq(AR_ID), eq(null), eq(SubmissionState.APPROVED), eq(SubmissionOrder.CREATED_ON), eq(true), any(AsyncCallback.class));
-		verify(mockDataAccessClient).getDataAccessSubmissions(eq(AR_ID), eq(NEXT_PAGE_TOKEN), eq(SubmissionState.APPROVED), eq(SubmissionOrder.CREATED_ON), eq(true), any(AsyncCallback.class));
+		verify(mockJsClient).getDataAccessSubmissions(eq(AR_ID.toString()), eq(null), eq(SubmissionState.APPROVED), eq(SubmissionOrder.CREATED_ON), eq(true), any(AsyncCallback.class));
+		verify(mockJsClient).getDataAccessSubmissions(eq(AR_ID.toString()), eq(NEXT_PAGE_TOKEN), eq(SubmissionState.APPROVED), eq(SubmissionOrder.CREATED_ON), eq(true), any(AsyncCallback.class));
 
 		verify(mockBigPromptModal).configure(eq(IntendedDataUseReportButton.IDU_MODAL_TITLE), eq(IntendedDataUseReportButton.IDU_MODAL_FIELD_NAME), stringCaptor.capture());
 
