@@ -393,7 +393,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	@Override
 	public void loadMore() {
 		synAlert.clear();
-		jsClient.getRepliesForThread(threadId, LIMIT, offset, order, ascending, DEFAULT_FILTER, new AsyncCallback<List<DiscussionReplyBundle>>() {
+		Long currentOffset = offset;
+		jsClient.getRepliesForThread(threadId, LIMIT, currentOffset, order, ascending, DEFAULT_FILTER, new AsyncCallback<List<DiscussionReplyBundle>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -404,7 +405,10 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			@Override
 			public void onSuccess(List<DiscussionReplyBundle> results) {
 				boolean isEmpty = results.isEmpty() && offset == 0; // no replies
-				offset += LIMIT;
+				if (currentOffset == 0) {
+					repliesContainer.clear();
+				}
+
 				if (!results.isEmpty()) {
 					for (DiscussionReplyBundle bundle : results) {
 						ReplyWidget replyWidget = ginInjector.createReplyWidget();
@@ -414,6 +418,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 				}
 				repliesContainer.setIsMore(results.size() == LIMIT);
 				view.setSecondNewReplyContainerVisible(!isEmpty);
+				offset += LIMIT;
 			}
 		});
 	}
