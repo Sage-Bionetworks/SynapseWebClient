@@ -8,7 +8,7 @@
 	<t:Table width="100%" height="36px" addStyleNames="entityBadge">
 		<t:TableRow>
 			<t:TableData
-				addStyleNames="min-width-25 overflow-x-hidden">
+				addStyleNames="min-width-25 overflow-x-hidden" width="25px">
 				<g:FocusPanel ui:field="iconContainer">
 					<b:Icon ui:field="icon" type="FILE" />
 				</g:FocusPanel>
@@ -18,40 +18,40 @@
 					addStyleNames="displayInline margin-right-5" />
 			</t:TableData>
 			<t:TableData
-				addStyleNames="overflow-x-hidden min-width-140">
+				addStyleNames="overflow-x-hidden min-width-140" width="140px">
 				<bh:Div ui:field="iconsContainer" />
 			</t:TableData>
 			<t:TableData ui:field="sizeTableData"
-				addStyleNames="hidden-xs overflow-x-hidden text-align-right min-width-140">
+				addStyleNames="hidden-xs overflow-x-hidden text-align-right min-width-140" width="140px">
 				<g:Label ui:field="sizeField"
 					addStyleNames="margin-right-30" />
 			</t:TableData>
 			<t:TableData ui:field="modifiedOnTableData"
-				addStyleNames="visible-md visible-lg overflow-x-hidden min-width-165">
+				addStyleNames="visible-md visible-lg overflow-x-hidden min-width-165" width="165px">
 				<g:Label ui:field="modifiedOnField" />
 			</t:TableData>
 			<t:TableData ui:field="createdOnTableData"
-				addStyleNames="visible-xl overflow-x-hidden min-width-165">
+				addStyleNames="visible-xl overflow-x-hidden min-width-165" width="165px">
 				<g:Label ui:field="createdOnField" />
 			</t:TableData>
 			<t:TableData ui:field="idTableData"
-				addStyleNames="visible-lg overflow-x-hidden min-width-150">
+				addStyleNames="visible-lg overflow-x-hidden min-width-150" width="150px">
 				<g:TextBox ui:field="idField"
 					addStyleNames="border-none noBackground font-size-14"
 					readOnly="true" />
 			</t:TableData>
 			<t:TableData ui:field="md5TableData"
-				addStyleNames="visible-xl overflow-x-hidden min-width-150">
+				addStyleNames="visible-xl overflow-x-hidden min-width-150" width="150px">
 				<g:TextBox ui:field="md5Field"
 					addStyleNames="border-none noBackground font-size-14 overflow-x-hidden"
 					readOnly="true" />
 			</t:TableData>
 			<t:TableData ui:field="modifiedByTableData"
-				addStyleNames="visible-xl overflow-x-hidden min-width-310 max-width-310">
+				addStyleNames="visible-xl overflow-x-hidden min-width-310 max-width-310"  width="310px">
 				<g:SimplePanel ui:field="modifiedByField" />
 			</t:TableData>
 			<t:TableData ui:field="downloadTableData"
-				addStyleNames="overflow-x-hidden text-align-center hidden-xs min-width-70">
+				addStyleNames="overflow-x-hidden text-align-center hidden-xs min-width-70" width="70px">
 				<b:Anchor ui:field="addToDownloadListLink"
 					addStyleNames="textDecorationNone" visible="false">
 					<i class="fa syn-download moveright-5 movedown-1"></i>
