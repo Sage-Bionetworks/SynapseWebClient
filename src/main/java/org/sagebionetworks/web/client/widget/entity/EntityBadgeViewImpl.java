@@ -173,7 +173,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 
 	@Override
 	public void setEntityNameWidthPx(int width) {
-		entityTableData.getElement().setAttribute("style", "max-width:" + width+"px; min-width:"+width+"px");
+		entityTableData.getElement().setAttribute("style", "max-width:" + width+"px; min-width:"+width+"px;width:"+width+"px;");
 	}
 
 	@Override

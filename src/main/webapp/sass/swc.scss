@@ -1396,7 +1396,12 @@ h1, h2, h3, h4, h5, h6 {
   background: #ffffff !important;
   text-decoration:underline;
 }
-
+.entityTreeColumnsTable {
+	table-layout: fixed;
+}
+.entityBadge {
+	table-layout: fixed;
+}
 .entityTreeItem {
 	padding-right: 0px !important; /** Override gwt TreeItem BASE_BARE_ELEM padding of 3px **/
 }

@@ -78,10 +78,6 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 		entityTreeBrowser.configure(entityId);
 	}
 
-	public void setEntitySelectedHandler(org.sagebionetworks.web.client.events.EntitySelectedHandler handler) {
-		entityTreeBrowser.setEntitySelectedHandler(handler);
-	};
-
 	@Override
 	public void setEntityClickedHandler(CallbackP<String> callback) {
 		entityTreeBrowser.setEntityClickedHandler(entityId -> {
