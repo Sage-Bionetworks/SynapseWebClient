@@ -56,7 +56,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	@UiField
 	Div mainContainer;
 	LoadingSpinner loadingSpinner;
-	Tree entityTree;
+	EntityTree entityTree;
 	@UiField
 	Table entityTreeHeader;
 	@UiField
@@ -167,7 +167,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	private Tree getTree() {
 		if (entityTree == null) {
 			// On open, it will call expandTreeItemOnOpen, which starts a loading message.
-			entityTree = new Tree(new EntityTreeResources());
+			entityTree = new EntityTree(new EntityTreeResources());
 			entityTree.setScrollOnSelectEnabled(false);
 			entityTree.addOpenHandler(event -> {
 				final EntityTreeItem target = getTreeItem2entityTreeItem().get(event.getTarget());
@@ -179,7 +179,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 				entityTree.addSelectionHandler(event -> {
 					EntityTreeItem targetItem = getTreeItem2entityTreeItem().get(event.getSelectedItem());
 					selectEntity(targetItem);
-
 				});
 			}
 			entityTreeContainer.clear();
