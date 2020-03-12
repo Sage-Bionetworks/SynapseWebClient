@@ -71,12 +71,12 @@ public class CrawlTester {
 	}
 
 	protected static String fixUrl(String url) throws UnsupportedEncodingException {
-		// String delimiter = "?";
-		// if (url.indexOf("?") > -1) {
-		// delimiter = "&";
-		// }
-		// String newUrl = url.replace("#!", delimiter+"_escaped_fragment_=");
-		return URLEncoder.encode(url, "UTF-8");
+		 String delimiter = "?";
+		 if (url.indexOf("?") > -1) {
+			 delimiter = "&";
+		 }
+		 String newUrl = url.replace("#!", delimiter+"_escaped_fragment_=");
+		return newUrl;
 	}
 
 
