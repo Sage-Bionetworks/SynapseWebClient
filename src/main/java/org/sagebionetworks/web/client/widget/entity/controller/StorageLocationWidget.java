@@ -142,8 +142,14 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 	@Override
 	public void onSave() {
 		synAlert.clear();
-		StorageLocationSetting setting = getStorageLocationSettingFromView();
-		String error = validate(setting);
+		String error = null;
+		StorageLocationSetting setting = null;
+		try {
+			setting = getStorageLocationSettingFromView();
+			error = validate(setting);
+		} catch (Exception e) {
+			error = e.getMessage();
+		}
 		if (error != null) {
 			synAlert.showError(error);
 		} else {
@@ -164,37 +170,48 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		}
 	}
 
-	public StorageLocationSetting getStorageLocationSettingFromView() {
-		if (view.isExternalS3StorageSelected()) {
-			ExternalS3StorageLocationSetting setting = new ExternalS3StorageLocationSetting();
-			setting.setBanner(replaceWithNullIfEmptyTrimmedString(view.getExternalS3Banner()));
-			setting.setBucket(replaceWithNullIfEmptyTrimmedString(view.getS3Bucket()));
-			setting.setBaseKey(replaceWithNullIfEmptyTrimmedString(view.getS3BaseKey()));
-			setting.setUploadType(UploadType.S3);
-			return setting;
-		} else if (view.isExternalGoogleCloudStorageSelected()) {
-			ExternalGoogleCloudStorageLocationSetting setting = new ExternalGoogleCloudStorageLocationSetting();
-			setting.setBanner(replaceWithNullIfEmptyTrimmedString(view.getExternalGoogleCloudBanner()));
-			setting.setBucket(replaceWithNullIfEmptyTrimmedString(view.getGoogleCloudBucket()));
-			setting.setBaseKey(replaceWithNullIfEmptyTrimmedString(view.getGoogleCloudBaseKey()));
-			setting.setUploadType(UploadType.GOOGLECLOUDSTORAGE);
-			return setting;
-		} else if (view.isExternalObjectStoreSelected()) {
-			ExternalObjectStorageLocationSetting setting = new ExternalObjectStorageLocationSetting();
-			setting.setBanner(replaceWithNullIfEmptyTrimmedString(view.getExternalObjectStoreBanner()));
-			setting.setBucket(replaceWithNullIfEmptyTrimmedString(view.getExternalObjectStoreBucket()));
-			setting.setEndpointUrl(replaceWithNullIfEmptyTrimmedString(view.getExternalObjectStoreEndpointUrl()));
-			setting.setUploadType(UploadType.S3);
-			return setting;
-		} else if (view.isSFTPStorageSelected()) {
-			ExternalStorageLocationSetting setting = new ExternalStorageLocationSetting();
-			setting.setUrl(replaceWithNullIfEmptyTrimmedString(view.getSFTPUrl()));
-			setting.setBanner(replaceWithNullIfEmptyTrimmedString(view.getSFTPBanner()));
-			setting.setUploadType(UploadType.SFTP);
-			return setting;
-		} else {
-			// default synapse storage
-			return null;
+	/**
+	 * Note that 
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
+	public StorageLocationSetting getStorageLocationSettingFromView() throws Exception {
+		try {
+			if (view.isExternalS3StorageSelected()) {
+				ExternalS3StorageLocationSetting setting = new ExternalS3StorageLocationSetting();
+				setting.setBanner(replaceWithNullIfEmptyTrimmedString(view.getExternalS3Banner()));
+				setting.setBucket(replaceWithNullIfEmptyTrimmedString(view.getS3Bucket()));
+				setting.setBaseKey(replaceWithNullIfEmptyTrimmedString(view.getS3BaseKey()));
+				setting.setUploadType(UploadType.S3);
+				return setting;
+			} else if (view.isExternalGoogleCloudStorageSelected()) {
+				ExternalGoogleCloudStorageLocationSetting setting = new ExternalGoogleCloudStorageLocationSetting();
+				setting.setBanner(replaceWithNullIfEmptyTrimmedString(view.getExternalGoogleCloudBanner()));
+				setting.setBucket(replaceWithNullIfEmptyTrimmedString(view.getGoogleCloudBucket()));
+				setting.setBaseKey(replaceWithNullIfEmptyTrimmedString(view.getGoogleCloudBaseKey()));
+				setting.setUploadType(UploadType.GOOGLECLOUDSTORAGE);
+				return setting;
+			} else if (view.isExternalObjectStoreSelected()) {
+				ExternalObjectStorageLocationSetting setting = new ExternalObjectStorageLocationSetting();
+				setting.setBanner(replaceWithNullIfEmptyTrimmedString(view.getExternalObjectStoreBanner()));
+				setting.setBucket(replaceWithNullIfEmptyTrimmedString(view.getExternalObjectStoreBucket()));
+				setting.setEndpointUrl(replaceWithNullIfEmptyTrimmedString(view.getExternalObjectStoreEndpointUrl()));
+				setting.setUploadType(UploadType.S3);
+				return setting;
+			} else if (view.isSFTPStorageSelected()) {
+				ExternalStorageLocationSetting setting = new ExternalStorageLocationSetting();
+				setting.setUrl(replaceWithNullIfEmptyTrimmedString(view.getSFTPUrl()));
+				setting.setBanner(replaceWithNullIfEmptyTrimmedString(view.getSFTPBanner()));
+				setting.setUploadType(UploadType.SFTP);
+				return setting;
+			} else {
+				// default synapse storage
+				return null;
+			}
+		} catch (RuntimeException e) {
+			// The storage location settings now throw an illegal argument exception if you attempt to instantiate with invalid params
+			// We would throw an InstantiationException, but it is not emulated by GWT.
+			 throw new Exception(e.getMessage());
 		}
 	}
 

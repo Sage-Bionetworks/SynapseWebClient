@@ -358,8 +358,6 @@ public class SynapseClientImplTest {
 		when(mockSynapse.getACL(anyString())).thenReturn(acl);
 		when(mockSynapse.createACL((AccessControlList) any())).thenReturn(acl);
 		when(mockSynapse.updateACL((AccessControlList) any())).thenReturn(acl);
-		when(mockSynapse.updateACL((AccessControlList) any(), eq(true))).thenReturn(acl);
-		when(mockSynapse.updateACL((AccessControlList) any(), eq(false))).thenReturn(acl);
 		when(mockSynapse.updateTeamACL(any(AccessControlList.class))).thenReturn(acl);
 		when(mockSynapse.getTeamACL(anyString())).thenReturn(acl);
 
@@ -410,7 +408,6 @@ public class SynapseClientImplTest {
 		ars.setTotalNumberOfResults(0);
 		ars.setResults(new ArrayList<AccessRequirement>());
 		when(mockSynapse.getAccessRequirements(any(RestrictableObjectDescriptor.class), anyLong(), anyLong())).thenReturn(ars);
-		when(mockSynapse.getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class), any(ACCESS_TYPE.class), anyLong(), anyLong())).thenReturn(ars);
 
 		when(mockEvaluation.getStatus()).thenReturn(EvaluationStatus.OPEN);
 		when(mockSynapse.getEvaluation(anyString())).thenReturn(mockEvaluation);
@@ -570,10 +567,10 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testUpdateAclRecursive() throws Exception {
-		AccessControlList clone = synapseClient.updateAcl(acl, true);
+	public void testUpdateAcl() throws Exception {
+		AccessControlList clone = synapseClient.updateAcl(acl);
 		assertEquals(acl, clone);
-		verify(mockSynapse).updateACL(any(AccessControlList.class), eq(true));
+		verify(mockSynapse).updateACL(any(AccessControlList.class));
 	}
 
 	@Test

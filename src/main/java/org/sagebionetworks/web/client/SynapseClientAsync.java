@@ -58,7 +58,7 @@ public interface SynapseClientAsync {
 
 	void createAcl(AccessControlList acl, AsyncCallback<AccessControlList> callback);
 
-	void updateAcl(AccessControlList acl, boolean recursive, AsyncCallback<AccessControlList> callback);
+	void updateAcl(AccessControlList acl, AsyncCallback<AccessControlList> callback);
 
 	void getTeamAcl(String teamId, AsyncCallback<AccessControlList> callback);
 

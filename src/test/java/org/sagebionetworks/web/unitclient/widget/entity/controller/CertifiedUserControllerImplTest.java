@@ -50,6 +50,7 @@ public class CertifiedUserControllerImplTest {
 		Project entity = new Project();
 		permissions = new UserEntityPermissions();
 		permissions.setIsCertifiedUser(true);
+		permissions.setIsCertificationRequired(true);
 		bundle = new EntityBundle();
 		bundle.setEntity(entity);
 		bundle.setPermissions(permissions);
@@ -69,6 +70,15 @@ public class CertifiedUserControllerImplTest {
 		controller.checkUploadToEntity(bundle, mockCallback);
 		verify(mockCallback, never()).invoke();
 		verify(mockQuizInfoDialog).show();
+	}
+	
+	@Test
+	public void testCheckUploadCertificationNotRequiredNotCertified() {
+		permissions.setIsCertifiedUser(false);
+		permissions.setIsCertificationRequired(false);
+		controller.checkUploadToEntity(bundle, mockCallback);
+		verify(mockCallback).invoke();
+		verify(mockQuizInfoDialog, never()).show();
 	}
 
 	@Test
@@ -97,6 +107,16 @@ public class CertifiedUserControllerImplTest {
 		verify(mockCallback).invoke();
 		verify(mockQuizInfoDialog, never()).show();
 	}
+	
+	@Test
+	public void testCreateNonProjectCertificatinNotRequiredNotCertified() {
+		permissions.setIsCertifiedUser(false);
+		permissions.setIsCertificationRequired(false);
+		controller.checkCreateEntity(bundle, TableEntity.class.getName(), mockCallback);
+		verify(mockCallback).invoke();
+		verify(mockQuizInfoDialog, never()).show();
+	}
+
 
 	@Test
 	public void testUpadateNotCertified() {

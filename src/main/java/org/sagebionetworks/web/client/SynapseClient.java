@@ -75,7 +75,7 @@ public interface SynapseClient extends RemoteService {
 	 * Update an entity's ACL. If 'recursive' is set to true, then any child ACLs will be deleted, such
 	 * that all child entities inherit this ACL.
 	 */
-	AccessControlList updateAcl(AccessControlList aclEW, boolean recursive) throws RestServiceException;
+	AccessControlList updateAcl(AccessControlList aclEW) throws RestServiceException;
 
 	AccessControlList getTeamAcl(String teamId) throws RestServiceException;
 

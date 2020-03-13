@@ -80,7 +80,7 @@ public class AccessControlListModalWidgetImplTest {
 	@Test
 	public void testOnPrimary() {
 		// Invoke the callback.
-		AsyncMockStubber.callWithInvoke().when(mockEditor).pushChangesToSynapse(anyBoolean(), any(Callback.class));
+		AsyncMockStubber.callWithInvoke().when(mockEditor).pushChangesToSynapse(any(Callback.class));
 		boolean canChangePermission = true;
 		modal.configure(fileEntity, canChangePermission);
 		modal.showSharing(mockCallback);
