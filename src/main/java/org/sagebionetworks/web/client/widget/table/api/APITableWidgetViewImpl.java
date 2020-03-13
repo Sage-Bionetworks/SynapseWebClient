@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.table.TimedRetryWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeader;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
@@ -71,7 +72,23 @@ public class APITableWidgetViewImpl implements APITableWidgetView {
 		// do not apply sorter if paging (service needs to be involved for a true column sort)
 		table.addStyleName("tablesorter");
 		synapseJSNIUtils.loadTableSorters();
+		// after table is sorted, refresh column ui
+		_bindSortEndEvent(table.getElement(), this);
 	}
+	
+	private static native void _bindSortEndEvent(Element tableElement, APITableWidgetViewImpl x) /*-{
+		try {
+			//bind to sortEnd event (wrap existing DOM element in a jQuery object)
+		 $wnd.jQuery(tableElement)
+			.bind("sortEnd",function(e, table) {
+				// update column UI
+				x.@org.sagebionetworks.web.client.widget.table.api.APITableWidgetViewImpl::refreshTableSorterHeaderUI()();
+			});
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
+
 
 	@Override
 	public void setColumnHeaders(List<APITableColumnConfig> headers) {
@@ -99,32 +116,28 @@ public class APITableWidgetViewImpl implements APITableWidgetView {
 			}
 			tableHeader.configure(displayName, headerName -> {
 				if (isPaging) {
-					presenter.columnClicked(columnIndex);
-				} else {
-					refreshTableSorterHeaderUI();
+					presenter.columnClicked(columnIndex);	
 				}
-			});
+			});	
 			row.add(tableHeader);
 		}
 		thead.add(row);
 		table.setVisible(true);
 	}
 
-	private void refreshTableSorterHeaderUI() {
-		gwt.scheduleExecution(() -> {
+	public void refreshTableSorterHeaderUI() {
 			for (SortableTableHeader tableHeader : sortableTableHeaders) {
 				String headerStyles = tableHeader.asWidget().getStyleName();
 				if (headerStyles != null) {
-					if (headerStyles.contains("headerSortUp")) {
+					if (headerStyles.contains("tablesorter-headerDesc")) {
 						tableHeader.setSortDirection(SortDirection.DESC);
-					} else if (headerStyles.contains("headerSortDown")) {
+					} else if (headerStyles.contains("tablesorter-headerAsc")) {
 						tableHeader.setSortDirection(SortDirection.ASC);
 					} else {
 						tableHeader.setSortDirection(null);
 					}
 				}
 			}
-		}, 250);
 	}
 
 	@Override
