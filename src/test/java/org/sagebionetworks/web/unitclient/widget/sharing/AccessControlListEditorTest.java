@@ -255,7 +255,7 @@ public class AccessControlListEditorTest {
 		acle.refresh();
 		acle.createAcl();
 		// for one test case, also test for a successful callback
-		acle.pushChangesToSynapse(false, mockPushToSynapseCallback);
+		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 		verify(mockPushToSynapseCallback).invoke();
 
 		verify(mockSynapseClient).createAcl(captor.capture(), any(AsyncCallback.class));
@@ -287,17 +287,17 @@ public class AccessControlListEditorTest {
 
 		// configure mocks
 		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).updateAcl(any(AccessControlList.class), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).updateAcl(any(AccessControlList.class), any(AsyncCallback.class));
 		ArgumentCaptor<AccessControlList> captor = ArgumentCaptor.forClass(AccessControlList.class);
 
 		// update
 		acle.refresh();
 		acle.setAccess(USER2_ID, PermissionLevel.CAN_VIEW);
 		acle.setAccess(TEAM_ID, PermissionLevel.CAN_VIEW);
-		acle.pushChangesToSynapse(false, mockPushToSynapseCallback);
+		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 		verify(mockPushToSynapseCallback).invoke();
 
-		verify(mockSynapseClient).updateAcl(captor.capture(), eq(false), any(AsyncCallback.class));
+		verify(mockSynapseClient).updateAcl(captor.capture(), any(AsyncCallback.class));
 		AccessControlList returnedACL = captor.getValue();
 		localACL.setCreationDate(returnedACL.getCreationDate());
 
@@ -332,12 +332,12 @@ public class AccessControlListEditorTest {
 
 		// configure mocks
 		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).updateAcl(any(AccessControlList.class), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).updateAcl(any(AccessControlList.class), any(AsyncCallback.class));
 
 		// update
 		acle.refresh();
 		acle.setAccess(USER2_ID, PermissionLevel.CAN_VIEW);
-		acle.pushChangesToSynapse(false, mockPushToSynapseCallback);
+		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 
 		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
@@ -353,7 +353,7 @@ public class AccessControlListEditorTest {
 
 		// configure mocks
 		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).updateAcl(any(AccessControlList.class), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).updateAcl(any(AccessControlList.class), any(AsyncCallback.class));
 
 		// update
 		acle.refresh();
@@ -364,7 +364,7 @@ public class AccessControlListEditorTest {
 		assertTrue(ids.contains(TEST_PUBLIC_PRINCIPAL_ID.toString()));
 
 		acle.setAccess(USER2_ID, PermissionLevel.CAN_VIEW);
-		acle.pushChangesToSynapse(false, mockPushToSynapseCallback);
+		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 		verify(mockPushToSynapseCallback).invoke();
 
 		// verify we do not even attempt to send a message to public
@@ -381,16 +381,16 @@ public class AccessControlListEditorTest {
 
 		// configure mocks
 		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).updateAcl(any(AccessControlList.class), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).updateAcl(any(AccessControlList.class), any(AsyncCallback.class));
 		ArgumentCaptor<AccessControlList> captor = ArgumentCaptor.forClass(AccessControlList.class);
 
 		// update
 		acle.refresh();
 		acle.setAccess(USER_ID, PermissionLevel.CAN_VIEW);
-		acle.pushChangesToSynapse(false, mockPushToSynapseCallback);
+		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 		verify(mockPushToSynapseCallback).invoke();
 
-		verify(mockSynapseClient).updateAcl(captor.capture(), eq(false), any(AsyncCallback.class));
+		verify(mockSynapseClient).updateAcl(captor.capture(), any(AsyncCallback.class));
 		AccessControlList returnedACL = captor.getValue();
 		localACL.setCreationDate(returnedACL.getCreationDate());
 
@@ -422,16 +422,16 @@ public class AccessControlListEditorTest {
 
 		// configure mocks
 		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).updateAcl(any(AccessControlList.class), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).updateAcl(any(AccessControlList.class), any(AsyncCallback.class));
 		ArgumentCaptor<AccessControlList> captor = ArgumentCaptor.forClass(AccessControlList.class);
 
 		// update
 		acle.refresh();
 		acle.removeAccess(USER_ID);
-		acle.pushChangesToSynapse(false, mockPushToSynapseCallback);
+		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 		verify(mockPushToSynapseCallback).invoke();
 
-		verify(mockSynapseClient).updateAcl(captor.capture(), eq(false), any(AsyncCallback.class));
+		verify(mockSynapseClient).updateAcl(captor.capture(), any(AsyncCallback.class));
 		AccessControlList returnedACL = captor.getValue();
 		localACL.setCreationDate(returnedACL.getCreationDate());
 
@@ -455,7 +455,7 @@ public class AccessControlListEditorTest {
 		// update
 		acle.refresh();
 		acle.deleteAcl();
-		acle.pushChangesToSynapse(false, mockPushToSynapseCallback);
+		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 		verify(mockPushToSynapseCallback).invoke();
 
 		verify(mockSynapseClient).deleteAcl(eq(ENTITY_ID), any(AsyncCallback.class));
@@ -472,7 +472,7 @@ public class AccessControlListEditorTest {
 		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(inheritedACL).when(mockSynapseClient).deleteAcl(eq(ENTITY_ID), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(inheritedACL).when(mockSynapseClient).getEntityBenefactorAcl(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).updateAcl(any(AccessControlList.class), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).updateAcl(any(AccessControlList.class), any(AsyncCallback.class));
 		ArgumentCaptor<AccessControlList> captor = ArgumentCaptor.forClass(AccessControlList.class);
 		String etag = "12843";
 		localACL.setEtag(etag);
@@ -482,10 +482,10 @@ public class AccessControlListEditorTest {
 		acle.refresh();
 		acle.deleteAcl();
 		acle.createAcl();
-		acle.pushChangesToSynapse(false, mockPushToSynapseCallback);
+		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 		verify(mockPushToSynapseCallback).invoke();
 
-		verify(mockSynapseClient).updateAcl(captor.capture(), eq(false), any(AsyncCallback.class));
+		verify(mockSynapseClient).updateAcl(captor.capture(), any(AsyncCallback.class));
 		AccessControlList updateAcl = captor.getValue();
 		assertEquals(localACL.getEtag(), updateAcl.getEtag());
 	}
@@ -501,16 +501,16 @@ public class AccessControlListEditorTest {
 
 		// configure mocks
 		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).updateAcl(any(AccessControlList.class), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).updateAcl(any(AccessControlList.class), any(AsyncCallback.class));
 		ArgumentCaptor<AccessControlList> captor = ArgumentCaptor.forClass(AccessControlList.class);
 
 		// update
 		acle.refresh();
 		acle.setAccess(USER_ID, PermissionLevel.CAN_VIEW);
-		acle.pushChangesToSynapse(true, mockPushToSynapseCallback);
+		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 		verify(mockPushToSynapseCallback).invoke();
 
-		verify(mockSynapseClient).updateAcl(captor.capture(), eq(true), any(AsyncCallback.class));
+		verify(mockSynapseClient).updateAcl(captor.capture(), any(AsyncCallback.class));
 		AccessControlList returnedACL = captor.getValue();
 		localACL.setCreationDate(returnedACL.getCreationDate());
 
@@ -529,7 +529,7 @@ public class AccessControlListEditorTest {
 		// update
 		acle.refresh();
 		acle.setAccess(ADMIN_ID, PermissionLevel.CAN_VIEW);
-		acle.pushChangesToSynapse(false, mockPushToSynapseCallback);
+		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 
 		boolean isProject = true;
 		boolean isInherited = false;
@@ -547,7 +547,7 @@ public class AccessControlListEditorTest {
 
 		// attempt to push changes when none have been made
 		acle.refresh();
-		acle.pushChangesToSynapse(false, mockPushToSynapseCallback);
+		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 
 		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());
 	}
@@ -556,11 +556,11 @@ public class AccessControlListEditorTest {
 	public void addDownloadAccessToAuthenticatedUsersNotCertified() throws Exception {
 		// configure mocks
 		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), any(EntityBundleRequest.class), any(AsyncCallback.class));
-		AsyncMockStubber.callFailureWith(new ForbiddenException("Only certified users can allow authenticated users to download.", ErrorResponseCode.USER_CERTIFICATION_REQUIRED)).when(mockSynapseClient).updateAcl(any(AccessControlList.class), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new ForbiddenException("Only certified users can allow authenticated users to download.", ErrorResponseCode.USER_CERTIFICATION_REQUIRED)).when(mockSynapseClient).updateAcl(any(AccessControlList.class), any(AsyncCallback.class));
 
 		acle.refresh();
 		acle.setAccess(TEST_PUBLIC_PRINCIPAL_ID, PermissionLevel.CAN_DOWNLOAD);
-		acle.pushChangesToSynapse(false, mockPushToSynapseCallback);
+		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 
 		verify(mockQuizInfoDialog).show();
 	}
@@ -574,7 +574,7 @@ public class AccessControlListEditorTest {
 		// attempt to remove permissions for user not on ACL
 		acle.refresh();
 		acle.removeAccess(USER2_ID);
-		acle.pushChangesToSynapse(false, mockPushToSynapseCallback);
+		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 
 		verify(mockSynAlert).showError(anyString());
 		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD), anyBoolean());

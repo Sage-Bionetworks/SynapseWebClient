@@ -386,10 +386,10 @@ public class SynapseClientImpl extends SynapseClientBase implements SynapseClien
 	}
 
 	@Override
-	public AccessControlList updateAcl(AccessControlList acl, boolean recursive) throws RestServiceException {
+	public AccessControlList updateAcl(AccessControlList acl) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.updateACL(acl, recursive);
+			return synapseClient.updateACL(acl);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
