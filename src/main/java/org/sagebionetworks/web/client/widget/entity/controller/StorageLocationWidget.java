@@ -142,8 +142,14 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 	@Override
 	public void onSave() {
 		synAlert.clear();
-		StorageLocationSetting setting = getStorageLocationSettingFromView();
-		String error = validate(setting);
+		String error = null;
+		StorageLocationSetting setting = null;
+		try {
+			setting = getStorageLocationSettingFromView();
+			error = validate(setting);
+		} catch (IllegalArgumentException e) {
+			error = e.getMessage();
+		}
 		if (error != null) {
 			synAlert.showError(error);
 		} else {
@@ -164,7 +170,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		}
 	}
 
-	public StorageLocationSetting getStorageLocationSettingFromView() {
+	public StorageLocationSetting getStorageLocationSettingFromView() throws IllegalArgumentException {
 		if (view.isExternalS3StorageSelected()) {
 			ExternalS3StorageLocationSetting setting = new ExternalS3StorageLocationSetting();
 			setting.setBanner(replaceWithNullIfEmptyTrimmedString(view.getExternalS3Banner()));
