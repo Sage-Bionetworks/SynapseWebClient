@@ -89,7 +89,6 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		peopleSuggestWidget.setTypeFilter(TypeFilter.USERS_ONLY);
 		peopleSuggestWidget.setPlaceholderText("Enter the user name of other data requestors...");
-		accessorsList.setCanDelete(true);
 		ducUploader.configure("Browse...", new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload fileUpload) {

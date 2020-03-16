@@ -7,8 +7,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<bh:Div marginTop="5" marginBottom="15">
-		<s:SelectionToolbar ui:field="selectionToolbar" />
 		<bh:Div width="100%" ui:field="userBadgeContainer" />
+		<s:SelectionOptions ui:field="selectionOptions"/>
 	</bh:Div>
-
 </ui:UiBinder>

@@ -67,7 +67,7 @@ public class UserBadgeListTest {
 	@Test
 	public void testConfigure() {
 		list.configure();
-		verify(mockView).setToolbarVisible(false);
+		verify(mockView).setSelectionOptionsVisible(false);
 	}
 
 	@Test
@@ -88,7 +88,7 @@ public class UserBadgeListTest {
 	public void testSetDeleteTrueNoUsers() {
 		list.configure();
 		list.setCanDelete(true);
-		verify(mockView, times(2)).setToolbarVisible(false);
+		verify(mockView, times(2)).setSelectionOptionsVisible(false);
 	}
 
 	@Test
@@ -96,14 +96,14 @@ public class UserBadgeListTest {
 		list.configure();
 		list.addAccessorChange(mockChange1);
 		list.setCanDelete(true);
-		verify(mockView).setToolbarVisible(true);
+		verify(mockView).setSelectionOptionsVisible(true);
 	}
 
 	@Test
 	public void testSetDeleteFalseWithUsers() {
 		list.configure();
 		list.setCanDelete(false);
-		verify(mockView, times(2)).setToolbarVisible(false);
+		verify(mockView, times(2)).setSelectionOptionsVisible(false);
 	}
 
 	@Test

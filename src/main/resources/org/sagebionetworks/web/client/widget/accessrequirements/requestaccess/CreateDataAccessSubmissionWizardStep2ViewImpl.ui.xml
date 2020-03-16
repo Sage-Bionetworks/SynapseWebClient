@@ -30,8 +30,8 @@
 				</bh:Div>
 				<b:Panel>
 					<b:PanelBody>
-						<bh:Div ui:field="accessorsContainer" />
 						<bh:Div ui:field="peopleSuggestContainer" />
+						<bh:Div ui:field="accessorsContainer" />
 					</b:PanelBody>
 				</b:Panel>
 			</b:FormGroup>
