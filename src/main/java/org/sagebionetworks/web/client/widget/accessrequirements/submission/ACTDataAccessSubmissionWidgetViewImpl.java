@@ -159,11 +159,9 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	public void addAccessors(IsWidget w, String username) {
 		Div div = new Div();
 		div.add(w);
-		w.asWidget().addStyleName("inline-block margin-right-15");
-		div.add(new Text(":"));
 		TextBoxWithCopyToClipboardWidget emailTextBox = new TextBoxWithCopyToClipboardWidget();
 		emailTextBox.setText(username + "@synapse.org");
-		emailTextBox.setAddStyleNames("margin-left-15 movedown-2");
+		emailTextBox.setAddStyleNames("margin-left-15");
 		div.add(emailTextBox);
 		accessorsContainer.add(div);
 	}

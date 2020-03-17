@@ -5,10 +5,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import org.sagebionetworks.repo.model.dataaccess.AccessType;
 import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.CheckBoxState;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -41,43 +42,30 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 
 	public UserBadgeList configure() {
 		this.isToolbarVisible = false;
-		view.setToolbarVisible(false);
+		view.setSelectionOptionsVisible(false);
 		return this;
 	};
 
-	/**
-	 * If true then show toolbar with the delete button.
-	 * 
-	 * @param canDelete
-	 * @return
-	 */
-	public UserBadgeList setCanDelete(boolean canDelete) {
-		this.isToolbarVisible = canDelete;
-		boolean toolbarVisible = isToolbarVisible && users.size() > 0;
-		view.setToolbarVisible(toolbarVisible);
-		return this;
-	}
-
 	public void addAccessorChange(AccessorChange change) {
-		addAccessorChange(change, false);
-	}
-
-	public void addSubmitterAccessorChange(AccessorChange change) {
 		addAccessorChange(change, true);
 	}
 
-	private void addAccessorChange(AccessorChange change, boolean hideSelect) {
+	public void addSubmitterAccessorChange(AccessorChange change) {
+		addAccessorChange(change, false);
+	}
+
+	private void addAccessorChange(AccessorChange change, boolean enableSelect) {
 		if (!userIds.contains(change.getUserId())) {
 			UserBadgeItem item = ginInjector.getUserBadgeItem();
 			item.configure(change);
 			item.setSelectionChangedCallback(selectionChangedCallback);
 			users.add(item);
 			view.addUserBadge(item.asWidget());
+			// selection is enabled as soon as we have one item of type "GAIN_ACCESS"
+			isToolbarVisible = isToolbarVisible || AccessType.GAIN_ACCESS.equals(change.getType());
 			boolean toolbarVisible = isToolbarVisible && users.size() > 0;
-			view.setToolbarVisible(toolbarVisible);
-			if (hideSelect) {
-				item.setSelectVisible(false);
-			}
+			view.setSelectionOptionsVisible(toolbarVisible);
+			item.setSelectEnabled(enableSelect);
 			userIds.add(change.getUserId());
 		}
 	}
@@ -90,10 +78,10 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		}
 
 		boolean toolbarVisible = isToolbarVisible && users.size() > 0;
-		view.setToolbarVisible(toolbarVisible);
 		if (toolbarVisible) {
 			checkSelectionState();
 		}
+		view.setSelectionOptionsVisible(toolbarVisible);
 	}
 
 	@Override
@@ -120,7 +108,9 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 			changingSelection = true;
 			// Select all
 			for (UserBadgeItem item : users) {
-				item.setSelected(select);
+				if (item.isSelectEnabled()) {
+					item.setSelected(select);	
+				}
 			}
 		} finally {
 			changingSelection = false;
@@ -133,21 +123,19 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		deleteSelected();
 	}
 
-	/**
-	 * The current selection state determines which buttons are enabled.
-	 */
-	public void checkSelectionState() {
+	/**	
+	 * The current selection state determines which buttons are enabled.	
+	 */	
+	public void checkSelectionState() {	
 		if (!changingSelection && isToolbarVisible) {
 			int count = 0;
-			for (UserBadgeItem item : users) {
-				count += item.isSelected() ? 1 : 0;
-			}
-			view.setCanDelete(count > 0);
-			CheckBoxState state = CheckBoxState.getStateFromCount(count, users.size());
-			view.setSelectionState(state);
-		}
+			for (UserBadgeItem item : users) {	
+				count += item.isSelected() ? 1 : 0;	
+			}	
+			view.setCanDelete(count > 0);	
+		}	
 	}
-
+	
 	@Override
 	public void selectAll() {
 		changeAllSelection(true);

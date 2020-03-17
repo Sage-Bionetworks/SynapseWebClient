@@ -8,17 +8,16 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<ui:with field='icons'
 		type='org.sagebionetworks.web.client.IconsImageBundle' />
-	<bh:Div marginTop="5">
-		<b:CheckBox ui:field="select" addStyleNames="inline-block" />
+	<bh:Div marginTop="5" addStyleNames="flexcontainer-row">
+		<bh:Div addStyleNames="flexcontainer-column">
+			<b:CheckBox ui:field="select" addStyleNames="inline-block" />
+		</bh:Div>
+		
 		<bh:Div ui:field="userBadgeContainer"
-			addStyleNames="inline-block" />
-		<b:ButtonGroup>
-			<b:Button ui:field="dropdown" dataToggle="DROPDOWN"
-				size="EXTRA_SMALL" text="Renew" addStyleNames="margin-left-10" />
-			<b:DropDownMenu>
-				<b:AnchorListItem ui:field="renew" text="Renew" />
-				<b:AnchorListItem ui:field="revoke" text="Revoke" />
-			</b:DropDownMenu>
-		</b:ButtonGroup>
+			addStyleNames="flexcontainer-column flexcontainer-column-fill-width" />
+			
+		<bh:Div ui:field="renewRevokeContainer" addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end">
+			<b:ButtonGroup ui:field="renewRevokeButtonGroup" />
+		</bh:Div>
 	</bh:Div>
 </ui:UiBinder>

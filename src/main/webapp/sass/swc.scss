@@ -32,6 +32,12 @@ a {color:$synapse-blue;text-decoration:none;}
 a:visited{color:$synapse-blue; text-decoration:none;}
 a:hover{color:$synapse-blue; text-decoration:underline;}
 a:focus{color:$synapse-blue; text-decoration:underline;}
+#body a.disabled {
+	color: #717171;
+	pointer-events: none;
+  cursor: default;
+  text-decoration: none;
+}
 #body {
 	.synapse-yellow {color:$synapse-yellow;}
 	.synapse-blue {color:$synapse-blue;}
