@@ -78,4 +78,8 @@ public class FileHandleListViewImpl implements FileHandleListView {
 		selectionOptions.setVisible(visible);
 	}
 
+	@Override
+	public void setCanDelete(boolean canDelete) {
+		selectionOptions.setCanDelete(canDelete);
+	}
 }

@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.dataaccess.AccessType;
 import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -18,7 +19,7 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 
 	UserBadgeListView view;
 	PortalGinInjector ginInjector;
-	boolean isToolbarVisible;
+	boolean isToolbarVisible, changingSelection;
 	List<UserBadgeItem> users;
 	Callback selectionChangedCallback;
 	Set<String> userIds;
@@ -77,6 +78,9 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		}
 
 		boolean toolbarVisible = isToolbarVisible && users.size() > 0;
+		if (toolbarVisible) {
+			checkSelectionState();
+		}
 		view.setSelectionOptionsVisible(toolbarVisible);
 	}
 
@@ -100,12 +104,18 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	 * @param select
 	 */
 	private void changeAllSelection(boolean select) {
-		// Select all
-		for (UserBadgeItem item : users) {
-			if (item.isSelectEnabled()) {
-				item.setSelected(select);	
+		try {
+			changingSelection = true;
+			// Select all
+			for (UserBadgeItem item : users) {
+				if (item.isSelectEnabled()) {
+					item.setSelected(select);	
+				}
 			}
+		} finally {
+			changingSelection = false;
 		}
+		checkSelectionState();
 	}
 
 	public void clear() {
@@ -113,6 +123,19 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		deleteSelected();
 	}
 
+	/**	
+	 * The current selection state determines which buttons are enabled.	
+	 */	
+	public void checkSelectionState() {	
+		if (!changingSelection && isToolbarVisible) {
+			int count = 0;
+			for (UserBadgeItem item : users) {	
+				count += item.isSelected() ? 1 : 0;	
+			}	
+			view.setCanDelete(count > 0);	
+		}	
+	}
+	
 	@Override
 	public void selectAll() {
 		changeAllSelection(true);

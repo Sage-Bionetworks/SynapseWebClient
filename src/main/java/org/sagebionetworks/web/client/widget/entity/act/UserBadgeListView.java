@@ -20,4 +20,6 @@ public interface UserBadgeListView extends IsWidget {
 	void addUserBadge(Widget widget);
 
 	void clearUserBadges();
+
+	void setCanDelete(boolean canDelete);
 }

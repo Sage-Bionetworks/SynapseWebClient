@@ -60,4 +60,8 @@ public class UserBadgeListViewImpl implements UserBadgeListView {
 	public void setSelectionOptionsVisible(boolean visible) {
 		selectionOptions.setVisible(visible);
 	}
+	@Override
+	public void setCanDelete(boolean canDelete) {
+		selectionOptions.setCanDelete(canDelete);
+	}
 }

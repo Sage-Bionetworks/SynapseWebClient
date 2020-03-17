@@ -28,4 +28,6 @@ public interface FileHandleListView extends IsWidget {
 	void addFileLink(Widget fileLinkWidget);
 
 	void clearFileLinks();
+
+	void setCanDelete(boolean canDelete);
 }

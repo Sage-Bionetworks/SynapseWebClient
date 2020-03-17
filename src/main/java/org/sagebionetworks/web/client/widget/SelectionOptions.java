@@ -37,6 +37,7 @@ public class SelectionOptions implements IsWidget {
 				selectAllClicked.onClick(event);
 			}
 		});
+		deleteSelected.setEnabled(false);
 	}
 
 	public void setDeleteClickedCallback(ClickHandler deleteClicked) {

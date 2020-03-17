@@ -16,7 +16,7 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 	FileHandleUploadWidget uploadWidget;
 	FileHandleListView view;
 	PortalGinInjector ginInjector;
-	boolean isToolbarVisible;
+	boolean isToolbarVisible, changingSelection;
 	Callback selectionChangedCallback;
 	CallbackP<FileUpload> fileUploadedCallback;
 	List<FileHandleLink> links;
@@ -111,6 +111,9 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 
 		boolean toolbarVisible = isToolbarVisible && links.size() > 0;
 		view.setToolbarVisible(toolbarVisible);
+		if (toolbarVisible) {
+			checkSelectionState();
+		}
 	}
 
 	@Override
@@ -133,12 +136,33 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 	 * @param select
 	 */
 	private void changeAllSelection(boolean select) {
-		// Select all
-		for (FileHandleLink fileHandleLink : links) {
-			fileHandleLink.setSelected(select);
+		try {
+			changingSelection = true;
+			// Select all
+			for (FileHandleLink fileHandleLink : links) {
+				fileHandleLink.setSelected(select);
+			}
+		} finally {
+			changingSelection = false;
 		}
+		checkSelectionState();
 	}
 
+	/**	
+	 * The current selection state determines which buttons are enabled.	
+	 */	
+	public void checkSelectionState() {
+		if (!changingSelection && isToolbarVisible) {
+			int count = 0;
+			for (FileHandleLink link : links) {
+				if (link.isSelected()) {
+					count++;	
+				}
+			}
+			view.setCanDelete(count > 0);
+		}
+	}
+		
 	@Override
 	public void selectAll() {
 		changeAllSelection(true);
