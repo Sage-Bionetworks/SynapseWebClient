@@ -56,6 +56,8 @@ public class UserBadgeListTest {
 		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadgeItem);
 		when(mockUserBadgeItem.getUserId()).thenReturn(USER_ID_1);
 		when(mockUserBadgeItem2.getUserId()).thenReturn(USER_ID_2);
+		when(mockUserBadgeItem.isSelectEnabled()).thenReturn(true);
+		when(mockUserBadgeItem2.isSelectEnabled()).thenReturn(true);
 		when(mockChange1.getUserId()).thenReturn(USER_ID_1);
 		when(mockChange1.getType()).thenReturn(AccessType.GAIN_ACCESS);
 		when(mockChange2.getUserId()).thenReturn(USER_ID_2);
@@ -87,23 +89,14 @@ public class UserBadgeListTest {
 	@Test
 	public void testSetDeleteTrueNoUsers() {
 		list.configure();
-		list.setCanDelete(true);
-		verify(mockView, times(2)).setSelectionOptionsVisible(false);
+		verify(mockView).setSelectionOptionsVisible(false);
 	}
 
 	@Test
 	public void testSetDeleteTrueWithUsers() {
 		list.configure();
 		list.addAccessorChange(mockChange1);
-		list.setCanDelete(true);
 		verify(mockView).setSelectionOptionsVisible(true);
-	}
-
-	@Test
-	public void testSetDeleteFalseWithUsers() {
-		list.configure();
-		list.setCanDelete(false);
-		verify(mockView, times(2)).setSelectionOptionsVisible(false);
 	}
 
 	@Test
@@ -156,7 +149,6 @@ public class UserBadgeListTest {
 	public void testCheckSelectionStateSelected() {
 		list.configure();
 		when(mockUserBadgeItem.isSelected()).thenReturn(true);
-		list.setCanDelete(true);
 		list.addAccessorChange(mockChange1);
 		list.checkSelectionState();
 		verify(mockView).setCanDelete(true);
@@ -166,7 +158,6 @@ public class UserBadgeListTest {
 	public void testCheckSelectionStateNotSelected() {
 		list.configure();
 		when(mockUserBadgeItem.isSelected()).thenReturn(false);
-		list.setCanDelete(true);
 		list.addAccessorChange(mockChange1);
 		list.checkSelectionState();
 		verify(mockView).setCanDelete(false);
@@ -204,7 +195,7 @@ public class UserBadgeListTest {
 		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadgeItem);
 		list.addSubmitterAccessorChange(mockChange1);
 		verify(mockUserBadgeItem).configure(mockChange1);
-		verify(mockUserBadgeItem).setSelectVisible(false);
+		verify(mockUserBadgeItem).setSelectEnabled(false);
 	}
 
 	@Test
@@ -215,7 +206,9 @@ public class UserBadgeListTest {
 		list.addAccessorChange(mockChange2);
 		list.selectAll();
 		verify(mockUserBadgeItem).setSelected(true);
+		verify(mockUserBadgeItem).setSelectEnabled(true);
 		verify(mockUserBadgeItem2).setSelected(true);
+		verify(mockUserBadgeItem).setSelectEnabled(true);
 	}
 
 	@Test

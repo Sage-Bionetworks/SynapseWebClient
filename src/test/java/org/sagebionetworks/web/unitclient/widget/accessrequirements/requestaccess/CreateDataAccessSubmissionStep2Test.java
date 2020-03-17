@@ -179,7 +179,6 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockView).setPeopleSuggestWidget(any(IsWidget.class));
 		verify(mockPeopleSuggestBox).setSuggestionProvider(mockProvider);
 		verify(mockPeopleSuggestBox).setTypeFilter(TypeFilter.USERS_ONLY);
-		verify(mockAccessorsList).setCanDelete(true);
 		verify(mockOtherDocuments).setCanDelete(true);
 		verify(mockOtherDocuments).setCanUpload(true);
 	}
