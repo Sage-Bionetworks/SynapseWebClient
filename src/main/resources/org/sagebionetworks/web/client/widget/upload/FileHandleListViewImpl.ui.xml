@@ -8,7 +8,7 @@
 		<t:Table width="100%">
 			<t:TBody ui:field="fileLinksContainer" />
 		</t:Table>
-		<bh:Div ui:field="fileUploadContainer" />
+		<bh:Div ui:field="fileUploadContainer" marginTop="10" />
 		<s:SelectionOptions ui:field="selectionOptions" />
 	</bh:Div>
 </ui:UiBinder>

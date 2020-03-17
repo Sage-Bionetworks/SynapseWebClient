@@ -60,7 +60,7 @@
 				<b:Panel>
 					<b:PanelBody>
 						<b:FormLabel>Upload other required documents</b:FormLabel>
-						<bh:Div ui:field="otherUploadedContainer" marginTop="15"/>
+						<bh:Div ui:field="otherUploadedContainer" />
 					</b:PanelBody>
 				</b:Panel>
 			</b:FormGroup>
