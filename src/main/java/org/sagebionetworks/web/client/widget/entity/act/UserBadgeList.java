@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import org.sagebionetworks.repo.model.dataaccess.AccessType;
 import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -59,6 +60,8 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 			item.setSelectionChangedCallback(selectionChangedCallback);
 			users.add(item);
 			view.addUserBadge(item.asWidget());
+			// selection is enabled as soon as we have one item of type "GAIN_ACCESS"
+			isToolbarVisible = isToolbarVisible || AccessType.GAIN_ACCESS.equals(change.getType());
 			boolean toolbarVisible = isToolbarVisible && users.size() > 0;
 			view.setSelectionOptionsVisible(toolbarVisible);
 			item.setSelectEnabled(enableSelect);
@@ -99,7 +102,9 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	private void changeAllSelection(boolean select) {
 		// Select all
 		for (UserBadgeItem item : users) {
-			item.setSelected(select);
+			if (item.isSelectEnabled()) {
+				item.setSelected(select);	
+			}
 		}
 	}
 

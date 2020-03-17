@@ -162,6 +162,10 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 		}
 	}
 
+	public boolean isSelectEnabled() {
+		return select.isEnabled();
+	}
+	
 	public void setSelectEnabled(boolean enabled) {
 		select.setEnabled(enabled);
 	}
