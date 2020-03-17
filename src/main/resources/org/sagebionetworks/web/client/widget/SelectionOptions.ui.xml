@@ -3,7 +3,7 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-	<bh:Div>
+	<bh:Div addStyleNames="border-top-1">
 		<b:Anchor ui:field="selectAll" text="Select All" marginRight="20"></b:Anchor>
 		<b:Anchor ui:field="deleteSelected" text="Remove Selected"></b:Anchor>
 	</bh:Div>

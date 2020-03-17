@@ -63,4 +63,8 @@ public class SelectionOptions implements IsWidget {
 	public void setAddStyleNames(String style) {
 		widget.addStyleName(style);
 	}
+	
+	public void setCanDelete(boolean canDelete) {
+		deleteSelected.setEnabled(canDelete);
+	}
 }

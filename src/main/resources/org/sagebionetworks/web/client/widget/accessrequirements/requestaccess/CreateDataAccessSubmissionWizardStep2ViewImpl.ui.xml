@@ -57,10 +57,10 @@
 					addStyleNames="margin-left-15" />
 			</b:FormGroup>
 			<b:FormGroup ui:field="otherUploadUI">
-				<b:FormLabel>Upload other required documents</b:FormLabel>
 				<b:Panel>
 					<b:PanelBody>
-						<bh:Div ui:field="otherUploadedContainer" />
+						<b:FormLabel>Upload other required documents</b:FormLabel>
+						<bh:Div ui:field="otherUploadedContainer" marginTop="15"/>
 					</b:PanelBody>
 				</b:Panel>
 			</b:FormGroup>

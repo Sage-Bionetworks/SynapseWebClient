@@ -7,7 +7,6 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.CheckBoxState;
 import org.sagebionetworks.web.shared.WebConstants;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -17,7 +16,7 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 	FileHandleUploadWidget uploadWidget;
 	FileHandleListView view;
 	PortalGinInjector ginInjector;
-	boolean isToolbarVisible, changingSelection;
+	boolean isToolbarVisible;
 	Callback selectionChangedCallback;
 	CallbackP<FileUpload> fileUploadedCallback;
 	List<FileHandleLink> links;
@@ -112,9 +111,6 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 
 		boolean toolbarVisible = isToolbarVisible && links.size() > 0;
 		view.setToolbarVisible(toolbarVisible);
-		if (toolbarVisible) {
-			checkSelectionState();
-		}
 	}
 
 	@Override
@@ -137,33 +133,9 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 	 * @param select
 	 */
 	private void changeAllSelection(boolean select) {
-		try {
-			changingSelection = true;
-			// Select all
-			for (FileHandleLink fileHandleLink : links) {
-				fileHandleLink.setSelected(select);
-			}
-		} finally {
-			changingSelection = false;
-		}
-		checkSelectionState();
-	}
-
-
-	/**
-	 * The current selection state determines which buttons are enabled.
-	 */
-	public void checkSelectionState() {
-		if (!changingSelection && isToolbarVisible) {
-			int count = 0;
-			for (FileHandleLink link : links) {
-				if (link.isSelected()) {
-					count++;
-				}
-			}
-			view.setCanDelete(count > 0);
-			CheckBoxState state = CheckBoxState.getStateFromCount(count, links.size());
-			view.setSelectionState(state);
+		// Select all
+		for (FileHandleLink fileHandleLink : links) {
+			fileHandleLink.setSelected(select);
 		}
 	}
 

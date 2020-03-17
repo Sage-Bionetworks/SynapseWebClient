@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.upload;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.widget.CheckBoxState;
+import org.sagebionetworks.web.client.widget.SelectionOptions;
 import org.sagebionetworks.web.client.widget.SelectionToolbar;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -19,7 +20,7 @@ public class FileHandleListViewImpl implements FileHandleListView {
 	Presenter presenter;
 
 	@UiField
-	SelectionToolbar selectionToolbar;
+	SelectionOptions selectionOptions;
 	@UiField
 	TBody fileLinksContainer;
 	@UiField
@@ -29,25 +30,14 @@ public class FileHandleListViewImpl implements FileHandleListView {
 	public FileHandleListViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 
-		selectionToolbar.hideReordering();
-
-		selectionToolbar.setDeleteClickedCallback(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.deleteSelected();
-			}
+		selectionOptions.setDeleteClickedCallback(event -> {
+			presenter.deleteSelected();
 		});
-		selectionToolbar.setSelectAllClicked(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.selectAll();
-			}
+		selectionOptions.setSelectAllClicked(event -> {
+			presenter.selectAll();
 		});
-		selectionToolbar.setSelectNoneClicked(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.selectNone();
-			}
+		selectionOptions.setSelectNoneClicked(event -> {
+			presenter.selectNone();
 		});
 	}
 
@@ -85,16 +75,7 @@ public class FileHandleListViewImpl implements FileHandleListView {
 
 	@Override
 	public void setToolbarVisible(boolean visible) {
-		selectionToolbar.setVisible(visible);
+		selectionOptions.setVisible(visible);
 	}
 
-	@Override
-	public void setCanDelete(boolean canDelete) {
-		selectionToolbar.setCanDelete(canDelete);
-	}
-
-	@Override
-	public void setSelectionState(CheckBoxState selectionState) {
-		selectionToolbar.setSelectionState(selectionState);
-	}
 }
