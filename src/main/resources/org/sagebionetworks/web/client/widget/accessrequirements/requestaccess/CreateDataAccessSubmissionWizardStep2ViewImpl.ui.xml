@@ -10,9 +10,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<bh:Div>
-		<b:FieldSet>
-			<b:Legend text="Please provide the information below"></b:Legend>
-		</b:FieldSet>
+		<bh:Paragraph>Please provide the information below to submit the request for access.</bh:Paragraph>
 		<bh:Div>
 			<b:FormGroup>
 				<b:FormLabel>Data Requestors</b:FormLabel>
@@ -28,47 +26,35 @@
 						href="http://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#validated-profile"
 						addMoreInfoStyleNames="font-italic" iconStyles="hide" />
 				</bh:Div>
-				<b:Panel>
-					<b:PanelBody>
-						<bh:Div ui:field="accessorsContainer" />
-						<bh:Div ui:field="peopleSuggestContainer" />
-					</b:PanelBody>
-				</b:Panel>
+				<bh:Div ui:field="peopleSuggestContainer" />
+				<bh:Div ui:field="accessorsContainer" />
 			</b:FormGroup>
-			<bh:Div ui:field="ducUI">
+			<bh:Div ui:field="ducUI" marginTop="22">
 				<b:FormGroup ui:field="ducTemplateUI">
 					<b:FormLabel>DUC template</b:FormLabel>
 					<bh:Div ui:field="ducTemplateContainer" />
 				</b:FormGroup>
 				<b:FormGroup>
 					<b:FormLabel>Upload DUC</b:FormLabel>
-					<bh:Div ui:field="ducUploadedContainer"
-						addStyleNames="margin-left-15" />
-					<bh:Div ui:field="ducUploadContainer"
-						addStyleNames="margin-left-15" />
+					<bh:Div ui:field="ducUploadedContainer"/>
+					<bh:Div ui:field="ducUploadContainer"/>
 				</b:FormGroup>
 			</bh:Div>
 
-			<b:FormGroup ui:field="irbUI">
+			<b:FormGroup ui:field="irbUI" addStyleNames="margin-top-22">
 				<b:FormLabel>Upload IRB approval</b:FormLabel>
-				<bh:Div ui:field="irbUploadedContainer"
-					addStyleNames="margin-left-15" />
-				<bh:Div ui:field="irbUploadContainer"
-					addStyleNames="margin-left-15" />
+				<bh:Div ui:field="irbUploadedContainer" />
+				<bh:Div ui:field="irbUploadContainer" />
 			</b:FormGroup>
-			<b:FormGroup ui:field="otherUploadUI">
+			<b:FormGroup ui:field="otherUploadUI" addStyleNames="margin-top-22">
 				<b:FormLabel>Upload other required documents</b:FormLabel>
-				<b:Panel>
-					<b:PanelBody>
-						<bh:Div ui:field="otherUploadedContainer" />
-					</b:PanelBody>
-				</b:Panel>
+				<bh:Div ui:field="otherUploadedContainer" />
 			</b:FormGroup>
-			<b:FormGroup ui:field="publicationsUI" visible="false">
+			<b:FormGroup ui:field="publicationsUI" visible="false" addStyleNames="margin-top-22">
 				<b:FormLabel>Publication(s)</b:FormLabel>
 				<b:TextArea ui:field="publicationsField" />
 			</b:FormGroup>
-			<b:FormGroup ui:field="summaryOfUseUI" visible="false">
+			<b:FormGroup ui:field="summaryOfUseUI" visible="false" addStyleNames="margin-top-22">
 				<b:FormLabel>Summary of use</b:FormLabel>
 				<b:TextArea ui:field="summaryOfUseField" />
 			</b:FormGroup>

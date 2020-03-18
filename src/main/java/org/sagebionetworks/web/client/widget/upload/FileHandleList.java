@@ -7,7 +7,6 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.CheckBoxState;
 import org.sagebionetworks.web.shared.WebConstants;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -149,24 +148,21 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 		checkSelectionState();
 	}
 
-
-	/**
-	 * The current selection state determines which buttons are enabled.
-	 */
+	/**	
+	 * The current selection state determines which buttons are enabled.	
+	 */	
 	public void checkSelectionState() {
 		if (!changingSelection && isToolbarVisible) {
 			int count = 0;
 			for (FileHandleLink link : links) {
 				if (link.isSelected()) {
-					count++;
+					count++;	
 				}
 			}
 			view.setCanDelete(count > 0);
-			CheckBoxState state = CheckBoxState.getStateFromCount(count, links.size());
-			view.setSelectionState(state);
 		}
 	}
-
+		
 	@Override
 	public void selectAll() {
 		changeAllSelection(true);

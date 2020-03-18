@@ -30,6 +30,4 @@ public interface FileHandleListView extends IsWidget {
 	void clearFileLinks();
 
 	void setCanDelete(boolean canDelete);
-
-	void setSelectionState(CheckBoxState selectionState);
 }
