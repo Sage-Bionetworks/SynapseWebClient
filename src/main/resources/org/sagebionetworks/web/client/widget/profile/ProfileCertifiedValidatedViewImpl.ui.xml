@@ -5,13 +5,13 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<ui:with field='sageImageBundle'
 		type='org.sagebionetworks.web.client.SageImageBundle' />
-	<bh:Span>
+	<bh:Div addStyleNames="flexcontainer-row">
 		<g:Image ui:field="certifiedIcon"
-			addStyleNames="displayInline margin-right-2" height="19px"
+			addStyleNames="margin-right-2 flexcontainer-column" height="19px"
 			width="16px" resource='{sageImageBundle.certificate}' visible="false" />
 		<b:Icon ui:field="validatedIcon" type="CHECK_SQUARE_O"
-			visible="false" addStyleNames="text-primary" size="LARGE" />
+			visible="false" addStyleNames="text-primary flexcontainer-column margin-top-3 margin-left-5" size="LARGE" />
 		<bh:Paragraph ui:field="errorMessage" emphasis="DANGER"
-			addStyleNames="displayInline" />
-	</bh:Span>
+			addStyleNames="flexcontainer-column" />
+	</bh:Div>
 </ui:UiBinder>
