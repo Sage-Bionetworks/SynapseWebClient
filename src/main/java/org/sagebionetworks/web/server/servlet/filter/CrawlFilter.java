@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
+import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.markdown.SynapseMarkdownProcessor;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
@@ -48,6 +49,7 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
+import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -183,23 +185,38 @@ public class CrawlFilter implements Filter {
 	}
 
 	private String getHomePageHtml() throws JSONObjectAdapterException, RestServiceException {
+		SynapseClient synClient = synapseClient.createAnonymousSynapseClient();
 		StringBuilder html = new StringBuilder();
 		html.append("<!DOCTYPE html><html><head><title>" + DisplayConstants.DEFAULT_PAGE_TITLE + "</title><meta name=\"description\" content=\"" + DisplayConstants.DEFAULT_PAGE_DESCRIPTION + "\" /></head><body>");
 		// add direct links to all public projects in the system
 		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
+		KeyValue projectsOnly = new KeyValue();
+		projectsOnly.setKey("node_type");
+		projectsOnly.setValue("project");
+		query.getBooleanQuery().add(projectsOnly);
+		//limit to 100 at a time
+		query.setSize(100L);
 		html.append("<h1>" + DisplayConstants.DEFAULT_PAGE_TITLE + "</h1>" + DisplayConstants.DEFAULT_PAGE_DESCRIPTION + "<br />");
 		// add link to team search
 		html.append("<h3><a href=\"https://www.synapse.org/#!TeamSearch:" + TeamSearch.START_DELIMITER + "0\">Teams</a></h3><br />");
-		SearchResults results = synapseClient.search(query);
-		// append this set to the list
-		while (results.getHits().size() > 0) {
-			for (Hit hit : results.getHits()) {
-				// add links
-				html.append("<a href=\"https://www.synapse.org/#!Synapse:" + hit.getId() + "\">" + hit.getName() + "</a><br />");
+		try {
+			SearchResults results = synClient.search(query);
+			// append this set to the list
+			while (results.getHits().size() > 0) {
+				for (Hit hit : results.getHits()) {
+					// SWC-5149: send a Project alias link to the crawler if available.
+					if (hit.getAlias() != null) {
+						html.append("<a href=\"https://www.synapse.org/" + hit.getAlias() + "\">" + hit.getName() + "</a><br />");
+					} else {
+						html.append("<a href=\"https://www.synapse.org/#!Synapse:" + hit.getId() + "\">" + hit.getName() + "</a><br />");
+					}
+				}
+				long newStart = results.getStart() + results.getHits().size();
+				query.setStart(newStart);
+				results = synClient.search(query);
 			}
-			long newStart = results.getStart() + results.getHits().size();
-			query.setStart(newStart);
-			results = synapseClient.search(query);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		html.append("</body></html>");
 		return html.toString();

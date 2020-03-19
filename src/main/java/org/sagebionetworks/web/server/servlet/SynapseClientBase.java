@@ -92,7 +92,7 @@ public class SynapseClientBase extends RemoteServiceServlet implements TokenProv
 		return createSynapseClient(tokenProvider.getSessionToken());
 	}
 
-	protected org.sagebionetworks.client.SynapseClient createAnonymousSynapseClient() {
+	public org.sagebionetworks.client.SynapseClient createAnonymousSynapseClient() {
 		return createSynapseClient(null);
 	}
 
