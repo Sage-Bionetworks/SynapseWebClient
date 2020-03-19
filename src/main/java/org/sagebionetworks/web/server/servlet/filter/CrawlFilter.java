@@ -205,14 +205,11 @@ public class CrawlFilter implements Filter {
 			while (results.getHits().size() > 0) {
 				for (Hit hit : results.getHits()) {
 					// SWC-5149: send a Project alias link to the crawler if available.
-					// Get the Project entity for it's alias:
-					Project project = (Project)synClient.getEntityById(hit.getId());
-					if (project.getAlias() != null) {
-						html.append("<a href=\"https://www.synapse.org/" + project.getAlias() + "\">" + project.getName() + "</a><br />");
+					if (hit.getAlias() != null) {
+						html.append("<a href=\"https://www.synapse.org/" + hit.getAlias() + "\">" + hit.getName() + "</a><br />");
 					} else {
-						html.append("<a href=\"https://www.synapse.org/#!Synapse:" + project.getId() + "\">" + project.getName() + "</a><br />");
+						html.append("<a href=\"https://www.synapse.org/#!Synapse:" + hit.getId() + "\">" + hit.getName() + "</a><br />");
 					}
-//					Thread.sleep(100);
 				}
 				long newStart = results.getStart() + results.getHits().size();
 				query.setStart(newStart);
