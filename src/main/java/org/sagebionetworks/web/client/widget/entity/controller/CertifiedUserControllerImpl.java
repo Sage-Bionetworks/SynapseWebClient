@@ -34,8 +34,8 @@ public class CertifiedUserControllerImpl implements CertifiedUserController {
 
 	@Override
 	public void checkUploadToEntity(EntityBundle toUpdate, Callback callback) {
-		// Only certified users can upload data
-		if (toUpdate.getPermissions().getIsCertifiedUser()) {
+		// Go directly to upload if certification is not required, or if the user is certified
+		if (!toUpdate.getPermissions().getIsCertificationRequired() || toUpdate.getPermissions().getIsCertifiedUser()) {
 			callback.invoke();
 		} else {
 			getQuizInfoDialog().show();
@@ -48,8 +48,8 @@ public class CertifiedUserControllerImpl implements CertifiedUserController {
 		if (Project.class.getName().equals(entityClassName)) {
 			callback.invoke();
 		} else {
-			// Only certified users can create non-projects
-			if (bundle.getPermissions().getIsCertifiedUser()) {
+			// Go directly to create the entity if certification is not required, or if the user is certified
+			if (!bundle.getPermissions().getIsCertificationRequired() || bundle.getPermissions().getIsCertifiedUser()) {
 				callback.invoke();
 			} else {
 				getQuizInfoDialog().show();

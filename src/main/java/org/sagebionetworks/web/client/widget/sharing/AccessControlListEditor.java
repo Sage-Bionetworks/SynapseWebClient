@@ -397,7 +397,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		});
 	}
 
-	public void pushChangesToSynapse(final boolean recursive, final Callback changesPushedCallback) {
+	public void pushChangesToSynapse(final Callback changesPushedCallback) {
 		validateEditorState();
 		synAlert.clear();
 		// Create an async callback to receive the updated ACL from Synapse
@@ -423,10 +423,10 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			}
 		};
 
-		applyChanges(recursive, callback);
+		applyChanges(callback);
 	}
 
-	protected void applyChanges(boolean recursive, AsyncCallback<AccessControlList> callback) {
+	protected void applyChanges(AsyncCallback<AccessControlList> callback) {
 		// Apply changes
 		boolean hasLocalACL_inPortal = (acl.getId().equals(entity.getId()));
 
@@ -438,7 +438,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		} else if (hasLocalACL_inPortal && hasLocalACL_inRepo) {
 			// Local ACL exists in both Portal and Repo
 			// Apply updates to local ACL in Repo
-			synapseClient.updateAcl(acl, recursive, callback);
+			synapseClient.updateAcl(acl, callback);
 			notifyNewUsers();
 		} else if (!hasLocalACL_inPortal && hasLocalACL_inRepo) {
 			// Local ACL does not exist in Portal but does exist in Repo
