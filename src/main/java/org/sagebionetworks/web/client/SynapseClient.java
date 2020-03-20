@@ -124,10 +124,6 @@ public interface SynapseClient extends RemoteService {
 
 	TeamMembershipStatus requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL, Date expiresOn) throws RestServiceException;
 
-	void inviteMember(String userGroupId, String teamId, String message, String hostPageBaseURL) throws RestServiceException;
-
-	void inviteNewMember(String email, String teamId, String message, String hostPageBaseURL) throws RestServiceException;
-
 	String getCertifiedUserPassingRecord(String userId) throws RestServiceException;
 
 	String getCertificationQuiz() throws RestServiceException;

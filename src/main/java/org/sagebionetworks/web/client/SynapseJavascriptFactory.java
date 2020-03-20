@@ -26,6 +26,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
+import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -83,7 +84,7 @@ import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 public class SynapseJavascriptFactory {
 	public enum OBJECT_TYPE {
 		PaginatedResultsEvaluations, EntityBundle, Team, RestrictionInformationResponse, EntityChildrenResponse, WikiPageKey, UserGroupHeaderResponsePage, WikiPage, ListWrapperUserProfile, ListWrapperTeam, ListWrapperUploadDestinations, SubscriptionPagedResults, UserGroupHeaderResponse, UserBundle, Count, PaginatedResultsEntityHeader, ProjectHeaderList, PaginatedResultReference, V2WikiPage, V2WikiOrderHint, DockerRepository, PaginatedDockerCommit, FileEntity, Project, Folder, EntityView, TableEntity, Link, Preview, SubmissionPage, Entity, // used for services where we don't know what type of entity is returned (but object has concreteType set)
-		AccessRequirement, EntityId, Forum, DiscussionThreadBundle, DiscussionReplyBundle, MessageURL, ThreadCount, EntityThreadCounts, PaginatedIds, SubscriberPagedResults, SubscriberCount, BatchFileResult, UserProfile, FileHandleResults, AsyncResponse, JSON, MembershipInvitation, InviteeVerificationSignedToken, ListWrapperColumnModel, PaginatedTeamIds, AsyncJobId, LoginResponse, ChallengePagedResults, Etag, Activity, Annotations, MultipartUploadStatus, NotificationEmail, BatchPresignedUploadUrlResponse, AddPartResponse, PaginatedResultsTotalNumberOfResults, PrincipalAliasResponse, DownloadList, DownloadOrder, DownloadOrderSummaryResponse, Doi, Subscription, SearchResults, SnapshotResponse, PaginatedColumnModelsResults, PaginatedResultsVersionInfo, PaginatedResultsDiscussionThreadBundle, PaginatedResultsDiscussionReplyBundle, PaginatedResultsV2WikiHeader, PaginatedResultsTeamMember, None, String
+		AccessRequirement, EntityId, Forum, DiscussionThreadBundle, DiscussionReplyBundle, MessageURL, ThreadCount, EntityThreadCounts, PaginatedIds, SubscriberPagedResults, SubscriberCount, BatchFileResult, UserProfile, FileHandleResults, AsyncResponse, JSON, MembershipInvitation, TeamMembershipStatus, InviteeVerificationSignedToken, ListWrapperColumnModel, PaginatedTeamIds, AsyncJobId, LoginResponse, ChallengePagedResults, Etag, Activity, Annotations, MultipartUploadStatus, NotificationEmail, BatchPresignedUploadUrlResponse, AddPartResponse, PaginatedResultsTotalNumberOfResults, PrincipalAliasResponse, DownloadList, DownloadOrder, DownloadOrderSummaryResponse, Doi, Subscription, SearchResults, SnapshotResponse, PaginatedColumnModelsResults, PaginatedResultsVersionInfo, PaginatedResultsDiscussionThreadBundle, PaginatedResultsDiscussionReplyBundle, PaginatedResultsV2WikiHeader, PaginatedResultsTeamMember, None, String
 	}
 
 	/**
@@ -333,6 +334,8 @@ public class SynapseJavascriptFactory {
 				return new Doi(json);
 			case MembershipInvitation:
 				return new MembershipInvitation(json);
+			case TeamMembershipStatus:
+				return new TeamMembershipStatus(json);
 			case InviteeVerificationSignedToken:
 				return new InviteeVerificationSignedToken(json);
 			case PaginatedTeamIds:

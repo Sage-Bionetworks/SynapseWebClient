@@ -826,50 +826,6 @@ public class SynapseClientImpl extends SynapseClientBase implements SynapseClien
 	}
 
 	@Override
-	public void inviteMember(String userGroupId, String teamId, String message, String hostPageBaseURL) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			String signedTokenEndpoint = getSignedTokenEndpoint(hostPageBaseURL);
-
-			TeamMembershipStatus membershipStatus = synapseClient.getTeamMembershipStatus(teamId, userGroupId);
-			if (membershipStatus.getIsMember()) {
-				return;
-			}
-			// if we can join the team without creating the invite (like if we
-			// are a team admin, or there is an open membership request), then
-			// just do that!
-			if (membershipStatus.getCanJoin()) {
-				synapseClient.addTeamMember(teamId, userGroupId, getTeamEndpoint(hostPageBaseURL), signedTokenEndpoint);
-			} else if (!membershipStatus.getHasOpenInvitation()) {
-				// check to see if there is already an open invite
-				MembershipInvitation membershipInvite = new MembershipInvitation();
-				membershipInvite.setMessage(message);
-				membershipInvite.setTeamId(teamId);
-				membershipInvite.setInviteeId(userGroupId);
-
-				synapseClient.createMembershipInvitation(membershipInvite, signedTokenEndpoint, signedTokenEndpoint);
-			}
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public void inviteNewMember(String email, String teamId, String message, String hostPageBaseURL) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			MembershipInvitation mis = new MembershipInvitation();
-			mis.setInviteeEmail(email);
-			mis.setTeamId(teamId);
-			mis.setMessage(message);
-			String signedTokenEndpoint = getSignedTokenEndpoint(hostPageBaseURL);
-			synapseClient.createMembershipInvitation(mis, signedTokenEndpoint, signedTokenEndpoint);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
 	public String getCertifiedUserPassingRecord(String userId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {

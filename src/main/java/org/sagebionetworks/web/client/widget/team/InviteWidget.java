@@ -1,18 +1,15 @@
 package org.sagebionetworks.web.client.widget.team;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.ValidationUtils.isValidEmail;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_CERTIFIED;
 import java.util.ArrayList;
 import java.util.List;
+import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
@@ -27,25 +24,21 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	public static final String NO_USERS_OR_EMAILS_ADDED_ERROR_MESSAGE = "Please add at least one user or email address and try again.";
 	public static final String INVALID_EMAIL_ERROR_MESSAGE = "Please select a suggested user or provide a valid email address and try again.";
 	private InviteWidgetView view;
-	private SynapseClientAsync synapseClient;
 	private Team team;
 	private Callback teamUpdatedCallback;
-	private GWTWrapper gwt;
 	private SynapseAlert synAlert;
 	private SynapseSuggestBox peopleSuggestWidget;
 	private List<String> inviteEmails, inviteUsers;
 	private String currentlyProcessingEmail, currentlyProcessingUser, invitationMessage;
 	private PortalGinInjector ginInjector;
-	private AsyncCallback<Void> inviteCallback;
+	private AsyncCallback<MembershipInvitation> inviteCallback;
+	private AsyncCallback<Void> voidInviteCallback;
 	private boolean isCertified;
 	private QuizInfoDialog quizInfoDialog;
 
 	@Inject
-	public InviteWidget(InviteWidgetView view, SynapseClientAsync synapseClient, GWTWrapper gwt, SynapseAlert synAlert, SynapseSuggestBox peopleSuggestBox, UserGroupSuggestionProvider provider, PortalGinInjector ginInjector) {
+	public InviteWidget(InviteWidgetView view,  SynapseAlert synAlert, SynapseSuggestBox peopleSuggestBox, UserGroupSuggestionProvider provider, PortalGinInjector ginInjector) {
 		this.view = view;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
-		this.gwt = gwt;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
 		this.peopleSuggestWidget = peopleSuggestBox;
@@ -63,9 +56,9 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 				addSuggestion();
 			}
 		});
-		inviteCallback = new AsyncCallback<Void>() {
+		inviteCallback = new AsyncCallback<MembershipInvitation>() {
 			@Override
-			public void onSuccess(Void result) {
+			public void onSuccess(MembershipInvitation result) {
 				if (currentlyProcessingEmail != null) {
 					inviteEmails.remove(currentlyProcessingEmail);
 				} else if (currentlyProcessingUser != null) {
@@ -78,6 +71,16 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 			public void onFailure(Throwable caught) {
 				synAlert.showError(caught.getMessage());
 				refreshInvitees();
+			}
+		};
+		voidInviteCallback = new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				inviteCallback.onFailure(caught);
+			}
+			@Override
+			public void onSuccess(Void result) {
+				inviteCallback.onSuccess(null);
 			}
 		};
 		view.setPresenter(this);
@@ -175,15 +178,50 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	 * Recursively process the user invitations (emails, then Synapse users).
 	 */
 	public void doSendInvites() {
-		currentlyProcessingUser = currentlyProcessingEmail = null;
+		currentlyProcessingUser = null;
+		currentlyProcessingEmail = null;
 		if (!inviteEmails.isEmpty()) {
 			// kick off the next email invite
 			currentlyProcessingEmail = inviteEmails.get(0);
-			synapseClient.inviteNewMember(currentlyProcessingEmail, team.getId(), invitationMessage, gwt.getHostPageBaseURL(), inviteCallback);
+			MembershipInvitation invite = new MembershipInvitation();
+			invite.setInviteeEmail(currentlyProcessingEmail);
+			invite.setTeamId(team.getId());
+			invite.setMessage(invitationMessage);
+			ginInjector.getSynapseJavascriptClient().createMembershipInvitation(invite, inviteCallback);
 		} else if (!inviteUsers.isEmpty()) {
 			// kick off the next user invite
 			currentlyProcessingUser = inviteUsers.get(0);
-			synapseClient.inviteMember(currentlyProcessingUser, team.getId(), invitationMessage, gwt.getHostPageBaseURL(), inviteCallback);
+			// get the current team status
+			ginInjector.getSynapseJavascriptClient().getTeamMembershipStatus(team.getId(), currentlyProcessingUser, new AsyncCallback<TeamMembershipStatus>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					// something went wrong trying to get the status.  Just try to invite.
+					synAlert.consoleError(caught.getMessage());
+					createMembershipInvitation();
+				}
+				public void onSuccess(TeamMembershipStatus membershipStatus) {
+					if (membershipStatus.getIsMember()) {
+						// no-op.  go to next
+						inviteCallback.onSuccess(null);
+						return;
+					}
+					// if we can join the team without creating the invite (like if we
+					// are a team admin, or there is an open membership request), then
+					// just do that!
+					if (membershipStatus.getCanJoin()) {
+						ginInjector.getSynapseJavascriptClient().addTeamMember(currentlyProcessingUser, team.getId(), voidInviteCallback);
+					} else if (!membershipStatus.getHasOpenInvitation()) {
+						createMembershipInvitation();
+					}
+				};
+				private void createMembershipInvitation() {
+					MembershipInvitation invite = new MembershipInvitation();
+					invite.setInviteeId(currentlyProcessingUser);
+					invite.setTeamId(team.getId());
+					invite.setMessage(invitationMessage);
+					ginInjector.getSynapseJavascriptClient().createMembershipInvitation(invite, inviteCallback);
+				}
+			});
 		} else {
 			// done!
 			view.hide();
