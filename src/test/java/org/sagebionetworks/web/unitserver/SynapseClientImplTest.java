@@ -72,9 +72,6 @@ import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.ProjectHeader;
-import org.sagebionetworks.repo.model.ProjectListSortColumn;
-import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
@@ -91,7 +88,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyRequest;
@@ -856,16 +852,6 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testInviteMemberOpenInvitations() throws SynapseException, RestServiceException, JSONObjectAdapterException {
-		membershipStatus.setHasOpenInvitation(true);
-		// verify it does not create a new invitation since one is already open
-		synapseClient.inviteMember("123", "a team", "", "");
-		verify(mockSynapse, Mockito.times(0)).addTeamMember(anyString(), anyString(), anyString(), anyString());
-		verify(mockSynapse, Mockito.times(0)).createMembershipInvitation(any(MembershipInvitation.class), anyString(), anyString());
-
-	}
-
-	@Test
 	public void testRequestMemberOpenRequests() throws SynapseException, RestServiceException, JSONObjectAdapterException {
 		membershipStatus.setHasOpenRequest(true);
 		// verify it does not create a new request since one is already open
@@ -876,23 +862,10 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testInviteMemberCanJoin() throws SynapseException, RestServiceException, JSONObjectAdapterException {
-		membershipStatus.setCanJoin(true);
-		synapseClient.inviteMember("123", "a team", "", TEST_HOME_PAGE_BASE);
-		verify(mockSynapse).addTeamMember(anyString(), anyString(), eq(TEST_HOME_PAGE_BASE + "#!Team:"), eq(TEST_HOME_PAGE_BASE + "#!SignedToken:"));
-	}
-
-	@Test
 	public void testRequestMembershipCanJoin() throws SynapseException, RestServiceException, JSONObjectAdapterException {
 		membershipStatus.setCanJoin(true);
 		synapseClient.requestMembership("123", "a team", "", TEST_HOME_PAGE_BASE, new Date());
 		verify(mockSynapse).addTeamMember(anyString(), anyString(), eq(TEST_HOME_PAGE_BASE + "#!Team:"), eq(TEST_HOME_PAGE_BASE + "#!SignedToken:"));
-	}
-
-	@Test
-	public void testInviteMember() throws SynapseException, RestServiceException, JSONObjectAdapterException {
-		synapseClient.inviteMember("123", "a team", "", TEST_HOME_PAGE_BASE);
-		verify(mockSynapse).createMembershipInvitation(any(MembershipInvitation.class), eq(TEST_HOME_PAGE_BASE + "#!SignedToken:"), eq(TEST_HOME_PAGE_BASE + "#!SignedToken:"));
 	}
 
 	@Test

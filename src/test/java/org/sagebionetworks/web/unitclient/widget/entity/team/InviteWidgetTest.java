@@ -18,7 +18,9 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
@@ -39,6 +41,7 @@ import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
 import org.sagebionetworks.web.client.widget.team.InviteWidgetView;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.entity.EvaluationSubmitterTest;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -245,4 +248,29 @@ public class InviteWidgetTest {
 		verify(mockView).hide();
 		verify(mockQuizInfoDialog).show();
 	}
+	
+	@Test
+	public void testInviteMemberOpenInvitations() {
+		when(mockTeamMembershipStatus.getHasOpenInvitation()).thenReturn(true);
+		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(mockSuggestion);
+		when(mockSuggestion.getHeader()).thenReturn(mockHeader);
+		
+		inviteWidget.doSendInvites(invitationMessage);
+
+		// verify it does not create a new invitation since one is already open
+		verify(mockJsClient, never()).createMembershipInvitation(any(MembershipInvitation.class), any(AsyncCallback.class));
+		verify(mockJsClient, never()).addTeamMember(anyString(), anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testInviteMemberCanJoin() {
+		when(mockTeamMembershipStatus.getCanJoin()).thenReturn(true);
+		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(mockSuggestion);
+		when(mockSuggestion.getHeader()).thenReturn(mockHeader);
+		
+		inviteWidget.doSendInvites(invitationMessage);
+		
+		verify(mockJsClient).addTeamMember(anyString(), anyString(), any(AsyncCallback.class));
+	}
+
 }
