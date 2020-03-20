@@ -118,11 +118,6 @@ public interface SynapseClientAsync {
 
 	void requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL, Date expiresOn, AsyncCallback<TeamMembershipStatus> callback);
 
-	void inviteMember(String userGroupId, String teamId, String message, String hostPageBaseURL, AsyncCallback<Void> callback);
-
-	void inviteNewMember(String email, String teamId, String message, String hostPageBaseURL, AsyncCallback<Void> callback);
-	/////////////////
-
 	/**
 	 * The PassingRecord that documents when a user was certified is returned. Otherwise, a
 	 * NotFoundException is thrown.

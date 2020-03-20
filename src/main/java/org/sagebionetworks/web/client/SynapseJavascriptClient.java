@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Challenge;
@@ -54,6 +55,7 @@ import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.TeamMemberTypeFilterOptions;
+import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
@@ -245,9 +247,11 @@ public class SynapseJavascriptClient {
 
 	public static final String MEMBERSHIP_REQUEST = "/membershipRequest";
 	public static final String OPEN_MEMBERSHIP_REQUEST_COUNT = MEMBERSHIP_REQUEST + "/openRequestCount";
-
+	public static final String MEMBERSHIP_STATUS = "/membershipStatus";
 	public static final String MEMBERSHIP_INVITATION = "/membershipInvitation";
 	public static final String OPEN_MEMBERSHIP_INVITATION_COUNT = MEMBERSHIP_INVITATION + "/openInvitationCount";
+	public static final String ACCEPT_INVITATION_ENDPOINT_PARAM = "acceptInvitationEndpoint";
+	public static final String NOTIFICATION_UNSUBSCRIBE_ENDPOINT_PARAM = "notificationUnsubscribeEndpoint";
 	public static final String INVITEE_VERIFICATION_SIGNED_TOKEN = "/inviteeVerificationSignedToken";
 	public static final String INVITEE_ID = "/inviteeId";
 	public static final String ICON = "/icon";
@@ -301,6 +305,7 @@ public class SynapseJavascriptClient {
 	public static final String EMAIL_VALIDATION = "/emailValidation";
 	public static final String PORTAL_ENDPOINT_PARAM = "portalEndpoint=";
 	public static final int LIMIT_50 = 50;
+	public static final String SIGNED_TOKEN = "#!SignedToken:";
 
 	public Map<String, List<Request>> requestsMap;
 
@@ -1088,6 +1093,19 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + MEMBERSHIP_INVITATION + "/" + id;
 		doDelete(url, callback);
 	}
+	
+	public void createMembershipInvitation(MembershipInvitation invitation, AsyncCallback<MembershipInvitation> callback) {
+		String url = getRepoServiceUrl() + MEMBERSHIP_INVITATION;
+		String signedTokenEndpoint = gwt.encodeQueryString(gwt.getHostPageBaseURL() + SIGNED_TOKEN);
+		url += "?" + ACCEPT_INVITATION_ENDPOINT_PARAM + "=" + signedTokenEndpoint +
+					"&" + NOTIFICATION_UNSUBSCRIBE_ENDPOINT_PARAM + "=" + signedTokenEndpoint;
+		doPost(url, invitation, OBJECT_TYPE.MembershipInvitation, false, callback);
+	}
+
+	public void getTeamMembershipStatus(String teamId, String principalId, AsyncCallback<TeamMembershipStatus> callback) {
+		String url = TEAM + "/" + teamId + MEMBER + "/" + principalId + MEMBERSHIP_STATUS;
+		doGet(url, OBJECT_TYPE.TeamMembershipStatus, callback);
+	}
 
 	public void deleteEntityById(String id, AsyncCallback<Void> callback) {
 		deleteEntityById(id, false, callback);
@@ -1610,7 +1628,7 @@ public class SynapseJavascriptClient {
 
 	public void addTeamMember(String userId, String teamId, AsyncCallback<Void> cb) {
 		String teamEndpoint = gwt.encodeQueryString(gwt.getHostPageBaseURL() + "#!Team:");
-		String signedTokenEndpoint = gwt.encodeQueryString(gwt.getHostPageBaseURL() + "#!SignedToken:");
+		String signedTokenEndpoint = gwt.encodeQueryString(gwt.getHostPageBaseURL() + SIGNED_TOKEN);
 		String url = getRepoServiceUrl() + TEAM + "/" + teamId + MEMBER + "/" + userId + "?teamEndpoint=" + teamEndpoint + "&notificationUnsubscribeEndpoint=" + signedTokenEndpoint;
 		doPut(url, null, OBJECT_TYPE.None, cb);
 	}
