@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.team;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.ValidationUtils.isValidEmail;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_CERTIFIED;
 import java.util.ArrayList;
@@ -10,9 +9,7 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
@@ -27,10 +24,8 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	public static final String NO_USERS_OR_EMAILS_ADDED_ERROR_MESSAGE = "Please add at least one user or email address and try again.";
 	public static final String INVALID_EMAIL_ERROR_MESSAGE = "Please select a suggested user or provide a valid email address and try again.";
 	private InviteWidgetView view;
-	private SynapseClientAsync synapseClient;
 	private Team team;
 	private Callback teamUpdatedCallback;
-	private GWTWrapper gwt;
 	private SynapseAlert synAlert;
 	private SynapseSuggestBox peopleSuggestWidget;
 	private List<String> inviteEmails, inviteUsers;
@@ -42,11 +37,8 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	private QuizInfoDialog quizInfoDialog;
 
 	@Inject
-	public InviteWidget(InviteWidgetView view, SynapseClientAsync synapseClient, GWTWrapper gwt, SynapseAlert synAlert, SynapseSuggestBox peopleSuggestBox, UserGroupSuggestionProvider provider, PortalGinInjector ginInjector) {
+	public InviteWidget(InviteWidgetView view,  SynapseAlert synAlert, SynapseSuggestBox peopleSuggestBox, UserGroupSuggestionProvider provider, PortalGinInjector ginInjector) {
 		this.view = view;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
-		this.gwt = gwt;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
 		this.peopleSuggestWidget = peopleSuggestBox;

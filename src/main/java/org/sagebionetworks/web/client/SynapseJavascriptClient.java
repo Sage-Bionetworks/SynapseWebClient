@@ -1103,7 +1103,7 @@ public class SynapseJavascriptClient {
 	}
 
 	public void getTeamMembershipStatus(String teamId, String principalId, AsyncCallback<TeamMembershipStatus> callback) {
-		String url = TEAM + "/" + teamId + MEMBER + "/" + principalId + MEMBERSHIP_STATUS;
+		String url = getRepoServiceUrl() + TEAM + "/" + teamId + MEMBER + "/" + principalId + MEMBERSHIP_STATUS;
 		doGet(url, OBJECT_TYPE.TeamMembershipStatus, callback);
 	}
 

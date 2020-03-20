@@ -123,7 +123,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			view.setIsMemberMessage(SafeHtmlUtils.htmlEscape(isMemberMessage));
 		}
 		boolean isLoggedIn = authenticationController.isLoggedIn();
-		if (isLoggedIn) {
+		if (isLoggedIn && teamMembershipStatus != null) {
 			view.setUserPanelVisible(true);
 			// (note: in all cases, clicking UI will check for unmet ToU)
 			if (teamMembershipStatus.getIsMember()) {
