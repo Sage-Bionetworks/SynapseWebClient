@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
 import java.util.List;
+import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -22,7 +23,7 @@ public interface ApproveUserAccessModalView extends IsWidget {
 
 	Widget getEmailBodyWidget(String html);
 
-	void setAccessRequirement(String num, String html);
+	void setAccessRequirement(String num);
 
 	void setApproveProcessing(boolean processing);
 
@@ -56,5 +57,7 @@ public interface ApproveUserAccessModalView extends IsWidget {
 
 		void onRevoke();
 	}
+
+	void setAccessRequirementWidget(AccessRequirementWidget arWidget);
 
 }
