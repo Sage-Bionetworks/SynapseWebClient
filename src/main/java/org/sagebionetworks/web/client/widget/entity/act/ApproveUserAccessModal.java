@@ -86,7 +86,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		this.view.setPresenter(this);
 		this.view.setUserPickerWidget(peopleSuggestWidget.asWidget());
 		this.arWidget = arWidget;
-		arWidget.hideButtons();
+		arWidget.hideControls();
 		this.view.setAccessRequirementWidget(arWidget);
 		view.setLoadingEmailWidget(this.progressWidget.asWidget());
 		peopleSuggestBox.addItemSelectedHandler(suggestion -> {

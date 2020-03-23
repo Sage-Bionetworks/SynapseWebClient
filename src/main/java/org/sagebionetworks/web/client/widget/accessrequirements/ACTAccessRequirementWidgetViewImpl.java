@@ -51,6 +51,8 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	Div convertAccessRequirementContainer;
 	@UiField
 	Button loginButton;
+	@UiField
+	Div controlsContainer;
 	Callback onAttachCallback;
 
 	public interface Binder extends UiBinder<Widget, ACTAccessRequirementWidgetViewImpl> {
@@ -179,10 +181,8 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	}
 
 	@Override
-	public void hideButtonContainers() {
-		editAccessRequirementContainer.setVisible(false);
-		deleteAccessRequirementContainer.setVisible(false);
-		requestAccessButtonContainer.setVisible(false);
+	public void hideControls() {
+		controlsContainer.setVisible(false);
 	}
 
 	@Override

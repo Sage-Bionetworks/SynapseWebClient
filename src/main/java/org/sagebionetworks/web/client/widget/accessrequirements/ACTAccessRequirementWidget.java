@@ -169,7 +169,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		view.setVisible(visible);
 	}
 
-	public void hideButtons() {
-		view.hideButtonContainers();
+	public void hideControls() {
+		view.hideControls();
 	}
 }

@@ -158,4 +158,8 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	public Widget asWidget() {
 		return view.asWidget();
 	}
+	public void hideControls() {
+		view.hideControls();
+	}
+
 }

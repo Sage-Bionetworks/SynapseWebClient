@@ -22,7 +22,7 @@ public class AccessRequirementWidget implements IsWidget {
 	PortalGinInjector ginInjector;
 	SynapseJavascriptClient jsClient;
 	DivView div;
-	boolean isHideButtons = false;
+	boolean isHideControls = false;
 
 	@Inject
 	public AccessRequirementWidget(PortalGinInjector ginInjector, SynapseJavascriptClient jsClient, DivView div) {
@@ -52,8 +52,8 @@ public class AccessRequirementWidget implements IsWidget {
 		});
 	}
 
-	public void hideButtons() {
-		isHideButtons = true;
+	public void hideControls() {
+		isHideControls = true;
 	}
 
 	private void handleException(Throwable t) {
@@ -69,24 +69,30 @@ public class AccessRequirementWidget implements IsWidget {
 			ManagedACTAccessRequirementWidget w = ginInjector.getManagedACTAccessRequirementWidget();
 			w.setRequirement((ManagedACTAccessRequirement) requirement, refreshCallback);
 			w.setTargetSubject(targetSubject);
-			if (isHideButtons) {
-				w.hideButtons();
+			if (isHideControls) {
+				w.hideControls();
 			}
 			div.add(w);
 		} else if (requirement instanceof ACTAccessRequirement) {
 			ACTAccessRequirementWidget w = ginInjector.getACTAccessRequirementWidget();
 			w.setRequirement((ACTAccessRequirement) requirement, refreshCallback);
-			if (isHideButtons) {
-				w.hideButtons();
+			if (isHideControls) {
+				w.hideControls();
 			}
 			div.add(w);
 		} else if (requirement instanceof TermsOfUseAccessRequirement) {
 			TermsOfUseAccessRequirementWidget w = ginInjector.getTermsOfUseAccessRequirementWidget();
 			w.setRequirement((TermsOfUseAccessRequirement) requirement, refreshCallback);
+			if (isHideControls) {
+				w.hideControls();
+			}
 			div.add(w);
 		} else if (requirement instanceof SelfSignAccessRequirement) {
 			SelfSignAccessRequirementWidget w = ginInjector.getSelfSignAccessRequirementWidget();
 			w.setRequirement((SelfSignAccessRequirement) requirement, refreshCallback);
+			if (isHideControls) {
+				w.hideControls();
+			}
 			div.add(w);
 		} else if (requirement instanceof LockAccessRequirement) {
 			LockAccessRequirementWidget w = ginInjector.getLockAccessRequirementWidget();

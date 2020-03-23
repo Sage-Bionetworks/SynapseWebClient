@@ -59,7 +59,7 @@ public interface ManagedACTAccessRequirementWidgetView extends IsWidget, Support
 
 	void setSynAlert(IsWidget w);
 
-	void hideButtonContainers();
+	void hideControls();
 
 	void setReviewAccessRequestsWidgetContainerVisible(boolean visible);
 

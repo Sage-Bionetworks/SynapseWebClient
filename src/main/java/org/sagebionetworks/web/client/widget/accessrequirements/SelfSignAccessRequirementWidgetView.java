@@ -39,6 +39,8 @@ public interface SelfSignAccessRequirementWidgetView extends IsWidget, SupportsL
 
 	void showLoginButton();
 
+	void hideControls();
+
 	/**
 	 * Presenter interface
 	 */

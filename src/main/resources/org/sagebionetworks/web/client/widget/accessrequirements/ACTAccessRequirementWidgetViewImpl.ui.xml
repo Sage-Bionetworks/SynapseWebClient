@@ -50,7 +50,7 @@
 					addStyleNames="margin-left-5 margin-right-5" />
 			</bh:Div>
 			<bh:ClearFix />
-			<bh:Div addStyleNames="margin-top-5">
+			<bh:Div addStyleNames="margin-top-5" ui:field="controlsContainer">
 				<bh:Div ui:field="convertAccessRequirementContainer"
 					pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
 				<bh:Div ui:field="manageAccessContainer" pull="RIGHT"
