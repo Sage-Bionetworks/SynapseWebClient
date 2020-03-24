@@ -152,9 +152,11 @@ public class StorageLocationWidgetTest {
 		String baseKey = "key";
 		String bucket = "a.bucket     ";
 		String banner = "upload to a.bucket";
+		Boolean isStsEnabled = false;
 		entityStorageLocationSetting.setBanner(banner);
 		entityStorageLocationSetting.setBucket(bucket);
 		entityStorageLocationSetting.setBaseKey(baseKey);
+		entityStorageLocationSetting.setStsEnabled(isStsEnabled);
 		AsyncMockStubber.callSuccessWith(entityStorageLocationSetting).when(mockSynapseClient).getStorageLocationSetting(anyString(), any(AsyncCallback.class));
 		widget.getStorageLocationSetting();
 		verify(mockView).setS3BaseKey(baseKey);
@@ -162,6 +164,37 @@ public class StorageLocationWidgetTest {
 		verify(mockView).setExternalS3Banner(banner);
 		verify(mockView).selectExternalS3Storage();
 		verify(mockView).setSFTPVisible(true);
+		verify(mockView).setS3StsVisible(true); //because we're in alpha mode
+		verify(mockView).setS3StsEnabled(isStsEnabled);
+	}
+	
+	@Test
+	public void testS3StsEnabled() {
+		ExternalS3StorageLocationSetting entityStorageLocationSetting = new ExternalS3StorageLocationSetting();
+		entityStorageLocationSetting.setBanner("");
+		entityStorageLocationSetting.setBucket("");
+		entityStorageLocationSetting.setBaseKey("");
+		entityStorageLocationSetting.setStsEnabled(true);
+		AsyncMockStubber.callSuccessWith(entityStorageLocationSetting).when(mockSynapseClient).getStorageLocationSetting(anyString(), any(AsyncCallback.class));
+		widget.getStorageLocationSetting();
+		verify(mockView).selectExternalS3Storage();
+		verify(mockView).setS3StsVisible(true);
+		verify(mockView).setS3StsEnabled(true);
+	}
+	
+	// This test can be deleted once STS is out of alpha mode
+	@Test
+	public void testS3StsNotEnabledNotInAlpha() {
+		ExternalS3StorageLocationSetting entityStorageLocationSetting = new ExternalS3StorageLocationSetting();
+		entityStorageLocationSetting.setBanner("");
+		entityStorageLocationSetting.setBucket("");
+		entityStorageLocationSetting.setBaseKey("");
+		entityStorageLocationSetting.setStsEnabled(false);
+		AsyncMockStubber.callSuccessWith(entityStorageLocationSetting).when(mockSynapseClient).getStorageLocationSetting(anyString(), any(AsyncCallback.class));
+		widget.getStorageLocationSetting();
+		verify(mockView).selectExternalS3Storage();
+		verify(mockView).setS3StsVisible(false);
+		verify(mockView).setS3StsEnabled(false);
 	}
 
 	@Test
