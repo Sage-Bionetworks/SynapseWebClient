@@ -2,10 +2,8 @@ package org.sagebionetworks.web.client.widget.entity.act;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -63,7 +61,6 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	private ApproveUserAccessModalView view;
 	private SynapseAlert synAlert;
 	private SynapseSuggestBox peopleSuggestWidget;
-	private Map<String, AccessRequirement> arMap;
 	private SynapseClientAsync synapseClient;
 	private SynapseProperties synapseProperties;
 	private JobTrackingWidget progressWidget;
@@ -93,11 +90,12 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 				onUserSelected(suggestion);
 		});
 		subject = new RestrictableObjectDescriptor();
+		subject.setType(RestrictableObjectType.ENTITY);
 	}
 
 	public void configure(final EntityBundle bundle) {
 		subject.setId(bundle.getEntity().getId());
-		subject.setType(RestrictableObjectType.ENTITY);
+		
 		dataAccessClient.getAccessRequirements(subject, 50L, 0L, new AsyncCallback<List<AccessRequirement>>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -116,12 +114,11 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	}
 
 	public void configure(List<AccessRequirement> accessRequirements, EntityBundle bundle) {
+		subject.setId(bundle.getEntity().getId());
 		view.startLoadingEmail();
 		this.entityBundle = bundle;
-		this.arMap = new HashMap<String, AccessRequirement>();
 		List<String> list = new ArrayList<String>();
 		for (AccessRequirement ar : accessRequirements) {
-			arMap.put(Long.toString(ar.getId()), ar);
 			list.add(Long.toString(ar.getId()));
 		}
 		view.setSynAlert(synAlert.asWidget());

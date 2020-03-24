@@ -41,11 +41,8 @@ public class AccessRequirementWidget implements IsWidget {
 
 			@Override
 			public void onSuccess(AccessRequirement requirement) {
-				Callback refreshCallback = new Callback() {
-					@Override
-					public void invoke() {
-						configure(accessRequirementId, targetSubject);
-					}
+				Callback refreshCallback = () -> {
+					configure(accessRequirementId, targetSubject);
 				};
 				configure(requirement, targetSubject, refreshCallback);
 			}
