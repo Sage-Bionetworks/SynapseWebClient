@@ -176,6 +176,7 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 		externalGoogleCloudBannerOptions.clear();
 		externalObjectStoreBannerOptions.clear();
 		sftpBannerOptions.clear();
+		s3StsField.setValue(false);
 	}
 
 	@Override
