@@ -28,7 +28,10 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResult;
@@ -38,7 +41,7 @@ import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseProperties;
-import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
+import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
@@ -95,6 +98,8 @@ public class ApproveUserAccessModalTest {
 	List<AccessApproval> mockAccAppList;
 	@Mock
 	Iterator<AccessApproval> mockAccAppItr;
+	@Mock
+	AccessRequirementWidget mockArWidget;
 	@Captor
 	ArgumentCaptor<AsyncCallback<AccessApproval>> aaCaptor;
 	@Captor
@@ -105,17 +110,18 @@ public class ApproveUserAccessModalTest {
 	ArgumentCaptor<AsyncCallback<PaginatedResults<AccessApproval>>> prCaptor;
 	@Captor
 	ArgumentCaptor<AsyncCallback<Void>> vCaptor;
-
+	RestrictableObjectDescriptor expectedRestrictableObjectDescriptor = new RestrictableObjectDescriptor();
 	Long accessReq;
 	String userId;
 	String message;
-	List<ACTAccessRequirement> actList;
+	List<AccessRequirement> actList;
 	Exception ex;
+	public static final String ENTITY_ID = "syn1011938";
 
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		dialog = new ApproveUserAccessModal(mockView, mockSynAlert, mockPeopleSuggestWidget, mockProvider, mockSynapseClient, mockSynapseProperties, mockProgressWidget, mockDataAccessClient);
+		dialog = new ApproveUserAccessModal(mockView, mockArWidget, mockSynAlert, mockPeopleSuggestWidget, mockProvider, mockSynapseClient, mockSynapseProperties, mockProgressWidget, mockDataAccessClient);
 		when(mockSynapseProperties.getSynapseProperty(anyString())).thenReturn("syn7444807");
 
 		message = "Message";
@@ -124,7 +130,7 @@ public class ApproveUserAccessModalTest {
 		ex = new Exception("error message");
 
 		ACTAccessRequirement act = Mockito.mock(ACTAccessRequirement.class);
-		actList = new ArrayList<ACTAccessRequirement>();
+		actList = new ArrayList<AccessRequirement>();
 		actList.add(act);
 
 		when(mockQrb.getQueryResult()).thenReturn(mockQr);
@@ -146,23 +152,25 @@ public class ApproveUserAccessModalTest {
 		when(mockAccAppItr.next()).thenReturn(mockAccessApproval);
 		when(mockAccessApproval.getRequirementId()).thenReturn(accessReq);
 		when(mockAccessApproval.getAccessorId()).thenReturn(userId);
+		when(mockEntity.getId()).thenReturn(ENTITY_ID);
+		expectedRestrictableObjectDescriptor.setType(RestrictableObjectType.ENTITY);
+		expectedRestrictableObjectDescriptor.setId(ENTITY_ID);
 	}
 
 	@Test
 	public void testConfigureNoAccessReqs() {
-		List<ACTAccessRequirement> accessReqs = new ArrayList<ACTAccessRequirement>();
+		List<AccessRequirement> accessReqs = new ArrayList<AccessRequirement>();
 		dialog.configure(accessReqs, mockEntityBundle);
-		verify(mockView, times(0)).setAccessRequirement(anyString(), anyString());
+		verify(mockView, times(0)).setAccessRequirement(anyString());
 	}
 
 	@Test
 	public void testConfigureOneAccessReq() {
-		ACTAccessRequirement ar = actList.get(0);
+		AccessRequirement ar = actList.get(0);
 		String num = Long.toString(ar.getId());
-		String text = GovernanceServiceHelper.getAccessRequirementText(ar);
 		dialog.configure(actList, mockEntityBundle);
-		verify(mockView).setAccessRequirement(eq(num), eq(text));
-		verify(mockView, times(1)).setAccessRequirement(anyString(), anyString());
+		verify(mockArWidget).configure(ar.getId().toString(), expectedRestrictableObjectDescriptor);
+		verify(mockView).setAccessRequirement(eq(num));
 		verify(mockView).setDatasetTitle(mockEntityBundle.getEntity().getName());
 	}
 
@@ -194,12 +202,11 @@ public class ApproveUserAccessModalTest {
 
 	@Test
 	public void testOnStateSelected() {
-		ACTAccessRequirement ar = actList.get(0);
+		AccessRequirement ar = actList.get(0);
 		String num = Long.toString(ar.getId());
-		String text = GovernanceServiceHelper.getAccessRequirementText(ar);
 		dialog.configure(actList, mockEntityBundle);
 		dialog.onStateSelected(num);
-		verify(mockView, times(2)).setAccessRequirement(eq(num), eq(text));
+		verify(mockView, times(2)).setAccessRequirement(eq(num));
 	}
 
 	@Test

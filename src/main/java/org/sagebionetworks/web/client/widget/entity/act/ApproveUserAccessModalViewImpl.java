@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -30,7 +31,7 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	@UiField
 	DropDownMenu arDropdownMenu;
 	@UiField
-	HTML accessReqText;
+	Div accessRequirementWidgetContainer;
 	@UiField
 	Div synAlertContainer;
 	@UiField
@@ -199,9 +200,8 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	}
 
 	@Override
-	public void setAccessRequirement(String num, String html) {
+	public void setAccessRequirement(String num) {
 		accessReqNum.setText(num);
-		accessReqText.setHTML(html);
 	}
 
 	@Override
@@ -236,5 +236,10 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 		}
 		cancelButton.setEnabled(!processing);
 		submitButton.setEnabled(!processing);
+	}
+	@Override
+	public void setAccessRequirementWidget(AccessRequirementWidget arWidget) {
+		accessRequirementWidgetContainer.clear();
+		accessRequirementWidgetContainer.add(arWidget);
 	}
 }

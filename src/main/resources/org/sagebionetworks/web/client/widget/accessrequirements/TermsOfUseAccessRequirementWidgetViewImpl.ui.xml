@@ -25,7 +25,7 @@
 				</bh:Paragraph>
 			</b:BlockQuote>
 			<bh:ClearFix />
-			<bh:Div addStyleNames="margin-top-5">
+			<bh:Div addStyleNames="margin-top-5" ui:field="controlsContainer">
 				<bh:Div ui:field="manageAccessContainer" pull="RIGHT"
 					addStyleNames="margin-right-5" />
 				<b:Button ui:field="signTermsButton" type="PRIMARY"

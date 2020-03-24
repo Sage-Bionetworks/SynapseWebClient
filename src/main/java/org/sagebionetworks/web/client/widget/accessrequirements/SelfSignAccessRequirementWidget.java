@@ -204,4 +204,8 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 	public void onValidateProfile() {
 		popupUtils.openInNewWindow(WebConstants.DOCS_URL + GET_VALIDATED_PROFILE_PAGE);
 	}
+	public void hideControls() {
+		view.hideControls();
+	}
+
 }

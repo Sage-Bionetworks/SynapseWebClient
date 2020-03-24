@@ -41,11 +41,12 @@ public interface TermsOfUseAccessRequirementWidgetView extends IsWidget, Support
 
 	void showLoginButton();
 
+	void hideControls();
+
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
 		void onSignTerms();
 	}
-
 }

@@ -250,8 +250,8 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		view.setVisible(visible);
 	}
 
-	public void hideButtons() {
-		view.hideButtonContainers();
+	public void hideControls() {
+		view.hideControls();
 	}
 
 	public void setReviewAccessRequestsVisible(boolean visible) {

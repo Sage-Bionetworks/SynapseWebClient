@@ -2,12 +2,9 @@ package org.sagebionetworks.web.client.widget.entity.act;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -23,8 +20,7 @@ import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseProperties;
-import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
+import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -56,7 +52,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	// Mask to get all parts of a query.
 	private static final Long ALL_PARTS_MASK = new Long(255);
 
-	private String accessRequirement;
+	private String accessRequirementId;
 	private String userId;
 	private String datasetId;
 	private String message;
@@ -65,14 +61,15 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	private ApproveUserAccessModalView view;
 	private SynapseAlert synAlert;
 	private SynapseSuggestBox peopleSuggestWidget;
-	private Map<String, AccessRequirement> arMap;
 	private SynapseClientAsync synapseClient;
 	private SynapseProperties synapseProperties;
 	private JobTrackingWidget progressWidget;
 	private DataAccessClientAsync dataAccessClient;
+	private AccessRequirementWidget arWidget;
+	private RestrictableObjectDescriptor subject;
 
 	@Inject
-	public ApproveUserAccessModal(ApproveUserAccessModalView view, SynapseAlert synAlert, SynapseSuggestBox peopleSuggestBox, UserGroupSuggestionProvider provider, SynapseClientAsync synapseClient, SynapseProperties synapseProperties, JobTrackingWidget progressWidget, DataAccessClientAsync dataAccessClient) {
+	public ApproveUserAccessModal(ApproveUserAccessModalView view, AccessRequirementWidget arWidget, SynapseAlert synAlert, SynapseSuggestBox peopleSuggestBox, UserGroupSuggestionProvider provider, SynapseClientAsync synapseClient, SynapseProperties synapseProperties, JobTrackingWidget progressWidget, DataAccessClientAsync dataAccessClient) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;
@@ -85,19 +82,20 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		this.view.setPresenter(this);
 		this.view.setUserPickerWidget(peopleSuggestWidget.asWidget());
+		this.arWidget = arWidget;
+		arWidget.hideControls();
+		this.view.setAccessRequirementWidget(arWidget);
 		view.setLoadingEmailWidget(this.progressWidget.asWidget());
-		peopleSuggestBox.addItemSelectedHandler(new CallbackP<UserGroupSuggestion>() {
-			@Override
-			public void invoke(UserGroupSuggestion suggestion) {
+		peopleSuggestBox.addItemSelectedHandler(suggestion -> {
 				onUserSelected(suggestion);
-			}
 		});
+		subject = new RestrictableObjectDescriptor();
+		subject.setType(RestrictableObjectType.ENTITY);
 	}
 
 	public void configure(final EntityBundle bundle) {
-		RestrictableObjectDescriptor subject = new RestrictableObjectDescriptor();
 		subject.setId(bundle.getEntity().getId());
-		subject.setType(RestrictableObjectType.ENTITY);
+		
 		dataAccessClient.getAccessRequirements(subject, 50L, 0L, new AsyncCallback<List<AccessRequirement>>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -106,24 +104,21 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 
 			@Override
 			public void onSuccess(List<AccessRequirement> result) {
-				List<ACTAccessRequirement> ars = new ArrayList<>();
+				List<AccessRequirement> ars = new ArrayList<>();
 				for (AccessRequirement ar : result) {
-					if (ar instanceof ACTAccessRequirement) {
-						ars.add((ACTAccessRequirement) ar);
-					}
+					ars.add(ar);	
 				}
 				configure(ars, bundle);
 			}
 		});
 	}
 
-	public void configure(List<ACTAccessRequirement> accessRequirements, EntityBundle bundle) {
+	public void configure(List<AccessRequirement> accessRequirements, EntityBundle bundle) {
+		subject.setId(bundle.getEntity().getId());
 		view.startLoadingEmail();
 		this.entityBundle = bundle;
-		this.arMap = new HashMap<String, AccessRequirement>();
 		List<String> list = new ArrayList<String>();
-		for (ACTAccessRequirement ar : accessRequirements) {
-			arMap.put(Long.toString(ar.getId()), ar);
+		for (AccessRequirement ar : accessRequirements) {
 			list.add(Long.toString(ar.getId()));
 		}
 		view.setSynAlert(synAlert.asWidget());
@@ -217,9 +212,9 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			synAlert.showError(NO_USER_SELECTED);
 			return;
 		}
-		accessRequirement = view.getAccessRequirement();
+		accessRequirementId = view.getAccessRequirement();
 		view.setRevokeProcessing(true);
-		synapseClient.deleteAccessApprovals(accessRequirement, userId, new AsyncCallback<Void>() {
+		synapseClient.deleteAccessApprovals(accessRequirementId, userId, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
@@ -246,11 +241,11 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			synAlert.showError(MESSAGE_BLANK);
 			return;
 		}
-		accessRequirement = view.getAccessRequirement();
+		accessRequirementId = view.getAccessRequirement();
 		view.setApproveProcessing(true);
 		AccessApproval aa = new AccessApproval();
 		aa.setAccessorId(userId); // user id
-		aa.setRequirementId(Long.parseLong(accessRequirement)); // requirement id
+		aa.setRequirementId(Long.parseLong(accessRequirementId)); // requirement id
 		synapseClient.createAccessApproval(aa, new AsyncCallback<AccessApproval>() {
 
 			@Override
@@ -296,9 +291,9 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	}
 
 	@Override
-	public void onStateSelected(String state) {
-		accessRequirement = state;
-		view.setAccessRequirement(state, GovernanceServiceHelper.getAccessRequirementText(arMap.get(state)));
+	public void onStateSelected(String arID) {
+		accessRequirementId = arID;
+		arWidget.configure(arID, subject);
+		view.setAccessRequirement(arID);
 	}
-
 }

@@ -44,7 +44,8 @@ public class SelfSignAccessRequirementWidgetViewImpl implements SelfSignAccessRe
 	Div manageAccessContainer;
 	@UiField
 	Alert approvedAlert;
-
+	@UiField
+	Div controlsContainer;
 	Callback onAttachCallback;
 
 	public interface Binder extends UiBinder<Widget, SelfSignAccessRequirementWidgetViewImpl> {
@@ -179,5 +180,9 @@ public class SelfSignAccessRequirementWidgetViewImpl implements SelfSignAccessRe
 	@Override
 	public void showLoginButton() {
 		loginButton.setVisible(true);
+	}
+	@Override
+	public void hideControls() {
+		controlsContainer.setVisible(false);
 	}
 }
