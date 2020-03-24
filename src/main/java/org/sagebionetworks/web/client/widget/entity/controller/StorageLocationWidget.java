@@ -85,16 +85,18 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 			@Override
 			public void onSuccess(StorageLocationSetting location) {
 				// if null, then still show the default UI
+				boolean isInAlpha = DisplayUtils.isInTestWebsite(cookies);
+				view.setS3StsVisible(isInAlpha);
 				if (location != null) {
 					// set up the view
-					boolean isInAlpha = DisplayUtils.isInTestWebsite(cookies);
 					String banner = trim(location.getBanner());
 					if (location instanceof ExternalS3StorageLocationSetting) {
 						ExternalS3StorageLocationSetting setting = (ExternalS3StorageLocationSetting) location;
 						boolean isStsEnabled = setting.getStsEnabled() == null ? false : setting.getStsEnabled();
 						view.setS3BaseKey(trim(setting.getBaseKey()));
 						view.setS3Bucket(trim(setting.getBucket()));
-						view.setS3StsVisible(isInAlpha || isStsEnabled);
+						if (isStsEnabled)
+							view.setS3StsVisible(true);
 						view.setS3StsEnabled(isStsEnabled);
 						view.setExternalS3Banner(banner);
 						view.selectExternalS3Storage();

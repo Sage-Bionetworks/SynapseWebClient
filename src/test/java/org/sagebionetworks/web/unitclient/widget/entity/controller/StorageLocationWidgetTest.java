@@ -117,6 +117,7 @@ public class StorageLocationWidgetTest {
 		// should remain set to the default config
 		verify(mockView).setSFTPVisible(anyBoolean());
 		verify(mockView).setLoading(false);
+		verify(mockView).setS3StsVisible(false);
 		verifyNoMoreInteractions(mockView);
 
 	}
