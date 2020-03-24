@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 import java.util.List;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Radio;
@@ -99,7 +100,11 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	Div loadingUI;
 	@UiField
 	Div contentUI;
-
+	@UiField
+	CheckBox s3StsField;
+	@UiField
+	Div s3StsUI;
+	
 	Widget widget;
 	Presenter presenter;
 
@@ -315,6 +320,19 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	@Override
 	public void setS3Bucket(String bucket) {
 		s3BucketField.setValue(bucket);
+	}
+	@Override
+	public void setS3StsEnabled(boolean stsEnabled) {
+		s3StsField.setValue(stsEnabled);
+	}
+	@Override
+	public boolean getS3StsEnabled() {
+		return s3StsField.getValue();
+	}
+
+	@Override
+	public void setS3StsVisible(boolean visible) {
+		s3StsUI.setVisible(visible);
 	}
 
 	@Override

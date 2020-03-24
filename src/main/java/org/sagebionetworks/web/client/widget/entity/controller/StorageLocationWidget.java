@@ -87,11 +87,15 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 				// if null, then still show the default UI
 				if (location != null) {
 					// set up the view
+					boolean isInAlpha = DisplayUtils.isInTestWebsite(cookies);
 					String banner = trim(location.getBanner());
 					if (location instanceof ExternalS3StorageLocationSetting) {
 						ExternalS3StorageLocationSetting setting = (ExternalS3StorageLocationSetting) location;
+						boolean isStsEnabled = setting.getStsEnabled() == null ? false : setting.getStsEnabled();
 						view.setS3BaseKey(trim(setting.getBaseKey()));
 						view.setS3Bucket(trim(setting.getBucket()));
+						view.setS3StsVisible(isInAlpha || isStsEnabled);
+						view.setS3StsEnabled(isStsEnabled);
 						view.setExternalS3Banner(banner);
 						view.selectExternalS3Storage();
 					} else if (location instanceof ExternalGoogleCloudStorageLocationSetting) {
@@ -182,6 +186,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 				setting.setBanner(replaceWithNullIfEmptyTrimmedString(view.getExternalS3Banner()));
 				setting.setBucket(replaceWithNullIfEmptyTrimmedString(view.getS3Bucket()));
 				setting.setBaseKey(replaceWithNullIfEmptyTrimmedString(view.getS3BaseKey()));
+				setting.setStsEnabled(view.getS3StsEnabled());
 				setting.setUploadType(UploadType.S3);
 				return setting;
 			} else if (view.isExternalGoogleCloudStorageSelected()) {

@@ -104,4 +104,10 @@ public interface StorageLocationWidgetView {
 	void setSFTPVisible(boolean visible);
 
 	void setLoading(boolean isLoading);
+
+	void setS3StsVisible(boolean visible);
+
+	void setS3StsEnabled(boolean stsEnabled);
+
+	boolean getS3StsEnabled();
 }
