@@ -45,7 +45,7 @@
 								<b:CheckBox ui:field="s3StsField" text="Security Token Service (STS) Enabled" addStyleNames="displayInlineBlock" />
 								<w:HelpWidget
 									helpMarkdown="Using AWS Security Token Service (STS), Synapse can securely grant you temporary AWS credentials with access to data directly in S3.&#10;This can be useful if you want to transfer data in bulk, or allow your compute cluster to read S3 objects using the S3 APIs."
-									addStyleNames="margin-left-5" placement="BOTTOM" href="http://docs.synapse.org/articles/sts_storage_locations.html"/>
+									addStyleNames="margin-left-5" placement="BOTTOM" href="http://docs.synapse.org/articles/aws_sts_storage_locations.html"/>
 									
 							</bh:Div>
 						</bh:Div>
