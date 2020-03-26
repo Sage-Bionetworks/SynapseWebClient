@@ -15,8 +15,6 @@ import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.events.EntitySelectedEvent;
-import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
@@ -34,7 +32,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	private Set<EntityTreeItem> alreadyFetchedEntityChildren;
 	private PortalGinInjector ginInjector;
 	private String currentSelection;
-	EntitySelectedHandler entitySelectedHandler;
 	CallbackP<String> entityClickedHandler;
 	EntityFilter filter = EntityFilter.ALL;
 	SynapseAlert synAlert;
@@ -214,14 +211,10 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		return currentSelection;
 	}
 
-	public void setEntitySelectedHandler(EntitySelectedHandler handler) {
-		entitySelectedHandler = handler;
+	public void setEntitySelectedHandler(CallbackP<String> entityClickedHandler) {
 		// if adding a selection handler, then the component user want to make this selectable
 		makeSelectable();
-	}
-
-	public EntitySelectedHandler getEntitySelectedHandler() {
-		return entitySelectedHandler;
+		setEntityClickedHandler(entityClickedHandler);
 	}
 
 	public void setEntityClickedHandler(CallbackP<String> entityClickedHandler) {
@@ -256,8 +249,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	}
 
 	public void fireEntitySelectedEvent() {
-		if (entitySelectedHandler != null) {
-			entitySelectedHandler.onSelection(new EntitySelectedEvent(getSelected()));
+		if (entityClickedHandler != null) {
+			entityClickedHandler.invoke(getSelected());
 		}
 	}
 
@@ -277,7 +270,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 
 		return request;
 	}
-
 	public EntityTreeItem makeTreeItemFromQueryResult(EntityHeader header, boolean isRootItem, boolean isExpandable) {
 		final EntityTreeItem childItem = ginInjector.getEntityTreeItemWidget();
 		childItem.configure(header, isRootItem, isExpandable);
