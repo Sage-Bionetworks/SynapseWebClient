@@ -39,13 +39,13 @@
 		<repository>
 			<id>sagebionetworks-releases-local</id>
 			<name>sagebionetworks-releases-local</name>
-			<url>http://sagebionetworks.jfrog.io/sagebionetworks/libs-releases-local
+			<url>httpss://sagebionetworks.jfrog.io/sagebionetworks/libs-releases-local
 			</url>
 		</repository>
 		<repository>
 			<id>sagebionetworks-ext</id>
 			<name>sagebionetworks-releases-ext</name>
-			<url>http://sagebionetworks.jfrog.io/sagebionetworks/ext-releases-local
+			<url>https://sagebionetworks.jfrog.io/sagebionetworks/ext-releases-local
 			</url>
 		</repository>
 		<repository>
@@ -58,7 +58,7 @@
 		</repository>
 		<repository>
 			<id>maven-central-rep-1</id>
-			<url>http://repo1.maven.org/maven2/</url>
+			<url>https://repo1.maven.org/maven2/</url>
 		</repository>
 		<repository>
 			<id>sun-maven-repository</id>
@@ -74,7 +74,7 @@
 	<pluginRepositories>
 		<pluginRepository>
 			<id>sagebionetworks-plugins-releases-local</id>
-			<url>http://sagebionetworks.jfrog.io/sagebionetworks/plugins-releases-local/
+			<url>https://sagebionetworks.jfrog.io/sagebionetworks/plugins-releases-local/
 			</url>
 			<snapshots>
 				<enabled>true</enabled>
@@ -85,7 +85,7 @@
 		</pluginRepository>
 		<pluginRepository>
 			<id>Maven Repo 1</id>
-			<url>http://repo1.maven.org/maven2/</url>
+			<url>https://repo1.maven.org/maven2/</url>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
@@ -619,13 +619,13 @@
 		<repository>
 			<id>sagebionetworks</id>
 			<name>sagebionetworks-releases</name>
-			<url>http://sagebionetworks.jfrog.io/sagebionetworks/libs-releases-local
+			<url>https://sagebionetworks.jfrog.io/sagebionetworks/libs-releases-local
 			</url>
 		</repository>
 		<snapshotRepository>
 			<id>sagebionetworks</id>
 			<name>sagebionetworks-snapshots</name>
-			<url>http://sagebionetworks.jfrog.io/sagebionetworks/libs-snapshots-local
+			<url>https://sagebionetworks.jfrog.io/sagebionetworks/libs-snapshots-local
 			</url>
 			<uniqueVersion>false</uniqueVersion>
 		</snapshotRepository>
