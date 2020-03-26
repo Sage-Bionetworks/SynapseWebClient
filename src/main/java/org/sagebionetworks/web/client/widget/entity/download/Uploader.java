@@ -684,7 +684,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED + ": " + caught.getMessage());
+				view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED + caught.getMessage());
 			}
 		};
 	}
@@ -693,7 +693,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		try {
 			synapseClient.updateExternalFile(entityId, path, name, contentType, fileSize, md5, storageLocationId, getExternalFileUpdatedCallback());
 		} catch (Throwable t) {
-			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
+			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED + t.getMessage());
 		}
 	}
 
@@ -701,7 +701,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		try {
 			synapseClient.createExternalFile(currentFileParentEntityId, path, name, contentType, fileSize, md5, storageLocationId, getExternalFileUpdatedCallback());
 		} catch (RestServiceException e) {
-			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
+			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED + e.getMessage());
 		}
 	}
 
