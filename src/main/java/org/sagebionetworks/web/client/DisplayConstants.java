@@ -73,7 +73,7 @@ public class DisplayConstants {
 	public static final String LINK_TO_URL = "Link to URL";
 	public static final String TEXT_LINK_FILE = "Link File";
 	public static final String TEXT_LINK_SUCCESS = "Link successfully updated in Synapse";
-	public static final String TEXT_LINK_FAILED = "An error occurred while creating the link. Please check the URL and try again.";
+	public static final String TEXT_LINK_FAILED = "An error occurred while creating the link.  ";
 	public static final String TEXT_UPLOAD_SUCCESS = "File successfully uploaded";
 	public static final String ERROR_UPLOAD_TITLE = "Upload Error";
 	public static final String LABEL_UPLOADING = "Uploading...";
