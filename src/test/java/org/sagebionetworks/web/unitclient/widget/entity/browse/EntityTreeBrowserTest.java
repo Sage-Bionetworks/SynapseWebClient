@@ -38,8 +38,6 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.events.EntitySelectedEvent;
-import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
@@ -255,14 +253,13 @@ public class EntityTreeBrowserTest {
 
 	@Test
 	public void testEntitySelectedHandler() {
-		EntitySelectedHandler handler = mock(EntitySelectedHandler.class);
-		assertNull(entityTreeBrowser.getEntitySelectedHandler());
 		// set entity selected handler
-		entityTreeBrowser.setEntitySelectedHandler(handler);
-		assertEquals(handler, entityTreeBrowser.getEntitySelectedHandler());
+		entityTreeBrowser.setEntitySelectedHandler(mockEntityClickedCallback);
+		
 		// verify firing a selection event
-		entityTreeBrowser.fireEntitySelectedEvent();
-		verify(handler).onSelection(any(EntitySelectedEvent.class));
+		entityTreeBrowser.setSelection(TEST_RESULT_ID);
+		
+		verify(mockEntityClickedCallback).invoke(TEST_RESULT_ID);
 	}
 
 	@Test
