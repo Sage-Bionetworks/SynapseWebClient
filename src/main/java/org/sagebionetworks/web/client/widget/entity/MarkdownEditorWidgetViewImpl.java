@@ -120,6 +120,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public AnchorListItem tutorialWizardLink;
 	@UiField
+	public AnchorListItem iduReportLink;
+	@UiField
 	public AnchorListItem teamMembersLink;
 	@UiField
 	public AnchorListItem teamMemberCountLink;
@@ -228,6 +230,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 			supertableLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_API_SUPERTABLE));
 			wikifilesPreviewLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_WIKI_FILES_PREVIEW));
 			tutorialWizardLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TUTORIAL_WIZARD));
+			iduReportLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_INTENDED_DATA_USE_REPORT));
 			registerChallengeTeamLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_REGISTER_CHALLENGE_TEAM));
 			challengeTeamsLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_CHALLENGE_TEAMS));
 			challengeParticipantsLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_CHALLENGE_PARTICIPANTS));

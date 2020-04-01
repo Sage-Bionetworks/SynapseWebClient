@@ -88,6 +88,8 @@ public class WidgetConstants {
 
 	public static final String BUTTON_TEXT_KEY = "buttonText";
 
+	
+	public static final String IDU_REPORT_CONTENT_TYPE = "iduReport";
 	public static final String BUTTON_LINK_CONTENT_TYPE = "buttonlink";
 	public static final String BUTTON_LINK_FRIENDLY_NAME = "Button Link";
 
