@@ -30,7 +30,6 @@ public class OpenSubmissionWidget implements OpenSubmissionWidgetView.Presenter,
 		this.synAlert = synAlert;
 		this.lazyLoadHelper = lazyLoadHelper;
 		view.setSynAlert(synAlert);
-		accessRequirementWidget.hideControls();
 		view.setACTAccessRequirementWidget(accessRequirementWidget);
 		accessRequirementWidget.setReviewAccessRequestsVisible(true);
 		view.setPresenter(this);
