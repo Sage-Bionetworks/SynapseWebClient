@@ -54,7 +54,8 @@
 													addStyleNames="textDecorationNone">Challenges</b:Anchor>
 											</w:ClickableDiv>
 											<w:HelpWidget
-												helpMarkdown="This tab shows you challenges you have registered for.&#10;Challenges are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems."
+												ui:field="challengeHelpWidget"
+												helpMarkdown=""
 												href="http://sagebionetworks.org/platforms/"
 												placement="BOTTOM" />
 										</a>
