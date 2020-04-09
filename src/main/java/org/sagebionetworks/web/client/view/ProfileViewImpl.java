@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.ClickableDiv;
+import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
@@ -61,8 +62,15 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Div certifiedValidatedContainer;
 	@UiField
 	SimplePanel editUserProfilePanel;
-	HTML noChallengesHtml = new HTML("<p>This tab shows you challenges you have registered for.</p>" + "<p><a href=\"http://sagebionetworks.org/challenges/\" target=\"_blank\">Challenges</a> are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.</p>");
-
+	HTML noChallengesHtml = new HTML();
+	public static final String NO_CHALLENGES_HTML = "<p><a href=\"http://sagebionetworks.org/challenges/\" target=\"_blank\">Challenges</a> are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.</p>";
+	
+	@UiField
+	HelpWidget challengeHelpWidget;
+	public static final String CHALLENGE_TAB_HELP_TEXT ="&#10;Challenges are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.";
+	public static final String CHALLENGES_THAT = "This tab shows challenges that ";
+	public static final String IS_REGISTERED_FOR = " is registered for.";
+	
 	@UiField
 	Div userBadgeFooter;
 	////// Tabs
@@ -356,11 +364,17 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		// TODO: use large user component to show profile. set ORCiD
 		userBadge.configure(profile);
 
+		String displayName = DisplayUtils.getDisplayName(profile);
 		if (!isOwner) {
-			setHighlightBoxUser(DisplayUtils.getDisplayName(profile));
+			setHighlightBoxUser(displayName);
 		} else {
 			userBadgeFooter.setVisible(true);
 		}
+		
+		String challengesThatUserIsRegisteredFor = CHALLENGES_THAT + displayName + IS_REGISTERED_FOR;
+		challengeHelpWidget.setHelpMarkdown(challengesThatUserIsRegisteredFor + CHALLENGE_TAB_HELP_TEXT);
+		noChallengesHtml.setHTML("<p>" + challengesThatUserIsRegisteredFor + "</p>" + NO_CHALLENGES_HTML);
+		
 		if (orcIdHref != null && orcIdHref.trim().length() > 0) {
 			orcIdLink.setVisible(true);
 			orcIdLink.setHref(orcIdHref);
