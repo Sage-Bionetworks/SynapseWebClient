@@ -15,9 +15,10 @@ public interface EditProjectMetadataModalView extends IsWidget {
 		 */
 		public void onPrimary();
 	}
-
+	
 	public void configure(String entityName, String alias);
 
+	public void setModifiedCreatedByWidget(IsWidget w);
 	public String getAlias();
 
 	public String getEntityName();

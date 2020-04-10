@@ -205,7 +205,9 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 
 	@Override
 	public void setLastPlace(Place lastPlace) {
-		sessionStorage.setItem(GlobalApplicationStateImpl.LAST_PLACE, appPlaceHistoryMapper.getToken(lastPlace));
+		if (appPlaceHistoryMapper != null) {
+			sessionStorage.setItem(GlobalApplicationStateImpl.LAST_PLACE, appPlaceHistoryMapper.getToken(lastPlace));	
+		}
 	}
 
 	@Override
@@ -229,7 +231,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	 * Private Methods
 	 */
 	private Place getPlaceFromHistoryValue(String historyValue, Place defaultPlace) {
-		if (historyValue != null) {
+		if (historyValue != null && appPlaceHistoryMapper != null) {
 			Place place = appPlaceHistoryMapper.getPlace(historyValue);
 			return place;
 		} else
