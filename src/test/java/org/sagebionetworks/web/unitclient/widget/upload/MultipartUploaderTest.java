@@ -17,6 +17,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.ContentTypeUtils.fixDefaultContentType;
 import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.EMPTY_FILE_ERROR_MESSAGE;
+import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.FILE_NAME_CONTAINS_PLUS_ERROR;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -201,6 +202,15 @@ public class MultipartUploaderTest {
 		uploader.uploadFile(FILE_NAME, CONTENT_TYPE, mockFileBlob, mockHandler, storageLocationId, mockView);
 		verify(mockJsClient, never()).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
 		verify(mockHandler).uploadFailed(EMPTY_FILE_ERROR_MESSAGE + FILE_NAME);
+	}
+
+	@Test
+	public void testDirectUploadFileNameWithPlusSign() throws Exception {
+		setPartsState("0");
+		String fileNameWithPlus = "a+" + FILE_NAME;
+		uploader.uploadFile(fileNameWithPlus, CONTENT_TYPE, mockFileBlob, mockHandler, storageLocationId, mockView);
+		verify(mockJsClient, never()).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockHandler).uploadFailed(FILE_NAME_CONTAINS_PLUS_ERROR + fileNameWithPlus);
 	}
 
 	@Test
