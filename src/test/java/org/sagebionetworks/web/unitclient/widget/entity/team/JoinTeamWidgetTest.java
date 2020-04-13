@@ -37,7 +37,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
@@ -69,8 +68,6 @@ public class JoinTeamWidgetTest {
 	WizardProgressWidget mockWizardProgress;
 	TeamMembershipStatus status;
 	@Mock
-	CookieProvider mockCookies;
-	@Mock
 	SynapseAlert mockSynAlert;
 
 	@Before
@@ -94,11 +91,12 @@ public class JoinTeamWidgetTest {
 		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(currentUserProfile);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		AsyncMockStubber.callSuccessWith(new HashMap()).when(mockSynapseClient).getPageNameToWikiKeyMap(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).hasAccess(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(ars).when(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
 
 
-		joinWidget = new JoinTeamWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockGwt, mockWikiPageWidget, mockWizardProgress, mockSynAlert, mockCookies);
+		joinWidget = new JoinTeamWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockGwt, mockWikiPageWidget, mockWizardProgress, mockSynAlert);
 		status = new TeamMembershipStatus();
 		status.setHasOpenInvitation(false);
 		status.setCanJoin(false);
@@ -211,7 +209,7 @@ public class JoinTeamWidgetTest {
 		ars.add(terms);
 		joinWidget.sendJoinRequestStep0();
 		verify(mockView).setButtonsEnabled(true);
-		verify(mockView).showJoinWizard();
+		verify(mockView).showJoinWizard(false);
 		verify(mockWizardProgress).configure(Mockito.anyInt(), Mockito.anyInt());
 		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
 		verify(mockView).setAccessRequirementHTML("");
@@ -230,7 +228,7 @@ public class JoinTeamWidgetTest {
 		ars.add(terms);
 		joinWidget.sendJoinRequestStep0();
 		verify(mockView).setButtonsEnabled(true);
-		verify(mockView).showJoinWizard();
+		verify(mockView).showJoinWizard(false);
 		verify(mockWizardProgress).configure(Mockito.anyInt(), Mockito.anyInt());
 		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
 		verify(mockView).setAccessRequirementHTML("");
@@ -249,7 +247,7 @@ public class JoinTeamWidgetTest {
 		ars.add(terms);
 		joinWidget.sendJoinRequestStep0();
 		verify(mockView).setButtonsEnabled(true);
-		verify(mockView).showJoinWizard();
+		verify(mockView).showJoinWizard(false);
 		verify(mockWizardProgress).configure(Mockito.anyInt(), Mockito.anyInt());
 		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
 		verify(mockView).setAccessRequirementHTML("");
@@ -281,7 +279,7 @@ public class JoinTeamWidgetTest {
 		joinWidget.sendJoinRequestStep0();
 		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
 		// no ARs shown...
-		verify(mockView, never()).showJoinWizard();
+		verify(mockView, never()).showJoinWizard(false);
 		verify(mockView).hideJoinWizard();
 		// no accessRequirements, so else should not be executed
 		verify(mockWizardProgress, never()).configure(Mockito.anyInt(), Mockito.anyInt());
@@ -294,6 +292,7 @@ public class JoinTeamWidgetTest {
 		boolean isChallengeSignup = true;
 		joinWidget.configure(teamId, isChallengeSignup, status, mockTeamUpdatedCallback, null, null, null, null, false);
 		joinWidget.sendJoinRequestStep0();
+		verify(mockView).showJoinWizard(true);
 		// one page for the AR
 		Assert.assertEquals(1, joinWidget.getTotalPageCount());
 
