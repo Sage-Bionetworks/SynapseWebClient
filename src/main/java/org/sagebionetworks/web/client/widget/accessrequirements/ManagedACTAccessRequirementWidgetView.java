@@ -66,6 +66,9 @@ public interface ManagedACTAccessRequirementWidgetView extends IsWidget, Support
 	void showExpirationDate(String dateString);
 
 	void showLoginButton();
+	
+	void setAccessRequirementIDVisible(boolean visible);
+	void setAccessRequirementID(String arID);
 
 	/**
 	 * Presenter interface

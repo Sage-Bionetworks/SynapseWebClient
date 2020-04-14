@@ -15,6 +15,11 @@
 				<g:InlineLabel styleName="font-size-18"
 					text="Access to these data is Controlled Use" />
 			</bh:Div>
+			<bh:Div ui:field="accessRequirementIDUI" visible="false">
+				<g:InlineLabel styleName="boldText"
+					text="Access Requirement ID:" addStyleNames="margin-right-5"/>
+				<g:InlineLabel ui:field="accessRequirementIDField" />
+			</bh:Div>
 			<bh:Div ui:field="approvedHeading" visible="false">
 				<g:InlineLabel styleName="boldText"
 					text="You have access to these data under the following terms:" />

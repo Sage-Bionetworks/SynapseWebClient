@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -70,6 +71,10 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 	Span expirationUI;
 	@UiField
 	Text expirationDateText;
+	@UiField
+	Div accessRequirementIDUI;
+	@UiField
+	InlineLabel accessRequirementIDField;
 
 	Callback onAttachCallback;
 
@@ -280,5 +285,13 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 	public void setIDUReportButton(IsWidget w) {
 		iduReportButtonContainer.clear();
 		iduReportButtonContainer.add(w);
+	}
+	@Override
+	public void setAccessRequirementID(String arID) {
+		accessRequirementIDField.setText(arID);
+	}
+	@Override
+	public void setAccessRequirementIDVisible(boolean visible) {
+		accessRequirementIDUI.setVisible(visible);		
 	}
 }
