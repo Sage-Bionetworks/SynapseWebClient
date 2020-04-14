@@ -30,6 +30,8 @@ public interface ACTAccessApprovalsView extends IsWidget, SynapseView {
 	void setClearAccessRequirementFilterButtonVisible(boolean visible);
 
 	void resetExportButton();
+	
+	void export(ArrayList<AccessorGroup> exportData);
 
 	public interface Presenter {
 		void onClearUserFilter();
@@ -40,6 +42,6 @@ public interface ACTAccessApprovalsView extends IsWidget, SynapseView {
 
 		void onExpiresBeforeDateSelected(Date selectedDate);
 
-		ArrayList<AccessorGroup> getExportData();
+		void onExportData();
 	}
 }
