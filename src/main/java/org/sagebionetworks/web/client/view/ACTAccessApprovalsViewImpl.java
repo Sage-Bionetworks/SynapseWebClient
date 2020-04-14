@@ -86,7 +86,7 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 			presenter.onExpiresBeforeDateSelected(expiresBeforeDatePicker.getValue());
 		});
 		exportButton.addClickHandler(event -> {
-			export(presenter.getExportData());
+			presenter.onExportData();
 		});
 	}
 

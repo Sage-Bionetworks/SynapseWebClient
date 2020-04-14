@@ -20,7 +20,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -49,7 +48,6 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private WizardProgressWidget progressWidget;
 	private SynapseAlert synAlert;
 	private GWTWrapper gwt;
-	private CookieProvider cookies;
 	private String teamId;
 	private boolean isChallengeSignup;
 	private AuthenticationController authenticationController;
@@ -66,7 +64,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	String accessRequirementsUrl;
 
 	@Inject
-	public JoinTeamWidget(JoinTeamWidgetView view, SynapseClientAsync synapseClient, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController, GWTWrapper gwt, MarkdownWidget wikiPage, WizardProgressWidget progressWidget, SynapseAlert synAlert, CookieProvider cookies) {
+	public JoinTeamWidget(JoinTeamWidgetView view, SynapseClientAsync synapseClient, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController, GWTWrapper gwt, MarkdownWidget wikiPage, WizardProgressWidget progressWidget, SynapseAlert synAlert) {
 		this.view = view;
 		view.setPresenter(this);
 		this.synapseClient = synapseClient;
@@ -77,7 +75,6 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.wikiPage = wikiPage;
 		this.progressWidget = progressWidget;
 		this.synAlert = synAlert;
-		this.cookies = cookies;
 		view.setProgressWidget(progressWidget);
 		view.setSynAlert(synAlert);
 	}
@@ -236,7 +233,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 					startChallengeSignup();
 				} else { // skip to step 2
 					if (accessRequirements.size() > 0) {
-						view.showJoinWizard();
+						view.showJoinWizard(false);
 					}
 					sendJoinRequestStep2();
 				}
@@ -255,7 +252,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		CallbackP<WikiPageKey> callback = new CallbackP<WikiPageKey>() {
 			@Override
 			public void invoke(WikiPageKey key) {
-				view.showJoinWizard();
+				view.showJoinWizard(true);
 				sendJoinRequestStep1(key);
 			}
 		};

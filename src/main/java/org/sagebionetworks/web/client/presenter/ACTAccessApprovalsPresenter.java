@@ -55,7 +55,8 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 	GlobalApplicationState globalAppState;
 	String accessRequirementId;
 	ArrayList<AccessorGroup> allExportData;
-
+	boolean isLoadingAllData;
+	
 	@Inject
 	public ACTAccessApprovalsPresenter(final ACTAccessApprovalsView view, SynapseAlert synAlert, PortalGinInjector ginInjector, LoadMoreWidgetContainer loadMoreContainer, final Button showHideAccessRequirementButton, DataAccessClientAsync dataAccessClient, SynapseSuggestBox peopleSuggestWidget, UserGroupSuggestionProvider provider, UserBadge selectedUserBadge, AccessRequirementWidget accessRequirementWidget, GlobalApplicationState globalAppState) {
 		this.view = view;
@@ -149,11 +150,12 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 		allExportData = new ArrayList<>();
 		loadMoreContainer.clear();
 		accessorGroupRequest.setNextPageToken(null);
+		isLoadingAllData = false;
+		view.resetExportButton();
 		loadMore();
 	}
 
 	public void loadMore() {
-		view.resetExportButton();
 		synAlert.clear();
 		dataAccessClient.listAccessorGroup(accessorGroupRequest, new AsyncCallback<AccessorGroupResponse>() {
 			@Override
@@ -173,6 +175,13 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 				boolean isMore = response.getNextPageToken() != null;
 				loadMoreContainer.setIsMore(isMore);
 				allExportData.addAll(response.getResults());
+				// as soon as we reach the end of the results, automatically set up the export file
+				if (!isMore) {
+					view.export(allExportData);
+				}
+				if (isMore && isLoadingAllData) {
+					loadMore();
+				}
 			};
 		});
 	}
@@ -236,7 +245,9 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 	}
 
 	@Override
-	public ArrayList<AccessorGroup> getExportData() {
-		return allExportData;
+	public void onExportData() {
+		// gather all pages of data to set up export
+		isLoadingAllData = true;
+		loadMore();
 	}
 }

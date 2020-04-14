@@ -21,7 +21,7 @@ public interface JoinTeamWidgetView extends IsWidget {
 	 */
 	public void setPresenter(Presenter presenter);
 
-	void showJoinWizard();
+	void showJoinWizard(boolean isChallengeSignup);
 
 	void hideJoinWizard();
 

@@ -2,10 +2,10 @@ package org.sagebionetworks.web.unitclient.widget.accessrequirements.submission;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import org.junit.Before;
@@ -95,7 +95,8 @@ public class OpenSubmissionWidgetTest {
 		inOrder.verify(mockSynapseAlert).handleException(captor.capture());
 		Exception exception = captor.getValue();
 		assertTrue(exception instanceof IllegalStateException);
-		verify(mockAccessRequirementWidget).hideControls();
+		//SWC-5171: controls should be shown in OpenSubmissions (in ACTDataAccessSubmissionDashboard)
+		verify(mockAccessRequirementWidget, never()).hideControls();
 		verify(mockAccessRequirementWidget).setReviewAccessRequestsVisible(true);
 		verifyNoMoreInteractions(mockAccessRequirementWidget);
 	}

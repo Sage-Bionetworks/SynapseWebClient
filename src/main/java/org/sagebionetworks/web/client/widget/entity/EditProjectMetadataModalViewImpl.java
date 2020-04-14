@@ -14,6 +14,7 @@ import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -34,6 +35,8 @@ public class EditProjectMetadataModalViewImpl implements EditProjectMetadataModa
 	Button primaryButton;
 	@UiField
 	Div aliasUI;
+	@UiField
+	Div modifiedCreatedByContainer;
 
 	@Inject
 	public EditProjectMetadataModalViewImpl(Binder binder) {
@@ -115,6 +118,12 @@ public class EditProjectMetadataModalViewImpl implements EditProjectMetadataModa
 		this.aliasField.setText(alias);
 	}
 
+	@Override
+	public void setModifiedCreatedByWidget(IsWidget w) {
+		modifiedCreatedByContainer.clear();
+		modifiedCreatedByContainer.add(w);
+	}
+	
 	@Override
 	public String getAlias() {
 		return aliasField.getText();

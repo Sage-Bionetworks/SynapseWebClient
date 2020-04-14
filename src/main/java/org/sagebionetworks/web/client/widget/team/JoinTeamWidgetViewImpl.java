@@ -198,8 +198,10 @@ public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
 	}
 
 	@Override
-	public void showJoinWizard() {
-		joinWizard.configure("Join", "Continue", DisplayConstants.BUTTON_CANCEL, new Dialog.Callback() {
+	public void showJoinWizard(boolean isChallengeSignup) {
+		// SWC-4522: setting Join team dialog title to blank instead of "Join" (since this is not in context for Challenges).
+		String dialogTitle = isChallengeSignup ? "" : "Join";
+		joinWizard.configure(dialogTitle, "Continue", DisplayConstants.BUTTON_CANCEL, new Dialog.Callback() {
 			@Override
 			public void onPrimary() {
 				okButtonCallback.invoke();
@@ -311,6 +313,7 @@ public class JoinTeamWidgetViewImpl implements JoinTeamWidgetView {
 		simpleRequestButton.setText(buttonText);
 		anonUserButton.setText(buttonText);
 		acceptInviteButton.setText(buttonText);
+		requestButton.setText(buttonText);
 	}
 
 	@Override
