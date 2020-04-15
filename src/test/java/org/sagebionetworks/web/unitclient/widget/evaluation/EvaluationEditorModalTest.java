@@ -204,7 +204,7 @@ public class EvaluationEditorModalTest {
 		when(mockView.getRoundStart()).thenReturn(new Date());
 		when(mockView.getSubmissionLimit()).thenReturn(22.0);
 		when(mockView.getNumberOfRounds()).thenReturn(10.0);
-		when(mockView.getRoundDuration()).thenReturn(2000000.0);
+		when(mockView.getRoundDuration()).thenReturn(2000000L);
 
 		modal.onSave();
 

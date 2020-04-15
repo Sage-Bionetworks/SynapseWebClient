@@ -35,7 +35,7 @@ public interface EvaluationEditorModalView extends IsWidget {
 
 	void setRoundDuration(Long roundDurationMs);
 
-	Double getRoundDuration();
+	Long getRoundDuration();
 
 	void setNumberOfRounds(Long numberOfRounds);
 

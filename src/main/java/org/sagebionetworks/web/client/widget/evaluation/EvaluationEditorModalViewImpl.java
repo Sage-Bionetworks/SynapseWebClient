@@ -38,7 +38,14 @@ public class EvaluationEditorModalViewImpl implements EvaluationEditorModalView 
 	@UiField
 	NumberBox numberOfRoundsField;
 	@UiField
-	NumberBox roundDurationField;
+	NumberBox roundDurationDays;
+	@UiField
+	NumberBox roundDurationHours;
+	@UiField
+	NumberBox roundDurationMinutes;
+	@UiField
+	NumberBox roundDurationSeconds;
+	
 	@UiField
 	DateTimePicker roundStartPicker;
 
@@ -160,7 +167,10 @@ public class EvaluationEditorModalViewImpl implements EvaluationEditorModalView 
 		submissionReceiptField.setValue("");
 		submissionLimitField.setValue(null);
 		numberOfRoundsField.setValue(null);
-		roundDurationField.setValue(null);
+		roundDurationDays.setValue(null);
+		roundDurationHours.setValue(null);
+		roundDurationMinutes.setValue(null);
+		roundDurationSeconds.setValue(null);
 		roundStartPicker.setValue(null);
 	}
 
@@ -175,8 +185,9 @@ public class EvaluationEditorModalViewImpl implements EvaluationEditorModalView 
 	}
 
 	@Override
-	public Double getRoundDuration() {
-		return roundDurationField.getNumberValue();
+	public Long getRoundDuration() {
+		DurationHelper duration = new DurationHelper(roundDurationSeconds.getNumberValue(), roundDurationMinutes.getNumberValue(), roundDurationHours.getNumberValue(), roundDurationDays.getNumberValue());
+		return duration.getDurationMs(); 
 	}
 
 	@Override
@@ -191,9 +202,15 @@ public class EvaluationEditorModalViewImpl implements EvaluationEditorModalView 
 
 	@Override
 	public void setRoundDuration(Long roundDurationMs) {
-		roundDurationField.setValue(roundDurationMs.toString());
+		if (roundDurationMs != null) {
+			DurationHelper duration = new DurationHelper(roundDurationMs);
+			roundDurationSeconds.setValue(duration.getSeconds().toString());
+			roundDurationMinutes.setValue(duration.getMinutes().toString());
+			roundDurationHours.setValue(duration.getHours().toString());
+			roundDurationDays.setValue(duration.getDays().toString());
+		}
 	}
-
+	
 	@Override
 	public void setRoundStart(Date roundStart) {
 		roundStartPicker.setValue(roundStart);

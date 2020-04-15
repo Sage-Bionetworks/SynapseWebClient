@@ -62,11 +62,15 @@
 							<w:NumberBox ui:field="numberOfRoundsField" />
 						</b:FormGroup>
 						<b:FormGroup>
-							<b:FormLabel text="Round Duration (ms)" />
-							<w:HelpWidget
-								helpMarkdown="This is in milliseconds. For a round of 7 days, use 604800000. For 1 hour, use 3600000."
-								iconStyles="" />
-							<w:NumberBox ui:field="roundDurationField" />
+							<b:FormLabel text="Round Duration" />
+							<b:FormLabel text="Days" />
+							<w:NumberBox ui:field="roundDurationDays" />
+							<b:FormLabel text="Hours" />
+							<w:NumberBox ui:field="roundDurationHours" />
+							<b:FormLabel text="Minutes" />
+							<w:NumberBox ui:field="roundDurationMinutes" />
+							<b:FormLabel text="Seconds" />
+							<w:NumberBox ui:field="roundDurationSeconds" />
 						</b:FormGroup>
 					</b:PanelBody>
 				</b:Panel>
