@@ -61,17 +61,27 @@
 							<b:FormLabel text="Number of Rounds" />
 							<w:NumberBox ui:field="numberOfRoundsField" />
 						</b:FormGroup>
-						<b:FormGroup>
-							<b:FormLabel text="Round Duration" />
-							<b:FormLabel text="Days" />
-							<w:NumberBox ui:field="roundDurationDays" />
-							<b:FormLabel text="Hours" />
-							<w:NumberBox ui:field="roundDurationHours" />
-							<b:FormLabel text="Minutes" />
-							<w:NumberBox ui:field="roundDurationMinutes" />
-							<b:FormLabel text="Seconds" />
-							<w:NumberBox ui:field="roundDurationSeconds" />
-						</b:FormGroup>
+						<bh:Div addStyleNames="light-border padding-10">
+							<bh:Div addStyleNames="highlight-title">
+								<bh:Text>Round Duration</bh:Text>
+							</bh:Div>
+							<bh:Div marginLeft="10" marginRight="10" marginTop="10">
+								<b:FormGroup>
+									<b:FormLabel text="Days" />
+									<w:NumberBox ui:field="roundDurationDays" />
+								</b:FormGroup>
+									<b:FormLabel text="Hours" />
+									<w:NumberBox ui:field="roundDurationHours" />
+								<b:FormGroup>
+									<b:FormLabel text="Minutes" />
+									<w:NumberBox ui:field="roundDurationMinutes" />
+								</b:FormGroup>
+								<b:FormGroup>
+									<b:FormLabel text="Seconds" />
+									<w:NumberBox ui:field="roundDurationSeconds" />
+								</b:FormGroup>
+							</bh:Div>
+						</bh:Div>
 					</b:PanelBody>
 				</b:Panel>
 			</bh:Div>

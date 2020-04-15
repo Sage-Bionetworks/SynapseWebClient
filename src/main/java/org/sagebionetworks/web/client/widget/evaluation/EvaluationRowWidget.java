@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.evaluation;
 import java.util.HashMap;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormControlStatic;
-import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.evaluation.model.Evaluation;
@@ -45,7 +44,7 @@ public class EvaluationRowWidget implements IsWidget {
 	@UiField
 	Div submitToEvaluationContainer;
 	@UiField
-	Panel quotaUI;
+	Div quotaUI;
 	@UiField
 	FormControlStatic roundStart;
 	@UiField
@@ -122,7 +121,8 @@ public class EvaluationRowWidget implements IsWidget {
 				numberOfRoundsField.setText(quota.getNumberOfRounds().toString());
 			}
 			if (quota.getRoundDurationMillis() != null) {
-				roundDurationField.setText(quota.getRoundDurationMillis().toString());
+				String roundDuration = dateTimeUtils.getFriendlyTimeEstimate(quota.getRoundDurationMillis()/1000);
+				roundDurationField.setText(roundDuration);
 			}
 		}
 		HashMap<String, String> submitToEvaluationParams = new HashMap<>();

@@ -1,17 +1,17 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
 public class DurationHelper {
-	public static final int SECOND_MS = 1000;
-	public static final int MINUTE_MS = 60 * SECOND_MS;
-	public static final int HOUR_MS = 60 * MINUTE_MS;
-	public static final int DAY_MS = 24 * HOUR_MS;
-	private Integer days, hours, minutes, seconds, ms;
+	public static final long SECOND_MS = 1000;
+	public static final long MINUTE_MS = 60 * SECOND_MS;
+	public static final long HOUR_MS = 60 * MINUTE_MS;
+	public static final long DAY_MS = 24 * HOUR_MS;
+	private Long days, hours, minutes, seconds, ms;
 	Long durationMs = null;
 	
 	public DurationHelper(Long durationMs) {
 		this.durationMs = durationMs;
 		if (durationMs != null) {
-			int leftOver = durationMs.intValue();
+			Long leftOver = durationMs.longValue();
 			days = Math.floorDiv(leftOver, DAY_MS);
 			leftOver -= days*DAY_MS;
 			hours = Math.floorDiv(leftOver, HOUR_MS);
@@ -25,34 +25,34 @@ public class DurationHelper {
 	}
 	
 	public DurationHelper(Double secondsDouble, Double minutesDouble, Double hoursDouble, Double daysDouble) {
-		int duration = 0; 
+		long duration = 0; 
 		if (daysDouble != null) {
-			duration += daysDouble.intValue() * DAY_MS;
+			duration += daysDouble * DAY_MS;
 		}
 		if (hoursDouble != null) {
-			duration += hoursDouble.intValue() * HOUR_MS;
+			duration += hoursDouble * HOUR_MS;
 		}
 		if (minutesDouble != null) {
-			duration += minutesDouble.intValue() * MINUTE_MS;
+			duration += minutesDouble * MINUTE_MS;
 		}
 		if (secondsDouble != null) {
-			duration += secondsDouble.intValue() * SECOND_MS;
+			duration += secondsDouble * SECOND_MS;
 		}
 		if (duration > 0) {
-			this.durationMs = new Long(duration);	
+			this.durationMs = duration;	
 		}
 	}
 	
-	public Integer getDays() {
+	public Long getDays() {
 		return days;
 	}
-	public Integer getHours() {
+	public Long getHours() {
 		return hours;
 	}
-	public Integer getMinutes() {
+	public Long getMinutes() {
 		return minutes;
 	}
-	public Integer getSeconds() {
+	public Long getSeconds() {
 		return seconds;
 	}
 	public Long getDurationMs() {
