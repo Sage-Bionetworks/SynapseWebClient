@@ -131,16 +131,23 @@ public class DateTimeUtilsImpl implements DateTimeUtils {
 		long seconds = totalSeconds % 60;
 		long totalMinutes = totalSeconds / 60;
 		long minutes = totalMinutes % 60;
-		long hours = totalMinutes / 60;
+		long totalHours = totalMinutes / 60;
+		long hours = totalHours % 24;
+		long days = totalHours / 24;
+		
 		StringBuilder sb = new StringBuilder();
+		boolean isDays = days > 0;
+		if (isDays) {
+			sb.append(days + " d ");
+		}
 		boolean isHours = hours > 0;
 		if (isHours) {
 			sb.append(hours + " h ");
 		}
-		if (minutes > 0) {
+		if (!isDays && minutes > 0) {
 			sb.append(minutes + " min ");
 		}
-		if (!isHours && (seconds > 0 || sb.toString().isEmpty())) {
+		if (!isDays && !isHours && (seconds > 0 || sb.toString().isEmpty())) {
 			sb.append(seconds + " s");
 		}
 		return sb.toString().trim();
