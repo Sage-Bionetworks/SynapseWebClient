@@ -70,8 +70,10 @@
 									<b:FormLabel text="Days" />
 									<w:NumberBox ui:field="roundDurationDays" />
 								</b:FormGroup>
+								<b:FormGroup>
 									<b:FormLabel text="Hours" />
 									<w:NumberBox ui:field="roundDurationHours" />
+								</b:FormGroup>
 								<b:FormGroup>
 									<b:FormLabel text="Minutes" />
 									<w:NumberBox ui:field="roundDurationMinutes" />
