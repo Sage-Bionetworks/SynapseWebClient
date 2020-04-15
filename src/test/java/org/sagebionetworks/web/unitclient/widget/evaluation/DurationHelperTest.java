@@ -1,54 +1,36 @@
 package org.sagebionetworks.web.unitclient.widget.evaluation;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import java.util.HashMap;
-import org.junit.Before;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InOrder;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.sagebionetworks.repo.model.Challenge;
-import org.sagebionetworks.web.client.ChallengeClientAsync;
-import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
-import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidget;
-import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidgetView;
 import org.sagebionetworks.web.client.widget.evaluation.DurationHelper;
-import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
-import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
-import org.sagebionetworks.web.shared.WidgetConstants;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DurationHelperTest {
 
-	DurationHelper durationHelper;
-	
 	@Test
 	public void testNullMs() {
-		durationHelper = new DurationHelper(null);
+		DurationHelper durationHelper = new DurationHelper(null);
 		assertNull(durationHelper.getDurationMs());
 	}
 	@Test
-	public void testMs() {
-		// 5 days
-		durationHelper = new DurationHelper(432000000L);
+	public void testRoundTrip() {
+		// used external service (https://www.epochconverter.com/) to figure out ms between current time and a known amount in the future...
+		Long knownDuration = 93784000L;
+		DurationHelper durationHelper = new DurationHelper(knownDuration);
+		assertEquals(1, durationHelper.getDays().intValue());
+		assertEquals(2, durationHelper.getHours().intValue());
+		assertEquals(3, durationHelper.getMinutes().intValue());
+		assertEquals(4, durationHelper.getSeconds().intValue());
 		
-		assertEquals(5, durationHelper.getDays().intValue());
+		// seconds, minutes, hours, days
+		durationHelper = new DurationHelper(4.0, 3.0, 2.0, 1.0);
+		assertEquals(knownDuration, durationHelper.getDurationMs());
+		
+		// try setting some values to null
+		durationHelper = new DurationHelper(4.0, null, 2.0, null);
+		assertEquals(7204000L, durationHelper.getDurationMs().longValue());
 	}
-
 }
