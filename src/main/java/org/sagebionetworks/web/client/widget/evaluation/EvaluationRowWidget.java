@@ -121,8 +121,7 @@ public class EvaluationRowWidget implements IsWidget {
 				numberOfRoundsField.setText(quota.getNumberOfRounds().toString());
 			}
 			if (quota.getRoundDurationMillis() != null) {
-				String roundDuration = dateTimeUtils.getFriendlyTimeEstimate(quota.getRoundDurationMillis()/1000);
-				roundDurationField.setText(roundDuration);
+				roundDurationField.setText(new DurationHelper(quota.getRoundDurationMillis()).toString());
 			}
 		}
 		HashMap<String, String> submitToEvaluationParams = new HashMap<>();

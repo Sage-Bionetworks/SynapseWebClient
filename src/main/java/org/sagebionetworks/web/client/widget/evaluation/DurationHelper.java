@@ -58,4 +58,22 @@ public class DurationHelper {
 	public Long getDurationMs() {
 		return durationMs;
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		if (days != null && days > 0) {
+			sb.append(days + " d ");
+		}
+		if (hours != null && hours > 0) {
+			sb.append(hours + " h ");
+		}
+		if (minutes != null && minutes > 0) {
+			sb.append(minutes + " min ");
+		}
+		if (seconds != null && (seconds > 0 || sb.toString().isEmpty())) {
+			sb.append(seconds + " s");
+		}
+		return sb.toString();
+	}
 }
