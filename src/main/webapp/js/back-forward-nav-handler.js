@@ -7,12 +7,14 @@
 // See https://stackoverflow.com/questions/25806608/how-to-detect-browser-back-button-event-cross-browser
 // Investigated using new Navigation API (which does not work for SPA), or popstate (which fires on place change or browser back/forward nav).
 
-document.onmouseover = function() {
+var body = document.getElementsByTagName("BODY")[0];
+
+body.onmouseenter = function() {
 	//User's mouse is inside the page.
 	window.innerDocClick = true;
 }
 
-document.onmouseleave = function() {
+body.onmouseleave = function() {
 	//User's mouse has left the page.
 	window.innerDocClick = false;
 }
