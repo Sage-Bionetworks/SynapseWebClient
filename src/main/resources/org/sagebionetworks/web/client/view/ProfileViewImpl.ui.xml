@@ -200,15 +200,6 @@
 											</b:BlockQuote>
 										</g:FlowPanel>
 									</div>
-									<b:Container fluid="true">
-										<b:Row>
-											<b:Column size="XS_12">
-												<b:Anchor
-													href="http://docs.synapse.org/articles/making_a_project.html"
-													target="_blank" text="What's a Project?" />
-											</b:Column>
-										</b:Row>
-									</b:Container>
 								</div>
 								<div class="tab-background margin-10"
 									ui:field="challengesTabContainer">
