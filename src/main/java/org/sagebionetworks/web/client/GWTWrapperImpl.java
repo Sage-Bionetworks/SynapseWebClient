@@ -150,11 +150,13 @@ public class GWTWrapperImpl implements GWTWrapper {
 
 	@Override
 	public void newItem(String historyToken, boolean issueEvent) {
+		SynapseJSNIUtilsImpl._setIsInnerProgrammaticHistoryChange();
 		History.newItem(historyToken, issueEvent);
 	}
 
 	@Override
 	public void replaceItem(String historyToken, boolean issueEvent) {
+		SynapseJSNIUtilsImpl._setIsInnerProgrammaticHistoryChange();
 		History.replaceItem(historyToken, issueEvent);
 	}
 

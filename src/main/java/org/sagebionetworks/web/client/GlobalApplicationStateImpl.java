@@ -148,6 +148,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			placeChanger = new PlaceChanger() {
 				@Override
 				public void goTo(Place place) {
+					synapseJSNIUtils.setIsInnerProgrammaticHistoryChange();
 					// If we are not already on this page, go there.
 					if (!placeController.getWhere().equals(place)) {
 						try {

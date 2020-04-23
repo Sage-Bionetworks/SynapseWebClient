@@ -119,4 +119,6 @@ public interface SynapseJSNIUtils {
 	String getVersionsServletUrl();
 
 	long getLastModified(JavaScriptObject blob);
+
+	void setIsInnerProgrammaticHistoryChange();
 }
