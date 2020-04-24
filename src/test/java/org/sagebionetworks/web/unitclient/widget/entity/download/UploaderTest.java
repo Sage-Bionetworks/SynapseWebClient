@@ -295,13 +295,14 @@ public class UploaderTest {
 		when(mockSynapseJsniUtils.getMultipleUploadFileNames(mockFileList)).thenReturn(fileNames);
 		AsyncMockStubber.callSuccessWith(testEntity).when(mockSynapseJavascriptClient).getEntity(anyString(), any(OBJECT_TYPE.class), any(AsyncCallback.class));
 		uploader.handleUploads();
+		verify(mockGlobalApplicationState).clearDropZoneHandler(); // SWC-5161 (cleared on handleUploads)
+		verify(mockView).disableSelectionDuringUpload();
 		verify(mockSynapseClient).setFileEntityFileHandle(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).hideLoading();
 		assertEquals(UploadType.S3, uploader.getCurrentUploadType());
 		// verify upload success
 		verify(mockView).showInfo(DisplayConstants.TEXT_UPLOAD_SUCCESS);
 		verify(mockView).clear();
-		verify(mockGlobalApplicationState).clearDropZoneHandler();
 		verify(mockView, times(2)).resetToInitialState();
 		verify(mockUploadSuccessHandler).onSuccessfulUpload();
 		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
@@ -361,7 +362,6 @@ public class UploaderTest {
 		uploader.cancelClicked();
 
 		verify(mockView).clear();
-		verify(mockGlobalApplicationState).clearDropZoneHandler();
 		verify(mockCancelHandler).onCancel();
 		assertTrue(multipartUploader.isCanceled());
 	}

@@ -192,6 +192,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 
 	public void handleUploads(JavaScriptObject fileList) {
+		// SWC-5161: can't drag/drop another file set while this file list is being uploaded.
+		globalAppState.clearDropZoneHandler();
+		view.disableSelectionDuringUpload();
 		this.fileList = fileList;
 		view.setSelectedFilenames(getSelectedFilesText());
 		fileNames = synapseJsniUtils.getMultipleUploadFileNames(fileList);
@@ -827,7 +830,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		multiPartUploader.cancelUpload();
 		view.hideLoading();
 		view.clear();
-		globalAppState.clearDropZoneHandler();
 		if (cancelHandler != null) {
 			cancelHandler.onCancel();
 		}
@@ -837,7 +839,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private void uploadSuccess() {
 		view.showInfo(DisplayConstants.TEXT_UPLOAD_SUCCESS);
 		view.clear();
-		globalAppState.clearDropZoneHandler();
 		view.resetToInitialState();
 		resetUploadProgress();
 		if (successHandler != null) {
