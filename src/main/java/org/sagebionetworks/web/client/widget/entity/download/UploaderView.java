@@ -95,4 +95,6 @@ public interface UploaderView extends IsWidget, SynapseView, HasAttachHandlers {
 
 		Long getStorageLocationId();
 	}
+
+	void disableSelectionDuringUpload();
 }
