@@ -18,6 +18,7 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
 	private String columnName;
 	private ColumnTypeViewEnum columnType;
 	private String maxSize;
+	private String maxListLength;
 	private String defaultValue;
 	private boolean isSelected;
 	private SelectionPresenter selectionPresenter;
@@ -46,6 +47,14 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
 
 	public void setMaxSize(String maxSize) {
 		this.maxSize = maxSize;
+	}
+	
+	public String getMaxListLength() {
+		return maxListLength;
+	}
+	
+	public void setMaxListLength(String maxListLength) {
+		this.maxListLength = maxListLength;
 	}
 
 	public String getDefaultValue() {

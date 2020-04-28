@@ -69,7 +69,6 @@ public class ColumnModelTableRowEditorWidgetTest {
 		verify(mockView).setMaxSize("" + ColumnModelTableRowEditorWidgetImpl.DEFAULT_STRING_SIZE);
 		verify(mockView).setDefaultEditor(mockStringEditor);
 		verify(mockView).setColumnType(ColumnTypeViewEnum.String);
-		verify(mockView).clearSizeError();
 		verify(mockView).setRestrictValuesVisible(true);
 	}
 
@@ -159,65 +158,6 @@ public class ColumnModelTableRowEditorWidgetTest {
 	}
 
 	@Test
-	public void testValidateSize() {
-		// integers do not have a size so they are always valid
-		when(mockView.getColumnType()).thenReturn(ColumnTypeViewEnum.Integer);
-		when(mockView.getMaxSize()).thenThrow(new IllegalArgumentException("Should not be hit"));
-		assertTrue(editor.validateSize());
-		verify(mockView).clearSizeError();
-	}
-
-	@Test
-	public void testValidateStringTooSmall() {
-		// integers do not have a size so they are always valid
-		when(mockView.getColumnType()).thenReturn(ColumnTypeViewEnum.String);
-		when(mockView.getMaxSize()).thenReturn("0");
-		assertFalse(editor.validateSize());
-		verify(mockView).setSizeError(ColumnModelTableRowEditorWidgetImpl.MUST_BE_A_NUMBER);
-		verify(mockView, never()).clearSizeError();
-	}
-
-	@Test
-	public void testValidateStringTooLarge() {
-		// integers do not have a size so they are always valid
-		when(mockView.getColumnType()).thenReturn(ColumnTypeViewEnum.String);
-		when(mockView.getMaxSize()).thenReturn("" + ColumnModelTableRowEditorWidgetImpl.MAX_STRING_SIZE + 1);
-		assertFalse(editor.validateSize());
-		verify(mockView).setSizeError(ColumnModelTableRowEditorWidgetImpl.MUST_BE_A_NUMBER);
-		verify(mockView, never()).clearSizeError();
-	}
-
-	@Test
-	public void testValidateStringNotANumber() {
-		// integers do not have a size so they are always valid
-		when(mockView.getColumnType()).thenReturn(ColumnTypeViewEnum.String);
-		when(mockView.getMaxSize()).thenReturn("not a number");
-		assertFalse(editor.validateSize());
-		verify(mockView).setSizeError(ColumnModelTableRowEditorWidgetImpl.MUST_BE_A_NUMBER);
-		verify(mockView, never()).clearSizeError();
-	}
-
-	@Test
-	public void testValidateString() {
-		// integers do not have a size so they are always valid
-		when(mockView.getColumnType()).thenReturn(ColumnTypeViewEnum.String);
-		when(mockView.getMaxSize()).thenReturn("" + ColumnModelTableRowEditorWidgetImpl.MAX_STRING_SIZE);
-		assertTrue(editor.validateSize());
-		verify(mockView, never()).setSizeError(anyString());
-		verify(mockView).clearSizeError();
-	}
-
-	@Test
-	public void testValidateLinkTooLarge() {
-		// integers do not have a size so they are always valid
-		when(mockView.getColumnType()).thenReturn(ColumnTypeViewEnum.Link);
-		when(mockView.getMaxSize()).thenReturn("" + ColumnModelTableRowEditorWidgetImpl.MAX_STRING_SIZE + 1);
-		assertFalse(editor.validateSize());
-		verify(mockView).setSizeError(ColumnModelTableRowEditorWidgetImpl.MUST_BE_A_NUMBER);
-		verify(mockView, never()).clearSizeError();
-	}
-
-	@Test
 	public void testValidateBadName() {
 		when(mockView.getColumnType()).thenReturn(ColumnTypeViewEnum.String);
 		when(mockView.getColumnName()).thenReturn("");
@@ -226,14 +166,8 @@ public class ColumnModelTableRowEditorWidgetTest {
 		assertFalse(editor.validate());
 	}
 
-	@Test
-	public void testValidateBadSize() {
-		when(mockView.getColumnType()).thenReturn(ColumnTypeViewEnum.String);
-		when(mockView.getColumnName()).thenReturn("foo");
-		when(mockView.getMaxSize()).thenReturn("not a numbers");
-		when(mockView.validateDefault()).thenReturn(true);
-		assertFalse(editor.validate());
-	}
+	// Note: Max size editor now only support numbers (no alpha characters). No longer need to test for non-number values from the editor.
+//	public void testValidateBadSize() { ...
 
 	@Test
 	public void testValidateBadDefault() {
