@@ -20,6 +20,10 @@
 				width="75px" />
 		</t:TableData>
 		<t:TableData>
+			<b:FormControlStatic ui:field="maxListLength"
+				width="75px" />
+		</t:TableData>
+		<t:TableData>
 			<b:FormControlStatic ui:field="defaultValue" />
 		</t:TableData>
 		<t:TableData>

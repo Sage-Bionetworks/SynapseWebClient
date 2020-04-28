@@ -28,6 +28,8 @@ public class ColumnModelTableRowViewerImpl extends AbstractColumnModelTableRow i
 	@UiField
 	FormControlStatic maxSize;
 	@UiField
+	FormControlStatic maxListLength;
+	@UiField
 	FormControlStatic defaultValue;
 	@UiField
 	FormControlStatic restrictValues;
@@ -59,6 +61,11 @@ public class ColumnModelTableRowViewerImpl extends AbstractColumnModelTableRow i
 		return maxSize.getText();
 	}
 
+	@Override
+	public String getMaxListLength() {
+		return maxListLength.getText();
+	}
+	
 	@Override
 	public String getDefaultValue() {
 		return defaultValue.getText();
@@ -94,6 +101,11 @@ public class ColumnModelTableRowViewerImpl extends AbstractColumnModelTableRow i
 		this.maxSize.setText(maxSize);
 	}
 
+	@Override
+	public void setMaxListLength(String maxListLength) {
+		this.maxListLength.setText(maxListLength);
+	}
+	
 	@Override
 	public void setDefaultValue(String defaultValue) {
 		this.defaultValue.setText(defaultValue);

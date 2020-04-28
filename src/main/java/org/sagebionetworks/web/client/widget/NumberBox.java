@@ -25,6 +25,14 @@ public class NumberBox extends TextBox {
 
 		getElement().setAttribute("type", "number");
 	}
+	
+	public void setMin(String min) {
+		getElement().setAttribute("min", min);
+	}
+
+	public void setMax(String max) {
+		getElement().setAttribute("max", max);
+	}
 
 	public Double getNumberValue() {
 		String v = getValue();

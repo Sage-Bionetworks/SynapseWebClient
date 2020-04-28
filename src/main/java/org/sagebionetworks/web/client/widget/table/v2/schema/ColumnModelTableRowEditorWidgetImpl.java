@@ -19,8 +19,6 @@ import com.google.inject.Inject;
  *
  */
 public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowEditorWidget, ColumnModelTableRowEditorView.TypePresenter {
-
-	public static final String MUST_BE_A_NUMBER = "Must be: 1 - 1000";
 	public static final String NAME_CANNOT_BE_EMPTY = "Name cannot be empty";
 	public static final int DEFAULT_STRING_SIZE = 50;
 	public static final int MAX_STRING_SIZE = 1000;
@@ -59,10 +57,16 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 			view.setMaxSize(null);
 			view.setSizeFieldVisible(false);
 		}
+		if (canHaveMaxListLength(newType)) {
+			view.setMaxListLength("100");
+			view.setMaxListLengthFieldVisible(true);
+		} else {
+			view.setMaxListLength(null);
+			view.setMaxListLengthFieldVisible(false);
+		}
 
 		configureFacetsForType(newType);
 		view.setRestrictValuesVisible(canHaveRestrictedValues(newType));
-		view.clearSizeError();
 		this.currentType = newType;
 		CellEditor defaultEditor = getDefaultEditorForType(newType);
 		view.setDefaultEditor(defaultEditor);
@@ -108,6 +112,27 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		}
 
 	}
+	
+	/**
+	 * Can the given type have a maximum list length?
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public boolean canHaveMaxListLength(ColumnTypeViewEnum type) {
+		switch (type) {
+			case StringList:
+			case BooleanList:
+			case DateList:
+			case IntegerList:
+				return true;
+			default:
+				// all other are false
+				return false;
+		}
+
+	}
+
 
 	/**
 	 * Can the given type have a restricted value?
@@ -217,17 +242,6 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		configureViewForType(ColumnTypeViewEnum.getViewForType(model.getColumnType()));
 		// Apply the column model to the view
 		ColumnModelUtils.applyColumnModelToRow(model, view);
-	}
-
-
-	@Override
-	public IsWidget getWidget(int index) {
-		return view.getWidget(index);
-	}
-
-	@Override
-	public int getWidgetCount() {
-		return view.getWidgetCount();
 	}
 
 	@Override
@@ -341,9 +355,6 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		if (!validateName()) {
 			isValid = false;
 		}
-		if (!validateSize()) {
-			isValid = false;
-		}
 		if (!view.validateDefault()) {
 			isValid = false;
 		}
@@ -368,36 +379,18 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		return isValid;
 	}
 
-	/**
-	 * Validate the size
-	 * 
-	 * @return
-	 */
-	public boolean validateSize() {
-		boolean isValid = true;
-		ColumnTypeViewEnum type = view.getColumnType();
-		if (canHaveSize(type)) {
-			String sizeString = view.getMaxSize();
-			try {
-				int size = Integer.parseInt(sizeString);
-				if (size < 1 || size > MAX_STRING_SIZE) {
-					view.setSizeError(MUST_BE_A_NUMBER);
-					isValid = false;
-				}
-			} catch (NumberFormatException e) {
-				view.setSizeError(MUST_BE_A_NUMBER);
-				isValid = false;
-			}
-		}
-		if (isValid) {
-			view.clearSizeError();
-		}
-		return isValid;
-	}
-
 	@Override
 	public void setToBeDefaultFileViewColumn() {
 		view.setToBeDefaultFileViewColumn();
 	}
 
+	@Override
+	public String getMaxListLength() {
+		return view.getMaxListLength();
+	}
+
+	@Override
+	public void setMaxListLength(String maxListLength) {
+		view.setMaxListLength(maxListLength);
+	}
 }

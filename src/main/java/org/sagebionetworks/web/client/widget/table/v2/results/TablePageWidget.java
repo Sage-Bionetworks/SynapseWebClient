@@ -14,7 +14,6 @@ import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
-import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -36,7 +35,6 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 	RowSelectionListener rowSelectionListener;
 	BasicPaginationWidget paginationWidget;
 	List<RowWidget> rows;
-	KeyboardNavigationHandler keyboardNavigationHandler;
 	String tableId;
 	TableType tableType;
 	
@@ -114,14 +112,6 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 			}
 		}
 
-		// Create a navigation handler
-		if (isEditable) {
-			// We only need key press navigation for editors.
-			keyboardNavigationHandler = ginInjector.createKeyboardNavigationHandler();
-		} else {
-			keyboardNavigationHandler = null;
-		}
-
 		view.setTableHeaders(headers);
 		rows = new ArrayList<RowWidget>(rowCount);
 		// Build the rows for this table
@@ -148,9 +138,6 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 		rowWidget.configure(tableId, types, isEditor, tableType, row, listner);
 		rows.add(rowWidget);
 		view.addRow(rowWidget);
-		if (keyboardNavigationHandler != null) {
-			this.keyboardNavigationHandler.bindRow(rowWidget);
-		}
 	}
 
 	@Override
@@ -186,9 +173,6 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 			if (row.isSelected()) {
 				view.removeRow(row);
 				it.remove();
-				if (this.keyboardNavigationHandler != null) {
-					this.keyboardNavigationHandler.removeRow(row);
-				}
 			}
 		}
 		onSelectionChanged();
