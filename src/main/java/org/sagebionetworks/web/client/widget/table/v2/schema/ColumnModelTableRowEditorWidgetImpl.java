@@ -8,7 +8,6 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 

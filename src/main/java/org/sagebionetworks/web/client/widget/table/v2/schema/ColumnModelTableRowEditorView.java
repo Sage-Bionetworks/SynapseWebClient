@@ -38,11 +38,6 @@ public interface ColumnModelTableRowEditorView extends ColumnModelTableRow {
 	 */
 	public void setSizeFieldVisible(boolean visible);
 
-	/**
-	 * Set the max list length field to be visible
-	 * 
-	 * @param visible
-	 */
 	public void setMaxListLengthFieldVisible(boolean visible);
 	
 	/**

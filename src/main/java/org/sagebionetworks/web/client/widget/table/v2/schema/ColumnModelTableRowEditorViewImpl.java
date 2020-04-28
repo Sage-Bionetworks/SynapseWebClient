@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.widget.NumberBox;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
@@ -51,6 +52,8 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	@UiField
 	NumberBox maxListLength;
 	@UiField
+	TableData maxListLengthTd;
+	@UiField
 	SimplePanel defaultPanel;
 	CellEditor defaultWidget;
 	@UiField
@@ -73,6 +76,7 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 		isInAlphaMode = DisplayUtils.isInTestWebsite(cookies);
 		type.setVisible(!isInAlphaMode);
 		alphaType.setVisible(isInAlphaMode);
+		maxListLengthTd.setVisible(isInAlphaMode);
 		ChangeHandler typeChangeHandler = new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {

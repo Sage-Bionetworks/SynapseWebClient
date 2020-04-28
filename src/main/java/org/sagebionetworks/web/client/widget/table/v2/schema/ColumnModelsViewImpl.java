@@ -6,9 +6,11 @@ import org.gwtbootstrap3.client.ui.ButtonToolBar;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.view.bootstrap.ButtonUtils;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -59,13 +61,17 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	Button addAnnotationColumnsButton;
 	@UiField
 	Span extraButtonsContainer;
+	@UiField
+	TableHeader maxListLengthHeader;
+	
 	ViewType viewType;
 	Presenter presenter;
 
 
 	@Inject
-	public ColumnModelsViewImpl(final Binder uiBinder) {
+	public ColumnModelsViewImpl(final Binder uiBinder, CookieProvider cookies) {
 		initWidget(uiBinder.createAndBindUi(this));
+		maxListLengthHeader.setVisible(DisplayUtils.isInTestWebsite(cookies));
 	}
 
 	@Override

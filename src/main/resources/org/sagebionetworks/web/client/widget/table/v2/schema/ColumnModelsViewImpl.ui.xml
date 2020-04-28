@@ -42,8 +42,8 @@
 					<t:TableHeader>
 						<b.html:Text>Size</b.html:Text>
 					</t:TableHeader>
-					<t:TableHeader>
-						<b.html:Text>List Length</b.html:Text>
+					<t:TableHeader ui:field="maxListLengthHeader">
+						<b.html:Text>Max List Length</b.html:Text>
 					</t:TableHeader>
 					<t:TableHeader>
 						<b.html:Text>Default Value</b.html:Text>

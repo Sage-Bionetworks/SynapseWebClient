@@ -59,7 +59,7 @@
 				<w:NumberBox ui:field="maxSize" placeholder="Size" width="75px" min="1" max="1000"/>
 			</b:FormGroup>
 		</t:TableData>
-		<t:TableData addStyleNames="vertical-align-middle">
+		<t:TableData addStyleNames="vertical-align-middle" ui:field="maxListLengthTd">
 			<b:FormGroup ui:field="maxListLengthGroup"
 				addStyleNames="margin-bottom-0-imp">
 				<w:NumberBox ui:field="maxListLength" placeholder="Maximum List Length" width="75px" min="1" max="100"/>
