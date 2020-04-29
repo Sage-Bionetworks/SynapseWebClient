@@ -10,10 +10,8 @@ import com.google.gwt.text.shared.testing.PassthroughParser;
 import com.google.gwt.text.shared.testing.PassthroughRenderer;
 
 /**
- * WARNING: On FireFox, this input element with type=number allows letter input, and does not seem to throw an error when you ask for the value.
- * Works well in Chrome, but we are not using in the Table Cell Editors for this reason. 
+ * WARNING: On FireFox, this input element with type=number allows letter input 
  * @author jayhodgson
- *
  */
 public class NumberBox extends TextBox {
 	public NumberBox() {

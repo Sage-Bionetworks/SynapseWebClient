@@ -22,6 +22,7 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 	public static final String NAME_CANNOT_BE_EMPTY = "Name cannot be empty";
 	public static final int DEFAULT_STRING_SIZE = 50;
 	public static final int MAX_STRING_SIZE = 1000;
+	public static final int DEFAULT_LIST_LENGTH = 10;
 	public static final String MUST_BE_A_NUMBER_ONE_AND_HUNDRED = "Must be: 1 - 100";
 	public static final int MAX_LIST_LENGTH = 100;
 	ColumnModelTableRowEditorView view;
@@ -60,7 +61,7 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 			view.setSizeFieldVisible(false);
 		}
 		if (canHaveMaxListLength(newType)) {
-			view.setMaxListLength("100");
+			view.setMaxListLength("" + DEFAULT_LIST_LENGTH);
 			view.setMaxListLengthFieldVisible(true);
 		} else {
 			view.setMaxListLength(null);

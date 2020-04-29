@@ -38,6 +38,10 @@ public class ColumnModelUtils {
 		if (model.getMaximumSize() != null) {
 			row.setMaxSize(model.getMaximumSize().toString());
 		}
+		if (model.getMaximumListLength() != null) {
+			row.setMaxListLength(model.getMaximumListLength().toString());
+		}
+		
 		if (model.getEnumValues() != null) {
 			row.setEnumValues(model.getEnumValues());
 		}
