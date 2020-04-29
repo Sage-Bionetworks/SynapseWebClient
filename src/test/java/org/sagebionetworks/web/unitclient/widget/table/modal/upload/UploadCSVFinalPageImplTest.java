@@ -25,7 +25,6 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
-import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.modal.upload.ContentTypeDelimiter;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFinishPageImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFinishPageView;
@@ -49,8 +48,6 @@ public class UploadCSVFinalPageImplTest {
 	PortalGinInjector mockPortalGinInjector;
 	JobTrackingWidget jobTrackingWidget;
 	@Mock
-	KeyboardNavigationHandler mockKeyboardNavigationHandler;
-	@Mock
 	SynapseClientAsync mockSynapseClient;
 	JobTrackingWidgetStub jobTrackingWidgetStub;
 	@Mock
@@ -70,7 +67,7 @@ public class UploadCSVFinalPageImplTest {
 	@Before
 	public void before() {
 		jobTrackingWidgetStub = new JobTrackingWidgetStub();
-		page = new UploadCSVFinishPageImpl(mockView, mockSynapseClient, mockJsClient, mockPortalGinInjector, jobTrackingWidgetStub, mockKeyboardNavigationHandler);
+		page = new UploadCSVFinishPageImpl(mockView, mockSynapseClient, mockJsClient, mockPortalGinInjector, jobTrackingWidgetStub);
 
 		ColumnModel one = new ColumnModel();
 		one.setMaximumSize(100L);

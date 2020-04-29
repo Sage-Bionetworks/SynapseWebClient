@@ -15,7 +15,6 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
@@ -32,7 +31,6 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	List<ColumnModel> startingModels;
 	List<ColumnModelTableRow> editorRows;
 	String tableId;
-	KeyboardNavigationHandler keyboardNavigationHandler;
 	Callback onAddDefaultViewColumnsCallback, onAddAnnotationColumnsCallback;
 	Set<String> columnModelIds;
 	CookieProvider cookies;
@@ -72,7 +70,6 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		this.changingSelection = false;
 		this.startingModels = startingModels;
 		this.tableType = tableType;
-		keyboardNavigationHandler = ginInjector.createKeyboardNavigationHandler();
 		resetEditor();
 	}
 
@@ -104,10 +101,6 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 
 	private ColumnModelTableRowEditorWidget createColumnModelEditorWidget(ColumnModel cm) {
 		ColumnModelTableRowEditorWidget rowEditor = ginInjector.createColumnModelEditorWidget();
-		// bind this row for navigation.
-		if (this.keyboardNavigationHandler != null) {
-			this.keyboardNavigationHandler.bindRow(rowEditor);
-		}
 		if (!TableType.table.equals(tableType)) {
 			rowEditor.setCanHaveDefault(false);
 			if (getDefaultColumnNames().contains(cm.getName())) {
@@ -126,8 +119,6 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	 */
 	private void resetEditor() {
 		columnModelIds.clear();
-		// clear the current navigation editor
-		this.keyboardNavigationHandler.removeAllRows();
 		this.editorRows.clear();
 		editor.configure(ViewType.EDITOR, true);
 		addColumns(this.startingModels);

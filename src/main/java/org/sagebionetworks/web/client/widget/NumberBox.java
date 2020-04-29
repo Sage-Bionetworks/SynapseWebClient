@@ -9,7 +9,10 @@ import com.google.gwt.text.shared.Renderer;
 import com.google.gwt.text.shared.testing.PassthroughParser;
 import com.google.gwt.text.shared.testing.PassthroughRenderer;
 
-
+/**
+ * WARNING: On FireFox, this input element with type=number allows letter input 
+ * @author jayhodgson
+ */
 public class NumberBox extends TextBox {
 	public NumberBox() {
 		this(Document.get().createTextInputElement());
@@ -24,6 +27,14 @@ public class NumberBox extends TextBox {
 		setStyleName(Styles.FORM_CONTROL);
 
 		getElement().setAttribute("type", "number");
+	}
+	
+	public void setMin(String min) {
+		getElement().setAttribute("min", min);
+	}
+
+	public void setMax(String max) {
+		getElement().setAttribute("max", max);
 	}
 
 	public Double getNumberValue() {

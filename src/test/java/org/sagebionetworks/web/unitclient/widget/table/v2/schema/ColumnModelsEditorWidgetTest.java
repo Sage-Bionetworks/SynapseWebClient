@@ -28,8 +28,6 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
-import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
@@ -54,8 +52,6 @@ public class ColumnModelsEditorWidgetTest {
 	ColumnModelsView mockEditor;
 	@Mock
 	PortalGinInjector mockGinInjector;
-	@Mock
-	KeyboardNavigationHandler mockKeyboardNavigationHandler;
 	@Mock
 	CookieProvider mockCookies;
 	@Mock
@@ -90,7 +86,6 @@ public class ColumnModelsEditorWidgetTest {
 			}
 		});
 		when(mockGinInjector.getImportTableViewColumnsButton()).thenReturn(mockAddTableViewColumnsButton);
-		when(mockGinInjector.createKeyboardNavigationHandler()).thenReturn(mockKeyboardNavigationHandler);
 		when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
 		nonEditableColumns = new ArrayList<ColumnModel>();
@@ -120,8 +115,6 @@ public class ColumnModelsEditorWidgetTest {
 		// All rows should be added to the editor
 		verify(mockEditor, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
 		verify(mockGinInjector, times(schema.size())).createColumnModelEditorWidget();
-		// are the rows registered?
-		verify(mockKeyboardNavigationHandler).removeAllRows();
 		// Extract the columns from the editor
 		List<ColumnModel> clone = widget.getEditedColumnModels();
 		assertEquals(schema, clone);
@@ -176,8 +169,6 @@ public class ColumnModelsEditorWidgetTest {
 		widget.configure(TableType.table, schema);
 		// This should add a new string column
 		widget.addNewColumn();
-		// the new row should be added to the keyboard navigator
-		verify(mockKeyboardNavigationHandler, times(schema.size() + 1)).bindRow(any(RowOfWidgets.class));
 		// A string should be added...
 		ColumnModel newModel = new ColumnModel();
 		newModel.setColumnType(ColumnModelsEditorWidget.DEFAULT_NEW_COLUMN_TYPE);

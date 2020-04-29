@@ -3,18 +3,17 @@ package org.sagebionetworks.web.client.widget.table.v2.schema;
 import java.util.List;
 import org.gwtbootstrap3.client.ui.FormControlStatic;
 import org.gwtbootstrap3.client.ui.FormGroup;
-import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.gwtbootstrap3.client.ui.constants.ValidationState;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -36,7 +35,7 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	@UiField
 	TextBox name;
 	@UiField
-	HelpBlock nameHelp;
+	Paragraph nameHelp;
 	@UiField
 	ListBox type;
 	// TODO: replace "type" with "alphaType" once multi-value list types are released out of alpha mode
@@ -47,7 +46,15 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	@UiField
 	TextBox maxSize;
 	@UiField
-	HelpBlock sizeHelp;
+	Paragraph sizeHelp;
+	@UiField
+	FormGroup maxListLengthGroup;
+	@UiField
+	TextBox maxListLength;
+	@UiField
+	Paragraph maxListLengthHelp;
+	@UiField
+	TableData maxListLengthTd;
 	@UiField
 	SimplePanel defaultPanel;
 	CellEditor defaultWidget;
@@ -71,6 +78,7 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 		isInAlphaMode = DisplayUtils.isInTestWebsite(cookies);
 		type.setVisible(!isInAlphaMode);
 		alphaType.setVisible(isInAlphaMode);
+		maxListLengthTd.setVisible(isInAlphaMode);
 		ChangeHandler typeChangeHandler = new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
@@ -107,6 +115,11 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 		return maxSize.getText();
 	}
 
+	@Override
+	public String getMaxListLength() {
+		return maxListLength.getText();
+	}
+	
 	@Override
 	public String getDefaultValue() {
 		return defaultWidget.getValue();
@@ -166,6 +179,11 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 		maxSizeStatic.setText(maxSize);
 		this.maxSize.setText(maxSize);
 	}
+	
+	@Override
+	public void setMaxListLength(String maxListLength) {
+		this.maxListLength.setText(maxListLength);
+	}
 
 	@Override
 	public void setDefaultValue(String defaultValue) {
@@ -176,6 +194,11 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	public void setSizeFieldVisible(boolean visible) {
 		maxSize.setVisible(visible);
 	}
+	
+	@Override
+	public void setMaxListLengthFieldVisible(boolean visible) {
+		maxListLength.setVisible(visible);
+	}
 
 	@Override
 	public void setEnumValues(List<String> enums) {
@@ -185,31 +208,6 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	@Override
 	public List<String> getEnumValues() {
 		return ColumnModelUtils.csvToList(restrictValues.getText());
-	}
-
-	@Override
-	public IsWidget getWidget(int index) {
-		switch (index) {
-			case 0:
-				return name;
-			case 1:
-				return type;
-			case 2:
-				return maxSize;
-			case 3:
-				return defaultWidget;
-			case 4:
-				return restrictValues;
-			case 5:
-				return facet;
-			default:
-				throw new IllegalArgumentException("Unknown index: " + index);
-		}
-	}
-
-	@Override
-	public int getWidgetCount() {
-		return 6;
 	}
 
 	@Override
@@ -227,34 +225,30 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	@Override
 	public void setNameError(String error) {
 		nameHelp.setVisible(true);
-		this.nameGroup.setValidationState(ValidationState.ERROR);
 		this.nameHelp.setText(error);
 	}
 
 	@Override
 	public void clearNameError() {
 		nameHelp.setVisible(false);
-		this.nameGroup.setValidationState(ValidationState.NONE);
 		this.nameHelp.setText("");
 	}
 
 	@Override
+	public boolean validateDefault() {
+		return this.defaultWidget.isValid();
+	}
+	
+	@Override
 	public void setSizeError(String error) {
 		this.sizeHelp.setVisible(true);
-		this.sizeGroup.setValidationState(ValidationState.ERROR);
 		this.sizeHelp.setText(error);
 	}
 
 	@Override
 	public void clearSizeError() {
 		this.sizeHelp.setVisible(false);
-		this.sizeGroup.setValidationState(ValidationState.NONE);
 		this.sizeHelp.setText("");
-	}
-
-	@Override
-	public boolean validateDefault() {
-		return this.defaultWidget.isValid();
 	}
 
 	@Override
@@ -282,9 +276,20 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 		sizeGroup.setVisible(false);
 		type.setVisible(false);
 		alphaType.setVisible(false);
+		maxListLengthGroup.setVisible(false);
 
 		nameStatic.setVisible(true);
 		typeStatic.setVisible(true);
 		maxSizeStatic.setVisible(true);
+	}
+	@Override
+	public void setMaxListLengthError(String error) {
+		this.maxListLengthHelp.setVisible(true);
+		this.maxListLengthHelp.setText(error);
+	}
+	@Override
+	public void clearMaxListLengthError() {
+		this.maxListLengthHelp.setVisible(false);
+		this.maxListLengthHelp.setText("");
 	}
 }

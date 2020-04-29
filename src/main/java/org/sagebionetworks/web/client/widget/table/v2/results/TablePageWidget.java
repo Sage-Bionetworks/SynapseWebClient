@@ -14,7 +14,6 @@ import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
-import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -36,7 +35,6 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 	RowSelectionListener rowSelectionListener;
 	BasicPaginationWidget paginationWidget;
 	List<RowWidget> rows;
-	KeyboardNavigationHandler keyboardNavigationHandler;
 	String tableId;
 	TableType tableType;
 	
@@ -114,14 +112,6 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 			}
 		}
 
-		// Create a navigation handler
-		if (isEditable) {
-			// We only need key press navigation for editors.
-			keyboardNavigationHandler = ginInjector.createKeyboardNavigationHandler();
-		} else {
-			keyboardNavigationHandler = null;
-		}
-
 		view.setTableHeaders(headers);
 		rows = new ArrayList<RowWidget>(rowCount);
 		// Build the rows for this table
@@ -129,6 +119,8 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 			// Create the row
 			addRow(row, isEditable);
 		}
+		// add rows in bulk to the view (single attach event)
+		view.addRows(rows);
 		view.hideLoading();
 	}
 
@@ -137,7 +129,7 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 	 * @param isSelectable
 	 * @param row
 	 */
-	private void addRow(Row row, boolean isEditor) {
+	private RowWidget addRow(Row row, boolean isEditor) {
 		// Create a new row and configure it with the data.
 		RowWidget rowWidget = ginInjector.createRowWidget();
 		// We only listen to selection changes on the row if one was provided.
@@ -147,10 +139,7 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 		}
 		rowWidget.configure(tableId, types, isEditor, tableType, row, listner);
 		rows.add(rowWidget);
-		view.addRow(rowWidget);
-		if (keyboardNavigationHandler != null) {
-			this.keyboardNavigationHandler.bindRow(rowWidget);
-		}
+		return rowWidget;
 	}
 
 	@Override
@@ -162,7 +151,7 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 	 * Add a new row to the table.
 	 */
 	public void onAddNewRow() {
-		addRow(new Row(), true);
+		view.addRow(addRow(new Row(), true));
 	}
 
 	/**
@@ -186,9 +175,6 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 			if (row.isSelected()) {
 				view.removeRow(row);
 				it.remove();
-				if (this.keyboardNavigationHandler != null) {
-					this.keyboardNavigationHandler.removeRow(row);
-				}
 			}
 		}
 		onSelectionChanged();

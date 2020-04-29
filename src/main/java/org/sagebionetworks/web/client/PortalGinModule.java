@@ -563,10 +563,6 @@ import org.sagebionetworks.web.client.widget.subscription.TopicRowWidgetView;
 import org.sagebionetworks.web.client.widget.subscription.TopicRowWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.subscription.TopicWidgetView;
 import org.sagebionetworks.web.client.widget.subscription.TopicWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.table.FocusSetter;
-import org.sagebionetworks.web.client.widget.table.FocusSetterImpl;
-import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
-import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandlerImpl;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.api.APITableWidgetView;
@@ -1108,10 +1104,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(DownloadFilePage.class).to(DownloadFilePageImpl.class);
 		bind(DownloadFilePageView.class).to(DownloadFilePageViewImpl.class);
 		bind(DownloadTableQueryModalWidget.class).to(DownloadTableQueryModalWidgetImpl.class);
-
-		// Keyboard navigation
-		bind(KeyboardNavigationHandler.class).to(KeyboardNavigationHandlerImpl.class);
-		bind(FocusSetter.class).to(FocusSetterImpl.class);
 
 		/*
 		 * TableEntity cell bindings.

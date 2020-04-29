@@ -8,7 +8,6 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -19,11 +18,13 @@ import com.google.inject.Inject;
  *
  */
 public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowEditorWidget, ColumnModelTableRowEditorView.TypePresenter {
-
 	public static final String MUST_BE_A_NUMBER = "Must be: 1 - 1000";
 	public static final String NAME_CANNOT_BE_EMPTY = "Name cannot be empty";
 	public static final int DEFAULT_STRING_SIZE = 50;
 	public static final int MAX_STRING_SIZE = 1000;
+	public static final int DEFAULT_LIST_LENGTH = 10;
+	public static final String MUST_BE_A_NUMBER_ONE_AND_HUNDRED = "Must be: 1 - 100";
+	public static final int MAX_LIST_LENGTH = 100;
 	ColumnModelTableRowEditorView view;
 	ColumnTypeViewEnum currentType;
 	CellFactory factory;
@@ -59,10 +60,18 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 			view.setMaxSize(null);
 			view.setSizeFieldVisible(false);
 		}
+		if (canHaveMaxListLength(newType)) {
+			view.setMaxListLength("" + DEFAULT_LIST_LENGTH);
+			view.setMaxListLengthFieldVisible(true);
+		} else {
+			view.setMaxListLength(null);
+			view.setMaxListLengthFieldVisible(false);
+		}
 
 		configureFacetsForType(newType);
 		view.setRestrictValuesVisible(canHaveRestrictedValues(newType));
 		view.clearSizeError();
+		view.clearMaxListLengthError();
 		this.currentType = newType;
 		CellEditor defaultEditor = getDefaultEditorForType(newType);
 		view.setDefaultEditor(defaultEditor);
@@ -108,6 +117,27 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		}
 
 	}
+	
+	/**
+	 * Can the given type have a maximum list length?
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public boolean canHaveMaxListLength(ColumnTypeViewEnum type) {
+		switch (type) {
+			case StringList:
+			case BooleanList:
+			case DateList:
+			case IntegerList:
+				return true;
+			default:
+				// all other are false
+				return false;
+		}
+
+	}
+
 
 	/**
 	 * Can the given type have a restricted value?
@@ -217,17 +247,6 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		configureViewForType(ColumnTypeViewEnum.getViewForType(model.getColumnType()));
 		// Apply the column model to the view
 		ColumnModelUtils.applyColumnModelToRow(model, view);
-	}
-
-
-	@Override
-	public IsWidget getWidget(int index) {
-		return view.getWidget(index);
-	}
-
-	@Override
-	public int getWidgetCount() {
-		return view.getWidgetCount();
 	}
 
 	@Override
@@ -344,6 +363,9 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		if (!validateSize()) {
 			isValid = false;
 		}
+		if (!validateMaxListLength()) {
+			isValid = false;
+		}
 		if (!view.validateDefault()) {
 			isValid = false;
 		}
@@ -367,7 +389,7 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		}
 		return isValid;
 	}
-
+	
 	/**
 	 * Validate the size
 	 * 
@@ -394,10 +416,46 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		}
 		return isValid;
 	}
-
+	
+	/**
+	 * Validate the max list length
+	 * 
+	 * @return
+	 */
+	public boolean validateMaxListLength() {
+		boolean isValid = true;
+		ColumnTypeViewEnum type = view.getColumnType();
+		if (canHaveMaxListLength(type)) {
+			String lengthString = view.getMaxListLength();
+			try {
+				int length = Integer.parseInt(lengthString);
+				if (length < 1 || length > MAX_LIST_LENGTH) {
+					view.setMaxListLengthError(MUST_BE_A_NUMBER_ONE_AND_HUNDRED);
+					isValid = false;
+				}
+			} catch (NumberFormatException e) {
+				view.setMaxListLengthError(MUST_BE_A_NUMBER_ONE_AND_HUNDRED);
+				isValid = false;
+			}
+		}
+		if (isValid) {
+			view.clearMaxListLengthError();
+		}
+		return isValid;
+	}
+	
 	@Override
 	public void setToBeDefaultFileViewColumn() {
 		view.setToBeDefaultFileViewColumn();
 	}
 
+	@Override
+	public String getMaxListLength() {
+		return view.getMaxListLength();
+	}
+
+	@Override
+	public void setMaxListLength(String maxListLength) {
+		view.setMaxListLength(maxListLength);
+	}
 }

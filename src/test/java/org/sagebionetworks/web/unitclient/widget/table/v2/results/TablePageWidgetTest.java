@@ -39,8 +39,6 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
-import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
-import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.results.PagingAndSortingListener;
@@ -73,8 +71,6 @@ public class TablePageWidgetTest {
 	PagingAndSortingListener mockPageChangeListner;
 	@Mock
 	BasicPaginationWidget mockPaginationWidget;
-	@Mock
-	KeyboardNavigationHandler mockKeyboardNavigationHandler;
 	TablePageWidget widget;
 	List<ColumnModel> schema;
 	SelectColumn derivedColumn;
@@ -122,7 +118,6 @@ public class TablePageWidgetTest {
 			}
 		});
 		when(mockGinInjector.getDateTimeUtils()).thenReturn(mockDateTimeUtils);
-		when(mockGinInjector.createKeyboardNavigationHandler()).thenReturn(mockKeyboardNavigationHandler);
 		sortHeaders = new LinkedList<SortableTableHeader>();
 		when(mockGinInjector.createSortableTableHeader()).thenAnswer(new Answer<SortableTableHeader>() {
 			@Override
@@ -196,8 +191,6 @@ public class TablePageWidgetTest {
 		derived.setName(derivedColumn.getName());
 		expected.add(derived);
 		assertEquals(expected, headers);
-		// are the rows registered?
-		verify(mockKeyboardNavigationHandler, times(extracted.size())).bindRow(any(RowOfWidgets.class));
 		// last updated date from bundle transformed and rendered?
 		verify(mockView).setLastUpdatedOn(TablePageWidget.LAST_UPDATED_ON + FRIENDLY_DATE_STRING);
 	}
@@ -384,8 +377,6 @@ public class TablePageWidgetTest {
 		assertTrue(widget.isOneRowOrMoreRowsSelected());
 		reset(mockListner);
 		widget.onDeleteSelected();
-		// Are the rows removed from the keyboard navigator?
-		verify(mockKeyboardNavigationHandler, times(3)).removeRow(any(RowOfWidgets.class));
 		// The handler should be called once
 		verify(mockListner).onSelectionChanged();
 		assertFalse(widget.isOneRowOrMoreRowsSelected());

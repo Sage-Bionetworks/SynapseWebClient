@@ -17,7 +17,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
-import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
@@ -40,15 +39,14 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 	SynapseClientAsync synapseClient;
 	PortalGinInjector portalGinInjector;
 	JobTrackingWidget jobTrackingWidget;
-	KeyboardNavigationHandler keyboardNavigationHandler;
-
+	
 	String parentId;
 	UploadToTableRequest uploadtoTableRequest;
 	ModalPresenter presenter;
 	List<ColumnModelTableRow> editors;
 
 	@Inject
-	public UploadCSVFinishPageImpl(UploadCSVFinishPageView view, SynapseClientAsync synapseClient, SynapseJavascriptClient jsClient, PortalGinInjector portalGinInjector, JobTrackingWidget jobTrackingWidget, KeyboardNavigationHandler keyboardNavigationHandler) {
+	public UploadCSVFinishPageImpl(UploadCSVFinishPageView view, SynapseClientAsync synapseClient, SynapseJavascriptClient jsClient, PortalGinInjector portalGinInjector, JobTrackingWidget jobTrackingWidget) {
 		super();
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -56,7 +54,6 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 		this.jsClient = jsClient;
 		this.portalGinInjector = portalGinInjector;
 		this.jobTrackingWidget = jobTrackingWidget;
-		this.keyboardNavigationHandler = keyboardNavigationHandler;
 		this.view.addTrackerWidget(jobTrackingWidget);
 	}
 
@@ -83,14 +80,12 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 		view.setTableName(fileName);
 		this.parentId = parentId;
 		this.uploadtoTableRequest = preProcessUploadToTableRequest(request);
-		this.keyboardNavigationHandler.removeAllRows();
 		// prepare the columns
 		List<ColumnModel> columns = preProcessColumns(suggestedSchema);
 		editors = new ArrayList<ColumnModelTableRow>(columns.size());
 		for (ColumnModel cm : columns) {
 			ColumnModelTableRowEditorWidget editor = portalGinInjector.createColumnModelEditorWidget();
 			editors.add(editor);
-			this.keyboardNavigationHandler.bindRow(editor);
 			editor.configure(cm, null);
 			editor.setSelectVisible(false);
 		}

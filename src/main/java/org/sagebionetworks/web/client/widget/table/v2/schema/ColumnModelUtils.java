@@ -38,6 +38,10 @@ public class ColumnModelUtils {
 		if (model.getMaximumSize() != null) {
 			row.setMaxSize(model.getMaximumSize().toString());
 		}
+		if (model.getMaximumListLength() != null) {
+			row.setMaxListLength(model.getMaximumListLength().toString());
+		}
+		
 		if (model.getEnumValues() != null) {
 			row.setEnumValues(model.getEnumValues());
 		}
@@ -95,6 +99,10 @@ public class ColumnModelUtils {
 		String size = treatEmptyAsNull(row.getMaxSize());
 		if (size != null) {
 			model.setMaximumSize(Long.parseLong(size));
+		}
+		String maxListLength = treatEmptyAsNull(row.getMaxListLength());
+		if (maxListLength != null) {
+			model.setMaximumListLength(Long.parseLong(maxListLength));
 		}
 		if (row.getEnumValues() != null && !row.getEnumValues().isEmpty()) {
 			model.setEnumValues(row.getEnumValues());

@@ -70,6 +70,7 @@ public class ColumnModelTableRowEditorWidgetTest {
 		verify(mockView).setDefaultEditor(mockStringEditor);
 		verify(mockView).setColumnType(ColumnTypeViewEnum.String);
 		verify(mockView).clearSizeError();
+		verify(mockView).clearMaxListLengthError();
 		verify(mockView).setRestrictValuesVisible(true);
 	}
 
@@ -157,7 +158,6 @@ public class ColumnModelTableRowEditorWidgetTest {
 		assertTrue(editor.validateName());
 		verify(mockView).clearNameError();
 	}
-
 	@Test
 	public void testValidateSize() {
 		// integers do not have a size so they are always valid
@@ -206,6 +206,55 @@ public class ColumnModelTableRowEditorWidgetTest {
 		verify(mockView, never()).setSizeError(anyString());
 		verify(mockView).clearSizeError();
 	}
+	
+	@Test
+	public void testValidateListLength() {
+		// integer type does not have a max list length, so it's always valid
+		when(mockView.getColumnType()).thenReturn(ColumnTypeViewEnum.Integer);
+		when(mockView.getMaxListLength()).thenThrow(new IllegalArgumentException("Should not be hit"));
+		assertTrue(editor.validateMaxListLength());
+		verify(mockView).clearMaxListLengthError();
+	}
+
+	@Test
+	public void testValidateListLengthStringTooSmall() {
+		// integers do not have a size so they are always valid
+		when(mockView.getColumnType()).thenReturn(ColumnTypeViewEnum.StringList);
+		when(mockView.getMaxListLength()).thenReturn("0");
+		assertFalse(editor.validateMaxListLength());
+		verify(mockView).setMaxListLengthError(ColumnModelTableRowEditorWidgetImpl.MUST_BE_A_NUMBER_ONE_AND_HUNDRED);
+		verify(mockView, never()).clearMaxListLengthError();
+	}
+
+	@Test
+	public void testValidateListLengthStringTooLarge() {
+		// integers do not have a size so they are always valid
+		when(mockView.getColumnType()).thenReturn(ColumnTypeViewEnum.IntegerList);
+		when(mockView.getMaxListLength()).thenReturn("" + ColumnModelTableRowEditorWidgetImpl.MAX_LIST_LENGTH + 1);
+		assertFalse(editor.validateMaxListLength());
+		verify(mockView).setMaxListLengthError(ColumnModelTableRowEditorWidgetImpl.MUST_BE_A_NUMBER_ONE_AND_HUNDRED);
+		verify(mockView, never()).clearMaxListLengthError();
+	}
+
+	@Test
+	public void testValidateListLengthStringNotANumber() {
+		// integers do not have a size so they are always valid
+		when(mockView.getColumnType()).thenReturn(ColumnTypeViewEnum.BooleanList);
+		when(mockView.getMaxListLength()).thenReturn("not a number");
+		assertFalse(editor.validateMaxListLength());
+		verify(mockView).setMaxListLengthError(ColumnModelTableRowEditorWidgetImpl.MUST_BE_A_NUMBER_ONE_AND_HUNDRED);
+		verify(mockView, never()).clearMaxListLengthError();
+	}
+
+	@Test
+	public void testValidateListLengthString() {
+		// integers do not have a size so they are always valid
+		when(mockView.getColumnType()).thenReturn(ColumnTypeViewEnum.StringList);
+		when(mockView.getMaxListLength()).thenReturn("" + ColumnModelTableRowEditorWidgetImpl.MAX_LIST_LENGTH);
+		assertTrue(editor.validateMaxListLength());
+		verify(mockView, never()).setMaxListLengthError(anyString());
+		verify(mockView).clearMaxListLengthError();
+	}
 
 	@Test
 	public void testValidateLinkTooLarge() {
@@ -216,7 +265,6 @@ public class ColumnModelTableRowEditorWidgetTest {
 		verify(mockView).setSizeError(ColumnModelTableRowEditorWidgetImpl.MUST_BE_A_NUMBER);
 		verify(mockView, never()).clearSizeError();
 	}
-
 	@Test
 	public void testValidateBadName() {
 		when(mockView.getColumnType()).thenReturn(ColumnTypeViewEnum.String);
@@ -234,7 +282,7 @@ public class ColumnModelTableRowEditorWidgetTest {
 		when(mockView.validateDefault()).thenReturn(true);
 		assertFalse(editor.validate());
 	}
-
+	
 	@Test
 	public void testValidateBadDefault() {
 		when(mockView.getColumnType()).thenReturn(ColumnTypeViewEnum.String);
