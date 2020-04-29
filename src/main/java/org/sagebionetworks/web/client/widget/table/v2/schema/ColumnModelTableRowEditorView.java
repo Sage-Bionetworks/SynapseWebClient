@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
-import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 
 /**
@@ -9,7 +8,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
  * @author John
  *
  */
-public interface ColumnModelTableRowEditorView extends ColumnModelTableRow, KeyboardNavigationHandler.RowOfWidgets {
+public interface ColumnModelTableRowEditorView extends ColumnModelTableRow {
 
 	/**
 	 * Control for this view.
@@ -39,6 +38,8 @@ public interface ColumnModelTableRowEditorView extends ColumnModelTableRow, Keyb
 	 */
 	public void setSizeFieldVisible(boolean visible);
 
+	public void setMaxListLengthFieldVisible(boolean visible);
+	
 	/**
 	 * Set the editor to be used for default values.
 	 * 
@@ -65,13 +66,21 @@ public interface ColumnModelTableRowEditorView extends ColumnModelTableRow, Keyb
 	 * Clear an error for a name.
 	 */
 	public void clearNameError();
-
+	
 	/**
 	 * Set an error on the size of a column.
 	 * 
 	 * @param string
 	 */
 	public void setSizeError(String string);
+
+	/**
+	 * Set an error on the max list length of a column.
+	 * 
+	 * @param string
+	 */
+	public void setMaxListLengthError(String string);
+	public void clearMaxListLengthError();
 
 	/**
 	 * Clear a size error.

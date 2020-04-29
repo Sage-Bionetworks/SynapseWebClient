@@ -19,12 +19,20 @@ public interface TablePageView extends IsWidget {
 	public void setTableHeaders(List<IsWidget> headers);
 
 	/**
-	 * Add a row to this table.o
+	 * Add a row to this table.
 	 * 
 	 * @param rowWidget
 	 */
 	public void addRow(RowWidget rowWidget);
-
+	
+	/**
+	 * Add rows in bulk to this table.
+	 * 
+	 * @param rowWidget
+	 */
+	public void addRows(List<RowWidget> rowWidgets);
+	
+	
 	/**
 	 * Remove this row from the view.
 	 * 

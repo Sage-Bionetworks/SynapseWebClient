@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
+import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import com.google.gwt.event.dom.client.ScrollEvent;
@@ -32,6 +33,8 @@ public class TablePageViewImpl implements TablePageView {
 
 	@UiField
 	Div loadingUI;
+	@UiField
+	Table table;
 	@UiField
 	TableRow header;
 	@UiField
@@ -106,6 +109,16 @@ public class TablePageViewImpl implements TablePageView {
 	public void addRow(RowWidget newRow) {
 		body.add(newRow);
 	}
+	
+	@Override
+	public void addRows(List<RowWidget> rowWidgets) {
+		body.removeFromParent();
+		for (RowWidget rowWidget : rowWidgets) {
+			addRow(rowWidget);
+		}
+		table.add(body);
+	}
+
 
 	@Override
 	public void removeRow(RowWidget row) {

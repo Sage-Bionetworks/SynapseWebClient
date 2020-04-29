@@ -71,6 +71,18 @@ public interface ColumnModelView {
 	public void setMaxSize(String maxSize);
 
 	/**
+	 * ColumnModel.maximumListLength
+	 * 
+	 * @return
+	 */
+	public String getMaxListLength();
+
+	/**
+	 * ColumnModel.maximumListLength
+	 */
+	public void setMaxListLength(String maxListLength);
+
+	/**
 	 * ColumnModel.defaultValue
 	 * 
 	 * @return

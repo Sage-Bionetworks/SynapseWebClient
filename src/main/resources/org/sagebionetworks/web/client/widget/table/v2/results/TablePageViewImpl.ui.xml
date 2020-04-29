@@ -18,7 +18,7 @@
 				<g:ScrollPanel ui:field="tableScrollPanel"
 					height="100%">
 					<bh:Div ui:field="tableDiv">
-						<t:Table styleName="table table-striped table-condensed">
+						<t:Table styleName="table table-striped table-condensed" ui:field="table">
 							<t:THead>
 								<t:TableRow ui:field="header">
 								</t:TableRow>

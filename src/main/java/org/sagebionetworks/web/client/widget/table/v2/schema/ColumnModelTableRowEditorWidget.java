@@ -1,9 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
 
-public interface ColumnModelTableRowEditorWidget extends RowOfWidgets, ColumnModelTableRow {
+public interface ColumnModelTableRowEditorWidget extends ColumnModelTableRow {
 	/**
 	 * Configure this widget before using.
 	 * 

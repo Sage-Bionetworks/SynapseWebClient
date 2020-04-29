@@ -196,7 +196,6 @@ import org.sagebionetworks.web.client.widget.sharing.AclAddPeoplePanel;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGrid;
 import org.sagebionetworks.web.client.widget.statistics.StatisticsPlotWidget;
 import org.sagebionetworks.web.client.widget.subscription.TopicRowWidget;
-import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.TableEntityListGroupItem;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.api.APITableWidget;
@@ -577,8 +576,6 @@ public interface PortalGinInjector extends Ginjector {
 	TableListWidget getTableListWidget();
 
 	CookieProvider getCookieProvider();
-
-	KeyboardNavigationHandler createKeyboardNavigationHandler();
 
 	Header getHeader();
 
