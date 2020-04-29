@@ -18,6 +18,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -297,6 +298,10 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	}
 
 	private void executeSearch() {
+		// Make sure url reflects current search. SWC-5181: the browser sometimes re-encodes the encoded search json
+		Search searchPlace = new Search(getCurrentSearchJSON());
+		globalApplicationState.replaceCurrentPlace(searchPlace);
+
 		synAlert.clear();
 		// Is there a search defined? If not, display empty result.
 		if (isEmptyQuery()) {

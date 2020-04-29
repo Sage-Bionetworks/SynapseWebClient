@@ -3,7 +3,7 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	<b:Container fluid="true" addStyleNames="border-bottom-1">
+	<b:Container fluid="true" addStyleNames="light-border padding-10 margin-bottom-10">
 		<b:Row>
 			<b:Column size="XS_12">
 				<b:Heading size="H4">
@@ -50,11 +50,11 @@
 					<b:FormControlStatic
 						ui:field="submissionReceiptField" addStyleNames="displayInline" />
 				</b:FormGroup>
-				<b:Panel addStyleNames="padding-10" ui:field="quotaUI">
-					<b:PanelHeader>
-						<b:Heading size="H4" text="Quota" />
-					</b:PanelHeader>
-					<b:PanelBody>
+				<bh:Div ui:field="quotaUI" addStyleNames="light-border">
+					<bh:Div addStyleNames="highlight-title">
+						<bh:Text>Quota</bh:Text>
+					</bh:Div>
+					<bh:Div marginLeft="10" marginRight="10" marginTop="10">
 						<b:FormGroup>
 							<b:FormLabel text="First Round Start Date/Time"
 								addStyleNames="displayInline margin-right-5" />
@@ -74,13 +74,13 @@
 								ui:field="numberOfRoundsField" addStyleNames="displayInline" />
 						</b:FormGroup>
 						<b:FormGroup>
-							<b:FormLabel text="Round Duration (ms)"
+							<b:FormLabel text="Round Duration"
 								addStyleNames="displayInline margin-right-5" />
 							<b:FormControlStatic
 								ui:field="roundDurationField" addStyleNames="displayInline" />
 						</b:FormGroup>
-					</b:PanelBody>
-				</b:Panel>
+					</bh:Div>
+				</bh:Div>
 			</b:Column>
 		</b:Row>
 

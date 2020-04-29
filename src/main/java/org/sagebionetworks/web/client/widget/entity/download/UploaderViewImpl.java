@@ -194,13 +194,6 @@ public class UploaderViewImpl extends FlowPanel implements UploaderView {
 
 					presenter.setExternalFilePath(pathField.getValue(), nameField.getValue(), presenter.getStorageLocationId());
 				} else {
-					formFieldsPanel.setVisible(false);
-					fileUploadLabel.setVisible(false);
-					uploadBtn.setEnabled(false);
-					// SWC-1730: disable clicking on external tab
-					externalTab.setEnabled(false);
-
-					initializeProgress();
 					presenter.handleUploads();
 				}
 
@@ -223,6 +216,16 @@ public class UploaderViewImpl extends FlowPanel implements UploaderView {
 		formPanel.addSubmitCompleteHandler(submitHandler);
 	}
 
+	@Override
+	public void disableSelectionDuringUpload() {
+		formFieldsPanel.setVisible(false);
+		fileUploadLabel.setVisible(false);
+		uploadBtn.setEnabled(false);
+		// SWC-1730: disable clicking on external tab
+		externalTab.setEnabled(false);
+
+		initializeProgress();
+	}
 
 	private void handleSubmitResult(String result) {
 		if (result != null) {

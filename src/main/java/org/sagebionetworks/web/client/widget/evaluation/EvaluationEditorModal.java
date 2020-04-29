@@ -112,7 +112,7 @@ public class EvaluationEditorModal implements EvaluationEditorModalView.Presente
 		// quota
 		Double submissionLimit = view.getSubmissionLimit();
 		Double numberOfRounds = view.getNumberOfRounds();
-		Double roundDuration = view.getRoundDuration();
+		Long roundDuration = view.getRoundDuration();
 		Date roundStart = view.getRoundStart();
 		boolean isUserTryingToSetQuota = submissionLimit != null || numberOfRounds != null || roundDuration != null || roundStart != null;
 		if (isUserTryingToSetQuota) {
@@ -128,7 +128,7 @@ public class EvaluationEditorModal implements EvaluationEditorModalView.Presente
 				newQuota.setNumberOfRounds(numberOfRounds.longValue());
 			}
 			if (roundDuration != null) {
-				newQuota.setRoundDurationMillis(roundDuration.longValue());
+				newQuota.setRoundDurationMillis(roundDuration);
 			}
 			evaluation.setQuota(newQuota);
 		} else {

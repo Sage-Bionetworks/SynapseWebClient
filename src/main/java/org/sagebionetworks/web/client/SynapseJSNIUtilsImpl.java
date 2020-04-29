@@ -799,6 +799,19 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 			console.error(err);
 		}
 	}-*/;
+	
+	@Override
+	public void setIsInnerProgrammaticHistoryChange() {
+		_setIsInnerProgrammaticHistoryChange();
+	}
+
+	public static native void _setIsInnerProgrammaticHistoryChange()/*-{
+		// see back-forward-nav-handler.js
+		// We don't want the handler to reload the page if we are programmatically changing the history.
+		// Reload when the user manually clicks the browser back/forward button.
+		$wnd.innerDocClick = true;
+	}-*/;
+
 
 	@Override
 	public void showJiraIssueCollector(String issueSummary, String issueDescription, String jiraIssueCollectorURL, String principalId, String userDisplayName, String userEmailAddress, String synapseDataObjectId, String componentID, String accessRequirementId, String issuePriority) {

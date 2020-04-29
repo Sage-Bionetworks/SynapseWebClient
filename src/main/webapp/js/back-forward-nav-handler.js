@@ -7,22 +7,24 @@
 // See https://stackoverflow.com/questions/25806608/how-to-detect-browser-back-button-event-cross-browser
 // Investigated using new Navigation API (which does not work for SPA), or popstate (which fires on place change or browser back/forward nav).
 
-document.onmouseover = function() {
+var html = document.getElementsByTagName("HTML")[0];
+
+html.onmouseenter = function() {
 	//User's mouse is inside the page.
 	window.innerDocClick = true;
 }
 
-document.onmouseleave = function() {
+html.onmouseleave = function() {
 	//User's mouse has left the page.
 	window.innerDocClick = false;
 }
 
-window.onhashchange = function() {
+window.onpopstate = function() {
 	if (!window.innerDocClick) {
-		// hash change invoked by action outside of window (like the back button).
-		console.log('detected hash change outside of doc, reloading');
+		// history change invoked by action outside of window (like the back/forward button).
+		console.log('detected popstate change outside of doc, reloading');
 		location.reload();
 	} else {
-		console.log('detected hash change inside of doc, propagating');
+		console.log('detected popstate change inside of doc, propagating');
 	}
 }
