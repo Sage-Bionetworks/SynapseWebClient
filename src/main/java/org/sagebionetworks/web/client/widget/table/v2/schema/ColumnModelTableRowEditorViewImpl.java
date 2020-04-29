@@ -3,14 +3,12 @@ package org.sagebionetworks.web.client.widget.table.v2.schema;
 import java.util.List;
 import org.gwtbootstrap3.client.ui.FormControlStatic;
 import org.gwtbootstrap3.client.ui.FormGroup;
-import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.gwtbootstrap3.client.ui.constants.ValidationState;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
-import org.sagebionetworks.web.client.widget.NumberBox;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -37,7 +35,7 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	@UiField
 	TextBox name;
 	@UiField
-	HelpBlock nameHelp;
+	Paragraph nameHelp;
 	@UiField
 	ListBox type;
 	// TODO: replace "type" with "alphaType" once multi-value list types are released out of alpha mode
@@ -46,11 +44,15 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	@UiField
 	FormGroup sizeGroup;
 	@UiField
-	NumberBox maxSize;
+	TextBox maxSize;
+	@UiField
+	Paragraph sizeHelp;
 	@UiField
 	FormGroup maxListLengthGroup;
 	@UiField
-	NumberBox maxListLength;
+	TextBox maxListLength;
+	@UiField
+	Paragraph maxListLengthHelp;
 	@UiField
 	TableData maxListLengthTd;
 	@UiField
@@ -223,20 +225,30 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	@Override
 	public void setNameError(String error) {
 		nameHelp.setVisible(true);
-		this.nameGroup.setValidationState(ValidationState.ERROR);
 		this.nameHelp.setText(error);
 	}
 
 	@Override
 	public void clearNameError() {
 		nameHelp.setVisible(false);
-		this.nameGroup.setValidationState(ValidationState.NONE);
 		this.nameHelp.setText("");
 	}
 
 	@Override
 	public boolean validateDefault() {
 		return this.defaultWidget.isValid();
+	}
+	
+	@Override
+	public void setSizeError(String error) {
+		this.sizeHelp.setVisible(true);
+		this.sizeHelp.setText(error);
+	}
+
+	@Override
+	public void clearSizeError() {
+		this.sizeHelp.setVisible(false);
+		this.sizeHelp.setText("");
 	}
 
 	@Override
@@ -269,5 +281,15 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 		nameStatic.setVisible(true);
 		typeStatic.setVisible(true);
 		maxSizeStatic.setVisible(true);
+	}
+	@Override
+	public void setMaxListLengthError(String error) {
+		this.maxListLengthHelp.setVisible(true);
+		this.maxListLengthHelp.setText(error);
+	}
+	@Override
+	public void clearMaxListLengthError() {
+		this.maxListLengthHelp.setVisible(false);
+		this.maxListLengthHelp.setText("");
 	}
 }

@@ -119,6 +119,8 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 			// Create the row
 			addRow(row, isEditable);
 		}
+		// add rows in bulk to the view (single attach event)
+		view.addRows(rows);
 		view.hideLoading();
 	}
 
@@ -127,7 +129,7 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 	 * @param isSelectable
 	 * @param row
 	 */
-	private void addRow(Row row, boolean isEditor) {
+	private RowWidget addRow(Row row, boolean isEditor) {
 		// Create a new row and configure it with the data.
 		RowWidget rowWidget = ginInjector.createRowWidget();
 		// We only listen to selection changes on the row if one was provided.
@@ -137,7 +139,7 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 		}
 		rowWidget.configure(tableId, types, isEditor, tableType, row, listner);
 		rows.add(rowWidget);
-		view.addRow(rowWidget);
+		return rowWidget;
 	}
 
 	@Override
@@ -149,7 +151,7 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 	 * Add a new row to the table.
 	 */
 	public void onAddNewRow() {
-		addRow(new Row(), true);
+		view.addRow(addRow(new Row(), true));
 	}
 
 	/**

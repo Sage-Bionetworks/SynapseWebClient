@@ -66,6 +66,26 @@ public interface ColumnModelTableRowEditorView extends ColumnModelTableRow {
 	 * Clear an error for a name.
 	 */
 	public void clearNameError();
+	
+	/**
+	 * Set an error on the size of a column.
+	 * 
+	 * @param string
+	 */
+	public void setSizeError(String string);
+
+	/**
+	 * Set an error on the max list length of a column.
+	 * 
+	 * @param string
+	 */
+	public void setMaxListLengthError(String string);
+	public void clearMaxListLengthError();
+
+	/**
+	 * Clear a size error.
+	 */
+	public void clearSizeError();
 
 	/**
 	 * Validate the default editor.

@@ -18,9 +18,12 @@ import com.google.inject.Inject;
  *
  */
 public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowEditorWidget, ColumnModelTableRowEditorView.TypePresenter {
+	public static final String MUST_BE_A_NUMBER = "Must be: 1 - 1000";
 	public static final String NAME_CANNOT_BE_EMPTY = "Name cannot be empty";
 	public static final int DEFAULT_STRING_SIZE = 50;
 	public static final int MAX_STRING_SIZE = 1000;
+	public static final String MUST_BE_A_NUMBER_ONE_AND_HUNDRED = "Must be: 1 - 100";
+	public static final int MAX_LIST_LENGTH = 100;
 	ColumnModelTableRowEditorView view;
 	ColumnTypeViewEnum currentType;
 	CellFactory factory;
@@ -354,6 +357,12 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		if (!validateName()) {
 			isValid = false;
 		}
+		if (!validateSize()) {
+			isValid = false;
+		}
+		if (!validateMaxListLength()) {
+			isValid = false;
+		}
 		if (!view.validateDefault()) {
 			isValid = false;
 		}
@@ -377,7 +386,61 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		}
 		return isValid;
 	}
-
+	
+	/**
+	 * Validate the size
+	 * 
+	 * @return
+	 */
+	public boolean validateSize() {
+		boolean isValid = true;
+		ColumnTypeViewEnum type = view.getColumnType();
+		if (canHaveSize(type)) {
+			String sizeString = view.getMaxSize();
+			try {
+				int size = Integer.parseInt(sizeString);
+				if (size < 1 || size > MAX_STRING_SIZE) {
+					view.setSizeError(MUST_BE_A_NUMBER);
+					isValid = false;
+				}
+			} catch (NumberFormatException e) {
+				view.setSizeError(MUST_BE_A_NUMBER);
+				isValid = false;
+			}
+		}
+		if (isValid) {
+			view.clearSizeError();
+		}
+		return isValid;
+	}
+	
+	/**
+	 * Validate the max list length
+	 * 
+	 * @return
+	 */
+	public boolean validateMaxListLength() {
+		boolean isValid = true;
+		ColumnTypeViewEnum type = view.getColumnType();
+		if (canHaveMaxListLength(type)) {
+			String lengthString = view.getMaxListLength();
+			try {
+				int length = Integer.parseInt(lengthString);
+				if (length < 1 || length > MAX_LIST_LENGTH) {
+					view.setMaxListLengthError(MUST_BE_A_NUMBER_ONE_AND_HUNDRED);
+					isValid = false;
+				}
+			} catch (NumberFormatException e) {
+				view.setMaxListLengthError(MUST_BE_A_NUMBER_ONE_AND_HUNDRED);
+				isValid = false;
+			}
+		}
+		if (isValid) {
+			view.clearMaxListLengthError();
+		}
+		return isValid;
+	}
+	
 	@Override
 	public void setToBeDefaultFileViewColumn() {
 		view.setToBeDefaultFileViewColumn();
