@@ -69,6 +69,8 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 
 		configureFacetsForType(newType);
 		view.setRestrictValuesVisible(canHaveRestrictedValues(newType));
+		view.clearSizeError();
+		view.clearMaxListLengthError();
 		this.currentType = newType;
 		CellEditor defaultEditor = getDefaultEditorForType(newType);
 		view.setDefaultEditor(defaultEditor);
