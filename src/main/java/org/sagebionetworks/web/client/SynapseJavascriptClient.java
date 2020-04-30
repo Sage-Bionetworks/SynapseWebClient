@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Challenge;
@@ -70,6 +69,8 @@ import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.auth.Username;
+import org.sagebionetworks.repo.model.dataaccess.SubmissionInfoPage;
+import org.sagebionetworks.repo.model.dataaccess.SubmissionInfoPageRequest;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionPageRequest;
@@ -1745,6 +1746,14 @@ public class SynapseJavascriptClient {
 		}
 
 		doGet(url, OBJECT_TYPE.PaginatedResultsEvaluations, cb);
+	}
+	
+	public void listApprovedSubmissionInfo(String requirementId, String nextPageToken, AsyncCallback<SubmissionInfoPage> cb) {
+		SubmissionInfoPageRequest request = new SubmissionInfoPageRequest();
+		request.setAccessRequirementId(requirementId);
+		request.setNextPageToken(nextPageToken);
+		String url = getRepoServiceUrl() + ACCESS_REQUIREMENT + "/" + requirementId + "/approvedSubmissionInfo";
+		doPost(url, request, OBJECT_TYPE.SubmissionInfoPage, true, cb);
 	}
 }
 

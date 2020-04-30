@@ -1,13 +1,9 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
-import org.sagebionetworks.repo.model.dataaccess.Submission;
-import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
-import org.sagebionetworks.repo.model.dataaccess.SubmissionPage;
-import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
+import org.sagebionetworks.repo.model.dataaccess.SubmissionInfo;
+import org.sagebionetworks.repo.model.dataaccess.SubmissionInfoPage;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -16,12 +12,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class IntendedDataUseGenerator {
-	Map<String, Submission> researchProjectId2Submission;
 	SynapseJavascriptClient jsClient;
 	PopupUtilsView popupUtils;
 	DateTimeUtils dateTimeUtils;
 	String accessRequirementId;
 	CallbackP<String> mdCallback;
+	List<SubmissionInfo> submissions;
 	
 	@Inject
 	public IntendedDataUseGenerator(SynapseJavascriptClient jsClient, PopupUtilsView popupUtils, DateTimeUtils dateTimeUtils) {
@@ -33,41 +29,34 @@ public class IntendedDataUseGenerator {
 	public void gatherAllSubmissions(String accessRequirementId, CallbackP<String> mdCallback) {
 		this.accessRequirementId = accessRequirementId;
 		this.mdCallback = mdCallback;
-		researchProjectId2Submission = new HashMap<>();
+		submissions = new ArrayList<SubmissionInfo>();
 		gatherSubmissionsPage(null);
 	}
 	
 	private void gatherSubmissionsPage(String nextPageToken) {
-		// NOTE: Only ACT can call this service!  Need a new service to gather the ResearchProject snapshots and the submission modifiedOn.
-		// See PLFM-6172
-		jsClient.getDataAccessSubmissions(accessRequirementId, nextPageToken, SubmissionState.APPROVED, SubmissionOrder.CREATED_ON, true, new AsyncCallback<SubmissionPage>() {
+		jsClient.listApprovedSubmissionInfo(accessRequirementId, nextPageToken, new AsyncCallback<SubmissionInfoPage>() {
 			@Override
-			public void onSuccess(SubmissionPage page) {
-				List<Submission> newSubmissions = page.getResults();
-				for (Submission submission : newSubmissions) {
-					researchProjectId2Submission.put(submission.getResearchProjectSnapshot().getId(), submission);
-				}
+			public void onFailure(Throwable caught) {
+				popupUtils.showErrorMessage("Unable to get all submissions: " + caught.getMessage());
+			}
+			public void onSuccess(SubmissionInfoPage page) {
+				List<SubmissionInfo> newSubmissions = page.getResults();
+				submissions.addAll(newSubmissions);
 				if (!newSubmissions.isEmpty() && page.getNextPageToken() != null) {
 					gatherSubmissionsPage(page.getNextPageToken());
 				} else {
 					showIDUs();
 				}
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				popupUtils.showErrorMessage("Unable to get all submissions: " + caught.getMessage());
-			}
+			};
 		});
 	}
 
 	public void showIDUs() {
 		StringBuilder sb = new StringBuilder();
-		for (Submission submission : researchProjectId2Submission.values()) {
-			ResearchProject rp = submission.getResearchProjectSnapshot();
-			String projectLead = rp.getProjectLead();
-			String currentInstitution = rp.getInstitution();
-			String currentIDU = rp.getIntendedDataUseStatement();
+		for (SubmissionInfo submission : submissions) {
+			String projectLead = submission.getProjectLead();
+			String currentInstitution = submission.getInstitution();
+			String currentIDU = submission.getIntendedDataUseStatement();
 			sb.append("\n**Researcher:** ");
 			sb.append(projectLead);
 			sb.append("\n**Affiliation:** ");
