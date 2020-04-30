@@ -41,7 +41,7 @@ public class IntendedDataUseGenerator {
 			}
 			public void onSuccess(SubmissionInfoPage page) {
 				List<SubmissionInfo> newSubmissions = page.getResults();
-				submissions.addAll(newSubmissions);
+				submissions.addAll(0, newSubmissions);
 				if (!newSubmissions.isEmpty() && page.getNextPageToken() != null) {
 					gatherSubmissionsPage(page.getNextPageToken());
 				} else {

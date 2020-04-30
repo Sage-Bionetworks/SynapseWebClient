@@ -22,13 +22,14 @@ public class IntendedDataUseReportWidget implements WidgetRendererPresenter {
 		this.iduGenerator = iduGenerator;
 		this.mdWidget = mdWidget;
 		view.add(mdWidget);
+		
 	}
 
 	@Override
 	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		this.descriptor = widgetDescriptor;
-
-		String arId = descriptor.get(ACCESS_RESTRICTION_ID);
+		mdWidget.setLoadingVisible(true);
+		String arId = descriptor.get(ACCESS_RESTRICTION_ID).trim();
 		iduGenerator.gatherAllSubmissions(arId, md -> {
 			mdWidget.configure(md);
 		});

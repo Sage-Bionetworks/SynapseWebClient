@@ -5,7 +5,7 @@
   to {transform: rotate(360deg);}
 }
 
-.spinner {
+#body .spinner {
   box-sizing: border-box;
   margin: auto;
   position: relative;
@@ -21,7 +21,7 @@
   to {transform: rotate(360deg);}
 }
 
-.white-spinner {
+#body .white-spinner {
   box-sizing: border-box;
   margin: auto;
   position: relative;

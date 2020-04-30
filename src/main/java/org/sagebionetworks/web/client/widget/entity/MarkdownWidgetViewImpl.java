@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.AnchorElement;
 import com.google.gwt.dom.client.Element;
@@ -25,18 +26,17 @@ import com.google.inject.Inject;
 public class MarkdownWidgetViewImpl implements MarkdownWidgetView {
 	public interface Binder extends UiBinder<Widget, MarkdownWidgetViewImpl> {
 	}
-
 	Widget widget;
 	SynapseJSNIUtils jsniUtils;
-
 	@UiField
 	HTMLPanel contentPanel;
-
 	@UiField
 	SimplePanel synAlertPanel;
-
+	@UiField
+	LoadingSpinner loading;
 	@UiField
 	Italic emptyPanel;
+
 	public static GlobalApplicationState globalAppState;
 	public static final EventListener relativeLinkClickHandler = event -> {
 		event.preventDefault();
@@ -123,5 +123,10 @@ public class MarkdownWidgetViewImpl implements MarkdownWidgetView {
 	public void clearMarkdown() {
 		contentPanel.clear();
 		setMarkdown("");
+	}
+
+	@Override
+	public void setLoadingVisible(boolean visible) {
+		loading.setVisible(visible);	
 	}
 }

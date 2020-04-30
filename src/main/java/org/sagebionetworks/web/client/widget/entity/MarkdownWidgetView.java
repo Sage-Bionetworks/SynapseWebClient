@@ -31,4 +31,6 @@ public interface MarkdownWidgetView extends IsWidget {
 
 	void clearMarkdown();
 
+	void setLoadingVisible(boolean visible);
+
 }
