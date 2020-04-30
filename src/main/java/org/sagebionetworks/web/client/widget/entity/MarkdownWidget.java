@@ -85,6 +85,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		this.wikiKey = wikiKey;
 		this.wikiVersionInView = wikiVersionInView;
 		final String uniqueSuffix = "-" + new Date().getTime() + "" + gwt.nextRandomInt();
+		view.setLoadingVisible(false);
 		view.callbackWhenAttached(new Callback() {
 			@Override
 			public void invoke() {
@@ -196,15 +197,18 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	public void loadMarkdownFromWikiPage(final WikiPageKey wikiKey, final boolean isIgnoreLoadingFailure) {
 		synAlert.clear();
 		// get the wiki page
+		view.setLoadingVisible(true);
 		jsClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
 			@Override
 			public void onSuccess(WikiPage page) {
 				wikiKey.setWikiPageId(page.getId());
 				configure(page.getMarkdown(), wikiKey, null);
+				view.setLoadingVisible(false);
 			}
 
 			@Override
 			public void onFailure(Throwable caught) {
+				view.setLoadingVisible(false);
 				if (!isIgnoreLoadingFailure)
 					synAlert.showError(DisplayConstants.ERROR_LOADING_WIKI_FAILED + caught.getMessage());
 			}
@@ -219,4 +223,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		return view.asWidget();
 	}
 
+	public void setLoadingVisible(boolean visible) {
+		view.setLoadingVisible(visible);
+	}
 }

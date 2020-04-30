@@ -88,6 +88,8 @@
 							text="Cytoscape JS Graph" />
 						<b:AnchorListItem ui:field="externalWebsiteLink"
 							text="External Website" />
+						<b:AnchorListItem ui:field="iduReportLink"
+							text="Intended Data Use Report" />
 						<b:AnchorListItem
 							ui:field="registerChallengeTeamLink"
 							text="Register Challenge Team Button" />

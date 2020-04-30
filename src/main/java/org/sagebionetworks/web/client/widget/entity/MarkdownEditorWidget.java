@@ -6,7 +6,7 @@ import static org.sagebionetworks.web.shared.WidgetConstants.API_TABLE_CONTENT_T
 import static org.sagebionetworks.web.shared.WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.BIODALLIANCE13_CONTENT_TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.BUTTON_LINK_CONTENT_TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.BUTTON_TEXT_KEY;
+import static org.sagebionetworks.web.shared.WidgetConstants.*;
 import static org.sagebionetworks.web.shared.WidgetConstants.CHALLENGE_ID_KEY;
 import static org.sagebionetworks.web.shared.WidgetConstants.CHALLENGE_PARTICIPANTS_CONTENT_TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.CHALLENGE_TEAMS_CONTENT_TYPE;
@@ -57,6 +57,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamSelector;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
+import org.sagebionetworks.web.client.widget.entity.renderer.IntendedDataUseReportWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -329,6 +330,9 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 				break;
 			case INSERT_TUTORIAL_WIZARD:
 				insertMarkdown(WIDGET_START_MARKDOWN + TUTORIAL_WIZARD_CONTENT_TYPE + "?" + WIDGET_ENTITY_ID_KEY + "=syn123&" + TEXT_KEY + "=Tutorial" + WIDGET_END_MARKDOWN);
+				break;
+			case INSERT_INTENDED_DATA_USE_REPORT:
+				insertMarkdown(WIDGET_START_MARKDOWN + IDU_REPORT_CONTENT_TYPE + "?" + IntendedDataUseReportWidget.ACCESS_RESTRICTION_ID + "=12345" + WIDGET_END_MARKDOWN);
 				break;
 			case INSERT_REGISTER_CHALLENGE_TEAM:
 				insertMarkdown(WIDGET_START_MARKDOWN + REGISTER_CHALLENGE_TEAM_CONTENT_TYPE + "?" + CHALLENGE_ID_KEY + "=123&" + BUTTON_TEXT_KEY + "=Register team" + WIDGET_END_MARKDOWN);

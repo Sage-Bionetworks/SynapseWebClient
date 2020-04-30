@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
@@ -47,9 +48,10 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 	DateTimeUtils dateTimeUtils;
 	ReviewAccessorsButton manageAccessButton;
 	RestrictableObjectDescriptor targetSubject;
+	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 
 	@Inject
-	public ManagedACTAccessRequirementWidget(ManagedACTAccessRequirementWidgetView view, SynapseJavascriptClient jsClient, WikiPageWidget wikiPageWidget, SynapseAlert synAlert, PortalGinInjector ginInjector, SubjectsWidget subjectsWidget, CreateAccessRequirementButton createAccessRequirementButton, DeleteAccessRequirementButton deleteAccessRequirementButton, ReviewAccessRequestsButton reviewAccessRequestsButton, IntendedDataUseReportButton iduReportButton, DataAccessClientAsync dataAccessClient, LazyLoadHelper lazyLoadHelper, AuthenticationController authController, UserBadge submitterUserBadge, DateTimeUtils dateTimeUtils, ReviewAccessorsButton manageAccessButton) {
+	public ManagedACTAccessRequirementWidget(ManagedACTAccessRequirementWidgetView view, SynapseJavascriptClient jsClient, WikiPageWidget wikiPageWidget, SynapseAlert synAlert, PortalGinInjector ginInjector, SubjectsWidget subjectsWidget, CreateAccessRequirementButton createAccessRequirementButton, DeleteAccessRequirementButton deleteAccessRequirementButton, ReviewAccessRequestsButton reviewAccessRequestsButton, IntendedDataUseReportButton iduReportButton, DataAccessClientAsync dataAccessClient, LazyLoadHelper lazyLoadHelper, AuthenticationController authController, UserBadge submitterUserBadge, DateTimeUtils dateTimeUtils, ReviewAccessorsButton manageAccessButton, IsACTMemberAsyncHandler isACTMemberAsyncHandler) {
 		this.view = view;
 		this.jsClient = jsClient;
 		this.synAlert = synAlert;
@@ -67,6 +69,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		this.authController = authController;
 		this.submitterUserBadge = submitterUserBadge;
 		this.dateTimeUtils = dateTimeUtils;
+		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setSubmitterUserBadge(submitterUserBadge);
 		view.setPresenter(this);
@@ -115,6 +118,10 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		manageAccessButton.configure(ar);
 		subjectsWidget.configure(ar.getSubjectIds());
 		lazyLoadHelper.setIsConfigured();
+		view.setAccessRequirementID(ar.getId().toString());
+		isACTMemberAsyncHandler.isACTActionAvailable(isACT -> {
+			view.setAccessRequirementIDVisible(isACT);
+		});
 	}
 
 	public void setTargetSubject(RestrictableObjectDescriptor targetSubject) {

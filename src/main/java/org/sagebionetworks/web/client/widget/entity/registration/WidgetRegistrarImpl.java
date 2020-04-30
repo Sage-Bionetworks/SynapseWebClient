@@ -17,6 +17,7 @@ import static org.sagebionetworks.web.shared.WidgetConstants.CYTOSCAPE_FRIENDLY_
 import static org.sagebionetworks.web.shared.WidgetConstants.DETAILS_SUMMARY_CONTENT_TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.ENTITYLIST_CONTENT_TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.ENTITYLIST_FRIENDLY_NAME;
+import static org.sagebionetworks.web.shared.WidgetConstants.IDU_REPORT_CONTENT_TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.IMAGE_CONTENT_TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.IMAGE_FRIENDLY_NAME;
 import static org.sagebionetworks.web.shared.WidgetConstants.IMAGE_LINK_EDITOR_CONTENT_TYPE;
@@ -283,6 +284,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getJoinTeamWidget();
 		} else if (contentTypeKey.equals(SUBMIT_TO_EVALUATION_CONTENT_TYPE) || contentTypeKey.equals(OLD_JOIN_EVALUATION_CONTENT_TYPE)) {
 			presenter = ginInjector.getEvaluationSubmissionWidget();
+		} else if (contentTypeKey.equals(IDU_REPORT_CONTENT_TYPE)) {
+			presenter = ginInjector.getIntendedDataUseReportWidget();
 		} else if (contentTypeKey.equals(BUTTON_LINK_CONTENT_TYPE)) {
 			presenter = ginInjector.getButtonLinkWidget();
 		} else if (contentTypeKey.equals(TUTORIAL_WIZARD_CONTENT_TYPE)) {
