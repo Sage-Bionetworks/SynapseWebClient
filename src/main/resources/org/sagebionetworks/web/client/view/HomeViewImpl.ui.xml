@@ -126,7 +126,7 @@
 						<bh:Paragraph>
 							<bh:Text>Don't see your language of choice here? Check out our
 								full</bh:Text>
-							<b:Anchor href="http://docs.synapse.org/rest/"
+							<b:Anchor href="https://rest-docs.synapse.org/rest/"
 								text="REST API documentation" target="_blank"
 								addStyleNames="margin-left-5" />
 						</bh:Paragraph>
