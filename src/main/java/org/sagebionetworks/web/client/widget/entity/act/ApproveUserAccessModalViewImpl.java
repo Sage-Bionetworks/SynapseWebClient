@@ -113,14 +113,14 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	}
 
 	@Override
-	public void setStates(List<String> states) {
+	public void setAccessRequirementIDs(List<String> states) {
 		arDropdownMenu.clear();
 		for (final String state : states) {
 			AnchorListItem item = new AnchorListItem(state);
 			item.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					presenter.onStateSelected(state);
+					presenter.onAccessRequirementIDSelected(state);
 				}
 			});
 			arDropdownMenu.add(item);

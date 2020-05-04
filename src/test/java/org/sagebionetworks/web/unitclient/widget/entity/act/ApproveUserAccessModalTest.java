@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.act;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anySetOf;
@@ -17,6 +19,7 @@ import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccess
 import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.QUERY_CANCELLED;
 import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.REVOKED_USER;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import org.junit.Before;
@@ -24,14 +27,15 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
+import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResult;
@@ -103,6 +107,8 @@ public class ApproveUserAccessModalTest {
 	@Captor
 	ArgumentCaptor<AsyncCallback<AccessApproval>> aaCaptor;
 	@Captor
+	ArgumentCaptor<List<String>> stringListCaptor;
+	@Captor
 	ArgumentCaptor<AsynchronousProgressHandler> phCaptor;
 	@Captor
 	ArgumentCaptor<AsyncCallback<String>> sCaptor;
@@ -110,6 +116,13 @@ public class ApproveUserAccessModalTest {
 	ArgumentCaptor<AsyncCallback<PaginatedResults<AccessApproval>>> prCaptor;
 	@Captor
 	ArgumentCaptor<AsyncCallback<Void>> vCaptor;
+	@Mock
+	ManagedACTAccessRequirement mockManagedACTAccessRequirement;
+	@Mock
+	ACTAccessRequirement mockACTAccessRequirement;
+	@Mock
+	SelfSignAccessRequirement mockSelfSignAccessRequirement;
+	
 	RestrictableObjectDescriptor expectedRestrictableObjectDescriptor = new RestrictableObjectDescriptor();
 	Long accessReq;
 	String userId;
@@ -117,6 +130,9 @@ public class ApproveUserAccessModalTest {
 	List<AccessRequirement> actList;
 	Exception ex;
 	public static final String ENTITY_ID = "syn1011938";
+	public static final Long ACT_ACCESS_REQUIREMENT_ID = 51L;
+	public static final Long MANAGED_ACT_ACCESS_REQUIREMENT_ID = 52L;
+	public static final Long SELF_SIGN_ACCESS_REQUIREMENT_ID = 53L;
 
 	@Before
 	public void before() {
@@ -129,9 +145,14 @@ public class ApproveUserAccessModalTest {
 		accessReq = 123L;
 		ex = new Exception("error message");
 
-		ACTAccessRequirement act = Mockito.mock(ACTAccessRequirement.class);
+		when(mockACTAccessRequirement.getId()).thenReturn(ACT_ACCESS_REQUIREMENT_ID);
+		when(mockManagedACTAccessRequirement.getId()).thenReturn(MANAGED_ACT_ACCESS_REQUIREMENT_ID);
+		when(mockSelfSignAccessRequirement.getId()).thenReturn(SELF_SIGN_ACCESS_REQUIREMENT_ID);
+		
 		actList = new ArrayList<AccessRequirement>();
-		actList.add(act);
+		actList.add(mockACTAccessRequirement);
+		actList.add(mockManagedACTAccessRequirement);
+		actList.add(mockSelfSignAccessRequirement);
 
 		when(mockQrb.getQueryResult()).thenReturn(mockQr);
 		when(mockQr.getQueryResults()).thenReturn(mockRs);
@@ -166,12 +187,22 @@ public class ApproveUserAccessModalTest {
 
 	@Test
 	public void testConfigureOneAccessReq() {
-		AccessRequirement ar = actList.get(0);
-		String num = Long.toString(ar.getId());
-		dialog.configure(actList, mockEntityBundle);
-		verify(mockArWidget).configure(ar.getId().toString(), expectedRestrictableObjectDescriptor);
-		verify(mockView).setAccessRequirement(eq(num));
+		dialog.configure(Collections.singletonList(mockACTAccessRequirement), mockEntityBundle);
+		verify(mockArWidget).configure(ACT_ACCESS_REQUIREMENT_ID.toString(), expectedRestrictableObjectDescriptor);
+		verify(mockView).setAccessRequirement(ACT_ACCESS_REQUIREMENT_ID.toString());
 		verify(mockView).setDatasetTitle(mockEntityBundle.getEntity().getName());
+	}
+	
+	@Test
+	public void testConfigureFilterManagedACTAccessRequirements() {
+		dialog.configure(actList, mockEntityBundle);
+		
+		verify(mockView).setAccessRequirementIDs(stringListCaptor.capture());
+		List<String> arIDs = stringListCaptor.getValue();
+		// verify managed act AR ID was not included
+		assertTrue(arIDs.contains(ACT_ACCESS_REQUIREMENT_ID.toString()));
+		assertTrue(arIDs.contains(SELF_SIGN_ACCESS_REQUIREMENT_ID.toString()));
+		assertFalse(arIDs.contains(MANAGED_ACT_ACCESS_REQUIREMENT_ID.toString()));
 	}
 
 	@Test
@@ -201,11 +232,11 @@ public class ApproveUserAccessModalTest {
 	}
 
 	@Test
-	public void testOnStateSelected() {
+	public void testOnAccessRequirementSelected() {
 		AccessRequirement ar = actList.get(0);
 		String num = Long.toString(ar.getId());
 		dialog.configure(actList, mockEntityBundle);
-		dialog.onStateSelected(num);
+		dialog.onAccessRequirementIDSelected(num);
 		verify(mockView, times(2)).setAccessRequirement(eq(num));
 	}
 
