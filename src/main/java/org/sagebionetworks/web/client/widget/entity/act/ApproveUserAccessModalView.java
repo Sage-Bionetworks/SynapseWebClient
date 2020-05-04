@@ -11,7 +11,7 @@ public interface ApproveUserAccessModalView extends IsWidget {
 
 	void setSynAlert(Widget asWidget);
 
-	void setStates(List<String> states);
+	void setAccessRequirementIDs(List<String> states);
 
 	void setUserPickerWidget(Widget w);
 
@@ -53,7 +53,7 @@ public interface ApproveUserAccessModalView extends IsWidget {
 	public interface Presenter {
 		void onSubmit();
 
-		void onStateSelected(String state);
+		void onAccessRequirementIDSelected(String state);
 
 		void onRevoke();
 	}

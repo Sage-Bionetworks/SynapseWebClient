@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
@@ -106,7 +107,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			public void onSuccess(List<AccessRequirement> result) {
 				List<AccessRequirement> ars = new ArrayList<>();
 				for (AccessRequirement ar : result) {
-					ars.add(ar);	
+					ars.add(ar);
 				}
 				configure(ars, bundle);
 			}
@@ -119,12 +120,16 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		this.entityBundle = bundle;
 		List<String> list = new ArrayList<String>();
 		for (AccessRequirement ar : accessRequirements) {
-			list.add(Long.toString(ar.getId()));
+			// approve/revoke for ManagedACTAccessRequirement handled through data access submission (backend does not currently support directly revoking this type)
+			// see PLFM-6209, and SWC-5189
+			if (!(ar instanceof ManagedACTAccessRequirement)) {
+				list.add(Long.toString(ar.getId()));
+			}
 		}
 		view.setSynAlert(synAlert.asWidget());
-		view.setStates(list);
+		view.setAccessRequirementIDs(list);
 		if (list.size() > 0) {
-			onStateSelected(list.get(0));
+			onAccessRequirementIDSelected(list.get(0));
 		}
 		datasetId = entityBundle.getEntity().getId(); // get synId of dataset we are currently on
 		view.setDatasetTitle(entityBundle.getEntity().getName());
@@ -291,7 +296,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	}
 
 	@Override
-	public void onStateSelected(String arID) {
+	public void onAccessRequirementIDSelected(String arID) {
 		accessRequirementId = arID;
 		arWidget.configure(arID, subject);
 		view.setAccessRequirement(arID);
