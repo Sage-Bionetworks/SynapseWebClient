@@ -121,6 +121,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		List<String> list = new ArrayList<String>();
 		for (AccessRequirement ar : accessRequirements) {
 			// approve/revoke for ManagedACTAccessRequirement handled through data access submission (backend does not currently support directly revoking this type)
+			// see PLFM-6209, and SWC-5189
 			if (!(ar instanceof ManagedACTAccessRequirement)) {
 				list.add(Long.toString(ar.getId()));
 			}
