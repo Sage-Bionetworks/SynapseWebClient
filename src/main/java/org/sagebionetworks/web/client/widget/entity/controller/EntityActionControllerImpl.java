@@ -595,7 +595,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void configureCreateOrUpdateDoi() {
 		boolean canEdit = permissions.getCanEdit();
 		actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
-		if (canEdit && !isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea) && !(entityBundle.getEntity() instanceof EntityView)) {
+		if (canEdit && !isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea)) {
 			actionMenu.setActionListener(Action.CREATE_OR_UPDATE_DOI, this);
 			actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
 			if (entityBundle.getDoiAssociation() == null) {
