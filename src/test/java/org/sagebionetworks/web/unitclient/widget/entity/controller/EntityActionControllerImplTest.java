@@ -1563,12 +1563,12 @@ public class EntityActionControllerImplTest {
 
 	@Test
 	public void testConfigureCreateOrUpdateDoiView() throws Exception {
-		// Create DOI not available for Views
+		// Create DOI is now available for Views since they're now versionable (SWC-4062, SWC-5191)
 		entityBundle.setDoiAssociation(null);
 		entityBundle.setEntity(new EntityView());
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
-		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
+		verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
 	}
 
 	@Test
