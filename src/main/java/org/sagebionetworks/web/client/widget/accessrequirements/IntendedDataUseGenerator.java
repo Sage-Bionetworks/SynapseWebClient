@@ -41,7 +41,7 @@ public class IntendedDataUseGenerator {
 			}
 			public void onSuccess(SubmissionInfoPage page) {
 				List<SubmissionInfo> newSubmissions = page.getResults();
-				submissions.addAll(0, newSubmissions);
+				submissions.addAll(newSubmissions);
 				if (!newSubmissions.isEmpty() && page.getNextPageToken() != null) {
 					gatherSubmissionsPage(page.getNextPageToken());
 				} else {
@@ -62,9 +62,9 @@ public class IntendedDataUseGenerator {
 			sb.append("\n**Affiliation:** ");
 			sb.append(currentInstitution);
 			String lastModifiedOn = dateTimeUtils.getDateString(submission.getModifiedOn());
-			sb.append("\n**Intended Data Use Statement (accepted on " + lastModifiedOn + "):**\n");
+			sb.append("\n**Intended Data Use Statement (accepted on " + lastModifiedOn + "):**\n<div>");
 			sb.append(currentIDU);
-			sb.append("\n\n-------------\n\n");
+			sb.append("</div>\n\n-------------\n\n");
 		}
 		mdCallback.invoke(sb.toString());
 	}
