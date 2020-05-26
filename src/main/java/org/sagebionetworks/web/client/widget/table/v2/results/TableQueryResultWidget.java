@@ -190,11 +190,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 				@Override
 				public void onFailure(Throwable failure) {
 					if (currentJobIndex == jobIndex) {
-						if (!startingQuery.getIsConsistent()) {
-							retryConsistentQuery(failure.getMessage());
-						} else {
-							showError(failure);
-						}
+						showError(failure);
 					}
 				}
 
@@ -217,15 +213,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		}
 	}
 
-	public void retryConsistentQuery(String message) {
-		if (!startingQuery.getIsConsistent()) {
-			// log, but try again with isConsistent = true.
-			synapseAlert.consoleError("Unexpected results when isConsistent=false, retrying with isConsistent=true.  " + message);
-			startingQuery.setIsConsistent(true);
-			runQuery(currentJobIndex);
-		}
-	}
-
 	/**
 	 * Look for the given etag in the given file view. If it is still there, wait a few seconds and try
 	 * again. If the etag is not in the view, then remove the clientCache key and run the query (since
@@ -242,7 +229,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		query.setSql("select * from " + fileViewEntityId + " where ROW_ETAG='" + oldEtag + "'");
 		query.setOffset(DEFAULT_OFFSET);
 		query.setLimit(DEFAULT_LIMIT);
-		query.setIsConsistent(true);
 		qbr.setQuery(query);
 		qbr.setEntityId(fileViewEntityId);
 		AsynchronousProgressWidget progressWidget = ginInjector.creatNewAsynchronousProgressWidget();
@@ -288,8 +274,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		RowSet rowSet = result.getQueryResults();
 		List<Row> rows = rowSet.getRows();
 
-		if (!startingQuery.getIsConsistent() && rows.isEmpty()) {
-			retryConsistentQuery("No rows returned.");
+		if (rows.isEmpty()) {
+			showError("No rows returned.");
 			return;
 		}
 		if (cachedFullQueryResultBundle != null) {

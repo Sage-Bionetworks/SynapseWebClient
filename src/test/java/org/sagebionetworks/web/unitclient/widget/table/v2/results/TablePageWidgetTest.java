@@ -170,7 +170,6 @@ public class TablePageWidgetTest {
 		when(mockDateTimeUtils.getDateTimeString(any(Date.class))).thenReturn(FRIENDLY_DATE_STRING);
 
 		query = new Query();
-		query.setIsConsistent(true);
 		query.setLimit(100L);
 		query.setOffset(0L);
 		query.setSql("select * from " + ENTITY_ID);

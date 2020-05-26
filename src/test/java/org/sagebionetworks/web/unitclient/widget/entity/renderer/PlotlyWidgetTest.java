@@ -242,7 +242,6 @@ public class PlotlyWidgetTest {
 		assertTrue(q.getIncludeEntityEtag());
 		assertEquals((Long) TableEntityWidget.DEFAULT_OFFSET, q.getOffset());
 		assertEquals((Long) TableEntityWidget.DEFAULT_LIMIT, q.getLimit());
-		assertTrue(q.getIsConsistent());
 		String sql = q.getSql();
 		assertTrue(sql.contains("\"" + X_COLUMN_NAME + "\"='" + xValue + "'"));
 		assertTrue(sql.contains(TABLE_ID));

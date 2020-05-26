@@ -169,7 +169,6 @@ public class TablesTabTest {
 		query.setSql("select one, two, three from syn22 where name=\"bar\" and type in('one','two','three'");
 		query.setLimit(101L);
 		query.setOffset(33L);
-		query.setIsConsistent(true);
 		SortItem one = new SortItem();
 		one.setColumn("one");
 		one.setDirection(SortDirection.ASC);

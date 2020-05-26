@@ -118,8 +118,7 @@ public class TableQueryResultWikiWidgetTest {
 		assertEquals(sql, query.getSql());
 		assertEquals((Long) TableEntityWidget.DEFAULT_LIMIT, query.getLimit());
 		assertEquals((Long) TableEntityWidget.DEFAULT_OFFSET, query.getOffset());
-		assertFalse(query.getIsConsistent());
-
+		
 		boolean isCurrentVersion = true;
 		String wikiPageRootId = null;
 		verify(mockEntityActionController).configure(mockActionMenu, mockEntityBundle, isCurrentVersion, wikiPageRootId, EntityArea.TABLES);
