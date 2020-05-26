@@ -94,7 +94,6 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		query = new Query();
 		query.setLimit(limit);
 		query.setOffset(offset);
-		query.setIsConsistent(false);
 		String sql = descriptor.get(WidgetConstants.TABLE_QUERY_KEY);
 		query.setSql(sql);
 		String tableId = QueryBundleUtils.getTableIdFromSql(query.getSql());

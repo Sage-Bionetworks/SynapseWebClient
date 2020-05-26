@@ -124,7 +124,6 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		currentOffset = 0L;
 		query = new Query();
 		query.setSql(sql);
-		query.setIsConsistent(false);
 		limit = DEFAULT_LIMIT;
 		partMask = DEFAULT_PART_MASK;
 		qbr = new QueryBundleRequest();
@@ -344,7 +343,6 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 			query.setSql(sql);
 			query.setOffset(TableEntityWidget.DEFAULT_OFFSET);
 			query.setLimit(TableEntityWidget.DEFAULT_LIMIT);
-			query.setIsConsistent(true);
 			String queryToken = queryTokenProvider.queryToToken(query);
 			String url = "#!Synapse:" + qbr.getEntityId() + "/" + TABLES.toString().toLowerCase() + "/" + TABLE_QUERY_PREFIX + queryToken;
 			view.newWindow(url);

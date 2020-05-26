@@ -202,7 +202,6 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 
 		Query query = new Query();
 		query.setSql(builder.toString());
-		query.setIsConsistent(true);
 		return query;
 	}
 

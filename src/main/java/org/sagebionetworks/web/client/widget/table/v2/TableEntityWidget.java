@@ -404,7 +404,6 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 		query.setSql(builder.toString());
 		query.setOffset(DEFAULT_OFFSET);
 		query.setLimit(DEFAULT_LIMIT);
-		query.setIsConsistent(true);
 		return query;
 	}
 

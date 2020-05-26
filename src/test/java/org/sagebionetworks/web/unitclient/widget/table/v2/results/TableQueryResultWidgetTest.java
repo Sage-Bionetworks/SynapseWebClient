@@ -9,7 +9,7 @@ import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.*;
 import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_RESULTS;
@@ -134,7 +134,6 @@ public class TableQueryResultWidgetTest {
 		widget = new TableQueryResultWidget(mockView, mockSynapseClient, mockGinInjector, mockSynapseAlert, mockClientCache, mockGWT, mockFacetsWidget, mockPopupUtils);
 		query = new Query();
 		query.setSql("select * from " + ENTITY_ID);
-		query.setIsConsistent(true);
 		row = new Row();
 		row.setRowId(123L);
 		select = new SelectColumn();
@@ -313,39 +312,17 @@ public class TableQueryResultWidgetTest {
 	}
 
 	@Test
-	public void testConfigureEmptyResultsIsConsistentFalse() {
-		// no rows are returned, and isConsistent is false. Verify it retries query in this case.
+	public void testConfigureEmptyResults() {
+		// no rows are returned
 		boolean isEditable = false;
 		tableType = TableType.files;
-		query.setIsConsistent(false);
 		rowSet.setRows(Collections.EMPTY_LIST);
 
 		widget.configure(query, isEditable, tableType, mockListner);
 
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
 		asyncProgressHandlerCaptor.getValue().onComplete(bundle);
-
-		verify(mockJobTrackingWidget2).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), any(AsynchronousProgressHandler.class));
-		// verify isConsistent has been flipped to true due to the empty result
-		assertTrue(query.getIsConsistent());
-	}
-
-	@Test
-	public void testConfigureErrorIsConsistentFalse() {
-		boolean isEditable = true;
-		// Make the call that changes it all.
-		widget.configure(query, isEditable, tableType, mockListner);
-		query.setIsConsistent(false);
-
-		// Setup a failure
-		UnauthorizedException error = new UnauthorizedException("Failed!!");
-		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
-		// invoke the error
-		asyncProgressHandlerCaptor.getValue().onFailure(error);
-
-		verify(mockJobTrackingWidget2).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), any(AsynchronousProgressHandler.class));
-		// verify isConsistent has been flipped to true due to the empty result
-		assertTrue(query.getIsConsistent());
+		verifyZeroInteractions(mockJobTrackingWidget2);
 	}
 
 	@Test
