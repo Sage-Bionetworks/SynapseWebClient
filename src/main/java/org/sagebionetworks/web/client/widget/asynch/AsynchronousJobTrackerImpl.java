@@ -176,7 +176,6 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 	 * @param caught
 	 */
 	private void oneTimeOnFailure(Throwable caught) {
-		GWT.debugger();
 		AsynchronousProgressHandler mightBeNull = this.oneTimeReference.getReference();
 		if (mightBeNull != null) {
 			mightBeNull.onFailure(caught);
