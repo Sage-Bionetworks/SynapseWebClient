@@ -4,19 +4,20 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEditor.*;
+import static org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEditor.CHARACTERS_OR_LESS;
+import static org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEditor.ITEMS_OR_LESS;
+import static org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEditor.MUST_BE;
+import static org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEditor.VALID_JSON_ARRAY;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEditor;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 
 
 @RunWith(MockitoJUnitRunner.class)

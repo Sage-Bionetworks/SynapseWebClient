@@ -2,8 +2,6 @@ package org.sagebionetworks.web.unitclient.widget.table.v2.results.cell;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import java.util.Arrays;
@@ -382,7 +380,7 @@ public class CellFactoryImplTest {
 		cm.setMaximumListLength(maxListLength);
 		assertEquals(mockListCellEditor, cellFactory.createEditor(cm));
 		// The max size and list length must get passed to the editor
-		verify(mockListCellEditor, never()).setMaxSize(any());
+		verify(mockListCellEditor).setMaxSize(null);
 		verify(mockListCellEditor).setMaxListLength(maxListLength);
 	}
 
