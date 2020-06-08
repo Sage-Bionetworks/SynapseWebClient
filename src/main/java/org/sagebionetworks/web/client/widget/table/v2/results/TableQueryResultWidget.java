@@ -31,6 +31,7 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -270,14 +271,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * @param bundle
 	 */
 	private void setQueryResults(final QueryResultBundle bundle) {
-		QueryResult result = bundle.getQueryResult();
-		RowSet rowSet = result.getQueryResults();
-		List<Row> rows = rowSet.getRows();
-
-		if (rows.isEmpty()) {
-			showError("No rows returned.");
-			return;
-		}
 		if (cachedFullQueryResultBundle != null) {
 			bundle.setColumnModels(cachedFullQueryResultBundle.getColumnModels());
 			bundle.setFacets(cachedFullQueryResultBundle.getFacets());
@@ -296,6 +289,14 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		// configure the page widget
 		this.pageViewerWidget.configure(bundle, this.startingQuery, sortItems, false, tableType, null, this, facetChangedHandler);
 		pageViewerWidget.setTableVisible(true);
+		
+		QueryResult result = bundle.getQueryResult();
+		RowSet rowSet = result.getQueryResults();
+		List<Row> rows = rowSet.getRows();
+		if (rows.isEmpty()) {
+			showError("No rows returned.");
+		}
+
 		fireFinishEvent(true, isQueryResultEditable());
 	}
 
