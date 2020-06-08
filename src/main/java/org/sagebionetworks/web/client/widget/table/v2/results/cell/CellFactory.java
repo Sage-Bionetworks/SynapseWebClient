@@ -39,10 +39,12 @@ public class CellFactory {
 			case STRING_LIST:
 			case BOOLEAN_LIST:
 			case INTEGER_LIST:
+//			case ENTITYID_LIST:
+//			case USERID_LIST:
 				return ginInjector.createStringListRendererCellView();
 			case DATE_LIST:
-				return ginInjector.createDateListRendererCellView();
-			
+				return ginInjector.createDateListRendererCellView();				
+			//TODO: add special renderers for entity id list and user id list
 			default:
 				return ginInjector.createStringRendererCellView();
 		}
@@ -57,6 +59,17 @@ public class CellFactory {
 			editor = enumEditor;
 		} else {
 			switch (model.getColumnType()) {
+				case STRING_LIST:
+				case INTEGER_LIST:
+				case BOOLEAN_LIST:
+				case DATE_LIST:
+//				case ENTITYID_LIST:
+//				case USERID_LIST:
+					ListEditorCell listEditor = ginInjector.createListEditor();
+					listEditor.setMaxSize(model.getMaximumSize());
+					listEditor.setMaxListLength(model.getMaximumListLength());
+					editor = listEditor;
+					break;
 				case DATE:
 					editor = ginInjector.createDateCellEditor();
 					break;
@@ -77,7 +90,7 @@ public class CellFactory {
 					break;
 				case USERID:
 					editor = ginInjector.createUserIdCellEditor();
-					break;
+					break;					
 				default:
 					StringEditorCell stringEditor = ginInjector.createStringEditorCell();
 					stringEditor.setMaxSize(model.getMaximumSize());
@@ -99,6 +112,17 @@ public class CellFactory {
 			editor = enumEditor;
 		} else {
 			switch (model.getColumnType()) {
+				case STRING_LIST:
+				case INTEGER_LIST:
+				case BOOLEAN_LIST:
+				case DATE_LIST:
+//				case ENTITYID_LIST:
+//				case USERID_LIST:
+					ListEditorCell stringListEditor = ginInjector.createListEditor();
+					stringListEditor.setMaxSize(model.getMaximumSize());
+					stringListEditor.setMaxListLength(model.getMaximumListLength());
+					editor = stringListEditor;
+					break;
 				case DATE:
 					editor = ginInjector.createDateCellEditor();
 					break;
