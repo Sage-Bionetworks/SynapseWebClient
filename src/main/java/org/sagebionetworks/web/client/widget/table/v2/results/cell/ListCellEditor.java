@@ -28,16 +28,19 @@ public class ListCellEditor extends AbstractCellEditor implements CellEditor {
 	@Override
 	public boolean isValid() {
 		String value = StringUtils.emptyAsNull(this.getValue());
-		if (value != null && maxListLength != null) {
+		if (value != null) {
 			// parse value
 			try {
 				JSONArrayAdapter adapter = jsonArrayAdapter.createNewArray(value);
-				boolean isListLengthValid = adapter.length() <= maxListLength;
-				if (!isListLengthValid) {
-					view.setValidationState(ValidationState.ERROR);
-					view.setHelpText(MUST_BE + maxListLength + ITEMS_OR_LESS);
-					return false;
+				if (maxListLength != null) {
+					boolean isListLengthValid = adapter.length() <= maxListLength;
+					if (!isListLengthValid) {
+						view.setValidationState(ValidationState.ERROR);
+						view.setHelpText(MUST_BE + maxListLength + ITEMS_OR_LESS);
+						return false;
+					}	
 				}
+				
 				if (maximumSize != null) {
 					// check that each value is under the max string length
 					for (int i = 0; i < adapter.length(); i++) {
