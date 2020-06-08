@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -103,7 +104,6 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		if (result != null && !result.isEmpty()) {
 			view.setEmptyVisible(false);
 			view.setMarkdown(result);
-			synapseJSNIUtils.highlightCodeBlocks();
 			synapseJSNIUtils.loadSummaryDetailsShim();
 			loadMath(uniqueSuffix);
 			loadWidgets(wikiKey, wikiVersionInView, uniqueSuffix);
