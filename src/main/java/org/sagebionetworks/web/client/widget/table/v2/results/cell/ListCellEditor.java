@@ -9,7 +9,7 @@ import com.google.inject.Inject;
 /**
  * An editor for list type columns renders raw json array!).
  */
-public class ListEditorCell extends AbstractCellEditor implements CellEditor {
+public class ListCellEditor extends AbstractCellEditor implements CellEditor {
 
 	public static final String MUST_BE = "Must be ";
 	public static final String CHARACTERS_OR_LESS = " characters or less";
@@ -20,7 +20,7 @@ public class ListEditorCell extends AbstractCellEditor implements CellEditor {
 	Long maximumSize;
 
 	@Inject
-	public ListEditorCell(CellEditorView view, JSONArrayAdapter jsonArrayAdapter) {
+	public ListCellEditor(CellEditorView view, JSONArrayAdapter jsonArrayAdapter) {
 		super(view);
 		this.jsonArrayAdapter = jsonArrayAdapter;
 	}

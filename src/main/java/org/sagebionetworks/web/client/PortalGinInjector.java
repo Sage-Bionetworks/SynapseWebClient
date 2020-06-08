@@ -227,7 +227,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEd
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LargeStringCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListEditorCell;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditor;
@@ -523,7 +523,7 @@ public interface PortalGinInjector extends Ginjector {
 
 	StringEditorCell createStringEditorCell();
 	
-	ListEditorCell createListEditor();
+	ListCellEditor createListCellEditor();
 
 	EntityIdCellEditor createEntityIdCellEditor();
 

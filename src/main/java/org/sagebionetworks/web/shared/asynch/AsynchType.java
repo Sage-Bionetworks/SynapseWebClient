@@ -1,18 +1,8 @@
 package org.sagebionetworks.web.shared.asynch;
 
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.ASYNC_GET;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.ASYNC_START;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.DOI;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.DOWNLOAD_LIST_ADD;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.FILE_BULK;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.STORAGE_REPORT;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_APPEND;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_DOWNLOAD_CSV;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_QUERY;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_QUERY_NEXTPAGE;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_TRANSACTION;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_UPLOAD_CSV;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_UPLOAD_CSV_PREVIEW;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.*;
+
+
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.doi.v2.DoiRequest;
@@ -24,6 +14,8 @@ import org.sagebionetworks.repo.model.file.BulkFileDownloadResponse;
 import org.sagebionetworks.repo.model.report.DownloadStorageReportRequest;
 import org.sagebionetworks.repo.model.report.DownloadStorageReportResponse;
 import org.sagebionetworks.repo.model.table.AppendableRowSetRequest;
+import org.sagebionetworks.repo.model.schema.CreateSchemaRequest;
+import org.sagebionetworks.repo.model.schema.CreateSchemaResponse;
 import org.sagebionetworks.repo.model.table.DownloadFromTableRequest;
 import org.sagebionetworks.repo.model.table.DownloadFromTableResult;
 import org.sagebionetworks.repo.model.table.HasEntityId;
@@ -49,7 +41,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public enum AsynchType implements IsSerializable {
 	TableAppendRowSet(TABLE_APPEND, AppendableRowSetRequest.class, RowReferenceSetResults.class), TableQuery(TABLE_QUERY, QueryBundleRequest.class, QueryResultBundle.class), TableQueryNextPage(TABLE_QUERY_NEXTPAGE, QueryNextPageToken.class, QueryResult.class), TableCSVUpload(TABLE_UPLOAD_CSV, UploadToTableRequest.class, UploadToTableResult.class), TableCSVUploadPreview(TABLE_UPLOAD_CSV_PREVIEW, UploadToTablePreviewRequest.class, UploadToTablePreviewResult.class), TableCSVDownload(TABLE_DOWNLOAD_CSV, DownloadFromTableRequest.class, DownloadFromTableResult.class), BulkFileDownload(FILE_BULK, BulkFileDownloadRequest.class, BulkFileDownloadResponse.class), TableTransaction(TABLE_TRANSACTION, TableUpdateTransactionRequest.class, TableUpdateTransactionResponse.class), Doi(DOI, DoiRequest.class, DoiResponse.class), AddFileToDownloadList(DOWNLOAD_LIST_ADD, AddFileToDownloadListRequest.class, AddFileToDownloadListResponse.class), DownloadStorageReport(STORAGE_REPORT,
-			DownloadStorageReportRequest.class, DownloadStorageReportResponse.class);
+			DownloadStorageReportRequest.class, DownloadStorageReportResponse.class), CreateJsonSchema(SCHEMA_TYPE_CREATE, CreateSchemaRequest.class, CreateSchemaResponse.class);
 
 	String prefix;
 	Class<? extends AsynchronousRequestBody> requestClass;

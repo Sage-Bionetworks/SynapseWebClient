@@ -65,7 +65,7 @@ public class CellFactory {
 				case DATE_LIST:
 //				case ENTITYID_LIST:
 //				case USERID_LIST:
-					ListEditorCell listEditor = ginInjector.createListEditor();
+					ListCellEditor listEditor = ginInjector.createListCellEditor();
 					listEditor.setMaxSize(model.getMaximumSize());
 					listEditor.setMaxListLength(model.getMaximumListLength());
 					editor = listEditor;
@@ -118,10 +118,10 @@ public class CellFactory {
 				case DATE_LIST:
 //				case ENTITYID_LIST:
 //				case USERID_LIST:
-					ListEditorCell stringListEditor = ginInjector.createListEditor();
-					stringListEditor.setMaxSize(model.getMaximumSize());
-					stringListEditor.setMaxListLength(model.getMaximumListLength());
-					editor = stringListEditor;
+					ListCellEditor listEditor = ginInjector.createListCellEditor();
+					listEditor.setMaxSize(model.getMaximumSize());
+					listEditor.setMaxListLength(model.getMaximumListLength());
+					editor = listEditor;
 					break;
 				case DATE:
 					editor = ginInjector.createDateCellEditor();
