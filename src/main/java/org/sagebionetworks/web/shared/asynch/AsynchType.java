@@ -16,7 +16,7 @@ import org.sagebionetworks.repo.model.report.DownloadStorageReportResponse;
 import org.sagebionetworks.repo.model.table.AppendableRowSetRequest;
 import org.sagebionetworks.repo.model.schema.CreateSchemaRequest;
 import org.sagebionetworks.repo.model.schema.CreateSchemaResponse;
-import org.sagebionetworks.repo.model.table.DownloadFromTableRequest;
+import org.sagebionetworks.repo.model.table.*;
 import org.sagebionetworks.repo.model.table.DownloadFromTableResult;
 import org.sagebionetworks.repo.model.table.HasEntityId;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
@@ -41,7 +41,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public enum AsynchType implements IsSerializable {
 	TableAppendRowSet(TABLE_APPEND, AppendableRowSetRequest.class, RowReferenceSetResults.class), TableQuery(TABLE_QUERY, QueryBundleRequest.class, QueryResultBundle.class), TableQueryNextPage(TABLE_QUERY_NEXTPAGE, QueryNextPageToken.class, QueryResult.class), TableCSVUpload(TABLE_UPLOAD_CSV, UploadToTableRequest.class, UploadToTableResult.class), TableCSVUploadPreview(TABLE_UPLOAD_CSV_PREVIEW, UploadToTablePreviewRequest.class, UploadToTablePreviewResult.class), TableCSVDownload(TABLE_DOWNLOAD_CSV, DownloadFromTableRequest.class, DownloadFromTableResult.class), BulkFileDownload(FILE_BULK, BulkFileDownloadRequest.class, BulkFileDownloadResponse.class), TableTransaction(TABLE_TRANSACTION, TableUpdateTransactionRequest.class, TableUpdateTransactionResponse.class), Doi(DOI, DoiRequest.class, DoiResponse.class), AddFileToDownloadList(DOWNLOAD_LIST_ADD, AddFileToDownloadListRequest.class, AddFileToDownloadListResponse.class), DownloadStorageReport(STORAGE_REPORT,
-			DownloadStorageReportRequest.class, DownloadStorageReportResponse.class), CreateJsonSchema(SCHEMA_TYPE_CREATE, CreateSchemaRequest.class, CreateSchemaResponse.class);
+			DownloadStorageReportRequest.class, DownloadStorageReportResponse.class), CreateJsonSchema(SCHEMA_TYPE_CREATE, CreateSchemaRequest.class, CreateSchemaResponse.class), ViewColumnModelRequest(VIEW_COLUMN_MODEL_REQUEST, ViewColumnModelRequest.class, ViewColumnModelResponse.class);
 
 	String prefix;
 	Class<? extends AsynchronousRequestBody> requestClass;
