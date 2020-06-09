@@ -37,7 +37,9 @@ public class MarkdownItImpl implements MarkdownIt {
 							} catch (_err) {
 								console.error(_err);
 							}
-						}
+						} else {
+							return $wnd.hljs.highlightAuto(str).value;
+						}						
 						return ''; // use external highlight
 					}
 				});
