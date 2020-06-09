@@ -117,8 +117,8 @@ public class MarkdownWidgetTest {
 		// verify loadMath
 		verify(mockSynapseJSNIUtils).processMath(mockElementWrapper.getElement());
 
-		// verify highlight code blocks applied
-		verify(mockSynapseJSNIUtils).highlightCodeBlocks();
+		// highlight code blocks is now called during markdown-it processing
+//		verify(mockSynapseJSNIUtils).highlightCodeBlocks();
 
 		// verify loadWidgets
 		verify(mockWidgetRegistrar).getWidgetContentType(elementContentType);
