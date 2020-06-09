@@ -9,6 +9,8 @@ import org.sagebionetworks.repo.model.table.ColumnModelPage;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
+import org.sagebionetworks.repo.model.table.ViewColumnModelRequest;
+import org.sagebionetworks.repo.model.table.ViewColumnModelResponse;
 import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -110,24 +112,38 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	}
 
 	public void getPossibleColumnModelsForViewScope(String nextPageToken) {
+		view.setJobTrackerVisible(true);
 		presenter.clearErrors();
 		ViewScope scope = new ViewScope();
 		scope.setScope(((EntityView) entity).getScopeIds());
 		scope.setViewTypeMask(tableType.getViewTypeMask().longValue());
-		synapseClient.getPossibleColumnModelsForViewScope(scope, nextPageToken, new AsyncCallback<ColumnModelPage>() {
+		
+		ViewColumnModelRequest request = new ViewColumnModelRequest();
+		request.setViewScope(scope);
+		
+		this.jobTrackingWidget.startAndTrackJob("Adding Columns", false, AsynchType.ViewColumnModelRequest, request, new AsynchronousProgressHandler() {
 			@Override
-			public void onFailure(Throwable caught) {
-				presenter.setError(caught);
+			public void onFailure(Throwable failure) {
+				view.setJobTrackerVisible(false);
+				presenter.setError(failure);
 			}
 
 			@Override
-			public void onSuccess(ColumnModelPage columnPage) {
-				editor.addColumns(columnPage.getResults());
-				if (columnPage.getNextPageToken() != null) {
-					getPossibleColumnModelsForViewScope(columnPage.getNextPageToken());
+			public void onComplete(AsynchronousResponseBody response) {
+				ViewColumnModelResponse viewColumnModelResponse = (ViewColumnModelResponse) response;
+				editor.addColumns(viewColumnModelResponse.getResults());
+				if (viewColumnModelResponse.getNextPageToken() != null) {
+					getPossibleColumnModelsForViewScope(viewColumnModelResponse.getNextPageToken());
+				} else {
+					view.setJobTrackerVisible(false);
 				}
 			}
-		});
+
+			@Override
+			public void onCancel() {
+				view.setJobTrackerVisible(false);
+			}
+		});		
 	}
 
 	@Override

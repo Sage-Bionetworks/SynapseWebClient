@@ -204,8 +204,6 @@ public interface SynapseClientAsync {
 
 	void generateSqlWithFacets(String basicSql, List<FacetColumnRequest> selectedFacets, List<ColumnModel> schema, AsyncCallback<String> callback);
 
-	void getPossibleColumnModelsForViewScope(ViewScope scope, String nextPageToken, AsyncCallback<ColumnModelPage> callback);
-
 	void isUserAllowedToRenderHTML(String userId, AsyncCallback<Boolean> callback);
 
 	void isChallenge(String id, AsyncCallback<Boolean> callback);
