@@ -48,6 +48,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	TableType tableType;
 	SynapseAlert synAlert;
 	public static final String UPDATING_SCHEMA = "Updating the table schema...";
+	public static final String RETRIEVING_DATA = "Retrieving data...";
 
 	/**
 	 * New presenter with its view.
@@ -130,7 +131,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		request.setViewScope(scope);
 		
 		this.baseView.setJobTrackingWidgetVisible(true);
-		this.jobTrackingWidget.startAndTrackJob("Adding Columns", false, AsynchType.ViewColumnModelRequest, request, new AsynchronousProgressHandler() {
+		this.jobTrackingWidget.startAndTrackJob(RETRIEVING_DATA, false, AsynchType.ViewColumnModelRequest, request, new AsynchronousProgressHandler() {
 			@Override
 			public void onFailure(Throwable failure) {
 				baseView.setJobTrackingWidgetVisible(false);

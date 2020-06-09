@@ -121,7 +121,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		ViewColumnModelRequest request = new ViewColumnModelRequest();
 		request.setViewScope(scope);
 		
-		this.jobTrackingWidget.startAndTrackJob("Adding Columns", false, AsynchType.ViewColumnModelRequest, request, new AsynchronousProgressHandler() {
+		this.jobTrackingWidget.startAndTrackJob(ColumnModelsWidget.RETRIEVING_DATA, false, AsynchType.ViewColumnModelRequest, request, new AsynchronousProgressHandler() {
 			@Override
 			public void onFailure(Throwable failure) {
 				view.setJobTrackerVisible(false);
