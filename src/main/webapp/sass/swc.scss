@@ -2950,7 +2950,7 @@ div.border {
 	padding: 10px 0px 0px 10px;
 }
 
-.AccessRequirementList {
+#body .AccessRequirementList {
   color: #515359;
 
   &__instruction {
@@ -2992,7 +2992,12 @@ div.border {
   &__AccessRequirementList__signin .terms-of-use-content {
     margin-top: 20px;
   }
-
+	&__signin button {
+		color: #515359;
+		font-weight: normal;
+		cursor: text;
+	}
+	
   .button-container {
     &.hide {
       visibility: hidden;
@@ -3059,4 +3064,8 @@ div.border {
 	.modal-body {
 		padding: 15px;
 	}
+	.modal-content {
+		padding: 20px 40px 50px 20px;
+	}
 }
+
