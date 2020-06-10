@@ -153,7 +153,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		this.globalAppState = globalAppState;
 		userBadge.setTooltipHidden(true);
 		userBadge.setTextHidden(true);
-		userBadge.addStyleNames("padding-top-15 padding-bottom-15 padding-left-10");
+		userBadge.addStyleNames("padding-top-13 padding-left-10");
 		// add search panel first
 		searchBox.setVisible(true);
 		searchBoxContainer.add(searchBox.asWidget());
