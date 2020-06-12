@@ -96,6 +96,18 @@ public class TableModelTestUtils {
 					case USERID:
 						defaultValue = "1234567";
 						break;
+					case SUBMISSIONID:
+						defaultValue = "98765";
+						break;
+					case EVALUATIONID:
+						defaultValue = "999888777";
+						break;
+					case ENTITYID_LIST:
+						defaultValue= "syn987, syn988";
+						break;
+					case USERID_LIST:
+						defaultValue = "1234567, 1234568"; 
+						break;
 					default:
 						throw new IllegalStateException("huh? missing enum");
 				}
@@ -314,6 +326,15 @@ public class TableModelTestUtils {
 				return "";
 			case USERID:
 				return "" + i;
+			case SUBMISSIONID:
+				return "" + (i + 6000 + (isUpdate ? 10000 : 0));
+			case EVALUATIONID:
+				return "" + (i + 7000 + (isUpdate ? 10000 : 0));
+			case ENTITYID_LIST:
+				return (isUpdate ? "syn123, syn124" : "syn234, syn235") + i;
+			case USERID_LIST:
+				return "111, 112" + i; 
+			
 		}
 		throw new IllegalArgumentException("Unknown ColumnType: " + cm.getColumnType());
 	}

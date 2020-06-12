@@ -121,6 +121,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 		List<EntityType> types = new ArrayList<EntityType>();
 		types.add(EntityType.table);
 		types.add(EntityType.entityview);
+		types.add(EntityType.submissionview);
 		newQuery.setIncludeTypes(types);
 		return newQuery;
 	}

@@ -8,6 +8,8 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnModelPage;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
+import org.sagebionetworks.repo.model.table.ViewColumnModelRequest;
+import org.sagebionetworks.repo.model.table.ViewColumnModelResponse;
 import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -46,6 +48,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	TableType tableType;
 	SynapseAlert synAlert;
 	public static final String UPDATING_SCHEMA = "Updating the table schema...";
+	public static final String RETRIEVING_DATA = "Retrieving data...";
 
 	/**
 	 * New presenter with its view.
@@ -123,20 +126,33 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		} else {
 			scope.setViewType(((EntityView) bundle.getEntity()).getType());
 		}
-
-		synapseClient.getPossibleColumnModelsForViewScope(scope, nextPageToken, new AsyncCallback<ColumnModelPage>() {
+		
+		ViewColumnModelRequest request = new ViewColumnModelRequest();
+		request.setViewScope(scope);
+		
+		this.baseView.setJobTrackingWidgetVisible(true);
+		this.jobTrackingWidget.startAndTrackJob(RETRIEVING_DATA, false, AsynchType.ViewColumnModelRequest, request, new AsynchronousProgressHandler() {
 			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
+			public void onFailure(Throwable failure) {
+				baseView.setJobTrackingWidgetVisible(false);
+				synAlert.handleException(failure);
 				baseView.resetSaveButton();
 			}
 
 			@Override
-			public void onSuccess(ColumnModelPage columnPage) {
-				editor.addColumns(columnPage.getResults());
-				if (columnPage.getNextPageToken() != null) {
-					getPossibleColumnModelsForViewScope(columnPage.getNextPageToken());
+			public void onComplete(AsynchronousResponseBody response) {
+				ViewColumnModelResponse viewColumnModelResponse = (ViewColumnModelResponse) response;
+				editor.addColumns(viewColumnModelResponse.getResults());
+				if (viewColumnModelResponse.getNextPageToken() != null) {
+					getPossibleColumnModelsForViewScope(viewColumnModelResponse.getNextPageToken());
+				} else {
+					baseView.setJobTrackingWidgetVisible(false);
 				}
+			}
+
+			@Override
+			public void onCancel() {
+				baseView.setJobTrackingWidgetVisible(false);				
 			}
 		});
 	}
