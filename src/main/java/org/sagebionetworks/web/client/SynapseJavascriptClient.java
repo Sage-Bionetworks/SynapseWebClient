@@ -69,6 +69,7 @@ import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.auth.Username;
+import org.sagebionetworks.repo.model.dataaccess.AccessType;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionInfoPage;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionInfoPageRequest;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
@@ -217,7 +218,8 @@ public class SynapseJavascriptClient {
 	public static final String PRINCIPAL = "/principal";
 	public static final String DOI = "/doi";
 	public static final String DOI_ASSOCIATION = DOI + "/association";
-	public static final String EVALUATION_AVAILABLE = "/evaluation/available";
+	public static final String EVALUATION = "/evaluation";
+	public static final String EVALUATION_AVAILABLE = EVALUATION + "/available";
 	public static final String ID_PARAMETER = "id=";
 	public static final String TYPE_PARAMETER = "type=";
 	public static final String VERSION_PARAMETER = "version=";
@@ -1745,6 +1747,29 @@ public class SynapseJavascriptClient {
 		}
 		if (offset != null) {
 			url += '&' + OFFSET_PARAMETER + offset;
+		}
+
+		doGet(url, OBJECT_TYPE.PaginatedResultsEvaluations, cb);
+	}
+	
+	public void getEvaluations(Boolean isActiveOnly, AccessType accessType, Integer limit, Integer offset, AsyncCallback<List<Evaluation>> cb) {
+		char sep = '?';
+		String url = getRepoServiceUrl() + EVALUATION;
+		if (isActiveOnly != null) {
+			url += sep + "activeOnly=" + isActiveOnly;
+			sep = '&';
+		}
+		if (accessType != null) {
+			url += sep + "accessType=AccessType." + accessType.name();
+			sep = '&';
+		}
+		if (limit != null) {
+			url += sep + LIMIT_PARAMETER + limit;
+			sep = '&';
+		}
+		if (offset != null) {
+			url += sep +  OFFSET_PARAMETER + offset;
+			sep = '&';
 		}
 
 		doGet(url, OBJECT_TYPE.PaginatedResultsEvaluations, cb);

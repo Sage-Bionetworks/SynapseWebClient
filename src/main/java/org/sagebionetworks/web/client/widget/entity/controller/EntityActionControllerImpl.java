@@ -26,6 +26,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.SnapshotRequest;
 import org.sagebionetworks.repo.model.table.SnapshotResponse;
+import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
@@ -480,11 +481,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionListener(Action.ADD_FILE_VIEW, this);
 			actionMenu.setActionVisible(Action.ADD_PROJECT_VIEW, canEditResults);
 			actionMenu.setActionListener(Action.ADD_PROJECT_VIEW, this);
+			actionMenu.setActionVisible(Action.ADD_SUBMISSION_VIEW, canEditResults);
+			actionMenu.setActionListener(Action.ADD_SUBMISSION_VIEW, this);
 		} else {
 			actionMenu.setActionVisible(Action.UPLOAD_TABLE, false);
 			actionMenu.setActionVisible(Action.ADD_TABLE, false);
 			actionMenu.setActionVisible(Action.ADD_FILE_VIEW, false);
 			actionMenu.setActionVisible(Action.ADD_PROJECT_VIEW, false);
+			actionMenu.setActionVisible(Action.ADD_SUBMISSION_VIEW, false);
 		}
 	}
 
@@ -1044,6 +1048,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			case ADD_PROJECT_VIEW:
 				onAddProjectView();
 				break;
+			case ADD_SUBMISSION_VIEW:
+				onAddSubmissionView();
+				break;
 			case CREATE_EXTERNAL_DOCKER_REPO:
 				onCreateExternalDockerRepo();
 				break;
@@ -1111,6 +1118,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void postCheckCreateTableOrView(TableType type) {
 		getCreateTableViewWizard().configure(entityBundle.getEntity().getId(), type);
 		getCreateTableViewWizard().showModal(entityUpdatedWizardCallback);
+	}
+	
+	public void onAddSubmissionView() {
+		preflightController.checkCreateEntity(entityBundle, SubmissionView.class.getName(), () -> {
+			postCheckCreateTableOrView(TableType.submission_view);
+		});
 	}
 
 	private void onUploadNewFileEntity() {
