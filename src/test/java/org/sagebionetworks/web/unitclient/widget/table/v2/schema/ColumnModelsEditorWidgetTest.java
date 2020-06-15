@@ -103,7 +103,7 @@ public class ColumnModelsEditorWidgetTest {
 		nonEditableColumnNames.add(colName1);
 		nonEditableColumnNames.add(ETAG_COLUMN_NAME);
 
-		when(mockFileViewDefaultColumns.getDefaultViewColumnNames(anyBoolean())).thenReturn(nonEditableColumnNames);
+		when(mockFileViewDefaultColumns.getDefaultViewColumnNames(any(TableType.class))).thenReturn(nonEditableColumnNames);
 		widget = new ColumnModelsEditorWidget(mockGinInjector, adapterFactory, mockFileViewDefaultColumns);
 		schema = TableModelTestUtils.createOneOfEachType(true);
 	}
