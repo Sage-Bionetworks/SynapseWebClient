@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.ColumnModelPage;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
@@ -107,7 +106,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	}
 
 	public void getDefaultColumnsForView() {
-		List<ColumnModel> defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.isIncludeFiles());
+		List<ColumnModel> defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType);
 		editor.addColumns(defaultColumns);
 	}
 

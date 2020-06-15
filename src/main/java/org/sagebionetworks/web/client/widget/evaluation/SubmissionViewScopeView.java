@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.evaluation;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface EvaluationListScopeView extends IsWidget {
+public interface SubmissionViewScopeView extends IsWidget {
 	void setPresenter(Presenter presenter);
 
 	void addRow(Evaluation ev);

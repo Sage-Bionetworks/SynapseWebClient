@@ -3,11 +3,14 @@ package org.sagebionetworks.web.client.widget.table.modal.fileview;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import java.util.ArrayList;
 import java.util.List;
+import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScope;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -30,16 +33,19 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 	String parentId;
 	ModalPresenter modalPresenter;
 	EntityContainerListWidget entityContainerList;
+	SubmissionViewScope submissionViewScope;
 	TableType tableType;
 	CreateTableViewWizardStep2 step2;
 
 	@Inject
-	public CreateTableViewWizardStep1(CreateTableViewWizardStep1View view, SynapseJavascriptClient jsClient, EntityContainerListWidget entityContainerList, CreateTableViewWizardStep2 step2) {
+	public CreateTableViewWizardStep1(CreateTableViewWizardStep1View view, SynapseJavascriptClient jsClient, EntityContainerListWidget entityContainerList, SubmissionViewScope submissionViewScope, CreateTableViewWizardStep2 step2) {
 		super();
 		this.view = view;
 		this.step2 = step2;
 		this.entityContainerList = entityContainerList;
-		view.setScopeWidget(entityContainerList.asWidget());
+		this.submissionViewScope = submissionViewScope;
+		view.setEntityViewScopeWidget(entityContainerList.asWidget());
+		view.setSubmissionViewScopeWidget(submissionViewScope);
 		this.jsClient = jsClient;
 		view.setPresenter(this);
 	}
@@ -58,9 +64,16 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 		this.parentId = parentId;
 		this.tableType = type;
 		boolean canEdit = true;
-		view.setScopeWidgetVisible(!TableType.table.equals(type));
-
-		if (TableType.table.equals(type) || TableType.projects.equals(type)) {
+		view.setEntityViewScopeWidgetVisible(false);
+		view.setSubmissionViewScopeWidgetVisible(false);
+		
+		if (TableType.submission_view.equals(type)) {
+			view.setSubmissionViewScopeWidgetVisible(true);
+		} else if (!TableType.table.equals(type)) {
+			view.setEntityViewScopeWidgetVisible(true);	
+		}
+		
+		if (TableType.table.equals(type) || TableType.projects.equals(type) || TableType.submission_view.equals(type)) {
 			view.setViewTypeOptionsVisible(false);
 		} else {
 			view.setViewTypeOptionsVisible(true);
@@ -71,6 +84,7 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 		}
 
 		entityContainerList.configure(new ArrayList<String>(), canEdit, type);
+		submissionViewScope.configure(new ArrayList<Evaluation>());
 		view.setName("");
 	}
 
@@ -84,6 +98,19 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 		Table table;
 		if (TableType.table.equals(tableType)) {
 			table = new TableEntity();
+		} else if (TableType.submission_view.equals(tableType)) {
+			table = new SubmissionView();
+			List<Evaluation> scope = submissionViewScope.getEvaluations();
+			if (scope.isEmpty()) {
+				modalPresenter.setErrorMessage(EMPTY_SCOPE_MESSAGE);
+				return;
+			}
+			// gather IDs
+			List<String> evalIds = new ArrayList<String>();
+			for (Evaluation evaluation : scope) {
+				evalIds.add(evaluation.getId());
+			}
+			((SubmissionView) table).setScopeIds(evalIds);
 		} else {
 			table = new EntityView();
 			List<String> scopeIds = entityContainerList.getEntityIds();

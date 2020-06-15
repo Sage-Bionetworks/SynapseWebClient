@@ -128,6 +128,7 @@ import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.SnapshotRequest;
 import org.sagebionetworks.repo.model.table.SnapshotResponse;
+import org.sagebionetworks.repo.model.table.ViewEntityType;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
@@ -1170,11 +1171,17 @@ public class SynapseJavascriptClient {
 		return getFuture(cb -> doPost(url, entity, OBJECT_TYPE.Entity, false, cb));
 	}
 
-	public FluentFuture<List<ColumnModel>> getDefaultColumnsForView(ViewType viewType) {
-		String url = getRepoServiceUrl() + COLUMN_VIEW_DEFAULT + viewType.name();
+	public FluentFuture<List<ColumnModel>> getDefaultColumnsForView(int viewTypeMask) {
+		String url = getRepoServiceUrl() + COLUMN_VIEW_DEFAULT + "?viewTypeMask="+viewTypeMask;
 		boolean canCancel = false;
 		return getFuture(cb -> doGet(url, OBJECT_TYPE.ListWrapperColumnModel, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserSessionToken(), canCancel, cb));
 	}
+	public FluentFuture<List<ColumnModel>> getDefaultColumnsForView(ViewEntityType viewEntityType) {
+		String url = getRepoServiceUrl() + COLUMN_VIEW_DEFAULT + "?viewEntityType=" + viewEntityType.name();
+		boolean canCancel = false;
+		return getFuture(cb -> doGet(url, OBJECT_TYPE.ListWrapperColumnModel, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserSessionToken(), canCancel, cb));
+	}
+
 
 	public FluentFuture<Void> deleteMembershipRequest(String requestId) {
 		String url = getRepoServiceUrl() + MEMBERSHIP_REQUEST + "/" + requestId;

@@ -495,8 +495,8 @@ import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidgetView;
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModalView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModalViewImpl;
-import org.sagebionetworks.web.client.widget.evaluation.EvaluationListScopeView;
-import org.sagebionetworks.web.client.widget.evaluation.EvaluationListScopeViewImpl;
+import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeView;
+import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeViewImpl;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationListView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationListViewImpl;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterView;
@@ -1381,6 +1381,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ContainerItemCountWidgetView.class).to(ContainerItemCountWidgetViewImpl.class);
 		bind(StatisticsPlotWidgetView.class).to(StatisticsPlotWidgetViewImpl.class);
 		bind(QuarantinedEmailModal.class).in(Singleton.class);
-		bind(EvaluationListScopeView.class).to(EvaluationListScopeViewImpl.class);
+		bind(SubmissionViewScopeView.class).to(SubmissionViewScopeViewImpl.class);
 	}
 }

@@ -18,9 +18,13 @@ public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizard
 	@UiField
 	TextBox nameField;
 	@UiField
-	SimplePanel scopeContainer;
+	SimplePanel entityViewScopeContainer;
 	@UiField
-	FormGroup scopeUI;
+	FormGroup entityViewScopeUI;
+	@UiField
+	SimplePanel submissionViewScopeContainer;
+	@UiField
+	FormGroup submissionViewScopeUI;
 	@UiField
 	Div viewOptionsContainer;
 	Widget widget;
@@ -83,14 +87,25 @@ public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizard
 	}
 
 	@Override
-	public void setScopeWidget(IsWidget scopeWidget) {
-		scopeContainer.clear();
-		scopeContainer.setWidget(scopeWidget);
+	public void setEntityViewScopeWidget(IsWidget scopeWidget) {
+		entityViewScopeContainer.clear();
+		entityViewScopeContainer.setWidget(scopeWidget);
 	}
 
 	@Override
-	public void setScopeWidgetVisible(boolean visible) {
-		scopeUI.setVisible(visible);
+	public void setEntityViewScopeWidgetVisible(boolean visible) {
+		entityViewScopeUI.setVisible(visible);
+	}
+	
+	@Override
+	public void setSubmissionViewScopeWidget(IsWidget scopeWidget) {
+		submissionViewScopeContainer.clear();
+		submissionViewScopeContainer.setWidget(scopeWidget);
+	}
+	
+	@Override
+	public void setSubmissionViewScopeWidgetVisible(boolean visible) {
+		submissionViewScopeUI.setVisible(visible);
 	}
 
 	@Override

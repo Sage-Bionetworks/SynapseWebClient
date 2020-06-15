@@ -125,7 +125,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	}
 
 	private Set<String> getDefaultColumnNames() {
-		return fileViewDefaultColumns.getDefaultViewColumnNames(tableType.isIncludeFiles());
+		return fileViewDefaultColumns.getDefaultViewColumnNames(tableType);
 	}
 
 	public void addColumns(List<ColumnModel> models) {

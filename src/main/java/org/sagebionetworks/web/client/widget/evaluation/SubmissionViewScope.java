@@ -7,13 +7,13 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EvaluationListScope implements EvaluationListScopeView.Presenter, IsWidget {
+public class SubmissionViewScope implements SubmissionViewScopeView.Presenter, IsWidget {
 
-	private EvaluationListScopeView view;
+	private SubmissionViewScopeView view;
 	private List<Evaluation> evaluations;
 	
 	@Inject
-	public EvaluationListScope(EvaluationListScopeView view) {
+	public SubmissionViewScope(SubmissionViewScopeView view) {
 		this.view = view;
 		view.setPresenter(this);
 	}

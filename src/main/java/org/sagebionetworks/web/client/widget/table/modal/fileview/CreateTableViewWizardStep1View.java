@@ -21,9 +21,11 @@ public interface CreateTableViewWizardStep1View extends IsWidget {
 	/**
 	 * Add widget to set/get scope.
 	 */
-	void setScopeWidget(IsWidget scopeWidget);
+	void setEntityViewScopeWidget(IsWidget scopeWidget);
+	void setSubmissionViewScopeWidget(IsWidget scopeWidget);
 
-	void setScopeWidgetVisible(boolean visible);
+	void setEntityViewScopeWidgetVisible(boolean visible);
+	void setSubmissionViewScopeWidgetVisible(boolean visible);
 
 	void setViewTypeOptionsVisible(boolean visible);
 

@@ -22,6 +22,7 @@ import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.ViewTypeMask;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScope;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1View;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2;
@@ -40,6 +41,8 @@ public class CreateTableViewWizardStep1Test {
 	@Mock
 	EntityContainerListWidget mockEntityContainerListWidget;
 	@Mock
+	SubmissionViewScope mockSubmissionViewScope;
+	@Mock
 	CreateTableViewWizardStep2 mockStep2;
 
 	@Mock
@@ -53,7 +56,7 @@ public class CreateTableViewWizardStep1Test {
 		MockitoAnnotations.initMocks(this);
 		scopeIds = Collections.singletonList("3");
 		when(mockEntityContainerListWidget.getEntityIds()).thenReturn(scopeIds);
-		widget = new CreateTableViewWizardStep1(mockView, mockJsClient, mockEntityContainerListWidget, mockStep2);
+		widget = new CreateTableViewWizardStep1(mockView, mockJsClient, mockEntityContainerListWidget, mockSubmissionViewScope, mockStep2);
 		widget.setModalPresenter(mockWizardPresenter);
 		parentId = "syn123";
 	}
@@ -71,7 +74,7 @@ public class CreateTableViewWizardStep1Test {
 	public void testCreateFileView() {
 		widget.configure(parentId, TableType.files);
 		verify(mockView).setName("");
-		verify(mockView).setScopeWidgetVisible(true);
+		verify(mockView).setEntityViewScopeWidgetVisible(true);
 
 		verify(mockView).setViewTypeOptionsVisible(true);
 		String tableName = "a name";
@@ -96,7 +99,7 @@ public class CreateTableViewWizardStep1Test {
 		// initially configured with Files only
 		widget.configure(parentId, TableType.files);
 		verify(mockView).setName("");
-		verify(mockView).setScopeWidgetVisible(true);
+		verify(mockView).setEntityViewScopeWidgetVisible(true);
 		verify(mockView).setViewTypeOptionsVisible(true);
 
 		// simulate updating view type mask (clicking on check boxes for folder and table)
@@ -141,7 +144,7 @@ public class CreateTableViewWizardStep1Test {
 	public void testCreateProjectView() {
 		widget.configure(parentId, TableType.projects);
 		verify(mockView).setName("");
-		verify(mockView).setScopeWidgetVisible(true);
+		verify(mockView).setEntityViewScopeWidgetVisible(true);
 		verify(mockView).setViewTypeOptionsVisible(false);
 		String tableName = "a name";
 		EntityView table = new EntityView();
@@ -163,7 +166,7 @@ public class CreateTableViewWizardStep1Test {
 	@Test
 	public void testCreateTable() {
 		widget.configure(parentId, TableType.table);
-		verify(mockView).setScopeWidgetVisible(false);
+		verify(mockView).setEntityViewScopeWidgetVisible(false);
 		verify(mockView).setViewTypeOptionsVisible(false);
 		String tableName = "a name";
 		TableEntity table = new TableEntity();
