@@ -6,10 +6,12 @@ import java.util.List;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewColumnModelRequest;
 import org.sagebionetworks.repo.model.table.ViewColumnModelResponse;
+import org.sagebionetworks.repo.model.table.ViewEntityType;
 import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -114,8 +116,16 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		view.setJobTrackerVisible(true);
 		presenter.clearErrors();
 		ViewScope scope = new ViewScope();
-		scope.setScope(((EntityView) entity).getScopeIds());
-		scope.setViewTypeMask(tableType.getViewTypeMask().longValue());
+		List<String> scopeIds = null;
+		if (entity instanceof EntityView) {
+			scopeIds = ((EntityView) entity).getScopeIds();
+			scope.setViewTypeMask(tableType.getViewTypeMask().longValue());
+			scope.setViewEntityType(ViewEntityType.entityview);
+		} else if (entity instanceof SubmissionView) {
+			scopeIds = ((SubmissionView) entity).getScopeIds();
+			scope.setViewEntityType(ViewEntityType.submissionview);
+		}
+		scope.setScope(scopeIds);
 		
 		ViewColumnModelRequest request = new ViewColumnModelRequest();
 		request.setViewScope(scope);
