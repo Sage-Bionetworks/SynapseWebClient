@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.annotation;
 
+import com.google.gwt.user.client.Window;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
@@ -26,6 +27,10 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView 
 	Button cancelButton;
 	@UiField
 	Button addAnnotationButton;
+	@UiField
+	Button pasteNewValuesButton;
+	@UiField
+	FlowPanel pasteNewValuesPanel; //TODO: handle
 
 	@UiField
 	Alert alert;
@@ -40,8 +45,9 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView 
 			presenter.onSave();
 		});
 		addAnnotationButton.addClickHandler(event -> {
-			presenter.onAddNewAnnotation();
+			presenter.onAddNewAnnotation(null);
 		});
+		pasteNewValuesButton.addClickHandler(clickEvent -> presenter.onClickPasteNewValues());
 		saveButton.addDomHandler(DisplayUtils.getPreventTabHandler(saveButton), KeyDownEvent.getType());
 	}
 
@@ -90,6 +96,17 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView 
 	public void removeAnnotationEditor(Widget editor) {
 		editorsPanel.remove(editor);
 	}
+
+	@Override
+	public void addCommaSeparatedValuesParser(Widget commaSeparatedValuesParser){
+		pasteNewValuesPanel.add(commaSeparatedValuesParser);
+	}
+
+	@Override
+	public void removeCommaSeparatedValuesParser(Widget commaSeparatedValuesParser){
+		pasteNewValuesPanel.remove(commaSeparatedValuesParser);
+	}
+
 
 	@Override
 	public Widget asWidget() {

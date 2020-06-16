@@ -1,8 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.annotation;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParser;
 
 public interface EditAnnotationsDialogView extends IsWidget {
 
@@ -18,6 +21,10 @@ public interface EditAnnotationsDialogView extends IsWidget {
 		 */
 		void onSave();
 
+		void onClickPasteNewValues();
+
+		void onCancelPasteNewValues(CommaSeparatedValuesParser commaSeparatedValuesParser);
+
 		/**
 		 * Called when the cancel button is clicked in the dialog
 		 */
@@ -26,7 +33,7 @@ public interface EditAnnotationsDialogView extends IsWidget {
 		/**
 		 * Called when the add button is clicked in the dialog
 		 */
-		void onAddNewAnnotation();
+		void onAddNewAnnotation(List<String> values);
 
 		/**
 		 * From the annotation editor
@@ -66,6 +73,10 @@ public interface EditAnnotationsDialogView extends IsWidget {
 	void addAnnotationEditor(Widget editor);
 
 	void removeAnnotationEditor(Widget editor);
+
+	void addCommaSeparatedValuesParser(Widget commaSeparatedValuesParser);
+
+	void removeCommaSeparatedValuesParser(Widget commaSeparatedValuesParser);
 
 	void clearAnnotationEditors();
 
