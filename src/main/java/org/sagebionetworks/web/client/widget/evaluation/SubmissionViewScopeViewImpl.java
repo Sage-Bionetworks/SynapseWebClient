@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -22,6 +23,8 @@ public class SubmissionViewScopeViewImpl implements SubmissionViewScopeView {
 	Button addButton;
 	@UiField
 	Div emptyUI;
+	@UiField
+	Div otherWidgets;
 	Widget widget;
 
 	@Inject
@@ -60,7 +63,10 @@ public class SubmissionViewScopeViewImpl implements SubmissionViewScopeView {
 		rows.clear();
 		emptyUI.setVisible(true);		
 	}
-
+	@Override
+	public void add(IsWidget w) {
+		otherWidgets.add(w);
+	}
 	@Override
 	public Widget asWidget() {
 		return widget;

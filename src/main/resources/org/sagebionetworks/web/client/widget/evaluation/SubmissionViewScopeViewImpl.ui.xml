@@ -4,13 +4,12 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
-		<b:Heading size="H3" text="Evaluation Queues" addStyleNames="margin-left-15"/>
 		<bh:Div ui:field="emptyUI" visible="false">
-			<i>- Empty</i>
+			<bh:Italic>- Empty</bh:Italic>
 		</bh:Div>
 		<bh:Div ui:field="rows" />
 		<b:Button ui:field="addButton" icon="PLUS"
-			addStyleNames="margin-top-10" size="SMALL" visible="false">Add evaluation queue</b:Button>
-		
+			addStyleNames="margin-top-10" size="SMALL">Add evaluation queue</b:Button>
+		<bh:Div ui:field="otherWidgets" />
 	</bh:Div>
 </ui:UiBinder>

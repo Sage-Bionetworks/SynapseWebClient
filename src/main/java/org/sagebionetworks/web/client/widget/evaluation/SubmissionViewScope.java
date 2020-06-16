@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.evaluation;
 import java.util.ArrayList;
 import java.util.List;
 import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -11,11 +13,14 @@ public class SubmissionViewScope implements SubmissionViewScopeView.Presenter, I
 
 	private SubmissionViewScopeView view;
 	private List<Evaluation> evaluations;
+	EvaluationFinder evaluationFinder;
 	
 	@Inject
-	public SubmissionViewScope(SubmissionViewScopeView view) {
+	public SubmissionViewScope(SubmissionViewScopeView view, EvaluationFinder evaluationFinder) {
 		this.view = view;
+		this.evaluationFinder = evaluationFinder;
 		view.setPresenter(this);
+//		view.add(evaluationFinder);
 	}
 
 	public void configure(List<Evaluation> initEvaluations) {
@@ -42,8 +47,16 @@ public class SubmissionViewScope implements SubmissionViewScopeView.Presenter, I
 	
 	@Override
 	public void onAddClicked() {
-		// TODO: pop up evaluation queue selector
+		// pop up evaluation queue selector
+		Boolean isActiveOnly = false;
 		
+		evaluationFinder.configure(isActiveOnly, ACCESS_TYPE.READ_PRIVATE_SUBMISSION, new CallbackP<Evaluation>() {
+			@Override
+			public void invoke(Evaluation evaluation) {
+				evaluations.add(evaluation);
+				refresh();
+			}
+		});
 	}
 
 	@Override

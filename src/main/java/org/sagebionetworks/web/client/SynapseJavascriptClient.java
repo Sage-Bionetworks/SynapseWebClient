@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
@@ -69,7 +70,7 @@ import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.auth.Username;
-import org.sagebionetworks.repo.model.dataaccess.AccessType;
+
 import org.sagebionetworks.repo.model.dataaccess.SubmissionInfoPage;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionInfoPageRequest;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
@@ -1759,7 +1760,7 @@ public class SynapseJavascriptClient {
 		doGet(url, OBJECT_TYPE.PaginatedResultsEvaluations, cb);
 	}
 	
-	public void getEvaluations(Boolean isActiveOnly, AccessType accessType, Integer limit, Integer offset, AsyncCallback<List<Evaluation>> cb) {
+	public void getEvaluations(Boolean isActiveOnly, ACCESS_TYPE accessType, Integer limit, Integer offset, AsyncCallback<List<Evaluation>> cb) {
 		char sep = '?';
 		String url = getRepoServiceUrl() + EVALUATION;
 		if (isActiveOnly != null) {
@@ -1767,7 +1768,7 @@ public class SynapseJavascriptClient {
 			sep = '&';
 		}
 		if (accessType != null) {
-			url += sep + "accessType=AccessType." + accessType.name();
+			url += sep + "accessType=ACCESS_TYPE." + accessType.name();
 			sep = '&';
 		}
 		if (limit != null) {
