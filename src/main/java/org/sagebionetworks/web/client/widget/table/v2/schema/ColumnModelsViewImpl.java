@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
+import java.util.List;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
@@ -176,6 +177,21 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 				this.buttonToolbar.setVisible(true);
 			}
 		}
+	}
+	
+	@Override
+	public void addColumns(List<ColumnModelTableRow> rows) {
+		tableBody.removeFromParent();
+		
+		for (ColumnModelTableRow row : rows) {
+			tableBody.add(row);
+		}
+		if (ViewType.EDITOR.equals(this.viewType)) {
+			if (!this.buttonToolbar.isVisible()) {
+				this.buttonToolbar.setVisible(true);
+			}
+		}
+		table.add(tableBody);
 	}
 
 	@Override

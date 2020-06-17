@@ -108,8 +108,13 @@ public class SubmissionViewScopeWidget implements SynapseWidgetPresenter, Submis
 	public void onSave() {
 		// update scope
 		synAlert.clear();
+		List<String> newScopeIds = editScopeWidget.getEvaluationIds();
+		if (newScopeIds.isEmpty()) {
+			synAlert.showError(CreateTableViewWizardStep1.EMPTY_SCOPE_MESSAGE);
+			return;
+		}
 		view.setLoading(true);
-		currentView.setScopeIds(editScopeWidget.getEvaluationIds());
+		currentView.setScopeIds(newScopeIds);
 		jsClient.updateEntity(currentView, null, null, new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity entity) {
