@@ -1768,7 +1768,7 @@ public class SynapseJavascriptClient {
 			sep = '&';
 		}
 		if (accessType != null) {
-			url += sep + "accessType=ACCESS_TYPE." + accessType.name();
+			url += sep + "accessType=" + accessType.name();
 			sep = '&';
 		}
 		if (limit != null) {

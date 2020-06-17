@@ -25,7 +25,7 @@ public class EvaluationFinder implements EvaluationFinderView.Presenter, IsWidge
 	ACCESS_TYPE accessType;
 	CallbackP<Evaluation> evaluationSelectedCallback;
 	BasicPaginationWidget paginationWidget;
-	public static final Long DEFAULT_EVALUATION_LIMIT = 30L;
+	public static final Long DEFAULT_EVALUATION_LIMIT = 20L;
 	public static final Long DEFAULT_OFFSET = 0L;
 	
 	@Inject

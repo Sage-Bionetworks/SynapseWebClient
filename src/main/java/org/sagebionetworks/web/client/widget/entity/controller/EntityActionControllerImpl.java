@@ -481,7 +481,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionListener(Action.ADD_FILE_VIEW, this);
 			actionMenu.setActionVisible(Action.ADD_PROJECT_VIEW, canEditResults);
 			actionMenu.setActionListener(Action.ADD_PROJECT_VIEW, this);
-			actionMenu.setActionVisible(Action.ADD_SUBMISSION_VIEW, canEditResults);
+			// TODO: add ability to create a submission view outside of alpha mode.
+			actionMenu.setActionVisible(Action.ADD_SUBMISSION_VIEW, canEditResults && DisplayUtils.isInTestWebsite(cookies));
 			actionMenu.setActionListener(Action.ADD_SUBMISSION_VIEW, this);
 		} else {
 			actionMenu.setActionVisible(Action.UPLOAD_TABLE, false);
