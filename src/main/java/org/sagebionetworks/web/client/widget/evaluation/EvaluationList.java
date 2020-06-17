@@ -3,10 +3,11 @@ package org.sagebionetworks.web.client.widget.evaluation;
 import java.util.List;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EvaluationList implements SynapseWidgetPresenter {
+public class EvaluationList implements SynapseWidgetPresenter, IsWidget {
 
 	private EvaluationListView view;
 	List<Evaluation> evaluationList;
@@ -16,9 +17,9 @@ public class EvaluationList implements SynapseWidgetPresenter {
 		this.view = view;
 	}
 
-	public void configure(List<Evaluation> list) {
+	public void configure(List<Evaluation> list, boolean isSelectable) {
 		this.evaluationList = list;
-		view.configure(list);
+		view.configure(list, isSelectable);
 	}
 
 	@Override

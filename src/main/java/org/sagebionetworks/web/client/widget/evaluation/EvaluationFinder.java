@@ -54,7 +54,8 @@ public class EvaluationFinder implements EvaluationFinderView.Presenter, IsWidge
 				}
 				long rowCount = new Integer(results.size()).longValue();
 				paginationWidget.configure(DEFAULT_EVALUATION_LIMIT, newOffset, rowCount, EvaluationFinder.this);
-				evaluationList.configure(results);
+				boolean isSelectable = true;
+				evaluationList.configure(results, isSelectable);
 			}
 			
 			@Override

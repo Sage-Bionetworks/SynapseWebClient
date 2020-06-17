@@ -13,10 +13,10 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class SubmissionViewScopeViewImpl implements SubmissionViewScopeView {
-	public interface Binder extends UiBinder<Widget, SubmissionViewScopeViewImpl> {}
+public class SubmissionViewScopeEditorViewImpl implements SubmissionViewScopeEditorView {
+	public interface Binder extends UiBinder<Widget, SubmissionViewScopeEditorViewImpl> {}
 
-	private SubmissionViewScopeView.Presenter presenter;
+	private SubmissionViewScopeEditorView.Presenter presenter;
 	@UiField
 	Div rows;
 	@UiField
@@ -28,7 +28,7 @@ public class SubmissionViewScopeViewImpl implements SubmissionViewScopeView {
 	Widget widget;
 
 	@Inject
-	public SubmissionViewScopeViewImpl(Binder binder) {
+	public SubmissionViewScopeEditorViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 		addButton.addClickHandler(event -> {
 			presenter.onAddClicked();
@@ -54,7 +54,7 @@ public class SubmissionViewScopeViewImpl implements SubmissionViewScopeView {
 	}
 
 	@Override
-	public void setPresenter(SubmissionViewScopeView.Presenter presenter) {
+	public void setPresenter(SubmissionViewScopeEditorView.Presenter presenter) {
 		this.presenter = presenter;
 	}
 

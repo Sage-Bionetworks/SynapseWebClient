@@ -30,9 +30,9 @@ import com.google.inject.Inject;
  * @author Jay
  *
  */
-public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Presenter {
+public class EntityViewScopeWidget implements SynapseWidgetPresenter, EntityViewScopeWidgetView.Presenter {
 	boolean isEditable;
-	ScopeWidgetView view;
+	EntityViewScopeWidgetView view;
 	SynapseJavascriptClient jsClient;
 	EntityBundle bundle;
 	EntityContainerListWidget viewScopeWidget, editScopeWidget;
@@ -47,7 +47,7 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 	 * @param view
 	 */
 	@Inject
-	public ScopeWidget(ScopeWidgetView view, SynapseJavascriptClient jsClient, EntityContainerListWidget viewScopeWidget, EntityContainerListWidget editScopeWidget, SynapseAlert synAlert, EventBus eventBus) {
+	public EntityViewScopeWidget(EntityViewScopeWidgetView view, SynapseJavascriptClient jsClient, EntityContainerListWidget viewScopeWidget, EntityContainerListWidget editScopeWidget, SynapseAlert synAlert, EventBus eventBus) {
 		this.jsClient = jsClient;
 		this.view = view;
 		this.viewScopeWidget = viewScopeWidget;

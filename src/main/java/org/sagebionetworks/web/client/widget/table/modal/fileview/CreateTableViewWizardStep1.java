@@ -10,7 +10,7 @@ import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScope;
+import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditor;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -33,12 +33,12 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 	String parentId;
 	ModalPresenter modalPresenter;
 	EntityContainerListWidget entityContainerList;
-	SubmissionViewScope submissionViewScope;
+	SubmissionViewScopeEditor submissionViewScope;
 	TableType tableType;
 	CreateTableViewWizardStep2 step2;
 
 	@Inject
-	public CreateTableViewWizardStep1(CreateTableViewWizardStep1View view, SynapseJavascriptClient jsClient, EntityContainerListWidget entityContainerList, SubmissionViewScope submissionViewScope, CreateTableViewWizardStep2 step2) {
+	public CreateTableViewWizardStep1(CreateTableViewWizardStep1View view, SynapseJavascriptClient jsClient, EntityContainerListWidget entityContainerList, SubmissionViewScopeEditor submissionViewScope, CreateTableViewWizardStep2 step2) {
 		super();
 		this.view = view;
 		this.step2 = step2;
@@ -100,17 +100,12 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 			table = new TableEntity();
 		} else if (TableType.submission_view.equals(tableType)) {
 			table = new SubmissionView();
-			List<Evaluation> scope = submissionViewScope.getEvaluations();
-			if (scope.isEmpty()) {
+			List<String> scopeIds = submissionViewScope.getEvaluationIds();
+			if (scopeIds.isEmpty()) {
 				modalPresenter.setErrorMessage(EMPTY_SCOPE_MESSAGE);
 				return;
 			}
-			// gather IDs
-			List<String> evalIds = new ArrayList<String>();
-			for (Evaluation evaluation : scope) {
-				evalIds.add(evaluation.getId());
-			}
-			((SubmissionView) table).setScopeIds(evalIds);
+			((SubmissionView) table).setScopeIds(scopeIds);
 		} else {
 			table = new EntityView();
 			List<String> scopeIds = entityContainerList.getEntityIds();

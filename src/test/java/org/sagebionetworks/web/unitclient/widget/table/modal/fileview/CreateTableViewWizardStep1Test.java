@@ -22,7 +22,7 @@ import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.ViewTypeMask;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScope;
+import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditor;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1View;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2;
@@ -41,7 +41,7 @@ public class CreateTableViewWizardStep1Test {
 	@Mock
 	EntityContainerListWidget mockEntityContainerListWidget;
 	@Mock
-	SubmissionViewScope mockSubmissionViewScope;
+	SubmissionViewScopeEditor mockSubmissionViewScope;
 	@Mock
 	CreateTableViewWizardStep2 mockStep2;
 

@@ -9,14 +9,14 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class SubmissionViewScope implements SubmissionViewScopeView.Presenter, IsWidget {
+public class SubmissionViewScopeEditor implements SubmissionViewScopeEditorView.Presenter, IsWidget {
 
-	private SubmissionViewScopeView view;
+	private SubmissionViewScopeEditorView view;
 	private List<Evaluation> evaluations;
 	EvaluationFinder evaluationFinder;
 	
 	@Inject
-	public SubmissionViewScope(SubmissionViewScopeView view, EvaluationFinder evaluationFinder) {
+	public SubmissionViewScopeEditor(SubmissionViewScopeEditorView view, EvaluationFinder evaluationFinder) {
 		this.view = view;
 		this.evaluationFinder = evaluationFinder;
 		view.setPresenter(this);
@@ -37,6 +37,15 @@ public class SubmissionViewScope implements SubmissionViewScopeView.Presenter, I
 	}
 	public List<Evaluation> getEvaluations() {
 		return evaluations;
+	}
+	
+	public List<String> getEvaluationIds() {
+		// gather IDs
+		List<String> evalIds = new ArrayList<String>();
+		for (Evaluation evaluation : evaluations) {
+			evalIds.add(evaluation.getId());
+		}
+		return evalIds;
 	}
 	
 	@Override

@@ -7,7 +7,8 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidget;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScopeWidget;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.SubmissionViewScopeWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -51,16 +52,19 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	Div addToDownloadListContainer;
 	PortalGinInjector ginInjector;
 	ColumnModelsWidget columnModelsWidget;
-	ScopeWidget scopeWidget;
+	EntityViewScopeWidget scopeWidget;
+	SubmissionViewScopeWidget submissionViewScopeWidget;
 
 	@Inject
-	public TableEntityWidgetViewImpl(final Binder uiBinder, PortalGinInjector ginInjector, ScopeWidget scopeWidget) {
+	public TableEntityWidgetViewImpl(final Binder uiBinder, PortalGinInjector ginInjector, EntityViewScopeWidget scopeWidget, SubmissionViewScopeWidget submissionViewScopeWidget) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.ginInjector = ginInjector;
 		this.columnModelsWidget = ginInjector.createNewColumnModelsWidget();
 		this.columnDetailsPanel.setWidget(this.columnModelsWidget.asWidget());
 		this.scopeWidget = scopeWidget;
+		this.submissionViewScopeWidget = submissionViewScopeWidget;
 		this.scopePanel.add(scopeWidget.asWidget());
+		this.scopePanel.add(submissionViewScopeWidget.asWidget());
 		scopePanel.getElement().setAttribute("highlight-box-title", "Scope");
 	}
 
@@ -68,6 +72,7 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	public void configure(EntityBundle bundle, boolean isEditable) {
 		this.columnModelsWidget.configure(bundle, isEditable);
 		this.scopeWidget.configure(bundle, isEditable);
+		this.submissionViewScopeWidget.configure(bundle, isEditable);
 	}
 
 	@Override

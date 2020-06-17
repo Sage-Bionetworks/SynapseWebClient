@@ -1783,6 +1783,11 @@ public class SynapseJavascriptClient {
 		doGet(url, OBJECT_TYPE.PaginatedResultsEvaluations, cb);
 	}
 	
+	public void getEvaluation(String evaluationId, AsyncCallback<Evaluation> cb) {
+		String url = getRepoServiceUrl() + EVALUATION + "/" + evaluationId;
+		doGet(url, OBJECT_TYPE.Evaluation, cb);
+	}
+	
 	public void listApprovedSubmissionInfo(String requirementId, String nextPageToken, AsyncCallback<SubmissionInfoPage> cb) {
 		SubmissionInfoPageRequest request = new SubmissionInfoPageRequest();
 		request.setAccessRequirementId(requirementId);
