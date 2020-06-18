@@ -20,7 +20,6 @@ public class SubmissionViewScopeEditor implements SubmissionViewScopeEditorView.
 		this.view = view;
 		this.evaluationFinder = evaluationFinder;
 		view.setPresenter(this);
-//		view.add(evaluationFinder);
 	}
 
 	public void configure(List<Evaluation> initEvaluations) {
