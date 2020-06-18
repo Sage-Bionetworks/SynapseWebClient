@@ -97,9 +97,12 @@ public class EntityTypeUtils {
 		} else if (TableEntity.class.getName().equals(className)) {
 			// TableEntity
 			icon = IconType.TABLE;
-		} else if (EntityView.class.getName().equals(className) || SubmissionView.class.getName().equals(className)) {
+		} else if (EntityView.class.getName().equals(className)) {
 			// FileView
 			icon = IconType.TH_LIST;
+		} else if (SubmissionView.class.getName().equals(className)) {
+			// Submission View
+			icon = IconType.SERVER;
 		} else if (DockerRepository.class.getName().equals(className)) {
 			// DockerRepository
 			// TODO: change to Docker Icon: https://github.com/wesbos/Font-Awesome-Docker-Icon
