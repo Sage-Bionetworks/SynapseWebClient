@@ -5,8 +5,7 @@
              xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
     <bh:Div>
-<!--        todo: use Input group?????-->
-        <b:Input ui:field="commaSeparatedTextBox" height="32px"/>
+        <b:TextArea ui:field="commaSeparatedTextBox" height="32px" placeholder="Paste comma delimited values here."/>
         <b:Button ui:field="cancelButton"
                   type="INFO">Cancel</b:Button>
         <b:Button ui:field="addButton"

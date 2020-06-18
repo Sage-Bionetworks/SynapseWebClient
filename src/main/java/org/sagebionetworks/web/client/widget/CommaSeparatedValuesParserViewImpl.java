@@ -7,13 +7,14 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Input;
+import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditorViewImpl;
 
 
 public class CommaSeparatedValuesParserViewImpl implements CommaSeparatedValuesParserView{
-	//TODO: what is diff between com.google.gwt.user.client.ui and org.gwtbootstrap3.client.ui ?
 	public interface Binder extends UiBinder<Widget, CommaSeparatedValuesParserViewImpl> {}
 
 	private Widget widget;
@@ -26,7 +27,7 @@ public class CommaSeparatedValuesParserViewImpl implements CommaSeparatedValuesP
 	Button addButton;
 
 	@UiField
-	TextBox commaSeparatedTextBox;
+	TextArea commaSeparatedTextBox;
 
 
 	@Inject
@@ -38,7 +39,7 @@ public class CommaSeparatedValuesParserViewImpl implements CommaSeparatedValuesP
 
 	@Override
 	public String getText(){
-		return this.commaSeparatedTextBox.getText();
+		return this.commaSeparatedTextBox.getValue();
 	}
 
 	@Override

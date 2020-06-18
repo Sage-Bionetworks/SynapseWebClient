@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Window;
 import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
 import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValueType;
@@ -69,11 +72,14 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 
 	@Override
 	public void onAddNewAnnotation(List<String> values) {
+		GWT.debugger();
 		String initialKey = "";
-		AnnotationsValue value = new AnnotationsValue();
-		value.setType(AnnotationsValueType.STRING);
-		value.setValue(values);
-		AnnotationEditor newEditor = createAnnotationEditor(initialKey, value);
+		AnnotationsValue annotationValue = new AnnotationsValue();
+		annotationValue.setType(AnnotationsValueType.STRING);
+		if(values != null) {
+			annotationValue.setValue(values);
+		}
+		AnnotationEditor newEditor = createAnnotationEditor(initialKey, annotationValue);
 		view.addAnnotationEditor(newEditor.asWidget());
 	}
 
@@ -94,6 +100,7 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 
 		parser.configure(this::onAddNewAnnotation, this::onCancelPasteNewValues);
 		view.addCommaSeparatedValuesParser(parser.asWidget());
+		GWT.debugger();
 		this.commaSeparatedValuesParserExists = true;
 	}
 

@@ -104,6 +104,8 @@ import org.sagebionetworks.web.client.view.users.RegisterWidgetView;
 import org.sagebionetworks.web.client.view.users.RegisterWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.ButtonImpl;
+import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParserView;
+import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParserViewImpl;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.CopyTextModalImpl;
 import org.sagebionetworks.web.client.widget.DownloadSpeedTester;
@@ -1200,6 +1202,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AnnotationTransformer.class).to(AnnotationTransformerImpl.class).in(Singleton.class);
 		bind(AnnotationEditorView.class).to(AnnotationEditorViewImpl.class);
 		bind(EditAnnotationsDialogView.class).to(EditAnnotationsDialogViewImpl.class);
+		bind(CommaSeparatedValuesParserView.class).to(CommaSeparatedValuesParserViewImpl.class);
 
 		bind(AnnotationCellFactory.class).to(AnnotationCellFactoryImpl.class).in(Singleton.class);
 		bind(EntityId2BundleCache.class).to(EntityId2BundleCacheImpl.class).in(Singleton.class);

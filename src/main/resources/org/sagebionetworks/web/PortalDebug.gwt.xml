@@ -2,5 +2,6 @@
 <module rename-to='Portal'>
 	<inherits name="org.sagebionetworks.web.Portal" />
 
-	<set-property name="user.agent" value="safari" />
+<!--	TODO: change back-->
+	<set-property name="user.agent" value="gecko1_8" />
 </module>

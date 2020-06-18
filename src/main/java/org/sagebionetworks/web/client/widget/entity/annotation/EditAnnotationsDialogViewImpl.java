@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.annotation;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
@@ -47,7 +48,9 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView 
 		addAnnotationButton.addClickHandler(event -> {
 			presenter.onAddNewAnnotation(null);
 		});
-		pasteNewValuesButton.addClickHandler(clickEvent -> presenter.onClickPasteNewValues());
+		pasteNewValuesButton.addClickHandler(clickEvent -> {
+			presenter.onClickPasteNewValues();
+		});
 		saveButton.addDomHandler(DisplayUtils.getPreventTabHandler(saveButton), KeyDownEvent.getType());
 	}
 

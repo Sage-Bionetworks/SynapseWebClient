@@ -12,6 +12,8 @@ public interface CommaSeparatedValuesParserView extends IsWidget {
 		void onCancel();
 		void onAdd();
 
+		List<String> parseToStringList();
+
 		Widget asWidget();
 	}
 
