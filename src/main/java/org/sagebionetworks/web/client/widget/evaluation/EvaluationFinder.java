@@ -15,6 +15,8 @@ import com.google.inject.Inject;
 
 public class EvaluationFinder implements EvaluationFinderView.Presenter, IsWidget, PageChangeListener {
 
+	public static final String NO_EVALUATIONS_FOUND = "No evaluations were found.";
+
 	public static final String NO_EVALUATION_SELECTED = "Please select an evaluation.";
 	
 	private EvaluationFinderView view;
@@ -49,7 +51,7 @@ public class EvaluationFinder implements EvaluationFinderView.Presenter, IsWidge
 			public void onSuccess(List<Evaluation> results) {
 				if (results.isEmpty() && newOffset.equals(DEFAULT_OFFSET)) {
 					// no evaluations found!
-					synAlert.showError("No evaluations were found.");
+					synAlert.showError(NO_EVALUATIONS_FOUND);
 					return;
 				}
 				long rowCount = new Integer(results.size()).longValue();
