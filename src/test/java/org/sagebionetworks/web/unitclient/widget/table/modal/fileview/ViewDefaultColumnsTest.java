@@ -27,7 +27,6 @@ public class ViewDefaultColumnsTest {
 
 	@Mock
 	SynapseJavascriptClient mockJsClient;
-	ColumnModel columnModel;
 	List<ColumnModel> columns, projectColumns, submissionViewColumns;
 	ViewDefaultColumns fileViewDefaultColumns;
 	@Mock
@@ -39,18 +38,31 @@ public class ViewDefaultColumnsTest {
 
 	@Captor
 	ArgumentCaptor<Set<String>> setCaptor;
-	public static final String colName = "default column name";
+	// unable to mock these column models since we use the json adapter to deep clone the objects
+	ColumnModel fileColumn;
+	ColumnModel projectColumn;
+	ColumnModel submissionViewColumn;
+	public static final String FILE_COLUMN = "default file column name";
+	public static final String PROJECT_COLUMN = "default project name";
+	public static final String SUBMISSION_VIEW_COLUMN = "default submission view column name";
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		when(mockException.getMessage()).thenReturn(errorMessage);
-		columnModel = new ColumnModel();
-		columnModel.setId("not null");
-		columnModel.setName(colName);
+		fileColumn = new ColumnModel();
+		fileColumn.setId("1");
+		fileColumn.setName(FILE_COLUMN);
+		projectColumn = new ColumnModel();
+		projectColumn.setId("2");
+		projectColumn.setName(PROJECT_COLUMN);
+		submissionViewColumn = new ColumnModel();
+		submissionViewColumn.setId("3");
+		submissionViewColumn.setName(SUBMISSION_VIEW_COLUMN);
+		
 		adapterFactory = new AdapterFactoryImpl();
-		columns = Collections.singletonList(columnModel);
-		projectColumns = Collections.singletonList(columnModel);
-		submissionViewColumns = Collections.singletonList(columnModel);
+		columns = Collections.singletonList(fileColumn);
+		projectColumns = Collections.singletonList(projectColumn);
+		submissionViewColumns = Collections.singletonList(submissionViewColumn);
 		when(mockJsClient.getDefaultColumnsForView(TableType.files.getViewTypeMask())).thenReturn(getDoneFuture(columns));
 		when(mockJsClient.getDefaultColumnsForView(TableType.projects.getViewTypeMask())).thenReturn(getDoneFuture(projectColumns));
 		when(mockJsClient.getDefaultColumnsForView(ViewEntityType.submissionview)).thenReturn(getDoneFuture(submissionViewColumns));		
@@ -59,13 +71,12 @@ public class ViewDefaultColumnsTest {
 
 	@Test
 	public void testGetDefaultColumnNames() {
-		columnModel.setName(colName);
 		Set<String> columnNames = fileViewDefaultColumns.getDefaultViewColumnNames(TableType.files);
 		Set<String> projectColumnNames = fileViewDefaultColumns.getDefaultViewColumnNames(TableType.projects);
 		Set<String> submissionViewColumnNames = fileViewDefaultColumns.getDefaultViewColumnNames(TableType.submission_view);
-		assertTrue(columnNames.contains(colName));
-		assertTrue(projectColumnNames.contains(colName));
-		assertTrue(submissionViewColumnNames.contains(colName));
+		assertTrue(columnNames.contains(FILE_COLUMN));
+		assertTrue(projectColumnNames.contains(PROJECT_COLUMN));
+		assertTrue(submissionViewColumnNames.contains(SUBMISSION_VIEW_COLUMN));
 	}
 
 	@Test
@@ -94,6 +105,4 @@ public class ViewDefaultColumnsTest {
 		verify(mockJsClient, times(2)).getDefaultColumnsForView(ViewEntityType.submissionview);
 		verify(mockPopupUtils).showErrorMessage(errorMessage);
 	}
-
-
 }
