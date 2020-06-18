@@ -25,7 +25,7 @@
 		<schema-to-pojo.version>0.6.1</schema-to-pojo.version>
 		<org.json.version>20090211</org.json.version>
 		<jackson.version>2.9.10</jackson.version>
-		<jackson.databind.version>2.9.10.4</jackson.databind.version>
+		<jackson.databind.version>2.10.0.pr1</jackson.databind.version>
 		<log4j.version>2.6.1</log4j.version>
 		<markdown.version>2016-01-22-a2731f7-19</markdown.version>
 		<gwtbootstrap3.version>1.5.10</gwtbootstrap3.version>
