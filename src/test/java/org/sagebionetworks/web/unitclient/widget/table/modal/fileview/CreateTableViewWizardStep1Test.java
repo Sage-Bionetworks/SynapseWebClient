@@ -3,7 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.ViewTypeMask;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -49,13 +50,16 @@ public class CreateTableViewWizardStep1Test {
 	SynapseJavascriptClient mockJsClient;
 	String parentId;
 	CreateTableViewWizardStep1 widget;
-	List<String> scopeIds;
+	List<String> entityScopeIds;
+	List<String> evaluationScopeIds;
 
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		scopeIds = Collections.singletonList("3");
-		when(mockEntityContainerListWidget.getEntityIds()).thenReturn(scopeIds);
+		entityScopeIds = Collections.singletonList("3");
+		when(mockEntityContainerListWidget.getEntityIds()).thenReturn(entityScopeIds);
+		evaluationScopeIds = Collections.singletonList("8278743");
+		when(mockSubmissionViewScope.getEvaluationIds()).thenReturn(evaluationScopeIds);
 		widget = new CreateTableViewWizardStep1(mockView, mockJsClient, mockEntityContainerListWidget, mockSubmissionViewScope, mockStep2);
 		widget.setModalPresenter(mockWizardPresenter);
 		parentId = "syn123";
@@ -70,6 +74,33 @@ public class CreateTableViewWizardStep1Test {
 		verify(mockJsClient, never()).createEntity(any(Entity.class));
 	}
 
+	@Test
+	public void testConfigureSubmissionView() {
+		// verify configure with submission_view type
+		widget.configure(parentId, TableType.submission_view);
+		
+		verify(mockView).setSubmissionViewScopeWidgetVisible(true);
+		verify(mockView, never()).setEntityViewScopeWidgetVisible(true);
+		verify(mockView).setViewTypeOptionsVisible(false);
+		verify(mockSubmissionViewScope).configure(anyList());
+		
+		//and create the submission view entity
+		String tableName = "a name";
+		SubmissionView table = new SubmissionView();
+		table.setName(tableName);
+		table.setId("syn57");
+		ArgumentCaptor<Entity> captor = ArgumentCaptor.forClass(Entity.class);
+		when(mockJsClient.createEntity(captor.capture())).thenReturn(getDoneFuture(table));
+		when(mockView.getName()).thenReturn(tableName);
+		widget.onPrimary();
+		SubmissionView capturedView = (SubmissionView) captor.getValue();
+		assertEquals(evaluationScopeIds, capturedView.getScopeIds());
+		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
+		verify(mockStep2).configure(table, TableType.submission_view);
+		verify(mockWizardPresenter).setNextActivePage(mockStep2);
+
+	}
+	
 	@Test
 	public void testCreateFileView() {
 		widget.configure(parentId, TableType.files);
@@ -86,7 +117,7 @@ public class CreateTableViewWizardStep1Test {
 		when(mockView.getName()).thenReturn(tableName);
 		widget.onPrimary();
 		EntityView capturedFileView = (EntityView) captor.getValue();
-		assertEquals(scopeIds, capturedFileView.getScopeIds());
+		assertEquals(entityScopeIds, capturedFileView.getScopeIds());
 		assertNull(capturedFileView.getType());
 		assertEquals((Long) ViewTypeMask.File.getMask(), capturedFileView.getViewTypeMask());
 		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
@@ -118,7 +149,7 @@ public class CreateTableViewWizardStep1Test {
 		when(mockView.getName()).thenReturn(tableName);
 		widget.onPrimary();
 		EntityView capturedFileView = (EntityView) captor.getValue();
-		assertEquals(scopeIds, capturedFileView.getScopeIds());
+		assertEquals(entityScopeIds, capturedFileView.getScopeIds());
 		assertNull(capturedFileView.getType());
 		assertEquals(new Long(TableType.files_folders_tables.getViewTypeMask()), capturedFileView.getViewTypeMask());
 		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
@@ -155,7 +186,7 @@ public class CreateTableViewWizardStep1Test {
 		when(mockView.getName()).thenReturn(tableName);
 		widget.onPrimary();
 		EntityView capturedFileView = (EntityView) captor.getValue();
-		assertEquals(scopeIds, capturedFileView.getScopeIds());
+		assertEquals(entityScopeIds, capturedFileView.getScopeIds());
 		assertNull(capturedFileView.getType());
 		assertEquals((Long) ViewTypeMask.Project.getMask(), capturedFileView.getViewTypeMask());
 		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
