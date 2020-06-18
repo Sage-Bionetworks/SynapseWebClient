@@ -8,6 +8,8 @@ import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
@@ -238,5 +240,18 @@ public class GWTWrapperImpl implements GWTWrapper {
 	@Override
 	public DateTimeFormat getFormat(PredefinedFormat predefinedFormat) {
 		return DateTimeFormat.getFormat(predefinedFormat);
+	}
+	
+	@Override
+	public boolean isValidJSONArray(String json) {
+		if (json == null || json.trim().length() == 0) {
+			return true;
+		}
+		try {
+			JSONValue jsonValue = JSONParser.parseStrict(json);
+			return jsonValue.isArray() != null;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 }

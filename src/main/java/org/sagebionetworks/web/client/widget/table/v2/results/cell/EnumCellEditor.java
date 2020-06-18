@@ -14,12 +14,12 @@ public class EnumCellEditor implements CellEditor {
 
 	public static final String NOTHING_SELECTED = "nothing selected";
 
-	ListCellEdtiorView view;
+	ListCellEditorView view;
 	SynapseJSNIUtils jsniUtils;
 	ArrayList<String> items;
 
 	@Inject
-	public EnumCellEditor(ListCellEdtiorView view, SynapseJSNIUtils jsniUtils) {
+	public EnumCellEditor(ListCellEditorView view, SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.jsniUtils = jsniUtils;
 	}
