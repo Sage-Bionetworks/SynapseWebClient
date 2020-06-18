@@ -16,7 +16,7 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class ListCellEditorViewImpl implements ListCellEdtiorView {
+public class ListCellEditorViewImpl implements ListCellEditorView {
 
 	public interface Binder extends UiBinder<Widget, ListCellEditorViewImpl> {
 	}

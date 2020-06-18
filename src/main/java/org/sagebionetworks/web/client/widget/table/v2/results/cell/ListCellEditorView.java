@@ -6,12 +6,11 @@ import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface ListCellEdtiorView extends IsWidget, TakesValue<Integer>, HasKeyDownHandlers, Focusable {
+public interface ListCellEditorView extends IsWidget, TakesValue<Integer>, HasKeyDownHandlers, Focusable {
 	/**
 	 * Configure before using it.
 	 * 
 	 * @param values The possible values in the list. Selection is based on the index of each item.
 	 */
-	public void configure(List<String> values);
-
+	void configure(List<String> values);
 }

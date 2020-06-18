@@ -26,10 +26,10 @@ public class BooleanCellEditor implements CellEditor {
 	 */
 	private static final List<String> VALUES = Arrays.asList(NOTHING_SELECTED, TRUE, FALSE);
 
-	ListCellEdtiorView view;
+	ListCellEditorView view;
 
 	@Inject
-	public BooleanCellEditor(ListCellEdtiorView view) {
+	public BooleanCellEditor(ListCellEditorView view) {
 		this.view = view;
 		view.configure(VALUES);
 	}
