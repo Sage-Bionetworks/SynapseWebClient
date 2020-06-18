@@ -64,6 +64,7 @@ public class SubmissionViewScopeWidget implements SynapseWidgetPresenter, Submis
 		if (isVisible) {
 			int currentJobKey = jobKey;
 			currentView = (SubmissionView) bundle.getEntity();
+			viewScopeWidget.clear();
 			evaluationsList.clear();
 			synAlert.clear();
 			// get the evaluation queues

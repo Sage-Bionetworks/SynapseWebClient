@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -20,6 +21,10 @@ public class EvaluationList implements SynapseWidgetPresenter, IsWidget {
 	public void configure(List<Evaluation> list, boolean isSelectable) {
 		this.evaluationList = list;
 		view.configure(list, isSelectable);
+	}
+	
+	public void clear() {
+		configure(new ArrayList<Evaluation>(), false);
 	}
 
 	@Override
