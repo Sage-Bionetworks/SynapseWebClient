@@ -11,16 +11,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEdtiorView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEditorView;
 
 public class BooleanCellEditorTest {
 
-	ListCellEdtiorView mockView;
+	ListCellEditorView mockView;
 	BooleanCellEditor editor;
 
 	@Before
 	public void before() {
-		mockView = Mockito.mock(ListCellEdtiorView.class);
+		mockView = Mockito.mock(ListCellEditorView.class);
 		editor = new BooleanCellEditor(mockView);
 	}
 
