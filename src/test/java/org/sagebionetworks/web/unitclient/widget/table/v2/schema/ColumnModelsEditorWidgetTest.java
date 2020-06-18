@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -16,6 +15,8 @@ import java.util.List;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
@@ -64,6 +65,8 @@ public class ColumnModelsEditorWidgetTest {
 	ColumnModelTableRowEditorWidget mockColumnModelTableRowEditorWidget2;
 	@Mock
 	ImportTableViewColumnsButton mockAddTableViewColumnsButton;
+	@Captor
+	ArgumentCaptor<List<ColumnModelTableRow>> columnModelTableRowsCaptor;
 
 	ColumnModel nonEditableColumn;
 	List<ColumnModel> nonEditableColumns;
@@ -113,21 +116,21 @@ public class ColumnModelsEditorWidgetTest {
 		widget.configure(TableType.table, schema);
 		verify(mockEditor).configure(ViewType.EDITOR, true);
 		// All rows should be added to the editor
-		verify(mockEditor, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
+		verify(mockEditor).addColumns(columnModelTableRowsCaptor.capture());
+		assertEquals(schema.size(), columnModelTableRowsCaptor.getValue().size());
 		verify(mockGinInjector, times(schema.size())).createColumnModelEditorWidget();
 		// Extract the columns from the editor
 		List<ColumnModel> clone = widget.getEditedColumnModels();
 		assertEquals(schema, clone);
 
-		// attempting to add all columns again is a no-op if they all exist in the editor already
-		widget.addColumns(schema);
-		verify(mockEditor, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
-
+		// note that attempting to add all columns again is a no-op if they all exist in the editor already
 		// select all, delete, and add schema again (verify all columns from the schema have been re-added).
 		widget.selectAll();
 		widget.deleteSelected();
 		widget.addColumns(schema);
-		verify(mockEditor, times(schema.size() * 2)).addColumn(any(ColumnModelTableRow.class));
+		verify(mockEditor, times(2)).addColumns(columnModelTableRowsCaptor.capture());
+		assertEquals(schema.size(), columnModelTableRowsCaptor.getAllValues().get(0).size());
+		assertEquals(schema.size(), columnModelTableRowsCaptor.getAllValues().get(1).size());
 	}
 
 	@Test
@@ -149,7 +152,9 @@ public class ColumnModelsEditorWidgetTest {
 		clone.get(2).setId(null);
 		// all other columns should be ignored (because they have the same name and type)
 		widget.addColumns(clone);
-		verify(mockEditor, times(schema.size() + 2)).addColumn(any(ColumnModelTableRow.class));
+		verify(mockEditor, times(2)).addColumns(columnModelTableRowsCaptor.capture());
+		assertEquals(schema.size(), columnModelTableRowsCaptor.getAllValues().get(0).size());
+		assertEquals(2, columnModelTableRowsCaptor.getAllValues().get(1).size());
 	}
 
 	@Test
@@ -195,10 +200,10 @@ public class ColumnModelsEditorWidgetTest {
 	@Test
 	public void testSelectAll() {
 		widget.configure(TableType.table, schema);
-		// checks selection state each time a column editor is added, and once when columns are initialized.
-		verify(mockEditor, times(schema.size() + 1)).setCanDelete(false);
-		verify(mockEditor, times(schema.size() + 1)).setCanMoveUp(false);
-		verify(mockEditor, times(schema.size() + 1)).setCanMoveDown(false);
+		// checks selection state after all column editors have been added.
+		verify(mockEditor).setCanDelete(false);
+		verify(mockEditor).setCanMoveUp(false);
+		verify(mockEditor).setCanMoveDown(false);
 
 		// Add three columns
 		reset(mockEditor);

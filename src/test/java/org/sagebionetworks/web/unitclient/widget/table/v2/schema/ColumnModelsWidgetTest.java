@@ -109,6 +109,8 @@ public class ColumnModelsWidgetTest {
 	SynapseAlert mockSynAlert;
 	@Captor
 	ArgumentCaptor<ViewColumnModelRequest> viewColumnModelRequestCaptor;
+	@Captor
+	ArgumentCaptor<List<ColumnModelTableRow>> columnModelTableRowsCaptor;
 	@Mock
 	ViewColumnModelResponse mockViewColumnModelResponse;
 	
@@ -168,7 +170,8 @@ public class ColumnModelsWidgetTest {
 		widget.configure(mockBundle, isEditable);
 		verify(mockViewer).configure(ViewType.VIEWER, isEditable);
 		// All rows should be added to both the viewer and editor
-		verify(mockViewer, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
+		verify(mockViewer).addColumns(columnModelTableRowsCaptor.capture());
+		assertEquals(schema.size(), columnModelTableRowsCaptor.getValue().size());
 		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(false);
 	}
 
@@ -181,7 +184,8 @@ public class ColumnModelsWidgetTest {
 		widget.configure(mockBundle, isEditable);
 		verify(mockViewer).configure(ViewType.VIEWER, isEditable);
 		// All rows should be added to both the viewer and editor
-		verify(mockViewer, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
+		verify(mockViewer).addColumns(columnModelTableRowsCaptor.capture());
+		assertEquals(schema.size(), columnModelTableRowsCaptor.getValue().size());
 		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(true);
 	}
 
@@ -376,7 +380,8 @@ public class ColumnModelsWidgetTest {
 		verify(mockSynAlert).handleException(ex);
 		verify(mockBaseView).resetSaveButton();
 		// only the original columns should be applied to the view.
-		verify(mockViewer, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
+		verify(mockViewer).addColumns(columnModelTableRowsCaptor.capture());
+		assertEquals(schema.size(), columnModelTableRowsCaptor.getValue().size());
 	}
 
 	@Test

@@ -99,6 +99,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		ColumnModelTableRowEditorWidget rowEditor = createColumnModelEditorWidget(cm);
 		editor.addColumn(rowEditor);
 		this.editorRows.add(rowEditor);
+		checkSelectionState();
 		return rowEditor;
 	}
 
@@ -111,7 +112,6 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 			}
 		}
 		rowEditor.configure(cm, this);
-		checkSelectionState();
 		return rowEditor;
 	}
 
