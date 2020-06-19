@@ -40,6 +40,10 @@ public class CreateTableViewWizard {
 		} else if (TableType.table.equals(type)) {
 			this.modalWizardWidget.setTitle("Create Table");
 			this.modalWizardWidget.setHelp(TablesTab.TABLES_HELP, TablesTab.TABLES_HELP_URL);
+		} else if (TableType.submission_view.equals(type)) {
+			this.modalWizardWidget.setTitle("Create Submission View");
+			// TODO: send to submission view docs page (https://github.com/Sage-Bionetworks/synapseDocs/issues/787)
+			// this.modalWizardWidget.setHelp(TablesTab.SUBMISSION_VIEW_HELP, TablesTab.SUBMISSION_VIEW_HELP_URL);
 		} else {
 			this.modalWizardWidget.setTitle("Create View");
 			this.modalWizardWidget.setHelp(VIEW_HELP, VIEW_URL);

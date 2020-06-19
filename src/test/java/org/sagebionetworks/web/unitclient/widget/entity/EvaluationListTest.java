@@ -31,7 +31,8 @@ public class EvaluationListTest {
 	public void testGetSelectedEvaluationsEmpty() throws RestServiceException {
 		// configure with no evaluations
 		List<Evaluation> emptyList = new ArrayList<Evaluation>();
-		widget.configure(emptyList);
+		boolean isSelectable = true;
+		widget.configure(emptyList, isSelectable);
 		verify(mockView, never()).setSelectedEvaluationIndex(anyInt());
 	}
 
@@ -42,7 +43,8 @@ public class EvaluationListTest {
 		singleEvaluation.setId("1");
 		List<Evaluation> evaluations = new ArrayList<Evaluation>();
 		evaluations.add(singleEvaluation);
-		widget.configure(evaluations);
+		boolean isSelectable = true;
+		widget.configure(evaluations, isSelectable);
 		when(mockView.getSelectedEvaluationIndex()).thenReturn(null);
 		assertEquals(singleEvaluation, widget.getSelectedEvaluation());
 	}
@@ -53,7 +55,8 @@ public class EvaluationListTest {
 		List<Evaluation> evaluations = new ArrayList<Evaluation>();
 		evaluations.add(new Evaluation());
 		evaluations.add(new Evaluation());
-		widget.configure(evaluations);
+		boolean isSelectable = true;
+		widget.configure(evaluations, isSelectable);
 		verify(mockView, never()).setSelectedEvaluationIndex(anyInt());
 		when(mockView.getSelectedEvaluationIndex()).thenReturn(null);
 		assertNull(widget.getSelectedEvaluation());
@@ -67,11 +70,21 @@ public class EvaluationListTest {
 		Evaluation eval2 = new Evaluation();
 		eval2.setId("2");
 		evaluations.add(eval2);
-		widget.configure(evaluations);
+		boolean isSelectable = true;
+		widget.configure(evaluations, isSelectable);
 		when(mockView.getSelectedEvaluationIndex()).thenReturn(1);
 
 		assertEquals(eval2, widget.getSelectedEvaluation());
 	}
+	@Test
+	public void testNotSelectable() throws RestServiceException {
+		// user selected a subset of the evaluations
+		List<Evaluation> evaluations = new ArrayList<Evaluation>();
+		evaluations.add(new Evaluation());
+		boolean isSelectable = false;
 
-
+		widget.configure(evaluations, isSelectable);
+		
+		verify(mockView).configure(evaluations, isSelectable);
+	}
 }

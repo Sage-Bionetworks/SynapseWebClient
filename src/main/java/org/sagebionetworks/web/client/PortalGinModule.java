@@ -495,6 +495,10 @@ import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidgetView;
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModalView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModalViewImpl;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationFinderView;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationFinderViewImpl;
+import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditorView;
+import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditorViewImpl;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationListView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationListViewImpl;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterView;
@@ -583,8 +587,10 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableVie
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2ViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetView;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScopeWidgetView;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScopeWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.SubmissionViewScopeWidgetView;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.SubmissionViewScopeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsView;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsViewImpl;
@@ -1279,7 +1285,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(UserSelectorView.class).to(UserSelectorViewImpl.class);
 		bind(CreateTableViewWizardStep1View.class).to(CreateTableViewWizardStep1ViewImpl.class);
 		bind(EntityContainerListWidgetView.class).to(EntityContainerListWidgetViewImpl.class);
-		bind(ScopeWidgetView.class).to(ScopeWidgetViewImpl.class);
+		bind(EntityViewScopeWidgetView.class).to(EntityViewScopeWidgetViewImpl.class);
 		bind(CopyTextModal.class).to(CopyTextModalImpl.class);
 
 		bind(EvaluationEditorModalView.class).to(EvaluationEditorModalViewImpl.class);
@@ -1379,5 +1385,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ContainerItemCountWidgetView.class).to(ContainerItemCountWidgetViewImpl.class);
 		bind(StatisticsPlotWidgetView.class).to(StatisticsPlotWidgetViewImpl.class);
 		bind(QuarantinedEmailModal.class).in(Singleton.class);
+		bind(SubmissionViewScopeEditorView.class).to(SubmissionViewScopeEditorViewImpl.class);
+		bind(EvaluationFinderView.class).to(EvaluationFinderViewImpl.class);
+		bind(SubmissionViewScopeWidgetView.class).to(SubmissionViewScopeWidgetViewImpl.class);
 	}
 }

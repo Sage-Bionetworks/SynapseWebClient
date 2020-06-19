@@ -22,8 +22,8 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidget;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidget;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetView;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScopeWidget;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScopeWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -35,7 +35,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class ScopeWidgetTest {
 
 	@Mock
-	ScopeWidgetView mockView;
+	EntityViewScopeWidgetView mockView;
 	@Mock
 	SynapseJavascriptClient mockJsClient;
 	@Mock
@@ -50,7 +50,7 @@ public class ScopeWidgetTest {
 	List<String> mockScopeIds;
 	@Mock
 	List<String> mockNewScopeIds;
-	ScopeWidget widget;
+	EntityViewScopeWidget widget;
 	@Mock
 	EntityView mockEntityView;
 	@Mock
@@ -63,7 +63,7 @@ public class ScopeWidgetTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		widget = new ScopeWidget(mockView, mockJsClient, mockViewScopeWidget, mockEditScopeWidget, mockSynapseAlert, mockEventBus);
+		widget = new EntityViewScopeWidget(mockView, mockJsClient, mockViewScopeWidget, mockEditScopeWidget, mockSynapseAlert, mockEventBus);
 		when(mockEntityView.getId()).thenReturn("syn123");
 		when(mockEntityView.getScopeIds()).thenReturn(mockScopeIds);
 		when(mockBundle.getEntity()).thenReturn(mockEntityView);

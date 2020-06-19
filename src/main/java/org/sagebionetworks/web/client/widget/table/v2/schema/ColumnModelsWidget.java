@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+import java.util.ArrayList;
 import java.util.List;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.ColumnModelPage;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewColumnModelRequest;
@@ -101,18 +101,20 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		tableType = TableType.getTableType(bundle.getEntity());
 		editor.setAddDefaultViewColumnsButtonVisible(isEditableView);
 		editor.setAddAnnotationColumnsButtonVisible(isEditableView);
+		List<ColumnModelTableRow> rowViewers = new ArrayList<>();
 		for (ColumnModel cm : startingModels) {
 			// Create a viewer
 			ColumnModelTableRowViewer rowViewer = ginInjector.createNewColumnModelTableRowViewer();
 			ColumnModelUtils.applyColumnModelToRow(cm, rowViewer);
 			rowViewer.setSelectable(false);
-			viewer.addColumn(rowViewer);
+			rowViewers.add(rowViewer);
 		}
+		viewer.addColumns(rowViewers);
 	}
 
 	public void getDefaultColumnsForView() {
 		synAlert.clear();
-		List<ColumnModel> defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.isIncludeFiles());
+		List<ColumnModel> defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType);
 		editor.addColumns(defaultColumns);
 	}
 

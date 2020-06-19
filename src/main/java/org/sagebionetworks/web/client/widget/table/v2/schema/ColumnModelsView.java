@@ -106,7 +106,11 @@ public interface ColumnModelsView extends IsWidget {
 	 * @param row
 	 */
 	void addColumn(ColumnModelTableRow row);
-
+	/**
+	 * bulk add column model table rows to the view (single attach)
+	 * @param rows
+	 */
+	void addColumns(List<ColumnModelTableRow> rows);
 	/**
 	 * 
 	 * @param row

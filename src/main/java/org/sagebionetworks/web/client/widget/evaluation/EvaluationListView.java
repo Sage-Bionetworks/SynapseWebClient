@@ -6,7 +6,7 @@ import org.sagebionetworks.web.client.SynapseView;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface EvaluationListView extends IsWidget, SynapseView {
-	void configure(List<Evaluation> evaluationList);
+	void configure(List<Evaluation> evaluationList, boolean isSelectable);
 
 	Integer getSelectedEvaluationIndex();
 

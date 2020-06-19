@@ -306,7 +306,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		this.showEntityFinder = !isEntitySet && !isForm;
 		submissionNameUi.setVisible(!isForm);
 		entityFinderUI.setVisible(showEntityFinder);
-		evaluationList.configure(evaluations);
+		boolean isSelectable = true;
+		evaluationList.configure(evaluations, isSelectable);
 		boolean isMoreThanOneEvaluation = evaluations.size() > 1;
 		multipleEvaluationsFormLabel.setVisible(isMoreThanOneEvaluation);
 		singleEvaluationFormLabel.setVisible(!isMoreThanOneEvaluation);

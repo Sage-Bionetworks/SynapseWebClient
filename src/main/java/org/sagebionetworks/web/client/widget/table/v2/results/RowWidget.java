@@ -61,7 +61,7 @@ public class RowWidget implements IsWidget, RowView.Presenter {
 		// Setup each cell
 		List<ColumnModel> defaultColumns = null;
 		if (isEditor) {
-			defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.isIncludeFiles());
+			defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType);
 		}
 		for (ColumnModel type : types) {
 			// Create each cell

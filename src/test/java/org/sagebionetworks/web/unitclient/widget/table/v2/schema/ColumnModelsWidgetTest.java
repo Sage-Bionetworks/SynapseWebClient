@@ -109,6 +109,8 @@ public class ColumnModelsWidgetTest {
 	SynapseAlert mockSynAlert;
 	@Captor
 	ArgumentCaptor<ViewColumnModelRequest> viewColumnModelRequestCaptor;
+	@Captor
+	ArgumentCaptor<List<ColumnModelTableRow>> columnModelTableRowsCaptor;
 	@Mock
 	ViewColumnModelResponse mockViewColumnModelResponse;
 	
@@ -168,7 +170,8 @@ public class ColumnModelsWidgetTest {
 		widget.configure(mockBundle, isEditable);
 		verify(mockViewer).configure(ViewType.VIEWER, isEditable);
 		// All rows should be added to both the viewer and editor
-		verify(mockViewer, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
+		verify(mockViewer).addColumns(columnModelTableRowsCaptor.capture());
+		assertEquals(schema.size(), columnModelTableRowsCaptor.getValue().size());
 		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(false);
 	}
 
@@ -181,7 +184,8 @@ public class ColumnModelsWidgetTest {
 		widget.configure(mockBundle, isEditable);
 		verify(mockViewer).configure(ViewType.VIEWER, isEditable);
 		// All rows should be added to both the viewer and editor
-		verify(mockViewer, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
+		verify(mockViewer).addColumns(columnModelTableRowsCaptor.capture());
+		assertEquals(schema.size(), columnModelTableRowsCaptor.getValue().size());
 		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(true);
 	}
 
@@ -189,7 +193,7 @@ public class ColumnModelsWidgetTest {
 	public void testGetDefaultColumnsForView() {
 		boolean isEditable = true;
 
-		when(mockFileViewDefaultColumns.getDefaultViewColumns(anyBoolean())).thenReturn(mockDefaultColumnModels);
+		when(mockFileViewDefaultColumns.getDefaultViewColumns(any(TableType.class))).thenReturn(mockDefaultColumnModels);
 		when(mockView.getType()).thenReturn(org.sagebionetworks.repo.model.table.ViewType.file);
 		when(mockBundle.getEntity()).thenReturn(mockView);
 		tableBundle.setColumnModels(TableModelTestUtils.createOneOfEachType(true));
@@ -201,7 +205,7 @@ public class ColumnModelsWidgetTest {
 	@Test
 	public void testGetDefaultColumnsForProjectView() {
 		boolean isEditable = true;
-		when(mockFileViewDefaultColumns.getDefaultViewColumns(anyBoolean())).thenReturn(mockDefaultColumnModels);
+		when(mockFileViewDefaultColumns.getDefaultViewColumns(any(TableType.class))).thenReturn(mockDefaultColumnModels);
 		when(mockView.getType()).thenReturn(org.sagebionetworks.repo.model.table.ViewType.project);
 		when(mockBundle.getEntity()).thenReturn(mockView);
 		tableBundle.setColumnModels(TableModelTestUtils.createOneOfEachType(true));
@@ -376,7 +380,8 @@ public class ColumnModelsWidgetTest {
 		verify(mockSynAlert).handleException(ex);
 		verify(mockBaseView).resetSaveButton();
 		// only the original columns should be applied to the view.
-		verify(mockViewer, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
+		verify(mockViewer).addColumns(columnModelTableRowsCaptor.capture());
+		assertEquals(schema.size(), columnModelTableRowsCaptor.getValue().size());
 	}
 
 	@Test
