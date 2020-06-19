@@ -1,8 +1,11 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
+import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.Placement;
+import org.gwtbootstrap3.client.ui.constants.Trigger;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
-import com.google.gwt.event.dom.client.MouseOverEvent;
-import com.google.gwt.event.dom.client.MouseOverHandler;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * A non editable renderer for a string.
@@ -10,26 +13,39 @@ import com.google.gwt.event.dom.client.MouseOverHandler;
  * @author John
  *
  */
-public class StringRendererCellViewImpl extends Paragraph implements StringRendererCellView {
-	public static final MouseOverHandler STRING_RENDERER_MOUSE_OVER_HANDLER = event -> {
-		StringRendererCellViewImpl src = (StringRendererCellViewImpl) event.getSource();
-		src.removeStyleName("max-height-100 overflowHidden");
-	};
+public class StringRendererCellViewImpl implements StringRendererCellView {
 
+	Div div = new Div();
+	Paragraph p = new Paragraph();
+	public static final int LENGTH_REQUIRES_TOOLTIP = 20;
+	
 	public StringRendererCellViewImpl() {
 		super();
-		addStyleName("max-height-100 overflowHidden");
-		addDomHandler(STRING_RENDERER_MOUSE_OVER_HANDLER, MouseOverEvent.getType());
+		p.addStyleName("truncate");
 	}
 
 	@Override
 	public void setValue(String value) {
-		this.setText(value);
+		p.setText(value);
+		if (value != null && value.length() > LENGTH_REQUIRES_TOOLTIP) {
+			Tooltip tooltip = new Tooltip(p, value);
+			tooltip.setContainer("body");
+			tooltip.setPlacement(Placement.BOTTOM);
+			tooltip.setTrigger(Trigger.HOVER);
+			div.add(tooltip);
+		} else {
+			div.add(p);
+		}		
 	}
 
 	@Override
 	public String getValue() {
-		return this.getText();
+		return p.getText();
+	}
+
+	@Override
+	public Widget asWidget() {
+		return div;
 	}
 
 }

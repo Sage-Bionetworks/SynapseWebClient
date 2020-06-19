@@ -143,6 +143,7 @@ end sticky footer
 			font-size: 16px;
 		}
 	}
+	
 	.modal-header {
 		min-height: 50px;
 	}
@@ -1173,6 +1174,13 @@ h1, h2, h3, h4, h5, h6 {
 
 .scroll-auto {
 	overflow: auto;
+}
+
+.truncate {
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .maxWidth100 {
