@@ -37,6 +37,8 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 	FormGroup formGroup;
 	@UiField
 	HelpBlock helpBlock;
+	@UiField
+	Button addNewAnnotationValueButton;
 
 	@Inject
 	public AnnotationEditorViewImpl(Binder uiBinder) {
@@ -47,6 +49,7 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 				presenter.onTypeChange(typeComboBox.getSelectedIndex());
 			}
 		});
+		addNewAnnotationValueButton.addClickHandler(clickEvent -> presenter.onAddNewValue());
 	}
 
 	@Override
