@@ -34,7 +34,7 @@ public class StringListRendererCellViewImpl extends StringRendererCellViewImpl i
 			}
 			super.setValue(newValue.toString());
 		} catch (Exception e) {
-			this.setValue(jsonValue);
+			super.setValue(jsonValue);
 		}
 	}
 
