@@ -1662,8 +1662,10 @@ ol.lowerroman {
 		height: 30px;
 		position: absolute;
  		cursor: col-resize;
-		background-color:red;
 		user-select: none;
+		&:hover {
+			background-color:$synapse-blue;
+		}
 	}
 }
 
