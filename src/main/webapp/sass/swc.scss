@@ -1655,14 +1655,15 @@ ol.lowerroman {
 			visibility: visible;
 		}
 	}
-	.th-resizer-grip {
+	.th-resizer {
 		top: 0;
  		right: 0;
- 		width: '5px';
- 		position: 'absolute';
- 		cursor: 'col-resize';
-		background-color:'red';
-		user-select: 'none';
+		width: 5px;
+		height: 30px;
+		position: absolute;
+ 		cursor: col-resize;
+		background-color:red;
+		user-select: none;
 	}
 }
 
