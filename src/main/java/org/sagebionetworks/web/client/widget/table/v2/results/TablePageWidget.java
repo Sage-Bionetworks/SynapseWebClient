@@ -109,7 +109,7 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 				// For the static case we just set the header name.
 				StaticTableHeader sth = ginInjector.createStaticTableHeader();
 				sth.setHeader(headerName);
-				sth.setIsResizable(true);
+				sth.setIsResizable(false);
 				headers.add(sth);
 			}
 		}
