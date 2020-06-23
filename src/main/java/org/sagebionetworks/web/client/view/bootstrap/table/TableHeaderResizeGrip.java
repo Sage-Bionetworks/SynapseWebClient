@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.view.bootstrap.table;
 
-import java.util.Locale;
 import org.gwtbootstrap3.client.ui.html.Div;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NodeList;
@@ -41,16 +40,18 @@ public class TableHeaderResizeGrip extends Div {
 			colIndex++;
 			prevSiblingElement = prevSiblingElement.getPreviousSiblingElement();
 		}
-		// find ALL <trs> in the table
+		// find ALL <trs> in the table under <tbody>
 		// td -> tr -> thead -> table
 		Element tableElement = thElement.getParentElement().getParentElement().getParentElement();
-		NodeList<Element> allTableRows = tableElement.getElementsByTagName("tr");
-		for (int i = 0; i < allTableRows.getLength(); i++) {
-			Element tr = allTableRows.getItem(i);
-			Element cellElement = (Element)tr.getChild(colIndex);
-			if ("td".equals(cellElement.getNodeName().toLowerCase(Locale.ROOT))) {
+		// modify the max-width of the target <td> elements
+		NodeList<Element> tbodyElements = tableElement.getElementsByTagName("tbody");
+		if (tbodyElements.getLength() == 1) {
+			NodeList<Element> allTableRows = tbodyElements.getItem(0).getElementsByTagName("tr");
+			for (int i = 0; i < allTableRows.getLength(); i++) {
+				Element tr = allTableRows.getItem(i);
+				Element cellElement = (Element)tr.getChild(colIndex);
 				cellElement.setAttribute("style", "max-width: " + newWidthPx );	
-			}			
+			}
 		}
 	}
 	
