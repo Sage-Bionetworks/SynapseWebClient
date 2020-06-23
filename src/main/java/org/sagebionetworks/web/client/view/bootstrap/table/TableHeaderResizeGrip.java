@@ -12,15 +12,12 @@ import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.user.client.ui.RootPanel;
 
 public class TableHeaderResizeGrip extends Div {
-	public static Element curCol = null, nxtCol = null;
-	public static int curColWidth = -1, nxtColWidth = -1, pageX = -1;
+	public static Element curCol = null;
+	public static int curColWidth = -1, pageX = -1;
 	// add MOUSE_MOVE_HANDLER and MOUSE_UP_HANDLER to Document!
 	public static final MouseMoveHandler MOUSE_MOVE_HANDLER = event -> {
 		if (curCol != null) {
 			int diffX = event.getClientX() - pageX;
-			if (nxtCol != null && diffX > 0) {
-				updateWidth(nxtCol, nxtColWidth - diffX);
-			}
 			updateWidth(curCol, curColWidth + diffX);
 		}
 	};
@@ -57,9 +54,7 @@ public class TableHeaderResizeGrip extends Div {
 	
 	public static final MouseUpHandler MOUSE_UP_HANDLER = event -> {
 		curCol = null;
-		nxtCol = null;
 		pageX = -1;
-		nxtColWidth = -1;
 		curColWidth = -1;
 	};
 	
@@ -77,12 +72,8 @@ public class TableHeaderResizeGrip extends Div {
 		Div sourceDiv = (Div)event.getSource();
 		curCol = sourceDiv.getParent().getElement();
 		// and the next th element over
-		nxtCol = curCol.getNextSiblingElement();
 		pageX = event.getClientX();
 		curColWidth = curCol.getOffsetWidth();
-		if (nxtCol != null) {
-			nxtColWidth = nxtCol.getOffsetWidth();
-		}
 	};
 	
 	public void makeResizable() {
