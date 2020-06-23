@@ -1177,10 +1177,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .truncate {
-  max-width: 250px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+	max-width: 250px;
+	p {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+}
+.tablePage td {
+	overflow: hidden;
 }
 
 .maxWidth100 {

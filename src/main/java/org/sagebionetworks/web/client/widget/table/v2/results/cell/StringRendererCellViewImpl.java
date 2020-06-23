@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
+import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -21,7 +22,13 @@ public class StringRendererCellViewImpl implements StringRendererCellView {
 	
 	public StringRendererCellViewImpl() {
 		super();
-		p.addStyleName("truncate");
+		div.addAttachHandler(event -> {
+			if (event.isAttached()) {
+				// div has been attached.  add the "truncate" style to it's parent (td)
+				div.getParent().addStyleName("truncate");
+			};
+		});
+
 	}
 
 	@Override
