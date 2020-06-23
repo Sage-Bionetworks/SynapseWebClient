@@ -1,7 +1,14 @@
 package org.sagebionetworks.web.client.view.bootstrap.table;
 
 import org.gwtbootstrap3.client.ui.base.ComplexWidget;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.MouseMoveHandler;
+import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.user.client.DOM;
 
 /**
@@ -12,7 +19,6 @@ import com.google.gwt.user.client.DOM;
  *
  */
 public class TableHeader extends ComplexWidget {
-
 	private static final String MIN_WIDTH = "minWidth";
 
 	public TableHeader() {
@@ -34,5 +40,5 @@ public class TableHeader extends ComplexWidget {
 	 */
 	public void setMinimumWidth(String minWidth) {
 		DOM.setStyleAttribute(getElement(), MIN_WIDTH, minWidth);
-	}
+	}	
 }

@@ -16,5 +16,5 @@ public interface StaticTableHeader extends IsWidget {
 	 * @param headerText
 	 */
 	public void setHeader(String headerText);
-
+	public void setIsResizable(boolean isResizable);
 }

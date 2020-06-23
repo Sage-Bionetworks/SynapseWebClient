@@ -9,11 +9,12 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
-	<bt:TableHeader addStyleNames="whitespace-nowrap">
+	<bt:TableHeader addStyleNames="whitespace-nowrap position-relative">
 		<b:Anchor ui:field="tableHeaderLink" paddingLeft="2"
 			paddingRight="5" />
 		<b:Icon ui:field="sortIcon" type="SORT_AMOUNT_ASC"
 			paddingTop="4" paddingRight="3" paddingBottom="4" paddingLeft="1"
 			addStyleNames="imageButton" />
+		<bt:TableHeaderResizeGrip ui:field="resizeGrip" visible="false"/>
 	</bt:TableHeader>
 </ui:UiBinder>

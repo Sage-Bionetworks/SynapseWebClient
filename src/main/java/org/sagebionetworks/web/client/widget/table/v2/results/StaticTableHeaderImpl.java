@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import org.gwtbootstrap3.client.ui.html.Strong;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableHeaderResizeGrip;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -14,7 +15,8 @@ public class StaticTableHeaderImpl implements StaticTableHeader {
 
 	@UiField
 	Strong header;
-
+	@UiField
+	TableHeaderResizeGrip resizeGrip;
 	Widget widget;
 
 
@@ -33,4 +35,8 @@ public class StaticTableHeaderImpl implements StaticTableHeader {
 		return widget;
 	}
 
+	@Override
+	public void setIsResizable(boolean isResizable) {
+		resizeGrip.setVisible(isResizable);
+	}
 }

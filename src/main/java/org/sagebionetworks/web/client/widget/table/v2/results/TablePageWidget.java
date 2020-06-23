@@ -98,6 +98,7 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 				SortableTableHeader sth = ginInjector.createSortableTableHeader();
 				sth.configure(type.getName(), pageChangeListener);
 				headers.add(sth);
+				sth.setIsResizable(true);
 				if (sortedHeaders.containsKey(headerName)) {
 					SortItem sortItem = sortedHeaders.get(headerName);
 					sth.setSortDirection(sortItem.getDirection());
@@ -108,6 +109,7 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 				// For the static case we just set the header name.
 				StaticTableHeader sth = ginInjector.createStaticTableHeader();
 				sth.setHeader(headerName);
+				sth.setIsResizable(false);
 				headers.add(sth);
 			}
 		}

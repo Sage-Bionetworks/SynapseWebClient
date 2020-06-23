@@ -1177,10 +1177,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .truncate {
-  max-width: 250px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+	max-width: 250px;
+	p {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+}
+.tablePage td {
+	overflow: hidden;
 }
 
 .maxWidth100 {
@@ -1653,6 +1658,18 @@ ol.lowerroman {
 		summary::before {
 			content: 'Show Less';
 			visibility: visible;
+		}
+	}
+	.th-resizer {
+		top: 0;
+ 		right: 0;
+		width: 5px;
+		height: 30px;
+		position: absolute;
+ 		cursor: col-resize;
+		user-select: none;
+		&:hover {
+			background-color:$synapse-blue;
 		}
 	}
 }
@@ -3082,4 +3099,3 @@ div.border {
 		padding: 20px 40px 50px 20px;
 	}
 }
-

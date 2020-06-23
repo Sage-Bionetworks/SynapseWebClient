@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.table.SortDirection;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableHeaderResizeGrip;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -27,6 +28,8 @@ public class SortableTableHeaderImpl implements SortableTableHeader {
 
 	@UiField
 	Anchor tableHeaderLink;
+	@UiField
+	TableHeaderResizeGrip resizeGrip;
 	@UiField
 	Icon sortIcon;
 	Widget widget;
@@ -101,5 +104,10 @@ public class SortableTableHeaderImpl implements SortableTableHeader {
 
 	public void setVisible(boolean visible) {
 		widget.setVisible(visible);
+	}
+
+	@Override
+	public void setIsResizable(boolean isResizable) {
+		resizeGrip.setVisible(isResizable);
 	}
 }
