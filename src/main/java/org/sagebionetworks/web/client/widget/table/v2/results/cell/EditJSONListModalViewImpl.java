@@ -1,21 +1,20 @@
-package org.sagebionetworks.web.client.widget.entity.annotation;
+package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.Window;
-import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Modal;
-import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialogView;
 
-public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView {
+public class EditJSONListModalViewImpl implements EditJSONListModalView {
 
-	public interface Binder extends UiBinder<Widget, EditAnnotationsDialogViewImpl> {
+	public interface Binder extends UiBinder<Widget, EditJSONListModalViewImpl> {
 	}
 
 	@UiField
@@ -26,8 +25,7 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView 
 	Button saveButton;
 	@UiField
 	Button cancelButton;
-	@UiField
-	Button addAnnotationButton;
+
 	@UiField
 	Button pasteNewValuesButton;
 	@UiField
@@ -40,13 +38,10 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView 
 	Widget widget;
 
 	@Inject
-	public EditAnnotationsDialogViewImpl(final Binder uiBinder) {
+	public EditJSONListModalViewImpl(final Binder uiBinder) {
 		widget = uiBinder.createAndBindUi(this);
 		saveButton.addClickHandler(event -> {
 			presenter.onSave();
-		});
-		addAnnotationButton.addClickHandler(event -> {
-			presenter.onAddNewAnnotation(null);
 		});
 		pasteNewValuesButton.addClickHandler(clickEvent -> {
 			presenter.onClickPasteNewValues();
@@ -54,26 +49,10 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView 
 		saveButton.addDomHandler(DisplayUtils.getPreventTabHandler(saveButton), KeyDownEvent.getType());
 	}
 
+
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-	}
-
-	@Override
-	public void showEditor() {
-		saveButton.state().reset();
-		alert.setVisible(false);
-		editModal.show();
-	}
-
-	@Override
-	public void hideEditor() {
-		editModal.hide();
-	}
-
-	@Override
-	public void setLoading() {
-		saveButton.state().loading();
 	}
 
 	@Override
@@ -88,16 +67,6 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView 
 	public void hideErrors() {
 		alert.clear();
 		alert.setVisible(false);
-	}
-
-	@Override
-	public void addAnnotationEditor(Widget editor) {
-		editorsPanel.add(editor);
-	}
-
-	@Override
-	public void removeAnnotationEditor(Widget editor) {
-		editorsPanel.remove(editor);
 	}
 
 	@Override
@@ -117,13 +86,7 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView 
 	}
 
 	@Override
-	public void clearAnnotationEditors() {
-		editorsPanel.clear();
-	}
-
-	@Override
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message);
 	}
-
 }

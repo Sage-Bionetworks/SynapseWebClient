@@ -29,7 +29,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRende
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LargeStringCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererView;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONListCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellView;
@@ -59,7 +59,7 @@ public class CellFactoryImplTest {
 	@Mock
 	IntegerCellEditor mockIntegerCellEditor;
 	@Mock
-	ListCellEditor mockListCellEditor;
+	JSONListCellEditor mockJSONListCellEditor;
 	@Mock
 	LinkCellRendererView mockLinkCellRenderer;
 	@Mock
@@ -108,7 +108,7 @@ public class CellFactoryImplTest {
 		when(mockInjector.createLargeTextFormCellEditor()).thenReturn(mockLargeStringCellEditor);
 		when(mockInjector.createStringListRendererCellView()).thenReturn(mockStringListRenderer);
 		when(mockInjector.createDateListRendererCellView()).thenReturn(mockDateListRenderer);
-		when(mockInjector.createListCellEditor()).thenReturn(mockListCellEditor);
+		when(mockInjector.createListCellEditor()).thenReturn(mockJSONListCellEditor);
 		cellFactory = new CellFactory(mockInjector);
 	}
 
@@ -366,10 +366,10 @@ public class CellFactoryImplTest {
 		Long maxListLength = 20L;
 		cm.setMaximumSize(maxSize);
 		cm.setMaximumListLength(maxListLength);
-		assertEquals(mockListCellEditor, cellFactory.createEditor(cm));
+		assertEquals(mockJSONListCellEditor, cellFactory.createEditor(cm));
 		// The max size and list length must get passed to the editor
-		verify(mockListCellEditor).setMaxSize(maxSize);
-		verify(mockListCellEditor).setMaxListLength(maxListLength);
+		verify(mockJSONListCellEditor).setMaxSize(maxSize);
+		verify(mockJSONListCellEditor).setMaxListLength(maxListLength);
 	}
 
 	@Test
@@ -378,10 +378,10 @@ public class CellFactoryImplTest {
 		cm.setColumnType(ColumnType.INTEGER_LIST);
 		Long maxListLength = 10L;
 		cm.setMaximumListLength(maxListLength);
-		assertEquals(mockListCellEditor, cellFactory.createEditor(cm));
+		assertEquals(mockJSONListCellEditor, cellFactory.createEditor(cm));
 		// The max size and list length must get passed to the editor
-		verify(mockListCellEditor).setMaxSize(null);
-		verify(mockListCellEditor).setMaxListLength(maxListLength);
+		verify(mockJSONListCellEditor).setMaxSize(null);
+		verify(mockJSONListCellEditor).setMaxListLength(maxListLength);
 	}
 
 	@Test

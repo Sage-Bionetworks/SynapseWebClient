@@ -640,12 +640,16 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEdito
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateListRendererCellViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EditJSONListModalViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONListCellEditorView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONListCellEditorViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EditJSONListModalView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LargeStringCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LargeStringCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererView;
@@ -1123,6 +1127,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(FileCellRendererView.class).to(FileCellRendererViewImpl.class);
 		bind(EntityIdCellRendererView.class).to(EntityIdCellRendererViewImpl.class);
 		bind(LargeStringCellEditorView.class).to(LargeStringCellEditorViewImpl.class);
+		bind(JSONListCellEditorView.class).to(JSONListCellEditorViewImpl.class);
+		bind(EditJSONListModalView.class).to(EditJSONListModalViewImpl.class);
 
 		/*
 		 * Teams Places

@@ -25,9 +25,6 @@
 				<g:FlowPanel ui:field="editorsPanel" />
 				<b:Button ui:field="addAnnotationButton"
 					type="INFO">Add New Key</b:Button>
-				<!--
-				todo: is there a way to bundle the flowpanel and the button together but still allow the button to appear on the right side of the "add Key" button for annotations editing?
-				-->
 				<b:Button ui:field="pasteNewValuesButton"
 						  type="INFO">Paste New Values</b:Button>
 				<g:FlowPanel ui:field="pasteNewValuesPanel" />

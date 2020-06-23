@@ -218,6 +218,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEdito
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EditJSONModal;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
@@ -228,7 +229,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEd
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LargeStringCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONListCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditor;
@@ -524,7 +525,7 @@ public interface PortalGinInjector extends Ginjector {
 
 	StringEditorCell createStringEditorCell();
 	
-	ListCellEditor createListCellEditor();
+	JSONListCellEditor createListCellEditor();
 
 	EntityIdCellEditor createEntityIdCellEditor();
 
@@ -594,6 +595,8 @@ public interface PortalGinInjector extends Ginjector {
 	RegisterTeamDialog getRegisterTeamDialog();
 
 	AnnotationEditor getAnnotationEditor();
+
+	EditJSONModal getEditJsonModal();
 
 	CommaSeparatedValuesParser getCommaSeparatedValuesParser();
 

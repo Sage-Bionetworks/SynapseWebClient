@@ -1,5 +1,13 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
+import java.util.function.Consumer;
+
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.InputGroup;
+import org.gwtbootstrap3.client.ui.InputGroupButton;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -65,7 +73,7 @@ public class CellFactory {
 				case DATE_LIST:
 //				case ENTITYID_LIST:
 //				case USERID_LIST:
-					ListCellEditor listEditor = ginInjector.createListCellEditor();
+					JSONListCellEditor listEditor = ginInjector.createListCellEditor();
 					listEditor.setMaxSize(model.getMaximumSize());
 					listEditor.setMaxListLength(model.getMaximumListLength());
 					editor = listEditor;
@@ -118,7 +126,7 @@ public class CellFactory {
 				case DATE_LIST:
 //				case ENTITYID_LIST:
 //				case USERID_LIST:
-					ListCellEditor listEditor = ginInjector.createListCellEditor();
+					JSONListCellEditor listEditor = ginInjector.createListCellEditor();
 					listEditor.setMaxSize(model.getMaximumSize());
 					listEditor.setMaxListLength(model.getMaximumListLength());
 					editor = listEditor;
@@ -157,6 +165,26 @@ public class CellFactory {
 		editor.setValue(model.getDefaultValue());
 		return editor;
 
+	}
+
+	// TODO: test?
+	public static InputGroup appendDeleteButton(final CellEditor editor, Consumer<CellEditor> additionalDeleteCallback){
+		final InputGroup group = new InputGroup();
+		Button deleteButton = new Button("", IconType.TIMES, new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				group.removeFromParent();
+				additionalDeleteCallback.accept(editor);
+			}
+		});
+
+		deleteButton.setHeight("35px");
+		InputGroupButton deleteButtonGroup = new InputGroupButton();
+		deleteButtonGroup.add(deleteButton);
+		group.add(editor.asWidget());
+		group.add(deleteButtonGroup);
+
+		return group;
 	}
 
 }

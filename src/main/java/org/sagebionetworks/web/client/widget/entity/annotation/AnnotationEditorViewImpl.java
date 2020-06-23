@@ -20,6 +20,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 
 public class AnnotationEditorViewImpl implements AnnotationEditorView {
 	public interface Binder extends UiBinder<Widget, AnnotationEditorViewImpl> {
@@ -83,21 +84,8 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 
 	@Override
 	public void addNewEditor(final CellEditor editor) {
-		final InputGroup group = new InputGroup();
-		Button deleteButton = new Button("", IconType.TIMES, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				editorsContainer.remove(group);
-				presenter.onValueDeleted(editor);
-			}
-		});
-
-		deleteButton.setHeight("35px");
-		InputGroupButton deleteButtonGroup = new InputGroupButton();
-		deleteButtonGroup.add(deleteButton);
-		group.add(editor.asWidget());
-		group.add(deleteButtonGroup);
-		editorsContainer.add(group);
+		InputGroup editorWithDeleteButton = CellFactory.appendDeleteButton(editor, presenter::onValueDeleted);
+		editorsContainer.add(editorWithDeleteButton);
 	}
 
 	@Override
