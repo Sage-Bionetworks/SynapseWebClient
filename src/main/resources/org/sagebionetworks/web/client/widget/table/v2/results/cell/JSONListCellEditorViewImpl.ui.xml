@@ -11,8 +11,8 @@
 		<b:InputGroup>
 			<b:TextBox ui:field="textBox" styleName="form-control min-width-140"/>
 <!--			TODO: configure, copied mostly from the search button-->
-			<b:Icon ui:field="editButton" type="PENCIL" size="TIMES1.5"
-					addStyleNames="synapse-blue imageButton topLevelZIndex" marginLeft="-20px" paddingTop="10px"/>
+			<b:Icon ui:field="editButton" type="PENCIL"
+					addStyleNames="synapse-blue imageButton topLevelZIndex" marginLeft="-20" paddingTop="10"/>
 		</b:InputGroup>
 		<b:HelpBlock ui:field="helpBlock" visible="false" />
 <!--		TODO: is this the correct place-->

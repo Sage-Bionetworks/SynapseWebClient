@@ -18,6 +18,8 @@ import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialog;
 
 /**
  * View with zero business logic.
@@ -41,12 +43,15 @@ public class JSONListCellEditorViewImpl implements JSONListCellEditorView {
 
 	@UiField
 	Div valueEditorModalContainer;
+	EditJSONModal editJSONModal;
 
 	Widget widget;
 	JSONListCellEditor editor;
 
+	PortalGinInjector ginInjector;
 	@Inject
 	public JSONListCellEditorViewImpl(Binder binder) {
+		this.ginInjector = ginInjector;
 		widget = binder.createAndBindUi(this);
 		// users want us to select all on focus see SWC-2213
 		textBox.addFocusHandler(new FocusHandler() {
@@ -61,7 +66,7 @@ public class JSONListCellEditorViewImpl implements JSONListCellEditorView {
 			}
 		});
 
-		editButton.addClickHandler(clickEvent -> Window.alert("clicked"));
+		editButton.addClickHandler(clickEvent -> editor.onEditButtonClick());
 	}
 
 	@Override
@@ -134,5 +139,10 @@ public class JSONListCellEditorViewImpl implements JSONListCellEditorView {
 	@Override
 	public void setEditor(JSONListCellEditor editor) {
 		this.editor = editor;
+	}
+
+	@Override
+	public void addEditorToPage(Widget editJSONModalWidget){
+		this.valueEditorModalContainer.add(editJSONModalWidget);
 	}
 }

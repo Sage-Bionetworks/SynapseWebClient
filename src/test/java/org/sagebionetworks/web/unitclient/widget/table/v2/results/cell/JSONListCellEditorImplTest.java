@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONListCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONListCellEditorView;
@@ -28,10 +29,12 @@ public class JSONListCellEditorImplTest {
 	JSONListCellEditorView mockView;
 	JSONArrayAdapter jsonArrayAdapter = new JSONArrayAdapterImpl();
 	JSONListCellEditor editor;
+	@Mock
+	PortalGinInjector mockGinInjector;
 	
 	@Before
 	public void before() {
-		editor = new JSONListCellEditor(mockView, jsonArrayAdapter);
+		editor = new JSONListCellEditor(mockView, jsonArrayAdapter, mockGinInjector);
 	}
 
 	@Test

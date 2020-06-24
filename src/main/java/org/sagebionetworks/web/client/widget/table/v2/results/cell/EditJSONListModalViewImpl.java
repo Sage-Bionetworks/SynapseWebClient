@@ -8,9 +8,11 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialogView;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 
 public class EditJSONListModalViewImpl implements EditJSONListModalView {
 
@@ -26,6 +28,8 @@ public class EditJSONListModalViewImpl implements EditJSONListModalView {
 	@UiField
 	Button cancelButton;
 
+	@UiField
+	Button addNewValueButton;
 	@UiField
 	Button pasteNewValuesButton;
 	@UiField
@@ -47,6 +51,8 @@ public class EditJSONListModalViewImpl implements EditJSONListModalView {
 			presenter.onClickPasteNewValues();
 		});
 		saveButton.addDomHandler(DisplayUtils.getPreventTabHandler(saveButton), KeyDownEvent.getType());
+		cancelButton.addClickHandler(clickEvent -> hideEditor());
+		addNewValueButton.addClickHandler(clickEvent -> presenter.onAddNewEmptyValue());
 	}
 
 
@@ -64,9 +70,8 @@ public class EditJSONListModalViewImpl implements EditJSONListModalView {
 	}
 
 	@Override
-	public void hideErrors() {
-		alert.clear();
-		alert.setVisible(false);
+	public void clearEditors(){
+		editorsPanel.clear();
 	}
 
 	@Override
@@ -79,14 +84,27 @@ public class EditJSONListModalViewImpl implements EditJSONListModalView {
 		pasteNewValuesPanel.remove(commaSeparatedValuesParser);
 	}
 
+	@Override
+	public void showEditor() {
+		saveButton.state().reset();
+		alert.setVisible(false);
+		editModal.show();
+	}
+
+	@Override
+	public void hideEditor(){
+		editModal.hide();
+	}
+
+	@Override
+	public void addNewEditor(final CellEditor editor) {
+		InputGroup editorWithDeleteButton = CellFactory.appendDeleteButton(editor, presenter::onValueDeleted);
+		editorsPanel.add(editorWithDeleteButton.asWidget());
+	}
 
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
 
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
 }

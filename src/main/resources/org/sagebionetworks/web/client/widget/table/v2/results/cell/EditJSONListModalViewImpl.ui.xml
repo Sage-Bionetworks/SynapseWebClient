@@ -7,8 +7,8 @@
 
     <g:HTMLPanel>
         <b:Modal ui:field="editModal" title="Edit Values"
-                 closable="true" dataBackdrop="STATIC" dataKeyboard="true"
-                 b:id="editAnnotationsModal">
+                 size="SMALL"
+                 closable="false" dataBackdrop="STATIC" dataKeyboard="true">
             <b:ModalBody>
                 <t:Table width="80%">
                     <t:TableRow>
@@ -16,8 +16,20 @@
                             <b.html:Text>Value</b.html:Text>
                         </t:TableHeader>
                     </t:TableRow>
+
+                    <t:TableRow>
+                        <t:TableData>
+                            <t:Table>
+                                <t:TableRow>
+                                    <t:TableData><g:FlowPanel ui:field="editorsPanel" /></t:TableData>
+                                    <t:TableData addStyleNames="vertical-align-bottom"><b:Button ui:field="addNewValueButton" icon="PLUS"/></t:TableData>
+                                </t:TableRow>
+                            </t:Table>
+
+                        </t:TableData>
+                    </t:TableRow>
                 </t:Table>
-                <g:FlowPanel ui:field="editorsPanel" />
+
                 <b:Button ui:field="pasteNewValuesButton"
                           type="INFO">Paste New Values</b:Button>
                 <g:FlowPanel ui:field="pasteNewValuesPanel" />
@@ -25,8 +37,7 @@
                          title="Error" addStyleNames="margin-top-10" />
             </b:ModalBody>
             <b:ModalFooter>
-                <b:Button ui:field="cancelButton" type="LINK"
-                          dataDismiss="MODAL">Cancel</b:Button>
+                <b:Button ui:field="cancelButton" type="LINK">Cancel</b:Button>
                 <b:Button ui:field="saveButton" type="PRIMARY"
                           dataLoadingText="Saving...">Save</b:Button>
             </b:ModalFooter>

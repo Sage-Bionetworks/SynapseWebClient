@@ -16,8 +16,6 @@ import org.sagebionetworks.web.client.widget.csv.PapaParseWrapper;
 import org.sagebionetworks.web.client.widget.csv.PapaParseResult;
 
 public class CommaSeparatedValuesParser implements CommaSeparatedValuesParserView.Presenter{
-	private static final RegExp COMMA_REGEX = RegExp.compile("[^\\\\],");
-
 	//TODO: onModuleLoad() implement here to inject the CSV parser, PapaParser?
 
 	CommaSeparatedValuesParserView view;
