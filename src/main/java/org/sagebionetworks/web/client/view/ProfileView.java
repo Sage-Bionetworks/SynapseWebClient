@@ -25,7 +25,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	/**
 	 * Renders the view for a given presenter
 	 */
-	void setProfile(UserProfile profile, boolean isOwner, String orcIdHref);
+	void setProfile(UserProfile profile, boolean isOwner, boolean isCertified, boolean isValidated, String orcIdHref);
 
 	void refreshHeader();
 
@@ -116,8 +116,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void open(String url);
 
 	void setLastActivityOnColumnVisible(boolean visible);
-
-	void setCertifiedValidatedWidget(IsWidget w);
 
 	void showLoginAlert();
 }

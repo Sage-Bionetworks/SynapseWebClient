@@ -103,8 +103,6 @@
 										class="profileUI inline-block vertical-align-top max-width-800">
 										<div class="padding-15">
 											<g:SimplePanel ui:field="profileSynAlertPanel" />
-											<bh:Div ui:field="certifiedValidatedContainer"
-												paddingBottom="3" marginLeft="5" />
 											<bh:Div ui:field="userBadgeContainer" />
 											<!-- View Profile Panel -->
 											<bh:Div ui:field="userBadgeFooter"

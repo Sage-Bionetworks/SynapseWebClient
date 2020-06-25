@@ -72,7 +72,6 @@ import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidget;
-import org.sagebionetworks.web.client.widget.profile.ProfileCertifiedValidatedWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
@@ -162,10 +161,6 @@ public class ProfilePresenterTest {
 	@Mock
 	DownloadListWidget mockDownloadListWidget;
 	@Mock
-	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
-	@Mock
-	ProfileCertifiedValidatedWidget mockProfileCertifiedValidatedWidget;
-	@Mock
 	ProjectHeaderList mockProjectHeaderList;
 
 	List<Team> myTeams;
@@ -175,12 +170,11 @@ public class ProfilePresenterTest {
 	@Before
 	public void setup() throws JSONObjectAdapterException {
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
-		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockGwt, mockTeamListWidget, mockTeamInviteWidget, mockInjector, mockSynapseJavascriptClient, mockIsACTMemberAsyncHandler);
+		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockGwt, mockTeamListWidget, mockTeamInviteWidget, mockInjector, mockSynapseJavascriptClient);
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockInjector.getPromptForValuesModal()).thenReturn(mockPromptModalView);
 		when(mockInjector.getUserProfileModalWidget()).thenReturn(mockUserProfileModalWidget);
-		when(mockInjector.getProfileCertifiedValidatedWidget()).thenReturn(mockProfileCertifiedValidatedWidget);
 		when(mockInjector.getProjectBadgeWidget()).thenReturn(mockProjectBadge);
 		when(mockInjector.getChallengeBadgeWidget()).thenReturn(mockChallengeBadge);
 		when(mockInjector.getSettingsPresenter()).thenReturn(mockSettingsPresenter);
@@ -298,16 +292,6 @@ public class ProfilePresenterTest {
 		verify(mockView).setProfileEditButtonVisible(isOwner);
 		verify(mockView).showTabs(isOwner);
 		verify(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
-
-		// SWC-4872: if not ACT, then profile certification/validation state not shown.
-		// If ACT, configure and show that widget.
-		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackPCaptor.capture());
-		CallbackP<Boolean> isACTCallback = callbackPCaptor.getValue();
-		isACTCallback.invoke(false);
-		verify(mockView, never()).setCertifiedValidatedWidget(any(IsWidget.class));
-		isACTCallback.invoke(true);
-		verify(mockProfileCertifiedValidatedWidget).configure(Long.parseLong(userId));
-		verify(mockView).setCertifiedValidatedWidget(mockProfileCertifiedValidatedWidget);
 	}
 
 	@Test
