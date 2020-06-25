@@ -59,8 +59,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Button editProfileButton;
 	@UiField
-	Div certifiedValidatedContainer;
-	@UiField
 	SimplePanel editUserProfilePanel;
 	HTML noChallengesHtml = new HTML();
 	public static final String NO_CHALLENGES_HTML = "<p><a href=\"http://sagebionetworks.org/challenges/\" target=\"_blank\">Challenges</a> are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.</p>";
@@ -359,10 +357,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 
 	@Override
-	public void setProfile(UserProfile profile, boolean isOwner, String orcIdHref) {
+	public void setProfile(UserProfile profile, boolean isOwner, boolean isCertified, boolean isValidated, String orcIdHref) {
 		userBadgeFooter.setVisible(false);
 		// TODO: use large user component to show profile. set ORCiD
-		userBadge.configure(profile);
+		userBadge.configure(profile, isCertified, isValidated);
 
 		String displayName = DisplayUtils.getDisplayName(profile);
 		if (!isOwner) {
@@ -543,7 +541,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		teamFiltersDropDownMenu.clear();
 		projectNameColumnHeader.setSortDirection(null);
 		lastActivityOnColumnHeader.setSortDirection(null);
-		certifiedValidatedContainer.clear();
 		loginAlert.setVisible(false);
 	}
 
@@ -711,11 +708,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void open(String url) {
 		Window.open(url, "_self", "");
-	}
-
-	@Override
-	public void setCertifiedValidatedWidget(IsWidget w) {
-		certifiedValidatedContainer.add(w);
 	}
 
 	@Override

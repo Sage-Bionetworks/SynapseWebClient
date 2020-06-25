@@ -36,7 +36,7 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 	private String principalId = null, username = null;
 	UserProfileAsyncHandler userProfileAsyncHandler;
 	private AdapterFactory adapterFactory;
-
+	
 	public static final ClickHandler DO_NOTHING_ON_CLICK = new ClickHandler() {
 		@Override
 		public void onClick(ClickEvent event) {
@@ -64,10 +64,15 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 	 * @param profile
 	 */
 	public void configure(UserProfile profile) {
+		configure(profile, null, null);
+	}
+	
+	public void configure(UserProfile profile, Boolean isCertified, Boolean isValidated) {
 		this.profile = profile;
 		useCachedImage = true;
-		view.configure(profile);
+		view.configure(profile, isCertified, isValidated);
 	}
+
 
 	public void setTextHidden(boolean isTextHidden) {
 		view.setTextHidden(isTextHidden);

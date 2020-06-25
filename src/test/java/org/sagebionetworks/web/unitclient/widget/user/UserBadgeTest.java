@@ -85,7 +85,7 @@ public class UserBadgeTest {
 		userBadge.configure(principalId);
 
 		verify(mockUserProfileAsyncHandler).getUserProfile(eq(principalId), any(AsyncCallback.class));
-		verify(mockView).configure(profile);
+		verify(mockView).configure(profile, null, null);
 	}
 
 	@Test
@@ -131,7 +131,7 @@ public class UserBadgeTest {
 		userBadge.configure(principalId);
 		verify(mockCache).get(anyString());
 		verify(mockUserProfileAsyncHandler).getUserProfile(eq(principalId), any(AsyncCallback.class));
-		verify(mockView).configure(profile);
+		verify(mockView).configure(profile, null, null);
 	}
 
 	@Test
@@ -143,7 +143,7 @@ public class UserBadgeTest {
 		userBadge.configure(principalId);
 		verify(mockCache).get(anyString());
 		verify(mockUserProfileAsyncHandler, never()).getUserProfile(eq(principalId), any(AsyncCallback.class));
-		verify(mockView).configure(profile);
+		verify(mockView).configure(profile, null, null);
 	}
 
 }
