@@ -17,9 +17,6 @@ public interface SageImageBundle extends ClientBundle {
 	@Source("resource/images/logo-Shell.png")
 	ImageResource logoCommandLine45();
 
-	@Source("resource/images/certificate.png")
-	ImageResource certificate();
-
 	@Source("resource/images/greyArrow.png")
 	ImageResource greyArrow();
 
