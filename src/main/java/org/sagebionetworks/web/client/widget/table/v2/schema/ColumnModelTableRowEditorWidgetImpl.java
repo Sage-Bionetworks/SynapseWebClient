@@ -5,6 +5,7 @@ import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnFacetT
 import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnFacetTypeViewEnum.Values;
 import java.util.List;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
@@ -176,6 +177,9 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 			case Entity:
 			case StringList:
 			case BooleanList:
+			case EntityIdList:
+			case UserIdList:
+			case EvaluationId:
 				view.setFacetValues(None.toString(), Values.toString());
 				view.setFacetVisible(true);
 				break;
@@ -203,6 +207,9 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 			case IntegerList:
 			case BooleanList:
 			case DateList:
+			case EntityIdList:
+			case UserIdList:
+			case EvaluationId:
 				return true;
 			default:
 				return false;

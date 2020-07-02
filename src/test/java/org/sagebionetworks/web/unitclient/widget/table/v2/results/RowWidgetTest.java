@@ -10,6 +10,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import org.junit.Before;
@@ -162,12 +163,13 @@ public class RowWidgetTest {
 
 	@Test
 	public void testEditDefaultColumnModelsIsView() {
-		defaultColumnModels.add(types.get(0));
-		defaultColumnModels.add(types.get(1));
-		defaultColumnModels.add(types.get(2));
 		tableType = TableType.files;
 		boolean isEditor = true;
-		when(mockFileViewDefaultColumns.deepColumnModel(any(ColumnModel.class))).thenReturn(defaultColumnModels.get(0), defaultColumnModels.get(1), defaultColumnModels.get(2));
+		HashSet<String> defaultColumnNames = new HashSet<String>();
+		for (ColumnModel cm : types) {
+			defaultColumnNames.add(cm.getName());
+		}
+		when(mockFileViewDefaultColumns.getDefaultViewColumnNames(TableType.files)).thenReturn(defaultColumnNames);
 		rowWidget.configure(tableId, types, isEditor, tableType, aRow, mockListner);
 		verify(mockCellFactory, times(types.size())).createRenderer(any(ColumnModel.class));
 		verify(mockCellFactory, never()).createEditor(any(ColumnModel.class));
