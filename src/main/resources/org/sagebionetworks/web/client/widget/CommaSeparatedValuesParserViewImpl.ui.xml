@@ -5,10 +5,11 @@
              xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
     <bh:Div>
-        <b:TextArea ui:field="commaSeparatedTextBox" height="100px" placeholder="Paste comma delimited values here."/>
-        <b:Button ui:field="cancelButton"
-                  type="INFO">Cancel</b:Button>
-        <b:Button ui:field="addButton"
-                  type="INFO">Add</b:Button>
+        <b:TextArea ui:field="commaSeparatedTextBox" placeholder="Paste comma delimited values here." visibleLines="3"/>
+        <b:html.Div addStyleNames="text-align-right">
+            <b:Button ui:field="cancelButton" type="LINK">Cancel</b:Button>
+            <b:Button ui:field="addButton" type="LINK">Add</b:Button>
+        </b:html.Div>
+
     </bh:Div>
 </ui:UiBinder>

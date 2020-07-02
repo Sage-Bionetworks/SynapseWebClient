@@ -160,7 +160,14 @@ end sticky footer
 		background-color:$synapse-yellow;
 	}
 	.btn-default {
-		background-color: #ebebeb;
+		$button-color: #ebebeb;
+		background-color: $button-color;
+		border-color: $button-color;
+	}
+
+	//TODO: this is suppoed to make buttons not have rounded corners
+	.btn {
+		@include border-radius(2px);
 	}
 	.dropdown button.btn {
 		padding: 6px 12px;
@@ -864,6 +871,11 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 	min-height: 200px;
 }
 
+.transparent-background-and-border{
+	background: transparent;
+	border-color: transparent;
+}
+
 .file-preview {
     position: relative;
     margin: 15px 0;
@@ -1554,6 +1566,9 @@ ol.lowerroman {
 	.displayBlock {
 		display: block;
 	}
+	.displayTable {
+		display: table;
+	}
 	.displayTableCell {
 		display: table-cell;
 	}
@@ -2239,6 +2254,20 @@ div.input-group > input.search-textbox {
 .nav>li>a>div {
 	padding: 1em 2em .5em 2em;
 	margin: -1em -2em -.5em -2em;
+}
+
+table.annotations-editor-view{
+	$horizontal-spacing: 8px;
+	border-collapse: separate;
+	border-spacing: $horizontal-spacing 0;
+	margin: 0 -$horizontal-spacing;
+}
+
+table.multi-value-editor-spaced{
+	$vertical-spacing: 6px;
+	border-collapse: separate;
+	border-spacing: 0 $vertical-spacing;
+	margin-top: -2 * $vertical-spacing;
 }
 
 /**Override JQuery table styles **/

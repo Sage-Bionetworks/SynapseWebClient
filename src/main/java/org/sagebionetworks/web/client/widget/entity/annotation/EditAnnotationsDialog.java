@@ -72,7 +72,6 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 
 	@Override
 	public void onAddNewAnnotation(List<String> values) {
-		GWT.debugger();
 		String initialKey = "";
 		AnnotationsValue annotationValue = new AnnotationsValue();
 		annotationValue.setType(AnnotationsValueType.STRING);

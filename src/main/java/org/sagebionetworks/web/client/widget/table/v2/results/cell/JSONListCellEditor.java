@@ -38,7 +38,7 @@ public class JSONListCellEditor extends AbstractCellEditor implements CellEditor
 	public EditJSONModal getEditJSONModal() {
 		if (editJSONModal == null) {
 			editJSONModal = ginInjector.getEditJsonModal();
-			((JSONListCellEditorView) view).addEditorToPage(editJSONModal.asWidget());
+//			((JSONListCellEditorView) view).addEditorToPage(editJSONModal.asWidget());
 		}
 		return editJSONModal;
 	}

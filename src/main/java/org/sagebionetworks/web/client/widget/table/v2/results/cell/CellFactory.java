@@ -4,14 +4,20 @@ import java.util.function.Consumer;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.AnchorButton;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.InputGroup;
-import org.gwtbootstrap3.client.ui.InputGroupButton;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import com.google.inject.Inject;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 
 /**
  * Factory for creating table cells.
@@ -168,23 +174,31 @@ public class CellFactory {
 	}
 
 	// TODO: test?
-	public static InputGroup appendDeleteButton(final CellEditor editor, Consumer<CellEditor> additionalDeleteCallback){
-		final InputGroup group = new InputGroup();
-		Button deleteButton = new Button("", IconType.TIMES, new ClickHandler() {
+	public static TableRow appendDeleteButton(final CellEditor editor, Consumer<CellEditor> additionalDeleteCallback){
+		TableRow row = new TableRow();
+		//TODO: change to Anchor instead of button. without using input group to format
+		Button deleteButton = new Button();
+		deleteButton.setIcon(IconType.TIMES);
+		deleteButton.setType(ButtonType.LINK);
+		deleteButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				group.removeFromParent();
+				row.removeFromParent();
 				additionalDeleteCallback.accept(editor);
 			}
 		});
+		deleteButton.setSize(ButtonSize.EXTRA_SMALL);
 
-		deleteButton.setHeight("35px");
-		InputGroupButton deleteButtonGroup = new InputGroupButton();
-		deleteButtonGroup.add(deleteButton);
-		group.add(editor.asWidget());
-		group.add(deleteButtonGroup);
+		TableData deleteButtonWrapper = new TableData();
+		deleteButtonWrapper.add(deleteButton);
 
-		return group;
+		TableData editorTableData = new TableData();
+		editorTableData.add(editor.asWidget());
+
+		row.add(editorTableData);
+		row.add(deleteButtonWrapper);
+
+		return row;
 	}
 
 }

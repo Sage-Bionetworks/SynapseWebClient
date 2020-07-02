@@ -22,6 +22,8 @@ public interface EditJSONListModalView extends IsWidget {
 
 	void addNewEditor(CellEditor editor);
 
+	void moveAddNewAnnotationValueButtonToRowToLastRow();
+
 	public interface Presenter{
 
 		void onSave();

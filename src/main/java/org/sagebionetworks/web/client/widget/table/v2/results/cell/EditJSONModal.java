@@ -160,7 +160,17 @@ public class EditJSONModal implements EditJSONListModalView.Presenter{
 
 	@Override
 	public void onValueDeleted(CellEditor editor) {
-		cellEditors.remove(editor);
+
+		int editorIndex = cellEditors.indexOf(editor);
+		boolean editorAtEndOfList = editorIndex == cellEditors.size() - 1;
+
+		cellEditors.remove(editorIndex);
+		if (cellEditors.size() == 0) {
+			view.addNewEditor(createNewEditor());
+		} else if (editorAtEndOfList){
+			//if last row removed, we need to move the addValues button
+			view.moveAddNewAnnotationValueButtonToRowToLastRow();
+		}
 	}
 
 	@Override

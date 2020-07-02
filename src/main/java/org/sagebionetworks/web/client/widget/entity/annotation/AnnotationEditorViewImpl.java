@@ -7,8 +7,14 @@ import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.InputGroupButton;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.view.bootstrap.table.Table;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -33,12 +39,13 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 	@UiField
 	TextBox keyField;
 	@UiField
-	FlowPanel editorsContainer;
+	Table editorsContainer;
 	@UiField
 	FormGroup formGroup;
 	@UiField
 	HelpBlock helpBlock;
-	@UiField
+
+	//Not in UI XML because it is moved around a lot
 	Button addNewAnnotationValueButton;
 
 	@Inject
@@ -50,7 +57,10 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 				presenter.onTypeChange(typeComboBox.getSelectedIndex());
 			}
 		});
-		addNewAnnotationValueButton.addClickHandler(clickEvent -> presenter.onAddNewValue());
+
+		addNewAnnotationValueButton = new Button("", IconType.PLUS, clickEvent -> presenter.onAddNewValue());
+		addNewAnnotationValueButton.setType(ButtonType.PRIMARY);
+		addNewAnnotationValueButton.setSize(ButtonSize.EXTRA_SMALL);
 	}
 
 	@Override
@@ -84,8 +94,24 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 
 	@Override
 	public void addNewEditor(final CellEditor editor) {
-		InputGroup editorWithDeleteButton = CellFactory.appendDeleteButton(editor, presenter::onValueDeleted);
-		editorsContainer.add(editorWithDeleteButton);
+		TableRow row = CellFactory.appendDeleteButton(editor, presenter::onValueDeleted);
+
+		//additional column placeholder for the addNewAnnotationValueButton
+		TableData addButtonTableData = new TableData();
+		row.add(addButtonTableData);
+
+		editorsContainer.add(row);
+
+		addNewAnnotationValueButton.removeFromParent();
+		addButtonTableData.add(addNewAnnotationValueButton);
+	}
+
+	@Override
+	public void moveAddNewAnnotationValueButtonToRowToLastRow(){
+		TableRow lastRow = (TableRow) editorsContainer.getWidget(editorsContainer.getWidgetCount() - 1);
+		addNewAnnotationValueButton.removeFromParent();
+		//add the button to last cell of last row
+		((TableData)lastRow.getWidget(lastRow.getWidgetCount() - 1)).add(addNewAnnotationValueButton);
 	}
 
 	@Override

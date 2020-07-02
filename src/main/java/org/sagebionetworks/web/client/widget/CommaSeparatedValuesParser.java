@@ -67,7 +67,6 @@ public class CommaSeparatedValuesParser implements CommaSeparatedValuesParserVie
 	public List<String> parseToStringList(){
 		String text = view.getText();
 		PapaParseConfig config = new PapaParseConfig();
-		config.delimiter = ",";
 		GWT.debugger();
 
 		PapaParseResult parsed = PapaParseWrapper.parse(text.trim(),config);
