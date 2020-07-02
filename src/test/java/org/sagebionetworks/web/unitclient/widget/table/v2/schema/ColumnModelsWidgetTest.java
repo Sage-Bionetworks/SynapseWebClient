@@ -26,6 +26,7 @@ import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
@@ -85,6 +86,8 @@ public class ColumnModelsWidgetTest {
 	EntityBundle mockBundle;
 	@Mock
 	EntityView mockView;
+	@Mock
+	SubmissionView mockSubmissionView;
 	@Mock
 	List<ColumnModel> mockDefaultColumnModels;
 	@Mock
@@ -179,6 +182,20 @@ public class ColumnModelsWidgetTest {
 	public void testConfigureView() {
 		boolean isEditable = true;
 		when(mockBundle.getEntity()).thenReturn(mockView);
+		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
+		tableBundle.setColumnModels(schema);
+		widget.configure(mockBundle, isEditable);
+		verify(mockViewer).configure(ViewType.VIEWER, isEditable);
+		// All rows should be added to both the viewer and editor
+		verify(mockViewer).addColumns(columnModelTableRowsCaptor.capture());
+		assertEquals(schema.size(), columnModelTableRowsCaptor.getValue().size());
+		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(true);
+	}
+	
+	@Test
+	public void testConfigureSubmissionView() {
+		boolean isEditable = true;
+		when(mockBundle.getEntity()).thenReturn(mockSubmissionView);
 		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
 		tableBundle.setColumnModels(schema);
 		widget.configure(mockBundle, isEditable);

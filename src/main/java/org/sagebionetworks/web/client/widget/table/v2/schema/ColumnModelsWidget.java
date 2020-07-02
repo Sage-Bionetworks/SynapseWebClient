@@ -3,13 +3,16 @@ package org.sagebionetworks.web.client.widget.table.v2.schema;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import java.util.ArrayList;
 import java.util.List;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.SubmissionView;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewColumnModelRequest;
 import org.sagebionetworks.repo.model.table.ViewColumnModelResponse;
+import org.sagebionetworks.repo.model.table.ViewEntityType;
 import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -97,7 +100,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		this.bundle = bundle;
 		List<ColumnModel> startingModels = bundle.getTableBundle().getColumnModels();
 		viewer.configure(ViewType.VIEWER, this.isEditable);
-		boolean isEditableView = isEditable && bundle.getEntity() instanceof EntityView;
+		boolean isEditableView = isEditable && (bundle.getEntity() instanceof EntityView || bundle.getEntity() instanceof SubmissionView);
 		tableType = TableType.getTableType(bundle.getEntity());
 		editor.setAddDefaultViewColumnsButtonVisible(isEditableView);
 		editor.setAddAnnotationColumnsButtonVisible(isEditableView);
@@ -120,14 +123,19 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 
 	public void getPossibleColumnModelsForViewScope(String nextPageToken) {
 		synAlert.clear();
+		
 		ViewScope scope = new ViewScope();
-		scope.setScope(((EntityView) bundle.getEntity()).getScopeIds());
-		Long viewTypeMask = ((EntityView) bundle.getEntity()).getViewTypeMask();
-		if (viewTypeMask != null) {
-			scope.setViewTypeMask(viewTypeMask);
-		} else {
-			scope.setViewType(((EntityView) bundle.getEntity()).getType());
+		List<String> scopeIds = null;
+		Entity entity = bundle.getEntity();
+		if (entity instanceof EntityView) {
+			scopeIds = ((EntityView) entity).getScopeIds();
+			scope.setViewTypeMask(((EntityView) entity).getViewTypeMask());
+			scope.setViewEntityType(ViewEntityType.entityview);
+		} else if (entity instanceof SubmissionView) {
+			scopeIds = ((SubmissionView) entity).getScopeIds();
+			scope.setViewEntityType(ViewEntityType.submissionview);
 		}
+		scope.setScope(scopeIds);
 		
 		ViewColumnModelRequest request = new ViewColumnModelRequest();
 		request.setViewScope(scope);
