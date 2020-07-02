@@ -1414,8 +1414,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .gwt-TreeItem-selected {
-  background: #ffffff !important;
-  text-decoration:underline;
+	background: #ffffff !important;
+}
+.selectable .gwt-TreeItem-selected {
+	text-decoration:underline;
 }
 .entityTreeColumnsTable {
 	table-layout: fixed;
