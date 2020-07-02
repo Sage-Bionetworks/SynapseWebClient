@@ -39,8 +39,8 @@ public class CellFactory {
 			case STRING_LIST:
 			case BOOLEAN_LIST:
 			case INTEGER_LIST:
-//			case ENTITYID_LIST:
-//			case USERID_LIST:
+			case ENTITYID_LIST:
+			case USERID_LIST:				
 				return ginInjector.createStringListRendererCellView();
 			case DATE_LIST:
 				return ginInjector.createDateListRendererCellView();				
