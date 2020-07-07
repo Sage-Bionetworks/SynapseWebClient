@@ -78,7 +78,10 @@ public class SubmissionViewScopeWidgetTest {
 		scopeIds.add(EVAL_ID_1);
 		scopeIds.add(EVAL_ID_2);
 		when(mockSubmissionView.getScopeIds()).thenReturn(scopeIds);
-		AsyncMockStubber.callSuccessWith(mockEvaluation1, mockEvaluation2).when(mockJsClient).getEvaluation(anyString(), any(AsyncCallback.class));
+		List<Evaluation> evaluations = new ArrayList<Evaluation>();
+		evaluations.add(mockEvaluation1);
+		evaluations.add(mockEvaluation2);
+		AsyncMockStubber.callSuccessWith(evaluations).when(mockJsClient).getEvaluations(anyBoolean(), any(ACCESS_TYPE.class), anyList(), anyInt(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockSubmissionView).when(mockJsClient).updateEntity(any(Entity.class), anyString(), anyBoolean(), any(AsyncCallback.class));
 	}
 

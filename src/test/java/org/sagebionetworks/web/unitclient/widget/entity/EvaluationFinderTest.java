@@ -68,7 +68,7 @@ public class EvaluationFinderTest {
 		evaluationListPage = new ArrayList<Evaluation>();
 		when(mockEvaluation1.getId()).thenReturn(EVAL_ID_1);
 		when(mockEvaluation2.getId()).thenReturn(EVAL_ID_2);
-		AsyncMockStubber.callSuccessWith(evaluationListPage).when(mockJsClient).getEvaluations(anyBoolean(),  any(ACCESS_TYPE.class), anyInt(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(evaluationListPage).when(mockJsClient).getEvaluations(anyBoolean(),  any(ACCESS_TYPE.class), anyList(), anyInt(), anyInt(), any(AsyncCallback.class));
 	}
 	
 
@@ -89,7 +89,7 @@ public class EvaluationFinderTest {
 		widget.configure(isActiveOnly, access, mockSelectedEvaluationCallback);
 		
 		verify(mockSynAlert).clear();
-		verify(mockJsClient).getEvaluations(eq(isActiveOnly), eq(access), eq(DEFAULT_EVALUATION_LIMIT.intValue()), eq(DEFAULT_OFFSET.intValue()), any(AsyncCallback.class));
+		verify(mockJsClient).getEvaluations(eq(isActiveOnly), eq(access), eq(null), eq(DEFAULT_EVALUATION_LIMIT.intValue()), eq(DEFAULT_OFFSET.intValue()), any(AsyncCallback.class));
 		// set up success in Before, with non-empty result (in this test)
 		long expectedRowCount = evaluationListPage.size();
 		verify(mockPaginationWidget).configure(DEFAULT_EVALUATION_LIMIT, DEFAULT_OFFSET, expectedRowCount, widget);
@@ -115,7 +115,7 @@ public class EvaluationFinderTest {
 		
 		widget.configure(isActiveOnly, access, mockSelectedEvaluationCallback);
 		
-		verify(mockJsClient).getEvaluations(eq(isActiveOnly), eq(access), eq(DEFAULT_EVALUATION_LIMIT.intValue()), eq(DEFAULT_OFFSET.intValue()), any(AsyncCallback.class));
+		verify(mockJsClient).getEvaluations(eq(isActiveOnly), eq(access), eq(null), eq(DEFAULT_EVALUATION_LIMIT.intValue()), eq(DEFAULT_OFFSET.intValue()), any(AsyncCallback.class));
 		verify(mockSynAlert).showError(NO_EVALUATIONS_FOUND);
 		verify(mockPaginationWidget, never()).configure(anyLong(), anyLong(), anyLong(), any(PageChangeListener.class));
 		verify(mockEvaluationListWidget, never()).configure(anyList(), anyBoolean());
@@ -126,7 +126,7 @@ public class EvaluationFinderTest {
 		boolean isActiveOnly = true;
 		ACCESS_TYPE access = ACCESS_TYPE.READ_PRIVATE_SUBMISSION;
 		Exception ex = new Exception();
-		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).getEvaluations(anyBoolean(),  any(ACCESS_TYPE.class), anyInt(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).getEvaluations(anyBoolean(), any(ACCESS_TYPE.class), anyList(), anyInt(), anyInt(), any(AsyncCallback.class));
 		
 		widget.configure(isActiveOnly, access, mockSelectedEvaluationCallback);
 		

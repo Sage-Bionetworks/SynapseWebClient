@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationFinder;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationList;
 import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditor;
 import com.google.gwt.event.shared.EventBus;
@@ -67,9 +68,7 @@ public class SubmissionViewScopeWidget implements SynapseWidgetPresenter, Submis
 			viewScopeWidget.clear();
 			evaluationsList.clear();
 			synAlert.clear();
-			// get the evaluation queues
-			// TODO: currently getting these individually, but would like to get them in bulk (PLFM-6288).
-			AsyncCallback<Evaluation> cb = new AsyncCallback<Evaluation>() {
+			AsyncCallback<Void> cb = new AsyncCallback<Void>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					if (currentJobKey != jobKey) {
@@ -78,27 +77,39 @@ public class SubmissionViewScopeWidget implements SynapseWidgetPresenter, Submis
 					synAlert.handleException(caught);
 				}
 				@Override
-				public void onSuccess(Evaluation evaluation) {
+				public void onSuccess(Void result) {
 					if (currentJobKey != jobKey) {
 						return;
 					}
-					evaluationsList.add(evaluation);
-					if (evaluationsList.size() == currentView.getScopeIds().size()) {
-						// got them all!
-						boolean isSelectable = false;
-						viewScopeWidget.configure(evaluationsList, isSelectable);
-					}
+					boolean isSelectable = false;
+					viewScopeWidget.configure(evaluationsList, isSelectable);
 				}
 			};
-			for (String evaluationId : currentView.getScopeIds()) {
-				jsClient.getEvaluation(evaluationId, cb);
-			}
-			
+			getAllEvaluations(currentView.getScopeIds(), 0, cb);
 			view.setEditButtonVisible(isEditable);
 		}
 		view.setVisible(isVisible);
 	}
 
+	private void getAllEvaluations(List<String> scopeIds, int currentOffset, AsyncCallback<Void> cb) {
+		jsClient.getEvaluations(null, null, scopeIds, EvaluationFinder.DEFAULT_EVALUATION_LIMIT.intValue(), currentOffset, new AsyncCallback<List<Evaluation>>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					cb.onFailure(caught);
+				}
+				@Override
+				public void onSuccess(List<Evaluation> result) {
+					evaluationsList.addAll(result);
+					if (result.size() == EvaluationFinder.DEFAULT_EVALUATION_LIMIT) {
+						// keep looking for more results
+						getAllEvaluations(scopeIds, currentOffset + EvaluationFinder.DEFAULT_EVALUATION_LIMIT.intValue(), cb);
+					} else {
+						cb.onSuccess(null);
+					}
+				}
+		});
+		
+	}
 
 	@Override
 	public Widget asWidget() {
