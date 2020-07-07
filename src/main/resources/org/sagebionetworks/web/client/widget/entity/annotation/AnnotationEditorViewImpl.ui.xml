@@ -4,7 +4,7 @@
 	xmlns:b.html="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
-	<t:Table width="80%" addStyleNames="annotations-editor-view">
+	<t:Table addStyleNames="annotations-editor-view" width="100%">
 		<t:TableRow>
 			<t:TableHeader addStyleNames="min-width-200">
 				<b.html:Text>Key</b.html:Text>
@@ -32,8 +32,8 @@
 					styleName="form-control" />
 			</t:TableData>
 			<t:TableData
-				addStyleNames="vertical-align-top min-width-200" paddingRight="2">
-				<t:Table addStyleNames="multi-value-editor-spaced" ui:field="editorsContainer">
+				addStyleNames="vertical-align-top min-width-275" paddingRight="2">
+				<t:Table width="100%" addStyleNames="multi-value-editor-spaced" ui:field="editorsContainer">
 				</t:Table>
 
 			</t:TableData>

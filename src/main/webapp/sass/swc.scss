@@ -669,6 +669,11 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 .min-width-200 {
 	min-width: 200px;
 }
+
+.min-width-275 {
+	min-width: 275px;
+}
+
 .min-width-300 {
 	min-width: 300px;
 }
@@ -685,13 +690,14 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 	min-height: 17px;
 }
 
+.margin-5 {
+	margin: 5px;
+}
+
 .margin-10 {
 	margin: 10px;
 }
 
-.margin-5 {
-	margin: 5px;
-}
 .margin-top-left-10 {
 	margin-top: 10px;
 	margin-left: 10px;
@@ -2257,17 +2263,16 @@ div.input-group > input.search-textbox {
 }
 
 table.annotations-editor-view{
-	$horizontal-spacing: 8px;
+	$horizontal-spacing: 15px;
 	border-collapse: separate;
 	border-spacing: $horizontal-spacing 0;
-	margin: 0 -$horizontal-spacing;
 }
 
 table.multi-value-editor-spaced{
-	$vertical-spacing: 6px;
+	$vertical-spacing: 25px;
 	border-collapse: separate;
 	border-spacing: 0 $vertical-spacing;
-	margin-top: -2 * $vertical-spacing;
+	margin-top: -$vertical-spacing;
 }
 
 /**Override JQuery table styles **/
