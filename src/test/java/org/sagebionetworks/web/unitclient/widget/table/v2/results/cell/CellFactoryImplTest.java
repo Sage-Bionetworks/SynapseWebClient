@@ -393,6 +393,20 @@ public class CellFactoryImplTest {
 	}
 
 	@Test
+	public void testGetEntityIdListRenderer() {
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.ENTITYID_LIST);
+		assertEquals(mockEntityIdListRenderer, cellFactory.createRenderer(cm));
+	}
+
+	@Test
+	public void testGetUserIdListRenderer() {
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.USERID_LIST);
+		assertEquals(mockUserIdListRenderer, cellFactory.createRenderer(cm));
+	}
+	
+	@Test
 	public void testGetStringFormCellEditor() {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.STRING);
