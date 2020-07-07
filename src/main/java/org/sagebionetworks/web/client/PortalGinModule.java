@@ -646,6 +646,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateListRende
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateListRendererCellViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdListRendererCellView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdListRendererCellViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererView;
@@ -666,6 +668,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendere
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdListRendererCellView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdListRendererCellViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesView;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorView;
@@ -1118,6 +1122,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(StringRendererCellView.class).to(StringRendererCellViewImpl.class);
 		bind(StringListRendererCellView.class).to(StringListRendererCellViewImpl.class);
 		bind(DateListRendererCellView.class).to(DateListRendererCellViewImpl.class);
+		bind(UserIdListRendererCellView.class).to(UserIdListRendererCellViewImpl.class);
+		bind(EntityIdListRendererCellView.class).to(EntityIdListRendererCellViewImpl.class);
 		bind(CellEditorView.class).to(CellEditorViewImpl.class);
 		bind(NumberCellEditorView.class).to(NumberCellEditorViewImpl.class);
 		bind(ListCellEditorView.class).to(ListCellEditorViewImpl.class);

@@ -219,6 +219,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateListRende
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
@@ -232,6 +233,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringListRen
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeWidget;
@@ -519,6 +521,8 @@ public interface PortalGinInjector extends Ginjector {
 	// TableEntity V2 cells
 	StringRendererCellView createStringRendererCellView();
 	StringListRendererCellView createStringListRendererCellView();
+	UserIdListRendererCellView createUserIdListRendererCellView();
+	EntityIdListRendererCellView createEntityIdListRendererCellView();
 	DateListRendererCellView createDateListRendererCellView();
 
 	StringEditorCell createStringEditorCell();

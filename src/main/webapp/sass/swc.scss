@@ -350,7 +350,22 @@ end sticky footer
 	color: #939598;
 	font-size: 11px;
 }
-
+#body .synapseViewOrTable {
+	th {
+		background-color: #BBD3E2;
+		border: 1px solid #8BB4CE;
+	}
+	th:nth-child(1) {
+		border-right: none;
+	}
+	th:nth-child(2) {
+		border-left: none;
+	}
+}
+#body .tableHeaderSortIcon {
+	position: absolute;
+	right: 5px;
+}
 .nobordertable-imp td {
   border: 0px !important;
   padding: 0px;
@@ -1665,8 +1680,8 @@ ol.lowerroman {
 	.th-resizer {
 		top: 0;
  		right: 0;
-		width: 5px;
-		height: 30px;
+		width: 3px;
+		height: 32px;
 		position: absolute;
  		cursor: col-resize;
 		user-select: none;

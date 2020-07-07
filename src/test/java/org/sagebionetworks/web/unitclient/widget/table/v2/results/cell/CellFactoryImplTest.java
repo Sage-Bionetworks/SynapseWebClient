@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateListRende
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
@@ -35,6 +36,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringListRen
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdListRendererCellView;
 
 public class CellFactoryImplTest {
 
@@ -84,6 +86,10 @@ public class CellFactoryImplTest {
 	StringListRendererCellView mockStringListRenderer;
 	@Mock
 	DateListRendererCellView mockDateListRenderer;
+	@Mock
+	UserIdListRendererCellView mockUserIdListRenderer;
+	@Mock
+	EntityIdListRendererCellView mockEntityIdListRenderer;
 
 	@Before
 	public void before() {
@@ -108,6 +114,8 @@ public class CellFactoryImplTest {
 		when(mockInjector.createLargeTextFormCellEditor()).thenReturn(mockLargeStringCellEditor);
 		when(mockInjector.createStringListRendererCellView()).thenReturn(mockStringListRenderer);
 		when(mockInjector.createDateListRendererCellView()).thenReturn(mockDateListRenderer);
+		when(mockInjector.createEntityIdListRendererCellView()).thenReturn(mockEntityIdListRenderer);
+		when(mockInjector.createUserIdListRendererCellView()).thenReturn(mockUserIdListRenderer);
 		when(mockInjector.createListCellEditor()).thenReturn(mockListCellEditor);
 		cellFactory = new CellFactory(mockInjector);
 	}
