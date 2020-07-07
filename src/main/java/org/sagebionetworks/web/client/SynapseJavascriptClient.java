@@ -1760,7 +1760,7 @@ public class SynapseJavascriptClient {
 		doGet(url, OBJECT_TYPE.PaginatedResultsEvaluations, cb);
 	}
 	
-	public void getEvaluations(Boolean isActiveOnly, ACCESS_TYPE accessType, Integer limit, Integer offset, AsyncCallback<List<Evaluation>> cb) {
+	public void getEvaluations(Boolean isActiveOnly, ACCESS_TYPE accessType, List<String> idsList, Integer limit, Integer offset, AsyncCallback<List<Evaluation>> cb) {
 		char sep = '?';
 		String url = getRepoServiceUrl() + EVALUATION;
 		if (isActiveOnly != null) {
@@ -1771,6 +1771,14 @@ public class SynapseJavascriptClient {
 			url += sep + "accessType=" + accessType.name();
 			sep = '&';
 		}
+		if (idsList != null && !idsList.isEmpty()) {
+			url += sep + "evaluationIds=";
+			for (String id : idsList) {
+				url += id + ",";
+			}
+			sep = '&';
+		}
+		
 		if (limit != null) {
 			url += sep + LIMIT_PARAMETER + limit;
 			sep = '&';

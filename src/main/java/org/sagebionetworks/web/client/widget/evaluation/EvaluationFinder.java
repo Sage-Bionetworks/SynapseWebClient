@@ -46,7 +46,7 @@ public class EvaluationFinder implements EvaluationFinderView.Presenter, IsWidge
 	public void onPageChange(final Long newOffset) {
 		synAlert.clear();
 		
-		jsClient.getEvaluations(isActiveOnly, accessType, DEFAULT_EVALUATION_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<List<Evaluation>>() {
+		jsClient.getEvaluations(isActiveOnly, accessType, null, DEFAULT_EVALUATION_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<List<Evaluation>>() {
 			@Override
 			public void onSuccess(List<Evaluation> results) {
 				if (results.isEmpty() && newOffset.equals(DEFAULT_OFFSET)) {
