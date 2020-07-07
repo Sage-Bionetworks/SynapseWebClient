@@ -57,6 +57,7 @@ public class EditJSONListModalViewImpl implements EditJSONListModalView {
 		cancelButton.addClickHandler(clickEvent -> hideEditor());
 
 		addNewValueButton = new Button("", IconType.PLUS, clickEvent -> presenter.onAddNewEmptyValue());
+		addNewValueButton.addStyleName("center-in-div");
 		addNewValueButton.setType(ButtonType.PRIMARY);
 		addNewValueButton.setSize(ButtonSize.EXTRA_SMALL);
 	}

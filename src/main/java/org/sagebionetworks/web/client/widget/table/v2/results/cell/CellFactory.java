@@ -188,6 +188,7 @@ public class CellFactory {
 			}
 		});
 		deleteButton.setSize(ButtonSize.EXTRA_SMALL);
+		deleteButton.addStyleName("center-in-div");
 
 		TableData deleteButtonWrapper = new TableData();
 		deleteButtonWrapper.add(deleteButton);

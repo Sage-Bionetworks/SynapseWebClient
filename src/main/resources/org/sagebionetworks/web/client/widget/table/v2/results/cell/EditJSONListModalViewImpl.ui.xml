@@ -16,7 +16,7 @@
                         </t:TableHeader>
                     </t:TableRow>
                 </t:Table>
-                <t:Table ui:field="editorsPanel" addStyleNames="multi-value-editor-spaced">
+                <t:Table ui:field="editorsPanel" addStyleNames="multi-value-editor-spaced" width="100%">
                 </t:Table>
 
                 <b:Button ui:field="pasteNewValuesButton"

@@ -59,6 +59,7 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 		});
 
 		addNewAnnotationValueButton = new Button("", IconType.PLUS, clickEvent -> presenter.onAddNewValue());
+		addNewAnnotationValueButton.addStyleName("center-in-div");
 		addNewAnnotationValueButton.setType(ButtonType.PRIMARY);
 		addNewAnnotationValueButton.setSize(ButtonSize.EXTRA_SMALL);
 	}

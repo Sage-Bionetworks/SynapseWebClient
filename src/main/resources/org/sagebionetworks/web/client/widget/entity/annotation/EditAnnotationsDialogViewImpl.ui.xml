@@ -10,7 +10,7 @@
 			b:id="editAnnotationsModal">
 			<b:ModalBody>
 				<g:FlowPanel ui:field="editorsPanel" />
-				<b.html:Div marginLeft="-15" marginRight="-15">
+				<b.html:Div marginLeft="15" marginRight="15">
 					<b:Button ui:field="addAnnotationButton">Add New Key</b:Button>
 					<b:Button ui:field="pasteNewValuesButton"
 							  type="LINK">Paste New Values</b:Button>
