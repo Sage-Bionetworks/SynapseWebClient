@@ -11,7 +11,7 @@ import com.google.inject.Inject;
  * A non editable renderer for a list of dates
  *
  */
-public class DateListRendererCellViewImpl extends Paragraph implements DateListRendererCellView {
+public class DateListRendererCellViewImpl extends StringRendererCellViewImpl implements DateListRendererCellView {
 	String v;
 	JSONObjectAdapter adapter;
 	DateTimeUtils dateTimeUtils;
@@ -38,9 +38,9 @@ public class DateListRendererCellViewImpl extends Paragraph implements DateListR
 					newValue.append(", ");
 				}
 			}
-			this.setText(newValue.toString());
+			super.setValue(newValue.toString());
 		} catch (Exception e) {
-			this.setText(jsonValue);
+			super.setValue(jsonValue);
 		}
 	}
 
