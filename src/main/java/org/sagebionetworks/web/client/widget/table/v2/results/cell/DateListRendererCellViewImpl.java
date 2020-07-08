@@ -5,30 +5,22 @@ import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DateTimeUtils;
-import com.google.gwt.event.dom.client.MouseOverEvent;
-import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.inject.Inject;
 
 /**
  * A non editable renderer for a list of dates
  *
  */
-public class DateListRendererCellViewImpl extends Paragraph implements DateListRendererCellView {
+public class DateListRendererCellViewImpl extends StringRendererCellViewImpl implements DateListRendererCellView {
 	String v;
 	JSONObjectAdapter adapter;
 	DateTimeUtils dateTimeUtils;
-	public static final MouseOverHandler STRING_RENDERER_MOUSE_OVER_HANDLER = event -> {
-		DateListRendererCellViewImpl src = (DateListRendererCellViewImpl) event.getSource();
-		src.removeStyleName("max-height-100 overflowHidden");
-	};
 
 	@Inject
 	public DateListRendererCellViewImpl(JSONObjectAdapter adapter, DateTimeUtils dateTimeUtils) {
 		super();
 		this.adapter = adapter;
 		this.dateTimeUtils = dateTimeUtils;
-		addStyleName("max-height-100 overflowHidden");
-		addDomHandler(STRING_RENDERER_MOUSE_OVER_HANDLER, MouseOverEvent.getType());
 	}
 
 	@Override
@@ -46,9 +38,9 @@ public class DateListRendererCellViewImpl extends Paragraph implements DateListR
 					newValue.append(", ");
 				}
 			}
-			this.setText(newValue.toString());
+			super.setValue(newValue.toString());
 		} catch (Exception e) {
-			this.setText(jsonValue);
+			super.setValue(jsonValue);
 		}
 	}
 
