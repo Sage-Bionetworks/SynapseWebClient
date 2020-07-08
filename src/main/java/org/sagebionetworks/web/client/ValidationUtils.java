@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.web.shared.WebConstants;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 
