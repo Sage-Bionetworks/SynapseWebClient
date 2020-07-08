@@ -8,7 +8,7 @@
 
 	<b:FormGroup ui:field="formGroup"
 		addStyleNames="margin-bottom-0-imp">
-		<b:InputGroup>
+		<b:InputGroup width="100%" addStyleNames="show-icon-on-hover">
 			<b:TextBox ui:field="textBox" styleName="form-control min-width-140"/>
 <!--			TODO: configure, copied mostly from the search button-->
 			<b:Icon ui:field="editButton" type="PENCIL"

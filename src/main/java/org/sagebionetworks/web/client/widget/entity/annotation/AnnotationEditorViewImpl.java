@@ -99,7 +99,9 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 
 		//additional column placeholder for the addNewAnnotationValueButton
 		TableData addButtonTableData = new TableData();
+		addButtonTableData.setWidth("35px");
 		row.add(addButtonTableData);
+
 
 		editorsContainer.add(row);
 

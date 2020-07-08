@@ -79,9 +79,9 @@ public class CellFactory {
 				case DATE_LIST:
 //				case ENTITYID_LIST:
 //				case USERID_LIST:
+					//TODO: copy over model
 					JSONListCellEditor listEditor = ginInjector.createListCellEditor();
-					listEditor.setMaxSize(model.getMaximumSize());
-					listEditor.setMaxListLength(model.getMaximumListLength());
+					listEditor.setColumnModel(model);
 					editor = listEditor;
 					break;
 				case DATE:
@@ -133,8 +133,7 @@ public class CellFactory {
 //				case ENTITYID_LIST:
 //				case USERID_LIST:
 					JSONListCellEditor listEditor = ginInjector.createListCellEditor();
-					listEditor.setMaxSize(model.getMaximumSize());
-					listEditor.setMaxListLength(model.getMaximumListLength());
+					listEditor.setColumnModel(model);
 					editor = listEditor;
 					break;
 				case DATE:
@@ -176,7 +175,6 @@ public class CellFactory {
 	// TODO: test?
 	public static TableRow appendDeleteButton(final CellEditor editor, Consumer<CellEditor> additionalDeleteCallback){
 		TableRow row = new TableRow();
-		//TODO: change to Anchor instead of button. without using input group to format
 		Button deleteButton = new Button();
 		deleteButton.setIcon(IconType.TIMES);
 		deleteButton.setType(ButtonType.LINK);
@@ -192,6 +190,7 @@ public class CellFactory {
 
 		TableData deleteButtonWrapper = new TableData();
 		deleteButtonWrapper.add(deleteButton);
+		deleteButtonWrapper.setWidth("35px");
 
 		TableData editorTableData = new TableData();
 		editorTableData.add(editor.asWidget());

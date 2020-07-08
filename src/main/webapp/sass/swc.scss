@@ -143,8 +143,33 @@ end sticky footer
 			font-size: 16px;
 		}
 	}
+
+
+	.modal-body {
+		//originally padding: 20px
+		padding: 20px 0px 0px;
+		//orignally no margin
+		margin: 0px 45px;
+	}
 	.modal-header {
 		min-height: 50px;
+		//originally padding: 15px
+		padding: 15px 0px 0px;
+		//orignally no margin
+		margin: 0px 45px;
+	}
+
+	.modal-title{
+		font-weight: bold;
+		font-size: 21px;
+		line-height: 25px;
+	}
+
+	.modal-footer{
+		//originally padding: 19px 20px 20px
+		padding: 12px 0px 16px;
+		//orignally margin-top: 15px
+		margin: 15px 45px 0px;
 	}
 	
 	.tooltip-inner {
@@ -2262,14 +2287,25 @@ div.input-group > input.search-textbox {
 	margin: -1em -2em -.5em -2em;
 }
 
-table.annotations-editor-view{
-	$horizontal-spacing: 15px;
-	border-collapse: separate;
-	border-spacing: $horizontal-spacing 0;
+//table.annotations-editor-view{
+//	//$horizontal-spacing: 15px;
+//	//border-collapse: separate;
+//	//border-spacing: $horizontal-spacing 0;
+//}
+
+table.annotations-editor-view > tr > {
+	td, th {
+		$horizontal-spacing: 15px;
+		border-left: $horizontal-spacing solid transparent;
+	}
+
+	td:first-child, th:first-child{
+		border-left: 0;
+	}
 }
 
 table.multi-value-editor-spaced{
-	$vertical-spacing: 25px;
+	$vertical-spacing: 15px;
 	border-collapse: separate;
 	border-spacing: 0 $vertical-spacing;
 	margin-top: -$vertical-spacing;
@@ -3106,3 +3142,12 @@ div.border {
 	}
 }
 
+.show-icon-on-hover{
+	i {
+		display: none;
+	}
+
+	&:hover i {
+		display: inline-block;
+	}
+}

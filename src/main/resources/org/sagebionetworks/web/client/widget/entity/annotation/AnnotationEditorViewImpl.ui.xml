@@ -18,7 +18,7 @@
 		</t:TableRow>
 		<t:TableRow>
 			<t:TableData
-				addStyleNames="vertical-align-top min-width-200" paddingRight="2">
+				addStyleNames="vertical-align-top min-width-200">
 				<!-- Some inherited CSS causes form group to have margin-bottom of 15px, but to ensure that
 				addNewAnnotationValueButton can be aligned properly, we must give it a margin of 0px-->
 				<b:FormGroup ui:field="formGroup" addStyleNames="margin-bottom-0-imp">
@@ -27,12 +27,12 @@
 				</b:FormGroup>
 			</t:TableData>
 			<t:TableData
-				addStyleNames="vertical-align-top min-width-150" paddingRight="2">
+				addStyleNames="vertical-align-top min-width-150">
 				<g:ListBox ui:field="typeComboBox"
 					styleName="form-control" />
 			</t:TableData>
 			<t:TableData
-				addStyleNames="vertical-align-top min-width-275" paddingRight="2">
+				addStyleNames="vertical-align-top min-width-275">
 				<t:Table width="100%" addStyleNames="multi-value-editor-spaced" ui:field="editorsContainer">
 				</t:Table>
 

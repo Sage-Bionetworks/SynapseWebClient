@@ -14,6 +14,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -31,10 +33,15 @@ public class JSONListCellEditorImplTest {
 	JSONListCellEditor editor;
 	@Mock
 	PortalGinInjector mockGinInjector;
+
+	ColumnModel columnModel;
 	
 	@Before
 	public void before() {
 		editor = new JSONListCellEditor(mockView, jsonArrayAdapter, mockGinInjector);
+		columnModel = new ColumnModel();
+		columnModel.setColumnType(ColumnType.STRING_LIST);
+		editor.setColumnModel(columnModel);
 	}
 
 	@Test
@@ -50,7 +57,7 @@ public class JSONListCellEditorImplTest {
 	@Test
 	public void testInvalidSize() {
 		Long maxSize = 3L;
-		editor.setMaxSize(maxSize);
+		columnModel.setMaximumSize(maxSize);
 		when(mockView.getValue()).thenReturn("[\"1234\"]");
 		
 		assertFalse(editor.isValid());
@@ -63,7 +70,7 @@ public class JSONListCellEditorImplTest {
 	@Test
 	public void testInvalidLength() {
 		Long maxListLength = 2L;
-		editor.setMaxListLength(maxListLength);
+		columnModel.setMaximumListLength(maxListLength);
 		when(mockView.getValue()).thenReturn("[\"a\", \"b\", \"c\"]");
 		
 		assertFalse(editor.isValid());
@@ -76,9 +83,9 @@ public class JSONListCellEditorImplTest {
 	@Test
 	public void testValidState() {
 		Long maxSize = 3L;
-		editor.setMaxSize(maxSize);
+		columnModel.setMaximumSize(maxSize);
 		Long maxListLength = 3L;
-		editor.setMaxListLength(maxListLength);
+		columnModel.setMaximumListLength(maxListLength);
 		when(mockView.getValue()).thenReturn("[\"a\", \"b\", \"c\"]");
 		
 		assertTrue(editor.isValid());

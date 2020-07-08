@@ -12,11 +12,11 @@ import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONException;
 import com.google.gwt.json.client.JSONParser;
-import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParser;
@@ -33,18 +33,21 @@ public class EditJSONModal implements EditJSONListModalView.Presenter{
 //	private ColumnModel columnModel;
 	private Consumer<List<String>> onSaveCallback;
 
+	private ColumnModel columnModel;
+	private CellFactory cellFactory;
+
 	@Inject
-	public EditJSONModal(EditJSONListModalView view, PortalGinInjector ginInjector){
+	public EditJSONModal(EditJSONListModalView view, PortalGinInjector ginInjector, CellFactory cellFactory){
 		this.ginInjector = ginInjector;
 		this.view = view;
-
+		this.cellFactory = cellFactory;
 		view.setPresenter(this);
 	}
 
-	void configure(String jsonString, Consumer<List<String>> onSaveCallback){
+	void configure(String jsonString, Consumer<List<String>> onSaveCallback, ColumnModel columnModel){
 		view.clearEditors();
 		//TODO: enforce list size , string length limits and generate appropriately typed cell editor
-//		this.columnModel = columnModel;
+		this.columnModel = columnModel;
 		this.onSaveCallback = onSaveCallback;
 		this.cellEditors = new ArrayList<>();
 		GWT.debugger();

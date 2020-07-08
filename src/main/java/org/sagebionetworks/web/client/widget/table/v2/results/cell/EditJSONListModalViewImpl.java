@@ -111,6 +111,7 @@ public class EditJSONListModalViewImpl implements EditJSONListModalView {
 		//additional column placeholder for the addNewAnnotationValueButton
 		TableData addButtonTableData = new TableData();
 		row.add(addButtonTableData);
+		addButtonTableData.setWidth("35px");
 
 		editorsPanel.add(row);
 

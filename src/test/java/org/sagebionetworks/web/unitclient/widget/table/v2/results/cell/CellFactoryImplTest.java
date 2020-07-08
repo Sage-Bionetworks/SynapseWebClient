@@ -368,8 +368,8 @@ public class CellFactoryImplTest {
 		cm.setMaximumListLength(maxListLength);
 		assertEquals(mockJSONListCellEditor, cellFactory.createEditor(cm));
 		// The max size and list length must get passed to the editor
-		verify(mockJSONListCellEditor).setMaxSize(maxSize);
-		verify(mockJSONListCellEditor).setMaxListLength(maxListLength);
+		verify(mockJSONListCellEditor).setColumnModel(cm);
+
 	}
 
 	@Test
@@ -380,8 +380,7 @@ public class CellFactoryImplTest {
 		cm.setMaximumListLength(maxListLength);
 		assertEquals(mockJSONListCellEditor, cellFactory.createEditor(cm));
 		// The max size and list length must get passed to the editor
-		verify(mockJSONListCellEditor).setMaxSize(null);
-		verify(mockJSONListCellEditor).setMaxListLength(maxListLength);
+		verify(mockJSONListCellEditor).setColumnModel(cm);
 	}
 
 	@Test

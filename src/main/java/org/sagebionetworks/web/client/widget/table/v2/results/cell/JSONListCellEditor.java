@@ -3,11 +3,14 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
+import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.StringUtils;
 import com.google.inject.Inject;
+import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 
 /**
  * An editor for list type columns renders raw json array!).
@@ -20,8 +23,7 @@ public class JSONListCellEditor extends AbstractCellEditor implements CellEditor
 	public static final String VALID_JSON_ARRAY = " a valid json array";
 	public static final String VALID_VALUE = "a valid value";
 	JSONArrayAdapter jsonArrayAdapter;
-	Long maxListLength;
-	Long maximumSize;
+	ColumnModel columnModel;
 	PortalGinInjector ginInjector;
 
 	EditJSONModal editJSONModal;
@@ -32,7 +34,6 @@ public class JSONListCellEditor extends AbstractCellEditor implements CellEditor
 		this.jsonArrayAdapter = jsonArrayAdapter;
 		this.ginInjector = ginInjector;
 		view.setEditor(this);
-
 	}
 
 	public EditJSONModal getEditJSONModal() {
@@ -45,7 +46,7 @@ public class JSONListCellEditor extends AbstractCellEditor implements CellEditor
 
 	@Override
 	public void onEditButtonClick(){
-		getEditJSONModal().configure(this.getValue(), this::setValues);
+		getEditJSONModal().configure(this.getValue(), this::setValues, this.columnModel);
 	}
 
 	@Override
@@ -55,15 +56,17 @@ public class JSONListCellEditor extends AbstractCellEditor implements CellEditor
 			// parse value
 			try {
 				JSONArrayAdapter adapter = jsonArrayAdapter.createNewArray(value);
-				if (maxListLength != null) {
-					boolean isListLengthValid = adapter.length() <= maxListLength;
+				Long maximumListLength = columnModel.getMaximumListLength();
+				if (maximumListLength != null) {
+					boolean isListLengthValid = adapter.length() <= maximumListLength;
 					if (!isListLengthValid) {
 						view.setValidationState(ValidationState.ERROR);
-						view.setHelpText(MUST_BE + maxListLength + ITEMS_OR_LESS);
+						view.setHelpText(MUST_BE + maximumListLength + ITEMS_OR_LESS);
 						return false;
 					}	
 				}
-				
+
+				Long maximumSize = columnModel.getMaximumSize();
 				if (maximumSize != null) {
 					// check that each value is under the max string length
 					for (int i = 0; i < adapter.length(); i++) {
@@ -109,11 +112,11 @@ public class JSONListCellEditor extends AbstractCellEditor implements CellEditor
 		this.setValue(adapter.toJSONString());
 	}
 
-	public void setMaxSize(Long maximumSize) {
-		this.maximumSize = maximumSize;
-	}
-	public void setMaxListLength(Long maximumListLength) {
-		this.maxListLength = maximumListLength;
+	public ColumnModel getColumnModel() {
+		return columnModel;
 	}
 
+	public void setColumnModel(ColumnModel columnModel) {
+		this.columnModel = columnModel;
+	}
 }
