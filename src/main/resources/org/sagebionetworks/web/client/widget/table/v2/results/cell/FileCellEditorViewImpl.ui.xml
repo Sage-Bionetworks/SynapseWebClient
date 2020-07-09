@@ -6,7 +6,7 @@
 
 	<g:HTMLPanel>
 
-		<b:FormGroup ui:field="formGroup">
+		<b:FormGroup ui:field="formGroup" addStyleNames="margin-bottom-0-imp">
 			<b:InputGroup>
 				<b:TextBox ui:field="idTextBox" placeholder="File ID"
 					width="175px" />

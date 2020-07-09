@@ -2,9 +2,12 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
@@ -24,6 +27,13 @@ import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParser;
 public class EditJSONModal implements EditJSONListModalView.Presenter{
 	public static final String SEE_THE_ERRORS_ABOVE = "See the error(s) above.";
 
+	private static final Map<ColumnType, ColumnType> LIST_TYPE_TO_NON_LIST = ImmutableMap.of(
+			ColumnType.STRING_LIST, ColumnType.STRING,
+			ColumnType.INTEGER_LIST, ColumnType.INTEGER,
+			ColumnType.DATE_LIST, ColumnType.DATE,
+			ColumnType.BOOLEAN_LIST,ColumnType.BOOLEAN
+	);
+
 	private final PortalGinInjector ginInjector;
 	private final EditJSONListModalView view;
 	private boolean commaSeparatedValuesParserExists;
@@ -33,7 +43,8 @@ public class EditJSONModal implements EditJSONListModalView.Presenter{
 //	private ColumnModel columnModel;
 	private Consumer<List<String>> onSaveCallback;
 
-	private ColumnModel columnModel;
+	private long maxListLength;
+	private ColumnModel effectiveSingleValueColumnModel;
 	private CellFactory cellFactory;
 
 	@Inject
@@ -46,8 +57,12 @@ public class EditJSONModal implements EditJSONListModalView.Presenter{
 
 	void configure(String jsonString, Consumer<List<String>> onSaveCallback, ColumnModel columnModel){
 		view.clearEditors();
-		//TODO: enforce list size , string length limits and generate appropriately typed cell editor
-		this.columnModel = columnModel;
+		this.effectiveSingleValueColumnModel = new ColumnModel();
+		effectiveSingleValueColumnModel.setMaximumSize(Optional.ofNullable(columnModel.getMaximumSize()).orElse(50L));
+		effectiveSingleValueColumnModel.setColumnType(LIST_TYPE_TO_NON_LIST.get(columnModel.getColumnType()));
+
+		maxListLength = Optional.ofNullable(columnModel.getMaximumListLength()).orElse(100L);
+
 		this.onSaveCallback = onSaveCallback;
 		this.cellEditors = new ArrayList<>();
 		GWT.debugger();
@@ -82,8 +97,7 @@ public class EditJSONModal implements EditJSONListModalView.Presenter{
 	}
 
 	public CellEditor createNewEditor() {
-		//todo: replace with factory
-		CellEditor editor = ginInjector.createStringEditorCell();
+		CellEditor editor = cellFactory.createEditor(effectiveSingleValueColumnModel);
 		editor.addKeyDownHandler(new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
@@ -100,10 +114,20 @@ public class EditJSONModal implements EditJSONListModalView.Presenter{
 
 	@Override
 	public void onSave() {
+		//check that value size does not exceed the defined limit
+		if(cellEditors.size() > maxListLength){
+			view.showError("Exceeded maximum number of values defined in schema: " + maxListLength);
+			return;
+		}
+
 		// check all annotation editor validity
-		boolean isValid = cellEditors.stream().allMatch(CellEditor::isValid);
+		boolean isValid = true;
+		for (CellEditor cellEditor : cellEditors) {
+			isValid = isValid & cellEditor.isValid();
+		}
 		if (!isValid) {
 			view.showError(SEE_THE_ERRORS_ABOVE);
+			return;
 		}
 
 		List<String> values = cellEditors.stream()

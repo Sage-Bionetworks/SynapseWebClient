@@ -13,7 +13,7 @@
 				<b.html:Div>
 					<b:Button ui:field="addAnnotationButton">Add New Key</b:Button>
 					<b:Button ui:field="pasteNewValuesButton"
-							  type="LINK">Paste New Values</b:Button>
+							  type="LINK" addStyleNames="boldText">PASTE NEW VALUES</b:Button>
 					<g:FlowPanel addStyleNames="margin-top-10" ui:field="pasteNewValuesPanel" />
 					<b:Alert type="DANGER" ui:field="alert" visible="false"
 							 title="Error" addStyleNames="margin-top-10" />
@@ -22,9 +22,9 @@
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button ui:field="cancelButton" type="LINK"
-					dataDismiss="MODAL">Cancel</b:Button>
+					dataDismiss="MODAL" addStyleNames="boldText">CANCEL</b:Button>
 				<b:Button ui:field="saveButton" type="PRIMARY"
-					dataLoadingText="Saving...">Ok</b:Button>
+					dataLoadingText="Saving..." addStyleNames="boldText">OK</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
 	</g:HTMLPanel>

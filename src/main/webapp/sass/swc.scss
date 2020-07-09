@@ -112,6 +112,7 @@ end sticky footer
 
 .btn-link {
 	color: $synapse-blue;
+	text-transform: uppercase;
 }
 
 /* Bootstrap overrides */
@@ -190,9 +191,10 @@ end sticky footer
 		border-color: $button-color;
 	}
 
-	//TODO: this is suppoed to make buttons not have rounded corners
 	.btn {
 		@include border-radius(2px);
+		//TODO: should this be applied across the board?
+		font-weight: bold;
 	}
 	.dropdown button.btn {
 		padding: 6px 12px;

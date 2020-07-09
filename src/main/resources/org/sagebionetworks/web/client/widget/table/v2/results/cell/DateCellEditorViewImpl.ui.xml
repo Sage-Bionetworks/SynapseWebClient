@@ -11,7 +11,7 @@
 		This results in the text editor 'correcting' any hours greater than 12 or 
 		less than 1. Make sure the format and showMeridian are consistent with each 
 		other when configuring this widget. There is an open issue for this: https://github.com/gwtbootstrap3/gwtbootstrap3-extras/issues/83 -->
-	<b:FormGroup ui:field="formGroup">
+	<b:FormGroup ui:field="formGroup" addStyleNames="margin-bottom-0-imp">
 		<bd:DateTimePicker ui:field="dateTimePicker"
 			autoClose="true" highlightToday="true" showTodayButton="true"
 			showMeridian="false" format="mm/dd/yyyy hh:ii:ss" minView="MONTH"

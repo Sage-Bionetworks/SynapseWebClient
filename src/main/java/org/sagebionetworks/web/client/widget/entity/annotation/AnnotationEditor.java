@@ -2,6 +2,9 @@ package org.sagebionetworks.web.client.widget.entity.annotation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.google.gwt.user.client.TakesValue;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
 import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValueType;
@@ -55,12 +58,7 @@ public class AnnotationEditor implements Presenter {
 		if (annotation.getValue() == null) {
 			annotation.setValue(new ArrayList<String>());
 		}
-		for (String value : annotation.getValue()) {
-			// create an editor for each value
-			CellEditor editor = createNewEditor();
-			editor.setValue(value);
-			view.addNewEditor(editor);
-		}
+		addNewValues(annotation.getValue());
 
 		// if no values, then add a single editor (allows edit or delete of annotation)
 		if (annotation.getValue().isEmpty()) {
@@ -76,6 +74,20 @@ public class AnnotationEditor implements Presenter {
 		view.addNewEditor(editor);
 		// after attaching, set focus to the new editor
 		editor.setFocus(true);
+	}
+
+	private void addNewValues(Iterable<String> strings){
+		for (String value : strings) {
+				// create an editor for each value
+				CellEditor editor = createNewEditor();
+				try {
+					editor.setValue(value);
+				} catch (Exception e){
+					//ignore values that can't be transferred. this most likely
+					// occurs with converting from STRING to DATE types
+				}
+				view.addNewEditor(editor);
+		}
 	}
 
 	public CellEditor createNewEditor() {
@@ -103,9 +115,13 @@ public class AnnotationEditor implements Presenter {
 	public void onTypeChange(int typeIndex) {
 		// clear values, add an appropriate
 		newAnnotation.setType(annotationTypes.get(typeIndex));
+		//copy over values
+		List<String> copiedValues =  cellEditors.stream()
+				.map(CellEditor::getValue)
+				.collect(Collectors.toList());
 		cellEditors = new ArrayList<CellEditor>();
 		view.clearValueEditors();
-		onAddNewValue();
+		addNewValues(copiedValues);
 	}
 
 	@Override
