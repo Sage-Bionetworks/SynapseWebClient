@@ -1,17 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity.annotation;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.Window;
-import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Modal;
-import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
 
 public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView {
 
@@ -34,7 +32,7 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView 
 	FlowPanel pasteNewValuesPanel;
 
 	@UiField
-	Alert alert;
+	SynapseAlertView alert;
 	Presenter presenter;
 
 	Widget widget;
@@ -62,7 +60,8 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView 
 	@Override
 	public void showEditor() {
 		saveButton.state().reset();
-		alert.setVisible(false);
+//		alert.setVisible(false);
+		alert.clearState();
 		editModal.show();
 	}
 
@@ -78,16 +77,18 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView 
 
 	@Override
 	public void showError(String message) {
-		alert.setText(message);
-		alert.setVisible(true);
+//		alert.setText(message);
+//		alert.setVisible(true);
+		alert.showError(message);
 		// enable the save button after an error
 		saveButton.state().reset();
 	}
 
 	@Override
 	public void hideErrors() {
-		alert.clear();
-		alert.setVisible(false);
+//		alert.clear();
+//		alert.setVisible(false);
+		alert.clearState();
 	}
 
 	@Override

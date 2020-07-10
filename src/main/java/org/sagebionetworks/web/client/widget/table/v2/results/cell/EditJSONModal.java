@@ -25,7 +25,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParser;
 
 public class EditJSONModal implements EditJSONListModalView.Presenter{
-	public static final String SEE_THE_ERRORS_ABOVE = "See the error(s) above.";
+	public static final String SEE_THE_ERRORS_BELOW = "See the error(s) below.";
 
 	private static final Map<ColumnType, ColumnType> LIST_TYPE_TO_NON_LIST = ImmutableMap.of(
 			ColumnType.STRING_LIST, ColumnType.STRING,
@@ -40,7 +40,6 @@ public class EditJSONModal implements EditJSONListModalView.Presenter{
 
 	private List<CellEditor> cellEditors;
 
-//	private ColumnModel columnModel;
 	private Consumer<List<String>> onSaveCallback;
 
 	private long maxListLength;
@@ -126,7 +125,7 @@ public class EditJSONModal implements EditJSONListModalView.Presenter{
 			isValid = isValid & cellEditor.isValid();
 		}
 		if (!isValid) {
-			view.showError(SEE_THE_ERRORS_ABOVE);
+			view.showError(SEE_THE_ERRORS_BELOW);
 			return;
 		}
 

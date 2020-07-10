@@ -6,7 +6,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
@@ -16,6 +15,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
 
 public class EditJSONListModalViewImpl implements EditJSONListModalView {
 
@@ -37,7 +37,7 @@ public class EditJSONListModalViewImpl implements EditJSONListModalView {
 	FlowPanel pasteNewValuesPanel;
 
 	@UiField
-	Alert alert;
+	SynapseAlertView alert;
 	Presenter presenter;
 	Button addNewValueButton;
 
@@ -70,8 +70,7 @@ public class EditJSONListModalViewImpl implements EditJSONListModalView {
 
 	@Override
 	public void showError(String message) {
-		alert.setText(message);
-		alert.setVisible(true);
+		alert.showError(message);
 		// enable the save button after an error
 		saveButton.state().reset();
 	}
@@ -94,7 +93,7 @@ public class EditJSONListModalViewImpl implements EditJSONListModalView {
 	@Override
 	public void showEditor() {
 		saveButton.state().reset();
-		alert.setVisible(false);
+		alert.clearState();
 		editModal.show();
 	}
 

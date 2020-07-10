@@ -6,7 +6,7 @@
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:e="urn:import:org.sagebionetworks.web.client.widget.entity">
   
-  	<bh:Div addStyleNames="margin-top-10">
+  	<bh:Div addStyleNames="margin-top-10" height="48px">
   		<bh:Div ui:field="loginAlert">
   			<b:Alert type="INFO">
 	  			<bh:Strong text="Please login to access this resource." />
@@ -14,12 +14,12 @@
   			<bh:Div ui:field="loginWidgetContainer" />
   		</bh:Div>
   		
-  		<b:Alert ui:field="alert" type="DANGER" addStyleNames="margin-bottom-0-imp fullWidthAlert flexcontainer-row">
+  		<b:Alert ui:field="alert" type="DANGER" addStyleNames="margin-bottom-0-imp fullWidthAlert flexcontainer-row" height="100%">
   			<bh:Div addStyleNames="flexcontainer-column">
-  			  	<b:Icon type="WARNING" size="LARGE" marginRight="10" marginLeft="5" marginTop="2"/>
+  			  	<b:Icon addStyleNames="black-25-percent center-in-div" type="WARNING" size="LARGE" marginRight="10"/>
   			</bh:Div>
   			<bh:Div addStyleNames="flexcontainer-column">
-	  			<bh:Strong ui:field="alertText"></bh:Strong>
+	  			<bh:Strong ui:field="alertText" addStyleNames="center-in-div"></bh:Strong>
 	  			<b:Button ui:field="reloadButton" text="Retry" visible="false" icon="REFRESH" size="EXTRA_SMALL" addStyleNames="margin-left-15"/>
   			</bh:Div>
   		</b:Alert>

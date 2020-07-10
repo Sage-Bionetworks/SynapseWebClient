@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.Window;
 import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
 import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValueType;
@@ -21,7 +20,7 @@ import com.google.inject.Inject;
 import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParser;
 
 public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presenter {
-	public static final String SEE_THE_ERRORS_ABOVE = "See the error(s) above.";
+	public static final String SEE_THE_ERRORS_BELOW = "See the error(s) below.";
 	EditAnnotationsDialogView view;
 	SynapseJavascriptClient jsClient;
 	PortalGinInjector ginInjector;
@@ -125,7 +124,7 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 			}
 		}
 		if (!isValid) {
-			view.showError(SEE_THE_ERRORS_ABOVE);
+			view.showError(SEE_THE_ERRORS_BELOW);
 			return;
 		}
 
