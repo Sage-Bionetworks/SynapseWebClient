@@ -65,7 +65,7 @@ public class JSONListCellEditorViewImpl implements JSONListCellEditorView {
 				});
 			}
 		});
-
+		textBox.addClickHandler(clickEvent -> editor.onEditButtonClick() );
 		editButton.addClickHandler(clickEvent -> editor.onEditButtonClick());
 	}
 
