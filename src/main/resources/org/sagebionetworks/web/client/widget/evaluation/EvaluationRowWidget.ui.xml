@@ -8,7 +8,7 @@
 			<b:Column size="XS_12">
 				<b:Heading size="H4">
 					<bh:Text ui:field="evaluationNameText" />
-					<b:Button ui:field="deleteButton" type="DANGER"
+					<b:Button ui:field="deleteButton" type="LINK"
 						icon="TIMES" pull="RIGHT" addStyleNames="margin-right-5"
 						size="EXTRA_SMALL" height="22px" />
 					<b:Button ui:field="shareButton" text="Share" pull="RIGHT"

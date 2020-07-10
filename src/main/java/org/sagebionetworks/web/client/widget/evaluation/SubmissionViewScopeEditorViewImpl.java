@@ -46,7 +46,7 @@ public class SubmissionViewScopeEditorViewImpl implements SubmissionViewScopeEdi
 			presenter.onDeleteClicked(evaluation);
 		});
 		button.setSize(ButtonSize.EXTRA_SMALL);
-		button.setType(ButtonType.DANGER);
+		button.setType(ButtonType.LINK);
 		button.addStyleName("displayInline margin-left-5");
 
 		d.add(button);

@@ -167,7 +167,7 @@
 								<b:Tooltip
 									title="Unlink this ORCID from your Synapse profile.">
 									<b:Icon type="TIMES" ui:field="unbindButton"
-										addStyleNames="imageButton text-danger" />
+										addStyleNames="imageButton text-primary" />
 								</b:Tooltip>
 							</bh:Span>
 						</bh:Div>

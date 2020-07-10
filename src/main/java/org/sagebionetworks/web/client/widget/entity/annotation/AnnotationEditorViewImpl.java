@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.InputGroupButton;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
@@ -88,7 +89,7 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 				presenter.onValueDeleted(editor);
 			}
 		});
-
+		deleteButton.setType(ButtonType.LINK);
 		deleteButton.setHeight("35px");
 		InputGroupButton deleteButtonGroup = new InputGroupButton();
 		deleteButtonGroup.add(deleteButton);
