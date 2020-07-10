@@ -318,6 +318,7 @@ public class UploaderViewImpl extends FlowPanel implements UploaderView {
 
 	@Override
 	public void showLoading() {
+		spinningProgressContainer.clear();
 		spinningProgressContainer.add(DisplayUtils.getLoadingWidget(DisplayConstants.LABEL_INITIALIZING));
 		spinningProgressContainer.addStyleName("margin-top-10");
 	}
@@ -400,6 +401,7 @@ public class UploaderViewImpl extends FlowPanel implements UploaderView {
 		initMessageHandler();
 		showSpinningProgress();
 		formPanel.setAction(actionUrl);
+		spinningProgressContainer.clear();
 		spinningProgressContainer.add(DisplayUtils.getLoadingWidget(DisplayConstants.LABEL_UPLOADING));
 		formPanel.submit();
 	}
@@ -507,6 +509,7 @@ public class UploaderViewImpl extends FlowPanel implements UploaderView {
 
 	private void initializeProgress() {
 		showSpinningProgress();
+		spinningProgressContainer.clear();
 		spinningProgressContainer.add(DisplayUtils.getLoadingWidget(DisplayConstants.LABEL_INITIALIZING));
 	}
 

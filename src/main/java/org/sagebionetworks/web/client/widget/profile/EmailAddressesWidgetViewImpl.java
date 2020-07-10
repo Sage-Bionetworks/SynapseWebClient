@@ -124,7 +124,7 @@ public class EmailAddressesWidgetViewImpl implements EmailAddressesWidgetView {
 		});
 		deleteButton.addStyleName("margin-left-5");
 		deleteButton.setHeight("21px");
-		deleteButton.setType(ButtonType.DANGER);
+		deleteButton.setType(ButtonType.LINK);
 		deleteButton.setSize(ButtonSize.EXTRA_SMALL);
 		emailDiv.add(deleteButton);
 		emailsPanel.add(emailDiv);

@@ -267,7 +267,7 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 		yColumnContainer.addStyleName("margin-bottom-5");
 		yColumnContainer.add(new Text(yColumnName));
 		Icon deleteButton = new Icon(IconType.TIMES);
-		deleteButton.addStyleName("imageButton text-danger margin-left-5");
+		deleteButton.addStyleName("imageButton text-primary margin-left-5");
 		yColumnContainer.add(deleteButton);
 		deleteButton.addClickHandler(new ClickHandler() {
 			@Override

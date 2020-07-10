@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.InlineRadio;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -87,6 +88,7 @@ public class WikiAttachmentsViewImpl implements WikiAttachmentsView {
 			});
 			button.setSize(ButtonSize.EXTRA_SMALL);
 			button.addStyleName("displayInline margin-left-5");
+			button.setType(ButtonType.LINK);
 			row.add(button);
 		}
 	}

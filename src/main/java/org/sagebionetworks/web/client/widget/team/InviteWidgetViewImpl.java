@@ -112,7 +112,7 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 			presenter.removeEmailToInvite(emailInvite);
 		});
 		button.setSize(ButtonSize.EXTRA_SMALL);
-		button.setType(ButtonType.DANGER);
+		button.setType(ButtonType.LINK);
 		button.addStyleName("displayInline margin-left-5");
 
 		d.add(button);
@@ -131,7 +131,7 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 			presenter.removeUserToInvite(userId);
 		});
 		button.setSize(ButtonSize.EXTRA_SMALL);
-		button.setType(ButtonType.DANGER);
+		button.setType(ButtonType.LINK);
 		button.addStyleName("displayInline margin-left-5");
 
 		d.add(badge);

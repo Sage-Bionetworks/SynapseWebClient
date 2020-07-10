@@ -36,7 +36,7 @@
 		</t:TableData>
 		<t:TableData>
 			<b:Tooltip title="Delete version">
-				<b:Button icon="TIMES" ui:field="deleteButton" size="SMALL"
+				<b:Button icon="TIMES" ui:field="deleteButton" type="LINK" size="SMALL"
 					addStyleNames="displayInline margin-left-3" />
 			</b:Tooltip>
 		</t:TableData>

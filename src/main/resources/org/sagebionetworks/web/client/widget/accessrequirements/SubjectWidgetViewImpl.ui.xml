@@ -5,7 +5,7 @@
 	<bh:Span addStyleNames="margin-right-10">
 		<bh:Span ui:field="container" />
 		<b:Button icon="TIMES" ui:field="deleteButton"
-			size="EXTRA_SMALL" type="DANGER"
+			size="EXTRA_SMALL" type="LINK"
 			addStyleNames="displayInline margin-left-3" />
 
 	</bh:Span>

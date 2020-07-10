@@ -12,7 +12,7 @@
 			addStyleNames="position-relative">
 			<bh:Div addStyleNames="position-absolute topLevelZIndex">
 				<b:Button ui:field="removePicture" icon="TIMES"
-					size="EXTRA_SMALL" type="DANGER" />
+					size="EXTRA_SMALL" type="LINK" />
 			</bh:Div>
 			<b:Image ui:field="image" width="150px" visible="false"
 				addStyleNames="img-circle" />
