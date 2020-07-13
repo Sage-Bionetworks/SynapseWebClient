@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.MapPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
+import org.sagebionetworks.web.client.place.NrgrSynapseGlue;
 import org.sagebionetworks.web.client.place.PasswordResetSignedTokenPlace;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Profile;
@@ -45,6 +46,6 @@ import com.google.gwt.place.shared.WithTokenizers;
  * PlaceHistoryMapperWithFactory and creating a separate TokenizerFactory.
  */
 @WithTokenizers({Home.Tokenizer.class, LoginPlace.Tokenizer.class, PasswordReset.Tokenizer.class, RegisterAccount.Tokenizer.class, Profile.Tokenizer.class, ComingSoon.Tokenizer.class, Synapse.Tokenizer.class, Wiki.Tokenizer.class, Search.Tokenizer.class, Challenges.Tokenizer.class, Help.Tokenizer.class, Governance.Tokenizer.class, Down.Tokenizer.class, Team.Tokenizer.class, MapPlace.Tokenizer.class, TeamSearch.Tokenizer.class, Quiz.Tokenizer.class, Account.Tokenizer.class, NewAccount.Tokenizer.class, ChangeUsername.Tokenizer.class, Trash.Tokenizer.class, PeopleSearch.Tokenizer.class, StandaloneWiki.Tokenizer.class, SignedToken.Tokenizer.class, ErrorPlace.Tokenizer.class, ACTPlace.Tokenizer.class, SynapseForumPlace.Tokenizer.class, SubscriptionPlace.Tokenizer.class, AccessRequirementsPlace.Tokenizer.class, AccessRequirementPlace.Tokenizer.class, ACTDataAccessSubmissionsPlace.Tokenizer.class, ACTDataAccessSubmissionDashboardPlace.Tokenizer.class, ACTAccessApprovalsPlace.Tokenizer.class, EmailInvitation.Tokenizer.class,
-		WikiDiff.Tokenizer.class, PasswordResetSignedTokenPlace.Tokenizer.class})
+		WikiDiff.Tokenizer.class, PasswordResetSignedTokenPlace.Tokenizer.class, NrgrSynapseGlue.Tokenizer.class})
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {
 }

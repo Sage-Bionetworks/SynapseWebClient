@@ -62,6 +62,8 @@ import org.sagebionetworks.web.client.view.MapView;
 import org.sagebionetworks.web.client.view.MapViewImpl;
 import org.sagebionetworks.web.client.view.NewAccountView;
 import org.sagebionetworks.web.client.view.NewAccountViewImpl;
+import org.sagebionetworks.web.client.view.NrgrSynapseGlueView;
+import org.sagebionetworks.web.client.view.NrgrSynapseGlueViewImpl;
 import org.sagebionetworks.web.client.view.PasswordResetSignedTokenView;
 import org.sagebionetworks.web.client.view.PasswordResetSignedTokenViewImpl;
 import org.sagebionetworks.web.client.view.PeopleSearchView;
@@ -863,6 +865,9 @@ public class PortalGinModule extends AbstractGinModule {
 
 		// SignedToken
 		bind(SignedTokenView.class).to(SignedTokenViewImpl.class).in(Singleton.class);
+
+		// NrgrSynapseGlue
+		bind(NrgrSynapseGlueView.class).to(NrgrSynapseGlueViewImpl.class).in(Singleton.class);
 
 		// Trash
 		bind(TrashView.class).to(TrashViewImpl.class).in(Singleton.class);
