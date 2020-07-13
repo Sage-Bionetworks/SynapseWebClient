@@ -110,7 +110,6 @@ public class AppActivityMapper implements ActivityMapper {
 		excludeFromLastPlace.add(SignedToken.class);
 		excludeFromLastPlace.add(PasswordResetSignedTokenPlace.class);
 		excludeFromLastPlace.add(Down.class);
-		excludeFromLastPlace.add(NrgrSynapseGlue.class);
 	}
 
 	@Override

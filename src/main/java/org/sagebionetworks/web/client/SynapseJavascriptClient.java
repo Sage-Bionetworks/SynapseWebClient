@@ -20,7 +20,7 @@ import static org.sagebionetworks.web.shared.WebConstants.CONTENT_TYPE;
 import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.SYNAPSE_VERSION_KEY;
-import static org.sagebionetworks.web.shared.WebConstants.NBCONVERT_ENDPOINT_PROPERTY;
+import static org.sagebionetworks.web.shared.WebConstants.NRGR_SYNAPSE_GLUE_ENDPOINT_PROPERTY;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -386,7 +386,7 @@ public class SynapseJavascriptClient {
 	}
 	
 	private String getNrgrSynapseGlueEndpoint() {
-		return synapseProperties.getSynapseProperty(NBCONVERT_ENDPOINT_PROPERTY);
+		return synapseProperties.getSynapseProperty(NRGR_SYNAPSE_GLUE_ENDPOINT_PROPERTY);
 	}
 
 	private String getSynapseVersionInfo() {

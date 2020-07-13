@@ -3,19 +3,19 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	<bh:Div width="365px" addStyleNames="center-in-div">
-		<b:Heading size="H2" text="Submit NIMH/NRGR Data Access Token"
+	<bh:Div width="500px" addStyleNames="center-in-div">
+		<b:Heading size="H2" text="Data Access Token"
 			addStyleNames="text-align-center margin-top-20" />
-		<bh:Div width="100%">
-			<b:Heading size="H4" subText="Enter token"
+		<bh:Div width="100%" paddingBottom="50">
+			<b:Heading size="H4" subText="Paste NIMH/NRGR data access token"
 				addStyleNames="flexcontainer-justify-center margin-top-20" />
 			<b:FormGroup>
-				<b:TextArea ui:field="textArea" placeholder="" />
+				<b:TextArea ui:field="textArea" placeholder="=============== SYNAPSE LINK TOKEN BOUNDARY ===============|ProjectName|12345|6789|ZYXabcWVUdef123=|=============== SYNAPSE LINK TOKEN BOUNDARY ===============" visibleLines="8"/>
 			</b:FormGroup>
 			<bh:Div ui:field="synAlertContainer" marginBottom="10" />
 			<b:Button ui:field="submitButton" size="LARGE"
-				width="100%" addStyleNames="lightGreyBackground no-background"
-				text="" paddingTop="0" paddingBottom="0" paddingLeft="0" />
+				width="100%" type="PRIMARY"
+				text="Submit" />
 		</bh:Div>
 	</bh:Div>
 </ui:UiBinder> 
