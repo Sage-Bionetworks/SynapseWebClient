@@ -7,10 +7,13 @@
 		<b:Heading size="H2" text="Data Access Token"
 			addStyleNames="text-align-center margin-top-20" />
 		<bh:Div width="100%" paddingBottom="50">
-			<b:Heading size="H4" subText="Paste NIMH/NRGR data access token"
+			<b:Heading size="H4" subText="Paste the data access approval token"
 				addStyleNames="flexcontainer-justify-center margin-top-20" />
 			<b:FormGroup>
-				<b:TextArea ui:field="textArea" placeholder="=============== SYNAPSE LINK TOKEN BOUNDARY ===============|ProjectName|12345|6789|ZYXabcWVUdef123=|=============== SYNAPSE LINK TOKEN BOUNDARY ===============" visibleLines="8"/>
+				<b:TextArea ui:field="textArea" 
+				placeholder="=============== SYNAPSE LINK TOKEN BOUNDARY ===============|AbcdEfgh|12345|6789|ZYXabcWVUdef123=|=============== SYNAPSE LINK TOKEN BOUNDARY ==============="
+				visibleLines="10"				
+				/>
 			</b:FormGroup>
 			<bh:Div ui:field="synAlertContainer" marginBottom="10" />
 			<b:Button ui:field="submitButton" size="LARGE"

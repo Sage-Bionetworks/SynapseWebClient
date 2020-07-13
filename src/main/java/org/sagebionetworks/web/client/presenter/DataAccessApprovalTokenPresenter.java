@@ -3,8 +3,8 @@ package org.sagebionetworks.web.client.presenter;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.place.NrgrSynapseGlue;
-import org.sagebionetworks.web.client.view.NrgrSynapseGlueView;
+import org.sagebionetworks.web.client.place.DataAccessApprovalTokenPlace;
+import org.sagebionetworks.web.client.view.DataAccessApprovalTokenView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -12,15 +12,15 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class NrgrSynapseGluePresenter extends AbstractActivity implements NrgrSynapseGlueView.Presenter,Presenter<NrgrSynapseGlue> {
+public class DataAccessApprovalTokenPresenter extends AbstractActivity implements DataAccessApprovalTokenView.Presenter,Presenter<DataAccessApprovalTokenPlace> {
 
-	private NrgrSynapseGlueView view;
+	private DataAccessApprovalTokenView view;
 	private PopupUtilsView popupUtils;
 	private SynapseAlert synAlert;
 	private SynapseJavascriptClient jsClient;
 
 	@Inject
-	public NrgrSynapseGluePresenter(NrgrSynapseGlueView view, PopupUtilsView popupUtils, SynapseAlert synAlert, SynapseJavascriptClient jsClient) {
+	public DataAccessApprovalTokenPresenter(DataAccessApprovalTokenView view, PopupUtilsView popupUtils, SynapseAlert synAlert, SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.popupUtils = popupUtils;
 		this.synAlert = synAlert;
@@ -34,7 +34,7 @@ public class NrgrSynapseGluePresenter extends AbstractActivity implements NrgrSy
 	}
 
 	@Override
-	public void setPlace(NrgrSynapseGlue place) {
+	public void setPlace(DataAccessApprovalTokenPlace place) {
 		String token = place.toToken();
 		view.refreshHeader();
 		if (token != null && !token.equalsIgnoreCase(ClientProperties.DEFAULT_PLACE_TOKEN)) {

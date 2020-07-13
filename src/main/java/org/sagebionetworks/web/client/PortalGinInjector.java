@@ -21,7 +21,7 @@ import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.presenter.MapPresenter;
 import org.sagebionetworks.web.client.presenter.NewAccountPresenter;
-import org.sagebionetworks.web.client.presenter.NrgrSynapseGluePresenter;
+import org.sagebionetworks.web.client.presenter.DataAccessApprovalTokenPresenter;
 import org.sagebionetworks.web.client.presenter.PasswordResetSignedTokenPresenter;
 import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
@@ -358,7 +358,7 @@ public interface PortalGinInjector extends Ginjector {
 	WikiDiffPresenter getWikiDiffPresenter();
 
 	EmailInvitationPresenter getEmailInvitationPresenter();
-	NrgrSynapseGluePresenter getNrgrSynapseGluePresenter();
+	DataAccessApprovalTokenPresenter getDataAccessApprovalTokenPresenter();
 
 	/*
 	 * Markdown Widgets

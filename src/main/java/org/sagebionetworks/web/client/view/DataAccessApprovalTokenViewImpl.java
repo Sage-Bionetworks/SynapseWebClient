@@ -11,7 +11,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class NrgrSynapseGlueViewImpl implements NrgrSynapseGlueView {
+public class DataAccessApprovalTokenViewImpl implements DataAccessApprovalTokenView {
 	private Header headerWidget;
 	@UiField
 	Button submitButton;
@@ -21,13 +21,13 @@ public class NrgrSynapseGlueViewImpl implements NrgrSynapseGlueView {
 	Div synAlertContainer;
 	Presenter presenter;
 	
-	public interface Binder extends UiBinder<Widget, NrgrSynapseGlueViewImpl> {
+	public interface Binder extends UiBinder<Widget, DataAccessApprovalTokenViewImpl> {
 	}
 
 	public Widget widget;
 
 	@Inject
-	public NrgrSynapseGlueViewImpl(Binder uiBinder, Header headerWidget, GlobalApplicationState globalAppState) {
+	public DataAccessApprovalTokenViewImpl(Binder uiBinder, Header headerWidget, GlobalApplicationState globalAppState) {
 		widget = uiBinder.createAndBindUi(this);
 		this.headerWidget = headerWidget;
 		headerWidget.configure();

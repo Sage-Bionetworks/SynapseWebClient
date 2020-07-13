@@ -1813,6 +1813,9 @@ public class SynapseJavascriptClient {
 		String url = getNrgrSynapseGlueEndpoint();
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
 		requestBuilder.configure(POST, url);
+		requestBuilder.setHeader(ACCEPT, "text/plain");
+		requestBuilder.setHeader(CONTENT_TYPE, "text/plain");
+
 		if (authController.isLoggedIn()) {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}

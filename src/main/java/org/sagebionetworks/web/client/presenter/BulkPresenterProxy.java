@@ -28,7 +28,7 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.MapPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
-import org.sagebionetworks.web.client.place.NrgrSynapseGlue;
+import org.sagebionetworks.web.client.place.DataAccessApprovalTokenPlace;
 import org.sagebionetworks.web.client.place.PasswordResetSignedTokenPlace;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Profile;
@@ -616,12 +616,12 @@ public class BulkPresenterProxy extends AbstractActivity {
 					loadError(caught);
 				}
 			});
-		} else if (place instanceof NrgrSynapseGlue) {
-			GWT.runAsync(NrgrSynapseGlue.class, new RunAsyncCallback() {
+		} else if (place instanceof DataAccessApprovalTokenPlace) {
+			GWT.runAsync(DataAccessApprovalTokenPlace.class, new RunAsyncCallback() {
 				@Override
 				public void onSuccess() {
-					NrgrSynapseGluePresenter presenter = ginjector.getNrgrSynapseGluePresenter();
-					presenter.setPlace((NrgrSynapseGlue) place);
+					DataAccessApprovalTokenPresenter presenter = ginjector.getDataAccessApprovalTokenPresenter();
+					presenter.setPlace((DataAccessApprovalTokenPlace) place);
 					presenter.start(panel, eventBus);
 				}
 
