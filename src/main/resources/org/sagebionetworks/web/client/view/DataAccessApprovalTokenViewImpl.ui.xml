@@ -17,6 +17,7 @@
 			</b:FormGroup>
 			<bh:Div ui:field="synAlertContainer" marginBottom="10" />
 			<b:Button ui:field="submitButton" size="LARGE"
+				dataLoadingText="Submitting..."
 				width="100%" type="PRIMARY"
 				text="Submit" />
 		</bh:Div>

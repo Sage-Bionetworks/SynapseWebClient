@@ -62,5 +62,16 @@ public class DataAccessApprovalTokenViewImpl implements DataAccessApprovalTokenV
 	public Widget asWidget() {
 		return widget;
 	}
+	
+	@Override
+	public void setLoading(boolean isLoading) {
+		textArea.setEnabled(!isLoading);
+		if (isLoading) {
+			this.submitButton.state().loading();
+		} else {
+			this.submitButton.state().reset();
+		}
+	}
+
 
 }

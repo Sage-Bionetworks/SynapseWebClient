@@ -26,6 +26,7 @@ public class DataAccessApprovalTokenPresenter extends AbstractActivity implement
 		this.synAlert = synAlert;
 		this.jsClient = jsClient;
 		view.setPresenter(this);
+		view.setSynAlert(synAlert);
 	}
 
 	@Override
@@ -45,16 +46,23 @@ public class DataAccessApprovalTokenPresenter extends AbstractActivity implement
 	public void onSubmitToken() {
 		// call the service (see IT-834)
 		String token = view.getNrgrToken();
+		if (token.trim().isEmpty()) {
+			synAlert.showError("Please enter at least one data access approval token and try again.");
+			return;
+		}
 		synAlert.clear();
+		view.setLoading(true);
 		jsClient.submitNRGRDataAccessToken(token, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String responseMessage) {
+				view.setLoading(false);
 				// on 201, pop up the message (note that this might be an error or success message, so do not clear the text area)
 				popupUtils.showInfoDialog("", responseMessage, null);
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				view.setLoading(false);
 				// on error, show in synAlert
 				synAlert.handleException(caught);
 			}

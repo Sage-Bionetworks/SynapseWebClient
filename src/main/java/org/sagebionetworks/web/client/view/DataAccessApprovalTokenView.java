@@ -8,7 +8,8 @@ public interface DataAccessApprovalTokenView extends IsWidget {
 	void setPresenter(Presenter presenter);
 	String getNrgrToken();
 	void setNrgrToken(String token);
-
+	void setLoading(boolean isLoading);
+	
 	public interface Presenter {
 		void onSubmitToken();
 	}
