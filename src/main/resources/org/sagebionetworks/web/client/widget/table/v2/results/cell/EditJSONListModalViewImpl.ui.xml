@@ -17,8 +17,9 @@
                         </t:TableHeader>
                     </t:TableRow>
                 </t:Table>
-                <t:Table ui:field="editorsPanel" addStyleNames="multi-value-editor-spaced" width="100%">
-                </t:Table>
+                <b.html:Div addStyleNames="max-height-65-vh scroll-y">
+                    <t:Table ui:field="editorsPanel" addStyleNames="multi-value-editor-spaced" width="100%"/>
+                </b.html:Div>
 
                 <b:Button ui:field="pasteNewValuesButton" marginLeft="-12"
                           type="LINK" addStyleNames="boldText">PASTE NEW VALUES</b:Button>

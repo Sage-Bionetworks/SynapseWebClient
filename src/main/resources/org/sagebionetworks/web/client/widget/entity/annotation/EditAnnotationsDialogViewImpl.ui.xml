@@ -10,7 +10,7 @@
 			closable="true" dataBackdrop="STATIC" dataKeyboard="true" size="LARGE"
 			b:id="editAnnotationsModal">
 			<b:ModalBody>
-				<g:FlowPanel ui:field="editorsPanel" />
+				<g:FlowPanel ui:field="editorsPanel" addStyleNames="max-height-65-vh scroll-y"/>
 				<b.html:Div>
 					<b:Button ui:field="addAnnotationButton">Add New Key</b:Button>
 					<b:Button ui:field="pasteNewValuesButton"
