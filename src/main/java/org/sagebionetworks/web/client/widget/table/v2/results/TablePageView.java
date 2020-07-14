@@ -54,13 +54,6 @@ public interface TablePageView extends IsWidget {
 	 */
 	public void setPaginationWidgetVisible(boolean visible);
 
-	/**
-	 * Show or hide the editor buffer.
-	 * 
-	 * @param isEditable
-	 */
-	public void setEditorBufferVisible(boolean isEditable);
-
 	void setTableVisible(boolean visible);
 
 	void showLoading();

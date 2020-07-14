@@ -86,11 +86,6 @@ public class EditJSONListModalViewImpl implements EditJSONListModalView {
 	}
 
 	@Override
-	public void removeCommaSeparatedValuesParser(Widget commaSeparatedValuesParser){
-		pasteNewValuesPanel.remove(commaSeparatedValuesParser);
-	}
-
-	@Override
 	public void showEditor() {
 		saveButton.state().reset();
 		alert.clearState();

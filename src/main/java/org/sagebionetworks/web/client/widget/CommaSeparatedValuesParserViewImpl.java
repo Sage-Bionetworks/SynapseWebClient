@@ -11,6 +11,7 @@ import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditorViewImpl;
 
 
@@ -19,6 +20,9 @@ public class CommaSeparatedValuesParserViewImpl implements CommaSeparatedValuesP
 
 	private Widget widget;
 	private Presenter presenter;
+
+	@UiField
+	Div container;
 
 	@UiField
 	Button cancelButton;
@@ -55,5 +59,15 @@ public class CommaSeparatedValuesParserViewImpl implements CommaSeparatedValuesP
 	@Override
 	public Widget asWidget() {
 		return widget;
+	}
+
+	@Override
+	public void hide(){
+		container.setVisible(false);
+	}
+
+	@Override
+	public void show(){
+		container.setVisible(true);
 	}
 }

@@ -14,8 +14,6 @@ public interface EditJSONListModalView extends IsWidget {
 
 	void addCommaSeparatedValuesParser(Widget asWidget);
 
-	void removeCommaSeparatedValuesParser(Widget asWidget);
-
 	void showEditor();
 
 	void hideEditor();
@@ -29,8 +27,6 @@ public interface EditJSONListModalView extends IsWidget {
 		void onSave();
 
 		void onClickPasteNewValues();
-
-		void onCancelPasteNewValues(CommaSeparatedValuesParser commaSeparatedValuesParser);
 
 		void onAddNewEmptyValue();
 

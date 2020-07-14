@@ -36,7 +36,7 @@ public class EditJSONModal implements EditJSONListModalView.Presenter{
 
 	private final PortalGinInjector ginInjector;
 	private final EditJSONListModalView view;
-	private boolean commaSeparatedValuesParserExists;
+	private CommaSeparatedValuesParser commaSeparatedValuesParser;
 
 	private List<CellEditor> cellEditors;
 
@@ -144,21 +144,14 @@ public class EditJSONModal implements EditJSONListModalView.Presenter{
 	@Override
 	public void onClickPasteNewValues(){
 		//do not add another parser if one is already active
-		if(this.commaSeparatedValuesParserExists){
+		if(this.commaSeparatedValuesParser != null){
+			this.commaSeparatedValuesParser.show();
 			return;
 		}
-		CommaSeparatedValuesParser parser = ginInjector.getCommaSeparatedValuesParser();
+		this.commaSeparatedValuesParser = ginInjector.getCommaSeparatedValuesParser();
 
-		parser.configure(this::addNewValues, this::onCancelPasteNewValues);
-		view.addCommaSeparatedValuesParser(parser.asWidget());
-		this.commaSeparatedValuesParserExists = true;
-	}
-
-	@Override
-	public void onCancelPasteNewValues(CommaSeparatedValuesParser commaSeparatedValuesParser){
-		//TODO: do we want to enforce singleton? if so we can avoid passing in the parser as an arg.
-		view.removeCommaSeparatedValuesParser(commaSeparatedValuesParser.asWidget());
-		this.commaSeparatedValuesParserExists = false;
+		this.commaSeparatedValuesParser.configure(this::addNewValues);
+		view.addCommaSeparatedValuesParser(this.commaSeparatedValuesParser.asWidget());
 	}
 
 

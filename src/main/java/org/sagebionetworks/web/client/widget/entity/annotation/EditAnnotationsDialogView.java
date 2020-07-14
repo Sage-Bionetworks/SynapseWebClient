@@ -23,8 +23,6 @@ public interface EditAnnotationsDialogView extends IsWidget {
 
 		void onClickPasteNewValues();
 
-		void onCancelPasteNewValues(CommaSeparatedValuesParser commaSeparatedValuesParser);
-
 		/**
 		 * Called when the cancel button is clicked in the dialog
 		 */
@@ -75,8 +73,6 @@ public interface EditAnnotationsDialogView extends IsWidget {
 	void removeAnnotationEditor(Widget editor);
 
 	void addCommaSeparatedValuesParser(Widget commaSeparatedValuesParser);
-
-	void removeCommaSeparatedValuesParser(Widget commaSeparatedValuesParser);
 
 	void clearAnnotationEditors();
 

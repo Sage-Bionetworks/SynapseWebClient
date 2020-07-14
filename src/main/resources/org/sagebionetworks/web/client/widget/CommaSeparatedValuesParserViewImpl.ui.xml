@@ -4,13 +4,12 @@
              xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
              xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
-    <bh:Div>
+    <bh:Div ui:field="container">
         <b:TextArea addStyleNames="hide-resize" ui:field="commaSeparatedTextBox"
-                    placeholder="Paste comma delimited values here." visibleLines="5"/>
+                    placeholder="Paste comma or tab delimited values here." visibleLines="5"/>
         <b:html.Div addStyleNames="text-align-right">
             <b:Button ui:field="cancelButton" type="LINK" addStyleNames="boldText" >CANCEL</b:Button>
             <b:Button ui:field="addButton" type="LINK" addStyleNames="boldText" >ADD</b:Button>
         </b:html.Div>
-
     </bh:Div>
 </ui:UiBinder>

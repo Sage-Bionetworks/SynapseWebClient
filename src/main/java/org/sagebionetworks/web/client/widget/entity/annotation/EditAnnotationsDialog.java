@@ -20,14 +20,15 @@ import com.google.inject.Inject;
 import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParser;
 
 public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presenter {
-	public static final String SEE_THE_ERRORS_BELOW = "See the error(s) below.";
+	public static final String SEE_THE_ERRORS_ABOVE = "See the error(s) above.";
 	EditAnnotationsDialogView view;
 	SynapseJavascriptClient jsClient;
 	PortalGinInjector ginInjector;
 	String entityId;
 	List<AnnotationEditor> annotationEditors;
 	Annotations annotationsCopy;
-	boolean commaSeparatedValuesParserExists;
+
+	CommaSeparatedValuesParser commaSeparatedValuesParser;
 
 	@Inject
 	public EditAnnotationsDialog(EditAnnotationsDialogView view, SynapseJavascriptClient jsClient, PortalGinInjector ginInjector) {
@@ -91,22 +92,15 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 	@Override
 	public void onClickPasteNewValues(){
 		//do not add another parser if one is already active
-		if(this.commaSeparatedValuesParserExists){
+		if(this.commaSeparatedValuesParser != null){
+			commaSeparatedValuesParser.show();
 			return;
 		}
-		CommaSeparatedValuesParser parser = ginInjector.getCommaSeparatedValuesParser();
+		commaSeparatedValuesParser = ginInjector.getCommaSeparatedValuesParser();
 
-		parser.configure(this::onAddNewAnnotation, this::onCancelPasteNewValues);
-		view.addCommaSeparatedValuesParser(parser.asWidget());
+		commaSeparatedValuesParser.configure(this::onAddNewAnnotation);
+		view.addCommaSeparatedValuesParser(commaSeparatedValuesParser.asWidget());
 		GWT.debugger();
-		this.commaSeparatedValuesParserExists = true;
-	}
-
-	@Override
-	public void onCancelPasteNewValues(CommaSeparatedValuesParser commaSeparatedValuesParser){
-		//TODO: do we want to enforce singleton? if so we can avoid passing in the parser as an arg.
-		view.removeCommaSeparatedValuesParser(commaSeparatedValuesParser.asWidget());
-		this.commaSeparatedValuesParserExists = false;
 	}
 
 	@Override
@@ -124,7 +118,7 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 			}
 		}
 		if (!isValid) {
-			view.showError(SEE_THE_ERRORS_BELOW);
+			view.showError(SEE_THE_ERRORS_ABOVE);
 			return;
 		}
 

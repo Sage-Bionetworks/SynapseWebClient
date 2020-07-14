@@ -7,12 +7,18 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface CommaSeparatedValuesParserView extends IsWidget {
+	void hide();
+
+	void show();
+
 	public interface Presenter {
-		void configure(Consumer<List<String>> onAddCallback, Consumer<CommaSeparatedValuesParser> onCancelCallback);
+		void configure(Consumer<List<String>> onAddCallback);
 		void onCancel();
 		void onAdd();
 
 		List<String> parseToStringList();
+
+		void show();
 
 		Widget asWidget();
 	}

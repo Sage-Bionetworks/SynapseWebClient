@@ -78,7 +78,6 @@ public class TablePageWidget implements IsWidget, RowSelectionListener {
 		} else {
 			view.setPaginationWidgetVisible(false);
 		}
-		view.setEditorBufferVisible(isEditable);
 		tableId = QueryBundleUtils.getTableId(bundle);
 		// Map the columns to types
 		types = ColumnModelUtils.buildTypesForQueryResults(QueryBundleUtils.getSelectFromBundle(bundle), bundle.getColumnModels());

@@ -9,6 +9,7 @@ import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParserView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
 
 public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView {
@@ -105,12 +106,6 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView 
 	public void addCommaSeparatedValuesParser(Widget commaSeparatedValuesParser){
 		pasteNewValuesPanel.add(commaSeparatedValuesParser);
 	}
-
-	@Override
-	public void removeCommaSeparatedValuesParser(Widget commaSeparatedValuesParser){
-		pasteNewValuesPanel.remove(commaSeparatedValuesParser);
-	}
-
 
 	@Override
 	public Widget asWidget() {

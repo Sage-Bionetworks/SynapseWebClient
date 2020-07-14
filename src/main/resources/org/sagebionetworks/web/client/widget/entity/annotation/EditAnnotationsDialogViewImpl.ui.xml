@@ -10,7 +10,6 @@
 			closable="true" dataBackdrop="STATIC" dataKeyboard="true" size="LARGE"
 			b:id="editAnnotationsModal">
 			<b:ModalBody>
-				<s:SynapseAlertViewImpl ui:field="alert" />
 				<g:FlowPanel ui:field="editorsPanel" />
 				<b.html:Div>
 					<b:Button ui:field="addAnnotationButton">Add New Key</b:Button>
@@ -21,6 +20,7 @@
 
 			</b:ModalBody>
 			<b:ModalFooter>
+				<s:SynapseAlertViewImpl ui:field="alert" />
 				<b:Button ui:field="cancelButton" type="LINK"
 					dataDismiss="MODAL" addStyleNames="boldText">CANCEL</b:Button>
 				<b:Button ui:field="saveButton" type="PRIMARY"

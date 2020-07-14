@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -21,7 +20,6 @@ public class CommaSeparatedValuesParser implements CommaSeparatedValuesParserVie
 	CommaSeparatedValuesParserView view;
 	ResourceLoader resourceLoader;
 	private Consumer<List<String>> onAddCallback;
-	private Consumer<CommaSeparatedValuesParser> onCancelCallback;
 
 	@Inject
 	public CommaSeparatedValuesParser(CommaSeparatedValuesParserView view, ResourceLoader resourceLoader) {
@@ -31,9 +29,8 @@ public class CommaSeparatedValuesParser implements CommaSeparatedValuesParserVie
 	}
 
 	@Override
-	public void configure(Consumer<List<String>> onAddCallback, Consumer<CommaSeparatedValuesParser> onCancelCallback) {
+	public void configure(Consumer<List<String>> onAddCallback) {
 		this.onAddCallback = onAddCallback;
-		this.onCancelCallback = onCancelCallback;
 		this.resourceLoader.requires(new WebResource("https://cdn.jsdelivr.net/npm/papaparse@5.2.0/papaparse.min.js"), new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -49,9 +46,7 @@ public class CommaSeparatedValuesParser implements CommaSeparatedValuesParserVie
 
 	@Override
 	public void onCancel() {
-		if(this.onCancelCallback != null){
-			this.onCancelCallback.accept(this);
-		}
+		view.hide();
 	}
 
 	@Override
@@ -59,8 +54,8 @@ public class CommaSeparatedValuesParser implements CommaSeparatedValuesParserVie
 		if(this.onAddCallback != null){
 			this.onAddCallback.accept(parseToStringList());
 		}
-		//TODO: to clear or not to clear? should we delete the
 		view.clearTextBox();
+		view.hide();
 	}
 
 	@Override
@@ -77,6 +72,11 @@ public class CommaSeparatedValuesParser implements CommaSeparatedValuesParserVie
 			}
 		}
 		return result;
+	}
+
+	@Override
+	public void show(){
+		view.show();
 	}
 
 	@Override
