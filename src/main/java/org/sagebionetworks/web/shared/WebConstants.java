@@ -165,6 +165,7 @@ public class WebConstants {
 	public static final String PROVENANCE_ENTITY_ID_PROPERTY = "org.sagebionetworks.portal.provenance_synapse_id";
 	public static final String PROVENANCE_WIKI_ID_PROPERTY = "org.sagebionetworks.portal.provenance_wiki_id";
 	public static final String NBCONVERT_ENDPOINT_PROPERTY = "org.sagebionetworks.portal.nbconvert_endpoint";
+	public static final String NRGR_SYNAPSE_GLUE_ENDPOINT_PROPERTY = "org.sagebionetworks.portal.nrgrsynapseglue_endpoint";	
 	public static final String FORUM_SYNAPSE_ID_PROPERTY = "org.sagebionetworks.portal.forum_project_id";
 
 	// Workshop

@@ -20,6 +20,7 @@ import static org.sagebionetworks.web.shared.WebConstants.CONTENT_TYPE;
 import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.SYNAPSE_VERSION_KEY;
+import static org.sagebionetworks.web.shared.WebConstants.NRGR_SYNAPSE_GLUE_ENDPOINT_PROPERTY;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -382,6 +383,10 @@ public class SynapseJavascriptClient {
 
 	private String getFileServiceUrl() {
 		return synapseProperties.getSynapseProperty(FILE_SERVICE_URL_KEY);
+	}
+	
+	private String getNrgrSynapseGlueEndpoint() {
+		return synapseProperties.getSynapseProperty(NRGR_SYNAPSE_GLUE_ENDPOINT_PROPERTY);
 	}
 
 	private String getSynapseVersionInfo() {
@@ -1802,6 +1807,19 @@ public class SynapseJavascriptClient {
 		request.setNextPageToken(nextPageToken);
 		String url = getRepoServiceUrl() + ACCESS_REQUIREMENT + "/" + requirementId + "/approvedSubmissionInfo";
 		doPost(url, request, OBJECT_TYPE.SubmissionInfoPage, true, cb);
+	}
+	
+	public void submitNRGRDataAccessToken(String token, AsyncCallback<String> cb) {
+		String url = getNrgrSynapseGlueEndpoint();
+		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
+		requestBuilder.configure(POST, url);
+		requestBuilder.setHeader(ACCEPT, "text/plain");
+		requestBuilder.setHeader(CONTENT_TYPE, "text/plain");
+
+		if (authController.isLoggedIn()) {
+			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
+		}
+		sendRequest(requestBuilder, token, OBJECT_TYPE.String, INITIAL_RETRY_REQUEST_DELAY_MS, false, cb);
 	}
 }
 
