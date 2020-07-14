@@ -1,12 +1,14 @@
 package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.DataAccessApprovalTokenPlace;
 import org.sagebionetworks.web.client.view.DataAccessApprovalTokenView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -19,13 +21,15 @@ public class DataAccessApprovalTokenPresenter extends AbstractActivity implement
 	private PopupUtilsView popupUtils;
 	private SynapseAlert synAlert;
 	private SynapseJavascriptClient jsClient;
+	private GWTWrapper gwt;
 
 	@Inject
-	public DataAccessApprovalTokenPresenter(DataAccessApprovalTokenView view, PopupUtilsView popupUtils, SynapseAlert synAlert, SynapseJavascriptClient jsClient) {
+	public DataAccessApprovalTokenPresenter(DataAccessApprovalTokenView view, PopupUtilsView popupUtils, SynapseAlert synAlert, SynapseJavascriptClient jsClient, GWTWrapper gwt) {
 		this.view = view;
 		this.popupUtils = popupUtils;
 		this.synAlert = synAlert;
 		this.jsClient = jsClient;
+		this.gwt = gwt;
 		view.setPresenter(this);
 		view.setSynAlert(synAlert);
 	}
@@ -40,7 +44,9 @@ public class DataAccessApprovalTokenPresenter extends AbstractActivity implement
 		String token = place.toToken();
 		view.refreshHeader();
 		if (token != null && !token.equalsIgnoreCase(ClientProperties.DEFAULT_PLACE_TOKEN)) {
-			view.setAccessApprovalToken(token);	
+			String decodedToken = gwt.decodeQueryString(token);
+			view.setAccessApprovalToken(decodedToken);
+			onSubmitToken();
 		}		
 	}
 	@Override

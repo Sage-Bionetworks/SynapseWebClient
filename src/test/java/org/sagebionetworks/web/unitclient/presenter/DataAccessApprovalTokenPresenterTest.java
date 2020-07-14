@@ -3,14 +3,17 @@ package org.sagebionetworks.web.unitclient.presenter;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.DataAccessApprovalTokenPlace;
@@ -22,6 +25,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+@RunWith(MockitoJUnitRunner.class)
 public class DataAccessApprovalTokenPresenterTest {
 	DataAccessApprovalTokenPresenter presenter;
 	@Mock
@@ -33,6 +37,8 @@ public class DataAccessApprovalTokenPresenterTest {
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
+	GWTWrapper mockGWT;
+	@Mock
 	PopupUtilsView mockPopupUtils;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
@@ -43,8 +49,7 @@ public class DataAccessApprovalTokenPresenterTest {
 	
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
-		presenter = new DataAccessApprovalTokenPresenter(mockView, mockPopupUtils, mockSynAlert, mockJsClient);
+		presenter = new DataAccessApprovalTokenPresenter(mockView, mockPopupUtils, mockSynAlert, mockJsClient, mockGWT);
 		AsyncMockStubber.callSuccessWith(TEST_RESPONSE).when(mockJsClient).submitNRGRDataAccessToken(anyString(), any(AsyncCallback.class));
 	}
 
@@ -56,13 +61,28 @@ public class DataAccessApprovalTokenPresenterTest {
 
 	@Test
 	public void testSetPlace() {
-		String initToken = "12345";
-		when(mockPlace.toToken()).thenReturn(initToken);
+		when(mockPlace.toToken()).thenReturn("0");
 		
 		presenter.setPlace(mockPlace);
 		
-		verify(mockView).setAccessApprovalToken(initToken);
+		verify(mockView, never()).setAccessApprovalToken(anyString());
 		verify(mockView).refreshHeader();
+	}
+	
+	@Test
+	public void testSetPlaceNonDefaultToken() {
+		String initToken = "123%2045";
+		String decodedToken = "123 45";
+		when(mockGWT.decodeQueryString(initToken)).thenReturn(decodedToken);
+		when(mockPlace.toToken()).thenReturn(initToken);
+		when(mockView.getAccessApprovalToken()).thenReturn(decodedToken);
+		
+		presenter.setPlace(mockPlace);
+		
+		verify(mockView).setAccessApprovalToken(decodedToken);
+		verify(mockView).refreshHeader();
+		// verify auto-submits if init token was set
+		verify(mockJsClient).submitNRGRDataAccessToken(eq(decodedToken), any(AsyncCallback.class));
 	}
 
 	@Test
