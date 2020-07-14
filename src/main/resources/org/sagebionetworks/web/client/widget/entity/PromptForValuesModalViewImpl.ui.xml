@@ -10,10 +10,10 @@
 			<bh:Div ui:field="synAlertContainer" />
 		</b:ModalBody>
 		<b:ModalFooter>
-			<b:Button ui:field="defaultButton" type="DEFAULT"
-				>Cancel</b:Button>
+			<b:Button ui:field="defaultButton" type="DEFAULT" text="Cancel"
+				></b:Button>
 			<b:Button ui:field="primaryButton" type="PRIMARY"
-				dataLoadingText="Saving...">OK</b:Button>
+				dataLoadingText="Saving..." text="OK"></b:Button>
 		</b:ModalFooter>
 	</b:Modal>
 </ui:UiBinder>
