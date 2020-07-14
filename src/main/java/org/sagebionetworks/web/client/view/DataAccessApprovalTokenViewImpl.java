@@ -44,11 +44,11 @@ public class DataAccessApprovalTokenViewImpl implements DataAccessApprovalTokenV
 		this.presenter = presenter;
 	}
 	@Override
-	public String getNrgrToken() {
+	public String getAccessApprovalToken() {
 		return textArea.getText();
 	}
 	@Override
-	public void setNrgrToken(String token) {
+	public void setAccessApprovalToken(String token) {
 		textArea.setText(token);
 	}
 	@Override

@@ -6,8 +6,8 @@ public interface DataAccessApprovalTokenView extends IsWidget {
 	void setSynAlert(IsWidget w);
 	void refreshHeader();
 	void setPresenter(Presenter presenter);
-	String getNrgrToken();
-	void setNrgrToken(String token);
+	String getAccessApprovalToken();
+	void setAccessApprovalToken(String token);
 	void setLoading(boolean isLoading);
 	
 	public interface Presenter {

@@ -14,6 +14,7 @@ import com.google.inject.Inject;
 
 public class DataAccessApprovalTokenPresenter extends AbstractActivity implements DataAccessApprovalTokenView.Presenter,Presenter<DataAccessApprovalTokenPlace> {
 
+	public static final String EMPTY_TOKEN_ERROR_MESSAGE = "Please enter at least one data access approval token and try again.";
 	private DataAccessApprovalTokenView view;
 	private PopupUtilsView popupUtils;
 	private SynapseAlert synAlert;
@@ -39,15 +40,15 @@ public class DataAccessApprovalTokenPresenter extends AbstractActivity implement
 		String token = place.toToken();
 		view.refreshHeader();
 		if (token != null && !token.equalsIgnoreCase(ClientProperties.DEFAULT_PLACE_TOKEN)) {
-			view.setNrgrToken(token);	
+			view.setAccessApprovalToken(token);	
 		}		
 	}
 	@Override
 	public void onSubmitToken() {
 		// call the service (see IT-834)
-		String token = view.getNrgrToken();
+		String token = view.getAccessApprovalToken();
 		if (token.trim().isEmpty()) {
-			synAlert.showError("Please enter at least one data access approval token and try again.");
+			synAlert.showError(EMPTY_TOKEN_ERROR_MESSAGE);
 			return;
 		}
 		synAlert.clear();
