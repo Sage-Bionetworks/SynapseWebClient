@@ -11,8 +11,6 @@ import jsinterop.annotations.JsType;
  *
  */
 @JsType(isNative = true, name="Papa", namespace = JsPackage.GLOBAL)
-public class PapaParseWrapper {
-	//TODO: introduce a factory that will ensure that the WebResource is loaded/injected into the HTML before we can use it
-	//TODO: somehow make this instanced instead of a static call?? or just wrap this class in a object?
+class PapaParse {
 	public static native PapaParseResult parse(String string, PapaParseConfig config);
 }

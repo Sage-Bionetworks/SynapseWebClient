@@ -1,47 +1,49 @@
 package org.sagebionetworks.web.client.widget;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.resources.WebResource;
-import org.sagebionetworks.web.client.widget.csv.PapaParseConfig;
-import org.sagebionetworks.web.client.widget.csv.PapaParseWrapper;
+import org.sagebionetworks.web.client.widget.csv.PapaCSVParser;
 import org.sagebionetworks.web.client.widget.csv.PapaParseResult;
 
 public class CommaSeparatedValuesParser implements CommaSeparatedValuesParserView.Presenter{
-	//TODO: onModuleLoad() implement here to inject the CSV parser, PapaParser?
-
 	CommaSeparatedValuesParserView view;
 	ResourceLoader resourceLoader;
 	private Consumer<List<String>> onAddCallback;
+	PapaCSVParser papaCSVParser;
 
 	@Inject
-	public CommaSeparatedValuesParser(CommaSeparatedValuesParserView view, ResourceLoader resourceLoader) {
+	public CommaSeparatedValuesParser(CommaSeparatedValuesParserView view, ResourceLoader resourceLoader, PapaCSVParser papaCSVParser) {
 		this.view = view;
 		this.resourceLoader = resourceLoader;
+		this.papaCSVParser = papaCSVParser;
 		view.setPresenter(this);
 	}
 
 	@Override
 	public void configure(Consumer<List<String>> onAddCallback) {
 		this.onAddCallback = onAddCallback;
-		this.resourceLoader.requires(new WebResource("https://cdn.jsdelivr.net/npm/papaparse@5.2.0/papaparse.min.js"), new AsyncCallback<Void>() {
-			@Override
-			public void onFailure(Throwable caught) {
+		this.resourceLoader.requires(new WebResource("https://cdn.jsdelivr.net/npm/papaparse@5.2.0/papaparse.min.js"),
+				new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
 
-			}
+					}
 
-			@Override
-			public void onSuccess(Void result) {
+					@Override
+					public void onSuccess(Void result) {
 
-			}
-		});
+					}
+				}
+		);
+
 	}
 
 	@Override
@@ -61,15 +63,10 @@ public class CommaSeparatedValuesParser implements CommaSeparatedValuesParserVie
 	@Override
 	public List<String> parseToStringList(){
 		String text = view.getText();
-		PapaParseConfig config = new PapaParseConfig();
-		GWT.debugger();
-
-		PapaParseResult parsed = PapaParseWrapper.parse(text.trim(),config);
+		PapaParseResult parsed = papaCSVParser.parse(text.trim());
 		List<String> result = new ArrayList<>();
 		for(String[] row : parsed.data){
-			for(String element: row){
-				result.add(element);
-			}
+			Collections.addAll(result, row);
 		}
 		return result;
 	}

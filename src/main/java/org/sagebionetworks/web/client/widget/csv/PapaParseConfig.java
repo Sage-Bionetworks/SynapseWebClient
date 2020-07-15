@@ -9,7 +9,7 @@ import jsinterop.annotations.JsType;
  * https://www.papaparse.com/docs#config
  */
 @JsType(isNative = true, name = "Object", namespace = JsPackage.GLOBAL)
-public class PapaParseConfig {
+class PapaParseConfig {
 	@JsProperty
 	public String delimiter;
 }

@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditor;
 
 public class AnnotationEditorTest {
 	AnnotationEditor editor;
@@ -194,7 +195,10 @@ public class AnnotationEditorTest {
 
 	@Test
 	public void testOnTypeChange() {
-		annotationValues.add("value 1");
+		String value = "value 1";
+		when(mockCellEditor.getValue()).thenReturn(value);
+
+		annotationValues.add(value);
 		editor.configure(ANNOTATION_KEY, annotation, null);
 		verify(mockView).addNewEditor(any(CellEditor.class));
 
@@ -202,12 +206,12 @@ public class AnnotationEditorTest {
 		editor.onTypeChange(dateIndex);
 		verify(mockView).clearValueEditors();
 		verify(mockView, times(2)).addNewEditor(any(CellEditor.class));
+
+		// value was copied over
+		verify(mockCellEditor2).setValue(value);
 		verify(mockCellEditor2).setFocus(true);
 
 		assertEquals(AnnotationsValueType.TIMESTAMP_MS, editor.getAnnotation().getType());
-		// after type change, should clear values
-		AnnotationsValue a = editor.getUpdatedAnnotation();
-		assertEquals(0, a.getValue().size());
 	}
 
 }

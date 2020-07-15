@@ -77,6 +77,7 @@ public class AnnotationEditor implements Presenter {
 	}
 
 	private void addNewValues(Iterable<String> strings){
+		CellEditor last = null;
 		for (String value : strings) {
 				// create an editor for each value
 				CellEditor editor = createNewEditor();
@@ -87,6 +88,10 @@ public class AnnotationEditor implements Presenter {
 					// occurs with converting from STRING to DATE types
 				}
 				view.addNewEditor(editor);
+				last = editor;
+		}
+		if(last != null){
+			last.setFocus(true);
 		}
 	}
 

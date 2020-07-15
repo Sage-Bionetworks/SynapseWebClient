@@ -191,6 +191,7 @@ import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelpView;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelpViewImpl;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelpImpl;
+import org.sagebionetworks.web.client.widget.csv.PapaCSVParser;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetView;
@@ -1226,6 +1227,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AnnotationEditorView.class).to(AnnotationEditorViewImpl.class);
 		bind(EditAnnotationsDialogView.class).to(EditAnnotationsDialogViewImpl.class);
 		bind(CommaSeparatedValuesParserView.class).to(CommaSeparatedValuesParserViewImpl.class);
+		bind(PapaCSVParser.class).in(Singleton.class);
 
 		bind(AnnotationCellFactory.class).to(AnnotationCellFactoryImpl.class).in(Singleton.class);
 		bind(EntityId2BundleCache.class).to(EntityId2BundleCacheImpl.class).in(Singleton.class);
