@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import java.util.Arrays;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -22,19 +24,21 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateListRende
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONListCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LargeStringCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererView;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONListCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdListRendererCellView;
 
 public class CellFactoryImplTest {
 
@@ -84,6 +88,10 @@ public class CellFactoryImplTest {
 	StringListRendererCellView mockStringListRenderer;
 	@Mock
 	DateListRendererCellView mockDateListRenderer;
+	@Mock
+	UserIdListRendererCellView mockUserIdListRenderer;
+	@Mock
+	EntityIdListRendererCellView mockEntityIdListRenderer;
 
 	@Before
 	public void before() {
@@ -108,6 +116,8 @@ public class CellFactoryImplTest {
 		when(mockInjector.createLargeTextFormCellEditor()).thenReturn(mockLargeStringCellEditor);
 		when(mockInjector.createStringListRendererCellView()).thenReturn(mockStringListRenderer);
 		when(mockInjector.createDateListRendererCellView()).thenReturn(mockDateListRenderer);
+		when(mockInjector.createEntityIdListRendererCellView()).thenReturn(mockEntityIdListRenderer);
+		when(mockInjector.createUserIdListRendererCellView()).thenReturn(mockUserIdListRenderer);
 		when(mockInjector.createListCellEditor()).thenReturn(mockJSONListCellEditor);
 		cellFactory = new CellFactory(mockInjector);
 	}
@@ -383,6 +393,20 @@ public class CellFactoryImplTest {
 		verify(mockJSONListCellEditor).setColumnModel(cm);
 	}
 
+	@Test
+	public void testGetEntityIdListRenderer() {
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.ENTITYID_LIST);
+		assertEquals(mockEntityIdListRenderer, cellFactory.createRenderer(cm));
+	}
+
+	@Test
+	public void testGetUserIdListRenderer() {
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.USERID_LIST);
+		assertEquals(mockUserIdListRenderer, cellFactory.createRenderer(cm));
+	}
+	
 	@Test
 	public void testGetStringFormCellEditor() {
 		ColumnModel cm = new ColumnModel();

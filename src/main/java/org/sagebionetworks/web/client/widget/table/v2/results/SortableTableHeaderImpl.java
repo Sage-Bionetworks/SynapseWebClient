@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
-import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.html.Strong;
 import org.sagebionetworks.repo.model.table.SortDirection;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableHeaderResizeGrip;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -26,7 +27,9 @@ public class SortableTableHeaderImpl implements SortableTableHeader {
 	}
 
 	@UiField
-	Anchor tableHeaderLink;
+	Strong header;
+	@UiField
+	TableHeaderResizeGrip resizeGrip;
 	@UiField
 	Icon sortIcon;
 	Widget widget;
@@ -45,7 +48,7 @@ public class SortableTableHeaderImpl implements SortableTableHeader {
 
 	@Override
 	public void configure(final String text, final SortingListener handler) {
-		tableHeaderLink.setText(text);
+		header.setText(text);
 		setSortingListener(handler);
 	}
 
@@ -54,7 +57,6 @@ public class SortableTableHeaderImpl implements SortableTableHeader {
 			ClickHandler onClick = event -> {
 				handler.onToggleSort(getText());
 			};
-			tableHeaderLink.addClickHandler(onClick);
 			sortIcon.addClickHandler(onClick);
 		}
 	}
@@ -92,14 +94,19 @@ public class SortableTableHeaderImpl implements SortableTableHeader {
 	}
 
 	public void setText(String text) {
-		tableHeaderLink.setText(text);
+		header.setText(text);
 	}
 
 	public String getText() {
-		return tableHeaderLink.getText();
+		return header.getText();
 	}
 
 	public void setVisible(boolean visible) {
 		widget.setVisible(visible);
+	}
+
+	@Override
+	public void setIsResizable(boolean isResizable) {
+		resizeGrip.setVisible(isResizable);
 	}
 }

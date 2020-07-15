@@ -73,4 +73,6 @@ public interface GWTWrapper {
 	DateTimeFormat getFormat(String formatPattern);
 
 	DateTimeFormat getFormat(PredefinedFormat predefinedFormat);
+	
+	boolean isValidJSONArray(String json);
 }

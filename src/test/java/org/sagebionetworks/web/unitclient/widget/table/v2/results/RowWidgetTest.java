@@ -5,12 +5,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import org.junit.Before;
@@ -77,7 +77,7 @@ public class RowWidgetTest {
 		when(mockCellFactory.createEditor(any(ColumnModel.class))).thenAnswer(answer);
 		when(mockCellFactory.createRenderer(any(ColumnModel.class))).thenAnswer(answer);
 		defaultColumnModels = new ArrayList<ColumnModel>();
-		when(mockFileViewDefaultColumns.getDefaultViewColumns(anyBoolean())).thenReturn(defaultColumnModels);
+		when(mockFileViewDefaultColumns.getDefaultViewColumns(any(TableType.class))).thenReturn(defaultColumnModels);
 		types = TableModelTestUtils.createOneOfEachType();
 		// Create a row that matches the type.
 		aRow = TableModelTestUtils.createRows(types, 1).get(0);
@@ -163,12 +163,13 @@ public class RowWidgetTest {
 
 	@Test
 	public void testEditDefaultColumnModelsIsView() {
-		defaultColumnModels.add(types.get(0));
-		defaultColumnModels.add(types.get(1));
-		defaultColumnModels.add(types.get(2));
 		tableType = TableType.files;
 		boolean isEditor = true;
-		when(mockFileViewDefaultColumns.deepColumnModel(any(ColumnModel.class))).thenReturn(defaultColumnModels.get(0), defaultColumnModels.get(1), defaultColumnModels.get(2));
+		HashSet<String> defaultColumnNames = new HashSet<String>();
+		for (ColumnModel cm : types) {
+			defaultColumnNames.add(cm.getName());
+		}
+		when(mockFileViewDefaultColumns.getDefaultViewColumnNames(TableType.files)).thenReturn(defaultColumnNames);
 		rowWidget.configure(tableId, types, isEditor, tableType, aRow, mockListner);
 		verify(mockCellFactory, times(types.size())).createRenderer(any(ColumnModel.class));
 		verify(mockCellFactory, never()).createEditor(any(ColumnModel.class));

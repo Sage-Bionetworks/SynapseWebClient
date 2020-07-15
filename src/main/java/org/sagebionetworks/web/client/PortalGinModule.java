@@ -62,6 +62,8 @@ import org.sagebionetworks.web.client.view.MapView;
 import org.sagebionetworks.web.client.view.MapViewImpl;
 import org.sagebionetworks.web.client.view.NewAccountView;
 import org.sagebionetworks.web.client.view.NewAccountViewImpl;
+import org.sagebionetworks.web.client.view.DataAccessApprovalTokenView;
+import org.sagebionetworks.web.client.view.DataAccessApprovalTokenViewImpl;
 import org.sagebionetworks.web.client.view.PasswordResetSignedTokenView;
 import org.sagebionetworks.web.client.view.PasswordResetSignedTokenViewImpl;
 import org.sagebionetworks.web.client.view.PeopleSearchView;
@@ -497,6 +499,10 @@ import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidgetView;
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModalView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModalViewImpl;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationFinderView;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationFinderViewImpl;
+import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditorView;
+import org.sagebionetworks.web.client.widget.evaluation.SubmissionViewScopeEditorViewImpl;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationListView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationListViewImpl;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterView;
@@ -585,8 +591,10 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableVie
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2ViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetView;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScopeWidgetView;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityViewScopeWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.SubmissionViewScopeWidgetView;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.SubmissionViewScopeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsView;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsViewImpl;
@@ -643,6 +651,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateListRende
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EditJSONListModalViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdListRendererCellView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdListRendererCellViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererView;
@@ -655,7 +665,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.LargeStringCe
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEditorViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEdtiorView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.NumberCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.NumberCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.RadioCellEditorView;
@@ -666,6 +676,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendere
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdListRendererCellView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdListRendererCellViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesView;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorView;
@@ -859,6 +871,9 @@ public class PortalGinModule extends AbstractGinModule {
 
 		// SignedToken
 		bind(SignedTokenView.class).to(SignedTokenViewImpl.class).in(Singleton.class);
+
+		// NrgrSynapseGlue
+		bind(DataAccessApprovalTokenView.class).to(DataAccessApprovalTokenViewImpl.class).in(Singleton.class);
 
 		// Trash
 		bind(TrashView.class).to(TrashViewImpl.class).in(Singleton.class);
@@ -1118,9 +1133,11 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(StringRendererCellView.class).to(StringRendererCellViewImpl.class);
 		bind(StringListRendererCellView.class).to(StringListRendererCellViewImpl.class);
 		bind(DateListRendererCellView.class).to(DateListRendererCellViewImpl.class);
+		bind(UserIdListRendererCellView.class).to(UserIdListRendererCellViewImpl.class);
+		bind(EntityIdListRendererCellView.class).to(EntityIdListRendererCellViewImpl.class);
 		bind(CellEditorView.class).to(CellEditorViewImpl.class);
 		bind(NumberCellEditorView.class).to(NumberCellEditorViewImpl.class);
-		bind(ListCellEdtiorView.class).to(ListCellEditorViewImpl.class);
+		bind(ListCellEditorView.class).to(ListCellEditorViewImpl.class);
 		bind(DateCellEditorView.class).to(DateCellEditorViewImpl.class);
 		bind(UserIdCellEditorView.class).to(UserIdCellEditorViewImpl.class);
 		bind(FileCellEditorView.class).to(FileCellEditorViewImpl.class);
@@ -1288,7 +1305,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(UserSelectorView.class).to(UserSelectorViewImpl.class);
 		bind(CreateTableViewWizardStep1View.class).to(CreateTableViewWizardStep1ViewImpl.class);
 		bind(EntityContainerListWidgetView.class).to(EntityContainerListWidgetViewImpl.class);
-		bind(ScopeWidgetView.class).to(ScopeWidgetViewImpl.class);
+		bind(EntityViewScopeWidgetView.class).to(EntityViewScopeWidgetViewImpl.class);
 		bind(CopyTextModal.class).to(CopyTextModalImpl.class);
 
 		bind(EvaluationEditorModalView.class).to(EvaluationEditorModalViewImpl.class);
@@ -1388,5 +1405,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ContainerItemCountWidgetView.class).to(ContainerItemCountWidgetViewImpl.class);
 		bind(StatisticsPlotWidgetView.class).to(StatisticsPlotWidgetViewImpl.class);
 		bind(QuarantinedEmailModal.class).in(Singleton.class);
+		bind(SubmissionViewScopeEditorView.class).to(SubmissionViewScopeEditorViewImpl.class);
+		bind(EvaluationFinderView.class).to(EvaluationFinderViewImpl.class);
+		bind(SubmissionViewScopeWidgetView.class).to(SubmissionViewScopeWidgetViewImpl.class);
 	}
 }

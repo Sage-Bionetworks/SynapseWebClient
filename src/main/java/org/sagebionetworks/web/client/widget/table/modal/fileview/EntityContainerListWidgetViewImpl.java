@@ -74,7 +74,7 @@ public class EntityContainerListWidgetViewImpl implements EntityContainerListWid
 					presenter.onRemoveProject(id);
 				}
 			});
-			deleteButton.addStyleName("imageButton text-danger");
+			deleteButton.addStyleName("imageButton text-primary");
 			row.add(deleteButton);
 		}
 		entitiesContainer.add(row);

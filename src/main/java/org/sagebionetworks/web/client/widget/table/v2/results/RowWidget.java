@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
@@ -59,16 +60,14 @@ public class RowWidget implements IsWidget, RowView.Presenter {
 
 	private void configureAfterInit(String tableId, List<ColumnModel> types, boolean isEditor, TableType tableType, Row row) {
 		// Setup each cell
-		List<ColumnModel> defaultColumns = null;
+		Set<String> defaultColumnNames = null;
 		if (isEditor) {
-			defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.isIncludeFiles());
+			defaultColumnNames = fileViewDefaultColumns.getDefaultViewColumnNames(tableType);
 		}
 		for (ColumnModel type : types) {
 			// Create each cell
 			Cell cell = null;
-			ColumnModel deepCopyCM = fileViewDefaultColumns.deepColumnModel(type);
-			deepCopyCM.setId(null);
-			if (isEditor && (TableType.table.equals(tableType) || !defaultColumns.contains(deepCopyCM))) {
+			if (isEditor && (TableType.table.equals(tableType) || !defaultColumnNames.contains(type.getName()))) {
 				cell = cellFactory.createEditor(type);
 			} else {
 				cell = cellFactory.createRenderer(type);

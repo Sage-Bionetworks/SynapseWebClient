@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.presenter.MapPresenter;
 import org.sagebionetworks.web.client.presenter.NewAccountPresenter;
+import org.sagebionetworks.web.client.presenter.DataAccessApprovalTokenPresenter;
 import org.sagebionetworks.web.client.presenter.PasswordResetSignedTokenPresenter;
 import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
@@ -221,6 +222,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEdi
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EditJSONModal;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumFormCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
@@ -234,6 +236,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringListRen
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultDateRangeViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeWidget;
@@ -357,6 +360,7 @@ public interface PortalGinInjector extends Ginjector {
 	WikiDiffPresenter getWikiDiffPresenter();
 
 	EmailInvitationPresenter getEmailInvitationPresenter();
+	DataAccessApprovalTokenPresenter getDataAccessApprovalTokenPresenter();
 
 	/*
 	 * Markdown Widgets
@@ -521,6 +525,8 @@ public interface PortalGinInjector extends Ginjector {
 	// TableEntity V2 cells
 	StringRendererCellView createStringRendererCellView();
 	StringListRendererCellView createStringListRendererCellView();
+	UserIdListRendererCellView createUserIdListRendererCellView();
+	EntityIdListRendererCellView createEntityIdListRendererCellView();
 	DateListRendererCellView createDateListRendererCellView();
 
 	StringEditorCell createStringEditorCell();

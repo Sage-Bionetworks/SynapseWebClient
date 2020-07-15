@@ -31,14 +31,12 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidget;
-import org.sagebionetworks.web.client.widget.profile.ProfileCertifiedValidatedWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
@@ -102,10 +100,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public PromptForValuesModalView promptDialog;
 	public SynapseJavascriptClient jsClient;
 	public DownloadListWidget downloadListWidget;
-	public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 
 	@Inject
-	public ProfilePresenter(ProfileView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, GWTWrapper gwt, TeamListWidget myTeamsWidget, OpenTeamInvitationsWidget openInvitesWidget, PortalGinInjector ginInjector, SynapseJavascriptClient jsClient, IsACTMemberAsyncHandler isACTMemberAsyncHandler) {
+	public ProfilePresenter(ProfileView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, GWTWrapper gwt, TeamListWidget myTeamsWidget, OpenTeamInvitationsWidget openInvitesWidget, PortalGinInjector ginInjector, SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -114,7 +111,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.myTeamsWidget = myTeamsWidget;
 		this.openInvitesWidget = openInvitesWidget;
 		this.jsClient = jsClient;
-		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		profileSynAlert = ginInjector.getSynapseAlertWidget();
 		projectSynAlert = ginInjector.getSynapseAlertWidget();
 		teamSynAlert = ginInjector.getSynapseAlertWidget();
@@ -274,28 +270,20 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private void getUserProfile() {
 		// ask for everything in the user bundle
 		currentUserBundle = null;
-		int mask = PROFILE | ORC_ID | VERIFICATION_SUBMISSION | IS_VERIFIED;
+		int mask = PROFILE | ORC_ID | VERIFICATION_SUBMISSION | IS_VERIFIED | IS_CERTIFIED;
 		Long currentUserIdLong = currentUserId != null ? Long.parseLong(currentUserId) : null;
 		jsClient.getUserBundle(currentUserIdLong, mask, new AsyncCallback<UserBundle>() {
 			@Override
 			public void onSuccess(UserBundle bundle) {
 				view.hideLoading();
 				currentUserBundle = bundle;
-				view.setProfile(bundle.getUserProfile(), isOwner, bundle.getORCID());
+				view.setProfile(bundle.getUserProfile(), isOwner, bundle.getIsCertified(), bundle.getIsVerified(), bundle.getORCID());
 			}
 
 			@Override
 			public void onFailure(Throwable caught) {
 				view.hideLoading();
 				profileSynAlert.handleException(caught);
-			}
-		});
-
-		isACTMemberAsyncHandler.isACTActionAvailable(isACT -> {
-			if (isACT) {
-				ProfileCertifiedValidatedWidget certifiedValidatedWidget = ginInjector.getProfileCertifiedValidatedWidget();
-				certifiedValidatedWidget.configure(currentUserIdLong);
-				view.setCertifiedValidatedWidget(certifiedValidatedWidget);
 			}
 		});
 	}

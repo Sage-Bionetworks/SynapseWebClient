@@ -7,10 +7,11 @@
 		type='org.sagebionetworks.web.client.SageImageBundle' />
 	<bh:Div addStyleNames="flexcontainer-row">
 		<g:Image ui:field="certifiedIcon"
-			addStyleNames="margin-right-2 flexcontainer-column" height="19px"
-			width="16px" resource='{sageImageBundle.certificate}' visible="false" />
-		<b:Icon ui:field="validatedIcon" type="CHECK_SQUARE_O"
-			visible="false" addStyleNames="text-primary flexcontainer-column margin-top-3 margin-left-5" size="LARGE" />
+			addStyleNames="margin-right-2 margin-top-3 flexcontainer-column" height="19px"
+			width="16px" url="images/CertifiedUser.svg" visible="false" />
+		<g:Image ui:field="validatedIcon"
+			addStyleNames="flexcontainer-column margin-top-3 margin-left-5" height="19px"
+			width="16px" url="images/ValidatedProfile.svg" visible="false" />
 		<bh:Paragraph ui:field="errorMessage" emphasis="DANGER"
 			addStyleNames="flexcontainer-column" />
 	</bh:Div>

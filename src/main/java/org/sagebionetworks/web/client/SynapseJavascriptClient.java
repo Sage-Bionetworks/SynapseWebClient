@@ -20,6 +20,7 @@ import static org.sagebionetworks.web.shared.WebConstants.CONTENT_TYPE;
 import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.SYNAPSE_VERSION_KEY;
+import static org.sagebionetworks.web.shared.WebConstants.NRGR_SYNAPSE_GLUE_ENDPOINT_PROPERTY;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
@@ -69,6 +71,7 @@ import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.auth.Username;
+
 import org.sagebionetworks.repo.model.dataaccess.SubmissionInfoPage;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionInfoPageRequest;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
@@ -127,6 +130,7 @@ import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.SnapshotRequest;
 import org.sagebionetworks.repo.model.table.SnapshotResponse;
+import org.sagebionetworks.repo.model.table.ViewEntityType;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
@@ -217,7 +221,8 @@ public class SynapseJavascriptClient {
 	public static final String PRINCIPAL = "/principal";
 	public static final String DOI = "/doi";
 	public static final String DOI_ASSOCIATION = DOI + "/association";
-	public static final String EVALUATION_AVAILABLE = "/evaluation/available";
+	public static final String EVALUATION = "/evaluation";
+	public static final String EVALUATION_AVAILABLE = EVALUATION + "/available";
 	public static final String ID_PARAMETER = "id=";
 	public static final String TYPE_PARAMETER = "type=";
 	public static final String VERSION_PARAMETER = "version=";
@@ -282,6 +287,7 @@ public class SynapseJavascriptClient {
 	public static final String FILE_BULK = FILE + "/bulk";
 	public static final String ACTIVITY_URI_PATH = "/activity";
 	public static final String SCHEMA_TYPE_CREATE = "/schema/type/create/";
+	public static final String VIEW_COLUMN_MODEL_REQUEST = "/column/view/scope";
 
 	public static final String ASYNC_START = "/async/start";
 	public static final String ASYNC_GET = "/async/get/";
@@ -377,6 +383,10 @@ public class SynapseJavascriptClient {
 
 	private String getFileServiceUrl() {
 		return synapseProperties.getSynapseProperty(FILE_SERVICE_URL_KEY);
+	}
+	
+	private String getNrgrSynapseGlueEndpoint() {
+		return synapseProperties.getSynapseProperty(NRGR_SYNAPSE_GLUE_ENDPOINT_PROPERTY);
 	}
 
 	private String getSynapseVersionInfo() {
@@ -1167,11 +1177,17 @@ public class SynapseJavascriptClient {
 		return getFuture(cb -> doPost(url, entity, OBJECT_TYPE.Entity, false, cb));
 	}
 
-	public FluentFuture<List<ColumnModel>> getDefaultColumnsForView(ViewType viewType) {
-		String url = getRepoServiceUrl() + COLUMN_VIEW_DEFAULT + viewType.name();
+	public FluentFuture<List<ColumnModel>> getDefaultColumnsForView(int viewTypeMask) {
+		String url = getRepoServiceUrl() + COLUMN_VIEW_DEFAULT + "?viewTypeMask="+viewTypeMask;
 		boolean canCancel = false;
 		return getFuture(cb -> doGet(url, OBJECT_TYPE.ListWrapperColumnModel, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserSessionToken(), canCancel, cb));
 	}
+	public FluentFuture<List<ColumnModel>> getDefaultColumnsForView(ViewEntityType viewEntityType) {
+		String url = getRepoServiceUrl() + COLUMN_VIEW_DEFAULT + "?viewEntityType=" + viewEntityType.name();
+		boolean canCancel = false;
+		return getFuture(cb -> doGet(url, OBJECT_TYPE.ListWrapperColumnModel, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserSessionToken(), canCancel, cb));
+	}
+
 
 	public FluentFuture<Void> deleteMembershipRequest(String requestId) {
 		String url = getRepoServiceUrl() + MEMBERSHIP_REQUEST + "/" + requestId;
@@ -1749,12 +1765,61 @@ public class SynapseJavascriptClient {
 		doGet(url, OBJECT_TYPE.PaginatedResultsEvaluations, cb);
 	}
 	
+	public void getEvaluations(Boolean isActiveOnly, ACCESS_TYPE accessType, List<String> idsList, Integer limit, Integer offset, AsyncCallback<List<Evaluation>> cb) {
+		char sep = '?';
+		String url = getRepoServiceUrl() + EVALUATION;
+		if (isActiveOnly != null) {
+			url += sep + "activeOnly=" + isActiveOnly;
+			sep = '&';
+		}
+		if (accessType != null) {
+			url += sep + "accessType=" + accessType.name();
+			sep = '&';
+		}
+		if (idsList != null && !idsList.isEmpty()) {
+			url += sep + "evaluationIds=";
+			for (String id : idsList) {
+				url += id + ",";
+			}
+			sep = '&';
+		}
+		
+		if (limit != null) {
+			url += sep + LIMIT_PARAMETER + limit;
+			sep = '&';
+		}
+		if (offset != null) {
+			url += sep +  OFFSET_PARAMETER + offset;
+			sep = '&';
+		}
+
+		doGet(url, OBJECT_TYPE.PaginatedResultsEvaluations, cb);
+	}
+	
+	public void getEvaluation(String evaluationId, AsyncCallback<Evaluation> cb) {
+		String url = getRepoServiceUrl() + EVALUATION + "/" + evaluationId;
+		doGet(url, OBJECT_TYPE.Evaluation, cb);
+	}
+	
 	public void listApprovedSubmissionInfo(String requirementId, String nextPageToken, AsyncCallback<SubmissionInfoPage> cb) {
 		SubmissionInfoPageRequest request = new SubmissionInfoPageRequest();
 		request.setAccessRequirementId(requirementId);
 		request.setNextPageToken(nextPageToken);
 		String url = getRepoServiceUrl() + ACCESS_REQUIREMENT + "/" + requirementId + "/approvedSubmissionInfo";
 		doPost(url, request, OBJECT_TYPE.SubmissionInfoPage, true, cb);
+	}
+	
+	public void submitNRGRDataAccessToken(String token, AsyncCallback<String> cb) {
+		String url = getNrgrSynapseGlueEndpoint();
+		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
+		requestBuilder.configure(POST, url);
+		requestBuilder.setHeader(ACCEPT, "text/plain");
+		requestBuilder.setHeader(CONTENT_TYPE, "text/plain");
+
+		if (authController.isLoggedIn()) {
+			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
+		}
+		sendRequest(requestBuilder, token, OBJECT_TYPE.String, INITIAL_RETRY_REQUEST_DELAY_MS, false, cb);
 	}
 }
 

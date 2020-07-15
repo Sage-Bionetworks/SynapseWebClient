@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.StringUtils;
 import com.google.inject.Inject;
@@ -25,13 +26,14 @@ public class JSONListCellEditor extends AbstractCellEditor implements CellEditor
 	JSONArrayAdapter jsonArrayAdapter;
 	ColumnModel columnModel;
 	PortalGinInjector ginInjector;
-
+	GWTWrapper gwt;
 	EditJSONModal editJSONModal;
 
 	@Inject
-	public JSONListCellEditor(JSONListCellEditorView view, JSONArrayAdapter jsonArrayAdapter, PortalGinInjector ginInjector) {
+	public JSONListCellEditor(JSONListCellEditorView view, JSONArrayAdapter jsonArrayAdapter, PortalGinInjector ginInjector, GWTWrapper gwt) {
 		super(view);
 		this.jsonArrayAdapter = jsonArrayAdapter;
+		this.gwt = gwt;
 		this.ginInjector = ginInjector;
 		view.setEditor(this);
 	}
@@ -54,14 +56,19 @@ public class JSONListCellEditor extends AbstractCellEditor implements CellEditor
 		String value = StringUtils.emptyAsNull(this.getValue());
 		if (value != null) {
 			// parse value
+			if (!gwt.isValidJSONArray(value)) {
+				view.setValidationState(ValidationState.ERROR);
+				view.setHelpText(MUST_BE + VALID_JSON_ARRAY);
+				return false;
+			}
 			try {
 				JSONArrayAdapter adapter = jsonArrayAdapter.createNewArray(value);
-				Long maximumListLength = columnModel.getMaximumListLength();
-				if (maximumListLength != null) {
-					boolean isListLengthValid = adapter.length() <= maximumListLength;
+				Long maxListLength = columnModel.getMaximumListLength();
+				if (maxListLength != null) {
+					boolean isListLengthValid = adapter.length() <= maxListLength;
 					if (!isListLengthValid) {
 						view.setValidationState(ValidationState.ERROR);
-						view.setHelpText(MUST_BE + maximumListLength + ITEMS_OR_LESS);
+						view.setHelpText(MUST_BE + maxListLength + ITEMS_OR_LESS);
 						return false;
 					}	
 				}
@@ -78,7 +85,8 @@ public class JSONListCellEditor extends AbstractCellEditor implements CellEditor
 					}
 				}
 			} catch (JSONObjectAdapterException e) {
-				// failed to parse, show error
+				// gwt.isValidJSONArray() will catch json parsing errors.
+				// Is this now unreachable?
 				view.setValidationState(ValidationState.ERROR);
 				view.setHelpText(MUST_BE + VALID_JSON_ARRAY);
 				return false;

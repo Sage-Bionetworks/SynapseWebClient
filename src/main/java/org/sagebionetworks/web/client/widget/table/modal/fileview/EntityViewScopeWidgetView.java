@@ -8,7 +8,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author Jay
  *
  */
-public interface ScopeWidgetView extends IsWidget {
+public interface EntityViewScopeWidgetView extends IsWidget {
 
 	void setVisible(boolean visible);
 

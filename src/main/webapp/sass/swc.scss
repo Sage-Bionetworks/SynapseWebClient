@@ -145,13 +145,13 @@ end sticky footer
 		}
 	}
 
-
 	.modal-body {
 		//originally padding: 20px
 		padding: 20px 0px 0px;
 		//orignally no margin
 		margin: 0px 45px;
 	}
+
 	.modal-header {
 		min-height: 50px;
 		//originally padding: 15px
@@ -386,7 +386,22 @@ end sticky footer
 	color: #939598;
 	font-size: 11px;
 }
-
+#body .synapseViewOrTable {
+	th {
+		background-color: #BBD3E2;
+		border: 1px solid #8BB4CE;
+	}
+	th:nth-child(1) {
+		border-right: none;
+	}
+	th:nth-child(2) {
+		border-left: none;
+	}
+}
+#body .tableHeaderSortIcon {
+	position: absolute;
+	right: 5px;
+}
 .nobordertable-imp td {
   border: 0px !important;
   padding: 0px;
@@ -1223,6 +1238,18 @@ h1, h2, h3, h4, h5, h6 {
 	overflow: auto;
 }
 
+.truncate {
+	max-width: 250px;
+	p {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+}
+.tablePage td {
+	overflow: hidden;
+}
+
 .maxWidth100 {
 	max-width: 100%;
 }
@@ -1454,8 +1481,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .gwt-TreeItem-selected {
-  background: #ffffff !important;
-  text-decoration:underline;
+	background: #ffffff !important;
+}
+.selectable .gwt-TreeItem-selected {
+	text-decoration:underline;
 }
 .entityTreeColumnsTable {
 	table-layout: fixed;
@@ -1701,6 +1730,18 @@ ol.lowerroman {
 		summary::before {
 			content: 'Show Less';
 			visibility: visible;
+		}
+	}
+	.th-resizer {
+		top: 0;
+ 		right: 0;
+		width: 3px;
+		height: 32px;
+		position: absolute;
+ 		cursor: col-resize;
+		user-select: none;
+		&:hover {
+			background-color:$synapse-blue;
 		}
 	}
 }
@@ -3091,6 +3132,9 @@ div.border {
   }
 
   .view-terms-button {
+    color: $synapse-blue;
+	}
+	.update-request-button {
     color: $synapse-blue;
   }
 

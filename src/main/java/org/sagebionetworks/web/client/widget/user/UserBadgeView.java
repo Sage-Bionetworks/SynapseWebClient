@@ -7,7 +7,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface UserBadgeView extends IsWidget, SynapseView {
-	void configure(UserProfile profile);
+	void configure(UserProfile profile, Boolean isCertified, Boolean isValidated);
 
 	void showLoadError(String error);
 

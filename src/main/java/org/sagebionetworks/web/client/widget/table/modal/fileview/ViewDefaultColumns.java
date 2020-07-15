@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.ViewType;
+import org.sagebionetworks.repo.model.table.ViewEntityType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PopupUtilsView;
@@ -17,7 +17,7 @@ import com.google.inject.Inject;
 
 public class ViewDefaultColumns {
 	private SynapseJavascriptClient jsClient;
-	private List<ColumnModel> defaultFileViewColumns, defaultProjectViewColumns;
+	private List<ColumnModel> defaultFileViewColumns, defaultProjectViewColumns, defaultSubmissionViewColumns;
 
 
 	private AdapterFactory adapterFactory;
@@ -32,11 +32,13 @@ public class ViewDefaultColumns {
 	}
 
 	public void init() {
-		FluentFuture<List<ColumnModel>> fileViewColumnsFuture = jsClient.getDefaultColumnsForView(ViewType.file);
-		FluentFuture<List<ColumnModel>> projectViewColumnsFuture = jsClient.getDefaultColumnsForView(ViewType.project);
-		FluentFuture.from(whenAllComplete(fileViewColumnsFuture, projectViewColumnsFuture).call(() -> {
+		FluentFuture<List<ColumnModel>> fileViewColumnsFuture = jsClient.getDefaultColumnsForView(TableType.files.getViewTypeMask());
+		FluentFuture<List<ColumnModel>> projectViewColumnsFuture = jsClient.getDefaultColumnsForView(TableType.projects.getViewTypeMask());
+		FluentFuture<List<ColumnModel>> submissionViewColumnsFuture = jsClient.getDefaultColumnsForView(ViewEntityType.submissionview);
+		FluentFuture.from(whenAllComplete(fileViewColumnsFuture, projectViewColumnsFuture, submissionViewColumnsFuture).call(() -> {
 			defaultFileViewColumns = clearIds(fileViewColumnsFuture.get());
 			defaultProjectViewColumns = clearIds(projectViewColumnsFuture.get());
+			defaultSubmissionViewColumns = clearIds(submissionViewColumnsFuture.get());
 			return null;
 		}, directExecutor())).catching(Throwable.class, e -> {
 			popupUtils.showErrorMessage(e.getMessage());
@@ -52,16 +54,20 @@ public class ViewDefaultColumns {
 		return defaultColumnNames;
 	}
 
-	public Set<String> getDefaultViewColumnNames(boolean includesFiles) {
-		if (includesFiles) {
+	public Set<String> getDefaultViewColumnNames(TableType tableType) {
+		if (TableType.submission_view.equals(tableType)) {
+			return getColumnNames(defaultSubmissionViewColumns);
+		} else if (tableType.isIncludeFiles()) {
 			return getColumnNames(defaultFileViewColumns);
 		} else {
 			return getColumnNames(defaultProjectViewColumns);
 		}
 	}
 
-	public List<ColumnModel> getDefaultViewColumns(boolean includesFiles) {
-		if (includesFiles) {
+	public List<ColumnModel> getDefaultViewColumns(TableType tableType) {
+		if (TableType.submission_view.equals(tableType)) {
+			return defaultSubmissionViewColumns;
+		} else if (tableType.isIncludeFiles()) {
 			return defaultFileViewColumns;
 		} else {
 			return defaultProjectViewColumns;

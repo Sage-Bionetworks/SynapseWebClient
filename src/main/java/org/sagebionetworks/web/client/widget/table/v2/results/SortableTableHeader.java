@@ -25,5 +25,7 @@ public interface SortableTableHeader extends IsWidget {
 	 * @param icon
 	 */
 	public void setSortDirection(SortDirection direction);
+	
+	public void setIsResizable(boolean isResizable);
 
 }

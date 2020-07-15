@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.table.v2.results.cell;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONListCellEditor.CHARACTERS_OR_LESS;
@@ -18,6 +19,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONListCellEditor;
@@ -29,6 +31,8 @@ public class JSONListCellEditorImplTest {
 
 	@Mock
 	JSONListCellEditorView mockView;
+	@Mock
+	GWTWrapper mockGwt;
 	JSONArrayAdapter jsonArrayAdapter = new JSONArrayAdapterImpl();
 	JSONListCellEditor editor;
 	@Mock
@@ -38,18 +42,24 @@ public class JSONListCellEditorImplTest {
 	
 	@Before
 	public void before() {
-		editor = new JSONListCellEditor(mockView, jsonArrayAdapter, mockGinInjector);
+		editor = new JSONListCellEditor(mockView, jsonArrayAdapter, mockGinInjector, mockGwt);
 		columnModel = new ColumnModel();
 		columnModel.setColumnType(ColumnType.STRING_LIST);
 		editor.setColumnModel(columnModel);
+		when(mockGwt.isValidJSONArray(anyString())).thenReturn(true);
 	}
 
 	@Test
 	public void testNotValidJsonArray() {
-		when(mockView.getValue()).thenReturn("1923");
+		// there's a difference in behavior between JSONArrayAdapterImpl (java implementation) and GwtAdapterFactory (client-side)
+		// need a special method client-side to check for a valid json array.
+		String testString = "1923";
+		when(mockGwt.isValidJSONArray(anyString())).thenReturn(false);
+		when(mockView.getValue()).thenReturn(testString);
 		
 		assertFalse(editor.isValid());
-		
+
+		verify(mockGwt).isValidJSONArray(testString);
 		verify(mockView).setValidationState(ValidationState.ERROR);
 		verify(mockView).setHelpText(MUST_BE + VALID_JSON_ARRAY);
 	}

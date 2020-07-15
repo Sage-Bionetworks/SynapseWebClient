@@ -25,7 +25,7 @@ public class EvaluationListViewImpl extends Panel implements EvaluationListView 
 	}
 
 	@Override
-	public void configure(List<Evaluation> list) {
+	public void configure(List<Evaluation> list, boolean isSelectable) {
 		clear();
 
 		if (list == null || list.size() == 0) {
@@ -35,7 +35,7 @@ public class EvaluationListViewImpl extends Panel implements EvaluationListView 
 			singleItem.add(new Text(list.get(0).getName()));
 			add(singleItem);
 		} else {
-			populateTable(list);
+			populateTable(list, isSelectable);
 		}
 	}
 
@@ -43,14 +43,20 @@ public class EvaluationListViewImpl extends Panel implements EvaluationListView 
 		add(new InlineHTML("No evaluations found"));
 	}
 
-	private void populateTable(List<Evaluation> list) {
+	private void populateTable(List<Evaluation> list, boolean isSelectable) {
 		ButtonGroup group = new ButtonGroup();
 		for (final Evaluation data : list) {
 			Div row = new Div();
-			final Radio selectBox = new Radio("evaluationButtons", data.getName());
-			selectBox.addStyleName("margin-left-10 displayInline");
-			row.add(selectBox);
-			evaluationCheckboxes.add(selectBox);
+			if (isSelectable) {
+				final Radio selectBox = new Radio("evaluationButtons", data.getName());
+				selectBox.addStyleName("margin-left-10 displayInline");
+				row.add(selectBox);
+				evaluationCheckboxes.add(selectBox);
+			} else {
+				Span s = new Span();
+				s.setText(data.getName());
+				row.add(s);
+			}
 			if (DisplayUtils.isDefined(data.getSubmissionInstructionsMessage())) {
 				HelpWidget helpWidget = new HelpWidget();
 				helpWidget.setHelpMarkdown(SafeHtmlUtils.htmlEscape(data.getSubmissionInstructionsMessage()));

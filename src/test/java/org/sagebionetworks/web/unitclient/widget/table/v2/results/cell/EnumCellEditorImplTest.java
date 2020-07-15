@@ -13,11 +13,11 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEdtiorView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEditorView;
 
 public class EnumCellEditorImplTest {
 
-	ListCellEdtiorView mockView;
+	ListCellEditorView mockView;
 	EnumCellEditor editor;
 	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
@@ -25,7 +25,7 @@ public class EnumCellEditorImplTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		mockView = Mockito.mock(ListCellEdtiorView.class);
+		mockView = Mockito.mock(ListCellEditorView.class);
 		editor = new EnumCellEditor(mockView, mockSynapseJSNIUtils);
 	}
 

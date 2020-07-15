@@ -53,9 +53,11 @@ public class CellFactory {
 			case STRING_LIST:
 			case BOOLEAN_LIST:
 			case INTEGER_LIST:
-//			case ENTITYID_LIST:
-//			case USERID_LIST:
 				return ginInjector.createStringListRendererCellView();
+			case ENTITYID_LIST:
+				return ginInjector.createEntityIdListRendererCellView();
+			case USERID_LIST:				
+				return ginInjector.createUserIdListRendererCellView();
 			case DATE_LIST:
 				return ginInjector.createDateListRendererCellView();				
 			//TODO: add special renderers for entity id list and user id list

@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.web.client.place.AccessRequirementPlace;
+import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
@@ -36,8 +38,19 @@ public class AccessRequirementPresenter extends AbstractActivity implements Pres
 		this.place = place;
 		view.initHeaderAndFooter();
 		requirementId = place.getParam(AccessRequirementPlace.AR_ID_PARAM);
+		String id = place.getParam(AccessRequirementsPlace.ID_PARAM);
+		String typeString = place.getParam(AccessRequirementsPlace.TYPE_PARAM);
+
 		// Note: configuring the Access Requirement widget without a target subject will result in notifications sent to the user will not have the context (Project/Folder/File associated with the restriction).
 		RestrictableObjectDescriptor targetSubject = null;
+
+		if (id != null && typeString != null) {
+			targetSubject = new RestrictableObjectDescriptor();
+			RestrictableObjectType type = RestrictableObjectType.valueOf(typeString.toUpperCase());
+			targetSubject.setType(type);
+			targetSubject.setId(id);
+		}
+		
 		arWidget.configure(requirementId, targetSubject);
 	}
 

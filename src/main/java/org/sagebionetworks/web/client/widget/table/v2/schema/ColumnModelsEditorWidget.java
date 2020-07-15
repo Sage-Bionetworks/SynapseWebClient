@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -96,7 +97,11 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(DEFAULT_NEW_COLUMN_TYPE);
 		cm.setMaximumSize(DEFAULT_STRING_MAX_SIZE);
-		return createColumnModelEditorWidget(cm);
+		ColumnModelTableRowEditorWidget rowEditor = createColumnModelEditorWidget(cm);
+		editor.addColumn(rowEditor);
+		this.editorRows.add(rowEditor);
+		checkSelectionState();
+		return rowEditor;
 	}
 
 	private ColumnModelTableRowEditorWidget createColumnModelEditorWidget(ColumnModel cm) {
@@ -107,10 +112,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 				rowEditor.setToBeDefaultFileViewColumn();
 			}
 		}
-		editor.addColumn(rowEditor);
-		this.editorRows.add(rowEditor);
 		rowEditor.configure(cm, this);
-		checkSelectionState();
 		return rowEditor;
 	}
 
@@ -125,7 +127,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	}
 
 	private Set<String> getDefaultColumnNames() {
-		return fileViewDefaultColumns.getDefaultViewColumnNames(tableType.isIncludeFiles());
+		return fileViewDefaultColumns.getDefaultViewColumnNames(tableType);
 	}
 
 	public void addColumns(List<ColumnModel> models) {
@@ -147,14 +149,17 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 				newColumns.remove(newModels.get(newModelName));
 			}
 		}
-
+		List<ColumnModelTableRow> rowEditors = new ArrayList<>();
 		for (ColumnModel cm : newColumns) {
 			String columnModelId = cm.getId();
 			if (columnModelId == null || !columnModelIds.contains(columnModelId)) {
-				createColumnModelEditorWidget(cm);
+				rowEditors.add(createColumnModelEditorWidget(cm));
 				columnModelIds.add(columnModelId);
 			}
 		}
+		editor.addColumns(rowEditors);
+		this.editorRows.addAll(rowEditors);
+
 		checkSelectionState();
 	}
 

@@ -14,7 +14,7 @@ public class ProfileCertifiedValidatedViewImpl implements ProfileCertifiedValida
 	}
 
 	@UiField
-	Icon validatedIcon;
+	Image validatedIcon;
 	@UiField
 	Image certifiedIcon;
 	@UiField

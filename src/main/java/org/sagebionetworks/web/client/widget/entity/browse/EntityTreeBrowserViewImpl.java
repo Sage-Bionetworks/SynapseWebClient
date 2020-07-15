@@ -180,6 +180,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 					EntityTreeItem targetItem = getTreeItem2entityTreeItem().get(event.getSelectedItem());
 					selectEntity(targetItem);
 				});
+				entityTree.addStyleName("selectable");
 			}
 			entityTreeContainer.clear();
 			entityTreeContainer.add(entityTree);

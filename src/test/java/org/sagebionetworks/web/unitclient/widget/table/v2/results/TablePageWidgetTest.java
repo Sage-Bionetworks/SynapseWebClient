@@ -137,7 +137,7 @@ public class TablePageWidgetTest {
 			}
 		});
 		defaultColumnModels = new ArrayList<ColumnModel>();
-		when(mockFileViewDefaultColumns.getDefaultViewColumns(anyBoolean())).thenReturn(defaultColumnModels);
+		when(mockFileViewDefaultColumns.getDefaultViewColumns(any(TableType.class))).thenReturn(defaultColumnModels);
 		when(mockFileViewDefaultColumns.deepColumnModel(any(ColumnModel.class))).thenReturn(mockColumnModel);
 		widget = new TablePageWidget(mockView, mockGinInjector, mockPaginationWidget);
 

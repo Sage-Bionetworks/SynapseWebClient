@@ -323,8 +323,8 @@
 							<t:Table>
 								<t:TableRow>
 									<t:TableData paddingRight="10">
-										<g:Image resource='{sageImageBundle.certificate}'
-											addStyleNames="margin-10" />
+										<g:Image url="images/CertifiedUser.svg"
+											addStyleNames="margin-10" width="75px"/>
 									</t:TableData>
 									<t:TableData paddingRight="2">
 										<b:Heading size="H4"

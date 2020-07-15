@@ -23,7 +23,12 @@ public enum ColumnTypeViewEnum {
 	StringList(ColumnType.STRING_LIST),
 	IntegerList(ColumnType.INTEGER_LIST),
 	DateList(ColumnType.DATE_LIST),
-	BooleanList(ColumnType.BOOLEAN_LIST);
+	BooleanList(ColumnType.BOOLEAN_LIST),
+	EntityIdList(ColumnType.ENTITYID_LIST),
+	UserIdList(ColumnType.USERID_LIST),
+	SubmissionId(ColumnType.SUBMISSIONID),
+	EvaluationId(ColumnType.EVALUATIONID),	
+	;
 
 	private ColumnType type;
 

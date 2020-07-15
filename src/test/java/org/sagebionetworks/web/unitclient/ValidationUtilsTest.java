@@ -22,6 +22,7 @@ public class ValidationUtilsTest {
 		assertTrue(ValidationUtils.isValidUrl("https://www.youtube.com/watch?v=m86ae_e_ptU", false));
 		assertTrue(ValidationUtils.isValidUrl("http://www.google.com", false));
 		assertTrue(ValidationUtils.isValidUrl("#!Synapse:syn123", false));
+		assertTrue(ValidationUtils.isValidUrl("https://adknowledgeportal.synapse.org/Explore/Data?QueryWrapper0=%7B%22sql%22%3A%22SELECT%20*%20FROM%20syn11346063%22%2C%22limit%22%3A25%2C%22offset%22%3A0%2C%22selectedFacets%22%3A%5B%7B%22concreteType%22%3A%22org.sagebionetworks.repo.model.table.FacetColumnValuesRequest%22%2C%22columnName%22%3A%22dataType%22%2C%22facetValues%22%3A%5B%22chromatinActivity%22%5D%7D%5D%7D", false));
 
 		assertFalse(ValidationUtils.isValidUrl("http:/www.google.com", false));
 		assertFalse(ValidationUtils.isValidUrl("missingprotocol.com", false));

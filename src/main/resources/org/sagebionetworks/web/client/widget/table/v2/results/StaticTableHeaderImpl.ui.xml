@@ -11,5 +11,6 @@
 
 	<bt:TableHeader addStyleNames="whitespace-nowrap">
 		<bh:Strong ui:field="header"></bh:Strong>
+		<bt:TableHeaderResizeGrip ui:field="resizeGrip" visible="false"/>
 	</bt:TableHeader>
 </ui:UiBinder>
