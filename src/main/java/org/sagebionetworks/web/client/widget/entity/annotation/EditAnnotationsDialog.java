@@ -100,7 +100,6 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 
 		commaSeparatedValuesParser.configure(this::onAddNewAnnotation);
 		view.addCommaSeparatedValuesParser(commaSeparatedValuesParser.asWidget());
-		GWT.debugger();
 	}
 
 	@Override

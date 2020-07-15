@@ -39,9 +39,7 @@ public class JSONListCellEditorViewImpl implements JSONListCellEditorView {
 	@UiField
 	HelpBlock helpBlock;
 
-	@UiField
-	Div valueEditorModalContainer;
-	EditJSONModal editJSONModal;
+	EditJSONListModal editJSONListModal;
 
 	Widget widget;
 	JSONListCellEditor editor;
@@ -141,8 +139,4 @@ public class JSONListCellEditorViewImpl implements JSONListCellEditorView {
 		this.editor = editor;
 	}
 
-	@Override
-	public void addEditorToPage(Widget editJSONModalWidget){
-		this.valueEditorModalContainer.add(editJSONModalWidget);
-	}
 }

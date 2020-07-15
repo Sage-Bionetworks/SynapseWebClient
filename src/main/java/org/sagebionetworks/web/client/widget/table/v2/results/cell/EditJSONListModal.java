@@ -24,7 +24,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParser;
 
-public class EditJSONModal implements EditJSONListModalView.Presenter{
+public class EditJSONListModal implements EditJSONListModalView.Presenter{
 	public static final String SEE_THE_ERRORS_BELOW = "See the error(s) below.";
 
 	private static final Map<ColumnType, ColumnType> LIST_TYPE_TO_NON_LIST = ImmutableMap.of(
@@ -47,7 +47,7 @@ public class EditJSONModal implements EditJSONListModalView.Presenter{
 	private CellFactory cellFactory;
 
 	@Inject
-	public EditJSONModal(EditJSONListModalView view, PortalGinInjector ginInjector, CellFactory cellFactory){
+	public EditJSONListModal(EditJSONListModalView view, PortalGinInjector ginInjector, CellFactory cellFactory){
 		this.ginInjector = ginInjector;
 		this.view = view;
 		this.cellFactory = cellFactory;
@@ -64,7 +64,6 @@ public class EditJSONModal implements EditJSONListModalView.Presenter{
 
 		this.onSaveCallback = onSaveCallback;
 		this.cellEditors = new ArrayList<>();
-		GWT.debugger();
 		if (jsonString != null && !jsonString.isEmpty()) {
 			try {
 				JSONArray jsonArray = JSONParser.parseStrict(jsonString).isArray();

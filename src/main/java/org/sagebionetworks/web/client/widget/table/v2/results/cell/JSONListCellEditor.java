@@ -4,14 +4,12 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.StringUtils;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 
 /**
  * An editor for list type columns renders raw json array!).
@@ -27,7 +25,7 @@ public class JSONListCellEditor extends AbstractCellEditor implements CellEditor
 	ColumnModel columnModel;
 	PortalGinInjector ginInjector;
 	GWTWrapper gwt;
-	EditJSONModal editJSONModal;
+	EditJSONListModal editJSONListModal;
 
 	@Inject
 	public JSONListCellEditor(JSONListCellEditorView view, JSONArrayAdapter jsonArrayAdapter, PortalGinInjector ginInjector, GWTWrapper gwt) {
@@ -38,17 +36,16 @@ public class JSONListCellEditor extends AbstractCellEditor implements CellEditor
 		view.setEditor(this);
 	}
 
-	public EditJSONModal getEditJSONModal() {
-		if (editJSONModal == null) {
-			editJSONModal = ginInjector.getEditJsonModal();
-//			((JSONListCellEditorView) view).addEditorToPage(editJSONModal.asWidget());
+	public EditJSONListModal getEditJSONListModal() {
+		if (editJSONListModal == null) {
+			editJSONListModal = ginInjector.getEditJsonModal();
 		}
-		return editJSONModal;
+		return editJSONListModal;
 	}
 
 	@Override
 	public void onEditButtonClick(){
-		getEditJSONModal().configure(this.getValue(), this::setValues, this.columnModel);
+		getEditJSONListModal().configure(this.getValue(), this::setValues, this.columnModel);
 	}
 
 	@Override

@@ -219,7 +219,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEdito
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EditJSONModal;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EditJSONListModal;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdListRendererCellView;
@@ -602,7 +602,7 @@ public interface PortalGinInjector extends Ginjector {
 
 	AnnotationEditor getAnnotationEditor();
 
-	EditJSONModal getEditJsonModal();
+	EditJSONListModal getEditJsonModal();
 
 	CommaSeparatedValuesParser getCommaSeparatedValuesParser();
 

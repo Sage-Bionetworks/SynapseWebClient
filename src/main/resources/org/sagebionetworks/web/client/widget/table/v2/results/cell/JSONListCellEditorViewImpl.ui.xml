@@ -14,7 +14,5 @@
 					addStyleNames="synapse-blue imageButton topLevelZIndex" marginLeft="-20" paddingTop="10"/>
 		</b:InputGroup>
 		<b:HelpBlock ui:field="helpBlock" visible="false" />
-<!--		TODO: is this the correct place-->
-		<bh:Div ui:field="valueEditorModalContainer" />
 	</b:FormGroup>
 </ui:UiBinder>

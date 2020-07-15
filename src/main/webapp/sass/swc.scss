@@ -196,7 +196,6 @@ end sticky footer
 
 	.btn {
 		@include border-radius(2px);
-		//TODO: should this be applied across the board?
 		font-weight: bold;
 	}
 	.dropdown button.btn {

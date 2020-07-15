@@ -1146,7 +1146,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityIdCellRendererView.class).to(EntityIdCellRendererViewImpl.class);
 		bind(LargeStringCellEditorView.class).to(LargeStringCellEditorViewImpl.class);
 		bind(JSONListCellEditorView.class).to(JSONListCellEditorViewImpl.class);
-		bind(EditJSONListModalView.class).to(EditJSONListModalViewImpl.class);
+		bind(EditJSONListModalView.class).to(EditJSONListModalViewImpl.class).in(Singleton.class);
 
 		/*
 		 * Teams Places

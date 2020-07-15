@@ -81,7 +81,6 @@ public class CellFactory {
 				case DATE_LIST:
 //				case ENTITYID_LIST:
 //				case USERID_LIST:
-					//TODO: copy over model
 					JSONListCellEditor listEditor = ginInjector.createListCellEditor();
 					listEditor.setColumnModel(model);
 					editor = listEditor;
