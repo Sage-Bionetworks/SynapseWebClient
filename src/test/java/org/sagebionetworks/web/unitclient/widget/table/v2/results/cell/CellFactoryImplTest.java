@@ -2,11 +2,16 @@ package org.sagebionetworks.web.unitclient.widget.table.v2.results.cell;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.function.Consumer;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -14,9 +19,12 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanFormCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRenderer;
@@ -417,4 +425,24 @@ public class CellFactoryImplTest {
 		// The max size must get passed to the editor
 		verify(mockStringEditorCell).setMaxSize(maxSize);
 	}
+//
+//	@Test
+//	public void testAddDeleteButton(){
+//		Consumer<CellEditor> mockCallback = mock(Consumer.class);
+//		TableRow row = CellFactory.appendDeleteButton(mockUserIdCellEditor, mockCallback);
+//		assertEquals(2, row.getWidgetCount());
+//
+//		TableData firstChild = (TableData) row.getWidget(0);
+//		assertEquals(mockUserIdCellEditor, firstChild.getWidget(0));
+//
+//
+//		TableData secondChild = (TableData) row.getWidget(0);
+//		assertTrue(secondChild.getWidget(0) instanceof Button);
+//		Button deleteButton = (Button) secondChild.getWidget(0);
+//
+//		//simulate a click of delete button
+//		deleteButton.click();
+//
+//		verify(mockCallback).accept(mockUserIdCellEditor);
+//	}
 }

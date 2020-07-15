@@ -181,10 +181,28 @@ public class AnnotationEditorTest {
 
 		editor.onValueDeleted(mockCellEditor2);
 		verify(mockDeletedCallback).invoke();
+		// in this case, all values were deleted so we don't move the new annotation value button
+		verify(mockView, never()).moveAddNewAnnotationValueButtonToRowToLastRow();
 
 		AnnotationsValue updatedAnnotation = editor.getUpdatedAnnotation();
 		assertEquals(0, updatedAnnotation.getValue().size());
+	}
 
+	@Test
+	public void testOnValueDeleted_lastValueDeleted() {
+		// also verify that when all values are deleted, then the annotation deleted callback in invoked
+		Callback mockDeletedCallback = mock(Callback.class);
+		annotationValues.add("value 1");
+		annotationValues.add("value 2");
+		editor.configure(ANNOTATION_KEY, annotation, mockDeletedCallback);
+
+		editor.onValueDeleted(mockCellEditor2);
+		verify(mockDeletedCallback, never()).invoke();
+		// in this case the second/last value was deleted so we move the add new row button
+		verify(mockView).moveAddNewAnnotationValueButtonToRowToLastRow();
+
+		AnnotationsValue updatedAnnotation = editor.getUpdatedAnnotation();
+		assertEquals(0, updatedAnnotation.getValue().size());
 	}
 
 	@Test

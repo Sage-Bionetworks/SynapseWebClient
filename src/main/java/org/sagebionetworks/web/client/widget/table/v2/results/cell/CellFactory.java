@@ -173,7 +173,6 @@ public class CellFactory {
 
 	}
 
-	// TODO: test?
 	public static TableRow appendDeleteButton(final CellEditor editor, Consumer<CellEditor> additionalDeleteCallback){
 		TableRow row = new TableRow();
 		Button deleteButton = new Button();
