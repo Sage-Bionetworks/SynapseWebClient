@@ -25,10 +25,10 @@
 							  type="LINK" addStyleNames="boldText">PASTE NEW VALUES</b:Button>
 					<g:FlowPanel addStyleNames="margin-top-10" ui:field="pasteNewValuesPanel" />
 				</b.html:Div>
+				<s:SynapseAlertViewImpl ui:field="alert" />
 
 			</b:ModalBody>
 			<b:ModalFooter>
-				<s:SynapseAlertViewImpl ui:field="alert" />
 				<b:Button ui:field="cancelButton" type="LINK"
 					dataDismiss="MODAL" addStyleNames="boldText">CANCEL</b:Button>
 				<b:Button ui:field="saveButton" type="PRIMARY"
