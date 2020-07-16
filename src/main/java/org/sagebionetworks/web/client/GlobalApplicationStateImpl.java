@@ -116,6 +116,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public void handleUncaughtException(Throwable e) {
 		try {
 			if (!isIgnoredErrorMessage(e.getMessage())) {
+				GWT.debugger();
 				jsClient.logError(unwrap(e));
 				synapseJSNIUtils.consoleError(e);
 			} else {
