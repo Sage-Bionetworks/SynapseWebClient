@@ -29,8 +29,12 @@
 					addStyleNames="hidden-xs text-align-right min-width-140" width="140px">
 					<bh:Span text="Size" addStyleNames="margin-right-30" />
 				</t:TableHeader>
-				<t:TableHeader ui:field="modifiedOnColumnHeader"
-					addStyleNames="visible-md visible-lg min-width-165" width="165px">
+				<tr:SortableTableHeaderImpl
+					ui:field="modifiedOnColumnHeader"
+					addStyleNames="visible-md visible-lg min-width-165" width="165px" text="Modified On" />
+				<t:TableHeader
+					ui:field="modifiedOnColumnHeaderUnsortable"
+					addStyleNames="visible-md visible-lg min-width-165"  width="165px" visible="false">
 					<bh:Span text="Modified On" />
 				</t:TableHeader>
 				<tr:SortableTableHeaderImpl

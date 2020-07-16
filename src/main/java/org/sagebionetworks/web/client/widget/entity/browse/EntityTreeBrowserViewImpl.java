@@ -74,7 +74,9 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	@UiField
 	TableHeader sizeColumnHeader;
 	@UiField
-	TableHeader modifiedOnColumnHeader;
+	SortableTableHeaderImpl modifiedOnColumnHeader;
+	@UiField
+	TableHeader modifiedOnColumnHeaderUnsortable;
 	@UiField
 	TableHeader idColumnHeader;
 	@UiField
@@ -110,6 +112,10 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		createdOnColumnHeader.setSortingListener(headerName -> {
 			presenter.onToggleSort(SortBy.CREATED_ON);
 		});
+		modifiedOnColumnHeader.setSortingListener(headerName -> {
+			presenter.onToggleSort(SortBy.MODIFIED_ON);
+		});
+
 		copyIDToClipboardIcon.addClickHandler(event -> presenter.copyIDsToClipboard());
 	}
 
@@ -353,6 +359,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	public void clearSortUI() {
 		nameColumnHeader.setSortDirection(null);
 		createdOnColumnHeader.setSortDirection(null);
+		modifiedOnColumnHeader.setSortDirection(null);
 	}
 
 	@Override
@@ -363,6 +370,8 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 			nameColumnHeader.setSortDirection(direction);
 		} else if (SortBy.CREATED_ON.equals(sortBy)) {
 			createdOnColumnHeader.setSortDirection(direction);
+		} else if (SortBy.MODIFIED_ON.equals(sortBy)) {
+			modifiedOnColumnHeader.setSortDirection(direction);
 		}
 	}
 
@@ -373,10 +382,15 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		if (!isShowingMinColumnSet) {
 			createdOnColumnHeader.setVisible(isSortable);
 			createdOnColumnHeaderUnsortable.setVisible(!isSortable);
+			modifiedOnColumnHeader.setVisible(isSortable);
+			modifiedOnColumnHeaderUnsortable.setVisible(!isSortable);
+			
 			if (isSortable) {
 				createdOnColumnHeaderUnsortable.setStyleName("");
+				modifiedOnColumnHeaderUnsortable.setStyleName("");
 			} else {
 				createdOnColumnHeader.setStyleName("");
+				modifiedOnColumnHeader.setStyleName("");
 			}
 		}
 	}
@@ -400,6 +414,8 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		sizeColumnHeader.setStyleName("");
 		modifiedOnColumnHeader.setVisible(false);
 		modifiedOnColumnHeader.setStyleName("");
+		modifiedOnColumnHeaderUnsortable.setVisible(false);
+		modifiedOnColumnHeaderUnsortable.setStyleName("");
 		// idColumnHeader.setVisible(false);
 		// idColumnHeader.setStyleName("");
 		createdOnColumnHeader.setVisible(false);
