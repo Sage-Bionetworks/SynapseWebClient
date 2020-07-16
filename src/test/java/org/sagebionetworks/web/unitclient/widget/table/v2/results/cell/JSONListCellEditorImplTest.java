@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results.cell;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -9,6 +11,10 @@ import static org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONLi
 import static org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONListCellEditor.ITEMS_OR_LESS;
 import static org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONListCellEditor.MUST_BE;
 import static org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONListCellEditor.VALID_JSON_ARRAY;
+
+import java.util.Arrays;
+import java.util.Collections;
+
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.junit.Before;
 import org.junit.Test;
@@ -103,4 +109,23 @@ public class JSONListCellEditorImplTest {
 		verify(mockView).setValidationState(ValidationState.NONE);
 		verify(mockView).setHelpText("");
 	}
+
+	@Test
+	public void testJsonArrayString_null(){
+		assertNull(editor.jsonArrayString(null));
+	}
+
+	@Test
+	public void testJsonArrayString_emptyList() {
+		assertNull(editor.jsonArrayString(Collections.emptyList()));
+
+	}
+
+	@Test
+	public void testJsonArrayString_happy(){
+		String arrayString = editor.jsonArrayString(Arrays.asList("a","b","c"));
+
+		assertEquals("[\"a\",\"b\",\"c\"]", arrayString);
+	}
+
 }

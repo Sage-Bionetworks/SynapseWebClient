@@ -32,8 +32,6 @@ public interface EditJSONListModalView extends IsWidget {
 
 		void addNewValues(Iterable<String> values);
 
-		void addNewValue(String value);
-
 		void onValueDeleted(CellEditor editor);
 
 		Widget asWidget();

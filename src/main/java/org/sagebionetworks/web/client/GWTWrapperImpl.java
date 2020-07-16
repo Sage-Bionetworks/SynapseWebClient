@@ -241,7 +241,7 @@ public class GWTWrapperImpl implements GWTWrapper {
 	public DateTimeFormat getFormat(PredefinedFormat predefinedFormat) {
 		return DateTimeFormat.getFormat(predefinedFormat);
 	}
-	
+
 	@Override
 	public boolean isValidJSONArray(String json) {
 		if (json == null || json.trim().length() == 0) {
@@ -253,5 +253,10 @@ public class GWTWrapperImpl implements GWTWrapper {
 		} catch (Exception e) {
 			return false;
 		}
+	}
+
+	@Override
+	public JSONValue parseJSONStrict(String json){
+		return JSONParser.parseStrict(json);
 	}
 }

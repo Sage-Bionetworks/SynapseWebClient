@@ -97,9 +97,13 @@ public class JSONListCellEditor extends AbstractCellEditor implements CellEditor
 	}
 
 	public void setValues(List<String> values) {
+		String jsonArrayString = jsonArrayString(values);
+		this.setValue(jsonArrayString);
+	}
+
+	public String jsonArrayString(List<String> values){
 		if (values == null || values.isEmpty()) {
-			this.setValue(null);
-			return;
+			return null;
 		}
 
 		//put each value into the JSON array
@@ -109,13 +113,14 @@ public class JSONListCellEditor extends AbstractCellEditor implements CellEditor
 				adapter.put(i, values.get(i));
 			}
 		} catch (JSONObjectAdapterException e){
-			// failed to add value, show error
+			// should never happen since we're just adding strings
 			view.setValidationState(ValidationState.ERROR);
 			view.setHelpText(MUST_BE + VALID_VALUE);
 		}
 		//set JSON string as the editor's value
-		this.setValue(adapter.toJSONString());
+		return adapter.toJSONString();
 	}
+
 
 	public ColumnModel getColumnModel() {
 		return columnModel;

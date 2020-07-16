@@ -8,24 +8,23 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONException;
-import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParser;
 
 public class EditJSONListModal implements EditJSONListModalView.Presenter{
-	public static final String SEE_THE_ERRORS_BELOW = "See the error(s) below.";
+	public static final String SEE_THE_ERRORS_ABOVE = "See the error(s) above.";
 
 	private static final Map<ColumnType, ColumnType> LIST_TYPE_TO_NON_LIST = ImmutableMap.of(
 			ColumnType.STRING_LIST, ColumnType.STRING,
@@ -33,6 +32,7 @@ public class EditJSONListModal implements EditJSONListModalView.Presenter{
 			ColumnType.DATE_LIST, ColumnType.DATE,
 			ColumnType.BOOLEAN_LIST,ColumnType.BOOLEAN
 	);
+	public static final String NOT_A_VALID_JSON_ARRAY = "Not a valid JSON Array";
 
 	private final PortalGinInjector ginInjector;
 	private final EditJSONListModalView view;
@@ -45,45 +45,48 @@ public class EditJSONListModal implements EditJSONListModalView.Presenter{
 	private long maxListLength;
 	private ColumnModel effectiveSingleValueColumnModel;
 	private CellFactory cellFactory;
+	private GWTWrapper gwtWrapper;
 
 	@Inject
-	public EditJSONListModal(EditJSONListModalView view, PortalGinInjector ginInjector, CellFactory cellFactory){
+	public EditJSONListModal(EditJSONListModalView view, PortalGinInjector ginInjector, CellFactory cellFactory, GWTWrapper gwtWrapper){
 		this.ginInjector = ginInjector;
 		this.view = view;
 		this.cellFactory = cellFactory;
+		this.gwtWrapper = gwtWrapper;
 		view.setPresenter(this);
 	}
 
-	void configure(String jsonString, Consumer<List<String>> onSaveCallback, ColumnModel columnModel){
+	public void configure(String jsonString, Consumer<List<String>> onSaveCallback, ColumnModel columnModel){
 		view.clearEditors();
 		this.effectiveSingleValueColumnModel = new ColumnModel();
-		effectiveSingleValueColumnModel.setMaximumSize(Optional.ofNullable(columnModel.getMaximumSize()).orElse(50L));
-		effectiveSingleValueColumnModel.setColumnType(LIST_TYPE_TO_NON_LIST.get(columnModel.getColumnType()));
+		this.effectiveSingleValueColumnModel.setMaximumSize(Optional.ofNullable(columnModel.getMaximumSize()).orElse(50L));
+		this.effectiveSingleValueColumnModel.setColumnType(LIST_TYPE_TO_NON_LIST.get(columnModel.getColumnType()));
 
-		maxListLength = Optional.ofNullable(columnModel.getMaximumListLength()).orElse(100L);
+		this.maxListLength = Optional.ofNullable(columnModel.getMaximumListLength()).orElse(100L);
 
 		this.onSaveCallback = onSaveCallback;
 		this.cellEditors = new ArrayList<>();
+
 		if (jsonString != null && !jsonString.isEmpty()) {
 			try {
-				JSONArray jsonArray = JSONParser.parseStrict(jsonString).isArray();
+				JSONArray jsonArray = gwtWrapper.parseJSONStrict(jsonString).isArray();
 				if (jsonArray == null) {
-					view.showError("Not a valid JSON Array");
+					view.showError(NOT_A_VALID_JSON_ARRAY);
 				} else {
 					//replace currently tracked editors with new list
 					for (int i = 0; i < jsonArray.size(); i++) {
-						JSONValue maybeString = jsonArray.get(i);
+						JSONValue currValue = jsonArray.get(i);
 
-						// if the value is a json string , we want unquoted vesion, else we want its string representation;
-						String strVal = maybeString.isString() != null ?
-								maybeString.isString().stringValue() : maybeString.toString();
+						// if the value is a json string , we want unquoted version, else we want its string representation;
+						String strVal = currValue.isString() != null ?
+								currValue.isString().stringValue() : currValue.toString();
 
 						addNewValue(strVal);
 
 					}
 				}
 			} catch (JSONException e){
-				view.showError("Not a valid JSON Array");
+				view.showError(NOT_A_VALID_JSON_ARRAY);
 			}
 		}
 
@@ -124,7 +127,7 @@ public class EditJSONListModal implements EditJSONListModalView.Presenter{
 			isValid = isValid & cellEditor.isValid();
 		}
 		if (!isValid) {
-			view.showError(SEE_THE_ERRORS_BELOW);
+			view.showError(SEE_THE_ERRORS_ABOVE);
 			return;
 		}
 
@@ -156,8 +159,7 @@ public class EditJSONListModal implements EditJSONListModalView.Presenter{
 
 	@Override
 	public void onAddNewEmptyValue() {
-		CellEditor editor = createNewEditor();
-		view.addNewEditor(editor);
+		CellEditor editor = addNewValue(null);
 		// after attaching, set focus to the new editor
 		editor.setFocus(true);
 	}
@@ -169,11 +171,13 @@ public class EditJSONListModal implements EditJSONListModalView.Presenter{
 		}
 	}
 
-	@Override
-	public void addNewValue(String value){
+	public CellEditor addNewValue(String value){
 		CellEditor editor =  createNewEditor();
-		editor.setValue(value);
+		if(value != null) {
+			editor.setValue(value);
+		}
 		view.addNewEditor(editor);
+		return editor;
 	}
 
 	@Override
@@ -196,4 +200,24 @@ public class EditJSONListModal implements EditJSONListModalView.Presenter{
 		return view.asWidget();
 	}
 
+	/**
+	 * for testing
+	 */
+	public ColumnModel getEffectiveSingleValueColumnModel(){
+		return this.effectiveSingleValueColumnModel;
+	}
+
+	/**
+	 * for testing
+	 */
+	public long getMaxListLength(){
+		return this.maxListLength;
+	}
+
+	/**
+	 * for testing
+	 */
+	public List<CellEditor> getCellEditors(){
+		return cellEditors;
+	}
 }

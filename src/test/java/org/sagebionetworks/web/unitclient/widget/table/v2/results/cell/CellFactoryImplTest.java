@@ -425,24 +425,5 @@ public class CellFactoryImplTest {
 		// The max size must get passed to the editor
 		verify(mockStringEditorCell).setMaxSize(maxSize);
 	}
-//
-//	@Test
-//	public void testAddDeleteButton(){
-//		Consumer<CellEditor> mockCallback = mock(Consumer.class);
-//		TableRow row = CellFactory.appendDeleteButton(mockUserIdCellEditor, mockCallback);
-//		assertEquals(2, row.getWidgetCount());
-//
-//		TableData firstChild = (TableData) row.getWidget(0);
-//		assertEquals(mockUserIdCellEditor, firstChild.getWidget(0));
-//
-//
-//		TableData secondChild = (TableData) row.getWidget(0);
-//		assertTrue(secondChild.getWidget(0) instanceof Button);
-//		Button deleteButton = (Button) secondChild.getWidget(0);
-//
-//		//simulate a click of delete button
-//		deleteButton.click();
-//
-//		verify(mockCallback).accept(mockUserIdCellEditor);
-//	}
+
 }
