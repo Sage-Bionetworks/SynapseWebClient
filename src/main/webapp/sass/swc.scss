@@ -1671,6 +1671,11 @@ ol.lowerroman {
 		justify-content: center;
 	}
 
+	.flexcontainer-justify-flex-end {
+		-webkit-justify-content: flex-end;
+		justify-content: flex-end;
+	}
+
 	.flexcontainer-column-fill-width {
 		flex-grow: 1;
 	}
