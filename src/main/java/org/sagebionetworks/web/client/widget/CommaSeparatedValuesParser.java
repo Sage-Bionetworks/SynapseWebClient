@@ -8,22 +8,26 @@ import java.util.function.Consumer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.resources.WebResource;
 import org.sagebionetworks.web.client.widget.csv.PapaCSVParser;
 import org.sagebionetworks.web.client.widget.csv.PapaParseResult;
 
 public class CommaSeparatedValuesParser implements CommaSeparatedValuesParserView.Presenter{
-	CommaSeparatedValuesParserView view;
-	ResourceLoader resourceLoader;
+	private CommaSeparatedValuesParserView view;
+	private ResourceLoader resourceLoader;
 	private Consumer<List<String>> onAddCallback;
-	PapaCSVParser papaCSVParser;
+	private PapaCSVParser papaCSVParser;
+	private SynapseJSNIUtils jsniUtils;
 
 	@Inject
-	public CommaSeparatedValuesParser(CommaSeparatedValuesParserView view, ResourceLoader resourceLoader, PapaCSVParser papaCSVParser) {
+	public CommaSeparatedValuesParser(CommaSeparatedValuesParserView view, ResourceLoader resourceLoader,
+									  PapaCSVParser papaCSVParser, SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.resourceLoader = resourceLoader;
 		this.papaCSVParser = papaCSVParser;
+		this.jsniUtils = jsniUtils;
 		view.setPresenter(this);
 	}
 
@@ -34,12 +38,12 @@ public class CommaSeparatedValuesParser implements CommaSeparatedValuesParserVie
 				new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
-
+						jsniUtils.consoleError(caught);
 					}
 
 					@Override
 					public void onSuccess(Void result) {
-
+						// Nothing to do. Just want the library to be available for later use.
 					}
 				}
 		);

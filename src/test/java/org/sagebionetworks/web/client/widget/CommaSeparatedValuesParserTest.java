@@ -28,7 +28,7 @@ public class CommaSeparatedValuesParserTest extends TestCase {
 	CommaSeparatedValuesParser parser;
 
 	@Test
-	public void testSplitWithEscape(){
+	public void testParseToStringList(){
 		String text = "asdf,asdf\nqwer,zxcv";
 		when(mockView.getText()).thenReturn(text);
 		PapaParseResult parseResult = new PapaParseResult();

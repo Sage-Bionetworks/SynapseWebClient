@@ -33,6 +33,7 @@ public class EditJSONListModal implements EditJSONListModalView.Presenter{
 			ColumnType.BOOLEAN_LIST,ColumnType.BOOLEAN
 	);
 	public static final String NOT_A_VALID_JSON_ARRAY = "Not a valid JSON Array";
+	public static final String EXCEEDED_MAXIMUM_NUMBER_OF_VALUES_DEFINED_IN_SCHEMA = "Exceeded maximum number of values defined in schema: ";
 
 	private final PortalGinInjector ginInjector;
 	private final EditJSONListModalView view;
@@ -117,7 +118,7 @@ public class EditJSONListModal implements EditJSONListModalView.Presenter{
 	public void onSave() {
 		//check that value size does not exceed the defined limit
 		if(cellEditors.size() > maxListLength){
-			view.showError("Exceeded maximum number of values defined in schema: " + maxListLength);
+			view.showError(EXCEEDED_MAXIMUM_NUMBER_OF_VALUES_DEFINED_IN_SCHEMA + maxListLength);
 			return;
 		}
 

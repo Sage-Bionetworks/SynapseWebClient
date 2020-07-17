@@ -61,7 +61,6 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView 
 	@Override
 	public void showEditor() {
 		saveButton.state().reset();
-//		alert.setVisible(false);
 		alert.clearState();
 		editModal.show();
 	}
@@ -78,8 +77,6 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView 
 
 	@Override
 	public void showError(String message) {
-//		alert.setText(message);
-//		alert.setVisible(true);
 		alert.showError(message);
 		// enable the save button after an error
 		saveButton.state().reset();
@@ -87,8 +84,6 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView 
 
 	@Override
 	public void hideErrors() {
-//		alert.clear();
-//		alert.setVisible(false);
 		alert.clearState();
 	}
 

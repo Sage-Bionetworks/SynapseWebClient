@@ -160,7 +160,7 @@ end sticky footer
 		margin: 0px 45px;
 	}
 
-	.modal-title{
+	.modal-title, .modal-header>h4{
 		font-weight: bold;
 		font-size: 21px;
 		line-height: 25px;
@@ -919,11 +919,6 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 
 .tab-background {
 	min-height: 200px;
-}
-
-.transparent-background-and-border{
-	background: transparent;
-	border-color: transparent;
 }
 
 .file-preview {
@@ -2336,12 +2331,6 @@ div.input-group > input.search-textbox {
 	padding: 1em 2em .5em 2em;
 	margin: -1em -2em -.5em -2em;
 }
-
-//table.annotations-editor-view{
-//	//$horizontal-spacing: 15px;
-//	//border-collapse: separate;
-//	//border-spacing: $horizontal-spacing 0;
-//}
 
 table.annotations-editor-view > tr > {
 	td, th {

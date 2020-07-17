@@ -7,8 +7,8 @@
         <b:TextArea addStyleNames="hide-resize" ui:field="commaSeparatedTextBox"
                     placeholder="Paste comma or tab delimited values here." visibleLines="5"/>
         <b:html.Div addStyleNames="text-align-right">
-            <b:Button ui:field="cancelButton" type="LINK" addStyleNames="boldText" >CANCEL</b:Button>
-            <b:Button ui:field="addButton" type="LINK" addStyleNames="boldText" >ADD</b:Button>
+            <b:Button ui:field="cancelButton" type="LINK">CANCEL</b:Button>
+            <b:Button ui:field="addButton" type="LINK">ADD</b:Button>
         </b:html.Div>
     </bh:Div>
 </ui:UiBinder>
