@@ -34,6 +34,8 @@ public class EditJSONListModal implements EditJSONListModalView.Presenter{
 	);
 	public static final String NOT_A_VALID_JSON_ARRAY = "Not a valid JSON Array";
 	public static final String EXCEEDED_MAXIMUM_NUMBER_OF_VALUES_DEFINED_IN_SCHEMA = "Exceeded maximum number of values defined in schema: ";
+	public static final long DEFAULT_MAX_SIZE = 50L;
+	public static final long DEFAULT_MAX_LIST_LENGTH = 100L;
 
 	private final PortalGinInjector ginInjector;
 	private final EditJSONListModalView view;
@@ -60,10 +62,10 @@ public class EditJSONListModal implements EditJSONListModalView.Presenter{
 	public void configure(String jsonString, Consumer<List<String>> onSaveCallback, ColumnModel columnModel){
 		view.clearEditors();
 		this.effectiveSingleValueColumnModel = new ColumnModel();
-		this.effectiveSingleValueColumnModel.setMaximumSize(Optional.ofNullable(columnModel.getMaximumSize()).orElse(50L));
+		this.effectiveSingleValueColumnModel.setMaximumSize(Optional.ofNullable(columnModel.getMaximumSize()).orElse(DEFAULT_MAX_SIZE));
 		this.effectiveSingleValueColumnModel.setColumnType(LIST_TYPE_TO_NON_LIST.get(columnModel.getColumnType()));
 
-		this.maxListLength = Optional.ofNullable(columnModel.getMaximumListLength()).orElse(100L);
+		this.maxListLength = Optional.ofNullable(columnModel.getMaximumListLength()).orElse(DEFAULT_MAX_LIST_LENGTH);
 
 		this.onSaveCallback = onSaveCallback;
 		this.cellEditors = new ArrayList<>();

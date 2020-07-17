@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results.cell;
 
 
-
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -15,16 +13,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONException;
-import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
-import com.google.gwt.junit.GWTMockUtilities;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,14 +27,11 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParser;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EditJSONListModal;
@@ -122,7 +114,7 @@ public class EditJSONListModalTest{
 		verify(mockView).clearEditors();
 
 		//assert default value used when null
-		assertEquals((Long) 50L, modal.getEffectiveSingleValueColumnModel().getMaximumSize());
+		assertEquals((Long) EditJSONListModal.DEFAULT_MAX_SIZE, modal.getEffectiveSingleValueColumnModel().getMaximumSize());
 		assertEquals(maxListLength, modal.getMaxListLength());
 
 		verify(mockCell1).setValue(listVal1);
@@ -141,7 +133,7 @@ public class EditJSONListModalTest{
 
 		assertEquals((Long) maxSize, modal.getEffectiveSingleValueColumnModel().getMaximumSize());
 		//assert default value used when null
-		assertEquals(100L, modal.getMaxListLength());
+		assertEquals(EditJSONListModal.DEFAULT_MAX_LIST_LENGTH, modal.getMaxListLength());
 
 		verify(mockCell1).setValue(listVal1);
 		verify(mockCell2).setValue(listVal2);
@@ -281,7 +273,7 @@ public class EditJSONListModalTest{
 		modal.onSave();
 
 		verify(mockOnSaveCallback, never()).accept(any());
-		verify(mockView).showError("Exceeded maximum number of values defined in schema: 1");
+		verify(mockView).showError(EditJSONListModal.EXCEEDED_MAXIMUM_NUMBER_OF_VALUES_DEFINED_IN_SCHEMA + inputColumnModel.getMaximumListLength());
 	}
 
 
