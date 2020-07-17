@@ -28,7 +28,7 @@ import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionResponse;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewRequest;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewResult;
-import org.sagebionetworks.repo.model.table.UploadToTableRequest;
+import org.sagebionetworks.repo.model.schema.*;
 import org.sagebionetworks.repo.model.table.UploadToTableResult;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -41,7 +41,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public enum AsynchType implements IsSerializable {
 	TableAppendRowSet(TABLE_APPEND, AppendableRowSetRequest.class, RowReferenceSetResults.class), TableQuery(TABLE_QUERY, QueryBundleRequest.class, QueryResultBundle.class), TableQueryNextPage(TABLE_QUERY_NEXTPAGE, QueryNextPageToken.class, QueryResult.class), TableCSVUpload(TABLE_UPLOAD_CSV, UploadToTableRequest.class, UploadToTableResult.class), TableCSVUploadPreview(TABLE_UPLOAD_CSV_PREVIEW, UploadToTablePreviewRequest.class, UploadToTablePreviewResult.class), TableCSVDownload(TABLE_DOWNLOAD_CSV, DownloadFromTableRequest.class, DownloadFromTableResult.class), BulkFileDownload(FILE_BULK, BulkFileDownloadRequest.class, BulkFileDownloadResponse.class), TableTransaction(TABLE_TRANSACTION, TableUpdateTransactionRequest.class, TableUpdateTransactionResponse.class), Doi(DOI, DoiRequest.class, DoiResponse.class), AddFileToDownloadList(DOWNLOAD_LIST_ADD, AddFileToDownloadListRequest.class, AddFileToDownloadListResponse.class), DownloadStorageReport(STORAGE_REPORT,
-			DownloadStorageReportRequest.class, DownloadStorageReportResponse.class), CreateJsonSchema(SCHEMA_TYPE_CREATE, CreateSchemaRequest.class, CreateSchemaResponse.class), ViewColumnModelRequest(VIEW_COLUMN_MODEL_REQUEST, ViewColumnModelRequest.class, ViewColumnModelResponse.class);
+			DownloadStorageReportRequest.class, DownloadStorageReportResponse.class), CreateJsonSchema(SCHEMA_TYPE_CREATE, CreateSchemaRequest.class, CreateSchemaResponse.class), ViewColumnModelRequest(VIEW_COLUMN_MODEL_REQUEST, ViewColumnModelRequest.class, ViewColumnModelResponse.class), GetValidationSchema(SCHEMA_TYPE_VALIDATION, GetValidationSchemaRequest.class, GetValidationSchemaResponse.class);
 
 	String prefix;
 	Class<? extends AsynchronousRequestBody> requestClass;

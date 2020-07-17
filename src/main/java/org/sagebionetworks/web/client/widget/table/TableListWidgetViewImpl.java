@@ -39,6 +39,8 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	SortableTableHeaderImpl nameColumnHeader;
 	@UiField
 	SortableTableHeaderImpl createdOnColumnHeader;
+	@UiField
+	SortableTableHeaderImpl modifiedOnColumnHeader;
 	HTMLPanel panel;
 	Presenter presenter;
 	PortalGinInjector ginInjector;
@@ -59,6 +61,10 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 		createdOnColumnHeader.setSortingListener(header -> {
 			presenter.toggleSort(SortBy.CREATED_ON);
 		});
+		modifiedOnColumnHeader.setSortingListener(header -> {
+			presenter.toggleSort(SortBy.MODIFIED_ON);
+		});
+
 		copyIDToClipboardIcon.addClickHandler(event -> presenter.copyIDsToClipboard());
 	}
 
@@ -66,6 +72,7 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	public void clearSortUI() {
 		nameColumnHeader.setSortDirection(null);
 		createdOnColumnHeader.setSortDirection(null);
+		modifiedOnColumnHeader.setSortDirection(null);
 	}
 
 	@Override
@@ -76,8 +83,9 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 			nameColumnHeader.setSortDirection(direction);
 		} else if (SortBy.CREATED_ON.equals(sortBy)) {
 			createdOnColumnHeader.setSortDirection(direction);
+		} else if (SortBy.MODIFIED_ON.equals(sortBy)) {
+			modifiedOnColumnHeader.setSortDirection(direction);
 		}
-
 	}
 
 	@Override
