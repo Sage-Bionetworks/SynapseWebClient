@@ -288,7 +288,8 @@ public class SynapseJavascriptClient {
 	public static final String ACTIVITY_URI_PATH = "/activity";
 	public static final String SCHEMA_TYPE_CREATE = "/schema/type/create/";
 	public static final String VIEW_COLUMN_MODEL_REQUEST = "/column/view/scope";
-
+	public static final String SCHEMA_TYPE_VALIDATION = "/schema/type/validation/";
+	
 	public static final String ASYNC_START = "/async/start";
 	public static final String ASYNC_GET = "/async/get/";
 	public static final String AUTH_OAUTH_2 = "/oauth2";
