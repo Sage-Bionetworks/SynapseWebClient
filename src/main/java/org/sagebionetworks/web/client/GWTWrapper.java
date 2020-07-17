@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client;
 
 import java.util.Date;
+
+import com.google.gwt.json.client.JSONValue;
 import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
@@ -75,4 +77,6 @@ public interface GWTWrapper {
 	DateTimeFormat getFormat(PredefinedFormat predefinedFormat);
 	
 	boolean isValidJSONArray(String json);
+
+	JSONValue parseJSONStrict(String json);
 }

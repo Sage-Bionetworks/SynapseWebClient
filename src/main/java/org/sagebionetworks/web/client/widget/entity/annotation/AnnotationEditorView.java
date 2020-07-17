@@ -49,6 +49,8 @@ public interface AnnotationEditorView extends IsWidget {
 	 */
 	void addNewEditor(CellEditor editor);
 
+	void moveAddNewAnnotationValueButtonToRowToLastRow();
+
 	String getKey();
 
 	/**

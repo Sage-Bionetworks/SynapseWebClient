@@ -7,7 +7,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
-	<b:FormGroup ui:field="formGroup">
+	<b:FormGroup ui:field="formGroup" addStyleNames="margin-bottom-0-imp">
 		<b:TextBox ui:field="textBox" styleName="form-control min-width-42" />
 		<b:HelpBlock ui:field="helpBlock" visible="false" />
 	</b:FormGroup>

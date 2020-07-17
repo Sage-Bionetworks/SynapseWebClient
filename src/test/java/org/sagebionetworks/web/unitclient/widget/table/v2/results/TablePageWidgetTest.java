@@ -202,7 +202,6 @@ public class TablePageWidgetTest {
 		long rowCount = rows.size();
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), rowCount, mockPageChangeListner);
 		verify(mockView).setPaginationWidgetVisible(true);
-		verify(mockView).setEditorBufferVisible(true);
 	}
 
 	@Test
@@ -213,7 +212,6 @@ public class TablePageWidgetTest {
 		widget.configure(bundle, query, null, isEditable, tableType, null, mockPageChangeListner, mockFacetChangedHandler);
 		long rowCount = rows.size();
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), rowCount, mockPageChangeListner);
-		verify(mockView).setEditorBufferVisible(true);
 		assertEquals(bundle.getColumnModels().size() + 1, staticHeader.size());
 	}
 
@@ -225,7 +223,6 @@ public class TablePageWidgetTest {
 		widget.configure(bundle, query, null, isEditable, tableType, null, mockPageChangeListner, mockFacetChangedHandler);
 		long rowCount = rows.size();
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), rowCount, mockPageChangeListner);
-		verify(mockView).setEditorBufferVisible(false);
 		assertEquals(bundle.getColumnModels().size() + 1, sortHeaders.size());
 	}
 

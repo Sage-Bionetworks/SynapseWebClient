@@ -1,26 +1,27 @@
 package org.sagebionetworks.web.client.widget.entity.annotation;
 
 import java.util.List;
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.FormGroup;
-import org.gwtbootstrap3.client.ui.HelpBlock;
-import org.gwtbootstrap3.client.ui.InputGroup;
-import org.gwtbootstrap3.client.ui.InputGroupButton;
-import org.gwtbootstrap3.client.ui.TextBox;
-import org.gwtbootstrap3.client.ui.constants.ButtonType;
-import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.gwtbootstrap3.client.ui.constants.ValidationState;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
+
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.FormGroup;
+import org.gwtbootstrap3.client.ui.HelpBlock;
+import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.constants.ValidationState;
+import org.sagebionetworks.web.client.view.bootstrap.table.Table;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 
 public class AnnotationEditorViewImpl implements AnnotationEditorView {
 	public interface Binder extends UiBinder<Widget, AnnotationEditorViewImpl> {
@@ -33,11 +34,14 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 	@UiField
 	TextBox keyField;
 	@UiField
-	FlowPanel editorsContainer;
+	Table editorsContainer;
 	@UiField
 	FormGroup formGroup;
 	@UiField
 	HelpBlock helpBlock;
+
+	//Not in UI XML because it is moved around a lot
+	Button addNewAnnotationValueButton;
 
 	@Inject
 	public AnnotationEditorViewImpl(Binder uiBinder) {
@@ -48,6 +52,11 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 				presenter.onTypeChange(typeComboBox.getSelectedIndex());
 			}
 		});
+
+		addNewAnnotationValueButton = new Button("", IconType.PLUS, clickEvent -> presenter.onAddNewValue());
+		addNewAnnotationValueButton.addStyleName("center-in-div");
+		addNewAnnotationValueButton.setType(ButtonType.PRIMARY);
+		addNewAnnotationValueButton.setSize(ButtonSize.EXTRA_SMALL);
 	}
 
 	@Override
@@ -81,21 +90,26 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 
 	@Override
 	public void addNewEditor(final CellEditor editor) {
-		final InputGroup group = new InputGroup();
-		Button deleteButton = new Button("", IconType.TIMES, new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				editorsContainer.remove(group);
-				presenter.onValueDeleted(editor);
-			}
-		});
-		deleteButton.setType(ButtonType.LINK);
-		deleteButton.setHeight("35px");
-		InputGroupButton deleteButtonGroup = new InputGroupButton();
-		deleteButtonGroup.add(deleteButton);
-		group.add(editor.asWidget());
-		group.add(deleteButtonGroup);
-		editorsContainer.add(group);
+		TableRow row = CellFactory.appendDeleteButton(editor, presenter::onValueDeleted);
+
+		//additional column placeholder for the addNewAnnotationValueButton
+		TableData addButtonTableData = new TableData();
+		addButtonTableData.setWidth("35px");
+		row.add(addButtonTableData);
+
+
+		editorsContainer.add(row);
+
+		addNewAnnotationValueButton.removeFromParent();
+		addButtonTableData.add(addNewAnnotationValueButton);
+	}
+
+	@Override
+	public void moveAddNewAnnotationValueButtonToRowToLastRow(){
+		TableRow lastRow = (TableRow) editorsContainer.getWidget(editorsContainer.getWidgetCount() - 1);
+		addNewAnnotationValueButton.removeFromParent();
+		//add the button to last cell of last row
+		((TableData)lastRow.getWidget(lastRow.getWidgetCount() - 1)).add(addNewAnnotationValueButton);
 	}
 
 	@Override

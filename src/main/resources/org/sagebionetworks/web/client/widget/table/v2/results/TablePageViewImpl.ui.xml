@@ -25,9 +25,6 @@
 							</t:THead>
 							<t:TBody ui:field="body"></t:TBody>
 						</t:Table>
-						<g:SimplePanel ui:field="editorPopupBuffer">
-							<bh:Div styleName="margin-top-300" />
-						</g:SimplePanel>
 					</bh:Div>
 				</g:ScrollPanel>
 				<bh:Div addStyleNames="flexcontainer-row">

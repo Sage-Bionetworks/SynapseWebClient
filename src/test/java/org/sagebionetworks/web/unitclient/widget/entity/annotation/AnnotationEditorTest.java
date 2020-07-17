@@ -11,6 +11,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.junit.Before;
@@ -26,6 +27,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditor;
 
 public class AnnotationEditorTest {
 	AnnotationEditor editor;
@@ -36,6 +38,8 @@ public class AnnotationEditorTest {
 	static String ANNOTATION_KEY = "size";
 	static String ANNOTATION_KEY_FROM_VIEW = "different_key";
 	List<String> annotationValues;
+	String val1 = "val1";
+	String val2 = "val2";
 
 	@Before
 	public void setUp() throws Exception {
@@ -170,20 +174,57 @@ public class AnnotationEditorTest {
 
 	@Test
 	public void testOnValueDeleted() {
+		when(mockCellEditor.getValue()).thenReturn(val1);
+		when(mockCellEditor2.getValue()).thenReturn(val2);
+
 		// also verify that when all values are deleted, then the annotation deleted callback in invoked
 		Callback mockDeletedCallback = mock(Callback.class);
 		annotationValues.add("value 1");
 		annotationValues.add("value 2");
 		editor.configure(ANNOTATION_KEY, annotation, mockDeletedCallback);
+
+
+		AnnotationsValue updatedAnnotation = editor.getUpdatedAnnotation();
+		assertEquals(2, updatedAnnotation.getValue().size());
+		assertEquals(val1, updatedAnnotation.getValue().get(0));
+		assertEquals(val2, updatedAnnotation.getValue().get(1));
+
 		editor.onValueDeleted(mockCellEditor);
 		verify(mockDeletedCallback, never()).invoke();
 
 		editor.onValueDeleted(mockCellEditor2);
 		verify(mockDeletedCallback).invoke();
+		// in this case, all values were deleted so we don't move the new annotation value button
+		verify(mockView, never()).moveAddNewAnnotationValueButtonToRowToLastRow();
+
+		updatedAnnotation = editor.getUpdatedAnnotation();
+		assertEquals(0, updatedAnnotation.getValue().size());
+	}
+
+	@Test
+	public void testOnValueDeleted_lastValueDeleted() {
+		when(mockCellEditor.getValue()).thenReturn(val1);
+		when(mockCellEditor2.getValue()).thenReturn(val2);
+
+		// also verify that when all values are deleted, then the annotation deleted callback in invoked
+		Callback mockDeletedCallback = mock(Callback.class);
+		annotationValues.add("value 1");
+		annotationValues.add("value 2");
+		editor.configure(ANNOTATION_KEY, annotation, mockDeletedCallback);
 
 		AnnotationsValue updatedAnnotation = editor.getUpdatedAnnotation();
-		assertEquals(0, updatedAnnotation.getValue().size());
+		assertEquals(2, updatedAnnotation.getValue().size());
+		assertEquals(val1, updatedAnnotation.getValue().get(0));
+		assertEquals(val2, updatedAnnotation.getValue().get(1));
 
+		editor.onValueDeleted(mockCellEditor2);
+		verify(mockDeletedCallback, never()).invoke();
+		// in this case the second/last value was deleted so we move the add new row button
+		verify(mockView).moveAddNewAnnotationValueButtonToRowToLastRow();
+
+		updatedAnnotation = editor.getUpdatedAnnotation();
+		assertEquals(1, updatedAnnotation.getValue().size());
+		assertEquals(val1, updatedAnnotation.getValue().get(0));
 	}
 
 	@Test
@@ -194,7 +235,10 @@ public class AnnotationEditorTest {
 
 	@Test
 	public void testOnTypeChange() {
-		annotationValues.add("value 1");
+		String value = "value 1";
+		when(mockCellEditor.getValue()).thenReturn(value);
+
+		annotationValues.add(value);
 		editor.configure(ANNOTATION_KEY, annotation, null);
 		verify(mockView).addNewEditor(any(CellEditor.class));
 
@@ -202,12 +246,12 @@ public class AnnotationEditorTest {
 		editor.onTypeChange(dateIndex);
 		verify(mockView).clearValueEditors();
 		verify(mockView, times(2)).addNewEditor(any(CellEditor.class));
+
+		// value was copied over
+		verify(mockCellEditor2).setValue(value);
 		verify(mockCellEditor2).setFocus(true);
 
 		assertEquals(AnnotationsValueType.TIMESTAMP_MS, editor.getAnnotation().getType());
-		// after type change, should clear values
-		AnnotationsValue a = editor.getUpdatedAnnotation();
-		assertEquals(0, a.getValue().size());
 	}
 
 }

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.google.gwt.core.client.GWT;
 import org.sagebionetworks.repo.model.annotation.v2.Annotations;
 import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValue;
 import org.sagebionetworks.repo.model.annotation.v2.AnnotationsValueType;
@@ -15,6 +17,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParser;
 
 public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presenter {
 	public static final String SEE_THE_ERRORS_ABOVE = "See the error(s) above.";
@@ -24,6 +27,8 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 	String entityId;
 	List<AnnotationEditor> annotationEditors;
 	Annotations annotationsCopy;
+
+	CommaSeparatedValuesParser commaSeparatedValuesParser;
 
 	@Inject
 	public EditAnnotationsDialog(EditAnnotationsDialogView view, SynapseJavascriptClient jsClient, PortalGinInjector ginInjector) {
@@ -51,30 +56,29 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 			view.addAnnotationEditor(newEditor.asWidget());
 		}
 		// if there are no annotations, prepopulate with a single default annotation
-		if (annotationsCopy.getAnnotations().isEmpty())
-			onAddNewAnnotation();
+		if (annotationsCopy.getAnnotations().isEmpty()) {
+			onAddNewAnnotation(null);
+		}
 		view.showEditor();
 	}
 
 	public AnnotationEditor createAnnotationEditor(String key, AnnotationsValue annotation) {
 		final AnnotationEditor editor = ginInjector.getAnnotationEditor();
-		Callback deletedCallback = new Callback() {
-			@Override
-			public void invoke() {
-				onAnnotationDeleted(editor);
-			}
-		};
+		Callback deletedCallback = () -> onAnnotationDeleted(editor);
 		editor.configure(key, annotation, deletedCallback);
 		annotationEditors.add(editor);
 		return editor;
 	}
 
 	@Override
-	public void onAddNewAnnotation() {
+	public void onAddNewAnnotation(List<String> values) {
 		String initialKey = "";
-		AnnotationsValue value = new AnnotationsValue();
-		value.setType(AnnotationsValueType.STRING);
-		AnnotationEditor newEditor = createAnnotationEditor(initialKey, value);
+		AnnotationsValue annotationValue = new AnnotationsValue();
+		annotationValue.setType(AnnotationsValueType.STRING);
+		if(values != null) {
+			annotationValue.setValue(values);
+		}
+		AnnotationEditor newEditor = createAnnotationEditor(initialKey, annotationValue);
 		view.addAnnotationEditor(newEditor.asWidget());
 	}
 
@@ -82,6 +86,20 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 	public void onAnnotationDeleted(AnnotationEditor editor) {
 		annotationEditors.remove(editor);
 		view.removeAnnotationEditor(editor.asWidget());
+	}
+
+
+	@Override
+	public void onClickPasteNewValues(){
+		//do not add another parser if one is already active
+		if(this.commaSeparatedValuesParser != null){
+			commaSeparatedValuesParser.show();
+			return;
+		}
+		commaSeparatedValuesParser = ginInjector.getCommaSeparatedValuesParser();
+
+		commaSeparatedValuesParser.configure(this::onAddNewAnnotation);
+		view.addCommaSeparatedValuesParser(commaSeparatedValuesParser.asWidget());
 	}
 
 	@Override

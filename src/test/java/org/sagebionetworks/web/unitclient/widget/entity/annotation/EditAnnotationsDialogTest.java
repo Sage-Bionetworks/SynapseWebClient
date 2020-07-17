@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParser;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialog;
@@ -56,6 +58,10 @@ public class EditAnnotationsDialogTest {
 	EntityBundle mockBundle;
 	@Mock
 	AnnotationEditor mockEditor;
+
+	@Mock
+	CommaSeparatedValuesParser mockCommaSeparatedValuesParser;
+
 	Map<String, AnnotationsValue> annotationsMap;
 
 	@Before
@@ -191,5 +197,28 @@ public class EditAnnotationsDialogTest {
 	public void testAsWidget() {
 		dialog.asWidget();
 		verify(mockView).asWidget();
+	}
+
+	@Test
+	public void testOnClickPasteNewValues(){
+
+		when(mockPortalGinInjector.getCommaSeparatedValuesParser()).thenReturn(mockCommaSeparatedValuesParser);
+
+		dialog.onClickPasteNewValues();
+		//on the first call, verify we created a new parser
+		verify(mockPortalGinInjector).getCommaSeparatedValuesParser();
+		verify(mockCommaSeparatedValuesParser).configure(any());
+		verify(mockView).addCommaSeparatedValuesParser(mockCommaSeparatedValuesParser.asWidget());
+		verify(mockCommaSeparatedValuesParser, never()).show();
+
+
+		//call again to verify we never create another parser
+		dialog.onClickPasteNewValues();
+		verify(mockCommaSeparatedValuesParser).show();
+
+		//same verify() calls as before to ensure they were only called once
+		verify(mockPortalGinInjector).getCommaSeparatedValuesParser();
+		verify(mockCommaSeparatedValuesParser).configure(any());
+		verify(mockView).addCommaSeparatedValuesParser(mockCommaSeparatedValuesParser.asWidget());
 	}
 }

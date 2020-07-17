@@ -1,9 +1,23 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
+import java.util.function.Consumer;
+
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.AnchorButton;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import com.google.inject.Inject;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 
 /**
  * Factory for creating table cells.
@@ -67,9 +81,8 @@ public class CellFactory {
 				case DATE_LIST:
 //				case ENTITYID_LIST:
 //				case USERID_LIST:
-					ListCellEditor listEditor = ginInjector.createListCellEditor();
-					listEditor.setMaxSize(model.getMaximumSize());
-					listEditor.setMaxListLength(model.getMaximumListLength());
+					JSONListCellEditor listEditor = ginInjector.createListCellEditor();
+					listEditor.setColumnModel(model);
 					editor = listEditor;
 					break;
 				case DATE:
@@ -120,9 +133,8 @@ public class CellFactory {
 				case DATE_LIST:
 //				case ENTITYID_LIST:
 //				case USERID_LIST:
-					ListCellEditor listEditor = ginInjector.createListCellEditor();
-					listEditor.setMaxSize(model.getMaximumSize());
-					listEditor.setMaxListLength(model.getMaximumListLength());
+					JSONListCellEditor listEditor = ginInjector.createListCellEditor();
+					listEditor.setColumnModel(model);
 					editor = listEditor;
 					break;
 				case DATE:
@@ -159,6 +171,34 @@ public class CellFactory {
 		editor.setValue(model.getDefaultValue());
 		return editor;
 
+	}
+
+	public static TableRow appendDeleteButton(final CellEditor editor, Consumer<CellEditor> additionalDeleteCallback){
+		TableRow row = new TableRow();
+		Button deleteButton = new Button();
+		deleteButton.setIcon(IconType.TIMES);
+		deleteButton.setType(ButtonType.LINK);
+		deleteButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				row.removeFromParent();
+				additionalDeleteCallback.accept(editor);
+			}
+		});
+		deleteButton.setSize(ButtonSize.EXTRA_SMALL);
+		deleteButton.addStyleName("center-in-div");
+
+		TableData deleteButtonWrapper = new TableData();
+		deleteButtonWrapper.add(deleteButton);
+		deleteButtonWrapper.setWidth("35px");
+
+		TableData editorTableData = new TableData();
+		editorTableData.add(editor.asWidget());
+
+		row.add(editorTableData);
+		row.add(deleteButtonWrapper);
+
+		return row;
 	}
 
 }

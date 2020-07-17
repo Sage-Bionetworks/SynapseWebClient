@@ -106,6 +106,8 @@ import org.sagebionetworks.web.client.view.users.RegisterWidgetView;
 import org.sagebionetworks.web.client.view.users.RegisterWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.ButtonImpl;
+import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParserView;
+import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParserViewImpl;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.CopyTextModalImpl;
 import org.sagebionetworks.web.client.widget.DownloadSpeedTester;
@@ -189,6 +191,7 @@ import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelpView;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelpViewImpl;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelpImpl;
+import org.sagebionetworks.web.client.widget.csv.PapaCSVParser;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetView;
@@ -646,6 +649,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEdito
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateListRendererCellViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EditJSONListModalViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdListRendererCellView;
@@ -654,6 +658,9 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEdito
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONListCellEditorView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONListCellEditorViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EditJSONListModalView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LargeStringCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LargeStringCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererView;
@@ -1138,6 +1145,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(FileCellRendererView.class).to(FileCellRendererViewImpl.class);
 		bind(EntityIdCellRendererView.class).to(EntityIdCellRendererViewImpl.class);
 		bind(LargeStringCellEditorView.class).to(LargeStringCellEditorViewImpl.class);
+		bind(JSONListCellEditorView.class).to(JSONListCellEditorViewImpl.class);
+		bind(EditJSONListModalView.class).to(EditJSONListModalViewImpl.class).in(Singleton.class);
 
 		/*
 		 * Teams Places
@@ -1217,6 +1226,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AnnotationTransformer.class).to(AnnotationTransformerImpl.class).in(Singleton.class);
 		bind(AnnotationEditorView.class).to(AnnotationEditorViewImpl.class);
 		bind(EditAnnotationsDialogView.class).to(EditAnnotationsDialogViewImpl.class);
+		bind(CommaSeparatedValuesParserView.class).to(CommaSeparatedValuesParserViewImpl.class);
+		bind(PapaCSVParser.class).in(Singleton.class);
 
 		bind(AnnotationCellFactory.class).to(AnnotationCellFactoryImpl.class).in(Singleton.class);
 		bind(EntityId2BundleCache.class).to(EntityId2BundleCacheImpl.class).in(Singleton.class);
