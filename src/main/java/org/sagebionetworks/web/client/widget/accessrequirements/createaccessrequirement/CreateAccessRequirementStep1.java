@@ -111,6 +111,7 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 	public void configure(AccessRequirement ar) {
 		accessRequirement = ar;
 		view.setAccessRequirementTypeSelectionVisible(false);
+		view.setShortDescription(accessRequirement.getDescription());
 		setSubjects(accessRequirement.getSubjectIds());
 	}
 
@@ -165,6 +166,7 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 		}
 		accessRequirement.setAccessType(currentAccessType);
 		accessRequirement.setSubjectIds(subjects);
+		accessRequirement.setDescription(view.getShortDescription());
 
 		modalPresenter.setLoading(true);
 		synapseClient.createOrUpdateAccessRequirement(accessRequirement, new AsyncCallback<AccessRequirement>() {

@@ -30,6 +30,9 @@ public interface CreateAccessRequirementStep1View extends IsWidget {
 
 	void setAccessRequirementTypeSelectionVisible(boolean visible);
 
+	void setShortDescription(String description);
+	String getShortDescription();
+	
 	/**
 	 * Presenter interface
 	 */
@@ -38,4 +41,5 @@ public interface CreateAccessRequirementStep1View extends IsWidget {
 
 		void onAddTeams();
 	}
+
 }

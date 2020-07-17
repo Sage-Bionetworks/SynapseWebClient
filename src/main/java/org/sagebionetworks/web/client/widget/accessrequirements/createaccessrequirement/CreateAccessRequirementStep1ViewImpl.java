@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.Radio;
+import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -32,6 +33,8 @@ public class CreateAccessRequirementStep1ViewImpl implements CreateAccessRequire
 	Button teamMultiIdButton;
 	@UiField
 	FormGroup arTypeUI;
+	@UiField
+	TextBox descriptionField;
 
 	@UiField
 	Radio managedActTypeButton;
@@ -89,6 +92,15 @@ public class CreateAccessRequirementStep1ViewImpl implements CreateAccessRequire
 	@Override
 	public String getEntityIds() {
 		return entityIds.getText();
+	}
+	
+	@Override
+	public String getShortDescription() {
+		return descriptionField.getText();
+	}
+	@Override
+	public void setShortDescription(String description) {
+		descriptionField.setText(description);
 	}
 
 	@Override

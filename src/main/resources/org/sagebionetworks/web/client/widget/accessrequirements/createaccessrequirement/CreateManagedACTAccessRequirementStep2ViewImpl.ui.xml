@@ -6,12 +6,13 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt"
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<bh:Div>
 		<bh:Div>
 			<b:FormGroup>
-				<b:FormLabel>Instructions (Wiki)</b:FormLabel>
+				<b:FormLabel>Instructions (wiki)</b:FormLabel>
 				<bh:Div ui:field="wikiPageContainer" />
 				<b:Button ui:field="editWikiButton"
 					text="Edit Instructions" />
@@ -42,8 +43,15 @@
 						<b:CheckBox ui:field="otherAttachmentsCheckbox"
 							text="Other documents are required." />
 						<b:FormGroup>
-							<b:FormLabel>Expiration Period (Days)</b:FormLabel>
+							<b:FormLabel>Expiration period (days)</b:FormLabel>
 							<b:TextBox ui:field="expirationPeriodTextbox" />
+						</b:FormGroup>
+						<b:FormGroup>
+							<b:FormLabel>Renewal details URL (optional)</b:FormLabel>
+							<w:HelpWidget
+								helpMarkdown="Optional URL that can be used for external informational material about the access renewal process. If present will be included in access renewal notifications. Only applies if the expiration period is set."
+								addStyleNames="margin-left-5" placement="RIGHT" />									
+							<b:TextBox ui:field="renewalDetailsURLTextbox" />
 						</b:FormGroup>
 						<b:CheckBox ui:field="intendedDataUsePublicCheckbox"
 							text="Intended Data Use statements will be publicly available." />
