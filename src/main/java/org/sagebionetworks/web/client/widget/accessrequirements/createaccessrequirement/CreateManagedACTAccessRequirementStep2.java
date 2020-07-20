@@ -148,7 +148,7 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 			try {
 				long expirationPeriodInDays = Long.parseLong(expirationPeriod);
 				if (expirationPeriodInDays < 0 || (expirationPeriodInDays > 0 && expirationPeriodInDays < 365)) {
-					throw new NumberFormatException("If expiration period is set, then it must be a greater than a year.");
+					throw new NumberFormatException("If expiration period is set, then it must be greater than a year.");
 				}
 				accessRequirement.setExpirationPeriod(expirationPeriodInDays * DAY_IN_MS);
 			} catch (NumberFormatException e) {
