@@ -39,6 +39,8 @@ public class CreateManagedACTAccessRequirementStep2ViewImpl implements CreateMan
 	@UiField
 	TextBox expirationPeriodTextbox;
 	@UiField
+	TextBox renewalDetailsURLTextbox;
+	@UiField
 	CheckBox intendedDataUsePublicCheckbox;
 
 	Presenter presenter;
@@ -78,6 +80,17 @@ public class CreateManagedACTAccessRequirementStep2ViewImpl implements CreateMan
 	public String getExpirationPeriod() {
 		return expirationPeriodTextbox.getValue();
 	}
+	
+	@Override
+	public void setRenewalDetailsURL(String value) {
+		renewalDetailsURLTextbox.setValue(value);
+	}
+
+	@Override
+	public String getRenewalDetailsURL() {
+		return renewalDetailsURLTextbox.getValue();
+	}
+
 
 	@Override
 	public void setIsCertifiedUserRequired(boolean value) {

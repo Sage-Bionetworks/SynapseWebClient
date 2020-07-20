@@ -77,6 +77,8 @@ public class CreateAccessRequirementStep1Test {
 
 	public static final String ROD_ENTITY_ID = "syn97992";
 	public static final String ROD_TEAM_ID = "87654";
+	public static final String SHORT_DESCRIPTION = "A Dataset";
+	public static final String MODIFIED_SHORT_DESCRIPTION = "An Interesting Dataset";
 
 	@Before
 	public void setUp() throws Exception {
@@ -148,12 +150,17 @@ public class CreateAccessRequirementStep1Test {
 
 	@Test
 	public void testConfigureWithACTAccessRequirement() {
+		when(mockACTAccessRequirement.getDescription()).thenReturn(SHORT_DESCRIPTION);
 		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(Collections.singletonList(mockEntityRestrictableObjectDescriptor));
+		
 		widget.configure(mockACTAccessRequirement);
+		
+		when(mockView.getShortDescription()).thenReturn(MODIFIED_SHORT_DESCRIPTION);
 		// on save, we should be updating the ar we passed in
 		widget.onPrimary();
 		verify(mockACTAccessRequirement).setAccessType(any(ACCESS_TYPE.class));
 		verify(mockACTAccessRequirement).setSubjectIds(anyList());
+		verify(mockACTAccessRequirement).setDescription(MODIFIED_SHORT_DESCRIPTION);
 		verify(mockSynapseClient).createOrUpdateAccessRequirement(eq(mockACTAccessRequirement), any(AsyncCallback.class));
 	}
 
