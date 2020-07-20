@@ -69,6 +69,7 @@ public class CreateManagedACTAccessRequirementStep2Test {
 	public static final Long AR_ID = 8765L;
 	public static final String FILENAME = "templatefile.pdf";
 	public static final String FILE_HANDLE_ID = "9999";
+	public static final String RENEWAL_DETAILS_URL = "https://hodgsonfoundation.org";
 
 	@Before
 	public void setUp() throws Exception {
@@ -80,7 +81,7 @@ public class CreateManagedACTAccessRequirementStep2Test {
 		when(mockFileUpload.getFileMeta()).thenReturn(mockFileMetadata);
 		when(mockFileUpload.getFileHandleId()).thenReturn(FILE_HANDLE_ID);
 		when(mockFileMetadata.getFileName()).thenReturn(FILENAME);
-
+		when(mockACTAccessRequirement.getRenewalDetailsUrl()).thenReturn(RENEWAL_DETAILS_URL);
 		when(mockView.areOtherAttachmentsRequired()).thenReturn(false);
 		when(mockView.isCertifiedUserRequired()).thenReturn(false);
 		when(mockView.isDUCRequired()).thenReturn(false);
@@ -114,7 +115,6 @@ public class CreateManagedACTAccessRequirementStep2Test {
 	@Test
 	public void testConfigureWithWiki() {
 		when(mockACTAccessRequirement.getDucTemplateFileHandleId()).thenReturn(FILE_HANDLE_ID);
-
 		when(mockACTAccessRequirement.getAreOtherAttachmentsRequired()).thenReturn(true);
 		Long expirationPeriodDays = 5L;
 		Long newExpirationPeriodDays = 365L;
@@ -127,7 +127,10 @@ public class CreateManagedACTAccessRequirementStep2Test {
 		when(mockACTAccessRequirement.getIsIDUPublic()).thenReturn(true);
 		when(mockACTAccessRequirement.getIsIRBApprovalRequired()).thenReturn(false);
 		when(mockACTAccessRequirement.getIsValidatedProfileRequired()).thenReturn(true);
+		
 		widget.configure(mockACTAccessRequirement);
+		
+		verify(mockView).setRenewalDetailsURL(RENEWAL_DETAILS_URL);
 		verify(mockWikiPageRenderer).configure(wikiPageKeyCaptor.capture(), eq(false), eq((WikiPageWidget.Callback) null));
 		WikiPageKey key = wikiPageKeyCaptor.getValue();
 		assertEquals(AR_ID.toString(), key.getOwnerObjectId());
@@ -153,12 +156,16 @@ public class CreateManagedACTAccessRequirementStep2Test {
 		// on edit of wiki
 		widget.onEditWiki();
 		verify(mockWikiMarkdownEditor).configure(eq(key), any(CallbackP.class));
+		
+		String modifiedRenewalUrl = "https://synapse.org";
+		when(mockView.getRenewalDetailsURL()).thenReturn(modifiedRenewalUrl);
 
 		// on finish
 		widget.onPrimary();
 
 		// verify access requirement was updated from the view (view value responses configured in the the
 		// test setUp()
+		verify(mockACTAccessRequirement).setRenewalDetailsUrl(modifiedRenewalUrl);
 		verify(mockACTAccessRequirement).setAreOtherAttachmentsRequired(false);
 		verify(mockACTAccessRequirement).setExpirationPeriod(newExpirationPeriodDays * CreateManagedACTAccessRequirementStep2.DAY_IN_MS);
 		verify(mockACTAccessRequirement).setIsCertifiedUserRequired(false);
@@ -170,16 +177,40 @@ public class CreateManagedACTAccessRequirementStep2Test {
 	}
 
 	@Test
-	public void testInvalidExpirationPeriod() {
-		String newExpirationPeriodDaysString = "20.2345";
+	public void testInvalidExpirationPeriod_negative() {
+		String newExpirationPeriodDaysString = "-1";
 		when(mockView.getExpirationPeriod()).thenReturn(newExpirationPeriodDaysString);
-		when(mockACTAccessRequirement.getExpirationPeriod()).thenReturn(null);
+		
 		widget.configure(mockACTAccessRequirement);
-
-		// on finish
 		widget.onPrimary();
 
 		verify(mockModalPresenter).setErrorMessage(anyString());
 		verify(mockModalPresenter, never()).onFinished();
 	}
+
+	@Test
+	public void testInvalidExpirationPeriod_lessThanAYear() {
+		String newExpirationPeriodDaysString = "20.2345";
+		when(mockView.getExpirationPeriod()).thenReturn(newExpirationPeriodDaysString);
+		
+		widget.configure(mockACTAccessRequirement);
+		widget.onPrimary();
+
+		verify(mockModalPresenter).setErrorMessage(anyString());
+		verify(mockModalPresenter, never()).onFinished();
+	}
+	
+	@Test
+	public void testInvalidRenewalUrl() {
+		String renewalUrl = "abc";
+		when(mockView.getRenewalDetailsURL()).thenReturn(renewalUrl);
+		when(mockACTAccessRequirement.getRenewalDetailsUrl()).thenReturn(null);
+		
+		widget.configure(mockACTAccessRequirement);
+		widget.onPrimary();
+
+		verify(mockModalPresenter).setErrorMessage(CreateManagedACTAccessRequirementStep2.INVALID_RENEWAL_URL_MESSAGE);
+		verify(mockModalPresenter, never()).onFinished();
+	}
+
 }

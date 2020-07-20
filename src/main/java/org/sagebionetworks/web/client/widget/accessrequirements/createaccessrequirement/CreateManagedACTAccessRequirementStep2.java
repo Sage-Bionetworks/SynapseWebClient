@@ -30,6 +30,7 @@ import com.google.inject.Inject;
  *
  */
 public class CreateManagedACTAccessRequirementStep2 implements ModalPage, CreateManagedACTAccessRequirementStep2View.Presenter {
+	public static final String INVALID_RENEWAL_URL_MESSAGE = "Please enter a valid renewal details URL.";
 	CreateManagedACTAccessRequirementStep2View view;
 	ModalPresenter modalPresenter;
 	ManagedACTAccessRequirement accessRequirement;
@@ -133,7 +134,7 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 		String renewalDetailsURL = view.getRenewalDetailsURL();
 		
 		if (!ValidationUtils.isValidUrl(renewalDetailsURL, true)) {
-			modalPresenter.setErrorMessage("Please enter a valid renewal details URL.");
+			modalPresenter.setErrorMessage(INVALID_RENEWAL_URL_MESSAGE);
 			return;
 		}
 		
