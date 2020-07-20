@@ -41,7 +41,7 @@
 				<bh:Div marginTop="10">
 					<b:FormLabel text="Short description (optional)"></b:FormLabel>
 					<w:HelpWidget
-						helpMarkdown="Enter access requirement description.  This is used in the automated renewal process.  For example, 'The approval for the **short_description** access requirement was revoked...'"
+						helpMarkdown="Enter access requirement description.  This will also be used when sending notifications for expiring or revoked approval.  For example, 'The approval for the **short_description** access requirement was revoked...'"
 						addStyleNames="margin-left-5" placement="RIGHT" />
 					<b:TextBox ui:field="descriptionField"
 						placeholder="" maxLength="50"

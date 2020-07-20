@@ -34,7 +34,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
-public class CreateACTAccessRequirementStep2Test {
+public class CreateManagedACTAccessRequirementStep2Test {
 
 	CreateManagedACTAccessRequirementStep2 widget;
 	@Mock

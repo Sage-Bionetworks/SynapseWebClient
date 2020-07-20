@@ -19,7 +19,6 @@ import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -97,7 +96,6 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 		} else {
 			view.setExpirationPeriod("");
 		}
-		GWT.debugger();
 		if (accessRequirement.getRenewalDetailsUrl() != null) {
 			view.setRenewalDetailsURL(accessRequirement.getRenewalDetailsUrl());
 		} else {

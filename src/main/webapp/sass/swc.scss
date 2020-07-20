@@ -1710,9 +1710,6 @@ ol.lowerroman {
 		margin-left: 2px;
 		border-bottom: 1px solid transparent;
 	}
-	details > summary:hover {
-		border-bottom: 1px solid $synapse-blue;
-	}
 	details > summary::-webkit-details-marker {
 		display:none;
 	}
@@ -2974,7 +2971,7 @@ div.border {
 		pointer-events: none;
 	}
 }
-#rootPanel {
+#body {
 	summary { color:$synapse-blue; }
 	summary:hover { text-decoration: underline; cursor:pointer; }
 	.input-group-addon, .input-group-btn {
