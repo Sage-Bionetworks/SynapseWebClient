@@ -212,5 +212,16 @@ public class CreateManagedACTAccessRequirementStep2Test {
 		verify(mockModalPresenter).setErrorMessage(CreateManagedACTAccessRequirementStep2.INVALID_RENEWAL_URL_MESSAGE);
 		verify(mockModalPresenter, never()).onFinished();
 	}
+	
+	@Test
+	public void testEmptyRenewalUrl() {
+		when(mockView.getRenewalDetailsURL()).thenReturn("  ");
+		when(mockACTAccessRequirement.getRenewalDetailsUrl()).thenReturn(null);
+		
+		widget.configure(mockACTAccessRequirement);
+		widget.onPrimary();
 
+		//verify that the empty string renewal details URL is converted into a null 
+		verify(mockACTAccessRequirement).setRenewalDetailsUrl(null);
+	}
 }

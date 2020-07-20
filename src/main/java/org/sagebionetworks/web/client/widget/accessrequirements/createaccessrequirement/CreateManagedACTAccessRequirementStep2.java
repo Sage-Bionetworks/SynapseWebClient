@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -137,7 +138,10 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 			modalPresenter.setErrorMessage(INVALID_RENEWAL_URL_MESSAGE);
 			return;
 		}
-		
+		if (renewalDetailsURL != null && renewalDetailsURL.trim().isEmpty()) {
+			// service will reject if setting to the empty string with an undefined expiration period.
+			renewalDetailsURL = null;
+		}
 		accessRequirement.setRenewalDetailsUrl(renewalDetailsURL);
 		
 		if (DisplayUtils.isDefined(expirationPeriod)) {
