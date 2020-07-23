@@ -26,12 +26,14 @@ import org.sagebionetworks.web.client.widget.CommaSeparatedValuesParser;
 public class EditJSONListModal implements EditJSONListModalView.Presenter{
 	public static final String SEE_THE_ERRORS_ABOVE = "See the error(s) above.";
 
-	private static final Map<ColumnType, ColumnType> LIST_TYPE_TO_NON_LIST = ImmutableMap.of(
-			ColumnType.STRING_LIST, ColumnType.STRING,
-			ColumnType.INTEGER_LIST, ColumnType.INTEGER,
-			ColumnType.DATE_LIST, ColumnType.DATE,
-			ColumnType.BOOLEAN_LIST,ColumnType.BOOLEAN
-	);
+	private static final Map<ColumnType, ColumnType> LIST_TYPE_TO_NON_LIST = ImmutableMap.<ColumnType, ColumnType>builder()
+			.put(ColumnType.STRING_LIST, ColumnType.STRING)
+			.put(ColumnType.INTEGER_LIST, ColumnType.INTEGER)
+			.put(ColumnType.DATE_LIST, ColumnType.DATE)
+			.put(ColumnType.BOOLEAN_LIST,ColumnType.BOOLEAN)
+			.put(ColumnType.USERID_LIST, ColumnType.USERID)
+			.put(ColumnType.ENTITYID_LIST, ColumnType.ENTITYID)
+			.build();
 	public static final String NOT_A_VALID_JSON_ARRAY = "Not a valid JSON Array";
 	public static final String EXCEEDED_MAXIMUM_NUMBER_OF_VALUES_DEFINED_IN_SCHEMA = "Exceeded maximum number of values defined in schema: ";
 	public static final long DEFAULT_MAX_SIZE = 50L;

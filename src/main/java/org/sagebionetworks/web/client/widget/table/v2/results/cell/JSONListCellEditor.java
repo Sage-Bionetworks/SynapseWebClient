@@ -33,7 +33,7 @@ public class JSONListCellEditor extends AbstractCellEditor implements CellEditor
 		this.jsonArrayAdapter = jsonArrayAdapter;
 		this.gwt = gwt;
 		this.ginInjector = ginInjector;
-		view.setEditor(this);
+		view.setPresenter(this);
 	}
 
 	public EditJSONListModal getEditJSONListModal() {
