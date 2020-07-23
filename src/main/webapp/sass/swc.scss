@@ -396,10 +396,10 @@ end sticky footer
 	th:nth-child(2) {
 		border-left: none;
 	}
-}
-#body .tableHeaderSortIcon {
-	position: absolute;
-	right: 5px;
+	.tableHeaderSortIcon {
+		position: absolute;
+		right: 5px;
+	}
 }
 .nobordertable-imp td {
   border: 0px !important;
