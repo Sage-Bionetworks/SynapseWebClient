@@ -5,7 +5,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<b:FormGroup ui:field="formGroup" addStyleNames="margin-bottom-0-imp">
 		<bh:Span ui:field="suggestBoxContainer" />
-		<g:FocusPanel addStyleNames="form-control cursor-text"
+		<g:FocusPanel addStyleNames="form-control cursor-text padding-2"
 			ui:field="userIdCellRendererContainer" />
 	</b:FormGroup>
 </ui:UiBinder>

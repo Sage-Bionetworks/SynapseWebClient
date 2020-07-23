@@ -79,8 +79,8 @@ public class CellFactory {
 				case INTEGER_LIST:
 				case BOOLEAN_LIST:
 				case DATE_LIST:
-//				case ENTITYID_LIST:
-//				case USERID_LIST:
+				case ENTITYID_LIST:
+				case USERID_LIST:
 					JSONListCellEditor listEditor = ginInjector.createListCellEditor();
 					listEditor.setColumnModel(model);
 					editor = listEditor;

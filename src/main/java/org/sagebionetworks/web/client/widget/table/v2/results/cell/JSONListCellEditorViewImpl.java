@@ -1,9 +1,12 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
+import org.gwtbootstrap3.client.ui.FormGroup;
+import org.gwtbootstrap3.client.ui.HelpBlock;
+import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
-import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -11,13 +14,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.gwtbootstrap3.client.ui.FormGroup;
-import org.gwtbootstrap3.client.ui.HelpBlock;
-import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.TextBox;
-import org.gwtbootstrap3.client.ui.constants.ValidationState;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.PortalGinInjector;
 
 /**
  * View with zero business logic.
@@ -42,29 +38,22 @@ public class JSONListCellEditorViewImpl implements JSONListCellEditorView {
 	EditJSONListModal editJSONListModal;
 
 	Widget widget;
-	JSONListCellEditor editor;
-
-	CellFactory cellFactory;
-	PortalGinInjector ginInjector;
+	Presenter presenter;
 
 	@Inject
-	public JSONListCellEditorViewImpl(Binder binder, CellFactory cellFactory) {
-		this.ginInjector = ginInjector;
+	public JSONListCellEditorViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 		// users want us to select all on focus see SWC-2213
-		textBox.addFocusHandler(new FocusHandler() {
-			@Override
-			public void onFocus(FocusEvent event) {
-				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
-					@Override
-					public void execute() {
-						textBox.selectAll();
-					}
-				});
-			}
+		textBox.addFocusHandler(event -> {
+			Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+				@Override
+				public void execute() {
+					textBox.selectAll();
+				}
+			});
 		});
-		textBox.addClickHandler(clickEvent -> editor.onEditButtonClick() );
-		editButton.addClickHandler(clickEvent -> editor.onEditButtonClick());
+		textBox.addClickHandler(clickEvent -> presenter.onEditButtonClick() );
+		editButton.addClickHandler(clickEvent -> presenter.onEditButtonClick());
 	}
 
 	@Override
@@ -135,8 +124,8 @@ public class JSONListCellEditorViewImpl implements JSONListCellEditorView {
 
 
 	@Override
-	public void setEditor(JSONListCellEditor editor) {
-		this.editor = editor;
+	public void setPresenter(Presenter presenter) {
+		this.presenter = presenter;
 	}
 
 }
