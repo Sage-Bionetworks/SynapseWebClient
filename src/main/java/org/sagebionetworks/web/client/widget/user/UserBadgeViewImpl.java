@@ -129,6 +129,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		if (badgeSize.equals(BadgeSize.DEFAULT)) {
 			isReactHandlingClickEvents = false;
 			addStyleName("inline-block vertical-align-middle");
+			setHeight("35px");
 		} else {
 			isReactHandlingClickEvents = true;
 			removeStyleName("inline-block");
