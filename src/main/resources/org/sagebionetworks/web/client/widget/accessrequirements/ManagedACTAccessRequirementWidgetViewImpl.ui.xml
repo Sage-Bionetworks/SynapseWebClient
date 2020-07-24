@@ -7,25 +7,24 @@
 		type='org.sagebionetworks.web.client.IconsImageBundle' />
 	<b:Panel marginBottom="0">
 		<b:PanelBody>
-			<bh:Div styleName="margin-bottom-20">
-				<g:Image styleName="displayInline moveup-2 margin-right-5"
+			<b:Heading size="H4" addStyleNames="margin-bottom-20">
+				<g:Image addStyleNames="displayInline moveup-2 margin-right-5"
 					resource='{icons.shieldRed16}' />
-				<b:Icon styleName="displayInline moveup-2 margin-right-5"
-					type="SHIELD" emphasis="DANGER" />
-				<g:InlineLabel styleName="font-size-18"
-					text="Access to these data is Controlled Use" />
-			</bh:Div>
+				<bh:Paragraph addStyleNames="displayInline">
+					Access to <bh:Span ui:field="accessRequirementDescription" /> is Controlled Use
+				</bh:Paragraph>
+			</b:Heading>
 			<bh:Div ui:field="accessRequirementIDUI" visible="false">
-				<g:InlineLabel styleName="boldText"
-					text="Access Requirement ID:" addStyleNames="margin-right-5"/>
+				<g:InlineLabel addStyleNames="boldText margin-right-5"
+					text="Access Requirement ID:" />
 				<g:InlineLabel ui:field="accessRequirementIDField" />
 			</bh:Div>
 			<bh:Div ui:field="approvedHeading" visible="false">
-				<g:InlineLabel styleName="boldText"
+				<g:InlineLabel addStyleNames="boldText"
 					text="You have access to these data under the following terms:" />
 			</bh:Div>
 			<bh:Div ui:field="unapprovedHeading" visible="false">
-				<g:InlineLabel styleName="boldText"
+				<g:InlineLabel addStyleNames="boldText"
 					text="Access to the data requires that you are a registered Synapse user and fulfill the following requirements:" />
 			</bh:Div>
 			<!-- terms -->
@@ -35,7 +34,7 @@
 			<bh:Div marginRight="30">
 				<bh:Text>For more information on use conditions, please read the </bh:Text>
 				<b:Anchor text="Conditions for using Human Data in Synapse"
-					styleName="link margin-left-5"
+					addStyleNames="link margin-left-5"
 					href="http://docs.synapse.org/articles/governance.html"
 					target="_blank" />
 				<bh:Text>.&nbsp;&nbsp;</bh:Text>

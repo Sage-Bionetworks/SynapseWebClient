@@ -60,6 +60,7 @@ public class ACTAccessRequirementWidgetTest {
 	public static final String USERNAME = "Clue";
 	public static final String FIRST_NAME = "Professor";
 	public static final String LAST_NAME = "Plum";
+	public static final String DESCRIPTION = "Mystery Game";
 
 	ACTAccessRequirementWidget widget;
 	@Mock
@@ -156,12 +157,17 @@ public class ACTAccessRequirementWidgetTest {
 		verify(mockDeleteAccessRequirementButton).configure(mockACTAccessRequirement, mockRefreshCallback);
 		verify(mockSubjectsWidget).configure(mockSubjectIds);
 		verify(mockLazyLoadHelper).setIsConfigured();
+		verify(mockView).setAccessRequirementDescription(null);
 	}
 
 	@Test
-	public void testSetRequirementWithWikiTerms() {
+	public void testSetRequirementWithWikiTermsAndCustomDescription() {
+		when(mockACTAccessRequirement.getDescription()).thenReturn(DESCRIPTION);
+		
 		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+		
 		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(false), any(WikiPageWidget.Callback.class));
+		verify(mockView).setAccessRequirementDescription(DESCRIPTION);
 		verify(mockView, never()).setTerms(anyString());
 		verify(mockView, never()).showTermsUI();
 	}

@@ -112,6 +112,7 @@ public class ManagedACTAccessRequirementWidgetTest {
 	public final static String ROOT_WIKI_ID = "777";
 	public final static String SUBMISSION_ID = "442";
 	public final static String SUBMITTER_ID = "9";
+	public static final String DESCRIPTION = "JUnit Test Dataset";
 
 	@Before
 	public void setUp() throws Exception {
@@ -152,13 +153,18 @@ public class ManagedACTAccessRequirementWidgetTest {
 		verify(mockManageAccessButton).configure(mockACTAccessRequirement);
 		verify(mockSubjectsWidget).configure(mockSubjectIds);
 		verify(mockLazyLoadHelper).setIsConfigured();
+		verify(mockView).setAccessRequirementDescription(null);
 	}
 
 	@Test
-	public void testSetRequirementWithWikiTerms() {
+	public void testSetRequirementWithWikiTermsAndCustomDescription() {
+		when(mockACTAccessRequirement.getDescription()).thenReturn(DESCRIPTION);
+		
 		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+		
 		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(false), any(WikiPageWidget.Callback.class));
 		verify(mockView).setWikiTermsWidgetVisible(true);
+		verify(mockView).setAccessRequirementDescription(DESCRIPTION);
 	}
 
 	@Test

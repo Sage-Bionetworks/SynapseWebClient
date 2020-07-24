@@ -50,7 +50,7 @@ public interface ACTAccessRequirementWidgetView extends IsWidget, SupportsLazyLo
 	void setConvertAccessRequirementWidget(IsWidget w);
 
 	void showLoginButton();
-
+	void setAccessRequirementDescription(String description);
 	/**
 	 * Presenter interface
 	 */

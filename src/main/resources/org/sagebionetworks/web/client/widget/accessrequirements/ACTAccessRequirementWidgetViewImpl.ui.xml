@@ -7,14 +7,13 @@
 		type='org.sagebionetworks.web.client.IconsImageBundle' />
 	<b:Panel marginBottom="0">
 		<b:PanelBody>
-			<bh:Div styleName="margin-bottom-20">
-				<g:Image styleName="displayInline moveup-2 margin-right-5"
+			<b:Heading size="H4" addStyleNames="margin-bottom-20">
+				<g:Image addStyleNames="displayInline moveup-2 margin-right-5"
 					resource='{icons.shieldRed16}' />
-				<b:Icon styleName="displayInline moveup-2 margin-right-5"
-					type="SHIELD" emphasis="DANGER" />
-				<g:InlineLabel styleName="font-size-18"
-					text="Access to these data is Controlled Use" />
-			</bh:Div>
+				<bh:Paragraph addStyleNames="displayInline">
+					Access to <bh:Span ui:field="accessRequirementDescription" /> is Controlled Use
+				</bh:Paragraph>
+			</b:Heading>
 			<bh:Div ui:field="approvedHeading" visible="false">
 				<g:InlineLabel styleName="boldText"
 					text="Access requirements fulfilled:  You have access to these data under the following terms:" />

@@ -69,6 +69,7 @@ public interface ManagedACTAccessRequirementWidgetView extends IsWidget, Support
 	
 	void setAccessRequirementIDVisible(boolean visible);
 	void setAccessRequirementID(String arID);
+	void setAccessRequirementDescription(String description);
 
 	/**
 	 * Presenter interface

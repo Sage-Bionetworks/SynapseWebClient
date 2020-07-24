@@ -75,9 +75,12 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 	Div accessRequirementIDUI;
 	@UiField
 	InlineLabel accessRequirementIDField;
+	@UiField
+	Span accessRequirementDescription;
 
 	Callback onAttachCallback;
-
+	public static final String DEFAULT_AR_DESCRIPTION = "these data";
+	
 	public interface Binder extends UiBinder<Widget, ManagedACTAccessRequirementWidgetViewImpl> {
 	}
 
@@ -293,5 +296,15 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 	@Override
 	public void setAccessRequirementIDVisible(boolean visible) {
 		accessRequirementIDUI.setVisible(visible);		
+	}
+	@Override
+	public void setAccessRequirementDescription(String description) {
+		if (DisplayUtils.isDefined(description)) {
+			accessRequirementDescription.setText(description);
+			accessRequirementDescription.addStyleName("boldText");
+		} else {
+			accessRequirementDescription.setText(DEFAULT_AR_DESCRIPTION);
+			accessRequirementDescription.removeStyleName("boldText");
+		}
 	}
 }
