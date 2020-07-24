@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.BlockQuote;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -54,6 +55,8 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	@UiField
 	Div controlsContainer;
 	Callback onAttachCallback;
+	@UiField
+	Span accessRequirementDescription;
 
 	public interface Binder extends UiBinder<Widget, ACTAccessRequirementWidgetViewImpl> {
 	}
@@ -206,5 +209,11 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	public void showLoginButton() {
 		loginButton.setVisible(true);
 	}
+	@Override
+	public void setCustomAccessRequirementDescription(String description) {
+		accessRequirementDescription.setText(description);
+		accessRequirementDescription.addStyleName("boldText");
+	}
+
 }
 

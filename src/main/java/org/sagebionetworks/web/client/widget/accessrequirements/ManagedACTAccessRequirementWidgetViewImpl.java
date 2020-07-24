@@ -75,6 +75,8 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 	Div accessRequirementIDUI;
 	@UiField
 	InlineLabel accessRequirementIDField;
+	@UiField
+	Span accessRequirementDescription;
 
 	Callback onAttachCallback;
 
@@ -293,5 +295,10 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 	@Override
 	public void setAccessRequirementIDVisible(boolean visible) {
 		accessRequirementIDUI.setVisible(visible);		
+	}
+	@Override
+	public void setCustomAccessRequirementDescription(String description) {
+		accessRequirementDescription.setText(description);
+		accessRequirementDescription.addStyleName("boldText");
 	}
 }

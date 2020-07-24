@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.dataaccess.ManagedACTAccessRequirementStat
 import org.sagebionetworks.repo.model.dataaccess.SubmissionStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtils;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -122,6 +123,9 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		isACTMemberAsyncHandler.isACTActionAvailable(isACT -> {
 			view.setAccessRequirementIDVisible(isACT);
 		});
+		if (DisplayUtils.isDefined(ar.getDescription())) {
+			view.setCustomAccessRequirementDescription(ar.getDescription());	
+		}		
 	}
 
 	public void setTargetSubject(RestrictableObjectDescriptor targetSubject) {
