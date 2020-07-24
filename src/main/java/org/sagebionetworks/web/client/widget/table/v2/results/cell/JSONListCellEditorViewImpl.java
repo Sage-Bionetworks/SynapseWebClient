@@ -3,15 +3,16 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
-import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -28,7 +29,9 @@ public class JSONListCellEditorViewImpl implements JSONListCellEditorView {
 	@UiField
 	FormGroup formGroup;
 	@UiField
-	TextBox textBox;
+	FocusPanel rendererFocusPanel;
+	@UiField
+	Div rendererContainer;
 	@UiField
 	Icon editButton;
 
@@ -39,20 +42,15 @@ public class JSONListCellEditorViewImpl implements JSONListCellEditorView {
 
 	Widget widget;
 	Presenter presenter;
+	CellFactory cellFactory;
+	String rawValue = null;
 
 	@Inject
-	public JSONListCellEditorViewImpl(Binder binder) {
+	public JSONListCellEditorViewImpl(Binder binder, CellFactory cellFactory) {
 		widget = binder.createAndBindUi(this);
+		this.cellFactory = cellFactory;
 		// users want us to select all on focus see SWC-2213
-		textBox.addFocusHandler(event -> {
-			Scheduler.get().scheduleDeferred(new ScheduledCommand() {
-				@Override
-				public void execute() {
-					textBox.selectAll();
-				}
-			});
-		});
-		textBox.addClickHandler(clickEvent -> presenter.onEditButtonClick() );
+		rendererFocusPanel.addClickHandler(clickEvent -> presenter.onEditButtonClick() );
 		editButton.addClickHandler(clickEvent -> presenter.onEditButtonClick());
 	}
 
@@ -63,42 +61,51 @@ public class JSONListCellEditorViewImpl implements JSONListCellEditorView {
 
 	@Override
 	public void setValue(String value) {
-		textBox.setValue(value);
+		rawValue = value;
+		rendererContainer.clear();
+		ColumnType columnType = presenter.getColumnModel().getColumnType();
+		// entity id list and user id list renderers have links, do not use standard renderer for these.
+		if (ColumnType.ENTITYID_LIST == columnType || ColumnType.USERID_LIST == columnType) {
+			columnType = ColumnType.INTEGER_LIST;
+		}
+		Cell renderer = cellFactory.createRenderer(columnType);
+		renderer.setValue(value);
+		rendererContainer.add(renderer);
 	}
 
 	@Override
 	public String getValue() {
-		return textBox.getValue();
+		return rawValue;
 	}
 
 	@Override
 	public HandlerRegistration addKeyDownHandler(KeyDownHandler handler) {
-		return textBox.addKeyDownHandler(handler);
+		return rendererFocusPanel.addKeyDownHandler(handler);
 	}
 
 	@Override
 	public void fireEvent(GwtEvent<?> event) {
-		textBox.fireEvent(event);
+		rendererFocusPanel.fireEvent(event);
 	}
 
 	@Override
 	public int getTabIndex() {
-		return textBox.getTabIndex();
+		return rendererFocusPanel.getTabIndex();
 	}
 
 	@Override
 	public void setAccessKey(char key) {
-		textBox.setAccessKey(key);
+		rendererFocusPanel.setAccessKey(key);
 	}
 
 	@Override
 	public void setFocus(boolean focused) {
-		textBox.setFocus(focused);
+		rendererFocusPanel.setFocus(focused);
 	}
 
 	@Override
 	public void setTabIndex(int index) {
-		textBox.setTabIndex(index);
+		rendererFocusPanel.setTabIndex(index);
 	}
 
 	@Override
@@ -114,12 +121,11 @@ public class JSONListCellEditorViewImpl implements JSONListCellEditorView {
 
 	@Override
 	public void setPlaceholder(String placeholder) {
-		textBox.setPlaceholder(placeholder);
 	}
 
 	@Override
 	public String getPlaceholder() {
-		return textBox.getPlaceholder();
+		return "";
 	}
 
 
