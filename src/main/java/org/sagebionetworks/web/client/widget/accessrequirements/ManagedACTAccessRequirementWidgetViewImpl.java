@@ -79,7 +79,8 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 	Span accessRequirementDescription;
 
 	Callback onAttachCallback;
-
+	public static final String DEFAULT_AR_DESCRIPTION = "these data";
+	
 	public interface Binder extends UiBinder<Widget, ManagedACTAccessRequirementWidgetViewImpl> {
 	}
 
@@ -297,8 +298,13 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 		accessRequirementIDUI.setVisible(visible);		
 	}
 	@Override
-	public void setCustomAccessRequirementDescription(String description) {
-		accessRequirementDescription.setText(description);
-		accessRequirementDescription.addStyleName("boldText");
+	public void setAccessRequirementDescription(String description) {
+		if (DisplayUtils.isDefined(description)) {
+			accessRequirementDescription.setText(description);
+			accessRequirementDescription.addStyleName("boldText");
+		} else {
+			accessRequirementDescription.setText(DEFAULT_AR_DESCRIPTION);
+			accessRequirementDescription.removeStyleName("boldText");
+		}
 	}
 }

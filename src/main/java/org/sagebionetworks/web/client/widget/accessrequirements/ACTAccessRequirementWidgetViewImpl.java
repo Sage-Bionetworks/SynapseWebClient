@@ -57,7 +57,7 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	Callback onAttachCallback;
 	@UiField
 	Span accessRequirementDescription;
-
+	
 	public interface Binder extends UiBinder<Widget, ACTAccessRequirementWidgetViewImpl> {
 	}
 
@@ -210,9 +210,14 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 		loginButton.setVisible(true);
 	}
 	@Override
-	public void setCustomAccessRequirementDescription(String description) {
-		accessRequirementDescription.setText(description);
-		accessRequirementDescription.addStyleName("boldText");
+	public void setAccessRequirementDescription(String description) {
+		if (DisplayUtils.isDefined(description)) {
+			accessRequirementDescription.setText(description);
+			accessRequirementDescription.addStyleName("boldText");
+		} else {
+			accessRequirementDescription.setText(ManagedACTAccessRequirementWidgetViewImpl.DEFAULT_AR_DESCRIPTION);
+			accessRequirementDescription.removeStyleName("boldText");
+		}
 	}
 
 }

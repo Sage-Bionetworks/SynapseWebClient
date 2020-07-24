@@ -104,10 +104,8 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		subjectsWidget.configure(ar.getSubjectIds());
 		manageAccessButton.configure(ar);
 		convertACTAccessRequirementButton.configure(ar, refreshCallback);
-		if (DisplayUtils.isDefined(ar.getDescription())) {
-			view.setCustomAccessRequirementDescription(ar.getDescription());	
-		}		
-
+		view.setAccessRequirementDescription(ar.getDescription());	
+		
 		lazyLoadHelper.setIsConfigured();
 	}
 

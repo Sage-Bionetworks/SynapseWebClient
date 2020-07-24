@@ -11,7 +11,7 @@
 				<g:Image addStyleNames="displayInline moveup-2 margin-right-5"
 					resource='{icons.shieldRed16}' />
 				<bh:Paragraph addStyleNames="displayInline">
-					Access to <bh:Span ui:field="accessRequirementDescription" text="these data"/> is Controlled Use
+					Access to <bh:Span ui:field="accessRequirementDescription" /> is Controlled Use
 				</bh:Paragraph>
 			</b:Heading>
 			<bh:Div ui:field="accessRequirementIDUI" visible="false">
