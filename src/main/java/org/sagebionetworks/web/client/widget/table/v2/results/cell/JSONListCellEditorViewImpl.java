@@ -5,7 +5,6 @@ import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
@@ -49,6 +48,7 @@ public class JSONListCellEditorViewImpl implements JSONListCellEditorView {
 	public JSONListCellEditorViewImpl(Binder binder, CellFactory cellFactory) {
 		widget = binder.createAndBindUi(this);
 		this.cellFactory = cellFactory;
+		rendererFocusPanel.getElement().setAttribute("readonly", "true");
 		// users want us to select all on focus see SWC-2213
 		rendererFocusPanel.addClickHandler(clickEvent -> presenter.onEditButtonClick() );
 		editButton.addClickHandler(clickEvent -> presenter.onEditButtonClick());
