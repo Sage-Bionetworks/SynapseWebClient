@@ -115,7 +115,9 @@ public class ColumnModelsWidgetTest {
 	@Captor
 	ArgumentCaptor<List<ColumnModelTableRow>> columnModelTableRowsCaptor;
 	@Mock
-	ViewColumnModelResponse mockViewColumnModelResponse;
+	ViewColumnModelResponse mockViewColumnModelResponsePage1;
+	@Mock
+	ViewColumnModelResponse mockViewColumnModelResponsePage2;
 	
 	public static final String NEXT_PAGE_TOKEN = "nextPageToken";
 
@@ -152,8 +154,10 @@ public class ColumnModelsWidgetTest {
 		when(mockView.getScopeIds()).thenReturn(mockViewScopeIds);
 		when(mockView.getType()).thenReturn(org.sagebionetworks.repo.model.table.ViewType.file);
 		when(mockView.getViewTypeMask()).thenReturn(null);
-		when(mockViewColumnModelResponse.getNextPageToken()).thenReturn(NEXT_PAGE_TOKEN, null);
-		when(mockViewColumnModelResponse.getResults()).thenReturn(mockAnnotationColumnsPage1, mockAnnotationColumnsPage2);		
+		when(mockViewColumnModelResponsePage1.getNextPageToken()).thenReturn(NEXT_PAGE_TOKEN);
+		when(mockViewColumnModelResponsePage1.getResults()).thenReturn(mockAnnotationColumnsPage1);
+		when(mockViewColumnModelResponsePage2.getNextPageToken()).thenReturn(null);
+		when(mockViewColumnModelResponsePage2.getResults()).thenReturn(mockAnnotationColumnsPage2);		
 		when(mockGinInjector.getEventBus()).thenReturn(mockEventBus);
 	}
 
@@ -247,12 +251,12 @@ public class ColumnModelsWidgetTest {
 		String firstPageToken = null;
 		widget.getPossibleColumnModelsForViewScope(firstPageToken);
 
-		AsynchronousProgressHandler handler = verifyViewColumnModelRequest(mockViewScopeIds, viewScopeMask);
-		handler.onComplete(mockViewColumnModelResponse);
+		AsynchronousProgressHandler handler = verifyViewColumnModelRequest(mockViewScopeIds, viewScopeMask, firstPageToken);
+		handler.onComplete(mockViewColumnModelResponsePage1);
 		
 		verify(mockEditor).addColumns(mockAnnotationColumnsPage1);
-		handler = verifyViewColumnModelRequest(mockViewScopeIds, viewScopeMask);
-		handler.onComplete(mockViewColumnModelResponse);
+		handler = verifyViewColumnModelRequest(mockViewScopeIds, viewScopeMask, NEXT_PAGE_TOKEN);
+		handler.onComplete(mockViewColumnModelResponsePage2);
 		verify(mockEditor).addColumns(mockAnnotationColumnsPage2);
 	}
 
@@ -270,7 +274,7 @@ public class ColumnModelsWidgetTest {
 		String firstPageToken = null;
 		widget.getPossibleColumnModelsForViewScope(firstPageToken);
 		
-		AsynchronousProgressHandler handler = verifyViewColumnModelRequest(mockViewScopeIds, null);
+		AsynchronousProgressHandler handler = verifyViewColumnModelRequest(mockViewScopeIds, null, firstPageToken);
 		handler.onFailure(ex);
 		
 		verify(mockSynAlert).handleException(ex);
@@ -315,13 +319,14 @@ public class ColumnModelsWidgetTest {
 		return captor.getValue();
 	}
 
-	private AsynchronousProgressHandler verifyViewColumnModelRequest(List<String> scopeIds, Long viewMask) {
+	private AsynchronousProgressHandler verifyViewColumnModelRequest(List<String> scopeIds, Long viewMask, String nextPageToken) {
 		ArgumentCaptor<AsynchronousProgressHandler> captor = ArgumentCaptor.forClass(AsynchronousProgressHandler.class);
 		boolean isDeterminate = false;
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(ColumnModelsWidget.RETRIEVING_DATA), eq(isDeterminate), eq(AsynchType.ViewColumnModelRequest), viewColumnModelRequestCaptor.capture(), captor.capture());
 		ViewColumnModelRequest capturedRequest = viewColumnModelRequestCaptor.getValue();
 		assertEquals(scopeIds, capturedRequest.getViewScope().getScope());
 		assertEquals(viewMask, capturedRequest.getViewScope().getViewTypeMask());
+		assertEquals(nextPageToken, capturedRequest.getNextPageToken());
 		reset(mockJobTrackingWidget);
 		return captor.getValue();
 	}
