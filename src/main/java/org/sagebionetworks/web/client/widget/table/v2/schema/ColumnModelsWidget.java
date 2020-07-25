@@ -139,6 +139,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		
 		ViewColumnModelRequest request = new ViewColumnModelRequest();
 		request.setViewScope(scope);
+		request.setNextPageToken(nextPageToken);
 		
 		this.baseView.setJobTrackingWidgetVisible(true);
 		this.jobTrackingWidget.startAndTrackJob(RETRIEVING_DATA, false, AsynchType.ViewColumnModelRequest, request, new AsynchronousProgressHandler() {
