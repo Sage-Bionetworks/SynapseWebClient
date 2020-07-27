@@ -2,6 +2,7 @@
 
 .fa {
   vertical-align: middle;
+  text-transform: none;
 }
 .fa.fa-plus:before {
   font-family: "Material Icons";
@@ -126,7 +127,7 @@
 }
 .fa.fa-strikethrough:before {
   font-family: "Material Icons";
-  content: "format_strikethrough";
+  content: "strikethrough_s";
 }
 .fa.fa-subscript:before {
   font-family: "Material Icons";
@@ -143,4 +144,36 @@
 .fa.fa-user-plus:before {
   font-family: "Material Icons";
   content: "person_add_alt";
+}
+.fa.syn-user:before {
+  font-family: "Material Icons";
+  content: "person";
+}
+.fa.syn-users:before {
+  font-family: "Material Icons";
+  content: "people_alt";
+}
+.fa.fa-times:before {
+  font-family: "Material Icons";
+  content: "close";
+}
+.fa.fa-code-fork:before {
+  font-family: "Material Icons";
+  content: "account_tree";
+}
+.fa.fa-tags:before {
+  font-family: "Material Icons";
+  content: "local_offer";
+}
+.fa.fa-exchange:before {
+  font-family: "Material Icons";
+  content: "compare_arrows";
+}
+.fa.fa-caret-square-o-right:before {
+  font-family: "Material Icons";
+  content: "arrow_drop_down";
+}
+.fa.fa-caret-square-o-down:before {
+  font-family: "Material Icons";
+  content: "arrow_drop_up";
 }
