@@ -106,15 +106,15 @@
 
 				<b:Tooltip placement="BOTTOM" title="Bold">
 					<b:Button ui:field="boldButton" icon="BOLD"
-						size="EXTRA_SMALL" height="22px" />
+						size="EXTRA_SMALL" height="22px" addStyleNames="markdown-editor-icon-button"/>
 				</b:Tooltip>
 				<b:Tooltip placement="BOTTOM" title="Italic">
 					<b:Button ui:field="italicButton" icon="ITALIC"
-						size="EXTRA_SMALL" height="22px" />
+						size="EXTRA_SMALL" height="22px" addStyleNames="markdown-editor-icon-button"/>
 				</b:Tooltip>
 				<b:Tooltip placement="BOTTOM" title="Strike-through">
 					<b:Button ui:field="strikeButton" icon="STRIKETHROUGH"
-						size="EXTRA_SMALL" height="22px" />
+						size="EXTRA_SMALL" height="22px" addStyleNames="markdown-editor-icon-button" />
 				</b:Tooltip>
 
 				<b:Tooltip placement="BOTTOM"
@@ -126,11 +126,11 @@
 				</b:Tooltip>
 				<b:Tooltip placement="BOTTOM" title="Subscript">
 					<b:Button ui:field="subscriptButton" icon="SUBSCRIPT"
-						size="EXTRA_SMALL" height="22px" />
+						size="EXTRA_SMALL" height="22px" addStyleNames="markdown-editor-icon-button" />
 				</b:Tooltip>
 				<b:Tooltip placement="BOTTOM" title="Superscript">
 					<b:Button ui:field="superscriptButton" icon="SUPERSCRIPT"
-						size="EXTRA_SMALL" height="22px" />
+						size="EXTRA_SMALL" height="22px" addStyleNames="markdown-editor-icon-button"/>
 				</b:Tooltip>
 				<b:ButtonGroup>
 					<b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL">Heading</b:Button>
@@ -151,27 +151,27 @@
 				</b:ButtonGroup>
 				<b:Tooltip placement="BOTTOM" title="Insert Attachment">
 					<b:Button ui:field="attachmentButton" icon="PAPERCLIP"
-						size="EXTRA_SMALL" height="22px" />
+						size="EXTRA_SMALL" height="22px" addStyleNames="markdown-editor-icon-button"/>
 				</b:Tooltip>
 				<b:Tooltip placement="BOTTOM" title="Insert Image">
 					<b:Button ui:field="imageButton" icon="CAMERA"
-						size="EXTRA_SMALL" height="22px" />
+						size="EXTRA_SMALL" height="22px" addStyleNames="markdown-editor-icon-button"/>
 				</b:Tooltip>
 				<b:Tooltip placement="BOTTOM" title="Insert Image">
 					<b:Button ui:field="imageLinkButton" icon="CAMERA"
-						size="EXTRA_SMALL" height="22px" visible="false" />
+						size="EXTRA_SMALL" height="22px" visible="false" addStyleNames="markdown-editor-icon-button" />
 				</b:Tooltip>
 				<b:Tooltip placement="BOTTOM" title="Insert Video">
 					<b:Button ui:field="videoButton" icon="VIDEO_CAMERA"
-						size="EXTRA_SMALL" height="22px" />
+						size="EXTRA_SMALL" height="22px" addStyleNames="markdown-editor-icon-button" />
 				</b:Tooltip>
 				<b:Tooltip placement="BOTTOM" title="Insert Link">
 					<b:Button ui:field="linkButton" icon="LINK"
-						size="EXTRA_SMALL" height="22px" />
+						size="EXTRA_SMALL" height="22px" addStyleNames="markdown-editor-icon-button" />
 				</b:Tooltip>
 				<b:Tooltip placement="BOTTOM" title="Tag someone">
 					<b:Button ui:field="userButton" icon="USER_PLUS"
-						size="EXTRA_SMALL" height="22px" />
+						size="EXTRA_SMALL" height="22px" addStyleNames="markdown-editor-icon-button" />
 				</b:Tooltip>
 				<b:Button ui:field="formattingGuideButton"
 					icon="QUESTION_CIRCLE" size="EXTRA_SMALL" text="Formatting Guide"

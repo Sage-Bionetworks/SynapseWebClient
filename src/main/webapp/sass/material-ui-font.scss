@@ -1,0 +1,258 @@
+// icon overrides
+
+.fa {
+  vertical-align: middle;
+  text-transform: none;
+}
+.fa.fa-plus:before {
+  font-family: "Material Icons";
+  content: "add";
+}
+.fa.syn-file:before {
+  font-family: "Material Icons";
+  content: "insert_drive_file";
+}
+.fa.fa-folder:before {
+  font-family: "Material Icons";
+  content: "folder";
+}
+.fa.fa-gear:before {
+  font-family: "Material Icons";
+  content: "settings";
+}
+.fa.fa-globe:before {
+  font-family: "Material Icons";
+  content: "public";
+}
+.fa.fa-edit:before, .fa.fa-pencil:before {
+  font-family: "Material Icons";
+  content: "edit";
+}
+.fa.fa-link:before {
+  font-family: "Material Icons";
+  content: "link";
+}
+.fa.fa-upload:before {
+  font-family: "Material Icons";
+  content: "cloud_upload";
+}
+.fa.fa-clipboard:before {
+  font-family: "Material Icons";
+  content: "content_copy";
+}
+.fa.fa-plus-square-o:before, .fa.fa-plus-o:before {
+  font-family: "Material Icons";
+  content: "add_circle_outline";
+}
+.fa.fa-lock:before {
+  font-family: "Material Icons";
+  content: "lock";
+}
+.fa.syn-question-circle:before {
+  font-family: "Material Icons";
+  content: "help_outline";
+}
+.fa.syn-info-circle:before {
+  font-family: "Material Icons";
+  content: "info_outline";
+}
+.fa.fa-sign-out:before {
+  font-family: "Material Icons";
+  content: "exit_to_app";
+}
+.fa.fa-envelope-o:before {
+  font-family: "Material Icons";
+  content: "mail_outline";
+}
+.fa.fa-times-circle:before {
+  font-family: "Material Icons";
+  content: "delete";
+}
+.fa.syn-check:before {
+  font-family: "Material Icons";
+  content: "check";
+}
+
+.fa.fa-newspaper-o:before {
+  font-family: "Material Icons";
+  content: "article";
+}
+.fa.syn-star:before {
+  font-family: "Material Icons";
+  content: "star";
+}
+.fa.syn-star-o:before {
+  font-family: "Material Icons";
+  content: "star_border";
+}
+.fa.fa-bar-chart:before {
+  font-family: "Material Icons";
+  content: "bar_chart";
+}
+.fa.fa-flag:before {
+  font-family: "Material Icons";
+  content: "flag";
+}
+.fa.fa-history:before {
+  font-family: "Material Icons";
+  content: "history";
+}
+.fa.fa-filter:before {
+  font-family: "Material Icons";
+  content: "filter_alt";
+}
+.fa.fa-thumb-tack:before {
+  font-family: "Material Icons";
+  content: "push_pin";
+}
+.fa.fa-eye:before {
+  font-family: "Material Icons";
+  content: "visibility";
+}
+.fa.fa-eye-slash:before {
+  font-family: "Material Icons";
+  content: "visibility_off";
+}
+.fa.fa-bold:before {
+  font-family: "Material Icons";
+  content: "format_bold";
+}
+.fa.fa-italic:before {
+  font-family: "Material Icons";
+  content: "format_italic";
+}
+.fa.fa-italic:before {
+  font-family: "Material Icons";
+  content: "format_italic";
+}
+.fa.fa-strikethrough:before {
+  font-family: "Material Icons";
+  content: "strikethrough_s";
+}
+.fa.fa-subscript:before {
+  font-family: "Material Icons";
+  content: "subscript";
+}
+.fa.fa-superscript:before {
+  font-family: "Material Icons";
+  content: "superscript";
+}
+.fa.fa-camera:before {
+  font-family: "Material Icons";
+  content: "image";
+}
+.fa.fa-user-plus:before {
+  font-family: "Material Icons";
+  content: "person_add_alt";
+}
+.fa.syn-user:before {
+  font-family: "Material Icons";
+  content: "person";
+}
+.fa.syn-users:before {
+  font-family: "Material Icons";
+  content: "people_alt";
+}
+.fa.fa-times:before {
+  font-family: "Material Icons";
+  content: "close";
+}
+.fa.fa-code-fork:before {
+  font-family: "Material Icons";
+  content: "account_tree";
+}
+.fa.fa-tags:before {
+  font-family: "Material Icons";
+  content: "local_offer";
+}
+.fa.fa-exchange:before {
+  font-family: "Material Icons";
+  content: "compare_arrows";
+}
+.fa.fa-caret-square-o-right:before {
+  font-family: "Material Icons";
+  content: "arrow_drop_down";
+}
+.fa.fa-caret-square-o-down:before {
+  font-family: "Material Icons";
+  content: "arrow_drop_up";
+}
+.fa.syn-search:before {
+  font-family: "Material Icons";
+  content: "search";
+}
+.fa.fa-arrows:before {
+  font-family: "Material Icons";
+  content: "open_with";
+}
+.fa.fa-remove:before {
+  font-family: "Material Icons";
+  content: "remove_circle";
+}
+.fa.fa-ellipsis-h:before {
+  font-family: "Material Icons";
+  content: "more_horiz";
+}
+.fa.fa-ellipsis-v:before {
+  font-family: "Material Icons";
+  content: "more_vert";
+}
+.fa.fa-arrow-left:before {
+  font-family: "Material Icons";
+  content: "arrow_back";
+}
+.fa.fa-arrows-alt:before {
+  font-family: "Material Icons";
+  content: "open_in_full";
+}
+
+//Project
+.fa.fa-list-alt:before {
+  font-family: "Material Icons";
+  content: "wysiwyg";
+}
+//Table
+.fa.fa-table:before {
+  font-family: "Material Icons";
+  // content: "table_view";
+  content: "grid_on";
+}
+//View
+.fa.fa-th-list:before {
+  font-family: "Material Icons";
+  content: "view_list";
+}
+//Submission view
+.fa.fa-server:before {
+  font-family: "Material Icons";
+  content: "view_stream";
+}
+
+// special cases
+
+//dropdowns.  usually defined via border styles, hack it!
+#body .caret {
+  border-top:none;
+  border-left:none;
+  border-right:none;
+  display: inline-block;
+  width: 8px;
+  height: 12px;
+  vertical-align: top;
+  &:before {
+    font-family: "Material Icons";
+    content: "expand_more";  
+  }
+}
+
+//modal dialog close button, hack it!
+#body .modal-header .close {
+  // hide the bootstrap button text ('x'), but show an icon in a pseudo element.
+  visibility: hidden;
+  margin-top: 0px; //bootstrap corrects their x by moving it up via negative margin top.
+  &:before {
+    visibility: visible;
+    font-family: "Material Icons";
+    content: "close";  
+  }
+}

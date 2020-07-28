@@ -2,10 +2,8 @@ package org.sagebionetworks.web.client.widget.sharing;
 
 import java.util.HashSet;
 import java.util.Map;
-import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.ListBox;
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
-import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
@@ -23,8 +21,6 @@ import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -105,19 +101,13 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 			data.add(permListBox);
 			// Add delete button and size columns.
 			data = new TableData();
-			Button button = new Button("", new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent event) {
-					tableBody.remove(row);
-					deleteButtonCallback.invoke(Long.parseLong(aclEntry.getOwnerId()));
-				}
-
+			Anchor deleteButton = new Anchor();
+			deleteButton.setIcon(IconType.TIMES);
+			deleteButton.addClickHandler(event -> {
+				tableBody.remove(row);
+				deleteButtonCallback.invoke(Long.parseLong(aclEntry.getOwnerId()));
 			});
-			button.setSize(ButtonSize.EXTRA_SMALL);
-			button.setIcon(IconType.REMOVE);
-			button.setType(ButtonType.DANGER);
-			data.add(button);
+			data.add(deleteButton);
 			row.add(data);
 
 			permissionColumnHeader.addStyleName("col-md-2");
