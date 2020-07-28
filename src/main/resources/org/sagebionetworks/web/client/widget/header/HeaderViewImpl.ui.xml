@@ -80,8 +80,8 @@
 					addStyleNames="right margin-left-10 margin-right-10 padding-left-15"
 					visible="false">
 					<b:Button ui:field="loginLink"
-						text="&nbsp;&nbsp;&nbsp;Sign in&nbsp;&nbsp;&nbsp;" type="SUCCESS"
-						marginTop="7" />
+						text="Sign in" type="SUCCESS"
+						marginTop="10" paddingLeft="20" paddingRight="20" />
 				</g:SimplePanel>
 				<b:DropDown ui:field="dashboardDropdown"
 					addStyleNames="right imageButton greenBackgroundOnHover"
