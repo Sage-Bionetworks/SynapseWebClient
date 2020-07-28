@@ -2832,7 +2832,8 @@ div.border {
 		input, input:focus {
 			background-color:#274660;
 			color: white;
-			padding: 0px;			
+			padding: 0px;	
+			margin-top: 15px;		
 		}
 	}
 	div.searchBoxContainer.inactive:hover, div.searchBoxContainer.inactive:focus {
@@ -2846,7 +2847,7 @@ div.border {
 			transition: width 0.4s ease-in-out;
 		}
 		i {
-			font-size: 25px;
+			font-size: 30px;
 		}
 	}
 
@@ -2861,7 +2862,6 @@ div.border {
 			font-size: 20px;
 			position: relative;
 			left: 8px;
-			top: -1px;
 			opacity: 0.5;
 			width: 10px;
 		}

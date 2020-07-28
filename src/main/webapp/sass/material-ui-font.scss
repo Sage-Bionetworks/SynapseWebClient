@@ -177,3 +177,76 @@
   font-family: "Material Icons";
   content: "arrow_drop_up";
 }
+.fa.syn-search:before {
+  font-family: "Material Icons";
+  content: "search";
+}
+.fa.fa-arrows:before {
+  font-family: "Material Icons";
+  content: "open_with";
+}
+.fa.fa-remove:before {
+  font-family: "Material Icons";
+  content: "remove_circle";
+}
+.fa.fa-ellipsis-h:before {
+  font-family: "Material Icons";
+  content: "more_horiz";
+}
+.fa.fa-ellipsis-v:before {
+  font-family: "Material Icons";
+  content: "more_vert";
+}
+.fa.fa-arrow-left:before {
+  font-family: "Material Icons";
+  content: "arrow_back";
+}
+//Project
+.fa.fa-list-alt:before {
+  font-family: "Material Icons";
+  content: "wysiwyg";
+}
+//Table
+.fa.fa-table:before {
+  font-family: "Material Icons";
+  content: "table_view";
+}
+//View
+.fa.fa-th-list:before {
+  font-family: "Material Icons";
+  content: "view_list";
+}
+//Submission view
+.fa.fa-server:before {
+  font-family: "Material Icons";
+  content: "view_stream";
+}
+
+// special cases
+
+//dropdowns.  usually defined via border styles, hack it!
+#body .caret {
+  border-top:none;
+  border-left:none;
+  border-right:none;
+  display: inline-block;
+  width: 8px;
+  height: 12px;
+  vertical-align: top;
+  &:before {
+    font-family: "Material Icons";
+    content: "expand_more";  
+  }
+}
+
+//modal dialog close button, hack it!
+#body .modal-header .close {
+  // hide the bootstrap button text ('x'), but show an icon in a pseudo element.
+  visibility: hidden;
+  margin-top: 0px; //bootstrap corrects their x by moving it up via negative margin top.
+  &:before {
+    visibility: visible;
+    font-family: "Material Icons";
+    content: "close";  
+  }
+}
