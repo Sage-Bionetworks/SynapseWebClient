@@ -24,6 +24,7 @@ $synapse-purple: #7772b4;
 $synapse-yellow: #e0b603;
 $synapse-orange: #E8762B;
 $synapse-accent-primary: #17a2b8;
+$synapse-dark-text: #515359;
 
 .colored { color:$synapse-blue;}
 .link, details > summary { color:$synapse-blue;}
@@ -77,8 +78,11 @@ a:focus{color:$synapse-blue; text-decoration:underline;}
 	display: inline-block;
 }
 
-body {
-	overflow-y: auto
+#body {
+	overflow-y: auto;
+	color:#666666;
+	// font-size:1em;
+	// line-height:1.6em;
 }
 /* Prevent body from scrolling when modal is open
 http://stackoverflow.com/questions/9538868/prevent-body-from-scrolling-when-a-modal-is-opened
@@ -94,9 +98,6 @@ sticky footer
 #rootPanel {
   /** set the min height of the root panel to subtract the height of the header and footer **/
 	min-height: calc(100vh - 50px);
-	color:#666666;
-	font-size:1em;
-	line-height:1.6em;
 }
 /**
 end sticky footer
@@ -193,6 +194,7 @@ end sticky footer
 		$button-color: #ebebeb;
 		background-color: $button-color;
 		border-color: $button-color;
+		color: $synapse-dark-text;
 	}
 
 	.btn {
@@ -1940,7 +1942,7 @@ ol.lowerroman {
     position: absolute;
     top: 6px;
     left: 6px;
-	color: #333333;
+		color: $synapse-dark-text;
     font-size: 18px;
     font-weight: 200;
     line-height: 1.4;
@@ -1949,7 +1951,7 @@ ol.lowerroman {
 }
 
 .highlight-title {
-	color: #333333;
+		color: $synapse-dark-text;
     font-size: 18px;
     font-weight: 200;
     line-height: 1.4;
@@ -2505,7 +2507,6 @@ td.datePickerMonth {
 	z-index:20; 
 	position:absolute;
 	top: 28.8px; 
-	color:black;
 	font-size:12px;
 	text-align:center;	
 	background-repeat: no-repeat;	
@@ -2518,7 +2519,6 @@ td.datePickerMonth {
 	width: 132px;
 	z-index:20; 
 	position:absolute; 
-	color:black;
 	padding: 0px 5px 11px 0px;
 	font-size:12px;	
 
@@ -2551,7 +2551,6 @@ td.datePickerMonth {
 	width:32.4px; height:16.8px;
 	z-index:20;
 	position:absolute;
-	color:black;
 	padding-top:0px;
 	font-size:12px;
 	text-align:center;
@@ -2905,8 +2904,13 @@ div.border {
 	}
 }
 #body {
+	.dropdown-menu>li>a {
+		color: $synapse-dark-text;
+	}
+
 	.dropdown-menu>li>a:focus, .dropdown-menu>li>a:hover {
 		background-color: $synapse-blue;
+		color: white;
 	}
 
 	.dropdown.SRC-primary-background-color-hover.open {
@@ -3066,7 +3070,7 @@ div.border {
 }
 
 #body .AccessRequirementList {
-  color: #515359;
+  color: $synapse-dark-text;
 
   &__instruction {
     font-size: 18px;
@@ -3108,7 +3112,7 @@ div.border {
     margin-top: 20px;
   }
 	&__signin button {
-		color: #515359;
+		color: $synapse-dark-text;
 		font-weight: normal;
 		cursor: text;
 	}
