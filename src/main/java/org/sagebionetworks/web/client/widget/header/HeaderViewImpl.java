@@ -161,9 +161,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		Icon angleDown = new Icon(IconType.ANGLE_DOWN);
 		angleDown.setPull(Pull.RIGHT);
 		angleDown.setPaddingTop(20);
-		angleDown.setPaddingRight(10);
+		angleDown.setPaddingRight(6);
 		angleDown.setPaddingBottom(19);
-		angleDown.setPaddingLeft(5);
+		angleDown.setPaddingLeft(0);
 		angleDown.setMarginLeft(0);
 		dashboardDropdownAnchor.add(angleDown);
 		Icon starIcon = new Icon(IconType.STAR);
