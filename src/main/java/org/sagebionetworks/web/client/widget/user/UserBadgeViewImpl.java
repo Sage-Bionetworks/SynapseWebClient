@@ -17,7 +17,6 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -54,6 +53,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		this.authController = authController;
 		setMarginRight(2);
 		setMarginLeft(2);
+		addStyleName("vertical-align-middle");
 		currentClickHandler = STANDARD_HANDLER;
 		addAttachHandler(event -> {
 			if (!event.isAttached()) {
@@ -128,11 +128,10 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		this.badgeSize = size;
 		if (badgeSize.equals(BadgeSize.DEFAULT)) {
 			isReactHandlingClickEvents = false;
-			addStyleName("inline-block vertical-align-middle");
-			setHeight("35px");
+			addStyleName("default-user-badge");
 		} else {
 			isReactHandlingClickEvents = true;
-			removeStyleName("inline-block");
+			removeStyleName("default-user-badge");
 		}
 	}
 
