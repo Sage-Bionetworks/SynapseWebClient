@@ -10,7 +10,6 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
@@ -19,7 +18,6 @@ import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -31,7 +29,6 @@ import com.google.inject.Inject;
  *
  */
 public class CreateManagedACTAccessRequirementStep2 implements ModalPage, CreateManagedACTAccessRequirementStep2View.Presenter {
-	public static final String INVALID_RENEWAL_URL_MESSAGE = "Please enter a valid renewal details URL.";
 	CreateManagedACTAccessRequirementStep2View view;
 	ModalPresenter modalPresenter;
 	ManagedACTAccessRequirement accessRequirement;
@@ -98,11 +95,6 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 		} else {
 			view.setExpirationPeriod("");
 		}
-		if (accessRequirement.getRenewalDetailsUrl() != null) {
-			view.setRenewalDetailsURL(accessRequirement.getRenewalDetailsUrl());
-		} else {
-			view.setRenewalDetailsURL("");
-		}
 		
 		view.setIsCertifiedUserRequired(accessRequirement.getIsCertifiedUserRequired());
 		view.setIsDUCRequired(accessRequirement.getIsDUCRequired());
@@ -132,23 +124,12 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 		modalPresenter.setLoading(true);
 		accessRequirement.setAreOtherAttachmentsRequired(view.areOtherAttachmentsRequired());
 		String expirationPeriod = view.getExpirationPeriod();
-		String renewalDetailsURL = view.getRenewalDetailsURL();
-		
-		if (!ValidationUtils.isValidUrl(renewalDetailsURL, true)) {
-			modalPresenter.setErrorMessage(INVALID_RENEWAL_URL_MESSAGE);
-			return;
-		}
-		if (renewalDetailsURL != null && renewalDetailsURL.trim().isEmpty()) {
-			// service will reject if setting to the empty string with an undefined expiration period.
-			renewalDetailsURL = null;
-		}
-		accessRequirement.setRenewalDetailsUrl(renewalDetailsURL);
 		
 		if (DisplayUtils.isDefined(expirationPeriod)) {
 			try {
 				long expirationPeriodInDays = Long.parseLong(expirationPeriod);
-				if (expirationPeriodInDays < 0 || (expirationPeriodInDays > 0 && expirationPeriodInDays < 365)) {
-					throw new NumberFormatException("If expiration period is set, then it must be greater than a year.");
+				if (expirationPeriodInDays < 0) {
+					throw new NumberFormatException("If expiration period is set, then it must be greater than 0.");
 				}
 				accessRequirement.setExpirationPeriod(expirationPeriodInDays * DAY_IN_MS);
 			} catch (NumberFormatException e) {

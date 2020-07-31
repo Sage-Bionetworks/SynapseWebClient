@@ -46,13 +46,6 @@
 							<b:FormLabel>Expiration period (days)</b:FormLabel>
 							<b:TextBox ui:field="expirationPeriodTextbox" />
 						</b:FormGroup>
-						<b:FormGroup>
-							<b:FormLabel>Renewal details URL (optional)</b:FormLabel>
-							<w:HelpWidget
-								helpMarkdown="Optional URL that can be used for external informational material about the access renewal process. If present will be included in access renewal notifications. Only applies if the expiration period is set."
-								addStyleNames="margin-left-5" placement="RIGHT" />									
-							<b:TextBox ui:field="renewalDetailsURLTextbox" />
-						</b:FormGroup>
 						<b:CheckBox ui:field="intendedDataUsePublicCheckbox"
 							text="Intended Data Use statements will be publicly available." />
 					</b:PanelBody>

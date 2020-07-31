@@ -43,10 +43,6 @@ public interface CreateManagedACTAccessRequirementStep2View extends IsWidget {
 
 	void setDUCTemplateWidget(IsWidget w);
 
-	void setRenewalDetailsURL(String value);
-
-	String getRenewalDetailsURL();
-
 	public void setPresenter(Presenter p);
 
 	/*
