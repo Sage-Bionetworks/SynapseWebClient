@@ -29,7 +29,6 @@ import com.google.inject.Inject;
  *
  */
 public class CreateManagedACTAccessRequirementStep2 implements ModalPage, CreateManagedACTAccessRequirementStep2View.Presenter {
-	public static final String INVALID_RENEWAL_URL_MESSAGE = "Please enter a valid renewal details URL.";
 	CreateManagedACTAccessRequirementStep2View view;
 	ModalPresenter modalPresenter;
 	ManagedACTAccessRequirement accessRequirement;
