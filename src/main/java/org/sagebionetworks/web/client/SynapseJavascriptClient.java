@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -71,7 +72,8 @@ import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.auth.Username;
-
+import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotificationRequest;
+import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotificationResponse;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionInfoPage;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionInfoPageRequest;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
@@ -139,6 +141,7 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.util.ValidateArgument;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -299,6 +302,7 @@ public class SynapseJavascriptClient {
 	public static final String DOWNLOAD_LIST_REMOVE = DOWNLOAD_LIST + "/remove";
 	public static final String DOWNLOAD_LIST_CLEAR = DOWNLOAD_LIST + "/clear";
 	public static final String ACCESS_REQUIREMENT = "/accessRequirement/";
+	public static final String ACCESS_APPROVAL = "/accessApproval";
 	public static final String SUBMISSIONS = "/submissions";
 	public static final String DOWNLOAD_ORDER = "/download/order";
 	public static final String DOWNLOAD_ORDER_HISTORY = DOWNLOAD_ORDER + "/history";
@@ -1821,6 +1825,14 @@ public class SynapseJavascriptClient {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}
 		sendRequest(requestBuilder, token, OBJECT_TYPE.String, INITIAL_RETRY_REQUEST_DELAY_MS, false, cb);
+	}
+	
+	public void getAccessApprovalNotifications(Long requirementId, List<Long> recipientIds, AsyncCallback<AccessApprovalNotificationResponse> cb) {
+		AccessApprovalNotificationRequest request = new AccessApprovalNotificationRequest();
+		request.setRecipientIds(recipientIds);
+		request.setRequirementId(requirementId);
+		String url = getRepoServiceUrl() + ACCESS_APPROVAL + "/notifications";
+		doPost(url, request, OBJECT_TYPE.AccessApprovalNotificationResponse, true, cb);
 	}
 }
 
