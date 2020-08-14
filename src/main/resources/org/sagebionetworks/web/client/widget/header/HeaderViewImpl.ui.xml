@@ -27,35 +27,21 @@
 		<b:Alert ui:field="stagingAlert" type="WARNING"
 			visible="false" marginRight="0" marginLeft="0" marginBottom="0"
 			marginTop="0">
-			<bh:Div width="100%">
-				<bh:Span paddingRight="5" paddingLeft="10">
+			<bh:Div width="100%" addStyleNames="flexcontainer-row" marginTop="5">
+				<bh:Span paddingRight="5" paddingLeft="10" addStyleNames="flexcontainer-column">
 					<b:Icon type="SYN_CRASH_HELMET" />
 				</bh:Span>
+				<bh:Span addStyleNames="flexcontainer-column flexcontainer-column-fill-width"
+					paddingRight="3" text="THIS WEBSITE IS FOR TESTING ONLY!" />
 				<bh:Span
-					addStyleNames="displayInlineBlock color-white moveup-3"
-					paddingRight="5" paddingLeft="5">
-					<bh:Span addStyleNames="displayInlineBlock"
-						paddingRight="3">
-						<bh:Span text="THIS WEBSITE IS FOR"
-							addStyleNames="hidden-xs" />
-					</bh:Span>
-					<bh:Span text="TESTING ONLY!" addStyleNames="hidden-xxs" />
-					<bh:Span addStyleNames="displayInlineBlock">
-						<bh:Span
-							text="Any data created will be deleted. To do your work, please use production site."
-							addStyleNames="margin-left-5 visible-lg" />
-					</bh:Span>
-				</bh:Span>
-				<bh:Span>
-					<bh:Span addStyleNames="right">
-						<b:Anchor text="GO TO PRODUCTION"
-							addStyleNames="color-white" href="https://www.synapse.org" />
-						<w:HelpWidget
-							helpMarkdown="This is not the official Sage Bionetworks Synapse Production website."
-							addStyleNames="margin-left-5 right" iconStyles="color-white"
-							placement="LEFT" />
-					</bh:Span>
-				</bh:Span>
+					text="Any data created will be deleted. To do your work, please use production site."
+					addStyleNames="flexcontainer-column flexcontainer-column-fill-width margin-left-5 visible-lg" /> 
+				<b:Anchor text="GO TO PRODUCTION"
+					addStyleNames="flexcontainer-column flexcontainer-justify-flex-end color-white" href="https://www.synapse.org" />
+				<w:HelpWidget
+					helpMarkdown="This is not the official Sage Bionetworks Synapse Production website."
+					addStyleNames="flexcontainer-column flexcontainer-justify-flex-end margin-left-5" iconStyles="color-white"
+					placement="LEFT" />
 			</bh:Div>
 		</b:Alert>
 		<bh:Div ui:field="headerDiv"
@@ -163,25 +149,23 @@
 			</bh:Span>
 		</bh:Div>
 		<b:Alert ui:field="cookieNotificationAlert" visible="false"
-			addStyleNames="fullWidthAlert" type="INFO" marginTop="0"
+			addStyleNames="fullWidthAlert flexcontainer-row" type="INFO" marginTop="0"
 			marginRight="0" paddingRight="40">
-			<bh:Span marginLeft="10">
-				<b:Icon addStyleNames="font-size-17 black-25-percent"
-					type="INFO_CIRCLE" marginLeft="5" marginTop="15" />
-				<bh:Span addStyleNames="font-size-15" marginLeft="10"
-					marginTop="13">
-					<bh:Span>This site uses Cookies to enhance your experience and to
-						analyze our traffic. Using Synapse means that you agree with our
-						cookie policy.</bh:Span>
-				</bh:Span>
+			<b:Icon addStyleNames="flexcontainer-column font-size-17 black-25-percent"
+				type="INFO_CIRCLE" marginLeft="5" marginTop="15" />
+			<bh:Span addStyleNames="flexcontainer-column font-size-15 flexcontainer-column-fill-width" marginLeft="10"
+				marginTop="13">
+				This site uses Cookies to enhance your experience and to
+				analyze our traffic. Using Synapse means that you agree with our
+				cookie policy.
 			</bh:Span>
 			<bh:Br addStyleNames="hidden-lg" />
 			<b:Anchor text="LEARN MORE"
 				ui:field="cookieNotificationLearnMoreLink" target="_blank"
-				addStyleNames="color-white font-size-15" marginLeft="15"
+				addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end color-white font-size-15" marginLeft="15"
 				marginTop="13" marginRight="10"
 				href="https://s3.amazonaws.com/static.synapse.org/governance/SynapsePrivacyPolicy.pdf" />
-			<b:Button ui:field="cookieNotificationAlertOkButton"
+			<b:Button ui:field="cookieNotificationAlertOkButton" addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end"
 				text="OK" size="SMALL" marginLeft="15" marginBottom="4" />
 		</b:Alert>
 	</bh:Div>
