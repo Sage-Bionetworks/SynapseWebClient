@@ -8,12 +8,12 @@
 
 	<bh:Div>
 		<bh:Div addStyleNames="flexcontainer-row margin-bottom-10">
-			<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width">
-				<b:Heading size="H2" addStyleNames="displayInlineBlock margin-right-5 margin-bottom-0-imp">
-				 	<b:Icon ui:field="entityIcon" addStyleNames="margin-right-5 lightGreyText" type="FOLDER"/>
-				 	<bh:Span ui:field="fileName"/>
-				 	<g:SimplePanel ui:field="favoritePanel" addStyleNames="margin-left-5"/>
-				</b:Heading>
+			<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width font-size-30">
+				<bh:Div addStyleNames="flexcontainer-row flexcontainer-align-items-center overflow-x-auto">
+				 	<b:Icon ui:field="entityIcon" addStyleNames="margin-right-5 lightGreyText flexcontainer-column" type="FOLDER"/>
+				 	<bh:Span ui:field="fileName" addStyleNames="flexcontainer-column "/>
+				 	<g:SimplePanel ui:field="favoritePanel" addStyleNames="flexcontainer-column margin-left-5"/>
+				 </bh:Div>
 			</bh:Div>
 			<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end" ui:field="actionMenuContainer"/>
 		</bh:Div>

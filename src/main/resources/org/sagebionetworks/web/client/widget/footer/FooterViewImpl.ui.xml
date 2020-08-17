@@ -12,25 +12,17 @@
 		<bh:ClearFix />
 		<b:Alert ui:field="debugModeAlert" type="DANGER"
 			visible="false" marginRight="0" marginLeft="0" marginBottom="0">
-			<bh:Div width="100%">
-				<bh:Span paddingRight="5" paddingLeft="10">
+			<bh:Div width="100%" addStyleNames="flexcontainer-row">
+				<bh:Span paddingRight="5" paddingLeft="10" addStyleNames="flexcontainer-column">
 					<b:Icon type="SYN_CRASH_HELMET" />
 				</bh:Span>
-				<bh:Span
-					addStyleNames="displayInlineBlock color-white moveup-3">
-					<bh:Span text="ALPHA TEST MODE" />
-					<bh:Span text="ACTIVE" addStyleNames="hidden-xs"
-						paddingLeft="3" />
-				</bh:Span>
-				<bh:Span
-					addStyleNames="right displayInlineBlock color-white">
-					<b:Anchor ui:field="debugOffLink" text="TURN OFF"
-						addStyleNames="color-white margin-right-10" />
-					<w:HelpWidget
-						helpMarkdown="This mode is for alpha testing features only. Please note that the developer does not guarantee an absence of errors, and that the data created using alpha features may be lost during product upgrade."
-						addStyleNames="margin-left-5 right" iconStyles="color-white"
-						placement="TOP" />
-				</bh:Span>
+				<bh:Span text="ALPHA TEST MODE ACTIVE" addStyleNames="flexcontainer-column flexcontainer-column-fill-width color-white" />
+				<b:Anchor ui:field="debugOffLink" text="TURN OFF"
+					addStyleNames="flexcontainer-column flexcontainer-justify-flex-end color-white margin-right-10" />
+				<w:HelpWidget
+					helpMarkdown="This mode is for alpha testing features only. Please note that the developer does not guarantee an absence of errors, and that the data created using alpha features may be lost during product upgrade."
+					addStyleNames="flexcontainer-column flexcontainer-justify-flex-end margin-left-5" iconStyles="color-white"
+					placement="TOP" />
 			</bh:Div>
 		</b:Alert>
 
