@@ -152,9 +152,9 @@
 			addStyleNames="fullWidthAlert flexcontainer-row" type="INFO" marginTop="0"
 			marginRight="0" paddingRight="40">
 			<b:Icon addStyleNames="flexcontainer-column font-size-17 black-25-percent"
-				type="INFO_CIRCLE" marginLeft="5" marginTop="15" />
+				type="INFO_CIRCLE" marginLeft="5" marginTop="10" />
 			<bh:Span addStyleNames="flexcontainer-column font-size-15 flexcontainer-column-fill-width" marginLeft="10"
-				marginTop="13">
+				marginTop="7">
 				This site uses Cookies to enhance your experience and to
 				analyze our traffic. Using Synapse means that you agree with our
 				cookie policy.
@@ -163,10 +163,10 @@
 			<b:Anchor text="LEARN MORE"
 				ui:field="cookieNotificationLearnMoreLink" target="_blank"
 				addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end color-white font-size-15" marginLeft="15"
-				marginTop="13" marginRight="10"
+				marginTop="7" marginRight="10"
 				href="https://s3.amazonaws.com/static.synapse.org/governance/SynapsePrivacyPolicy.pdf" />
 			<b:Button ui:field="cookieNotificationAlertOkButton" addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end"
-				text="OK" size="SMALL" marginLeft="15" marginBottom="4" />
+				text="OK" size="SMALL" marginLeft="15" marginBottom="3" marginTop="5" />
 		</b:Alert>
 	</bh:Div>
 </ui:UiBinder>
