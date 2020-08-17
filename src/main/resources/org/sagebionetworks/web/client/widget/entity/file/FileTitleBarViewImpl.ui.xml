@@ -11,12 +11,12 @@
 	<g:HTMLPanel ui:field="panel">
 		<g:HTMLPanel ui:field="fileFoundContainer">
 			<bh:Div addStyleNames="flexcontainer-row margin-bottom-10">
-				<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width overflow-x-auto">
-					<b:Heading size="H2" addStyleNames="displayInlineBlock">
-					 	<b:Icon ui:field="entityIcon" addStyleNames="lightGreyText margin-right-5" type="FILE"/>
-					 	<bh:Text ui:field="entityName" />
-					 	<g:SimplePanel ui:field="favoritePanel" addStyleNames="margin-left-5 margin-right-10"/>
-					</b:Heading>
+				<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width font-size-30">
+					<bh:Div addStyleNames="flexcontainer-row flexcontainer-align-items-center overflow-x-auto">
+					 	<b:Icon ui:field="entityIcon" addStyleNames="flexcontainer-column lightGreyText margin-right-5" type="FILE"/>
+					 	<bh:Span ui:field="entityName" addStyleNames="flexcontainer-column"/>
+					 	<g:SimplePanel ui:field="favoritePanel" addStyleNames="flexcontainer-column margin-left-5 margin-right-10"/>
+					</bh:Div>
 				</bh:Div>
 				<bh:Div addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end">
 					<b:DropDown addStyleNames="displayInlineBlock">
