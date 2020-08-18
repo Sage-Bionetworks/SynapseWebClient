@@ -1,11 +1,18 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.approval;
 
+import java.util.List;
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.ModalBody;
+import org.gwtbootstrap3.client.ui.ModalFooter;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotification;
+import org.sagebionetworks.web.client.DateTimeUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.TextBoxWithCopyToClipboardWidget;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -22,22 +29,22 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 	@UiField
 	Div submittedByContainer;
 	@UiField
-	Button showAccessRequirementButton;
+	AnchorListItem showAccessRequirementItem;
+	@UiField
+	AnchorListItem showNotificationsItem;
 	@UiField
 	Div emailsContainer;
 	@UiField
-	Button revokeAccessButton;
+	AnchorListItem revokeAccessItem;
 	@UiField
 	Label expiresOnField;
-	@UiField
-	Button closeButton;
-
-	@UiField
+	
 	Modal dialog;
-	@UiField
-	Div accessRequirementWidgetContainer;
-
+	Div dialogBodyDiv = new Div();
+	
 	Presenter presenter;
+	PortalGinInjector ginInjector;
+	DateTimeUtils dateTimeUtils;
 
 	public interface Binder extends UiBinder<Widget, AccessorGroupViewImpl> {
 	}
@@ -45,25 +52,18 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 	Widget w;
 
 	@Inject
-	public AccessorGroupViewImpl(Binder binder) {
+	public AccessorGroupViewImpl(Binder binder, PortalGinInjector ginInjector, DateTimeUtils dateTimeUtils) {
 		this.w = binder.createAndBindUi(this);
-		showAccessRequirementButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onShowAccessRequirement();
-			}
+		this.ginInjector = ginInjector;
+		this.dateTimeUtils = dateTimeUtils;
+		showAccessRequirementItem.addClickHandler(event -> {
+			presenter.onShowAccessRequirement();
 		});
-		revokeAccessButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onRevoke();
-			}
+		revokeAccessItem.addClickHandler(event -> {
+			presenter.onRevoke();
 		});
-		closeButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				dialog.hide();
-			}
+		showNotificationsItem.addClickHandler(event -> {
+			presenter.onShowNotifications();
 		});
 	}
 
@@ -110,17 +110,49 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 	}
 
 	@Override
-	public void showAccessRequirementDialog() {
-		accessRequirementWidgetContainer.setVisible(true);
-		dialog.show();
+	public void showAccessRequirementDialog(IsWidget w) {
+		dialogBodyDiv.clear();
+		dialogBodyDiv.add(w);
+
+		Modal modal = getModal();
+		modal.addStyleName("modal-fullscreen");
+		modal.setTitle("Access Requirement");
+		modal.show();
 	}
 
 	@Override
-	public void setAccessRequirementWidget(IsWidget w) {
-		accessRequirementWidgetContainer.clear();
-		accessRequirementWidgetContainer.add(w);
+	public void showNotifications(List<AccessApprovalNotification> notifications) {
+		dialogBodyDiv.clear();
+		// show each notification
+		for (AccessApprovalNotification notification : notifications) {
+			Div div = new Div();
+			div.addStyleName("flexcontainer-row flexcontainer-align-items-center");
+			
+			Span s = new Span();
+			s.addStyleName("flexcontainer-column");
+			s.setMarginRight(10);
+			s.setText(dateTimeUtils.getDateTimeString(notification.getSentOn()) + " : ");
+			div.add(s);
+			
+			UserBadge badge = ginInjector.getUserBadgeWidget();
+			badge.configure(notification.getRecipientId().toString());
+			badge.addStyleNames("flexcontainer-column");
+			div.add(badge);
+			
+			s = new Span();
+			s.addStyleName("flexcontainer-column");
+			s.setMarginLeft(10);
+			s.setText(notification.getNotificationType().toString());
+			div.add(s);
+			
+			dialogBodyDiv.add(div);	
+		}
+		Modal modal = getModal();
+		modal.removeStyleName("modal-fullscreen");
+		modal.setTitle("Notifications");
+		modal.show();
 	}
-
+	
 	@Override
 	public void setExpiresOn(String expiresOnString) {
 		expiresOnField.setText(expiresOnString);
@@ -137,5 +169,24 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 		emailTextBox.setText(username + "@synapse.org");
 		emailTextBox.setAddStyleNames("displayBlock");
 		emailsContainer.add(emailTextBox);
+	}
+	
+	
+	private Modal getModal() {
+		if (dialog == null) {
+			dialog = new Modal();
+			Button dialogCloseButton = new Button("Close");
+			dialogCloseButton.addClickHandler(event -> {
+				dialog.hide();
+			});
+			ModalBody body = new ModalBody();
+			body.add(dialogBodyDiv);
+			dialog.add(body);
+			
+			ModalFooter footer = new ModalFooter();
+			footer.add(dialogCloseButton);
+			dialog.add(footer);
+		}
+		return dialog;
 	}
 }

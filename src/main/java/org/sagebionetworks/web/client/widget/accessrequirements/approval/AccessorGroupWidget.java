@@ -3,11 +3,13 @@ package org.sagebionetworks.web.client.widget.accessrequirements.approval;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import java.util.List;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotificationResponse;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroup;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
@@ -20,6 +22,7 @@ import com.google.inject.Inject;
 
 public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidget {
 
+	public static final String NO_NOTIFICATIONS_FOUND_MESSAGE = "No notifications found.";
 	public static final String ARE_YOU_SURE = "Accessors will lose access to resources that this approval grants. Are you sure?";
 	public static final String REVOKE_ACCESS_TO_GROUP = "Revoke access?";
 	private AccessorGroupView view;
@@ -32,9 +35,10 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 	Callback onRevokeCallback;
 	DateTimeUtils dateTimeUtils;
 	UserProfileAsyncHandler userProfileAsyncHandler;
+	SynapseJavascriptClient jsClient;
 
 	@Inject
-	public AccessorGroupWidget(AccessorGroupView view, SynapseAlert synAlert, PortalGinInjector ginInjector, PopupUtilsView popupUtils, AccessRequirementWidget accessRequirementWidget, DataAccessClientAsync dataAccessClient, DateTimeUtils dateTimeUtils, UserProfileAsyncHandler userProfileAsyncHandler) {
+	public AccessorGroupWidget(AccessorGroupView view, SynapseAlert synAlert, PortalGinInjector ginInjector, PopupUtilsView popupUtils, AccessRequirementWidget accessRequirementWidget, DataAccessClientAsync dataAccessClient, DateTimeUtils dateTimeUtils, UserProfileAsyncHandler userProfileAsyncHandler, SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
@@ -42,11 +46,11 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 		this.accessRequirementWidget = accessRequirementWidget;
 		this.dataAccessClient = dataAccessClient;
 		fixServiceEntryPoint(dataAccessClient);
+		this.jsClient = jsClient;
 		this.userProfileAsyncHandler = userProfileAsyncHandler;
 		this.dateTimeUtils = dateTimeUtils;
 		view.setPresenter(this);
 		view.setSynAlert(synAlert);
-		view.setAccessRequirementWidget(accessRequirementWidget);
 	}
 
 	public void configure(AccessorGroup accessorGroup) {
@@ -105,7 +109,7 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 	@Override
 	public void onShowAccessRequirement() {
 		accessRequirementWidget.configure(accessorGroup.getAccessRequirementId(), null);
-		view.showAccessRequirementDialog();
+		view.showAccessRequirementDialog(accessRequirementWidget);
 	}
 
 	@Override
@@ -125,6 +129,25 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 				popupUtils.showInfo("Successfully revoked access.");
 				if (onRevokeCallback != null) {
 					onRevokeCallback.invoke();
+				}
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		});
+	}
+	
+	@Override
+	public void onShowNotifications() {
+		jsClient.getAccessApprovalNotifications(accessorGroup.getAccessRequirementId(), accessorGroup.getAccessorIds(), new AsyncCallback<AccessApprovalNotificationResponse>() {
+			@Override
+			public void onSuccess(AccessApprovalNotificationResponse result) {
+				if (result.getResults().isEmpty()) {
+					popupUtils.showInfo(NO_NOTIFICATIONS_FOUND_MESSAGE);
+				} else {
+					view.showNotifications(result.getResults());
 				}
 			}
 

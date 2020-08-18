@@ -28,7 +28,7 @@
 			addStyleNames="margin-top-30 margin-left-35 min-height-400 margin-right-10 light-border">
 			<b:Column size="SM_6">
 				<b:Panel
-					addStyleNames="margin-top-10 margin-left-10 margin-right-10 margin-bottom-20">
+					addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
 					<b:PanelHeader>
 						<b:Heading size="H3" text="Submitter Filter" />
 						<bh:Div ui:field="currentUserContainer" />
@@ -63,33 +63,31 @@
 				text="Export CSV" size="EXTRA_SMALL" pull="RIGHT" />
 			<b:Anchor ui:field="downloadLink" text="Download CSV"
 				visible="false" icon="DOWNLOAD" pull="RIGHT" />
-			<!-- table header -->
-			<t:Table
-				addStyleNames="table-layout-fixed margin-left-10 margin-bottom-20"
-				width="100%">
-				<t:TableRow>
-					<!-- action column (revoke) -->
-					<t:TableHeader width="100px" />
-					<t:TableHeader width="40%">
-						<bh:Span text="Submitted By" />
-					</t:TableHeader>
-					<t:TableHeader width="40%">
-						<!-- list of accessor badge -->
-						<bh:Span text="Accessors" />
-					</t:TableHeader>
-					<t:TableHeader width="175px">
-						<bh:Span text="Expires On" />
-					</t:TableHeader>
-					<t:TableHeader width="200px">
-						<!-- easy way to copy all (synapse.org) email addresses -->
-						<bh:Span text="Email" />
-					</t:TableHeader>
-					<t:TableHeader width="150px">
-						<bh:Span text="Access Requirement" />
-					</t:TableHeader>
-				</t:TableRow>
-			</t:Table>
-			<bh:Div ui:field="tableData" addStyleNames="margin-bottom-20" />
+			<bh:Div marginLeft="5" marginRight="5">
+				<!-- table header -->
+				<t:Table
+					addStyleNames="table-layout-fixed margin-bottom-20"
+					width="100%">
+					<t:TableRow>
+						<t:TableHeader width="40%">
+							<bh:Span text="Submitted By" />
+						</t:TableHeader>
+						<t:TableHeader width="40%">
+							<!-- list of accessor badge -->
+							<bh:Span text="Accessors" />
+						</t:TableHeader>
+						<t:TableHeader width="175px">
+							<bh:Span text="Expires On" />
+						</t:TableHeader>
+						<t:TableHeader width="200px">
+							<!-- easy way to copy all (synapse.org) email addresses -->
+							<bh:Span text="Email" />
+						</t:TableHeader>
+						<t:TableHeader width="80px" />
+					</t:TableRow>
+				</t:Table>
+				<bh:Div ui:field="tableData" addStyleNames="margin-bottom-20" />
+			</bh:Div>
 		</bh:Div>
 		<bh:Div addStyleNames="clear" />
 	</bh:Div>
