@@ -6,28 +6,11 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<bh:Div>
-		<b:Modal ui:field="dialog" title="" closable="true"
-			dataBackdrop="STATIC" dataKeyboard="true"
-			addStyleNames="modal-fullscreen">
-			<b:ModalBody>
-				<bh:Div ui:field="accessRequirementWidgetContainer" />
-			</b:ModalBody>
-			<b:ModalFooter>
-				<b:Button ui:field="closeButton" type="DEFAULT"
-					text="Close" />
-			</b:ModalFooter>
-		</b:Modal>
 		<bh:Div ui:field="synAlertContainer" />
 		<t:Table
-			addStyleNames="table-layout-fixed border-top-1 margin-left-10"
+			addStyleNames="table-layout-fixed border-top-1"
 			width="100%">
 			<t:TableRow>
-				<t:TableData width="100px">
-					<b:Button ui:field="revokeAccessButton" type="DANGER"
-						size="EXTRA_SMALL"
-						addStyleNames="margin-top-10 margin-right-2 margin-bottom-5"
-						text="Revoke" />
-				</t:TableData>
 				<t:TableData width="40%">
 					<bh:Div ui:field="submittedByContainer" />
 				</t:TableData>
@@ -40,11 +23,15 @@
 				<t:TableData width="200px">
 					<bh:Div ui:field="emailsContainer" />
 				</t:TableData>
-				<t:TableData width="150px">
-					<b:Button ui:field="showAccessRequirementButton"
-						type="PRIMARY" size="EXTRA_SMALL"
-						addStyleNames="margin-top-10 margin-right-2 margin-bottom-5"
-						text="Access Requirement" />
+				<t:TableData width="80px">
+					<b:ButtonGroup>
+						<b:Anchor icon="ELLIPSIS_H" dataToggle="DROPDOWN"></b:Anchor>
+						<b:DropDownMenu pull="RIGHT">
+							<b:AnchorListItem ui:field="showAccessRequirementItem">Access Requirement</b:AnchorListItem>
+							<b:AnchorListItem ui:field="showNotificationsItem">Notifications</b:AnchorListItem>
+							<b:AnchorListItem ui:field="revokeAccessItem">Revoke</b:AnchorListItem>
+						</b:DropDownMenu>
+					</b:ButtonGroup>
 				</t:TableData>
 			</t:TableRow>
 		</t:Table>

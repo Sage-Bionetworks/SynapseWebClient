@@ -18,9 +18,9 @@ import static org.sagebionetworks.web.client.utils.FutureUtils.getFuture;
 import static org.sagebionetworks.web.shared.WebConstants.AUTH_PUBLIC_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.CONTENT_TYPE;
 import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
+import static org.sagebionetworks.web.shared.WebConstants.NRGR_SYNAPSE_GLUE_ENDPOINT_PROPERTY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.SYNAPSE_VERSION_KEY;
-import static org.sagebionetworks.web.shared.WebConstants.NRGR_SYNAPSE_GLUE_ENDPOINT_PROPERTY;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.sagebionetworks.client.exceptions.SynapseException;
+import java.util.stream.Collectors;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -133,7 +133,6 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.SnapshotRequest;
 import org.sagebionetworks.repo.model.table.SnapshotResponse;
 import org.sagebionetworks.repo.model.table.ViewEntityType;
-import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -141,7 +140,6 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.util.ValidateArgument;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.cache.EntityId2BundleCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -1827,10 +1825,11 @@ public class SynapseJavascriptClient {
 		sendRequest(requestBuilder, token, OBJECT_TYPE.String, INITIAL_RETRY_REQUEST_DELAY_MS, false, cb);
 	}
 	
-	public void getAccessApprovalNotifications(Long requirementId, List<Long> recipientIds, AsyncCallback<AccessApprovalNotificationResponse> cb) {
+	public void getAccessApprovalNotifications(String requirementId, List<String> recipientIds, AsyncCallback<AccessApprovalNotificationResponse> cb) {
 		AccessApprovalNotificationRequest request = new AccessApprovalNotificationRequest();
-		request.setRecipientIds(recipientIds);
-		request.setRequirementId(requirementId);
+		List<Long> recipientIdsLongs = recipientIds.stream().map(Long::parseLong).collect(Collectors.toList());
+		request.setRecipientIds(recipientIdsLongs);
+		request.setRequirementId(Long.parseLong(requirementId));
 		String url = getRepoServiceUrl() + ACCESS_APPROVAL + "/notifications";
 		doPost(url, request, OBJECT_TYPE.AccessApprovalNotificationResponse, true, cb);
 	}
