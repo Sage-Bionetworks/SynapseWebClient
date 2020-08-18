@@ -22,6 +22,7 @@ import com.google.inject.Inject;
 
 public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidget {
 
+	public static final String NO_NOTIFICATIONS_FOUND_MESSAGE = "No notifications found.";
 	public static final String ARE_YOU_SURE = "Accessors will lose access to resources that this approval grants. Are you sure?";
 	public static final String REVOKE_ACCESS_TO_GROUP = "Revoke access?";
 	private AccessorGroupView view;
@@ -144,7 +145,7 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 			@Override
 			public void onSuccess(AccessApprovalNotificationResponse result) {
 				if (result.getResults().isEmpty()) {
-					popupUtils.showInfo("No notifications found.");
+					popupUtils.showInfo(NO_NOTIFICATIONS_FOUND_MESSAGE);
 				} else {
 					view.showNotifications(result.getResults());
 				}

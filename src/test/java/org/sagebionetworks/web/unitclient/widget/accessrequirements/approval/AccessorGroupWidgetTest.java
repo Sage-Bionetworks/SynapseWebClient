@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements.approval;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupWidget.ARE_YOU_SURE;
-import static org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupWidget.REVOKE_ACCESS_TO_GROUP;
+import static org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupWidget.*;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -16,6 +17,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotification;
+import org.sagebionetworks.repo.model.dataaccess.AccessApprovalNotificationResponse;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroup;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtils;
@@ -61,7 +64,12 @@ public class AccessorGroupWidgetTest {
 	UserProfile mockUserProfile;
 	@Mock
 	SynapseJavascriptClient mockJsClient;
+	@Mock
+	AccessApprovalNotificationResponse mockAccessApprovalNotificationResponse;
+	@Mock
+	AccessApprovalNotification mockAccessApprovalNotification;
 
+	List<AccessApprovalNotification> accessApprovalNotifications;
 	List<String> accessorIds;
 	public static final String ACCESSOR_USER_ID = "98888";
 	public static final String SUBMITTER_USER_ID = "77776";
@@ -80,6 +88,9 @@ public class AccessorGroupWidgetTest {
 		when(mockAccessorGroup.getExpiredOn()).thenReturn(AROUND_NOW);
 		when(mockDateTimeUtils.getDateTimeString(any(Date.class))).thenReturn(FORMATTED_DATE);
 		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockUserProfileAsyncHandler).getUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockAccessApprovalNotificationResponse).when(mockJsClient).getAccessApprovalNotifications(anyString(), anyList(), any(AsyncCallback.class));
+		accessApprovalNotifications = new ArrayList<AccessApprovalNotification>();
+		when(mockAccessApprovalNotificationResponse.getResults()).thenReturn(accessApprovalNotifications);
 	}
 
 	@Test
@@ -132,4 +143,27 @@ public class AccessorGroupWidgetTest {
 		verify(mockDataAccessClient).revokeGroup(eq(ACCESS_REQUIREMENT_ID), eq(SUBMITTER_USER_ID), any(AsyncCallback.class));
 		verify(onRevokeCallback).invoke();
 	}
+	
+	@Test
+	public void testOnShowNotifications() {
+		widget.configure(mockAccessorGroup);
+		accessApprovalNotifications.add(mockAccessApprovalNotification);
+		
+		widget.onShowNotifications();
+		
+		verify(mockView).showNotifications(accessApprovalNotifications);
+	}
+	
+	@Test
+	public void testOnShowNotificationsNoNotifications() {
+		widget.configure(mockAccessorGroup);
+		accessApprovalNotifications.clear();
+		
+		widget.onShowNotifications();
+		
+		verify(mockView, never()).showNotifications(accessApprovalNotifications);
+		verify(mockPopupUtils).showInfo(NO_NOTIFICATIONS_FOUND_MESSAGE);
+	}
+	
+
 }
