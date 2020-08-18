@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupView;
@@ -58,6 +59,8 @@ public class AccessorGroupWidgetTest {
 	UserProfileAsyncHandler mockUserProfileAsyncHandler;
 	@Mock
 	UserProfile mockUserProfile;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
 
 	List<String> accessorIds;
 	public static final String ACCESSOR_USER_ID = "98888";
@@ -68,7 +71,7 @@ public class AccessorGroupWidgetTest {
 
 	@Before
 	public void setUp() throws Exception {
-		widget = new AccessorGroupWidget(mockView, mockSynAlert, mockGinInjector, mockPopupUtils, mockAccessRequirementWidget, mockDataAccessClient, mockDateTimeUtils, mockUserProfileAsyncHandler);
+		widget = new AccessorGroupWidget(mockView, mockSynAlert, mockGinInjector, mockPopupUtils, mockAccessRequirementWidget, mockDataAccessClient, mockDateTimeUtils, mockUserProfileAsyncHandler, mockJsClient);
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		when(mockAccessorGroup.getSubmitterId()).thenReturn(SUBMITTER_USER_ID);
 		accessorIds = Collections.singletonList(ACCESSOR_USER_ID);
@@ -83,7 +86,6 @@ public class AccessorGroupWidgetTest {
 	public void testConstruction() {
 		verify(mockView).setPresenter(widget);
 		verify(mockView).setSynAlert(mockSynAlert);
-		verify(mockView).setAccessRequirementWidget(mockAccessRequirementWidget);
 	}
 
 	@Test
@@ -108,9 +110,18 @@ public class AccessorGroupWidgetTest {
 	public void testOnRevoke() {
 		widget.onRevoke();
 		verify(mockPopupUtils).showConfirmDialog(eq(REVOKE_ACCESS_TO_GROUP), eq(ARE_YOU_SURE), any(Callback.class));
-
 	}
 
+	@Test
+	public void testOnShowAccessRequirement() {
+		widget.configure(mockAccessorGroup);
+		
+		widget.onShowAccessRequirement();
+		
+		verify(mockAccessRequirementWidget).configure(ACCESS_REQUIREMENT_ID, null);
+		verify(mockView).showAccessRequirementDialog(mockAccessRequirementWidget);
+	}
+	
 	@Test
 	public void testOnRevokeAfterConfirm() {
 		AsyncMockStubber.callSuccessWith(null).when(mockDataAccessClient).revokeGroup(anyString(), anyString(), any(AsyncCallback.class));
