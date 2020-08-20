@@ -33,11 +33,10 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
-import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
@@ -56,23 +55,19 @@ public class ImageWidgetTest {
 	@Mock
 	AuthenticationController mockAuthenticationController;
 	@Mock
-	PresignedURLAsyncHandler mockPresignedURLAsyncHandler;
-	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
 	FileEntity mockFileEntity;
 	@Mock
-	FileResult mockFileResult;
-	@Mock
 	FileHandle mockFileHandle1;
 	@Mock
 	FileHandle mockFileHandle2;
 	@Captor
-	ArgumentCaptor<FileHandleAssociation> fhaCaptor;
-	@Captor
 	ArgumentCaptor<Throwable> throwableCaptor;
+	@Mock
+	SynapseJSNIUtils mockJSNIUtils;
 
 	public static final String PRESIGNED_URL = "https://s3.presigned/image.jpg";
 	public static final String FILE_NAME = "image.jpg";
@@ -83,13 +78,12 @@ public class ImageWidgetTest {
 		MockitoAnnotations.initMocks(this);
 		mockView = mock(ImageWidgetView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		widget = new ImageWidget(mockView, mockAuthenticationController, mockPresignedURLAsyncHandler, mockSynapseJavascriptClient, mockSynAlert);
+		widget = new ImageWidget(mockView, mockAuthenticationController, mockSynapseJavascriptClient, mockSynAlert, mockJSNIUtils);
 		descriptor = new HashMap<String, String>();
 		descriptor.put(IMAGE_WIDGET_FILE_NAME_KEY, FILE_NAME);
 		descriptor.put(IMAGE_WIDGET_ALT_TEXT_KEY, ALT_TEXT);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockFileResult.getPreSignedURL()).thenReturn(PRESIGNED_URL);
-		AsyncMockStubber.callSuccessWith(mockFileResult).when(mockPresignedURLAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
+		when(mockJSNIUtils.getFileHandleAssociationUrl(anyString(),  any(FileHandleAssociateType.class), anyString())).thenReturn(PRESIGNED_URL);
 	}
 
 	@Test
@@ -111,7 +105,6 @@ public class ImageWidgetTest {
 
 		verify(mockSynAlert).clear();
 		verify(mockSynapseJavascriptClient).getEntityForVersion(eq(synId), eq((Long) null), any(AsyncCallback.class));
-		verify(mockPresignedURLAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		boolean isLoggedIn = true;
 		verify(mockView).configure(eq(PRESIGNED_URL), eq(FILE_NAME), anyString(), anyString(), eq(ALT_TEXT), eq(synId), eq(isLoggedIn));
 	}
@@ -131,11 +124,7 @@ public class ImageWidgetTest {
 
 		verify(mockSynAlert).clear();
 		verify(mockSynapseJavascriptClient).getEntityForVersion(eq(synId), eq(version), any(AsyncCallback.class));
-		verify(mockPresignedURLAsyncHandler).getFileResult(fhaCaptor.capture(), any(AsyncCallback.class));
-		FileHandleAssociation fha = fhaCaptor.getValue();
-		assertEquals(synId, fha.getAssociateObjectId());
-		assertEquals(FileHandleAssociateType.FileEntity, fha.getAssociateObjectType());
-		assertEquals(dataFileHandleId, fha.getFileHandleId());
+		verify(mockJSNIUtils).getFileHandleAssociationUrl(synId, FileHandleAssociateType.FileEntity, dataFileHandleId);
 		boolean isLoggedIn = true;
 		verify(mockView).configure(eq(PRESIGNED_URL), eq(FILE_NAME), anyString(), anyString(), eq(ALT_TEXT), eq(synId), eq(isLoggedIn));
 	}
@@ -171,11 +160,7 @@ public class ImageWidgetTest {
 
 		verify(mockSynAlert).clear();
 		verify(mockSynapseJavascriptClient).getWikiAttachmentFileHandles(any(WikiPageKey.class), eq(wikiVersion), any(AsyncCallback.class));
-		verify(mockPresignedURLAsyncHandler).getFileResult(fhaCaptor.capture(), any(AsyncCallback.class));
-		FileHandleAssociation fha = fhaCaptor.getValue();
-		assertEquals(wikiKey.getWikiPageId(), fha.getAssociateObjectId());
-		assertEquals(FileHandleAssociateType.WikiAttachment, fha.getAssociateObjectType());
-		assertEquals(fileHandleId2, fha.getFileHandleId());
+		verify(mockJSNIUtils).getFileHandleAssociationUrl(wikiKey.getWikiPageId(), FileHandleAssociateType.WikiAttachment, fileHandleId2);
 		boolean isLoggedIn = true;
 		verify(mockView).configure(eq(PRESIGNED_URL), eq(FILE_NAME), anyString(), anyString(), eq(ALT_TEXT), eq((String) null), eq(isLoggedIn));
 	}
