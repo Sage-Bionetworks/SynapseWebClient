@@ -17,6 +17,7 @@ import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.H
 import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.SCHEMA;
 import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.SCOPE;
 import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.SHOW;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,6 +36,8 @@ import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnValuesRequest;
 import org.sagebionetworks.repo.model.table.FacetType;
 import org.sagebionetworks.repo.model.table.Query;
+import org.sagebionetworks.repo.model.table.QueryFilter;
+import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.ViewType;
@@ -370,6 +373,8 @@ public class TableEntityWidgetTest {
 		expected.setSql(newSQL);
 		expected.setLimit(TableEntityWidget.DEFAULT_LIMIT);
 		expected.setOffset(TableEntityWidget.DEFAULT_OFFSET);
+		expected.setSort(new ArrayList<SortItem>());
+		expected.setAdditionalFilters(new ArrayList<QueryFilter>());
 		verify(mockQueryResultsWidget).configure(expected, canEdit, tableType, widget);
 	}
 

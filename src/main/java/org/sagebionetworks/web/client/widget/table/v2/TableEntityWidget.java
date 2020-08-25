@@ -1,12 +1,16 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+import java.util.ArrayList;
+import java.util.Collections;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Query;
+import org.sagebionetworks.repo.model.table.QueryFilter;
+import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -466,6 +470,8 @@ public class TableEntityWidget implements IsWidget, QueryResultsListener, QueryI
 	@Override
 	public void onExecuteQuery(String sql) {
 		this.currentQuery.setSql(sql);
+		this.currentQuery.setSort(new ArrayList<SortItem>());
+		this.currentQuery.setAdditionalFilters(new ArrayList<QueryFilter>());
 		this.currentQuery.setLimit(DEFAULT_LIMIT);
 		this.currentQuery.setOffset(DEFAULT_OFFSET);
 		setQuery(this.currentQuery, false);
