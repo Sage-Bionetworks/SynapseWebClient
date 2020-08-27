@@ -69,6 +69,8 @@
 					addStyleNames="table-layout-fixed margin-bottom-20"
 					width="100%">
 					<t:TableRow>
+						<!-- action column (revoke) -->
+						<t:TableHeader width="100px" />
 						<t:TableHeader width="40%">
 							<bh:Span text="Submitted By" />
 						</t:TableHeader>

@@ -35,7 +35,7 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 	@UiField
 	Div emailsContainer;
 	@UiField
-	AnchorListItem revokeAccessItem;
+	Button revokeAccessButton;
 	@UiField
 	Label expiresOnField;
 	
@@ -59,7 +59,7 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 		showAccessRequirementItem.addClickHandler(event -> {
 			presenter.onShowAccessRequirement();
 		});
-		revokeAccessItem.addClickHandler(event -> {
+		revokeAccessButton.addClickHandler(event -> {
 			presenter.onRevoke();
 		});
 		showNotificationsItem.addClickHandler(event -> {
