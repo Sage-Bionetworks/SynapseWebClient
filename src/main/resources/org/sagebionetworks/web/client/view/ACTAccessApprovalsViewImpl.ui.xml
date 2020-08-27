@@ -69,6 +69,8 @@
 					addStyleNames="table-layout-fixed margin-bottom-20"
 					width="100%">
 					<t:TableRow>
+						<!-- action column (revoke) -->
+						<t:TableHeader width="100px" />
 						<t:TableHeader width="40%">
 							<bh:Span text="Submitted By" />
 						</t:TableHeader>
@@ -83,7 +85,9 @@
 							<!-- easy way to copy all (synapse.org) email addresses -->
 							<bh:Span text="Email" />
 						</t:TableHeader>
-						<t:TableHeader width="80px" />
+						<t:TableHeader width="80px" addStyleNames="text-align-center">
+							<bh:Span text="Menu" />
+						</t:TableHeader>
 					</t:TableRow>
 				</t:Table>
 				<bh:Div ui:field="tableData" addStyleNames="margin-bottom-20" />
