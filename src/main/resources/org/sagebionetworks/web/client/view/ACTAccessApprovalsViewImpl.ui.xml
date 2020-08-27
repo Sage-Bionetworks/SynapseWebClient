@@ -85,7 +85,9 @@
 							<!-- easy way to copy all (synapse.org) email addresses -->
 							<bh:Span text="Email" />
 						</t:TableHeader>
-						<t:TableHeader width="80px" />
+						<t:TableHeader width="80px" addStyleNames="text-align-center">
+							<bh:Span text="Menu" />
+						</t:TableHeader>
 					</t:TableRow>
 				</t:Table>
 				<bh:Div ui:field="tableData" addStyleNames="margin-bottom-20" />
