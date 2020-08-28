@@ -31,7 +31,7 @@ public class FileHandleAssociationServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
-	public static final long CACHE_TIME_SECONDS = 86400; // a day
+	public static final long CACHE_TIME_SECONDS = 30; // 30 seconds
 	private TokenProvider tokenProvider = new TokenProvider() {
 		@Override
 		public String getSessionToken() {
