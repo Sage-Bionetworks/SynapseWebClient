@@ -14,11 +14,12 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -35,16 +36,16 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 	private Map<String, String> descriptor;
 	AuthenticationController authenticationController;
 	public static final String MAX_WIDTH_NONE = "max-width-none";
+	PresignedURLAsyncHandler presignedURLAsyncHandler;
 	SynapseJavascriptClient jsClient;
 	SynapseAlert synAlert;
 	WikiPageKey wikiKey;
-	SynapseJSNIUtils jsniUtils;
 
 	@Inject
-	public ImageWidget(ImageWidgetView view, AuthenticationController authenticationController, SynapseJavascriptClient jsClient, SynapseAlert synAlert, SynapseJSNIUtils jsniUtils) {
+	public ImageWidget(ImageWidgetView view, AuthenticationController authenticationController, PresignedURLAsyncHandler presignedURLAsyncHandler, SynapseJavascriptClient jsClient, SynapseAlert synAlert) {
 		this.view = view;
 		this.authenticationController = authenticationController;
-		this.jsniUtils = jsniUtils;
+		this.presignedURLAsyncHandler = presignedURLAsyncHandler;
 		this.jsClient = jsClient;
 		this.synAlert = synAlert;
 		view.setPresenter(this);
@@ -57,8 +58,16 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 	}
 
 	private void loadFromFileHandleAssociation(FileHandleAssociation fha) {
-		String url = jsniUtils.getFileHandleAssociationUrl(fha.getAssociateObjectId(), fha.getAssociateObjectType(), fha.getFileHandleId());
-		view.configure(url, descriptor.get(IMAGE_WIDGET_FILE_NAME_KEY), descriptor.get(IMAGE_WIDGET_SCALE_KEY), descriptor.get(ALIGNMENT_KEY), descriptor.get(IMAGE_WIDGET_ALT_TEXT_KEY), descriptor.get(IMAGE_WIDGET_SYNAPSE_ID_KEY), authenticationController.isLoggedIn());		
+		presignedURLAsyncHandler.getFileResult(fha, new AsyncCallback<FileResult>() {
+			public void onSuccess(FileResult fileResult) {
+				view.configure(fileResult.getPreSignedURL(), descriptor.get(IMAGE_WIDGET_FILE_NAME_KEY), descriptor.get(IMAGE_WIDGET_SCALE_KEY), descriptor.get(ALIGNMENT_KEY), descriptor.get(IMAGE_WIDGET_ALT_TEXT_KEY), descriptor.get(IMAGE_WIDGET_SYNAPSE_ID_KEY), authenticationController.isLoggedIn());
+			};
+
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		});
 	}
 
 	@Override
