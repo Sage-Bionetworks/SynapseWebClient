@@ -1072,6 +1072,11 @@ public class SynapseJavascriptClient {
 		doGetString(url, false, callback);
 	}
 
+	public void getProfilePicturePreviewURL(String profileId, AsyncCallback<String> callback) {
+		String url = getRepoServiceUrl() + USER_PROFILE_PATH + "/" + profileId + "/image/preview?redirect=false";
+		doGetString(url, false, callback);
+	}
+	
 	public void getEntityHeaderBatch(List<String> entityIds, AsyncCallback<ArrayList<EntityHeader>> callback) {
 		List<Reference> list = new ArrayList<Reference>();
 		for (String entityId : entityIds) {

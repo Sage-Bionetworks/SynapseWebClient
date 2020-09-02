@@ -138,7 +138,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 
 	@Override
 	public void setEntity(final EntityHeader entityHeader) {
-		clear();
 		if (entityHeader == null)
 			throw new IllegalArgumentException("Entity is required");
 
@@ -187,10 +186,20 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		entityContainer.add(new HTML(DisplayConstants.ERROR_LOADING));
 	}
 
-	public void clear() {
-		iconContainer.clear();
+	@Override
+	public void clearEntityInformation() {
 		entityContainer.clear();
+	}
+	
+	@Override
+	public void clearIcons() {
+		iconContainer.clear();
 		iconsContainer.clear();
+	}
+	
+	public void clear() {
+		clearEntityInformation();
+		clearIcons();
 	}
 
 	@Override

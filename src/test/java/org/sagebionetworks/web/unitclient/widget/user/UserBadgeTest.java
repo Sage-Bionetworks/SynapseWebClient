@@ -55,7 +55,7 @@ public class UserBadgeTest {
 	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	@Mock
-	SynapseProperties mockSynapseProperties;
+	SynapseJavascriptClient mockJsClient;
 	@Mock
 	UserBadgeView mockView;
 	UserBadge userBadge;
@@ -68,7 +68,7 @@ public class UserBadgeTest {
 	@Mock
 	UserProfileAsyncHandler mockUserProfileAsyncHandler;
 	public static final String FULL_PICTURE_URL = "http://url.to.profile.picture";
-	public static final String REPO_URL = "https://repo-prod.prod.sagebase.org/repo/v1";
+	public static final String SMALL_PICTURE_URL = "https://s3.url.to.preview.picture";
 
 	@Before
 	public void before() {
@@ -83,8 +83,8 @@ public class UserBadgeTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		when(mockSynapseJSNIUtils.getFileHandleAssociationUrl(anyString(), any(FileHandleAssociateType.class), anyString())).thenReturn(FULL_PICTURE_URL);
-		when(mockSynapseProperties.getSynapseProperty(WebConstants.REPO_SERVICE_URL_KEY)).thenReturn(REPO_URL);
-		userBadge = new UserBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseJSNIUtils, mockCache, mockUserProfileAsyncHandler, adapterFactory, mockSynapseProperties);
+		AsyncMockStubber.callSuccessWith(SMALL_PICTURE_URL).when(mockJsClient).getProfilePicturePreviewURL(anyString(), any(AsyncCallback.class));
+		userBadge = new UserBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseJSNIUtils, mockCache, mockUserProfileAsyncHandler, adapterFactory, mockJsClient);
 	}
 
 	@Test
@@ -93,8 +93,7 @@ public class UserBadgeTest {
 		userBadge.configure(principalId);
 
 		verify(mockUserProfileAsyncHandler).getUserProfile(eq(principalId), any(AsyncCallback.class));
-		String expectedProfileUrl = "https://repo-prod.prod.sagebase.org/repo/v1/userProfile/id1/image/preview?redirect=true";
-		verify(mockView).configure(profile, expectedProfileUrl, null, null);
+		verify(mockView).configure(profile, SMALL_PICTURE_URL, null, null);
 	}
 
 	@Test

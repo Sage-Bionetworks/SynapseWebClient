@@ -47,7 +47,8 @@ public interface EntityBadgeView extends IsWidget, SupportsLazyLoadInterface {
 
 	void setEntityNameWidthPx(int width);
 
-	void clear();
+	void clearIcons();
+	void clearEntityInformation();
 
 	public interface Presenter {
 		void onUnlink();
