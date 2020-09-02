@@ -70,7 +70,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	}
 
 	@Override
-	public void configure(UserProfile profile, Boolean isCertified, Boolean isValidated) {
+	public void configure(UserProfile profile, String pictureUrl, Boolean isCertified, Boolean isValidated) {
 		userId = profile.getOwnerId();
 		clear();
 		add(userBadgeContainer);
@@ -82,8 +82,6 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		} catch (Throwable e) {
 			jsniUtils.consoleError(e);
 		}
-		String pictureUrl = profile.getProfilePicureFileHandleId() != null ? jsniUtils.getFileHandleAssociationUrl(profile.getOwnerId(), FileHandleAssociateType.UserProfileAttachment, profile.getProfilePicureFileHandleId()) : null;
-
 		_showBadge(userBadgeContainer.getElement(), profileJson, userId, badgeSize.reactClientSize, isTextHidden, isTooltipHidden, pictureUrl, !authController.isLoggedIn(), isCertified , isValidated, menuActionsArray, this);
 	}
 

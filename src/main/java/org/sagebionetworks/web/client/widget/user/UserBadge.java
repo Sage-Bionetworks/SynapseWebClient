@@ -3,12 +3,14 @@ package org.sagebionetworks.web.client.widget.user;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import java.util.Map;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -31,11 +33,12 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 	UserProfile profile;
 	GlobalApplicationState globalApplicationState;
 	SynapseJSNIUtils synapseJSNIUtils;
-	boolean useCachedImage;
 	private ClientCache clientCache;
 	private String principalId = null, username = null;
 	UserProfileAsyncHandler userProfileAsyncHandler;
 	private AdapterFactory adapterFactory;
+	BadgeSize currentBadgeSize;
+	SynapseProperties synapseProperties;
 	
 	public static final ClickHandler DO_NOTHING_ON_CLICK = new ClickHandler() {
 		@Override
@@ -45,7 +48,7 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 	};
 
 	@Inject
-	public UserBadge(UserBadgeView view, SynapseClientAsync synapseClient, GlobalApplicationState globalApplicationState, SynapseJSNIUtils synapseJSNIUtils, ClientCache clientCache, UserProfileAsyncHandler userProfileAsyncHandler, AdapterFactory adapterFactory) {
+	public UserBadge(UserBadgeView view, SynapseClientAsync synapseClient, GlobalApplicationState globalApplicationState, SynapseJSNIUtils synapseJSNIUtils, ClientCache clientCache, UserProfileAsyncHandler userProfileAsyncHandler, AdapterFactory adapterFactory, SynapseProperties synapseProperties) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -54,7 +57,8 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 		this.clientCache = clientCache;
 		this.userProfileAsyncHandler = userProfileAsyncHandler;
 		this.adapterFactory = adapterFactory;
-		view.setSize(BadgeSize.DEFAULT);
+		this.synapseProperties = synapseProperties;
+		setSize(BadgeSize.DEFAULT);
 		clearState();
 	}
 
@@ -69,8 +73,17 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 	
 	public void configure(UserProfile profile, Boolean isCertified, Boolean isValidated) {
 		this.profile = profile;
-		useCachedImage = true;
-		view.configure(profile, isCertified, isValidated);
+		String pictureUrl = null;
+		if (BadgeSize.DEFAULT.equals(currentBadgeSize)) {
+			// small preview image
+			// http://rest-docs.synapse.org/rest/GET/userProfile/profileId/image/preview.html
+			String repoUrl = synapseProperties.getSynapseProperty(WebConstants.REPO_SERVICE_URL_KEY);
+			pictureUrl = repoUrl + "/userProfile/" + profile.getOwnerId() + "/image/preview?redirect=true";
+		} else if (profile.getProfilePicureFileHandleId() != null){
+			// full image
+			pictureUrl = synapseJSNIUtils.getFileHandleAssociationUrl(profile.getOwnerId(), FileHandleAssociateType.UserProfileAttachment, profile.getProfilePicureFileHandleId());
+		}
+		view.configure(profile, pictureUrl, isCertified, isValidated);
 	}
 
 
@@ -83,6 +96,7 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 	}
 
 	public void setSize(BadgeSize size) {
+		this.currentBadgeSize = size;
 		view.setSize(size);
 	}
 
