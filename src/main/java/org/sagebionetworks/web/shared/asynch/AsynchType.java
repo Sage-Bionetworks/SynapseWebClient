@@ -84,8 +84,6 @@ public enum AsynchType implements IsSerializable {
 			return ((UploadToTableRequest) request).getTableId();
 		} else if (request instanceof HasEntityId && ((HasEntityId) request).getEntityId() != null) {
 			return ((HasEntityId) request).getEntityId();
-		} else if ((request instanceof UploadToTableRequest && ((UploadToTableRequest) request).getTableId() == null) || (request instanceof HasEntityId && ((HasEntityId) request).getEntityId() == null)) {
-			throw new IllegalArgumentException("entityId cannot be null");
 		} else {
 			return null;
 		}

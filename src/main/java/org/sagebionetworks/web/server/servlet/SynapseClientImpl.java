@@ -98,7 +98,6 @@ import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.table.query.TableQueryParser;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
@@ -114,7 +113,6 @@ import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.exceptions.TableQueryParseException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.gwt.thirdparty.guava.common.base.Supplier;
@@ -1420,15 +1418,6 @@ public class SynapseClientImpl extends SynapseClientBase implements SynapseClien
 		columnChange.setOldColumnId(oldColumnId);
 		columnChange.setNewColumnId(newColumnId);
 		return columnChange;
-	}
-
-	@Override
-	public void validateTableQuery(String sql) throws RestServiceException {
-		try {
-			TableQueryParser.parserQuery(sql);
-		} catch (Throwable e) {
-			throw new TableQueryParseException(e.getMessage());
-		}
 	}
 
 	public EntityChildrenResponse getEntityChildren(EntityChildrenRequest request) throws RestServiceException {
