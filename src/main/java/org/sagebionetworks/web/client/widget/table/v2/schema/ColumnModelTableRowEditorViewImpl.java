@@ -5,9 +5,7 @@ import org.gwtbootstrap3.client.ui.FormControlStatic;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -38,9 +36,6 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	Paragraph nameHelp;
 	@UiField
 	ListBox type;
-	// TODO: replace "type" with "alphaType" once multi-value list types are released out of alpha mode
-	@UiField
-	ListBox alphaType;
 	@UiField
 	FormGroup sizeGroup;
 	@UiField
@@ -53,8 +48,6 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	TextBox maxListLength;
 	@UiField
 	Paragraph maxListLengthHelp;
-	@UiField
-	TableData maxListLengthTd;
 	@UiField
 	SimplePanel defaultPanel;
 	CellEditor defaultWidget;
@@ -71,21 +64,15 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 
 	String id;
 	TypePresenter presenter;
-	boolean isInAlphaMode;
 	@Inject
 	public ColumnModelTableRowEditorViewImpl(Binder uiBinder, CookieProvider cookies) {
 		row = uiBinder.createAndBindUi(this);
-		isInAlphaMode = DisplayUtils.isInTestWebsite(cookies);
-		type.setVisible(!isInAlphaMode);
-		alphaType.setVisible(isInAlphaMode);
-		maxListLengthTd.setVisible(isInAlphaMode);
 		ChangeHandler typeChangeHandler = new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
 				presenter.onTypeChanged();
 			}
 		};
-		alphaType.addChangeHandler(typeChangeHandler);
 		type.addChangeHandler(typeChangeHandler);
 	}
 
@@ -101,8 +88,7 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 
 	@Override
 	public ColumnTypeViewEnum getColumnType() {
-		ListBox listBox = isInAlphaMode ? alphaType : type;
-		return ColumnTypeViewEnum.valueOf(listBox.getSelectedValue());
+		return ColumnTypeViewEnum.valueOf(type.getSelectedValue());
 	}
 
 	@Override
@@ -143,16 +129,15 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	@Override
 	public void setColumnType(ColumnTypeViewEnum columnType) {
 		typeStatic.setText(columnType.name());
-		ListBox listBox = isInAlphaMode ? alphaType : type;
 		int index = 0;
 		String targetName = columnType.name();
-		for (int i = 0; i < listBox.getItemCount(); i++) {
-			if (listBox.getValue(i).equals(targetName)) {
+		for (int i = 0; i < type.getItemCount(); i++) {
+			if (type.getValue(i).equals(targetName)) {
 				index = i;
 				break;
 			}
 		}
-		listBox.setSelectedIndex(index);
+		type.setSelectedIndex(index);
 	}
 
 	@Override
@@ -275,7 +260,6 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 		nameGroup.setVisible(false);
 		sizeGroup.setVisible(false);
 		type.setVisible(false);
-		alphaType.setVisible(false);
 		maxListLengthGroup.setVisible(false);
 
 		nameStatic.setVisible(true);

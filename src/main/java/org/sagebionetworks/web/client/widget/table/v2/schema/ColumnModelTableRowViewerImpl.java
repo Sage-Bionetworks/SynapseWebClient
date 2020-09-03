@@ -2,9 +2,7 @@ package org.sagebionetworks.web.client.widget.table.v2.schema;
 
 import java.util.List;
 import org.gwtbootstrap3.client.ui.FormControlStatic;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -31,8 +29,6 @@ public class ColumnModelTableRowViewerImpl extends AbstractColumnModelTableRow i
 	@UiField
 	FormControlStatic maxSize;
 	@UiField
-	TableData maxListLengthTd;
-	@UiField
 	FormControlStatic maxListLength;
 	@UiField
 	FormControlStatic defaultValue;
@@ -44,7 +40,6 @@ public class ColumnModelTableRowViewerImpl extends AbstractColumnModelTableRow i
 	@Inject
 	public ColumnModelTableRowViewerImpl(Binder uiBinder, CookieProvider cookies) {
 		row = uiBinder.createAndBindUi(this);
-		maxListLengthTd.setVisible(DisplayUtils.isInTestWebsite(cookies));
 	}
 
 	@Override

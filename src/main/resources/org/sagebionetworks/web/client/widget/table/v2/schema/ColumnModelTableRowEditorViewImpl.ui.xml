@@ -33,18 +33,6 @@
 				<g:item>Link</g:item>
 				<g:item>LargeText</g:item>
 				<g:item>User</g:item>
-			</g:ListBox>
-			<g:ListBox ui:field="alphaType" width="100px" height="34px" visible="false">
-				<g:item>String</g:item>
-				<g:item>Boolean</g:item>
-				<g:item>Integer</g:item>
-				<g:item>Double</g:item>
-				<g:item>Date</g:item>
-				<g:item>File</g:item>
-				<g:item>Entity</g:item>
-				<g:item>Link</g:item>
-				<g:item>LargeText</g:item>
-				<g:item>User</g:item>
 				<g:item>SubmissionId</g:item>
 				<g:item>EvaluationId</g:item>
 				<g:item>StringList</g:item>
