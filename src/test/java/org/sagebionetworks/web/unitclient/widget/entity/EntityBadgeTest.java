@@ -169,7 +169,9 @@ public class EntityBadgeTest {
 	@Test
 	public void testConfigure() throws Exception {
 		EntityHeader header = configure();
-		verify(mockView).setEntity(header);
+		
+		verify(mockView).clearEntityInformation();
+		verify(mockView).setEntity(header);		
 	}
 
 	/**
@@ -216,7 +218,7 @@ public class EntityBadgeTest {
 		widget.getEntityBundle();
 
 		verify(mockSynapseJavascriptClient).getEntityBundleFromCache(anyString(), any(AsyncCallback.class));
-		verify(mockView).clear();
+		verify(mockView).clearIcons();
 		verify(mockView).showPublicIcon();
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).showHasWikiIcon();

@@ -3,12 +3,14 @@ package org.sagebionetworks.web.client.widget.user;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import java.util.Map;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -17,6 +19,7 @@ import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -31,11 +34,12 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 	UserProfile profile;
 	GlobalApplicationState globalApplicationState;
 	SynapseJSNIUtils synapseJSNIUtils;
-	boolean useCachedImage;
 	private ClientCache clientCache;
 	private String principalId = null, username = null;
 	UserProfileAsyncHandler userProfileAsyncHandler;
 	private AdapterFactory adapterFactory;
+	BadgeSize currentBadgeSize;
+	SynapseJavascriptClient jsClient;
 	
 	public static final ClickHandler DO_NOTHING_ON_CLICK = new ClickHandler() {
 		@Override
@@ -45,7 +49,7 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 	};
 
 	@Inject
-	public UserBadge(UserBadgeView view, SynapseClientAsync synapseClient, GlobalApplicationState globalApplicationState, SynapseJSNIUtils synapseJSNIUtils, ClientCache clientCache, UserProfileAsyncHandler userProfileAsyncHandler, AdapterFactory adapterFactory) {
+	public UserBadge(UserBadgeView view, SynapseClientAsync synapseClient, GlobalApplicationState globalApplicationState, SynapseJSNIUtils synapseJSNIUtils, ClientCache clientCache, UserProfileAsyncHandler userProfileAsyncHandler, AdapterFactory adapterFactory, SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -54,7 +58,8 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 		this.clientCache = clientCache;
 		this.userProfileAsyncHandler = userProfileAsyncHandler;
 		this.adapterFactory = adapterFactory;
-		view.setSize(BadgeSize.DEFAULT);
+		this.jsClient = jsClient;
+		setSize(BadgeSize.DEFAULT);
 		clearState();
 	}
 
@@ -69,10 +74,29 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 	
 	public void configure(UserProfile profile, Boolean isCertified, Boolean isValidated) {
 		this.profile = profile;
-		useCachedImage = true;
-		view.configure(profile, isCertified, isValidated);
+		if (BadgeSize.DEFAULT.equals(currentBadgeSize)) {
+			// small preview image
+			// http://rest-docs.synapse.org/rest/GET/userProfile/profileId/image/preview.html
+			jsClient.getProfilePicturePreviewURL(profile.getOwnerId(), new AsyncCallback<String>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					configure(profile, null, isCertified, isValidated);
+				}
+				@Override
+				public void onSuccess(String pictureUrl) {
+					configure(profile, pictureUrl, isCertified, isValidated);
+				}
+			});
+		} else {
+			// full image, if available
+			String pictureUrl = profile.getProfilePicureFileHandleId() != null ? synapseJSNIUtils.getFileHandleAssociationUrl(profile.getOwnerId(), FileHandleAssociateType.UserProfileAttachment, profile.getProfilePicureFileHandleId()) : null;
+			configure(profile, pictureUrl, isCertified, isValidated);
+		}		
 	}
 
+	public void configure(UserProfile profile, String pictureUrl, Boolean isCertified, Boolean isValidated) {
+		view.configure(profile, pictureUrl, isCertified, isValidated);
+	}
 
 	public void setTextHidden(boolean isTextHidden) {
 		view.setTextHidden(isTextHidden);
@@ -83,6 +107,7 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 	}
 
 	public void setSize(BadgeSize size) {
+		this.currentBadgeSize = size;
 		view.setSize(size);
 	}
 

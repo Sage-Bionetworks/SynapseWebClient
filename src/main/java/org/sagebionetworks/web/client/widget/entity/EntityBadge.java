@@ -98,6 +98,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	}
 	
 	public void configureViewWithEntityHeader() {
+		view.clearEntityInformation();
 		if (entityHeader != null) {
 			view.setEntity(entityHeader);
 			view.setIcon(EntityTypeUtils.getIconTypeForEntityClassName(entityHeader.getType()));
@@ -115,8 +116,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	}
 
 	public void setEntityBundle(EntityBundle eb) {
-		view.clear();
-		configureViewWithEntityHeader();
+		view.clearIcons();
 		Annotations annotations = eb.getAnnotations();
 		String rootWikiId = eb.getRootWikiId();
 		List<FileHandle> handles = eb.getFileHandles();

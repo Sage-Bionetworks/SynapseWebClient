@@ -21,10 +21,14 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
+import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadgeView;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -51,6 +55,8 @@ public class UserBadgeTest {
 	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	@Mock
+	SynapseJavascriptClient mockJsClient;
+	@Mock
 	UserBadgeView mockView;
 	UserBadge userBadge;
 	UserProfile profile;
@@ -61,7 +67,8 @@ public class UserBadgeTest {
 	String displayName;
 	@Mock
 	UserProfileAsyncHandler mockUserProfileAsyncHandler;
-	public static final String PICTURE_URL = "http://url.to.profile.picture";
+	public static final String FULL_PICTURE_URL = "http://url.to.profile.picture";
+	public static final String SMALL_PICTURE_URL = "https://s3.url.to.preview.picture";
 
 	@Before
 	public void before() {
@@ -75,8 +82,9 @@ public class UserBadgeTest {
 		profile.setOwnerId(principalId);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		when(mockSynapseJSNIUtils.getFileHandleAssociationUrl(anyString(), any(FileHandleAssociateType.class), anyString())).thenReturn(PICTURE_URL);
-		userBadge = new UserBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseJSNIUtils, mockCache, mockUserProfileAsyncHandler, adapterFactory);
+		when(mockSynapseJSNIUtils.getFileHandleAssociationUrl(anyString(), any(FileHandleAssociateType.class), anyString())).thenReturn(FULL_PICTURE_URL);
+		AsyncMockStubber.callSuccessWith(SMALL_PICTURE_URL).when(mockJsClient).getProfilePicturePreviewURL(anyString(), any(AsyncCallback.class));
+		userBadge = new UserBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseJSNIUtils, mockCache, mockUserProfileAsyncHandler, adapterFactory, mockJsClient);
 	}
 
 	@Test
@@ -85,7 +93,7 @@ public class UserBadgeTest {
 		userBadge.configure(principalId);
 
 		verify(mockUserProfileAsyncHandler).getUserProfile(eq(principalId), any(AsyncCallback.class));
-		verify(mockView).configure(profile, null, null);
+		verify(mockView).configure(profile, SMALL_PICTURE_URL, null, null);
 	}
 
 	@Test
@@ -128,10 +136,13 @@ public class UserBadgeTest {
 	public void testConfigureAsyncFailFromCache() throws Exception {
 		AsyncMockStubber.callSuccessWith(profile).when(mockUserProfileAsyncHandler).getUserProfile(eq(principalId), any(AsyncCallback.class));
 		when(mockCache.get(anyString())).thenReturn("invalid user profile json");
+		
+		userBadge.setSize(BadgeSize.LARGE);
 		userBadge.configure(principalId);
+		
 		verify(mockCache).get(anyString());
 		verify(mockUserProfileAsyncHandler).getUserProfile(eq(principalId), any(AsyncCallback.class));
-		verify(mockView).configure(profile, null, null);
+		verify(mockView).configure(profile, FULL_PICTURE_URL, null, null);
 	}
 
 	@Test
@@ -139,11 +150,13 @@ public class UserBadgeTest {
 		JSONObjectAdapter adapter = adapterFactory.createNew();
 		profile.writeToJSONObject(adapter);
 		when(mockCache.get(anyString())).thenReturn(adapter.toJSONString());
-
+		
+		userBadge.setSize(BadgeSize.MEDIUM);
 		userBadge.configure(principalId);
+		
 		verify(mockCache).get(anyString());
 		verify(mockUserProfileAsyncHandler, never()).getUserProfile(eq(principalId), any(AsyncCallback.class));
-		verify(mockView).configure(profile, null, null);
+		verify(mockView).configure(profile, FULL_PICTURE_URL, null, null);
 	}
 
 }
