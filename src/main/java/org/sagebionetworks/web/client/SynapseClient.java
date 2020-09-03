@@ -154,13 +154,6 @@ public interface SynapseClient extends RemoteService {
 	TableUpdateTransactionRequest getTableUpdateTransactionRequest(String tableId, List<ColumnModel> oldSchema, List<ColumnModel> newSchema) throws RestServiceException;
 
 	/**
-	 * Validate a table query.
-	 * 
-	 * @param sql
-	 */
-	void validateTableQuery(String sql) throws RestServiceException;
-
-	/**
 	 * Create a list of columns.
 	 * 
 	 * @param value

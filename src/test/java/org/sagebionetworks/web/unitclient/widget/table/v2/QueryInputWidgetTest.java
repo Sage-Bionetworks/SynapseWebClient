@@ -44,12 +44,13 @@ public class QueryInputWidgetTest {
 
 
 	@Test
-	public void testExecuteValidateSuccess() {
+	public void testExecuteSuccess() {
 		String sql = "select * from syn123";
 		widget.configure(sql, mockQueryInputListener);
 		when(mockView.getInputQueryString()).thenReturn(sql);
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).validateTableQuery(anyString(), any(AsyncCallback.class));
+		
 		widget.onExecuteQuery();
+	
 		verify(mockView).setQueryInputLoading(true);
 		verify(mockView, times(2)).showInputError(false);
 		verify(mockView).setQueryInputLoading(true);
@@ -57,38 +58,20 @@ public class QueryInputWidgetTest {
 		verify(mockQueryInputListener).onExecuteQuery(sql);
 	}
 
-
-	@Test
-	public void testExecuteValidateFailure() {
-		String sql = "select * from syn123";
-		widget.configure(sql, mockQueryInputListener);
-		when(mockView.getInputQueryString()).thenReturn(sql);
-		String errorMessage = "bad query";
-		AsyncMockStubber.callFailureWith(new ParseException(errorMessage)).when(mockSynapseClient).validateTableQuery(anyString(), any(AsyncCallback.class));
-		widget.onExecuteQuery();
-		verify(mockView).setQueryInputLoading(true);
-		verify(mockView).showInputError(false);
-		verify(mockView).setQueryInputLoading(true);
-		verify(mockView).setInputErrorMessage(errorMessage);
-		// the listener should not be passed the query
-		verify(mockQueryInputListener, never()).onExecuteQuery(anyString());
-	}
-
 	@Test
 	public void testEmptyQuery() {
 		String sql = "";
 		widget.configure(sql, mockQueryInputListener);
 		when(mockView.getInputQueryString()).thenReturn(sql);
-		String errorMessage = "bad query";
-		AsyncMockStubber.callFailureWith(new ParseException(errorMessage)).when(mockSynapseClient).validateTableQuery(anyString(), any(AsyncCallback.class));
+		
 		widget.onExecuteQuery();
+		
 		verify(mockView).setQueryInputLoading(true);
 		verify(mockView).showInputError(false);
 		verify(mockView).setQueryInputLoading(true);
 		verify(mockView).setInputErrorMessage(QueryInputWidget.AN_EMPTY_QUERY_IS_NOT_VALID);
 		// the listener should not be passed the query
-		verify(mockQueryInputListener, never()).onExecuteQuery(anyString());
-		verify(mockSynapseClient, never()).validateTableQuery(anyString(), any(AsyncCallback.class));
+		verify(mockQueryInputListener, never()).onExecuteQuery(anyString());		
 	}
 
 	@Test
@@ -96,17 +79,33 @@ public class QueryInputWidgetTest {
 		String sql = null;
 		widget.configure(sql, mockQueryInputListener);
 		when(mockView.getInputQueryString()).thenReturn(sql);
-		String errorMessage = "bad query";
-		AsyncMockStubber.callFailureWith(new ParseException(errorMessage)).when(mockSynapseClient).validateTableQuery(anyString(), any(AsyncCallback.class));
+		
 		widget.onExecuteQuery();
+		
 		verify(mockView).setQueryInputLoading(true);
 		verify(mockView).showInputError(false);
 		verify(mockView).setQueryInputLoading(true);
 		verify(mockView).setInputErrorMessage(QueryInputWidget.AN_EMPTY_QUERY_IS_NOT_VALID);
 		// the listener should not be passed the query
-		verify(mockQueryInputListener, never()).onExecuteQuery(anyString());
-		verify(mockSynapseClient, never()).validateTableQuery(anyString(), any(AsyncCallback.class));
+		verify(mockQueryInputListener, never()).onExecuteQuery(anyString());		
 	}
+	
+	@Test
+	public void testQueryWithNoEntityID() {
+		String sql = "select name where x=y";
+		widget.configure(sql, mockQueryInputListener);
+		when(mockView.getInputQueryString()).thenReturn(sql);
+		
+		widget.onExecuteQuery();
+		
+		verify(mockView).setQueryInputLoading(true);
+		verify(mockView).showInputError(false);
+		verify(mockView).setQueryInputLoading(true);
+		verify(mockView).setInputErrorMessage(QueryInputWidget.ENTITY_ID_NOT_FOUND);
+		// the listener should not be passed the query
+		verify(mockQueryInputListener, never()).onExecuteQuery(anyString());		
+	}
+
 
 	@Test
 	public void testOnReset() {

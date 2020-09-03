@@ -27,10 +27,8 @@ import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.ColumnModelPage;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
-import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -163,14 +161,6 @@ public interface SynapseClientAsync {
 	 * @param callback
 	 */
 	void getTableUpdateTransactionRequest(String tableId, List<ColumnModel> oldSchema, List<ColumnModel> newSchema, AsyncCallback<TableUpdateTransactionRequest> callback);
-
-	/**
-	 * Validate a table query.
-	 * 
-	 * @param sql
-	 * @param callback
-	 */
-	void validateTableQuery(String sql, AsyncCallback<Void> callback);
 
 	void restoreFromTrash(String entityId, String newParentId, AsyncCallback<Void> callback);
 

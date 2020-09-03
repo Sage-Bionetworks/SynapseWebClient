@@ -2,9 +2,9 @@ package org.sagebionetworks.web.client.widget.table.v2;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryExecutionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -18,6 +18,7 @@ import com.google.inject.Inject;
 public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, QueryExecutionListener {
 
 	public static final String AN_EMPTY_QUERY_IS_NOT_VALID = "An empty query is not valid.";
+	public static final String ENTITY_ID_NOT_FOUND = "A query must select from a Synapse Table/View";
 	QueryInputView view;
 	SynapseClientAsync synapseClient;
 	QueryInputListener queryInputListener;
@@ -74,20 +75,12 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 		if (sql == null || "".equals(sql.trim())) {
 			view.showInputError(true);
 			view.setInputErrorMessage(AN_EMPTY_QUERY_IS_NOT_VALID);
+		} else if (QueryBundleUtils.getTableIdFromSql(sql) == null) {
+			view.showInputError(true);
+			view.setInputErrorMessage(ENTITY_ID_NOT_FOUND);
 		} else {
-			// validate the query
-			synapseClient.validateTableQuery(sql, new AsyncCallback<Void>() {
-				@Override
-				public void onSuccess(Void result) {
-					setQuery(sql);
-				}
-
-				@Override
-				public void onFailure(Throwable caught) {
-					setFailed(caught);
-				}
-
-			});
+			// full query validation occurs when the query is started in the backend, no need to do an additional servlet call before kicking it off.
+			setQuery(sql);
 		}
 	}
 
