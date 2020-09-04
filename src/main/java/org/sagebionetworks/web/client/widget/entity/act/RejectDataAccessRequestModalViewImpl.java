@@ -26,6 +26,8 @@ public class RejectDataAccessRequestModalViewImpl implements RejectDataAccessReq
 
 	// Checkboxes
 	@UiField
+	CheckBox fillInPrincipalInvestigatorOption;
+	@UiField
 	CheckBox wrongDucOption;
 	@UiField
 	CheckBox everyPageDucOption;
@@ -86,7 +88,7 @@ public class RejectDataAccessRequestModalViewImpl implements RejectDataAccessReq
 	}
 
 	private CheckBox[] getCheckBoxes() {
-		return new CheckBox[] {wrongDucOption, everyPageDucOption, executeDucOption, notOwnSigningOfficialOption, requestorsMismatchSignedOption, projectLeadMissingOption, institutionNameMissingOption, missingBasicInfoOption, missingApprovalLetterOption};
+		return new CheckBox[] {wrongDucOption, everyPageDucOption, executeDucOption, notOwnSigningOfficialOption, requestorsMismatchSignedOption, projectLeadMissingOption, fillInPrincipalInvestigatorOption, institutionNameMissingOption, missingBasicInfoOption, missingApprovalLetterOption};
 	}
 	public void setValue(String value) {
 		responseField.setText(value);
