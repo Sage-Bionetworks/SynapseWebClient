@@ -117,6 +117,10 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 
 	public void setEntityBundle(EntityBundle eb) {
 		view.clearIcons();
+		
+		if (customClickHandler != null) {
+			view.setClickHandler(customClickHandler);
+		}
 		Annotations annotations = eb.getAnnotations();
 		String rootWikiId = eb.getRootWikiId();
 		List<FileHandle> handles = eb.getFileHandles();
