@@ -103,8 +103,7 @@ public class AppActivityMapper implements ActivityMapper {
 		excludeFromLastPlace.add(LoginPlace.class);
 		excludeFromLastPlace.add(PasswordReset.class);
 		excludeFromLastPlace.add(RegisterAccount.class);
-		excludeFromLastPlace.add(NewAccount.class);
-		excludeFromLastPlace.add(Quiz.class);
+		excludeFromLastPlace.add(NewAccount.class);		
 		excludeFromLastPlace.add(ChangeUsername.class);
 		excludeFromLastPlace.add(Trash.class);
 		excludeFromLastPlace.add(SignedToken.class);
