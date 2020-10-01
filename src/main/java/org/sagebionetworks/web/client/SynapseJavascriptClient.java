@@ -1078,7 +1078,8 @@ public class SynapseJavascriptClient {
 	}
 	
 	public void getTeamPicturePreviewURL(String teamId, AsyncCallback<String> callback) {
-		String url = getRepoServiceUrl() + TEAM + "/" + teamId + "/icon/preview?redirect=false";
+		// TODO: remove extra TEAM/teamId once service call path is fixed.
+		String url = getRepoServiceUrl() + TEAM + "/" + teamId + TEAM + "/" + teamId + "/icon/preview?redirect=false";
 		doGetString(url, false, callback);
 	}
 	
