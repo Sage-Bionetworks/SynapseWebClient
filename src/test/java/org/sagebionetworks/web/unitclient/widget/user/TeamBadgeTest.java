@@ -12,8 +12,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.widget.asynch.TeamAsyncHandler;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
@@ -42,6 +42,9 @@ public class TeamBadgeTest {
 	@Mock
 	SynapseJSNIUtils mockSnapseJsniUtils;
 	@Mock
+	SynapseJavascriptClient mockJsClient;
+	
+	@Mock
 	SynapseProperties mockSynapseProperties;
 	public static final String TEAM_ICON_URL = "http://team.icon.png";
 	public static final String PUBLIC_USER_ID = "222";
@@ -53,10 +56,11 @@ public class TeamBadgeTest {
 		team = new Team();
 		team.setName("name");
 		team.setId(principalId);
-		when(mockSnapseJsniUtils.getFileHandleAssociationUrl(anyString(), any(FileHandleAssociateType.class), anyString())).thenReturn(TEAM_ICON_URL);
+		team.setIcon("111");
+		AsyncMockStubber.callSuccessWith(TEAM_ICON_URL).when(mockJsClient).getTeamPicturePreviewURL(anyString(), any(AsyncCallback.class));
 		when(mockSynapseProperties.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID)).thenReturn(PUBLIC_USER_ID);
 		when(mockSynapseProperties.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID)).thenReturn(AUTHENTICATED_USERS_GROUP_ID);
-		badge = new TeamBadge(mockView, mockTeamAsyncHandler, mockSynapseProperties, mockSnapseJsniUtils);
+		badge = new TeamBadge(mockView, mockTeamAsyncHandler, mockSynapseProperties, mockSnapseJsniUtils, mockJsClient);
 
 	}
 

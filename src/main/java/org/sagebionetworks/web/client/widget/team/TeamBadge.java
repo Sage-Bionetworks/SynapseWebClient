@@ -1,8 +1,9 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.widget.HasNotificationUI;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -24,13 +25,15 @@ public class TeamBadge implements SynapseWidgetPresenter, HasNotificationUI, IsW
 	String publicAclPrincipalId, authenticatedAclPrincipalId;
 	public static final String PUBLIC_GROUP_NAME = "Anyone on the web";
 	public static final String AUTHENTICATED_USERS_GROUP_NAME = "All registered Synapse users";
+	SynapseJavascriptClient jsClient;
 	SynapseJSNIUtils synapseJsniUtils;
 
 	@Inject
-	public TeamBadge(TeamBadgeView view, TeamAsyncHandler teamAsyncHandler, SynapseProperties synapseProperties, SynapseJSNIUtils synapseJsniUtils) {
+	public TeamBadge(TeamBadgeView view, TeamAsyncHandler teamAsyncHandler, SynapseProperties synapseProperties, SynapseJSNIUtils synapseJsniUtils, SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.teamAsyncHandler = teamAsyncHandler;
 		this.synapseJsniUtils = synapseJsniUtils;
+		this.jsClient = jsClient;
 		publicAclPrincipalId = synapseProperties.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID);
 		authenticatedAclPrincipalId = synapseProperties.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID);
 	}
@@ -73,7 +76,24 @@ public class TeamBadge implements SynapseWidgetPresenter, HasNotificationUI, IsW
 	}
 
 	public void configure(Team team) {
-		String teamIconUrl = synapseJsniUtils.getFileHandleAssociationUrl(team.getId(), FileHandleAssociateType.TeamAttachment, team.getIcon());
+		if (DisplayUtils.isDefined(team.getIcon())) {
+			jsClient.getTeamPicturePreviewURL(team.getId(), new AsyncCallback<String>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					synapseJsniUtils.consoleError(caught);
+					setViewTeam(team, null);
+				}
+				@Override
+				public void onSuccess(String teamIconUrl) {
+					setViewTeam(team, teamIconUrl);
+				}
+			});
+		} else {
+			setViewTeam(team, null);
+		}
+	}
+	
+	private void setViewTeam(Team team, String teamIconUrl) {
 		view.setTeam(team, maxNameLength, teamIconUrl, customClickHandler);
 	}
 
