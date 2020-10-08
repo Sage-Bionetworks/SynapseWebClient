@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.HasNotificationUI;
@@ -15,13 +17,15 @@ public class BigTeamBadge implements SynapseWidgetPresenter, HasNotificationUI {
 
 	private BigTeamBadgeView view;
 	SynapseJavascriptClient jsClient;
+	SynapseJSNIUtils jsniUtils;
 	AuthenticationController authController;
 	TeamMemberCountWidget teamMemberCountWidget;
 
 	@Inject
-	public BigTeamBadge(BigTeamBadgeView view, SynapseJavascriptClient jsClient, AuthenticationController authController, TeamMemberCountWidget teamMemberCountWidget) {
+	public BigTeamBadge(BigTeamBadgeView view, SynapseJavascriptClient jsClient, SynapseJSNIUtils jsniUtils, AuthenticationController authController, TeamMemberCountWidget teamMemberCountWidget) {
 		this.view = view;
 		this.jsClient = jsClient;
+		this.jsniUtils = jsniUtils;
 		this.authController = authController;
 		this.teamMemberCountWidget = teamMemberCountWidget;
 		view.setMemberCountWidget(teamMemberCountWidget);
@@ -33,7 +37,25 @@ public class BigTeamBadge implements SynapseWidgetPresenter, HasNotificationUI {
 
 	public void configure(Team team, String description, TeamMembershipStatus teamMembershipStatus) {
 		teamMemberCountWidget.configure(team.getId());
-		view.setTeam(team, description);
+		if (DisplayUtils.isDefined(team.getIcon())) {
+			jsClient.getTeamPicturePreviewURL(team.getId(), new AsyncCallback<String>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					jsniUtils.consoleError(caught);
+					setViewTeam(team, description, teamMembershipStatus, null);
+				}
+				@Override
+				public void onSuccess(String teamIconUrl) {
+					setViewTeam(team, description, teamMembershipStatus, teamIconUrl);
+				}
+			});
+		} else {
+			setViewTeam(team, description, teamMembershipStatus, null);
+		}
+	}
+	
+	private void setViewTeam(Team team, String description, TeamMembershipStatus teamMembershipStatus, String teamIconUrl) {
+		view.setTeam(team, description, teamIconUrl);
 		boolean canSendEmail = teamMembershipStatus != null && teamMembershipStatus.getCanSendEmail();
 		view.setTeamEmailAddress(getTeamEmail(team.getName(), canSendEmail));
 	}

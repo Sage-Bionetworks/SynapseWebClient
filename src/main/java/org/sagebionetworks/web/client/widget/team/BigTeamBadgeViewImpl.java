@@ -5,13 +5,11 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.Linkify;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.TextBoxWithCopyToClipboardWidget;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -48,16 +46,14 @@ public class BigTeamBadgeViewImpl implements BigTeamBadgeView {
 	@UiField
 	TextBoxWithCopyToClipboardWidget synapseEmailField;
 
-	SynapseJSNIUtils synapseJSNIUtils;
 	GlobalApplicationState globalApplicationState;
 	IconsImageBundle iconsImageBundle;
 	Linkify linkify;
 	Widget widget;
 
 	@Inject
-	public BigTeamBadgeViewImpl(Binder uiBinder, SynapseJSNIUtils synapseJSNIUtils, GlobalApplicationState globalApplicationState, IconsImageBundle iconsImageBundle, Linkify linkify) {
+	public BigTeamBadgeViewImpl(Binder uiBinder, GlobalApplicationState globalApplicationState, IconsImageBundle iconsImageBundle, Linkify linkify) {
 		widget = uiBinder.createAndBindUi(this);
-		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.globalApplicationState = globalApplicationState;
 		this.iconsImageBundle = iconsImageBundle;
 		this.linkify = linkify;
@@ -65,7 +61,7 @@ public class BigTeamBadgeViewImpl implements BigTeamBadgeView {
 	}
 
 	@Override
-	public void setTeam(final Team team, String description) {
+	public void setTeam(final Team team, String description, String teamIconUrl) {
 		teamPicture.setVisible(false);
 		defaultPicture.setVisible(false);
 		notificationsSpan.clear();
@@ -77,9 +73,9 @@ public class BigTeamBadgeViewImpl implements BigTeamBadgeView {
 			event.preventDefault();
 			globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(team.getId()));
 		};
-		if (team.getIcon() != null && team.getIcon().length() > 0) {
+		if (teamIconUrl != null) {
 			teamPicture.setVisible(true);
-			teamPicture.setUrl(synapseJSNIUtils.getFileHandleAssociationUrl(team.getId(), FileHandleAssociateType.TeamAttachment, team.getIcon()));
+			teamPicture.setUrl(teamIconUrl);
 		} else {
 			defaultPicture.setVisible(true);
 		}

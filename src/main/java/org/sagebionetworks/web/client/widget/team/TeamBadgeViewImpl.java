@@ -82,7 +82,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 					anchor.fireEvent(event);
 				}
 			};
-			if (team.getIcon() != null && team.getIcon().length() > 0) {
+			if (teamIconUrl != null) {
 				Image profilePicture = new Image();
 				profilePicture.setUrl(teamIconUrl);
 				profilePicture.setHeight("24px");

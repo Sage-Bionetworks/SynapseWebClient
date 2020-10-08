@@ -5,7 +5,7 @@ import org.sagebionetworks.web.client.SynapseView;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface BigTeamBadgeView extends IsWidget, SynapseView {
-	public void setTeam(Team team, String description);
+	public void setTeam(Team team, String description, String teamIconUrl);
 
 	public void showLoadError(String principalId);
 
