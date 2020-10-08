@@ -57,7 +57,7 @@ public class BigTeamBadge implements SynapseWidgetPresenter, HasNotificationUI {
 	private void setViewTeam(Team team, String description, TeamMembershipStatus teamMembershipStatus, String teamIconUrl) {
 		view.setTeam(team, description, teamIconUrl);
 		boolean canSendEmail = teamMembershipStatus != null && teamMembershipStatus.getCanSendEmail();
-		view.setTeamEmailAddress(getTeamEmail(team.getName(), canSendEmail));		
+		view.setTeamEmailAddress(getTeamEmail(team.getName(), canSendEmail));
 	}
 
 	public void configure(final String teamId) {
