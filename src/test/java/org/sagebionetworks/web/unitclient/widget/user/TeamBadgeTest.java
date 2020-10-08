@@ -78,6 +78,13 @@ public class TeamBadgeTest {
 		badge.configure(principalId, mockClickHandler);
 		verify(mockView).setTeam(team, max, TEAM_ICON_URL, mockClickHandler);
 	}
+	
+	@Test
+	public void testConfigureFailedToGetIcon() {
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockJsClient).getTeamPicturePreviewURL(anyString(), any(AsyncCallback.class));
+		badge.configure(team);
+		verify(mockView).setTeam(team, null, null, null);
+	}
 
 	@Test
 	public void testConfigureAsync() throws Exception {
