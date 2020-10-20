@@ -1247,33 +1247,6 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testGetStorageLocationSettingNullSetting() throws SynapseException, RestServiceException {
-		when(mockSynapse.getProjectSetting(entityId, ProjectSettingsType.upload)).thenReturn(null);
-		assertNull(synapseClient.getStorageLocationSetting(entityId));
-	}
-
-	@Test
-	public void testGetStorageLocationSettingNullUploadDestination() throws SynapseException, RestServiceException {
-		assertNull(synapseClient.getStorageLocationSetting(entityId));
-	}
-
-	@Test
-	public void testGetStorageLocationSetting() throws SynapseException, RestServiceException {
-		UploadDestination setting = Mockito.mock(UploadDestination.class);
-		when(setting.getStorageLocationId()).thenReturn(42L);
-		when(mockSynapse.getDefaultUploadDestination(entityId)).thenReturn(setting);
-		StorageLocationSetting mockStorageLocationSetting = Mockito.mock(StorageLocationSetting.class);
-		when(mockSynapse.getMyStorageLocationSetting(anyLong())).thenReturn(mockStorageLocationSetting);
-		assertEquals(mockStorageLocationSetting, synapseClient.getStorageLocationSetting(entityId));
-	}
-
-	@Test(expected = Exception.class)
-	public void testGetStorageLocationSettingFailure() throws SynapseException, RestServiceException {
-		when(mockSynapse.getMyStorageLocationSetting(anyLong())).thenThrow(new Exception());
-		synapseClient.getStorageLocationSetting(entityId);
-	}
-
-	@Test
 	public void testCreateStorageLocationSettingFoundStorageAndProjectSetting() throws SynapseException, RestServiceException {
 		setupGetMyLocationSettings();
 		Long storageLocationId = 2L;

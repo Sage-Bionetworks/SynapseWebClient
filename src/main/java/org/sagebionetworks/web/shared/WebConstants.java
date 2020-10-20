@@ -167,6 +167,7 @@ public class WebConstants {
 	public static final String NBCONVERT_ENDPOINT_PROPERTY = "org.sagebionetworks.portal.nbconvert_endpoint";
 	public static final String NRGR_SYNAPSE_GLUE_ENDPOINT_PROPERTY = "org.sagebionetworks.portal.nrgrsynapseglue_endpoint";	
 	public static final String FORUM_SYNAPSE_ID_PROPERTY = "org.sagebionetworks.portal.forum_project_id";
+	public static final String DEFAULT_STORAGE_ID_PROPERTY_KEY = "org.sagebionetworks.portal.synapse_storage_id";
 
 	// Workshop
 	public static final String COLLABORATORIUM_ENTITY_ID_PROPERTY = "org.sagebionetworks.portal.collaboratorium_synapse_id";
