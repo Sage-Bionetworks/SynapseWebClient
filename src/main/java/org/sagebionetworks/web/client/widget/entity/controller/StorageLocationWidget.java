@@ -1,10 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import static org.sagebionetworks.web.client.DisplayUtils.*;
+import static org.sagebionetworks.web.client.DisplayUtils.replaceWithNullIfEmptyTrimmedString;
+import static org.sagebionetworks.web.client.DisplayUtils.trim;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import java.util.List;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.repo.model.file.ExternalGoogleCloudUploadDestination;
+import org.sagebionetworks.repo.model.file.ExternalObjectStoreUploadDestination;
+import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
+import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
+import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.repo.model.project.ExternalGoogleCloudStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalObjectStorageLocationSetting;
@@ -13,6 +19,8 @@ import org.sagebionetworks.repo.model.project.ExternalStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -27,18 +35,23 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 
 	StorageLocationWidgetView view;
 	SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	SynapseAlert synAlert;
 	EntityBundle entityBundle;
 	CookieProvider cookies;
 	EventBus eventBus;
+	SynapseProperties synapseProperties;
 
 	@Inject
-	public StorageLocationWidget(StorageLocationWidgetView view, SynapseClientAsync synapseClient, SynapseAlert synAlert, CookieProvider cookies, EventBus eventBus) {
+	public StorageLocationWidget(StorageLocationWidgetView view, SynapseClientAsync synapseClient, SynapseJavascriptClient jsClient, SynapseAlert synAlert, 
+			SynapseProperties synapseProperties, CookieProvider cookies, EventBus eventBus) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
+		this.jsClient = jsClient;
 		this.synAlert = synAlert;
 		this.cookies = cookies;
+		this.synapseProperties = synapseProperties;
 		this.eventBus = eventBus;
 		view.setSynAlertWidget(synAlert);
 		view.setPresenter(this);
@@ -73,7 +86,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 	public void getStorageLocationSetting() {
 		Entity entity = entityBundle.getEntity();
 		view.setSFTPVisible(DisplayUtils.isInTestWebsite(cookies));
-		synapseClient.getStorageLocationSetting(entity.getId(), new AsyncCallback<StorageLocationSetting>() {
+		jsClient.getDefaultUploadDestination(entity.getId(), new AsyncCallback<UploadDestination>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				// unable to get storage location
@@ -83,40 +96,41 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 			}
 
 			@Override
-			public void onSuccess(StorageLocationSetting location) {
+			public void onSuccess(UploadDestination uploadDestination) {
 				// if null, then still show the default UI
 				boolean isInAlpha = DisplayUtils.isInTestWebsite(cookies);
 				view.setS3StsVisible(isInAlpha);
-				if (location != null) {
+				Long defaultStorageId = Long.parseLong(synapseProperties.getSynapseProperty(WebConstants.DEFAULT_STORAGE_ID_PROPERTY_KEY));
+				if (uploadDestination != null && !defaultStorageId.equals(uploadDestination.getStorageLocationId())) {
 					// set up the view
-					String banner = trim(location.getBanner());
-					if (location instanceof ExternalS3StorageLocationSetting) {
-						ExternalS3StorageLocationSetting setting = (ExternalS3StorageLocationSetting) location;
-						boolean isStsEnabled = setting.getStsEnabled() == null ? false : setting.getStsEnabled();
-						view.setS3BaseKey(trim(setting.getBaseKey()));
-						view.setS3Bucket(trim(setting.getBucket()));
+					String banner = trim(uploadDestination.getBanner());
+					if (uploadDestination instanceof ExternalS3UploadDestination) {
+						ExternalS3UploadDestination destination = (ExternalS3UploadDestination) uploadDestination;
+						boolean isStsEnabled = destination.getStsEnabled() == null ? false : destination.getStsEnabled();
+						view.setS3BaseKey(trim(destination.getBaseKey()));
+						view.setS3Bucket(trim(destination.getBucket()));
 						if (isStsEnabled)
 							view.setS3StsVisible(true);
 						view.setS3StsEnabled(isStsEnabled);
 						view.setExternalS3Banner(banner);
 						view.selectExternalS3Storage();
-					} else if (location instanceof ExternalGoogleCloudStorageLocationSetting) {
+					} else if (uploadDestination instanceof ExternalGoogleCloudUploadDestination) {
 						view.setGoogleCloudVisible(true);
-						ExternalGoogleCloudStorageLocationSetting setting = (ExternalGoogleCloudStorageLocationSetting) location;
-						view.setGoogleCloudBaseKey(trim(setting.getBaseKey()));
-						view.setGoogleCloudBucket(trim(setting.getBucket()));
+						ExternalGoogleCloudUploadDestination destination = (ExternalGoogleCloudUploadDestination) uploadDestination;
+						view.setGoogleCloudBaseKey(trim(destination.getBaseKey()));
+						view.setGoogleCloudBucket(trim(destination.getBucket()));
 						view.setExternalGoogleCloudBanner(banner);
 						view.selectExternalGoogleCloudStorage();
-					} else if (location instanceof ExternalObjectStorageLocationSetting) {
-						ExternalObjectStorageLocationSetting setting = (ExternalObjectStorageLocationSetting) location;
+					} else if (uploadDestination instanceof ExternalObjectStoreUploadDestination) {
+						ExternalObjectStoreUploadDestination destination = (ExternalObjectStoreUploadDestination) uploadDestination;
 						view.setExternalObjectStoreBanner(banner);
-						view.setExternalObjectStoreBucket(trim(setting.getBucket()));
-						view.setExternalObjectStoreEndpointUrl(trim(setting.getEndpointUrl()));
+						view.setExternalObjectStoreBucket(trim(destination.getBucket()));
+						view.setExternalObjectStoreEndpointUrl(trim(destination.getEndpointUrl()));
 						view.selectExternalObjectStore();
-					} else if (location instanceof ExternalStorageLocationSetting) {
+					} else if (uploadDestination instanceof ExternalUploadDestination) {
 						view.setSFTPVisible(true);
-						ExternalStorageLocationSetting setting = (ExternalStorageLocationSetting) location;
-						view.setSFTPUrl(trim(setting.getUrl()));
+						ExternalUploadDestination destination = (ExternalUploadDestination) uploadDestination;
+						view.setSFTPUrl(trim(destination.getUrl()));
 						view.setSFTPBanner(banner);
 						view.selectSFTPStorage();
 					}

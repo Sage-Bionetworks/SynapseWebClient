@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -1842,6 +1843,11 @@ public class SynapseJavascriptClient {
 		request.setRequirementId(Long.parseLong(requirementId));
 		String url = getRepoServiceUrl() + ACCESS_APPROVAL + "/notifications";
 		doPost(url, request, OBJECT_TYPE.AccessApprovalNotificationResponse, true, cb);
+	}
+	
+	public void getDefaultUploadDestination(String parentEntityId, AsyncCallback<UploadDestination> cb) {
+		String url = getRepoServiceUrl() + ENTITY + "/" + parentEntityId + "/uploadDestination";
+		doGet(url, OBJECT_TYPE.UploadDestination, cb);
 	}
 }
 

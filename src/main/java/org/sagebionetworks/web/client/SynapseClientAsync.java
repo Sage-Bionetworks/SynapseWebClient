@@ -178,8 +178,6 @@ public interface SynapseClientAsync {
 
 	void createStorageLocationSetting(String parentEntityId, StorageLocationSetting setting, AsyncCallback<Void> callback);
 
-	void getStorageLocationSetting(String parentEntityId, AsyncCallback<StorageLocationSetting> callback);
-
 	void getMyLocationSettingBanners(AsyncCallback<List<String>> callback);
 
 	void isTeamMember(String userId, Long groupPrincipalId, AsyncCallback<Boolean> callback);

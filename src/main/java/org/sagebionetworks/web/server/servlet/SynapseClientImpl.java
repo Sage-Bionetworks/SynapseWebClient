@@ -65,7 +65,6 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleCopyResult;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.repo.model.principal.AccountCreationToken;
@@ -1474,23 +1473,6 @@ public class SynapseClientImpl extends SynapseClientBase implements SynapseClien
 				}
 			}
 			return new ArrayList<String>(banners);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public StorageLocationSetting getStorageLocationSetting(String parentEntityId) throws RestServiceException {
-		try {
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			UploadDestination uploadDestination = synapseClient.getDefaultUploadDestination(parentEntityId);
-			if (uploadDestination == null || uploadDestination.getStorageLocationId().equals(defaultStorageLocation)) {
-				// default storage location
-				return null;
-			}
-
-			// else
-			return synapseClient.getMyStorageLocationSetting(uploadDestination.getStorageLocationId());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
