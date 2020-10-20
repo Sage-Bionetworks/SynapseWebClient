@@ -1846,7 +1846,7 @@ public class SynapseJavascriptClient {
 	}
 	
 	public void getDefaultUploadDestination(String parentEntityId, AsyncCallback<UploadDestination> cb) {
-		String url = getRepoServiceUrl() + ENTITY + "/" + parentEntityId + "/uploadDestination";
+		String url = getFileServiceUrl() + ENTITY + "/" + parentEntityId + "/uploadDestination";
 		doGet(url, OBJECT_TYPE.UploadDestination, cb);
 	}
 }
