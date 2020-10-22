@@ -33,7 +33,6 @@
 		<meta http-equiv="expires" content="0" />
 		<meta http-equiv="pragma" content="no-cache" />
 		<!-- end cache control -->
-
 		<link rel="icon" href="favicon.png?v=4" />
 		<link href="/opensearch.xml" rel="search" title="Synapse" type="application/opensearchdescription+xml" />
 		<link rel="manifest" href="manifest.json" />
@@ -52,10 +51,21 @@
 		<script>
 			// determine cdn endpoint (staging or prod, do not use a cdn for local or dev builds)
 			var cdnEndpoint = "//cdn-" + location.hostname + "/";
+			var processEnvironment = 'production';
 			var synapseOrgRegex = /(www|staging|tst)\.synapse\.org$/;
+			
 			if (!synapseOrgRegex.test(location.hostname)) {
 				cdnEndpoint = "";
+				processEnvironment = 'development';
 			}
+			
+			// define process.env.NODE_ENV for any library that fails to export
+			process = {
+				env: {
+					NODE_ENV: processEnvironment // production or development
+				}
+			}
+			
 			window.cdnEndpoint = cdnEndpoint;
 
 			function loadJs(src) {
@@ -116,7 +126,7 @@
 			head.load("https://unpkg.com/react-jsonschema-form/dist/react-jsonschema-form.js");
 			head.load("https://unpkg.com/universal-cookie@4/umd/universalCookie.min.js");
 			head.load("https://unpkg.com/react-bootstrap@next/dist/react-bootstrap.min.js");
-			head.load("https://unpkg.com/synapse-react-client@1.14.27/dist/umd/synapse-react-client.production.min.js");
+			head.load("https://unpkg.com/synapse-react-client@1.15.32/dist/umd/synapse-react-client.production.min.js");
 			head.load(cdnEndpoint + "js/sanitize-html.min.js");
 			head.load("//cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js");
 			head.load(cdnEndpoint + "js/diff/diffview.css");
@@ -126,7 +136,7 @@
 			head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.css");
 			head.load(cdnEndpoint + "js/linkify.min.js");
 			head.load(cdnEndpoint + "js/linkify-string.min.js");
-			head.load("https://unpkg.com/synapse-react-client@1.14.27/dist/umd/synapse-react-client.production.styles.css");
+			head.load("https://unpkg.com/synapse-react-client@1.15.32/dist/umd/synapse-react-client.production.styles.css");
 			head.load(cdnEndpoint + "css/katex-0.10.1.min.css");
 			head.load("//cdn.statuspage.io/se-v2.js");
 			// head.load("//kh896k90gyvg.statuspage.io/embed/script.js");			
