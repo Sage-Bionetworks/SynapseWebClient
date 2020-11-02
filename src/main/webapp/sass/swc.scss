@@ -3047,6 +3047,10 @@ div.border {
     color: $synapse-blue;
     fill: $synapse-blue;
 	}
+	.table .SRC-primary-text-color svg, .table .SRC-primary-text-color path {
+		color: $synapse-blue;
+    	fill: $synapse-blue;
+	}
 
 	.SRC-primary-text-color {
 		color: $synapse-blue;
