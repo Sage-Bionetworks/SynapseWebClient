@@ -459,7 +459,6 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testConfigurePublicReadTable() {
 		setPublicCanRead();
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 
 		verify(mockActionMenu).setActionIcon(Action.SHARE, IconType.GLOBE);
@@ -475,19 +474,8 @@ public class EntityActionControllerImplTest {
 	}
 
 	@Test
-	public void testTableVersionAlphaCommands() {
-		// not in test mode, table version commands should be hidden
-		setPublicCanRead();
-		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-
-		verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, false);
-		verify(mockActionMenu).setActionVisible(Action.CREATE_TABLE_VERSION, false);
-	}
-
-	@Test
 	public void testConfigureTableNoEdit() {
 		setPublicCanRead();
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		permissions.setCanCertifiedUserEdit(false);
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 
@@ -626,8 +614,7 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(new EntityView());
 		entityBundle.setRootWikiId(null);
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, false);
-		verify(mockActionMenu).setActionVisible(Action.SHOW_VERSION_HISTORY, false);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, false);		
 	}
 
 

@@ -872,10 +872,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	public static boolean isVersionSupported(Entity entity, CookieProvider cookies) {
-		// TODO: remove check once Table versions are released from alpha mode.
-		if (entity instanceof Table) {
-			return DisplayUtils.isInTestWebsite(cookies);
-		}
 		return entity instanceof Versionable;
 	}
 
