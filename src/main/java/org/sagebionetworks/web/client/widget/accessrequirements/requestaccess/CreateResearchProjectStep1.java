@@ -44,6 +44,7 @@ public class CreateResearchProjectStep1 implements ModalPage {
 	public void configure(ManagedACTAccessRequirement ar, RestrictableObjectDescriptor targetSubject) {
 		this.ar = ar;
 		this.targetSubject = targetSubject;
+		view.setIntendedDataUseStatementUIVisible(ar.getIsIDURequired());
 		view.setIDUPublicNoteVisible(ar.getIsIDUPublic());
 		client.getResearchProject(ar.getId(), new AsyncCallback<ResearchProject>() {
 			@Override
@@ -95,7 +96,7 @@ public class CreateResearchProjectStep1 implements ModalPage {
 			modalPresenter.setErrorMessage("Please fill in the institution.");
 		} else if (!DisplayUtils.isDefined(view.getProjectLead())) {
 			modalPresenter.setErrorMessage("Please fill in the project lead.");
-		} else if (!DisplayUtils.isDefined(view.getIntendedDataUseStatement())) {
+		} else if (ar.getIsIDURequired() && !DisplayUtils.isDefined(view.getIntendedDataUseStatement())) {
 			modalPresenter.setErrorMessage("Please fill in the intended data use statement.");
 		} else {
 			updateResearchProject();

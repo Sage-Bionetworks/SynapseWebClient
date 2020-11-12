@@ -35,6 +35,8 @@ public class CreateManagedACTAccessRequirementStep2ViewImpl implements CreateMan
 	@UiField
 	CheckBox irbCheckbox;
 	@UiField
+	CheckBox iduCheckbox;
+	@UiField
 	CheckBox otherAttachmentsCheckbox;
 	@UiField
 	TextBox expirationPeriodTextbox;
@@ -46,11 +48,11 @@ public class CreateManagedACTAccessRequirementStep2ViewImpl implements CreateMan
 	@Inject
 	public CreateManagedACTAccessRequirementStep2ViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		editWikiButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onEditWiki();
-			}
+		editWikiButton.addClickHandler(event -> {
+			presenter.onEditWiki();
+		});
+		iduCheckbox.addValueChangeHandler(event -> {
+			intendedDataUsePublicCheckbox.setEnabled(event.getValue());
 		});
 	}
 
@@ -93,6 +95,12 @@ public class CreateManagedACTAccessRequirementStep2ViewImpl implements CreateMan
 	public void setIsIDUPublic(boolean value) {
 		intendedDataUsePublicCheckbox.setValue(value);
 	}
+	
+	@Override
+	public void setIsIDURequired(boolean value) {
+		iduCheckbox.setValue(value);
+		intendedDataUsePublicCheckbox.setEnabled(value);
+	}
 
 	@Override
 	public void setIsIRBApprovalRequired(boolean value) {
@@ -117,6 +125,11 @@ public class CreateManagedACTAccessRequirementStep2ViewImpl implements CreateMan
 	@Override
 	public boolean isDUCRequired() {
 		return ducCheckbox.getValue();
+	}
+	
+	@Override
+	public boolean isIDURequired() {
+		return iduCheckbox.getValue();
 	}
 
 	@Override

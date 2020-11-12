@@ -101,6 +101,7 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 		view.setIsIDUPublic(accessRequirement.getIsIDUPublic());
 		view.setIsIRBApprovalRequired(accessRequirement.getIsIRBApprovalRequired());
 		view.setIsValidatedProfileRequired(accessRequirement.getIsValidatedProfileRequired());
+		view.setIsIDURequired(accessRequirement.getIsIDURequired());
 	}
 
 
@@ -142,6 +143,7 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 
 		accessRequirement.setIsCertifiedUserRequired(view.isCertifiedUserRequired());
 		accessRequirement.setIsDUCRequired(view.isDUCRequired());
+		accessRequirement.setIsIDURequired(view.isIDURequired());
 		accessRequirement.setIsIDUPublic(view.isIDUPublic());
 		accessRequirement.setIsIRBApprovalRequired(view.isIRBApprovalRequired());
 		accessRequirement.setIsValidatedProfileRequired(view.isValidatedProfileRequired());
