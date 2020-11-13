@@ -65,6 +65,7 @@ public class CreateResearchProjectStep1Test {
 		when(mockResearchProject.getIntendedDataUseStatement()).thenReturn(INTENDED_DUS);
 		when(mockResearchProject.getProjectLead()).thenReturn(PROJECT_LEAD);
 		when(mockACTAccessRequirement.getId()).thenReturn(AR_ID);
+		when(mockACTAccessRequirement.getIsIDURequired()).thenReturn(true);
 
 		when(mockView.getInstitution()).thenReturn(INSTITUTION2);
 		when(mockView.getIntendedDataUseStatement()).thenReturn(INTENDED_DUS2);
@@ -88,6 +89,7 @@ public class CreateResearchProjectStep1Test {
 		verify(mockView).setIDUPublicNoteVisible(isIDUPublic);
 		verify(mockClient).getResearchProject(anyLong(), any(AsyncCallback.class));
 		verify(mockView).setInstitution(INSTITUTION);
+		verify(mockView).setIntendedDataUseStatementUIVisible(true);
 		verify(mockView).setIntendedDataUseStatement(INTENDED_DUS);
 		verify(mockView).setProjectLead(PROJECT_LEAD);
 	}
@@ -115,6 +117,16 @@ public class CreateResearchProjectStep1Test {
 		verify(mockView).setIDUPublicNoteVisible(isIDUPublic);
 		verify(mockClient).getResearchProject(anyLong(), any(AsyncCallback.class));
 		verify(mockModalPresenter).setErrorMessage(error);
+	}
+
+	@Test
+	public void testConfigureIDUNotRequired() {
+		when(mockACTAccessRequirement.getIsIDURequired()).thenReturn(false);
+		widget.configure(mockACTAccessRequirement, mockSubject);
+		verify(mockView).setIntendedDataUseStatementUIVisible(false);
+		verify(mockClient).getResearchProject(anyLong(), any(AsyncCallback.class));
+		verify(mockView).setInstitution(INSTITUTION);		
+		verify(mockView).setProjectLead(PROJECT_LEAD);
 	}
 
 	@Test
@@ -150,6 +162,31 @@ public class CreateResearchProjectStep1Test {
 		verify(mockModalPresenter, never()).setLoading(true);
 		verify(mockClient, never()).updateResearchProject(any(ResearchProject.class), any(AsyncCallback.class));
 		verify(mockModalPresenter).setErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testNextInvalidViewValue3() {
+		widget.configure(mockACTAccessRequirement, mockSubject);
+		when(mockView.getIntendedDataUseStatement()).thenReturn("");
+		
+		widget.onPrimary();
+		
+		verify(mockModalPresenter, never()).setLoading(true);
+		verify(mockClient, never()).updateResearchProject(any(ResearchProject.class), any(AsyncCallback.class));
+		verify(mockModalPresenter).setErrorMessage(anyString());
+	}
+	@Test
+	public void testNextInvalidViewValue3NotRequired() {
+		when(mockACTAccessRequirement.getIsIDURequired()).thenReturn(false);
+		widget.configure(mockACTAccessRequirement, mockSubject);
+		when(mockView.getIntendedDataUseStatement()).thenReturn("");
+		
+		widget.onPrimary();
+		
+		verify(mockClient).updateResearchProject(researchProjectCaptor.capture(), any(AsyncCallback.class));
+		ResearchProject rp = researchProjectCaptor.getValue();
+		assertEquals(mockResearchProject, rp);
+		verify(mockResearchProject).setIntendedDataUseStatement("");
 	}
 
 	@Test

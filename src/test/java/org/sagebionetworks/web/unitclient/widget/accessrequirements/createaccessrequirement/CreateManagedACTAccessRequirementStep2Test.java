@@ -86,6 +86,7 @@ public class CreateManagedACTAccessRequirementStep2Test {
 		when(mockView.isIDUPublic()).thenReturn(false);
 		when(mockView.isIRBApprovalRequired()).thenReturn(false);
 		when(mockView.isValidatedProfileRequired()).thenReturn(false);
+		when(mockView.isIDURequired()).thenReturn(true);
 
 	}
 
@@ -125,6 +126,7 @@ public class CreateManagedACTAccessRequirementStep2Test {
 		when(mockACTAccessRequirement.getIsIDUPublic()).thenReturn(true);
 		when(mockACTAccessRequirement.getIsIRBApprovalRequired()).thenReturn(false);
 		when(mockACTAccessRequirement.getIsValidatedProfileRequired()).thenReturn(true);
+		when(mockACTAccessRequirement.getIsIDURequired()).thenReturn(true);
 		
 		widget.configure(mockACTAccessRequirement);
 		
@@ -149,6 +151,7 @@ public class CreateManagedACTAccessRequirementStep2Test {
 		verify(mockView).setIsIDUPublic(true);
 		verify(mockView).setIsIRBApprovalRequired(false);
 		verify(mockView).setIsValidatedProfileRequired(true);
+		verify(mockView).setIsIDURequired(true);
 
 		// on edit of wiki
 		widget.onEditWiki();
@@ -166,6 +169,7 @@ public class CreateManagedACTAccessRequirementStep2Test {
 		verify(mockACTAccessRequirement).setIsIDUPublic(false);
 		verify(mockACTAccessRequirement).setIsIRBApprovalRequired(false);
 		verify(mockACTAccessRequirement).setIsValidatedProfileRequired(false);
+		verify(mockACTAccessRequirement).setIsIDURequired(true);
 		verify(mockModalPresenter).onFinished();
 	}
 

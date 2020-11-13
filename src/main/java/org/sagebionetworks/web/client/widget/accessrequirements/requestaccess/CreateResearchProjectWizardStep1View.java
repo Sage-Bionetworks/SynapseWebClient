@@ -23,4 +23,6 @@ public interface CreateResearchProjectWizardStep1View extends IsWidget {
 	void setIntendedDataUseStatement(String text);
 
 	void setIDUPublicNoteVisible(boolean visible);
+
+	void setIntendedDataUseStatementUIVisible(boolean visible);
 }

@@ -21,8 +21,8 @@
 				<b:FormLabel>Institution</b:FormLabel>
 				<b:TextBox ui:field="institutionField" />
 			</b:FormGroup>
-			<b:FormGroup>
-				<b:FormLabel>Intended Data Use Statement</b:FormLabel>
+			<b:FormGroup ui:field="intendedDataUseUI">
+				<b:FormLabel>Intended Data Use Statement </b:FormLabel>
 				<bh:Italic ui:field="visibleToPublicNote" visible="false"
 					text=" - this will be visible to the public" />
 				<b:TextArea ui:field="intendedDataUseStatementField"

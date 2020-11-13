@@ -43,12 +43,16 @@ public interface CreateManagedACTAccessRequirementStep2View extends IsWidget {
 
 	void setDUCTemplateWidget(IsWidget w);
 
-	public void setPresenter(Presenter p);
+	void setIsIDURequired(boolean value);
 
+	boolean isIDURequired();
+
+	public void setPresenter(Presenter p);
 	/*
 	 * Presenter interface
 	 */
 	public interface Presenter {
 		void onEditWiki();
 	}
+
 }

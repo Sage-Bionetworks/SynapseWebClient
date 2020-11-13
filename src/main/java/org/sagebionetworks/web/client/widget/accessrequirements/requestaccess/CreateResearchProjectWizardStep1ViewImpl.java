@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.requestaccess;
 
+import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Italic;
@@ -21,6 +22,8 @@ public class CreateResearchProjectWizardStep1ViewImpl implements CreateResearchP
 	TextArea intendedDataUseStatementField;
 	@UiField
 	Italic visibleToPublicNote;
+	@UiField
+	FormGroup intendedDataUseUI;
 	Widget widget;
 
 	@Inject
@@ -51,6 +54,11 @@ public class CreateResearchProjectWizardStep1ViewImpl implements CreateResearchP
 	@Override
 	public void setIntendedDataUseStatement(String text) {
 		intendedDataUseStatementField.setText(text);
+	}
+	
+	@Override
+	public void setIntendedDataUseStatementUIVisible(boolean visible) {
+		intendedDataUseUI.setVisible(visible);
 	}
 
 	@Override
