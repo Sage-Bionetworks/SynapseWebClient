@@ -3216,3 +3216,21 @@ div.border {
 		vertical-align: top;
 	}	
 }
+
+.settingsSubPageContainer {
+	margin-top: 20px;
+	margin-left: 20px;
+	margin-right: 15px;
+
+	.backToSettingsNav {
+		text-transform: uppercase;
+		font-weight: bold;
+		font-size: 14px;
+		line-height: 150%;
+	}
+}
+
+.personalAccessTokenWidgetContainer {
+	padding: 20px 30px;
+}
+
