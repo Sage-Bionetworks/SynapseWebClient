@@ -3217,3 +3217,14 @@ div.border {
 		vertical-align: top;
 	}	
 }
+
+#body .editProfileImageButton {
+	position: absolute;
+	left: 131px;
+	button {
+		border-radius: 50%;
+		&:focus {
+			outline: none;
+		}
+	}
+}

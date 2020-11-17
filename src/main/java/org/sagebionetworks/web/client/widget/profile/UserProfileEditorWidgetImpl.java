@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.profile;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
@@ -9,9 +11,7 @@ import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -54,6 +54,12 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		this.popupUtils = popupUtils;
 		this.globalAppState = globalAppState;
 		fileHandleUploadWidget.setView(ginInjector.getCroppedImageUploadView());
+		fileHandleUploadWidget.asWidget().addStyleName("editProfileImageButton");
+		fileHandleUploadWidget.setButtonIcon(IconType.EDIT);
+		fileHandleUploadWidget.setButtonText("");
+		fileHandleUploadWidget.setButtonType(ButtonType.DEFAULT);
+		fileHandleUploadWidget.asWidget().setVisible(false);
+		imageWidget.setRemovePictureCommandVisible(false);
 		this.view.addFileInputWidget(fileHandleUploadWidget);
 		this.view.addImageWidget(imageWidget);
 		this.view.setPresenter(this);
@@ -89,11 +95,8 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 				setNewFileHandle(null);
 			}
 		});
-		fileHandleUploadWidget.configure(new CallbackP<FileUpload>() {
-			@Override
-			public void invoke(FileUpload fileUploaded) {
-				setNewFileHandle(fileUploaded.getFileHandleId());
-			}
+		fileHandleUploadWidget.configure(fileUploaded -> {
+			setNewFileHandle(fileUploaded.getFileHandleId());			
 		});
 	}
 
@@ -230,6 +233,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	@Override
 	public void setIsEditingMode(boolean isEditing) {
 		globalAppState.setIsEditing(isEditing);
+		fileHandleUploadWidget.asWidget().setVisible(isEditing);
 		view.setEditMode(isEditing);
 	}
 	/**

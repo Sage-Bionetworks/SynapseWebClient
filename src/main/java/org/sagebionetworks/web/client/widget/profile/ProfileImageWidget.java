@@ -24,4 +24,6 @@ public interface ProfileImageWidget extends IsWidget {
 
 	public void onRemovePicture();
 
+	void setRemovePictureCommandVisible(boolean isVisible);
+
 }

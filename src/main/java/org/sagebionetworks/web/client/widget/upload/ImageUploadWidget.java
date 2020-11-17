@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.upload;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -121,6 +123,18 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 		getView().showProgress(false);
 		synAlert.clear();
 		getView().resetForm();
+	}
+
+	public void setButtonType(ButtonType type) {
+		getView().setButtonType(type);
+	}
+
+	public void setButtonText(String text) {
+		getView().setButtonText(text);
+	}
+	
+	public void setButtonIcon(IconType iconType) {
+		getView().setButtonIcon(iconType);
 	}
 
 	private void doMultipartUpload(final FileMetadata fileMeta, JavaScriptObjectWrapper blob) {
