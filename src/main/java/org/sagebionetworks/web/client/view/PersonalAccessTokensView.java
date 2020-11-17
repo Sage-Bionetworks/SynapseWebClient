@@ -5,7 +5,7 @@ import org.sagebionetworks.web.client.presenter.PersonalAccessTokensPresenter;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface PersonalAccessTokensView extends IsWidget, SynapseView {
+public interface PersonalAccessTokensView extends IsWidget {
 
 	/**
 	 * Set this view's presenter

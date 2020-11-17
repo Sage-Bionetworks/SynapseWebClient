@@ -29,7 +29,7 @@ public class PersonalAccessTokensPresenter extends AbstractActivity implements P
 
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
-		this.view.clear();
+		this.view.render();
 		panel.setWidget(view.asWidget());
 	}
 

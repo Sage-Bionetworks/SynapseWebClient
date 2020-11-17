@@ -47,6 +47,7 @@ public class PersonalAccessTokensViewImpl extends Composite implements PersonalA
 
 	@Override
 	public void render() {
+		jsniUtils.unmountComponentAtNode(container.getElement());
 		_showPersonalAccessTokensComponent(container.getElement(), authController.getCurrentUserSessionToken());
 	}
 
@@ -72,28 +73,5 @@ public class PersonalAccessTokensViewImpl extends Composite implements PersonalA
 	public void setPresenter(PersonalAccessTokensPresenter presenter) {
 		this.presenter = presenter;
 		headerWidget.refresh();
-		render();
 	}
-
-
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
-
-	@Override
-	public void showLoading() {}
-
-	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message);
-	}
-
-
-	@Override
-	public void clear() {
-		jsniUtils.unmountComponentAtNode(container.getElement());
-		render();
-	}
-
 }

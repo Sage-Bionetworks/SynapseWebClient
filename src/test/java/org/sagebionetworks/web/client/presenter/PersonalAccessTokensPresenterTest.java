@@ -51,12 +51,12 @@ public class PersonalAccessTokensPresenterTest {
 
         AcceptsOneWidget mockPanel = mock(AcceptsOneWidget.class);
         EventBus mockEventBus = mock(EventBus.class);
-        when(mockView.asWidget()).thenReturn(new Widget());
+        when(mockView.asWidget()).thenReturn(mock(Widget.class));
 
         // Method under test
         presenter.start(mockPanel, mockEventBus);
 
-        verify(mockView).clear();
+        verify(mockView).render();
         verify(mockPanel).setWidget(mockView.asWidget());
 
         GWTMockUtilities.restore();
