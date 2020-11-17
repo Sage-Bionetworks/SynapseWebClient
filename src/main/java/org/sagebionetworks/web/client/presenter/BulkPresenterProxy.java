@@ -31,6 +31,7 @@ import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.place.DataAccessApprovalTokenPlace;
 import org.sagebionetworks.web.client.place.PasswordResetSignedTokenPlace;
 import org.sagebionetworks.web.client.place.PeopleSearch;
+import org.sagebionetworks.web.client.place.PersonalAccessTokenPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.Search;
@@ -622,6 +623,20 @@ public class BulkPresenterProxy extends AbstractActivity {
 				public void onSuccess() {
 					DataAccessApprovalTokenPresenter presenter = ginjector.getDataAccessApprovalTokenPresenter();
 					presenter.setPlace((DataAccessApprovalTokenPlace) place);
+					presenter.start(panel, eventBus);
+				}
+
+				@Override
+				public void onFailure(Throwable caught) {
+					loadError(caught);
+				}
+			});
+		} else if (place instanceof PersonalAccessTokenPlace) {
+			GWT.runAsync(PersonalAccessTokenPlace.class, new RunAsyncCallback() {
+				@Override
+				public void onSuccess() {
+					PersonalAccessTokensPresenter presenter = ginjector.getPersonalAccessTokensPresenter();
+					presenter.setPlace((PersonalAccessTokenPlace) place);
 					presenter.start(panel, eventBus);
 				}
 

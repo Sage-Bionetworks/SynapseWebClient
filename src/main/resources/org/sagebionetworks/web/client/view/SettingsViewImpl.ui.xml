@@ -230,6 +230,14 @@
 					addStyleNames="margin-top-10" text="Change API Key" />
 			</g:HTMLPanel>
 
+			<g:HTMLPanel ui:field="personalAccessTokensHighlightBox"
+						 addStyleNames="highlight-box">
+				<p>You can issue personal access tokens to authenticate your scripts with scoped access
+					to your account. It is important that you treat personal access tokens with	the same security as your password.</p>
+				<b:Button ui:field="managePersonalAccessTokensButton"
+						  addStyleNames="margin-top-10" text="Manage Personal Access Tokens" />
+			</g:HTMLPanel>
+
 			<bh:Div addStyleNames="clear"></bh:Div>
 		</bh:Div> <!-- close class="container" -->
 		<g:SimplePanel ui:field="footer" />
