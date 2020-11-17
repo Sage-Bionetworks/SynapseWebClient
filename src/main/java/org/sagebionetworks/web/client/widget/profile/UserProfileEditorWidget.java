@@ -12,7 +12,7 @@ public interface UserProfileEditorWidget extends IsWidget {
 	 * 
 	 * @param profile
 	 */
-	void configure(UserProfile profile);
+	void configure(UserProfile profile, Callback callback);
 
 	/**
 	 * Are the values in this editor valid?

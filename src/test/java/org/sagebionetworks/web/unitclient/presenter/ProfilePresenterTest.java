@@ -174,7 +174,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockInjector.getPromptForValuesModal()).thenReturn(mockPromptModalView);
-		when(mockInjector.getUserProfileModalWidget()).thenReturn(mockUserProfileModalWidget);
+		when(mockInjector.getUserProfileEditorWidget()).thenReturn(mockUserProfileModalWidget);
 		when(mockInjector.getProjectBadgeWidget()).thenReturn(mockProjectBadge);
 		when(mockInjector.getChallengeBadgeWidget()).thenReturn(mockChallengeBadge);
 		when(mockInjector.getSettingsPresenter()).thenReturn(mockSettingsPresenter);

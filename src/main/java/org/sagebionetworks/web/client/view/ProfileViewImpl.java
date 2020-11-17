@@ -55,10 +55,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 
 	@UiField
-	org.gwtbootstrap3.client.ui.Anchor orcIdLink;
-	@UiField
-	Button editProfileButton;
-	@UiField
 	SimplePanel editUserProfilePanel;
 	HTML noChallengesHtml = new HTML();
 	public static final String NO_CHALLENGES_HTML = "<p><a href=\"http://sagebionetworks.org/challenges/\" target=\"_blank\">Challenges</a> are open science, collaborative competitions for evaluating and comparing computational algorithms or solutions to problems.</p>";
@@ -69,8 +65,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public static final String CHALLENGES_THAT = "This tab shows challenges that ";
 	public static final String IS_REGISTERED_FOR = " is registered for.";
 	
-	@UiField
-	Div userBadgeFooter;
 	////// Tabs
 	@UiField
 	LIElement profileListItem;
@@ -113,7 +107,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	LIElement challengesListItem;
 
 	@UiField
-	DivElement profileUI;
+	Div profileUI;
 	@UiField
 	DivElement dashboardUI;
 
@@ -280,8 +274,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		allProjectsFilter.addClickHandler(event -> presenter.applyFilterClicked(ProjectFilterEnum.ALL, null));
 		myProjectsFilter.addClickHandler(event -> presenter.applyFilterClicked(ProjectFilterEnum.CREATED_BY_ME, null));
 		sharedDirectlyWithMeFilter.addClickHandler(event -> presenter.applyFilterClicked(ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME, null));
-		ClickHandler editProfileClickHandler = event -> presenter.onEditProfile();
-		editProfileButton.addClickHandler(editProfileClickHandler);
 
 		projectNameColumnHeader.setSortingListener(headerName -> presenter.sort(ProjectListSortColumn.PROJECT_NAME));
 		lastActivityOnColumnHeader.setSortingListener(headerName -> presenter.sort(ProjectListSortColumn.LAST_ACTIVITY));
@@ -358,29 +350,19 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
 	@Override
 	public void setProfile(UserProfile profile, boolean isOwner, boolean isCertified, boolean isValidated, String orcIdHref) {
-		userBadgeFooter.setVisible(false);
-		// TODO: use large user component to show profile. set ORCiD
-		userBadge.configure(profile, isCertified, isValidated);
-
 		String displayName = DisplayUtils.getDisplayName(profile);
+		userBadgeContainer.setVisible(!isOwner);
+		editUserProfilePanel.setVisible(isOwner);
+
 		if (!isOwner) {
 			setHighlightBoxUser(displayName);
-		} else {
-			userBadgeFooter.setVisible(true);
+			// TODO: use large user component to show profile. set ORCiD
+			userBadge.configure(profile, isCertified, isValidated);
 		}
 		
 		String challengesThatUserIsRegisteredFor = CHALLENGES_THAT + displayName + IS_REGISTERED_FOR;
 		challengeHelpWidget.setHelpMarkdown(challengesThatUserIsRegisteredFor + CHALLENGE_TAB_HELP_TEXT);
 		noChallengesHtml.setHTML("<p>" + challengesThatUserIsRegisteredFor + "</p>" + NO_CHALLENGES_HTML);
-		
-		if (orcIdHref != null && orcIdHref.trim().length() > 0) {
-			orcIdLink.setVisible(true);
-			orcIdLink.setHref(orcIdHref);
-			orcIdLink.setText(orcIdHref);
-			userBadgeFooter.setVisible(true);
-		} else {
-			orcIdLink.setVisible(false);
-		}
 		updateHrefs(profile.getOwnerId());
 	}
 
@@ -694,17 +676,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 
 	@Override
-	public void setProfileEditButtonVisible(boolean isVisible) {
-		this.editProfileButton.setVisible(isVisible);
-		// this.importLinkedIn.setVisible(isVisible);
-	}
-
-	@Override
-	public void addUserProfileModalWidget(IsWidget userProfileModalWidget) {
+	public void setUserProfileEditorWidget(IsWidget userProfileEditorWidget) {
 		this.editUserProfilePanel.clear();
-		this.editUserProfilePanel.add(userProfileModalWidget);
+		this.editUserProfilePanel.add(userProfileEditorWidget);
 	}
-
+	
 	@Override
 	public void open(String url) {
 		Window.open(url, "_self", "");

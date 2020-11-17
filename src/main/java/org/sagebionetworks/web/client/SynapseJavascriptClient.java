@@ -1150,6 +1150,11 @@ public class SynapseJavascriptClient {
 
 		doPut(url, toUpdate, OBJECT_TYPE.V2WikiPage, callback);
 	}
+	
+	public void updateMyUserProfile(UserProfile profile, AsyncCallback<UserProfile> callback) {
+		String url = getRepoServiceUrl() + "/" + USER_PROFILE_PATH;
+		doPut(url, profile, OBJECT_TYPE.UserProfile, callback);
+	}
 
 	public void updateEntity(Entity toUpdate, String generatedByID, Boolean newVersion, AsyncCallback<Entity> callback) {
 		String url = getRepoServiceUrl() + ENTITY + "/" + toUpdate.getId() + "?";

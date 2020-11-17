@@ -5,8 +5,10 @@ import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_CERTI
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.ORC_ID;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.PROFILE;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.VERIFICATION_SUBMISSION;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.auth.ChangePasswordWithCurrentPassword;
@@ -30,9 +32,9 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.EmailAddressesWidget;
-import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
+
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -49,7 +51,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	private SynapseAlert notificationSynAlert;
 	private SynapseAlert passwordSynAlert;
 	private PortalGinInjector ginInjector;
-	private UserProfileModalWidget userProfileModalWidget;
 	private SubscriptionListWidget subscriptionListWidget;
 	private EmailAddressesWidget emailAddressesWidget;
 	private SynapseJavascriptClient jsClient;
@@ -59,14 +60,13 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	private PopupUtilsView popupUtils;
 
 	@Inject
-	public SettingsPresenter(SettingsView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient, PortalGinInjector ginInjector, UserProfileModalWidget userProfileModalWidget, SubscriptionListWidget subscriptionListWidget, EmailAddressesWidget emailAddressesWidget, PopupUtilsView popupUtils, SynapseJavascriptClient jsClient) {
+	public SettingsPresenter(SettingsView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient, PortalGinInjector ginInjector, SubscriptionListWidget subscriptionListWidget, EmailAddressesWidget emailAddressesWidget, PopupUtilsView popupUtils, SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.ginInjector = ginInjector;
-		this.userProfileModalWidget = userProfileModalWidget;
 		this.subscriptionListWidget = subscriptionListWidget;
 		this.emailAddressesWidget = emailAddressesWidget;
 		this.popupUtils = popupUtils;
@@ -283,12 +283,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 
 	@Override
 	public void onEditProfile() {
-		userProfileModalWidget.showEditProfile(authenticationController.getCurrentUserPrincipalId(), new Callback() {
-			@Override
-			public void invoke() {
-				goTo(new Profile(authenticationController.getCurrentUserPrincipalId(), ProfileArea.SETTINGS));
-			}
-		});
+		globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId(), ProfileArea.PROFILE));
 	}
 
 	@Override

@@ -53,6 +53,7 @@ public class ProfileImageWidgetImpl implements ProfileImageWidget {
 		}
 	}
 
+	
 	@Override
 	public void onRemovePicture() {
 		if (removePictureCallback != null) {

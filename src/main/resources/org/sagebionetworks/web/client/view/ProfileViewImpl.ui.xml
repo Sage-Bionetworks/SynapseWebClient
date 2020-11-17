@@ -99,33 +99,14 @@
 							<div>
 								<div class="tab-background margin-10"
 									ui:field="profileTabContainer">
-									<div ui:field="profileUI"
-										class="profileUI inline-block vertical-align-top max-width-800">
-										<div class="padding-15">
+									<bh:Div ui:field="profileUI"
+										addStyleNames="profileUI inline-block vertical-align-top " width="100%">
+										<bh:Div addStyleNames="padding-15">
 											<g:SimplePanel ui:field="profileSynAlertPanel" />
-											<bh:Div ui:field="userBadgeContainer" />
-											<!-- View Profile Panel -->
-											<bh:Div ui:field="userBadgeFooter"
-												addStyleNames="dropshadow2" marginLeft="2" marginRight="2"
-												marginTop="0" paddingLeft="34" paddingRight="18"
-												paddingTop="3" height="70px">
-												<bh:Div addStyleNames="border-top-1" width="100%"
-													paddingBottom="15" />
-												<bh:Div addStyleNames="flexcontainer-row">
-													<bh:Div
-														addStyleNames="flexcontainer-column flexcontainer-column-fill-width">
-														<b:Anchor ui:field="orcIdLink"
-															addStyleNames="movedown-3 margin-right-30" />
-													</bh:Div>
-													<bh:Div addStyleNames="flexcontainer-column">
-														<b:Button ui:field="editProfileButton"
-															icon="EDIT" type="PRIMARY">Edit Profile</b:Button>
-													</bh:Div>
-												</bh:Div>
-											</bh:Div>
-											<g:SimplePanel ui:field="editUserProfilePanel" />
-										</div>
-									</div>
+											<bh:Div ui:field="userBadgeContainer" addStyleNames="max-width-800"/>
+											<g:SimplePanel ui:field="editUserProfilePanel"/>											
+										</bh:Div> 
+									</bh:Div> 
 								</div>
 								<div class="tab-background margin-10"
 									ui:field="projectsTabContainer">

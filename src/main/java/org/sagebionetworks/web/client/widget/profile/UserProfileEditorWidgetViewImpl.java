@@ -1,9 +1,11 @@
 package org.sagebionetworks.web.client.widget.profile;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.base.TextBoxBase;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.widget.search.GooglePlacesSuggestOracle;
@@ -52,17 +54,36 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	HelpBlock linkHelpBlock;
 	@UiField
 	TextArea bio;
+	@UiField
+	Div synAlertContainer;
+	@UiField
+	Button editProfileButton;
+	@UiField
+	Button saveProfileButton;
+	
 	SuggestBox locationSuggestBox;
 	private Widget widget;
 
+	TextBoxBase[] textBoxes;
+	com.google.gwt.user.client.ui.TextBoxBase locationTextBox;
+	boolean isEditing = false;
+	Presenter presenter;
 	@Inject
 	public UserProfileEditorWidgetViewImpl(Binder binder, GooglePlacesSuggestOracle locationOracle) {
 		widget = binder.createAndBindUi(this);
 		locationSuggestBox = new SuggestBox(locationOracle);
 		locationSuggestBox.setWidth("100%");
-		locationSuggestBox.getTextBox().addStyleName("form-control");
-		locationSuggestBox.getTextBox().getElement().setAttribute("placeholder", "Enter City, Country");
+		locationTextBox = locationSuggestBox.getTextBox();
+		locationTextBox.addStyleName("form-control");
+		locationTextBox.getElement().setAttribute("placeholder", "Enter City, Country");
 		locationSuggestBoxContainer.add(locationSuggestBox);
+		textBoxes = new TextBoxBase[] {username, firstName, lastName, currentPosition, currentAffiliation, industry, link, bio} ;
+		editProfileButton.addClickHandler(event -> {
+			presenter.setIsEditingMode(true);			
+		});
+		saveProfileButton.addClickHandler(event -> {
+			presenter.onSave();
+		});
 	}
 
 	@Override
@@ -133,8 +154,8 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	}
 
 	@Override
-	public void setPresenter(final Presenter presenter) {
-
+	public void setPresenter(Presenter presenter) {
+		this.presenter = presenter;
 	}
 
 	@Override
@@ -212,4 +233,21 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 		bio.addKeyDownHandler(keyDownHandler);
 	}
 
+	@Override
+	public void setEditMode(boolean isEditing) {
+		this.isEditing = isEditing;
+		for (TextBoxBase tb : textBoxes) {
+			tb.setEnabled(isEditing);
+		}
+		locationTextBox.setEnabled(isEditing);
+		editProfileButton.setVisible(!isEditing);
+		saveProfileButton.setVisible(isEditing);
+		// style text boxes to look like static text (no borders, white backgrounds, ...) ?
+	}
+
+	@Override
+	public void setSynAlert(IsWidget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
+	}
 }

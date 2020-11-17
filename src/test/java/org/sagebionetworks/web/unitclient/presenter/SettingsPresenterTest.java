@@ -16,9 +16,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,11 +56,11 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.EmailAddressesWidget;
-import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -84,8 +86,6 @@ public class SettingsPresenterTest {
 	PortalGinInjector mockInjector;
 	@Mock
 	SynapseAlert mockSynAlert;
-	@Mock
-	UserProfileModalWidget mockUserProfileModalWidget;
 	UserProfile profile = new UserProfile();
 	String password = "password";
 	String newPassword = "otherpassword";
@@ -115,7 +115,7 @@ public class SettingsPresenterTest {
 	public void setup() throws JSONObjectAdapterException {
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 
-		presenter = new SettingsPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, mockInjector, mockUserProfileModalWidget, mockSubscriptionListWidget, mockEmailAddressesWidget, mockPopupUtils, mockSynapseJavascriptClient);
+		presenter = new SettingsPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, mockInjector, mockSubscriptionListWidget, mockEmailAddressesWidget, mockPopupUtils, mockSynapseJavascriptClient);
 		verify(mockView).setPresenter(presenter);
 		verify(mockView).setSubscriptionsListWidget(any(Widget.class));
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
@@ -260,9 +260,7 @@ public class SettingsPresenterTest {
 	@Test
 	public void testOnEditProfile() {
 		presenter.onEditProfile();
-		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
-		verify(mockUserProfileModalWidget).showEditProfile(anyString(), captor.capture());
-		captor.getValue().invoke();
+		
 		verify(mockPlaceChanger).goTo(isA(Profile.class));
 	}
 
