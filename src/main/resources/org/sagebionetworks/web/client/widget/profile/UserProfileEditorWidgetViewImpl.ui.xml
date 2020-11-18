@@ -30,14 +30,14 @@
 				<b:Row>
 					<b:Column size="SM_6">
 						<b:FormGroup>
-							<b:FormLabel for="currentPosition">Current position</b:FormLabel>
+							<b:FormLabel for="currentPosition">Current Position</b:FormLabel>
 							<b:TextBox name="currentPosition"
 								ui:field="currentPosition" placeholder="Enter current position" />
 						</b:FormGroup>
 					</b:Column>
 					<b:Column size="SM_6">
 						<b:FormGroup>
-							<b:FormLabel for="currentAffiliation">Current affiliation</b:FormLabel>
+							<b:FormLabel for="currentAffiliation">Current Affiliation</b:FormLabel>
 							<b:TextBox name="currentAffiliation"
 								ui:field="currentAffiliation"
 								placeholder="Enter current affiliation" />
