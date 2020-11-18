@@ -19,6 +19,7 @@
 							<bh:Strong text="Please login to access this resource." />
 						</b:Alert>
 						<div>
+							<h3 class="margin-left-30" ui:field="myDashboardHeading" style="display: none;">My Dashboard</h3>
 							<div ui:field="navtabContainer">
 								<ul
 									class="nav nav-tabs entity-tabs margin-top-15">

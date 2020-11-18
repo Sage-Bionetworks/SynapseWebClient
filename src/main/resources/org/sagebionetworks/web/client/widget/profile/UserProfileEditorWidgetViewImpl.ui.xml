@@ -107,6 +107,7 @@
 				<bh:Div marginTop="45">
 					<b:Button ui:field="editProfileButton" type="PRIMARY" visible="false">Edit Profile</b:Button>
 					<b:Button ui:field="saveProfileButton" type="PRIMARY" visible="false" dataLoadingText="Saving Changes...">Save Changes</b:Button>
+					<b:Button ui:field="cancelButton" type="DEFAULT" visible="false" marginLeft="5">Cancel</b:Button>
 				</bh:Div>
 			</b:Column>
 			<b:Column size="MD_2 XS_12">

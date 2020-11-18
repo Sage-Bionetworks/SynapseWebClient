@@ -72,6 +72,8 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	@UiField
 	Button saveProfileButton;
 	@UiField
+	Button cancelButton;
+	@UiField
 	Anchor changeEmailLink;
 	@UiField
 	Anchor changePasswordLink;
@@ -100,6 +102,9 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 		saveProfileButton.addClickHandler(event -> {
 			saveProfileButton.state().loading();
 			presenter.onSave();
+		});
+		cancelButton.addClickHandler(event -> {
+			presenter.onCancel();
 		});
 		linkRenderer.getElement().setAttribute("rel", "noreferrer noopener");
 		ClickHandler goToSettingsPage = event -> {
@@ -272,6 +277,7 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 		locationTextBox.setReadOnly(!isEditing);
 		editProfileButton.setVisible(!isEditing);
 		saveProfileButton.setVisible(isEditing);
+		cancelButton.setVisible(isEditing);
 		linkRenderer.setVisible(!isEditing);
 		link.setVisible(isEditing);
 		changeEmailLink.setVisible(isEditing);

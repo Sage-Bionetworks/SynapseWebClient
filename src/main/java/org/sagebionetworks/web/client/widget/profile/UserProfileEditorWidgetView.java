@@ -8,6 +8,7 @@ public interface UserProfileEditorWidgetView extends IsWidget {
 	public interface Presenter {
 		// inform presenter that the user wants to save the edits to their profile
 		void onSave();
+		void onCancel();
 		// inform presenter that the user is editing their profile info
 		void setIsEditingMode(boolean isEditing);
 	}

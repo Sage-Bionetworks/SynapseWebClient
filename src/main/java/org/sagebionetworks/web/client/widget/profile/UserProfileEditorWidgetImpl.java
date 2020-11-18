@@ -205,6 +205,13 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	}
 	
 	@Override
+	public void onCancel() {
+		// revert changes
+		configure(originalProfile, callback);
+		setIsEditingMode(false);
+	}
+	
+	@Override
 	public void onSave() {
 		synAlert.clear();
 		// First validate the view

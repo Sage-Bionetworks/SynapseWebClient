@@ -33,6 +33,7 @@ import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import com.google.gwt.dom.client.DivElement;
+import com.google.gwt.dom.client.HeadingElement;
 import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -221,6 +222,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	SimplePanel teamSynAlertPanel;
 	@UiField
 	FlowPanel challengeSynAlertPanel;
+	
+	@UiField
+	HeadingElement myDashboardHeading;
 
 	@UiField
 	Span teamNotifications;
@@ -353,7 +357,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		String displayName = DisplayUtils.getDisplayName(profile);
 		userBadgeContainer.setVisible(!isOwner);
 		editUserProfilePanel.setVisible(isOwner);
-
+		UIObject.setVisible(myDashboardHeading, isOwner);
 		if (!isOwner) {
 			setHighlightBoxUser(displayName);
 			// TODO: use large user component to show profile. set ORCiD
