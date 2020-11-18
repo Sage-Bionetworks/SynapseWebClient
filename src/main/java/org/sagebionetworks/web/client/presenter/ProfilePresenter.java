@@ -898,6 +898,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				@Override
 				public void invoke() {
 					globalApplicationState.setIsEditing(false);
+					getUserProfileEditorWidget().setIsEditingMode(false);
 					boolean pushState = true;
 					showTab(tab, pushState);
 				}

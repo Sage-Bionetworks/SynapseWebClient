@@ -86,11 +86,27 @@
 						</b:FormGroup>
 					</b:Column>
 				</b:Row>
+				<b:Row>
+					<b:Column size="SM_6">
+						<b:FormGroup>
+							<b:FormLabel for="email">Email Address</b:FormLabel>
+							<b:TextBox name="email" ui:field="email" readOnly="true" addStyleNames="margin-bottom-10"/>
+							<b:Anchor addStyleNames="displayBlock" ui:field="changeEmailLink" visible="false">Change email</b:Anchor>
+						</b:FormGroup>
+					</b:Column>
+					<b:Column size="SM_6">
+						<b:FormGroup>
+							<b:FormLabel for="password">Password</b:FormLabel>					
+							<g:PasswordTextBox name="password" readOnly="true" addStyleNames="displayBlock margin-bottom-10">NotThePassword</g:PasswordTextBox>
+							<b:Anchor addStyleNames="displayBlock" ui:field="changePasswordLink" visible="false">Change password</b:Anchor>
+						</b:FormGroup>
+					</b:Column>
+				</b:Row>
 				
 				<bh:Div ui:field="synAlertContainer"/>
 				<bh:Div marginTop="45">
 					<b:Button ui:field="editProfileButton" type="PRIMARY" visible="false">Edit Profile</b:Button>
-					<b:Button ui:field="saveProfileButton" type="PRIMARY" visible="false">Save Changes</b:Button>
+					<b:Button ui:field="saveProfileButton" type="PRIMARY" visible="false" dataLoadingText="Saving Changes...">Save Changes</b:Button>
 				</bh:Div>
 			</b:Column>
 			<b:Column size="MD_2 XS_12">

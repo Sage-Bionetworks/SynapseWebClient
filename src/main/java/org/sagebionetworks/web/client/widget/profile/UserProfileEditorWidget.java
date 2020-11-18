@@ -96,4 +96,6 @@ public interface UserProfileEditorWidget extends IsWidget {
 	void setUploadingCallback(Callback startedUploadingCallback);
 
 	void setUploadingCompleteCallback(Callback uploadCompleteCallback);
+	
+	void setIsEditingMode(boolean isEditing);
 }

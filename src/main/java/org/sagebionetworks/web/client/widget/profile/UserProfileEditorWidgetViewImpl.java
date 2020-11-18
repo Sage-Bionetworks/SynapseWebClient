@@ -9,7 +9,13 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.base.TextBoxBase;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.search.GooglePlacesSuggestOracle;
+
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -46,6 +52,8 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	@UiField
 	TextBox industry;
 	@UiField
+	TextBox email;
+	@UiField
 	Div locationSuggestBoxContainer;
 	@UiField
 	FormGroup linkFormGroup;
@@ -63,6 +71,10 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	Button editProfileButton;
 	@UiField
 	Button saveProfileButton;
+	@UiField
+	Anchor changeEmailLink;
+	@UiField
+	Anchor changePasswordLink;
 	
 	SuggestBox locationSuggestBox;
 	private Widget widget;
@@ -72,7 +84,7 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	boolean isEditing = false;
 	Presenter presenter;
 	@Inject
-	public UserProfileEditorWidgetViewImpl(Binder binder, GooglePlacesSuggestOracle locationOracle) {
+	public UserProfileEditorWidgetViewImpl(Binder binder, GooglePlacesSuggestOracle locationOracle, GlobalApplicationState globalAppState, AuthenticationController authController) {
 		widget = binder.createAndBindUi(this);
 		locationSuggestBox = new SuggestBox(locationOracle);
 		locationSuggestBox.setWidth("100%");
@@ -80,14 +92,21 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 		locationTextBox.addStyleName("form-control");
 		locationTextBox.getElement().setAttribute("placeholder", "Enter City, Country");
 		locationSuggestBoxContainer.add(locationSuggestBox);
+		// note, not adding email since it's not editable here.
 		textBoxes = new TextBoxBase[] {username, firstName, lastName, currentPosition, currentAffiliation, industry, link, bio} ;
 		editProfileButton.addClickHandler(event -> {
 			presenter.setIsEditingMode(true);			
 		});
 		saveProfileButton.addClickHandler(event -> {
+			saveProfileButton.state().loading();
 			presenter.onSave();
 		});
 		linkRenderer.getElement().setAttribute("rel", "noreferrer noopener");
+		ClickHandler goToSettingsPage = event -> {
+			globalAppState.getPlaceChanger().goTo(new Profile(authController.getCurrentUserPrincipalId(), ProfileArea.SETTINGS));
+		};
+		changeEmailLink.addClickHandler(goToSettingsPage);
+		changePasswordLink.addClickHandler(goToSettingsPage);
 	}
 
 	@Override
@@ -98,6 +117,11 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	@Override
 	public void setUsername(String username) {
 		this.username.setText(username);
+	}
+	
+	@Override
+	public void setEmail(String email) {
+		this.email.setText(email);
 	}
 
 	@Override
@@ -250,11 +274,21 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 		saveProfileButton.setVisible(isEditing);
 		linkRenderer.setVisible(!isEditing);
 		link.setVisible(isEditing);
+		changeEmailLink.setVisible(isEditing);
+		changePasswordLink.setVisible(isEditing);
+		if (!isEditing) {
+			saveProfileButton.state().reset();	
+		}		
 	}
 
 	@Override
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
+	}
+	
+	@Override
+	public void resetSaveButtonState() {
+		saveProfileButton.state().reset();
 	}
 }

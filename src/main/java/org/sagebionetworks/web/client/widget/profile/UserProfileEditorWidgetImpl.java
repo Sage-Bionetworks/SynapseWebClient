@@ -89,6 +89,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		view.setIndustry(profile.getIndustry());
 		view.setLocation(profile.getLocation());
 		view.setLink(profile.getUrl());
+		view.setEmail(profile.getEmails().get(0));
 		setIsEditingMode(false);
 		this.fileHandleId = profile.getProfilePicureFileHandleId();
 		imageWidget.configure(this.fileHandleId);
@@ -228,6 +229,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
+				view.resetSaveButtonState();
 			}
 		});
 
