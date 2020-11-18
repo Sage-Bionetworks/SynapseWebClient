@@ -79,6 +79,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		originalProfile = profile;
 		view.hideUsernameError();
 		view.hideLinkError();
+		synAlert.clear();
 		view.setUsername(profile.getUserName());
 		view.setFirstName(profile.getFirstName());
 		view.setLastName(profile.getLastName());
@@ -88,7 +89,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		view.setIndustry(profile.getIndustry());
 		view.setLocation(profile.getLocation());
 		view.setLink(profile.getUrl());
-		view.setEditMode(false);
+		setIsEditingMode(false);
 		this.fileHandleId = profile.getProfilePicureFileHandleId();
 		imageWidget.configure(this.fileHandleId);
 		imageWidget.setRemovePictureCallback(new Callback() {
