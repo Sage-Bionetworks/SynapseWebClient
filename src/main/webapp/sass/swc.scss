@@ -128,8 +128,8 @@ end sticky footer
 		padding: 15px 0 30px 0;
 	}
 	.nav-tabs {
-		border-bottom: 1px solid #e6e6e6;
-		padding-bottom: 3px;
+		border-bottom: 4px solid #DCDCDC;
+		
 	}
 	.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
 		border: none;
@@ -1103,7 +1103,9 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 	.font-size-90 {
 		font-size: 90px;
 	}
-	
+	.font-size-80 {
+		font-size: 80px;
+	}	
 	.font-size-67 {
 		font-size: 67px;
 	}
@@ -2014,19 +2016,24 @@ ol.lowerroman {
 	top: 4px;
 	right: 4px;
 }
-
-.entity-tab {
-	font-size: 16px;	
-}
-
-@media (max-width: 991px) {
+#body {
 	.entity-tab {
-		width: 100%;
+		font-size: 16px;
+		margin-bottom: -4px;
+		a {
+			padding-bottom: 24px;
+		}
 	}
-}
-@media (min-width: 992px) {
-	.entity-tab {
-		width: 140px;
+
+	@media (max-width: 991px) {
+		.entity-tab {
+			width: 100%;
+		}
+	}
+	@media (min-width: 992px) {
+		.entity-tab {
+			width: 175px;
+		}
 	}
 }
 
@@ -2052,6 +2059,7 @@ ol.lowerroman {
 }
 .entity-tab > a {
 	text-align: center;
+	text-transform: uppercase;
 }
 
 .overflowHidden {
@@ -3218,13 +3226,26 @@ div.border {
 	}	
 }
 
+#body .myProfileImage {
+	position: absolute;
+	right: 40px;
+}
 #body .editProfileImageButton {
 	position: absolute;
-	left: 131px;
+	right: 20px;
+	top: -5px;
 	button {
 		border-radius: 50%;
 		&:focus {
 			outline: none;
 		}
 	}
+}
+#body .profileUI input[readonly], #body .profileUI textarea[readonly] {
+	background: unset;
+	border: none;
+	box-shadow: initial;
+	resize: none;
+	cursor: text;
+	padding: 0px;
 }

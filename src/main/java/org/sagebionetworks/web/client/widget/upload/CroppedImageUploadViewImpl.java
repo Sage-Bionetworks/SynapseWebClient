@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalBody;
 import org.gwtbootstrap3.client.ui.Progress;
 import org.gwtbootstrap3.client.ui.ProgressBar;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -250,6 +251,11 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 	@Override
 	public void setButtonType(ButtonType type) {
 		uploadbutton.setType(type);
+	}
+	
+	@Override
+	public void setButtonSize(ButtonSize size) {
+		uploadbutton.setSize(size);		
 	}
 	
 	@Override

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.upload;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -127,6 +128,10 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 
 	public void setButtonType(ButtonType type) {
 		getView().setButtonType(type);
+	}
+
+	public void setButtonSize(ButtonSize size) {
+		getView().setButtonSize(size);
 	}
 
 	public void setButtonText(String text) {

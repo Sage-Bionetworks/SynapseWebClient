@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.Progress;
 import org.gwtbootstrap3.client.ui.ProgressBar;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -102,6 +103,11 @@ public class ImageUploadViewImpl implements ImageUploadView {
 	@Override
 	public void setButtonType(ButtonType type) {
 		uploadbutton.setType(type);
+	}
+	
+	@Override
+	public void setButtonSize(ButtonSize size) {
+		uploadbutton.setSize(size);		
 	}
 	
 	@Override

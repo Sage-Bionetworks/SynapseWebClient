@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.profile;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -58,6 +59,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		fileHandleUploadWidget.setButtonIcon(IconType.EDIT);
 		fileHandleUploadWidget.setButtonText("");
 		fileHandleUploadWidget.setButtonType(ButtonType.DEFAULT);
+		fileHandleUploadWidget.setButtonSize(ButtonSize.SMALL);
 		fileHandleUploadWidget.asWidget().setVisible(false);
 		imageWidget.setRemovePictureCommandVisible(false);
 		this.view.addFileInputWidget(fileHandleUploadWidget);

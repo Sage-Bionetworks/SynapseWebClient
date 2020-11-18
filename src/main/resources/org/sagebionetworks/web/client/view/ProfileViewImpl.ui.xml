@@ -21,7 +21,7 @@
 						<div>
 							<div ui:field="navtabContainer">
 								<ul
-									class="nav nav-tabs entity-tabs margin-top-15 border-none">
+									class="nav nav-tabs entity-tabs margin-top-15">
 									<li class="entity-tab active margin-left-15"
 										ui:field="profileListItem">
 										<a class="text-align-center link no-background">
@@ -95,7 +95,7 @@
 								</ul>
 							</div>
 						</div>
-						<div>
+						<div class="margin-top-40">
 							<div>
 								<div class="tab-background margin-10"
 									ui:field="profileTabContainer">

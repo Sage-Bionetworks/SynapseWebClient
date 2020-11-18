@@ -897,6 +897,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			Callback yesCallback = new Callback() {
 				@Override
 				public void invoke() {
+					globalApplicationState.setIsEditing(false);
 					boolean pushState = true;
 					showTab(tab, pushState);
 				}

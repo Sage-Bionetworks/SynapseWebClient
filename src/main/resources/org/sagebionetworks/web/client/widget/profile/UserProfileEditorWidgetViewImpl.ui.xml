@@ -6,14 +6,9 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<g:HTMLPanel>
 		<b:Row>
-			<b:Column size="MD_2 XS_12">
-				<b:Row>
-					<b:Column size="MD_3 SM_4 XS_12"
-						addStyleNames="margin-bottom-10">
-						<g:SimplePanel ui:field="imagePanel" />
-					</b:Column>
-					<g:SimplePanel ui:field="fileInputWidgetPanel" />
-				</b:Row>
+			<b:Column size="MD_2 XS_12" height="80px">
+				<g:SimplePanel ui:field="imagePanel" addStyleNames="myProfileImage"/>
+				<g:SimplePanel ui:field="fileInputWidgetPanel" />
 			</b:Column>
 			<b:Column size="MD_8 XS_12">
 				<b:Row>
@@ -69,6 +64,7 @@
 					<b:Column size="SM_6">
 						<b:FormGroup ui:field="linkFormGroup">
 							<b:FormLabel for="link">Website</b:FormLabel>
+							<b:Anchor ui:field="linkRenderer" target="_blank" addStyleNames="displayBlock"></b:Anchor>
 							<b:TextBox name="link" ui:field="link"
 								placeholder="Enter link to more info" />
 							<b:HelpBlock ui:field="linkHelpBlock" />
@@ -93,7 +89,7 @@
 				
 				<bh:Div ui:field="synAlertContainer"/>
 				<bh:Div marginTop="45">
-					<b:Button ui:field="editProfileButton" icon="EDIT" type="PRIMARY" visible="false">Edit Profile</b:Button>
+					<b:Button ui:field="editProfileButton" type="PRIMARY" visible="false">Edit Profile</b:Button>
 					<b:Button ui:field="saveProfileButton" type="PRIMARY" visible="false">Save Changes</b:Button>
 				</bh:Div>
 			</b:Column>

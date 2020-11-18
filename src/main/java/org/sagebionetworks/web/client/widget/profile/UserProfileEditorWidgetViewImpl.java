@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.profile;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
@@ -51,6 +52,8 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	@UiField
 	TextBox link;
 	@UiField
+	Anchor linkRenderer;
+	@UiField
 	HelpBlock linkHelpBlock;
 	@UiField
 	TextArea bio;
@@ -84,6 +87,7 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 		saveProfileButton.addClickHandler(event -> {
 			presenter.onSave();
 		});
+		linkRenderer.getElement().setAttribute("rel", "noreferrer noopener");
 	}
 
 	@Override
@@ -218,6 +222,8 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	@Override
 	public void setLink(String url) {
 		this.link.setText(url);
+		this.linkRenderer.setHref(url);
+		this.linkRenderer.setText(url);
 	}
 
 	@Override
@@ -237,12 +243,13 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	public void setEditMode(boolean isEditing) {
 		this.isEditing = isEditing;
 		for (TextBoxBase tb : textBoxes) {
-			tb.setEnabled(isEditing);
+			tb.setReadOnly(!isEditing);
 		}
-		locationTextBox.setEnabled(isEditing);
+		locationTextBox.setReadOnly(!isEditing);
 		editProfileButton.setVisible(!isEditing);
 		saveProfileButton.setVisible(isEditing);
-		// style text boxes to look like static text (no borders, white backgrounds, ...) ?
+		linkRenderer.setVisible(!isEditing);
+		link.setVisible(isEditing);
 	}
 
 	@Override
