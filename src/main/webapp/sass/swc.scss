@@ -129,11 +129,13 @@ end sticky footer
 	}
 	.nav-tabs {
 		border-bottom: 4px solid #DCDCDC;
-		
+		>li	{
+			margin-bottom: -4px;
+		}
 	}
 	.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
 		border: none;
-	}
+	}	
 	.nav-tabs > li > a {
 		box-shadow: none;
 	}

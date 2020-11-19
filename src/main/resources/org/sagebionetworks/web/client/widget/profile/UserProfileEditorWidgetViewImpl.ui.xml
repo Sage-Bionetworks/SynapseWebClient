@@ -10,7 +10,7 @@
 				<g:SimplePanel ui:field="imagePanel" addStyleNames="myProfileImage"/>
 				<g:SimplePanel ui:field="fileInputWidgetPanel" />
 			</b:Column>
-			<b:Column size="MD_8 XS_12">
+			<b:Column size="MD_7 XS_12">
 				<b:Row>
 					<b:Column size="SM_6">
 						<b:FormGroup>
@@ -104,14 +104,14 @@
 				</b:Row>
 				
 				<bh:Div ui:field="synAlertContainer"/>
-				<bh:Div marginTop="45">
+				<bh:Div marginTop="45" marginBottom="50">
 					<b:Button ui:field="editProfileButton" type="PRIMARY" visible="false">Edit Profile</b:Button>
 					<b:Button ui:field="saveProfileButton" type="PRIMARY" visible="false" dataLoadingText="Saving Changes...">Save Changes</b:Button>
 					<b:Button ui:field="cancelButton" type="DEFAULT" visible="false" marginLeft="5">Cancel</b:Button>
 				</bh:Div>
 			</b:Column>
-			<b:Column size="MD_2 XS_12">
-				<bh:Span>New badge goes here</bh:Span>
+			<b:Column size="MD_3 XS_12">
+				<bh:Span ui:field="accountLevelBadgeContainer" />
 			</b:Column>
 		</b:Row>
 	</g:HTMLPanel>

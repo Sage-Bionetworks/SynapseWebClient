@@ -70,6 +70,7 @@ public interface UserProfileEditorWidgetView extends IsWidget {
 	// if in edit mode, then editable text fields will be available.  If not, their static values will be shown (but still in a form).
 	void setEditMode(boolean isEditing);
 
+	void setOwnerId(String userId);
 	void setEmail(String email);
 	void resetSaveButtonState();
 }

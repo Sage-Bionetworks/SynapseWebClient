@@ -90,6 +90,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		view.setLocation(profile.getLocation());
 		view.setLink(profile.getUrl());
 		view.setEmail(profile.getEmails().get(0));
+		view.setOwnerId(profile.getOwnerId());
 		setIsEditingMode(false);
 		this.fileHandleId = profile.getProfilePicureFileHandleId();
 		imageWidget.configure(this.fileHandleId);

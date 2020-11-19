@@ -9,12 +9,15 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.base.TextBoxBase;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.search.GooglePlacesSuggestOracle;
 
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -77,6 +80,8 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	Anchor changeEmailLink;
 	@UiField
 	Anchor changePasswordLink;
+	@UiField
+	Span accountLevelBadgeContainer;
 	
 	SuggestBox locationSuggestBox;
 	private Widget widget;
@@ -84,10 +89,12 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	TextBoxBase[] textBoxes;
 	com.google.gwt.user.client.ui.TextBoxBase locationTextBox;
 	boolean isEditing = false;
+	SynapseJSNIUtils jsniUtils;
 	Presenter presenter;
 	@Inject
-	public UserProfileEditorWidgetViewImpl(Binder binder, GooglePlacesSuggestOracle locationOracle, GlobalApplicationState globalAppState, AuthenticationController authController) {
+	public UserProfileEditorWidgetViewImpl(Binder binder, GooglePlacesSuggestOracle locationOracle, GlobalApplicationState globalAppState, AuthenticationController authController, SynapseJSNIUtils jsniUtils) {
 		widget = binder.createAndBindUi(this);
+		this.jsniUtils = jsniUtils;
 		locationSuggestBox = new SuggestBox(locationOracle);
 		locationSuggestBox.setWidth("100%");
 		locationTextBox = locationSuggestBox.getTextBox();
@@ -292,7 +299,25 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
 	}
+	@Override
+	public void setOwnerId(String userId) {
+		jsniUtils.unmountComponentAtNode(accountLevelBadgeContainer.getElement());
+		_showAccountLevelBadge(accountLevelBadgeContainer.getElement(), userId);
+	}
 	
+	private static native void _showAccountLevelBadge(Element el, String userId) /*-{
+		try {
+			var props = {
+			  	userId: userId,
+			};
+			$wnd.ReactDOM.render($wnd.React.createElement(
+					$wnd.SRC.SynapseComponents.AccountLevelBadge, props, null),
+					el);
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
+
 	@Override
 	public void resetSaveButtonState() {
 		saveProfileButton.state().reset();
