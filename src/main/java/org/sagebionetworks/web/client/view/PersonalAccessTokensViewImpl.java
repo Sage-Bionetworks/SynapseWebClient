@@ -73,5 +73,6 @@ public class PersonalAccessTokensViewImpl extends Composite implements PersonalA
 	public void setPresenter(PersonalAccessTokensPresenter presenter) {
 		this.presenter = presenter;
 		headerWidget.refresh();
+		DisplayUtils.scrollToTop();
 	}
 }

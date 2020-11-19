@@ -74,19 +74,10 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 	
 	public void configure(UserProfile profile, Boolean isCertified, Boolean isValidated) {
 		this.profile = profile;
-		if (BadgeSize.DEFAULT.equals(currentBadgeSize)) {
+		if (BadgeSize.DEFAULT.equals(currentBadgeSize) && profile.getProfilePicureFileHandleId() != null) {
 			// small preview image
 			// http://rest-docs.synapse.org/rest/GET/userProfile/profileId/image/preview.html
-			jsClient.getProfilePicturePreviewURL(profile.getOwnerId(), new AsyncCallback<String>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					configure(profile, null, isCertified, isValidated);
-				}
-				@Override
-				public void onSuccess(String pictureUrl) {
-					configure(profile, pictureUrl, isCertified, isValidated);
-				}
-			});
+			configure(profile, jsClient.getProfilePicturePreviewURL(profile.getOwnerId(), true), isCertified, isValidated);
 		} else {
 			// full image, if available
 			String pictureUrl = profile.getProfilePicureFileHandleId() != null ? synapseJSNIUtils.getFileHandleAssociationUrl(profile.getOwnerId(), FileHandleAssociateType.UserProfileAttachment, profile.getProfilePicureFileHandleId()) : null;

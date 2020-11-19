@@ -1073,9 +1073,12 @@ public class SynapseJavascriptClient {
 		doGetString(url, false, callback);
 	}
 
+	public String getProfilePicturePreviewURL(String profileId, boolean redirect) {
+		return getRepoServiceUrl() + USER_PROFILE_PATH + "/" + profileId + "/image/preview?redirect=" + redirect;
+	}
+
 	public void getProfilePicturePreviewURL(String profileId, AsyncCallback<String> callback) {
-		String url = getRepoServiceUrl() + USER_PROFILE_PATH + "/" + profileId + "/image/preview?redirect=false";
-		doGetString(url, false, callback);
+		doGetString(getProfilePicturePreviewURL(profileId, false), false, callback);
 	}
 	
 	public void getTeamPicturePreviewURL(String teamId, AsyncCallback<String> callback) {
