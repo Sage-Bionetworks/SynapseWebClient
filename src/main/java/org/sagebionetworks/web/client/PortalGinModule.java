@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.presenter.DownPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenterEventBinder;
 import org.sagebionetworks.web.client.presenter.EntityPresenterEventBinderImpl;
+import org.sagebionetworks.web.client.presenter.PersonalAccessTokensPresenter;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.SignedTokenPresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
@@ -68,6 +69,8 @@ import org.sagebionetworks.web.client.view.PasswordResetSignedTokenView;
 import org.sagebionetworks.web.client.view.PasswordResetSignedTokenViewImpl;
 import org.sagebionetworks.web.client.view.PeopleSearchView;
 import org.sagebionetworks.web.client.view.PeopleSearchViewImpl;
+import org.sagebionetworks.web.client.view.PersonalAccessTokensView;
+import org.sagebionetworks.web.client.view.PersonalAccessTokensViewImpl;
 import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.view.PlaceViewImpl;
 import org.sagebionetworks.web.client.view.ProfileView;
@@ -777,6 +780,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityPresenter.class).in(Singleton.class);
 		bind(DownPresenter.class).in(Singleton.class);
 		bind(SignedTokenPresenter.class).in(Singleton.class);
+        bind(PersonalAccessTokensPresenter.class).in(Singleton.class);
 
 		bind(AnnotationsRendererWidgetView.class).to(AnnotationsRendererWidgetViewImpl.class);
 		bind(VersionHistoryWidgetView.class).to(VersionHistoryWidgetViewImpl.class);
@@ -1405,5 +1409,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SubmissionViewScopeEditorView.class).to(SubmissionViewScopeEditorViewImpl.class);
 		bind(EvaluationFinderView.class).to(EvaluationFinderViewImpl.class);
 		bind(SubmissionViewScopeWidgetView.class).to(SubmissionViewScopeWidgetViewImpl.class);
-	}
+        bind(PersonalAccessTokensView.class).to(PersonalAccessTokensViewImpl.class);
+
+    }
 }

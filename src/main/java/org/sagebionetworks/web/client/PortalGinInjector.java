@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.presenter.MapPresenter;
 import org.sagebionetworks.web.client.presenter.NewAccountPresenter;
 import org.sagebionetworks.web.client.presenter.PasswordResetSignedTokenPresenter;
 import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
+import org.sagebionetworks.web.client.presenter.PersonalAccessTokensPresenter;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.QuestionContainerWidget;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
@@ -703,6 +704,9 @@ public interface PortalGinInjector extends Ginjector {
 	QueryTokenProvider getQueryTokenProvider();
 
 	SettingsPresenter getSettingsPresenter();
+
+	PersonalAccessTokensPresenter getPersonalAccessTokensPresenter();
+
 
 	AccessControlListModalWidget getAccessControlListModalWidget();
 

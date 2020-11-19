@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.PersonalAccessTokenPlace;
 import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -43,6 +44,10 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	Div changeSynapsePasswordUI;
 	@UiField
 	Div changeSynapsePasswordHighlightBox;
+	@UiField
+	HTMLPanel personalAccessTokensHighlightBox;
+	@UiField
+	Button managePersonalAccessTokensButton;
 	@UiField
 	HTMLPanel apiKeyHighlightBox;
 	@UiField
@@ -212,6 +217,10 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		certificationButton.addClickHandler(event -> presenter.goTo(new Quiz("Certification")));
 		certificationPassedButton.addClickHandler(event -> DisplayUtils.newWindow("https://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#certified-users", "_blank", ""));
 		synapseTermsAcceptedButton.addClickHandler(event -> presenter.goTo(new LoginPlace(LoginPlace.SHOW_SIGNED_TOU)));
+
+		personalAccessTokensHighlightBox.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Personal Access Tokens");
+		managePersonalAccessTokensButton.addClickHandler(event -> presenter.goTo(new PersonalAccessTokenPlace("")));
+
 	}
 
 	@Override
