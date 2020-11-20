@@ -137,6 +137,7 @@ end sticky footer
 		border: none;
 	}	
 	.nav-tabs > li > a {
+		text-transform: uppercase;
 		box-shadow: none;
 	}
 	.nav-tabs > li.active > a, #rootPanel .nav-tabs > li > a:hover {
@@ -2028,7 +2029,7 @@ ol.lowerroman {
 }
 @media (min-width: 992px) {
 	.entity-tab {
-		width: 140px;
+		width: 170px;
 	}
 }
 
@@ -2052,8 +2053,9 @@ ol.lowerroman {
         display:none!important
     }
 }
-.entity-tab > a {
+#body .entity-tab > a {
 	text-align: center;
+	padding: 15px;
 }
 
 .overflowHidden {

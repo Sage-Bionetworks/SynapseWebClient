@@ -114,11 +114,6 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 			presenter.onCancel();
 		});
 		linkRenderer.getElement().setAttribute("rel", "noreferrer noopener");
-		ClickHandler goToSettingsPage = event -> {
-			globalAppState.getPlaceChanger().goTo(new Profile(authController.getCurrentUserPrincipalId(), ProfileArea.SETTINGS));
-		};
-		changeEmailLink.addClickHandler(goToSettingsPage);
-		changePasswordLink.addClickHandler(goToSettingsPage);
 	}
 
 	@Override

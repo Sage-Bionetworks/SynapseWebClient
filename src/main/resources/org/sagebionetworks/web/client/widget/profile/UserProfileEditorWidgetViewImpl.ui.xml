@@ -91,14 +91,14 @@
 						<b:FormGroup>
 							<b:FormLabel for="email">Email Address</b:FormLabel>
 							<b:TextBox name="email" ui:field="email" readOnly="true" addStyleNames="margin-bottom-10"/>
-							<b:Anchor addStyleNames="displayBlock" ui:field="changeEmailLink" visible="false">Change email</b:Anchor>
+							<b:Anchor addStyleNames="displayBlock" ui:field="changeEmailLink" visible="false" target="_blank" href="#!Profile:v/settings">Change email</b:Anchor>
 						</b:FormGroup>
 					</b:Column>
 					<b:Column size="SM_6">
 						<b:FormGroup>
 							<b:FormLabel for="password">Password</b:FormLabel>					
 							<g:PasswordTextBox name="password" readOnly="true" addStyleNames="displayBlock margin-bottom-10">NotThePassword</g:PasswordTextBox>
-							<b:Anchor addStyleNames="displayBlock" ui:field="changePasswordLink" visible="false">Change password</b:Anchor>
+							<b:Anchor addStyleNames="displayBlock" ui:field="changePasswordLink" visible="false" target="_blank" href="#!Profile:v/settings">Change password</b:Anchor>
 						</b:FormGroup>
 					</b:Column>
 				</b:Row>

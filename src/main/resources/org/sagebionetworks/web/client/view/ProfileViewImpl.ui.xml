@@ -23,7 +23,7 @@
 							<div ui:field="navtabContainer">
 								<ul
 									class="nav nav-tabs entity-tabs margin-top-15">
-									<li class="entity-tab active margin-left-15"
+									<li class="entity-tab active"
 										ui:field="profileListItem">
 										<a class="text-align-center link no-background">
 											<w:ClickableDiv ui:field="profileTabItemDiv"
