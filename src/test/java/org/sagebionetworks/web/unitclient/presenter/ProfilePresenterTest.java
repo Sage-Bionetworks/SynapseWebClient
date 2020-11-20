@@ -72,7 +72,7 @@ import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidget;
-import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
+import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
@@ -108,7 +108,7 @@ public class ProfilePresenterTest {
 	@Mock
 	Profile place;
 	@Mock
-	UserProfileModalWidget mockUserProfileModalWidget;
+	UserProfileEditorWidget mockUserProfileEditorWidget;
 	UserSessionData testUser = new UserSessionData();
 	UserProfile userProfile = new UserProfile();
 	String password = "password";
@@ -174,7 +174,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockInjector.getPromptForValuesModal()).thenReturn(mockPromptModalView);
-		when(mockInjector.getUserProfileEditorWidget()).thenReturn(mockUserProfileModalWidget);
+		when(mockInjector.getUserProfileEditorWidget()).thenReturn(mockUserProfileEditorWidget);
 		when(mockInjector.getProjectBadgeWidget()).thenReturn(mockProjectBadge);
 		when(mockInjector.getChallengeBadgeWidget()).thenReturn(mockChallengeBadge);
 		when(mockInjector.getSettingsPresenter()).thenReturn(mockSettingsPresenter);
@@ -289,9 +289,9 @@ public class ProfilePresenterTest {
 		verify(mockView).clear();
 		verify(mockTeamListWidget, Mockito.atLeastOnce()).clear();
 		verify(mockView).showLoading();
-		verify(mockView).setProfileEditButtonVisible(isOwner);
 		verify(mockView).showTabs(isOwner);
 		verify(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
+		verify(mockUserProfileEditorWidget).configure(eq(userProfile), any(Callback.class));
 	}
 
 	@Test
