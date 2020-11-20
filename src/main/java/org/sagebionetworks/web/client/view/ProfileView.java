@@ -25,7 +25,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	/**
 	 * Renders the view for a given presenter
 	 */
-	void setProfile(UserProfile profile, boolean isOwner, boolean isCertified, boolean isValidated, String orcIdHref);
+	void setProfile(UserProfile profile, boolean isOwner);
 
 	void refreshHeader();
 

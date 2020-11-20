@@ -40,6 +40,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	GlobalApplicationState globalAppState;
 	SynapseAlert synAlert;
 	PopupUtilsView popupUtils;
+	String orcIdHref;
 	Callback callback;
 	
 	@Inject
@@ -74,8 +75,9 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	}
 
 	@Override
-	public void configure(UserProfile profile, Callback callback) {
+	public void configure(UserProfile profile, String orcIdHref, Callback callback) {
 		this.callback = callback;
+		this.orcIdHref = orcIdHref;
 		originalProfile = profile;
 		view.hideUsernameError();
 		view.hideLinkError();
@@ -89,11 +91,15 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		view.setIndustry(profile.getIndustry());
 		view.setLocation(profile.getLocation());
 		view.setLink(profile.getUrl());
-		view.setEmail(profile.getEmails().get(0));
+		if (profile.getEmails() != null && profile.getEmails().size() > 0) {
+			view.setEmail(profile.getEmails().get(0));	
+		}
+		view.setOrcIdHref(orcIdHref);
 		view.setOwnerId(profile.getOwnerId());
 		setIsEditingMode(false);
+		view.setCanEdit(profile.getOwnerId().equals(authController.getCurrentUserPrincipalId()));
 		this.fileHandleId = profile.getProfilePicureFileHandleId();
-		imageWidget.configure(this.fileHandleId);
+		imageWidget.configure(profile.getOwnerId(), this.fileHandleId);
 		imageWidget.setRemovePictureCallback(new Callback() {
 			@Override
 			public void invoke() {
@@ -208,7 +214,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	@Override
 	public void onCancel() {
 		// revert changes
-		configure(originalProfile, callback);
+		configure(originalProfile, orcIdHref, callback);
 	}
 	
 	@Override

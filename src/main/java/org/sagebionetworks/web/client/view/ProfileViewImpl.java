@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
 import static org.sagebionetworks.web.client.DisplayUtils.DO_NOTHING_CLICKHANDLER;
+
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
@@ -30,8 +31,7 @@ import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
-import org.sagebionetworks.web.client.widget.user.BadgeSize;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
+
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.HeadingElement;
 import com.google.gwt.dom.client.LIElement;
@@ -232,24 +232,17 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Alert loginAlert;
 	private Presenter presenter;
 	private Header headerWidget;
-	@UiField
-	Div userBadgeContainer;
 	// View profile widgets
 	private static Icon defaultProfilePicture = new Icon(IconType.SYN_USER);
 	static {
 		defaultProfilePicture.addStyleName("font-size-150 lightGreyText");
 	}
-	UserBadge userBadge;
 	AnchorListItem loadingTeamsListItem = new AnchorListItem("Loading...");
 
 	@Inject
-	public ProfileViewImpl(ProfileViewImplUiBinder binder, Header headerWidget, UserBadge userBadge) {
+	public ProfileViewImpl(ProfileViewImplUiBinder binder, Header headerWidget) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
-
-		this.userBadge = userBadge;
-		userBadge.setSize(BadgeSize.LARGE);
-		userBadgeContainer.add(userBadge);
 		headerWidget.configure();
 		initTabs();
 		projectSearchTextBox.getElement().setAttribute("placeholder", "Project name");
@@ -353,15 +346,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 
 	@Override
-	public void setProfile(UserProfile profile, boolean isOwner, boolean isCertified, boolean isValidated, String orcIdHref) {
+	public void setProfile(UserProfile profile, boolean isOwner) {
 		String displayName = DisplayUtils.getDisplayName(profile);
-		userBadgeContainer.setVisible(!isOwner);
-		editUserProfilePanel.setVisible(isOwner);
 		UIObject.setVisible(myDashboardHeading, isOwner);
 		if (!isOwner) {
 			setHighlightBoxUser(displayName);
-			// TODO: use large user component to show profile. set ORCiD
-			userBadge.configure(profile, isCertified, isValidated);
 		}
 		
 		String challengesThatUserIsRegisteredFor = CHALLENGES_THAT + displayName + IS_REGISTERED_FOR;

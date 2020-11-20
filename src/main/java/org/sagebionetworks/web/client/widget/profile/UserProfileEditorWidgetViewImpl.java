@@ -4,21 +4,20 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
+import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.base.TextBoxBase;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.search.GooglePlacesSuggestOracle;
 
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -81,7 +80,15 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	@UiField
 	Anchor changePasswordLink;
 	@UiField
+	Row orcIDContainer;
+	@UiField
+	Anchor orcIdLink;
+	@UiField
 	Span accountLevelBadgeContainer;
+	@UiField
+	Row ownerFieldsContainer;
+	@UiField
+	Div commandsContainer;
 	
 	SuggestBox locationSuggestBox;
 	private Widget widget;
@@ -99,7 +106,6 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 		locationSuggestBox.setWidth("100%");
 		locationTextBox = locationSuggestBox.getTextBox();
 		locationTextBox.addStyleName("form-control");
-		locationTextBox.getElement().setAttribute("placeholder", "Enter City, Country");
 		locationSuggestBoxContainer.add(locationSuggestBox);
 		// note, not adding email since it's not editable here.
 		textBoxes = new TextBoxBase[] {username, firstName, lastName, currentPosition, currentAffiliation, industry, link, bio} ;
@@ -276,7 +282,17 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 		for (TextBoxBase tb : textBoxes) {
 			tb.setReadOnly(!isEditing);
 		}
+		
 		locationTextBox.setReadOnly(!isEditing);
+		firstName.setPlaceholder(isEditing ? "Enter first name" : "");
+		lastName.setPlaceholder(isEditing ? "Enter last name" : "");
+		currentAffiliation.setPlaceholder(isEditing ? "Enter current affiliation" : "");
+		bio.setPlaceholder(isEditing ? "Enter bio" : "");
+		link.setPlaceholder(isEditing ? "Enter link to more info" : "");
+		locationTextBox.getElement().setAttribute("placeholder", isEditing ? "Enter City, Country" : "");
+		currentPosition.setPlaceholder(isEditing ? "Enter current position" : "");
+		industry.setPlaceholder(isEditing ? "Enter industry/discipline" : "");
+		
 		editProfileButton.setVisible(!isEditing);
 		saveProfileButton.setVisible(isEditing);
 		cancelButton.setVisible(isEditing);
@@ -294,6 +310,7 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
 	}
+	
 	@Override
 	public void setOwnerId(String userId) {
 		jsniUtils.unmountComponentAtNode(accountLevelBadgeContainer.getElement());
@@ -316,5 +333,21 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	@Override
 	public void resetSaveButtonState() {
 		saveProfileButton.state().reset();
+	}
+	
+	@Override
+	public void setCanEdit(boolean canEdit) {
+		ownerFieldsContainer.setVisible(canEdit);
+		commandsContainer.setVisible(canEdit);
+	}
+	
+	@Override
+	public void setOrcIdHref(String orcIdHref) {
+		boolean isDefined = DisplayUtils.isDefined(orcIdHref);
+		orcIDContainer.setVisible(isDefined);
+		if (isDefined) {
+			orcIdLink.setHref(orcIdHref);
+			orcIdLink.setText(orcIdHref);
+		}
 	}
 }

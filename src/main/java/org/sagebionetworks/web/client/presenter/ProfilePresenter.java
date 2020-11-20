@@ -278,10 +278,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			public void onSuccess(UserBundle bundle) {
 				view.hideLoading();
 				currentUserBundle = bundle;
-				view.setProfile(bundle.getUserProfile(), isOwner, bundle.getIsCertified(), bundle.getIsVerified(), bundle.getORCID());
-				if (isOwner) {
-					getUserProfileEditorWidget().configure(bundle.getUserProfile(), () -> { profileUpdated(); });
-				}
+				view.setProfile(bundle.getUserProfile(), isOwner);
+				getUserProfileEditorWidget().configure(bundle.getUserProfile(), bundle.getORCID(), () -> { profileUpdated(); });
 			}
 
 			@Override

@@ -73,4 +73,7 @@ public interface UserProfileEditorWidgetView extends IsWidget {
 	void setOwnerId(String userId);
 	void setEmail(String email);
 	void resetSaveButtonState();
+	void setCanEdit(boolean canEdit);
+
+	void setOrcIdHref(String orcIdHref);
 }
