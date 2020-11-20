@@ -1,23 +1,41 @@
 package org.sagebionetworks.web.unitclient.widget.profile;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.ProfileImageWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetImpl;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetView;
 import org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl;
 import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
+import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class UserProfileEditorWidgetImplTest {
 	@Mock
@@ -30,16 +48,30 @@ public class UserProfileEditorWidgetImplTest {
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
 	@Mock
+	SynapseJavascriptClient mockJsClient;
+	@Mock
 	CroppedImageUploadViewImpl mockCroppedImageUploadViewImpl;
 	@Mock
+	ClientCache mockClientCache;
+	@Mock
+	AuthenticationController mockAuthController;
+	@Mock
 	Callback mockCallback;
-	UserProfile profile;
+	@Mock
+	SynapseAlert mockSynAlert;
+	@Mock
+	PopupUtilsView mockPopupUtilsView;
+	@Mock
+	GlobalApplicationState mockGlobalAppState;
+	@Captor
+	ArgumentCaptor<UserProfile> userProfileCaptor;
+	UserProfile profile, changes;
 
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		when(mockPortalGinInjector.getCroppedImageUploadView()).thenReturn(mockCroppedImageUploadViewImpl);
-		widget = new UserProfileEditorWidgetImpl(mockView, mockImageWidget, mockfileHandleUploadWidget, mockPortalGinInjector);
+		widget = new UserProfileEditorWidgetImpl(mockView, mockImageWidget, mockfileHandleUploadWidget, mockJsClient, mockClientCache, mockAuthController, mockPortalGinInjector, mockSynAlert, mockPopupUtilsView, mockGlobalAppState);
 
 		profile = new UserProfile();
 		profile.setOwnerId("123");
@@ -54,29 +86,123 @@ public class UserProfileEditorWidgetImplTest {
 		profile.setUrl("http://spys.r.us");
 		profile.setSummary("My live story...");
 		profile.setProfilePicureFileHandleId("45678");
+		profile.setEmails(java.util.Collections.singletonList("007@uk.supersecret.gov"));
+		
+		
+		changes = new UserProfile();
+		changes.setOwnerId("123");
+		changes.setUserName("a-user-name-2");
+		changes.setFirstName("James-2");
+		changes.setLastName("Bond-2");
+		changes.setPosition("Spy-2");
+		changes.setCompany("SI6-2");
+		changes.setEtag("etag");
+		changes.setIndustry("Politics-2");
+		changes.setLocation("Britain-2");
+		changes.setUrl("http://spys.r.us.two");
+		changes.setSummary("My live story...2");
+		changes.setProfilePicureFileHandleId("456782");
+		changes.setDisplayName("James-2 Bond-2");
+		
+		widget.setNewFileHandle(changes.getProfilePicureFileHandleId());
+		when(mockView.getUsername()).thenReturn(changes.getUserName());
+		when(mockView.getFirstName()).thenReturn(changes.getFirstName());
+		when(mockView.getLastName()).thenReturn(changes.getLastName());
+		when(mockView.getCurrentPosition()).thenReturn(changes.getPosition());
+		when(mockView.getCurrentAffiliation()).thenReturn(changes.getCompany());
+		when(mockView.getIndustry()).thenReturn(changes.getIndustry());
+		when(mockView.getLocation()).thenReturn(changes.getLocation());
+		when(mockView.getLink()).thenReturn(changes.getUrl());
+		when(mockView.getBio()).thenReturn(changes.getSummary());
+		
+		AsyncMockStubber.callSuccessWith(profile).when(mockJsClient).updateMyUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 	}
 
 	@Test
 	public void testConstruction() {
 		verify(mockfileHandleUploadWidget).setView(mockCroppedImageUploadViewImpl);
+		verify(mockfileHandleUploadWidget).setButtonIcon(IconType.EDIT);
+		verify(mockfileHandleUploadWidget).setButtonText("");
+		verify(mockfileHandleUploadWidget).setButtonType(ButtonType.DEFAULT);
+		verify(mockfileHandleUploadWidget).setButtonSize(ButtonSize.SMALL);
+		verify(mockfileHandleUploadWidget).addStyleName("editProfileImageButton");
+		verify(mockfileHandleUploadWidget).setVisible(false);
+		verify(mockImageWidget).setRemovePictureCommandVisible(false);
+		verify(mockView).setSynAlert(mockSynAlert);
+	}
+
+	private void verifyIsEditingMode(boolean isEditing, int nCalls) {
+		verify(mockGlobalAppState, times(nCalls)).setIsEditing(isEditing);
+		verify(mockView, times(nCalls)).setEditMode(isEditing);
+	}
+	
+	private void verifyConfigure(int nCalls) {
+		verify(mockSynAlert, times(nCalls)).clear();
+		verify(mockView, times(nCalls)).hideLinkError();
+		verify(mockView, times(nCalls)).hideUsernameError();
+		verify(mockView, times(nCalls)).setOwnerId(profile.getOwnerId());
+		verify(mockView, times(nCalls)).setFirstName(profile.getFirstName());
+		verify(mockView, times(nCalls)).setLastName(profile.getLastName());
+		verify(mockView, times(nCalls)).setUsername(profile.getUserName());
+		verify(mockView, times(nCalls)).setCurrentPosition(profile.getPosition());
+		verify(mockView, times(nCalls)).setCurrentAffiliation(profile.getCompany());
+		verify(mockView, times(nCalls)).setIndustry(profile.getIndustry());
+		verify(mockView, times(nCalls)).setLocation(profile.getLocation());
+		verify(mockView, times(nCalls)).setLink(profile.getUrl());
+		verify(mockView, times(nCalls)).setBio(profile.getSummary());
+		verify(mockView, times(nCalls)).setEmail(profile.getEmails().get(0));
+		verify(mockImageWidget, times(nCalls)).configure(profile.getProfilePicureFileHandleId());
+		verifyIsEditingMode(false, nCalls);
+	}
+	
+	@Test
+	public void testConfigure() {
+		widget.configure(profile, mockCallback);
+		
+		verifyConfigure(1);
+	}
+	
+	@Test
+	public void testOnCancel() {
+		widget.configure(profile, mockCallback);
+		widget.onCancel();
+		
+		verifyConfigure(2);
 	}
 
 	@Test
-	public void testConfigure() {
-		widget.configure(profile);
-		verify(mockView).hideLinkError();
-		verify(mockView).hideUsernameError();
-		verify(mockView).setFirstName(profile.getFirstName());
-		verify(mockView).setLastName(profile.getLastName());
-		verify(mockView).setUsername(profile.getUserName());
-		verify(mockView).setCurrentPosition(profile.getPosition());
-		verify(mockView).setCurrentAffiliation(profile.getCompany());
-		verify(mockView).setIndustry(profile.getIndustry());
-		verify(mockView).setLocation(profile.getLocation());
-		verify(mockView).setLink(profile.getUrl());
-		verify(mockView).setBio(profile.getSummary());
-		verify(mockImageWidget).configure(profile.getProfilePicureFileHandleId());
+	public void testOnSave() {
+		widget.configure(profile, mockCallback);
+		widget.onSave();
+		
+		verify(mockSynAlert, times(2)).clear();
+		verify(mockJsClient).updateMyUserProfile(userProfileCaptor.capture(), any(AsyncCallback.class));
+		
+		//verify profile was updated to new values
+		assertEquals(changes.getOwnerId(), userProfileCaptor.getValue().getOwnerId());
+		assertEquals(changes.getFirstName(), userProfileCaptor.getValue().getFirstName());
+		assertEquals(changes.getLastName(), userProfileCaptor.getValue().getLastName());
+		assertEquals(changes.getUserName(), userProfileCaptor.getValue().getUserName());
+		
+		verify(mockCallback).invoke();
+		verify(mockClientCache).remove(profile.getOwnerId() + WebConstants.USER_PROFILE_SUFFIX);
+		verify(mockAuthController).updateCachedProfile(profile);
 	}
+	
+	@Test
+	public void testOnSaveFailure() {
+		Exception ex = new Exception("An error");
+		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).updateMyUserProfile(any(UserProfile.class), any(AsyncCallback.class));
+
+		widget.configure(profile, mockCallback);
+		widget.onSave();
+		
+		verify(mockSynAlert, times(2)).clear();
+		verify(mockJsClient).updateMyUserProfile(userProfileCaptor.capture(), any(AsyncCallback.class));
+		verify(mockSynAlert).handleException(ex);
+		verify(mockView).resetSaveButtonState();
+	}
+	
 
 	@Test
 	public void testSetNewFileHandle() {
@@ -99,13 +225,13 @@ public class UserProfileEditorWidgetImplTest {
 	@Test
 	public void testConfigureNoProfileImage() {
 		profile.setProfilePicureFileHandleId(null);
-		widget.configure(profile);
+		widget.configure(profile, mockCallback);
 		verify(mockImageWidget).configure(null);
 	}
 
 	@Test
 	public void testIsValid() {
-		widget.configure(profile);
+		widget.configure(profile, mockCallback);
 		reset(mockView);
 		when(mockView.getUsername()).thenReturn("valid");
 		assertTrue(widget.isValid());
@@ -115,7 +241,7 @@ public class UserProfileEditorWidgetImplTest {
 
 	@Test
 	public void testIsValidShortUsername() {
-		widget.configure(profile);
+		widget.configure(profile, mockCallback);
 		reset(mockView);
 		when(mockView.getUsername()).thenReturn("12");
 		assertFalse(widget.isValid());
@@ -126,7 +252,7 @@ public class UserProfileEditorWidgetImplTest {
 
 	@Test
 	public void testIsValidUsernameBadChars() {
-		widget.configure(profile);
+		widget.configure(profile, mockCallback);
 		reset(mockView);
 		when(mockView.getUsername()).thenReturn("ABC@");
 		assertFalse(widget.isValid());

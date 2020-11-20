@@ -51,6 +51,14 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 	public Widget asWidget() {
 		return getView().asWidget();
 	}
+	
+	public void addStyleName(String styleName) {
+		getView().asWidget().addStyleName(styleName);
+	}
+	
+	public void setVisible(boolean visible) {
+		getView().asWidget().setVisible(visible);
+	}
 
 	public void configure(CallbackP<FileUpload> finishedUploadingCallback) {
 		this.finishedUploadingCallback = finishedUploadingCallback;

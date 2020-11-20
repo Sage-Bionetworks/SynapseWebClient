@@ -55,12 +55,12 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		this.popupUtils = popupUtils;
 		this.globalAppState = globalAppState;
 		fileHandleUploadWidget.setView(ginInjector.getCroppedImageUploadView());
-		fileHandleUploadWidget.asWidget().addStyleName("editProfileImageButton");
+		fileHandleUploadWidget.addStyleName("editProfileImageButton");
 		fileHandleUploadWidget.setButtonIcon(IconType.EDIT);
 		fileHandleUploadWidget.setButtonText("");
 		fileHandleUploadWidget.setButtonType(ButtonType.DEFAULT);
 		fileHandleUploadWidget.setButtonSize(ButtonSize.SMALL);
-		fileHandleUploadWidget.asWidget().setVisible(false);
+		fileHandleUploadWidget.setVisible(false);
 		imageWidget.setRemovePictureCommandVisible(false);
 		this.view.addFileInputWidget(fileHandleUploadWidget);
 		this.view.addImageWidget(imageWidget);
@@ -209,7 +209,6 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	public void onCancel() {
 		// revert changes
 		configure(originalProfile, callback);
-		setIsEditingMode(false);
 	}
 	
 	@Override
@@ -246,7 +245,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	@Override
 	public void setIsEditingMode(boolean isEditing) {
 		globalAppState.setIsEditing(isEditing);
-		fileHandleUploadWidget.asWidget().setVisible(isEditing);
+		fileHandleUploadWidget.setVisible(isEditing);
 		view.setEditMode(isEditing);
 	}
 	/**
