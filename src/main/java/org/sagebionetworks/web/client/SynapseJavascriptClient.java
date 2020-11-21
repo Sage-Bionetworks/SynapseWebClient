@@ -1073,11 +1073,10 @@ public class SynapseJavascriptClient {
 		doGetString(url, false, callback);
 	}
 
-	public void getProfilePicturePreviewURL(String profileId, AsyncCallback<String> callback) {
-		String url = getRepoServiceUrl() + USER_PROFILE_PATH + "/" + profileId + "/image/preview?redirect=false";
-		doGetString(url, false, callback);
+	public String getProfilePicturePreviewURL(String profileId, boolean redirect) {
+		return getRepoServiceUrl() + USER_PROFILE_PATH + "/" + profileId + "/image/preview?redirect=" + redirect;
 	}
-	
+
 	public void getTeamPicturePreviewURL(String teamId, AsyncCallback<String> callback) {
 		String url = getRepoServiceUrl() + TEAM + "/" + teamId + "/icon/preview?redirect=false";
 		doGetString(url, false, callback);
@@ -1149,6 +1148,11 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + "/" + key.getOwnerObjectType().toLowerCase() + "/" + key.getOwnerObjectId() + WIKI2 + key.getWikiPageId();
 
 		doPut(url, toUpdate, OBJECT_TYPE.V2WikiPage, callback);
+	}
+	
+	public void updateMyUserProfile(UserProfile profile, AsyncCallback<UserProfile> callback) {
+		String url = getRepoServiceUrl() + "/" + USER_PROFILE_PATH;
+		doPut(url, profile, OBJECT_TYPE.UserProfile, callback);
 	}
 
 	public void updateEntity(Entity toUpdate, String generatedByID, Boolean newVersion, AsyncCallback<Entity> callback) {

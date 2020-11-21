@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.upload;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -47,6 +50,14 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 	@Override
 	public Widget asWidget() {
 		return getView().asWidget();
+	}
+	
+	public void addStyleName(String styleName) {
+		getView().asWidget().addStyleName(styleName);
+	}
+	
+	public void setVisible(boolean visible) {
+		getView().asWidget().setVisible(visible);
 	}
 
 	public void configure(CallbackP<FileUpload> finishedUploadingCallback) {
@@ -121,6 +132,22 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 		getView().showProgress(false);
 		synAlert.clear();
 		getView().resetForm();
+	}
+
+	public void setButtonType(ButtonType type) {
+		getView().setButtonType(type);
+	}
+
+	public void setButtonSize(ButtonSize size) {
+		getView().setButtonSize(size);
+	}
+
+	public void setButtonText(String text) {
+		getView().setButtonText(text);
+	}
+	
+	public void setButtonIcon(IconType iconType) {
+		getView().setButtonIcon(iconType);
 	}
 
 	private void doMultipartUpload(final FileMetadata fileMeta, JavaScriptObjectWrapper blob) {

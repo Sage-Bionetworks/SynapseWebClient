@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.client.presenter;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -37,10 +39,11 @@ import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidget;
-import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
+import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
+
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -65,10 +68,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private ProfileView view;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
-	private UserProfileModalWidget userProfileModalWidget;
 	private GWTWrapper gwt;
 	private OpenTeamInvitationsWidget openInvitesWidget;
-
+	private UserProfileEditorWidget userProfileEditorWidget;
 	private SettingsPresenter settingsPresenter;
 	private PortalGinInjector ginInjector;
 	private int inviteCount;
@@ -141,12 +143,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		return promptDialog;
 	}
 
-	public UserProfileModalWidget getUserProfileModalWidget() {
-		if (userProfileModalWidget == null) {
-			userProfileModalWidget = ginInjector.getUserProfileModalWidget();
-			view.addUserProfileModalWidget(userProfileModalWidget);
+	public UserProfileEditorWidget getUserProfileEditorWidget() {
+		if (userProfileEditorWidget == null) {
+			userProfileEditorWidget = ginInjector.getUserProfileEditorWidget();
+			view.setUserProfileEditorWidget(userProfileEditorWidget);
 		}
-		return userProfileModalWidget;
+		return userProfileEditorWidget;
 	}
 
 	public SettingsPresenter getSettingsPresenter() {
@@ -242,7 +244,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 		view.clear();
 		view.showLoading();
-		view.setProfileEditButtonVisible(isOwner);
 		view.showTabs(isOwner);
 		if (settingsPresenter != null) {
 			settingsPresenter.clear();
@@ -270,14 +271,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private void getUserProfile() {
 		// ask for everything in the user bundle
 		currentUserBundle = null;
-		int mask = PROFILE | ORC_ID | VERIFICATION_SUBMISSION | IS_VERIFIED | IS_CERTIFIED;
+		int mask = PROFILE | ORC_ID;
 		Long currentUserIdLong = currentUserId != null ? Long.parseLong(currentUserId) : null;
 		jsClient.getUserBundle(currentUserIdLong, mask, new AsyncCallback<UserBundle>() {
 			@Override
 			public void onSuccess(UserBundle bundle) {
 				view.hideLoading();
 				currentUserBundle = bundle;
-				view.setProfile(bundle.getUserProfile(), isOwner, bundle.getIsCertified(), bundle.getIsVerified(), bundle.getORCID());
+				view.setProfile(bundle.getUserProfile(), isOwner);
+				getUserProfileEditorWidget().configure(bundle.getUserProfile(), bundle.getORCID(), () -> { profileUpdated(); });
 			}
 
 			@Override
@@ -740,7 +742,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		updateProfileView(currentUserId);
 		view.refreshHeader();
 	}
-
+	
 	private void showView(Profile place) {
 		view.clear();
 		profileSynAlert.clear();
@@ -893,6 +895,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			Callback yesCallback = new Callback() {
 				@Override
 				public void invoke() {
+					globalApplicationState.setIsEditing(false);
+					getUserProfileEditorWidget().setIsEditingMode(false);
 					boolean pushState = true;
 					showTab(tab, pushState);
 				}
@@ -986,18 +990,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public ProjectFilterEnum getFilterType() {
 		return filterType;
 	}
-
-	@Override
-	public void onEditProfile() {
-		getUserProfileModalWidget().showEditProfile(this.currentUserId, new Callback() {
-			@Override
-			public void invoke() {
-				profileUpdated();
-			}
-		});
-
-	}
-
 
 	// used for targeted unit test only
 	public void setLoadMoreProjectsWidgetContainer(LoadMoreWidgetContainer loadMoreProjectsWidgetContainer) {

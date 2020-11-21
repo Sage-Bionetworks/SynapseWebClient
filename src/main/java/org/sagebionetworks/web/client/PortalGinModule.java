@@ -541,10 +541,6 @@ import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetImpl;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetView;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.profile.UserProfileModalView;
-import org.sagebionetworks.web.client.widget.profile.UserProfileModalViewImpl;
-import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
-import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlertView;
@@ -999,8 +995,6 @@ public class PortalGinModule extends AbstractGinModule {
 
 		bind(UserProfileEditorWidget.class).to(UserProfileEditorWidgetImpl.class);
 		bind(UserProfileEditorWidgetView.class).to(UserProfileEditorWidgetViewImpl.class);
-		bind(UserProfileModalWidget.class).to(UserProfileModalWidgetImpl.class);
-		bind(UserProfileModalView.class).to(UserProfileModalViewImpl.class);
 		bind(ProfileImageView.class).to(ProfileImageViewImpl.class);
 		bind(ProfileImageWidget.class).to(ProfileImageWidgetImpl.class);
 

@@ -1,12 +1,23 @@
 package org.sagebionetworks.web.client.widget.profile;
 
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
+import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.base.TextBoxBase;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.search.GooglePlacesSuggestOracle;
+
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -43,26 +54,72 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	@UiField
 	TextBox industry;
 	@UiField
+	TextBox email;
+	@UiField
 	Div locationSuggestBoxContainer;
 	@UiField
 	FormGroup linkFormGroup;
 	@UiField
 	TextBox link;
 	@UiField
+	Anchor linkRenderer;
+	@UiField
 	HelpBlock linkHelpBlock;
 	@UiField
 	TextArea bio;
+	@UiField
+	Div synAlertContainer;
+	@UiField
+	Button editProfileButton;
+	@UiField
+	Button saveProfileButton;
+	@UiField
+	Button cancelButton;
+	@UiField
+	Anchor changeEmailLink;
+	@UiField
+	Anchor changePasswordLink;
+	@UiField
+	Row orcIDContainer;
+	@UiField
+	Anchor orcIdLink;
+	@UiField
+	Span accountLevelBadgeContainer;
+	@UiField
+	Row ownerFieldsContainer;
+	@UiField
+	Div commandsContainer;
+	
 	SuggestBox locationSuggestBox;
 	private Widget widget;
 
+	TextBoxBase[] textBoxes;
+	com.google.gwt.user.client.ui.TextBoxBase locationTextBox;
+	boolean isEditing = false;
+	SynapseJSNIUtils jsniUtils;
+	Presenter presenter;
 	@Inject
-	public UserProfileEditorWidgetViewImpl(Binder binder, GooglePlacesSuggestOracle locationOracle) {
+	public UserProfileEditorWidgetViewImpl(Binder binder, GooglePlacesSuggestOracle locationOracle, GlobalApplicationState globalAppState, AuthenticationController authController, SynapseJSNIUtils jsniUtils) {
 		widget = binder.createAndBindUi(this);
+		this.jsniUtils = jsniUtils;
 		locationSuggestBox = new SuggestBox(locationOracle);
 		locationSuggestBox.setWidth("100%");
-		locationSuggestBox.getTextBox().addStyleName("form-control");
-		locationSuggestBox.getTextBox().getElement().setAttribute("placeholder", "Enter City, Country");
+		locationTextBox = locationSuggestBox.getTextBox();
+		locationTextBox.addStyleName("form-control");
 		locationSuggestBoxContainer.add(locationSuggestBox);
+		// note, not adding email since it's not editable here.
+		textBoxes = new TextBoxBase[] {username, firstName, lastName, currentPosition, currentAffiliation, industry, link, bio} ;
+		editProfileButton.addClickHandler(event -> {
+			presenter.setIsEditingMode(true);			
+		});
+		saveProfileButton.addClickHandler(event -> {
+			saveProfileButton.state().loading();
+			presenter.onSave();
+		});
+		cancelButton.addClickHandler(event -> {
+			presenter.onCancel();
+		});
+		linkRenderer.getElement().setAttribute("rel", "noreferrer noopener");
 	}
 
 	@Override
@@ -73,6 +130,11 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	@Override
 	public void setUsername(String username) {
 		this.username.setText(username);
+	}
+	
+	@Override
+	public void setEmail(String email) {
+		this.email.setText(email);
 	}
 
 	@Override
@@ -133,8 +195,8 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	}
 
 	@Override
-	public void setPresenter(final Presenter presenter) {
-
+	public void setPresenter(Presenter presenter) {
+		this.presenter = presenter;
 	}
 
 	@Override
@@ -197,6 +259,8 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	@Override
 	public void setLink(String url) {
 		this.link.setText(url);
+		this.linkRenderer.setHref(url);
+		this.linkRenderer.setText(url);
 	}
 
 	@Override
@@ -212,4 +276,78 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 		bio.addKeyDownHandler(keyDownHandler);
 	}
 
+	@Override
+	public void setEditMode(boolean isEditing) {
+		this.isEditing = isEditing;
+		for (TextBoxBase tb : textBoxes) {
+			tb.setReadOnly(!isEditing);
+		}
+		
+		locationTextBox.setReadOnly(!isEditing);
+		firstName.setPlaceholder(isEditing ? "Enter first name" : "");
+		lastName.setPlaceholder(isEditing ? "Enter last name" : "");
+		currentAffiliation.setPlaceholder(isEditing ? "Enter current affiliation" : "");
+		bio.setPlaceholder(isEditing ? "Enter bio" : "");
+		link.setPlaceholder(isEditing ? "Enter link to more info" : "");
+		locationTextBox.getElement().setAttribute("placeholder", isEditing ? "Enter City, Country" : "");
+		currentPosition.setPlaceholder(isEditing ? "Enter current position" : "");
+		industry.setPlaceholder(isEditing ? "Enter industry/discipline" : "");
+		
+		editProfileButton.setVisible(!isEditing);
+		saveProfileButton.setVisible(isEditing);
+		cancelButton.setVisible(isEditing);
+		linkRenderer.setVisible(!isEditing);
+		link.setVisible(isEditing);
+		changeEmailLink.setVisible(isEditing);
+		changePasswordLink.setVisible(isEditing);
+		if (!isEditing) {
+			saveProfileButton.state().reset();	
+		}		
+	}
+
+	@Override
+	public void setSynAlert(IsWidget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
+	}
+	
+	@Override
+	public void setOwnerId(String userId) {
+		jsniUtils.unmountComponentAtNode(accountLevelBadgeContainer.getElement());
+		_showAccountLevelBadge(accountLevelBadgeContainer.getElement(), userId);
+	}
+	
+	private static native void _showAccountLevelBadge(Element el, String userId) /*-{
+		try {
+			var props = {
+			  	userId: userId,
+			};
+			$wnd.ReactDOM.render($wnd.React.createElement(
+					$wnd.SRC.SynapseComponents.AccountLevelBadge, props, null),
+					el);
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
+
+	@Override
+	public void resetSaveButtonState() {
+		saveProfileButton.state().reset();
+	}
+	
+	@Override
+	public void setCanEdit(boolean canEdit) {
+		ownerFieldsContainer.setVisible(canEdit);
+		commandsContainer.setVisible(canEdit);
+	}
+	
+	@Override
+	public void setOrcIdHref(String orcIdHref) {
+		boolean isDefined = DisplayUtils.isDefined(orcIdHref);
+		orcIDContainer.setVisible(isDefined);
+		if (isDefined) {
+			orcIdLink.setHref(orcIdHref);
+			orcIdLink.setText(orcIdHref);
+		}
+	}
 }

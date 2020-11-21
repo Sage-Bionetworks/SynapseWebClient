@@ -1,5 +1,9 @@
 package org.sagebionetworks.web.client.widget.upload;
 
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
+
 import com.google.gwt.event.logical.shared.HasAttachHandlers;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -28,4 +32,12 @@ public interface ImageUploadView extends IsWidget, HasAttachHandlers {
 	void setUploadedFileText(String text);
 
 	void processFile();
+
+	void setButtonType(ButtonType type);
+	
+	void setButtonSize(ButtonSize size);
+
+	void setButtonText(String text);
+
+	void setButtonIcon(IconType iconType);
 }

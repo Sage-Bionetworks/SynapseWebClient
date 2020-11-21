@@ -5,6 +5,9 @@ import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.Progress;
 import org.gwtbootstrap3.client.ui.ProgressBar;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
@@ -87,6 +90,7 @@ public class ImageUploadViewImpl implements ImageUploadView {
 			_initResizer();
 			isLoaded = true;
 		}
+		
 	}
 
 	@Override
@@ -94,6 +98,26 @@ public class ImageUploadViewImpl implements ImageUploadView {
 		// load into image
 		loadingUI.setVisible(true);
 		_loadImage(fileInput.getElement().getId(), ImageUploadViewImpl.this, originalCanvas, resizedCanvas);
+	}
+	
+	@Override
+	public void setButtonType(ButtonType type) {
+		uploadbutton.setType(type);
+	}
+	
+	@Override
+	public void setButtonSize(ButtonSize size) {
+		uploadbutton.setSize(size);		
+	}
+	
+	@Override
+	public void setButtonText(String text) {
+		uploadbutton.setText(text);		
+	}
+
+	@Override
+	public void setButtonIcon(IconType iconType) {
+		uploadbutton.setIcon(iconType);		
 	}
 
 	private static native void _loadImage(String fileFieldId, ImageUploadViewImpl v, CanvasElement originalCanvas, CanvasElement resizedCanvas) /*-{

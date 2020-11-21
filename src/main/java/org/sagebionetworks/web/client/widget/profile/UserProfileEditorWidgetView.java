@@ -6,6 +6,11 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface UserProfileEditorWidgetView extends IsWidget {
 
 	public interface Presenter {
+		// inform presenter that the user wants to save the edits to their profile
+		void onSave();
+		void onCancel();
+		// inform presenter that the user is editing their profile info
+		void setIsEditingMode(boolean isEditing);
 	}
 
 	void setUsername(String userName);
@@ -57,7 +62,18 @@ public interface UserProfileEditorWidgetView extends IsWidget {
 	String getLocation();
 
 	void setLink(String url);
+	
+	void setSynAlert(IsWidget w);
 
 	void addKeyDownHandlerToFields(KeyDownHandler keyDownHandler);
+	
+	// if in edit mode, then editable text fields will be available.  If not, their static values will be shown (but still in a form).
+	void setEditMode(boolean isEditing);
 
+	void setOwnerId(String userId);
+	void setEmail(String email);
+	void resetSaveButtonState();
+	void setCanEdit(boolean canEdit);
+
+	void setOrcIdHref(String orcIdHref);
 }

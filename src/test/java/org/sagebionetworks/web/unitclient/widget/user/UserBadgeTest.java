@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.user;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -83,7 +83,7 @@ public class UserBadgeTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		when(mockSynapseJSNIUtils.getFileHandleAssociationUrl(anyString(), any(FileHandleAssociateType.class), anyString())).thenReturn(FULL_PICTURE_URL);
-		AsyncMockStubber.callSuccessWith(SMALL_PICTURE_URL).when(mockJsClient).getProfilePicturePreviewURL(anyString(), any(AsyncCallback.class));
+		when(mockJsClient.getProfilePicturePreviewURL(anyString(), anyBoolean())).thenReturn(SMALL_PICTURE_URL);
 		userBadge = new UserBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseJSNIUtils, mockCache, mockUserProfileAsyncHandler, adapterFactory, mockJsClient);
 	}
 

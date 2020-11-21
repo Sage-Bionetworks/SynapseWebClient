@@ -11,6 +11,7 @@ public class ProfileImageWidgetImpl implements ProfileImageWidget {
 	ProfileImageView view;
 	Callback removePictureCallback;
 	SynapseJSNIUtils jsniUtils;
+	boolean isRemovePictureCommandVisible = true;
 
 	@Inject
 	public ProfileImageWidgetImpl(ProfileImageView view, SynapseJSNIUtils jsniUtils) {
@@ -23,6 +24,12 @@ public class ProfileImageWidgetImpl implements ProfileImageWidget {
 	public void setRemovePictureCallback(Callback removePictureCallback) {
 		this.removePictureCallback = removePictureCallback;
 	}
+	
+	@Override
+	public void setRemovePictureCommandVisible(boolean isVisible) {
+		isRemovePictureCommandVisible = isVisible;
+		view.setRemovePictureButtonVisible(isVisible);
+	}
 
 	@Override
 	public Widget asWidget() {
@@ -32,7 +39,7 @@ public class ProfileImageWidgetImpl implements ProfileImageWidget {
 	@Override
 	public void configure(String userId, String fileHandleId) {
 		boolean hasProfilePicture = fileHandleId != null;
-		view.setRemovePictureButtonVisible(hasProfilePicture);
+		view.setRemovePictureButtonVisible(isRemovePictureCommandVisible && hasProfilePicture);
 		if (hasProfilePicture) {
 			String url = jsniUtils.getFileHandleAssociationUrl(userId, FileHandleAssociateType.UserProfileAttachment, fileHandleId);
 			view.setImageUrl(url);
@@ -44,7 +51,7 @@ public class ProfileImageWidgetImpl implements ProfileImageWidget {
 	@Override
 	public void configure(String fileHandleId) {
 		boolean hasProfilePicture = fileHandleId != null;
-		view.setRemovePictureButtonVisible(hasProfilePicture);
+		view.setRemovePictureButtonVisible(isRemovePictureCommandVisible && hasProfilePicture);
 		if (fileHandleId != null) {
 			String url = jsniUtils.getRawFileHandleUrl(fileHandleId);
 			view.setImageUrl(url);
@@ -53,6 +60,7 @@ public class ProfileImageWidgetImpl implements ProfileImageWidget {
 		}
 	}
 
+	
 	@Override
 	public void onRemovePicture() {
 		if (removePictureCallback != null) {

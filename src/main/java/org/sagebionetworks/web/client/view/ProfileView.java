@@ -25,7 +25,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	/**
 	 * Renders the view for a given presenter
 	 */
-	void setProfile(UserProfile profile, boolean isOwner, boolean isCertified, boolean isValidated, String orcIdHref);
+	void setProfile(UserProfile profile, boolean isOwner);
 
 	void refreshHeader();
 
@@ -67,9 +67,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 
 	void setFavoritesHelpPanelVisible(boolean isVisible);
 
-	void setProfileEditButtonVisible(boolean isVisible);
-
-	void addUserProfileModalWidget(IsWidget userProfileModalWidget);
+	void setUserProfileEditorWidget(IsWidget userProfileEditorWidget);
 
 	void setSettingsWidget(Widget w);
 
@@ -91,8 +89,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void getMoreChallenges();
 
 		void applyFilterClicked(ProjectFilterEnum filterType, Team team);
-
-		void onEditProfile();
 
 		void sort(ProjectListSortColumn column);
 	}

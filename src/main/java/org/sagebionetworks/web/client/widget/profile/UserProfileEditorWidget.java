@@ -12,7 +12,7 @@ public interface UserProfileEditorWidget extends IsWidget {
 	 * 
 	 * @param profile
 	 */
-	void configure(UserProfile profile);
+	void configure(UserProfile profile, String orcIDHref, Callback callback);
 
 	/**
 	 * Are the values in this editor valid?
@@ -96,4 +96,6 @@ public interface UserProfileEditorWidget extends IsWidget {
 	void setUploadingCallback(Callback startedUploadingCallback);
 
 	void setUploadingCompleteCallback(Callback uploadCompleteCallback);
+	
+	void setIsEditingMode(boolean isEditing);
 }

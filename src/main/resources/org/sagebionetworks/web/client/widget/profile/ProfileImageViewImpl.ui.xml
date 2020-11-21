@@ -7,14 +7,14 @@
 		type='org.sagebionetworks.web.client.SageImageBundle' />
 	<g:HTMLPanel>
 		<b:Icon ui:field="defaultIcon" type="SYN_USER"
-			addStyleNames="font-size-150 lightGreyText" visible="true" />
-		<g:HTMLPanel width="150px"
+			addStyleNames="font-size-80 lightGreyText" visible="true" />
+		<g:HTMLPanel width="80px"
 			addStyleNames="position-relative">
 			<bh:Div addStyleNames="position-absolute topLevelZIndex">
 				<b:Button ui:field="removePicture" icon="TIMES"
 					size="EXTRA_SMALL" type="LINK" />
 			</bh:Div>
-			<b:Image ui:field="image" width="150px" visible="false"
+			<b:Image ui:field="image" width="80px" visible="false"
 				addStyleNames="img-circle" />
 		</g:HTMLPanel>
 	</g:HTMLPanel>
