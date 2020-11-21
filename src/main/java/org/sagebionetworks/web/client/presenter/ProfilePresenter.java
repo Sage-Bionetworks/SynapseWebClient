@@ -271,7 +271,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private void getUserProfile() {
 		// ask for everything in the user bundle
 		currentUserBundle = null;
-		int mask = PROFILE | ORC_ID | VERIFICATION_SUBMISSION | IS_VERIFIED | IS_CERTIFIED;
+		int mask = PROFILE | ORC_ID;
 		Long currentUserIdLong = currentUserId != null ? Long.parseLong(currentUserId) : null;
 		jsClient.getUserBundle(currentUserIdLong, mask, new AsyncCallback<UserBundle>() {
 			@Override
