@@ -166,6 +166,7 @@ public class ProfilePresenterTest {
 	List<Team> myTeams;
 	List<String> teamIds;
 	public static final String NEXT_PAGE_TOKEN = "19282";
+	public static final String ORC_ID = "https://orcid.goes.here";
 
 	@Before
 	public void setup() throws JSONObjectAdapterException {
@@ -193,6 +194,7 @@ public class ProfilePresenterTest {
 		when(mockUserBundle.getUserProfile()).thenReturn(userProfile);
 		when(mockUserBundle.getIsCertified()).thenReturn(true);
 		when(mockUserBundle.getIsVerified()).thenReturn(false);
+		when(mockUserBundle.getORCID()).thenReturn(ORC_ID);
 		// by default, we only have a single page of results
 		when(mockPaginatedTeamIds.getNextPageToken()).thenReturn(null);
 		when(mockSynapseJavascriptClient.getUserTeams(anyString(), anyBoolean(), anyString())).thenReturn(getDoneFuture(mockPaginatedTeamIds), getDoneFuture(mockPaginatedTeamIdsPage2));
@@ -291,7 +293,7 @@ public class ProfilePresenterTest {
 		verify(mockView).showLoading();
 		verify(mockView).showTabs(isOwner);
 		verify(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
-		verify(mockUserProfileEditorWidget).configure(eq(userProfile), any(Callback.class));
+		verify(mockUserProfileEditorWidget).configure(eq(userProfile), eq(ORC_ID), any(Callback.class));
 	}
 
 	@Test

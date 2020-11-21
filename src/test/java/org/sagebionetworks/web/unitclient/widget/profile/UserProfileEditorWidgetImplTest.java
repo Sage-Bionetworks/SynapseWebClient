@@ -66,11 +66,13 @@ public class UserProfileEditorWidgetImplTest {
 	@Captor
 	ArgumentCaptor<UserProfile> userProfileCaptor;
 	UserProfile profile, changes;
-
+	public static final String ORC_ID = "https://orcid"; 
+	
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		when(mockPortalGinInjector.getCroppedImageUploadView()).thenReturn(mockCroppedImageUploadViewImpl);
+		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn("123");
 		widget = new UserProfileEditorWidgetImpl(mockView, mockImageWidget, mockfileHandleUploadWidget, mockJsClient, mockClientCache, mockAuthController, mockPortalGinInjector, mockSynAlert, mockPopupUtilsView, mockGlobalAppState);
 
 		profile = new UserProfile();
@@ -142,6 +144,7 @@ public class UserProfileEditorWidgetImplTest {
 		verify(mockView, times(nCalls)).hideUsernameError();
 		verify(mockView, times(nCalls)).setOwnerId(profile.getOwnerId());
 		verify(mockView, times(nCalls)).setFirstName(profile.getFirstName());
+		verify(mockView, times(nCalls)).setOrcIdHref(ORC_ID);
 		verify(mockView, times(nCalls)).setLastName(profile.getLastName());
 		verify(mockView, times(nCalls)).setUsername(profile.getUserName());
 		verify(mockView, times(nCalls)).setCurrentPosition(profile.getPosition());
@@ -151,20 +154,38 @@ public class UserProfileEditorWidgetImplTest {
 		verify(mockView, times(nCalls)).setLink(profile.getUrl());
 		verify(mockView, times(nCalls)).setBio(profile.getSummary());
 		verify(mockView, times(nCalls)).setEmail(profile.getEmails().get(0));
-		verify(mockImageWidget, times(nCalls)).configure(profile.getProfilePicureFileHandleId());
+		verify(mockImageWidget, times(nCalls)).configure(profile.getOwnerId(), profile.getProfilePicureFileHandleId());
 		verifyIsEditingMode(false, nCalls);
 	}
 	
 	@Test
 	public void testConfigure() {
-		widget.configure(profile, mockCallback);
+		widget.configure(profile, ORC_ID, mockCallback);
 		
 		verifyConfigure(1);
+		verify(mockView).setCanEdit(true);
 	}
 	
 	@Test
+	public void testConfigureNoEmail() {
+		// should not cause an error
+		profile.setEmails(null);
+		
+		widget.configure(profile, ORC_ID, mockCallback);
+	}
+
+	@Test
+	public void testConfigureNotOwner() {
+		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(null); //anonymous
+		widget.configure(profile, ORC_ID, mockCallback);
+		
+		verifyConfigure(1);
+		verify(mockView).setCanEdit(false);
+	}
+
+	@Test
 	public void testOnCancel() {
-		widget.configure(profile, mockCallback);
+		widget.configure(profile, ORC_ID, mockCallback);
 		widget.onCancel();
 		
 		verifyConfigure(2);
@@ -172,7 +193,7 @@ public class UserProfileEditorWidgetImplTest {
 
 	@Test
 	public void testOnSave() {
-		widget.configure(profile, mockCallback);
+		widget.configure(profile, null, mockCallback);
 		widget.onSave();
 		
 		verify(mockSynAlert, times(2)).clear();
@@ -194,7 +215,7 @@ public class UserProfileEditorWidgetImplTest {
 		Exception ex = new Exception("An error");
 		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).updateMyUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 
-		widget.configure(profile, mockCallback);
+		widget.configure(profile, ORC_ID, mockCallback);
 		widget.onSave();
 		
 		verify(mockSynAlert, times(2)).clear();
@@ -225,13 +246,13 @@ public class UserProfileEditorWidgetImplTest {
 	@Test
 	public void testConfigureNoProfileImage() {
 		profile.setProfilePicureFileHandleId(null);
-		widget.configure(profile, mockCallback);
-		verify(mockImageWidget).configure(null);
+		widget.configure(profile, ORC_ID, mockCallback);
+		verify(mockImageWidget).configure(profile.getOwnerId(), null);
 	}
 
 	@Test
 	public void testIsValid() {
-		widget.configure(profile, mockCallback);
+		widget.configure(profile, ORC_ID, mockCallback);
 		reset(mockView);
 		when(mockView.getUsername()).thenReturn("valid");
 		assertTrue(widget.isValid());
@@ -241,7 +262,7 @@ public class UserProfileEditorWidgetImplTest {
 
 	@Test
 	public void testIsValidShortUsername() {
-		widget.configure(profile, mockCallback);
+		widget.configure(profile, ORC_ID, mockCallback);
 		reset(mockView);
 		when(mockView.getUsername()).thenReturn("12");
 		assertFalse(widget.isValid());
@@ -252,7 +273,7 @@ public class UserProfileEditorWidgetImplTest {
 
 	@Test
 	public void testIsValidUsernameBadChars() {
-		widget.configure(profile, mockCallback);
+		widget.configure(profile, ORC_ID, mockCallback);
 		reset(mockView);
 		when(mockView.getUsername()).thenReturn("ABC@");
 		assertFalse(widget.isValid());
