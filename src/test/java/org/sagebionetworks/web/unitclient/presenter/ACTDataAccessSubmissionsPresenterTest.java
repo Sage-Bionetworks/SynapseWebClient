@@ -143,7 +143,8 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		when(mockACTAccessRequirement.getExpirationPeriod()).thenReturn(expirationPeriod);
 		when(mockACTAccessRequirement.getIsCertifiedUserRequired()).thenReturn(true);
 		when(mockACTAccessRequirement.getIsDUCRequired()).thenReturn(false);
-		when(mockACTAccessRequirement.getIsIDUPublic()).thenReturn(true);
+		when(mockACTAccessRequirement.getIsIDURequired()).thenReturn(true);
+		when(mockACTAccessRequirement.getIsIDUPublic()).thenReturn(true);		
 		when(mockACTAccessRequirement.getIsIRBApprovalRequired()).thenReturn(false);
 		when(mockACTAccessRequirement.getIsValidatedProfileRequired()).thenReturn(true);
 
@@ -161,6 +162,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		verify(mockView).setExpirationPeriod(expirationPeriod);
 		verify(mockView).setIsCertifiedUserRequired(true);
 		verify(mockView).setIsDUCRequired(false);
+		verify(mockView).setIsIDURequired(true);
 		verify(mockView).setIsIDUPublic(true);
 		verify(mockView).setIsIRBApprovalRequired(false);
 		verify(mockView).setIsValidatedProfileRequired(true);

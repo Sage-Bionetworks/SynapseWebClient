@@ -165,6 +165,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 
 						view.setIsCertifiedUserRequired(actAccessRequirement.getIsCertifiedUserRequired());
 						view.setIsDUCRequired(actAccessRequirement.getIsDUCRequired());
+						view.setIsIDURequired(actAccessRequirement.getIsIDURequired());
 						view.setIsIDUPublic(actAccessRequirement.getIsIDUPublic());
 						view.setIsIRBApprovalRequired(actAccessRequirement.getIsIRBApprovalRequired());
 						view.setIsValidatedProfileRequired(actAccessRequirement.getIsValidatedProfileRequired());

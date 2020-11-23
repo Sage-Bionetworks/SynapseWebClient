@@ -74,6 +74,8 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	@UiField
 	CheckBox intendedDataUsePublicCheckbox;
 	@UiField
+	CheckBox iduCheckbox;
+	@UiField
 	Div subjectsContainer;
 	@UiField
 	TextBox expirationPeriodTextbox;
@@ -225,6 +227,11 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	@Override
 	public void setIsDUCRequired(boolean value) {
 		ducCheckbox.setValue(value);
+	}
+
+	@Override
+	public void setIsIDURequired(boolean value) {
+		iduCheckbox.setValue(value);
 	}
 
 	@Override

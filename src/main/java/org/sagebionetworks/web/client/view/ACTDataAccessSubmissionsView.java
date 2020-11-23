@@ -31,6 +31,8 @@ public interface ACTDataAccessSubmissionsView extends IsWidget, SynapseView {
 	void setIsCertifiedUserRequired(boolean value);
 
 	void setIsDUCRequired(boolean value);
+	
+	void setIsIDURequired(boolean value);
 
 	void setIsIDUPublic(boolean value);
 
@@ -59,6 +61,4 @@ public interface ACTDataAccessSubmissionsView extends IsWidget, SynapseView {
 
 		void onCreatedOnClick();
 	}
-
-
 }
