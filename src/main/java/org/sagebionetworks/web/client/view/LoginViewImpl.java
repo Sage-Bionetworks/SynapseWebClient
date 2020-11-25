@@ -132,21 +132,14 @@ public class LoginViewImpl extends Composite implements LoginView {
 	}
 	
 	// will interact with Page Progress widget in the future
-	public void onFormComplete() {
-		takePledgeButton.setEnabled(true);
-	}
-	public void onFormIncomplete() {
-		takePledgeButton.setEnabled(false);
+	public void onFormChange(boolean completed) {
+		takePledgeButton.setEnabled(completed);
 	}
 	
 	private static native void _showTermsOfUse(Element el, LoginViewImpl v) /*-{
 		try {
 			function cb(completed) {
-				if (completed) {
-					v.@org.sagebionetworks.web.client.view.LoginViewImpl::onFormComplete()();
-				} else {
-					v.@org.sagebionetworks.web.client.view.LoginViewImpl::onFormIncomplete()();
-				}				
+				v.@org.sagebionetworks.web.client.view.LoginViewImpl::onFormChange(Z)(completed);
 			}
 			var props = {
 			  	onFormChange: cb,
