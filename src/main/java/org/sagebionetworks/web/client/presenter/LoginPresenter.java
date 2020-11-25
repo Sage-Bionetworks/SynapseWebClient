@@ -12,10 +12,10 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WebConstants;
+
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
@@ -39,38 +39,37 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		view.setPresenter(this);
 	}
 
-	private Callback getAcceptTermsOfUseCallback() {
-		return () -> {
-			synAlert.clear();
-			view.showLoggingInLoader();
-			authenticationController.signTermsOfUse(true, new AsyncCallback<Void>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					synAlert.handleException(caught);
-					view.showLogin();
-				}
+	@Override
+	public void onAcceptTermsOfUse() {
+		synAlert.clear();
+		view.showLoggingInLoader();
+		authenticationController.signTermsOfUse(true, new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+				view.showLogin();
+			}
 
-				@Override
-				public void onSuccess(Void result) {
-					// Have to get the UserSessionData again,
-					// since it won't contain the UserProfile if the terms haven't been signed
-					synAlert.clear();
-					authenticationController.initializeFromExistingSessionCookie(new AsyncCallback<UserProfile>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							synAlert.handleException(caught);
-							view.showLogin();
-						}
+			@Override
+			public void onSuccess(Void result) {
+				// Have to get the UserSessionData again,
+				// since it won't contain the UserProfile if the terms haven't been signed
+				synAlert.clear();
+				authenticationController.initializeFromExistingSessionCookie(new AsyncCallback<UserProfile>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						synAlert.handleException(caught);
+						view.showLogin();
+					}
 
-						@Override
-						public void onSuccess(UserProfile result) {
-							// Signed ToU. Check for temp username, passing record, and then forward
-							userAuthenticated();
-						}
-					});
-				}
-			});
-		};
+					@Override
+					public void onSuccess(UserProfile result) {
+						// Signed ToU. Check for temp username, passing record, and then forward
+						userAuthenticated();
+					}
+				});
+			}
+		});
 	}
 
 	@Override
@@ -158,7 +157,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	public void showTermsOfUse(boolean isSigned) {
 		synAlert.clear();
 		view.hideLoggingInLoader();
-		view.showTermsOfUse(isSigned, getAcceptTermsOfUseCallback());
+		view.showTermsOfUse(isSigned);
 	}
 
 	public void userAuthenticated() {
