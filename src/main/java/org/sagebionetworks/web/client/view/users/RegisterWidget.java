@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -20,6 +21,7 @@ public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidg
 	private GWTWrapper gwt;
 	private SynapseAlert synAlert;
 	private String encodedMembershipInvtnSignedToken;
+	private Callback sentEmailCallback;
 
 	@Inject
 	public RegisterWidget(RegisterWidgetView view, UserAccountServiceAsync userService, GWTWrapper gwt, SynapseAlert synAlert) {
@@ -59,7 +61,11 @@ public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidg
 			@Override
 			public void onSuccess(Void result) {
 				view.enableRegisterButton(true);
-				view.showInfo(DisplayConstants.ACCOUNT_EMAIL_SENT);
+				if (sentEmailCallback != null) {
+					sentEmailCallback.invoke();
+				} else {
+					view.showInfo(DisplayConstants.ACCOUNT_EMAIL_SENT);	
+				}				
 				view.clear();
 			}
 
@@ -75,6 +81,9 @@ public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidg
 		});
 	}
 
+	public void setSentEmailCallback(Callback cb) {
+		sentEmailCallback = cb;
+	}
 	@Override
 	public String getEncodedMembershipInvtnSignedToken() {
 		return encodedMembershipInvtnSignedToken;

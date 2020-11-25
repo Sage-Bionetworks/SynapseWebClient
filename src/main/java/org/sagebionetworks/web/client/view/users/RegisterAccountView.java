@@ -14,6 +14,8 @@ public interface RegisterAccountView extends IsWidget {
 
 	void setGoogleRegisterButtonEnabled(boolean enabled);
 
+	void showEmailSentUI(boolean visible);
+	
 	public interface Presenter {
 		void checkUsernameAvailable(String username);
 	}

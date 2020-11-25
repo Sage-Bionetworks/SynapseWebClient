@@ -10,11 +10,11 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.view.users.RegisterWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
+
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -37,8 +37,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	org.gwtbootstrap3.client.ui.Button dashboardBtn;
 	@UiField
 	Div dashboardUI;
-	@UiField
-	Div registerUI;
 	@UiField
 	Div loginUI;
 
@@ -72,8 +70,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	Heading collaborateHeading;
 	@UiField
 	Heading userDisplayName;
-	@UiField
-	Div registerWidgetContainer;
 
 	private Header headerWidget;
 	UserBadge userBadge;
@@ -81,7 +77,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	LoginWidget loginWidget;
 
 	@Inject
-	public HomeViewImpl(HomeViewImplUiBinder binder, Header headerWidget, final GlobalApplicationState globalApplicationState, final AuthenticationController authController, UserBadge userBadge, RegisterWidget registerWidget, LoginWidget loginWidget) {
+	public HomeViewImpl(HomeViewImplUiBinder binder, Header headerWidget, final GlobalApplicationState globalApplicationState, final AuthenticationController authController, UserBadge userBadge, LoginWidget loginWidget) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.userBadge = userBadge;
@@ -104,7 +100,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 				globalApplicationState.getPlaceChanger().goTo(new Profile(authController.getCurrentUserPrincipalId(), ProfileArea.PROJECTS));
 			}
 		});
-		registerWidgetContainer.add(registerWidget.asWidget());
 		// Other links
 		dreamChallengesBox.addClickHandler(new ClickHandler() {
 			@Override
@@ -201,7 +196,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 
 	@Override
 	public void showRegisterUI() {
-		registerUI.setVisible(true);
+		showLoginUI();
 	}
 
 	private void setUserProfilePicture(UserProfile profile) {
@@ -240,7 +235,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	public void clear() {
 		userBadge.clearState();
 		dashboardUI.setVisible(false);
-		registerUI.setVisible(false);
 		loginUI.setVisible(false);
 		userDisplayName.setText("");
 	}
