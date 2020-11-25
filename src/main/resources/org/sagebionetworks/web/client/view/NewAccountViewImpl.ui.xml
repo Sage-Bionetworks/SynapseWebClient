@@ -52,8 +52,6 @@
 			</b:Column>
 		</b:Row>
 		<bh:Div ui:field="synAlertContainer"/>
-		<b:Button ui:field="registerBtn"
-			addStyleNames="margin-top-10" type="PRIMARY" size="LARGE"
-			pull="RIGHT" dataLoadingText="Register...">Register</b:Button>
+		<bh:Div ui:field="pageProgressContainer"/>
 	</bh:Div>
 </ui:UiBinder> 

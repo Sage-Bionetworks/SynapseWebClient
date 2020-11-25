@@ -1,14 +1,19 @@
 package org.sagebionetworks.web.client.view;
 
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.ValidationUtils;
+import org.sagebionetworks.web.client.place.users.RegisterAccount;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.pageprogress.PageProgressWidget;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -38,27 +43,37 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 	Input password2Field;
 
 	@UiField
-	Button registerBtn;
+	Div pageProgressContainer;
+
 	@UiField
 	Div synAlertContainer;
 	private Presenter presenter;
 	private Header headerWidget;
-	
+	private PageProgressWidget pageProgressWidget;
+	private GlobalApplicationState globalAppState;
 	private SynapseAlert synAlert;
 
 	@Inject
-	public NewAccountViewImpl(NewAccountViewImplUiBinder binder, Header headerWidget) {
+	public NewAccountViewImpl(NewAccountViewImplUiBinder binder, Header headerWidget, PageProgressWidget pageProgressWidget, GlobalApplicationState globalAppState) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
+		this.pageProgressWidget = pageProgressWidget;
+		this.globalAppState = globalAppState;
 		headerWidget.configure();
 		init();
 	}
 
+	private void onRegisterClick() {
+		if (checkUsernameFormat() && checkPassword1() && checkPassword2() && checkPasswordMatch()) {
+			// formatting is ok. submit to presenter (will fail if one is taken)
+			presenter.completeRegistration(userNameField.getValue(), firstNameField.getValue(), lastNameField.getValue(), password1Field.getValue());
+		}
+	}
 	// Apply to all input fields if clickEvent is enter
 	public void init() {
 		KeyDownHandler register = event -> {
 			if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-				registerBtn.click();
+				onRegisterClick();
 			}
 		};
 		emailField.addKeyDownHandler(register);
@@ -68,12 +83,6 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 		password1Field.addKeyDownHandler(register);
 		password2Field.addKeyDownHandler(register);
 
-		registerBtn.addClickHandler(event -> {
-			if (checkUsernameFormat() && checkPassword1() && checkPassword2() && checkPasswordMatch()) {
-				// formatting is ok. submit to presenter (will fail if one is taken)
-				presenter.completeRegistration(userNameField.getValue(), firstNameField.getValue(), lastNameField.getValue(), password1Field.getValue());
-			}
-		});
 		userNameField.addBlurHandler(event -> {
 			checkUsernameFormat();
 		});
@@ -83,6 +92,15 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 		password2Field.addBlurHandler(event -> {
 			if (checkPassword2() && checkPasswordMatch() && checkUsernameFormat());			
 		});
+		
+		pageProgressContainer.add(pageProgressWidget);
+		Callback backBtnCallback = () -> {
+			globalAppState.getPlaceChanger().goTo(new RegisterAccount(ClientProperties.DEFAULT_PLACE_TOKEN));
+		};
+		Callback forwardBtnCallback = () -> {
+			onRegisterClick();
+		};
+		pageProgressWidget.configure(WebConstants.SYNAPSE_GREEN, 50, "Back", backBtnCallback, "Next", forwardBtnCallback, true);
 	}
 
 	private boolean checkUsernameFormat() {
@@ -111,11 +129,6 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 
 	@Override
 	public void setLoading(boolean loading) {
-		if (!loading) {
-			this.registerBtn.state().reset();
-		} else {
-			this.registerBtn.state().loading();
-		}
 	}
 
 	@Override

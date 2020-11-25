@@ -1,14 +1,19 @@
 package org.sagebionetworks.web.client.view;
 
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.InfoAlert;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
+import org.sagebionetworks.web.client.widget.pageprogress.PageProgressWidget;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -40,29 +45,40 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@UiField
 	Div synAlertContainer;
 	@UiField
-	Button takePledgeButton;
+	Div pageProgressContainer;
 	
 	private Presenter presenter;
 	private LoginWidget loginWidget;
 	private Header headerWidget;
 	SynapseJSNIUtils jsniUtils;
-	
+	PageProgressWidget pageProgressWidget;
+	GlobalApplicationState globalAppState;
+	Callback backBtnCallback, forwardBtnCallback;
 	public interface LoginViewImplBinder extends UiBinder<Widget, LoginViewImpl> {
 	}	
 
 	@Inject
-	public LoginViewImpl(LoginViewImplBinder uiBinder, Header headerWidget, LoginWidget loginWidget, SynapseJSNIUtils jsniUtils) {
+	public LoginViewImpl(LoginViewImplBinder uiBinder, Header headerWidget, LoginWidget loginWidget, SynapseJSNIUtils jsniUtils, PageProgressWidget pageProgressWidget, GlobalApplicationState globalAppState) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.loginWidget = loginWidget;
 		this.headerWidget = headerWidget;
+		this.pageProgressWidget = pageProgressWidget;
+		this.globalAppState = globalAppState;
 		this.jsniUtils = jsniUtils;
 		headerWidget.configure();
-		
-		takePledgeButton.addClickHandler(event -> {
+		pageProgressContainer.add(pageProgressWidget);
+		backBtnCallback = () -> {
+			globalAppState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
+		};
+		forwardBtnCallback = () -> {
 			presenter.onAcceptTermsOfUse();
-		});
+		};
 	}
 
+	private void reconfigurePageProgress(boolean enableForward) {
+		pageProgressWidget.configure(WebConstants.SYNAPSE_GREEN, 75, "Back", backBtnCallback, "Next", forwardBtnCallback, enableForward);
+	}
+	
 	@Override
 	public void setPresenter(Presenter loginPresenter) {
 		this.presenter = loginPresenter;
@@ -123,7 +139,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 		
 		if (!hasAccepted) {
 			termsOfUseView.setVisible(true);
-			takePledgeButton.setEnabled(false);
+			reconfigurePageProgress(false);
 			jsniUtils.unmountComponentAtNode(termsOfUseContainer.getElement());
 			_showTermsOfUse(termsOfUseContainer.getElement(), this);
 		} else {
@@ -131,9 +147,8 @@ public class LoginViewImpl extends Composite implements LoginView {
 		}		
 	}
 	
-	// will interact with Page Progress widget in the future
 	public void onFormChange(boolean completed) {
-		takePledgeButton.setEnabled(completed);
+		reconfigurePageProgress(completed);		
 	}
 	
 	private static native void _showTermsOfUse(Element el, LoginViewImpl v) /*-{

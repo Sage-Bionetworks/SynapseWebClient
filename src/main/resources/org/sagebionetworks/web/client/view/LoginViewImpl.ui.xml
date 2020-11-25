@@ -40,7 +40,7 @@
 					visible="false" />
 			<bh:Div ui:field="termsOfUseView">
 				<bh:Div ui:field="termsOfUseContainer" />
-				<b:Button ui:field="takePledgeButton" type="PRIMARY" pull="RIGHT" addStyleNames="margin-top-10 margin-bottom-40" text="Accept Terms and Conditions for Use" />	
+				<bh:Div ui:field="pageProgressContainer"/>
 			</bh:Div>
 			
 		</div> <!-- close class="container" -->
