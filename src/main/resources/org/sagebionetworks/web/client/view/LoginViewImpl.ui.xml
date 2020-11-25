@@ -33,7 +33,8 @@
 				addStyleNames="displayInline center center-block margin-left-5" />
 			<w:InfoAlert ui:field="acceptedTermsOfUseView"
 					alertType="SUCCESS" icon="CHECK_SQUARE"
-					linkText="You've accepted the Terms and Conditions for Use"
+					message="You've accepted the Synapse Terms and Conditions for Use"
+					linkText="View Terms"
 					linkTarget="_blank"
 					linkHref="https://s3.amazonaws.com/static.synapse.org/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf?v=5"
 					visible="false" />
