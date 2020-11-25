@@ -3,11 +3,13 @@ package org.sagebionetworks.web.client.view;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.ValidationUtils;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.header.Header;
-import com.google.gwt.dom.client.DivElement;
+
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -36,32 +38,13 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 	Input password2Field;
 
 	@UiField
-	DivElement firstName;
-	@UiField
-	DivElement lastName;
-	@UiField
-	DivElement userName;
-	@UiField
-	DivElement password1;
-	@UiField
-	DivElement password2;
-
-	@UiField
-	DivElement firstNameError;
-	@UiField
-	DivElement lastNameError;
-	@UiField
-	DivElement userNameError;
-	@UiField
-	DivElement password1Error;
-	@UiField
-	DivElement password2Error;
-
-	@UiField
 	Button registerBtn;
-
+	@UiField
+	Div synAlertContainer;
 	private Presenter presenter;
 	private Header headerWidget;
+	
+	private SynapseAlert synAlert;
 
 	@Inject
 	public NewAccountViewImpl(NewAccountViewImplUiBinder binder, Header headerWidget) {
@@ -92,23 +75,25 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 			}
 		});
 		userNameField.addBlurHandler(event -> {
-			if (checkUsernameFormat())
-				presenter.checkUsernameAvailable(userNameField.getValue());
+			checkUsernameFormat();
 		});
-		password1Field.addBlurHandler(event -> checkPassword1());
-		password2Field.addBlurHandler(event -> checkPassword2());
+		password1Field.addBlurHandler(event -> {
+			if (checkPassword1() && checkUsernameFormat());
+		});
+		password2Field.addBlurHandler(event -> {
+			if (checkPassword2() && checkPasswordMatch() && checkUsernameFormat());			
+		});
 	}
 
 	private boolean checkUsernameFormat() {
-		DisplayUtils.hideFormError(userName, userNameError);
+		synAlert.clear();
 		if (ValidationUtils.isValidUsername(userNameField.getValue())) {
+			presenter.checkUsernameAvailable(userNameField.getValue());
 			return true;
 		} else {
-			userNameError.setInnerHTML(DisplayConstants.USERNAME_FORMAT_ERROR);
-			DisplayUtils.showFormError(userName, userNameError);
+			synAlert.showError(DisplayConstants.USERNAME_FORMAT_ERROR);
 			return false;
 		}
-
 	}
 
 	@Override
@@ -149,45 +134,46 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 		password1Field.setValue("");
 		password2Field.setValue("");
 		emailField.setValue("");
-		DisplayUtils.hideFormError(userName, userNameError);
-		DisplayUtils.hideFormError(password1, password1Error);
-		DisplayUtils.hideFormError(password2, password2Error);
+		synAlert.clear();
 	}
 
 	@Override
 	public void markUsernameUnavailable() {
-		userNameError.setInnerHTML(DisplayConstants.ERROR_USERNAME_ALREADY_EXISTS);
-		DisplayUtils.showFormError(userName, userNameError);
+		synAlert.showError(DisplayConstants.ERROR_USERNAME_ALREADY_EXISTS);		
 	}
 
 	private boolean checkPassword1() {
-		DisplayUtils.hideFormError(password1, password1Error);
+		synAlert.clear();
 		if (!DisplayUtils.isDefined(password1Field.getText())) {
-			password1Error.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
-			DisplayUtils.showFormError(password1, password1Error);
+			synAlert.showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
 			return false;
 		} else
 			return true;
 	}
 
 	private boolean checkPassword2() {
-		DisplayUtils.hideFormError(password2, password2Error);
+		synAlert.clear();
 		if (!DisplayUtils.isDefined(password2Field.getText())) {
-			password2Error.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
-			DisplayUtils.showFormError(password2, password2Error);
+			synAlert.showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);			
 			return false;
 		} else
 			return true;
 	}
 
 	private boolean checkPasswordMatch() {
-		DisplayUtils.hideFormError(password2, password2Error);
+		synAlert.clear();
 		if (!password1Field.getValue().equals(password2Field.getValue())) {
-			password2Error.setInnerHTML(DisplayConstants.PASSWORDS_MISMATCH);
-			DisplayUtils.showFormError(password2, password2Error);
+			synAlert.showError(DisplayConstants.PASSWORDS_MISMATCH);
 			return false;
 		} else
 			return true;
+	}
+	
+	@Override
+	public void setSynAlert(SynapseAlert synAlert) {
+		this.synAlert = synAlert;
+		synAlertContainer.clear();
+		synAlertContainer.add(synAlert);
 	}
 
 	@Override

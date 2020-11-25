@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
@@ -13,6 +14,8 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.NewAccountView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -26,16 +29,19 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 	private UserAccountServiceAsync userAccountService;
 	private AuthenticationController authController;
 	private AccountCreationToken accountCreationToken;
+	private SynapseAlert synAlert;
 
 	@Inject
-	public NewAccountPresenter(NewAccountView view, SynapseClientAsync synapseClient, GlobalApplicationState globalAppState, UserAccountServiceAsync userAccountService, AuthenticationController authController) {
+	public NewAccountPresenter(NewAccountView view, SynapseClientAsync synapseClient, GlobalApplicationState globalAppState, UserAccountServiceAsync userAccountService, AuthenticationController authController, SynapseAlert synAlert) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		this.synAlert = synAlert;
 		fixServiceEntryPoint(synapseClient);
 		this.globalAppState = globalAppState;
 		this.userAccountService = userAccountService;
 		fixServiceEntryPoint(userAccountService);
 		this.authController = authController;
+		view.setSynAlert(synAlert);
 		view.setPresenter(this);
 	}
 
@@ -53,13 +59,14 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 		}
 		view.clear();
 		this.view.setPresenter(this);
+		synAlert.clear();
 		synapseClient.hexDecodeAndDeserializeAccountCreationToken(place.toToken(), new AsyncCallback<AccountCreationToken>() {
 			@Override
 			public void onSuccess(AccountCreationToken result) {
 				accountCreationToken = result;
 				if (!accountCreationTokenIsValid()) {
 					view.setLoading(false);
-					view.showErrorMessage(DisplayConstants.ACCOUNT_CREATION_FAILURE + " token is not valid");
+					synAlert.showError(DisplayConstants.ACCOUNT_CREATION_FAILURE + " Token is invalid.");					
 					return;
 				}
 				String email = accountCreationToken.getEmailValidationSignedToken().getEmail();
@@ -70,7 +77,7 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setLoading(false);
-				view.showErrorMessage(DisplayConstants.ACCOUNT_CREATION_FAILURE + caught.getMessage());
+				synAlert.showError(DisplayConstants.ACCOUNT_CREATION_FAILURE + " Token is invalid: " + caught.getMessage());
 			}
 		});
 	}
@@ -82,6 +89,7 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 	@Override
 	public void completeRegistration(String userName, String fName, String lName, String password) {
 		view.setLoading(true);
+		synAlert.clear();
 		EmailValidationSignedToken emailValidationSignedToken = accountCreationToken.getEmailValidationSignedToken();
 		userAccountService.createUserStep2(userName.trim(), fName.trim(), lName.trim(), password, emailValidationSignedToken, new AsyncCallback<String>() {
 			@Override
@@ -98,7 +106,7 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setLoading(false);
-				view.showErrorMessage(DisplayConstants.ACCOUNT_CREATION_FAILURE + caught.getMessage());
+				synAlert.handleException(caught);				
 			}
 		});
 	}

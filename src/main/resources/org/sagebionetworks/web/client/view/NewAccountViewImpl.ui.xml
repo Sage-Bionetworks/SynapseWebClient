@@ -5,77 +5,53 @@
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	<g:HTMLPanel>
-		<div class="container margin-top-15">
-			<div class="row">
-				<div class="col-sm-10 col-sm-offset-1">
-					<h2 class="margin-bottom-40">Register with Synapse</h2>
-					<div class="margin-bottom-40" ui:field="contentHtml" />
-					<div ui:field="registrationForm">
-						<div class="form-horizontal">
-							<div ui:field="email" class="form-group row">
-								<label class="col-sm-3 control-label">Email</label>
-								<div class="col-sm-9">
-									<b:TextBox ui:field="emailField" enabled="false" />
-								</div>
-							</div>
-							<div ui:field="userName" class="form-group row">
-								<label class="col-sm-3 control-label">Username</label>
-								<div class="col-sm-9">
-									<b:TextBox ui:field="userNameField"
-										placeholder="Enter username" />
-									<div ui:field="userNameError" style="display:none"
-										class="help-block"></div>
-								</div>
-							</div>
-							<div ui:field="firstName" class="form-group row">
-								<label class="col-sm-3 control-label">First name</label>
-								<div class="col-sm-9">
-									<b:TextBox ui:field="firstNameField"
-										placeholder="Enter first name (optional)" />
-									<div ui:field="firstNameError" style="display:none"
-										class="help-block"></div>
-								</div>
-							</div>
-							<div ui:field="lastName" class="form-group row">
-								<label class="col-sm-3 control-label">Last name</label>
-								<div class="col-sm-9">
-									<b:TextBox ui:field="lastNameField"
-										placeholder="Enter last name (optional)" />
-									<div ui:field="lastNameError" style="display:none"
-										class="help-block"></div>
-								</div>
-							</div>
-							<div ui:field="password1" class="form-group row">
-								<label class="col-sm-3 control-label">Password</label>
-								<div class="col-sm-9">
-									<b:Input type="PASSWORD" ui:field="password1Field"
-										placeholder="Enter password" />
-									<div ui:field="password1Error" style="display:none"
-										class="help-block"></div>
-								</div>
-							</div>
-							<div ui:field="password2" class="form-group row">
-								<label class="col-sm-3 control-label">Confirm password</label>
-								<div class="col-sm-9">
-									<b:Input type="PASSWORD" ui:field="password2Field"
-										placeholder="Confirm password" />
-									<div ui:field="password2Error" style="display:none"
-										class="help-block"></div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row margin-bottom-40">
-				<div class="col-sm-10 col-sm-offset-1">
-					<b:Button ui:field="registerBtn"
-						addStyleNames="margin-top-10" type="PRIMARY" size="LARGE"
-						pull="RIGHT" dataLoadingText="Register...">Register</b:Button>
-				</div>
-			</div>
-		</div>
-	</g:HTMLPanel>
-
+	<bh:Div addStyleNames="container" marginTop="20">
+		<b:Heading size="H3" text="Register with Synapse" />
+		<b:Row>
+			<b:Column size="MD_4 SM_6 XS_12" marginTop="20">
+				<b:FormGroup>
+					<b:FormLabel>First Name</b:FormLabel>
+					<b:TextBox ui:field="firstNameField" />
+				</b:FormGroup>
+			</b:Column>
+			<b:Column size="MD_4 SM_6 XS_12" marginTop="20">
+				<b:FormGroup>
+					<b:FormLabel>Last Name</b:FormLabel>
+					<b:TextBox ui:field="lastNameField"/>
+				</b:FormGroup>
+			</b:Column>
+			<b:Column size="MD_4 SM_6 XS_12" marginTop="20">
+				<b:FormGroup>
+					<b:FormLabel>Email Address</b:FormLabel>
+					<b:Icon type="ASTERISK" addStyleNames="small-icon margin-left-2 synapse-green" />
+					<b:TextBox ui:field="emailField" readOnly="true"/>
+				</b:FormGroup>
+			</b:Column>
+			<b:Column size="MD_4 SM_6 XS_12" marginTop="20">
+				<b:FormGroup>
+					<b:FormLabel>Username</b:FormLabel>
+					<b:Icon type="ASTERISK" addStyleNames="small-icon margin-left-2 synapse-green" />
+					<b:TextBox ui:field="userNameField"/>
+				</b:FormGroup>
+			</b:Column>
+			<b:Column size="MD_4 SM_6 XS_12" marginTop="20">
+				<b:FormGroup>
+					<b:FormLabel>Password</b:FormLabel>
+					<b:Icon type="ASTERISK" addStyleNames="small-icon margin-left-2 synapse-green" />
+					<b:Input type="PASSWORD" ui:field="password1Field" />
+				</b:FormGroup>
+			</b:Column>
+			<b:Column size="MD_4 SM_6 XS_12" marginTop="20">
+				<b:FormGroup>
+					<b:FormLabel>Confirm Password</b:FormLabel>
+					<b:Icon type="ASTERISK" addStyleNames="small-icon margin-left-2 synapse-green" />
+					<b:Input type="PASSWORD" ui:field="password2Field" />
+				</b:FormGroup>
+			</b:Column>
+		</b:Row>
+		<bh:Div ui:field="synAlertContainer"/>
+		<b:Button ui:field="registerBtn"
+			addStyleNames="margin-top-10" type="PRIMARY" size="LARGE"
+			pull="RIGHT" dataLoadingText="Register...">Register</b:Button>
+	</bh:Div>
 </ui:UiBinder> 
