@@ -95,8 +95,7 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 			@Override
 			public void onSuccess(String sessionToken) {
 				view.setLoading(false);
-				// success, send to login place to continue login process (sign terms of use...)
-				view.showInfo(DisplayConstants.ACCOUNT_CREATED);
+				// success, send to login place to continue login process (sign terms of use)
 				if (accountCreationToken.getEncodedMembershipInvtnSignedToken() != null) {
 					globalAppState.setLastPlace(new EmailInvitation(accountCreationToken.getEncodedMembershipInvtnSignedToken()));
 				}
