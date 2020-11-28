@@ -53,6 +53,10 @@ public class CreateManagedACTAccessRequirementStep2ViewImpl implements CreateMan
 		});
 		iduCheckbox.addValueChangeHandler(event -> {
 			intendedDataUsePublicCheckbox.setEnabled(event.getValue());
+			// SWC-5319: if IDU is optional (required==false), clear the IDU public checkbox
+			if (!event.getValue() ) {
+				intendedDataUsePublicCheckbox.setValue(false);
+			}
 		});
 	}
 
