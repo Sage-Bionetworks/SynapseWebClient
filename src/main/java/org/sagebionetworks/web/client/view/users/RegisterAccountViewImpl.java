@@ -4,14 +4,20 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTTimer;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.ValidationUtils;
+import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.pageprogress.PageProgressWidget;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.shared.WebConstants;
+
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.http.client.URL;
@@ -37,6 +43,13 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	Div googleSynAlertContainer;
 	@UiField
 	Div googleSynapseAccountCreationUI;
+	@UiField
+	Div createSynapseAccountUI;
+	@UiField
+	Div emailSentUI;
+	@UiField
+	Div pageProgressContainer;
+	
 	SynapseAlert synAlert;
 	GWTTimer timer;
 	Presenter presenter;
@@ -46,7 +59,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	public static final String GOOGLE_OAUTH_WITH_STATE_CALLBACK_URL = GOOGLE_OAUTH_CALLBACK_URL + "&state=";
 
 	@Inject
-	public RegisterAccountViewImpl(RegisterAccountViewImplUiBinder binder, GlobalApplicationState globalAppState, Header headerWidget, GWTTimer timer, SageImageBundle sageImageBundle) {
+	public RegisterAccountViewImpl(RegisterAccountViewImplUiBinder binder, GlobalApplicationState globalAppState, Header headerWidget, GWTTimer timer, SageImageBundle sageImageBundle, PageProgressWidget pageProgressWidget) {
 		initWidget(binder.createAndBindUi(this));
 		this.timer = timer;
 		this.headerWidget = headerWidget;
@@ -78,6 +91,21 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 				Window.Location.assign(RegisterAccountViewImpl.GOOGLE_OAUTH_WITH_STATE_CALLBACK_URL + encodedUsername);
 			}
 		});
+		
+		pageProgressContainer.add(pageProgressWidget);
+		Callback backBtnCallback = () -> {
+			showEmailSentUI(false);
+		};
+		Callback forwardBtnCallback = () -> {
+			globalAppState.getPlaceChanger().goTo(new Home(ClientProperties.DEFAULT_PLACE_TOKEN));
+		};
+		pageProgressWidget.configure(WebConstants.SYNAPSE_GREEN, 20, "Back", backBtnCallback, "Go to Home", forwardBtnCallback, true);
+	}
+	
+	@Override
+	public void showEmailSentUI(boolean visible) {
+		emailSentUI.setVisible(visible);
+		createSynapseAccountUI.setVisible(!visible);
 	}
 
 	private boolean checkUsernameFormat() {

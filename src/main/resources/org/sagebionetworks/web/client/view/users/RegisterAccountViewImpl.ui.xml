@@ -8,7 +8,7 @@
 
 	<g:HTMLPanel>
 		<div class="container margin-top-15 min-height-400">
-			<bh:Div width="365px" addStyleNames="center-in-div">
+			<bh:Div width="365px" addStyleNames="center-in-div" ui:field="createSynapseAccountUI">
 				<b:Heading size="H2" text="Create Synapse Account"
 					addStyleNames="text-align-center margin-top-20" />
 				<bh:Div width="100%"
@@ -37,6 +37,11 @@
 					<b:Anchor text="&lt; Back to Sign In"
 						addStyleNames="synapse-green" href="#!LoginPlace:0" />
 				</b:Heading>
+			</bh:Div>
+			<bh:Div ui:field="emailSentUI" visible="false" marginTop="40">
+				<b:Heading size="H3" text="Please check your email to finish creating your account" />
+				<bh:Paragraph addStyleNames="margin-top-30" text="We have sent you an email to the email address provided. Please check your email and click the provided link to activate your account." />
+				<bh:Div ui:field="pageProgressContainer"/>
 			</bh:Div>
 		</div>
 	</g:HTMLPanel>

@@ -527,6 +527,8 @@ import org.sagebionetworks.web.client.widget.login.LoginModalView;
 import org.sagebionetworks.web.client.widget.login.LoginModalViewImpl;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetView;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.pageprogress.PageProgressWidgetView;
+import org.sagebionetworks.web.client.widget.pageprogress.PageProgressWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationView;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationViewImpl;
 import org.sagebionetworks.web.client.widget.profile.EmailAddressesWidgetView;
@@ -1410,6 +1412,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EvaluationFinderView.class).to(EvaluationFinderViewImpl.class);
 		bind(SubmissionViewScopeWidgetView.class).to(SubmissionViewScopeWidgetViewImpl.class);
         bind(PersonalAccessTokensView.class).to(PersonalAccessTokensViewImpl.class);
-
+        bind(PageProgressWidgetView.class).to(PageProgressWidgetViewImpl.class);
     }
 }

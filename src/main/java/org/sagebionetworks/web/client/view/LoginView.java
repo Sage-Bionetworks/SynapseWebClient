@@ -15,7 +15,7 @@ public interface LoginView extends IsWidget, SynapseView {
 
 	void showLogin();
 
-	void showTermsOfUse(boolean hasAccepted, Callback callback);
+	void showTermsOfUse(boolean hasAccepted);
 
 	void setSynAlert(IsWidget w);
 
@@ -23,5 +23,6 @@ public interface LoginView extends IsWidget, SynapseView {
 		void goTo(Place place);
 
 		void goToLastPlace();
+		void onAcceptTermsOfUse();
 	}
 }

@@ -57,7 +57,7 @@ public class DisplayConstants {
 	public static final String ERROR_GENERIC_RELOAD = "An error occurred. Please try reloading the page.";
 	public static final String NO_HEADERS_FOUND = "No Headers were found on this page.";
 	public static final String ERROR_LOGIN_REQUIRED = "You will need to sign in for access to that resource.";
-	public static final String ERROR_ALL_FIELDS_REQUIRED = "All fields must first be properly fill in.";
+	public static final String ERROR_ALL_FIELDS_REQUIRED = "All required fields must first be properly fill in.";
 	public static final String ERROR_ALL_QUESTIONS_REQUIRED = "Please answer all of the questions and try again.";
 	public static final String BUTTON_DOWNLOAD = "Download";
 	public static final String ERROR_ENTITY_DELETE_FAILURE = "Deletion failed. ";

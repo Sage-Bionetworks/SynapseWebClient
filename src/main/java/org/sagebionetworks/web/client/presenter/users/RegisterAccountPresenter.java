@@ -40,6 +40,9 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 		fixServiceEntryPoint(synapseClient);
 		view.setRegisterWidget(registerWidget.asWidget());
 		view.setGoogleSynAlert(googleSynAlert);
+		registerWidget.setSentEmailCallback(() -> {
+			view.showEmailSentUI(true);
+		});
 	}
 
 	@Override
