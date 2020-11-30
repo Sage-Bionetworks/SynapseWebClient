@@ -28,5 +28,4 @@ public class RegisterAccount extends Place {
 			return new RegisterAccount(token);
 		}
 	}
-
 }

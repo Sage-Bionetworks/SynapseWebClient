@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.principal.AccountCreationToken;
@@ -28,6 +29,7 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.NewAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.NewAccountView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -42,6 +44,8 @@ public class NewAccountPresenterTest {
 	SynapseClientAsync mockSynapseClient;
 	AuthenticationController mockAuthController;
 	PlaceChanger mockPlaceChanger;
+	@Mock
+	SynapseAlert mockSynAlert;
 
 	String testSessionToken = "1239381foobar";
 
@@ -55,8 +59,9 @@ public class NewAccountPresenterTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockAuthController = mock(AuthenticationController.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
-		newAccountPresenter = new NewAccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockUserService, mockAuthController);
+		newAccountPresenter = new NewAccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockUserService, mockAuthController, mockSynAlert);
 		verify(mockView).setPresenter(newAccountPresenter);
+		verify(mockView).setSynAlert(mockSynAlert);
 
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_NAME.toString()), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_EMAIL.toString()), any(AsyncCallback.class));
@@ -150,9 +155,10 @@ public class NewAccountPresenterTest {
 		AsyncMockStubber.callSuccessWith(accountCreationToken).when(mockSynapseClient).hexDecodeAndDeserializeAccountCreationToken(anyString(), any(AsyncCallback.class));
 		newAccountPresenter.setPlace(newPlace);
 		String failureMessage = "test message";
-		AsyncMockStubber.callFailureWith(new Throwable(failureMessage)).when(mockUserService).createUserStep2(eq(userName.trim()), eq(firstName.trim()), eq(lastName.trim()), eq(password), any(EmailValidationSignedToken.class), any(AsyncCallback.class));
+		Throwable ex = new Throwable(failureMessage);
+		AsyncMockStubber.callFailureWith(ex).when(mockUserService).createUserStep2(eq(userName.trim()), eq(firstName.trim()), eq(lastName.trim()), eq(password), any(EmailValidationSignedToken.class), any(AsyncCallback.class));
 		newAccountPresenter.completeRegistration(userName, firstName, lastName, password);
 		verify(mockView).setLoading(false);
-		verify(mockView).showErrorMessage(DisplayConstants.ACCOUNT_CREATION_FAILURE + failureMessage);
+		verify(mockSynAlert).handleException(ex);
 	}
 }

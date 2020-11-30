@@ -1,19 +1,23 @@
 package org.sagebionetworks.web.client.view;
 
-import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.InfoAlert;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+import org.sagebionetworks.web.client.widget.pageprogress.PageProgressWidget;
+import org.sagebionetworks.web.shared.WebConstants;
+
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -29,23 +33,11 @@ public class LoginViewImpl extends Composite implements LoginView {
 
 	// terms of service view
 	@UiField
-	Div termsOfServiceView;
+	Div termsOfUseView;
 	@UiField
-	CheckBox actEthicallyCb;
+	Div termsOfUseContainer;	
 	@UiField
-	CheckBox protectPrivacyCb;
-	@UiField
-	CheckBox noHackCb;
-	@UiField
-	CheckBox shareCb;
-	@UiField
-	CheckBox responsibilityCb;
-	@UiField
-	CheckBox lawsCb;
-	@UiField
-	CheckBox responsibleDataUseCb;
-	@UiField
-	Button takePledgeButton;
+	InfoAlert acceptedTermsOfUseView;
 	@UiField
 	LoadingSpinner loadingUi;
 	@UiField
@@ -53,27 +45,40 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@UiField
 	Div synAlertContainer;
 	@UiField
-	InfoAlert acceptedTermsOfUse;
-
+	Div pageProgressContainer;
+	
 	private Presenter presenter;
 	private LoginWidget loginWidget;
 	private Header headerWidget;
-
-	public interface Binder extends UiBinder<Widget, LoginViewImpl> {
-	}
-
-	boolean toUInitialized;
-
+	SynapseJSNIUtils jsniUtils;
+	PageProgressWidget pageProgressWidget;
+	GlobalApplicationState globalAppState;
+	Callback backBtnCallback, forwardBtnCallback;
+	public interface LoginViewImplBinder extends UiBinder<Widget, LoginViewImpl> {
+	}	
 
 	@Inject
-	public LoginViewImpl(Binder uiBinder, Header headerWidget, LoginWidget loginWidget) {
+	public LoginViewImpl(LoginViewImplBinder uiBinder, Header headerWidget, LoginWidget loginWidget, SynapseJSNIUtils jsniUtils, PageProgressWidget pageProgressWidget, GlobalApplicationState globalAppState) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.loginWidget = loginWidget;
 		this.headerWidget = headerWidget;
+		this.pageProgressWidget = pageProgressWidget;
+		this.globalAppState = globalAppState;
+		this.jsniUtils = jsniUtils;
 		headerWidget.configure();
-		toUInitialized = false;
+		pageProgressContainer.add(pageProgressWidget);
+		backBtnCallback = () -> {
+			globalAppState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
+		};
+		forwardBtnCallback = () -> {
+			presenter.onAcceptTermsOfUse();
+		};
 	}
 
+	private void reconfigurePageProgress(boolean enableForward) {
+		pageProgressWidget.configure(WebConstants.SYNAPSE_GREEN, 75, "Back", backBtnCallback, "Next", forwardBtnCallback, enableForward);
+	}
+	
 	@Override
 	public void setPresenter(Presenter loginPresenter) {
 		this.presenter = loginPresenter;
@@ -125,59 +130,49 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@Override
 	public void clear() {
 		loginWidget.clear();
-		loginWidgetPanel.clear();
+		loginWidgetPanel.clear();		
 	}
-
+	
 	@Override
-	public void showTermsOfUse(boolean hasAccepted, Callback callback) {
+	public void showTermsOfUse(boolean hasAccepted) {
 		hideViews();
-		acceptedTermsOfUse.setVisible(hasAccepted);
-
-		// initialize checkboxes
-		actEthicallyCb.setValue(hasAccepted);
-		actEthicallyCb.setEnabled(!hasAccepted);
-		protectPrivacyCb.setValue(hasAccepted);
-		protectPrivacyCb.setEnabled(!hasAccepted);
-		noHackCb.setValue(hasAccepted);
-		noHackCb.setEnabled(!hasAccepted);
-		shareCb.setValue(hasAccepted);
-		shareCb.setEnabled(!hasAccepted);
-		responsibilityCb.setValue(hasAccepted);
-		responsibilityCb.setEnabled(!hasAccepted);
-		lawsCb.setValue(hasAccepted);
-		lawsCb.setEnabled(!hasAccepted);
-		responsibleDataUseCb.setValue(hasAccepted);
-		responsibleDataUseCb.setEnabled(!hasAccepted);
-
-		takePledgeButton.setVisible(!hasAccepted);
-
-		termsOfServiceView.setVisible(true);
-		// initialize if necessary
-		if (!toUInitialized) {
-			toUInitialized = true;
-			takePledgeButton.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					if (validatePledge()) {
-						callback.invoke();
-					} else {
-						showErrorMessage("To accept these Terms and Conditions for Use, you must first agree to all of the statements.");
-					}
-				}
-			});
+		
+		if (!hasAccepted) {
+			termsOfUseView.setVisible(true);
+			reconfigurePageProgress(false);
+			jsniUtils.unmountComponentAtNode(termsOfUseContainer.getElement());
+			_showTermsOfUse(termsOfUseContainer.getElement(), this);
+		} else {
+			acceptedTermsOfUseView.setVisible(true);
+		}		
+	}
+	
+	public void onFormChange(boolean completed) {
+		reconfigurePageProgress(completed);		
+	}
+	
+	private static native void _showTermsOfUse(Element el, LoginViewImpl v) /*-{
+		try {
+			function cb(completed) {
+				v.@org.sagebionetworks.web.client.view.LoginViewImpl::onFormChange(Z)(completed);
+			}
+			var props = {
+			  	onFormChange: cb,
+			};
+			$wnd.ReactDOM.render($wnd.React.createElement(
+					$wnd.SRC.SynapseComponents.TermsAndConditions, props, null),
+					el);
+		} catch (err) {
+			console.error(err);
 		}
-	}
-
-	private boolean validatePledge() {
-		return actEthicallyCb.getValue() && protectPrivacyCb.getValue() && noHackCb.getValue() && shareCb.getValue() && responsibilityCb.getValue() && lawsCb.getValue() && responsibleDataUseCb.getValue();
-	}
+	}-*/;
 
 	private void hideViews() {
 		loadingUi.setVisible(false);
 		loadingUiText.setVisible(false);
 		loginView.setVisible(false);
-		termsOfServiceView.setVisible(false);
-		acceptedTermsOfUse.setVisible(false);
+		termsOfUseView.setVisible(false);
+		acceptedTermsOfUseView.setVisible(false);		
 	}
 
 	@Override
