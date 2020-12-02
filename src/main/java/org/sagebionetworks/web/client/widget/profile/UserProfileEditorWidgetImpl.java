@@ -24,7 +24,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, UserProfileEditorWidgetView.Presenter {
-	public static final String CONFIRM_SAVE_BEFORE_GOTO_SETTINGS_MESSAGE = "Would you like to save any recent changes to your user profile and go to your account settings to change your password?";
+	public static final String CONFIRM_SAVE_BEFORE_GOTO_SETTINGS_TITLE = "Would you like to save your profile changes?";
+	public static final String CONFIRM_SAVE_BEFORE_GOTO_SETTINGS_MESSAGE = "Select OK to save the changes to your Profile and go to the Settings tab to change your password, or select Cancel to continue editing your Profile.";
 	public static final String PLEASE_ENTER_A_VALID_URL = "Please enter a valid URL";
 	public static final String PLEASE_SELECT_A_FILE = "Please select a file";
 	public static final String CAN_ONLY_INCLUDE = "Can only include letters, numbers, dot (.), dash (-), and underscore (_)";
@@ -219,7 +220,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	@Override
 	public void onChangePassword() {
 		// confirm user is ok with saving changes before send them to the Settings page
-		popupUtils.showConfirmDialog("", CONFIRM_SAVE_BEFORE_GOTO_SETTINGS_MESSAGE, () -> {
+		popupUtils.showConfirmDialog(CONFIRM_SAVE_BEFORE_GOTO_SETTINGS_TITLE, CONFIRM_SAVE_BEFORE_GOTO_SETTINGS_MESSAGE, () -> {
 			goToAccountSettingsAfterSave = true;
 			onSave();
 		});

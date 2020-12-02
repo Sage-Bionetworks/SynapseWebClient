@@ -229,7 +229,7 @@ public class UserProfileEditorWidgetImplTest {
 		widget.configure(profile, null, mockCallback);
 		widget.onChangePassword();
 		
-		verify(mockPopupUtilsView).showConfirmDialog(eq(""), eq(UserProfileEditorWidgetImpl.CONFIRM_SAVE_BEFORE_GOTO_SETTINGS_MESSAGE), callbackCaptor.capture());
+		verify(mockPopupUtilsView).showConfirmDialog(eq(UserProfileEditorWidgetImpl.CONFIRM_SAVE_BEFORE_GOTO_SETTINGS_TITLE), eq(UserProfileEditorWidgetImpl.CONFIRM_SAVE_BEFORE_GOTO_SETTINGS_MESSAGE), callbackCaptor.capture());
 		
 		// simulate confirm
 		callbackCaptor.getValue().invoke();
