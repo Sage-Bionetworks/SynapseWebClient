@@ -10,6 +10,8 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -22,6 +24,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, UserProfileEditorWidgetView.Presenter {
+	public static final String CONFIRM_SAVE_BEFORE_GOTO_SETTINGS_TITLE = "Would you like to save your profile changes?";
+	public static final String CONFIRM_SAVE_BEFORE_GOTO_SETTINGS_MESSAGE = "Select OK to save the changes to your Profile and go to the Settings tab to change your password, or select Cancel to continue editing your Profile.";
 	public static final String PLEASE_ENTER_A_VALID_URL = "Please enter a valid URL";
 	public static final String PLEASE_SELECT_A_FILE = "Please select a file";
 	public static final String CAN_ONLY_INCLUDE = "Can only include letters, numbers, dot (.), dash (-), and underscore (_)";
@@ -42,6 +46,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	PopupUtilsView popupUtils;
 	String orcIdHref;
 	Callback callback;
+	boolean goToAccountSettingsAfterSave = false;
 	
 	@Inject
 	public UserProfileEditorWidgetImpl(UserProfileEditorWidgetView view, ProfileImageWidget imageWidget, ImageUploadWidget fileHandleUploadWidget, SynapseJavascriptClient jsClient, ClientCache clientCache, AuthenticationController authController, PortalGinInjector ginInjector, SynapseAlert synAlert, PopupUtilsView popupUtils, GlobalApplicationState globalAppState) {
@@ -79,6 +84,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		this.callback = callback;
 		this.orcIdHref = orcIdHref;
 		originalProfile = profile;
+		goToAccountSettingsAfterSave = false;
 		view.hideUsernameError();
 		view.hideLinkError();
 		synAlert.clear();
@@ -212,6 +218,15 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	}
 	
 	@Override
+	public void onChangePassword() {
+		// confirm user is ok with saving changes before send them to the Settings page
+		popupUtils.showConfirmDialog(CONFIRM_SAVE_BEFORE_GOTO_SETTINGS_TITLE, CONFIRM_SAVE_BEFORE_GOTO_SETTINGS_MESSAGE, () -> {
+			goToAccountSettingsAfterSave = true;
+			onSave();
+		});
+	}
+	
+	@Override
 	public void onCancel() {
 		// revert changes
 		configure(originalProfile, orcIdHref, callback);
@@ -237,6 +252,9 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 				authController.updateCachedProfile(originalProfile);
 				setIsEditingMode(false);
 				callback.invoke();
+				if (goToAccountSettingsAfterSave) {
+					globalAppState.getPlaceChanger().goTo(new Profile(originalProfile.getOwnerId(), ProfileArea.SETTINGS));
+				}
 			}
 
 			@Override

@@ -20,10 +20,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -38,6 +41,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class UserProfileEditorWidgetImplTest {
+	
 	@Mock
 	UserProfileEditorWidgetView mockView;
 	@Mock
@@ -63,20 +67,28 @@ public class UserProfileEditorWidgetImplTest {
 	PopupUtilsView mockPopupUtilsView;
 	@Mock
 	GlobalApplicationState mockGlobalAppState;
+	@Mock
+	PlaceChanger mockPlaceChanger;
+	@Captor
+	ArgumentCaptor<Profile> profilePlaceCaptor;
+	@Captor
+	ArgumentCaptor<Callback> callbackCaptor;
+	
 	@Captor
 	ArgumentCaptor<UserProfile> userProfileCaptor;
 	UserProfile profile, changes;
-	public static final String ORC_ID = "https://orcid"; 
+	public static final String ORC_ID = "https://orcid";
+	public static final String USER_PROFILE_ID = "123";
 	
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		when(mockPortalGinInjector.getCroppedImageUploadView()).thenReturn(mockCroppedImageUploadViewImpl);
-		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn("123");
+		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(USER_PROFILE_ID);
 		widget = new UserProfileEditorWidgetImpl(mockView, mockImageWidget, mockfileHandleUploadWidget, mockJsClient, mockClientCache, mockAuthController, mockPortalGinInjector, mockSynAlert, mockPopupUtilsView, mockGlobalAppState);
 
 		profile = new UserProfile();
-		profile.setOwnerId("123");
+		profile.setOwnerId(USER_PROFILE_ID);
 		profile.setUserName("a-user-name");
 		profile.setFirstName("James");
 		profile.setLastName("Bond");
@@ -92,7 +104,7 @@ public class UserProfileEditorWidgetImplTest {
 		
 		
 		changes = new UserProfile();
-		changes.setOwnerId("123");
+		changes.setOwnerId(USER_PROFILE_ID);
 		changes.setUserName("a-user-name-2");
 		changes.setFirstName("James-2");
 		changes.setLastName("Bond-2");
@@ -117,6 +129,7 @@ public class UserProfileEditorWidgetImplTest {
 		when(mockView.getLink()).thenReturn(changes.getUrl());
 		when(mockView.getBio()).thenReturn(changes.getSummary());
 		
+		when(mockGlobalAppState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(profile).when(mockJsClient).updateMyUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 	}
 
@@ -208,6 +221,34 @@ public class UserProfileEditorWidgetImplTest {
 		verify(mockCallback).invoke();
 		verify(mockClientCache).remove(profile.getOwnerId() + WebConstants.USER_PROFILE_SUFFIX);
 		verify(mockAuthController).updateCachedProfile(profile);
+		verify(mockPlaceChanger, never()).goTo(any(Profile.class));
+	}
+	
+	@Test
+	public void testOnChangePassword() {
+		widget.configure(profile, null, mockCallback);
+		widget.onChangePassword();
+		
+		verify(mockPopupUtilsView).showConfirmDialog(eq(UserProfileEditorWidgetImpl.CONFIRM_SAVE_BEFORE_GOTO_SETTINGS_TITLE), eq(UserProfileEditorWidgetImpl.CONFIRM_SAVE_BEFORE_GOTO_SETTINGS_MESSAGE), callbackCaptor.capture());
+		
+		// simulate confirm
+		callbackCaptor.getValue().invoke();
+		
+		// in the case of changing the password, updated values should be saved, and then user should be sent to the Settings tab.
+		verify(mockJsClient).updateMyUserProfile(userProfileCaptor.capture(), any(AsyncCallback.class));
+		assertEquals(changes.getOwnerId(), userProfileCaptor.getValue().getOwnerId());
+		assertEquals(changes.getFirstName(), userProfileCaptor.getValue().getFirstName());
+		assertEquals(changes.getLastName(), userProfileCaptor.getValue().getLastName());
+		assertEquals(changes.getUserName(), userProfileCaptor.getValue().getUserName());
+		
+		verify(mockCallback).invoke();
+		verify(mockClientCache).remove(profile.getOwnerId() + WebConstants.USER_PROFILE_SUFFIX);
+		verify(mockAuthController).updateCachedProfile(profile);
+ 
+		verify(mockPlaceChanger).goTo(profilePlaceCaptor.capture());
+		Profile profilePlace = profilePlaceCaptor.getValue();
+		assertEquals(USER_PROFILE_ID, profilePlace.getUserId());
+		assertEquals(ProfileArea.SETTINGS, profilePlace.getArea());
 	}
 	
 	@Test

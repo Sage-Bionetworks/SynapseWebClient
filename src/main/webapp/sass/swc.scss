@@ -2022,18 +2022,21 @@ ol.lowerroman {
 	right: 4px;
 }
 
-.entity-tab {
+.entity-tab, .finder-tab {
 	font-size: 16px;	
 }
 
 @media (max-width: 991px) {
-	.entity-tab {
+	.entity-tab, .finder-tab {
 		width: 100%;
 	}
 }
 @media (min-width: 992px) {
 	.entity-tab {
 		width: 170px;
+	}
+	.finder-tab {
+		width: 200px;
 	}
 }
 
@@ -2057,7 +2060,7 @@ ol.lowerroman {
         display:none!important
     }
 }
-#body .entity-tab > a {
+#body .entity-tab > a, #body .finder-tab > a {
 	text-align: center;
 	padding: 23px 15px;
 	&:focus, &:hover {
