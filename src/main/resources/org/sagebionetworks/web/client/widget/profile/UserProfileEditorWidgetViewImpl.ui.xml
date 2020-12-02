@@ -93,7 +93,7 @@
 						<b:FormGroup>
 							<b:FormLabel for="password">Password</b:FormLabel>					
 							<g:PasswordTextBox name="password" readOnly="true" addStyleNames="displayBlock margin-bottom-10">NotThePassword</g:PasswordTextBox>
-							<b:Anchor addStyleNames="displayBlock" ui:field="changePasswordLink" visible="false" target="_blank" href="#!Profile:v/settings">Change password</b:Anchor>
+							<b:Anchor addStyleNames="displayBlock" ui:field="changePasswordLink" visible="false">Change password</b:Anchor>
 						</b:FormGroup>
 					</b:Column>
 				</b:Row>
@@ -110,9 +110,9 @@
 				
 				<bh:Div ui:field="synAlertContainer"/>
 				<bh:Div marginTop="45" marginBottom="50" ui:field="commandsContainer">
-					<b:Button ui:field="editProfileButton" type="PRIMARY" visible="false">Edit Profile</b:Button>
-					<b:Button ui:field="saveProfileButton" type="PRIMARY" visible="false" dataLoadingText="Saving Changes...">Save Changes</b:Button>
-					<b:Button ui:field="cancelButton" type="DEFAULT" visible="false" marginLeft="5">Cancel</b:Button>
+					<b:Button ui:field="cancelButton" type="DEFAULT" visible="false">Cancel</b:Button>
+					<b:Button ui:field="saveProfileButton" type="PRIMARY" visible="false" dataLoadingText="Saving Changes..." marginLeft="5">Save Changes</b:Button>
+					<b:Button ui:field="editProfileButton" type="PRIMARY" visible="false">Edit Profile</b:Button>										
 				</bh:Div>
 			</b:Column>
 			<b:Column size="MD_3 XS_12">

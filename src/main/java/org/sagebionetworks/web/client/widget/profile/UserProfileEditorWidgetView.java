@@ -11,6 +11,7 @@ public interface UserProfileEditorWidgetView extends IsWidget {
 		void onCancel();
 		// inform presenter that the user is editing their profile info
 		void setIsEditingMode(boolean isEditing);
+		void onChangePassword();
 	}
 
 	void setUsername(String userName);

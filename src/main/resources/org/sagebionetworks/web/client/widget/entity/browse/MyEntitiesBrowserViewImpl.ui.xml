@@ -7,16 +7,15 @@
 		<!-- Tabs -->
 		<div>
 			<ul class="nav nav-tabs">
-				<li class="active" ui:field="myProjectsListItem">
+				<li class="active finder-tab" ui:field="myProjectsListItem">
 					<g:Anchor styleName="text-align-center no-background"
 						ui:field="myProjectsLink" text="My Projects" />
 				</li>
-				<li ui:field="currentContextListItem">
+				<li class="finder-tab" ui:field="currentContextListItem">
 					<g:Anchor styleName="text-align-center link no-background"
 						ui:field="currentContextLink" text="Current Project" />
 				</li>
-
-				<li ui:field="myFavoritesListItem">
+				<li class="finder-tab" ui:field="myFavoritesListItem">
 					<g:Anchor styleName="text-align-center link no-background"
 						ui:field="myFavoritesLink" text="My Favorites" />
 				</li>
