@@ -10,6 +10,8 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -42,6 +44,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	PopupUtilsView popupUtils;
 	String orcIdHref;
 	Callback callback;
+	boolean goToAccountSettingsAfterSave = false;
 	
 	@Inject
 	public UserProfileEditorWidgetImpl(UserProfileEditorWidgetView view, ProfileImageWidget imageWidget, ImageUploadWidget fileHandleUploadWidget, SynapseJavascriptClient jsClient, ClientCache clientCache, AuthenticationController authController, PortalGinInjector ginInjector, SynapseAlert synAlert, PopupUtilsView popupUtils, GlobalApplicationState globalAppState) {
@@ -79,6 +82,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		this.callback = callback;
 		this.orcIdHref = orcIdHref;
 		originalProfile = profile;
+		goToAccountSettingsAfterSave = false;
 		view.hideUsernameError();
 		view.hideLinkError();
 		synAlert.clear();
@@ -212,6 +216,15 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	}
 	
 	@Override
+	public void onChangePassword() {
+		// confirm user is ok with saving changes before send them to the Settings page
+		popupUtils.showConfirmDialog("", "Would you like to save any recent changes to your user profile and go to your account settings to change your password?", () -> {
+			goToAccountSettingsAfterSave = true;
+			onSave();
+		});
+	}
+	
+	@Override
 	public void onCancel() {
 		// revert changes
 		configure(originalProfile, orcIdHref, callback);
@@ -237,6 +250,9 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 				authController.updateCachedProfile(originalProfile);
 				setIsEditingMode(false);
 				callback.invoke();
+				if (goToAccountSettingsAfterSave) {
+					globalAppState.getPlaceChanger().goTo(new Profile(originalProfile.getOwnerId(), ProfileArea.SETTINGS));
+				}
 			}
 
 			@Override
