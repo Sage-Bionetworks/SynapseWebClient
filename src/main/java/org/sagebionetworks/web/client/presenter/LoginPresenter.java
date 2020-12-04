@@ -98,7 +98,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	public void onCancelAcceptTermsOfUse() {
 		// confirm
 		popupUtils.showConfirmDialog(ARE_YOU_SURE_YOU_WANT_TO_CANCEL, CANCEL_TERMS_OF_USE_CONFIRM_MESSAGE, () -> {
-			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGOUT_TOKEN));
 		});
 	}
 
