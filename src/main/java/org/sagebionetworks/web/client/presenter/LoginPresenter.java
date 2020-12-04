@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -37,21 +38,24 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class LoginPresenter extends AbstractActivity implements LoginView.Presenter, Presenter<LoginPlace> {
+	public static final String CANCEL_TERMS_OF_USE_CONFIRM_MESSAGE = "Canceling now will log you out. You can always log in again to resume the registration process from where you left off.";
+	public static final String ARE_YOU_SURE_YOU_WANT_TO_CANCEL = "Are you sure you want to cancel?";
 	private LoginView view;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseAlert synAlert;
-
+	private PopupUtilsView popupUtils;
 	
 	public Set<String> recognizedTokens = new HashSet<>();
 	
 	
 	@Inject
-	public LoginPresenter(LoginView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, SynapseAlert synAlert) {
+	public LoginPresenter(LoginView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, SynapseAlert synAlert, PopupUtilsView popupUtils) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synAlert = synAlert;
+		this.popupUtils = popupUtils;
 		view.setSynAlert(synAlert);
 		view.setPresenter(this);
 		Collections.addAll(recognizedTokens, LOGOUT_TOKEN, OPEN_ID_UNKNOWN_USER_ERROR_TOKEN, OPEN_ID_ERROR_TOKEN, CHANGE_USERNAME, SHOW_TOU, SHOW_SIGNED_TOU, DEFAULT_PLACE_TOKEN);			
@@ -89,6 +93,15 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			}
 		});
 	}
+	
+	@Override
+	public void onCancelAcceptTermsOfUse() {
+		// confirm
+		popupUtils.showConfirmDialog(ARE_YOU_SURE_YOU_WANT_TO_CANCEL, CANCEL_TERMS_OF_USE_CONFIRM_MESSAGE, () -> {
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
+		});
+	}
+
 
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {

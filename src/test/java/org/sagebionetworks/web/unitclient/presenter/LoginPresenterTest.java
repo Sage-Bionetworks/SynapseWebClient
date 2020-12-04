@@ -7,8 +7,10 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -19,6 +21,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -31,6 +34,7 @@ import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -59,6 +63,11 @@ public class LoginPresenterTest {
 	Callback mockTouCallback;
 	@Captor
 	ArgumentCaptor<Place> placeCaptor;
+	@Captor
+	ArgumentCaptor<Callback> callbackCaptor;
+
+	@Mock
+	PopupUtilsView mockPopupUtils;
 
 	@Mock
 	UserProfile mockUserProfile;
@@ -70,7 +79,7 @@ public class LoginPresenterTest {
 		when(mockUserProfile.getUserName()).thenReturn("a_username");
 		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(mockUserProfile);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynAlert);
+		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynAlert, mockPopupUtils);
 		loginPresenter.start(mockPanel, mockEventBus);
 		verify(mockView).setPresenter(loginPresenter);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
@@ -126,6 +135,24 @@ public class LoginPresenterTest {
 		verify(mockGlobalApplicationState).gotoLastPlace(any(Profile.class));
 	}
 
+	@Test
+	public void testCancelToU() {
+		when(mockLoginPlace.toToken()).thenReturn(LoginPlace.SHOW_TOU);
+		when(mockAuthenticationController.getCurrentUserSessionToken()).thenReturn("valid session token");
+
+		loginPresenter.setPlace(mockLoginPlace);
+		loginPresenter.onCancelAcceptTermsOfUse();
+
+		// verify confirmation popup
+		verify(mockPopupUtils).showConfirmDialog(eq(LoginPresenter.ARE_YOU_SURE_YOU_WANT_TO_CANCEL), eq(LoginPresenter.CANCEL_TERMS_OF_USE_CONFIRM_MESSAGE), callbackCaptor.capture());
+				
+		// simulate confirm
+		callbackCaptor.getValue().invoke();
+		
+		verify(mockAuthenticationController, never()).signTermsOfUse(eq(true), any(AsyncCallback.class));
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+	}
+	
 	@Test
 	public void testSetPlaceShowAcceptedToU() {
 		when(mockLoginPlace.toToken()).thenReturn(LoginPlace.SHOW_SIGNED_TOU);

@@ -24,5 +24,6 @@ public interface LoginView extends IsWidget, SynapseView {
 
 		void goToLastPlace();
 		void onAcceptTermsOfUse();
+		void onCancelAcceptTermsOfUse();
 	}
 }
