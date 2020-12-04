@@ -2,11 +2,8 @@ package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.InfoAlert;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
@@ -52,23 +49,21 @@ public class LoginViewImpl extends Composite implements LoginView {
 	private Header headerWidget;
 	SynapseJSNIUtils jsniUtils;
 	PageProgressWidget pageProgressWidget;
-	GlobalApplicationState globalAppState;
 	Callback backBtnCallback, forwardBtnCallback;
 	public interface LoginViewImplBinder extends UiBinder<Widget, LoginViewImpl> {
 	}	
 
 	@Inject
-	public LoginViewImpl(LoginViewImplBinder uiBinder, Header headerWidget, LoginWidget loginWidget, SynapseJSNIUtils jsniUtils, PageProgressWidget pageProgressWidget, GlobalApplicationState globalAppState) {
+	public LoginViewImpl(LoginViewImplBinder uiBinder, Header headerWidget, LoginWidget loginWidget, SynapseJSNIUtils jsniUtils, PageProgressWidget pageProgressWidget) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.loginWidget = loginWidget;
 		this.headerWidget = headerWidget;
 		this.pageProgressWidget = pageProgressWidget;
-		this.globalAppState = globalAppState;
 		this.jsniUtils = jsniUtils;
 		headerWidget.configure();
 		pageProgressContainer.add(pageProgressWidget);
 		backBtnCallback = () -> {
-			globalAppState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
+			presenter.onCancelAcceptTermsOfUse();			
 		};
 		forwardBtnCallback = () -> {
 			presenter.onAcceptTermsOfUse();
@@ -76,7 +71,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	}
 
 	private void reconfigurePageProgress(boolean enableForward) {
-		pageProgressWidget.configure(WebConstants.SYNAPSE_GREEN, 75, "Back", backBtnCallback, "Next", forwardBtnCallback, enableForward);
+		pageProgressWidget.configure(WebConstants.SYNAPSE_GREEN, 75, "Cancel", backBtnCallback, "Next", forwardBtnCallback, enableForward);
 	}
 	
 	@Override
