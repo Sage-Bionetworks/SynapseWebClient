@@ -112,9 +112,6 @@ public class RejectReasonViewImpl implements RejectReasonView {
 	@Override
 	public void clear() {
 		this.clearError();
-		this.primaryButton.state().reset();
-		this.defaultButton.state().reset();
-		this.defaultButton.state().reset();
 		this.customText.clear();
 		this.nameField.clear();
 		this.synapseQuizOption.setValue(false);

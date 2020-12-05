@@ -30,7 +30,7 @@ public class ReplyModalViewImpl implements ReplyModalView {
 
 	private Widget widget;
 	private Presenter presenter;
-
+	String originalButtonText;
 	@Inject
 	public ReplyModalViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
@@ -45,6 +45,7 @@ public class ReplyModalViewImpl implements ReplyModalView {
 		});
 		cancelButton.addClickHandler(onCancel);
 		replyModal.addDomHandler(DisplayUtils.getESCKeyDownHandler(onCancel), KeyDownEvent.getType());
+		originalButtonText = saveButton.getText();
 	}
 
 	@Override
@@ -75,7 +76,11 @@ public class ReplyModalViewImpl implements ReplyModalView {
 
 	@Override
 	public void clear() {
-		saveButton.state().reset();
+		showLoading(false);	
+	}
+
+	private void showLoading(boolean isLoading) {
+		DisplayUtils.showLoading(saveButton, isLoading, originalButtonText);
 	}
 
 	@Override
@@ -90,12 +95,12 @@ public class ReplyModalViewImpl implements ReplyModalView {
 
 	@Override
 	public void showSaving() {
-		saveButton.state().loading();
+		showLoading(true);
 	}
 
 	@Override
 	public void resetButton() {
-		saveButton.state().reset();
+		showLoading(false);		
 	}
 
 	@Override

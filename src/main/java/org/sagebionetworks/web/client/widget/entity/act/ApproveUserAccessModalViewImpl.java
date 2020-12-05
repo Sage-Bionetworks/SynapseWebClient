@@ -60,7 +60,7 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 	private Presenter presenter;
 
 	Widget widget;
-
+	String originalSubmitButtonText, originalRevokeButtonText;
 	public ApproveUserAccessModalViewImpl() {
 		widget = uiBinder.createAndBindUi(this);
 		submitButton.addClickHandler(new ClickHandler() {
@@ -100,6 +100,8 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 				presenter.onRevoke();
 			}
 		});
+		originalSubmitButtonText = submitButton.getText();
+		originalRevokeButtonText = revokeButton.getText();
 	}
 
 	@Override
@@ -190,11 +192,7 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 
 	@Override
 	public void setApproveProcessing(boolean processing) {
-		if (processing) {
-			submitButton.state().loading();
-		} else {
-			submitButton.state().reset();
-		}
+		DisplayUtils.showLoading(submitButton, processing, originalSubmitButtonText);
 		cancelButton.setEnabled(!processing);
 		revokeButton.setEnabled(!processing);
 	}
@@ -229,11 +227,7 @@ public class ApproveUserAccessModalViewImpl implements ApproveUserAccessModalVie
 
 	@Override
 	public void setRevokeProcessing(boolean processing) {
-		if (processing) {
-			revokeButton.state().loading();
-		} else {
-			revokeButton.state().reset();
-		}
+		DisplayUtils.showLoading(revokeButton, processing, originalRevokeButtonText);
 		cancelButton.setEnabled(!processing);
 		submitButton.setEnabled(!processing);
 	}

@@ -49,7 +49,7 @@ public class LoginModalViewImpl implements LoginModalView {
 	Modal modal;
 	Presenter presenter;
 	private HandlerRegistration messageHandler;
-
+	String originalButtonText;
 	@Inject
 	public LoginModalViewImpl(Binder binder) {
 		modal = binder.createAndBindUi(this);
@@ -75,6 +75,7 @@ public class LoginModalViewImpl implements LoginModalView {
 				presenter.onPrimary();
 			}
 		});
+		originalButtonText = primaryButton.getText();
 	}
 
 	@Override
@@ -105,11 +106,7 @@ public class LoginModalViewImpl implements LoginModalView {
 
 	@Override
 	public void setLoading(boolean loading) {
-		if (!loading) {
-			this.primaryButton.state().reset();
-		} else {
-			this.primaryButton.state().loading();
-		}
+		DisplayUtils.showLoading(primaryButton, loading, originalButtonText);		
 	}
 
 	@Override
@@ -120,6 +117,7 @@ public class LoginModalViewImpl implements LoginModalView {
 	@Override
 	public void setPrimaryButtonText(String text) {
 		this.primaryButton.setText(text);
+		originalButtonText = text;
 	}
 
 	@Override

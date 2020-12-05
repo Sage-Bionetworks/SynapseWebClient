@@ -67,10 +67,11 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	Button cancelProgressButton;
 	Presenter presenter;
 	Widget widget;
-
+	String originalButtonText;
 	@Inject
 	public QueryResultEditorViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
+		originalButtonText = saveRowsButton.getText();
 	}
 
 	@Override
@@ -200,11 +201,7 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 
 	@Override
 	public void setSaveButtonLoading(boolean isLoading) {
-		if (isLoading) {
-			this.saveRowsButton.state().loading();
-		} else {
-			this.saveRowsButton.state().reset();
-		}
+		DisplayUtils.showLoading(saveRowsButton, isLoading, originalButtonText);
 	}
 
 	@Override
