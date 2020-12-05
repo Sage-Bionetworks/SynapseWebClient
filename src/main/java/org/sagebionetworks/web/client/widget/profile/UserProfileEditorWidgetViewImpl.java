@@ -98,6 +98,7 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	boolean isEditing = false;
 	SynapseJSNIUtils jsniUtils;
 	Presenter presenter;
+	String originalButtonText;
 	@Inject
 	public UserProfileEditorWidgetViewImpl(Binder binder, GooglePlacesSuggestOracle locationOracle, GlobalApplicationState globalAppState, AuthenticationController authController, SynapseJSNIUtils jsniUtils) {
 		widget = binder.createAndBindUi(this);
@@ -113,7 +114,7 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 			presenter.setIsEditingMode(true);			
 		});
 		saveProfileButton.addClickHandler(event -> {
-			saveProfileButton.state().loading();
+			DisplayUtils.showLoading(saveProfileButton, true, originalButtonText);
 			presenter.onSave();
 		});
 		cancelButton.addClickHandler(event -> {
@@ -123,6 +124,7 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 			presenter.onChangePassword();
 		});
 		linkRenderer.getElement().setAttribute("rel", "noreferrer noopener");
+		originalButtonText = saveProfileButton.getText();
 	}
 
 	@Override
@@ -304,7 +306,7 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 		changeEmailLink.setVisible(isEditing);
 		changePasswordLink.setVisible(isEditing);
 		if (!isEditing) {
-			saveProfileButton.state().reset();	
+			DisplayUtils.showLoading(saveProfileButton, false, originalButtonText);	
 		}		
 	}
 
@@ -335,7 +337,7 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 
 	@Override
 	public void resetSaveButtonState() {
-		saveProfileButton.state().reset();
+		DisplayUtils.showLoading(saveProfileButton, false, originalButtonText);		
 	}
 	
 	@Override

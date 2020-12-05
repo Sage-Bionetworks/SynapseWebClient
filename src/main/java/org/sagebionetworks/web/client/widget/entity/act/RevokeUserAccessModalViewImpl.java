@@ -32,6 +32,7 @@ public class RevokeUserAccessModalViewImpl implements RevokeUserAccessModalView 
 	private Presenter presenter;
 
 	Widget widget;
+	String originalButtonText;
 
 	public RevokeUserAccessModalViewImpl() {
 		widget = uiBinder.createAndBindUi(this);
@@ -47,6 +48,7 @@ public class RevokeUserAccessModalViewImpl implements RevokeUserAccessModalView 
 				presenter.onRevoke();
 			}
 		});
+		originalButtonText = revokeButton.getText();
 	}
 
 	@Override
@@ -88,11 +90,7 @@ public class RevokeUserAccessModalViewImpl implements RevokeUserAccessModalView 
 
 	@Override
 	public void setRevokeProcessing(boolean processing) {
-		if (processing) {
-			revokeButton.state().loading();
-		} else {
-			revokeButton.state().reset();
-		}
+		DisplayUtils.showLoading(revokeButton, processing, originalButtonText);
 		cancelButton.setEnabled(!processing);
 	}
 }

@@ -71,8 +71,6 @@ public class EditJSONListModalViewImpl implements EditJSONListModalView {
 	@Override
 	public void showError(String message) {
 		alert.showError(message);
-		// enable the save button after an error
-		saveButton.state().reset();
 	}
 
 	@Override
@@ -87,7 +85,6 @@ public class EditJSONListModalViewImpl implements EditJSONListModalView {
 
 	@Override
 	public void showEditor() {
-		saveButton.state().reset();
 		alert.clearState();
 		editModal.show();
 	}

@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.sagebionetworks.web.client.DisplayUtils;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -28,6 +30,7 @@ public class SubmissionViewScopeWidgetViewImpl implements SubmissionViewScopeWid
 	Modal editModal;
 	Widget widget;
 	Presenter presenter;
+	String originalButtonText;
 
 	@Inject
 	public SubmissionViewScopeWidgetViewImpl(Binder binder) {
@@ -38,6 +41,7 @@ public class SubmissionViewScopeWidgetViewImpl implements SubmissionViewScopeWid
 		saveButton.addClickHandler(event -> {
 			presenter.onSave();
 		});
+		originalButtonText = saveButton.getText();
 	}
 
 	@Override
@@ -90,10 +94,6 @@ public class SubmissionViewScopeWidgetViewImpl implements SubmissionViewScopeWid
 
 	@Override
 	public void setLoading(boolean loading) {
-		if (!loading) {
-			this.saveButton.state().reset();
-		} else {
-			this.saveButton.state().loading();
-		}
+		DisplayUtils.showLoading(saveButton, loading, originalButtonText);
 	}
 }

@@ -38,12 +38,13 @@ public class AccessControlListModalWidgetViewImpl implements AccessControlListMo
 	@UiField
 	Span modalTitleContainer;
 	Modal modal;
-
+	String originalButtonText;
 	@Inject
 	public AccessControlListModalWidgetViewImpl(Binder binder) {
 		modal = binder.createAndBindUi(this);
 		modal.addAttachHandler(DisplayUtils.getHideModalOnDetachHandler());
 		primaryButton.addDomHandler(DisplayUtils.getPreventTabHandler(primaryButton), KeyDownEvent.getType());
+		originalButtonText = primaryButton.getText();
 	}
 
 	@Override
@@ -93,11 +94,7 @@ public class AccessControlListModalWidgetViewImpl implements AccessControlListMo
 
 	@Override
 	public void setLoading(boolean loading) {
-		if (loading) {
-			this.primaryButton.state().loading();
-		} else {
-			this.primaryButton.state().reset();
-		}
+		DisplayUtils.showLoading(primaryButton, loading, originalButtonText);		
 	}
 
 	@Override

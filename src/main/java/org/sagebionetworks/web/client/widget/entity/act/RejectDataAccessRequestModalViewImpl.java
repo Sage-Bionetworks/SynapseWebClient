@@ -124,9 +124,6 @@ public class RejectDataAccessRequestModalViewImpl implements RejectDataAccessReq
 	@Override
 	public void clear() {
 		this.clearError();
-		this.primaryButton.state().reset();
-		this.defaultButton.state().reset();
-		this.defaultButton.state().reset();
 		this.customText.clear();
 		this.responseField.clear();
 		for (CheckBox cb : getCheckBoxes()) {

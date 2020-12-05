@@ -35,6 +35,7 @@ public class EditFileMetadataModalViewImpl implements EditFileMetadataModalView 
 	Alert alert;
 	@UiField
 	Button primaryButton;
+	String originalButtonText;
 
 	@Inject
 	public EditFileMetadataModalViewImpl(Binder binder) {
@@ -47,6 +48,7 @@ public class EditFileMetadataModalViewImpl implements EditFileMetadataModalView 
 				entityNameField.selectAll();
 			}
 		});
+		originalButtonText = primaryButton.getText();
 	}
 
 	@Override
@@ -101,18 +103,14 @@ public class EditFileMetadataModalViewImpl implements EditFileMetadataModalView 
 
 	@Override
 	public void clear() {
-		this.primaryButton.state().reset();
 		this.alert.setVisible(false);
 		this.entityNameField.clear();
+		setLoading(false);
 	}
 
 	@Override
 	public void setLoading(boolean isLoading) {
-		if (isLoading) {
-			this.primaryButton.state().loading();
-		} else {
-			this.primaryButton.state().reset();
-		}
+		DisplayUtils.showLoading(primaryButton, isLoading, originalButtonText);
 	}
 
 	@Override

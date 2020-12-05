@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.table.modal.fileview;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.DisplayUtils;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -34,7 +36,8 @@ public class EntityViewScopeWidgetViewImpl implements EntityViewScopeWidgetView 
 	Widget widget;
 	Presenter presenter;
 	FileViewOptions viewOptions;
-
+	String originalButtonText;
+	
 	@Inject
 	public EntityViewScopeWidgetViewImpl(Binder binder, FileViewOptions viewOptions) {
 		widget = binder.createAndBindUi(this);
@@ -55,6 +58,7 @@ public class EntityViewScopeWidgetViewImpl implements EntityViewScopeWidgetView 
 		viewOptions.addClickHandler(event -> {
 			presenter.updateViewTypeMask();
 		});
+		originalButtonText = saveButton.getText();
 	}
 
 	@Override
@@ -107,11 +111,7 @@ public class EntityViewScopeWidgetViewImpl implements EntityViewScopeWidgetView 
 
 	@Override
 	public void setLoading(boolean loading) {
-		if (!loading) {
-			this.saveButton.state().reset();
-		} else {
-			this.saveButton.state().loading();
-		}
+		DisplayUtils.showLoading(saveButton, loading, originalButtonText);
 	}
 
 	@Override

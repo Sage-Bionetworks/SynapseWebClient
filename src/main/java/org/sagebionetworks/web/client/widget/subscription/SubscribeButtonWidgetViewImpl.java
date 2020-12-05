@@ -36,6 +36,7 @@ public class SubscribeButtonWidgetViewImpl implements SubscribeButtonWidgetView 
 	Widget w;
 	Presenter presenter;
 
+	String originalFollowButtonText, originalUnfollowButtonText;
 	@Inject
 	public SubscribeButtonWidgetViewImpl(Binder binder) {
 		this.w = binder.createAndBindUi(this);
@@ -52,6 +53,8 @@ public class SubscribeButtonWidgetViewImpl implements SubscribeButtonWidgetView 
 		};
 		unfollowIcon.addClickHandler(unfollowClickHandler);
 		unfollowButton.addClickHandler(unfollowClickHandler);
+		originalFollowButtonText = followButton.getText();
+		originalUnfollowButtonText = unfollowButton.getText();
 	}
 
 	@Override
@@ -76,8 +79,8 @@ public class SubscribeButtonWidgetViewImpl implements SubscribeButtonWidgetView 
 
 	@Override
 	public void showLoading() {
-		followButton.state().loading();
-		unfollowButton.state().loading();
+		DisplayUtils.showLoading(followButton, true, originalFollowButtonText);
+		DisplayUtils.showLoading(unfollowButton, true, originalUnfollowButtonText);
 	}
 
 	@Override
@@ -114,8 +117,8 @@ public class SubscribeButtonWidgetViewImpl implements SubscribeButtonWidgetView 
 
 	@Override
 	public void hideLoading() {
-		followButton.state().reset();
-		unfollowButton.state().reset();
+		DisplayUtils.showLoading(followButton, false, originalFollowButtonText);
+		DisplayUtils.showLoading(unfollowButton, false, originalUnfollowButtonText);
 	}
 
 	@Override

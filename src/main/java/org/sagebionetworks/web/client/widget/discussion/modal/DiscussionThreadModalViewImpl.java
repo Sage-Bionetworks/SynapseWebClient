@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
@@ -34,7 +35,7 @@ public class DiscussionThreadModalViewImpl implements DiscussionThreadModalView 
 
 	private Widget widget;
 	private Presenter presenter;
-
+	String originalButtonText;
 	@Inject
 	public DiscussionThreadModalViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
@@ -49,6 +50,7 @@ public class DiscussionThreadModalViewImpl implements DiscussionThreadModalView 
 		});
 		cancelButton.addClickHandler(onCancel);
 		threadModal.addDomHandler(DisplayUtils.getESCKeyDownHandler(onCancel), KeyDownEvent.getType());
+		originalButtonText = saveButton.getText();
 	}
 
 	@Override
@@ -80,7 +82,7 @@ public class DiscussionThreadModalViewImpl implements DiscussionThreadModalView 
 	@Override
 	public void clear() {
 		threadTitle.setText("");
-		saveButton.state().reset();
+		showLoading(false);		
 	}
 
 	@Override
@@ -95,12 +97,16 @@ public class DiscussionThreadModalViewImpl implements DiscussionThreadModalView 
 
 	@Override
 	public void showSaving() {
-		saveButton.state().loading();
+		showLoading(true);
 	}
 
 	@Override
 	public void resetButton() {
-		saveButton.state().reset();
+		showLoading(false);		
+	}
+	
+	private void showLoading(boolean isLoading) {
+		DisplayUtils.showLoading(saveButton, isLoading, originalButtonText);
 	}
 
 	@Override
