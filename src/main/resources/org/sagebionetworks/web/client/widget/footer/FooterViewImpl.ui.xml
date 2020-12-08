@@ -27,7 +27,7 @@
 		</b:Alert>
 
 		<bh:Div>
-			<bh:Div addStyleNames="synapse-blue-bg-gradient padding-15">
+			<bh:Div addStyleNames="synapse-dark-blue-bg padding-15">
 				<bh:Div>
 					<bh:Span addStyleNames="left">
 						<g:Image url="images/logo.svg"
@@ -48,7 +48,7 @@
 					<bh:Div addStyleNames="flexcontainer-row hidden-xs">
 						<bh:Div addStyleNames="margin-auto" paddingTop="10">
 							<bh:Div
-								addStyleNames="flexcontainer-row flexcontainer-align-items-center">
+								addStyleNames="flexcontainer-row flexcontainer-align-items-center letter-spacing-1">
 								<bh:Span addStyleNames="flexcontainer-column">
 									<b:Anchor
 										href="mailto:synapseInfo@sagebionetworks.org"
@@ -113,7 +113,7 @@
 							<bh:Div addStyleNames="center margin-top-10">
 								<b:Anchor ui:field="copyrightYear"
 									href="http://sagebionetworks.org/"
-									addStyleNames="margin-top-5 margin-bottom-5 color-white" />
+									addStyleNames="margin-top-5 margin-bottom-5 color-white letter-spacing-1 font-weight-400" />
 							</bh:Div>
 						</bh:Div>
 						<bh:Span addStyleNames="right text-align-right">
