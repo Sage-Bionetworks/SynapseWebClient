@@ -654,6 +654,23 @@ public class EntityActionControllerImplTest {
 	}
 
 	@Test
+	public void testConfigureAddSubmissionView() {
+		entityBundle.setEntity(new Project());
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, EntityArea.TABLES);
+		verify(mockActionMenu).setActionVisible(Action.ADD_SUBMISSION_VIEW, true);
+		verify(mockActionMenu).setActionListener(Action.ADD_SUBMISSION_VIEW, controller);
+	}
+
+	@Test
+	public void testConfigureAddSubmissionViewCannotEdit() {
+		entityBundle.setEntity(new Project());
+		permissions.setCanCertifiedUserEdit(false);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, EntityArea.TABLES);
+		verify(mockActionMenu).setActionVisible(Action.ADD_SUBMISSION_VIEW, false);
+		verify(mockActionMenu).setActionListener(Action.ADD_SUBMISSION_VIEW, controller);
+	}
+
+	@Test
 	public void testConfigureAddEvaluationProjectSettings() {
 		currentEntityArea = null;
 		entityBundle.setEntity(new Project());
