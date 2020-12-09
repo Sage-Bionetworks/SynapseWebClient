@@ -59,7 +59,7 @@ public class ChallengeWidgetTest {
 
 	@Before
 	public void setup() throws Exception {
-		widget = new ChallengeWidget(mockView, mockChallengeClient, mockSynAlert, mockTeamBadge, mockSelectTeamModal, submitToChallengeWidget);
+		widget = new ChallengeWidget(mockView, mockChallengeClient, mockSynAlert, mockTeamBadge, mockSelectTeamModal);
 
 		AsyncMockStubber.callSuccessWith(mockChallenge).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
 		when(mockChallenge.getId()).thenReturn(CHALLENGE_ID);

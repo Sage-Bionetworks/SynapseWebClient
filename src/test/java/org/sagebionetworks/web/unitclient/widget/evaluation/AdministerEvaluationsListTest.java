@@ -6,6 +6,8 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import java.util.ArrayList;
+
+import org.apache.tapestry.form.Submit;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -13,8 +15,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
 import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsListView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
@@ -35,13 +41,27 @@ public class AdministerEvaluationsListTest {
 	EvaluationEditorModal mockEvalEditor;
 	@Mock
 	SynapseAlert mockSynAlert;
+	@Mock
+	CookieProvider mockCookieProvider;
+	@Mock
+	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
+	AuthenticationController mockAuthenticationController;
+	@Mock
+	SubmitToEvaluationWidget mockSubmitToEvaluationWidget;
+
+
 
 	Evaluation e1, e2;
+
+	boolean isTestWebsite = false;
+	boolean utc = false;
 
 	@Before
 	public void setup() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		evalList = new AdministerEvaluationsList(mockView, mockChallengeClient, mockAclEditor, mockEvalEditor, mockSynAlert);
+		evalList = new AdministerEvaluationsList(mockView, mockChallengeClient, mockAclEditor, mockEvalEditor, mockSynAlert,
+				mockCookieProvider, mockGlobalApplicationState, mockAuthenticationController, mockSubmitToEvaluationWidget);
 
 		ArrayList<Evaluation> evaluationResults = new ArrayList<Evaluation>();
 

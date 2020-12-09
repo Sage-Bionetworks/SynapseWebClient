@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -43,11 +44,13 @@ public class ChallengeTabTest {
 	EntityBundle mockProjectEntityBundle;
 	@Mock
 	ActionMenuWidget mockActionMenuWidget;
+	@Mock
+	CookieProvider mockCookieProvider;
 	ChallengeTab tab;
 
 	@Before
 	public void setUp() {
-		tab = new ChallengeTab(mockTab, mockPortalGinInjector);
+		tab = new ChallengeTab(mockTab, mockPortalGinInjector );
 		when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
 		when(mockPortalGinInjector.getChallengeTabView()).thenReturn(mockView);
 		when(mockPortalGinInjector.getAdministerEvaluationsList()).thenReturn(mockAdministerEvaluationsList);

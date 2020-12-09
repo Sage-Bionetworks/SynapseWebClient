@@ -22,8 +22,6 @@ public interface ChallengeWidgetView extends IsWidget {
 
 	void setSelectTeamModal(Widget w);
 
-	void setSubmitToChallengeWidget(IsWidget submitToChallengeWidget);
-
 	public interface Presenter {
 		void onEditTeamClicked();
 	}

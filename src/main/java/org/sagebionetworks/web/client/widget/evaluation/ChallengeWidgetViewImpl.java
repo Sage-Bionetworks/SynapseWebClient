@@ -24,8 +24,6 @@ public class ChallengeWidgetViewImpl implements ChallengeWidgetView {
 	@UiField
 	Heading challengeIdHeading;
 	@UiField
-	Div submitToChallengeContainer;
-	@UiField
 	Div selectTeamModalContainer;
 
 	@UiField
@@ -78,9 +76,4 @@ public class ChallengeWidgetViewImpl implements ChallengeWidgetView {
 		widgetsContainer.add(w);
 	}
 
-	@Override
-	public void setSubmitToChallengeWidget(IsWidget submitToChallengeWidget) {
-		submitToChallengeContainer.clear();
-		submitToChallengeContainer.add(submitToChallengeWidget);
-	}
 }
