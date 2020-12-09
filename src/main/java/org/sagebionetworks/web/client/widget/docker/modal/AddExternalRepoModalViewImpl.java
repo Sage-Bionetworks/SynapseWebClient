@@ -29,7 +29,7 @@ public class AddExternalRepoModalViewImpl implements AddExternalRepoModalView {
 
 	private Widget widget;
 	private Presenter presenter;
-
+	String originalButtonText;
 	@Inject
 	public AddExternalRepoModalViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
@@ -45,6 +45,7 @@ public class AddExternalRepoModalViewImpl implements AddExternalRepoModalView {
 				addExternalRepoModal.hide();
 			}
 		});
+		originalButtonText = saveButton.getText();
 	}
 
 	@Override
@@ -75,7 +76,7 @@ public class AddExternalRepoModalViewImpl implements AddExternalRepoModalView {
 	@Override
 	public void clear() {
 		repoName.setText("");
-		saveButton.state().reset();
+		showLoading(false);
 	}
 
 	@Override
@@ -90,12 +91,16 @@ public class AddExternalRepoModalViewImpl implements AddExternalRepoModalView {
 
 	@Override
 	public void showSaving() {
-		saveButton.state().loading();
+		showLoading(true);
 	}
 
 	@Override
 	public void resetButton() {
-		saveButton.state().reset();
+		showLoading(false);
+	}
+	
+	private void showLoading(boolean isLoading) {
+		DisplayUtils.showLoading(saveButton, isLoading, originalButtonText);
 	}
 
 	@Override

@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.table.v2.schema;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.DisplayUtils;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -40,10 +42,11 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 	Presenter presenter;
 	@UiField
 	SimplePanel jobTrackerWidgetContainer;
-
+	String originalButtonText;
 	@Inject
 	public ColumnModelsViewBaseImpl(final Binder uiBinder) {
 		initWidget(uiBinder.createAndBindUi(this));
+		originalButtonText = saveButton.getText();
 	}
 
 	@Override
@@ -70,7 +73,7 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 
 	@Override
 	public void showEditor() {
-		saveButton.state().reset();
+		DisplayUtils.showLoading(saveButton, false, originalButtonText);
 		editModal.show();
 	}
 
@@ -81,7 +84,7 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 
 	@Override
 	public void setLoading() {
-		saveButton.state().loading();
+		DisplayUtils.showLoading(saveButton, true, originalButtonText);
 	}
 
 	@Override
@@ -92,7 +95,7 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 
 	@Override
 	public void resetSaveButton() {
-		saveButton.state().reset();
+		DisplayUtils.showLoading(saveButton, false, originalButtonText);
 	}
 
 	@Override

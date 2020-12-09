@@ -33,6 +33,7 @@ public class SingleButtonViewImpl implements SingleButtonView {
 	Widget widget;
 	@UiField
 	Div extraWidgetsContainer;
+	String originalButtonText;
 
 	@Inject
 	public SingleButtonViewImpl(Binder binder) {
@@ -43,6 +44,7 @@ public class SingleButtonViewImpl implements SingleButtonView {
 				presenter.onClick();
 			}
 		});
+		originalButtonText = button.getText();
 	}
 
 	@Override
@@ -63,6 +65,7 @@ public class SingleButtonViewImpl implements SingleButtonView {
 	@Override
 	public void setButtonText(String string) {
 		button.setText(string);
+		originalButtonText = string;
 	}
 
 	@Override
@@ -76,14 +79,10 @@ public class SingleButtonViewImpl implements SingleButtonView {
 	}
 
 	@Override
-	public void setLoading(boolean loading) {
-		if (loading) {
-			this.button.state().loading();
-		} else {
-			this.button.state().reset();
-		}
+	public void setLoading(boolean isLoading) {
+		DisplayUtils.showLoading(button, isLoading, originalButtonText);
 	}
-
+	
 	@Override
 	public void setDataLoadingText(String loadingText) {
 		button.setDataLoadingText(loadingText);

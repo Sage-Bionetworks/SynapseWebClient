@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.FormLabel;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -40,6 +41,7 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 	List<TextBox> textBoxes;
 	SynapseAlert synAlert;
 	KeyDownHandler handler;
+	String originalButtonText;
 
 	@Inject
 	public PromptForValuesModalViewImpl(Binder binder, SynapseAlert synAlert) {
@@ -65,6 +67,7 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 				onPrimary();
 			}
 		};
+		originalButtonText = primaryButton.getText();
 	}
 
 	private void onPrimary() {
@@ -135,17 +138,13 @@ public class PromptForValuesModalViewImpl implements PromptForValuesModalView {
 	public void clear() {
 		form.clear();
 		textBoxes = new ArrayList<>();
-		this.primaryButton.state().reset();
 		synAlert.clear();
+		setLoading(false);
 	}
 
 	@Override
 	public void setLoading(boolean isLoading) {
-		if (isLoading) {
-			this.primaryButton.state().loading();
-		} else {
-			this.primaryButton.state().reset();
-		}
+		DisplayUtils.showLoading(primaryButton, isLoading, originalButtonText);
 	}
 
 	@Override

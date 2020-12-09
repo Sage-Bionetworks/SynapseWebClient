@@ -33,7 +33,8 @@ public class BigPromptModalViewImpl implements BigPromptModalView {
 	Button defaultButton;
 	Widget widget;
 	Callback callback;
-
+	String originalButtonText;
+	
 	@Inject
 	public BigPromptModalViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
@@ -48,6 +49,7 @@ public class BigPromptModalViewImpl implements BigPromptModalView {
 			}
 		});
 		primaryButton.addDomHandler(DisplayUtils.getPreventTabHandler(primaryButton), KeyDownEvent.getType());
+		originalButtonText = primaryButton.getText();
 	}
 
 	@Override
@@ -79,18 +81,14 @@ public class BigPromptModalViewImpl implements BigPromptModalView {
 
 	@Override
 	public void clear() {
-		this.primaryButton.state().reset();
+		setLoading(false);
 		this.alert.setVisible(false);
 		this.nameField.clear();
 	}
 
 	@Override
 	public void setLoading(boolean isLoading) {
-		if (isLoading) {
-			this.primaryButton.state().loading();
-		} else {
-			this.primaryButton.state().reset();
-		}
+		DisplayUtils.showLoading(primaryButton, isLoading, originalButtonText);
 	}
 
 	@Override

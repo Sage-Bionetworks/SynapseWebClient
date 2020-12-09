@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.view;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.widget.header.Header;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -20,6 +21,7 @@ public class DataAccessApprovalTokenViewImpl implements DataAccessApprovalTokenV
 	@UiField
 	Div synAlertContainer;
 	Presenter presenter;
+	String originalButtonText;
 	
 	public interface Binder extends UiBinder<Widget, DataAccessApprovalTokenViewImpl> {
 	}
@@ -32,6 +34,7 @@ public class DataAccessApprovalTokenViewImpl implements DataAccessApprovalTokenV
 		this.headerWidget = headerWidget;
 		headerWidget.configure();
 		submitButton.addClickHandler(event -> presenter.onSubmitToken());
+		originalButtonText = submitButton.getText();
 	}
 
 	@Override
@@ -65,13 +68,7 @@ public class DataAccessApprovalTokenViewImpl implements DataAccessApprovalTokenV
 	
 	@Override
 	public void setLoading(boolean isLoading) {
+		DisplayUtils.showLoading(submitButton, isLoading, originalButtonText);
 		textArea.setEnabled(!isLoading);
-		if (isLoading) {
-			this.submitButton.state().loading();
-		} else {
-			this.submitButton.state().reset();
-		}
 	}
-
-
 }

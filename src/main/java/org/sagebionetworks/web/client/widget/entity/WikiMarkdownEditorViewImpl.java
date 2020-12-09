@@ -43,8 +43,7 @@ public class WikiMarkdownEditorViewImpl implements WikiMarkdownEditorView {
 
 	// this UI widget
 	Widget widget;
-
-
+	String originalButtonText;
 
 	@Inject
 	public WikiMarkdownEditorViewImpl(Binder binder) {
@@ -76,14 +75,12 @@ public class WikiMarkdownEditorViewImpl implements WikiMarkdownEditorView {
 		editorDialog.addCloseHandler(onCancel);
 		deleteButton.addClickHandler(onDelete);
 		editorDialog.addDomHandler(DisplayUtils.getESCKeyDownHandler(onCancel), KeyDownEvent.getType());
+		originalButtonText = saveButton.getText();
 	}
 
 	@Override
 	public void setSaving(boolean isSaving) {
-		if (isSaving)
-			saveButton.state().loading();
-		else
-			saveButton.state().reset();
+		DisplayUtils.showLoading(saveButton, isSaving, originalButtonText);		
 	}
 
 	@Override
@@ -120,7 +117,7 @@ public class WikiMarkdownEditorViewImpl implements WikiMarkdownEditorView {
 
 	@Override
 	public void clear() {
-		saveButton.state().reset();
+		setSaving(false);		
 	}
 
 	@Override

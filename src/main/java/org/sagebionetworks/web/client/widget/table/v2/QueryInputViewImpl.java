@@ -6,7 +6,9 @@ import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.InfoAlert;
+
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -41,10 +43,11 @@ public class QueryInputViewImpl implements QueryInputView {
 	Anchor simpleModeLink;
 	HTMLPanel panel;
 	Presenter presenter;
-
+	String originalButtonText;
 	@Inject
 	public QueryInputViewImpl(Binder binder) {
 		this.panel = binder.createAndBindUi(this);
+		originalButtonText = queryButton.getText();
 	}
 
 	@Override
@@ -75,11 +78,7 @@ public class QueryInputViewImpl implements QueryInputView {
 	@Override
 	public void setQueryInputLoading(boolean loading) {
 		this.queryInput.setEnabled(!loading);
-		if (loading) {
-			this.queryButton.state().loading();
-		} else {
-			this.queryButton.state().reset();
-		}
+		DisplayUtils.showLoading(queryButton, loading, originalButtonText);
 	}
 
 	@Override

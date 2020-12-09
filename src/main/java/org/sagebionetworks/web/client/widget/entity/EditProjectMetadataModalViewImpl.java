@@ -7,6 +7,8 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.DisplayUtils;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -37,7 +39,7 @@ public class EditProjectMetadataModalViewImpl implements EditProjectMetadataModa
 	Div aliasUI;
 	@UiField
 	Div modifiedCreatedByContainer;
-
+	String originalButtonText;
 	@Inject
 	public EditProjectMetadataModalViewImpl(Binder binder) {
 		binder.createAndBindUi(this);
@@ -49,6 +51,7 @@ public class EditProjectMetadataModalViewImpl implements EditProjectMetadataModa
 				entityNameField.selectAll();
 			}
 		});
+		originalButtonText = primaryButton.getText();
 	}
 
 	@Override
@@ -98,18 +101,14 @@ public class EditProjectMetadataModalViewImpl implements EditProjectMetadataModa
 
 	@Override
 	public void clear() {
-		this.primaryButton.state().reset();
+		setLoading(false);
 		this.alert.setVisible(false);
 		this.entityNameField.clear();
 	}
 
 	@Override
 	public void setLoading(boolean isLoading) {
-		if (isLoading) {
-			this.primaryButton.state().loading();
-		} else {
-			this.primaryButton.state().reset();
-		}
+		DisplayUtils.showLoading(primaryButton, isLoading, originalButtonText);
 	}
 
 	@Override

@@ -37,7 +37,7 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView 
 	Presenter presenter;
 
 	Widget widget;
-
+	String originalButtonText;
 	@Inject
 	public EditAnnotationsDialogViewImpl(final Binder uiBinder) {
 		widget = uiBinder.createAndBindUi(this);
@@ -51,6 +51,7 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView 
 			presenter.onClickPasteNewValues();
 		});
 		saveButton.addDomHandler(DisplayUtils.getPreventTabHandler(saveButton), KeyDownEvent.getType());
+		originalButtonText = saveButton.getText();
 	}
 
 	@Override
@@ -60,7 +61,7 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView 
 
 	@Override
 	public void showEditor() {
-		saveButton.state().reset();
+		setLoading(false);
 		alert.clearState();
 		editModal.show();
 	}
@@ -72,14 +73,18 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView 
 
 	@Override
 	public void setLoading() {
-		saveButton.state().loading();
+		setLoading(true);		
 	}
 
+	private void setLoading(boolean isLoading) {
+		DisplayUtils.showLoading(saveButton, isLoading, originalButtonText);
+	}
+	
 	@Override
 	public void showError(String message) {
 		alert.showError(message);
 		// enable the save button after an error
-		saveButton.state().reset();
+		setLoading(false);
 	}
 
 	@Override

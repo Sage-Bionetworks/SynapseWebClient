@@ -35,6 +35,7 @@ public class NewReplyWidgetViewImpl implements NewReplyWidgetView {
 
 	private Presenter presenter;
 	private Widget widget;
+	String originalButtonText;
 
 	@Inject
 	public NewReplyWidgetViewImpl(Binder binder) {
@@ -57,6 +58,7 @@ public class NewReplyWidgetViewImpl implements NewReplyWidgetView {
 				presenter.onSave();
 			}
 		});
+		originalButtonText = saveButton.getText();
 	}
 
 	@Override
@@ -66,7 +68,11 @@ public class NewReplyWidgetViewImpl implements NewReplyWidgetView {
 
 	@Override
 	public void resetButton() {
-		saveButton.state().reset();
+		showLoading(false);		
+	}
+	
+	private void showLoading(boolean isLoading) {
+		DisplayUtils.showLoading(saveButton, isLoading, originalButtonText);
 	}
 
 	@Override
@@ -81,7 +87,7 @@ public class NewReplyWidgetViewImpl implements NewReplyWidgetView {
 
 	@Override
 	public void showSaving() {
-		saveButton.state().loading();
+		showLoading(true);		
 	}
 
 	@Override

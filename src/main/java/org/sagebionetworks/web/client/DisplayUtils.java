@@ -12,11 +12,14 @@ import static org.sagebionetworks.web.client.DisplayConstants.DANGER_BUTTON_STYL
 import static org.sagebionetworks.web.client.DisplayConstants.LINK_BUTTON_STYLE;
 import static org.sagebionetworks.web.client.DisplayConstants.OK;
 import static org.sagebionetworks.web.client.DisplayConstants.PRIMARY_BUTTON_STYLE;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconType;
@@ -58,7 +61,7 @@ import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import com.google.gwt.core.client.GWT;
+
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.NodeList;
@@ -107,6 +110,12 @@ public class DisplayUtils {
 			}
 		}
 	};
+
+	public static void showLoading(Button b, boolean isLoading, String originalButtonText) {
+		b.setEnabled(!isLoading);
+		String text = isLoading ? b.getDataLoadingText() : originalButtonText;
+		b.setText(text);
+	}
 
 	public static final Handler getHideModalOnDetachHandler() {
 		return event -> {

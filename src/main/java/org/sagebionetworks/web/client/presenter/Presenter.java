@@ -12,5 +12,5 @@ import com.google.gwt.place.shared.Place;
  */
 public interface Presenter<T extends Place> extends Activity {
 
-	public void setPlace(T place);
+	public void setPlace(T place);	
 }

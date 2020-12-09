@@ -125,7 +125,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	Div formDiv;
 
 	private PortalGinInjector ginInjector;
-
+	String originalNextButtonText, originalSubmitButtonText;
 	@Inject
 	public EvaluationSubmitterViewImpl(Binder binder, EntityFinder entityFinder, EvaluationList evaluationList, PortalGinInjector ginInjector, AuthenticationController authController) {
 		widget = binder.createAndBindUi(this);
@@ -141,6 +141,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 				ginInjector.getSynapseJSNIUtils().unmountComponentAtNode(formDiv.getElement());
 			}
 		});
+		originalNextButtonText = nextButton.getText();
+		originalSubmitButtonText = okButton.getText();
 	}
 
 	public void initClickHandlers() {
@@ -222,22 +224,22 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 
 	@Override
 	public void setNextButtonLoading() {
-		nextButton.state().loading();
+		DisplayUtils.showLoading(nextButton, true, originalNextButtonText);
 	}
 
 	@Override
 	public void resetNextButton() {
-		nextButton.state().reset();
+		DisplayUtils.showLoading(nextButton, false, originalNextButtonText);		
 	}
 
 	@Override
 	public void resetSubmitButton() {
-		okButton.state().reset();
+		DisplayUtils.showLoading(okButton, false, originalSubmitButtonText);
 	}
 
 	@Override
 	public void setSubmitButtonLoading() {
-		okButton.state().loading();
+		DisplayUtils.showLoading(okButton, true, originalSubmitButtonText);
 	}
 
 	@Override
