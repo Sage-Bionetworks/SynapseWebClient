@@ -77,7 +77,7 @@ public class AdministerEvaluationsListTest {
 
 	@Test
 	public void testConfigure() {
-		evalList.configure("syn100");
+		evalList.configure("syn100", any());
 		verify(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
 		verify(mockView).addRow(e1);
 		verify(mockView).addRow(e2);
@@ -86,7 +86,7 @@ public class AdministerEvaluationsListTest {
 	@Test
 	public void testConfigureZeroResults() {
 		AsyncMockStubber.callSuccessWith(new ArrayList<Evaluation>()).when(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
-		evalList.configure("syn100");
+		evalList.configure("syn100", any());
 		verify(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
 		verify(mockView, never()).addRow(e1);
 	}
@@ -95,7 +95,7 @@ public class AdministerEvaluationsListTest {
 	public void testConfigureFailure() throws Exception {
 		Exception ex = new Exception("bad time");
 		AsyncMockStubber.callFailureWith(ex).when(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
-		evalList.configure("syn100");
+		evalList.configure("syn100", any());
 		verify(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(ex);
 	}

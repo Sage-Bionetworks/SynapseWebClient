@@ -24,6 +24,8 @@ public class ChallengeWidgetViewImpl implements ChallengeWidgetView {
 	@UiField
 	Heading challengeIdHeading;
 	@UiField
+	Heading challengeNameHeading;
+	@UiField
 	Div selectTeamModalContainer;
 
 	@UiField
@@ -53,6 +55,11 @@ public class ChallengeWidgetViewImpl implements ChallengeWidgetView {
 	@Override
 	public void setChallengeId(String challengeId) {
 		challengeIdHeading.setText(challengeId);
+	}
+
+	@Override
+	public void setChallengeNameHeading(String challengeName){
+		challengeNameHeading.setText(challengeName);
 	}
 
 	@Override

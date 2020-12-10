@@ -9,10 +9,10 @@
 				<bh:Div>
 					<bh:Span ui:field="actionMenuContainer" addStyleNames="right"/>
 				</bh:Div>
-				<g:SimplePanel ui:field="challengeWidgetContainer"/>
-				<g:SimplePanel ui:field="evaluationListContainer"/>
+				<g:SimplePanel ui:field="challengeWidgetContainer" addStyleNames="max-width-1200 align-center"/>
+				<g:SimplePanel ui:field="evaluationListContainer" addStyleNames="max-width-1200 align-center"/>
 			</b:Column>
 		</b:Row>
-		<bh:Div ui:field="evaluationEditorContainer"/>
+		<bh:Div ui:field="evaluationEditorContainer" addStyleNames="max-width-1200 align-center"/>
 	</bh:Div>
 </ui:UiBinder>

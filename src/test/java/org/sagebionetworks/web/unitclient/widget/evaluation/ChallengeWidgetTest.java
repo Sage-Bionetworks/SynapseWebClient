@@ -76,7 +76,7 @@ public class ChallengeWidgetTest {
 
 	@Test
 	public void testConfigure() {
-		widget.configure("syn100");
+		widget.configure("syn100", "entity Name");
 		verify(mockSynAlert).clear();
 		verify(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
 		verify(mockTeamBadge).configure(PARTICIPANT_TEAM_ID);
@@ -93,7 +93,7 @@ public class ChallengeWidgetTest {
 	public void testConfigureChallengeNotFound() {
 		Exception ex = new NotFoundException("Challenge not found");
 		AsyncMockStubber.callFailureWith(ex).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
-		widget.configure("syn100");
+		widget.configure("syn100", "entity Name");
 
 		verify(mockSynAlert).clear();
 		verify(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
@@ -104,7 +104,7 @@ public class ChallengeWidgetTest {
 	public void testConfigureFailure() {
 		Exception ex = new Exception("unknown error");
 		AsyncMockStubber.callFailureWith(ex).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
-		widget.configure("syn100");
+		widget.configure("syn100", "entity Name");
 
 		verify(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
 

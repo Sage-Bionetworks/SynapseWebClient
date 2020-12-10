@@ -5,6 +5,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public interface ChallengeWidgetView extends IsWidget {
 
+	void setChallengeNameHeading(String challengeName);
+
 	/**
 	 * Set the presenter.
 	 * 

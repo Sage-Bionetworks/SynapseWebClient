@@ -52,7 +52,7 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
 	public void configure(String entityId, String entityName, EntityBundle projectBundle) {
 		lazyInject();
 		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, null, EntityArea.CHALLENGE, null));
-		challengeWidget.configure(entityId);
+		challengeWidget.configure(entityId, entityName);
 
 		//This is currently only used in the "alpha" test mode where a React component is using
 		// a different Evaluation editor

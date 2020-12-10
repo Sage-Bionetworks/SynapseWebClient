@@ -4,6 +4,7 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import java.util.HashMap;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
+import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
@@ -64,9 +65,10 @@ public class ChallengeWidget implements ChallengeWidgetView.Presenter, IsWidget 
 		};
 	}
 
-	public void configure(String entityId) {
+	public void configure(String entityId, String entityName) {
 		synAlert.clear();
 		view.setChallengeVisible(false);
+		view.setChallengeNameHeading(entityName);
 		challengeClient.getChallengeForProject(entityId, callback);
 	}
 

@@ -5,12 +5,22 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
 		<b:Panel ui:field="challengeUI">
-			<b:Heading size="H3" text="Challenge" addStyleNames="margin-left-15"/>
-			<bh:Div addStyleNames="margin-left-15 padding-bottom-15 displayTable">
+			<b:Heading size="H3" text="Challenge" />
+			<bh:Div addStyleNames="padding-bottom-15 displayTable" width="100%">
 				<bh:Div addStyleNames="displayTableRow">
+					<bh:Div addStyleNames="displayTableCell" width="150px">
+						<b:Heading size="H5" text="Challenge Name"
+								   addStyleNames="displayInlineBlock lightGreyText margin-right-30" />
+					</bh:Div>
 					<bh:Div addStyleNames="displayTableCell">
+						<b:Heading size="H5" ui:field="challengeNameHeading"
+								   addStyleNames="displayInlineBlock" />
+					</bh:Div>
+				</bh:Div>
+				<bh:Div addStyleNames="displayTableRow">
+					<bh:Div addStyleNames="displayTableCell" width="150px">
 						<b:Heading size="H5" text="Challenge ID"
-							addStyleNames="displayInlineBlock margin-right-10" />
+							addStyleNames="displayInlineBlock lightGreyText margin-right-30" />
 					</bh:Div>
 					<bh:Div addStyleNames="displayTableCell">
 						<b:Heading size="H5" ui:field="challengeIdHeading"
@@ -18,9 +28,9 @@
 					</bh:Div>
 				</bh:Div>
 				<bh:Div addStyleNames="displayTableRow">
-					<bh:Div addStyleNames="displayTableCell">
+					<bh:Div addStyleNames="displayTableCell" width="150px">
 						<b:Heading size="H5" text="Team"
-								   addStyleNames="displayInlineBlock margin-right-10" />
+								   addStyleNames="displayInlineBlock lightGreyText margin-right-30" />
 					</bh:Div>
 
 					<bh:Div addStyleNames="displayTableCell">
