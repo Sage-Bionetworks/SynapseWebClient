@@ -96,6 +96,7 @@ public class SubscribersWidget implements SubscribersWidgetView.Presenter, IsWid
 				for (String userId : subscribers) {
 					UserBadge userBadge = ginInjector.getUserBadgeWidget();
 					userBadge.configure(userId);
+					userBadge.setOpenInNewWindow();
 					loadMoreWidgetContainer.add(userBadge.asWidget());
 				}
 				loadMoreWidgetContainer.setIsMore(nextPageToken != null);
