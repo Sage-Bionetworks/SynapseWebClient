@@ -74,30 +74,19 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Evalua
 		synAlert.clear();
 		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookieProvider);
 		boolean timeInUtc = globalApplicationState.isShowingUTCTime();
+		String sessionToken = authenticationController.getCurrentUserSessionToken();
 
 		challengeClient.getSharableEvaluations(entityId, new AsyncCallback<List<Evaluation>>() {
 			@Override
 			public void onSuccess(List<Evaluation> evaluations) {
 				for (Evaluation evaluation : evaluations) {
 					if(isInTestWebsite && evaluation.getQuota() == null){
-						EvaluationCardProps props = EvaluationCardProps.create(
-							EvaluationJS.fromEvaluation(evaluation),
-							authenticationController.getCurrentUserSessionToken(),
+						createEvaluationCardReactComponent(
+							evaluation,
 							timeInUtc,
-							() -> onEditEvaluation.accept(evaluation.getId()),
-							() -> onShareClicked(evaluation),
-							() -> {
-								String subchallengeList = evaluation.getId();
-								HashMap<String, String> submitToEvaluationParams = new HashMap<>();
-								submitToEvaluationParams.put(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY, subchallengeList);
-								submitToEvaluationParams.put(WidgetConstants.BUTTON_TEXT_KEY, "Submit");
-								submitToEvaluationWidget.configure(null, submitToEvaluationParams, null, null);
-								submitToEvaluationWidget.submitToChallengeClicked();
-							},
-							() -> refresh()
+							sessionToken,
+							onEditEvaluation
 						);
-
-						view.addReactComponent(evaluation, props);
 					} else{
 						view.addRow(evaluation);
 					}
@@ -109,6 +98,33 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Evalua
 				synAlert.handleException(caught);
 			}
 		});
+	}
+
+	private void createEvaluationCardReactComponent(Evaluation evaluation, boolean timeInUtc, String sessionToken, Consumer<String> onEditEvaluation) {
+		EvaluationCardProps.Callback onEdit = () -> onEditEvaluation.accept(evaluation.getId());
+		EvaluationCardProps.Callback onModifyAccess = () -> onShareClicked(evaluation);
+		EvaluationCardProps.Callback onSubmit = () -> {
+			HashMap<String, String> submitToEvaluationParams = new HashMap<>();
+			submitToEvaluationParams.put(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY, evaluation.getId());
+			submitToEvaluationParams.put(WidgetConstants.BUTTON_TEXT_KEY, "Submit");
+
+			// The submitToEvaluation widget has a button, which we choose not to show since the React component also has a button, so we simulate the button click immediately
+			submitToEvaluationWidget.configure(null, submitToEvaluationParams, null, null);
+			submitToEvaluationWidget.submitToChallengeClicked();
+		};
+		EvaluationCardProps.Callback onDeleteSuccess = this::refresh;
+
+		EvaluationCardProps props = EvaluationCardProps.create(
+			EvaluationJS.fromEvaluation(evaluation),
+				sessionToken,
+				timeInUtc,
+				onEdit,
+				onModifyAccess,
+				onSubmit,
+				onDeleteSuccess
+		);
+
+		view.addReactComponent(evaluation, props);
 	}
 
 	public void refresh() {

@@ -57,7 +57,6 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
 		//This is currently only used in the "alpha" test mode where a React component is using
 		// a different Evaluation editor
 		Consumer<String> editEvaluationCallback = (String evaluationId) ->{
-			GWT.log("here");
 			EvaluationEditorReactComponentPage evaluationEditor = ginInjector.createEvaluationEditorReactComponentPage();
 			evaluationEditor.configure(evaluationId,
 					authenticationController.getCurrentUserSessionToken(),
