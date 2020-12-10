@@ -42,7 +42,7 @@ public class ClientProperties {
 	public static final WebResource MATH_PROCESSOR_JS = new WebResource("js/katex-0.10.1.min.js");
 	public static final WebResource AWS_SDK_JS = new WebResource("js/aws-sdk-2.494.0.min.js");
 	public static final String QUERY_SERVICE_PREFIX = "/query?query=";
-	public static final String EVALUATION_QUERY_SERVICE_PREFIX = "/evaluation/submissison/query?query=";
+	public static final String EVALUATION_QUERY_SERVICE_PREFIX = "/evaluation/submission/query?query=";
 
 	public static final WebResource SYNAPSE_REACT_COMPONENTS_JS = new WebResource("js/SRC/synapse-react-client.production.min.js");
 	public static final WebResource PROP_TYPES_JS = new WebResource("https://unpkg.com/prop-types@15.6.2/prop-types.min.js");

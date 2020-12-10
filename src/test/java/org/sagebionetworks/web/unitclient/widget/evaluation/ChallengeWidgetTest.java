@@ -84,9 +84,6 @@ public class ChallengeWidgetTest {
 		inOrder.verify(mockView).setChallengeVisible(false);
 		inOrder.verify(mockView).setChallengeVisible(true);
 		verify(mockView).setChallengeId(CHALLENGE_ID);
-		// submit to challenge widget has been configured
-		verify(submitToChallengeWidget).configure(any(), hashmapCaptor.capture(), any(), any());
-		assertEquals(CHALLENGE_ID, hashmapCaptor.getValue().get(WidgetConstants.CHALLENGE_ID_KEY));
 	}
 
 	@Test
