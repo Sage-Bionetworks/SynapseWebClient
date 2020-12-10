@@ -5,16 +5,23 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import java.util.ArrayList;
+import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.function.Consumer;
+
+import com.google.gwt.junit.client.GWTTestCase;
 import org.apache.tapestry.form.Submit;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -28,7 +35,7 @@ import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlList
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-public class AdministerEvaluationsListTest {
+public class AdministerEvaluationsListTest{
 
 	AdministerEvaluationsList evalList;
 	@Mock
@@ -51,11 +58,10 @@ public class AdministerEvaluationsListTest {
 	SubmitToEvaluationWidget mockSubmitToEvaluationWidget;
 
 
+	@Mock
+	Consumer<String> mockOnEditEvaluation;
 
 	Evaluation e1, e2;
-
-	boolean isTestWebsite = false;
-	boolean utc = false;
 
 	@Before
 	public void setup() throws Exception {
@@ -67,26 +73,39 @@ public class AdministerEvaluationsListTest {
 
 		e1 = new Evaluation();
 		e1.setId("101");
+		e1.setCreatedOn(new Date());
 		evaluationResults.add(e1);
 
 		e2 = new Evaluation();
 		e1.setId("102");
+		e1.setCreatedOn(new Date());
 		evaluationResults.add(e2);
 		AsyncMockStubber.callSuccessWith(evaluationResults).when(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
 	}
 
 	@Test
 	public void testConfigure() {
-		evalList.configure("syn100", any());
+		evalList.configure("syn100", mockOnEditEvaluation);
 		verify(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
 		verify(mockView).addRow(e1);
 		verify(mockView).addRow(e2);
 	}
 
+	@Ignore // Not sure how to stub out GWT Javascript-specific module used in EvaluationJSObject
+	@Test
+	public void testConfigure_useReactComponent() {
+		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
+
+		evalList.configure("syn100", mockOnEditEvaluation);
+		verify(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
+		verify(mockView).addReactComponent(eq(e1), any());
+		verify(mockView).addReactComponent(eq(e2), any());
+	}
+
 	@Test
 	public void testConfigureZeroResults() {
 		AsyncMockStubber.callSuccessWith(new ArrayList<Evaluation>()).when(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
-		evalList.configure("syn100", any());
+		evalList.configure("syn100", mockOnEditEvaluation);
 		verify(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
 		verify(mockView, never()).addRow(e1);
 	}
@@ -95,7 +114,7 @@ public class AdministerEvaluationsListTest {
 	public void testConfigureFailure() throws Exception {
 		Exception ex = new Exception("bad time");
 		AsyncMockStubber.callFailureWith(ex).when(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
-		evalList.configure("syn100", any());
+		evalList.configure("syn100", mockOnEditEvaluation);
 		verify(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(ex);
 	}

@@ -6,14 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.google.gwt.user.client.Window;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.jsinterop.EvaluationCardProps;
-import org.sagebionetworks.web.client.jsinterop.EvaluationJS;
+import org.sagebionetworks.web.client.jsinterop.EvaluationJSObject;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -81,12 +80,7 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Evalua
 			public void onSuccess(List<Evaluation> evaluations) {
 				for (Evaluation evaluation : evaluations) {
 					if(isInTestWebsite && evaluation.getQuota() == null){
-						createEvaluationCardReactComponent(
-							evaluation,
-							timeInUtc,
-							sessionToken,
-							onEditEvaluation
-						);
+						createEvaluationCardReactComponent(evaluation,timeInUtc,sessionToken,onEditEvaluation);
 					} else{
 						view.addRow(evaluation);
 					}
@@ -115,7 +109,7 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Evalua
 		EvaluationCardProps.Callback onDeleteSuccess = this::refresh;
 
 		EvaluationCardProps props = EvaluationCardProps.create(
-			EvaluationJS.fromEvaluation(evaluation),
+			EvaluationJSObject.fromEvaluation(evaluation),
 				sessionToken,
 				timeInUtc,
 				onEdit,
