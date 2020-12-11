@@ -1,14 +1,13 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:d="urn:import:com.google.gwt.dom.client"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<b:Modal ui:field="statsPlotModal" title="" addStyleNames="modal-90-percent"
 		closable="true" dataBackdrop="STATIC" dataKeyboard="true">
 		<b:ModalBody>
-			<bh:Div ui:field="srcContainer" />
+			<w:ReactComponentDiv ui:field="srcContainer" />
 			<bh:Div>
 				<bh:Paragraph addStyleNames="center">This data is collected and processed on a monthly basis.</bh:Paragraph>
 			</bh:Div>

@@ -17,6 +17,8 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -41,6 +43,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	BadgeSize badgeSize = BadgeSize.DEFAULT;
 	CallbackP<String> currentClickHandler = STANDARD_HANDLER;
 	FocusPanel userBadgeContainer = new FocusPanel();
+	ReactComponentDiv userBadgeReactDiv = new ReactComponentDiv();
 	JsArray<JavaScriptObject> menuActionsArray = null;
 	AuthenticationController authController;
 	boolean isReactHandlingClickEvents = false;
@@ -55,18 +58,13 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		setMarginLeft(2);
 		addStyleName("vertical-align-middle");
 		currentClickHandler = STANDARD_HANDLER;
-		addAttachHandler(event -> {
-			if (!event.isAttached()) {
-				// detach event, clean up react component
-				jsniUtils.unmountComponentAtNode(userBadgeContainer.getElement());	
-			}
-		});
 		userBadgeContainer.addClickHandler(event -> {
 			if (!isReactHandlingClickEvents) {
 				event.preventDefault();
 				currentClickHandler.invoke(userId);
 			}
 		});
+		userBadgeContainer.add(userBadgeReactDiv);
 	}
 
 	@Override
@@ -82,7 +80,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		} catch (Throwable e) {
 			jsniUtils.consoleError(e);
 		}
-		_showBadge(userBadgeContainer.getElement(), profileJson, userId, badgeSize.reactClientSize, isTextHidden, isTooltipHidden, pictureUrl, !authController.isLoggedIn(), isCertified , isValidated, menuActionsArray, this);
+		_showBadge(userBadgeReactDiv.getElement(), profileJson, userId, badgeSize.reactClientSize, isTextHidden, isTooltipHidden, pictureUrl, !authController.isLoggedIn(), isCertified , isValidated, menuActionsArray, this);
 	}
 
 	public void setClickHandler(ClickHandler clickHandler) {

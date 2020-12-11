@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -122,7 +123,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@UiField
 	FormGroup submissionNameUi;
 	@UiField
-	Div formDiv;
+	ReactComponentDiv formDiv;
 
 	private PortalGinInjector ginInjector;
 	String originalNextButtonText, originalSubmitButtonText;
@@ -135,12 +136,6 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		this.authController = authController;
 		evaluationListContainer.setWidget(evaluationList.asWidget());
 		initClickHandlers();
-		widget.addAttachHandler(event -> {
-			if (!event.isAttached()) {
-				// detach event, clean up react component
-				ginInjector.getSynapseJSNIUtils().unmountComponentAtNode(formDiv.getElement());
-			}
-		});
 		originalNextButtonText = nextButton.getText();
 		originalSubmitButtonText = okButton.getText();
 	}

@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.view;
 
-import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.dom.client.Element;
@@ -19,7 +19,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	}
 
 	@UiField
-	Div container;
+	ReactComponentDiv container;
 
 	private static final String PROJECT_VIEW_ID = "syn23593547.1";
 
@@ -56,7 +56,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@Override
 	public void render() {
 		scrollToTop();
-		jsniUtils.unmountComponentAtNode(container.getElement());
 		_showHomepageComponent(container.getElement(), authController.getCurrentUserSessionToken(), PROJECT_VIEW_ID);
 	}
 

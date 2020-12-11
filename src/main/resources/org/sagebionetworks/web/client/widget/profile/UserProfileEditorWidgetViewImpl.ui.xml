@@ -116,7 +116,7 @@
 				</bh:Div>
 			</b:Column>
 			<b:Column size="MD_3 XS_12">
-				<bh:Span ui:field="accountLevelBadgeContainer" />
+				<w:ReactComponentDiv ui:field="accountLevelBadgeContainer" />
 			</b:Column>
 		</b:Row>
 	</g:HTMLPanel>

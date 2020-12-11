@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.InfoAlert;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.pageprogress.PageProgressWidget;
@@ -32,7 +33,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@UiField
 	Div termsOfUseView;
 	@UiField
-	Div termsOfUseContainer;	
+	ReactComponentDiv termsOfUseContainer;	
 	@UiField
 	InfoAlert acceptedTermsOfUseView;
 	@UiField
@@ -135,7 +136,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 		if (!hasAccepted) {
 			termsOfUseView.setVisible(true);
 			reconfigurePageProgress(false);
-			jsniUtils.unmountComponentAtNode(termsOfUseContainer.getElement());
 			_showTermsOfUse(termsOfUseContainer.getElement(), this);
 		} else {
 			acceptedTermsOfUseView.setVisible(true);

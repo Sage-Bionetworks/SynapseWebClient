@@ -6,6 +6,8 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseProperties;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Element;
@@ -23,7 +25,7 @@ public class StatisticsPlotWidgetViewImpl implements StatisticsPlotWidgetView, I
 	}
 
 	@UiField
-	Div srcContainer;
+	ReactComponentDiv srcContainer;
 	@UiField
 	Button closeButton;
 	@UiField
@@ -31,19 +33,12 @@ public class StatisticsPlotWidgetViewImpl implements StatisticsPlotWidgetView, I
 	Widget widget;
 	SynapseJSNIUtils jsniUtils;
 	String endpoint;
-	boolean isConfigured = false;
-
+	
 	@Inject
 	public StatisticsPlotWidgetViewImpl(StatisticsPlotWidgetViewImplUiBinder binder, SynapseJSNIUtils jsniUtils, SynapseProperties synapseProperties) {
 		widget = binder.createAndBindUi(this);
 		this.jsniUtils = jsniUtils;
 		endpoint = synapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY);
-		widget.addAttachHandler(event -> {
-			if (!event.isAttached()) {
-				// detach event, clean up react component
-				jsniUtils.unmountComponentAtNode(srcContainer.getElement());
-			}
-		});
 		closeButton.addClickHandler(event -> {
 			statsPlotModal.hide();
 		});
@@ -51,11 +46,7 @@ public class StatisticsPlotWidgetViewImpl implements StatisticsPlotWidgetView, I
 
 	@Override
 	public void configureAndShow(String projectId, String sessionToken) {
-		if (isConfigured) {
-			jsniUtils.unmountComponentAtNode(srcContainer.getElement());
-		}
 		_createSRCWidget(srcContainer.getElement(), projectId, sessionToken, endpoint);
-		isConfigured = true;
 		statsPlotModal.show();
 	}
 

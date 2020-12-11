@@ -39,7 +39,7 @@
 					linkHref="https://s3.amazonaws.com/static.synapse.org/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf?v=5"
 					visible="false" />
 			<bh:Div ui:field="termsOfUseView">
-				<bh:Div ui:field="termsOfUseContainer" />
+				<w:ReactComponentDiv ui:field="termsOfUseContainer" />
 				<bh:Div ui:field="pageProgressContainer"/>
 			</bh:Div>
 			

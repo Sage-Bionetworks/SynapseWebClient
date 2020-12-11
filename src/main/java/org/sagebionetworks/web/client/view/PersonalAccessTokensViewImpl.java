@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.PersonalAccessTokensPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.dom.client.Element;
@@ -23,9 +24,9 @@ public class PersonalAccessTokensViewImpl extends Composite implements PersonalA
 	}
 
 	@UiField
-	Div container = new Div();
+	ReactComponentDiv container;
 	@UiField
-	Anchor backToSettingsAnchor = new Anchor();
+	Anchor backToSettingsAnchor;
 
 	private PersonalAccessTokensPresenter presenter;
 	private AuthenticationController authController;
@@ -48,7 +49,6 @@ public class PersonalAccessTokensViewImpl extends Composite implements PersonalA
 	@Override
 	public void render() {
 		Window.scrollTo(0, 0); // scroll user to top of page
-		jsniUtils.unmountComponentAtNode(container.getElement());
 		_showPersonalAccessTokensComponent(container.getElement(), authController.getCurrentUserSessionToken());
 	}
 
