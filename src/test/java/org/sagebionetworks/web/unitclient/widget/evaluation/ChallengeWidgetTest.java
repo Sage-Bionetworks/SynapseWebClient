@@ -59,7 +59,7 @@ public class ChallengeWidgetTest {
 
 	@Before
 	public void setup() throws Exception {
-		widget = new ChallengeWidget(mockView, mockChallengeClient, mockSynAlert, mockTeamBadge, mockSelectTeamModal, submitToChallengeWidget);
+		widget = new ChallengeWidget(mockView, mockChallengeClient, mockSynAlert, mockTeamBadge, mockSelectTeamModal);
 
 		AsyncMockStubber.callSuccessWith(mockChallenge).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
 		when(mockChallenge.getId()).thenReturn(CHALLENGE_ID);
@@ -76,7 +76,7 @@ public class ChallengeWidgetTest {
 
 	@Test
 	public void testConfigure() {
-		widget.configure("syn100");
+		widget.configure("syn100", "entity Name");
 		verify(mockSynAlert).clear();
 		verify(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
 		verify(mockTeamBadge).configure(PARTICIPANT_TEAM_ID);
@@ -84,16 +84,13 @@ public class ChallengeWidgetTest {
 		inOrder.verify(mockView).setChallengeVisible(false);
 		inOrder.verify(mockView).setChallengeVisible(true);
 		verify(mockView).setChallengeId(CHALLENGE_ID);
-		// submit to challenge widget has been configured
-		verify(submitToChallengeWidget).configure(any(), hashmapCaptor.capture(), any(), any());
-		assertEquals(CHALLENGE_ID, hashmapCaptor.getValue().get(WidgetConstants.CHALLENGE_ID_KEY));
 	}
 
 	@Test
 	public void testConfigureChallengeNotFound() {
 		Exception ex = new NotFoundException("Challenge not found");
 		AsyncMockStubber.callFailureWith(ex).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
-		widget.configure("syn100");
+		widget.configure("syn100", "entity Name");
 
 		verify(mockSynAlert).clear();
 		verify(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
@@ -104,7 +101,7 @@ public class ChallengeWidgetTest {
 	public void testConfigureFailure() {
 		Exception ex = new Exception("unknown error");
 		AsyncMockStubber.callFailureWith(ex).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
-		widget.configure("syn100");
+		widget.configure("syn100", "entity Name");
 
 		verify(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
 

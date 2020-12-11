@@ -13,9 +13,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
@@ -43,11 +46,17 @@ public class ChallengeTabTest {
 	EntityBundle mockProjectEntityBundle;
 	@Mock
 	ActionMenuWidget mockActionMenuWidget;
+	@Mock
+	CookieProvider mockCookieProvider;
 	ChallengeTab tab;
+	@Mock
+	AuthenticationController authenticationController;
+	@Mock
+	GlobalApplicationState globalApplicationState;
 
 	@Before
 	public void setUp() {
-		tab = new ChallengeTab(mockTab, mockPortalGinInjector);
+		tab = new ChallengeTab(mockTab, mockPortalGinInjector , authenticationController, globalApplicationState);
 		when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
 		when(mockPortalGinInjector.getChallengeTabView()).thenReturn(mockView);
 		when(mockPortalGinInjector.getAdministerEvaluationsList()).thenReturn(mockAdministerEvaluationsList);
@@ -73,8 +82,8 @@ public class ChallengeTabTest {
 		String entityName = "challenge project test";
 		tab.configure(entityId, entityName, mockProjectEntityBundle);
 
-		verify(mockAdministerEvaluationsList).configure(eq(entityId));
-		verify(mockChallengeWidget).configure(eq(entityId));
+		verify(mockAdministerEvaluationsList).configure(eq(entityId), any());
+		verify(mockChallengeWidget).configure(entityId, entityName);
 
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab).setEntityNameAndPlace(eq(entityName), captor.capture());

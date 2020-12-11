@@ -5,6 +5,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public interface ChallengeWidgetView extends IsWidget {
 
+	void setChallengeNameHeading(String challengeName);
+
 	/**
 	 * Set the presenter.
 	 * 
@@ -21,8 +23,6 @@ public interface ChallengeWidgetView extends IsWidget {
 	void add(Widget w);
 
 	void setSelectTeamModal(Widget w);
-
-	void setSubmitToChallengeWidget(IsWidget submitToChallengeWidget);
 
 	public interface Presenter {
 		void onEditTeamClicked();

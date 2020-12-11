@@ -5,22 +5,43 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
 		<b:Panel ui:field="challengeUI">
-			<b:Heading size="H3" text="Challenge" addStyleNames="margin-left-15"/>
-			<bh:Div addStyleNames="margin-left-15 padding-bottom-15">
-				<bh:Div>
-					<b:Heading size="H5" text="Challenge ID:"
-						addStyleNames="displayInlineBlock margin-right-10" />
-					<b:Heading size="H5" ui:field="challengeIdHeading"
-						addStyleNames="displayInlineBlock" />
+			<b:Heading size="H3" text="Challenge" />
+			<bh:Div addStyleNames="padding-bottom-15 displayTable" width="100%">
+				<bh:Div addStyleNames="displayTableRow">
+					<bh:Div addStyleNames="displayTableCell" width="150px">
+						<b:Heading size="H5" text="Challenge Name"
+								   addStyleNames="displayInlineBlock lightGreyText margin-right-30" />
+					</bh:Div>
+					<bh:Div addStyleNames="displayTableCell">
+						<b:Heading size="H5" ui:field="challengeNameHeading"
+								   addStyleNames="displayInlineBlock" />
+					</bh:Div>
 				</bh:Div>
-				<bh:Div>
-					<bh:Div ui:field="submitToChallengeContainer" />
-					<b:Heading size="H5" text="Registered participants team"
-						addStyleNames="displayInlineBlock margin-right-10" />
-					<b:Button ui:field="editTeamButton" type="DEFAULT"
-						text="Edit" icon="EDIT" size="EXTRA_SMALL" />
-					<bh:Div ui:field="teamWidgetContainer" />
+				<bh:Div addStyleNames="displayTableRow">
+					<bh:Div addStyleNames="displayTableCell" width="150px">
+						<b:Heading size="H5" text="Challenge ID"
+							addStyleNames="displayInlineBlock lightGreyText margin-right-30" />
+					</bh:Div>
+					<bh:Div addStyleNames="displayTableCell">
+						<b:Heading size="H5" ui:field="challengeIdHeading"
+							addStyleNames="displayInlineBlock" />
+					</bh:Div>
 				</bh:Div>
+				<bh:Div addStyleNames="displayTableRow">
+					<bh:Div addStyleNames="displayTableCell" width="150px">
+						<b:Heading size="H5" text="Team"
+								   addStyleNames="displayInlineBlock lightGreyText margin-right-30" />
+					</bh:Div>
+
+					<bh:Div addStyleNames="displayTableCell">
+						<b:Heading size="H5" text="Registered participant's team"
+								   addStyleNames="displayInlineBlock margin-right-10" />
+						<b:Button ui:field="editTeamButton" type="LINK"
+								  text="Edit Team" size="EXTRA_SMALL" />
+						<bh:Div ui:field="teamWidgetContainer" addStyleNames="border-top-6-synapse-blue border-left-1 border-right-1 border-bottom-1"/>
+					</bh:Div>
+				</bh:Div>
+
 			</bh:Div>
 		</b:Panel>
 		<bh:Div ui:field="selectTeamModalContainer" />
