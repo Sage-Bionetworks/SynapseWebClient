@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import com.google.gwt.user.client.Window;
+import org.gwtbootstrap3.client.ui.Container;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -16,9 +17,9 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorReactCom
 public class ChallengeTabViewImpl implements ChallengeTabView {
 
 	@UiField
-	SimplePanel evaluationListContainer;
+	Container evaluationListContainer;
 	@UiField
-	SimplePanel challengeWidgetContainer;
+	Container challengeWidgetContainer;
 	@UiField
 	Span actionMenuContainer;
 
@@ -26,7 +27,7 @@ public class ChallengeTabViewImpl implements ChallengeTabView {
 	Row adminTabContainer;
 
 	@UiField
-	Div evaluationEditorContainer;
+	Container evaluationEditorContainer;
 
 	public interface TabsViewImplUiBinder extends UiBinder<Widget, ChallengeTabViewImpl> {
 	}
@@ -41,12 +42,12 @@ public class ChallengeTabViewImpl implements ChallengeTabView {
 
 	@Override
 	public void setEvaluationList(Widget w) {
-		evaluationListContainer.setWidget(w);
+		evaluationListContainer.add(w);
 	}
 
 	@Override
 	public void setChallengeWidget(Widget w) {
-		challengeWidgetContainer.setWidget(w);
+		challengeWidgetContainer.add(w);
 	}
 	
 	@Override

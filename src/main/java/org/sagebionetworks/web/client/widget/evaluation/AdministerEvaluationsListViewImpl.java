@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.ReactElement;
 import org.sagebionetworks.web.client.jsinterop.SRC;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationRowWidget.EvaluationActionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -63,13 +64,7 @@ public class AdministerEvaluationsListViewImpl implements AdministerEvaluationsL
 
 	@Override
 	public void addReactComponent(Evaluation evaluation, EvaluationCardProps props) {
-		Div container = new Div(){
-			@Override
-			protected void onUnload() {
-				ReactDOM.unmountComponentAtNode(this.getElement());
-				super.onUnload();
-			}
-		};
+		ReactComponentDiv container = new ReactComponentDiv();
 		container.setMarginTop(50);
 		rows.add(container);
 

@@ -61,6 +61,7 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
 			evaluationEditor.configure(evaluationId,
 					authenticationController.getCurrentUserSessionToken(),
 					globalApplicationState.isShowingUTCTime(),
+					// onPageBack() callback
 					() ->{
 						evaluationEditor.removeFromParent();
 						view.showAdminTabContents();

@@ -9,28 +9,23 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.evaluation.model.EvaluationRoundListResponse;
 import org.sagebionetworks.web.client.jsinterop.EvaluationEditorProps;
 import org.sagebionetworks.web.client.jsinterop.EvaluationRoundEditorListProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.SRC;
-import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
 public class EvaluationEditorReactComponentPage extends Composite {
 	public interface Binder extends UiBinder<Widget, EvaluationEditorReactComponentPage> {}
 
 	@UiField
-	Icon leftArrow;
-	@UiField
 	Anchor backToChallenge;
 
 	@UiField
-	Div evaluationEditorContainer;
+	ReactComponentDiv evaluationEditorContainer;
 	@UiField
-	Div evaluationRoundEditorContainer;
+	ReactComponentDiv evaluationRoundEditorContainer;
 
 	String evaluationId;
 	String sessionToken;
@@ -62,7 +57,7 @@ public class EvaluationEditorReactComponentPage extends Composite {
 				evaluationRoundEditorContainer.getElement());
 	}
 
-	@UiHandler(value={"leftArrow","backToChallenge"})
+	@UiHandler(value={"backToChallenge"})
 	void onBackToChallengeClick(ClickEvent event){
 		unmountReactComponents();
 		onPageBack.run();
@@ -73,10 +68,4 @@ public class EvaluationEditorReactComponentPage extends Composite {
 		ReactDOM.unmountComponentAtNode(evaluationEditorContainer.getElement());
 	}
 
-
-	@Override
-	protected void onUnload() {
-		super.onUnload();
-		unmountReactComponents();
-	}
 }
