@@ -33,7 +33,7 @@
 			ui:field="modal1">
 			<b:ModalBody>
 				<bh:Div>
-					<bh:Div ui:field="formDiv" />
+					<w:ReactComponentDiv ui:field="formDiv" />
 					<b:FormGroup ui:field="entityFinderUI">
 						<b:FormGroup>
 							<b:FormLabel>Select the Entity that you would like to submit:</b:FormLabel>

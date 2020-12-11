@@ -10,6 +10,8 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.PlotlyTraceWrapper;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -24,7 +26,7 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	}
 
 	@UiField
-	Div chartContainer;
+	ReactComponentDiv chartContainer;
 	@UiField
 	Div synAlertContainer;
 	@UiField
@@ -39,12 +41,6 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	@Inject
 	public PlotlyWidgetViewImpl(Binder binder, SynapseJSNIUtils jsniUtils) {
 		w = binder.createAndBindUi(this);
-		w.addAttachHandler(event -> {
-			if (!event.isAttached()) {
-				// detach event, clean up react component
-				jsniUtils.unmountComponentAtNode(chartContainer.getElement());
-			}
-		});
 		_addPlotlyClickEventListener(chartContainer.getElement(), this);
 	}
 

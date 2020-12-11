@@ -6,6 +6,8 @@ import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Element;
@@ -19,7 +21,7 @@ public class SRCDemoWidgetViewImpl implements SRCDemoWidgetView {
 	}
 
 	@UiField
-	Div demoContainer;
+	ReactComponentDiv demoContainer;
 	@UiField
 	Div synAlertContainer;
 	@UiField
@@ -32,12 +34,6 @@ public class SRCDemoWidgetViewImpl implements SRCDemoWidgetView {
 	@Inject
 	public SRCDemoWidgetViewImpl(Binder binder, PortalGinInjector ginInjector) {
 		w = binder.createAndBindUi(this);
-		w.addAttachHandler(event -> {
-			if (!event.isAttached()) {
-				// detach event, clean up react component
-				ginInjector.getSynapseJSNIUtils().unmountComponentAtNode(demoContainer.getElement());
-			}
-		});
 	}
 
 	@Override

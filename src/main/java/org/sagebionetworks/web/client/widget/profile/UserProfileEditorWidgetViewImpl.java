@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.search.GooglePlacesSuggestOracle;
 
 import com.google.gwt.dom.client.Element;
@@ -84,7 +85,7 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	@UiField
 	Anchor orcIdLink;
 	@UiField
-	Span accountLevelBadgeContainer;
+	ReactComponentDiv accountLevelBadgeContainer;
 	@UiField
 	Row ownerFieldsContainer;
 	@UiField
@@ -318,7 +319,6 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 	
 	@Override
 	public void setOwnerId(String userId) {
-		jsniUtils.unmountComponentAtNode(accountLevelBadgeContainer.getElement());
 		_showAccountLevelBadge(accountLevelBadgeContainer.getElement(), userId);
 	}
 	

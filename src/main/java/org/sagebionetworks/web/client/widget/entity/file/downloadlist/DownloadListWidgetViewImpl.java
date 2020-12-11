@@ -4,6 +4,8 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -12,7 +14,7 @@ import com.google.inject.Inject;
 
 public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWidget {
 	Div mainContainer = new Div();
-	Div downloadListContainer = new Div();
+	Div downloadListContainer = new ReactComponentDiv();
 	AuthenticationController authController;
 	SynapseJSNIUtils jsniUtils;
 	EventBus eventBus;
@@ -24,11 +26,6 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 		this.eventBus = eventBus;
 		mainContainer.addStyleName("mainContainer");
 		mainContainer.add(downloadListContainer);
-		downloadListContainer.addAttachHandler(event -> {
-			if (!event.isAttached()) {
-				jsniUtils.unmountComponentAtNode(downloadListContainer.getElement());
-			}
-		});
 		downloadListContainer.addStyleName("downloadListContainer");
 	}
 	public void fireDownloadListUpdatedEvent() {

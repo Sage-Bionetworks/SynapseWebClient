@@ -14,7 +14,7 @@
 		<div class="separator margin-top-3"></div>
 		<div class="settingsSubPageContainer">
 			<b:Anchor addStyleNames="backToSettingsNav" ui:field="backToSettingsAnchor" >&lt; Back to Settings</b:Anchor>
-			<bh:Div ui:field="container" addStyleNames="padding-10" />
+			<w:ReactComponentDiv ui:field="container" addStyleNames="padding-10" />
 		</div>
 	</g:HTMLPanel>
 </ui:UiBinder> 

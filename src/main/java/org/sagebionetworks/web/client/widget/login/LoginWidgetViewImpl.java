@@ -1,16 +1,17 @@
 package org.sagebionetworks.web.client.widget.login;
 
-import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.users.RegisterAccountViewImpl;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -20,7 +21,7 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 	}
 
 	@UiField
-	Div srcLoginContainer;
+	ReactComponentDiv srcLoginContainer;
 	Widget widget;
 	SynapseJSNIUtils jsniUtils;
 	GlobalApplicationState globalAppState;
@@ -34,9 +35,6 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 		widget.addAttachHandler(event -> {
 			if (event.isAttached()) {
 				_createSRCLogin(srcLoginContainer.getElement(), this, RegisterAccountViewImpl.GOOGLE_OAUTH_CALLBACK_URL);
-			} else {
-				// detach event, clean up react component
-				jsniUtils.unmountComponentAtNode(srcLoginContainer.getElement());
 			}
 		});
 	}

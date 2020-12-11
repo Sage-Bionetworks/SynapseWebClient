@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client.widget.pageprogress;
 
-import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -17,7 +17,7 @@ public class PageProgressWidgetViewImpl implements PageProgressWidgetView, IsWid
 	}
 
 	@UiField
-	Div srcContainer;
+	ReactComponentDiv srcContainer;
 	Widget widget;
 	SynapseJSNIUtils jsniUtils;
 	boolean isConfigured = false;
@@ -26,19 +26,10 @@ public class PageProgressWidgetViewImpl implements PageProgressWidgetView, IsWid
 	public PageProgressWidgetViewImpl(PageProgressWidgetViewImplUiBinder binder, SynapseJSNIUtils jsniUtils, SynapseProperties synapseProperties) {
 		widget = binder.createAndBindUi(this);
 		this.jsniUtils = jsniUtils;
-		widget.addAttachHandler(event -> {
-			if (!event.isAttached()) {
-				// detach event, clean up react component
-				jsniUtils.unmountComponentAtNode(srcContainer.getElement());
-			}
-		});
 	}
 
 	@Override
 	public void configure(String barColor, int barPercent, String backBtnLabel, Callback backBtnCallback, String forwardBtnLabel, Callback forwardBtnCallback, boolean isForwardActive) {
-		if (isConfigured) {
-			jsniUtils.unmountComponentAtNode(srcContainer.getElement());
-		}
 		_createSRCWidget(srcContainer.getElement(), barColor, barPercent, backBtnLabel, backBtnCallback, forwardBtnLabel, forwardBtnCallback, isForwardActive);
 		isConfigured = true;
 	}

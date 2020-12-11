@@ -1,18 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity.restriction.v2;
 
 import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.constants.IconPosition;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Element;
@@ -49,7 +46,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	@UiField
 	Span modalsContainer;
 	@UiField
-	Span hasAccessContainer;
+	ReactComponentDiv hasAccessContainer;
 	
 	Presenter presenter;
 	// this UI widget
@@ -75,18 +72,6 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		reportIssueLink.addClickHandler(event -> {
 			presenter.reportIssueClicked();
 		});
-		widget.addAttachHandler(event -> {
-			if (!event.isAttached()) {
-				// detach event, clean up react component
-				cleanupOldReactComponent();
-			}
-		});
-	}
-	
-	private void cleanupOldReactComponent() {
-		// detach event, clean up react component
-		jsniUtils.unmountComponentAtNode(hasAccessContainer.getElement());
-		hasAccessContainer.clear();
 	}
 
 	@Override
@@ -199,7 +184,6 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	
 	@Override
 	public void configureCurrentAccessComponent(String entityId, Long versionNumber) {
-		cleanupOldReactComponent();
 		String versionNumberString = versionNumber == null ? null : versionNumber.toString();
 		_showHasAccess(hasAccessContainer.getElement(), entityId, versionNumberString, authController.getCurrentUserSessionToken());
 	}
