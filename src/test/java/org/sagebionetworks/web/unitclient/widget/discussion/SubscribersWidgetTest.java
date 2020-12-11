@@ -127,6 +127,7 @@ public class SubscribersWidgetTest {
 		widget.onClickSubscribersLink();
 		verify(mockGinInjector).getUserBadgeWidget();
 		verify(mockUserBadge).configure(subscriberId);
+		verify(mockUserBadge).setOpenInNewWindow();
 		verify(mockSynAlert).clear();
 		verify(mockLoadMoreWidgetContainer).clear();
 		verify(mockView).showDialog();

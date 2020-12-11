@@ -19,6 +19,7 @@ Synapse color scheme
 ****************/
 $synapse-green: #28a745;
 $synapse-blue: #2B688F;
+$synapse-dark-blue: #184e71;
 $synapse-blue-end-gradient: #164B6E;
 $synapse-purple: #7772b4;
 $synapse-yellow: #e0b603;
@@ -49,6 +50,7 @@ a:focus{color:$synapse-blue; text-decoration:underline;}
 	
 	.synapse-yellow-bg {background-color:$synapse-yellow;}
 	.synapse-blue-bg {background-color:$synapse-blue;}
+	.synapse-dark-blue-bg {background-color:$synapse-dark-blue;}
 	.synapse-purple-bg {background-color:$synapse-purple;}
 	.synapse-green-bg {background-color:$synapse-green;}
 	.synapse-orange-bg {background-color:$synapse-orange;}
@@ -1084,6 +1086,9 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 #body {
 	.font-italic { font-style: italic; }
 	.font-size-1-1em { font-size: 1.1em; }
+	.font-weight-400 {
+		font-weight: 400;
+	}
 	.font-weight-700 {
 		font-weight: 700;
 	}
@@ -3025,6 +3030,11 @@ div.border {
 .lato {
 	font-family: Lato;
 }
+
+.letter-spacing-1 {
+	letter-spacing: 1px;
+}
+
 .letter-spacing-6 {
 	letter-spacing: 6px;
 }
