@@ -1090,7 +1090,7 @@ public class SynapseClientImpl extends SynapseClientBase implements SynapseClien
 				fileEntity = (FileEntity) synapseClient.getEntityById(entityId);
 				// update data file handle id
 				fileEntity.setDataFileHandleId(fileHandleId);
-				fileEntity = synapseClient.putEntity(fileEntity);
+				fileEntity = synapseClient.putEntity(fileEntity, null, true);
 			}
 			return fileEntity.getId();
 		} catch (SynapseException e) {
