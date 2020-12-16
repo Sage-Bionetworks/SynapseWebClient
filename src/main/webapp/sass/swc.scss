@@ -1699,6 +1699,11 @@ ol.lowerroman {
 		justify-content: flex-end;
 	}
 
+	.flexcontainer-justify-space-between {
+		-webkit-justify-content: space-between;
+		justify-content: space-between;
+	}
+
 	.flexcontainer-column-fill-width {
 		flex-grow: 1;
 	}

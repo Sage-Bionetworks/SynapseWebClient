@@ -34,9 +34,15 @@ public class FooterViewImpl implements FooterView {
 	@UiField
 	Anchor copyrightYear;
 	@UiField
+	Anchor copyrightYear2;
+	@UiField
 	Span portalVersionSpan;
 	@UiField
+	Span portalVersionSpan2;
+	@UiField
 	Span repoVersionSpan;
+	@UiField
+	Span repoVersionSpan2;
 	@UiField
 	Anchor reportAbuseLink;
 	@UiField
@@ -60,6 +66,7 @@ public class FooterViewImpl implements FooterView {
 			initDebugModeLink();
 			hideACTActionsContainer.add(hideACTActionsButton);
 			copyrightYear.setText(DateTimeFormat.getFormat("yyyy").format(new Date()) + " SAGE BIONETWORKS");
+			copyrightYear2.setText(DateTimeFormat.getFormat("yyyy").format(new Date()) + " SAGE BIONETWORKS");
 			reportAbuseLink.addClickHandler(event -> {
 				presenter.onReportAbuseClicked();
 			});
@@ -68,7 +75,9 @@ public class FooterViewImpl implements FooterView {
 			});
 			if (portalVersion != null) {
 				portalVersionSpan.setText(portalVersion);
+				portalVersionSpan2.setText(portalVersion);
 				repoVersionSpan.setText(repoVersion);
+				repoVersionSpan2.setText(repoVersion);
 			}
 
 			refresh();
@@ -117,7 +126,9 @@ public class FooterViewImpl implements FooterView {
 		this.repoVersion = repoVersion;
 		if (portalVersionSpan != null) {
 			portalVersionSpan.setText(portalVersion);
+			portalVersionSpan2.setText(portalVersion);
 			repoVersionSpan.setText(repoVersion);
+			repoVersionSpan2.setText(repoVersion);
 		}
 	}
 
