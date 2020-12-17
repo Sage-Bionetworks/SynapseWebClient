@@ -21,7 +21,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@UiField
 	ReactComponentDiv container;
 
-	private static final String PROJECT_VIEW_ID = "syn23593547.1";
+	private static final String PROJECT_VIEW_ID = "syn23593547.2";
 
 	private Header headerWidget;
 	private SynapseJSNIUtils jsniUtils;
