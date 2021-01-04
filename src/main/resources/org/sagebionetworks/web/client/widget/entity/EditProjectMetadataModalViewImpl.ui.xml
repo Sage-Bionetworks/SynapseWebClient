@@ -44,7 +44,7 @@
 		</b:ModalBody>
 		<b:ModalFooter>
 			<bh:Div addStyleNames="flexcontainer-row">
-				<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width flexcontainer-align-items-flex-start text-align-left" ui:field="modifiedCreatedByContainer" />
+				<bh:Div addStyleNames="flexcontainer-column flexcontainer-column-fill-width flexcontainer-align-items-flex-start text-align-left" />
 				<bh:Div addStyleNames="flexcontainer-column">
 					<b:Button ui:field="defaultButton" type="LINK"
 						dataDismiss="MODAL">Cancel</b:Button>
