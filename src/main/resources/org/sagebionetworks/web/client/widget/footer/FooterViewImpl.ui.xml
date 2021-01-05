@@ -29,24 +29,40 @@
 		<bh:Div>
 			<bh:Div addStyleNames="synapse-dark-blue-bg padding-15">
 				<bh:Div>
-					<bh:Span addStyleNames="left">
-						<g:Image url="images/logo.svg"
-							addStyleNames="margin-bottom-15 margin-right-5 moveup-2"
-							width="35px" height="35px" />
-						<b:Heading size="H3"
-							addStyleNames="displayInline color-white lato letter-spacing-6 moveup-5"
-							text="SYNAPSE" />
-					</bh:Span>
-					<bh:Span addStyleNames="right">
-						<bh:Span ui:field="hideACTActionsContainer" />
-						<b:Tooltip title="Website alpha test mode">
-							<b:Button ui:field="debugLink" icon="SYN_CRASH_HELMET"
-								type="SUCCESS" pull="RIGHT" iconSize="TIMES2" paddingLeft="0"
-								paddingRight="0" />
-						</b:Tooltip>
-					</bh:Span>
-					<bh:Div addStyleNames="flexcontainer-row hidden-xs">
-						<bh:Div addStyleNames="margin-auto" paddingTop="10">
+					<bh:Div addStyleNames="flexcontainer-row flexcontainer-justify">
+						<bh:Div addStyleNames="visible-xs" width="200px"/> <!--Dummy column to center logo in mobile view-->
+						<bh:Div addStyleNames="flexcontainer-column-fill-width hidden-xs"> <!--Left-aligned logo for desktop view-->
+							<bh:Div>
+							<g:Image url="images/logo.svg"
+								addStyleNames="margin-bottom-15 margin-right-5 moveup-2"
+								width="35px" height="35px" />
+							<b:Heading size="H3"
+								addStyleNames="displayInline color-white lato letter-spacing-6 moveup-5"
+								text="SYNAPSE" />
+							</bh:Div>
+						</bh:Div>
+						<bh:Div addStyleNames="flexcontainer-column-fill-width"> <!--Acts as a max-width flex column between logo and alpha mode buttons in desktop view. Contains a centered logo in mobile view-->
+							<bh:Div addStyleNames="visible-xs margin-auto" width="200px">
+								<g:Image url="images/logo.svg"
+										 addStyleNames="margin-bottom-15 margin-right-5 moveup-2"
+										 width="35px" height="35px" />
+								<b:Heading size="H3"
+										   addStyleNames="displayInline color-white lato letter-spacing-6 moveup-5"
+										   text="SYNAPSE" />
+							</bh:Div>
+						</bh:Div>
+
+						<bh:Div width="200px" addStyleNames="text-align-right">
+							<bh:Span ui:field="hideACTActionsContainer" />
+							<b:Tooltip title="Website alpha test mode">
+								<b:Button ui:field="debugLink" icon="SYN_CRASH_HELMET"
+									type="SUCCESS" pull="RIGHT" iconSize="TIMES2" paddingLeft="0"
+									paddingRight="0" />
+							</b:Tooltip>
+						</bh:Div>
+					</bh:Div>
+					<bh:Div addStyleNames="flexcontainer-row margin-bottom-10 hidden-xs">
+						<bh:Div addStyleNames="margin-auto">
 							<bh:Div
 								addStyleNames="flexcontainer-row flexcontainer-align-items-center letter-spacing-1">
 								<bh:Span addStyleNames="flexcontainer-column">
@@ -80,43 +96,61 @@
 									<b:Anchor ui:field="reportAbuseLink"
 										text="Report Abuse" addStyleNames="color-white" />
 								</bh:Span>
-								<bh:Span addStyleNames="flexcontainer-column"
-									width="140px" /> <!-- dummy column to center links (offset Synapse logo on the left) -->
 							</bh:Div>
 						</bh:Div>
 					</bh:Div>
 				</bh:Div>
 				<bh:ClearFix />
-				<bh:Div addStyleNames="visible-xs">
+				<bh:Div addStyleNames="visible-xs center">
 					<bh:Div>
 						<b:Anchor href="mailto:synapseInfo@sagebionetworks.org"
-							text="Contact Us" addStyleNames="color-white displayBlock" />
+							text="Contact Us" addStyleNames="color-white displayBlock margin-top-5 margin-bottom-5" />
 						<b:Anchor href="https://docs.synapse.org"
-							text="Documentation" addStyleNames="color-white displayBlock" />
+							text="Documentation" addStyleNames="color-white displayBlock margin-top-5 margin-bottom-5" />
 						<b:Anchor
 							href="http://creativecommons.org/licenses/by/4.0/legalcode"
 							text="Creative Commons License"
-							addStyleNames="color-white displayBlock" target="_blank" />
+							addStyleNames="color-white displayBlock margin-top-5 margin-bottom-5" target="_blank" />
 						<b:Anchor ui:field="reportAbuseLink2" text="Report Abuse"
-							addStyleNames="color-white displayBlock" />
+							addStyleNames="color-white displayBlock margin-top-5 margin-bottom-5" />
+						<bh:Div addStyleNames="margin-top-10 margin-bottom-10">
+							<g:Image addStyleNames="margin-right-5" url="images/sagebionetworks-logo.svg"/>
+							<b:Anchor ui:field="copyrightYear2"
+									  href="http://sagebionetworks.org/"
+									  addStyleNames="color-white letter-spacing-1 font-weight-400" />
+						</bh:Div>
+						<bh:Div>
+							<g:Label
+									addStyleNames="margin-top-5 margin-bottom-5 lightGreyText margin-left-2 displayInline"
+									text="portal: " />
+							<bh:Span ui:field="portalVersionSpan2"
+									 addStyleNames="margin-top-5 margin-bottom-5 lightGreyText" />
+							<bh:Span addStyleNames="margin-left-10 margin-right-10">|</bh:Span>
+							<g:Label
+									addStyleNames="margin-top-5 margin-bottom-5 lightGreyText displayInline"
+									text="repo: " />
+							<bh:Span ui:field="repoVersionSpan2"
+									 addStyleNames="margin-top-5 margin-bottom-5 lightGreyText" />
+
+						</bh:Div>
 					</bh:Div>
 				</bh:Div>
 				<bh:Div>
-					<bh:Div addStyleNames="flexcontainer-row">
-						<bh:Span addStyleNames="left" width="170px" /> <!-- dummy column to center Sage Bionetworks logo (offset Synapse versions 
+					<bh:Div addStyleNames="flexcontainer-row flexcontainer-justify-space-between hidden-xs">
+						<bh:Div width="180px" /> <!-- dummy column to center Sage Bionetworks logo (offset Synapse versions
 							on the right) -->
-						<bh:Div addStyleNames="margin-auto">
+						<bh:Div>
 							<bh:Div>
 								<g:Image url="images/sagebionetworks-logo.svg"
 									addStyleNames="center-in-div" />
 							</bh:Div>
-							<bh:Div addStyleNames="center margin-top-10">
+							<bh:Div addStyleNames="margin-top-10">
 								<b:Anchor ui:field="copyrightYear"
 									href="http://sagebionetworks.org/"
 									addStyleNames="margin-top-5 margin-bottom-5 color-white letter-spacing-1 font-weight-400" />
 							</bh:Div>
 						</bh:Div>
-						<bh:Span addStyleNames="right text-align-right">
+						<bh:Div addStyleNames="text-align-right" width="180px">
 							<bh:Br />
 							<g:Label
 								addStyleNames="margin-top-5 margin-bottom-5 lightGreyText margin-left-2 displayInline"
@@ -129,8 +163,7 @@
 								text="repo: " />
 							<bh:Span ui:field="repoVersionSpan"
 								addStyleNames="margin-top-5 margin-bottom-5 lightGreyText" />
-						</bh:Span>
-
+						</bh:Div>
 					</bh:Div>
 				</bh:Div>
 			</bh:Div>
