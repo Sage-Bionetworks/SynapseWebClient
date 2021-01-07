@@ -33,9 +33,10 @@
 				<bh:Div ui:field="registerWidgetContainer"
 					addStyleNames="margin-top-20" />
 				<b:Heading size="H5"
-					addStyleNames="text-align-center margin-top-20">
-					<b:Anchor text="&lt; Back to Sign In"
-						addStyleNames="synapse-green" href="#!LoginPlace:0" />
+					addStyleNames="margin-top-30">
+					<bh:Text>Already have a Synapse account?</bh:Text> 
+					<b:Anchor text="Sign in"
+						addStyleNames="synapse-green" marginLeft="10" href="#!LoginPlace:0" />
 				</b:Heading>
 			</bh:Div>
 			<bh:Div ui:field="emailSentUI" visible="false" marginTop="40">
