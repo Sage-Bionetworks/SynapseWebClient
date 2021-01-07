@@ -227,6 +227,18 @@ end sticky footer
 	input[type="checkbox"], input[type="radio"] {
 		display:none;
 	}
+
+	.radio {
+		display: flex;
+		flex-wrap: nowrap;
+	}
+
+	.checkbox>label {
+		display: flex;
+		flex-wrap: nowrap;
+		margin-bottom: 10px;
+	}
+
 	.checkbox>label::before, .radio::before, .radio-inline::before {
 		content: "";
 		display: inline-block;
@@ -237,6 +249,8 @@ end sticky footer
 		border-radius: 2px;
 		background: radial-gradient(white, #eee);
 		margin-right: 5px;
+		margin-top: 3px;
+		flex-shrink: 0;
 	}
 	
 	.radio::before {
@@ -266,7 +280,6 @@ end sticky footer
 	.radio-inline input[type="radio"]:checked + label::before, .radio-inline input[type="radio"]:checked + span::before {
 		content: "";
 		display: inline-block;
-		vertical-align: middle;
 		width: 10px;
 		height: 10px;
 		border-radius: 50%;
