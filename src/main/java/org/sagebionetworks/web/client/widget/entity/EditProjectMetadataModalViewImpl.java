@@ -37,8 +37,6 @@ public class EditProjectMetadataModalViewImpl implements EditProjectMetadataModa
 	Button primaryButton;
 	@UiField
 	Div aliasUI;
-	@UiField
-	Div modifiedCreatedByContainer;
 	String originalButtonText;
 	@Inject
 	public EditProjectMetadataModalViewImpl(Binder binder) {
@@ -115,12 +113,6 @@ public class EditProjectMetadataModalViewImpl implements EditProjectMetadataModa
 	public void configure(String entityName, String alias) {
 		this.entityNameField.setText(entityName);
 		this.aliasField.setText(alias);
-	}
-
-	@Override
-	public void setModifiedCreatedByWidget(IsWidget w) {
-		modifiedCreatedByContainer.clear();
-		modifiedCreatedByContainer.add(w);
 	}
 	
 	@Override
