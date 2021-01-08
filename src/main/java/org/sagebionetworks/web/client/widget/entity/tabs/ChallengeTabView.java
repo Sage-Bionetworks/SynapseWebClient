@@ -12,6 +12,7 @@ public interface ChallengeTabView extends IsWidget {
 	void addEvaluationEditor(EvaluationEditorReactComponentPage evaluationEditor);
 
 	public interface Presenter {
+		void showCreateNewEvaluationEditor(String entityId);
 	}
 
 	void setChallengeWidget(Widget w);

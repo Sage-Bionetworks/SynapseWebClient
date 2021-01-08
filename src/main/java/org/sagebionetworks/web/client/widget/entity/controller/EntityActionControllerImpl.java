@@ -5,6 +5,8 @@ import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.C
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.PROJECT;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.gwt.core.client.GWT;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.Challenge;
@@ -69,7 +71,10 @@ import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
+import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
+import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorReactComponentPage;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
@@ -167,6 +172,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	Callback reconfigureActionsCallback;
 	WikiPageDeleteConfirmationDialog wikiPageDeleteConfirmationDialog;
 	StatisticsPlotWidget statisticsPlotWidget;
+	ChallengeTab challengeTab;
 
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view, PreflightController preflightController, PortalGinInjector ginInjector, AuthenticationController authenticationController, CookieProvider cookies, IsACTMemberAsyncHandler isACTMemberAsyncHandler, GWTWrapper gwt, EventBus eventBus) {
@@ -392,6 +398,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			view.addWidget(evalEditor.asWidget());
 		}
 		return evalEditor;
+	}
+
+	private ChallengeTab getChallengeTab(){
+		if(challengeTab == null){
+			challengeTab = ginInjector.getChallengeTab();
+		}
+
+		return challengeTab;
 	}
 
 	@Override
@@ -811,7 +825,13 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void configureAddEvaluationAction() {
 		if (entityBundle.getEntity() instanceof Project && currentArea == EntityArea.CHALLENGE) {
 			actionMenu.setActionVisible(Action.ADD_EVALUATION_QUEUE, permissions.getCanEdit());
-			actionMenu.setActionListener(Action.ADD_EVALUATION_QUEUE, this);
+			if(DisplayUtils.isInTestWebsite(cookies)){
+				actionMenu.setActionListener(Action.ADD_EVALUATION_QUEUE, (Action action) -> {
+					getChallengeTab().showCreateNewEvaluationEditor(entity.getId());
+				});
+			}else {
+				actionMenu.setActionListener(Action.ADD_EVALUATION_QUEUE, this);
+			}
 		} else {
 			actionMenu.setActionVisible(Action.ADD_EVALUATION_QUEUE, false);
 		}

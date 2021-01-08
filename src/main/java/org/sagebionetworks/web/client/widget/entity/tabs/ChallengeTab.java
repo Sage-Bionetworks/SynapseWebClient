@@ -2,8 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import java.util.function.Consumer;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.Window;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -57,23 +55,44 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
 		//This is currently only used in the "alpha" test mode where a React component is using
 		// a different Evaluation editor
 		Consumer<String> editEvaluationCallback = (String evaluationId) ->{
-			EvaluationEditorReactComponentPage evaluationEditor = ginInjector.createEvaluationEditorReactComponentPage();
-			evaluationEditor.configure(evaluationId,
-					authenticationController.getCurrentUserSessionToken(),
-					globalApplicationState.isShowingUTCTime(),
-					// onPageBack() callback
-					() ->{
-						evaluationEditor.removeFromParent();
-						view.showAdminTabContents();
-						evaluationList.refresh();
-					}
-			);
-			view.hideAdminTabContents();
-			view.addEvaluationEditor(evaluationEditor);
+			showEvaluationEditor(null, evaluationId);
 		};
+
 		evaluationList.configure(entityId, editEvaluationCallback);
 
 		tab.configureEntityActionController(projectBundle, true, null);
+	}
+
+	/**
+	 * Set only one of entityId or evaluationId to be non-null
+	 * @param entityId non-null if creating new evaluation
+	 * @param evaluationId non-null if updating existing evaluation
+	 */
+	private void showEvaluationEditor(String entityId, String evaluationId){
+		//This is currently only used in the "alpha" test mode where a React component is using
+		// a different Evaluation editor
+
+		EvaluationEditorReactComponentPage evaluationEditor = ginInjector.createEvaluationEditorReactComponentPage();
+		evaluationEditor.configure(evaluationId,
+				entityId, authenticationController.getCurrentUserSessionToken(),
+				globalApplicationState.isShowingUTCTime(),
+				// onPageBack() callback
+				() ->{
+					evaluationEditor.removeFromParent();
+					view.showAdminTabContents();
+					evaluationList.refresh();
+				}
+		);
+		view.hideAdminTabContents();
+		view.addEvaluationEditor(evaluationEditor);
+	}
+
+	@Override
+	public void showCreateNewEvaluationEditor(String entityId){
+		//This is currently only used in the "alpha" test mode where a React component is using
+		// a different Evaluation editor
+
+		showEvaluationEditor(entityId, null);
 	}
 
 	public Tab asTab() {
