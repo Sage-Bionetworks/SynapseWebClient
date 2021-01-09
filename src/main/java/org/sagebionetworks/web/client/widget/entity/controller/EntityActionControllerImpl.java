@@ -73,8 +73,6 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
-import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
-import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorReactComponentPage;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
@@ -153,7 +151,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	WikiMarkdownEditor wikiEditor;
 	ProvenanceEditorWidget provenanceEditor;
 	StorageLocationWidget storageLocationEditor;
-	EvaluationEditorModal evalEditor;
 	CookieProvider cookies;
 	ChallengeClientAsync challengeClient;
 	SelectTeamModal selectTeamModal;
@@ -392,22 +389,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		return storageLocationEditor;
 	}
 
-	private EvaluationEditorModal getEvaluationEditorModal() {
-		if (evalEditor == null) {
-			evalEditor = ginInjector.getEvaluationEditorModal();
-			view.addWidget(evalEditor.asWidget());
-		}
-		return evalEditor;
-	}
-
-	private ChallengeTab getChallengeTab(){
-		if(challengeTab == null){
-			challengeTab = ginInjector.getChallengeTab();
-		}
-
-		return challengeTab;
-	}
-
 	@Override
 	public void configure(ActionMenuWidget actionMenu, EntityBundle entityBundle, boolean isCurrentVersion, String wikiPageId, EntityArea currentArea) {
 		this.entityBundle = entityBundle;
@@ -452,7 +433,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureCreateOrUpdateDoi();
 		configureEditProjectMetadataAction();
 		configureEditFileMetadataAction();
-		configureAddEvaluationAction();
 		configureCreateChallenge();
 		configureACTCommands();
 		configureTableCommands();
@@ -822,21 +802,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 
-	private void configureAddEvaluationAction() {
-		if (entityBundle.getEntity() instanceof Project && currentArea == EntityArea.CHALLENGE) {
-			actionMenu.setActionVisible(Action.ADD_EVALUATION_QUEUE, permissions.getCanEdit());
-			if(DisplayUtils.isInTestWebsite(cookies)){
-				actionMenu.setActionListener(Action.ADD_EVALUATION_QUEUE, (Action action) -> {
-					getChallengeTab().showCreateNewEvaluationEditor(entity.getId());
-				});
-			}else {
-				actionMenu.setActionListener(Action.ADD_EVALUATION_QUEUE, this);
-			}
-		} else {
-			actionMenu.setActionVisible(Action.ADD_EVALUATION_QUEUE, false);
-		}
-	}
-
 	private void configureEditFileMetadataAction() {
 		if (entityBundle.getEntity() instanceof FileEntity) {
 			actionMenu.setActionVisible(Action.EDIT_FILE_METADATA, permissions.getCanEdit());
@@ -1031,9 +996,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			case CREATE_OR_UPDATE_DOI:
 				onCreateOrUpdateDoi();
 				break;
-			case ADD_EVALUATION_QUEUE:
-				onAddEvaluationQueue();
-				break;
 			case CREATE_CHALLENGE:
 				onCreateChallenge();
 				break;
@@ -1162,17 +1124,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void onApproveUserAccess() {
 		getApproveUserAccessModal().configure(entityBundle);
 		getApproveUserAccessModal().show();
-	}
-
-	private void onAddEvaluationQueue() {
-		getEvaluationEditorModal().configure(entity.getId(), new Callback() {
-			@Override
-			public void invoke() {
-				Place gotoPlace = new Synapse(entity.getId(), null, EntityArea.CHALLENGE, null);
-				getGlobalApplicationState().getPlaceChanger().goTo(gotoPlace);
-			}
-		});
-		getEvaluationEditorModal().show();
 	}
 
 	private void onManageAccessRequirements() {

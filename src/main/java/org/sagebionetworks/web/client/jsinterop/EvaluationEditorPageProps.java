@@ -6,7 +6,7 @@ import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name="Object")
-public class EvaluationEditorProps extends ReactComponentProps  {
+public class EvaluationEditorPageProps extends ReactComponentProps  {
 	@JsFunction
 	public interface Callback {
 		void run();
@@ -19,12 +19,12 @@ public class EvaluationEditorProps extends ReactComponentProps  {
 	Callback onDeleteSuccess;
 
 	@JsOverlay
-	public static EvaluationEditorProps create(String sessionToken, String evaluationId, String entityId, boolean utc, Callback onDeleteSuccess) {
+	public static EvaluationEditorPageProps create(String sessionToken, String evaluationId, String entityId, boolean utc, Callback onDeleteSuccess) {
 		if(evaluationId != null && entityId != null || evaluationId == null && entityId == null){
 			throw new IllegalArgumentException("Either evaluationId (non-null means edit existing) or entityId (non-null means create new) must be null, but not both");
 		}
 
-		EvaluationEditorProps props = new EvaluationEditorProps();
+		EvaluationEditorPageProps props = new EvaluationEditorPageProps();
 		props.sessionToken = sessionToken;
 		props.evaluationId = evaluationId;
 		props.entityId = entityId;

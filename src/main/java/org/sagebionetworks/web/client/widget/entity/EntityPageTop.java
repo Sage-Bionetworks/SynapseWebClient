@@ -38,7 +38,6 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -64,7 +63,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 	private WikiTab wikiTab;
 	private FilesTab filesTab;
 	private TablesTab tablesTab;
-	private ChallengeTab adminTab;
+	private ChallengeTab challengeTab;
 	private DiscussionTab discussionTab;
 	private DockerTab dockerTab;
 	private EntityMetadata projectMetadata;
@@ -107,7 +106,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 			WikiTab wikiTab,
 			FilesTab filesTab,
 			TablesTab tablesTab,
-			ChallengeTab adminTab,
+			ChallengeTab challengeTab,
 			DiscussionTab discussionTab,
 			DockerTab dockerTab,
 			EntityActionController projectActionController,
@@ -124,7 +123,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		this.wikiTab = wikiTab;
 		this.filesTab = filesTab;
 		this.tablesTab = tablesTab;
-		this.adminTab = adminTab;
+		this.challengeTab = challengeTab;
 		this.discussionTab = discussionTab;
 		this.dockerTab = dockerTab;
 		this.projectMetadata = projectMetadata;
@@ -205,7 +204,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		tabs.addTab(wikiTab.asTab());
 		tabs.addTab(filesTab.asTab());
 		tabs.addTab(tablesTab.asTab());
-		tabs.addTab(adminTab.asTab());
+		tabs.addTab(challengeTab.asTab());
 		tabs.addTab(discussionTab.asTab());
 		tabs.addTab(dockerTab.asTab());
 
@@ -219,9 +218,9 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 			configureWikiTab();
 			projectMetadata.setVisible(true);
 		});
-		adminTab.setTabClickedCallback(tab -> {
+		challengeTab.setTabClickedCallback(tab -> {
 			area = EntityArea.CHALLENGE;
-			configureAdminTab();
+			configureChallengeTab();
 			projectMetadata.setVisible(true);
 		});
 
@@ -311,7 +310,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 			wikiTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.WIKI, wikiAreaToken));
 			filesTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.FILES, null));
 			tablesTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.TABLES, tablesAreaToken));
-			adminTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.CHALLENGE, null));
+			challengeTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.CHALLENGE, null));
 			discussionTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.DISCUSSION, discussionAreaToken));
 			dockerTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.DOCKER, dockerAreaToken));
 		}
@@ -389,8 +388,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 				tabs.showTab(tablesTab.asTab(), pushTabUrlToBrowserHistory);
 				break;
 			case CHALLENGE:
-				configureAdminTab();
-				tabs.showTab(adminTab.asTab(), pushTabUrlToBrowserHistory);
+				configureChallengeTab();
+				tabs.showTab(challengeTab.asTab(), pushTabUrlToBrowserHistory);
 				break;
 			case DISCUSSION:
 				configureDiscussionTab();
@@ -485,7 +484,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 			synapseJavascriptClient.isTable(projectHeader.getId(), getTabVisibilityCallback(EntityArea.TABLES, tablesTab.asTab()));
 			synapseJavascriptClient.isDocker(projectHeader.getId(), getTabVisibilityCallback(EntityArea.DOCKER, dockerTab.asTab()));
 		}
-		synapseClient.isChallenge(projectHeader.getId(), getTabVisibilityCallback(EntityArea.CHALLENGE, adminTab.asTab()));
+		synapseClient.isChallenge(projectHeader.getId(), getTabVisibilityCallback(EntityArea.CHALLENGE, challengeTab.asTab()));
 	}
 
 	public AsyncCallback<Boolean> getTabVisibilityCallback(final EntityArea entityArea, final Tab tab) {
@@ -516,7 +515,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		filesTab.resetView();
 		tablesTab.asTab().setTabListItemVisible(false);
 		tablesTab.resetView();
-		adminTab.asTab().setTabListItemVisible(false);
+		challengeTab.asTab().setTabListItemVisible(false);
 		discussionTab.asTab().setTabListItemVisible(false);
 		dockerTab.asTab().setTabListItemVisible(false);
 	}
@@ -539,7 +538,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		if (discussionTab.asTab().isTabListItemVisible()) {
 			return EntityArea.DISCUSSION;
 		}
-		if (adminTab.asTab().isTabListItemVisible()) {
+		if (challengeTab.asTab().isTabListItemVisible()) {
 			return EntityArea.CHALLENGE;
 		}
 		if (dockerTab.asTab().isTabListItemVisible()) {
@@ -585,7 +584,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		filesTab.asTab().setContentStale(true);
 		wikiTab.asTab().setContentStale(true);
 		tablesTab.asTab().setContentStale(true);
-		adminTab.asTab().setContentStale(true);
+		challengeTab.asTab().setContentStale(true);
 		discussionTab.asTab().setContentStale(true);
 		dockerTab.asTab().setContentStale(true);
 	}
@@ -692,12 +691,13 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget {
 		}
 	}
 
-	public void configureAdminTab() {
-		if (adminTab.asTab().isContentStale()) {
+	public void configureChallengeTab() {
+		if (challengeTab.asTab().isContentStale()) {
 			String projectId = projectHeader.getId();
-			adminTab.configure(projectId, projectHeader.getName(), projectBundle);
-			adminTab.asTab().setContentStale(false);
+			challengeTab.configure(projectId, projectHeader.getName(), projectBundle);
+			challengeTab.asTab().setContentStale(false);
 		}
+		challengeTab.updateActionMenuCommands();
 	}
 
 	public void configureDiscussionTab() {
