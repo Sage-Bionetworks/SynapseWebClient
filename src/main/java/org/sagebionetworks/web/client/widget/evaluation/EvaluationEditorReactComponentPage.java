@@ -9,8 +9,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.Anchor;
-import org.sagebionetworks.web.client.jsinterop.EvaluationEditorProps;
-import org.sagebionetworks.web.client.jsinterop.EvaluationRoundEditorListProps;
+import org.sagebionetworks.web.client.jsinterop.EvaluationEditorPageProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.SRC;
@@ -24,12 +23,11 @@ public class EvaluationEditorReactComponentPage extends Composite {
 
 	@UiField
 	ReactComponentDiv evaluationEditorContainer;
-	@UiField
-	ReactComponentDiv evaluationRoundEditorContainer;
 
 	String evaluationId;
 	String sessionToken;
-	EvaluationEditorProps.Callback onPageBack;
+	String entityId;
+	EvaluationEditorPageProps.Callback onPageBack;
 	boolean utc;
 
 	@Inject
@@ -37,8 +35,9 @@ public class EvaluationEditorReactComponentPage extends Composite {
 		initWidget(binder.createAndBindUi(this));
 	}
 
-	public void configure(String evaluationId, String sessionToken, boolean utc, EvaluationEditorProps.Callback onPageBack){
+	public void configure(String evaluationId, String entityId, String sessionToken, boolean utc, EvaluationEditorPageProps.Callback onPageBack){
 		this.evaluationId = evaluationId;
+		this.entityId = entityId;
 		this.onPageBack = onPageBack;
 		this.sessionToken = sessionToken;
 		this.utc = utc;
@@ -47,14 +46,10 @@ public class EvaluationEditorReactComponentPage extends Composite {
 	@Override
 	protected void onLoad() {
 		super.onLoad();
-		EvaluationEditorProps editorProps = EvaluationEditorProps.create(sessionToken, evaluationId,
-				null, utc, this.onPageBack);
-		ReactDOM.render(React.createElement(SRC.SynapseComponents.EvaluationEditor, editorProps),
+		EvaluationEditorPageProps editorProps = EvaluationEditorPageProps.create(sessionToken, evaluationId,
+				entityId, utc, this.onPageBack);
+		ReactDOM.render(React.createElement(SRC.SynapseComponents.EvaluationEditorPage, editorProps),
 				evaluationEditorContainer.getElement());
-
-		EvaluationRoundEditorListProps roundListProps = EvaluationRoundEditorListProps.create(sessionToken, evaluationId, utc);
-		ReactDOM.render(React.createElement(SRC.SynapseComponents.EvaluationRoundEditorList, roundListProps),
-				evaluationRoundEditorContainer.getElement());
 	}
 
 	@UiHandler(value={"backToChallenge"})
@@ -64,7 +59,6 @@ public class EvaluationEditorReactComponentPage extends Composite {
 	}
 
 	private void unmountReactComponents(){
-		ReactDOM.unmountComponentAtNode(evaluationRoundEditorContainer.getElement());
 		ReactDOM.unmountComponentAtNode(evaluationEditorContainer.getElement());
 	}
 

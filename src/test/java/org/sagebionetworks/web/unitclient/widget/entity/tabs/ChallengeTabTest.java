@@ -56,7 +56,7 @@ public class ChallengeTabTest {
 
 	@Before
 	public void setUp() {
-		tab = new ChallengeTab(mockTab, mockPortalGinInjector , authenticationController, globalApplicationState);
+		tab = new ChallengeTab(mockTab, mockPortalGinInjector , authenticationController, globalApplicationState, mockCookieProvider);
 		when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
 		when(mockPortalGinInjector.getChallengeTabView()).thenReturn(mockView);
 		when(mockPortalGinInjector.getAdministerEvaluationsList()).thenReturn(mockAdministerEvaluationsList);

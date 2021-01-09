@@ -312,6 +312,8 @@ public class EntityPageTopTest {
 		verify(mockTablesTab).configure(mockProjectBundle, versionNumber, areaToken);
 		verify(mockChallengeTab).configure(projectEntityId, projectName, mockProjectBundle);
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, mockProjectBundle, areaToken, canModerate);
+		verify(mockChallengeTab).updateActionMenuCommands();
+		verify(mockDiscussionTab).updateActionMenuCommands();
 		verify(mockDockerTab).configure(mockProjectBundle, areaToken);
 	}
 

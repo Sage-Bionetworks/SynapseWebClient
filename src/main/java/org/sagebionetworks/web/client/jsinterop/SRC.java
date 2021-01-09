@@ -8,8 +8,7 @@ public class SRC {
 	@JsType(isNative = true)
 	public static class SynapseComponents{
 		public static ReactFunctionComponent<EvaluationCardProps> EvaluationCard;
-		public static ReactFunctionComponent<EvaluationEditorProps> EvaluationEditor;
-		public static ReactFunctionComponent<EvaluationRoundEditorListProps> EvaluationRoundEditorList;
+		public static ReactFunctionComponent<EvaluationEditorPageProps> EvaluationEditorPage;
 	}
 }
 

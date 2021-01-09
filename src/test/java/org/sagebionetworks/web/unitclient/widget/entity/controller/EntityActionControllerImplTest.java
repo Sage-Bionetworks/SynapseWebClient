@@ -671,30 +671,6 @@ public class EntityActionControllerImplTest {
 	}
 
 	@Test
-	public void testConfigureAddEvaluationProjectSettings() {
-		currentEntityArea = null;
-		entityBundle.setEntity(new Project());
-		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		verify(mockActionMenu).setActionVisible(Action.ADD_EVALUATION_QUEUE, false);
-	}
-
-	@Test
-	public void testConfigureAddEvaluationOnChallengeTab() {
-		currentEntityArea = EntityArea.CHALLENGE;
-		entityBundle.setEntity(new Project());
-		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		verify(mockActionMenu).setActionVisible(Action.ADD_EVALUATION_QUEUE, true);
-	}
-
-	@Test
-	public void testConfigureAddEvaluationInAlphaNotProject() {
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
-		entityBundle.setEntity(new FileEntity());
-		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		verify(mockActionMenu).setActionVisible(Action.ADD_EVALUATION_QUEUE, false);
-	}
-
-	@Test
 	public void testConfigureMoveTable() {
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, true);
