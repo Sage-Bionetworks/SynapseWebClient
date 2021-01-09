@@ -5,7 +5,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
-import com.google.gwt.core.client.GWT;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -13,19 +13,16 @@ import com.google.inject.Inject;
 public class EditProjectMetadataModalWidgetImpl implements EditProjectMetadataModalView.Presenter, EditProjectMetadataModalWidget {
 	EditProjectMetadataModalView view;
 	SynapseJavascriptClient jsClient;
-	ModifiedCreatedByWidget modifiedCreatedByWidget;
 	Project project;
 	String startingName, startingAlias;
 	Callback handler;
 
 	@Inject
-	public EditProjectMetadataModalWidgetImpl(EditProjectMetadataModalView view, SynapseJavascriptClient jsClient, ModifiedCreatedByWidget modifiedCreatedByWidget) {
+	public EditProjectMetadataModalWidgetImpl(EditProjectMetadataModalView view, SynapseJavascriptClient jsClient) {
 		super();
 		this.view = view;
-		this.jsClient = jsClient;
-		this.modifiedCreatedByWidget = modifiedCreatedByWidget;
+		this.jsClient = jsClient;		
 		this.view.setPresenter(this);
-		view.setModifiedCreatedByWidget(modifiedCreatedByWidget);
 	}
 
 	private void updateProject(final String name, final String alias) {
@@ -80,7 +77,6 @@ public class EditProjectMetadataModalWidgetImpl implements EditProjectMetadataMo
 		this.startingAlias = project.getAlias();
 		this.view.clear();
 		this.view.configure(startingName, startingAlias);
-		modifiedCreatedByWidget.configure(project.getCreatedOn(), project.getCreatedBy(), project.getModifiedOn(), project.getModifiedBy());
 		this.view.setAliasUIVisible(canChangeSettings);
 		this.view.show();
 	}
