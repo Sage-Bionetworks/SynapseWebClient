@@ -699,8 +699,6 @@ public interface PortalGinInjector extends Ginjector {
 
 	ChallengeTabView getChallengeTabView();
 
-	ChallengeTab getChallengeTab();
-
 	ChallengeWidget getChallengeWidget();
 
 	TablesTabView getTablesTabView();

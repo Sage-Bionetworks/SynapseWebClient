@@ -483,7 +483,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesView;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesViewImpl;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidgetView;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabViewImpl;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTabView;

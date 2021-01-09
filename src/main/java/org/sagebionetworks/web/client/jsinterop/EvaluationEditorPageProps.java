@@ -20,7 +20,7 @@ public class EvaluationEditorPageProps extends ReactComponentProps  {
 
 	@JsOverlay
 	public static EvaluationEditorPageProps create(String sessionToken, String evaluationId, String entityId, boolean utc, Callback onDeleteSuccess) {
-		if(evaluationId != null && entityId != null || evaluationId == null && entityId == null){
+		if((evaluationId != null && entityId != null) || (evaluationId == null && entityId == null)){
 			throw new IllegalArgumentException("Either evaluationId (non-null means edit existing) or entityId (non-null means create new) must be null, but not both");
 		}
 
