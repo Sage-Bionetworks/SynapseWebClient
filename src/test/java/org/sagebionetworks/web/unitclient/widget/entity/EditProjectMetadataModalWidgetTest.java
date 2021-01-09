@@ -7,7 +7,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidgetImpl.NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER;
-import java.util.Date;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,8 +19,8 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalView;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidgetImpl;
-import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -32,8 +32,6 @@ public class EditProjectMetadataModalWidgetTest {
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	Callback mockCallback;
-	@Mock
-	ModifiedCreatedByWidget mockModifiedCreatedByWidget;
 	String startName;
 	String parentId;
 	EditProjectMetadataModalWidgetImpl widget;
@@ -49,7 +47,7 @@ public class EditProjectMetadataModalWidgetTest {
 		canChangeSettings = true;
 		entity.setName(startName);
 		entity.setAlias(null);
-		widget = new EditProjectMetadataModalWidgetImpl(mockView, mockSynapseJavascriptClient, mockModifiedCreatedByWidget);
+		widget = new EditProjectMetadataModalWidgetImpl(mockView, mockSynapseJavascriptClient);
 		newEntityName = "Modified Entity Name";
 		when(mockView.getEntityName()).thenReturn(newEntityName);
 		newAlias = "modified";
@@ -61,7 +59,6 @@ public class EditProjectMetadataModalWidgetTest {
 	public void testConfigure() {
 		widget.configure(entity, canChangeSettings, mockCallback);
 		verify(mockView).clear();
-		verify(mockModifiedCreatedByWidget).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockView).show();
 		verify(mockView).configure(startName, null);
 	}
