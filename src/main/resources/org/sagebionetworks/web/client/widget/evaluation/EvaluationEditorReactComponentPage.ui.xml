@@ -10,7 +10,6 @@
         </bh:Div>
 
         <w:ReactComponentDiv ui:field="evaluationEditorContainer" marginTop="25"/>
-        <w:ReactComponentDiv ui:field="evaluationRoundEditorContainer" marginTop="25"/>
 
 
     </bh:Div>

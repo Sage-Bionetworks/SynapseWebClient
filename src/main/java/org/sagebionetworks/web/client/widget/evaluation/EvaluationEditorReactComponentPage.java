@@ -23,8 +23,6 @@ public class EvaluationEditorReactComponentPage extends Composite {
 
 	@UiField
 	ReactComponentDiv evaluationEditorContainer;
-	@UiField
-	ReactComponentDiv evaluationRoundEditorContainer;
 
 	String evaluationId;
 	String sessionToken;
@@ -61,7 +59,6 @@ public class EvaluationEditorReactComponentPage extends Composite {
 	}
 
 	private void unmountReactComponents(){
-		ReactDOM.unmountComponentAtNode(evaluationRoundEditorContainer.getElement());
 		ReactDOM.unmountComponentAtNode(evaluationEditorContainer.getElement());
 	}
 
