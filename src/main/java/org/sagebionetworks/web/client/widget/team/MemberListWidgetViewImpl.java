@@ -79,10 +79,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements MemberListWid
 			if (teamMember.getIsTeamAdmin()) {
 				// otherwise, indicate that this row user is an admin (via label)
 				Div teamManagerBadge = new Div();
-				teamManagerBadge.addStyleName("lightGreyBackground border-left-1 border-bottom-1 border-right-1");
-				teamManagerBadge.setMarginLeft(2);
-				teamManagerBadge.setMarginRight(2);
-				teamManagerBadge.setPaddingLeft(15);
+				teamManagerBadge.addStyleName("TeamManagerBadge lightGreyBackground border-left-1 border-bottom-1 border-right-1");
 				teamManagerBadge.add(new Icon(IconType.SYN_MANAGER));
 				Span p = new Span();
 				p.add(new Text(ADMIN_ACCESS));
