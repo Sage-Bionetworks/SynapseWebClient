@@ -98,7 +98,7 @@
 					</b:Column>
 				</b:Row>
 				<b:FormGroup ui:field="uploadedFilesUI">
-					<b:FormLabel>Upload your signed and initialed oath AND your
+					<b:FormLabel>Upload your signed and initialed Synapse Pledge AND your
 						documentation (e.g. a letter from a signing official at your
 						institution using your institution's letterhead) below</b:FormLabel>
 					<b:Panel ui:field="filesContainer"
