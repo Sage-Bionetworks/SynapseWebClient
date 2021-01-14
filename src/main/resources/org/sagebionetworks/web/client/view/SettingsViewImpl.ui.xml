@@ -86,9 +86,11 @@
 											<b:Anchor ui:field="createOrcIdLink"
 												text="Create/populate a public ORCID profile or link to your existing one." />
 										</b:ListItem>
+										<b:ListItem text="Download the Synapse Pledge. Complete the form by typing your name, checking each statement, signing, and dating the document." />
+										<b:ListItem text="Obtain your identity attestation documentation." />
 										<b:ListItem>
 											<b:Anchor ui:field="requestProfileValidationLink2"
-												text="Request profile validation." />
+												text="Upload the completed Synapse Pledge and identity documentation to request validation." />
 										</b:ListItem>
 									</bh:OrderedList>
 								</bh:Paragraph>
