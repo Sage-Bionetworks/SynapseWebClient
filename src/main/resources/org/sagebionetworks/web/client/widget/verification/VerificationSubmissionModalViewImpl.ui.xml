@@ -30,7 +30,7 @@
 			<bh:Div ui:field="publicallyVisible"
 				addStyleNames="bg-primary padding-10 rounded">
 				<b:Heading size="H4"
-					text="Publicly visible profile information"
+					text="Public profile information"
 					addStyleNames="color-white" />
 				<b:Row>
 					<b:Column size="SM_6">
@@ -87,7 +87,8 @@
 			<bh:Div ui:field="actOnly"
 				addStyleNames="bg-warning padding-10 rounded margin-top-10">
 				<b:Heading size="H4"
-					text="Visible to the Sage Bionetworks Access and Compliance Team only" />
+					text="Private profile information" />
+				<bh:Paragraph>The following will only be visible to the Sage Bionetworks Access and Compliance Team upon submission.</bh:Paragraph>
 				<b:Row>
 					<b:Column size="SM_12">
 						<b:FormGroup>
@@ -97,7 +98,7 @@
 					</b:Column>
 				</b:Row>
 				<b:FormGroup ui:field="uploadedFilesUI">
-					<b:FormLabel>Upload your signed and initialed oath AND your
+					<b:FormLabel>Upload your signed and initialed Synapse Pledge AND your
 						documentation (e.g. a letter from a signing official at your
 						institution using your institution's letterhead) below</b:FormLabel>
 					<b:Panel ui:field="filesContainer"

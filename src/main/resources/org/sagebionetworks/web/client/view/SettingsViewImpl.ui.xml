@@ -87,8 +87,16 @@
 												text="Create/populate a public ORCID profile or link to your existing one." />
 										</b:ListItem>
 										<b:ListItem>
+											<b:Anchor href="https://docs.synapse.org/assets/other/oath.html"
+												text="Download the Synapse Pledge. Complete the form by typing your name, checking each statement, signing, and dating the document." target="_blank" />
+										</b:ListItem>
+										<b:ListItem>
+											<b:Anchor href="https://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#validated-profile"
+												text="Obtain your identity attestation documentation." target="_blank" />																				
+										</b:ListItem>
+										<b:ListItem>
 											<b:Anchor ui:field="requestProfileValidationLink2"
-												text="Request profile validation." />
+												text="Upload the completed Synapse Pledge and identity documentation to request validation." />
 										</b:ListItem>
 									</bh:OrderedList>
 								</bh:Paragraph>
