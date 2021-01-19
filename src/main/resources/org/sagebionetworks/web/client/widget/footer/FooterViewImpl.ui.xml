@@ -34,17 +34,17 @@
 							</bh:Div>
 						</bh:Div>
 
-						<bh:Div width="160px" addStyleNames="text-align-right">
+						<bh:Div width="200px" addStyleNames="text-align-right">
 							<bh:Span ui:field="hideACTActionsContainer" />						
 							<bh:Div width="100%" addStyleNames="flexcontainer-row">
 								<g:Image ui:field="alphaModeStatusIcon" addStyleNames="flexcontainer-column margin-right-5 margin-top-3" width="18px" height="18px" />
 								<b:Anchor ui:field="debugLink"
 									addStyleNames="flexcontainer-column flexcontainer-justify-flex-end color-white">
-									<span>Alpha Mode <strong>Off</strong></span>
+									<span>Experimental Mode <strong>Off</strong></span>
 								</b:Anchor>
 								<b:Anchor ui:field="debugOffLink"
 									addStyleNames="flexcontainer-column flexcontainer-justify-flex-end color-white">
-									<span>Alpha Mode <strong>On</strong></span>
+									<span>Experimental Mode <strong>On</strong></span>
 								</b:Anchor>
 								<w:HelpWidget
 									helpMarkdown="This mode is for alpha testing features only. Please note that the developer does not guarantee an absence of errors, and that the data created using alpha features may be lost during product upgrade."
