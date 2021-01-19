@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client;
 
 import com.google.gwt.resources.client.ClientBundle;
+import com.google.gwt.resources.client.DataResource;
+import com.google.gwt.resources.client.DataResource.MimeType;
 import com.google.gwt.resources.client.ImageResource;
 
 public interface SageImageBundle extends ClientBundle {
@@ -43,4 +45,12 @@ public interface SageImageBundle extends ClientBundle {
 
 	@Source("resource/images/g-logo.png")
 	ImageResource logoGoogle();
+	
+	@Source("resource/images/alphaModeOn.svg")
+	@MimeType("image/svg+xml")
+	DataResource alphaModeOn();
+	
+	@Source("resource/images/alphaModeOff.svg")
+	@MimeType("image/svg+xml")
+	DataResource alphaModeOff();
 }

@@ -1,22 +1,25 @@
 package org.sagebionetworks.web.client.widget.footer;
 
 import java.util.Date;
-import org.gwtbootstrap3.client.ui.Alert;
+
 import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.ToggleACTActionsButton;
+
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -26,9 +29,7 @@ public class FooterViewImpl implements FooterView {
 	}
 
 	@UiField
-	Alert debugModeAlert;
-	@UiField
-	Button debugLink;
+	Anchor debugLink;
 	@UiField
 	Anchor debugOffLink;
 	@UiField
@@ -49,6 +50,9 @@ public class FooterViewImpl implements FooterView {
 	Anchor reportAbuseLink2;
 	@UiField
 	Span hideACTActionsContainer;
+	@UiField
+	Image alphaModeStatusIcon;
+	SageImageBundle sageImageBundle;
 	String portalVersion, repoVersion;
 	private Presenter presenter;
 	private CookieProvider cookies;
@@ -57,7 +61,9 @@ public class FooterViewImpl implements FooterView {
 	Div container = new Div();
 
 	@Inject
-	public FooterViewImpl(Binder binder, CookieProvider cookies, GlobalApplicationState globalAppState, ToggleACTActionsButton hideACTActionsButton, GWTWrapper gwt) {
+	public FooterViewImpl(Binder binder, CookieProvider cookies, GlobalApplicationState globalAppState, ToggleACTActionsButton hideACTActionsButton, GWTWrapper gwt, SageImageBundle sageImageBundle) {
+		this.sageImageBundle = sageImageBundle;
+				
 		// defer constructing this view (to give a chance for other page components to load first)
 		Callback constructViewCallback = () -> {
 			IsWidget widget = binder.createAndBindUi(this);
@@ -141,8 +147,12 @@ public class FooterViewImpl implements FooterView {
 	public void refresh() {
 		hideACTActionsButton.refresh();
 		boolean isTestMode = DisplayUtils.isInTestWebsite(cookies);
-		if (debugModeAlert != null) {
-			debugModeAlert.setVisible(isTestMode);
+		if (alphaModeStatusIcon != null) {
+			SafeUri uri = isTestMode ? sageImageBundle.alphaModeOn().getSafeUri() : sageImageBundle.alphaModeOff().getSafeUri();
+			alphaModeStatusIcon.setUrl(uri);
+		}
+		if (debugOffLink != null) {
+			debugOffLink.setVisible(isTestMode);			
 		}
 		if (debugLink != null) {
 			debugLink.setVisible(!isTestMode);
