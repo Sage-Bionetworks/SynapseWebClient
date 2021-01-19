@@ -6,31 +6,13 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-
 	<g:HTMLPanel addStyleNames="footer">
 		<!-- FOOTER -->
 		<bh:ClearFix />
-		<b:Alert ui:field="debugModeAlert" type="DANGER"
-			visible="false" marginRight="0" marginLeft="0" marginBottom="0">
-			<bh:Div width="100%" addStyleNames="flexcontainer-row">
-				<bh:Span paddingRight="5" paddingLeft="10" addStyleNames="flexcontainer-column">
-					<b:Icon type="SYN_CRASH_HELMET" />
-				</bh:Span>
-				<bh:Span text="ALPHA TEST MODE ACTIVE" addStyleNames="flexcontainer-column flexcontainer-column-fill-width color-white" />
-				<b:Anchor ui:field="debugOffLink" text="TURN OFF"
-					addStyleNames="flexcontainer-column flexcontainer-justify-flex-end color-white margin-right-10" />
-				<w:HelpWidget
-					helpMarkdown="This mode is for alpha testing features only. Please note that the developer does not guarantee an absence of errors, and that the data created using alpha features may be lost during product upgrade."
-					addStyleNames="flexcontainer-column flexcontainer-justify-flex-end margin-left-5" iconStyles="color-white"
-					placement="TOP" />
-			</bh:Div>
-		</b:Alert>
-
 		<bh:Div>
 			<bh:Div addStyleNames="synapse-dark-blue-bg padding-15">
 				<bh:Div>
-					<bh:Div addStyleNames="flexcontainer-row flexcontainer-justify">
-						<bh:Div addStyleNames="visible-xs" width="200px"/> <!--Dummy column to center logo in mobile view-->
+					<bh:Div addStyleNames="flexcontainer-row flexcontainer-justify">						
 						<bh:Div addStyleNames="flexcontainer-column-fill-width hidden-xs"> <!--Left-aligned logo for desktop view-->
 							<bh:Div>
 							<g:Image url="images/logo.svg"
@@ -52,13 +34,23 @@
 							</bh:Div>
 						</bh:Div>
 
-						<bh:Div width="200px" addStyleNames="text-align-right">
-							<bh:Span ui:field="hideACTActionsContainer" />
-							<b:Tooltip title="Website alpha test mode">
-								<b:Button ui:field="debugLink" icon="SYN_CRASH_HELMET"
-									type="SUCCESS" pull="RIGHT" iconSize="TIMES2" paddingLeft="0"
-									paddingRight="0" />
-							</b:Tooltip>
+						<bh:Div width="160px" addStyleNames="text-align-right">
+							<bh:Span ui:field="hideACTActionsContainer" />						
+							<bh:Div width="100%" addStyleNames="flexcontainer-row">
+								<g:Image ui:field="alphaModeStatusIcon" addStyleNames="flexcontainer-column margin-right-5 margin-top-3" width="18px" height="18px" />
+								<b:Anchor ui:field="debugLink"
+									addStyleNames="flexcontainer-column flexcontainer-justify-flex-end color-white">
+									<span>Alpha Mode <strong>Off</strong></span>
+								</b:Anchor>
+								<b:Anchor ui:field="debugOffLink"
+									addStyleNames="flexcontainer-column flexcontainer-justify-flex-end color-white">
+									<span>Alpha Mode <strong>On</strong></span>
+								</b:Anchor>
+								<w:HelpWidget
+									helpMarkdown="This mode is for alpha testing features only. Please note that the developer does not guarantee an absence of errors, and that the data created using alpha features may be lost during product upgrade."
+									addStyleNames="flexcontainer-column flexcontainer-justify-flex-end margin-left-5" iconStyles="color-white"
+									placement="TOP" />
+							</bh:Div>							
 						</bh:Div>
 					</bh:Div>
 					<bh:Div addStyleNames="flexcontainer-row margin-bottom-10 hidden-xs">
