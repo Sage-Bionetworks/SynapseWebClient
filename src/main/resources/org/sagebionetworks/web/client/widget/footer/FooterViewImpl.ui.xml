@@ -47,7 +47,7 @@
 									<span>Experimental Mode <strong>On</strong></span>
 								</b:Anchor>
 								<w:HelpWidget
-									helpMarkdown="This mode is for alpha testing features only. Please note that the developer does not guarantee an absence of errors, and that the data created using alpha features may be lost during product upgrade."
+									helpMarkdown="This mode gives you early access to features that are still in development. Please note that we do not guarantee an absence of errors, and that the data created using these features may be lost during product upgrade."
 									addStyleNames="flexcontainer-column flexcontainer-justify-flex-end margin-left-5" iconStyles="color-white"
 									placement="TOP" />
 							</bh:Div>							
