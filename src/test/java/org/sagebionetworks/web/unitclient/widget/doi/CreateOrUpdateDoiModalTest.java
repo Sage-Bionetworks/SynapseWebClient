@@ -13,6 +13,8 @@ import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,7 +55,7 @@ public class CreateOrUpdateDoiModalTest {
 
 	private static final String objectId = "syn123";
 	private static final ObjectType objectType = ObjectType.ENTITY;
-	private static final Long objectVersion = 2L;
+	private static final Optional<Long> objectVersion = Optional.of(2L);
 	private static final DoiResourceTypeGeneral rtg = DoiResourceTypeGeneral.Collection;
 	private static final String pubYearString = "2005";
 	private static final Long pubYear = 2005L;
@@ -170,7 +172,7 @@ public class CreateOrUpdateDoiModalTest {
 		Doi expectedDoi = new Doi();
 		expectedDoi.setObjectId(objectId);
 		expectedDoi.setObjectType(ObjectType.ENTITY);
-		expectedDoi.setObjectVersion(objectVersion);
+		expectedDoi.setObjectVersion(objectVersion.orElse(null));
 		List<DoiCreator> expectedCreators = new ArrayList<>();
 		DoiCreator expectedCreator = new DoiCreator();
 		expectedCreator.setCreatorName(CreateOrUpdateDoiModal.getFormattedCreatorName(mockUserProfile));
@@ -557,7 +559,7 @@ public class CreateOrUpdateDoiModalTest {
 
 		doi.setObjectId(objectId);
 		doi.setObjectType(objectType);
-		doi.setObjectVersion(objectVersion);
+		doi.setObjectVersion(objectVersion.orElse(null));
 		doi.setTitles(titles);
 		doi.setCreators(creators);
 		doi.setPublicationYear(pubYear);

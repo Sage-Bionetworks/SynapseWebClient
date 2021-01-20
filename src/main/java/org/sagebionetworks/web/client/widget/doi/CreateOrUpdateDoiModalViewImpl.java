@@ -1,18 +1,21 @@
 package org.sagebionetworks.web.client.widget.doi;
 
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Heading;
-import org.gwtbootstrap3.client.ui.IntegerBox;
-import org.gwtbootstrap3.client.ui.ListBox;
-import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.TextArea;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.repo.model.doi.v2.DoiResourceTypeGeneral;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.*;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.doi.v2.DoiResourceTypeGeneral;
+import org.sagebionetworks.web.client.EntityTypeUtils;
+import org.sagebionetworks.web.client.widget.HelpWidget;
+
+import java.util.List;
+import java.util.Optional;
 
 public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalView {
 
@@ -21,6 +24,9 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 
 	private CreateOrUpdateDoiModalView.Presenter presenter;
 	private Widget widget;
+	private Entity entity;
+
+//	private final String VERSION_SELECT_HELP_TEXT = ;
 
 	@UiField
 	Button mintDoiButton;
@@ -46,6 +52,12 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 	Div synAlert;
 	@UiField
 	Div doiOverwriteWarning;
+	@UiField
+	FormGroup versionForm;
+	@UiField
+	ListBox versionSelection;
+	@UiField
+	HelpWidget versionHelpBox;
 
 
 	@Inject
@@ -55,6 +67,14 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 		mintDoiButton.addClickHandler(event -> presenter.onSaveDoi());
 		mintDoiButton.setEnabled(true);
 		cancelButton.addClickHandler(event -> doiModal.hide());
+		versionSelection.addChangeHandler(event -> {
+			Long version = Long.valueOf(versionSelection.getSelectedValue());
+			if (version == 0L) { // We let '0' represent no version in the select box.
+				presenter.onVersionChange(Optional.empty());
+			} else {
+				presenter.onVersionChange(Optional.of(version));
+			}
+		});
 
 		initializeResourceTypeGeneralSelect();
 	}
@@ -76,10 +96,14 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 
 	@Override
 	public void reset() {
-		jobTrackingWidget.setVisible(false);
+		this.setIsLoading(true);
 		creatorsField.clear();
 		titlesField.clear();
 		resourceTypeGeneralSelect.setTitle(DoiResourceTypeGeneral.Dataset.name());
+		versionForm.setVisible(this.entity instanceof Versionable);
+		versionHelpBox.setHelpMarkdown("The version of the " + EntityTypeUtils.getEntityTypeForEntityClassName(this.entity.getClass().getName()) +
+				" that the DOI should be minted for. Unversioned DOIs will always resolve to the newest version of this " +
+				EntityTypeUtils.getEntityTypeForEntityClassName(this.entity.getClass().getName()) + ".");
 		publicationYearField.reset();
 		mintDoiButton.setEnabled(true);
 	}
@@ -88,6 +112,30 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 	public void setIsLoading(boolean isLoading) {
 		jobTrackingWidget.setVisible(isLoading);
 		mintDoiButton.setEnabled(!isLoading);
+		versionSelection.setEnabled(!isLoading);
+		creatorsField.setEnabled(!isLoading);
+		resourceTypeGeneralSelect.setEnabled(!isLoading);
+		titlesField.setEnabled(!isLoading);
+		publicationYearField.setEnabled(!isLoading);
+	}
+
+	@Override
+	public void setVersions(List<VersionInfo> versions, Optional<Long> selectedVersion) {
+		versionSelection.clear();
+		versionSelection.addItem("Unversioned", "0"); // We let '0' represent no version in the select box.
+		int selectedIndex = 0;
+		for (int i = 0; i < versions.size(); i++) {
+			VersionInfo version = versions.get(i);
+			String label = "Version " + version.getVersionNumber();
+			if (!version.getVersionLabel().isEmpty()) {
+				label += " / " + version.getVersionLabel();
+			}
+			versionSelection.addItem(label, String.valueOf(version.getVersionNumber()));
+			if (selectedVersion.isPresent() && selectedVersion.get().equals(version.getVersionNumber())) {
+				selectedIndex = i + 1; // add one to offset the "Unversioned" entry before we iterate
+			}
+		}
+		versionSelection.setSelectedIndex(selectedIndex);
 	}
 
 	@Override
@@ -148,6 +196,11 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 	@Override
 	public void showOverwriteWarning(boolean showWarning) {
 		doiOverwriteWarning.setVisible(showWarning);
+	}
+
+	@Override
+	public void setEntity(Entity entity) {
+		this.entity = entity;
 	}
 
 	@Override

@@ -20,6 +20,16 @@
 					addStyleNames="em" />
 				<bh:Div ui:field="doiEditorDiv">
 					<b:Form>
+						<b:FormGroup ui:field="versionForm">
+							<b:FormLabel>Version</b:FormLabel>
+							<w:HelpWidget
+									ui:field="versionHelpBox"
+									helpMarkdown="The version that the DOI should be minted for. Unversioned DOIs will always resolve to the newest version of the "
+									addStyleNames="margin-left-5" placement="BOTTOM" />
+							<bh:Div>
+								<b:ListBox ui:field="versionSelection" />
+							</bh:Div>
+						</b:FormGroup>
 						<b:FormGroup>
 							<b:FormLabel>Creator(s), one per line</b:FormLabel>
 							<w:HelpWidget
@@ -63,7 +73,7 @@
 					<b:Alert type="WARNING" addStyleNames="margin-top-10">
 						<bh:Strong text="Note: &nbsp;" />
 						<bh:Text
-							text="Updating the DOI information will cause old information to be lost!" />
+							text="A DOI has already been created. Updating the DOI information will cause old information to be lost!" />
 					</b:Alert>
 				</bh:Div>
 				<bh:Div ui:field="synAlert" />
