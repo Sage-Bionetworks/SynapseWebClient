@@ -40,7 +40,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	private AdapterFactory adapterFactory;
 	private Quiz quiz;
 	private PortalGinInjector ginInjector;
-	private Map<Long, QuestionContainerWidget> questionIndexToQuestionWidget;
+	private Map<Long, QuestionContainerWidget> questionIndexToQuestionWidget = new HashMap<Long, QuestionContainerWidget>();
 	private SynapseAlert synAlert;
 
 	@Inject
@@ -55,8 +55,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		this.ginInjector = ginInjector;
 		this.synAlert = synAlert;
 		this.view.setPresenter(this);
-		view.setSynAlertWidget(synAlert.asWidget());
-		questionIndexToQuestionWidget = new HashMap<Long, QuestionContainerWidget>();
+		view.setSynAlertWidget(synAlert.asWidget());		
 	}
 
 	@Override
@@ -78,7 +77,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	@Override
 	public void showQuiz(Quiz quiz) {
 		view.clear();
-		questionIndexToQuestionWidget.clear();
+		questionIndexToQuestionWidget = new HashMap<Long, QuestionContainerWidget>();
 		if (quiz.getHeader() != null)
 			view.setQuizHeader(quiz.getHeader());
 		List<Question> questions = quiz.getQuestions();
@@ -211,7 +210,6 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	public void setPlace(org.sagebionetworks.web.client.place.Quiz place) {
 		view.setPresenter(this);
 		view.clear();
-		questionIndexToQuestionWidget.clear();
 		getIsCertified();
 	}
 

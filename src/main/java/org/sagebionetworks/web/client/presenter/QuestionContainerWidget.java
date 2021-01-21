@@ -43,7 +43,7 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 					view.addRadioButton(questionIndex, answer.getPrompt(), new ClickHandler() {
 						@Override
 						public void onClick(ClickEvent event) {
-							answers.clear();
+							answers = new HashSet<Long>();
 							answers.add(answer.getAnswerIndex());
 						}
 					}, wasSelected(response, answer.getAnswerIndex()));
