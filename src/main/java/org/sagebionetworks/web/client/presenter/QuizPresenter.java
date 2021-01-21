@@ -97,7 +97,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	private boolean checkAllAnswered() {
 		for (Long questionNumber : questionNumberToQuestionWidget.keySet()) {
 			if (questionNumberToQuestionWidget.get(questionNumber).getAnswers().isEmpty()) {
-				// SWC-5383: really, that might not be the case!
+				// SWC-5383: No answer found for this question, but this could be a bug.  What's going on?
 				SynapseJSNIUtils utils = ginInjector.getSynapseJSNIUtils();
 				utils.consoleLog("No answers found for question index " + questionNumberToQuestionWidget.get(questionNumber).getQuestionIndex());
 				
