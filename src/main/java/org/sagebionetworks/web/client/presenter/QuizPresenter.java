@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.presenter;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.QuizView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -40,7 +42,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	private AdapterFactory adapterFactory;
 	private Quiz quiz;
 	private PortalGinInjector ginInjector;
-	private Map<Long, QuestionContainerWidget> questionIndexToQuestionWidget = new HashMap<Long, QuestionContainerWidget>();
+	private Map<Long, QuestionContainerWidget> questionNumberToQuestionWidget = new HashMap<Long, QuestionContainerWidget>();
 	private SynapseAlert synAlert;
 
 	@Inject
@@ -77,14 +79,14 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	@Override
 	public void showQuiz(Quiz quiz) {
 		view.clear();
-		questionIndexToQuestionWidget = new HashMap<Long, QuestionContainerWidget>();
+		questionNumberToQuestionWidget = new HashMap<Long, QuestionContainerWidget>();
 		if (quiz.getHeader() != null)
 			view.setQuizHeader(quiz.getHeader());
 		List<Question> questions = quiz.getQuestions();
 		Long questionNumber = Long.valueOf(1);
 		for (Question question : questions) {
 			QuestionContainerWidget newQuestion = ginInjector.getQuestionContainerWidget();
-			questionIndexToQuestionWidget.put(questionNumber, newQuestion);
+			questionNumberToQuestionWidget.put(questionNumber, newQuestion);
 			newQuestion.configure(questionNumber, question, null);
 			view.addQuestionContainerWidget(newQuestion.asWidget());
 			questionNumber++;
@@ -93,8 +95,25 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	}
 
 	private boolean checkAllAnswered() {
-		for (Long questionIndex : questionIndexToQuestionWidget.keySet()) {
-			if (questionIndexToQuestionWidget.get(questionIndex).getAnswers().isEmpty()) {
+		for (Long questionNumber : questionNumberToQuestionWidget.keySet()) {
+			if (questionNumberToQuestionWidget.get(questionNumber).getAnswers().isEmpty()) {
+				// SWC-5383: really, that might not be the case!
+				SynapseJSNIUtils utils = ginInjector.getSynapseJSNIUtils();
+				utils.consoleLog("No answers found for question index " + questionNumberToQuestionWidget.get(questionNumber).getQuestionIndex());
+				
+				utils.consoleLog("\nQuestions in the UI...");
+				utils.consoleLog("Index : Prompt");
+				Collection<QuestionContainerWidget> uiQuestions = questionNumberToQuestionWidget.values();
+				for (QuestionContainerWidget questionContainerWidget : uiQuestions) {
+					utils.consoleLog(questionContainerWidget.getQuestionIndex() + " : " + questionContainerWidget.getQuestionPrompt());
+				}				
+				
+				utils.consoleLog("\nQuiz Definition...");
+				utils.consoleLog("Index : Prompt");
+				List<Question> questions = quiz.getQuestions();
+				for (Question question : questions) {
+					utils.consoleLog(question.getQuestionIndex() + " : " + question.getPrompt());					
+				}
 				return false;
 			}
 		}
@@ -103,7 +122,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 
 	// For testing only
 	public void setQuestionIndexToQuestionWidgetMap(Map<Long, QuestionContainerWidget> ans) {
-		this.questionIndexToQuestionWidget = ans;
+		this.questionNumberToQuestionWidget = ans;
 	}
 
 	@Override
@@ -114,8 +133,8 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		QuizResponse submission = new QuizResponse();
 		List<QuestionResponse> questionResponses = new ArrayList<QuestionResponse>();
 
-		for (Long questionNumber : questionIndexToQuestionWidget.keySet()) {
-			QuestionContainerWidget questionWidget = questionIndexToQuestionWidget.get(questionNumber);
+		for (Long questionNumber : questionNumberToQuestionWidget.keySet()) {
+			QuestionContainerWidget questionWidget = questionNumberToQuestionWidget.get(questionNumber);
 			Set<Long> answers = questionWidget.getAnswers();
 			Long questionIndex = questionWidget.getQuestionIndex();
 			MultichoiceResponse response = new MultichoiceResponse();
@@ -164,7 +183,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		Long questionNumber = Long.valueOf(1);
 		for (ResponseCorrectness response : responseCorrections) {
 			QuestionContainerWidget newQuestion = ginInjector.getQuestionContainerWidget();
-			questionIndexToQuestionWidget.put(questionNumber, newQuestion);
+			questionNumberToQuestionWidget.put(questionNumber, newQuestion);
 			newQuestion.configure(questionNumber, response.getQuestion(), (MultichoiceResponse) response.getResponse());
 			view.addQuestionContainerWidget(newQuestion.asWidget());
 			questionNumber++;
@@ -178,7 +197,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		for (ResponseCorrectness correctness : passingRecord.getCorrections()) {
 			// indicate success/failure
 			if (correctness.getQuestion() != null) {
-				QuestionContainerWidget question = questionIndexToQuestionWidget.get(questionNumber++);
+				QuestionContainerWidget question = questionNumberToQuestionWidget.get(questionNumber++);
 				question.addCorrectnessStyle(correctness.getIsCorrect());
 				question.setEnabled(false);
 			}

@@ -23,6 +23,8 @@ public interface QuestionContainerWidgetView extends IsWidget {
 		void addCorrectnessStyle(boolean isCorrect);
 
 		Long getQuestionIndex();
+		
+		String getQuestionPrompt();
 
 		void setEnabled(boolean enabled);
 

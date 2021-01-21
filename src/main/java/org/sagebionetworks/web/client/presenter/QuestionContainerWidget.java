@@ -20,6 +20,7 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 	private Set<Long> answers;
 	// Used to disable the buttons after scoring is performed
 	private Long questionIndex;
+	private String questionPrompt;
 
 	@Inject
 	public QuestionContainerWidget(QuestionContainerWidgetView view) {
@@ -30,6 +31,11 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 	public Long getQuestionIndex() {
 		return questionIndex;
 	}
+	
+	@Override
+	public String getQuestionPrompt() {
+		return questionPrompt;
+	}
 
 	@Override
 	public void configure(Long questionNumber, Question question, MultichoiceResponse response) {
@@ -37,6 +43,7 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 		view.configure(questionNumber, question.getPrompt());
 		final MultichoiceQuestion multichoiceQuestion = (MultichoiceQuestion) question;
 		this.questionIndex = question.getQuestionIndex();
+		this.questionPrompt = question.getPrompt();
 		if (question instanceof MultichoiceQuestion) {
 			if (multichoiceQuestion.getExclusive()) {
 				for (final MultichoiceAnswer answer : multichoiceQuestion.getAnswers()) {
