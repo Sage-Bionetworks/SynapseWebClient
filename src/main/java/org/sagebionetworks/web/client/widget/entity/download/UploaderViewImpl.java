@@ -433,7 +433,8 @@ public class UploaderViewImpl extends FlowPanel implements UploaderView {
 			// Upload File
 			TabListItem tab = new TabListItem(DisplayConstants.UPLOAD_FILE);
 			tab.setDataTarget("#uploadTab");
-			tab.setActive(true);
+			tab.addStyleName("entity-tab");
+			tab.setActive(true);			
 			tabs.add(tab);
 			TabPane tabPanel = new TabPane();
 			tabPanel.setActive(true);
@@ -450,6 +451,7 @@ public class UploaderViewImpl extends FlowPanel implements UploaderView {
 			// External URL
 			tab = new TabListItem(DisplayConstants.LINK_TO_URL);
 			tab.setDataTarget("#externalTab");
+			tab.addStyleName("entity-tab");
 			tabs.add(tab);
 			externalLinkFormPanel.removeFromParent();
 			tabPanel = new TabPane();
@@ -685,6 +687,7 @@ public class UploaderViewImpl extends FlowPanel implements UploaderView {
 		set.add(externalNameFormGroup);
 
 		externalLinkFormPanel.add(set);
+		externalLinkFormPanel.addStyleName("margin-top-10 margin-bottom-10");
 		pathField.addKeyPressHandler(new KeyPressHandler() {
 			@Override
 			public void onKeyPress(KeyPressEvent event) {
