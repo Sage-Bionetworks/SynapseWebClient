@@ -8,10 +8,11 @@ import com.google.inject.Inject;
 import org.gwtbootstrap3.client.ui.*;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.doi.v2.DoiResourceTypeGeneral;
-import org.sagebionetworks.web.client.EntityTypeUtils;
+import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 
 import java.util.List;
@@ -101,9 +102,15 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 		titlesField.clear();
 		resourceTypeGeneralSelect.setTitle(DoiResourceTypeGeneral.Dataset.name());
 		versionForm.setVisible(this.entity instanceof Versionable);
-		versionHelpBox.setHelpMarkdown("The version of the " + EntityTypeUtils.getEntityTypeForEntityClassName(this.entity.getClass().getName()) +
-				" that the DOI should be minted for. Unversioned DOIs will always resolve to the newest version of this " +
-				EntityTypeUtils.getEntityTypeForEntityClassName(this.entity.getClass().getName()) + ".");
+		String entityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(this.entity.getClass()));
+		String helpMarkdown = "The version of the " + entityTypeDisplay +" for which the DOI should be minted.\n\n" +
+				"Versioned DOIs will resolve to the specified version of the " + entityTypeDisplay + ".\n\n" +
+				"Unversioned DOIs will always resolve to the newest version of this " + entityTypeDisplay + ", so the data in the table may change over time.";
+		if (entity instanceof Table) {
+			helpMarkdown += "\n\nTo create a DOI that resolves to the current set of data in the " + entityTypeDisplay +
+					", create a new version and mint a DOI for that version.";
+		}
+		versionHelpBox.setHelpMarkdown(helpMarkdown);
 		publicationYearField.reset();
 		mintDoiButton.setEnabled(true);
 	}
