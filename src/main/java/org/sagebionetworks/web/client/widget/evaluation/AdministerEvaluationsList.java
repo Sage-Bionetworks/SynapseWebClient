@@ -78,7 +78,11 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Evalua
 			@Override
 			public void onSuccess(List<Evaluation> evaluations) {
 				for (Evaluation evaluation : evaluations) {
-					createEvaluationCardReactComponent(evaluation,timeInUtc,sessionToken,onEditEvaluation);
+					if(evaluation.getQuota() == null){
+						createEvaluationCardReactComponent(evaluation,timeInUtc,sessionToken,onEditEvaluation);
+					} else{
+						view.addRow(evaluation);
+					}
 				}
 			}
 
