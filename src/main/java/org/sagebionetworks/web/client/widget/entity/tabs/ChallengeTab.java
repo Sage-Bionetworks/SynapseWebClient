@@ -119,15 +119,9 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
 
 	public void updateActionMenuCommands(){
 		actionMenuWidget.setActionVisible(Action.ADD_EVALUATION_QUEUE, permissions.getCanEdit());
-		if(DisplayUtils.isInTestWebsite(cookies)){
-			actionMenuWidget.setActionListener(Action.ADD_EVALUATION_QUEUE, (Action action) -> {
-				showCreateNewEvaluationEditor(entityId);
-			});
-		}else {
-			actionMenuWidget.setActionListener(Action.ADD_EVALUATION_QUEUE, (Action action) -> {
-				showOldAddEvaluationQueueModal();
-			});
-		}
+		actionMenuWidget.setActionListener(Action.ADD_EVALUATION_QUEUE, (Action action) -> {
+			showCreateNewEvaluationEditor(entityId);
+		});
 	}
 
 	private void showOldAddEvaluationQueueModal() {
