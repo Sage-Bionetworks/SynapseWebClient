@@ -20,6 +20,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.evaluation.model.SubmissionQuota;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -75,8 +76,11 @@ public class AdministerEvaluationsListTest{
 		e1.setId("101");
 		e1.setCreatedOn(new Date());
 		evaluationResults.add(e1);
+		e1.setQuota(new SubmissionQuota());
 
 		e2 = new Evaluation();
+		e2.setQuota(new SubmissionQuota());
+
 		e1.setId("102");
 		e1.setCreatedOn(new Date());
 		evaluationResults.add(e2);

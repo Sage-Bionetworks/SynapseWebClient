@@ -71,7 +71,6 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Evalua
 		this.onEditEvaluation = onEditEvaluation;
 		view.clearRows();
 		synAlert.clear();
-		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookieProvider);
 		boolean timeInUtc = globalApplicationState.isShowingUTCTime();
 		String sessionToken = authenticationController.getCurrentUserSessionToken();
 
@@ -79,7 +78,7 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Evalua
 			@Override
 			public void onSuccess(List<Evaluation> evaluations) {
 				for (Evaluation evaluation : evaluations) {
-					if(isInTestWebsite && evaluation.getQuota() == null){
+					if(evaluation.getQuota() == null){
 						createEvaluationCardReactComponent(evaluation,timeInUtc,sessionToken,onEditEvaluation);
 					} else{
 						view.addRow(evaluation);

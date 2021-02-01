@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -144,8 +145,8 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 					}
 					@Override
 					public void onSuccess(Entity entity) {
-						if (entity instanceof FileEntity) {
-							if (versionNumber.equals(((FileEntity)entity).getVersionNumber())) {
+						if (entity instanceof Versionable) {
+							if (versionNumber.equals(((Versionable)entity).getVersionNumber())) {
 								// we've been asked to load the current file version
 								versionNumber = null;	
 							}
