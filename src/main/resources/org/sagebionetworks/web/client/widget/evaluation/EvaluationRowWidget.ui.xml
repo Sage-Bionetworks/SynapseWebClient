@@ -21,7 +21,7 @@
 							helpMarkdown="This Evaluation is using a deprecated (SubmissionQuota) system to enforce submission limits and round duration.
 							Use the Migrate button to automatically convert the Evaluation to use the new EvaluationRound system."
 							placement="BOTTOM" pull="RIGHT"/>
-					<b:Button ui:field="migrateButton" text="Migrate To Evaluation Rounds" color="RED"
+					<b:Button ui:field="migrateButton" text="Migrate To Evaluation Rounds" type="PRIMARY"
 						pull="RIGHT" size="EXTRA_SMALL" />
 				</b:Heading>
 				<bh:Div ui:field="submitToEvaluationContainer" />
