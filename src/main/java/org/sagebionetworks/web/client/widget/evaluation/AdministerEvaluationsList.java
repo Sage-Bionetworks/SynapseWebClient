@@ -120,6 +120,7 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Evalua
 		view.addReactComponent(evaluation, props);
 	}
 
+	@Override
 	public void refresh() {
 		configure(entityId, onEditEvaluation);
 	}
