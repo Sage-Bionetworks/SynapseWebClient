@@ -14,7 +14,7 @@
 						size="EXTRA_SMALL" height="22px" />
 					<b:Button ui:field="shareButton" text="Share" pull="RIGHT"
 						addStyleNames="margin-right-5" size="EXTRA_SMALL" />
-					<b:Button ui:field="editButton" text="Edit"
+					<b:Button ui:field="editButton" icon="EDIT" text="Edit"
 						pull="RIGHT" addStyleNames="margin-right-5" size="EXTRA_SMALL" />
 
 					<w:HelpWidget
