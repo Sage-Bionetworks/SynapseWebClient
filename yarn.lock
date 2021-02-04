@@ -7423,12 +7423,10 @@ markdown-it-synapse-table@^1.0.6:
   resolved "https://registry.yarnpkg.com/markdown-it-synapse-table/-/markdown-it-synapse-table-1.0.6.tgz#5e14383257a6f6495d6c097388911548fe2155fb"
   integrity sha1-XhQ4Mlem9kldbAlziJEVSP4hVfs=
 
-markdown-it-synapse@^1.1.7:
-  version "1.1.7"
-  resolved "https://registry.yarnpkg.com/markdown-it-synapse/-/markdown-it-synapse-1.1.7.tgz#b91324a4b366769ef3623fe4869fc6582a9f9a80"
-  integrity sha512-xCxlY5T75nbI2hWJKpBveoN2mDgpKD+dj2zepWS8n5z8GzvWy1IPmcm8MgDH2qDGd8hKHv5zspaN4XZp1znd2g==
-  dependencies:
-    node "^10.3.0"
+markdown-it-synapse@^1.1.8:
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/markdown-it-synapse/-/markdown-it-synapse-1.1.8.tgz#887395e1f628a1a3c997b60965a2ece0b72a6dd0"
+  integrity sha512-KoRODZ3pIYEtFlMbLS8/xWhCxBeADoFp5j8cKFyo7j/TjUROXTpUIUA5RR/stYjr+64If0lWF4DgAmj/7d7tHw==
 
 markdown-it@^11.0.0:
   version "11.0.1"
@@ -7803,11 +7801,6 @@ no-case@^3.0.4:
     lower-case "^2.0.2"
     tslib "^2.0.3"
 
-node-bin-setup@^1.0.0:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/node-bin-setup/-/node-bin-setup-1.0.6.tgz#4b5c9bb937ece702d7069b36ca78af4684677528"
-  integrity sha512-uPIxXNis1CRbv1DwqAxkgBk5NFV3s7cMN/Gf556jSw6jBvV7ca4F9lRL/8cALcZecRibeqU+5dFYqFFmzv5a0Q==
-
 node-forge@^0.10.0:
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.10.0.tgz#32dea2afb3e9926f02ee5ce8794902691a676bf3"
@@ -7867,13 +7860,6 @@ node-releases@^1.1.52, node-releases@^1.1.69:
   version "1.1.70"
   resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-1.1.70.tgz#66e0ed0273aa65666d7fe78febe7634875426a08"
   integrity sha512-Slf2s69+2/uAD79pVVQo8uSiC34+g8GWY8UH2Qtqv34ZfhYrxpYpfzs9Js9d6O0mbDmALuxaTlplnBTnSELcrw==
-
-node@^10.3.0:
-  version "10.23.0"
-  resolved "https://registry.yarnpkg.com/node/-/node-10.23.0.tgz#848049b565361d5b2f8ad1ba0117d12d0575c047"
-  integrity sha512-iC4soH/Ej+F/ncc5s1vs5w1rp/iIKym2p8CM05VsfLHkj0FFMUoYbsTSXtICFmFeou9FCGNs0XrPImhP3xlAPA==
-  dependencies:
-    node-bin-setup "^1.0.0"
 
 normalize-package-data@^2.3.2:
   version "2.5.0"
@@ -11029,10 +11015,10 @@ symbol-tree@^3.2.2:
   resolved "https://registry.yarnpkg.com/symbol-tree/-/symbol-tree-3.2.4.tgz#430637d248ba77e078883951fb9aa0eed7c63fa2"
   integrity sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==
 
-synapse-react-client@1.15.64:
-  version "1.15.64"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-1.15.64.tgz#815bf85e6cb57ad97dd39e204dd4482a9f341089"
-  integrity sha512-w5C3KShbL9l0bF/BkOsvY6Z1/dxDQGUZuN3lwcXFR6MDKnAInwmvyplGqfCpOggrEJ6LXmsd3pP/DcgS0cIINQ==
+synapse-react-client@1.15.66:
+  version "1.15.66"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-1.15.66.tgz#d74c2b2c4d3a7c3b12a604697e8794e1349368e4"
+  integrity sha512-8sc/xLF57CYDM04lAxLwFY59M5YX0Jc32+1eGRbmtZv9rkXOFypN1pQXFIjnYyovOJMxylxhpAM05LQTB7kIGw==
   dependencies:
     "@brainhubeu/react-carousel" "1.19.26"
     "@fortawesome/fontawesome-free" "^5.13.0"
@@ -11074,7 +11060,7 @@ synapse-react-client@1.15.64:
     markdown-it-strikethrough-alt "^1.0.0"
     markdown-it-sub-alt "^1.0.0"
     markdown-it-sup-alt "^1.0.2"
-    markdown-it-synapse "^1.1.7"
+    markdown-it-synapse "^1.1.8"
     markdown-it-synapse-heading "^1.0.1"
     markdown-it-synapse-math "^3.0.4"
     markdown-it-synapse-table "^1.0.6"
