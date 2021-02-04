@@ -169,6 +169,19 @@
 										<ignore />
 									</action>
 								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-antrun-plugin</artifactId>
+										<versionRange>[1.7,)</versionRange>
+										<goals>
+											<goal>run</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute />
+									</action>
+								</pluginExecution>
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
@@ -299,7 +312,7 @@
 						<goals>
 							<goal>install-node-and-yarn</goal>
 						</goals>
-						<phase>compile</phase>
+						<phase>generate-resources</phase>
 					</execution>
 
 					<!--Install dependencies specified in package.json, including SRC-->
@@ -311,7 +324,7 @@
 						<configuration>
 							<arguments>install</arguments>
 						</configuration>
-						<phase>compile</phase>
+						<phase>generate-resources</phase>
 					</execution>
 
 					<!--Compile SCSS (using `sass` - a Dart Sass compatible compiler from npm)-->
@@ -322,7 +335,7 @@
 							<goal>yarn</goal>
 						</goals>
 						<configuration>
-							<arguments>sass --no-source-map --style=compressed --unicode --stop-on-error --update --load-path=. src/main/webapp/sass:target/portal-develop-SNAPSHOT</arguments>
+							<arguments>sass --no-source-map --style=compressed --unicode --stop-on-error --update --load-path=. src/main/webapp/sass</arguments>
 						</configuration>
 						<phase>compile</phase>
 					</execution>
@@ -333,7 +346,7 @@
 					<yarnVersion>v1.22.5</yarnVersion>
 				</configuration>
 			</plugin>
-
+			
 			<!--Copy the Synapse React Client UMD build to the webapp directory-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -341,8 +354,8 @@
 				<version>3.0.0</version>
 				<executions>
 					<execution>
-						<id>copy-src-js</id>
-						<phase>compile</phase>
+						<id>Copy Synapse React Client JS</id>
+						<phase>process-resources</phase>
 						<goals>
 							<goal>run</goal>
 						</goals>
