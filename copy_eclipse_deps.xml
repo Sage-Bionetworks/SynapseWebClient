@@ -1,5 +1,5 @@
 <project name="Synapse Web Client" basedir=".">
-    <!--We copy -->
+    <!--We copy all of the dependencies handled at build-time to the folder that Jetty serves. -->
     <target name="copy">
         <echo message="Copying dependencies" />
         <copy
