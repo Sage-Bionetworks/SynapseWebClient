@@ -1,0 +1,10 @@
+<project name="Synapse Web Client" basedir=".">
+    <!--We copy -->
+    <target name="copy">
+        <echo message="Copying dependencies" />
+        <copy
+                file="node_modules/synapse-react-client/dist/umd/synapse-react-client.production.min.js"
+                tofile="src/main/webapp/js/synapse-react-client.production.min.js" />
+    </target>
+
+</project>

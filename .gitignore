@@ -16,3 +16,9 @@ extras/
 # Since these are retrieved at build-time, no need to commit.
 node/*
 node_modules/*
+
+# We copy these files to the webapp folder to serve this folder in Eclipse (dev builds only)
+# We don't want to commit them because they are compiled or retrieved at build-time
+src/main/webapp/js/synapse-react-client.production.min.js
+src/main/webapp/swc.css
+src/main/webapp/material-ui-font.css
