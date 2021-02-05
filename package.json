@@ -1,6 +1,6 @@
 {
   "dependencies": {
     "sass": "1.32.5",
-    "synapse-react-client": "1.15.66"
+    "synapse-react-client": "1.15.67"
   }
 }
