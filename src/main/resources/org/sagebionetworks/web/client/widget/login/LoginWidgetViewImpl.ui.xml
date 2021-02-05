@@ -2,10 +2,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-
-	<bh:Div addStyleNames="max-width-350 center-in-div">
-		<bh:ClearFix />
-		<w:ReactComponentDiv ui:field="srcLoginContainer" />
-		<bh:ClearFix />
-	</bh:Div>
+	
+	<w:ReactComponentDiv ui:field="srcLoginContainer" />
+	
 </ui:UiBinder>
