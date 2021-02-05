@@ -15,11 +15,6 @@
 	</ui:style>
 	<g:HTMLPanel>
 		<div>
-		<style>
-			#headerPanel .alert {
-			margin-bottom: 0;
-			}
-		</style>
 			<bh:Div ui:field="synAlertContainer" addStyleNames="container" />
 			<g:HTMLPanel ui:field="loginView" visible="true">
 				<!-- LoginView -->
