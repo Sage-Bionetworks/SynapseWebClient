@@ -19,6 +19,4 @@ node_modules/*
 
 # We copy these files to the webapp folder to serve this folder in Eclipse (dev builds only)
 # We don't want to commit them because they are compiled or retrieved at build-time
-src/main/webapp/js/synapse-react-client.production.min.js
-src/main/webapp/*.css
-src/main/webapp/sass/*.css
+src/main/webapp/generated/*
