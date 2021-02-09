@@ -14,31 +14,28 @@
 		}
 	</ui:style>
 	<g:HTMLPanel>
-		<div class="container margin-top-15">
-			<bh:Div ui:field="synAlertContainer" />
+		<div>
+			<bh:Div ui:field="synAlertContainer" addStyleNames="container" />
 			<g:HTMLPanel ui:field="loginView" visible="true">
 				<!-- LoginView -->
-				<div class="panel padding-10 col-sm-offset-4 col-sm-4">
-					<div class="padding-15">
-						<g:SimplePanel ui:field="loginWidgetPanel" />
-					</div>
-				</div>
-				<br />
+				<g:SimplePanel ui:field="loginWidgetPanel" />
 			</g:HTMLPanel>
 			<w:LoadingSpinner ui:field="loadingUi"
 				visible="false" size="31px"
-				addStyleNames="moveup-2 margin-150 center center-block" />
+				addStyleNames="container margin-top-15 moveup-2 margin-150 center center-block" />
 			<b:Heading ui:field="loadingUiText" size="H4"
 				text="Logging you in..."
-				addStyleNames="displayInline center center-block margin-left-5" />
+				addStyleNames="container margin-top-15 displayInline center center-block margin-left-5" />
 			<w:InfoAlert ui:field="acceptedTermsOfUseView"
 					alertType="SUCCESS" icon="CHECK_SQUARE"
 					message="You've accepted the Synapse Terms and Conditions for Use"
 					linkText="View Terms"
 					linkTarget="_blank"
 					linkHref="https://s3.amazonaws.com/static.synapse.org/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf?v=5"
-					visible="false" />
-			<bh:Div ui:field="termsOfUseView">
+					visible="false" 
+					addStyleNames="container margin-top-15"
+					/>
+			<bh:Div ui:field="termsOfUseView" addStyleNames="container margin-top-15">
 				<w:ReactComponentDiv ui:field="termsOfUseContainer" />
 				<bh:Div ui:field="pageProgressContainer"/>
 			</bh:Div>

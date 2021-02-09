@@ -150,7 +150,7 @@
 		</bh:Div>
 		<b:Alert ui:field="cookieNotificationAlert" visible="false"
 			addStyleNames="fullWidthAlert flexcontainer-row" type="INFO" marginTop="0"
-			marginRight="0" paddingRight="40">
+			marginRight="0" marginBottom="0" paddingRight="40">
 			<b:Icon addStyleNames="flexcontainer-column font-size-17 black-25-percent"
 				type="INFO_CIRCLE" marginLeft="5" marginTop="10" />
 			<bh:Span addStyleNames="flexcontainer-column font-size-15 flexcontainer-column-fill-width" marginLeft="10"
