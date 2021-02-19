@@ -8,11 +8,10 @@ import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
-import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.http.client.Request;
@@ -39,100 +38,108 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
 	private RejectReasonView view;
 	CallbackP<String> callback;
 	private SynapseProperties synapseProperties;
-	private RequestBuilderWrapper requestBuilder;
-	private JSONObjectAdapter jsonObjectAdapter;
-	private PresignedURLAsyncHandler presignedUrlAsyncHandler;
-	private SynapseJavascriptClient jsClient;
 	private boolean isLoaded = false;
+	PortalGinInjector ginInjector;
 	
 	@Inject
-	public RejectReasonWidget(RejectReasonView view, SynapseProperties synapseProperties, RequestBuilderWrapper requestBuilder, JSONObjectAdapter jsonObjectAdapter, PresignedURLAsyncHandler presignedUrlAsyncHandler, SynapseJavascriptClient jsClient) {
+	public RejectReasonWidget(RejectReasonView view, SynapseProperties synapseProperties, PortalGinInjector ginInjector) {
 		this.view = view;
 		this.synapseProperties = synapseProperties;
-		this.requestBuilder = requestBuilder;
-		this.jsonObjectAdapter = jsonObjectAdapter;
-		this.presignedUrlAsyncHandler = presignedUrlAsyncHandler;
-		this.jsClient = jsClient;
+		this.ginInjector = ginInjector;
 		this.view.setPresenter(this);
 	}
 
 	public void show(CallbackP<String> callback) {
-		// get the json file that define the reasons
-		String jsonSynID = synapseProperties.getSynapseProperty(WebConstants.ACT_PROFILE_VALIDATION_REJECTION_REASONS_PROPERTY_KEY);
 		this.view.clear();
 		this.callback = callback;
 		if (!isLoaded) {
-			// get the entity (to find it's file handle ID)
-			jsClient.getEntity(jsonSynID, new AsyncCallback<Entity>() {
+			view.clearReasons();
+			// get the json file that define the reasons
+			String jsonSynID = synapseProperties.getSynapseProperty(WebConstants.ACT_PROFILE_VALIDATION_REJECTION_REASONS_PROPERTY_KEY);
+			getJSON(jsonSynID, ginInjector, new AsyncCallback<JSONObjectAdapter>() {
 				@Override
-				public void onSuccess(Entity result) {
-					getPresignedURLForReasons(jsonSynID, ((FileEntity) result).getDataFileHandleId());				
+				public void onSuccess(JSONObjectAdapter json) {
+					try {
+						JSONArrayAdapter jsonArray = json.getJSONArray("reasons");
+						for (int i = 0; i < jsonArray.length(); i++) {
+							view.addReason(jsonArray.getString(i));
+						}
+						view.show();
+						isLoaded = true;
+					} catch (JSONObjectAdapterException e) {
+						view.showError(e.getMessage());
+					}
 				}
-				
 				@Override
 				public void onFailure(Throwable caught) {
 					view.showError(caught.getMessage());
 				}
-			});		
+			});
 		} else {
 			view.show();
 		}
 	}
 	
-	public void getPresignedURLForReasons(String synID, String fileHandleID) {
-		FileHandleAssociation fha = new FileHandleAssociation();
-		fha.setAssociateObjectType(FileHandleAssociateType.FileEntity);
-		fha.setAssociateObjectId(synID);
-		fha.setFileHandleId(fileHandleID);
-		presignedUrlAsyncHandler.getFileResult(fha, new AsyncCallback<FileResult>() {
+	/**
+	 * 
+	 * @param jsonSynID Synapse ID of the file in Synapse that contains the JSON
+	 * @param ginInjector
+	 * @param callback
+	 */
+	public static void getJSON(String jsonSynID, PortalGinInjector ginInjector, AsyncCallback<JSONObjectAdapter> callback) {
+		ginInjector.getSynapseJavascriptClient().getEntity(jsonSynID, new AsyncCallback<Entity>() {
 			@Override
-			public void onSuccess(FileResult result) {
-				getReasons(result.getPreSignedURL());
-			};
+			public void onSuccess(Entity result) {
+				FileHandleAssociation fha = new FileHandleAssociation();
+				fha.setAssociateObjectType(FileHandleAssociateType.FileEntity);
+				fha.setAssociateObjectId(jsonSynID);
+				fha.setFileHandleId(((FileEntity) result).getDataFileHandleId());
+				
+				ginInjector.getPresignedURLAsyncHandler().getFileResult(fha, new AsyncCallback<FileResult>() {
+					@Override
+					public void onSuccess(FileResult result) {
+						RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
+						requestBuilder.configure(RequestBuilder.GET, result.getPreSignedURL());
+						requestBuilder.setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
+						try {
+							requestBuilder.sendRequest(null, new RequestCallback() {
+								@Override
+								public void onResponseReceived(Request request, Response response) {
+									int statusCode = response.getStatusCode();
+									if (statusCode == Response.SC_OK) {
+										String text = response.getText();
+										try {
+											// parse json, and add each reason
+											JSONObjectAdapter json = ginInjector.getJSONObjectAdapter().createNew(text);
+											callback.onSuccess(json);
+										} catch (JSONObjectAdapterException e) {
+											onError(null, e);
+										}						
+									} else {
+										onError(null, new IllegalArgumentException("Unable to retrieve message ACT rejection reasons. Reason: " + response.getStatusText()));
+									}
+								}
+								@Override
+								public void onError(Request request, Throwable exception) {
+									callback.onFailure(exception);					
+								}
+							});
+						} catch (final Exception e) {
+							callback.onFailure(e);
+						}
+					};
+					@Override
+					public void onFailure(Throwable caught) {
+						callback.onFailure(caught);
+					}
+				});
+			}			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showError(caught.getMessage());
+				callback.onFailure(caught);
 			}
 		});
-	}
-	
-
-	public void getReasons(String url) {
-		view.clearReasons();
-		requestBuilder.configure(RequestBuilder.GET, url);
-		requestBuilder.setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
-		try {
-			requestBuilder.sendRequest(null, new RequestCallback() {
-				@Override
-				public void onResponseReceived(Request request, Response response) {
-					int statusCode = response.getStatusCode();
-					if (statusCode == Response.SC_OK) {
-						String text = response.getText();
-						try {
-							// parse json, and add each reason
-							JSONObjectAdapter json = jsonObjectAdapter.createNew(text);
-							JSONArrayAdapter jsonArray = json.getJSONArray("reasons");
-							for (int i = 0; i < jsonArray.length(); i++) {
-								view.addReason(jsonArray.getString(i));
-							}
-							view.show();
-							isLoaded = true;
-						} catch (JSONObjectAdapterException e) {
-							onError(null, e);
-						}						
-					} else {
-						onError(null, new IllegalArgumentException("Unable to retrieve message ACT rejection reasons. Reason: " + response.getStatusText()));
-					}
-				}
-				@Override
-				public void onError(Request request, Throwable exception) {
-					view.showError(exception.getMessage());					
-				}
-			});
-		} catch (final Exception e) {
-			view.showError(e.getMessage());
-		}
-	}
+	}	
 	
 	@Override
 	public void updateResponse() {
