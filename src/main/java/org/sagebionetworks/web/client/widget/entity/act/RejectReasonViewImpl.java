@@ -108,6 +108,9 @@ public class RejectReasonViewImpl implements RejectReasonView {
 		this.clearError();
 		this.customText.clear();
 		this.nameField.clear();
+		for (CheckBox cb : checkboxes) {
+			cb.setValue(false);
+		}
 		this.customTextOption.setValue(false);
 		this.customText.setVisible(false);
 	}

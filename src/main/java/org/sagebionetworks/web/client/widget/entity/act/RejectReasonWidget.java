@@ -43,7 +43,8 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
 	private JSONObjectAdapter jsonObjectAdapter;
 	private PresignedURLAsyncHandler presignedUrlAsyncHandler;
 	private SynapseJavascriptClient jsClient;
-
+	private boolean isLoaded = false;
+	
 	@Inject
 	public RejectReasonWidget(RejectReasonView view, SynapseProperties synapseProperties, RequestBuilderWrapper requestBuilder, JSONObjectAdapter jsonObjectAdapter, PresignedURLAsyncHandler presignedUrlAsyncHandler, SynapseJavascriptClient jsClient) {
 		this.view = view;
@@ -60,19 +61,22 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
 		String jsonSynID = synapseProperties.getSynapseProperty(WebConstants.ACT_PROFILE_VALIDATION_REJECTION_REASONS_PROPERTY_KEY);
 		this.view.clear();
 		this.callback = callback;
-		
-		// get the entity (to find it's file handle ID)
-		jsClient.getEntity(jsonSynID, new AsyncCallback<Entity>() {
-			@Override
-			public void onSuccess(Entity result) {
-				getPresignedURLForReasons(jsonSynID, ((FileEntity) result).getDataFileHandleId());				
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showError(caught.getMessage());
-			}
-		});		
+		if (!isLoaded) {
+			// get the entity (to find it's file handle ID)
+			jsClient.getEntity(jsonSynID, new AsyncCallback<Entity>() {
+				@Override
+				public void onSuccess(Entity result) {
+					getPresignedURLForReasons(jsonSynID, ((FileEntity) result).getDataFileHandleId());				
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showError(caught.getMessage());
+				}
+			});		
+		} else {
+			view.show();
+		}
 	}
 	
 	public void getPresignedURLForReasons(String synID, String fileHandleID) {
@@ -99,7 +103,6 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
 		requestBuilder.setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		try {
 			requestBuilder.sendRequest(null, new RequestCallback() {
-
 				@Override
 				public void onResponseReceived(Request request, Response response) {
 					int statusCode = response.getStatusCode();
@@ -113,6 +116,7 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
 								view.addReason(jsonArray.getString(i));
 							}
 							view.show();
+							isLoaded = true;
 						} catch (JSONObjectAdapterException e) {
 							onError(null, e);
 						}						
@@ -120,7 +124,6 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
 						onError(null, new IllegalArgumentException("Unable to retrieve message ACT rejection reasons. Reason: " + response.getStatusText()));
 					}
 				}
-
 				@Override
 				public void onError(Request request, Throwable exception) {
 					view.showError(exception.getMessage());					

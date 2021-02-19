@@ -26,6 +26,7 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 	SynapseJSNIUtils jsniUtils;
 	GlobalApplicationState globalAppState;
 	AuthenticationController authController;
+	boolean isComponentInitialized = false;
 
 	@Inject
 	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder, SynapseJSNIUtils jsniUtils,
@@ -35,9 +36,8 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 		this.globalAppState = globalAppState;
 		this.authController = authController;
 		widget.addAttachHandler(event -> {
-			if (event.isAttached()) {
-				_createSRCLogin(srcLoginContainer.getElement(), this,
-						RegisterAccountViewImpl.GOOGLE_OAUTH_CALLBACK_URL);
+			if (!event.isAttached()) {
+				isComponentInitialized = false;
 			}
 		});
 	}
@@ -58,8 +58,7 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 			var props = {
 				googleRedirectUrl : googleSSORedirectUrl,
 				sessionCallback : sessionCallback
-			};
-			debugger;
+			};			
 			$wnd.ReactDOM.render($wnd.React.createElement(
 					$wnd.SRC.SynapseComponents.LoginPage, props, null), el);
 		} catch (err) {
@@ -69,6 +68,11 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 
 	@Override
 	public Widget asWidget() {
+		if (!isComponentInitialized) {
+			_createSRCLogin(srcLoginContainer.getElement(), this,
+					RegisterAccountViewImpl.GOOGLE_OAUTH_CALLBACK_URL);
+			isComponentInitialized = true;
+		}
 		return widget;
 	}
 

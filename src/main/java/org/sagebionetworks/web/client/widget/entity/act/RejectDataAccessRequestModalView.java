@@ -29,6 +29,8 @@ public interface RejectDataAccessRequestModalView extends IsWidget {
 	 */
 	void show();
 
+	void addReason(String reason);
+	void clearReasons();
 	/**
 	 * Hide the dialog.
 	 */
