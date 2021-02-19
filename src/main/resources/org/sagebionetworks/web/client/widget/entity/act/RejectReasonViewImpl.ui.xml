@@ -12,20 +12,7 @@
 		dataBackdrop="STATIC" dataKeyboard="true" size="LARGE">
 		<b:ModalBody>
 			<bh:Div>
-				<b:CheckBox ui:field="synapseQuizOption"
-					text="You must become a Certified User first before you request Validation. Please take and pass the Synapse Certification quiz. Here is the link to the quiz: https://www.synapse.org/#!Quiz:Certification  " />
-				<b:CheckBox addStyleNames="margin-top-20"
-					ui:field="addInfoOption"
-					text="You must add at least one piece of information (education, employment, etc.) to your ORCID profile. For help with this process, please see the ORCID support documentation: https://support.orcid.org/hc/en-us/sections/360002054993-Assert-your-affiliations " />
-				<b:CheckBox addStyleNames="margin-top-20"
-					ui:field="orcIDPublicOption"
-					text="You must set your ORCID profile to be publicly viewable. For help with this process, please see the ORCID support documentation: https://support.orcid.org/hc/en-us/articles/360006897614-Visibility-settings " />
-				<b:CheckBox addStyleNames="margin-top-20"
-					ui:field="physicallyInitialOption"
-					text="Please print the Synapse Oath and completely fill it out by initialing each box, and then signing and dating the bottom of the sheet before scanning and uploading it. Here is the link to the Oath: https://docs.synapse.org/assets/other/oath.html " />
-				<b:CheckBox addStyleNames="margin-top-20"
-					ui:field="submitDocsOption"
-					text="Please submit an accepted form of identity attestation documentation. A list of all acceptable forms of documentation can be found here: https://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#acceptable-documentation-for-identity-verification " />
+				<bh:Div ui:field="reasonsContainer" />				
 				<b:CheckBox addStyleNames="margin-top-20"
 					ui:field="customTextOption" text="Custom text" />
 				<bh:Div>

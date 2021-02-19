@@ -169,6 +169,8 @@ public class WebConstants {
 	public static final String NRGR_SYNAPSE_GLUE_ENDPOINT_PROPERTY = "org.sagebionetworks.portal.nrgrsynapseglue_endpoint";	
 	public static final String FORUM_SYNAPSE_ID_PROPERTY = "org.sagebionetworks.portal.forum_project_id";
 	public static final String DEFAULT_STORAGE_ID_PROPERTY_KEY = "org.sagebionetworks.portal.synapse_storage_id";
+	public static final String ACT_PROFILE_VALIDATION_REJECTION_REASONS_PROPERTY_KEY = "org.sagebionetworks.portal.ACT_profile_validation_rejection_reasons_json";
+	public static final String ACT_DATA_ACCESS_REJECTION_REASONS_PROPERTY_KEY = "org.sagebionetworks.portal.ACT_data_access_rejection_reasons_json";
 
 	// Workshop
 	public static final String COLLABORATORIUM_ENTITY_ID_PROPERTY = "org.sagebionetworks.portal.collaboratorium_synapse_id";

@@ -1,10 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
+import java.util.ArrayList;
+
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -24,20 +27,11 @@ public class RejectReasonViewImpl implements RejectReasonView {
 	@UiField
 	TextArea nameField;
 
-	// Checkboxes
+	
 	@UiField
-	CheckBox synapseQuizOption;
-	@UiField
-	CheckBox addInfoOption;
-	@UiField
-	CheckBox orcIDPublicOption;
-	@UiField
-	CheckBox physicallyInitialOption;
-	@UiField
-	CheckBox submitDocsOption;
+	Div reasonsContainer;
 	@UiField
 	CheckBox customTextOption;
-
 
 	// Generate response button
 	@UiField
@@ -58,7 +52,7 @@ public class RejectReasonViewImpl implements RejectReasonView {
 	Button defaultButton;
 
 	Widget widget;
-
+	ArrayList<CheckBox> checkboxes = new ArrayList<>();
 	// Presenter
 	Presenter presenter;
 
@@ -114,11 +108,6 @@ public class RejectReasonViewImpl implements RejectReasonView {
 		this.clearError();
 		this.customText.clear();
 		this.nameField.clear();
-		this.synapseQuizOption.setValue(false);
-		this.addInfoOption.setValue(false);
-		this.orcIDPublicOption.setValue(false);
-		this.physicallyInitialOption.setValue(false);
-		this.submitDocsOption.setValue(false);
 		this.customTextOption.setValue(false);
 		this.customText.setVisible(false);
 	}
@@ -127,12 +116,22 @@ public class RejectReasonViewImpl implements RejectReasonView {
 	public void clearError() {
 		this.alert.setVisible(false);
 	}
-
+	
+	@Override
+	public void clearReasons() {
+		reasonsContainer.clear();
+		checkboxes = new ArrayList<CheckBox>();
+	}
+	
+	@Override
+	public void addReason(String reason) {
+		CheckBox cb = new CheckBox(reason);
+		cb.addStyleName("margin-top-20");
+		checkboxes.add(cb);
+		reasonsContainer.add(cb);
+	}
 	@Override
 	public String getSelectedCheckboxText() {
-		// add your textbox here if we have a new option
-		CheckBox[] checkboxes = new CheckBox[] {synapseQuizOption, addInfoOption, orcIDPublicOption, physicallyInitialOption, submitDocsOption};
-
 		String output = "";
 		for (CheckBox checkBox : checkboxes) {
 			if (checkBox.getValue()) {
