@@ -52,27 +52,28 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
 	public void show(CallbackP<String> callback) {
 		this.view.clear();
 		this.callback = callback;
-		if (!isLoaded) {
-			view.clearReasons();
+		if (!isLoaded) {			
 			// get the json file that define the reasons
 			String jsonSynID = synapseProperties.getSynapseProperty(WebConstants.ACT_PROFILE_VALIDATION_REJECTION_REASONS_PROPERTY_KEY);
-			getJSON(jsonSynID, ginInjector, new AsyncCallback<JSONObjectAdapter>() {
+			RejectReasonWidget.getJSON(jsonSynID, ginInjector, new AsyncCallback<JSONObjectAdapter>() {
 				@Override
 				public void onSuccess(JSONObjectAdapter json) {
+					view.clearReasons();
 					try {
 						JSONArrayAdapter jsonArray = json.getJSONArray("reasons");
 						for (int i = 0; i < jsonArray.length(); i++) {
 							view.addReason(jsonArray.getString(i));
-						}
-						view.show();
+						}						
 						isLoaded = true;
 					} catch (JSONObjectAdapterException e) {
 						view.showError(e.getMessage());
 					}
+					view.show();
 				}
 				@Override
 				public void onFailure(Throwable caught) {
 					view.showError(caught.getMessage());
+					view.show();
 				}
 			});
 		} else {

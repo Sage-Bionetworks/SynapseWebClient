@@ -47,20 +47,22 @@ public class RejectDataAccessRequestModal implements RejectDataAccessRequestModa
 			RejectReasonWidget.getJSON(jsonSynID, ginInjector, new AsyncCallback<JSONObjectAdapter>() {
 				@Override
 				public void onSuccess(JSONObjectAdapter json) {
+					view.clearReasons();
 					try {
 						JSONArrayAdapter jsonArray = json.getJSONArray("reasons");
 						for (int i = 0; i < jsonArray.length(); i++) {
 							view.addReason(jsonArray.getString(i));
-						}
-						view.show();
+						}						
 						isLoaded = true;
 					} catch (JSONObjectAdapterException e) {
 						view.showError(e.getMessage());
 					}
+					view.show();
 				}
 				@Override
 				public void onFailure(Throwable caught) {
 					view.showError(caught.getMessage());
+					view.show();
 				}
 			});
 		} else {
