@@ -33,7 +33,7 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 		widget = binder.createAndBindUi(this);
 		this.jsniUtils = jsniUtils;
 		this.globalAppState = globalAppState;
-		this.authController = authController;		
+		this.authController = authController;
 		widget.addAttachHandler(event -> {
 			if (event.isAttached()) {
 				_createSRCLogin(srcLoginContainer.getElement(), this,
