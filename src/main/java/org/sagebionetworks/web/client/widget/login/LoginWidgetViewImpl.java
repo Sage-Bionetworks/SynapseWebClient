@@ -25,7 +25,7 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 	Widget widget;
 	SynapseJSNIUtils jsniUtils;
 	GlobalApplicationState globalAppState;
-	AuthenticationController authController;	
+	AuthenticationController authController;
 
 	@Inject
 	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder, SynapseJSNIUtils jsniUtils,
@@ -34,6 +34,12 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 		this.jsniUtils = jsniUtils;
 		this.globalAppState = globalAppState;
 		this.authController = authController;		
+		widget.addAttachHandler(event -> {
+			if (event.isAttached()) {
+				_createSRCLogin(srcLoginContainer.getElement(), this,
+						RegisterAccountViewImpl.GOOGLE_OAUTH_CALLBACK_URL);
+			}
+		});
 	}
 
 	public void postLogin() {
@@ -45,18 +51,16 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 	private static native void _createSRCLogin(Element el, LoginWidgetViewImpl loginWidgetView,
 			String googleSSORedirectUrl) /*-{
 		try {
-			if ($wnd.SRC && $wnd.SRC.SynapseComponents) {
-				function sessionCallback() {
-					loginWidgetView.@org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl::postLogin()();
-				}
-	
-				var props = {
-					googleRedirectUrl : googleSSORedirectUrl,
-					sessionCallback : sessionCallback
-				};			
-				$wnd.ReactDOM.render($wnd.React.createElement(
-						$wnd.SRC.SynapseComponents.LoginPage, props, null), el);
+			function sessionCallback() {
+				loginWidgetView.@org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl::postLogin()();
 			}
+
+			var props = {
+				googleRedirectUrl : googleSSORedirectUrl,
+				sessionCallback : sessionCallback
+			};
+			$wnd.ReactDOM.render($wnd.React.createElement(
+					$wnd.SRC.SynapseComponents.LoginPage, props, null), el);
 		} catch (err) {
 			console.error(err);
 		}
@@ -64,8 +68,6 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 
 	@Override
 	public Widget asWidget() {
-		_createSRCLogin(srcLoginContainer.getElement(), this,
-				RegisterAccountViewImpl.GOOGLE_OAUTH_CALLBACK_URL);
 		return widget;
 	}
 
