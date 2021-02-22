@@ -229,14 +229,11 @@ end sticky footer
 		display:none;
 	}
 
-	.radio {
-		display: flex;
+	.radio {		
 		flex-wrap: nowrap;
 	}
 
 	.checkbox>label {
-		display: flex;
-		flex-wrap: nowrap;
 		margin-bottom: 10px;
 	}
 
@@ -249,8 +246,7 @@ end sticky footer
 		border: 1px solid #888;
 		border-radius: 2px;
 		background: radial-gradient(white, #eee);
-		margin-right: 5px;
-		margin-top: 3px;
+		margin-right: 5px;		
 		flex-shrink: 0;
 	}
 	
