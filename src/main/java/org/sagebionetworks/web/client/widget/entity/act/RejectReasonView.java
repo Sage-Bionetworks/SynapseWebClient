@@ -15,6 +15,9 @@ public interface RejectReasonView extends IsWidget {
 
 	String getSelectedCheckboxText();
 
+	void addReason(String reason);
+	void clearReasons();
+	
 	/**
 	 * Show an error message..
 	 * 

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.presenter.ACTAccessApprovalsPresenter;
 import org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionDashboardPresenter;
@@ -64,6 +65,7 @@ import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDa
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.OpenSubmissionWidget;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.InlineAsynchronousProgressViewImpl;
+import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditor;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditor;
@@ -862,4 +864,6 @@ public interface PortalGinInjector extends Ginjector {
 	
 	IntendedDataUseGenerator getIntendedDataUseGenerator();
 	IntendedDataUseReportWidget getIntendedDataUseReportWidget();
+	PresignedURLAsyncHandler getPresignedURLAsyncHandler();
+	JSONObjectAdapter getJSONObjectAdapter();
 }

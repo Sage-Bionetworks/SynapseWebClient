@@ -56,12 +56,9 @@ public class LoginWidgetViewImpl implements LoginWidgetView, IsWidget {
 			}
 
 			var props = {
-				theme : 'light',
-				icon : true,
 				googleRedirectUrl : googleSSORedirectUrl,
 				sessionCallback : sessionCallback
 			};
-
 			$wnd.ReactDOM.render($wnd.React.createElement(
 					$wnd.SRC.SynapseComponents.LoginPage, props, null), el);
 		} catch (err) {

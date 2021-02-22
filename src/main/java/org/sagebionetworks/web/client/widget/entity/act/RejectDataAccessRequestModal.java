@@ -1,6 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
+import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.shared.WebConstants;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -17,17 +25,49 @@ public class RejectDataAccessRequestModal implements RejectDataAccessRequestModa
 
 	private RejectDataAccessRequestModalView view;
 	CallbackP<String> callback;
+	private SynapseProperties synapseProperties;
+	PortalGinInjector ginInjector;
+	private boolean isLoaded = false;
 
 	@Inject
-	public RejectDataAccessRequestModal(RejectDataAccessRequestModalView view) {
+	public RejectDataAccessRequestModal(RejectDataAccessRequestModalView view, SynapseProperties synapseProperties, PortalGinInjector ginInjector) {
 		this.view = view;
+		this.synapseProperties = synapseProperties;
+		this.ginInjector = ginInjector;
 		this.view.setPresenter(this);
 	}
 
 	public void show(CallbackP<String> callback) {
 		this.view.clear();
 		this.callback = callback;
-		view.show();
+		if (!isLoaded) {
+			// get the json file that define the reasons
+			String jsonSynID = synapseProperties.getSynapseProperty(WebConstants.ACT_DATA_ACCESS_REJECTION_REASONS_PROPERTY_KEY);			
+			// get the entity (to find it's file handle ID)
+			RejectReasonWidget.getJSON(jsonSynID, ginInjector, new AsyncCallback<JSONObjectAdapter>() {
+				@Override
+				public void onSuccess(JSONObjectAdapter json) {
+					view.clearReasons();
+					try {
+						JSONArrayAdapter jsonArray = json.getJSONArray("reasons");
+						for (int i = 0; i < jsonArray.length(); i++) {
+							view.addReason(jsonArray.getString(i));
+						}						
+						isLoaded = true;
+					} catch (JSONObjectAdapterException e) {
+						view.showError(e.getMessage());
+					}
+					view.show();
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showError(caught.getMessage());
+					view.show();
+				}
+			});
+		} else {
+			view.show();
+		}
 	}
 
 	@Override

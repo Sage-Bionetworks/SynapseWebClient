@@ -1,10 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
+import java.util.ArrayList;
+
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -26,25 +29,7 @@ public class RejectDataAccessRequestModalViewImpl implements RejectDataAccessReq
 
 	// Checkboxes
 	@UiField
-	CheckBox fillInPrincipalInvestigatorOption;
-	@UiField
-	CheckBox wrongDucOption;
-	@UiField
-	CheckBox everyPageDucOption;
-	@UiField
-	CheckBox executeDucOption;
-	@UiField
-	CheckBox notOwnSigningOfficialOption;
-	@UiField
-	CheckBox requestorsMismatchSignedOption;
-	@UiField
-	CheckBox projectLeadMissingOption;
-	@UiField
-	CheckBox institutionNameMissingOption;
-	@UiField
-	CheckBox missingBasicInfoOption;
-	@UiField
-	CheckBox missingApprovalLetterOption;
+	Div reasonsContainer;
 	@UiField
 	CheckBox customTextOption;
 
@@ -68,6 +53,8 @@ public class RejectDataAccessRequestModalViewImpl implements RejectDataAccessReq
 
 	Widget widget;
 
+	ArrayList<CheckBox> checkboxes = new ArrayList<>();
+	
 	// Presenter
 	Presenter presenter;
 	
@@ -87,9 +74,20 @@ public class RejectDataAccessRequestModalViewImpl implements RejectDataAccessReq
 		this.presenter = presenter;
 	}
 
-	private CheckBox[] getCheckBoxes() {
-		return new CheckBox[] {wrongDucOption, everyPageDucOption, executeDucOption, notOwnSigningOfficialOption, requestorsMismatchSignedOption, projectLeadMissingOption, fillInPrincipalInvestigatorOption, institutionNameMissingOption, missingBasicInfoOption, missingApprovalLetterOption};
+	@Override
+	public void clearReasons() {
+		reasonsContainer.clear();
+		checkboxes = new ArrayList<CheckBox>();
 	}
+
+	@Override
+	public void addReason(String reason) {
+		CheckBox cb = new CheckBox(reason);
+		cb.addStyleName("margin-top-20");
+		checkboxes.add(cb);
+		reasonsContainer.add(cb);
+	}
+	
 	public void setValue(String value) {
 		responseField.setText(value);
 	}
@@ -126,7 +124,7 @@ public class RejectDataAccessRequestModalViewImpl implements RejectDataAccessReq
 		this.clearError();
 		this.customText.clear();
 		this.responseField.clear();
-		for (CheckBox cb : getCheckBoxes()) {
+		for (CheckBox cb : checkboxes) {
 			cb.setValue(false);
 		}
 		this.customTextOption.setValue(false);
@@ -141,7 +139,7 @@ public class RejectDataAccessRequestModalViewImpl implements RejectDataAccessReq
 	@Override
 	public String getSelectedCheckboxText() {
 		String output = "";
-		for (CheckBox checkBox : getCheckBoxes()) {
+		for (CheckBox checkBox : checkboxes) {
 			if (checkBox.getValue()) {
 				output += "\n" + checkBox.getText() + "\n";
 			}
