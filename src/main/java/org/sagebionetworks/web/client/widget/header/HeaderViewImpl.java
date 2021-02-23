@@ -125,8 +125,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	Alert portalAlert;
 	@UiField
-	Icon portalGoBackArrow;
-	@UiField
 	Image portalLogo;
 	@UiField
 	Span portalName;
@@ -404,15 +402,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public void setPortalAlertVisible(boolean visible, JSONObjectAdapter json) {
 		if (visible) {
 			try {
-				if (json.has("backgroundColor")) {
-					String color = json.getString("backgroundColor");
-					String oldStyle = portalAlert.getElement().getAttribute("style");
-					portalAlert.getElement().setAttribute("style", oldStyle + ";background-color: " + color + ";");
-				}
-				if (json.has("foregroundColor")) {
-					String color = json.getString("foregroundColor");
-					portalGoBackArrow.setColor(color);
-				}
 				if (json.has("callbackUrl")) {
 					String href = json.getString("callbackUrl");
 					portalHref = href;

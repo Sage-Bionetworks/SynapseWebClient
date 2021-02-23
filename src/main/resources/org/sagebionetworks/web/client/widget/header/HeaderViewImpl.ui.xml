@@ -10,13 +10,13 @@
 
 	<bh:Div addStyleNames="header">
 		<b:Alert ui:field="portalAlert" visible="false"
-			addStyleNames="fullWidthAlert flexcontainer-row" type="INFO" height="50px"
-			marginTop="0" marginRight="0" paddingRight="40" marginBottom="0">
+			addStyleNames="fullWidthAlert flexcontainer-row background-color-white" type="INFO" height="50px"
+			marginTop="0" marginRight="0" marginBottom="0">
 			<g:FocusPanel ui:field="portalLogoFocusPanel"
 				addStyleNames="imageButton flexcontainer-column-fill-width">
 				<bh:Div>
-					<b:Icon ui:field="portalGoBackArrow" type="ARROW_LEFT"
-						addStyleNames="movedown-2 font-size-14" />
+					<b:Icon type="ARROW_LEFT"
+						addStyleNames="movedown-2 font-size-14 dark-text" />
 					<b:Image ui:field="portalLogo" height="35px"
 						addStyleNames="margin-left-10" />
 					<bh:Span ui:field="portalName"
