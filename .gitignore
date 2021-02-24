@@ -20,4 +20,4 @@ node_modules/*
 # We copy these files to the webapp folder to serve this folder in Eclipse (dev builds only)
 # We don't want to commit them because they are compiled or retrieved at build-time
 src/main/webapp/generated/*
-src/main/webapp/fonts
+src/main/webapp/fonts/*
