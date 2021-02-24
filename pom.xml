@@ -354,14 +354,33 @@
 				<version>3.0.0</version>
 				<executions>
 					<execution>
-						<id>Copy Synapse React Client JS</id>
+						<id>Copy dependencies from node_modules to webapp (generated)</id>
 						<phase>process-resources</phase>
 						<goals>
 							<goal>run</goal>
 						</goals>
 						<configuration>
 							<target>
+								<copy file="${project.basedir}/node_modules/jquery/dist/jquery.min.js" tofile="src/main/webapp/generated/jquery.min.js" />
+								<copy file="${project.basedir}/node_modules/jsplumb/dist/js/jsplumb.min.js" tofile="src/main/webapp/generated/jsplumb.min.js" />								
+								<copy file="${project.basedir}/node_modules/pica/dist/pica.min.js" tofile="src/main/webapp/generated/pica.min.js" />
+								<copy file="${project.basedir}/node_modules/croppie/croppie.min.js" tofile="src/main/webapp/generated/croppie.min.js" />
+								<copy file="${project.basedir}/node_modules/croppie/croppie.css" tofile="src/main/webapp/generated/croppie.css" />
 								<copy file="${project.basedir}/node_modules/synapse-react-client/dist/umd/synapse-react-client.production.min.js" tofile="src/main/webapp/generated/synapse-react-client.production.min.js" />
+								<copy file="${project.basedir}/node_modules/react/umd/react.production.min.js" tofile="src/main/webapp/generated/react.production.min.js" />
+								<copy file="${project.basedir}/node_modules/react-dom/umd/react-dom.production.min.js" tofile="src/main/webapp/generated/react-dom.production.min.js" />
+								<copy file="${project.basedir}/node_modules/react-transition-group/dist/react-transition-group.min.js" tofile="src/main/webapp/generated/react-transition-group.min.js" />
+								<copy file="${project.basedir}/node_modules/react-measure/dist/index.umd.js" tofile="src/main/webapp/generated/react-measure.js" />
+								<copy file="${project.basedir}/node_modules/react-tooltip/standalone/react-tooltip.min.js" tofile="src/main/webapp/generated/react-tooltip.min.js" />
+								<copy file="${project.basedir}/node_modules/react-plotly.js/dist/create-plotly-component.min.js" tofile="src/main/webapp/generated/create-plotly-component.min.js" />
+								<copy file="${project.basedir}/node_modules/react-jsonschema-form/dist/react-jsonschema-form.js" tofile="src/main/webapp/generated/react-jsonschema-form.js" />
+								<copy file="${project.basedir}/node_modules/universal-cookie/umd/universalCookie.min.js" tofile="src/main/webapp/generated/universalCookie.min.js" />
+								<copy file="${project.basedir}/node_modules/react-bootstrap/dist/react-bootstrap.min.js" tofile="src/main/webapp/generated/react-bootstrap.min.js" />
+								<copy file="${project.basedir}/node_modules/prop-types/prop-types.min.js" tofile="src/main/webapp/generated/prop-types.min.js" />
+								<copy file="${project.basedir}/node_modules/font-awesome/css/font-awesome.css" tofile="src/main/webapp/generated/font-awesome.css" />
+								<copy file="${project.basedir}/node_modules/font-awesome/fonts/fontawesome-webfont.woff" tofile="src/main/webapp/fonts/fontawesome-webfont.woff" />
+								<copy file="${project.basedir}/node_modules/font-awesome/fonts/fontawesome-webfont.woff2" tofile="src/main/webapp/fonts/fontawesome-webfont.woff2" />
+								<copy file="${project.basedir}/node_modules/font-awesome/fonts/fontawesome-webfont.ttf" tofile="src/main/webapp/fonts/fontawesome-webfont.ttf" />
 							</target>
 						</configuration>
 					</execution>

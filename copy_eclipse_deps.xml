@@ -2,8 +2,12 @@
     <!--We copy all of the dependencies handled at build-time to the folder that Jetty serves. -->
     <target name="copy">
         <echo message="Copying dependencies" />
-        <copy
-                file="node_modules/synapse-react-client/dist/umd/synapse-react-client.production.min.js"
-                tofile="target/portal-develop-SNAPSHOT/generated/synapse-react-client.production.min.js" />
+    	<copy todir="src/main/webapp/generated">
+	        <fileset dir="target/portal-develop-SNAPSHOT/generated"/>
+	    </copy>
+    	<mkdir dir="target/portal-develop-SNAPSHOT/fonts"/>
+        <copy todir="src/main/webapp/fonts">
+	        <fileset dir="target/portal-develop-SNAPSHOT/fonts"/>
+	    </copy>
     </target>
 </project>
