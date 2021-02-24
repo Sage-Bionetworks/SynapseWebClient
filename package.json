@@ -1,5 +1,10 @@
 {
   "dependencies": {
+    "jquery": "3.5.1",    
+    "jsplumb": "2.13.2",
+    "font-awesome": "4.7.0",
+    "pica": "6.0.0",    
+    "croppie": "2.6.5",
   	"react": "16.13.1",
   	"react-dom": "16.13.1",
     "sass": "1.32.5",
