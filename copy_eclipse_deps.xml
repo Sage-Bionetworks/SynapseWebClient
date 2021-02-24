@@ -5,6 +5,7 @@
     	<copy todir="src/main/webapp/generated">
 	        <fileset dir="target/portal-develop-SNAPSHOT/generated"/>
 	    </copy>
+    	<mkdir dir="target/portal-develop-SNAPSHOT/fonts"/>
         <copy todir="src/main/webapp/fonts">
 	        <fileset dir="target/portal-develop-SNAPSHOT/fonts"/>
 	    </copy>
