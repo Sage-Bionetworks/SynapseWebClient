@@ -21,7 +21,6 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
@@ -90,7 +89,6 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -588,15 +586,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		Long version = null;
 		Entity entity = entityBundle.getEntity();
 		if (entity instanceof Versionable) {
-			if (entity instanceof Table) {
-				// TODO: This is undefined behavior, figure out if it's safe to use
-				// A user cannot label their version "in progress" because labels must be unique,
-				// and the current version is always labeled "in progress"
-				if (((VersionableEntity) entity).getVersionLabel().equals("in progress")) {
-					return Optional.empty();
-				}
-			}
-			GWT.log(entityBundle.toString());
 			version = ((Versionable) entity).getVersionNumber();
 		}
 		return Optional.ofNullable(version);
