@@ -1,11 +1,15 @@
 package org.sagebionetworks.web.client.widget.doi;
 
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
-import org.gwtbootstrap3.client.ui.*;
+import java.util.List;
+import java.util.Optional;
+
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.FormGroup;
+import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.IntegerBox;
+import org.gwtbootstrap3.client.ui.ListBox;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityTypeUtils;
@@ -15,8 +19,11 @@ import org.sagebionetworks.repo.model.doi.v2.DoiResourceTypeGeneral;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 
-import java.util.List;
-import java.util.Optional;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 
 public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalView {
 

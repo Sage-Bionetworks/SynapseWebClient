@@ -1,15 +1,27 @@
 package org.sagebionetworks.web.client.widget.doi;
 
-import com.google.common.util.concurrent.FluentFuture;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
+import static com.google.common.util.concurrent.Futures.whenAllComplete;
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-import org.sagebionetworks.repo.model.*;
+import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
-import org.sagebionetworks.repo.model.doi.v2.*;
+import org.sagebionetworks.repo.model.doi.v2.Doi;
+import org.sagebionetworks.repo.model.doi.v2.DoiCreator;
+import org.sagebionetworks.repo.model.doi.v2.DoiRequest;
+import org.sagebionetworks.repo.model.doi.v2.DoiResourceType;
+import org.sagebionetworks.repo.model.doi.v2.DoiResourceTypeGeneral;
+import org.sagebionetworks.repo.model.doi.v2.DoiTitle;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
@@ -21,13 +33,12 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
-import static com.google.common.util.concurrent.Futures.whenAllComplete;
-import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 
 public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presenter {
 	public static final String DOI_CREATED_MESSAGE = "DOI successfully updated for ";
