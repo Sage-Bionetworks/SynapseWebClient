@@ -67,6 +67,8 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
         synapseAlert.clear();
         doi = new Doi();
 
+        List<ListenableFuture<?>> requests = new ArrayList<>();
+
         FluentFuture<Doi> doiRequest = javascriptClient.getDoi(entity.getId(), ObjectType.ENTITY, entityVersion);
         doiRequest.addCallback(new FutureCallback<Doi>() {
             @Override
@@ -88,22 +90,25 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
             }
         }, directExecutor());
 
-        FluentFuture<List<VersionInfo>> versionRequest = javascriptClient.getEntityVersions(entity.getId(), 0, 100);
-        versionRequest.addCallback(new FutureCallback<List<VersionInfo>>() {
-            @Override
-            public void onSuccess(List<VersionInfo> result) {
-                view.setVersions(result, entityVersion);
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                popupUtilsView.showErrorMessage(t.getMessage());
-            }
-        }, directExecutor());
-
-        List<ListenableFuture<?>> requests = new ArrayList<>();
         requests.add(doiRequest);
-        requests.add(versionRequest);
+
+        if (entity instanceof VersionableEntity) {
+            FluentFuture<List<VersionInfo>> versionRequest = javascriptClient.getEntityVersions(entity.getId(), 0, 100);
+            versionRequest.addCallback(new FutureCallback<List<VersionInfo>>() {
+                @Override
+                public void onSuccess(List<VersionInfo> result) {
+                    view.setVersions(result, entityVersion);
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    popupUtilsView.showErrorMessage(t.getMessage());
+                }
+            }, directExecutor());
+
+            requests.add(versionRequest);
+        }
+
         FluentFuture.from(whenAllComplete(requests).call(() -> {
             view.setIsLoading(false);
             return null;
@@ -237,7 +242,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 
     /**
      * Do not call this method outside of this class. Exposed only for testing purposes
-     * <p>
+     *
      * Retrieves DOI fields from an instance variable (if it exists) and loads them into the view.
      */
     public void populateForms() {
@@ -272,7 +277,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 
     /**
      * Do not call this method outside of this class. Exposed only for testing purposes
-     * <p>
+     *
      * Converts a string of creator names to a List of DoiCreator, where creatorNames are separated with
      * newlines
      */
@@ -290,7 +295,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 
     /**
      * Do not call this method outside of this class. Exposed only for testing purposes
-     * <p>
+     *
      * Converts a List of DoiCreator to a string of creator names, concatenated with new lines
      */
     public static String convertMultipleCreatorsToString(List<DoiCreator> creators) {
@@ -300,7 +305,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 
     /**
      * Do not call this method outside of this class. Exposed only for testing purposes
-     * <p>
+     *
      * Converts a string of titles to a List of DoiTitle, where titles are separated with newlines
      */
     public static List<DoiTitle> parseTitlesString(String titles) {
@@ -317,7 +322,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 
     /**
      * Do not call this method outside of this class. Exposed only for testing purposes
-     * <p>
+     *
      * Converts a List of DoiTitle to a string of titles, concatenated with new lines
      */
     public static String convertMultipleTitlesToString(List<DoiTitle> titles) {

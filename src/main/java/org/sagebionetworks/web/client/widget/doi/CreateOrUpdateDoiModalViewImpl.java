@@ -27,7 +27,8 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 	private Widget widget;
 	private Entity entity;
 
-//	private final String VERSION_SELECT_HELP_TEXT = ;
+	// A select box can't have a null value, so we use -1 to represent selecting a null version
+	private static final long NO_VERSION = -1L;
 
 	@UiField
 	Button mintDoiButton;
@@ -70,7 +71,7 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 		cancelButton.addClickHandler(event -> doiModal.hide());
 		versionSelection.addChangeHandler(event -> {
 			Long version = Long.valueOf(versionSelection.getSelectedValue());
-			if (version == 0L) { // We let '0' represent no version in the select box.
+			if (version == NO_VERSION) {
 				presenter.onVersionChange(Optional.empty());
 			} else {
 				presenter.onVersionChange(Optional.of(version));
@@ -103,14 +104,15 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 		resourceTypeGeneralSelect.setTitle(DoiResourceTypeGeneral.Dataset.name());
 		versionForm.setVisible(this.entity instanceof Versionable);
 		String entityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(this.entity.getClass()));
-		String helpMarkdown = "The version of the " + entityTypeDisplay +" for which the DOI should be minted.\n\n" +
+		String versionHelpMarkdown = "The version of the " + entityTypeDisplay +" for which the DOI should be minted.\n\n" +
 				"Versioned DOIs will resolve to the specified version of the " + entityTypeDisplay + ".\n\n" +
-				"Unversioned DOIs will always resolve to the newest version of this " + entityTypeDisplay + ", so the data in the table may change over time.";
+				"A DOI without a version will always resolve to the newest version of this " + entityTypeDisplay +
+				", so the data that someone retrieves using the DOI may change over time.";
 		if (entity instanceof Table) {
-			helpMarkdown += "\n\nTo create a DOI that resolves to the current set of data in the " + entityTypeDisplay +
+			versionHelpMarkdown += "\n\nTo create a DOI that will always resolve to the current set of data in the " + entityTypeDisplay +
 					", create a new version and mint a DOI for that version.";
 		}
-		versionHelpBox.setHelpMarkdown(helpMarkdown);
+		versionHelpBox.setHelpMarkdown(versionHelpMarkdown);
 		publicationYearField.reset();
 		mintDoiButton.setEnabled(true);
 	}
@@ -129,7 +131,7 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 	@Override
 	public void setVersions(List<VersionInfo> versions, Optional<Long> selectedVersion) {
 		versionSelection.clear();
-		versionSelection.addItem("Unversioned", "0"); // We let '0' represent no version in the select box.
+		versionSelection.addItem("No version", String.valueOf(NO_VERSION));
 		int selectedIndex = 0;
 		for (int i = 0; i < versions.size(); i++) {
 			VersionInfo version = versions.get(i);

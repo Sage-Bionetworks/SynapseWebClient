@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.doi;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -10,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,8 +28,10 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.doi.v2.Doi;
 import org.sagebionetworks.repo.model.doi.v2.DoiCreator;
 import org.sagebionetworks.repo.model.doi.v2.DoiRequest;
@@ -47,6 +51,7 @@ import org.sagebionetworks.web.client.widget.doi.CreateOrUpdateDoiModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.gwt.event.shared.EventBus;
 
@@ -82,6 +87,8 @@ public class CreateOrUpdateDoiModalTest {
 	EventBus mockEventBus;
 	@Mock
 	Entity mockEntity;
+	@Mock
+	FileEntity mockFileEntity;
 	@Mock
 	UserProfile mockUserProfile;
 	@Mock
@@ -161,6 +168,28 @@ public class CreateOrUpdateDoiModalTest {
 	}
 
 	@Test
+	public void testConfigureAndShowEntityVersions() {
+		Doi doi = createDoi();
+		List<VersionInfo> versions = new ArrayList<>();
+		for (long i = 1; i <= 3; i++) {
+			VersionInfo versionInfo = new VersionInfo();
+			versionInfo.setVersionNumber(i);
+			versionInfo.setVersionLabel("version " + i);
+			versions.add(versionInfo);
+		}
+
+		when(mockFileEntity.getId()).thenReturn(objectId);
+		when(mockSynapseClient.getDoi(objectId, objectType, objectVersion)).thenReturn(getDoneFuture(doi));
+		when(mockSynapseClient.getEntityVersions(eq(objectId), anyInt(), anyInt())).thenReturn(getDoneFuture(versions));
+
+		// Call under test
+		presenter.configureAndShow(mockFileEntity, objectVersion, mockUserProfile);
+
+		// Just check that the versions were set, the previous test method covers the DOI info.
+		verify(mockView).setVersions(versions, objectVersion);
+	}
+
+	@Test
 	public void testConfigureAndShowNotFoundExceptionFailure() {
 		when(mockEntity.getId()).thenReturn(objectId);
 		when(mockEntity.getName()).thenReturn(entityName);
@@ -213,9 +242,9 @@ public class CreateOrUpdateDoiModalTest {
 	}
 
 	@Test
-	public void testConfigureAndShowOtherFailure() {
+	public void testConfigureAndShowOtherFailure_DoiRequest() {
 		when(mockEntity.getId()).thenReturn(objectId);
-		Throwable error = new Throwable("error message");
+		Throwable error = new Throwable("get doi error message");
 		when(mockSynapseClient.getDoi(objectId, ObjectType.ENTITY, objectVersion)).thenReturn(getFailedFuture(error));
 
 		// Call under test
@@ -224,6 +253,21 @@ public class CreateOrUpdateDoiModalTest {
 		verify(mockView, never()).show();
 		verify(mockPopupUtilsView).showErrorMessage(error.getMessage());
 	}
+
+	@Test
+	public void testConfigureAndShowOtherFailure_VersionRequest() {
+		when(mockFileEntity.getId()).thenReturn(objectId);
+		Throwable error = new Throwable("get versions error message");
+		when(mockSynapseClient.getDoi(objectId, ObjectType.ENTITY, objectVersion)).thenReturn(getDoneFuture(new Doi()));
+		when(mockSynapseClient.getEntityVersions(eq(objectId), anyInt(), anyInt())).thenReturn(getFailedFuture(error));
+
+		// Call under test
+		presenter.configureAndShow(mockFileEntity, objectVersion, mockUserProfile);
+
+		verify(mockView, never()).show();
+		verify(mockPopupUtilsView).showErrorMessage(error.getMessage());
+	}
+
 
 	@Test
 	public void testCreateNewDoi() {
@@ -248,7 +292,7 @@ public class CreateOrUpdateDoiModalTest {
 
 		assertEquals(objectId, result.getObjectId());
 		assertEquals(ObjectType.ENTITY, result.getObjectType());
-		assertEquals(objectVersion, result.getObjectVersion());
+		assertEquals(objectVersion.get(), result.getObjectVersion());
 		assertEquals(CreateOrUpdateDoiModal.getSuggestedResourceTypeGeneral(EntityTypeUtils.getEntityTypeForEntityClassName(mockEntity.getClass().getName())), result.getResourceType().getResourceTypeGeneral());
 		assertEquals(expectedCreators, result.getCreators());
 		assertEquals(expectedTitles, result.getTitles());
