@@ -111,12 +111,12 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 		resourceTypeGeneralSelect.setTitle(DoiResourceTypeGeneral.Dataset.name());
 		versionForm.setVisible(this.entity instanceof Versionable);
 		String entityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(this.entity.getClass()));
-		String versionHelpMarkdown = "The version of the " + entityTypeDisplay +" for which the DOI should be minted.\n\n" +
-				"Versioned DOIs will resolve to the specified version of the " + entityTypeDisplay + ".\n\n" +
-				"A DOI without a version will always resolve to the newest version of this " + entityTypeDisplay +
+		String versionHelpMarkdown = "A DOI can be associated with a specific version of this " + entityTypeDisplay + ".\n\n" +
+				"Versioned DOIs will link to the specified version of the " + entityTypeDisplay + ".\n\n" +
+				"A DOI without a version will always link to the newest version of this " + entityTypeDisplay +
 				", so the data that someone retrieves using the DOI may change over time.";
 		if (entity instanceof Table) {
-			versionHelpMarkdown += "\n\nTo create a DOI that will always resolve to the current set of data in the " + entityTypeDisplay +
+			versionHelpMarkdown += "\n\nTo create a DOI that will always link to the current set of data in the " + entityTypeDisplay +
 					", create a new version and mint a DOI for that version.";
 		}
 		versionHelpBox.setHelpMarkdown(versionHelpMarkdown);

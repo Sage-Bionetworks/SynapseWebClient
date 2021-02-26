@@ -14,7 +14,7 @@
 			</b:ModalHeader>
 			<b:ModalBody>
 				<bh:Paragraph
-					text="Minting a DOI allows you to credit contributors to your work, and makes it easier to cite your work." />
+					text="Minting a DOI allows you to credit contributors and makes it easy to cite your work." />
 				<bh:Paragraph
 					text="Note that all supplementary information attached to a DOI is publicly available outside of Synapse, even if your data is private."
 					addStyleNames="em" />
@@ -24,7 +24,7 @@
 							<b:FormLabel>Version</b:FormLabel>
 							<w:HelpWidget
 									ui:field="versionHelpBox"
-									helpMarkdown="The version for which the DOI should be minted. A DOI with a version will always resolve to the specified version. A DOI without a version will always resolve to the latest version."
+									helpMarkdown="A DOI can be associated with a specific version. A DOI associated with a version will always link to the specified version. A DOI without a version will always link to the latest version."
 									addStyleNames="margin-left-5" placement="BOTTOM" />
 							<bh:Div>
 								<b:ListBox ui:field="versionSelection" />
