@@ -21,6 +21,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
@@ -586,7 +587,15 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		Long version = null;
 		Entity entity = entityBundle.getEntity();
 		if (entity instanceof Versionable) {
-			version = ((Versionable) entity).getVersionNumber();
+			VersionableEntity versionableEntity = ((VersionableEntity) entity);
+			if (versionableEntity instanceof Table
+					&& versionableEntity.getVersionLabel() != null
+					&& versionableEntity.getVersionLabel().equals("in progress")) {
+				// TODO: This is undefined behavior. Use `isLatestVersion` when PLFM-6583 is complete.
+				return Optional.empty();
+
+			}
+			version = versionableEntity.getVersionNumber();
 		}
 		return Optional.ofNullable(version);
 	}
