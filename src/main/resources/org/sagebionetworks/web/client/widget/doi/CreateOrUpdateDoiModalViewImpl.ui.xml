@@ -24,7 +24,7 @@
 							<b:FormLabel>Version</b:FormLabel>
 							<w:HelpWidget
 									ui:field="versionHelpBox"
-									helpMarkdown="The version that the DOI should be minted for. Unversioned DOIs will always resolve to the newest version of the "
+									helpMarkdown="The version for which the DOI should be minted. A DOI with a version will always resolve to the specified version. A DOI without a version will always resolve to the latest version."
 									addStyleNames="margin-left-5" placement="BOTTOM" />
 							<bh:Div>
 								<b:ListBox ui:field="versionSelection" />
