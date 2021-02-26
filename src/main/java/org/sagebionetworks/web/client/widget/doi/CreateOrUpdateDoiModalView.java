@@ -1,6 +1,11 @@
 package org.sagebionetworks.web.client.widget.doi;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.VersionInfo;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface CreateOrUpdateDoiModalView extends IsWidget {
 
@@ -8,6 +13,7 @@ public interface CreateOrUpdateDoiModalView extends IsWidget {
 
 	interface Presenter {
 		void onSaveDoi();
+		void onVersionChange(Optional<Long> version);
 	}
 
 	String getCreators();
@@ -41,4 +47,8 @@ public interface CreateOrUpdateDoiModalView extends IsWidget {
 	void reset();
 
 	void setIsLoading(boolean isLoading);
+
+	void setVersions(List<VersionInfo> versions, Optional<Long> selectedVersion);
+
+	void setEntity(Entity entityType);
 }

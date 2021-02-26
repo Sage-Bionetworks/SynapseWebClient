@@ -90,6 +90,8 @@ public class EntityMetadata implements Presenter {
 			getVersionHistoryWidget().setVisible(!getVersionHistoryWidget().isVisible());
 		});
 
+		// TODO: This is undefined behavior, and differs between files and tables.
+		// Use `isLatestVersion` when PLFM-6583 is complete.
 		boolean isCurrentVersion = versionNumber == null;
 		if (EntityActionControllerImpl.isVersionSupported(bundle.getEntity(), ginInjector.getCookieProvider())) {
 			getVersionHistoryWidget().setVisible(false);

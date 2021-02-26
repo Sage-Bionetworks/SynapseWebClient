@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -684,10 +685,10 @@ public class SynapseJavascriptClient {
 		return getFuture(cb -> doGet(finalUrl, OBJECT_TYPE.Doi, cb));
 	}
 
-	public FluentFuture<Doi> getDoi(String objectId, ObjectType objectType, Long objectVersion) {
+	public FluentFuture<Doi> getDoi(String objectId, ObjectType objectType, Optional<Long> objectVersion) {
 		String url = getRepoServiceUrl() + DOI + "?" + ID_PARAMETER + objectId + "&" + TYPE_PARAMETER + objectType;
-		if (objectVersion != null) {
-			url += "&" + VERSION_PARAMETER + objectVersion;
+		if (objectVersion.isPresent()) {
+			url += "&" + VERSION_PARAMETER + objectVersion.get();
 		}
 		String finalUrl = url;
 		return getFuture(cb -> doGet(finalUrl, OBJECT_TYPE.Doi, cb));
@@ -1582,6 +1583,10 @@ public class SynapseJavascriptClient {
 	public Request getEntityVersions(String entityId, int offset, int limit, AsyncCallback<List<VersionInfo>> callback) {
 		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + REPO_SUFFIX_VERSION + "?" + OFFSET_PARAMETER + offset + "&" + LIMIT_PARAMETER + limit;
 		return doGet(url, OBJECT_TYPE.PaginatedResultsVersionInfo, callback);
+	}
+
+	public FluentFuture<List<VersionInfo>> getEntityVersions(String entityId, int offset, int limit) {
+		return getFuture(cb -> getEntityVersions(entityId, offset, limit, cb));
 	}
 
 	public void getThreadsForEntity(String entityId, Long limit, Long offset, DiscussionThreadOrder order, Boolean ascending, DiscussionFilter filter, AsyncCallback<List<DiscussionThreadBundle>> callback) {
