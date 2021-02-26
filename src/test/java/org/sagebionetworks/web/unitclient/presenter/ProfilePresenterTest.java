@@ -53,6 +53,8 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.place.Profile;
@@ -106,6 +108,8 @@ public class ProfilePresenterTest {
 	@Mock
 	PlaceChanger mockPlaceChanger;
 	@Mock
+	SynapseJSNIUtilsImpl mockJSNIUtils;
+	@Mock
 	Profile place;
 	@Mock
 	UserProfileEditorWidget mockUserProfileEditorWidget;
@@ -134,8 +138,6 @@ public class ProfilePresenterTest {
 
 	@Mock
 	UserBundle mockUserBundle;
-	@Mock
-	UserBundle mockCurrentUserBundle;
 	@Mock
 	Team mockTeam;
 	@Mock
@@ -180,9 +182,11 @@ public class ProfilePresenterTest {
 		when(mockInjector.getChallengeBadgeWidget()).thenReturn(mockChallengeBadge);
 		when(mockInjector.getSettingsPresenter()).thenReturn(mockSettingsPresenter);
 		when(mockInjector.getDownloadListWidget()).thenReturn(mockDownloadListWidget);
+		when(mockInjector.getSynapseJSNIUtils()).thenReturn(mockJSNIUtils);
 		userProfile.setDisplayName("tester");
 		userProfile.setOwnerId("1");
 		userProfile.setEmail("original.email@sagebase.org");
+		userProfile.setUserName("mr.t");
 		testUser.setProfile(userProfile);
 		testUser.setSession(new Session());
 		testUser.getSession().setSessionToken("token");
@@ -917,7 +921,9 @@ public class ProfilePresenterTest {
 		when(place.getArea()).thenReturn(ProfileArea.PROJECTS);
 		setPlaceMyProfile("456");
 		invokeGetMyTeamsCallback();
+		verify(mockJSNIUtils).setPageTitle(userProfile.getUserName());
 		profilePresenter.tabClicked(ProfileArea.PROJECTS);
+		verify(mockJSNIUtils, times(2)).setPageTitle(userProfile.getUserName() + " - " + ProfileArea.PROJECTS.name().toLowerCase());
 		verify(mockSynapseJavascriptClient, times(2)).getUserTeams(anyString(), anyBoolean(), anyString());
 		verify(mockSynapseJavascriptClient, times(2)).listTeams(anyList());
 		verify(mockView, atLeastOnce()).setTeamsFilterVisible(true);
