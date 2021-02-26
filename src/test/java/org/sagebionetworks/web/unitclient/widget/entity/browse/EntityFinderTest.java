@@ -36,7 +36,7 @@ import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderArea;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -55,7 +55,7 @@ public class EntityFinderTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	@Mock
 	AuthenticationController mockAuthenticationController;
-	EntityFinder entityFinder;
+	EntityFinderImpl entityFinder;
 	@Mock
 	ClientCache mockClientCache;
 	@Mock
@@ -71,7 +71,7 @@ public class EntityFinderTest {
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		adapterFactory = new AdapterFactoryImpl();
-		entityFinder = new EntityFinder(mockView, mockGlobalApplicationState, mockAuthenticationController, mockClientCache, mockSynAlert, mockJsClient);
+		entityFinder = new EntityFinderImpl(mockView, mockGlobalApplicationState, mockAuthenticationController, mockClientCache, mockSynAlert, mockJsClient);
 		verify(mockView).setPresenter(entityFinder);
 		reset(mockView);
 		when(mockView.isShowing()).thenReturn(false);
@@ -338,7 +338,7 @@ public class EntityFinderTest {
 
 	@Test
 	public void testShowBrowseArea() {
-		when(mockClientCache.get(EntityFinder.ENTITY_FINDER_AREA_KEY)).thenReturn(EntityFinderArea.BROWSE.toString());
+		when(mockClientCache.get(EntityFinderImpl.ENTITY_FINDER_AREA_KEY)).thenReturn(EntityFinderArea.BROWSE.toString());
 		entityFinder.show();
 		verify(mockView).clear();
 		verify(mockView).setBrowseAreaVisible();
@@ -347,7 +347,7 @@ public class EntityFinderTest {
 
 	@Test
 	public void testShowSearchArea() {
-		when(mockClientCache.get(EntityFinder.ENTITY_FINDER_AREA_KEY)).thenReturn(EntityFinderArea.SEARCH.toString());
+		when(mockClientCache.get(EntityFinderImpl.ENTITY_FINDER_AREA_KEY)).thenReturn(EntityFinderArea.SEARCH.toString());
 		entityFinder.show();
 		verify(mockView).clear();
 		verify(mockView).setSearchAreaVisible();
@@ -356,7 +356,7 @@ public class EntityFinderTest {
 
 	@Test
 	public void testShowSynIdArea() {
-		when(mockClientCache.get(EntityFinder.ENTITY_FINDER_AREA_KEY)).thenReturn(EntityFinderArea.SYNAPSE_ID.toString());
+		when(mockClientCache.get(EntityFinderImpl.ENTITY_FINDER_AREA_KEY)).thenReturn(EntityFinderArea.SYNAPSE_ID.toString());
 		entityFinder.show();
 		verify(mockView).clear();
 		verify(mockView).setSynapseIdAreaVisible();
@@ -365,7 +365,7 @@ public class EntityFinderTest {
 
 	@Test
 	public void testShowMultiSynIdArea() {
-		when(mockClientCache.get(EntityFinder.ENTITY_FINDER_AREA_KEY)).thenReturn(EntityFinderArea.SYNAPSE_MULTI_ID.toString());
+		when(mockClientCache.get(EntityFinderImpl.ENTITY_FINDER_AREA_KEY)).thenReturn(EntityFinderArea.SYNAPSE_MULTI_ID.toString());
 		entityFinder.show();
 		verify(mockView).clear();
 		verify(mockView).setSynapseMultiIdAreaVisible();
@@ -383,7 +383,7 @@ public class EntityFinderTest {
 	public void testHideSearchArea() {
 		when(mockView.getCurrentArea()).thenReturn(EntityFinderArea.SEARCH);
 		entityFinder.hide();
-		verify(mockClientCache).put(EntityFinder.ENTITY_FINDER_AREA_KEY, EntityFinderArea.SEARCH.toString());
+		verify(mockClientCache).put(EntityFinderImpl.ENTITY_FINDER_AREA_KEY, EntityFinderArea.SEARCH.toString());
 	}
 
 	@Test

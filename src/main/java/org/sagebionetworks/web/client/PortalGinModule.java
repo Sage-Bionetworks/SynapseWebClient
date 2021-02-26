@@ -311,8 +311,12 @@ import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRender
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialogView;
 import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialogViewImpl;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderV2Impl;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderViewImpl;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderV2View;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderV2ViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
@@ -1413,5 +1417,9 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SubmissionViewScopeWidgetView.class).to(SubmissionViewScopeWidgetViewImpl.class);
         bind(PersonalAccessTokensView.class).to(PersonalAccessTokensViewImpl.class);
         bind(PageProgressWidgetView.class).to(PageProgressWidgetViewImpl.class);
+
+        bind(EntityFinder.class).to(EntityFinderV2Impl.class);
+
+        bind(EntityFinderV2View.class).to(EntityFinderV2ViewImpl.class);
     }
 }
