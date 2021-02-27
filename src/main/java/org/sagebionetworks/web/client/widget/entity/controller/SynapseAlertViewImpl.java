@@ -5,6 +5,8 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
+import org.sagebionetworks.web.client.DisplayUtils;
+
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -29,8 +31,6 @@ public class SynapseAlertViewImpl implements SynapseAlertView {
 	Strong alertText;
 	@UiField
 	Alert alert;
-	@UiField
-	Div loginAlert;
 	@UiField
 	Div loginWidgetContainer;
 
@@ -69,7 +69,7 @@ public class SynapseAlertViewImpl implements SynapseAlertView {
 		if (widget != null) {
 			alert.setVisible(false);
 			alertText.setText("");
-			loginAlert.setVisible(false);
+			loginWidgetContainer.setVisible(false);
 			reloadButton.setVisible(false);
 		}
 	}
@@ -78,7 +78,7 @@ public class SynapseAlertViewImpl implements SynapseAlertView {
 	public void showLogin() {
 		lazyConstruct();
 		synapseAlertContainer.setVisible(true);
-		loginAlert.setVisible(true);
+		loginWidgetContainer.setVisible(true);
 	}
 
 	@Override

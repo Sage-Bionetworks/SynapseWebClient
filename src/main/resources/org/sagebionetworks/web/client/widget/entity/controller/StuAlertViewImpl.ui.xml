@@ -7,7 +7,7 @@
   xmlns:e="urn:import:org.sagebionetworks.web.client.widget.entity"
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
   
-  	<bh:Div addStyleNames="margin-top-10 margin-left-15 margin-right-15">
+  	<bh:Div>
  		<bh:Div ui:field="synAlertContainer" />
   		<g:HTMLPanel ui:field="httpCode404" visible="false">
   			<b:Row>

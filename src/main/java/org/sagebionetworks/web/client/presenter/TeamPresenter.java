@@ -183,6 +183,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			@Override
 			public void onSuccess(TeamBundle result) {
 				team = result.getTeam();
+				ginInjector.getSynapseJSNIUtils().setPageTitle(team.getName());
 				TeamMembershipStatus teamMembershipStatus = result.getTeamMembershipStatus();
 				boolean isAdmin = result.isUserAdmin();
 				Callback refreshCallback = () -> {
