@@ -17,7 +17,6 @@ import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.KeyDownEvent;
@@ -127,6 +126,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 	public void show() {
 		// show modal
 		modal.show();
+		presenter.renderComponent();
 		helpWidget.focus();
 	}
 

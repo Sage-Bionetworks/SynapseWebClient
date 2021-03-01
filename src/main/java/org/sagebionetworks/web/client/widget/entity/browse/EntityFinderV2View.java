@@ -37,12 +37,6 @@ public interface EntityFinderV2View extends SynapseView {
 
 		void setSelectedEntity(Reference selected);
 
-		void lookupEntity(String entityId, CallbackP<List<EntityHeader>> callback);
-
-		void lookupEntity(ReferenceList rl, CallbackP<List<EntityHeader>> callback);
-
-		boolean showVersions();
-
 		void okClicked();
 
 		void show();
@@ -55,6 +49,7 @@ public interface EntityFinderV2View extends SynapseView {
 
 		void clearSelectedEntities();
 
+		void renderComponent();
 	}
 
 	Widget asWidget();
