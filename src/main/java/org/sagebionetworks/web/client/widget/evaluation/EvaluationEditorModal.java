@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.evaluation;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import java.util.Date;
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.evaluation.model.EvaluationStatus;
 import org.sagebionetworks.evaluation.model.SubmissionQuota;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtils;
@@ -59,7 +58,6 @@ public class EvaluationEditorModal implements EvaluationEditorModalView.Presente
 	public void configure(String entityId, Callback evaluationUpdatedCallback) {
 		Evaluation newEvaluation = new Evaluation();
 		newEvaluation.setContentSource(entityId);
-		newEvaluation.setStatus(EvaluationStatus.OPEN);
 		newEvaluation.setOwnerId(authController.getCurrentUserPrincipalId());
 		newEvaluation.setCreatedOn(new Date());
 		configure(newEvaluation, evaluationUpdatedCallback, true);
