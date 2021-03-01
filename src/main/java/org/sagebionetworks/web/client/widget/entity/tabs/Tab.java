@@ -34,7 +34,7 @@ public class Tab implements TabView.Presenter {
 	EntityActionController entityActionController;
 	ActionMenuWidget entityActionMenu;
 	EntityArea area;
-	
+	String tabTitle;
 	@Inject
 	public Tab(TabView view,
 			GlobalApplicationState globalAppState,
@@ -59,6 +59,7 @@ public class Tab implements TabView.Presenter {
 	}
 
 	public void configure(String tabTitle, String helpMarkdown, String helpLink, EntityArea area) {
+		this.tabTitle = tabTitle;
 		view.configure(tabTitle, helpMarkdown, helpLink);
 		onClickCallbacks = new ArrayList<CallbackP<Tab>>();
 		this.area = area;
@@ -127,7 +128,7 @@ public class Tab implements TabView.Presenter {
 				if (place != null) {
 					entityId = " - " + place.getEntityId();
 				}
-				synapseJSNIUtils.setPageTitle(entityName + entityId);
+				synapseJSNIUtils.setPageTitle(entityName + entityId + " - " + tabTitle);
 			}
 		}
 	}

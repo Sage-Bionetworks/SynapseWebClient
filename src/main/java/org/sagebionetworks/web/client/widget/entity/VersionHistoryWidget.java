@@ -149,6 +149,7 @@ public class VersionHistoryWidget implements VersionHistoryWidgetView.Presenter,
 			public void onSuccess(List<VersionInfo> results) {
 				view.setMoreButtonVisible(results.size() == VERSION_LIMIT);
 				if (currentOffset == 0) {
+					// TODO: Use `isLatestVersion` when PLFM-6583 is complete.
 					boolean isCurrentVersion = versionNumber == null;
 					// we know the current version based on this, unless we're looking at a Table
 					if (!(bundle.getEntity() instanceof Table)) {

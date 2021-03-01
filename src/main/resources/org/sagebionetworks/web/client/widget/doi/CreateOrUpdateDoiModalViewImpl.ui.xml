@@ -14,12 +14,22 @@
 			</b:ModalHeader>
 			<b:ModalBody>
 				<bh:Paragraph
-					text="Minting a DOI allows you to credit contributors to your work, and makes it easier to cite your work." />
+					text="Minting a DOI allows you to credit contributors and makes it easy to cite your work." />
 				<bh:Paragraph
 					text="Note that all supplementary information attached to a DOI is publicly available outside of Synapse, even if your data is private."
 					addStyleNames="em" />
 				<bh:Div ui:field="doiEditorDiv">
 					<b:Form>
+						<b:FormGroup ui:field="versionForm">
+							<b:FormLabel>Version</b:FormLabel>
+							<w:HelpWidget
+									ui:field="versionHelpBox"
+									helpMarkdown="A DOI can be associated with a specific version. A DOI associated with a version will always link to the specified version. A DOI without a version will always link to the latest version."
+									addStyleNames="margin-left-5" placement="BOTTOM" />
+							<bh:Div>
+								<b:ListBox ui:field="versionSelection" />
+							</bh:Div>
+						</b:FormGroup>
 						<b:FormGroup>
 							<b:FormLabel>Creator(s), one per line</b:FormLabel>
 							<w:HelpWidget
@@ -63,7 +73,7 @@
 					<b:Alert type="WARNING" addStyleNames="margin-top-10">
 						<bh:Strong text="Note: &nbsp;" />
 						<bh:Text
-							text="Updating the DOI information will cause old information to be lost!" />
+							text="A DOI has already been created. Updating the DOI information will cause old information to be lost!" />
 					</b:Alert>
 				</bh:Div>
 				<bh:Div ui:field="synAlert" />

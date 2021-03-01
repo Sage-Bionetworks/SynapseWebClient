@@ -3,10 +3,11 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.CONTAINER;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.PROJECT;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import com.google.gwt.core.client.GWT;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.Challenge;
@@ -20,6 +21,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
@@ -72,7 +74,6 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
-import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
@@ -88,6 +89,7 @@ import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
+
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -144,7 +146,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	String wikiPageId;
 	Entity entity;
 	UserEntityPermissions permissions;
-	String enityTypeDisplay;
+	String entityTypeDisplay;
 	boolean isUserAuthenticated;
 	boolean isCurrentVersion;
 	ActionMenuWidget actionMenu;
@@ -398,14 +400,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.entity = entityBundle.getEntity();
 		this.isUserAuthenticated = authenticationController.isLoggedIn();
 		this.isCurrentVersion = isCurrentVersion;
-		this.enityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass()));
+		this.entityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass()));
 		this.currentArea = currentArea;
 
 		// hide all commands by default
 		actionMenu.hideAllActions();
 		gwt.scheduleExecution(reconfigureActionsCallback, 2000);
 		if (!(entity instanceof Project)) {
-			actionMenu.setToolsButtonIcon(enityTypeDisplay + TOOLS, IconType.GEAR);
+			actionMenu.setToolsButtonIcon(entityTypeDisplay + TOOLS, IconType.GEAR);
 		} else if (currentArea != null) {
 			actionMenu.setToolsButtonIcon(DisplayUtils.capitalize(currentArea.name()) + TOOLS, IconType.GEAR);
 		}
@@ -534,7 +536,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if (entityBundle.getEntity() instanceof FileEntity || entityBundle.getEntity() instanceof DockerRepository || entityBundle.getEntity() instanceof Table) {
 			actionMenu.setActionVisible(Action.EDIT_PROVENANCE, permissions.getCanEdit());
 			actionMenu.setActionListener(Action.EDIT_PROVENANCE, this);
-			actionMenu.setActionText(Action.EDIT_PROVENANCE, "Edit " + enityTypeDisplay + " Provenance");
+			actionMenu.setActionText(Action.EDIT_PROVENANCE, "Edit " + entityTypeDisplay + " Provenance");
 		} else {
 			actionMenu.setActionVisible(Action.EDIT_PROVENANCE, false);
 		}
@@ -543,7 +545,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void configureChangeStorageLocation() {
 		if (entityBundle.getEntity() instanceof Folder || (entityBundle.getEntity() instanceof Project && currentArea == null)) {
 			actionMenu.setActionVisible(Action.CHANGE_STORAGE_LOCATION, permissions.getCanEdit());
-			actionMenu.setActionText(Action.CHANGE_STORAGE_LOCATION, "Change " + enityTypeDisplay + " Storage Location");
+			actionMenu.setActionText(Action.CHANGE_STORAGE_LOCATION, "Change " + entityTypeDisplay + " Storage Location");
 			actionMenu.setActionListener(Action.CHANGE_STORAGE_LOCATION, this);
 		} else {
 			actionMenu.setActionVisible(Action.CHANGE_STORAGE_LOCATION, false);
@@ -581,13 +583,21 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 
-	private Long getVersion() {
+	private Optional<Long> getVersion() {
 		Long version = null;
 		Entity entity = entityBundle.getEntity();
 		if (entity instanceof Versionable) {
-			version = ((Versionable) entity).getVersionNumber();
+			VersionableEntity versionableEntity = ((VersionableEntity) entity);
+			if (versionableEntity instanceof Table
+					&& versionableEntity.getVersionLabel() != null
+					&& versionableEntity.getVersionLabel().equals("in progress")) {
+				// TODO: This is undefined behavior. Use `isLatestVersion` when PLFM-6583 is complete.
+				return Optional.empty();
+
+			}
+			version = versionableEntity.getVersionNumber();
 		}
-		return version;
+		return Optional.ofNullable(version);
 	}
 
 	private void configureCreateOrUpdateDoi() {
@@ -598,9 +608,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
 			if (entityBundle.getDoiAssociation() == null) {
 				// show command if not returned, thus not in existence
-				actionMenu.setActionText(Action.CREATE_OR_UPDATE_DOI, CREATE_DOI_FOR + enityTypeDisplay);
+				actionMenu.setActionText(Action.CREATE_OR_UPDATE_DOI, CREATE_DOI_FOR + entityTypeDisplay);
 			} else {
-				actionMenu.setActionText(Action.CREATE_OR_UPDATE_DOI, UPDATE_DOI_FOR + enityTypeDisplay);
+				actionMenu.setActionText(Action.CREATE_OR_UPDATE_DOI, UPDATE_DOI_FOR + entityTypeDisplay);
 			}
 		}
 	}
@@ -649,7 +659,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if (entityBundle.getEntity() instanceof Table) {
 			boolean canEditResults = entityBundle.getPermissions().getCanCertifiedUserEdit();
 			actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, canEditResults);
-			actionMenu.setActionText(Action.UPLOAD_TABLE_DATA, "Upload Data to " + enityTypeDisplay);
+			actionMenu.setActionText(Action.UPLOAD_TABLE_DATA, "Upload Data to " + entityTypeDisplay);
 			actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, canEditResults);
 			actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 			actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, true);
@@ -694,7 +704,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if (isWikiableConfig(entityBundle.getEntity(), currentArea)) {
 			actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, permissions.getCanEdit());
 			actionMenu.setActionListener(Action.EDIT_WIKI_PAGE, this);
-			actionMenu.setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI_PREFIX + enityTypeDisplay + WIKI);
+			actionMenu.setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI_PREFIX + entityTypeDisplay + WIKI);
 		} else {
 			actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, false);
 		}
@@ -753,7 +763,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void configureMove() {
 		if (isMovableType(entityBundle.getEntity())) {
 			actionMenu.setActionVisible(Action.MOVE_ENTITY, permissions.getCanEdit());
-			actionMenu.setActionText(Action.MOVE_ENTITY, MOVE_PREFIX + enityTypeDisplay);
+			actionMenu.setActionText(Action.MOVE_ENTITY, MOVE_PREFIX + entityTypeDisplay);
 			actionMenu.setActionListener(Action.MOVE_ENTITY, this);
 		} else {
 			actionMenu.setActionVisible(Action.MOVE_ENTITY, false);
@@ -764,7 +774,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if (isLinkType(entityBundle.getEntity()) && !isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea)) {
 			actionMenu.setActionVisible(Action.CREATE_LINK, true);
 			actionMenu.setActionListener(Action.CREATE_LINK, this);
-			actionMenu.setActionText(Action.CREATE_LINK, "Save Link to " + enityTypeDisplay);
+			actionMenu.setActionText(Action.CREATE_LINK, "Save Link to " + entityTypeDisplay);
 		} else {
 			actionMenu.setActionVisible(Action.CREATE_LINK, false);
 		}
@@ -787,7 +797,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if (isSubmittableType(entityBundle.getEntity())) {
 			actionMenu.setActionVisible(Action.SUBMIT_TO_CHALLENGE, true);
 			actionMenu.setActionListener(Action.SUBMIT_TO_CHALLENGE, this);
-			actionMenu.setActionText(Action.SUBMIT_TO_CHALLENGE, "Submit " + enityTypeDisplay + " to Challenge");
+			actionMenu.setActionText(Action.SUBMIT_TO_CHALLENGE, "Submit " + entityTypeDisplay + " to Challenge");
 		} else {
 			actionMenu.setActionVisible(Action.SUBMIT_TO_CHALLENGE, false);
 		}
@@ -814,7 +824,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void configureRenameAction() {
 		if (isRenameOnly(entityBundle.getEntity()) && !(entityBundle.getEntity() instanceof DockerRepository)) {
 			actionMenu.setActionVisible(Action.CHANGE_ENTITY_NAME, permissions.getCanEdit());
-			actionMenu.setActionText(Action.CHANGE_ENTITY_NAME, RENAME_PREFIX + enityTypeDisplay);
+			actionMenu.setActionText(Action.CHANGE_ENTITY_NAME, RENAME_PREFIX + entityTypeDisplay);
 			actionMenu.setActionListener(Action.CHANGE_ENTITY_NAME, this);
 		} else {
 			actionMenu.setActionVisible(Action.CHANGE_ENTITY_NAME, false);
@@ -826,7 +836,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.DELETE_ENTITY, false);
 		} else {
 			actionMenu.setActionVisible(Action.DELETE_ENTITY, permissions.getCanDelete());
-			actionMenu.setActionText(Action.DELETE_ENTITY, DELETE_PREFIX + enityTypeDisplay);
+			actionMenu.setActionText(Action.DELETE_ENTITY, DELETE_PREFIX + entityTypeDisplay);
 			actionMenu.setActionListener(Action.DELETE_ENTITY, this);
 		}
 	}
@@ -846,7 +856,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		} else {
 			actionMenu.setActionVisible(Action.SHARE, true);
 			actionMenu.setActionListener(Action.SHARE, this);
-			actionMenu.setActionText(Action.SHARE, enityTypeDisplay + " Sharing Settings");
+			actionMenu.setActionText(Action.SHARE, entityTypeDisplay + " Sharing Settings");
 			if (PublicPrivateBadge.isPublic(entityBundle.getBenefactorAcl(), ginInjector.getSynapseProperties().getPublicPrincipalIds())) {
 				actionMenu.setActionIcon(Action.SHARE, IconType.GLOBE);
 			} else {
@@ -1423,7 +1433,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				@Override
 				public void onSuccess(WikiPage result) {
 					view.showInfo("'" + name + "' Page Added");
-					Synapse newPlace = new Synapse(entityBundle.getEntity().getId(), getVersion(), EntityArea.WIKI, result.getId());
+					Synapse newPlace = new Synapse(entityBundle.getEntity().getId(), getVersion().orElse(null), EntityArea.WIKI, result.getId());
 					getGlobalApplicationState().getPlaceChanger().goTo(newPlace);
 				}
 
@@ -1503,7 +1513,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public void onDeleteEntity() {
 		// Confirm the delete with the user. Mention that everything inside folder will also be deleted if
 		// this is a folder entity.
-		String display = ARE_YOU_SURE_YOU_WANT_TO_DELETE + this.enityTypeDisplay + " \"" + this.entity.getName() + "\"?";
+		String display = ARE_YOU_SURE_YOU_WANT_TO_DELETE + this.entityTypeDisplay + " \"" + this.entity.getName() + "\"?";
 		if (this.entity instanceof Folder) {
 			display += DELETE_FOLDER_EXPLANATION;
 		}
@@ -1538,7 +1548,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		getSynapseJavascriptClient().deleteEntityById(entityId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo(THE + enityTypeDisplay + WAS_SUCCESSFULLY_DELETED);
+				view.showInfo(THE + entityTypeDisplay + WAS_SUCCESSFULLY_DELETED);
 				// Go to entity's parent
 				Place gotoPlace = createDeletePlace();
 				getGlobalApplicationState().getPlaceChanger().goTo(gotoPlace);

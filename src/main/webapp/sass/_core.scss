@@ -232,7 +232,12 @@ end sticky footer
 	.radio {		
 		flex-wrap: nowrap;
 	}
-
+	.dark-text {
+		color: $synapse-dark-text;
+	}
+	.background-color-white {
+		background-color: white;
+	}
 	.checkbox>label {
 		margin-bottom: 10px;
 	}

@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.presenter.TeamPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -78,6 +79,8 @@ public class TeamPresenterTest {
 	@Mock
 	OpenUserInvitationsWidget mockOpenUserInvitationsWidget;
 	@Mock
+	SynapseJSNIUtilsImpl mockJSNIUtils;
+	@Mock
 	Team mockTeam;
 	@Mock
 	TeamBundle mockTeamBundle;
@@ -116,6 +119,7 @@ public class TeamPresenterTest {
 		when(mockGinInjector.getTeamEditModalWidget()).thenReturn(mockEditModal);
 		when(mockGinInjector.getTeamLeaveModalWidget()).thenReturn(mockLeaveModal);
 		when(mockGinInjector.getTeamProjectsModalWidget()).thenReturn(mockTeamProjectsModalWidget);
+		when(mockGinInjector.getSynapseJSNIUtils()).thenReturn(mockJSNIUtils);
 
 		presenter = new TeamPresenter(mockView, mockAuthenticationController, mockGlobalAppState, mockSynClient, mockSynAlert, mockInviteModal, mockJoinWidget, mockManagerListWidget, mockMemberListWidget, mockOpenMembershipRequestsWidget, mockOpenUserInvitationsWidget, mockGoogleMap, mockCookies, mockIsACTMemberAsyncHandler, mockGinInjector);
 		when(mockTeam.getName()).thenReturn(teamName);

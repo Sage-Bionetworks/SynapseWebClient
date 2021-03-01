@@ -95,8 +95,9 @@ public class TabTest {
 		String entityName = "one project to rule them all";
 		String entityId = "syn123";
 		Synapse place = new Synapse(entityId);
+		tab.configure("Files", "help markdown", "link", EntityArea.FILES);
 		tab.setEntityNameAndPlace(entityName, place);
-		verify(mockSynapseJSNIUtils).setPageTitle(entityName + " - " + entityId);
+		verify(mockSynapseJSNIUtils).setPageTitle(entityName + " - " + entityId + " - Files");
 	}
 
 	@Test

@@ -279,6 +279,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				view.hideLoading();
 				currentUserBundle = bundle;
 				view.setProfile(bundle.getUserProfile(), isOwner);
+				ginInjector.getSynapseJSNIUtils().setPageTitle(currentUserBundle.getUserProfile().getUserName());
 				getUserProfileEditorWidget().configure(bundle.getUserProfile(), bundle.getORCID(), () -> { profileUpdated(); });
 			}
 
@@ -881,6 +882,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void showTab(ProfileArea tab, boolean pushState) {
 		updateArea(tab, pushState);
 		refreshData(tab);
+		if (currentUserBundle != null) {
+			ginInjector.getSynapseJSNIUtils().setPageTitle(currentUserBundle.getUserProfile().getUserName() + " - " + tab.name().toLowerCase());
+		}
 		view.setTabSelected(tab);
 	}
 
