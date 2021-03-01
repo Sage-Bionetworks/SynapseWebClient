@@ -30,7 +30,6 @@ import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.evaluation.model.EvaluationStatus;
 import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
 import org.sagebionetworks.repo.model.AccessControlList;
@@ -154,7 +153,6 @@ public class ChallengeClientImplTest {
 		when(mockSynapse.getEntityHeaderBatch(anyList())).thenReturn(batchHeaders);
 
 		mockEvaluation = Mockito.mock(Evaluation.class);
-		when(mockEvaluation.getStatus()).thenReturn(EvaluationStatus.OPEN);
 		when(mockSynapse.getEvaluation(anyString())).thenReturn(mockEvaluation);
 		mockUserSessionData = Mockito.mock(UserSessionData.class);
 		mockUserProfile = Mockito.mock(UserProfile.class);

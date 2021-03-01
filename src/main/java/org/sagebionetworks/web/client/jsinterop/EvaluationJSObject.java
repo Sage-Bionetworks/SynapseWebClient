@@ -16,10 +16,9 @@ public class EvaluationJSObject {
 	public String ownerId;
 	public String createdOn;
 	public String contentSource;
-	public String status;
 	public String submissionInstructionsMessage;
 	public String submissionReceiptMessage;
-	// omit submissionQuota field because it is deprecated and will not be used in React.js
+	// omit "submissionQuota" and "status" fields because they are deprecated and will not be used in React.js
 
 
 
@@ -36,7 +35,6 @@ public class EvaluationJSObject {
 		evaluationJSObject.ownerId = evaluation.getOwnerId();
 		evaluationJSObject.createdOn = DateUtils.convertDateToString(FORMAT.DATE_TIME,evaluation.getCreatedOn());
 		evaluationJSObject.contentSource = evaluation.getContentSource();
-		evaluationJSObject.status = evaluation.getStatus().name();
 		evaluationJSObject.submissionInstructionsMessage = evaluation.getSubmissionInstructionsMessage();
 		evaluationJSObject.submissionReceiptMessage = evaluation.getSubmissionReceiptMessage();
 		return evaluationJSObject;

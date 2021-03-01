@@ -51,7 +51,6 @@ import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.evaluation.model.EvaluationStatus;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
 import org.sagebionetworks.reflection.model.PaginatedResults;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
@@ -405,7 +404,6 @@ public class SynapseClientImplTest {
 		ars.setResults(new ArrayList<AccessRequirement>());
 		when(mockSynapse.getAccessRequirements(any(RestrictableObjectDescriptor.class), anyLong(), anyLong())).thenReturn(ars);
 
-		when(mockEvaluation.getStatus()).thenReturn(EvaluationStatus.OPEN);
 		when(mockSynapse.getEvaluation(anyString())).thenReturn(mockEvaluation);
 		when(mockSynapse.getUserSessionData()).thenReturn(mockUserSessionData);
 		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
