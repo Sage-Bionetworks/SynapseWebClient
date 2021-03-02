@@ -9,7 +9,7 @@
 			<b:Icon ui:field="icon" addStyleNames="iconForeground" type="CHECK_CIRCLE" stackTop="true"/>
 		</b:IconStack>
 		<bh:Span addStyleNames="messageArea font-size-15" marginLeft="10">
-			<bh:Strong ui:field="messageTitle" visible="false"/>
+			<bh:Strong ui:field="messageTitle" addStyleNames="displayBlock" visible="false"/>
 			<bh:Span ui:field="messageSpan" />
 		</bh:Span>
 		<b:Button text="link" ui:field="link" type="LINK"

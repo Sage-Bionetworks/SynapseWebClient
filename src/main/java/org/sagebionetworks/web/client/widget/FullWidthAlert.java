@@ -97,7 +97,7 @@ public class FullWidthAlert implements IsWidget {
 	public void setAlertType(AlertType type) {
 		IconType defaultIcon;		
 		switch(type) {
-			case DANGER: defaultIcon = IconType.EXCLAMATION;
+			case DANGER: defaultIcon = IconType.EXCLAMATION_CIRCLE;
 				break;
 			case INFO: defaultIcon = IconType.INFO;
 				break;
