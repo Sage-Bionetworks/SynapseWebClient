@@ -13,6 +13,7 @@ import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -29,7 +30,10 @@ public class FullWidthAlert implements IsWidget {
 	@UiField
 	Strong messageTitle;
 	@UiField
-	Button link;
+	Button primaryButton;
+	@UiField
+	Button secondaryButton;
+	
 	Alert w;
 
 	/**
@@ -79,19 +83,43 @@ public class FullWidthAlert implements IsWidget {
 		messageSpan.setText(message);
 	}
 
-	public void addClickHandler(ClickHandler c) {
-		link.addClickHandler(c);
+	public void addPrimaryCTAClickHandler(ClickHandler c) {		
+		primaryButton.addClickHandler(c);
 	}
 
-	public void setLinkText(String text) {
-		link.setText(text.toUpperCase());
+	public void setPrimaryCTAText(String text) {
+		primaryButton.setVisible(true);
+		primaryButton.setText(text.toUpperCase());
 	}
-	public void setButtonType(ButtonType type) {
-		link.setType(type);
+	public void setPrimaryCTAButtonType(ButtonType type) {
+		primaryButton.setType(type);
 	}
 
-	public void setLinkHref(String href) {
-		link.setHref(href);
+	public void setPrimaryCTAHref(String href) {
+		primaryButton.setHref(href);
+		addPrimaryCTAClickHandler(event -> {
+			Window.open(href, "_blank", "");
+		});
+	}
+
+	public void addSecondaryCTAClickHandler(ClickHandler c) {		
+		secondaryButton.addClickHandler(c);
+	}
+
+	public void setSecondaryCTAText(String text) {
+		secondaryButton.setVisible(true);
+		secondaryButton.setText(text.toUpperCase());
+	}
+	public void setSecondaryCTAButtonType(ButtonType type) {
+		secondaryButton.setType(type);
+	}
+
+	public void setSecondaryCTAHref(String href) {
+		secondaryButton.setHref(href);
+		addSecondaryCTAClickHandler(event -> {
+			Window.open(href, "_blank", "");
+		});
+
 	}
 
 	public void setAlertType(AlertType type) {

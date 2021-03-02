@@ -159,6 +159,7 @@
 		</bh:Div>
 		<w:FullWidthAlert ui:field="cookieNotificationAlert" visible="false" alertType="INFO" messageTitle="Our site uses cookies." 
 			message="Synapse uses cookies to enhance your experience and to analyze our traffic. Using Synapse means that you agree with our cookie policy."
-			linkText="Accept and continue" buttonType="PRIMARY" />
+			secondaryCTAText="Learn More" secondaryCTAHref="https://s3.amazonaws.com/static.synapse.org/governance/SynapsePrivacyPolicy.pdf"
+			primaryCTAText="Accept and continue" primaryCTAButtonType="PRIMARY" />
 	</bh:Div>
 </ui:UiBinder>

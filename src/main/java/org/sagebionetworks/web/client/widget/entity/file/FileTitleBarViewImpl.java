@@ -118,7 +118,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		programmaticOptionsLink.addClickHandler(event -> {
 			presenter.onProgrammaticDownloadOptions();
 		});
-		addedToDownloadListAlert.addClickHandler(event -> {
+		addedToDownloadListAlert.addPrimaryCTAClickHandler(event -> {
 			Profile place = new Profile(authController.getCurrentUserPrincipalId() + "/downloads");
 			globalAppState.getPlaceChanger().goTo(place);
 		});

@@ -56,7 +56,7 @@ public class QueryInputViewImpl implements QueryInputView {
 		queryButton.addClickHandler(event -> {
 			presenter.onExecuteQuery();
 		});
-		queryResultsMessage.addClickHandler(event -> {
+		queryResultsMessage.addPrimaryCTAClickHandler(event -> {
 			presenter.onReset();
 		});
 		// Enter key should execute the query.

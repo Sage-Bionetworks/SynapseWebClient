@@ -178,7 +178,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		angleDown.setPaddingLeft(1);
 		angleDown.setMarginLeft(0);
 		headerFavAnchor.add(angleDown);
-		cookieNotificationAlert.addClickHandler(event -> {
+		cookieNotificationAlert.addPrimaryCTAClickHandler(event -> {
 			presenter.onCookieNotificationDismissed();
 		});
 

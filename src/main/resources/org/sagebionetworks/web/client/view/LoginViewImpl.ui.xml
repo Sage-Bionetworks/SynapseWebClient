@@ -29,8 +29,8 @@
 			<w:FullWidthAlert ui:field="acceptedTermsOfUseView"
 					alertType="SUCCESS" icon="CHECK_SQUARE"
 					message="You've accepted the Synapse Terms and Conditions for Use"
-					linkText="View Terms"					
-					linkHref="https://s3.amazonaws.com/static.synapse.org/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf?v=5"
+					primaryCTAText="View Terms"					
+					primaryCTAHref="https://s3.amazonaws.com/static.synapse.org/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf?v=5"
 					visible="false" 
 					addStyleNames="container margin-top-15"
 					/>

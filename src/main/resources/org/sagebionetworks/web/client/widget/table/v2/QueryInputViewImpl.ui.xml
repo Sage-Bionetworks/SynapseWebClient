@@ -28,6 +28,6 @@
 		</b:InputGroup>
 		<w:FullWidthAlert ui:field="queryResultsMessage"
 			visible="false" alertType="DANGER" icon="EXCLAMATION_CIRCLE"
-			message="" linkText="Reset query" />
+			message="" primaryCTAText="Reset query" />
 	</g:HTMLPanel>
 </ui:UiBinder>

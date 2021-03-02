@@ -41,7 +41,7 @@ public class AddToDownloadListViewImpl implements AddToDownloadListView, IsWidge
 	@Inject
 	public AddToDownloadListViewImpl(AuthenticationController authController, GlobalApplicationState globalAppState) {
 		w = uiBinder.createAndBindUi(this);
-		addedToDownloadListAlert.addClickHandler(event -> {
+		addedToDownloadListAlert.addPrimaryCTAClickHandler(event -> {
 			Profile place = new Profile(authController.getCurrentUserPrincipalId() + "/downloads");
 			globalAppState.getPlaceChanger().goTo(place);
 		});

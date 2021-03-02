@@ -3076,87 +3076,92 @@ div.border {
 	font-style:italic;
 }
 
-#body .fullWidthAlert {
+#body .synapseAlert {
+	&.global {
+		width: 100%;
+		position: fixed;
+		bottom: 0px;
+		left: 0px;		
+	}
 	@include border-radius(0px);
 	box-shadow: none;
 	padding: 7px 15px;
-	&.global {	
-		position: fixed;
-    	bottom: 0px;
-		left: 0px;
-		padding: 14px;
-		width: 100%;
-		z-index: 500;
-		color: #323131;
-		display: grid;
-		grid-template-columns: 50px auto 200px;		
-		column-gap: 10px;
-		align-items: center;
-		justify-items: start;
-		.iconArea {
-			grid-column: 1 / span 1;
-			grid-row: 1 / span 1;
-			min-width: 50px;
-		}
+	padding: 14px;	
+	z-index: 500;
+	color: #323131;
+	display: grid;
+	grid-template-columns: 50px auto 150px 200px;
+	column-gap: 10px;
+	align-items: center;
+	justify-items: start;
+	.iconArea {
+		grid-column: 1 / span 1;
+		grid-row: 1 / span 1;
+		min-width: 50px;
+	}
+	.messageArea {
+		max-width: 700px;
+		grid-row: 1 / span 1;
+	}
+	.iconForeground {
+		color: white;
+	}
+	@media (min-width: 992px) {
+		grid-template-rows: auto;
 		.messageArea {
-			max-width: 750px;
+			grid-column: 2 / span 1;
+		}
+		.secondaryButton {
+			grid-column: 3 / span 1;
 			grid-row: 1 / span 1;
+			justify-self: end;
 		}
-		.iconForeground {
-			color: white;
+		.primaryButton {
+			grid-column: 4 / span 1;
+			grid-row: 1 / span 1;
+			justify-self: end;
 		}
-		@media (min-width: 992px) {
-			grid-template-rows: auto;
-			.messageArea {
-				grid-column: 2 / span 1;
-			}
-			button {
-				grid-column: 3 / span 1;
-				grid-row: 1 / span 1;
-				justify-self: end;
-			}
+	}
+	@media (max-width: 992px) {
+		grid-template-rows: auto 75px;
+		.messageArea {
+			grid-column: 2 / span 3;
 		}
-		@media (max-width: 992px) {
-			grid-template-rows: auto 50px;
-			.messageArea {
-				grid-column: 2 / span 2;
-			}
-			button {
-				grid-column: 2 / span 2;
-				grid-row: 2 / span 1;
-			}
+		.secondaryButton {
+			grid-column: 4 / span 1;
+			grid-row: 2 / span 1;
 		}
-		&.alert-info {
-			background: #DEEAF1;
-			border-left: 10px solid #5C94B9;
-			.iconBackground {
-				color: #5C94B9;
-			}
+		.primaryButton {
+			grid-column: 2 / span 2;
+			grid-row: 2 / span 1;
 		}
-		&.alert-danger {
-			background: #F5DAD9;
-			border-left: 10px solid #CD453F;
-			.iconBackground {
-				color: #CD453F;
-			}
+	}
+	&.alert-info {
+		background: #DEEAF1;
+		border-left: 10px solid #5C94B9;
+		.iconBackground {
+			color: #5C94B9;
 		}
-		&.alert-warning {
-			background: #FAEEDC;
-			border-left: 10px solid #E4AA52;
-			.iconBackground {
-				color: #E4AA52;
-			}
+	}
+	&.alert-danger {
+		background: #F5DAD9;
+		border-left: 10px solid #CD453F;
+		.iconBackground {
+			color: #CD453F;
 		}
-		&.alert-success {
-			background: #DAE7E1;
-			border-left: 10px solid #48896B;
-			.iconBackground {
-				color: #48896B;
-			}
+	}
+	&.alert-warning {
+		background: #FAEEDC;
+		border-left: 10px solid #E4AA52;
+		.iconBackground {
+			color: #E4AA52;
 		}
-
-		.flexcontainer-column-fill-width {
-			max-width: 700px;
+	}
+	&.alert-success {
+		background: #DAE7E1;
+		border-left: 10px solid #48896B;
+		.iconBackground {
+			color: #48896B;
 		}
 	}	
 }

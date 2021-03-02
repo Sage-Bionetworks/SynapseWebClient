@@ -3,6 +3,6 @@
 xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<bh:Div>
-		<w:FullWidthAlert ui:field="alert" alertType="SUCCESS" linkText="" />
+		<w:FullWidthAlert ui:field="alert" alertType="SUCCESS" />
 	</bh:Div>
 </ui:UiBinder>
