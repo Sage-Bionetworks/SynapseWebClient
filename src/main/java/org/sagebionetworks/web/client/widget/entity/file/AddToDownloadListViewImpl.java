@@ -8,7 +8,7 @@ import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.InfoAlert;
+import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -33,7 +33,7 @@ public class AddToDownloadListViewImpl implements AddToDownloadListView, IsWidge
 	@UiField
 	Alert progressContainer;
 	@UiField
-	InfoAlert addedToDownloadListAlert;
+	FullWidthAlert addedToDownloadListAlert;
 
 	Presenter presenter;
 	private static PackageSizeSummaryViewImplUiBinder uiBinder = GWT.create(PackageSizeSummaryViewImplUiBinder.class);
@@ -41,7 +41,7 @@ public class AddToDownloadListViewImpl implements AddToDownloadListView, IsWidge
 	@Inject
 	public AddToDownloadListViewImpl(AuthenticationController authController, GlobalApplicationState globalAppState) {
 		w = uiBinder.createAndBindUi(this);
-		addedToDownloadListAlert.addClickHandler(event -> {
+		addedToDownloadListAlert.addPrimaryCTAClickHandler(event -> {
 			Profile place = new Profile(authController.getCurrentUserPrincipalId() + "/downloads");
 			globalAppState.getPlaceChanger().goTo(place);
 		});

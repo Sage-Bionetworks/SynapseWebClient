@@ -3076,10 +3076,102 @@ div.border {
 	font-style:italic;
 }
 
-#body .fullWidthAlert {
-	@include border-radius(0px);
-	box-shadow: none;
-	padding: 7px 15px;
+#body .synapseAlert {
+	&.global {
+		width: 100%;
+		position: fixed;
+		bottom: 0px;
+		left: 0px;		
+	}
+	padding: 14px;
+	z-index: 500;	
+	display: grid;
+	grid-template-columns: 50px auto 150px 200px;
+	column-gap: 10px;
+	align-items: center;
+	justify-items: start;
+	.iconArea {
+		grid-column: 1 / span 1;
+		grid-row: 1 / span 1;
+		min-width: 50px;
+	}
+	.messageArea {
+		max-width: 700px;
+		grid-row: 1 / span 1;
+	}
+	.iconForeground {
+		color: white;
+	}
+	@media (min-width: 992px) {
+		grid-template-rows: auto;
+		.messageArea {
+			grid-column: 2 / span 1;
+		}
+		.secondaryButton {
+			grid-column: 3 / span 1;
+			grid-row: 1 / span 1;
+			justify-self: end;
+		}
+		.primaryButton {
+			grid-column: 4 / span 1;
+			grid-row: 1 / span 1;
+			justify-self: end;
+		}
+	}
+	@media (max-width: 992px) {
+		grid-template-rows: auto 75px;
+		.messageArea {
+			grid-column: 2 / span 3;
+		}
+		.secondaryButton {
+			grid-column: 4 / span 1;
+			grid-row: 2 / span 1;
+		}
+		.primaryButton {
+			grid-column: 2 / span 2;
+			grid-row: 2 / span 1;
+		}
+	}	
+}
+
+// Bootstrap Alert overrides
+#body {
+	.alert {		
+		color: #323131;
+		@include border-radius(0px);
+		box-shadow: none;
+		.alert-link {
+			color: inherit;
+		}
+		&.alert-info {
+			background: #DEEAF1;
+			border-left: 10px solid #5C94B9;
+			.iconBackground {
+				color: #5C94B9;
+			}
+		}
+		&.alert-danger {
+			background: #F5DAD9;
+			border-left: 10px solid #CD453F;
+			.iconBackground {
+				color: #CD453F;
+			}
+		}
+		&.alert-warning {
+			background: #FAEEDC;
+			border-left: 10px solid #E4AA52;
+			.iconBackground {
+				color: #E4AA52;
+			}
+		}
+		&.alert-success {
+			background: #DAE7E1;
+			border-left: 10px solid #48896B;
+			.iconBackground {
+				color: #48896B;
+			}
+		}
+	}	
 }
 
 #body .centered-in-hr {

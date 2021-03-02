@@ -9,8 +9,8 @@
 		type='org.sagebionetworks.web.client.SageImageBundle' />
 
 	<bh:Div addStyleNames="header">
-		<b:Alert ui:field="portalAlert" visible="false"
-			addStyleNames="fullWidthAlert flexcontainer-row background-color-white" type="INFO" height="50px"
+		<bh:Div ui:field="portalAlert" visible="false"
+			addStyleNames="padding-15 flexcontainer-row background-color-white"
 			marginTop="0" marginRight="0" marginBottom="0">
 			<g:FocusPanel ui:field="portalLogoFocusPanel"
 				addStyleNames="imageButton flexcontainer-column-fill-width">
@@ -32,7 +32,7 @@
 					addStyleNames="displayInline letter-spacing-6 lato vertical-align-middle" text="SYNAPSE">
 				</b:Heading>
 			</bh:Div>
-		</b:Alert>
+		</bh:Div>
 		<b:Alert ui:field="stagingAlert" type="WARNING"
 			visible="false" marginRight="0" marginLeft="0" marginBottom="0"
 			marginTop="0">
@@ -46,10 +46,10 @@
 					text="Any data created will be deleted. To do your work, please use production site."
 					addStyleNames="flexcontainer-column flexcontainer-column-fill-width margin-left-5 visible-lg" /> 
 				<b:Anchor text="GO TO PRODUCTION"
-					addStyleNames="flexcontainer-column flexcontainer-justify-flex-end color-white" href="https://www.synapse.org" />
+					addStyleNames="flexcontainer-column flexcontainer-justify-flex-end" href="https://www.synapse.org" />
 				<w:HelpWidget
 					helpMarkdown="This is not the official Sage Bionetworks Synapse Production website."
-					addStyleNames="flexcontainer-column flexcontainer-justify-flex-end margin-left-5" iconStyles="color-white"
+					addStyleNames="flexcontainer-column flexcontainer-justify-flex-end margin-left-5"
 					placement="LEFT" />
 			</bh:Div>
 		</b:Alert>
@@ -157,25 +157,9 @@
 				</bh:Div>
 			</bh:Span>
 		</bh:Div>
-		<b:Alert ui:field="cookieNotificationAlert" visible="false"
-			addStyleNames="fullWidthAlert flexcontainer-row" type="INFO" marginTop="0"
-			marginRight="0" marginBottom="0" paddingRight="40">
-			<b:Icon addStyleNames="flexcontainer-column font-size-17 black-25-percent"
-				type="INFO_CIRCLE" marginLeft="5" marginTop="10" />
-			<bh:Span addStyleNames="flexcontainer-column font-size-15 flexcontainer-column-fill-width" marginLeft="10"
-				marginTop="7">
-				This site uses Cookies to enhance your experience and to
-				analyze our traffic. Using Synapse means that you agree with our
-				cookie policy.
-			</bh:Span>
-			<bh:Br addStyleNames="hidden-lg" />
-			<b:Anchor text="LEARN MORE"
-				ui:field="cookieNotificationLearnMoreLink" target="_blank"
-				addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end color-white font-size-15" marginLeft="15"
-				marginTop="7" marginRight="10"
-				href="https://s3.amazonaws.com/static.synapse.org/governance/SynapsePrivacyPolicy.pdf" />
-			<b:Button ui:field="cookieNotificationAlertOkButton" addStyleNames="flexcontainer-column flexcontainer-align-items-flex-end"
-				text="OK" size="SMALL" marginLeft="15" marginBottom="3" marginTop="5" />
-		</b:Alert>
+		<w:FullWidthAlert ui:field="cookieNotificationAlert" visible="false" alertType="INFO" messageTitle="Our site uses cookies." 
+			message="Synapse uses cookies to enhance your experience and to analyze our traffic. Using Synapse means that you agree with our cookie policy."
+			secondaryCTAText="Learn More" secondaryCTAHref="https://s3.amazonaws.com/static.synapse.org/governance/SynapsePrivacyPolicy.pdf"
+			primaryCTAText="Accept and continue" primaryCTAButtonType="PRIMARY" />
 	</bh:Div>
 </ui:UiBinder>

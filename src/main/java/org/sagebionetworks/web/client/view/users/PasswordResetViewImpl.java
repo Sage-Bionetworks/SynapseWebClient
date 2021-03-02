@@ -7,7 +7,7 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.widget.InfoAlert;
+import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import org.sagebionetworks.web.client.widget.header.Header;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.SpanElement;
@@ -36,7 +36,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	@UiField
 	DivElement sendPasswordChangeForm;
 	@UiField
-	InfoAlert passwordResetRequired;
+	FullWidthAlert passwordResetRequired;
 	@UiField
 	PasswordTextBox currentPasswordField;
 	@UiField

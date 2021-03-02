@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.place.SynapseForumPlace;
+import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -116,14 +117,10 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	Label downloadListFileCount;
 	@UiField
-	Alert cookieNotificationAlert;
-	@UiField
-	Anchor cookieNotificationLearnMoreLink;
-	@UiField
-	Button cookieNotificationAlertOkButton;
+	FullWidthAlert cookieNotificationAlert;
 
 	@UiField
-	Alert portalAlert;
+	Div portalAlert;
 	@UiField
 	Image portalLogo;
 	@UiField
@@ -181,8 +178,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		angleDown.setPaddingLeft(1);
 		angleDown.setMarginLeft(0);
 		headerFavAnchor.add(angleDown);
-
-		cookieNotificationAlertOkButton.addClickHandler(event -> {
+		cookieNotificationAlert.addPrimaryCTAClickHandler(event -> {
 			presenter.onCookieNotificationDismissed();
 		});
 
