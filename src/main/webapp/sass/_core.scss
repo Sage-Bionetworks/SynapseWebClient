@@ -3080,6 +3080,84 @@ div.border {
 	@include border-radius(0px);
 	box-shadow: none;
 	padding: 7px 15px;
+	&.global {	
+		position: fixed;
+    	bottom: 0px;
+		padding: 14px;
+		width: 100%;
+		z-index: 500;
+		color: #323131;
+		display: grid;
+		grid-template-columns: 50px auto 200px;		
+		column-gap: 10px;
+		align-items: center;
+		justify-items: start;
+		.iconArea {
+			grid-column: 1 / span 1;
+			grid-row: 1 / span 1;
+			min-width: 50px;
+		}
+		.messageArea {
+			max-width: 750px;
+			grid-row: 1 / span 1;
+		}
+		.iconForeground {
+			color: white;
+		}
+		@media (min-width: 992px) {
+			grid-template-rows: auto;
+			.messageArea {
+				grid-column: 2 / span 1;
+			}
+			button {
+				grid-column: 3 / span 1;
+				grid-row: 1 / span 1;
+				justify-self: end;
+			}
+		}
+		@media (max-width: 992px) {
+			grid-template-rows: auto 50px;
+			.messageArea {
+				grid-column: 2 / span 2;
+			}
+			button {
+				grid-column: 2 / span 2;
+				grid-row: 2 / span 1;
+			}
+		}
+		&.alert-info {
+			background: #DEEAF1;
+			border-left: 10px solid #5C94B9;
+			.iconBackground {
+				color: #5C94B9;
+			}
+		}
+		&.alert-danger {
+			background: #F5DAD9;
+			border-left: 10px solid #CD453F;
+			.iconBackground {
+				color: #CD453F;
+			}
+		}
+		&.alert-warning {
+			background: #FAEEDC;
+			border-left: 10px solid #E4AA52;
+			.iconBackground {
+				color: #E4AA52;
+			}
+		}
+		&.alert-success {
+			background: #DAE7E1;
+			border-left: 10px solid #48896B;
+			.iconBackground {
+				color: #48896B;
+			}
+		}
+
+		.flexcontainer-column-fill-width {
+			max-width: 700px;
+		}
+	}	
 }
 
 #body .centered-in-hr {

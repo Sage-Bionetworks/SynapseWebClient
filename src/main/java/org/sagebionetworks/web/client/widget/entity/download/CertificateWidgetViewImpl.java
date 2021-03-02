@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
-import org.sagebionetworks.web.client.widget.InfoAlert;
+import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -10,7 +10,7 @@ import com.google.inject.Inject;
 public class CertificateWidgetViewImpl implements CertificateWidgetView, IsWidget {
 	Widget widget;
 	@UiField
-	InfoAlert alert;
+	FullWidthAlert alert;
 	public static final String PASSED_QUIZ_ON = "You passed the Synapse Certification Quiz on ";
 
 	public interface Binder extends UiBinder<Widget, CertificateWidgetViewImpl> {

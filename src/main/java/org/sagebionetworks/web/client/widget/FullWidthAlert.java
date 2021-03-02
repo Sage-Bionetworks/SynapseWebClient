@@ -1,11 +1,14 @@
 package org.sagebionetworks.web.client.widget;
 
 import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Strong;
+
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -13,8 +16,8 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public class InfoAlert implements IsWidget {
-	public interface Binder extends UiBinder<Alert, InfoAlert> {
+public class FullWidthAlert implements IsWidget {
+	public interface Binder extends UiBinder<Alert, FullWidthAlert> {
 	}
 
 	private static Binder uiBinder = GWT.create(Binder.class);
@@ -24,7 +27,9 @@ public class InfoAlert implements IsWidget {
 	@UiField
 	Span messageSpan;
 	@UiField
-	Anchor link;
+	Strong messageTitle;
+	@UiField
+	Button link;
 	Alert w;
 
 	/**
@@ -37,7 +42,7 @@ public class InfoAlert implements IsWidget {
 	 * <w:InfoAlert icon="CHECK_CIRCLE" message="x files were added to your Download List" linkTarget=""
 	 * linkText="view download list" /> ```
 	 */
-	public InfoAlert() {
+	public FullWidthAlert() {
 		w = uiBinder.createAndBindUi(this);
 	}
 
@@ -63,9 +68,13 @@ public class InfoAlert implements IsWidget {
 	}
 
 	public void setIcon(IconType type) {
-		icon.setType(type);;
+		icon.setType(type);
 	}
 
+	public void setMessageTitle(String title) {
+		messageTitle.setVisible(true);
+		messageTitle.setText(title);
+	}
 	public void setMessage(String message) {
 		messageSpan.setText(message);
 	}
@@ -74,12 +83,11 @@ public class InfoAlert implements IsWidget {
 		link.addClickHandler(c);
 	}
 
-	public void setLinkTarget(String href) {
-		link.setTarget(href);
-	}
-
 	public void setLinkText(String text) {
 		link.setText(text.toUpperCase());
+	}
+	public void setButtonType(ButtonType type) {
+		link.setType(type);
 	}
 
 	public void setLinkHref(String href) {
@@ -87,6 +95,19 @@ public class InfoAlert implements IsWidget {
 	}
 
 	public void setAlertType(AlertType type) {
+		IconType defaultIcon;		
+		switch(type) {
+			case DANGER: defaultIcon = IconType.EXCLAMATION;
+				break;
+			case INFO: defaultIcon = IconType.INFO;
+				break;
+			case WARNING: defaultIcon = IconType.BELL;
+				break;
+			case SUCCESS: 
+			case DEFAULT: 
+			default: defaultIcon = IconType.CHECK;
+		}
+		icon.setType(defaultIcon);
 		w.setType(type);
 	}
 

@@ -8,7 +8,7 @@ import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.InfoAlert;
+import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -33,7 +33,7 @@ public class AddToDownloadListViewImpl implements AddToDownloadListView, IsWidge
 	@UiField
 	Alert progressContainer;
 	@UiField
-	InfoAlert addedToDownloadListAlert;
+	FullWidthAlert addedToDownloadListAlert;
 
 	Presenter presenter;
 	private static PackageSizeSummaryViewImplUiBinder uiBinder = GWT.create(PackageSizeSummaryViewImplUiBinder.class);

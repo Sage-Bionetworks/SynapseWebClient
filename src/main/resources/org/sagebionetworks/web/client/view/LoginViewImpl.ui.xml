@@ -26,11 +26,10 @@
 			<b:Heading ui:field="loadingUiText" size="H4"
 				text="Logging you in..."
 				addStyleNames="container margin-top-15 displayInline center center-block margin-left-5" />
-			<w:InfoAlert ui:field="acceptedTermsOfUseView"
+			<w:FullWidthAlert ui:field="acceptedTermsOfUseView"
 					alertType="SUCCESS" icon="CHECK_SQUARE"
 					message="You've accepted the Synapse Terms and Conditions for Use"
-					linkText="View Terms"
-					linkTarget="_blank"
+					linkText="View Terms"					
 					linkHref="https://s3.amazonaws.com/static.synapse.org/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf?v=5"
 					visible="false" 
 					addStyleNames="container margin-top-15"

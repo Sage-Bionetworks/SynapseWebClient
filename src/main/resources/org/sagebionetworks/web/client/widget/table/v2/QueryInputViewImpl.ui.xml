@@ -26,7 +26,7 @@
 				width="22px"
 				placement="LEFT" addStyleNames="margin-left-5 moveup-15 displayTableCell" />
 		</b:InputGroup>
-		<w:InfoAlert ui:field="queryResultsMessage"
+		<w:FullWidthAlert ui:field="queryResultsMessage"
 			visible="false" alertType="DANGER" icon="EXCLAMATION_CIRCLE"
 			message="" linkText="Reset query" />
 	</g:HTMLPanel>

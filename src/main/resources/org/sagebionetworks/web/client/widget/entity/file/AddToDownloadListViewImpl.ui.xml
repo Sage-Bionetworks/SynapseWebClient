@@ -18,6 +18,6 @@
 			<b:Anchor ui:field="cancelLink" text="Cancel" pull="RIGHT" marginTop="13" addStyleNames="color-white"/>
 		</b:Alert>
 		<b:Alert ui:field="progressContainer" visible="false" addStyleNames="fullWidthAlert" type="INFO" height="60px" />
-		<w:InfoAlert ui:field="addedToDownloadListAlert" icon="CHECK_CIRCLE" message="x files were added to your Download List" linkText="view download list" />
+		<w:FullWidthAlert ui:field="addedToDownloadListAlert" icon="CHECK_CIRCLE" message="x files were added to your Download List" linkText="view download list" />
 	</bh:Div>
 </ui:UiBinder>

@@ -15,7 +15,7 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.HelpWidget;
-import org.sagebionetworks.web.client.widget.InfoAlert;
+import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
@@ -81,7 +81,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@UiField
 	Div versionInfoUI;
 	@UiField
-	InfoAlert addedToDownloadListAlert;
+	FullWidthAlert addedToDownloadListAlert;
 	@UiField
 	HelpWidget viewOnlyHelp;
 	@UiField
