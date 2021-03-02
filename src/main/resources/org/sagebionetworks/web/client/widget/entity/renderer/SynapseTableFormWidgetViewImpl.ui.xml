@@ -21,7 +21,7 @@
 		<b:Alert type="INFO" ui:field="successMessageUI" >
 			<bh:Span ui:field="successMessageText"/>
 			<bh:Div marginTop="15">
-				<b:Anchor ui:field="submitAnotherResponseLink" text="Submit another response" addStyleNames="color-white"/>
+				<b:Anchor ui:field="submitAnotherResponseLink" text="Submit another response" />
 			</bh:Div>
 		</b:Alert>
 	</bh:Div>

@@ -9,8 +9,8 @@
 		type='org.sagebionetworks.web.client.SageImageBundle' />
 
 	<bh:Div addStyleNames="header">
-		<b:Alert ui:field="portalAlert" visible="false"
-			addStyleNames="fullWidthAlert flexcontainer-row background-color-white" type="INFO" height="50px"
+		<bh:Div ui:field="portalAlert" visible="false"
+			addStyleNames="padding-15 flexcontainer-row background-color-white"
 			marginTop="0" marginRight="0" marginBottom="0">
 			<g:FocusPanel ui:field="portalLogoFocusPanel"
 				addStyleNames="imageButton flexcontainer-column-fill-width">
@@ -32,7 +32,7 @@
 					addStyleNames="displayInline letter-spacing-6 lato vertical-align-middle" text="SYNAPSE">
 				</b:Heading>
 			</bh:Div>
-		</b:Alert>
+		</bh:Div>
 		<b:Alert ui:field="stagingAlert" type="WARNING"
 			visible="false" marginRight="0" marginLeft="0" marginBottom="0"
 			marginTop="0">
@@ -46,10 +46,10 @@
 					text="Any data created will be deleted. To do your work, please use production site."
 					addStyleNames="flexcontainer-column flexcontainer-column-fill-width margin-left-5 visible-lg" /> 
 				<b:Anchor text="GO TO PRODUCTION"
-					addStyleNames="flexcontainer-column flexcontainer-justify-flex-end color-white" href="https://www.synapse.org" />
+					addStyleNames="flexcontainer-column flexcontainer-justify-flex-end" href="https://www.synapse.org" />
 				<w:HelpWidget
 					helpMarkdown="This is not the official Sage Bionetworks Synapse Production website."
-					addStyleNames="flexcontainer-column flexcontainer-justify-flex-end margin-left-5" iconStyles="color-white"
+					addStyleNames="flexcontainer-column flexcontainer-justify-flex-end margin-left-5"
 					placement="LEFT" />
 			</bh:Div>
 		</b:Alert>

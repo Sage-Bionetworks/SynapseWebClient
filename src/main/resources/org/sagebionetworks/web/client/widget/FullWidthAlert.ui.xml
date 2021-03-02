@@ -6,7 +6,7 @@
 	<b:Alert addStyleNames="synapseAlert global" type="INFO" marginTop="5">
 		<b:IconStack addStyleNames="iconArea font-size-20">
 			<b:Icon addStyleNames="iconBackground" type="CIRCLE" stackBase="true"/>
-			<b:Icon ui:field="icon" addStyleNames="iconForeground" type="CHECK_CIRCLE" stackTop="true"/>
+			<b:Icon ui:field="icon" addStyleNames="iconForeground" type="CHECK" stackTop="true"/>
 		</b:IconStack>
 		<bh:Span addStyleNames="messageArea font-size-15" marginLeft="10">
 			<bh:Strong ui:field="messageTitle" addStyleNames="displayBlock" visible="false"/>

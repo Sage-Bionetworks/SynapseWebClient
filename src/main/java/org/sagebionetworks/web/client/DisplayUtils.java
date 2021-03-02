@@ -168,10 +168,10 @@ public class DisplayUtils {
 
 	private static String getNotifyTemplate(String href, String buttonText) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("<div data-notify=\"container\" class=\"alert fullWidthAlert alert-{0}\" role=\"alert\" style=\"height: 50px;\">\n<div class=\"flexcontainer-row\">");
+		sb.append("<div data-notify=\"container\" class=\"alert fullWidthAlert alert-{0}\" role=\"alert\" style=\"height: 60px;\">\n<div class=\"flexcontainer-row\">");
 		sb.append("<span data-notify=\"icon\" class=\"flexcontainer-column black-25-percent font-size-17 margin-top-8 margin-right-5 margin-left-5 \"></span>\n" + "  <span data-notify=\"title\" class=\"flexcontainer-column margin-top-5\"><strong>{1}</strong></span>\n" + "  <span data-notify=\"message\" class=\"flexcontainer-column flexcontainer-column-fill-width margin-top-5\">{2}</span>\n" + "  <a href=\"{3}\" target=\"{4}\" data-notify=\"url\"></a>\n");
 		if (href != null && buttonText != null) {
-			sb.append("<a class=\"flexcontainer-column margin-top-5 flexcontainer-align-items-flex-end color-white margin-right-20\" href=" + href + ">" + buttonText.toUpperCase() + "</a>\n");
+			sb.append("<a class=\"flexcontainer-column margin-top-5 flexcontainer-align-items-flex-end margin-right-20\" href=" + href + ">" + buttonText.toUpperCase() + "</a>\n");
 		} else {
 			sb.append("<button type=\"button\" aria-hidden=\"true\" class=\"close margin-top-5\" data-notify=\"dismiss\">x</button>\n");
 		}

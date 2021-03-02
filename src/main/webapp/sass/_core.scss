@@ -3083,12 +3083,8 @@ div.border {
 		bottom: 0px;
 		left: 0px;		
 	}
-	@include border-radius(0px);
-	box-shadow: none;
-	padding: 7px 15px;
-	padding: 14px;	
-	z-index: 500;
-	color: #323131;
+	padding: 14px;
+	z-index: 500;	
 	display: grid;
 	grid-template-columns: 50px auto 150px 200px;
 	column-gap: 10px;
@@ -3135,33 +3131,45 @@ div.border {
 			grid-column: 2 / span 2;
 			grid-row: 2 / span 1;
 		}
-	}
-	&.alert-info {
-		background: #DEEAF1;
-		border-left: 10px solid #5C94B9;
-		.iconBackground {
-			color: #5C94B9;
+	}	
+}
+
+// Bootstrap Alert overrides
+#body {
+	.alert {		
+		color: #323131;
+		@include border-radius(0px);
+		box-shadow: none;
+		.alert-link {
+			color: inherit;
 		}
-	}
-	&.alert-danger {
-		background: #F5DAD9;
-		border-left: 10px solid #CD453F;
-		.iconBackground {
-			color: #CD453F;
+		&.alert-info {
+			background: #DEEAF1;
+			border-left: 10px solid #5C94B9;
+			.iconBackground {
+				color: #5C94B9;
+			}
 		}
-	}
-	&.alert-warning {
-		background: #FAEEDC;
-		border-left: 10px solid #E4AA52;
-		.iconBackground {
-			color: #E4AA52;
+		&.alert-danger {
+			background: #F5DAD9;
+			border-left: 10px solid #CD453F;
+			.iconBackground {
+				color: #CD453F;
+			}
 		}
-	}
-	&.alert-success {
-		background: #DAE7E1;
-		border-left: 10px solid #48896B;
-		.iconBackground {
-			color: #48896B;
+		&.alert-warning {
+			background: #FAEEDC;
+			border-left: 10px solid #E4AA52;
+			.iconBackground {
+				color: #E4AA52;
+			}
+		}
+		&.alert-success {
+			background: #DAE7E1;
+			border-left: 10px solid #48896B;
+			.iconBackground {
+				color: #48896B;
+			}
 		}
 	}	
 }

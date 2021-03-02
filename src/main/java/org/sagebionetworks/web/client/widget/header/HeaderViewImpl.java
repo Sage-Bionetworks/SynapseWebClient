@@ -120,7 +120,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	FullWidthAlert cookieNotificationAlert;
 
 	@UiField
-	Alert portalAlert;
+	Div portalAlert;
 	@UiField
 	Image portalLogo;
 	@UiField

@@ -9,13 +9,13 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 
 	<bh:Div>
-		<b:Alert ui:field="confirmationUI" addStyleNames="fullWidthAlert"  type="INFO" visible="false" height="60px">
+		<b:Alert ui:field="confirmationUI" type="INFO" visible="false" height="60px">
 			<bh:Span ui:field="packageSizeContainer" addStyleNames="inline-block hidden-xs inline-block" paddingTop="12"/>
 			<bh:Span addStyleNames="border-left-1 hidden-xs inline-block black-25-percent" />
 			<bh:Span addStyleNames="font-size-15 hidden-xs" text="Would you like to add all files to the download list?" marginLeft="15" marginTop="8"/>
 			<bh:Span addStyleNames="font-size-15 visible-xs left" text="Add files to the download list?" marginTop="13"/>
 			<b:Button ui:field="confirmButton" type="PRIMARY" text="Add" pull="RIGHT" marginLeft="15" marginTop="7" marginRight="10"/>
-			<b:Anchor ui:field="cancelLink" text="Cancel" pull="RIGHT" marginTop="13" addStyleNames="color-white"/>
+			<b:Anchor ui:field="cancelLink" text="Cancel" pull="RIGHT" marginTop="13"/>
 		</b:Alert>
 		<b:Alert ui:field="progressContainer" visible="false" addStyleNames="fullWidthAlert" type="INFO" height="60px" />
 		<w:FullWidthAlert ui:field="addedToDownloadListAlert" icon="CHECK_CIRCLE" message="x files were added to your Download List" primaryCTAText="view download list" dismissable="true"/>
