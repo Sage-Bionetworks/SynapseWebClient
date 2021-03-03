@@ -2,7 +2,11 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.StringUtils;
+import org.sagebionetworks.web.client.view.DivView;
+
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -13,12 +17,17 @@ public class EnumFormCellEditor implements CellEditor {
 
 	public static final String NOTHING_SELECTED = "nothing selected";
 
-	RadioCellEditorView view;
+	ListCellEditorView listView;
+	RadioCellEditorView radioView;
+	PortalGinInjector ginInjector;
 	ArrayList<String> items;
+	DivView view;
+	public static final int MAX_RADIO_BUTTONS = 10;
 
 	@Inject
-	public EnumFormCellEditor(RadioCellEditorView view) {
+	public EnumFormCellEditor(DivView view, PortalGinInjector ginInjector) {
 		this.view = view;
+		this.ginInjector = ginInjector;
 	}
 
 	@Override
@@ -41,19 +50,34 @@ public class EnumFormCellEditor implements CellEditor {
 		/*
 		 * Find the index matching the value. Note: Linear search for less than 100 items is reasonable.
 		 */
-		for (int i = 0; i < items.size(); i++) {
-			if (value.equals(items.get(i))) {
-				view.setValue(i);
-				return;
+		if (radioView != null) {
+			for (int i = 0; i < items.size(); i++) {
+				if (value.equals(items.get(i))) {
+					radioView.setValue(i);
+					return;
+				}
+			}
+		} else {
+			for (int i = 0; i < items.size(); i++) {
+				if (value.equals(items.get(i))) {
+					listView.setValue(i);
+					return;
+				}
 			}
 		}
+
 		// If here we did not match a value
 		throw new IllegalArgumentException("Unknown value: " + value);
 	}
 
 	@Override
 	public String getValue() {
-		Integer index = view.getValue();
+		Integer index = null;
+		if (radioView != null) {
+			index = radioView.getValue();
+		} else {
+			index = listView.getValue();
+		}
 		if (index == null) {
 			return null;
 		} else {
@@ -73,33 +97,57 @@ public class EnumFormCellEditor implements CellEditor {
 
 	@Override
 	public int getTabIndex() {
-		return view.getTabIndex();
+		if (radioView != null) {
+			return radioView.getTabIndex();
+		} else {
+			return listView.getTabIndex();
+		}
 	}
 
 	@Override
 	public void setAccessKey(char key) {
-		view.setAccessKey(key);
+		if (radioView != null) {
+			radioView.setAccessKey(key);
+		} else {
+			listView.setAccessKey(key);
+		}
 	}
 
 	@Override
 	public void setFocus(boolean focused) {
-		view.setFocus(focused);
+		if (radioView != null) {
+			radioView.setFocus(focused);
+		} else {
+			listView.setFocus(focused);
+		}
 	}
 
 	@Override
 	public void setTabIndex(int index) {
-		view.setTabIndex(index);
+		if (radioView != null) {
+			radioView.setTabIndex(index);
+		} else {
+			listView.setTabIndex(index);
+		}
 	}
 
 	public void configure(List<String> validValues) {
-		/*
-		 * The items include all passed values
-		 */
+		view.clear();
 		this.items = new ArrayList<String>(validValues.size());
 		for (String value : validValues) {
 			this.items.add(value);
 		}
-		view.configure(this.items);
+		if (validValues.size() > MAX_RADIO_BUTTONS) {
+			radioView = null;
+			listView = ginInjector.createListCellEditorView();
+			listView.configure(this.items);
+			view.add(listView);
+		} else {
+			listView = null;
+			radioView = ginInjector.createRadioCellEditorView();
+			radioView.configure(this.items);
+			view.add(radioView);
+		}
 	}
 
 }
