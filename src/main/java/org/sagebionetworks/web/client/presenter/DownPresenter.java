@@ -37,12 +37,9 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 			public void invoke() {
 				if (!isCheckingStatus && view.isAttached()) {
 					timeToNextRefresh -= SECOND_MS;
-					view.updateTimeToNextRefresh(timeToNextRefresh / 1000);
 					if (timeToNextRefresh <= 1) {
 						checkForRepoDown();
-					} else {
-						view.setTimerVisible(true);
-					}
+					} 
 				}
 			}
 		};
@@ -51,26 +48,22 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 
 	public void checkForRepoDown() {
 		isCheckingStatus = true;
-		view.setTimerVisible(false);
 		stackConfigService.getCurrentStatus(new AsyncCallback<StackStatus>() {
 			@Override
 			public void onSuccess(StackStatus status) {
 				switch (status.getStatus()) {
 					case READ_WRITE:
 						// it's up!
-						repoIsUp();
-						break;
+//						repoIsUp();
+//						break;
 					case READ_ONLY:
 					case DOWN:
-						// it's down, report the message and check again later
-						view.setMessage(status.getCurrentMessage());
 				}
 				reset();
 			}
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setMessage(caught.getMessage());
 				reset();
 			}
 

@@ -66,8 +66,6 @@ public class DownPresenterTest {
 		verify(mockGWT).scheduleFixedDelay(callbackCaptor.capture(), eq(SECOND_MS));
 		Callback secondTimerFired = callbackCaptor.getValue();
 		secondTimerFired.invoke();
-		verify(mockView).updateTimeToNextRefresh(anyInt()); // in seconds
-		verify(mockView).setTimerVisible(true);
 	}
 
 	@Test
@@ -88,7 +86,6 @@ public class DownPresenterTest {
 		secondTimerFired.invoke();
 
 		// verify it checks the stack status
-		verify(mockView).setTimerVisible(false);
 		verify(mockStackConfigService).getCurrentStatus(any(AsyncCallback.class));
 
 		// now that we've verified the repeating scheduled execution, eat up the rest of the seconds to get
@@ -97,7 +94,6 @@ public class DownPresenterTest {
 			secondTimerFired.invoke();
 		}
 		// verify it checks the stack status
-		verify(mockView, times(2)).setTimerVisible(false);
 		verify(mockStackConfigService, times(2)).getCurrentStatus(any(AsyncCallback.class));
 	}
 
@@ -108,20 +104,4 @@ public class DownPresenterTest {
 		verify(mockGlobalAppState).back();
 	}
 
-	@Test
-	public void testRepoDown() {
-		when(mockStackStatus.getStatus()).thenReturn(StatusEnum.DOWN);
-		String currentMessage = "upgrading synapse to new version";
-		when(mockStackStatus.getCurrentMessage()).thenReturn(currentMessage);
-		presenter.checkForRepoDown();
-		verify(mockView).setMessage(currentMessage);
-	}
-
-	@Test
-	public void testCheckFailure() {
-		String error = "Could not get status for some reason!";
-		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockStackConfigService).getCurrentStatus(any(AsyncCallback.class));
-		presenter.checkForRepoDown();
-		verify(mockView).setMessage(error);
-	}
 }
