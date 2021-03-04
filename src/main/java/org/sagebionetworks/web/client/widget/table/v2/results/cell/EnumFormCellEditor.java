@@ -2,7 +2,11 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.StringUtils;
+import org.sagebionetworks.web.client.view.DivView;
+
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -12,13 +16,16 @@ import com.google.inject.Inject;
 public class EnumFormCellEditor implements CellEditor {
 
 	public static final String NOTHING_SELECTED = "nothing selected";
-
-	RadioCellEditorView view;
+	ListIndexSelectionCellEditorView currentView;
+	PortalGinInjector ginInjector;
 	ArrayList<String> items;
+	DivView view;
+	public static final int MAX_RADIO_BUTTONS = 10;
 
 	@Inject
-	public EnumFormCellEditor(RadioCellEditorView view) {
+	public EnumFormCellEditor(DivView view, PortalGinInjector ginInjector) {
 		this.view = view;
+		this.ginInjector = ginInjector;
 	}
 
 	@Override
@@ -43,17 +50,19 @@ public class EnumFormCellEditor implements CellEditor {
 		 */
 		for (int i = 0; i < items.size(); i++) {
 			if (value.equals(items.get(i))) {
-				view.setValue(i);
+				currentView.setValue(i);
 				return;
 			}
 		}
+
 		// If here we did not match a value
 		throw new IllegalArgumentException("Unknown value: " + value);
 	}
 
 	@Override
 	public String getValue() {
-		Integer index = view.getValue();
+		Integer index = currentView.getValue();
+		
 		if (index == null) {
 			return null;
 		} else {
@@ -73,33 +82,36 @@ public class EnumFormCellEditor implements CellEditor {
 
 	@Override
 	public int getTabIndex() {
-		return view.getTabIndex();
+		return currentView.getTabIndex();
 	}
 
 	@Override
 	public void setAccessKey(char key) {
-		view.setAccessKey(key);
+		currentView.setAccessKey(key);
 	}
 
 	@Override
 	public void setFocus(boolean focused) {
-		view.setFocus(focused);
+		currentView.setFocus(focused);	
 	}
 
 	@Override
 	public void setTabIndex(int index) {
-		view.setTabIndex(index);
+		currentView.setTabIndex(index);
 	}
 
 	public void configure(List<String> validValues) {
-		/*
-		 * The items include all passed values
-		 */
+		view.clear();
 		this.items = new ArrayList<String>(validValues.size());
 		for (String value : validValues) {
 			this.items.add(value);
 		}
-		view.configure(this.items);
+		if (validValues.size() > MAX_RADIO_BUTTONS) {
+			currentView = ginInjector.createListCellEditorView();
+		} else {
+			currentView = ginInjector.createRadioCellEditorView();
+		}
+		currentView.configure(this.items);
+		view.add(currentView);
 	}
-
 }
