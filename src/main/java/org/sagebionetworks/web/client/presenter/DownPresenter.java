@@ -54,8 +54,8 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 				switch (status.getStatus()) {
 					case READ_WRITE:
 						// it's up!
-//						repoIsUp();
-//						break;
+						repoIsUp();
+						break;
 					case READ_ONLY:
 					case DOWN:
 				}
