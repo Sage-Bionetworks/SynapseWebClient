@@ -16,9 +16,7 @@ import com.google.inject.Inject;
 public class EnumFormCellEditor implements CellEditor {
 
 	public static final String NOTHING_SELECTED = "nothing selected";
-
-	ListCellEditorView listView;
-	RadioCellEditorView radioView;
+	IntegerCellEditorView currentView;
 	PortalGinInjector ginInjector;
 	ArrayList<String> items;
 	DivView view;
@@ -50,19 +48,10 @@ public class EnumFormCellEditor implements CellEditor {
 		/*
 		 * Find the index matching the value. Note: Linear search for less than 100 items is reasonable.
 		 */
-		if (radioView != null) {
-			for (int i = 0; i < items.size(); i++) {
-				if (value.equals(items.get(i))) {
-					radioView.setValue(i);
-					return;
-				}
-			}
-		} else {
-			for (int i = 0; i < items.size(); i++) {
-				if (value.equals(items.get(i))) {
-					listView.setValue(i);
-					return;
-				}
+		for (int i = 0; i < items.size(); i++) {
+			if (value.equals(items.get(i))) {
+				currentView.setValue(i);
+				return;
 			}
 		}
 
@@ -72,12 +61,8 @@ public class EnumFormCellEditor implements CellEditor {
 
 	@Override
 	public String getValue() {
-		Integer index = null;
-		if (radioView != null) {
-			index = radioView.getValue();
-		} else {
-			index = listView.getValue();
-		}
+		Integer index = currentView.getValue();
+		
 		if (index == null) {
 			return null;
 		} else {
@@ -97,38 +82,22 @@ public class EnumFormCellEditor implements CellEditor {
 
 	@Override
 	public int getTabIndex() {
-		if (radioView != null) {
-			return radioView.getTabIndex();
-		} else {
-			return listView.getTabIndex();
-		}
+		return currentView.getTabIndex();
 	}
 
 	@Override
 	public void setAccessKey(char key) {
-		if (radioView != null) {
-			radioView.setAccessKey(key);
-		} else {
-			listView.setAccessKey(key);
-		}
+		currentView.setAccessKey(key);
 	}
 
 	@Override
 	public void setFocus(boolean focused) {
-		if (radioView != null) {
-			radioView.setFocus(focused);
-		} else {
-			listView.setFocus(focused);
-		}
+		currentView.setFocus(focused);	
 	}
 
 	@Override
 	public void setTabIndex(int index) {
-		if (radioView != null) {
-			radioView.setTabIndex(index);
-		} else {
-			listView.setTabIndex(index);
-		}
+		currentView.setTabIndex(index);
 	}
 
 	public void configure(List<String> validValues) {
@@ -138,16 +107,11 @@ public class EnumFormCellEditor implements CellEditor {
 			this.items.add(value);
 		}
 		if (validValues.size() > MAX_RADIO_BUTTONS) {
-			radioView = null;
-			listView = ginInjector.createListCellEditorView();
-			listView.configure(this.items);
-			view.add(listView);
+			currentView = ginInjector.createListCellEditorView();
 		} else {
-			listView = null;
-			radioView = ginInjector.createRadioCellEditorView();
-			radioView.configure(this.items);
-			view.add(radioView);
+			currentView = ginInjector.createRadioCellEditorView();
 		}
+		currentView.configure(this.items);
+		view.add(currentView);
 	}
-
 }
