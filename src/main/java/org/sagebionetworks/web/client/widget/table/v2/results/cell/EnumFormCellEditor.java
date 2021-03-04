@@ -16,7 +16,7 @@ import com.google.inject.Inject;
 public class EnumFormCellEditor implements CellEditor {
 
 	public static final String NOTHING_SELECTED = "nothing selected";
-	IntegerCellEditorView currentView;
+	ListIndexSelectionCellEditorView currentView;
 	PortalGinInjector ginInjector;
 	ArrayList<String> items;
 	DivView view;

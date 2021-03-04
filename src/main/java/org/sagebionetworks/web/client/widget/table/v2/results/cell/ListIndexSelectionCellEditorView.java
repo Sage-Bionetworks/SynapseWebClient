@@ -7,6 +7,6 @@ import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface IntegerCellEditorView extends IsWidget, TakesValue<Integer>, HasKeyDownHandlers, Focusable {
+public interface ListIndexSelectionCellEditorView extends IsWidget, TakesValue<Integer>, HasKeyDownHandlers, Focusable {
 	public void configure(List<String> values);
 }
