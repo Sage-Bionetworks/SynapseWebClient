@@ -277,9 +277,11 @@ public class EntityActionControllerImplTest {
 
 		parentId = "syn456";
 		entityId = "syn123";
-		Entity table = new TableEntity();
+		TableEntity table = new TableEntity();
 		table.setId(entityId);
 		table.setParentId(parentId);
+		table.setVersionNumber(3L);
+		table.setIsLatestVersion(true);
 		permissions = new UserEntityPermissions();
 		permissions.setCanChangePermissions(true);
 		permissions.setCanView(true);
