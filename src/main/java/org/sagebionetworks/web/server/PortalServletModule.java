@@ -27,6 +27,7 @@ import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserProfileClientImpl;
 import org.sagebionetworks.web.server.servlet.VersionsServlet;
+import org.sagebionetworks.web.server.servlet.filter.AmpADFilter;
 import org.sagebionetworks.web.server.servlet.filter.DigitalHealthFilter;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
 import org.sagebionetworks.web.server.servlet.filter.MHealthFilter;
@@ -63,6 +64,9 @@ public class PortalServletModule extends ServletModule {
 		// This supports RPC
 		filter("/Portal/*").through(RPCValidationFilter.class);
 		bind(RPCValidationFilter.class).in(Singleton.class);
+
+		bind(AmpADFilter.class).in(Singleton.class);
+		filter("/ampad").through(AmpADFilter.class);
 
 		bind(DreamFilter.class).in(Singleton.class);
 		filter("/dream").through(DreamFilter.class);
