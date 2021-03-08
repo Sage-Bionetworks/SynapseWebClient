@@ -584,7 +584,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	/**
-	 * Retrieves the version of the entity, if it's not the latest version (i.e. the entity is immutable).
+	 * Retrieves the version of the entity, if it's not the latest version
 	 *
 	 * For versionable entities, the result depends on if the entity is the latest version.
 	 * If the entity is not the latest version, the optional will contain the version number.
