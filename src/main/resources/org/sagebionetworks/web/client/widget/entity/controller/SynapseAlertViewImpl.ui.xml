@@ -9,14 +9,16 @@
   	<bh:Div>
 		<bh:Div ui:field="loginWidgetContainer" />
   		<b:Alert ui:field="alert" type="DANGER" addStyleNames="synapseAlert margin-top-10 margin-bottom-0-imp">
-  			<b:IconStack addStyleNames="iconArea font-size-20">
-				<b:Icon addStyleNames="iconBackground" type="CIRCLE" stackBase="true"/>
-				<b:Icon ui:field="icon" addStyleNames="iconForeground" type="EXCLAMATION_CIRCLE" stackTop="true"/>
-			</b:IconStack>
-			<bh:Span addStyleNames="messageArea font-size-15" marginLeft="10">
-				<bh:Strong ui:field="alertText" addStyleNames="displayBlock"/>
-			</bh:Span>
-			<b:Button ui:field="reloadButton" addStyleNames="font-size-15"
+  			<bh:Div addStyleNames="iconAndMessageArea">
+	  			<b:IconStack addStyleNames="iconArea font-size-20">
+					<b:Icon addStyleNames="iconBackground" type="CIRCLE" stackBase="true"/>
+					<b:Icon ui:field="icon" addStyleNames="iconForeground" type="EXCLAMATION_CIRCLE" stackTop="true"/>
+				</b:IconStack>
+				<bh:Span addStyleNames="messageArea font-size-15" marginLeft="10">
+					<bh:Strong ui:field="alertText" addStyleNames="displayBlock"/>
+				</bh:Span>
+			</bh:Div>
+			<b:Button ui:field="reloadButton" addStyleNames="font-size-15 buttonArea"
 				marginRight="10" text="Retry" visible="false" icon="REFRESH"/>
   		</b:Alert>
   		<bh:Div ui:field="jiraDialogContainer"/>
