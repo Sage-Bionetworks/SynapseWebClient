@@ -588,12 +588,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		Entity entity = entityBundle.getEntity();
 		if (entity instanceof Versionable) {
 			VersionableEntity versionableEntity = ((VersionableEntity) entity);
-			if (versionableEntity instanceof Table
-					&& versionableEntity.getVersionLabel() != null
-					&& versionableEntity.getVersionLabel().equals("in progress")) {
-				// TODO: This is undefined behavior. Use `isLatestVersion` when PLFM-6583 is complete.
+			if (versionableEntity.getIsLatestVersion()) {
 				return Optional.empty();
-
 			}
 			version = versionableEntity.getVersionNumber();
 		}
