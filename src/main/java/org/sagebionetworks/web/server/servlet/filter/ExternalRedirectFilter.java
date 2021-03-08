@@ -12,12 +12,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * This filter redirects traffic heading to /xxx to a different place
- * 
- *
+ * This filter redirects traffic heading to /xxx to an external URL (hard coded in SWC).  This overrides any Project Alias definition that may have the same value. 
  */
 public abstract class ExternalRedirectFilter implements Filter {
-
 
 	@Override
 	public void destroy() {
