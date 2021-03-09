@@ -28,6 +28,8 @@ public class FullWidthAlert implements IsWidget {
 	@UiField
 	Span messageSpan;
 	@UiField
+	Span buttonArea;
+	@UiField
 	Strong messageTitle;
 	@UiField
 	Button primaryButton;
@@ -88,6 +90,7 @@ public class FullWidthAlert implements IsWidget {
 	}
 
 	public void setPrimaryCTAText(String text) {
+		buttonArea.setVisible(true);
 		primaryButton.setVisible(true);
 		primaryButton.setText(text.toUpperCase());
 	}
@@ -107,6 +110,7 @@ public class FullWidthAlert implements IsWidget {
 	}
 
 	public void setSecondaryCTAText(String text) {
+		buttonArea.setVisible(true);
 		secondaryButton.setVisible(true);
 		secondaryButton.setText(text.toUpperCase());
 	}
