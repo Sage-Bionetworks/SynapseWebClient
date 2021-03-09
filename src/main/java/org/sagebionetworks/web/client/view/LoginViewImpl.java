@@ -5,7 +5,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.InfoAlert;
+import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -35,7 +35,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@UiField
 	ReactComponentDiv termsOfUseContainer;	
 	@UiField
-	InfoAlert acceptedTermsOfUseView;
+	FullWidthAlert acceptedTermsOfUseView;
 	@UiField
 	LoadingSpinner loadingUi;
 	@UiField

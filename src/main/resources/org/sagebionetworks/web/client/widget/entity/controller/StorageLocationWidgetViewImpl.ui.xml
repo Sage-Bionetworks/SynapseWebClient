@@ -29,9 +29,11 @@
 							</bh:Div>
 							<b:FormLabel for="s3BucketField" >Bucket</b:FormLabel>
 							<b:TextBox ui:field="s3BucketField" addStyleNames="margin-bottom-10 hide-resize "/>
-							<b:FormLabel for="s3BaseKeyField" >Base Key</b:FormLabel>
+							<b:FormLabel for="s3BaseKeyField" >Base Key </b:FormLabel>
+							<w:HelpWidget helpMarkdown="This is the &quot;folder&quot; to which all files will be uploaded. Leave empty to upload directly to the root of the bucket." addStyleNames="margin-left-5" placement="RIGHT"/>
 							<b:TextBox ui:field="s3BaseKeyField" addStyleNames="margin-bottom-10 hide-resize "/>
 							<b:FormLabel for="externalS3BannerField" >Banner</b:FormLabel>
+							<w:HelpWidget helpMarkdown="A short description for this storage location that will be shown when uploading to it." addStyleNames="margin-left-5" placement="RIGHT"/>
 							<b:InputGroup width="100%">
 								<b:InputGroupButton>
 									<b:Button ui:field="externalS3BannerDropdownButton"
@@ -57,8 +59,10 @@
 							<b:FormLabel for="googleCloudBucketField" >Bucket</b:FormLabel>
 							<b:TextBox ui:field="googleCloudBucketField" addStyleNames="margin-bottom-10 hide-resize "/>
 							<b:FormLabel for="googleCloudBaseKeyField" >Base Key</b:FormLabel>
+							<w:HelpWidget helpMarkdown="This is the &quot;folder&quot; to which all files will be uploaded. Leave empty to upload directly to the root of the bucket." addStyleNames="margin-left-5" placement="RIGHT"/>
 							<b:TextBox ui:field="googleCloudBaseKeyField" addStyleNames="margin-bottom-10 hide-resize "/>
 							<b:FormLabel for="externalGoogleCloudBannerField" >Banner</b:FormLabel>
+							<w:HelpWidget helpMarkdown="A short description for this storage location that will be shown when uploading to it." addStyleNames="margin-left-5" placement="RIGHT"/>
 
 							<b:InputGroup width="100%">
 								<b:InputGroupButton>

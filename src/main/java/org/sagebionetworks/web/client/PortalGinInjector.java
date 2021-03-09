@@ -235,6 +235,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEd
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.JSONListCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LargeStringCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEditorView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.RadioCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringListRendererCellView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellView;
@@ -536,7 +538,7 @@ public interface PortalGinInjector extends Ginjector {
 
 	StringEditorCell createStringEditorCell();
 	
-	JSONListCellEditor createListCellEditor();
+	JSONListCellEditor createJSONListCellEditor();
 
 	EntityIdCellEditor createEntityIdCellEditor();
 
@@ -569,6 +571,9 @@ public interface PortalGinInjector extends Ginjector {
 	UserIdCellEditor createUserIdCellEditor();
 
 	LargeStringCellEditor createLargeTextFormCellEditor();
+	
+	ListCellEditorView createListCellEditorView();
+	RadioCellEditorView createRadioCellEditorView();
 
 	// Asynchronous
 	AsynchronousProgressWidget creatNewAsynchronousProgressWidget();

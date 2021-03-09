@@ -126,7 +126,7 @@ public class CellFactoryImplTest {
 		when(mockInjector.createDateListRendererCellView()).thenReturn(mockDateListRenderer);
 		when(mockInjector.createEntityIdListRendererCellView()).thenReturn(mockEntityIdListRenderer);
 		when(mockInjector.createUserIdListRendererCellView()).thenReturn(mockUserIdListRenderer);
-		when(mockInjector.createListCellEditor()).thenReturn(mockJSONListCellEditor);
+		when(mockInjector.createJSONListCellEditor()).thenReturn(mockJSONListCellEditor);
 		cellFactory = new CellFactory(mockInjector);
 	}
 

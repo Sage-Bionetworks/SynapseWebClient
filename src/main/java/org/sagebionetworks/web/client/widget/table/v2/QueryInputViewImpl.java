@@ -7,7 +7,7 @@ import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.widget.InfoAlert;
+import org.sagebionetworks.web.client.widget.FullWidthAlert;
 
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -38,7 +38,7 @@ public class QueryInputViewImpl implements QueryInputView {
 	@UiField
 	Button queryButton;
 	@UiField
-	InfoAlert queryResultsMessage;
+	FullWidthAlert queryResultsMessage;
 	@UiField
 	Anchor simpleModeLink;
 	HTMLPanel panel;
@@ -56,7 +56,7 @@ public class QueryInputViewImpl implements QueryInputView {
 		queryButton.addClickHandler(event -> {
 			presenter.onExecuteQuery();
 		});
-		queryResultsMessage.addClickHandler(event -> {
+		queryResultsMessage.addPrimaryCTAClickHandler(event -> {
 			presenter.onReset();
 		});
 		// Enter key should execute the query.

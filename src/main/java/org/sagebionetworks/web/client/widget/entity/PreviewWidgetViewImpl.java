@@ -186,8 +186,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 			event.preventDefault();
 			placeChanger.goTo(new Synapse(entityId, version, null, null));
 		});
-		link.setText(entityId + versionString);
-		link.addStyleName("color-white");
+		link.setText(entityId + versionString);		
 		alert.add(link);
 		add(alert);
 	}

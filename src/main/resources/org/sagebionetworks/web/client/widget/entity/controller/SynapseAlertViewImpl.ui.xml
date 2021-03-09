@@ -8,14 +8,18 @@
   
   	<bh:Div>
 		<bh:Div ui:field="loginWidgetContainer" />
-  		<b:Alert ui:field="alert" type="DANGER" addStyleNames="margin-top-10 margin-bottom-0-imp fullWidthAlert flexcontainer-row">
-  			<bh:Div addStyleNames="flexcontainer-column">
-  			  	<b:Icon addStyleNames="black-25-percent center-in-div" type="WARNING" size="LARGE" marginRight="10"/>
-  			</bh:Div>
-  			<bh:Div addStyleNames="flexcontainer-column">
-	  			<bh:Strong ui:field="alertText" addStyleNames="center-in-div"></bh:Strong>
-	  			<b:Button ui:field="reloadButton" text="Retry" visible="false" icon="REFRESH" size="EXTRA_SMALL" addStyleNames="margin-left-15"/>
-  			</bh:Div>
+  		<b:Alert ui:field="alert" type="DANGER" addStyleNames="synapseAlert margin-top-10 margin-bottom-0-imp">
+  			<bh:Div addStyleNames="iconAndMessageArea">
+	  			<b:IconStack addStyleNames="iconArea font-size-20">
+					<b:Icon addStyleNames="iconBackground" type="CIRCLE" stackBase="true"/>
+					<b:Icon ui:field="icon" addStyleNames="iconForeground" type="EXCLAMATION_CIRCLE" stackTop="true"/>
+				</b:IconStack>
+				<bh:Span addStyleNames="messageArea font-size-15" marginLeft="10">
+					<bh:Strong ui:field="alertText" addStyleNames="displayBlock"/>
+				</bh:Span>
+			</bh:Div>
+			<b:Button ui:field="reloadButton" addStyleNames="font-size-15 buttonArea"
+				marginRight="10" text="Retry" visible="false" icon="REFRESH"/>
   		</b:Alert>
   		<bh:Div ui:field="jiraDialogContainer"/>
 	</bh:Div>
