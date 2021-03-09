@@ -87,7 +87,6 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	private static native void _showChart(Element el, JavaScriptObject[] xyData, String barMode, String plotTitle, String xTitle, String yTitle, String xAxisType, String yAxisType, boolean showLegend) /*-{
 
 		try {
-
 			var plot = $wnd.createPlotlyComponent($wnd.Plotly);
 
 			// SWC-3668: We must manually construct an Object from the parent window Object prototype.  This is a general GWT js integration issue.
