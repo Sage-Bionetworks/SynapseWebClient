@@ -104,6 +104,7 @@ public class DownPresenterTest {
 		verify(mockGlobalAppState).back();
 	}
 	
+	@Test
 	public void testRepoDown() {
 		when(mockStackStatus.getStatus()).thenReturn(StatusEnum.DOWN);
 		String currentMessage = "upgrading synapse to new version";
