@@ -13,6 +13,7 @@ public class DownViewImpl implements DownView {
 	private Header headerWidget;
 	@UiField
 	ReactComponentDiv srcDownContainer;
+	String message;
 
 	public interface Binder extends UiBinder<Widget, DownViewImpl> {
 	}
@@ -26,7 +27,7 @@ public class DownViewImpl implements DownView {
 		headerWidget.configure();
 		widget.addAttachHandler(event -> {
 			if (event.isAttached()) {
-				_createSRCDown(srcDownContainer.getElement());
+				_createSRCDown(srcDownContainer.getElement(), this.message);
 			}
 		});
 	}
@@ -41,18 +42,26 @@ public class DownViewImpl implements DownView {
 	public Widget asWidget() {
 		return widget;
 	}
+	
+	@Override
+	public void setMessage(String message) {
+		this.message = message;
+		if (widget.isAttached()) {
+			_createSRCDown(srcDownContainer.getElement(), message);
+		}
+	}
 
 	@Override
 	public boolean isAttached() {
 		return widget.isAttached();
 	}
 	
-	private static native void _createSRCDown(Element el) /*-{
+	private static native void _createSRCDown(Element el, String message) /*-{
 		try {
 			var props = {
 				image : "maintenance",
 				title : "Sorry, Synapse is down for maintenance.",
-				message: "We're busy updating Synapse for you and will be back soon."
+				message: message
 			};
 			$wnd.ReactDOM.render($wnd.React.createElement(
 					$wnd.SRC.SynapseComponents.ErrorPage, props, null), el);

@@ -58,12 +58,15 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 						break;
 					case READ_ONLY:
 					case DOWN:
+						// it's down, report the message and check again later
+						view.setMessage(status.getCurrentMessage());
 				}
 				reset();
 			}
 
 			@Override
 			public void onFailure(Throwable caught) {
+				view.setMessage(caught.getMessage());
 				reset();
 			}
 
