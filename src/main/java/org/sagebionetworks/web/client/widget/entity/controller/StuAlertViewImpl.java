@@ -2,6 +2,10 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.view.DownViewImpl;
+import org.sagebionetworks.web.client.view.DownViewImpl.ErrorPageType;
+import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -17,9 +21,9 @@ public class StuAlertViewImpl implements StuAlertView {
 	Widget widget;
 
 	@UiField
-	HTMLPanel httpCode403;
+	ReactComponentDiv httpCode403;
 	@UiField
-	HTMLPanel httpCode404;
+	ReactComponentDiv httpCode404;
 	@UiField
 	Div synAlertContainer;
 	Widget synAlertWidget;
@@ -61,6 +65,7 @@ public class StuAlertViewImpl implements StuAlertView {
 		lazyConstruct();
 		container.setVisible(true);
 		httpCode403.setVisible(true);
+ 		DownViewImpl._createSRCErrorPage(httpCode403.getElement(), ErrorPageType.noAccess.name(), "Sorry, no access to this page.", "You are not authorized to access the page requested.");
 	}
 
 	@Override
@@ -68,6 +73,7 @@ public class StuAlertViewImpl implements StuAlertView {
 		lazyConstruct();
 		container.setVisible(true);
 		httpCode404.setVisible(true);
+		DownViewImpl._createSRCErrorPage(httpCode404.getElement(), ErrorPageType.unavailable.name(), "Sorry, this page isn’t available.", "The link you followed may be broken, or the page may have been removed.");
 	}
 
 	@Override
