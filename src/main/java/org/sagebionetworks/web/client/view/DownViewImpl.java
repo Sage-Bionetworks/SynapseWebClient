@@ -10,11 +10,17 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class DownViewImpl implements DownView {
+	public static final String SYNAPSE_DOWN_MAINTENANCE_TITLE = "Sorry, Synapse is down for maintenance.";
 	private Header headerWidget;
 	@UiField
 	ReactComponentDiv srcDownContainer;
 	String message;
 
+	public static enum ErrorPageType {
+		maintenance,
+		noAccess,
+		unavailable
+	}
 	public interface Binder extends UiBinder<Widget, DownViewImpl> {
 	}
 
@@ -27,7 +33,7 @@ public class DownViewImpl implements DownView {
 		headerWidget.configure();
 		widget.addAttachHandler(event -> {
 			if (event.isAttached()) {
-				_createSRCDown(srcDownContainer.getElement(), this.message);
+				_createSRCErrorPage(srcDownContainer.getElement(), ErrorPageType.maintenance.name(), SYNAPSE_DOWN_MAINTENANCE_TITLE, message);
 			}
 		});
 	}
@@ -47,7 +53,7 @@ public class DownViewImpl implements DownView {
 	public void setMessage(String message) {
 		this.message = message;
 		if (widget.isAttached()) {
-			_createSRCDown(srcDownContainer.getElement(), message);
+			_createSRCErrorPage(srcDownContainer.getElement(), ErrorPageType.maintenance.name(), SYNAPSE_DOWN_MAINTENANCE_TITLE, message);
 		}
 	}
 
@@ -56,11 +62,11 @@ public class DownViewImpl implements DownView {
 		return widget.isAttached();
 	}
 	
-	private static native void _createSRCDown(Element el, String message) /*-{
+	public static native void _createSRCErrorPage(Element el, String type, String title, String message) /*-{
 		try {
 			var props = {
-				image : "maintenance",
-				title : "Sorry, Synapse is down for maintenance.",
+				image : type,
+				title : title,
 				message: message
 			};
 			$wnd.ReactDOM.render($wnd.React.createElement(
