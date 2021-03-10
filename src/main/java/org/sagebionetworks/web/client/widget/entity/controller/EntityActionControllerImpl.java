@@ -583,17 +583,22 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 
-	private Optional<Long> getVersion() {
+	/**
+	 * Retrieves the version of the entity, if it's not the latest version
+	 *
+	 * For versionable entities, the result depends on if the entity is the latest version.
+	 * If the entity is not the latest version, the optional will contain the version number.
+	 * If the entity is the latest version, the optional will be empty.
+	 *
+	 * If the entity is not versionable, it returns an empty optional.
+	 */
+	private Optional<Long> getVersionIfNotLatest() {
 		Long version = null;
 		Entity entity = entityBundle.getEntity();
-		if (entity instanceof Versionable) {
+		if (entity instanceof VersionableEntity) {
 			VersionableEntity versionableEntity = ((VersionableEntity) entity);
-			if (versionableEntity instanceof Table
-					&& versionableEntity.getVersionLabel() != null
-					&& versionableEntity.getVersionLabel().equals("in progress")) {
-				// TODO: This is undefined behavior. Use `isLatestVersion` when PLFM-6583 is complete.
+			if (versionableEntity.getIsLatestVersion()) {
 				return Optional.empty();
-
 			}
 			version = versionableEntity.getVersionNumber();
 		}
@@ -616,7 +621,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void onCreateOrUpdateDoi() {
-		getCreateOrUpdateDoiModal().configureAndShow(entity, getVersion(), authenticationController.getCurrentUserProfile());
+		getCreateOrUpdateDoiModal().configureAndShow(entity, getVersionIfNotLatest(), authenticationController.getCurrentUserProfile());
 	}
 
 	private void onCreateChallenge() {
@@ -1433,7 +1438,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				@Override
 				public void onSuccess(WikiPage result) {
 					view.showInfo("'" + name + "' Page Added");
-					Synapse newPlace = new Synapse(entityBundle.getEntity().getId(), getVersion().orElse(null), EntityArea.WIKI, result.getId());
+					Synapse newPlace = new Synapse(entityBundle.getEntity().getId(), getVersionIfNotLatest().orElse(null), EntityArea.WIKI, result.getId());
 					getGlobalApplicationState().getPlaceChanger().goTo(newPlace);
 				}
 

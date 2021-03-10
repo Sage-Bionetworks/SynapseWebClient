@@ -97,9 +97,6 @@ import org.sagebionetworks.repo.model.file.FileHandleCopyResult;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.FileResultFailureCode;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.repo.model.file.State;
-import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
-import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.repo.model.message.Settings;
@@ -409,14 +406,6 @@ public class SynapseClientImplTest {
 		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
 		when(mockUserProfile.getOwnerId()).thenReturn(MY_USER_PROFILE_OWNER_ID);
 		when(mockSynapse.getMyProfile()).thenReturn(mockUserProfile);
-		UploadDaemonStatus status = new UploadDaemonStatus();
-		String fileHandleId = "myFileHandleId";
-		status.setFileHandleId(fileHandleId);
-		status.setState(State.COMPLETED);
-
-		status = new UploadDaemonStatus();
-		status.setState(State.PROCESSING);
-		status.setPercentComplete(.05d);
 
 		PaginatedResults<MembershipInvitation> openInvites = new PaginatedResults<MembershipInvitation>();
 		openInvites.setTotalNumberOfResults(0);

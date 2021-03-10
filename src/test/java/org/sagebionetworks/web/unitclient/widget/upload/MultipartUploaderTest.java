@@ -31,7 +31,6 @@ import org.sagebionetworks.repo.model.file.AddPartResponse;
 import org.sagebionetworks.repo.model.file.AddPartState;
 import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlRequest;
 import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlResponse;
-import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.MultipartUploadRequest;
 import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
 import org.sagebionetworks.repo.model.file.PartPresignedUrl;
@@ -103,8 +102,6 @@ public class MultipartUploaderTest {
 	@Before
 	public void before() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		ChunkedFileToken token = new ChunkedFileToken();
-		token.setFileName("testFile.txt");
 
 		// direct upload
 		// by default, do not support direct upload (direct upload tests will turn on)
