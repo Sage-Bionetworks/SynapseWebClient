@@ -6,7 +6,6 @@
   
   	<bh:Div>
  		<bh:Div ui:field="synAlertContainer" />
-  		<w:ReactComponentDiv ui:field="httpCode404" visible="false" />
-		<w:ReactComponentDiv ui:field="httpCode403" visible="false" />
+  		<w:ReactComponentDiv ui:field="errorPageContainer" visible="false" />
 	</bh:Div>
 </ui:UiBinder>
