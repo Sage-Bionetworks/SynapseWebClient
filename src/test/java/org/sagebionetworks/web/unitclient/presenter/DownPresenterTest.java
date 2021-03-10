@@ -103,5 +103,21 @@ public class DownPresenterTest {
 		presenter.checkForRepoDown();
 		verify(mockGlobalAppState).back();
 	}
+	
+	public void testRepoDown() {
+		when(mockStackStatus.getStatus()).thenReturn(StatusEnum.DOWN);
+		String currentMessage = "upgrading synapse to new version";
+		when(mockStackStatus.getCurrentMessage()).thenReturn(currentMessage);
+		presenter.checkForRepoDown();
+		verify(mockView).setMessage(currentMessage);
+	}
+
+	@Test
+	public void testCheckFailure() {
+		String error = "Could not get status for some reason!";
+		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockStackConfigService).getCurrentStatus(any(AsyncCallback.class));
+		presenter.checkForRepoDown();
+		verify(mockView).setMessage(error);
+	}
 
 }
