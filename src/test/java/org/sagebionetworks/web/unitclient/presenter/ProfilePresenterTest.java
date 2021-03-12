@@ -959,14 +959,12 @@ public class ProfilePresenterTest {
 		String testUserId = "9980";
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(testUserId);
+		profilePresenter.setPlace(place);
 
 		profilePresenter.editMyProfile();
-		// verify updateView shows Settings as the initial tab
-		ArgumentCaptor<Profile> captor = ArgumentCaptor.forClass(Profile.class);
-		verify(mockPlaceChanger).goTo(captor.capture());
-		Profile capturedPlace = captor.getValue();
-		assertEquals(ProfileArea.SETTINGS, capturedPlace.getArea());
-		assertEquals(testUserId, capturedPlace.getUserId());
+
+		// verify flip into editing mode
+		verify(mockUserProfileEditorWidget).setIsEditingMode(true);
 	}
 
 	@Test
@@ -985,7 +983,7 @@ public class ProfilePresenterTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 
 		// verify forces login if anonymous and trying to view own anonymous profile
-		profilePresenter.viewMyProfile("");
+		profilePresenter.viewMyProfile();
 
 		verify(mockView).showLoginAlert();
 		verify(mockPlaceChanger, never()).goTo(any(Place.class));
