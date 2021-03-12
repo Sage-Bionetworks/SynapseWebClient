@@ -283,7 +283,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 
 	@Override
 	public void onEditProfile() {
-		globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId(), ProfileArea.PROFILE));
+		globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.EDIT_PROFILE_TOKEN));
 	}
 
 	@Override
