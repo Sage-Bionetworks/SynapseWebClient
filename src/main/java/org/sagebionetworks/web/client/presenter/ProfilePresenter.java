@@ -197,13 +197,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	public void editMyProfile() {
 		if (authenticationController.isLoggedIn()) {
-			goTo(new Profile(authenticationController.getCurrentUserPrincipalId(), ProfileArea.SETTINGS));
+			getUserProfileEditorWidget().setIsEditingMode(true);
+			viewMyProfile();
 		} else {
 			view.showLoginAlert();
 		}
 	}
 
-	public void viewMyProfile(String area) {
+	public void viewMyProfile() {
 		if (authenticationController.isLoggedIn()) {
 			// view the current user profile
 			place.setUserId(authenticationController.getCurrentUserPrincipalId());
@@ -273,6 +274,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		currentUserBundle = null;
 		int mask = PROFILE | ORC_ID;
 		Long currentUserIdLong = currentUserId != null ? Long.parseLong(currentUserId) : null;
+		// capture current state of user profile editor widget, to restore after reconfiguring with the current user profile.
+		boolean isEditing = getUserProfileEditorWidget().isEditingMode();
 		jsClient.getUserBundle(currentUserIdLong, mask, new AsyncCallback<UserBundle>() {
 			@Override
 			public void onSuccess(UserBundle bundle) {
@@ -281,6 +284,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				view.setProfile(bundle.getUserProfile(), isOwner);
 				ginInjector.getSynapseJSNIUtils().setPageTitle(currentUserBundle.getUserProfile().getUserName());
 				getUserProfileEditorWidget().configure(bundle.getUserProfile(), bundle.getORCID(), () -> { profileUpdated(); });
+				getUserProfileEditorWidget().setIsEditingMode(isEditing);
 			}
 
 			@Override
@@ -766,7 +770,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			return;
 		}
 		if (token.equals(Profile.VIEW_PROFILE_TOKEN) || token.startsWith(Profile.VIEW_PROFILE_TOKEN + "/") || token.isEmpty()) {
-			viewMyProfile(token.substring(1));
+			viewMyProfile();
 			return;
 		}
 		if (authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(place.getUserId())) {

@@ -47,6 +47,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	String orcIdHref;
 	Callback callback;
 	boolean goToAccountSettingsAfterSave = false;
+	boolean isEditing = false;
 	
 	@Inject
 	public UserProfileEditorWidgetImpl(UserProfileEditorWidgetView view, ProfileImageWidget imageWidget, ImageUploadWidget fileHandleUploadWidget, SynapseJavascriptClient jsClient, ClientCache clientCache, AuthenticationController authController, PortalGinInjector ginInjector, SynapseAlert synAlert, PopupUtilsView popupUtils, GlobalApplicationState globalAppState) {
@@ -268,10 +269,17 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	
 	@Override
 	public void setIsEditingMode(boolean isEditing) {
+		this.isEditing = isEditing;
 		globalAppState.setIsEditing(isEditing);
 		fileHandleUploadWidget.setVisible(isEditing);
 		view.setEditMode(isEditing);
 	}
+	
+	@Override
+	public boolean isEditingMode() {
+		return isEditing;
+	}
+	
 	/**
 	 * Update the profile from the view.
 	 * 
