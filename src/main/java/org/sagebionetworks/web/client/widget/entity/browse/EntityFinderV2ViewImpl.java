@@ -62,6 +62,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 		okButton.addClickHandler(event -> {
 			presenter.okClicked();
 			jsniUtils.unmountComponentAtNode(entityFinderContainer.getElement());
+			modal.hide();
 		});
 		okButton.addDomHandler(DisplayUtils.getPreventTabHandler(okButton), KeyDownEvent.getType());
 		cancelButton.addClickHandler(event -> {
@@ -87,6 +88,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 					for (int i = 0; i < result.length(); i++) {
 						selected.add(convertFromJso(result.get(i)));
 					}
+					okButton.setEnabled(selected.size() > 0);
 					if (multiSelect) {
 						presenter.setSelectedEntities(selected);
 					} else {

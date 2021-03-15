@@ -1419,6 +1419,7 @@ public class PortalGinModule extends AbstractGinModule {
         bind(PageProgressWidgetView.class).to(PageProgressWidgetViewImpl.class);
 
         bind(EntityFinder.class).to(EntityFinderV2Impl.class);
+        bind(EntityFinder.Builder.class).to(EntityFinderV2Impl.Builder.class);
 
         bind(EntityFinderV2View.class).to(EntityFinderV2ViewImpl.class);
     }

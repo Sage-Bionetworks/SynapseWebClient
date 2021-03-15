@@ -136,7 +136,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	AuthenticationController authenticationController;
 	AccessControlListModalWidget accessControlListModalWidget;
 	RenameEntityModalWidget renameEntityModalWidget;
-	EntityFinder entityFinder;
+	EntityFinder.Builder entityFinderBuilder;
 	EvaluationSubmitter submitter;
 	EditFileMetadataModalWidget editFileMetadataModalWidget;
 	EditProjectMetadataModalWidget editProjectMetadataModalWidget;
@@ -346,11 +346,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		return editProjectMetadataModalWidget;
 	}
 
-	private EntityFinder getEntityFinder() {
-		if (entityFinder == null) {
-			entityFinder = ginInjector.getEntityFinder();
+	private EntityFinder.Builder getEntityFinderBuilder() {
+		if (entityFinderBuilder == null) {
+			entityFinderBuilder = ginInjector.getEntityFinderBuilder();
 		}
-		return entityFinder;
+		return entityFinderBuilder;
 	}
 
 	private EvaluationSubmitter getEvaluationSubmitter() {
@@ -1198,14 +1198,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void postCheckLink() {
-		getEntityFinder().configure(CONTAINER, false, new SelectedHandler<Reference>() {
-			@Override
-			public void onSelected(Reference selected) {
-				createLink(selected.getTargetId());
-				getEntityFinder().hide();
-			}
-		});
-		getEntityFinder().show();
+		getEntityFinderBuilder()
+				.setSelectableFilter(CONTAINER)
+				.setShowVersions(false)
+				.setSelectedHandler(selected -> createLink(selected.getTargetId()))
+				.build()
+				.show();
 	}
 
 	/**
@@ -1265,14 +1263,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	private void postCheckMove() {
 		EntityFilter filter = entityBundle.getEntity() instanceof Table ? PROJECT : CONTAINER;
-		getEntityFinder().configure(filter, false, new SelectedHandler<Reference>() {
-			@Override
-			public void onSelected(Reference selected) {
-				moveEntity(selected.getTargetId());
-				getEntityFinder().hide();
-			}
-		});
-		getEntityFinder().show();
+		getEntityFinderBuilder()
+				.setSelectableFilter(filter)
+				.setShowVersions(false)
+				.setSelectedHandler(selected -> moveEntity(selected.getTargetId()))
+				.build()
+				.show();
 	}
 
 	/**

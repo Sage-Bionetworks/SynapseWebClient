@@ -25,170 +25,312 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Presenter, IsWidget {
-	private EntityFinderV2View view;
-	private boolean showVersions;
-	private boolean multiSelect;
-	private List<Reference> selectedEntities;
-	String initialContainerId;
-	GlobalApplicationState globalApplicationState;
-	AuthenticationController authenticationController;
-	private SelectedHandler<Reference> selectedHandler;
-	private SelectedHandler<List<Reference>> selectedMultiHandler;
-	private EntityFilter visibleFilter;
-	private EntityFilter selectableFilter;
-	private SynapseAlert synAlert;
-	private SynapseJavascriptClient jsClient;
+    private EntityFinderV2View view;
+    private List<Reference> selectedEntities;
+    GlobalApplicationState globalApplicationState;
+    AuthenticationController authenticationController;
+    private SynapseAlert synAlert;
+    private SynapseJavascriptClient jsClient;
+
+    private boolean multiSelect;
+    private String initialContainerId;
+
+    private boolean showVersions;
+    private EntityFilter visibleFilter;
+    private EntityFilter selectableFilter;
+    private SelectedHandler<Reference> selectedHandler;
+    private SelectedHandler<List<Reference>> selectedMultiHandler;
+
+    private String modalTitle;
+    private String promptCopy;
+    private String selectedCopy;
+    private String confirmButtonCopy;
+
+    @Inject
+    public EntityFinderV2Impl(EntityFinderV2View view, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController, SynapseAlert synAlert, SynapseJavascriptClient jsClient) {
+        this.view = view;
+        this.globalApplicationState = globalApplicationState;
+        this.authenticationController = authenticationController;
+        this.synAlert = synAlert;
+        this.jsClient = jsClient;
+        this.selectedEntities = new ArrayList<>();
+        view.setPresenter(this);
+        view.setSynAlert(synAlert.asWidget());
+    }
+
+    private EntityFinderV2Impl(Builder builder) {
+        this.selectedEntities = new ArrayList<>();
+
+        // Dependencies injected into the builder
+        this.view = builder.view;
+        this.globalApplicationState = builder.globalApplicationState;
+        this.synAlert = builder.synAlert;
+        this.jsClient = builder.jsClient;
+
+        this.view.setPresenter(this);
+        this.view.setSynAlert(this.synAlert.asWidget());
+
+        // Configuration
+        multiSelect = builder.multiSelect;
+        initialContainerId = builder.initialContainerId;
+        selectedHandler = builder.selectedHandler;
+        selectedMultiHandler = builder.selectedMultiHandler;
+        selectableFilter = builder.selectableFilter;
+        visibleFilter = builder.visibleFilter;
+        showVersions = builder.showVersions;
+        renderComponent();
+    }
+
+    public static class Builder implements EntityFinder.Builder {
+        private EntityFinderV2View view;
+        GlobalApplicationState globalApplicationState;
+        AuthenticationController authenticationController;
+        private SynapseAlert synAlert;
+        private SynapseJavascriptClient jsClient;
+
+        private SelectedHandler<Reference> selectedHandler = selected -> {
+        };
+        private SelectedHandler<List<Reference>> selectedMultiHandler = selected -> {
+        };
+
+        private boolean showVersions = false;
+        private EntityFilter visibleFilter = ALL;
+        private EntityFilter selectableFilter = ALL;
+
+        private boolean multiSelect = false;
+        private String initialContainerId = null;
+
+        private String modalTitle = "Find in Synapse";
+        private String promptCopy = "";
+        private String selectedCopy = "Selected";
+        private String confirmButtonCopy = "Select";
+
+        @Inject
+        public Builder(EntityFinderV2View view, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController, SynapseAlert synAlert, SynapseJavascriptClient jsClient) {
+            this.view = view;
+            this.globalApplicationState = globalApplicationState;
+            this.authenticationController = authenticationController;
+            this.synAlert = synAlert;
+            this.jsClient = jsClient;
+        }
+
+        @Override
+        public EntityFinder build() {
+            return new EntityFinderV2Impl(this);
+        }
+
+        @Override
+        public EntityFinder.Builder setMultiSelect(boolean multiSelect) {
+            this.multiSelect = multiSelect;
+            return this;
+        }
+
+        @Override
+        public EntityFinder.Builder setInitialContainerId(String initialContainerId) {
+            this.initialContainerId = initialContainerId;
+            return this;
+        }
+
+        @Override
+        public EntityFinder.Builder setSelectedHandler(SelectedHandler<Reference> handler) {
+            if (multiSelect) {
+                throw new IllegalArgumentException("Attempted to set handler for single selection in Entity Finder when multiselect is true");
+            }
+            this.selectedHandler = handler;
+            return this;
+        }
+
+        @Override
+        public EntityFinder.Builder setSelectedMultiHandler(SelectedHandler<List<Reference>> handler) {
+            if (!multiSelect) {
+                throw new IllegalArgumentException("Attempted to set handler for single selection in Entity Finder when multiselect is true");
+            }
+            this.selectedMultiHandler = handler;
+            return this;
+        }
+
+        @Override
+        public EntityFinder.Builder setSelectableFilter(EntityFilter selectableFilter) {
+            this.selectableFilter = selectableFilter;
+            return this;
+        }
+
+        @Override
+        public EntityFinder.Builder setVisibleFilter(EntityFilter visibleFilter) {
+            this.visibleFilter = visibleFilter;
+            return this;
+        }
+
+        @Override
+        public EntityFinder.Builder setShowVersions(boolean showVersions) {
+            this.showVersions = showVersions;
+            return this;
+        }
+
+        @Override
+        public EntityFinder.Builder setModalTitle(String modalTitle) {
+            this.modalTitle = modalTitle;
+            return this;
+        }
+
+        @Override
+        public EntityFinder.Builder setPromptCopy(String promptCopy) {
+            this.promptCopy = promptCopy;
+            return this;
+        }
+
+        @Override
+        public EntityFinder.Builder setSelectedCopy(String selectedCopy) {
+            this.selectedCopy = selectedCopy;
+            return this;
+        }
+
+        @Override
+        public EntityFinder.Builder setConfirmButtonCopy(String confirmButtonCopy) {
+            this.confirmButtonCopy = confirmButtonCopy;
+            return this;
+        }
+    }
 
 
-	@Inject
-	public EntityFinderV2Impl(EntityFinderV2View view, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController, SynapseAlert synAlert, SynapseJavascriptClient jsClient) {
-		this.view = view;
-		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
-		this.synAlert = synAlert;
-		this.jsClient = jsClient;
-		this.selectedEntities = new ArrayList<>();
-		view.setPresenter(this);
-		view.setSynAlert(synAlert.asWidget());
-	}
+    @Override
+    public void configure(boolean showVersions, SelectedHandler<Reference> handler) {
+        configure(ALL, showVersions, handler);
+    }
 
-	@Override
-	public void configure(boolean showVersions, SelectedHandler<Reference> handler) {
-		configure(ALL, showVersions, handler);
-	}
+    @Override
+    public void configure(EntityFilter selectable, boolean showVersions, SelectedHandler<Reference> handler) {
+        configure(ALL, selectable, showVersions, handler);
+    }
 
-	@Override
-	public void configure(EntityFilter selectable, boolean showVersions, SelectedHandler<Reference> handler) {
-		configure(ALL, selectable, showVersions, handler);
-	}
+    @Override
+    public void configure(EntityFilter visible, EntityFilter selectable, boolean showVersions, SelectedHandler<Reference> handler) {
+        this.showVersions = showVersions;
+        this.visibleFilter = visible;
+        this.selectableFilter = selectable;
+        this.selectedHandler = handler;
+        this.multiSelect = false;
+        selectedEntities.clear();
+        renderComponent();
 
-	@Override
-	public void configure(EntityFilter visible, EntityFilter selectable, boolean showVersions, SelectedHandler<Reference> handler) {
-		this.showVersions = showVersions;
-		this.visibleFilter = visible;
-		this.selectableFilter = selectable;
-		this.selectedHandler = handler;
-		this.multiSelect = false;
-		selectedEntities.clear();
-		loadCurrentContext();
-	}
+    }
 
-	@Override
-	public void configureMulti(boolean showVersions, SelectedHandler<List<Reference>> handler) {
-		configureMulti(ALL, showVersions, handler);
-	}
+    @Override
+    public void configureMulti(boolean showVersions, SelectedHandler<List<Reference>> handler) {
+        configureMulti(ALL, showVersions, handler);
+    }
 
-	@Override
-	public void configureMulti(EntityFilter filter, boolean showVersions, SelectedHandler<List<Reference>> handler) {
-		configureMulti(ALL, filter, showVersions, handler);
-	}
+    @Override
+    public void configureMulti(EntityFilter filter, boolean showVersions, SelectedHandler<List<Reference>> handler) {
+        configureMulti(ALL, filter, showVersions, handler);
+    }
 
-	@Override
-	public void configureMulti(EntityFilter visible, EntityFilter selectable, boolean showVersions, SelectedHandler<List<Reference>> handler) {
-		this.showVersions = showVersions;
-		this.visibleFilter = visible;
-		this.selectableFilter = selectable;
-		this.selectedMultiHandler = handler;
-		this.multiSelect = true;
-		selectedEntities.clear();
-		loadCurrentContext();
-	}
+    @Override
+    public void configureMulti(EntityFilter visible, EntityFilter selectable, boolean showVersions, SelectedHandler<List<Reference>> handler) {
+        this.showVersions = showVersions;
+        this.visibleFilter = visible;
+        this.selectableFilter = selectable;
+        this.selectedMultiHandler = handler;
+        this.multiSelect = true;
+        selectedEntities.clear();
+        renderComponent();
+
+    }
 
 
-	public void loadCurrentContext() {
-		// get the entity path, and ask for each entity to add to the tree
-		Place currentPlace = globalApplicationState.getCurrentPlace();
-		boolean isSynapsePlace = currentPlace instanceof Synapse;
-		if (isSynapsePlace) {
-			String entityId = ((Synapse) currentPlace).getEntityId();
-			EntityBundleRequest bundleRequest = new EntityBundleRequest();
-			bundleRequest.setIncludeEntityPath(true);
-			jsClient.getEntityBundle(entityId, bundleRequest, new AsyncCallback<EntityBundle>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					showError(caught.getMessage());
-				}
+    @Override
+    public void setSelectedEntity(Reference selected) {
+        synAlert.clear();
+        selectedEntities.clear();
+        selectedEntities.add(selected);
+    }
 
-				public void onSuccess(EntityBundle result) {
-					EntityPath path = result.getPath();
-					List<EntityHeader> pathHeaders = path.getPath();
-					if (pathHeaders.size() > 1) {
-						initialContainerId = pathHeaders.get(1).getId();
-					}
-					renderComponent();
-				}
-			});
-		}
-	}
+    @Override
+    public void setSelectedEntities(List<Reference> selected) {
+        synAlert.clear();
+        selectedEntities.clear();
+        selectedEntities.addAll(selected);
+    }
 
+    @Override
+    public void clearSelectedEntities() {
+        selectedEntities.clear();
+    }
 
-	@Override
-	public void setSelectedEntity(Reference selected) {
-		synAlert.clear();
-		selectedEntities.clear();
-		selectedEntities.add(selected);
-	}
+    @Override
+    public void okClicked() {
+        synAlert.clear();
+        // check for valid selection
+        if (selectedEntities == null || selectedEntities.isEmpty()) {
+            synAlert.showError(DisplayConstants.PLEASE_MAKE_SELECTION);
+        } else {
+            fireEntitiesSelected();
+        }
+    }
 
-	@Override
-	public void setSelectedEntities(List<Reference> selected) {
-		synAlert.clear();
-		selectedEntities.clear();
-		selectedEntities.addAll(selected);
-	}
+    @Override
+    public void renderComponent() {
+        // get the entity path, and ask for each entity to add to the tree
+        Place currentPlace = globalApplicationState.getCurrentPlace();
+        boolean isSynapsePlace = currentPlace instanceof Synapse;
+        if (isSynapsePlace) {
+            String entityId = ((Synapse) currentPlace).getEntityId();
+            EntityBundleRequest bundleRequest = new EntityBundleRequest();
+            bundleRequest.setIncludeEntityPath(true);
+            jsClient.getEntityBundle(entityId, bundleRequest, new AsyncCallback<EntityBundle>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                    showError(caught.getMessage());
+                }
 
-	@Override
-	public void clearSelectedEntities() {
-		selectedEntities.clear();
-	}
+                public void onSuccess(EntityBundle result) {
+                    EntityPath path = result.getPath();
+                    List<EntityHeader> pathHeaders = path.getPath();
+                    if (pathHeaders.size() > 2) {
+                        initialContainerId = pathHeaders.get(pathHeaders.size() - 2).getId();
+                    } else {
+                        initialContainerId = pathHeaders.get(pathHeaders.size() - 1).getId();
+                    }
+                    view.renderComponent(initialContainerId, showVersions, multiSelect, visibleFilter, selectableFilter);
 
-	@Override
-	public void okClicked() {
-		synAlert.clear();
-		// check for valid selection
-		if (selectedEntities == null || selectedEntities.isEmpty()) {
-			synAlert.showError(DisplayConstants.PLEASE_MAKE_SELECTION);
-		} else {
-			fireEntitiesSelected();
-		}
-	}
+                }
+            });
+        }
 
-	@Override
-	public void renderComponent() {
-		view.renderComponent(initialContainerId, showVersions, multiSelect, visibleFilter, selectableFilter);
-	}
+    }
 
-	private void fireEntitiesSelected() {
-		if (selectedHandler != null) {
-			selectedHandler.onSelected(selectedEntities.get(0));
-		}
-		if (selectedMultiHandler != null) {
-			selectedMultiHandler.onSelected(selectedEntities);
-		}
-	}
+    private void fireEntitiesSelected() {
+        if (selectedHandler != null) {
+            selectedHandler.onSelected(selectedEntities.get(0));
+        }
+        if (selectedMultiHandler != null) {
+            selectedMultiHandler.onSelected(selectedEntities);
+        }
+    }
 
-	@Override
-	public void show() {
-		view.clear();
-		view.show();
-	}
+    @Override
+    public void show() {
+        view.clear();
+        view.show();
+    }
 
-	@Override
-	public void hide() {
-		// save area
-		view.hide();
-	}
+    @Override
+    public void hide() {
+        // save area
+        view.hide();
+    }
 
-	@Override
-	public void clearState() {
-		view.clear();
-	}
+    @Override
+    public void clearState() {
+        view.clear();
+    }
 
-	public void showError(String error) {
-		synAlert.showError(error);
-	}
+    public void showError(String error) {
+        synAlert.showError(error);
+    }
 
-	@Override
-	public Widget asWidget() {
-		return view.asWidget();
-	}
+    @Override
+    public Widget asWidget() {
+        return view.asWidget();
+    }
 }

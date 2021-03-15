@@ -724,7 +724,7 @@ public interface PortalGinInjector extends Ginjector {
 
 	EditProjectMetadataModalWidget getEditProjectMetadataModalWidget();
 
-	EntityFinder getEntityFinder();
+	EntityFinder.Builder getEntityFinderBuilder();
 
 	UploadDialogWidget getUploadDialogWidget();
 
