@@ -18,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
@@ -80,7 +79,7 @@ public class EntityContainerListWidgetTest {
 		assertTrue(widget.getEntityIds().isEmpty());
 
 		boolean showVersions = false;
-		verify(mockEntityFinder).configureMulti(eq(EntityFilter.CONTAINER), eq(showVersions), any(SelectedHandler.class));
+		verify(mockEntityFinder).configureMulti(eq(EntityFilter.CONTAINER), eq(showVersions), any(EntityFinder.SelectedHandler.class));
 	}
 
 	@Test
@@ -93,7 +92,7 @@ public class EntityContainerListWidgetTest {
 		assertEquals(1, widget.getEntityIds().size());
 
 		boolean showVersions = false;
-		verify(mockEntityFinder).configureMulti(eq(EntityFilter.PROJECT), eq(showVersions), any(SelectedHandler.class));
+		verify(mockEntityFinder).configureMulti(eq(EntityFilter.PROJECT), eq(showVersions), any(EntityFinder.SelectedHandler.class));
 
 		widget.configure(Collections.singletonList(headerId), canEdit, TableType.files);
 		assertTrue(widget.getEntityIds().contains(headerId));

@@ -7,7 +7,6 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
@@ -41,16 +40,16 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 		this.jsClient = jsClient;
 
 		view.setPresenter(this);
-		entityFinder.configure(EntityFilter.ALL_BUT_LINK, true, new SelectedHandler<Reference>() {
+		entityFinder.configure(EntityFilter.ALL_BUT_LINK, true, new EntityFinder.SelectedHandler<Reference>() {
 			@Override
-			public void onSelected(Reference selected) {
+			public void onSelected(Reference selected, EntityFinder finder) {
 				entitySelected(selected);
 			}
 		});
 
-		indexEntityFinder.configure(EntityFilter.ALL_BUT_LINK, true, new SelectedHandler<Reference>() {
+		indexEntityFinder.configure(EntityFilter.ALL_BUT_LINK, true, new EntityFinder.SelectedHandler<Reference>() {
 			@Override
-			public void onSelected(Reference selected) {
+			public void onSelected(Reference selected, EntityFinder finder) {
 				indexEntitySelected(selected);
 			}
 		});

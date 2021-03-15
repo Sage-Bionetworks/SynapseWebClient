@@ -8,7 +8,6 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
@@ -137,10 +136,10 @@ public class EntityFinderImpl implements EntityFinder, EntityFinderView.Presente
 
 	private void fireEntitiesSelected() {
 		if (selectedHandler != null) {
-			selectedHandler.onSelected(selectedEntities.get(0));
+			selectedHandler.onSelected(selectedEntities.get(0), this);
 		}
 		if (selectedMultiHandler != null) {
-			selectedMultiHandler.onSelected(selectedEntities);
+			selectedMultiHandler.onSelected(selectedEntities, this);
 		}
 
 	}

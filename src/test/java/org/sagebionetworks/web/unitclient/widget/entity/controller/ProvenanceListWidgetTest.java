@@ -14,7 +14,6 @@ import org.junit.Test;
 import org.mockito.AdditionalMatchers;
 import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
@@ -80,11 +79,11 @@ public class ProvenanceListWidgetTest {
 	@Test
 	public void testAddEntityRow() {
 		presenter.addEntityRow();
-		ArgumentCaptor<SelectedHandler> captor = ArgumentCaptor.forClass(SelectedHandler.class);
+		ArgumentCaptor<EntityFinder.SelectedHandler> captor = ArgumentCaptor.forClass(EntityFinder.SelectedHandler.class);
 		verify(mockEntityFinder).clearState();
 		verify(mockEntityFinder).configure(eq(true), captor.capture());
 		verify(mockEntityFinder).show();
-		captor.getValue().onSelected(mockRef);
+		captor.getValue().onSelected(mockRef, mockEntityFinder);
 		verify(mockEntityProvEntry).configure(targetId, version.toString());
 		verify(mockEntityProvEntry).setAnchorTarget(anyString());
 		verify(mockEntityProvEntry).setRemoveCallback(any(Callback.class));

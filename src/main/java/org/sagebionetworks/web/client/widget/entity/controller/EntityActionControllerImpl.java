@@ -39,7 +39,6 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -1201,7 +1200,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		getEntityFinderBuilder()
 				.setSelectableFilter(CONTAINER)
 				.setShowVersions(false)
-				.setSelectedHandler(selected -> createLink(selected.getTargetId()))
+				.setSelectedHandler((selected, entityFinder) -> {
+					createLink(selected.getTargetId());
+					entityFinder.hide();
+				})
+				.setModalTitle("Create Link to " + entityTypeDisplay)
+				.setPromptCopy("Find a destination and place a link to " + entity.getId())
+				.setSelectedCopy("Destination")
+				.setConfirmButtonCopy("Create Link")
 				.build()
 				.show();
 	}
@@ -1266,7 +1272,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		getEntityFinderBuilder()
 				.setSelectableFilter(filter)
 				.setShowVersions(false)
-				.setSelectedHandler(selected -> moveEntity(selected.getTargetId()))
+				.setSelectedHandler((selected, finder) -> {
+					moveEntity(selected.getTargetId());
+					finder.hide();
+				})
 				.build()
 				.show();
 	}

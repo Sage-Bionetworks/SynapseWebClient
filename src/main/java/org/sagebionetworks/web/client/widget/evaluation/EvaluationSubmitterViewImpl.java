@@ -19,7 +19,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder.SelectedHandler;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -185,7 +185,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		entityFinderButton.addClickHandler(event -> {
 			entityFinder.configure(true, new SelectedHandler<Reference>() {
 				@Override
-				public void onSelected(Reference selected) {
+				public void onSelected(Reference selected, EntityFinder finder) {
 					if (selected.getTargetId() != null) {
 						selectedReference = selected;
 						selectedText.setText(DisplayUtils.createEntityVersionString(selected));

@@ -72,7 +72,7 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 		this.entityFinder = entityFinder;
 		this.cookies = cookies;
 		findProjectButton.addClickHandler(event -> {
-			entityFinder.configure(EntityFilter.PROJECT, false, selectedRef -> {
+			entityFinder.configure(EntityFilter.PROJECT, false, (selectedRef, finder) -> {
 				challengeProjectField.setValue(selectedRef.getTargetId());
 				entityFinder.hide();
 			});
@@ -80,21 +80,21 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 		});
 
 		findFormContainerButton.addClickHandler(event -> {
-			entityFinder.configure(EntityFilter.CONTAINER, false, selectedRef -> {
+			entityFinder.configure(EntityFilter.CONTAINER, false, (selectedRef, finder) -> {
 				formContainerIdField.setValue(selectedRef.getTargetId());
 				entityFinder.hide();
 			});
 			entityFinder.show();
 		});
 		findSchemaFileButton.addClickHandler(event -> {
-			entityFinder.configure(EntityFilter.ALL_BUT_LINK, false, selectedRef -> {
+			entityFinder.configure(EntityFilter.ALL_BUT_LINK, false, (selectedRef, finder) -> {
 				schemaFileSynIdField.setValue(selectedRef.getTargetId());
 				entityFinder.hide();
 			});
 			entityFinder.show();
 		});
 		findUiSchemaFileButton.addClickHandler(event -> {
-			entityFinder.configure(EntityFilter.ALL_BUT_LINK, false, selectedRef -> {
+			entityFinder.configure(EntityFilter.ALL_BUT_LINK, false, (selectedRef, finder) -> {
 				uiSchemaFileSynIdField.setValue(selectedRef.getTargetId());
 				entityFinder.hide();
 			});

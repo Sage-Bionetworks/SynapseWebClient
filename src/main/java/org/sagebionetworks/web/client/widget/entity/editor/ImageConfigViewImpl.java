@@ -8,7 +8,6 @@ import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.ValidationUtils;
@@ -98,9 +97,9 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		findEntitiesButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				entityFinder.configure(EntityFilter.ALL_BUT_LINK, true, new SelectedHandler<Reference>() {
+				entityFinder.configure(EntityFilter.ALL_BUT_LINK, true, new EntityFinder.SelectedHandler<Reference>() {
 					@Override
-					public void onSelected(Reference selected) {
+					public void onSelected(Reference selected, EntityFinder entityFinder) {
 						entityField.setValue(DisplayUtils.createEntityVersionString(selected));
 						entityFinder.hide();
 					}

@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -36,12 +38,19 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 	private Presenter presenter;
 
 	private AuthenticationController authController;
+	private SynapseJSNIUtils jsniUtils;
 
 	// the modal dialog
 	private Modal modal;
 
 	@UiField
 	ReactComponentDiv entityFinderContainer;
+
+	@UiField
+	Heading modalTitle;
+	@UiField
+	Paragraph promptCopy;
+
 
 	@UiField
 	Button okButton;
@@ -58,22 +67,20 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 		this.modal = (Modal) uiBinder.createAndBindUi(this);
 
 		this.authController = authenticationController;
+		this.jsniUtils = jsniUtils;
 
 		okButton.addClickHandler(event -> {
 			presenter.okClicked();
-			jsniUtils.unmountComponentAtNode(entityFinderContainer.getElement());
-			modal.hide();
 		});
 		okButton.addDomHandler(DisplayUtils.getPreventTabHandler(okButton), KeyDownEvent.getType());
 		cancelButton.addClickHandler(event -> {
-			jsniUtils.unmountComponentAtNode(entityFinderContainer.getElement());
-			modal.hide();
+			this.hide();
 		});
 	}
 
 
 	@Override
-	public void renderComponent(String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter visibleEntityTypes, EntityFilter selectableEntityTypes) {
+	public void renderComponent(String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter visibleEntityTypes, EntityFilter selectableEntityTypes, String selectedCopy) {
 		entityFinderContainer.clear();
 		_showEntityFinderReactComponent(
 				entityFinderContainer.getElement(),
@@ -83,6 +90,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 				toJsArray(selectableEntityTypes),
 				showVersions,
 				multiSelect,
+				selectedCopy,
 				result -> {
 					List<Reference> selected = new ArrayList<>();
 					for (int i = 0; i < result.length(); i++) {
@@ -134,6 +142,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 
 	@Override
 	public void hide() {
+		this.jsniUtils.unmountComponentAtNode(entityFinderContainer.getElement());
 		modal.hide();
 	}
 
@@ -151,6 +160,21 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 	public void setSynAlert(Widget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
+	}
+
+	@Override
+	public void setModalTitle(String modalTitle) {
+		this.modalTitle.setText(modalTitle);
+	}
+
+	@Override
+	public void setPromptCopy(String promptCopy) {
+		this.promptCopy.setText(promptCopy);
+	}
+
+	@Override
+	public void setConfirmButtonCopy(String confirmButtonCopy) {
+		this.okButton.setText(confirmButtonCopy);
 	}
 
 	public static class ReferenceJso extends JavaScriptObject {
@@ -174,7 +198,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 		return r;
 	}
 
-	private static native void _showEntityFinderReactComponent(Element el, String sessionToken, String initialContainerId, JsArrayString visible, JsArrayString selectable, boolean showVersions, boolean multiSelect, OnSelectCallback onSelectedCallback) /*-{
+	private static native void _showEntityFinderReactComponent(Element el, String sessionToken, String initialContainerId, JsArrayString visible, JsArrayString selectable, boolean showVersions, boolean multiSelect, String selectedCopy, OnSelectCallback onSelectedCallback) /*-{
 		try {
 			var callback = function(selected) {
 				console.log(selected);

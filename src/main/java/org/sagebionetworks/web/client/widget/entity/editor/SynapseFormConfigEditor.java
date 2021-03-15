@@ -5,10 +5,10 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder.SelectedHandler;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -22,23 +22,25 @@ public class SynapseFormConfigEditor implements SynapseFormConfigView.Presenter,
 	EntityFinder entityFinder;
 
 	@Inject
-	public SynapseFormConfigEditor(SynapseFormConfigView view, EntityFinder entityFinder) {
+	public SynapseFormConfigEditor(SynapseFormConfigView view, EntityFinder.Builder entityFinderBuilder) {
 		this.view = view;
-		this.entityFinder = entityFinder;
+
 		view.setPresenter(this);
 		view.initView();
 
-		configureEntityFinder();
+		this.entityFinder = configureEntityFinder(entityFinderBuilder);
 	}
 
-	private void configureEntityFinder() {
-		entityFinder.configure(EntityFilter.PROJECT_OR_TABLE, true, new SelectedHandler<Reference>() {
-			@Override
-			public void onSelected(Reference selected) {
-				view.setEntityId(selected.getTargetId());
-				entityFinder.hide();
-			}
-		});
+	private EntityFinder configureEntityFinder(EntityFinder.Builder builder) {
+		return builder.setSelectableFilter(EntityFilter.PROJECT_OR_TABLE)
+				.setShowVersions(true)
+				.setSelectedHandler(new SelectedHandler<Reference>() {
+					@Override
+					public void onSelected(Reference selected, EntityFinder entityFinder) {
+						view.setEntityId(selected.getTargetId());
+						entityFinder.hide();
+					}
+				}).build();
 	}
 
 	@Override

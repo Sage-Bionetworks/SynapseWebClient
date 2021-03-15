@@ -29,13 +29,13 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderArea;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderView;
@@ -82,7 +82,7 @@ public class EntityFinderImplTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testLoadEntity() throws Exception {
-		SelectedHandler mockHandler = mock(SelectedHandler.class);
+		EntityFinder.SelectedHandler mockHandler = mock(EntityFinder.SelectedHandler.class);
 		entityFinder.configure(true, mockHandler);
 		verify(mockView).setMultiVisible(false);
 
@@ -103,7 +103,7 @@ public class EntityFinderImplTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testLoadMultiEntityComma() throws Exception {
-		SelectedHandler mockHandler = mock(SelectedHandler.class);
+		EntityFinder.SelectedHandler mockHandler = mock(EntityFinder.SelectedHandler.class);
 		entityFinder.configureMulti(EntityFilter.ALL, true, mockHandler);
 		verify(mockView).setMultiVisible(true);
 
@@ -131,7 +131,7 @@ public class EntityFinderImplTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testLoadMultiEntitySpace() throws Exception {
-		SelectedHandler mockHandler = mock(SelectedHandler.class);
+		EntityFinder.SelectedHandler mockHandler = mock(EntityFinder.SelectedHandler.class);
 		entityFinder.configureMulti(EntityFilter.ALL, true, mockHandler);
 
 		String name = "name";
@@ -158,7 +158,7 @@ public class EntityFinderImplTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testLoadEntityFail() throws Exception {
-		SelectedHandler mockHandler = mock(SelectedHandler.class);
+		EntityFinder.SelectedHandler mockHandler = mock(EntityFinder.SelectedHandler.class);
 		entityFinder.configure(true, mockHandler);
 
 		String name = "name";
@@ -177,7 +177,7 @@ public class EntityFinderImplTest {
 	}
 
 	public void testLookupEntityEmptyResults() throws Exception {
-		entityFinder.configure(true, mock(SelectedHandler.class));
+		entityFinder.configure(true, mock(EntityFinder.SelectedHandler.class));
 		AsyncMockStubber.callSuccessWith(new ArrayList<>()).when(mockJsClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
 		CallbackP<List<EntityHeader>> mockCallback = mock(CallbackP.class);
 
@@ -217,7 +217,7 @@ public class EntityFinderImplTest {
 
 	@Test
 	public void testSelectionHandlerAnyType() throws Exception {
-		SelectedHandler mockHandler = mock(SelectedHandler.class);
+		EntityFinder.SelectedHandler mockHandler = mock(EntityFinder.SelectedHandler.class);
 		entityFinder.configure(true, mockHandler);
 
 		// then the view calls okClicked if the user has clicked ok in the entity finder
@@ -235,36 +235,36 @@ public class EntityFinderImplTest {
 		// the view usually sets the selected entity in the presenter
 		entityFinder.setSelectedEntity(mockReference);
 		entityFinder.okClicked();
-		verify(mockHandler).onSelected(mockReference);
+		verify(mockHandler).onSelected(mockReference, entityFinder);
 	}
 
-	private void verifyWrongEntityTypeSelected(ArrayList<EntityHeader> entitySelected, SelectedHandler mockSelectionHandler) {
+	private void verifyWrongEntityTypeSelected(ArrayList<EntityHeader> entitySelected, EntityFinder.SelectedHandler mockSelectionHandler) {
 		reset(mockSynAlert, mockSelectionHandler);
 		AsyncMockStubber.callSuccessWith(entitySelected).when(mockJsClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
 		entityFinder.okClicked();
 		verify(mockSynAlert).showError(anyString());
-		verify(mockSelectionHandler, never()).onSelected(any(Reference.class));
+		verify(mockSelectionHandler, never()).onSelected(any(Reference.class), eq(entityFinder));
 	}
 
-	private void verifyCorrectEntityTypeSelected(ArrayList<EntityHeader> results, SelectedHandler mockSelectionHandler) {
+	private void verifyCorrectEntityTypeSelected(ArrayList<EntityHeader> results, EntityFinder.SelectedHandler mockSelectionHandler) {
 		reset(mockSynAlert, mockSelectionHandler);
 		AsyncMockStubber.callSuccessWith(results).when(mockJsClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
 		entityFinder.okClicked();
 		verify(mockSynAlert, never()).showError(anyString());
-		verify(mockSelectionHandler).onSelected(any(Reference.class));
+		verify(mockSelectionHandler).onSelected(any(Reference.class), eq(entityFinder));
 	}
 
-	private void verifySelectedWithoutTypeCheck(SelectedHandler mockSelectionHandler) {
+	private void verifySelectedWithoutTypeCheck(EntityFinder.SelectedHandler mockSelectionHandler) {
 		reset(mockSynAlert, mockSelectionHandler);
 		entityFinder.okClicked();
 		verify(mockJsClient, never()).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
 		verify(mockSynAlert, never()).showError(anyString());
-		verify(mockSelectionHandler).onSelected(any(Reference.class));
+		verify(mockSelectionHandler).onSelected(any(Reference.class), eq(entityFinder));
 	}
 
 	@Test
 	public void testAllFilter() throws Exception {
-		SelectedHandler mockHandler = mock(SelectedHandler.class);
+		EntityFinder.SelectedHandler mockHandler = mock(EntityFinder.SelectedHandler.class);
 		entityFinder.configure(EntityFilter.ALL, true, mockHandler);
 		Reference mockReference = mock(Reference.class);
 		when(mockReference.getTargetId()).thenReturn("syn99");
@@ -282,7 +282,7 @@ public class EntityFinderImplTest {
 
 	@Test
 	public void testProjectFilter() throws Exception {
-		SelectedHandler mockHandler = mock(SelectedHandler.class);
+		EntityFinder.SelectedHandler mockHandler = mock(EntityFinder.SelectedHandler.class);
 		entityFinder.configure(EntityFilter.PROJECT, true, mockHandler);
 		Reference mockReference = mock(Reference.class);
 		when(mockReference.getTargetId()).thenReturn("syn99");
@@ -298,7 +298,7 @@ public class EntityFinderImplTest {
 
 	@Test
 	public void testFileFilter() throws Exception {
-		SelectedHandler mockHandler = mock(SelectedHandler.class);
+		EntityFinder.SelectedHandler mockHandler = mock(EntityFinder.SelectedHandler.class);
 		entityFinder.configure(EntityFilter.FILE, true, mockHandler);
 		Reference mockReference = mock(Reference.class);
 		when(mockReference.getTargetId()).thenReturn("syn99");
@@ -314,7 +314,7 @@ public class EntityFinderImplTest {
 
 	@Test
 	public void testContainerFilter() throws Exception {
-		SelectedHandler mockHandler = mock(SelectedHandler.class);
+		EntityFinder.SelectedHandler mockHandler = mock(EntityFinder.SelectedHandler.class);
 		entityFinder.configure(EntityFilter.CONTAINER, true, mockHandler);
 		Reference mockReference = mock(Reference.class);
 		when(mockReference.getTargetId()).thenReturn("syn99");

@@ -17,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SelectableItemList;
@@ -87,7 +86,7 @@ public class EntityListConfigEditorTest {
 	public void testAddRecord() throws Exception {
 		editor.onAddRecord();
 		boolean showVersions = true;
-		ArgumentCaptor<SelectedHandler> captor = ArgumentCaptor.forClass(SelectedHandler.class);
+		ArgumentCaptor<EntityFinder.SelectedHandler> captor = ArgumentCaptor.forClass(EntityFinder.SelectedHandler.class);
 		verify(mockEntityFinder).configure(eq(showVersions), captor.capture());
 		verify(mockEntityFinder).show();
 		Reference selectedRef = new Reference();
@@ -95,7 +94,7 @@ public class EntityListConfigEditorTest {
 		Long targetVersion = 9L;
 		selectedRef.setTargetId(targetId);
 		selectedRef.setTargetVersionNumber(targetVersion);
-		captor.getValue().onSelected(selectedRef);
+		captor.getValue().onSelected(selectedRef, mockEntityFinder);
 
 		verify(mockEntityFinder).hide();
 		ArgumentCaptor<EntityGroupRecord> recordCaptor = ArgumentCaptor.forClass(EntityGroupRecord.class);

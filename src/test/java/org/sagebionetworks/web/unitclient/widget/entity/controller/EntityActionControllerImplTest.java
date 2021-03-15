@@ -78,7 +78,6 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -234,7 +233,7 @@ public class EntityActionControllerImplTest {
 	@Mock
 	SynapseProperties mockSynapseProperties;
 	@Captor
-	ArgumentCaptor<SelectedHandler<Reference>> entityFinderSelectedHandlerCaptor;
+	ArgumentCaptor<EntityFinder.SelectedHandler<Reference>> entityFinderSelectedHandlerCaptor;
 	@Captor
 	ArgumentCaptor<CallbackP<List<String>>> callbackListStringCaptor;
 	@Captor
@@ -318,8 +317,8 @@ public class EntityActionControllerImplTest {
 			@Override
 			public Void answer(InvocationOnMock invocation) throws Throwable {
 				verify(mockEntityFinderBuilder).setSelectedHandler(entityFinderSelectedHandlerCaptor.capture());
-				SelectedHandler<Reference> handler = entityFinderSelectedHandlerCaptor.getValue();
-				handler.onSelected(selected);
+				EntityFinder.SelectedHandler<Reference> handler = entityFinderSelectedHandlerCaptor.getValue();
+				handler.onSelected(selected, mockEntityFinder);
 				return null;
 			}
 		}).when(mockEntityFinder).show();
@@ -1238,7 +1237,7 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(new Folder());
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.MOVE_ENTITY);
-		verify(mockEntityFinder, never()).configure(anyBoolean(), any(SelectedHandler.class));
+		verify(mockEntityFinder, never()).configure(anyBoolean(), any(EntityFinder.SelectedHandler.class));
 		verify(mockEntityFinder, never()).show();
 		verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
 	}
@@ -1255,6 +1254,7 @@ public class EntityActionControllerImplTest {
 		verify(mockEntityFinderBuilder).setShowVersions(false);
 		verify(mockEntityFinderBuilder).build();
 		verify(mockEntityFinder).show();
+		verify(mockEntityFinder).hide();
 		verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
 		verify(mockView).showErrorMessage(error);
 	}
@@ -1271,9 +1271,10 @@ public class EntityActionControllerImplTest {
 		verify(mockEntityFinderBuilder)
 				.setShowVersions(false);
 		verify(mockEntityFinderBuilder)
-				.setSelectedHandler(any(SelectedHandler.class));
+				.setSelectedHandler(any(EntityFinder.SelectedHandler.class));
 		verify(mockEntityFinderBuilder).build();
 		verify(mockEntityFinder).show();
+		verify(mockEntityFinder).hide();
 		verify(mockSynapseClient).moveEntity(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockEventBus).fireEvent(any(EntityUpdatedEvent.class));
 		verify(mockView, never()).showErrorMessage(anyString());
@@ -1370,7 +1371,7 @@ public class EntityActionControllerImplTest {
 		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.CREATE_LINK);
-		verify(mockEntityFinder, never()).configure(anyBoolean(), any(SelectedHandler.class));
+		verify(mockEntityFinder, never()).configure(anyBoolean(), any(EntityFinder.SelectedHandler.class));
 		verify(mockEntityFinder, never()).show();
 		verify(mockView, never()).showInfo(anyString());
 	}
@@ -1385,6 +1386,7 @@ public class EntityActionControllerImplTest {
 		verify(mockEntityFinderBuilder).setShowVersions(false);
 		verify(mockEntityFinderBuilder).build();
 		verify(mockEntityFinder).show();
+		verify(mockEntityFinder).hide();
 		verify(mockView).showInfo(DisplayConstants.TEXT_LINK_SAVED);
 	}
 

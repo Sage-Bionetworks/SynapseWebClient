@@ -20,7 +20,6 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditor;
@@ -87,8 +86,8 @@ public class BiodallianceSourceEditorTest {
 	@Test
 	public void testConstructorAndUpdateViewFromSource() {
 		verify(mockView).setPresenter(editor);
-		verify(mockEntityFinder).configure(eq(EntityFilter.ALL_BUT_LINK), eq(true), any(SelectedHandler.class));
-		verify(mockIndexEntityFinder).configure(eq(EntityFilter.ALL_BUT_LINK), eq(true), any(SelectedHandler.class));
+		verify(mockEntityFinder).configure(eq(EntityFilter.ALL_BUT_LINK), eq(true), any(EntityFinder.SelectedHandler.class));
+		verify(mockIndexEntityFinder).configure(eq(EntityFilter.ALL_BUT_LINK), eq(true), any(EntityFinder.SelectedHandler.class));
 
 		verify(mockView).setSourceName(sourceName);
 		verify(mockView).setEntityFinderText(entityId + "." + version);

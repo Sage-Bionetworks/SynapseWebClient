@@ -6,10 +6,11 @@ import java.util.List;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder.SelectedHandler;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderV2Impl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -38,7 +39,7 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 		entityIds = new ArrayList<String>();
 		selectionHandler = new SelectedHandler<List<Reference>>() {
 			@Override
-			public void onSelected(List<Reference> selected) {
+			public void onSelected(List<Reference> selected, EntityFinder finder) {
 				for (Reference ref : selected) {
 					onAddProject(ref.getTargetId());
 				}

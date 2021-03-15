@@ -5,7 +5,6 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -50,9 +49,9 @@ public class CytoscapeConfigViewImpl implements CytoscapeConfigView {
 		return new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent arg0) {
-				entityFinder.configure(EntityFilter.ALL_BUT_LINK, false, new SelectedHandler<Reference>() {
+				entityFinder.configure(EntityFilter.ALL_BUT_LINK, false, new EntityFinder.SelectedHandler<Reference>() {
 					@Override
-					public void onSelected(Reference selected) {
+					public void onSelected(Reference selected, EntityFinder finder) {
 						textBox.setValue(selected.getTargetId());
 						entityFinder.hide();
 					}

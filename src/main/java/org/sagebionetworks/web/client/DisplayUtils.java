@@ -807,10 +807,6 @@ public class DisplayUtils {
 		return fileHandle;
 	}
 
-	public interface SelectedHandler<T> {
-		public void onSelected(T selected);
-	}
-
 	public static void updateWidgetSelectionState(WidgetSelectionState state, String text, int cursorPos) {
 		state.setWidgetSelected(false);
 		state.setWidgetStartIndex(-1);

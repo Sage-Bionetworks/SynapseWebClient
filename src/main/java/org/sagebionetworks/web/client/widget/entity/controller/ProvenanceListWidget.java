@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
@@ -52,9 +51,9 @@ public class ProvenanceListWidget implements ProvenanceListWidgetView.Presenter,
 	@Override
 	public void addEntityRow() {
 		entityFinder.clearState();
-		entityFinder.configure(true, new SelectedHandler<Reference>() {
+		entityFinder.configure(true, new EntityFinder.SelectedHandler<Reference>() {
 			@Override
-			public void onSelected(Reference ref) {
+			public void onSelected(Reference ref, EntityFinder finder) {
 				if (ref.getTargetId() != null) {
 					final EntityRefProvEntryView newEntry = ginInjector.getEntityRefEntry();
 					rows.add(newEntry);

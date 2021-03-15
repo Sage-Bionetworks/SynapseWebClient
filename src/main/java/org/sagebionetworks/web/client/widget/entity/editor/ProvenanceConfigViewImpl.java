@@ -6,7 +6,6 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -47,9 +46,9 @@ public class ProvenanceConfigViewImpl implements ProvenanceConfigView {
 		entityFinderButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				entityFinder.configure(true, new SelectedHandler<Reference>() {
+				entityFinder.configure(true, new EntityFinder.SelectedHandler<Reference>() {
 					@Override
-					public void onSelected(Reference selected) {
+					public void onSelected(Reference selected, EntityFinder finder) {
 						if (selected.getTargetId() != null) {
 							appendEntityListValue(selected);
 							entityFinder.hide();

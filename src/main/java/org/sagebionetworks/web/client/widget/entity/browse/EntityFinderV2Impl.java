@@ -11,7 +11,6 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -40,6 +39,7 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
     private EntityFilter selectableFilter;
     private SelectedHandler<Reference> selectedHandler;
     private SelectedHandler<List<Reference>> selectedMultiHandler;
+
 
     private String modalTitle;
     private String promptCopy;
@@ -71,6 +71,20 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         this.view.setSynAlert(this.synAlert.asWidget());
 
         // Configuration
+        if (builder.modalTitle != null) {
+            this.view.setModalTitle(builder.modalTitle);
+        }
+        if (builder.promptCopy != null) {
+            this.view.setPromptCopy(builder.promptCopy);
+        }
+        if (builder.confirmButtonCopy != null) {
+            this.view.setConfirmButtonCopy(builder.confirmButtonCopy);
+        }
+
+        modalTitle = builder.modalTitle;
+        promptCopy = builder.promptCopy;
+        selectedCopy = builder.selectedCopy;
+        modalTitle = builder.modalTitle;
         multiSelect = builder.multiSelect;
         initialContainerId = builder.initialContainerId;
         selectedHandler = builder.selectedHandler;
@@ -88,9 +102,9 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         private SynapseAlert synAlert;
         private SynapseJavascriptClient jsClient;
 
-        private SelectedHandler<Reference> selectedHandler = selected -> {
+        private SelectedHandler<Reference> selectedHandler = (selected, finder) -> {
         };
-        private SelectedHandler<List<Reference>> selectedMultiHandler = selected -> {
+        private SelectedHandler<List<Reference>> selectedMultiHandler = (selected, finder) -> {
         };
 
         private boolean showVersions = false;
@@ -237,7 +251,6 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
 
     }
 
-
     @Override
     public void setSelectedEntity(Reference selected) {
         synAlert.clear();
@@ -291,7 +304,7 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
                     } else {
                         initialContainerId = pathHeaders.get(pathHeaders.size() - 1).getId();
                     }
-                    view.renderComponent(initialContainerId, showVersions, multiSelect, visibleFilter, selectableFilter);
+                    view.renderComponent(initialContainerId, showVersions, multiSelect, visibleFilter, selectableFilter, selectedCopy);
 
                 }
             });
@@ -301,10 +314,10 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
 
     private void fireEntitiesSelected() {
         if (selectedHandler != null) {
-            selectedHandler.onSelected(selectedEntities.get(0));
+            selectedHandler.onSelected(selectedEntities.get(0), this);
         }
         if (selectedMultiHandler != null) {
-            selectedMultiHandler.onSelected(selectedEntities);
+            selectedMultiHandler.onSelected(selectedEntities, this);
         }
     }
 
@@ -316,7 +329,6 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
 
     @Override
     public void hide() {
-        // save area
         view.hide();
     }
 

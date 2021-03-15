@@ -3,17 +3,27 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 
 public interface EntityFinder {
+
+	/**
+	 * Designed to provide the same functionality as DisplayUtils.SelectedHandler,
+	 * except also providing the finder itself. This allows the caller to access methods
+	 * on the EntityFinder in the handler, which is specified prior to calling the Builder.build()
+	 * @param <T>
+	 */
+	@FunctionalInterface
+	public interface SelectedHandler<T> {
+		public void onSelected(T selected, EntityFinder entityFinder);
+	}
+
 
 	interface Builder {
 		EntityFinder build();
 
-		Builder setSelectedHandler(DisplayUtils.SelectedHandler<Reference> handler);
+		Builder setSelectedHandler(SelectedHandler<Reference> handler);
 
-		Builder setSelectedMultiHandler(DisplayUtils.SelectedHandler<List<Reference>> handler);
+		Builder setSelectedMultiHandler(SelectedHandler<List<Reference>> handler);
 
 		Builder setMultiSelect(boolean multiSelect);
 

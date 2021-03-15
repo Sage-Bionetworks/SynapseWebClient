@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CheckBoxState;
@@ -88,9 +87,9 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 
 	@Override
 	public void onAddRecord() {
-		entityFinder.configure(true, new SelectedHandler<Reference>() {
+		entityFinder.configure(true, new EntityFinder.SelectedHandler<Reference>() {
 			@Override
-			public void onSelected(Reference selected) {
+			public void onSelected(Reference selected, EntityFinder finder) {
 				entityFinder.hide();
 				EntityGroupRecord record = createRecord(selected.getTargetId(), selected.getTargetVersionNumber(), null);
 				entityListWidget.addRecord(record);
