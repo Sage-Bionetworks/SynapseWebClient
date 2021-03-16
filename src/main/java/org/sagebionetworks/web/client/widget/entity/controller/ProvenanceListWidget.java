@@ -20,11 +20,33 @@ public class ProvenanceListWidget implements ProvenanceListWidgetView.Presenter,
 	ProvenanceURLDialogWidget urlDialog;
 
 	@Inject
-	public ProvenanceListWidget(final ProvenanceListWidgetView view, final PortalGinInjector ginInjector) {
+	public ProvenanceListWidget(final ProvenanceListWidgetView view, final PortalGinInjector ginInjector, final EntityFinder.Builder entityFinderBuilder) {
 		this.view = view;
 		this.ginInjector = ginInjector;
 		rows = new LinkedList<ProvenanceEntry>();
 		this.view.setPresenter(this);
+
+		this.entityFinder = entityFinderBuilder
+				.setShowVersions(true)
+				.setSelectedHandler((ref, finder) -> {
+					if (ref.getTargetId() != null) {
+						final EntityRefProvEntryView newEntry = ginInjector.getEntityRefEntry();
+						rows.add(newEntry);
+						String targetId = ref.getTargetId();
+						Long version = ref.getTargetVersionNumber();
+						newEntry.configure(targetId, version != null ? version.toString() : "Current");
+						newEntry.setAnchorTarget(DisplayUtils.getSynapseHistoryToken(targetId, version));
+						newEntry.setRemoveCallback(new Callback() {
+							@Override
+							public void invoke() {
+								rows.remove(newEntry);
+								view.removeRow(newEntry);
+							}
+						});
+						view.addRow(newEntry);
+						entityFinder.hide();
+					}
+				}).build();
 	}
 
 	@Override
@@ -51,28 +73,6 @@ public class ProvenanceListWidget implements ProvenanceListWidgetView.Presenter,
 	@Override
 	public void addEntityRow() {
 		entityFinder.clearState();
-		entityFinder.configure(true, new EntityFinder.SelectedHandler<Reference>() {
-			@Override
-			public void onSelected(Reference ref, EntityFinder finder) {
-				if (ref.getTargetId() != null) {
-					final EntityRefProvEntryView newEntry = ginInjector.getEntityRefEntry();
-					rows.add(newEntry);
-					String targetId = ref.getTargetId();
-					Long version = ref.getTargetVersionNumber();
-					newEntry.configure(targetId, version != null ? version.toString() : "Current");
-					newEntry.setAnchorTarget(DisplayUtils.getSynapseHistoryToken(targetId, version));
-					newEntry.setRemoveCallback(new Callback() {
-						@Override
-						public void invoke() {
-							rows.remove(newEntry);
-							view.removeRow(newEntry);
-						}
-					});
-					view.addRow(newEntry);
-					entityFinder.hide();
-				}
-			}
-		});
 		entityFinder.show();
 	}
 
@@ -112,10 +112,6 @@ public class ProvenanceListWidget implements ProvenanceListWidgetView.Presenter,
 
 	public List<ProvenanceEntry> getEntries() {
 		return rows;
-	}
-
-	public void setEntityFinder(final EntityFinder entityFinder) {
-		this.entityFinder = entityFinder;
 	}
 
 	public void setURLDialog(final ProvenanceURLDialogWidget urlDialog) {

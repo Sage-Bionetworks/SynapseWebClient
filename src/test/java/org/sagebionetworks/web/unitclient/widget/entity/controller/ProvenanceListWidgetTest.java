@@ -23,11 +23,13 @@ import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWid
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceURLDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryView;
+import org.sagebionetworks.web.test.helper.SelfReturningAnswer;
 
 public class ProvenanceListWidgetTest {
 
 	ProvenanceListWidgetView mockView;
 	PortalGinInjector mockInjector;
+	EntityFinder.Builder mockEntityFinderBuilder;
 	EntityFinder mockEntityFinder;
 	ProvenanceURLDialogWidget mockUrlDialog;
 	ProvenanceListWidget presenter;
@@ -45,13 +47,14 @@ public class ProvenanceListWidgetTest {
 	public void setup() {
 		mockView = mock(ProvenanceListWidgetView.class);
 		mockInjector = mock(PortalGinInjector.class);
+		mockEntityFinderBuilder = mock(EntityFinder.Builder.class, new SelfReturningAnswer());
 		mockEntityFinder = mock(EntityFinder.class);
 		mockUrlDialog = mock(ProvenanceURLDialogWidget.class);
 		mockRef = mock(Reference.class);
 		mockEntityProvEntry = mock(EntityRefProvEntryView.class);
 		mockURLProvEntry = mock(URLProvEntryView.class);
-		presenter = new ProvenanceListWidget(mockView, mockInjector);
-		presenter.setEntityFinder(mockEntityFinder);
+		when(mockEntityFinderBuilder.build()).thenReturn(mockEntityFinder);
+		presenter = new ProvenanceListWidget(mockView, mockInjector, mockEntityFinderBuilder);
 		presenter.setURLDialog(mockUrlDialog);
 		when(mockInjector.getEntityRefEntry()).thenReturn(mockEntityProvEntry);
 		when(mockInjector.getURLEntry()).thenReturn(mockURLProvEntry);
@@ -80,8 +83,9 @@ public class ProvenanceListWidgetTest {
 	public void testAddEntityRow() {
 		presenter.addEntityRow();
 		ArgumentCaptor<EntityFinder.SelectedHandler> captor = ArgumentCaptor.forClass(EntityFinder.SelectedHandler.class);
+		verify(mockEntityFinderBuilder).setShowVersions(true);
+		verify(mockEntityFinderBuilder).setSelectedHandler(captor.capture());
 		verify(mockEntityFinder).clearState();
-		verify(mockEntityFinder).configure(eq(true), captor.capture());
 		verify(mockEntityFinder).show();
 		captor.getValue().onSelected(mockRef, mockEntityFinder);
 		verify(mockEntityProvEntry).configure(targetId, version.toString());
