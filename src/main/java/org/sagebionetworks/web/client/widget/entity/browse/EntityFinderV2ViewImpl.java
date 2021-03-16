@@ -173,6 +173,11 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 	}
 
 	@Override
+	public void setHelpMarkdown(String helpMarkdown) {
+		this.helpWidget.setHelpMarkdown(helpMarkdown);
+	}
+
+	@Override
 	public void setConfirmButtonCopy(String confirmButtonCopy) {
 		this.okButton.setText(confirmButtonCopy);
 	}

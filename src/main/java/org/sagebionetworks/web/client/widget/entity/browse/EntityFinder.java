@@ -39,6 +39,8 @@ public interface EntityFinder {
 
 		Builder setPromptCopy(String promptCopy);
 
+		Builder setHelpMarkdown(String helpMarkdown);
+
 		Builder setSelectedCopy(String selectedCopy);
 
 		Builder setConfirmButtonCopy(String confirmButtonCopy);

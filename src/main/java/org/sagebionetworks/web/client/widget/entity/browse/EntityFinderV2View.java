@@ -33,6 +33,8 @@ public interface EntityFinderV2View extends SynapseView {
 
 	void setPromptCopy(String promptCopy);
 
+	void setHelpMarkdown(String helpMarkdown);
+
 	void setConfirmButtonCopy(String confirmButtonCopy);
 
 

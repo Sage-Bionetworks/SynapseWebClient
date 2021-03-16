@@ -1201,10 +1201,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				.setSelectableFilter(CONTAINER)
 				.setShowVersions(false)
 				.setSelectedHandler((selected, entityFinder) -> {
-					createLink(selected.getTargetId());
-					entityFinder.hide();
+					createLink(selected.getTargetId(), entityFinder);
 				})
 				.setModalTitle("Create Link to " + entityTypeDisplay)
+				.setHelpMarkdown("Search or Browse to find a Project or Folder that you have access to, and place a symbolic link for easy access")
 				.setPromptCopy("Find a destination and place a link to " + entity.getId())
 				.setSelectedCopy("Destination")
 				.setConfirmButtonCopy("Create Link")
@@ -1217,7 +1217,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * 
 	 * @param target
 	 */
-	public void createLink(String target) {
+	public void createLink(String target, EntityFinder finder) {
 		Link link = new Link();
 		link.setParentId(target);
 		Reference ref = new Reference();
@@ -1235,23 +1235,24 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			@Override
 			public void onSuccess(Entity result) {
 				view.showInfo(DisplayConstants.TEXT_LINK_SAVED);
+				finder.hide();
 			}
 
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught instanceof BadRequestException) {
-					view.showErrorMessage(DisplayConstants.ERROR_CANT_MOVE_HERE);
+					finder.showError(DisplayConstants.ERROR_CANT_MOVE_HERE);
 					return;
 				}
 				if (caught instanceof NotFoundException) {
-					view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
+					finder.showError(DisplayConstants.ERROR_NOT_FOUND);
 					return;
 				}
 				if (caught instanceof UnauthorizedException) {
-					view.showErrorMessage(DisplayConstants.ERROR_NOT_AUTHORIZED);
+					finder.showError(DisplayConstants.ERROR_NOT_AUTHORIZED);
 					return;
 				}
-				view.showErrorMessage(caught.getMessage());
+				finder.showError(caught.getMessage());
 
 			}
 		});
@@ -1270,35 +1271,31 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void postCheckMove() {
 		EntityFilter filter = entityBundle.getEntity() instanceof Table ? PROJECT : CONTAINER;
 		getEntityFinderBuilder()
+				.setModalTitle("Move " + entityTypeDisplay)
+				.setHelpMarkdown("Search or Browse Synapse to find a destination to move this " + entityTypeDisplay)
+				.setPromptCopy("Find a location to move " + entity.getId())
+				.setSelectedCopy("Destination")
+				.setConfirmButtonCopy("Move")
 				.setSelectableFilter(filter)
 				.setShowVersions(false)
 				.setSelectedHandler((selected, finder) -> {
-					moveEntity(selected.getTargetId());
-					finder.hide();
+					String entityId = entityBundle.getEntity().getId();
+					getSynapseClient().moveEntity(entityId, selected.getTargetId(), new AsyncCallback<Entity>() {
+
+						@Override
+						public void onSuccess(Entity result) {
+							finder.hide();
+							fireEntityUpdatedEvent();
+						}
+
+						@Override
+						public void onFailure(Throwable caught) {
+							finder.showError(caught.getMessage());
+						}
+					});
 				})
 				.build()
 				.show();
-	}
-
-	/**
-	 * Move the entity to the given target.
-	 * 
-	 * @param target
-	 */
-	private void moveEntity(String target) {
-		String entityId = entityBundle.getEntity().getId();
-		getSynapseClient().moveEntity(entityId, target, new AsyncCallback<Entity>() {
-
-			@Override
-			public void onSuccess(Entity result) {
-				fireEntityUpdatedEvent();
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
-			}
-		});
 	}
 
 	private void onViewWikiSource() {

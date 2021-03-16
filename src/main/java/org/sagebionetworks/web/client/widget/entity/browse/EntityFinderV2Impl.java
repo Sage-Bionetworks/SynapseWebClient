@@ -77,6 +77,9 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         if (builder.promptCopy != null) {
             this.view.setPromptCopy(builder.promptCopy);
         }
+        if (builder.helpMarkdown != null) {
+            this.view.setHelpMarkdown(builder.helpMarkdown);
+        }
         if (builder.confirmButtonCopy != null) {
             this.view.setConfirmButtonCopy(builder.confirmButtonCopy);
         }
@@ -118,6 +121,7 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         private String promptCopy = "";
         private String selectedCopy = "Selected";
         private String confirmButtonCopy = "Select";
+        private String helpMarkdown = "Finding items in Synapse can be done by either “browsing”, “searching,” or directly entering the Synapse ID.&#10;Alternatively, navigate to the desired location in the current project, favorite projects or projects you own.";
 
         @Inject
         public Builder(EntityFinderV2View view, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController, SynapseAlert synAlert, SynapseJavascriptClient jsClient) {
@@ -190,6 +194,12 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         @Override
         public EntityFinder.Builder setPromptCopy(String promptCopy) {
             this.promptCopy = promptCopy;
+            return this;
+        }
+
+        @Override
+        public EntityFinder.Builder setHelpMarkdown(String helpMarkdown) {
+            this.helpMarkdown = helpMarkdown;
             return this;
         }
 

@@ -1237,7 +1237,7 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(new Folder());
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.MOVE_ENTITY);
-		verify(mockEntityFinder, never()).configure(anyBoolean(), any(EntityFinder.SelectedHandler.class));
+		verify(mockEntityFinderBuilder, never()).build();
 		verify(mockEntityFinder, never()).show();
 		verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
 	}
@@ -1254,9 +1254,9 @@ public class EntityActionControllerImplTest {
 		verify(mockEntityFinderBuilder).setShowVersions(false);
 		verify(mockEntityFinderBuilder).build();
 		verify(mockEntityFinder).show();
-		verify(mockEntityFinder).hide();
+		verify(mockEntityFinder, never()).hide();
 		verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
-		verify(mockView).showErrorMessage(error);
+		verify(mockEntityFinder).showError(error);
 	}
 
 	@Test
@@ -1284,24 +1284,28 @@ public class EntityActionControllerImplTest {
 	public void testCreateLinkBadRequest() {
 		AsyncMockStubber.callFailureWith(new BadRequestException("bad")).when(mockSynapseJavascriptClient).createEntity(any(Entity.class), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		controller.createLink("syn9876");
-		verify(mockView).showErrorMessage(DisplayConstants.ERROR_CANT_MOVE_HERE);
+		controller.createLink("syn9876", mockEntityFinder);
+		verify(mockEntityFinder).showError(DisplayConstants.ERROR_CANT_MOVE_HERE);
+		verify(mockEntityFinder, never()).hide();
 	}
 
 	@Test
 	public void testCreateLinkNotFound() {
 		AsyncMockStubber.callFailureWith(new NotFoundException("not found")).when(mockSynapseJavascriptClient).createEntity(any(Entity.class), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		controller.createLink("syn9876");
-		verify(mockView).showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
+		controller.createLink("syn9876", mockEntityFinder);
+		verify(mockEntityFinder).showError(DisplayConstants.ERROR_NOT_FOUND);
+		verify(mockEntityFinder, never()).hide();
 	}
 
 	@Test
 	public void testCreateLinkUnauthorizedException() {
 		AsyncMockStubber.callFailureWith(new UnauthorizedException("no way")).when(mockSynapseJavascriptClient).createEntity(any(Entity.class), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		controller.createLink("syn9876");
-		verify(mockView).showErrorMessage(DisplayConstants.ERROR_NOT_AUTHORIZED);
+		controller.createLink("syn9876", mockEntityFinder);
+		verify(mockEntityFinder).showError(DisplayConstants.ERROR_NOT_AUTHORIZED);
+		verify(mockEntityFinder, never()).hide();
+
 	}
 
 	@Test
@@ -1309,8 +1313,9 @@ public class EntityActionControllerImplTest {
 		String error = "some error";
 		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseJavascriptClient).createEntity(any(Entity.class), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		controller.createLink("syn9876");
-		verify(mockView).showErrorMessage(error);
+		controller.createLink("syn9876", mockEntityFinder);
+		verify(mockEntityFinder).showError(error);
+		verify(mockEntityFinder, never()).hide();
 	}
 
 	@Test
@@ -1326,9 +1331,10 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, isCurrentVersion, wikiPageId, currentEntityArea);
 		controller.setIsShowingVersion(true);
 		String target = "syn9876";
-		controller.createLink(target);
+		controller.createLink(target, mockEntityFinder);
 		verify(mockView, never()).showErrorMessage(anyString());
 		verify(mockView).showInfo(DisplayConstants.TEXT_LINK_SAVED);
+		verify(mockEntityFinder).hide();
 		Entity capture = argument.getValue();
 		assertNotNull(capture);
 		assertTrue(capture instanceof Link);
@@ -1353,7 +1359,8 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.setIsShowingVersion(false);
 		String target = "syn9876";
-		controller.createLink(target);
+		controller.createLink(target, mockEntityFinder);
+		verify(mockEntityFinder).hide();
 		Entity capture = argument.getValue();
 		assertNotNull(capture);
 		assertTrue(capture instanceof Link);
