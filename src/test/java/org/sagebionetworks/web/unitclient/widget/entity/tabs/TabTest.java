@@ -15,12 +15,15 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
@@ -43,15 +46,21 @@ public class TabTest {
 	ActionMenuWidget mockActionMenu;
 	@Mock
 	EntityBundle mockEntityBundle;
+	@Mock
+	PopupUtilsView mockPopupUtils;
 	
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
+	@Mock
+	CallbackP<Tab> mockOnClickCallback;
+	
 	Tab tab;
 
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		tab = new Tab(mockView, mockGlobalAppState, mockSynapseJSNIUtils, mockGWT, mockActionController, mockActionMenu);
+		tab = new Tab(mockView, mockGlobalAppState, mockSynapseJSNIUtils, mockGWT, mockActionController, mockActionMenu, mockPopupUtils);
+		when(mockGlobalAppState.isEditing()).thenReturn(false);
 		when(mockView.isActive()).thenReturn(true);
 	}
 
@@ -166,4 +175,32 @@ public class TabTest {
 		tab.addTabListItemStyle(style);
 		verify(mockView).addTabListItemStyle(style);
 	}
+	
+	@Test
+	public void testOnTabClicked() {
+		tab.configure("TestTab", "help markdown", "link", EntityArea.FILES);
+		tab.addTabClickedCallback(mockOnClickCallback);
+		
+		tab.onTabClicked();
+		
+		verify(mockOnClickCallback).invoke(tab);
+	}
+
+	@Test
+	public void testOnTabClickedWhileEditing() {
+		when(mockGlobalAppState.isEditing()).thenReturn(true);
+		tab.configure("TestTab", "help markdown", "link", EntityArea.FILES);
+		tab.addTabClickedCallback(mockOnClickCallback);
+		
+		tab.onTabClicked();
+		
+		verify(mockPopupUtils).showConfirmDialog(anyString(), eq(DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE),callbackCaptor.capture());
+		verify(mockOnClickCallback, never()).invoke(tab);
+		
+		//simulate confirm
+		callbackCaptor.getValue().invoke();
+		
+		verify(mockOnClickCallback).invoke(tab);
+	}
+
 }

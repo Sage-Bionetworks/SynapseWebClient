@@ -2,26 +2,23 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import java.util.function.Consumer;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.place.shared.Place;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidget;
-import com.google.inject.Inject;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorReactComponentPage;
+
+import com.google.inject.Inject;
 
 public class ChallengeTab implements ChallengeTabView.Presenter {
 	Tab tab;
@@ -94,6 +91,7 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
 		// a different Evaluation editor
 
 		EvaluationEditorReactComponentPage evaluationEditor = ginInjector.createEvaluationEditorReactComponentPage();
+		globalApplicationState.setIsEditing(true);
 		evaluationEditor.configure(evaluationId,
 				entityId, authenticationController.getCurrentUserSessionToken(),
 				globalApplicationState.isShowingUTCTime(),
@@ -102,6 +100,7 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
 					evaluationEditor.removeFromParent();
 					view.showAdminTabContents();
 					evaluationList.refresh();
+					globalApplicationState.setIsEditing(false);
 				}
 		);
 		view.hideAdminTabContents();
@@ -122,18 +121,6 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
 		actionMenuWidget.setActionListener(Action.ADD_EVALUATION_QUEUE, (Action action) -> {
 			showCreateNewEvaluationEditor(entityId);
 		});
-	}
-
-	private void showOldAddEvaluationQueueModal() {
-		getEvaluationEditorModal().configure(entityId, () -> {});
-		getEvaluationEditorModal().show();
-	}
-
-	private EvaluationEditorModal getEvaluationEditorModal() {
-		if (evalEditor == null) {
-			evalEditor = ginInjector.getEvaluationEditorModal();
-		}
-		return evalEditor;
 	}
 
 	public Tab asTab() {
