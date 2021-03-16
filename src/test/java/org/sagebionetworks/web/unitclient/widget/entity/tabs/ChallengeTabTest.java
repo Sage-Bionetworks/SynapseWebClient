@@ -3,19 +3,28 @@ package org.sagebionetworks.web.unitclient.widget.entity.tabs;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.function.Consumer;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.jsinterop.EvaluationEditorPageProps;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -26,9 +35,11 @@ import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidget;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorReactComponentPage;
+
+import com.google.gwt.junit.GWTMockUtilities;
 import com.google.gwt.user.client.ui.Widget;
 
-@RunWith(MockitoJUnitRunner.class)
 public class ChallengeTabTest {
 	@Mock
 	Tab mockTab;
@@ -50,20 +61,35 @@ public class ChallengeTabTest {
 	CookieProvider mockCookieProvider;
 	ChallengeTab tab;
 	@Mock
-	AuthenticationController authenticationController;
+	AuthenticationController mockAuthenticationController;
 	@Mock
-	GlobalApplicationState globalApplicationState;
+	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
+	EvaluationEditorReactComponentPage mockEvaluationEditorReactComponentPage;
+	@Captor
+	ArgumentCaptor<Consumer<String>> consumerCaptor;
+	@Captor
+	ArgumentCaptor<EvaluationEditorPageProps.Callback> callbackCaptor;
 
 	@Before
 	public void setUp() {
-		tab = new ChallengeTab(mockTab, mockPortalGinInjector , authenticationController, globalApplicationState, mockCookieProvider);
+		// The evaluation editor page does not have abstraction for all UIObjects, so we must disarm (to avoid GWT.create()) until this is fixed
+		GWTMockUtilities.disarm();
+		MockitoAnnotations.initMocks(this);
+		tab = new ChallengeTab(mockTab, mockPortalGinInjector , mockAuthenticationController, mockGlobalApplicationState, mockCookieProvider);
 		when(mockTab.getEntityActionMenu()).thenReturn(mockActionMenuWidget);
 		when(mockPortalGinInjector.getChallengeTabView()).thenReturn(mockView);
 		when(mockPortalGinInjector.getAdministerEvaluationsList()).thenReturn(mockAdministerEvaluationsList);
 		when(mockPortalGinInjector.getChallengeWidget()).thenReturn(mockChallengeWidget);
+		when(mockPortalGinInjector.createEvaluationEditorReactComponentPage()).thenReturn(mockEvaluationEditorReactComponentPage);
 		tab.lazyInject();
 	}
 
+	@After
+	public void after() {
+		GWTMockUtilities.restore();
+	}
+	
 	@Test
 	public void testConstruction() {
 		verify(mockView).setEvaluationList(any(Widget.class));
@@ -82,7 +108,7 @@ public class ChallengeTabTest {
 		String entityName = "challenge project test";
 		tab.configure(entityId, entityName, mockProjectEntityBundle);
 
-		verify(mockAdministerEvaluationsList).configure(eq(entityId), any());
+		verify(mockAdministerEvaluationsList).configure(eq(entityId), consumerCaptor.capture());
 		verify(mockChallengeWidget).configure(entityId, entityName);
 
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
@@ -92,6 +118,17 @@ public class ChallengeTabTest {
 		assertNull(place.getVersionNumber());
 		assertEquals(EntityArea.CHALLENGE, place.getArea());
 		assertNull(place.getAreaToken());
+		//verify evaluation editor
+		String evaluationId = "88288282";
+		
+		consumerCaptor.getValue().accept(evaluationId);
+		
+		verify(mockGlobalApplicationState).setIsEditing(true);
+		verify(mockEvaluationEditorReactComponentPage).configure(eq(evaluationId), anyString(), anyString(), anyBoolean(), callbackCaptor.capture());
+		
+		callbackCaptor.getValue().run();
+		verify(mockEvaluationEditorReactComponentPage).removeFromParent();
+		verify(mockGlobalApplicationState).setIsEditing(false);
 	}
 
 	@Test
