@@ -45,8 +45,6 @@ import org.sagebionetworks.repo.model.file.ExternalObjectStoreUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.S3UploadDestination;
-import org.sagebionetworks.repo.model.file.State;
-import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -146,11 +144,6 @@ public class UploaderTest {
 		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
 		destinations.add(d);
 		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseJavascriptClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
-
-		UploadDaemonStatus status = new UploadDaemonStatus();
-		status.setState(State.COMPLETED);
-		status.setFileHandleId("fake handle");
-		String completedUploadDaemonStatusJson = status.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 
 		AsyncMockStubber.callSuccessWith("entityID").when(mockSynapseClient).setFileEntityFileHandle(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 

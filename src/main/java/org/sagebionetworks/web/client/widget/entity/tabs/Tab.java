@@ -2,10 +2,13 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.gwtbootstrap3.client.ui.TabPane;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -14,7 +17,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -33,6 +35,7 @@ public class Tab implements TabView.Presenter {
 	
 	EntityActionController entityActionController;
 	ActionMenuWidget entityActionMenu;
+	PopupUtilsView popupUtils;
 	EntityArea area;
 	String tabTitle;
 	@Inject
@@ -41,7 +44,8 @@ public class Tab implements TabView.Presenter {
 			SynapseJSNIUtils synapseJSNIUtils,
 			GWTWrapper gwt,
 			EntityActionController entityActionController,
-			ActionMenuWidget entityActionMenu) {
+			ActionMenuWidget entityActionMenu,
+			PopupUtilsView popupUtils) {
 		this.view = view;
 		this.globalAppState = globalAppState;
 		this.synapseJSNIUtils = synapseJSNIUtils;
@@ -50,6 +54,7 @@ public class Tab implements TabView.Presenter {
 		this.entityActionController = entityActionController;
 		this.entityActionMenu = entityActionMenu;
 		entityActionMenu.addControllerWidget(entityActionController.asWidget());
+		this.popupUtils = popupUtils;
 		deferredShowTabCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -143,6 +148,18 @@ public class Tab implements TabView.Presenter {
 
 	@Override
 	public void onTabClicked() {
+		if (globalAppState.isEditing()) {
+			Callback yesCallback = () -> {
+				globalAppState.setIsEditing(false);
+				postOnTabClicked();
+			};
+			popupUtils.showConfirmDialog("", DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, yesCallback);
+		} else {
+			postOnTabClicked();
+		}
+	}
+	
+	private void postOnTabClicked() {
 		for (CallbackP<Tab> callbackP : onClickCallbacks) {
 			callbackP.invoke(this);
 		}
