@@ -17,7 +17,6 @@ import com.google.inject.Inject;
 public class QuestionContainerWidget implements QuestionContainerWidgetView.Presenter {
 
 	private QuestionContainerWidgetView view;
-	private Set<Long> answers;
 	// Used to disable the buttons after scoring is performed
 	private Long questionIndex;
 	private String questionPrompt;
@@ -39,7 +38,6 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 
 	@Override
 	public void configure(Long questionNumber, Question question, MultichoiceResponse response) {
-		answers = new HashSet<Long>();
 		view.configure(questionNumber, question.getPrompt());
 		final MultichoiceQuestion multichoiceQuestion = (MultichoiceQuestion) question;
 		this.questionIndex = question.getQuestionIndex();
@@ -47,29 +45,12 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 		if (question instanceof MultichoiceQuestion) {
 			if (multichoiceQuestion.getExclusive()) {
 				for (final MultichoiceAnswer answer : multichoiceQuestion.getAnswers()) {
-					view.addRadioButton(questionIndex, answer.getPrompt(), new ClickHandler() {
-						@Override
-						public void onClick(ClickEvent event) {
-							answers = new HashSet<Long>();
-							answers.add(answer.getAnswerIndex());
-						}
-					}, wasSelected(response, answer.getAnswerIndex()));
+					view.addRadioButton(questionIndex, answer.getPrompt(), answer.getAnswerIndex(), wasSelected(response, answer.getAnswerIndex()));
 				}
 			} else {
 				// checkbox
 				for (final MultichoiceAnswer answer : multichoiceQuestion.getAnswers()) {
-					view.addCheckBox(questionIndex, answer.getPrompt(), new ClickHandler() {
-						@Override
-						public void onClick(ClickEvent event) {
-							// not exclusive, include all possible answer indexes
-							// typecasting to CheckBox seems fragile
-							if (((CheckBox) (event.getSource())).getValue()) {
-								answers.add(answer.getAnswerIndex());
-							} else {
-								answers.remove(answer.getAnswerIndex());
-							}
-						}
-					}, wasSelected(response, answer.getAnswerIndex()));
+					view.addCheckBox(questionIndex, answer.getPrompt(), answer.getAnswerIndex(), wasSelected(response, answer.getAnswerIndex()));
 				}
 			}
 			String helpLink = question.getDocLink();
@@ -99,7 +80,8 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 
 	@Override
 	public Set<Long> getAnswers() {
-		return answers;
+		// ask the view for all selected answers
+		return view.getAnswers();
 	}
 
 
