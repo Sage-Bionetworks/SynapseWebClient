@@ -3,13 +3,14 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.widget.HelpWidget;
-import com.google.gwt.event.dom.client.ClickHandler;
+
 import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -43,6 +44,7 @@ public class QuestionContainerWidgetViewImpl implements QuestionContainerWidgetV
 
 	Set<Radio> radioButtons;
 	Set<CheckBox> checkBoxes;
+	public static final String ANSWER_INDEX_ATTRIBUTE = "data-answer-index";
 
 	public interface Binder extends UiBinder<Widget, QuestionContainerWidgetViewImpl> {
 	}
@@ -78,27 +80,27 @@ public class QuestionContainerWidgetViewImpl implements QuestionContainerWidgetV
 	}
 
 	@Override
-	public void addRadioButton(Long questionIndex, String answerPrompt, ClickHandler clickHandler, boolean isSelected) {
+	public void addRadioButton(Long questionIndex, String answerPrompt, Long answerIndex, boolean isSelected) {
 		SimplePanel answerContainer = new SimplePanel();
 		answerContainer.addStyleName("padding-left-30 control-label");
 		Radio answerButton = new Radio("question-" + questionIndex);
 		answerButton.setValue(isSelected);
 		answerButton.setHTML(SimpleHtmlSanitizer.sanitizeHtml(answerPrompt));
-		answerButton.addClickHandler(clickHandler);
+		answerButton.getElement().setAttribute(ANSWER_INDEX_ATTRIBUTE, answerIndex.toString());
 		answerContainer.setWidget(answerButton.asWidget());
 		addAnswer(answerContainer.asWidget());
 		radioButtons.add(answerButton);
 	}
 
 	@Override
-	public void addCheckBox(Long questionIndex, String answerPrompt, ClickHandler clickHandler, boolean isSelected) {
+	public void addCheckBox(Long questionIndex, String answerPrompt, Long answerIndex, boolean isSelected) {
 		SimplePanel answerContainer = new SimplePanel();
 		answerContainer.addStyleName("checkbox padding-left-30 control-label");
 		final CheckBox checkbox = new CheckBox();
 		checkbox.setValue(isSelected);
 		checkbox.setHTML(SimpleHtmlSanitizer.sanitizeHtml(answerPrompt));
-		checkbox.addClickHandler(clickHandler);
 		answerContainer.setWidget(checkbox);
+		checkbox.getElement().setAttribute(ANSWER_INDEX_ATTRIBUTE, answerIndex.toString());
 		addAnswer(answerContainer);
 		checkBoxes.add(checkbox);
 	}
@@ -128,6 +130,23 @@ public class QuestionContainerWidgetViewImpl implements QuestionContainerWidgetV
 		for (CheckBox checkBox : checkBoxes) {
 			checkBox.setEnabled(isEnabled);
 		}
+	}
+	
+@Override
+	public Set<Long> getAnswers() {
+		HashSet<Long> answerIndexes = new HashSet<Long>();
+		for (CheckBox cb : checkBoxes) {
+			if (cb.getValue()) {
+				answerIndexes.add(Long.parseLong(cb.getElement().getAttribute(ANSWER_INDEX_ATTRIBUTE)));
+			}
+		}
+		for (Radio r : radioButtons) {
+			if (r.getValue()) {
+				answerIndexes.add(Long.parseLong(r.getElement().getAttribute(ANSWER_INDEX_ATTRIBUTE)));
+			}
+		}
+
+		return answerIndexes;
 	}
 
 	@Override
