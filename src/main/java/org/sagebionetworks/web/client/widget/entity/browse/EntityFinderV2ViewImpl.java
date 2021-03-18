@@ -80,14 +80,16 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 
 
 	@Override
-	public void renderComponent(String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter visibleEntityTypes, EntityFilter selectableEntityTypes, String selectedCopy) {
+	public void renderComponent(String initialContainerId, EntityFinderScope initialScope, boolean showVersions, boolean multiSelect, EntityFilter visibleEntityTypes, EntityFilter selectableEntityTypes, EntityFilter visibleTypesInTree, String selectedCopy) {
 		entityFinderContainer.clear();
 		_showEntityFinderReactComponent(
 				entityFinderContainer.getElement(),
 				authController.getCurrentUserSessionToken(),
 				initialContainerId,
+				initialScope.getValue(),
 				toJsArray(visibleEntityTypes),
 				toJsArray(selectableEntityTypes),
+				toJsArray(visibleTypesInTree),
 				showVersions,
 				multiSelect,
 				selectedCopy,
@@ -203,7 +205,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 		return r;
 	}
 
-	private static native void _showEntityFinderReactComponent(Element el, String sessionToken, String initialContainerId, JsArrayString visible, JsArrayString selectable, boolean showVersions, boolean multiSelect, String selectedCopy, OnSelectCallback onSelectedCallback) /*-{
+	private static native void _showEntityFinderReactComponent(Element el, String sessionToken, String initialContainerId, String initialScope, JsArrayString visible, JsArrayString selectable, JsArrayString visibleTypesInTree, boolean showVersions, boolean multiSelect, String selectedCopy, OnSelectCallback onSelectedCallback) /*-{
 		try {
 			var callback = function(selected) {
 				console.log(selected);
@@ -212,8 +214,10 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 			var props = {
 				sessionToken: sessionToken,
 				initialContainerId: initialContainerId,
+				initialScope: initialScope,
 				showTypes: visible,
 				selectableTypes: selectable,
+				visibleTypesInTree: visibleTypesInTree,
 				selectMultiple: multiSelect,
 				onSelectedChange: callback,
 				showVersionSelection: showVersions,

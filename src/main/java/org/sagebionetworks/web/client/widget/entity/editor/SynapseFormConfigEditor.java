@@ -32,7 +32,7 @@ public class SynapseFormConfigEditor implements SynapseFormConfigView.Presenter,
 	}
 
 	private EntityFinder configureEntityFinder(EntityFinder.Builder builder) {
-		return builder.setSelectableFilter(EntityFilter.PROJECT_OR_TABLE)
+		return builder.setSelectableTypesInList(EntityFilter.PROJECT_OR_TABLE)
 				.setShowVersions(true)
 				.setSelectedHandler(new SelectedHandler<Reference>() {
 					@Override

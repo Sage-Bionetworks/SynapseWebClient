@@ -25,7 +25,7 @@ public interface EntityFinderV2View extends SynapseView {
 
 	void hide();
 
-	void renderComponent(String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter visible, EntityFilter selectable, String selectedCopy);
+	void renderComponent(String initialContainerId, EntityFinderScope initialScope, boolean showVersions, boolean multiSelect, EntityFilter visible, EntityFilter selectable, EntityFilter visibleTypesInTree, String selectedCopy);
 
 	void setSynAlert(Widget w);
 

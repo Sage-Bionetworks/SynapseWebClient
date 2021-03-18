@@ -67,6 +67,7 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDi
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
@@ -1203,7 +1204,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	private void postCheckLink() {
 		getEntityFinderBuilder()
-				.setSelectableFilter(CONTAINER)
+				.setSelectableTypesInList(CONTAINER)
 				.setShowVersions(false)
 				.setSelectedHandler((selected, entityFinder) -> {
 					createLink(selected.getTargetId(), entityFinder);
@@ -1274,14 +1275,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void postCheckMove() {
-		EntityFilter filter = entityBundle.getEntity() instanceof Table ? PROJECT : CONTAINER;
-		getEntityFinderBuilder()
+		EntityFinder.Builder builder = getEntityFinderBuilder()
 				.setModalTitle("Move " + entityTypeDisplay)
 				.setHelpMarkdown("Search or Browse Synapse to find a destination to move this " + entityTypeDisplay)
 				.setPromptCopy("Find a location to move " + entity.getId())
 				.setSelectedCopy("Destination")
 				.setConfirmButtonCopy("Move")
-				.setSelectableFilter(filter)
 				.setShowVersions(false)
 				.setSelectedHandler((selected, finder) -> {
 					String entityId = entityBundle.getEntity().getId();
@@ -1298,9 +1297,20 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 							finder.showError(caught.getMessage());
 						}
 					});
-				})
-				.build()
-				.show();
+				});
+
+		if (entityBundle.getEntity() instanceof Table) {
+			builder.setInitialScope(EntityFinderScope.ALL_PROJECTS)
+					.setVisibleTypesInTree(PROJECT)
+					.setSelectableTypesInList(PROJECT)
+					.setVisibleTypesInList(EntityFilter.PROJECT_OR_TABLE);
+		} else {
+			builder.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
+					.setVisibleTypesInTree(CONTAINER)
+					.setSelectableTypesInList(CONTAINER);
+		}
+
+		builder.build().show();
 	}
 
 	private void onViewWikiSource() {

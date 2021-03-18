@@ -29,9 +29,11 @@ public interface EntityFinder {
 
 		Builder setInitialContainerId(String initialContainerId);
 
-		Builder setSelectableFilter(EntityFilter selectableFilter);
+		Builder setSelectableTypesInList(EntityFilter selectableFilter);
 
-		Builder setVisibleFilter(EntityFilter visibleFilter);
+		Builder setVisibleTypesInList(EntityFilter visibleFilter);
+
+		Builder setVisibleTypesInTree(EntityFilter visibleTypesInTree);
 
 		Builder setShowVersions(boolean showVersions);
 
@@ -42,6 +44,8 @@ public interface EntityFinder {
 		Builder setHelpMarkdown(String helpMarkdown);
 
 		Builder setSelectedCopy(String selectedCopy);
+
+		Builder setInitialScope(EntityFinderScope initialScope);
 
 		Builder setConfirmButtonCopy(String confirmButtonCopy);
 	}

@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder.SelectedHandler;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderV2Impl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -20,6 +21,7 @@ import com.google.inject.Inject;
 
 public class EntityContainerListWidget implements EntityContainerListWidgetView.Presenter, IsWidget {
 	EntityFinder finder;
+	EntityFinder.Builder entityFinderBuilder;
 	EntityContainerListWidgetView view;
 	SynapseJavascriptClient jsClient;
 	List<String> entityIds;
@@ -29,9 +31,9 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 	SelectedHandler<List<Reference>> selectionHandler;
 
 	@Inject
-	public EntityContainerListWidget(EntityContainerListWidgetView view, EntityFinder finder, SynapseJavascriptClient jsClient, SynapseAlert synAlert) {
+	public EntityContainerListWidget(EntityContainerListWidgetView view, EntityFinder.Builder entityFinderBuilder, SynapseJavascriptClient jsClient, SynapseAlert synAlert) {
 		this.view = view;
-		this.finder = finder;
+		this.entityFinderBuilder = entityFinderBuilder;
 		this.jsClient = jsClient;
 		this.synAlert = synAlert;
 		view.setPresenter(this);
@@ -70,13 +72,24 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 				}
 			});
 		}
-		EntityFilter filter;
+
 		if (TableType.projects.equals(tableType)) {
-			filter = EntityFilter.PROJECT;
+			String friendlyEntityType = "Project View";
+			entityFinderBuilder.setSelectableTypesInList(EntityFilter.PROJECT);
+			entityFinderBuilder.setHelpMarkdown("Search or Browse Synapse to find " + EntityTypeUtils.getDisplayName(EntityType.project) + "s to put into this " + friendlyEntityType);
+			entityFinderBuilder.setPromptCopy("Find " + EntityTypeUtils.getDisplayName(EntityType.project) + "s for this View");
 		} else {
-			filter = EntityFilter.CONTAINER;
+			String friendlyEntityType = "File View";
+			entityFinderBuilder.setSelectableTypesInList(EntityFilter.CONTAINER);
+			entityFinderBuilder.setHelpMarkdown("Search or Browse Synapse to find " + EntityTypeUtils.getDisplayName(EntityType.folder) + "s to put into this " + friendlyEntityType);
+			entityFinderBuilder.setPromptCopy("Find " + EntityTypeUtils.getDisplayName(EntityType.folder) + "s for this View");
 		}
-		finder.configureMulti(filter, showVersions, selectionHandler);
+		finder = entityFinderBuilder
+				.setModalTitle("Set View Containers")
+				.setMultiSelect(true)
+				.setSelectedMultiHandler(selectionHandler)
+				.setShowVersions(showVersions)
+				.build();
 	}
 
 	@Override

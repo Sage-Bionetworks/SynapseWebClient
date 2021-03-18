@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.ALL;
+import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.CONTAINER;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +34,12 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
 
     private boolean multiSelect;
     private String initialContainerId;
+    private EntityFinderScope initialScope;
 
     private boolean showVersions;
-    private EntityFilter visibleFilter;
-    private EntityFilter selectableFilter;
+    private EntityFilter visibleTypesInList;
+    private EntityFilter selectableTypesInList;
+    private EntityFilter visibleTypesInTree;
     private SelectedHandler<Reference> selectedHandler;
     private SelectedHandler<List<Reference>> selectedMultiHandler;
 
@@ -92,9 +95,11 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         initialContainerId = builder.initialContainerId;
         selectedHandler = builder.selectedHandler;
         selectedMultiHandler = builder.selectedMultiHandler;
-        selectableFilter = builder.selectableFilter;
-        visibleFilter = builder.visibleFilter;
+        selectableTypesInList = builder.selectableTypesInList;
+        visibleTypesInList = builder.visibleTypesInList;
         showVersions = builder.showVersions;
+        initialScope = builder.initialScope;
+        visibleTypesInTree = builder.visibleTypesInTree;
         renderComponent();
     }
 
@@ -111,12 +116,14 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         };
 
         private boolean showVersions = false;
-        private EntityFilter visibleFilter = ALL;
-        private EntityFilter selectableFilter = ALL;
+        private EntityFilter visibleTypesInList = ALL;
+        private EntityFilter selectableTypesInList = ALL;
+        private EntityFilter visibleTypesInTree = CONTAINER;
 
         private boolean multiSelect = false;
         private String initialContainerId = null;
 
+        private EntityFinderScope initialScope = EntityFinderScope.CURRENT_PROJECT;
         private String modalTitle = "Find in Synapse";
         private String promptCopy = "";
         private String selectedCopy = "Selected";
@@ -168,14 +175,20 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         }
 
         @Override
-        public EntityFinder.Builder setSelectableFilter(EntityFilter selectableFilter) {
-            this.selectableFilter = selectableFilter;
+        public EntityFinder.Builder setSelectableTypesInList(EntityFilter selectableFilter) {
+            this.selectableTypesInList = selectableFilter;
             return this;
         }
 
         @Override
-        public EntityFinder.Builder setVisibleFilter(EntityFilter visibleFilter) {
-            this.visibleFilter = visibleFilter;
+        public EntityFinder.Builder setVisibleTypesInList(EntityFilter visibleFilter) {
+            this.visibleTypesInList = visibleFilter;
+            return this;
+        }
+
+        @Override
+        public EntityFinder.Builder setVisibleTypesInTree(EntityFilter visibleTypesInTree) {
+            this.visibleTypesInTree = visibleTypesInTree;
             return this;
         }
 
@@ -210,6 +223,12 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         }
 
         @Override
+        public EntityFinder.Builder setInitialScope(EntityFinderScope initialScope) {
+            this.initialScope = initialScope;
+            return this;
+        }
+
+        @Override
         public EntityFinder.Builder setConfirmButtonCopy(String confirmButtonCopy) {
             this.confirmButtonCopy = confirmButtonCopy;
             return this;
@@ -230,8 +249,8 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
     @Override
     public void configure(EntityFilter visible, EntityFilter selectable, boolean showVersions, SelectedHandler<Reference> handler) {
         this.showVersions = showVersions;
-        this.visibleFilter = visible;
-        this.selectableFilter = selectable;
+        this.visibleTypesInList = visible;
+        this.selectableTypesInList = selectable;
         this.selectedHandler = handler;
         this.multiSelect = false;
         selectedEntities.clear();
@@ -252,8 +271,8 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
     @Override
     public void configureMulti(EntityFilter visible, EntityFilter selectable, boolean showVersions, SelectedHandler<List<Reference>> handler) {
         this.showVersions = showVersions;
-        this.visibleFilter = visible;
-        this.selectableFilter = selectable;
+        this.visibleTypesInList = visible;
+        this.selectableTypesInList = selectable;
         this.selectedMultiHandler = handler;
         this.multiSelect = true;
         selectedEntities.clear();
@@ -314,7 +333,7 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
                     } else {
                         initialContainerId = pathHeaders.get(pathHeaders.size() - 1).getId();
                     }
-                    view.renderComponent(initialContainerId, showVersions, multiSelect, visibleFilter, selectableFilter, selectedCopy);
+                    view.renderComponent(initialContainerId, initialScope, showVersions, multiSelect, visibleTypesInList, selectableTypesInList, visibleTypesInTree, selectedCopy);
 
                 }
             });

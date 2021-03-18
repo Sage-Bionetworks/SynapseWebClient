@@ -47,7 +47,7 @@ public class SynapseFormConfigEditorTest {
 		verify(mockView).setPresenter(editor);
 		verify(mockView).initView();
 		// verify entity finder is configured
-		verify(mockEntityFinderBuilder).setSelectableFilter(eq(EntityFilter.PROJECT_OR_TABLE));
+		verify(mockEntityFinderBuilder).setSelectableTypesInList(eq(EntityFilter.PROJECT_OR_TABLE));
 		verify(mockEntityFinderBuilder).setShowVersions(eq(true));
 		verify(mockEntityFinderBuilder).setSelectedHandler(captor.capture());
 		verify(mockEntityFinderBuilder).build();
