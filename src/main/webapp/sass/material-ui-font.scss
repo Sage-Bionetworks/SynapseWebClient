@@ -260,10 +260,10 @@
 //modal dialog close button, hack it!
 #body .modal-header .close {
   // hide the bootstrap button text ('x'), but show an icon in a pseudo element.
-  visibility: hidden;
+  font-size: 0px;
   margin-top: 0px; //bootstrap corrects their x by moving it up via negative margin top.
-  &:before {
-    visibility: visible;
+  &:after {
+    font-size: 21px;
     font-family: "Material Icons";
     content: "close";  
   }
