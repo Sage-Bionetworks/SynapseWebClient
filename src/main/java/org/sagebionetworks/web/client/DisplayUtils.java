@@ -268,6 +268,8 @@ public class DisplayUtils {
 		settings.setType(NotifyType.INFO);
 		if (timeout != null) {
 			settings.setDelay(timeout);
+		} else {
+			settings.setDelay(0);
 		}
 		settings.setZIndex(2001);
 		notify(message, iconType, settings);
