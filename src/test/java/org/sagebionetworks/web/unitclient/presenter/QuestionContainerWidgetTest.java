@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -8,7 +8,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+
 import java.util.ArrayList;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.quiz.MultichoiceAnswer;
@@ -19,7 +21,6 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.presenter.QuestionContainerWidget;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.QuestionContainerWidgetView;
-import com.google.gwt.event.dom.client.ClickHandler;
 
 public class QuestionContainerWidgetTest {
 
@@ -66,7 +67,7 @@ public class QuestionContainerWidgetTest {
 		setExclusive(true);
 		when(mockMultichoiceQuestion.getDocLink()).thenReturn(null);
 		questionContainerWidget.configure(1L, mockMultichoiceQuestion, null);
-		verify(mockView, times(2)).addRadioButton(eq(mockMultichoiceQuestion.getQuestionIndex()), anyString(), any(ClickHandler.class), eq(false));
+		verify(mockView, times(2)).addRadioButton(eq(mockMultichoiceQuestion.getQuestionIndex()), anyString(), anyLong(), eq(false));
 		verify(mockView).setMoreInfoVisible(false);
 	}
 
@@ -78,7 +79,7 @@ public class QuestionContainerWidgetTest {
 		when(mockMultichoiceQuestion.getDocLink()).thenReturn(docLink);
 		when(mockMultichoiceQuestion.getHelpText()).thenReturn(helpText);
 		questionContainerWidget.configure(1L, mockMultichoiceQuestion, null);
-		verify(mockView, times(2)).addCheckBox(eq(mockMultichoiceQuestion.getQuestionIndex()), anyString(), any(ClickHandler.class), eq(false));
+		verify(mockView, times(2)).addCheckBox(eq(mockMultichoiceQuestion.getQuestionIndex()), anyString(), anyLong(), eq(false));
 		verify(mockView).configureMoreInfo(docLink, helpText);
 		verify(mockView).setMoreInfoVisible(true);
 	}

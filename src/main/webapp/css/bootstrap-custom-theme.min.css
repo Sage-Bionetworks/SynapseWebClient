@@ -5698,7 +5698,6 @@ button.close {
   border: 1px solid #fff;
   border-radius: 10px;
   cursor: pointer;
-  background-color: #000\9;
   background-color: rgba(0, 0, 0, 0);
 }
 .carousel-indicators .active {

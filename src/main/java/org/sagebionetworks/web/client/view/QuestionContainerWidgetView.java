@@ -38,9 +38,9 @@ public interface QuestionContainerWidgetView extends IsWidget {
 
 	void showFailure(boolean isShown);
 
-	void addCheckBox(Long questionIndex, String questionPrompt, ClickHandler clickHandler, boolean isSelected);
+	void addCheckBox(Long questionIndex, String questionPrompt, Long answerIndex, boolean isSelected);
 
-	void addRadioButton(Long long1, String string, ClickHandler clickHandler, boolean isSelected);
+	void addRadioButton(Long long1, String string, Long answerIndex, boolean isSelected);
 
 	public void configure(Long questionNumber, String prompt);
 
@@ -49,4 +49,6 @@ public interface QuestionContainerWidgetView extends IsWidget {
 	void configureMoreInfo(String helpUrl, String helpText);
 
 	void setMoreInfoVisible(boolean isVisible);
+	
+	Set<Long> getAnswers();
 }
