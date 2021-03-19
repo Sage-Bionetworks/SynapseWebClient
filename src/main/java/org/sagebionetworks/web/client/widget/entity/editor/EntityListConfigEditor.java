@@ -29,16 +29,16 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 	private EntityListConfigView view;
 	private Map<String, String> descriptor;
 	AuthenticationController authenticationController;
-	EntityFinder entityFinder;
+	EntityFinder.Builder entityFinderBuilder;
 	EntityListWidget entityListWidget;
 	WikiPageKey wikiKey;
 	PromptForValuesModalView promptForNoteModal;
 
 	@Inject
-	public EntityListConfigEditor(EntityListConfigView view, AuthenticationController authenticationController, EntityListWidget entityListWidget, EntityFinder entityFinder, PromptForValuesModalView promptForNoteModal) {
+	public EntityListConfigEditor(EntityListConfigView view, AuthenticationController authenticationController, EntityListWidget entityListWidget, EntityFinder.Builder entityFinderBuilder, PromptForValuesModalView promptForNoteModal) {
 		this.view = view;
 		this.authenticationController = authenticationController;
-		this.entityFinder = entityFinder;
+		this.entityFinderBuilder = entityFinderBuilder;
 		this.entityListWidget = entityListWidget;
 		this.promptForNoteModal = promptForNoteModal;
 		view.setSelectionToolbarHandler(entityListWidget.getRowWidgets());
@@ -87,16 +87,22 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 
 	@Override
 	public void onAddRecord() {
-		entityFinder.configure(true, new EntityFinder.SelectedHandler<Reference>() {
-			@Override
-			public void onSelected(Reference selected, EntityFinder finder) {
-				entityFinder.hide();
-				EntityGroupRecord record = createRecord(selected.getTargetId(), selected.getTargetVersionNumber(), null);
-				entityListWidget.addRecord(record);
-				view.setButtonToolbarVisible(true);
-			}
-		});
-		entityFinder.show();
+		entityFinderBuilder
+				.setModalTitle("Insert Entity List")
+				.setHelpMarkdown("Search or Browse Synapse to find Projects, Folders or Files and insert them as a list into this Wiki page")
+				.setPromptCopy("Find Files, Folders or Projects to insert a list")
+				.setMultiSelect(true)
+				.setShowVersions(true)
+				.setSelectedMultiHandler(((selected, entityFinder) -> {
+					entityFinder.hide();
+					for (Reference ref : selected) {
+						EntityGroupRecord record = createRecord(ref.getTargetId(), ref.getTargetVersionNumber(), null);
+						entityListWidget.addRecord(record);
+					}
+					view.setButtonToolbarVisible(true);
+				}))
+				.build()
+				.show();
 	}
 
 	public void clearState() {

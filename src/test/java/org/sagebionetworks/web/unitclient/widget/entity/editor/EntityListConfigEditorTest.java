@@ -6,7 +6,10 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +30,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEdito
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
+import org.sagebionetworks.web.test.helper.SelfReturningAnswer;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EntityListConfigEditorTest {
@@ -39,6 +43,7 @@ public class EntityListConfigEditorTest {
 	Map<String, String> descriptor;
 	@Mock
 	EntityListWidget mockEntityListWidget;
+	EntityFinder.Builder mockEntityFinderBuilder;
 	@Mock
 	EntityFinder mockEntityFinder;
 	@Mock
@@ -50,9 +55,13 @@ public class EntityListConfigEditorTest {
 	EntityGroupRecord mockEntityGroupRecord;
 	@Captor
 	ArgumentCaptor<CallbackP<String>> promptCallbackCaptor;
+	@Captor
+	ArgumentCaptor<EntityFinder.SelectedHandler<List<Reference>>> entityFinderCaptor;
 
 	@Before
 	public void setup() throws Exception {
+		mockEntityFinderBuilder = mock(EntityFinder.Builder.class, new SelfReturningAnswer());
+		when(mockEntityFinderBuilder.build()).thenReturn(mockEntityFinder);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		entityListRowWidgets = new SelectableItemList();
 		entityListRowWidgets.add(mockEntityListRowBadge);
@@ -63,7 +72,7 @@ public class EntityListConfigEditorTest {
 		// create empty descriptor
 		descriptor = new HashMap<String, String>();
 
-		editor = new EntityListConfigEditor(mockView, mockAuthenticationController, mockEntityListWidget, mockEntityFinder, mockPromptForNoteModal);
+		editor = new EntityListConfigEditor(mockView, mockAuthenticationController, mockEntityListWidget, mockEntityFinderBuilder, mockPromptForNoteModal);
 	}
 
 	@Test
@@ -86,15 +95,18 @@ public class EntityListConfigEditorTest {
 	public void testAddRecord() throws Exception {
 		editor.onAddRecord();
 		boolean showVersions = true;
-		ArgumentCaptor<EntityFinder.SelectedHandler> captor = ArgumentCaptor.forClass(EntityFinder.SelectedHandler.class);
-		verify(mockEntityFinder).configure(eq(showVersions), captor.capture());
+		verify(mockEntityFinderBuilder).setMultiSelect(true);
+		verify(mockEntityFinderBuilder).setShowVersions(true);
+		verify(mockEntityFinderBuilder).setSelectedMultiHandler(entityFinderCaptor.capture());
+		verify(mockEntityFinderBuilder).build();
 		verify(mockEntityFinder).show();
 		Reference selectedRef = new Reference();
 		String targetId = "syn987";
 		Long targetVersion = 9L;
 		selectedRef.setTargetId(targetId);
 		selectedRef.setTargetVersionNumber(targetVersion);
-		captor.getValue().onSelected(selectedRef, mockEntityFinder);
+		List<Reference> selectedRefs = Collections.singletonList(selectedRef);
+		entityFinderCaptor.getValue().onSelected(selectedRefs, mockEntityFinder);
 
 		verify(mockEntityFinder).hide();
 		ArgumentCaptor<EntityGroupRecord> recordCaptor = ArgumentCaptor.forClass(EntityGroupRecord.class);
