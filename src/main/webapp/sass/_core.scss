@@ -602,20 +602,6 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 	margin-right: auto;
 }
 
-.alert, #body .alert {
-	@include box-shadow(0px 1px 2px #aaa);
-	margin: 10px 0px;
-	border: none;
-	.close {
-		color: white;
-		font-size: 18px;
-		opacity: .6;
-	}
-	.close:hover, .close:visited, .close:focus {
-		opacity: 1;
-	}
-}
-
 .heading {
 	font-weight: bold;
 	margin-right: 5px;
@@ -3124,6 +3110,9 @@ div.border {
 		color: #323131;
 		@include border-radius(0px);
 		box-shadow: none;
+		margin: 10px 0px;
+		border: none;
+	
 		.alert-link {
 			color: inherit;
 		}
@@ -3154,6 +3143,17 @@ div.border {
 			.iconBackground {
 				color: #48896B;
 			}
+		}
+		.close {
+			font-size: 0px;
+			opacity: 1;
+		}
+		.close:after {
+			font-weight: 100;
+			color: #636262;
+			font-size: 18px;
+			font-family: "Material Icons";
+			content: "close";
 		}
 	}	
 }

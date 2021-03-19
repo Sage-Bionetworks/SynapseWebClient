@@ -519,7 +519,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		getChallengeClient().createChallenge(c, new AsyncCallback<Challenge>() {
 			@Override
 			public void onSuccess(Challenge v) {
-				view.showInfo(DisplayConstants.CHALLENGE_CREATED);
+				view.showSuccess(DisplayConstants.CHALLENGE_CREATED);
 				// go to challenge tab
 				Place gotoPlace = new Synapse(entity.getId(), null, EntityArea.CHALLENGE, null);
 				getGlobalApplicationState().getPlaceChanger().goTo(gotoPlace);
@@ -1240,7 +1240,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 			@Override
 			public void onSuccess(Entity result) {
-				view.showInfo(DisplayConstants.TEXT_LINK_SAVED);
+				view.showSuccess(DisplayConstants.TEXT_LINK_SAVED);
 				finder.hide();
 			}
 
@@ -1449,7 +1449,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			getSynapseClient().createV2WikiPageWithV1(entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), page, new AsyncCallback<WikiPage>() {
 				@Override
 				public void onSuccess(WikiPage result) {
-					view.showInfo("'" + name + "' Page Added");
+					view.showSuccess("'" + name + "' Page Added");
 					Synapse newPlace = new Synapse(entityBundle.getEntity().getId(), getVersionIfNotLatest().orElse(null), EntityArea.WIKI, result.getId());
 					getGlobalApplicationState().getPlaceChanger().goTo(newPlace);
 				}
