@@ -5,7 +5,6 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
-import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -87,13 +86,6 @@ public class SynapseAlertViewImpl implements SynapseAlertView {
 		synapseAlertContainer.setVisible(true);
 		alertText.setText(error);
 		alert.setVisible(true);
-	}
-
-	@Override
-	public void setLoginWidget(Widget w) {
-		lazyConstruct();
-		loginWidgetContainer.clear();
-		loginWidgetContainer.add(w);
 	}
 
 	@Override
