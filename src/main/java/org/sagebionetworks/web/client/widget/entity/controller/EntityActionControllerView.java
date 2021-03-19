@@ -33,6 +33,13 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	void showInfo(String message);
 
 	/**
+	 * Show success notification to the user.
+	 *
+	 * @param string
+	 */
+	void showSuccess(String message);
+
+	/**
 	 * Show info dialog to the user.
 	 */
 	void showInfoDialog(String header, String message);

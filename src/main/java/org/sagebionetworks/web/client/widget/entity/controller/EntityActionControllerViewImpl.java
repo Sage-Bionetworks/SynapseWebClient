@@ -72,6 +72,11 @@ public class EntityActionControllerViewImpl implements EntityActionControllerVie
 	}
 
 	@Override
+	public void showSuccess(String message) {
+		DisplayUtils.showSuccess(message);
+	}
+
+	@Override
 	public Widget asWidget() {
 		return widget;
 	}
