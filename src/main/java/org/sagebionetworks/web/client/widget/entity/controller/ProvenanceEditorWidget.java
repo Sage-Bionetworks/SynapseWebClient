@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import static org.sagebionetworks.web.client.widget.entity.controller.ProvenanceType.*;
+
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -65,8 +67,8 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 				if (caught instanceof NotFoundException) {
 					isNewActivity = true;
 					activity = new Activity();
-					usedProvenanceList.configure(new LinkedList<ProvenanceEntry>());
-					executedProvenanceList.configure(new LinkedList<ProvenanceEntry>());
+					usedProvenanceList.configure(new LinkedList<ProvenanceEntry>(), USED);
+					executedProvenanceList.configure(new LinkedList<ProvenanceEntry>(), EXECUTED);
 				} else {
 					synAlert.handleException(caught);
 				}
@@ -112,8 +114,8 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 							usedEntries.add(toAdd);
 						}
 					}
-					usedProvenanceList.configure(usedEntries);
-					executedProvenanceList.configure(executedEntries);
+					usedProvenanceList.configure(usedEntries, USED);
+					executedProvenanceList.configure(executedEntries, EXECUTED);
 				}
 			}
 		});

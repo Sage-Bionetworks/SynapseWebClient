@@ -16,8 +16,10 @@ public class ProvenanceListWidget implements ProvenanceListWidgetView.Presenter,
 	ProvenanceListWidgetView view;
 	PortalGinInjector ginInjector;
 	List<ProvenanceEntry> rows;
+	EntityFinder.Builder entityFinderBuilder;
 	EntityFinder entityFinder;
 	ProvenanceURLDialogWidget urlDialog;
+	ProvenanceType provenanceType;
 
 	@Inject
 	public ProvenanceListWidget(final ProvenanceListWidgetView view, final PortalGinInjector ginInjector, final EntityFinder.Builder entityFinderBuilder) {
@@ -25,32 +27,34 @@ public class ProvenanceListWidget implements ProvenanceListWidgetView.Presenter,
 		this.ginInjector = ginInjector;
 		rows = new LinkedList<ProvenanceEntry>();
 		this.view.setPresenter(this);
-
+		this.entityFinderBuilder = entityFinderBuilder;
 		this.entityFinder = entityFinderBuilder
+				.setModalTitle("Find in Synapse")
 				.setShowVersions(true)
-				.setSelectedHandler((ref, finder) -> {
-					if (ref.getTargetId() != null) {
-						final EntityRefProvEntryView newEntry = ginInjector.getEntityRefEntry();
-						rows.add(newEntry);
-						String targetId = ref.getTargetId();
-						Long version = ref.getTargetVersionNumber();
-						newEntry.configure(targetId, version != null ? version.toString() : "Current");
-						newEntry.setAnchorTarget(DisplayUtils.getSynapseHistoryToken(targetId, version));
-						newEntry.setRemoveCallback(new Callback() {
-							@Override
-							public void invoke() {
+				.setMultiSelect(true)
+				.setSelectedMultiHandler((refs, finder) -> {
+					for (Reference ref: refs) {
+						if (ref.getTargetId() != null) {
+							final EntityRefProvEntryView newEntry = ginInjector.getEntityRefEntry();
+							rows.add(newEntry);
+							String targetId = ref.getTargetId();
+							Long version = ref.getTargetVersionNumber();
+							newEntry.configure(targetId, version != null ? version.toString() : "Current");
+							newEntry.setAnchorTarget(DisplayUtils.getSynapseHistoryToken(targetId, version));
+							newEntry.setRemoveCallback(() -> {
 								rows.remove(newEntry);
 								view.removeRow(newEntry);
-							}
-						});
-						view.addRow(newEntry);
+							});
+							view.addRow(newEntry);
+						}
 						entityFinder.hide();
 					}
 				}).build();
 	}
 
 	@Override
-	public void configure(List<ProvenanceEntry> provEntries) {
+	public void configure(List<ProvenanceEntry> provEntries, ProvenanceType provenanceType) {
+		this.provenanceType = provenanceType;
 		rows = provEntries;
 		for (final ProvenanceEntry entry : rows) {
 			view.addRow(entry);
@@ -62,6 +66,21 @@ public class ProvenanceListWidget implements ProvenanceListWidgetView.Presenter,
 				}
 			});
 		}
+
+		switch (this.provenanceType) {
+			case USED:
+				this.entityFinderBuilder
+						.setHelpMarkdown("Search or Browse Synapse to find Projects, Folders or Files that were used to generate this entity")
+						.setPromptCopy("Find Files, Folders or Projects used to create this entity");
+				break;
+			case EXECUTED:
+				this.entityFinderBuilder
+						.setHelpMarkdown("Search or Browse Synapse to find Projects, Folders or Files that were originated from this entity")
+						.setPromptCopy("Find Files, Folders or Projects that were executed to generate this entity");
+				break;
+		}
+
+		this.entityFinder = this.entityFinderBuilder.build();
 	}
 
 	@Override

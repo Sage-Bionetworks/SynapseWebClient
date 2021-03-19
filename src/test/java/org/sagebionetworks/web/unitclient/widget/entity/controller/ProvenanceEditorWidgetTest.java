@@ -68,10 +68,6 @@ public class ProvenanceEditorWidgetTest {
 	@Mock
 	Reference mockRef;
 	@Mock
-	UsedURL mockUsedUrl;
-	@Mock
-	UsedEntity mockUsedEntity;
-	@Mock
 	EntityRefProvEntryView mockEntityProvEntry;
 	@Mock
 	URLProvEntryView mockUrlProvEntry;
@@ -137,7 +133,7 @@ public class ProvenanceEditorWidgetTest {
 		verify(mockInjector, Mockito.never()).getURLEntry();
 		verify(mockInjector.getURLEntry(), Mockito.never()).configure(name, url);
 		verify(mockInjector.getURLEntry(), Mockito.never()).setAnchorTarget(anyString());
-		verify(mockProvenanceList, Mockito.never()).configure(anyList());
+		verify(mockProvenanceList, Mockito.never()).configure(anyList(), any());
 
 
 		presenter.onSave();
@@ -163,7 +159,7 @@ public class ProvenanceEditorWidgetTest {
 		verify(mockInjector).getURLEntry();
 		verify(mockInjector.getURLEntry()).configure(name, url);
 		verify(mockInjector.getURLEntry()).setAnchorTarget(anyString());
-		verify(mockProvenanceList, times(2)).configure(anyList());
+		verify(mockProvenanceList, times(2)).configure(anyList(), any());
 	}
 
 	@Test
