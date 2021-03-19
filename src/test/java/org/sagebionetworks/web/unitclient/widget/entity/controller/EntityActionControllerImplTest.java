@@ -1309,7 +1309,7 @@ public class EntityActionControllerImplTest {
 		String target = "syn9876";
 		controller.createLink(target);
 		verify(mockView, never()).showErrorMessage(anyString());
-		verify(mockView).showInfo(DisplayConstants.TEXT_LINK_SAVED);
+		verify(mockView).showSuccess(DisplayConstants.TEXT_LINK_SAVED);
 		Entity capture = argument.getValue();
 		assertNotNull(capture);
 		assertTrue(capture instanceof Link);
@@ -1365,7 +1365,7 @@ public class EntityActionControllerImplTest {
 		controller.onAction(Action.CREATE_LINK);
 		verify(mockEntityFinder).configure(eq(EntityFilter.CONTAINER), anyBoolean(), any(SelectedHandler.class));
 		verify(mockEntityFinder).show();
-		verify(mockView).showInfo(DisplayConstants.TEXT_LINK_SAVED);
+		verify(mockView).showSuccess(DisplayConstants.TEXT_LINK_SAVED);
 	}
 
 	@Test
@@ -1517,7 +1517,7 @@ public class EntityActionControllerImplTest {
 
 		capturedCallback.callback("a valid name");
 		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString());
+		verify(mockView).showSuccess(anyString());
 		verify(mockPlaceChanger).goTo(new Synapse(entityId, null, EntityArea.WIKI, newWikiPageId));
 	}
 
@@ -1596,7 +1596,7 @@ public class EntityActionControllerImplTest {
 		ArgumentCaptor<Challenge> captor = ArgumentCaptor.forClass(Challenge.class);
 		verify(mockChallengeClient).createChallenge(captor.capture(), any(AsyncCallback.class));
 		verify(mockPlaceChanger).goTo(new Synapse(entityId, null, EntityArea.CHALLENGE, null));
-		verify(mockView).showInfo(DisplayConstants.CHALLENGE_CREATED);
+		verify(mockView).showSuccess(DisplayConstants.CHALLENGE_CREATED);
 		Challenge c = captor.getValue();
 		assertNull(c.getId());
 		assertEquals(SELECTED_TEAM_ID, c.getParticipantTeamId());

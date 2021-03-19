@@ -19,8 +19,8 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	/**
 	 * Show the user a confirm dialog.
 	 * 
-	 * @param string
-	 * @param action
+	 * @param message
+	 * @param callback
 	 */
 	void showConfirmDeleteDialog(String message, Callback callback);
 
@@ -28,9 +28,16 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	/**
 	 * Show info to the user.
 	 * 
-	 * @param string
+	 * @param message
 	 */
 	void showInfo(String message);
+
+	/**
+	 * Show success notification to the user.
+	 *
+	 * @param message
+	 */
+	void showSuccess(String message);
 
 	/**
 	 * Show info dialog to the user.
@@ -40,7 +47,7 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	/**
 	 * Prompt the user to enter a string value.
 	 * 
-	 * @param prompt
+	 * @param title
 	 * @param callback
 	 */
 	void showPromptDialog(String title, PromptCallback callback);

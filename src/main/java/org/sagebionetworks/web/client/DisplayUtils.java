@@ -243,6 +243,18 @@ public class DisplayUtils {
 		return div;
 	}
 
+	public static void showSuccess(String message) {
+		showNotification(message, null, null, NotifyType.SUCCESS, IconType.CHECK_CIRCLE, null);
+	}
+
+	public static void showWarning(String message) {
+		showNotification(message, null, null, NotifyType.WARNING, IconType.WARNING, null);
+	}
+
+	public static void showDanger(String message) {
+		showNotification(message, null, null, NotifyType.DANGER, IconType.WARNING, null);
+	}
+
 	/**
 	 * Shows an info message to the user in the "Global Alert area".
 	 * 
@@ -264,8 +276,12 @@ public class DisplayUtils {
 	}
 
 	public static void showInfo(String message, String href, String buttonText, IconType iconType, Integer timeout) {
+		showNotification(message, href, buttonText, NotifyType.INFO, iconType, timeout);
+	}
+
+	public static void showNotification(String message, String href, String buttonText, NotifyType notifyType, IconType iconType, Integer timeout) {
 		NotifySettings settings = getDefaultSettings(href, buttonText);
-		settings.setType(NotifyType.INFO);
+		settings.setType(notifyType);
 		if (timeout != null) {
 			settings.setDelay(timeout);
 		}
