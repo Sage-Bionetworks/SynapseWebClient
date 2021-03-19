@@ -3,18 +3,17 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
 import static org.sagebionetworks.web.shared.WebConstants.FLAG_ISSUE_DESCRIPTION_PART_1;
 import static org.sagebionetworks.web.shared.WebConstants.ISSUE_PRIORITY_MINOR;
+
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
 import org.sagebionetworks.web.shared.exceptions.DeprecatedServiceException;
@@ -25,6 +24,7 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+
 import com.google.gwt.user.client.rpc.StatusCodeException;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -35,18 +35,16 @@ public class SynapseAlertImpl implements SynapseAlert {
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authController;
 	SynapseAlertView view;
-	PortalGinInjector ginInjector;
 	Throwable ex;
 	SynapseJSNIUtils jsniUtils;
 	JSONObjectAdapter jsonObjectAdapter;
 	GWTWrapper gwt;
 
 	@Inject
-	public SynapseAlertImpl(SynapseAlertView view, GlobalApplicationState globalApplicationState, AuthenticationController authController, GWTWrapper gwt, PortalGinInjector ginInjector, SynapseJSNIUtils jsniUtils, JSONObjectAdapter jsonObjectAdapter) {
+	public SynapseAlertImpl(SynapseAlertView view, GlobalApplicationState globalApplicationState, AuthenticationController authController, GWTWrapper gwt, SynapseJSNIUtils jsniUtils, JSONObjectAdapter jsonObjectAdapter) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authController = authController;
-		this.ginInjector = ginInjector;
 		this.jsniUtils = jsniUtils;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.gwt = gwt;
@@ -148,9 +146,7 @@ public class SynapseAlertImpl implements SynapseAlert {
 	@Override
 	public void showLogin() {
 		clear();
-		// lazy inject login widget
-		LoginWidget loginWidget = ginInjector.getLoginWidget();
-		view.setLoginWidget(loginWidget.asWidget());
+		// show a link to the login page 
 		view.showLogin();
 	}
 
