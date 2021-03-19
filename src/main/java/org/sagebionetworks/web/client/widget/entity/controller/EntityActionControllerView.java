@@ -35,7 +35,7 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	/**
 	 * Show success notification to the user.
 	 *
-	 * @param string
+	 * @param message
 	 */
 	void showSuccess(String message);
 
