@@ -86,7 +86,7 @@
 								</bh:Span>
 								<bh:Span addStyleNames="flexcontainer-column">
 									<b:Anchor ui:field="reportAbuseLink"
-										text="Report Abuse" addStyleNames="color-white" />
+										text="Report Violation" addStyleNames="color-white" />
 								</bh:Span>
 							</bh:Div>
 						</bh:Div>
@@ -103,7 +103,7 @@
 							href="http://creativecommons.org/licenses/by/4.0/legalcode"
 							text="Creative Commons License"
 							addStyleNames="color-white displayBlock margin-top-5 margin-bottom-5" target="_blank" />
-						<b:Anchor ui:field="reportAbuseLink2" text="Report Abuse"
+						<b:Anchor ui:field="reportAbuseLink2" text="Report Violation"
 							addStyleNames="color-white displayBlock margin-top-5 margin-bottom-5" />
 						<bh:Div addStyleNames="margin-top-10 margin-bottom-10">
 							<g:Image addStyleNames="margin-right-5" url="images/sagebionetworks-logo.svg"/>
