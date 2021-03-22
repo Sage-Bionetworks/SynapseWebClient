@@ -284,6 +284,9 @@ public class DisplayUtils {
 		settings.setType(notifyType);
 		if (timeout != null) {
 			settings.setDelay(timeout);
+		} else {
+			// TODO: For Entity Finder testing, we set notifications to persist until explicitly closed.
+			settings.setDelay(0);
 		}
 		settings.setZIndex(2001);
 		notify(message, iconType, settings);
