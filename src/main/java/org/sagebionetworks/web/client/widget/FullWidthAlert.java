@@ -85,7 +85,7 @@ public class FullWidthAlert implements IsWidget {
 		messageSpan.setText(message);
 	}
 
-	public void addPrimaryCTAClickHandler(ClickHandler c) {		
+	public void addPrimaryCTAClickHandler(ClickHandler c) {
 		primaryButton.addClickHandler(c);
 	}
 
@@ -99,13 +99,21 @@ public class FullWidthAlert implements IsWidget {
 	}
 
 	public void setPrimaryCTAHref(String href) {
+		setPrimaryCTAHref(href, "_blank");
+	}
+	
+	public void setPrimaryCTAHrefTargetSelf(String href) {
+		setPrimaryCTAHref(href, "_self");
+	}
+	
+	private void setPrimaryCTAHref(String href, String target) {
 		primaryButton.setHref(href);
 		addPrimaryCTAClickHandler(event -> {
-			Window.open(href, "_blank", "");
-		});
+			Window.open(href, target, "");
+		});		
 	}
 
-	public void addSecondaryCTAClickHandler(ClickHandler c) {		
+	public void addSecondaryCTAClickHandler(ClickHandler c) {
 		secondaryButton.addClickHandler(c);
 	}
 
@@ -143,6 +151,14 @@ public class FullWidthAlert implements IsWidget {
 		w.setType(type);
 	}
 
+	public void setGlobal(boolean isGlobal) {
+		if (isGlobal) {
+			w.addStyleName("global");
+		} else {
+			w.removeStyleName("global");
+		}
+	}
+	
 	public void setDismissable(boolean dismissable) {
 		w.setDismissable(dismissable);
 	}

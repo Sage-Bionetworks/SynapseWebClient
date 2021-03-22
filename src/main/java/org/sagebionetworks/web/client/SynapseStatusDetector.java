@@ -1,8 +1,15 @@
 package org.sagebionetworks.web.client;
 
 import java.util.Date;
+
+import org.sagebionetworks.repo.model.status.StackStatus;
+import org.sagebionetworks.repo.model.status.StatusEnum;
+import org.sagebionetworks.web.client.place.Down;
+import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
+
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class SynapseStatusDetector {
@@ -13,28 +20,52 @@ public class SynapseStatusDetector {
 	public static final String STATUS_PAGE_IO_PAGE = "kh896k90gyvg";
 	DateTimeFormat iso8601DateFormat = DateTimeFormat.getFormat(PredefinedFormat.ISO_8601);
 	DateTimeUtils dateTimeUtils;
-
+	StackConfigServiceAsync stackConfig;
+	SynapseJSNIUtils jsniUtils;
+	GlobalApplicationState globalAppState;
 	// how long the popup should be shown (in ms)
 	public static final int POPUP_DELAY_MS = 5000;
 
 	@Inject
-	public SynapseStatusDetector(GWTWrapper gwt, PopupUtilsView popupUtils, DateTimeUtils dateTimeUtils) {
+	public SynapseStatusDetector(GWTWrapper gwt, PopupUtilsView popupUtils, DateTimeUtils dateTimeUtils, StackConfigServiceAsync stackConfig, SynapseJSNIUtils jsniUtils, GlobalApplicationState globalAppState) {
 		this.gwt = gwt;
 		this.popupUtils = popupUtils;
 		this.dateTimeUtils = dateTimeUtils;
+		this.stackConfig = stackConfig;
+		this.jsniUtils = jsniUtils;
+		this.globalAppState = globalAppState;
 	}
 
 	public void start() {
 		_getCurrentStatus(this);
 		_getUnresolvedIncidents(this);
 		_getScheduledMaintenance(this);
-
+		getSynapseStackStatus();
+		
 		gwt.scheduleFixedDelay(() -> {
 			_getCurrentStatus(this);
 			_getUnresolvedIncidents(this);
+			getSynapseStackStatus();
 		}, INTERVAL_MS);
 	}
-
+	
+	public void getSynapseStackStatus() {
+		stackConfig.getCurrentStatus(new AsyncCallback<StackStatus>() {
+			
+			@Override
+			public void onSuccess(StackStatus status) {
+				if (StatusEnum.READ_WRITE != status.getStatus()) {
+					// Synapse is down (RO mode or Down)
+					globalAppState.getPlaceChanger().goTo(new Down(DEFAULT_PLACE_TOKEN));
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				jsniUtils.consoleError("Unable to get Synapse stack status: " + caught.getMessage());
+			}
+		});
+	}
 	private void checkForScheduledMaintenanceLater() {
 		gwt.scheduleExecution(() -> {
 			_getScheduledMaintenance(this);

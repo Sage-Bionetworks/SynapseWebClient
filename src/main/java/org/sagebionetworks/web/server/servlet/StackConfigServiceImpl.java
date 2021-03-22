@@ -1,12 +1,10 @@
 package org.sagebionetworks.web.server.servlet;
 
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.status.StackStatus;
-import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
 import org.sagebionetworks.web.client.StackConfigService;
 import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl.PortalPropertiesHolder;
@@ -14,8 +12,6 @@ import org.sagebionetworks.web.server.servlet.SynapseClientImpl.PortalVersionHol
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
-import com.google.gwt.thirdparty.guava.common.base.Supplier;
-import com.google.gwt.thirdparty.guava.common.base.Suppliers;
 
 /**
  * 

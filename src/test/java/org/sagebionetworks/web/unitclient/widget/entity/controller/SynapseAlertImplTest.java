@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.controller;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -12,7 +11,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.shared.WebConstants.ISSUE_PRIORITY_MINOR;
 import static org.sagebionetworks.web.shared.WebConstants.SWC_ISSUE_COLLECTOR_URL;
+
 import java.util.Collections;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -26,9 +27,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -45,8 +44,8 @@ import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+
 import com.google.gwt.user.client.rpc.StatusCodeException;
-import com.google.gwt.user.client.ui.Widget;
 
 public class SynapseAlertImplTest {
 	@Mock
@@ -59,13 +58,9 @@ public class SynapseAlertImplTest {
 	@Mock
 	PlaceChanger mockPlaceChanger;
 	@Mock
-	PortalGinInjector mockPortalGinInjector;
-	@Mock
 	GWTWrapper mockGWT;
 	@Mock
 	LoginWidget mockLoginWidget;
-	@Mock
-	SynapseProperties mockSynapseProperties;
 	@Mock
 	SynapseJSNIUtils mockJsniUtils;
 	// a new jira odyssey
@@ -84,13 +79,11 @@ public class SynapseAlertImplTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		widget = new SynapseAlertImpl(mockView, mockGlobalApplicationState, mockAuthenticationController, mockGWT, mockPortalGinInjector, mockJsniUtils, jsonObjectAdapter);
+		widget = new SynapseAlertImpl(mockView, mockGlobalApplicationState, mockAuthenticationController, mockGWT, mockJsniUtils, jsonObjectAdapter);
 		UserProfile mockProfile = mock(UserProfile.class);
 		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(mockProfile);
 		when(mockGWT.getHostPageBaseURL()).thenReturn(HOST_PAGE_URL);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		when(mockPortalGinInjector.getLoginWidget()).thenReturn(mockLoginWidget);
-		when(mockPortalGinInjector.getSynapseProperties()).thenReturn(mockSynapseProperties);
 		when(mockAuthenticationController.getCurrentUserProfile()).thenReturn(mockProfile);
 		when(mockProfile.getOwnerId()).thenReturn(USER_ID);
 		when(mockProfile.getEmails()).thenReturn(Collections.singletonList(USER_EMAIL));
@@ -162,8 +155,6 @@ public class SynapseAlertImplTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		widget.handleException(new ForbiddenException());
 		verify(mockView, atLeastOnce()).clearState();
-		verify(mockPortalGinInjector).getLoginWidget();
-		verify(mockView).setLoginWidget(any(Widget.class));
 		verify(mockView).showLogin();
 	}
 
@@ -253,8 +244,6 @@ public class SynapseAlertImplTest {
 	public void testShowMustLogin() {
 		widget.showLogin();
 		verify(mockView).clearState();
-		verify(mockPortalGinInjector).getLoginWidget();
-		verify(mockView).setLoginWidget(any(Widget.class));
 		verify(mockView).showLogin();
 	}
 
