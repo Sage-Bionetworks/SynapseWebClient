@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder.SelectedHandler;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -75,6 +76,7 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 
 		if (TableType.projects.equals(tableType)) {
 			String friendlyEntityType = "Project View";
+			entityFinderBuilder.setInitialScope(EntityFinderScope.ALL_PROJECTS);
 			entityFinderBuilder.setSelectableTypesInList(EntityFilter.PROJECT);
 			entityFinderBuilder.setHelpMarkdown("Search or Browse Synapse to find " + EntityTypeUtils.getDisplayName(EntityType.project) + "s to put into this " + friendlyEntityType);
 			entityFinderBuilder.setPromptCopy("Find " + EntityTypeUtils.getDisplayName(EntityType.project) + "s for this View");
