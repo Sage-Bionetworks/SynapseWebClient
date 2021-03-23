@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.client;
 
+import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
+
 import java.util.Date;
 
 import org.sagebionetworks.repo.model.status.StackStatus;
 import org.sagebionetworks.repo.model.status.StatusEnum;
 import org.sagebionetworks.web.client.place.Down;
-import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
