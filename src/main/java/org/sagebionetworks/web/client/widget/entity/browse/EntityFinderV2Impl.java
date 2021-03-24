@@ -29,7 +29,7 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
     private List<Reference> selectedEntities;
     GlobalApplicationState globalApplicationState;
     AuthenticationController authenticationController;
-    private SynapseAlert synAlert;
+    private SynapseAlert synAlert; // TODO: Why is this exposed here? Should just be accessible/used in the view
     private SynapseJavascriptClient jsClient;
 
     private boolean multiSelect;
@@ -352,6 +352,7 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
 
     @Override
     public void show() {
+        synAlert.clear();
         view.clear();
         view.show();
     }
