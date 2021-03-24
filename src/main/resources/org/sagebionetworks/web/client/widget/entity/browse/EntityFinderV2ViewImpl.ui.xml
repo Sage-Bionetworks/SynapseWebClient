@@ -7,7 +7,7 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<b:Modal dataBackdrop="STATIC" dataKeyboard="true"
 		addStyleNames="entityFinder modal-fullscreen topLevelZIndex">
-		<b:ModalHeader closable="false">
+		<b:ModalHeader closable="true">
 			<b:Heading ui:field="modalTitle" size="H4" text="Find in Synapse"
 				addStyleNames="displayInline" />
 			<w:HelpWidget ui:field="helpWidget"
