@@ -21,30 +21,28 @@ public class PreviewConfigEditor implements PreviewConfigView.Presenter, WidgetE
 	EntityFinder entityFinder;
 
 	@Inject
-	public PreviewConfigEditor(PreviewConfigView view, EntityFinder entityFinder) {
+	public PreviewConfigEditor(PreviewConfigView view, EntityFinder.Builder entityFinderBuilder) {
 		this.view = view;
 		this.entityFinder = entityFinder;
 		view.setPresenter(this);
 		view.initView();
 
-		configureEntityFinder();
-	}
+		this.entityFinder = entityFinderBuilder
+				.setSelectableTypesInList(EntityFilter.ALL_BUT_LINK)
+				.setShowVersions(true)
+				.setSelectedHandler((selected, finder) -> {
+					view.setEntityId(selected.getTargetId());
+					Long version = selected.getTargetVersionNumber();
+					if (version != null) {
+						view.setVersion(version.toString());
+					} else {
+						view.setVersion("");
+					}
 
-	private void configureEntityFinder() {
-		entityFinder.configure(EntityFilter.ALL_BUT_LINK, true, new EntityFinder.SelectedHandler<Reference>() {
-			@Override
-			public void onSelected(Reference selected, EntityFinder finder) {
-				view.setEntityId(selected.getTargetId());
-				Long version = selected.getTargetVersionNumber();
-				if (version != null) {
-					view.setVersion(version.toString());
-				} else {
-					view.setVersion("");
+					finder.hide();
 				}
-
-				entityFinder.hide();
-			}
-		});
+				)
+				.build();
 	}
 
 	@Override
