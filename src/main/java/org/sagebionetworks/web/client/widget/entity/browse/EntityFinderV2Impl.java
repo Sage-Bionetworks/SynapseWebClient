@@ -296,6 +296,7 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
 
     @Override
     public void clearSelectedEntities() {
+        synAlert.clear();
         selectedEntities.clear();
     }
 
