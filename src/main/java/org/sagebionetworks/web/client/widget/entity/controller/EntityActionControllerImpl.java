@@ -1290,6 +1290,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 						public void onSuccess(Entity result) {
 							finder.hide();
 							fireEntityUpdatedEvent();
+							view.showSuccess(result.getId() + " successfully moved");
 						}
 
 						@Override
