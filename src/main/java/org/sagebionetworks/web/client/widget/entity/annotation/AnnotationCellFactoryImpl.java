@@ -33,6 +33,9 @@ public class AnnotationCellFactoryImpl implements AnnotationCellFactory {
 			case STRING:
 				editor = ginInjector.createStringEditorCell();
 				break;
+			case BOOLEAN:
+				editor = ginInjector.createBooleanCellEditor();
+				break;
 			default:
 				throw new IllegalArgumentException("Unrecognized annotation type " + annotation.getType());
 		}
