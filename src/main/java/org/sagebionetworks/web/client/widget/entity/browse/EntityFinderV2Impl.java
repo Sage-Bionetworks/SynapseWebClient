@@ -361,6 +361,7 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
     @Override
     public void hide() {
         view.hide();
+        view.clear();
     }
 
     @Override

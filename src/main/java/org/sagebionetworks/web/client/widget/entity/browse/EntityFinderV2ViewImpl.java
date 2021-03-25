@@ -131,6 +131,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 
 	@Override
 	public void clear() {
+		entityFinderContainer.clear();
 		presenter.clearSelectedEntities();
 	}
 

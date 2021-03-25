@@ -12,4 +12,10 @@ public class ReactComponentDiv extends Div {
 		ReactDOM.unmountComponentAtNode(this.getElement());
 		super.onUnload();
 	}
+
+	@Override
+	public void clear() {
+		ReactDOM.unmountComponentAtNode(this.getElement());
+		super.clear();
+	}
 }
