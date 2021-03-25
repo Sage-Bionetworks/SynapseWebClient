@@ -24,6 +24,7 @@ public class AnnotationEditor implements Presenter {
 	private static final String DATE = "Date";
 	private static final String TEXT = "Text";
 	private static final String INTEGER = "Integer";
+	private static final String BOOLEAN = "Boolean";
 	private static final String FLOATING_POINT = "Floating Point";
 	private AnnotationEditorView view;
 	private Callback deletedCallback;
@@ -44,6 +45,7 @@ public class AnnotationEditor implements Presenter {
 		annotationTypes.add(AnnotationsValueType.LONG);
 		annotationTypes.add(AnnotationsValueType.DOUBLE);
 		annotationTypes.add(AnnotationsValueType.TIMESTAMP_MS);
+		annotationTypes.add(AnnotationsValueType.BOOLEAN);
 		for (AnnotationsValueType type : annotationTypes) {
 			displayTypes.add(getDisplayName(type));
 		}
@@ -211,6 +213,9 @@ public class AnnotationEditor implements Presenter {
 			case TIMESTAMP_MS:
 				displayName = DATE;
 				break;
+			case BOOLEAN:
+				displayName = BOOLEAN;
+				break;
 			default:
 				break;
 		}
@@ -224,6 +229,8 @@ public class AnnotationEditor implements Presenter {
 			return AnnotationsValueType.LONG;
 		} else if (DATE.equals(displayName)) {
 			return AnnotationsValueType.TIMESTAMP_MS;
+		} else if (BOOLEAN.equals(displayName)) {
+			return AnnotationsValueType.BOOLEAN;
 		} else {
 			return AnnotationsValueType.STRING;
 		}
