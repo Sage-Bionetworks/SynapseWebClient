@@ -5,10 +5,7 @@ import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.dom.client.FocusHandler;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -42,36 +39,11 @@ public class BiodallianceSourceEditorViewImpl implements IsWidget, BiodallianceS
 	@Inject
 	public BiodallianceSourceEditorViewImpl(BiodallianceSourceViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
-		entityPickerTextbox.addFocusHandler(new FocusHandler() {
-			@Override
-			public void onFocus(FocusEvent event) {
-				entityPicker();
-			}
-		});
-		entityPickerButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				entityPicker();
-			}
-		});
-		indexEntityPickerTextbox.addFocusHandler(new FocusHandler() {
-			@Override
-			public void onFocus(FocusEvent event) {
-				indexEntityPicker();
-			}
-		});
-		indexEntityPickerButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				indexEntityPicker();
-			}
-		});
-		select.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onSelectionChanged();
-			}
-		});
+		entityPickerTextbox.addClickHandler(event -> entityPicker());
+		entityPickerButton.addClickHandler(event -> entityPicker());
+		indexEntityPickerTextbox.addClickHandler(event -> indexEntityPicker());
+		indexEntityPickerButton.addClickHandler(event -> indexEntityPicker());
+		select.addClickHandler(event -> presenter.onSelectionChanged());
 	}
 
 	public void entityPicker() {
