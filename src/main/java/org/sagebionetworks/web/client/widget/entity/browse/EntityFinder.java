@@ -9,7 +9,7 @@ public interface EntityFinder {
 	/**
 	 * Designed to provide the same functionality as DisplayUtils.SelectedHandler,
 	 * except also providing the finder itself. This allows the caller to access methods
-	 * on the EntityFinder in the handler, which is specified prior to calling the Builder.build()
+	 * on the EntityFinder in the handler, which is specified prior to calling Builder.build()
 	 * @param <T>
 	 */
 	@FunctionalInterface
@@ -49,42 +49,6 @@ public interface EntityFinder {
 
 		Builder setConfirmButtonCopy(String confirmButtonCopy);
 	}
-
-	@Deprecated
-	/**
-	 * Use EntityFinder.Builder
-	 */
-	void configure(boolean showVersions, SelectedHandler<Reference> handler);
-
-	@Deprecated
-	/**
-	 * Use EntityFinder.Builder
-	 */
-	void configure(EntityFilter selectableTypes, boolean showVersions, SelectedHandler<Reference> handler);
-
-	@Deprecated
-	/**
-	 * Use EntityFinder.Builder
-	 */
-	void configure(EntityFilter viewable, EntityFilter selectable, boolean showVersions, SelectedHandler<Reference> handler);
-
-	@Deprecated
-	/**
-	 * Use EntityFinder.Builder
-	 */
-	void configureMulti(boolean showVersions, SelectedHandler<List<Reference>> handler);
-
-	@Deprecated
-	/**
-	 * Use EntityFinder.Builder
-	 */
-	void configureMulti(EntityFilter selectableTypes, boolean showVersions, SelectedHandler<List<Reference>> handler);
-
-	@Deprecated
-	/**
-	 * Use EntityFinder.Builder
-	 */
-	void configureMulti(EntityFilter viewable, EntityFilter selectable, boolean showVersions, SelectedHandler<List<Reference>> handler);
 
 	void showError(String errorMessage);
 

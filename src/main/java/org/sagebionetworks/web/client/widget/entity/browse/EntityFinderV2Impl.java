@@ -235,51 +235,6 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         }
     }
 
-
-    @Override
-    public void configure(boolean showVersions, SelectedHandler<Reference> handler) {
-        configure(ALL, showVersions, handler);
-    }
-
-    @Override
-    public void configure(EntityFilter selectable, boolean showVersions, SelectedHandler<Reference> handler) {
-        configure(ALL, selectable, showVersions, handler);
-    }
-
-    @Override
-    public void configure(EntityFilter visible, EntityFilter selectable, boolean showVersions, SelectedHandler<Reference> handler) {
-        this.showVersions = showVersions;
-        this.visibleTypesInList = visible;
-        this.selectableTypesInList = selectable;
-        this.selectedHandler = handler;
-        this.multiSelect = false;
-        selectedEntities.clear();
-        renderComponent();
-
-    }
-
-    @Override
-    public void configureMulti(boolean showVersions, SelectedHandler<List<Reference>> handler) {
-        configureMulti(ALL, showVersions, handler);
-    }
-
-    @Override
-    public void configureMulti(EntityFilter filter, boolean showVersions, SelectedHandler<List<Reference>> handler) {
-        configureMulti(ALL, filter, showVersions, handler);
-    }
-
-    @Override
-    public void configureMulti(EntityFilter visible, EntityFilter selectable, boolean showVersions, SelectedHandler<List<Reference>> handler) {
-        this.showVersions = showVersions;
-        this.visibleTypesInList = visible;
-        this.selectableTypesInList = selectable;
-        this.selectedMultiHandler = handler;
-        this.multiSelect = true;
-        selectedEntities.clear();
-        renderComponent();
-
-    }
-
     @Override
     public void setSelectedEntity(Reference selected) {
         synAlert.clear();
