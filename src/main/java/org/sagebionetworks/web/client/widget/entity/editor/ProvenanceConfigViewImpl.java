@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -20,7 +21,6 @@ public class ProvenanceConfigViewImpl implements ProvenanceConfigView {
 
 	private Presenter presenter;
 
-	EntityFinder entityFinder;
 
 	@UiField
 	TextBox entityListField;
@@ -36,30 +36,20 @@ public class ProvenanceConfigViewImpl implements ProvenanceConfigView {
 	Widget widget;
 
 	@Inject
-	public ProvenanceConfigViewImpl(ProvenanceConfigViewImplUiBinder binder, EntityFinder entityFinder) {
+	public ProvenanceConfigViewImpl(ProvenanceConfigViewImplUiBinder binder, EntityFinder.Builder entityFinderBuilder) {
 		widget = binder.createAndBindUi(this);
-		this.entityFinder = entityFinder;
-		initClickHandlers();
-	}
 
-	private void initClickHandlers() {
-		entityFinderButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				entityFinder.configure(true, new EntityFinder.SelectedHandler<Reference>() {
-					@Override
-					public void onSelected(Reference selected, EntityFinder finder) {
-						if (selected.getTargetId() != null) {
-							appendEntityListValue(selected);
-							entityFinder.hide();
-						} else {
-							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-						}
-					}
-				});
-				entityFinder.show();
-			}
-		});
+		entityFinderButton.addClickHandler(event -> entityFinderBuilder
+				.setMultiSelect(false)
+				.setSelectableTypesInList(EntityFilter.ALL)
+				.setShowVersions(true)
+				.setSelectedHandler((selected, finder) -> {
+					appendEntityListValue(selected);
+					finder.hide();
+				})
+				.build()
+				.show()
+		);
 	}
 
 	@Override

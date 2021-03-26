@@ -20,50 +20,52 @@ public class CytoscapeConfigViewImpl implements CytoscapeConfigView {
 
 	private Presenter presenter;
 	@UiField
-	TextBox entity;
+	TextBox cyJsEntity;
 	@UiField
 	TextBox styleEntity;
 	@UiField
-	Button button;
+	Button findCyJSButton;
 	@UiField
-	Button styleButton;
+	Button findJSONStyleButton;
 	@UiField
 	TextBox displayHeightField;
 
-	EntityFinder entityFinder;
+	EntityFinder cyJsFinder, styleFinder;
 
 	Widget widget;
 
 	@Inject
-	public CytoscapeConfigViewImpl(CytoscapeConfigViewImplUiBinder binder, EntityFinder entityFinder) {
+	public CytoscapeConfigViewImpl(CytoscapeConfigViewImplUiBinder binder, EntityFinder.Builder entityFinderBuilder) {
 		widget = binder.createAndBindUi(this);
-		this.entityFinder = entityFinder;
-		button.addClickHandler(getClickHandler(entity));
-		styleButton.addClickHandler(getClickHandler(styleEntity));
+
+		this.cyJsFinder = entityFinderBuilder
+				.setMultiSelect(false)
+				.setSelectableTypesInList(EntityFilter.ALL_BUT_LINK)
+				.setShowVersions(false)
+				.setSelectedHandler((selected, finder) -> {
+					cyJsEntity.setValue(selected.getTargetId());
+					finder.hide();
+				})
+				.build();
+
+		this.styleFinder = entityFinderBuilder
+				// Same properties except the handler
+				.setSelectedHandler((selected, finder) -> {
+					styleEntity.setValue(selected.getTargetId());
+					finder.hide();
+				})
+				.build();
+
+		findCyJSButton.addClickHandler(event -> cyJsFinder.show());
+		findJSONStyleButton.addClickHandler(event -> styleFinder.show());
 	}
 
 	@Override
 	public void initView() {}
 
-	public ClickHandler getClickHandler(final TextBox textBox) {
-		return new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent arg0) {
-				entityFinder.configure(EntityFilter.ALL_BUT_LINK, false, new EntityFinder.SelectedHandler<Reference>() {
-					@Override
-					public void onSelected(Reference selected, EntityFinder finder) {
-						textBox.setValue(selected.getTargetId());
-						entityFinder.hide();
-					}
-				});
-				entityFinder.show();
-			}
-		};
-	}
-
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		if ("".equals(entity.getValue()))
+		if ("".equals(cyJsEntity.getValue()))
 			throw new IllegalArgumentException(DisplayConstants.ERROR_SELECT_CYTOSCAPE_FILE);
 	}
 
@@ -92,12 +94,12 @@ public class CytoscapeConfigViewImpl implements CytoscapeConfigView {
 
 	@Override
 	public String getEntity() {
-		return entity.getValue();
+		return cyJsEntity.getValue();
 	}
 
 	@Override
 	public void setEntity(String entityId) {
-		entity.setValue(entityId);
+		cyJsEntity.setValue(entityId);
 	}
 
 	@Override
@@ -112,7 +114,7 @@ public class CytoscapeConfigViewImpl implements CytoscapeConfigView {
 
 	@Override
 	public void clear() {
-		entity.setValue("");
+		cyJsEntity.setValue("");
 		styleEntity.setValue("");
 		displayHeightField.setValue("");
 	}

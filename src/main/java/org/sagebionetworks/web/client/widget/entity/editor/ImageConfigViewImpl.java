@@ -31,7 +31,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 
 	private Presenter presenter;
 	SageImageBundle sageImageBundle;
-	EntityFinder entityFinder;
 	ClientCache clientCache;
 	SynapseJSNIUtils synapseJSNIUtils;
 
@@ -78,10 +77,9 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	private ImageParamsPanel uploadParamsPanel, synapseParamsPanel;
 
 	@Inject
-	public ImageConfigViewImpl(ImageConfigViewImplUiBinder binder, SageImageBundle sageImageBundle, EntityFinder entityFinder, ClientCache clientCache, SynapseJSNIUtils synapseJSNIUtils, ImageParamsPanel synapseParamsPanel, ImageParamsPanel uploadParamsPanel) {
+	public ImageConfigViewImpl(ImageConfigViewImplUiBinder binder, SageImageBundle sageImageBundle, EntityFinder.Builder entityFinderBuilder, ClientCache clientCache, SynapseJSNIUtils synapseJSNIUtils, ImageParamsPanel synapseParamsPanel, ImageParamsPanel uploadParamsPanel) {
 		widget = binder.createAndBindUi(this);
 		this.sageImageBundle = sageImageBundle;
-		this.entityFinder = entityFinder;
 		this.clientCache = clientCache;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseParamsPanel = synapseParamsPanel;
@@ -90,24 +88,18 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		uploadParamsPanelContainer.setWidget(uploadParamsPanel.asWidget());
 		synapseParamsPanelContainer.setWidget(synapseParamsPanel.asWidget());
 
-		initClickHandlers();
+		findEntitiesButton.addClickHandler(event -> entityFinderBuilder
+				.setMultiSelect(false)
+				.setSelectableTypesInList(EntityFilter.ALL_BUT_LINK)
+				.setShowVersions(true)
+				.setSelectedHandler((selected, entityFinder) -> {
+					entityField.setValue(DisplayUtils.createEntityVersionString(selected));
+					entityFinder.hide();
+				})
+				.build()
+				.show());
 	}
 
-	private void initClickHandlers() {
-		findEntitiesButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				entityFinder.configure(EntityFilter.ALL_BUT_LINK, true, new EntityFinder.SelectedHandler<Reference>() {
-					@Override
-					public void onSelected(Reference selected, EntityFinder entityFinder) {
-						entityField.setValue(DisplayUtils.createEntityVersionString(selected));
-						entityFinder.hide();
-					}
-				});
-				entityFinder.show();
-			}
-		});
-	}
 
 	@Override
 	public void initView() {

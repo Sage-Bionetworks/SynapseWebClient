@@ -49,31 +49,21 @@ public class VideoConfigViewImpl implements VideoConfigView {
 	Widget widget;
 
 	@Inject
-	public VideoConfigViewImpl(VideoConfigViewImplUiBinder binder, EntityFinder entityFinder) {
+	public VideoConfigViewImpl(VideoConfigViewImplUiBinder binder, EntityFinder.Builder entityFinderBuilder) {
 		widget = binder.createAndBindUi(this);
-		this.entityFinder = entityFinder;
-		button.addClickHandler(getClickHandler(entity));
+		this.entityFinder = entityFinderBuilder
+				.setMultiSelect(false)
+				.setSelectableTypesInList(EntityFilter.ALL_BUT_LINK)
+				.setShowVersions(false)
+				.setSelectedHandler(((selected, finder) -> presenter.validateSelection(selected)))
+				.build();
+		button.addClickHandler(event -> entityFinder.show());
 	}
 
 	@Override
 	public void initView() {
 		youtubeUrlField.setValue("");
 		vimeoUrlField.setValue("");
-	}
-
-	public ClickHandler getClickHandler(final TextBox textBox) {
-		return new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent arg0) {
-				entityFinder.configure(EntityFilter.ALL_BUT_LINK, false, new EntityFinder.SelectedHandler<Reference>() {
-					@Override
-					public void onSelected(Reference selected, EntityFinder finder) {
-						presenter.validateSelection(selected);
-					}
-				});
-				entityFinder.show();
-			}
-		};
 	}
 
 	@Override

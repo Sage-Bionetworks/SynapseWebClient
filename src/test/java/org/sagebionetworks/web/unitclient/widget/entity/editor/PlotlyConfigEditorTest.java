@@ -8,6 +8,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -58,6 +59,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigView;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+import org.sagebionetworks.web.test.helper.SelfReturningAnswer;
+
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -67,12 +70,11 @@ public class PlotlyConfigEditorTest {
 	@Mock
 	PlotlyConfigView mockView;
 
+	EntityFinder.Builder mockEntityFinderBuilder;
 	@Mock
 	EntityFinder mockFinder;
 	@Mock
 	SynapseAlert mockSynAlert;
-	@Mock
-	SynapseClientAsync mockSynapseClient;
 	@Mock
 	Button mockShowHideAdvancedButton;
 	@Captor
@@ -100,7 +102,9 @@ public class PlotlyConfigEditorTest {
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		editor = new PlotlyConfigEditor(mockView, mockFinder, mockSynAlert, mockShowHideAdvancedButton, mockSynapseJavascriptClient);
+		mockEntityFinderBuilder = mock(EntityFinder.Builder.class, new SelfReturningAnswer());
+		when(mockEntityFinderBuilder.build()).thenReturn(mockFinder);
+		editor = new PlotlyConfigEditor(mockView, mockEntityFinderBuilder, mockSynAlert, mockShowHideAdvancedButton, mockSynapseJavascriptClient);
 		columnModels = new ArrayList<ColumnModel>();
 		AsyncMockStubber.callSuccessWith(columnModels).when(mockSynapseJavascriptClient).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
 		when(mockXColumnModel.getName()).thenReturn(X_COLUMN_NAME);
@@ -364,7 +368,11 @@ public class PlotlyConfigEditorTest {
 	@Test
 	public void testOnFindTable() {
 		editor.onFindTable();
-		verify(mockFinder).configure(eq(EntityFilter.PROJECT_OR_TABLE), eq(false), finderCallbackCaptor.capture());
+		verify(mockEntityFinderBuilder).setMultiSelect(false);
+		verify(mockEntityFinderBuilder).setSelectableTypesInList(EntityFilter.PROJECT_OR_TABLE);
+		verify(mockEntityFinderBuilder).setShowVersions(false);
+		verify(mockEntityFinderBuilder).setSelectedHandler(finderCallbackCaptor.capture());
+		verify(mockEntityFinderBuilder).build();
 		verify(mockFinder).show();
 		EntityFinder.SelectedHandler<Reference> callback = finderCallbackCaptor.getValue();
 		String newTableId = "syn222";

@@ -63,9 +63,8 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	SynapseJavascriptClient jsClient;
 
 	@Inject
-	public PlotlyConfigEditor(final PlotlyConfigView view, EntityFinder finder, SynapseAlert synAlert, Button showHideAdvancedButton, SynapseJavascriptClient jsClient) {
+	public PlotlyConfigEditor(final PlotlyConfigView view, EntityFinder.Builder entityFinderBuilder, SynapseAlert synAlert, Button showHideAdvancedButton, SynapseJavascriptClient jsClient) {
 		this.view = view;
-		this.finder = finder;
 		this.synAlert = synAlert;
 		this.jsClient = jsClient;
 		this.showHideAdvancedButton = showHideAdvancedButton;
@@ -85,6 +84,16 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 				setAdvancedModeVisible(!isAdvancedVisible);
 			}
 		});
+
+		this.finder = entityFinderBuilder
+				.setMultiSelect(false)
+				.setSelectableTypesInList(EntityFilter.PROJECT_OR_TABLE)
+				.setShowVersions(false)
+				.setSelectedHandler((selected, entityFinder) -> {
+					setTableId(selected.getTargetId());
+					finder.hide();
+				})
+				.build();
 	}
 
 	public void setAdvancedModeVisible(boolean visible) {
@@ -353,13 +362,6 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 
 	@Override
 	public void onFindTable() {
-		finder.configure(EntityFilter.PROJECT_OR_TABLE, false, new EntityFinder.SelectedHandler<Reference>() {
-			@Override
-			public void onSelected(Reference selected, EntityFinder entityFinder) {
-				setTableId(selected.getTargetId());
-				finder.hide();
-			}
-		});
 		finder.show();
 	}
 

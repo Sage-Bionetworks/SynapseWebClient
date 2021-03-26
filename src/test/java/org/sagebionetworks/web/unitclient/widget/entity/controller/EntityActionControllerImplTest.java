@@ -1380,7 +1380,6 @@ public class EntityActionControllerImplTest {
 		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.CREATE_LINK);
-		verify(mockEntityFinder, never()).configure(anyBoolean(), any(EntityFinder.SelectedHandler.class));
 		verify(mockEntityFinder, never()).show();
 		verify(mockView, never()).showInfo(anyString());
 	}

@@ -32,27 +32,24 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 	SynapseJavascriptClient jsClient;
 
 	@Inject
-	public BiodallianceSourceEditor(BiodallianceSourceEditorView view, EntityFinder entityFinder, EntityFinder indexEntityFinder, BiodallianceSource source, SynapseJavascriptClient jsClient) {
+	public BiodallianceSourceEditor(BiodallianceSourceEditorView view, EntityFinder.Builder entityFinderBuilder, BiodallianceSource source, SynapseJavascriptClient jsClient) {
 		this.view = view;
-		this.entityFinder = entityFinder;
-		this.indexEntityFinder = indexEntityFinder;
 		this.source = source;
 		this.jsClient = jsClient;
 
 		view.setPresenter(this);
-		entityFinder.configure(EntityFilter.ALL_BUT_LINK, true, new EntityFinder.SelectedHandler<Reference>() {
-			@Override
-			public void onSelected(Reference selected, EntityFinder finder) {
-				entitySelected(selected);
-			}
-		});
 
-		indexEntityFinder.configure(EntityFilter.ALL_BUT_LINK, true, new EntityFinder.SelectedHandler<Reference>() {
-			@Override
-			public void onSelected(Reference selected, EntityFinder finder) {
-				indexEntitySelected(selected);
-			}
-		});
+		this.entityFinder = entityFinderBuilder
+				.setMultiSelect(false)
+				.setSelectableTypesInList(EntityFilter.ALL_BUT_LINK)
+				.setShowVersions(true)
+				.setSelectedHandler((selected, finder) -> entitySelected(selected))
+				.build();
+
+		this.indexEntityFinder = entityFinderBuilder
+				.setSelectedHandler((selected, finder) -> indexEntitySelected(selected))
+				.build();
+
 		updateViewFromSource();
 	}
 

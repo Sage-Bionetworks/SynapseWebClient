@@ -64,41 +64,54 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 	Div submissionTypeOptions;
 	Widget widget;
 
-	EntityFinder entityFinder;
-
 	@Inject
-	public EvaluationSubmissionConfigViewImpl(EvaluationSubmissionConfigViewImplUiBinder binder, EntityFinder entityFinder, CookieProvider cookies) {
+	public EvaluationSubmissionConfigViewImpl(EvaluationSubmissionConfigViewImplUiBinder binder, EntityFinder.Builder entityFinderBuilder, CookieProvider cookies) {
 		widget = binder.createAndBindUi(this);
-		this.entityFinder = entityFinder;
 		this.cookies = cookies;
 		findProjectButton.addClickHandler(event -> {
-			entityFinder.configure(EntityFilter.PROJECT, false, (selectedRef, finder) -> {
-				challengeProjectField.setValue(selectedRef.getTargetId());
-				entityFinder.hide();
-			});
-			entityFinder.show();
+			entityFinderBuilder.setMultiSelect(false)
+					.setSelectableTypesInList(EntityFilter.PROJECT)
+					.setShowVersions(false)
+					.setSelectedHandler(((selected, entityFinder) -> {
+						challengeProjectField.setValue(selected.getTargetId());
+						entityFinder.hide();
+					}))
+					.build()
+					.show();
 		});
 
 		findFormContainerButton.addClickHandler(event -> {
-			entityFinder.configure(EntityFilter.CONTAINER, false, (selectedRef, finder) -> {
-				formContainerIdField.setValue(selectedRef.getTargetId());
-				entityFinder.hide();
-			});
-			entityFinder.show();
+			entityFinderBuilder.setMultiSelect(false)
+					.setSelectableTypesInList(EntityFilter.CONTAINER)
+					.setShowVersions(false)
+					.setSelectedHandler(((selected, entityFinder) -> {
+						formContainerIdField.setValue(selected.getTargetId());
+						entityFinder.hide();
+					}))
+					.build()
+					.show();
 		});
 		findSchemaFileButton.addClickHandler(event -> {
-			entityFinder.configure(EntityFilter.ALL_BUT_LINK, false, (selectedRef, finder) -> {
-				schemaFileSynIdField.setValue(selectedRef.getTargetId());
-				entityFinder.hide();
-			});
-			entityFinder.show();
+			entityFinderBuilder.setMultiSelect(false)
+					.setSelectableTypesInList(EntityFilter.ALL_BUT_LINK)
+					.setShowVersions(false)
+					.setSelectedHandler(((selected, entityFinder) -> {
+						schemaFileSynIdField.setValue(selected.getTargetId());
+						entityFinder.hide();
+					}))
+					.build()
+					.show();
 		});
 		findUiSchemaFileButton.addClickHandler(event -> {
-			entityFinder.configure(EntityFilter.ALL_BUT_LINK, false, (selectedRef, finder) -> {
-				uiSchemaFileSynIdField.setValue(selectedRef.getTargetId());
-				entityFinder.hide();
-			});
-			entityFinder.show();
+			entityFinderBuilder.setMultiSelect(false)
+					.setSelectableTypesInList(EntityFilter.ALL_BUT_LINK)
+					.setShowVersions(false)
+					.setSelectedHandler(((selected, entityFinder) -> {
+						uiSchemaFileSynIdField.setValue(selected.getTargetId());
+						entityFinder.hide();
+					}))
+					.build()
+					.show();
 		});
 
 		challengeRadioOption.addClickHandler(event -> {

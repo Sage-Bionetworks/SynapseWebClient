@@ -32,20 +32,19 @@ public class ImportTableViewColumnsButton implements IsWidget {
 	EntityFinder finder;
 
 	@Inject
-	public ImportTableViewColumnsButton(Button button, final EntityFinder finder, SynapseJavascriptClient jsClient) {
+	public ImportTableViewColumnsButton(Button button, final EntityFinder.Builder entityFinderBuilder, SynapseJavascriptClient jsClient) {
 		this.button = button;
 		this.jsClient = jsClient;
-		this.finder = finder;
 		button.setText(BUTTON_TEXT);
 		button.setSize(ButtonSize.DEFAULT);
 		button.setType(ButtonType.DEFAULT);
 		button.setIcon(IconType.ARROW_CIRCLE_O_DOWN);
-		finder.configure(EntityFilter.PROJECT_OR_TABLE, false, new EntityFinder.SelectedHandler<Reference>() {
-			@Override
-			public void onSelected(Reference selected, EntityFinder finder) {
-				onTableViewSelected(selected.getTargetId());
-			}
-		});
+		this.finder = entityFinderBuilder
+				.setMultiSelect(false)
+				.setSelectableTypesInList(EntityFilter.PROJECT_OR_TABLE)
+				.setShowVersions(false)
+				.setSelectedHandler((selected, entityFinder) -> onTableViewSelected(selected.getTargetId()))
+				.build();
 		button.addStyleName("margin-left-10");
 		button.addClickHandler(new ClickHandler() {
 			@Override
