@@ -10,9 +10,9 @@
 				<b:FormGroup>
 					<b:FormLabel>Cytoscape JS network file</b:FormLabel>
 					<b:InputGroup>
-						<b:TextBox ui:field="entity" autoComplete="false" enabled="false" />
+						<b:TextBox ui:field="cyJsEntity" autoComplete="false" enabled="false" />
 						<b:InputGroupButton>
-							<b:Button text="Find cyjs file" ui:field="button" icon="SEARCH" width="125px"/>
+							<b:Button text="Find cyjs file" ui:field="findCyJSButton" icon="SEARCH" width="125px"/>
 						</b:InputGroupButton>
 					</b:InputGroup>
 				</b:FormGroup>
@@ -26,7 +26,7 @@
 					<b:InputGroup>
 						<b:TextBox ui:field="styleEntity" autoComplete="false" enabled="false" />
 						<b:InputGroupButton>
-							<b:Button text="Find json file" ui:field="styleButton" icon="SEARCH" width="125px"/>
+							<b:Button text="Find json file" ui:field="findJSONStyleButton" icon="SEARCH" width="125px"/>
 						</b:InputGroupButton>
 					</b:InputGroup>
 				</b:FormGroup>
