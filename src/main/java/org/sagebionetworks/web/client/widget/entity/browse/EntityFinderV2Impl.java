@@ -15,8 +15,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -28,8 +26,6 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
     private EntityFinderV2View view;
     private List<Reference> selectedEntities;
     GlobalApplicationState globalApplicationState;
-    AuthenticationController authenticationController;
-    private SynapseAlert synAlert; // TODO: Why is this exposed here? Should just be accessible/used in the view
     private SynapseJavascriptClient jsClient;
 
     private boolean multiSelect;
@@ -38,7 +34,7 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
 
     private boolean showVersions;
     private EntityFilter visibleTypesInList;
-    private EntityFilter selectableTypesInList;
+    private EntityFilter selectableTypes;
     private EntityFilter visibleTypesInTree;
     private SelectedHandler<Reference> selectedHandler;
     private SelectedHandler<List<Reference>> selectedMultiHandler;
@@ -50,15 +46,12 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
     private String confirmButtonCopy;
 
     @Inject
-    public EntityFinderV2Impl(EntityFinderV2View view, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController, SynapseAlert synAlert, SynapseJavascriptClient jsClient) {
+    public EntityFinderV2Impl(EntityFinderV2View view, GlobalApplicationState globalApplicationState, SynapseJavascriptClient jsClient) {
         this.view = view;
         this.globalApplicationState = globalApplicationState;
-        this.authenticationController = authenticationController;
-        this.synAlert = synAlert;
         this.jsClient = jsClient;
         this.selectedEntities = new ArrayList<>();
         view.setPresenter(this);
-        view.setSynAlert(synAlert.asWidget());
     }
 
     private EntityFinderV2Impl(Builder builder) {
@@ -67,11 +60,9 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         // Dependencies injected into the builder
         this.view = builder.view;
         this.globalApplicationState = builder.globalApplicationState;
-        this.synAlert = builder.synAlert;
         this.jsClient = builder.jsClient;
 
         this.view.setPresenter(this);
-        this.view.setSynAlert(this.synAlert.asWidget());
 
         // Configuration
         if (builder.modalTitle != null) {
@@ -95,7 +86,7 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         initialContainerId = builder.initialContainerId;
         selectedHandler = builder.selectedHandler;
         selectedMultiHandler = builder.selectedMultiHandler;
-        selectableTypesInList = builder.selectableTypesInList;
+        selectableTypes = builder.selectableTypesInList;
         visibleTypesInList = builder.visibleTypesInList;
         showVersions = builder.showVersions;
         initialScope = builder.initialScope;
@@ -106,8 +97,6 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
     public static class Builder implements EntityFinder.Builder {
         private EntityFinderV2View view;
         GlobalApplicationState globalApplicationState;
-        AuthenticationController authenticationController;
-        private SynapseAlert synAlert;
         private SynapseJavascriptClient jsClient;
 
         private SelectedHandler<Reference> selectedHandler = (selected, finder) -> {
@@ -123,7 +112,7 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         private boolean multiSelect = false;
         private String initialContainerId = null;
 
-        private EntityFinderScope initialScope = EntityFinderScope.CURRENT_PROJECT;
+        private EntityFinderScope initialScope = EntityFinderScope.CREATED_BY_ME;
         private String modalTitle = "Find in Synapse";
         private String promptCopy = "";
         private String selectedCopy = "Selected";
@@ -131,16 +120,14 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         private String helpMarkdown = "Finding items in Synapse can be done by either “browsing”, “searching,” or directly entering the Synapse ID.&#10;Alternatively, navigate to the desired location in the current project, favorite projects or projects you own.";
 
         @Inject
-        public Builder(EntityFinderV2View view, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController, SynapseAlert synAlert, SynapseJavascriptClient jsClient) {
+        public Builder(EntityFinderV2View view, GlobalApplicationState globalApplicationState, SynapseJavascriptClient jsClient) {
             this.view = view;
             this.globalApplicationState = globalApplicationState;
-            this.authenticationController = authenticationController;
-            this.synAlert = synAlert;
             this.jsClient = jsClient;
         }
 
         @Override
-        public EntityFinder build() {
+        public EntityFinderV2Impl build() {
             return new EntityFinderV2Impl(this);
         }
 
@@ -237,30 +224,30 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
 
     @Override
     public void setSelectedEntity(Reference selected) {
-        synAlert.clear();
+        view.clearError();
         selectedEntities.clear();
         selectedEntities.add(selected);
     }
 
     @Override
     public void setSelectedEntities(List<Reference> selected) {
-        synAlert.clear();
+        view.clearError();
         selectedEntities.clear();
         selectedEntities.addAll(selected);
     }
 
     @Override
     public void clearSelectedEntities() {
-        synAlert.clear();
+        view.clearError();
         selectedEntities.clear();
     }
 
     @Override
     public void okClicked() {
-        synAlert.clear();
+        view.clearError();
         // check for valid selection
         if (selectedEntities == null || selectedEntities.isEmpty()) {
-            synAlert.showError(DisplayConstants.PLEASE_MAKE_SELECTION);
+            view.setErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
         } else {
             fireEntitiesSelected();
         }
@@ -268,47 +255,49 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
 
     @Override
     public void renderComponent() {
-        // get the entity path, and ask for each entity to add to the tree
-        Place currentPlace = globalApplicationState.getCurrentPlace();
-        boolean isSynapsePlace = currentPlace instanceof Synapse;
-        if (isSynapsePlace) {
-            String entityId = ((Synapse) currentPlace).getEntityId();
-            EntityBundleRequest bundleRequest = new EntityBundleRequest();
-            bundleRequest.setIncludeEntityPath(true);
-            jsClient.getEntityBundle(entityId, bundleRequest, new AsyncCallback<EntityBundle>() {
-                @Override
-                public void onFailure(Throwable caught) {
-                    showError(caught.getMessage());
-                }
-
-                public void onSuccess(EntityBundle result) {
-                    EntityPath path = result.getPath();
-                    List<EntityHeader> pathHeaders = path.getPath();
-                    if (pathHeaders.size() > 2) {
-                        initialContainerId = pathHeaders.get(pathHeaders.size() - 2).getId();
-                    } else {
-                        initialContainerId = pathHeaders.get(pathHeaders.size() - 1).getId();
+        if (initialScope.equals(EntityFinderScope.CURRENT_PROJECT)) {
+            // We have to determine the current project, so we get the entity path
+            Place currentPlace = globalApplicationState.getCurrentPlace();
+            if (currentPlace instanceof Synapse) {
+                String entityId = ((Synapse) currentPlace).getEntityId();
+                EntityBundleRequest bundleRequest = new EntityBundleRequest();
+                bundleRequest.setIncludeEntityPath(true);
+                jsClient.getEntityBundle(entityId, bundleRequest, new AsyncCallback<EntityBundle>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        showError(caught.getMessage());
                     }
-                    view.renderComponent(initialContainerId, initialScope, showVersions, multiSelect, visibleTypesInList, selectableTypesInList, visibleTypesInTree, selectedCopy);
 
-                }
-            });
+                    @Override
+                    public void onSuccess(EntityBundle result) {
+                        EntityPath path = result.getPath();
+                        List<EntityHeader> pathHeaders = path.getPath();
+                        if (pathHeaders.size() > 2) {
+                            initialContainerId = pathHeaders.get(pathHeaders.size() - 2).getId();
+                        } else {
+                            initialContainerId = pathHeaders.get(pathHeaders.size() - 1).getId();
+                        }
+                        view.renderComponent(initialScope, initialContainerId, showVersions, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selectedCopy);
+                    }
+                });
+            } else {
+                throw new IllegalStateException("While initializing Entity Finder, attempted to get entity bundle when not in a Synapse place");
+            }
+        } else {
+            view.renderComponent(initialScope, null, showVersions, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selectedCopy);
         }
-
     }
 
     private void fireEntitiesSelected() {
-        if (selectedHandler != null) {
+        if (!multiSelect) {
             selectedHandler.onSelected(selectedEntities.get(0), this);
-        }
-        if (selectedMultiHandler != null) {
+        } else {
             selectedMultiHandler.onSelected(selectedEntities, this);
         }
     }
 
     @Override
     public void show() {
-        synAlert.clear();
         view.clear();
         view.show();
     }
@@ -316,7 +305,6 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
     @Override
     public void hide() {
         view.hide();
-        view.clear();
     }
 
     @Override
@@ -324,8 +312,9 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         view.clear();
     }
 
+    @Override
     public void showError(String error) {
-        synAlert.showError(error);
+        view.showErrorMessage(error);
     }
 
     @Override

@@ -2,13 +2,12 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
-import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -16,6 +15,7 @@ import org.sagebionetworks.web.client.callback.OnSelectCallback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -60,7 +60,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 	HelpWidget helpWidget;
 
 	@UiField
-	Div synAlertContainer;
+	SynapseAlertView synAlert;
 
 	@Inject
 	public EntityFinderV2ViewImpl(AuthenticationController authenticationController, SynapseJSNIUtils jsniUtils) {
@@ -80,16 +80,22 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 
 
 	@Override
-	public void renderComponent(String initialContainerId, EntityFinderScope initialScope, boolean showVersions, boolean multiSelect, EntityFilter visibleEntityTypes, EntityFilter selectableEntityTypes, EntityFilter visibleTypesInTree, String selectedCopy) {
-		entityFinderContainer.clear();
+	public void renderComponent(EntityFinderScope initialScope, String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter selectableEntityTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, String selectedCopy) {
+        entityFinderContainer.clear();
+
+        // Convert EntityFilters to JS-compatible string arrays
+        JsArrayString selectableTypes = toJsArray(selectableEntityTypes.getEntityQueryValues().stream().map(e -> e.toString()).collect(Collectors.toList()));
+        JsArrayString visibleInList = toJsArray(visibleTypesInList.getEntityQueryValues().stream().map(e -> e.toString()).collect(Collectors.toList()));
+        JsArrayString visibleInTree = toJsArray(visibleTypesInTree.getEntityQueryValues().stream().map(e -> e.toString()).collect(Collectors.toList()));
+
 		_showEntityFinderReactComponent(
 				entityFinderContainer.getElement(),
 				authController.getCurrentUserSessionToken(),
 				initialContainerId,
 				initialScope.getValue(),
-				toJsArray(visibleEntityTypes),
-				toJsArray(selectableEntityTypes),
-				toJsArray(visibleTypesInTree),
+                selectableTypes,
+                visibleInList,
+                visibleInTree,
 				showVersions,
 				multiSelect,
 				selectedCopy,
@@ -131,6 +137,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 
 	@Override
 	public void clear() {
+		clearError();
 		entityFinderContainer.clear();
 		presenter.clearSelectedEntities();
 	}
@@ -155,14 +162,14 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 	}
 
 	@Override
-	public boolean isShowing() {
-		return modal.isAttached() && modal.isVisible();
+	public void setErrorMessage(String errorMessage) {
+		clearError();
+		synAlert.showError(errorMessage);
 	}
 
 	@Override
-	public void setSynAlert(Widget w) {
-		synAlertContainer.clear();
-		synAlertContainer.add(w);
+	public void clearError() {
+		synAlert.clearState();
 	}
 
 	@Override
@@ -206,35 +213,35 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 		return r;
 	}
 
-	private static native void _showEntityFinderReactComponent(Element el, String sessionToken, String initialContainerId, String initialScope, JsArrayString visible, JsArrayString selectable, JsArrayString visibleTypesInTree, boolean showVersions, boolean multiSelect, String selectedCopy, OnSelectCallback onSelectedCallback) /*-{
+	private static native void _showEntityFinderReactComponent(Element el, String sessionToken, String initialContainerId, String initialScope, JsArrayString selectableTypes, JsArrayString visibleTypesInList, JsArrayString visibleTypesInTree, boolean showVersions, boolean multiSelect, String selectedCopy, OnSelectCallback onSelectedCallback) /*-{
 		try {
 			var callback = function(selected) {
-				console.log(selected);
 				onSelectedCallback.@org.sagebionetworks.web.client.callback.OnSelectCallback::onSelect(Lcom/google/gwt/core/client/JsArray;)(selected)
 			};
 			var props = {
 				sessionToken: sessionToken,
 				initialContainerId: initialContainerId,
 				initialScope: initialScope,
-				showTypes: visible,
-				selectableTypes: selectable,
+				visibleTypesInList: visibleTypesInList,
+				selectableTypes: selectableTypes,
 				visibleTypesInTree: visibleTypesInTree,
 				selectMultiple: multiSelect,
 				onSelectedChange: callback,
 				showVersionSelection: showVersions,
 			};
-			$wnd.ReactDOM.render($wnd.React.createElement(
-					$wnd.SRC.SynapseComponents.EntityFinder, props, null),
-					el);
+			$wnd.ReactDOM.render(
+				$wnd.React.createElement($wnd.SRC.SynapseComponents.EntityFinder, props, null),
+				el
+			);
 		} catch (err) {
 			console.error(err);
 		}
 	}-*/;
 
-	public static JsArrayString toJsArray(EntityFilter filter) {
+	public static JsArrayString toJsArray(List<String> list) {
 		JsArrayString jsArrayString = JsArrayString.createArray().cast();
-		for (EntityType t : filter.getEntityQueryValues()) {
-			jsArrayString.push(t.toString());
+		for (String s : list) {
+			jsArrayString.push(s);
 		}
 		return jsArrayString;
 	}

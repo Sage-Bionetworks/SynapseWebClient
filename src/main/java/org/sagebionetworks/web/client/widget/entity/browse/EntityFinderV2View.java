@@ -2,11 +2,8 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.utils.CallbackP;
 
 import com.google.gwt.user.client.ui.Widget;
 
@@ -17,17 +14,17 @@ public interface EntityFinderV2View extends SynapseView {
 	 * 
 	 * @param presenter
 	 */
-	public void setPresenter(Presenter presenter);
-
-	boolean isShowing();
+	void setPresenter(Presenter presenter);
 
 	void show();
 
 	void hide();
 
-	void renderComponent(String initialContainerId, EntityFinderScope initialScope, boolean showVersions, boolean multiSelect, EntityFilter visible, EntityFilter selectable, EntityFilter visibleTypesInTree, String selectedCopy);
+	void renderComponent(EntityFinderScope initialScope, String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter selectableTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, String selectedCopy);
 
-	void setSynAlert(Widget w);
+	void setErrorMessage(String errorMessage);
+
+	void clearError();
 
     void setModalTitle(String modalTitle);
 
@@ -37,21 +34,16 @@ public interface EntityFinderV2View extends SynapseView {
 
 	void setConfirmButtonCopy(String confirmButtonCopy);
 
+	Widget asWidget();
 
 	/**
 	 * Presenter interface
 	 */
-	public interface Presenter {
+	interface Presenter {
 
 		void setSelectedEntity(Reference selected);
 
 		void okClicked();
-
-		void show();
-
-		void hide();
-
-		Widget asWidget();
 
 		void setSelectedEntities(List<Reference> selected);
 
@@ -60,5 +52,5 @@ public interface EntityFinderV2View extends SynapseView {
 		void renderComponent();
 	}
 
-	Widget asWidget();
+
 }
