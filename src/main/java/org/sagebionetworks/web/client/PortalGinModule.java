@@ -401,6 +401,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigView
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.TableQueryResultWikiView;
 import org.sagebionetworks.web.client.widget.entity.editor.TableQueryResultWikiViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.TeamSelectEditorView;
+import org.sagebionetworks.web.client.widget.entity.editor.TeamSelectEditorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.UserSelectorView;
 import org.sagebionetworks.web.client.widget.entity.editor.UserSelectorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigView;
@@ -1036,6 +1038,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EvaluationSubmissionConfigView.class).to(EvaluationSubmissionConfigViewImpl.class);
 		bind(VideoConfigView.class).to(VideoConfigViewImpl.class);
 		bind(TableQueryResultWikiView.class).to(TableQueryResultWikiViewImpl.class);
+		bind(TeamSelectEditorView.class).to(TeamSelectEditorViewImpl.class);
 
 		// UI Widget Renderers
 		bind(BookmarkWidgetView.class).to(BookmarkWidgetViewImpl.class);

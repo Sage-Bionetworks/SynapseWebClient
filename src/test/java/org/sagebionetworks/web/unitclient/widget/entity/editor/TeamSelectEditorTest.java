@@ -11,6 +11,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.widget.entity.editor.TeamSelectEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.TeamSelectEditorView;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
@@ -21,6 +22,8 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 public class TeamSelectEditorTest {
 
 	TeamSelectEditor widget;
+	@Mock
+	TeamSelectEditorView mockView;
 	@Mock
 	SynapseSuggestBox mockTeamSuggestBox;
 	@Mock
@@ -36,7 +39,7 @@ public class TeamSelectEditorTest {
 	@Before
 	public void setup() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new TeamSelectEditor(mockTeamSuggestBox, mockProvider);
+		widget = new TeamSelectEditor(mockView, mockTeamSuggestBox, mockProvider);
 
 		when(mockGroupSuggestion.getId()).thenReturn(SELECTED_TEAM_ID);
 		when(mockTeamSuggestBox.getSelectedSuggestion()).thenReturn(mockGroupSuggestion);
