@@ -29,13 +29,14 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
     private SynapseJavascriptClient jsClient;
 
     private boolean multiSelect;
-    private String initialContainerId;
+    private InitialContainer initialContainer;
     private EntityFinderScope initialScope;
 
     private boolean showVersions;
     private EntityFilter visibleTypesInList;
     private EntityFilter selectableTypes;
     private EntityFilter visibleTypesInTree;
+    private boolean treeOnly;
     private SelectedHandler<Reference> selectedHandler;
     private SelectedHandler<List<Reference>> selectedMultiHandler;
 
@@ -78,15 +79,16 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
             this.view.setConfirmButtonCopy(builder.confirmButtonCopy);
         }
 
+        treeOnly = builder.treeOnly;
         modalTitle = builder.modalTitle;
         promptCopy = builder.promptCopy;
         selectedCopy = builder.selectedCopy;
         modalTitle = builder.modalTitle;
         multiSelect = builder.multiSelect;
-        initialContainerId = builder.initialContainerId;
+        initialContainer = builder.initialContainer;
         selectedHandler = builder.selectedHandler;
         selectedMultiHandler = builder.selectedMultiHandler;
-        selectableTypes = builder.selectableTypesInList;
+        selectableTypes = builder.selectableTypes;
         visibleTypesInList = builder.visibleTypesInList;
         showVersions = builder.showVersions;
         initialScope = builder.initialScope;
@@ -106,11 +108,12 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
 
         private boolean showVersions = false;
         private EntityFilter visibleTypesInList = ALL;
-        private EntityFilter selectableTypesInList = ALL;
+        private EntityFilter selectableTypes = ALL;
         private EntityFilter visibleTypesInTree = CONTAINER;
+        boolean treeOnly = false;
 
         private boolean multiSelect = false;
-        private String initialContainerId = null;
+        private InitialContainer initialContainer = InitialContainer.NONE;
 
         private EntityFinderScope initialScope = EntityFinderScope.CREATED_BY_ME;
         private String modalTitle = "Find in Synapse";
@@ -138,8 +141,8 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         }
 
         @Override
-        public EntityFinder.Builder setInitialContainerId(String initialContainerId) {
-            this.initialContainerId = initialContainerId;
+        public EntityFinder.Builder setInitialContainer(InitialContainer initialContainer) {
+            this.initialContainer = initialContainer;
             return this;
         }
 
@@ -162,8 +165,8 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         }
 
         @Override
-        public EntityFinder.Builder setSelectableTypesInList(EntityFilter selectableFilter) {
-            this.selectableTypesInList = selectableFilter;
+        public EntityFinder.Builder setSelectableTypes(EntityFilter selectableFilter) {
+            this.selectableTypes = selectableFilter;
             return this;
         }
 
@@ -220,6 +223,12 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
             this.confirmButtonCopy = confirmButtonCopy;
             return this;
         }
+
+        @Override
+        public EntityFinder.Builder setTreeOnly(boolean treeOnly) {
+            this.treeOnly = treeOnly;
+            return this;
+        }
     }
 
     @Override
@@ -255,36 +264,35 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
 
     @Override
     public void renderComponent() {
-        if (initialScope.equals(EntityFinderScope.CURRENT_PROJECT)) {
-            // We have to determine the current project, so we get the entity path
-            Place currentPlace = globalApplicationState.getCurrentPlace();
-            if (currentPlace instanceof Synapse) {
-                String entityId = ((Synapse) currentPlace).getEntityId();
-                EntityBundleRequest bundleRequest = new EntityBundleRequest();
-                bundleRequest.setIncludeEntityPath(true);
-                jsClient.getEntityBundle(entityId, bundleRequest, new AsyncCallback<EntityBundle>() {
-                    @Override
-                    public void onFailure(Throwable caught) {
-                        showError(caught.getMessage());
-                    }
+        // We have to determine the current project, so we get the entity path
+        Place currentPlace = globalApplicationState.getCurrentPlace();
+        if (currentPlace instanceof Synapse) {
+            String entityId = ((Synapse) currentPlace).getEntityId();
+            EntityBundleRequest bundleRequest = new EntityBundleRequest();
+            bundleRequest.setIncludeEntityPath(true);
+            jsClient.getEntityBundle(entityId, bundleRequest, new AsyncCallback<EntityBundle>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                    showError(caught.getMessage());
+                }
 
-                    @Override
-                    public void onSuccess(EntityBundle result) {
-                        EntityPath path = result.getPath();
-                        List<EntityHeader> pathHeaders = path.getPath();
-                        if (pathHeaders.size() > 2) {
-                            initialContainerId = pathHeaders.get(pathHeaders.size() - 2).getId();
-                        } else {
-                            initialContainerId = pathHeaders.get(pathHeaders.size() - 1).getId();
-                        }
-                        view.renderComponent(initialScope, initialContainerId, showVersions, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selectedCopy);
+                @Override
+                public void onSuccess(EntityBundle result) {
+                    EntityPath path = result.getPath();
+                    List<EntityHeader> pathHeaders = path.getPath();
+                    String projectId;
+                    String parentId;
+                    projectId = pathHeaders.get(1).getId();
+                    if (pathHeaders.size() > 2) { // in other words, if the current entity is a project get the project
+                        parentId = pathHeaders.get(pathHeaders.size() - 2).getId();
+                    } else { // otherwise get the parent of the entity
+                        parentId = projectId;
                     }
-                });
-            } else {
-                throw new IllegalStateException("While initializing Entity Finder, attempted to get entity bundle when not in a Synapse place");
-            }
+                    view.renderComponent(initialScope, initialContainer, projectId, parentId, showVersions, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selectedCopy, treeOnly);
+                }
+            });
         } else {
-            view.renderComponent(initialScope, null, showVersions, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selectedCopy);
+            view.renderComponent(initialScope, initialContainer,null, null, showVersions, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selectedCopy, treeOnly);
         }
     }
 

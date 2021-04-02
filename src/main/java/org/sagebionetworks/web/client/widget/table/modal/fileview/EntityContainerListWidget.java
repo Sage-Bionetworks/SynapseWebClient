@@ -77,12 +77,12 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 		if (TableType.projects.equals(tableType)) {
 			String friendlyEntityType = "Project View";
 			entityFinderBuilder.setInitialScope(EntityFinderScope.ALL_PROJECTS);
-			entityFinderBuilder.setSelectableTypesInList(EntityFilter.PROJECT);
+			entityFinderBuilder.setSelectableTypes(EntityFilter.PROJECT);
 			entityFinderBuilder.setHelpMarkdown("Search or Browse Synapse to find " + EntityTypeUtils.getDisplayName(EntityType.project) + "s to put into this " + friendlyEntityType);
 			entityFinderBuilder.setPromptCopy("Find " + EntityTypeUtils.getDisplayName(EntityType.project) + "s for this View");
 		} else {
 			String friendlyEntityType = "File View";
-			entityFinderBuilder.setSelectableTypesInList(EntityFilter.CONTAINER);
+			entityFinderBuilder.setSelectableTypes(EntityFilter.CONTAINER);
 			entityFinderBuilder.setHelpMarkdown("Search or Browse Synapse to find " + EntityTypeUtils.getDisplayName(EntityType.folder) + "s to put into this " + friendlyEntityType);
 			entityFinderBuilder.setPromptCopy("Find " + EntityTypeUtils.getDisplayName(EntityType.folder) + "s for this View");
 		}

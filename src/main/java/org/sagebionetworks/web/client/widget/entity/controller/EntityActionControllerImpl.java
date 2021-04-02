@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.CONTAINER;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.PROJECT;
+import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.PROJECT_OR_TABLE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -1204,11 +1205,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	private void postCheckLink() {
 		getEntityFinderBuilder()
-				.setSelectableTypesInList(CONTAINER)
+				.setSelectableTypes(CONTAINER)
 				.setShowVersions(false)
 				.setSelectedHandler((selected, entityFinder) -> {
 					createLink(selected.getTargetId(), entityFinder);
 				})
+				.setTreeOnly(true)
 				.setModalTitle("Create Link to " + entityTypeDisplay)
 				.setHelpMarkdown("Search or Browse to find a Project or Folder that you have access to, and place a symbolic link for easy access")
 				.setPromptCopy("Find a destination and place a link to " + entity.getId())
@@ -1282,6 +1284,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				.setSelectedCopy("Destination")
 				.setConfirmButtonCopy("Move")
 				.setShowVersions(false)
+				.setTreeOnly(true)
 				.setSelectedHandler((selected, finder) -> {
 					String entityId = entityBundle.getEntity().getId();
 					getSynapseClient().moveEntity(entityId, selected.getTargetId(), new AsyncCallback<Entity>() {
@@ -1302,13 +1305,16 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 		if (entityBundle.getEntity() instanceof Table) {
 			builder.setInitialScope(EntityFinderScope.ALL_PROJECTS)
-					.setVisibleTypesInTree(PROJECT)
-					.setSelectableTypesInList(PROJECT)
+					.setInitialContainer(EntityFinder.InitialContainer.SCOPE)
+					.setVisibleTypesInTree(PROJECT_OR_TABLE)
+					.setVisibleTypesInList(PROJECT)
+					.setSelectableTypes(PROJECT)
 					.setVisibleTypesInList(EntityFilter.PROJECT_OR_TABLE);
 		} else {
 			builder.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
+					.setInitialContainer(EntityFinder.InitialContainer.PARENT)
 					.setVisibleTypesInTree(CONTAINER)
-					.setSelectableTypesInList(CONTAINER);
+					.setSelectableTypes(CONTAINER);
 		}
 
 		builder.build().show();

@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,6 +73,8 @@ public class EntityFinderV2ImplTest {
         EntityFilter visibleTypesInList = EntityFilter.ALL_BUT_LINK;
         EntityFilter visibleTypesInTree = EntityFilter.PROJECT;
         EntityFinderScope scope = EntityFinderScope.ALL_PROJECTS;
+        EntityFinder.InitialContainer initialContainer = EntityFinder.InitialContainer.NONE;
+        boolean treeOnly = true;
 
         String title = "Custom modal title";
         String prompt = "Custom prompt text";
@@ -82,10 +85,11 @@ public class EntityFinderV2ImplTest {
         // Finder behavior
         builder.setMultiSelect(multiSelect);
         builder.setShowVersions(showVersions);
-        builder.setSelectableTypesInList(selectableTypes);
+        builder.setSelectableTypes(selectableTypes);
         builder.setVisibleTypesInList(visibleTypesInList);
         builder.setVisibleTypesInTree(visibleTypesInTree);
         builder.setInitialScope(scope);
+        builder.setTreeOnly(treeOnly);
 
         // Copy text
         builder.setModalTitle(title);
@@ -106,13 +110,14 @@ public class EntityFinderV2ImplTest {
         // Call under test: show the modal, triggering rendering
         entityFinder.show();
 
-        verify(mockView).renderComponent(scope, null, showVersions, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selected);
+        verify(mockView).renderComponent(scope, EntityFinder.InitialContainer.NONE, null, null, showVersions, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selected, treeOnly);
     }
 
     @Test
     public void testRenderWithCurrentProjectScope() {
         String placeId = "syn123";
-        String containerId = "syn456";
+        String projectId = "syn456";
+        String containerId = "syn789";
 
         when(mockGlobalState.getCurrentPlace()).thenReturn(mockPlace);
         when(mockPlace.getEntityId()).thenReturn(placeId);
@@ -121,18 +126,25 @@ public class EntityFinderV2ImplTest {
         EntityPath path = new EntityPath();
         List<EntityHeader> pathList = new ArrayList<>();
         EntityHeader rootNode = new EntityHeader(); // First entity in path is always the root "syn4489"
+
+        EntityHeader project = new EntityHeader();
+        project.setId(projectId);
+
         EntityHeader parent = new EntityHeader();
         parent.setId(containerId);
+
         EntityHeader currentEntity = new EntityHeader();
         currentEntity.setId(placeId);
+
         pathList.add(rootNode);
+        pathList.add(project);
         pathList.add(parent);
         pathList.add(currentEntity);
         path.setPath(pathList);
         bundle.setPath(path);
 
         builder.setInitialScope(EntityFinderScope.CURRENT_PROJECT);
-        builder.setInitialContainerId(containerId);
+        builder.setInitialContainer(EntityFinder.InitialContainer.PARENT);
         entityFinder = builder.build();
 
         // Call under test: showing the modal will trigger finding the current project
@@ -143,7 +155,7 @@ public class EntityFinderV2ImplTest {
         getBundleCaptor.getValue().onSuccess(bundle);
 
 
-        verify(mockView).renderComponent(eq(EntityFinderScope.CURRENT_PROJECT), eq(containerId), anyBoolean(), anyBoolean(), any(EntityFilter.class), any(EntityFilter.class), any(EntityFilter.class), anyString());
+        verify(mockView).renderComponent(eq(EntityFinderScope.CURRENT_PROJECT), eq(EntityFinder.InitialContainer.PARENT), eq(projectId), eq(containerId), anyBoolean(), anyBoolean(), any(EntityFilter.class), any(EntityFilter.class), any(EntityFilter.class), anyString(), anyBoolean());
     }
 
     @Test

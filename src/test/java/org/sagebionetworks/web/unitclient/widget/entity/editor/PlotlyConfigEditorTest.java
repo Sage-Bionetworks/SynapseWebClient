@@ -44,8 +44,6 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.BarMode;
@@ -369,7 +367,7 @@ public class PlotlyConfigEditorTest {
 	public void testOnFindTable() {
 		editor.onFindTable();
 		verify(mockEntityFinderBuilder).setMultiSelect(false);
-		verify(mockEntityFinderBuilder).setSelectableTypesInList(EntityFilter.PROJECT_OR_TABLE);
+		verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.PROJECT_OR_TABLE);
 		verify(mockEntityFinderBuilder).setShowVersions(false);
 		verify(mockEntityFinderBuilder).setSelectedHandler(finderCallbackCaptor.capture());
 		verify(mockEntityFinderBuilder).build();

@@ -1252,7 +1252,7 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(new Folder());
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.MOVE_ENTITY);
-		verify(mockEntityFinderBuilder).setSelectableTypesInList(EntityFilter.CONTAINER);
+		verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.CONTAINER);
 		verify(mockEntityFinderBuilder).setShowVersions(false);
 		verify(mockEntityFinderBuilder).build();
 		verify(mockEntityFinder).show();
@@ -1269,7 +1269,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.MOVE_ENTITY);
 		verify(mockEntityFinderBuilder)
-				.setSelectableTypesInList(EntityFilter.CONTAINER);
+				.setSelectableTypes(EntityFilter.CONTAINER);
 		verify(mockEntityFinderBuilder)
 				.setShowVersions(false);
 		verify(mockEntityFinderBuilder)
@@ -1390,7 +1390,7 @@ public class EntityActionControllerImplTest {
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.CREATE_LINK);
-		verify(mockEntityFinderBuilder).setSelectableTypesInList(EntityFilter.CONTAINER);
+		verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.CONTAINER);
 		verify(mockEntityFinderBuilder).setShowVersions(false);
 		verify(mockEntityFinderBuilder).build();
 		verify(mockEntityFinder).show();

@@ -20,7 +20,7 @@ public interface EntityFinderV2View extends SynapseView {
 
 	void hide();
 
-	void renderComponent(EntityFinderScope initialScope, String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter selectableTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, String selectedCopy);
+	void renderComponent(EntityFinderScope initialScope, EntityFinder.InitialContainer initialContainer, String initialProject, String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter selectableTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, String selectedCopy, boolean treeOnly);
 
 	void setErrorMessage(String errorMessage);
 

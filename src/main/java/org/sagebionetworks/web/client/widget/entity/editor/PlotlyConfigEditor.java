@@ -17,7 +17,6 @@ import java.util.Map;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -87,7 +86,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 
 		this.finder = entityFinderBuilder
 				.setMultiSelect(false)
-				.setSelectableTypesInList(EntityFilter.PROJECT_OR_TABLE)
+				.setSelectableTypes(EntityFilter.PROJECT_OR_TABLE)
 				.setShowVersions(false)
 				.setSelectedHandler((selected, entityFinder) -> {
 					setTableId(selected.getTargetId());

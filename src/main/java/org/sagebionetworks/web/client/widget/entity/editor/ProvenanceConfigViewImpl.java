@@ -4,12 +4,10 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -41,7 +39,7 @@ public class ProvenanceConfigViewImpl implements ProvenanceConfigView {
 
 		entityFinderButton.addClickHandler(event -> entityFinderBuilder
 				.setMultiSelect(false)
-				.setSelectableTypesInList(EntityFilter.ALL)
+				.setSelectableTypes(EntityFilter.ALL)
 				.setShowVersions(true)
 				.setSelectedHandler((selected, finder) -> {
 					appendEntityListValue(selected);

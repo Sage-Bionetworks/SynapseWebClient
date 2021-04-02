@@ -7,7 +7,7 @@
  	xmlns:s="urn:import:org.sagebionetworks.web.client.widget.entity.controller"
  	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<b:Modal dataBackdrop="STATIC" dataKeyboard="true"
-		addStyleNames="entityFinder modal-fullscreen topLevelZIndex">
+		addStyleNames="entityFinder topLevelZIndex">
 		<b:ModalHeader closable="true">
 			<b:Heading ui:field="modalTitle" size="H4" text="Find in Synapse"
 				addStyleNames="displayInline" />
@@ -18,7 +18,7 @@
 		<b:ModalBody>
 			<bh:Paragraph ui:field="promptCopy"></bh:Paragraph>
 			<w:ReactComponentDiv ui:field="entityFinderContainer" />
-			<s:SynapseAlertViewImpl ui:field="alert" />
+			<s:SynapseAlertViewImpl ui:field="synAlert" />
 		</b:ModalBody>
 		<b:ModalFooter>
 			<b:Button ui:field="cancelButton" type="LINK">Cancel</b:Button>

@@ -5,7 +5,6 @@ import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Text;
-import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -14,8 +13,7 @@ import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -90,7 +88,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 
 		findEntitiesButton.addClickHandler(event -> entityFinderBuilder
 				.setMultiSelect(false)
-				.setSelectableTypesInList(EntityFilter.ALL_BUT_LINK)
+				.setSelectableTypes(EntityFilter.ALL_BUT_LINK)
 				.setShowVersions(true)
 				.setSelectedHandler((selected, entityFinder) -> {
 					entityField.setValue(DisplayUtils.createEntityVersionString(selected));

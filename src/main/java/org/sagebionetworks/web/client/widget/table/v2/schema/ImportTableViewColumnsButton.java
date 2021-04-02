@@ -4,12 +4,10 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Table;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -41,7 +39,7 @@ public class ImportTableViewColumnsButton implements IsWidget {
 		button.setIcon(IconType.ARROW_CIRCLE_O_DOWN);
 		this.finder = entityFinderBuilder
 				.setMultiSelect(false)
-				.setSelectableTypesInList(EntityFilter.PROJECT_OR_TABLE)
+				.setSelectableTypes(EntityFilter.PROJECT_OR_TABLE)
 				.setShowVersions(false)
 				.setSelectedHandler((selected, entityFinder) -> onTableViewSelected(selected.getTargetId()))
 				.build();

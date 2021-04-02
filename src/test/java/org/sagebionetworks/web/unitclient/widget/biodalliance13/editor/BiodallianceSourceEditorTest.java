@@ -95,7 +95,7 @@ public class BiodallianceSourceEditorTest {
 	public void testConstructorAndUpdateViewFromSource() {
 		verify(mockView).setPresenter(editor);
 		verify(mockEntityFinderBuilder).setMultiSelect(false);
-		verify(mockEntityFinderBuilder).setSelectableTypesInList(EntityFilter.ALL_BUT_LINK);
+		verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.ALL_BUT_LINK);
 		verify(mockEntityFinderBuilder).setShowVersions(true);
 		verify(mockEntityFinderBuilder, times(2)).setSelectedHandler(any(EntityFinder.SelectedHandler.class));
 		verify(mockEntityFinderBuilder, times(2)).build();

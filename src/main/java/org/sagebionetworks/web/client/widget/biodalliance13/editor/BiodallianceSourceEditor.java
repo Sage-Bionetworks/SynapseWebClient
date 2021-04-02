@@ -13,6 +13,8 @@ import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
+
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -40,8 +42,11 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 		view.setPresenter(this);
 
 		this.entityFinder = entityFinderBuilder
+				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
+				.setInitialContainer(EntityFinder.InitialContainer.NONE)
+				.setModalTitle("Find File")
 				.setMultiSelect(false)
-				.setSelectableTypesInList(EntityFilter.ALL_BUT_LINK)
+				.setSelectableTypes(EntityFilter.ALL_BUT_LINK)
 				.setShowVersions(true)
 				.setSelectedHandler((selected, finder) -> entitySelected(selected))
 				.build();

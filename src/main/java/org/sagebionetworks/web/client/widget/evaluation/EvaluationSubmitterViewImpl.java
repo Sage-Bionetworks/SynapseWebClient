@@ -20,7 +20,6 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder.SelectedHandler;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -187,7 +186,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		entityFinderButton.addClickHandler(event -> {
 			this.entityFinder = entityFinderBuilder
 					.setMultiSelect(false)
-					.setSelectableTypesInList(EntityFilter.ALL)
+					.setSelectableTypes(EntityFilter.ALL)
 					.setShowVersions(true)
 					.setSelectedHandler((selected, finder) -> {
 						if (selected.getTargetId() != null) {

@@ -70,7 +70,7 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 		this.cookies = cookies;
 		findProjectButton.addClickHandler(event -> {
 			entityFinderBuilder.setMultiSelect(false)
-					.setSelectableTypesInList(EntityFilter.PROJECT)
+					.setSelectableTypes(EntityFilter.PROJECT)
 					.setShowVersions(false)
 					.setSelectedHandler(((selected, entityFinder) -> {
 						challengeProjectField.setValue(selected.getTargetId());
@@ -82,7 +82,7 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 
 		findFormContainerButton.addClickHandler(event -> {
 			entityFinderBuilder.setMultiSelect(false)
-					.setSelectableTypesInList(EntityFilter.CONTAINER)
+					.setSelectableTypes(EntityFilter.CONTAINER)
 					.setShowVersions(false)
 					.setSelectedHandler(((selected, entityFinder) -> {
 						formContainerIdField.setValue(selected.getTargetId());
@@ -93,7 +93,7 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 		});
 		findSchemaFileButton.addClickHandler(event -> {
 			entityFinderBuilder.setMultiSelect(false)
-					.setSelectableTypesInList(EntityFilter.ALL_BUT_LINK)
+					.setSelectableTypes(EntityFilter.ALL_BUT_LINK)
 					.setShowVersions(false)
 					.setSelectedHandler(((selected, entityFinder) -> {
 						schemaFileSynIdField.setValue(selected.getTargetId());
@@ -104,7 +104,7 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 		});
 		findUiSchemaFileButton.addClickHandler(event -> {
 			entityFinderBuilder.setMultiSelect(false)
-					.setSelectableTypesInList(EntityFilter.ALL_BUT_LINK)
+					.setSelectableTypes(EntityFilter.ALL_BUT_LINK)
 					.setShowVersions(false)
 					.setSelectedHandler(((selected, entityFinder) -> {
 						uiSchemaFileSynIdField.setValue(selected.getTargetId());

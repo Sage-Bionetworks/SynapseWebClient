@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.sagebionetworks.repo.model.Reference;
 
@@ -17,6 +18,13 @@ public interface EntityFinder {
 		public void onSelected(T selected, EntityFinder entityFinder);
 	}
 
+	enum InitialContainer {
+		PROJECT,
+		PARENT,
+		SCOPE,
+		NONE,
+	}
+
 
 	interface Builder {
 		EntityFinder build();
@@ -27,9 +35,17 @@ public interface EntityFinder {
 
 		Builder setMultiSelect(boolean multiSelect);
 
-		Builder setInitialContainerId(String initialContainerId);
+		/**
+		 * Initial container ID will dictate the current project, and will also be
+		 * automatically opened if the initial scope is Current Project
+		 *
+		 *
+		 * @param initialContainerId
+		 * @return
+		 */
+		Builder setInitialContainer(InitialContainer initialContainer);
 
-		Builder setSelectableTypesInList(EntityFilter selectableFilter);
+		Builder setSelectableTypes(EntityFilter selectableFilter);
 
 		Builder setVisibleTypesInList(EntityFilter visibleFilter);
 
@@ -48,6 +64,8 @@ public interface EntityFinder {
 		Builder setInitialScope(EntityFinderScope initialScope);
 
 		Builder setConfirmButtonCopy(String confirmButtonCopy);
+
+		Builder setTreeOnly(boolean treeOnly);
 	}
 
 	void showError(String errorMessage);

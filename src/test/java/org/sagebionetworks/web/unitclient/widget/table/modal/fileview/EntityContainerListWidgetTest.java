@@ -97,7 +97,7 @@ public class EntityContainerListWidgetTest {
 		boolean showVersions = false;
 		verify(mockEntityFinderBuilder).setMultiSelect(true);
 		verify(mockEntityFinderBuilder).setSelectedMultiHandler(any(EntityFinder.SelectedHandler.class));
-		verify(mockEntityFinderBuilder).setSelectableTypesInList(EntityFilter.CONTAINER);
+		verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.CONTAINER);
 		verify(mockEntityFinderBuilder).setShowVersions(showVersions);
 		verify(mockEntityFinderBuilder).build();
 	}
@@ -114,7 +114,7 @@ public class EntityContainerListWidgetTest {
 		boolean showVersions = false;
 		verify(mockEntityFinderBuilder).setMultiSelect(true);
 		verify(mockEntityFinderBuilder).setSelectedMultiHandler(any(EntityFinder.SelectedHandler.class));
-		verify(mockEntityFinderBuilder).setSelectableTypesInList(EntityFilter.PROJECT);
+		verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.PROJECT);
 		verify(mockEntityFinderBuilder).setShowVersions(showVersions);
 
 		widget.configure(Collections.singletonList(headerId), canEdit, TableType.files);

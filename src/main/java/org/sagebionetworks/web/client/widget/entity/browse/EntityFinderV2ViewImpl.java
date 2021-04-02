@@ -78,10 +78,31 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 		});
 	}
 
+	private String getInitialContainerAsString(EntityFinder.InitialContainer initialContainer, String projectId, String containerId) {
+		switch (initialContainer) {
+			case PROJECT:
+				return projectId;
+			case PARENT:
+				return containerId;
+			case SCOPE:
+				return "root";
+			case NONE:
+			default:
+				return null;
+		}
+	}
 
 	@Override
-	public void renderComponent(EntityFinderScope initialScope, String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter selectableEntityTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, String selectedCopy) {
+	public void renderComponent(EntityFinderScope initialScope, EntityFinder.InitialContainer initialContainer, String projectId, String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter selectableEntityTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, String selectedCopy, boolean treeOnly) {
         entityFinderContainer.clear();
+
+        if (treeOnly) {
+			modal.removeStyleName("modal-fullscreen");
+			modal.addStyleName("modal-90-percent modal-max-width-1200");
+		} else {
+			modal.addStyleName("modal-fullscreen");
+			modal.removeStyleName("modal-90-percent modal-max-width-1200");
+		}
 
         // Convert EntityFilters to JS-compatible string arrays
         JsArrayString selectableTypes = toJsArray(selectableEntityTypes.getEntityQueryValues().stream().map(e -> e.toString()).collect(Collectors.toList()));
@@ -91,7 +112,8 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 		_showEntityFinderReactComponent(
 				entityFinderContainer.getElement(),
 				authController.getCurrentUserSessionToken(),
-				initialContainerId,
+				projectId,
+				getInitialContainerAsString(initialContainer, projectId, initialContainerId),
 				initialScope.getValue(),
                 selectableTypes,
                 visibleInList,
@@ -99,6 +121,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 				showVersions,
 				multiSelect,
 				selectedCopy,
+				treeOnly,
 				result -> {
 					List<Reference> selected = new ArrayList<>();
 					for (int i = 0; i < result.length(); i++) {
@@ -213,14 +236,15 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 		return r;
 	}
 
-	private static native void _showEntityFinderReactComponent(Element el, String sessionToken, String initialContainerId, String initialScope, JsArrayString selectableTypes, JsArrayString visibleTypesInList, JsArrayString visibleTypesInTree, boolean showVersions, boolean multiSelect, String selectedCopy, OnSelectCallback onSelectedCallback) /*-{
+	private static native void _showEntityFinderReactComponent(Element el, String sessionToken, String projectId, String initialContainer, String initialScope, JsArrayString selectableTypes, JsArrayString visibleTypesInList, JsArrayString visibleTypesInTree, boolean showVersions, boolean multiSelect, String selectedCopy, boolean treeOnly, OnSelectCallback onSelectedCallback) /*-{
 		try {
 			var callback = function(selected) {
 				onSelectedCallback.@org.sagebionetworks.web.client.callback.OnSelectCallback::onSelect(Lcom/google/gwt/core/client/JsArray;)(selected)
 			};
 			var props = {
 				sessionToken: sessionToken,
-				initialContainerId: initialContainerId,
+				projectId: projectId,
+				initialContainer: initialContainer,
 				initialScope: initialScope,
 				visibleTypesInList: visibleTypesInList,
 				selectableTypes: selectableTypes,
@@ -228,6 +252,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 				selectMultiple: multiSelect,
 				onSelectedChange: callback,
 				showVersionSelection: showVersions,
+				treeOnly: treeOnly,
 			};
 			$wnd.ReactDOM.render(
 				$wnd.React.createElement($wnd.SRC.SynapseComponents.EntityFinder, props, null),
