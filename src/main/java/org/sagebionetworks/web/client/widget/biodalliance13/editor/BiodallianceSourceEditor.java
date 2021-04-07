@@ -46,7 +46,7 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 				.setInitialContainer(EntityFinder.InitialContainer.NONE)
 				.setModalTitle("Find File")
 				.setMultiSelect(false)
-				.setSelectableTypes(EntityFilter.ALL_BUT_LINK)
+				.setSelectableTypes(EntityFilter.ALL_DIRECTORY_BUT_LINK)
 				.setShowVersions(true)
 				.setSelectedHandler((selected, finder) -> entitySelected(selected))
 				.build();

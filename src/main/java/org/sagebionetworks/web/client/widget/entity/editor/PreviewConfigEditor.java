@@ -32,7 +32,7 @@ public class PreviewConfigEditor implements PreviewConfigView.Presenter, WidgetE
 		this.entityFinder = entityFinderBuilder
 				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
 				.setInitialContainer(EntityFinder.InitialContainer.NONE)
-				.setSelectableTypes(EntityFilter.ALL_BUT_LINK)
+				.setSelectableTypes(EntityFilter.ALL_DIRECTORY_BUT_LINK)
 				.setShowVersions(true)
 				.setSelectedHandler((selected, finder) -> {
 					view.setEntityId(selected.getTargetId());

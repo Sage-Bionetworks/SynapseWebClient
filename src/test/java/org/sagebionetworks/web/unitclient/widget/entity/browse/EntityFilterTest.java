@@ -38,7 +38,7 @@ public class EntityFilterTest {
 
 	@Test
 	public void testFilterAllAllowed() {
-		EntityFilter filter = EntityFilter.ALL;
+		EntityFilter filter = EntityFilter.ALL_DIRECTORY;
 		List<EntityType> queryValues = filter.getEntityQueryValues();
 
 		assertTrue(queryValues.contains(EntityType.project));
@@ -104,7 +104,7 @@ public class EntityFilterTest {
 
 	@Test
 	public void testFilterFiles() {
-		EntityFilter filter = EntityFilter.ALL_BUT_LINK;
+		EntityFilter filter = EntityFilter.ALL_DIRECTORY_BUT_LINK;
 		List<EntityType> queryValues = filter.getEntityQueryValues();
 
 		assertTrue(queryValues.contains(EntityType.project));

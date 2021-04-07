@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.ALL;
+import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.ALL_DIRECTORY;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.CONTAINER;
 
 import java.util.ArrayList;
@@ -107,8 +107,8 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         };
 
         private boolean showVersions = false;
-        private EntityFilter visibleTypesInList = ALL;
-        private EntityFilter selectableTypes = ALL;
+        private EntityFilter visibleTypesInList = ALL_DIRECTORY;
+        private EntityFilter selectableTypes = ALL_DIRECTORY;
         private EntityFilter visibleTypesInTree = CONTAINER;
         boolean treeOnly = false;
 

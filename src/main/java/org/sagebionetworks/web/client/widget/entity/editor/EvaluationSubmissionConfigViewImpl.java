@@ -93,7 +93,7 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 		});
 		findSchemaFileButton.addClickHandler(event -> {
 			entityFinderBuilder.setMultiSelect(false)
-					.setSelectableTypes(EntityFilter.ALL_BUT_LINK)
+					.setSelectableTypes(EntityFilter.ALL_DIRECTORY_BUT_LINK)
 					.setShowVersions(false)
 					.setSelectedHandler(((selected, entityFinder) -> {
 						schemaFileSynIdField.setValue(selected.getTargetId());
@@ -104,7 +104,7 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 		});
 		findUiSchemaFileButton.addClickHandler(event -> {
 			entityFinderBuilder.setMultiSelect(false)
-					.setSelectableTypes(EntityFilter.ALL_BUT_LINK)
+					.setSelectableTypes(EntityFilter.ALL_DIRECTORY_BUT_LINK)
 					.setShowVersions(false)
 					.setSelectedHandler(((selected, entityFinder) -> {
 						uiSchemaFileSynIdField.setValue(selected.getTargetId());

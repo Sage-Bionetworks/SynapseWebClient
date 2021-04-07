@@ -88,7 +88,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 
 		findEntitiesButton.addClickHandler(event -> entityFinderBuilder
 				.setMultiSelect(false)
-				.setSelectableTypes(EntityFilter.ALL_BUT_LINK)
+				.setSelectableTypes(EntityFilter.ALL_DIRECTORY_BUT_LINK)
 				.setShowVersions(true)
 				.setSelectedHandler((selected, entityFinder) -> {
 					entityField.setValue(DisplayUtils.createEntityVersionString(selected));

@@ -10,7 +10,6 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -70,7 +69,7 @@ public class EntityFinderV2ImplTest {
         boolean multiSelect = true;
         boolean showVersions = true;
         EntityFilter selectableTypes = EntityFilter.FILE;
-        EntityFilter visibleTypesInList = EntityFilter.ALL_BUT_LINK;
+        EntityFilter visibleTypesInList = EntityFilter.ALL_DIRECTORY_BUT_LINK;
         EntityFilter visibleTypesInTree = EntityFilter.PROJECT;
         EntityFinderScope scope = EntityFinderScope.ALL_PROJECTS;
         EntityFinder.InitialContainer initialContainer = EntityFinder.InitialContainer.NONE;

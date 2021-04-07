@@ -213,7 +213,7 @@ public class MyEntitiesBrowserTest {
 		userId = "54321";
 		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(s);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
-		EntityFilter filter = EntityFilter.ALL_BUT_LINK;
+		EntityFilter filter = EntityFilter.ALL_DIRECTORY_BUT_LINK;
 		widget.setEntityFilter(filter);
 		verify(mockEntityTreeBrowser).setEntityFilter(filter);
 		verify(mockFavoritesTreeBrowser).setEntityFilter(filter);

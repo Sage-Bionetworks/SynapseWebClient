@@ -15,7 +15,7 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 
 public enum EntityFilter {
-	ALL(project, folder, file, link), CONTAINER(project, folder), PROJECT(project), FOLDER(folder), FILE(file), ALL_BUT_LINK(project, folder, file), PROJECT_OR_TABLE(project, table, entityview);
+	ALL_DIRECTORY(project, folder, file, link), CONTAINER(project, folder), PROJECT(project), FOLDER(folder), FILE(file), ALL_DIRECTORY_BUT_LINK(project, folder, file), PROJECT_OR_TABLE(project, table, entityview);
 
 	// when browsing (in the entity tree browser), only these types should be shown.
 	private Set<String> entityTypeClassNamesSet;

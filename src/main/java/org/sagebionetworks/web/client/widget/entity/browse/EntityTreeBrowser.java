@@ -33,7 +33,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	private PortalGinInjector ginInjector;
 	private String currentSelection;
 	CallbackP<String> entityClickedHandler;
-	EntityFilter filter = EntityFilter.ALL;
+	EntityFilter filter = EntityFilter.ALL_DIRECTORY;
 	SynapseAlert synAlert;
 	private SortBy currentSortBy;
 	private Direction currentDirection;

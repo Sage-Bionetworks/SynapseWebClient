@@ -186,7 +186,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		entityFinderButton.addClickHandler(event -> {
 			this.entityFinder = entityFinderBuilder
 					.setMultiSelect(false)
-					.setSelectableTypes(EntityFilter.ALL)
+					.setSelectableTypes(EntityFilter.ALL_DIRECTORY)
 					.setShowVersions(true)
 					.setSelectedHandler((selected, finder) -> {
 						if (selected.getTargetId() != null) {

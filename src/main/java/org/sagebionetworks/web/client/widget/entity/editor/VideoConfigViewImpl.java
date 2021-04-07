@@ -51,7 +51,7 @@ public class VideoConfigViewImpl implements VideoConfigView {
 		widget = binder.createAndBindUi(this);
 		this.entityFinder = entityFinderBuilder
 				.setMultiSelect(false)
-				.setSelectableTypes(EntityFilter.ALL_BUT_LINK)
+				.setSelectableTypes(EntityFilter.ALL_DIRECTORY_BUT_LINK)
 				.setShowVersions(false)
 				.setSelectedHandler(((selected, finder) -> presenter.validateSelection(selected)))
 				.build();

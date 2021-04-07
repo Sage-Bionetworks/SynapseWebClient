@@ -39,7 +39,7 @@ public class ProvenanceConfigViewImpl implements ProvenanceConfigView {
 
 		entityFinderButton.addClickHandler(event -> entityFinderBuilder
 				.setMultiSelect(false)
-				.setSelectableTypes(EntityFilter.ALL)
+				.setSelectableTypes(EntityFilter.ALL_DIRECTORY)
 				.setShowVersions(true)
 				.setSelectedHandler((selected, finder) -> {
 					appendEntityListValue(selected);
