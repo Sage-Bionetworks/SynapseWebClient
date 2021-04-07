@@ -252,6 +252,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 				selectMultiple: multiSelect,
 				onSelectedChange: callback,
 				showVersionSelection: showVersions,
+				selectedCopy: selectedCopy,
 				treeOnly: treeOnly,
 			};
 			$wnd.ReactDOM.render(

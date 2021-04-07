@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
@@ -89,11 +90,13 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 	@Override
 	public void onAddRecord() {
 		entityFinderBuilder
-				.setModalTitle("Insert Entity List")
+				.setModalTitle("Insert Item List")
 				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
 				.setInitialContainer(EntityFinder.InitialContainer.NONE)
+				.setVisibleTypesInList(EntityFilter.ALL)
+				.setSelectableTypes(EntityFilter.ALL)
 				.setHelpMarkdown("Search or Browse Synapse to find Projects, Folders or Files and insert them as a list into this Wiki page")
-				.setPromptCopy("Find Files, Folders or Projects to insert a list")
+				.setPromptCopy("Find items in Synapse to insert them as a list")
 				.setMultiSelect(true)
 				.setShowVersions(true)
 				.setSelectedMultiHandler(((selected, entityFinder) -> {

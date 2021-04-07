@@ -25,13 +25,12 @@ public class PreviewConfigEditor implements PreviewConfigView.Presenter, WidgetE
 	@Inject
 	public PreviewConfigEditor(PreviewConfigView view, EntityFinder.Builder entityFinderBuilder) {
 		this.view = view;
-		this.entityFinder = entityFinder;
 		view.setPresenter(this);
 		view.initView();
 
 		this.entityFinder = entityFinderBuilder
-				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
-				.setInitialContainer(EntityFinder.InitialContainer.NONE)
+				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
+				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
 				.setSelectableTypes(EntityFilter.ALL_DIRECTORY_BUT_LINK)
 				.setShowVersions(true)
 				.setSelectedHandler((selected, finder) -> {
@@ -107,7 +106,4 @@ public class PreviewConfigEditor implements PreviewConfigView.Presenter, WidgetE
 	public List<String> getDeletedFileHandleIds() {
 		return null;
 	}
-	/*
-	 * Private Methods
-	 */
 }

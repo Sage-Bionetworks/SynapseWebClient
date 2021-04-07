@@ -66,7 +66,6 @@ import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialog;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidget;
@@ -1205,6 +1204,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	private void postCheckLink() {
 		getEntityFinderBuilder()
+				.setInitialScope(EntityFinderScope.ALL_PROJECTS)
+				.setInitialContainer(EntityFinder.InitialContainer.NONE)
 				.setSelectableTypes(CONTAINER)
 				.setShowVersions(false)
 				.setSelectedHandler((selected, entityFinder) -> {
@@ -1280,7 +1281,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		EntityFinder.Builder builder = getEntityFinderBuilder()
 				.setModalTitle("Move " + entityTypeDisplay)
 				.setHelpMarkdown("Search or Browse Synapse to find a destination to move this " + entityTypeDisplay)
-				.setPromptCopy("Find a location to move " + entity.getId())
+				.setPromptCopy("Find a destination to move " + entity.getId())
 				.setSelectedCopy("Destination")
 				.setConfirmButtonCopy("Move")
 				.setShowVersions(false)
@@ -1305,15 +1306,15 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 		if (entityBundle.getEntity() instanceof Table) {
 			builder.setInitialScope(EntityFinderScope.ALL_PROJECTS)
-					.setInitialContainer(EntityFinder.InitialContainer.SCOPE)
+					.setInitialContainer(EntityFinder.InitialContainer.NONE)
 					.setVisibleTypesInTree(PROJECT_OR_TABLE)
 					.setVisibleTypesInList(PROJECT)
-					.setSelectableTypes(PROJECT)
-					.setVisibleTypesInList(EntityFilter.PROJECT_OR_TABLE);
+					.setSelectableTypes(PROJECT);
 		} else {
 			builder.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
 					.setInitialContainer(EntityFinder.InitialContainer.PARENT)
 					.setVisibleTypesInTree(CONTAINER)
+					.setVisibleTypesInList(CONTAINER)
 					.setSelectableTypes(CONTAINER);
 		}
 
