@@ -29,9 +29,10 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 	@Override
 	public void configure(SynapseSuggestOracle oracle) {
 		final TextBox suggestTextBox = new TextBox();
-		suggestTextBox.getElement().setAttribute("name", "address");
+		suggestTextBox.getElement().setAttribute("name", "synapse-user-search");
 		suggestBox = new SuggestBox(oracle, suggestTextBox, new SynapseSuggestionDisplay());
 		suggestBox.getValueBox().addStyleName("form-control");
+		suggestBox.getValueBox().getElement().setAttribute("autocomplete", "off");
 		suggestBox.addSelectionHandler(event -> {
 			selectSuggestion((UserGroupSuggestion) event.getSelectedItem());
 		});
