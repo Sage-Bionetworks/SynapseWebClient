@@ -92,7 +92,7 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 		entityFinderBuilder
 				.setModalTitle("Insert Item List")
 				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
-				.setInitialContainer(EntityFinder.InitialContainer.NONE)
+				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
 				.setVisibleTypesInList(EntityFilter.ALL)
 				.setSelectableTypes(EntityFilter.ALL)
 				.setHelpMarkdown("Search or Browse Synapse to find Projects, Folders or Files and insert them as a list into this Wiki page")

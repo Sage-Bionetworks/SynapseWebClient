@@ -29,9 +29,14 @@ public class PreviewConfigEditor implements PreviewConfigView.Presenter, WidgetE
 		view.initView();
 
 		this.entityFinder = entityFinderBuilder
+				.setModalTitle("Insert File Preview")
+				.setHelpMarkdown("Search or Browse Synapse to find Files and insert a preview into this Wiki page")
+				.setPromptCopy("Find a File to insert a preview into this Wiki")
+				.setConfirmButtonCopy("Insert")
 				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
 				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
-				.setSelectableTypes(EntityFilter.ALL_DIRECTORY_BUT_LINK)
+				.setVisibleTypesInList(EntityFilter.ALL_DIRECTORY_BUT_LINK)
+				.setSelectableTypes(EntityFilter.FILE)
 				.setShowVersions(true)
 				.setSelectedHandler((selected, finder) -> {
 					view.setEntityId(selected.getTargetId());

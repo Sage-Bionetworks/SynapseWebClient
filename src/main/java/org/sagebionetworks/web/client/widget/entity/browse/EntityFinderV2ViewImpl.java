@@ -147,7 +147,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		synAlert.showError(message);
 	}
 
 	@Override

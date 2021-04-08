@@ -50,8 +50,12 @@ public class VideoConfigViewImpl implements VideoConfigView {
 	public VideoConfigViewImpl(VideoConfigViewImplUiBinder binder, EntityFinder.Builder entityFinderBuilder) {
 		widget = binder.createAndBindUi(this);
 		this.entityFinder = entityFinderBuilder
+				.setModalTitle("Find Video File")
+				.setHelpMarkdown("Search or Browse Synapse to find a Video to insert into this Wiki")
+				.setPromptCopy("Find a Video File")
 				.setMultiSelect(false)
-				.setSelectableTypes(EntityFilter.ALL_DIRECTORY_BUT_LINK)
+				.setVisibleTypesInList(EntityFilter.ALL_DIRECTORY)
+				.setSelectableTypes(EntityFilter.FILE)
 				.setShowVersions(false)
 				.setSelectedHandler(((selected, finder) -> presenter.validateSelection(selected)))
 				.build();

@@ -38,26 +38,25 @@ public class ImportTableViewColumnsButton implements IsWidget {
 		button.setType(ButtonType.DEFAULT);
 		button.setIcon(IconType.ARROW_CIRCLE_O_DOWN);
 		this.finder = entityFinderBuilder
+				.setModalTitle("Find Table")
+				.setHelpMarkdown("Search or Browse Synapse to find an existing Table in order to import columns into this Table")
+				.setPromptCopy("Find Tables to import columns")
 				.setMultiSelect(false)
-				.setSelectableTypes(EntityFilter.PROJECT_OR_TABLE)
-				.setShowVersions(false)
-				.setSelectedHandler((selected, entityFinder) -> onTableViewSelected(selected.getTargetId()))
+				.setVisibleTypesInTree(EntityFilter.PROJECT)
+				.setSelectableTypes(EntityFilter.ALL_TABLES)
+				.setShowVersions(true)
+				.setSelectedHandler((selected, entityFinder) -> onTableViewSelected(selected.getTargetId(), selected.getTargetVersionNumber()))
 				.build();
 		button.addStyleName("margin-left-10");
-		button.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				finder.show();
-			}
-		});
+		button.addClickHandler(event -> finder.show());
 	}
 
-	public void onTableViewSelected(String entityId) {
+	public void onTableViewSelected(String entityId, Long versionNumber) {
 		// get the column schema
 		EntityBundleRequest bundleRequest = new EntityBundleRequest();
 		bundleRequest.setIncludeEntity(true);
 		bundleRequest.setIncludeTableBundle(true);
-		jsClient.getEntityBundle(entityId, bundleRequest, new AsyncCallback<EntityBundle>() {
+		jsClient.getEntityBundleForVersion(entityId, versionNumber, bundleRequest, new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				if (!(bundle.getEntity() instanceof Table)) {

@@ -45,7 +45,7 @@ public class PreviewConfigEditorTest {
 		verify(mockView).initView();
 		// verify entity finder is configured
 		ArgumentCaptor<EntityFinder.SelectedHandler> captor = ArgumentCaptor.forClass(EntityFinder.SelectedHandler.class);
-		verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.ALL_DIRECTORY_BUT_LINK);
+		verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.FILE);
 		verify(mockEntityFinderBuilder).setShowVersions(true);
 		verify(mockEntityFinderBuilder).setSelectedHandler(captor.capture());
 		verify(mockEntityFinderBuilder).build();

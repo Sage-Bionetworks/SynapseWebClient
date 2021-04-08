@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.sagebionetworks.repo.model.Reference;
 

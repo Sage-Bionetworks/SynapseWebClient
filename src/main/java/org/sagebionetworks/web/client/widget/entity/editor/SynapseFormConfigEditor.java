@@ -2,13 +2,12 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.List;
 import java.util.Map;
-import org.sagebionetworks.repo.model.Reference;
+
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder.SelectedHandler;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -32,14 +31,17 @@ public class SynapseFormConfigEditor implements SynapseFormConfigView.Presenter,
 	}
 
 	private EntityFinder configureEntityFinder(EntityFinder.Builder builder) {
-		return builder.setSelectableTypes(EntityFilter.PROJECT_OR_TABLE)
+		return builder
+				.setModalTitle("Find Table")
+				.setHelpMarkdown("Search or Browse Synapse to find a Table and create a form in this Wiki")
+				.setPromptCopy("Find Table to create a form")
+				.setVisibleTypesInTree(EntityFilter.PROJECT)
+				.setVisibleTypesInList(EntityFilter.TABLE)
+				.setSelectableTypes(EntityFilter.TABLE)
 				.setShowVersions(true)
-				.setSelectedHandler(new SelectedHandler<Reference>() {
-					@Override
-					public void onSelected(Reference selected, EntityFinder entityFinder) {
-						view.setEntityId(selected.getTargetId());
-						entityFinder.hide();
-					}
+				.setSelectedHandler((selected, entityFinder) -> {
+					view.setEntityId(selected.getTargetId());
+					entityFinder.hide();
 				}).build();
 	}
 

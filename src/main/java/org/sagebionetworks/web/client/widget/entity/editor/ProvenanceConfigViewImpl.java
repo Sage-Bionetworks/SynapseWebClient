@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -38,11 +39,17 @@ public class ProvenanceConfigViewImpl implements ProvenanceConfigView {
 		widget = binder.createAndBindUi(this);
 
 		entityFinderButton.addClickHandler(event -> entityFinderBuilder
-				.setMultiSelect(false)
-				.setSelectableTypes(EntityFilter.ALL_DIRECTORY)
+				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
+				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
+				.setHelpMarkdown("Search or Browse Synapse to find an item and display the Provenance Graph within the Wiki page")
+				.setPromptCopy("Find items to insert a Provenance Graph")
+				.setMultiSelect(true)
+				.setSelectableTypes(EntityFilter.ALL)
 				.setShowVersions(true)
-				.setSelectedHandler((selected, finder) -> {
-					appendEntityListValue(selected);
+				.setSelectedMultiHandler((selected, finder) -> {
+					for (Reference entity : selected) {
+						appendEntityListValue(entity);
+					}
 					finder.hide();
 				})
 				.build()

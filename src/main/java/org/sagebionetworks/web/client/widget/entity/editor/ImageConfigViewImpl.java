@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -87,8 +88,14 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		synapseParamsPanelContainer.setWidget(synapseParamsPanel.asWidget());
 
 		findEntitiesButton.addClickHandler(event -> entityFinderBuilder
+				.setModalTitle("Find Image File")
+				.setHelpMarkdown("Search or Browse Synapse to find an image file to insert into the Wiki page")
+				.setPromptCopy("Find an image to insert into this Wiki")
+				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
+				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
 				.setMultiSelect(false)
-				.setSelectableTypes(EntityFilter.ALL_DIRECTORY_BUT_LINK)
+				.setVisibleTypesInList(EntityFilter.ALL_DIRECTORY)
+				.setSelectableTypes(EntityFilter.FILE)
 				.setShowVersions(true)
 				.setSelectedHandler((selected, entityFinder) -> {
 					entityField.setValue(DisplayUtils.createEntityVersionString(selected));

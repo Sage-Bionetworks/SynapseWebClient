@@ -69,7 +69,11 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 		widget = binder.createAndBindUi(this);
 		this.cookies = cookies;
 		findProjectButton.addClickHandler(event -> {
-			entityFinderBuilder.setMultiSelect(false)
+			entityFinderBuilder
+					.setModalTitle("Find Project")
+					.setHelpMarkdown("Search or Browse Synapse to find a Project to display a Challenge Evaluation submission button")
+					.setPromptCopy("Find a Project to create a submission button")
+					.setMultiSelect(false)
 					.setSelectableTypes(EntityFilter.PROJECT)
 					.setShowVersions(false)
 					.setSelectedHandler(((selected, entityFinder) -> {
@@ -93,7 +97,7 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 		});
 		findSchemaFileButton.addClickHandler(event -> {
 			entityFinderBuilder.setMultiSelect(false)
-					.setSelectableTypes(EntityFilter.ALL_DIRECTORY_BUT_LINK)
+					.setSelectableTypes(EntityFilter.FILE)
 					.setShowVersions(false)
 					.setSelectedHandler(((selected, entityFinder) -> {
 						schemaFileSynIdField.setValue(selected.getTargetId());
@@ -104,7 +108,7 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 		});
 		findUiSchemaFileButton.addClickHandler(event -> {
 			entityFinderBuilder.setMultiSelect(false)
-					.setSelectableTypes(EntityFilter.ALL_DIRECTORY_BUT_LINK)
+					.setSelectableTypes(EntityFilter.FILE)
 					.setShowVersions(false)
 					.setSelectedHandler(((selected, entityFinder) -> {
 						uiSchemaFileSynIdField.setValue(selected.getTargetId());

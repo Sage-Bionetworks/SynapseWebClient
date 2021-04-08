@@ -43,7 +43,7 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 
 		this.entityFinder = entityFinderBuilder
 				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
-				.setInitialContainer(EntityFinder.InitialContainer.NONE)
+				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
 				.setModalTitle("Find File")
 				.setMultiSelect(false)
 				.setSelectableTypes(EntityFilter.ALL_DIRECTORY_BUT_LINK)

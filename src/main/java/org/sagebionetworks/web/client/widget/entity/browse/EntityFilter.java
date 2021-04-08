@@ -5,6 +5,7 @@ import static org.sagebionetworks.repo.model.EntityType.file;
 import static org.sagebionetworks.repo.model.EntityType.folder;
 import static org.sagebionetworks.repo.model.EntityType.link;
 import static org.sagebionetworks.repo.model.EntityType.project;
+import static org.sagebionetworks.repo.model.EntityType.submissionview;
 import static org.sagebionetworks.repo.model.EntityType.table;
 
 import java.util.ArrayList;
@@ -17,7 +18,16 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 
 public enum EntityFilter {
-	ALL(EntityType.values()), ALL_DIRECTORY(project, folder, file, link), CONTAINER(project, folder), PROJECT(project), FOLDER(folder), FILE(file), ALL_DIRECTORY_BUT_LINK(project, folder, file), PROJECT_OR_TABLE(project, table, entityview);
+	ALL(EntityType.values()),
+	ALL_DIRECTORY(project, folder, file, link),
+	CONTAINER(project, folder),
+	PROJECT(project),
+	FOLDER(folder),
+	FILE(file),
+	TABLE(table),
+	ALL_DIRECTORY_BUT_LINK(project, folder, file),
+	ALL_TABLES(table, entityview, submissionview),
+	PROJECT_OR_TABLE(project, table, entityview, submissionview);
 
 	// when browsing (in the entity tree browser), only these types should be shown.
 	private Set<String> entityTypeClassNamesSet;

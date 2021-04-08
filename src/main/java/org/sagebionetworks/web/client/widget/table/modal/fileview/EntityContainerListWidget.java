@@ -76,15 +76,21 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 
 		if (TableType.projects.equals(tableType)) {
 			String friendlyEntityType = "Project View";
-			entityFinderBuilder.setInitialScope(EntityFinderScope.ALL_PROJECTS);
-			entityFinderBuilder.setSelectableTypes(EntityFilter.PROJECT);
-			entityFinderBuilder.setHelpMarkdown("Search or Browse Synapse to find " + EntityTypeUtils.getDisplayName(EntityType.project) + "s to put into this " + friendlyEntityType);
-			entityFinderBuilder.setPromptCopy("Find " + EntityTypeUtils.getDisplayName(EntityType.project) + "s for this View");
+			entityFinderBuilder
+					.setInitialScope(EntityFinderScope.ALL_PROJECTS)
+					.setInitialContainer(EntityFinder.InitialContainer.SCOPE)
+					.setSelectableTypes(EntityFilter.PROJECT)
+					.setHelpMarkdown("Search or Browse Synapse to find " + EntityTypeUtils.getDisplayName(EntityType.project) + "s to put into this " + friendlyEntityType)
+					.setPromptCopy("Find " + EntityTypeUtils.getDisplayName(EntityType.project) + "s for this View");
 		} else {
 			String friendlyEntityType = "File View";
-			entityFinderBuilder.setSelectableTypes(EntityFilter.CONTAINER);
-			entityFinderBuilder.setHelpMarkdown("Search or Browse Synapse to find " + EntityTypeUtils.getDisplayName(EntityType.folder) + "s to put into this " + friendlyEntityType);
-			entityFinderBuilder.setPromptCopy("Find " + EntityTypeUtils.getDisplayName(EntityType.folder) + "s for this View");
+			entityFinderBuilder
+					.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
+					.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
+					.setSelectableTypes(EntityFilter.CONTAINER)
+					.setVisibleTypesInList(EntityFilter.ALL_DIRECTORY)
+					.setHelpMarkdown("Search or Browse Synapse to find " + EntityTypeUtils.getDisplayName(EntityType.folder) + "s containing items for this " + friendlyEntityType)
+					.setPromptCopy("Find and select " + EntityTypeUtils.getDisplayName(EntityType.folder) + "s to add their contents");
 		}
 		finder = entityFinderBuilder
 				.setModalTitle("Set View Containers")

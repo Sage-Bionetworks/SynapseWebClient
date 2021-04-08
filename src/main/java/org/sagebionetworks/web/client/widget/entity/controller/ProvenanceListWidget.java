@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -32,6 +33,7 @@ public class ProvenanceListWidget implements ProvenanceListWidgetView.Presenter,
 				.setModalTitle("Find in Synapse")
 				.setShowVersions(true)
 				.setMultiSelect(true)
+				.setSelectableTypes(EntityFilter.ALL)
 				.setSelectedMultiHandler((refs, finder) -> {
 					for (Reference ref: refs) {
 						if (ref.getTargetId() != null) {
@@ -71,12 +73,12 @@ public class ProvenanceListWidget implements ProvenanceListWidgetView.Presenter,
 			case USED:
 				this.entityFinderBuilder
 						.setHelpMarkdown("Search or Browse Synapse to find Projects, Folders or Files that were used to generate this entity")
-						.setPromptCopy("Find Files, Folders or Projects used to create this entity");
+						.setPromptCopy("Find Files, Folders or Projects representing objects used to create this entity");
 				break;
 			case EXECUTED:
 				this.entityFinderBuilder
-						.setHelpMarkdown("Search or Browse Synapse to find Projects, Folders or Files that were originated from this entity")
-						.setPromptCopy("Find Files, Folders or Projects that were executed to generate this entity");
+						.setHelpMarkdown("Search or Browse Synapse to find Projects, Folders or Files that represent a process or executable unit that was used to generate this entity")
+						.setPromptCopy("Find Files, Folders or Projects representing processes that were executed to generate this entity");
 				break;
 		}
 

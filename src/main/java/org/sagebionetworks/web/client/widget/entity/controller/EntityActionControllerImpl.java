@@ -1308,13 +1308,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			builder.setInitialScope(EntityFinderScope.ALL_PROJECTS)
 					.setInitialContainer(EntityFinder.InitialContainer.NONE)
 					.setVisibleTypesInTree(PROJECT_OR_TABLE)
-					.setVisibleTypesInList(PROJECT)
 					.setSelectableTypes(PROJECT);
 		} else {
 			builder.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
 					.setInitialContainer(EntityFinder.InitialContainer.PARENT)
 					.setVisibleTypesInTree(CONTAINER)
-					.setVisibleTypesInList(CONTAINER)
 					.setSelectableTypes(CONTAINER);
 		}
 
