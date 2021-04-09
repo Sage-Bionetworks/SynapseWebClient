@@ -69,6 +69,8 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 		this.authController = authenticationController;
 		this.jsniUtils = jsniUtils;
 
+		// Initially, nothing is selected, so we disable the confirm button
+		okButton.setEnabled(false);
 		okButton.addClickHandler(event -> {
 			presenter.okClicked();
 		});
@@ -96,15 +98,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 	public void renderComponent(EntityFinderScope initialScope, EntityFinder.InitialContainer initialContainer, String projectId, String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter selectableEntityTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, String selectedCopy, boolean treeOnly) {
         entityFinderContainer.clear();
 
-        if (treeOnly) {
-			modal.removeStyleName("modal-fullscreen");
-			modal.addStyleName("modal-90-percent modal-max-width-1200");
-		} else {
-			modal.addStyleName("modal-fullscreen");
-			modal.removeStyleName("modal-90-percent modal-max-width-1200");
-		}
-
-        // Convert EntityFilters to JS-compatible string arrays
+		// Convert EntityFilters to JS-compatible string arrays
         JsArrayString selectableTypes = toJsArray(selectableEntityTypes.getEntityQueryValues().stream().map(e -> e.toString()).collect(Collectors.toList()));
         JsArrayString visibleInList = toJsArray(visibleTypesInList.getEntityQueryValues().stream().map(e -> e.toString()).collect(Collectors.toList()));
         JsArrayString visibleInTree = toJsArray(visibleTypesInTree.getEntityQueryValues().stream().map(e -> e.toString()).collect(Collectors.toList()));
