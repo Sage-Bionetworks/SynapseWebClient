@@ -1307,7 +1307,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if (entityBundle.getEntity() instanceof Table) {
 			builder.setInitialScope(EntityFinderScope.ALL_PROJECTS)
 					.setInitialContainer(EntityFinder.InitialContainer.NONE)
-					.setVisibleTypesInTree(PROJECT_OR_TABLE)
+					.setVisibleTypesInTree(PROJECT)
 					.setSelectableTypes(PROJECT);
 		} else {
 			builder.setInitialScope(EntityFinderScope.CURRENT_PROJECT)

@@ -72,13 +72,13 @@ public class ProvenanceListWidget implements ProvenanceListWidgetView.Presenter,
 		switch (this.provenanceType) {
 			case USED:
 				this.entityFinderBuilder
-						.setHelpMarkdown("Search or Browse Synapse to find Projects, Folders or Files that were used to generate this entity")
-						.setPromptCopy("Find Files, Folders or Projects representing objects used to create this entity");
+						.setHelpMarkdown("Search or Browse Synapse to find items that were used to generate this entity")
+						.setPromptCopy("Find items representing objects used to create this entity");
 				break;
 			case EXECUTED:
 				this.entityFinderBuilder
-						.setHelpMarkdown("Search or Browse Synapse to find Projects, Folders or Files that represent a process or executable unit that was used to generate this entity")
-						.setPromptCopy("Find Files, Folders or Projects representing processes that were executed to generate this entity");
+						.setHelpMarkdown("Search or Browse Synapse to find items that represent a process or executable unit that generated this entity")
+						.setPromptCopy("Find items representing processes that were executed to generate this entity");
 				break;
 		}
 
