@@ -11222,10 +11222,10 @@ symbol-tree@^3.2.2:
   resolved "https://registry.yarnpkg.com/symbol-tree/-/symbol-tree-3.2.4.tgz#430637d248ba77e078883951fb9aa0eed7c63fa2"
   integrity sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==
 
-synapse-react-client@1.15.85:
-  version "1.15.85"
-  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-1.15.85.tgz#b97830402bf9b250ef74a0b816e327f2f3225739"
-  integrity sha512-2dGtlMwR33Gt9faH4GIQXSuw3GwCs6AL7FXgeBdlk/1t7A9axMsPYYJSCWjQui3rXW3u1IZDKMLwWE0IIxppZQ==
+synapse-react-client@0.0.0-experimental-9587ccdd:
+  version "0.0.0-experimental-9587ccdd"
+  resolved "https://registry.yarnpkg.com/synapse-react-client/-/synapse-react-client-0.0.0-experimental-9587ccdd.tgz#f709c264535310eb1f2bb375cc1444a9cb169f0b"
+  integrity sha512-9JAj9T/4lx1sfqBgGhsMo6KuX0fjy9foMuEFlyjFdzx/P8G5IFVY1o79ELWC4klhC5Ik2zoJqIH7MktRw0mgQw==
   dependencies:
     "@brainhubeu/react-carousel" "1.19.26"
     "@fortawesome/fontawesome-free" "^5.13.0"
