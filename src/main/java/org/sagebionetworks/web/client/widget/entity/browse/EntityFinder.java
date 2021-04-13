@@ -7,9 +7,8 @@ import org.sagebionetworks.repo.model.Reference;
 public interface EntityFinder {
 
 	/**
-	 * Designed to provide the same functionality as DisplayUtils.SelectedHandler,
-	 * except also providing the finder itself. This allows the caller to access methods
-	 * on the EntityFinder in the handler, which is specified prior to calling Builder.build()
+	 * Invoked when the user confirms their selection. The Entity Finder is also supplied as a parameter, which
+	 * allows the caller to access methods on the EntityFinder in the handler
 	 * @param <T>
 	 */
 	@FunctionalInterface
@@ -34,14 +33,6 @@ public interface EntityFinder {
 
 		Builder setMultiSelect(boolean multiSelect);
 
-		/**
-		 * Initial container ID will dictate the current project, and will also be
-		 * automatically opened if the initial scope is Current Project
-		 *
-		 *
-		 * @param initialContainerId
-		 * @return
-		 */
 		Builder setInitialContainer(InitialContainer initialContainer);
 
 		Builder setSelectableTypes(EntityFilter selectableFilter);

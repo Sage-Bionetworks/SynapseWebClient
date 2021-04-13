@@ -283,9 +283,9 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
                     String projectId;
                     String parentId;
                     projectId = pathHeaders.get(1).getId();
-                    if (pathHeaders.size() > 2) { // in other words, if the current entity is a project get the project
+                    if (pathHeaders.size() > 2) { // in other words, if the current entity is not a project, get the parent
                         parentId = pathHeaders.get(pathHeaders.size() - 2).getId();
-                    } else { // otherwise get the parent of the entity
+                    } else { // otherwise get the project itself
                         parentId = projectId;
                     }
                     view.renderComponent(initialScope, initialContainer, projectId, parentId, showVersions, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selectedCopy, treeOnly);
