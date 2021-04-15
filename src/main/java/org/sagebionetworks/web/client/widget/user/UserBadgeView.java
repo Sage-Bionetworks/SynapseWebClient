@@ -23,7 +23,7 @@ public interface UserBadgeView extends IsWidget, SynapseView {
 
 	void setTextHidden(boolean isTextHidden);
 
-	void setTooltipHidden(boolean isTooltipHidden);
+	void setShowCardOnHover(boolean isTooltipHidden);
 
 	void setOpenInNewWindow();
 

@@ -7,7 +7,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -37,10 +36,10 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		newWindow("#!Profile:" + userId, "_blank", "");
 	};
 	boolean isTextHidden = false;
-	boolean isTooltipHidden = false;
+	boolean showCardOnHover = true;
 	AdapterFactory adapterFactory;
 	SynapseJSNIUtils jsniUtils;
-	BadgeSize badgeSize = BadgeSize.DEFAULT;
+	BadgeSize badgeSize = BadgeSize.SMALL;
 	CallbackP<String> currentClickHandler = STANDARD_HANDLER;
 	FocusPanel userBadgeContainer = new FocusPanel();
 	ReactComponentDiv userBadgeReactDiv = new ReactComponentDiv();
@@ -80,7 +79,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		} catch (Throwable e) {
 			jsniUtils.consoleError(e);
 		}
-		_showBadge(userBadgeReactDiv.getElement(), profileJson, userId, badgeSize.reactClientSize, isTextHidden, isTooltipHidden, pictureUrl, !authController.isLoggedIn(), isCertified , isValidated, menuActionsArray, this);
+		_showBadge(userBadgeReactDiv.getElement(), profileJson, userId, badgeSize.getReactClientSize(), badgeSize.getAvatarSize(), showCardOnHover, pictureUrl, !authController.isLoggedIn(), isCertified , isValidated, menuActionsArray, this);
 	}
 
 	public void setClickHandler(ClickHandler clickHandler) {
@@ -115,19 +114,25 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	}
 
 	@Override
-	public void setTooltipHidden(boolean isTooltipHidden) {
-		this.isTooltipHidden = isTooltipHidden;
+	public void setShowCardOnHover(boolean showCardOnHover) {
+		this.showCardOnHover = showCardOnHover;
 	}
 
 	@Override
 	public void setSize(BadgeSize size) {
 		this.badgeSize = size;
-		if (badgeSize.equals(BadgeSize.DEFAULT)) {
+		if (badgeSize.equals(BadgeSize.SMALL_AVATAR)) {
 			isReactHandlingClickEvents = false;
+			addStyleName("vertical-align-middle");
 			addStyleName("default-user-badge");
+			removeStyleName("inline-user-badge");
 		} else {
 			isReactHandlingClickEvents = true;
 			removeStyleName("default-user-badge");
+			if (badgeSize.equals(BadgeSize.SMALL)) {
+				addStyleName("inline-user-badge");
+				removeStyleName("vertical-align-middle");
+			}
 		}
 	}
 
@@ -165,15 +170,15 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		_addToMenuActionsArray(commandName, callback, menuActionsArray);
 	}
 
-	private static native void _showBadge(Element el, String userProfileJson, String userId, String reactClientSize, boolean isTextHidden, boolean isTooltipHidden, String pictureUrl, boolean isEmailHidden, Boolean isCertifiedUser, Boolean isValidatedProfile, JsArray<JavaScriptObject> menuActionsArray, UserBadgeViewImpl userBadgeView) /*-{
+	private static native void _showBadge(Element el, String userProfileJson, String userId, String reactClientSize, String avatarSize, boolean showCardOnHover, String pictureUrl, boolean isEmailHidden, Boolean isCertifiedUser, Boolean isValidatedProfile, JsArray<JavaScriptObject> menuActionsArray, UserBadgeViewImpl userBadgeView) /*-{
 
 		try {
 			var userProfileObject = JSON.parse(userProfileJson);
 			var userCardProps = {
 				userProfile : userProfileObject,
 				size : reactClientSize,
-				hideText : isTextHidden,
-				hideTooltip : isTooltipHidden,
+				avatarSize: avatarSize,
+				showCardOnHover: showCardOnHover,
 				menuActions : menuActionsArray,
 				preSignedURL : pictureUrl,
 				hideEmail : isEmailHidden,

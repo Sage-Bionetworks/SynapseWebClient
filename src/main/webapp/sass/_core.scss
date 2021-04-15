@@ -2226,6 +2226,14 @@ Looks for any child element under .modal-fullscreen that has a class that contai
 	height: 35px;
 	display: inline-block;
 }
+#body .inline-user-badge {
+	height: 35px;
+	display: inline;
+
+	div {
+	    display: inline;
+	}
+}
 
 /* seamless attribute is not yet supported on most browsers, so define the style here for all iframes with this attribute */
 iframe[seamless] {
