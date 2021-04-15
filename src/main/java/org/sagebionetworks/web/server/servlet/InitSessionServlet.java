@@ -116,7 +116,7 @@ public class InitSessionServlet extends HttpServlet {
 
 		String token = getSessionToken(request);
 		if (token != null) {
-			SimpleHtmlSanitizer.sanitizeHtml(token); // The token should not be HTML, but just in case (SWC-5504)
+			token = SimpleHtmlSanitizer.sanitizeHtml(token).asString(); // The token should not be HTML, but just in case (SWC-5504)
 			response.setContentType("text/plain");
 			response.setHeader("X-Content-Type-Options", "nosniff");
 			response.setStatus(HttpServletResponse.SC_OK);
