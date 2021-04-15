@@ -117,8 +117,8 @@ public class InitSessionServlet extends HttpServlet {
 		String token = getSessionToken(request);
 		if (token != null) {
 			token = SimpleHtmlSanitizer.sanitizeHtml(token).asString(); // The token should not be HTML, but just in case (SWC-5504)
-			response.setContentType("text/plain");
-			response.setHeader("X-Content-Type-Options", "nosniff");
+			response.setContentType(WebConstants.TEXT_PLAIN_CHARSET_UTF8);
+			response.setHeader(WebConstants.CONTENT_TYPE_OPTIONS, WebConstants.NOSNIFF);
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.getOutputStream().write(token.getBytes("UTF-8"));
 			response.getOutputStream().flush();

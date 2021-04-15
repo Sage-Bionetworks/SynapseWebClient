@@ -293,6 +293,9 @@ public class WebConstants {
 	public static final String TEXT_HTML_CHARSET_UTF8 = "text/html; charset=utf-8";
 
 	public static final String CONTENT_TYPE = "Content-Type";
+	public static final String CONTENT_TYPE_OPTIONS = "X-Content-Type-Options";
+
+	public static final String NOSNIFF = "nosniff";
 
 	public static final Long ZERO_OFFSET = 0L;
 	public static final String REPO_SERVICE_URL_KEY = "repoServiceUrl";
