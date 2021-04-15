@@ -41,7 +41,7 @@
 					readOnly="true" />
 			</t:TableData>
 			<t:TableData ui:field="md5TableData"
-				addStyleNames="visible-xl overflow-x-hidden min-width-150" width="150px">
+				addStyleNames="visible-xl overflow-x-hidden min-width-165" width="165px">
 				<g:TextBox ui:field="md5Field"
 					addStyleNames="border-none noBackground font-size-14 overflow-x-hidden"
 					readOnly="true" />

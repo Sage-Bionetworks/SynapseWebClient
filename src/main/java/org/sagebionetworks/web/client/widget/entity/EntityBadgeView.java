@@ -45,8 +45,6 @@ public interface EntityBadgeView extends IsWidget, SupportsLazyLoadInterface {
 
 	void showMinimalColumnSet();
 
-	void setEntityNameWidthPx(int width);
-
 	void clearIcons();
 	void clearEntityInformation();
 
