@@ -270,8 +270,4 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	public void showMinimalColumnSet() {
 		view.showMinimalColumnSet();
 	}
-
-	public void setEntityNameWidthPx(int width) {
-		view.setEntityNameWidthPx(width);
-	}
 }

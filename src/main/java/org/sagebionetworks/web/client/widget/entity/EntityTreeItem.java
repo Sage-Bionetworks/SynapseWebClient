@@ -68,9 +68,6 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 
 	public void setHeight(int height) {
 		this.height = height;
-		// set the entity badge name width based on the height
-		int entityNameWidthPx = 400 - (height * 16);
-		entityBadge.setEntityNameWidthPx(entityNameWidthPx);
 	}
 
 	public int getHeight() {
