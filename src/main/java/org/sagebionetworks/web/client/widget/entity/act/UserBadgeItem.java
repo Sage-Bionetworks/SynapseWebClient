@@ -117,7 +117,7 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 		} else {
 			userBadge.configure(userId);
 		}
-		userBadge.setSize(BadgeSize.DEFAULT);
+		userBadge.setSize(BadgeSize.SMALL);
 		userBadge.setCustomClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

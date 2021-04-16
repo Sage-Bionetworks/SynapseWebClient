@@ -8,15 +8,13 @@
 	<bh:Div ui:field="container" visible="false">
 		<bh:Span ui:field="createdByUI">
 			<bh:Span text="Created by" />
-			<bh:Span ui:field="createdBadgePanel"
-				addStyleNames="movedown-2" />
+			<bh:Span ui:field="createdBadgePanel" />
 			<bh:Span ui:field="createdOnText" />
 		</bh:Span>
 		<bh:Br />
 		<bh:Span ui:field="modifiedByUI">
 			<bh:Span text="Modified by" />
-			<bh:Span ui:field="modifiedBadgePanel"
-				addStyleNames="movedown-2" />
+			<bh:Span ui:field="modifiedBadgePanel" />
 			<bh:Span ui:field="modifiedOnText" />
 		</bh:Span>
 
