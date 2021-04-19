@@ -38,7 +38,7 @@ public class CytoscapeConfigViewImpl implements CytoscapeConfigView {
 
 		this.cyJsFinder = entityFinderBuilder
 				.setMultiSelect(false)
-				.setSelectableTypes(EntityFilter.ALL_DIRECTORY_BUT_LINK)
+				.setSelectableTypes(EntityFilter.FILE)
 				.setShowVersions(false)
 				.setSelectedHandler((selected, finder) -> {
 					cyJsEntity.setValue(selected.getTargetId());

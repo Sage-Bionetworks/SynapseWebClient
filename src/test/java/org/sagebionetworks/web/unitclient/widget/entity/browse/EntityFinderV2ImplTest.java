@@ -69,7 +69,7 @@ public class EntityFinderV2ImplTest {
         boolean multiSelect = true;
         boolean showVersions = true;
         EntityFilter selectableTypes = EntityFilter.FILE;
-        EntityFilter visibleTypesInList = EntityFilter.ALL_DIRECTORY_BUT_LINK;
+        EntityFilter visibleTypesInList = EntityFilter.ALL;
         EntityFilter visibleTypesInTree = EntityFilter.PROJECT;
         EntityFinderScope scope = EntityFinderScope.ALL_PROJECTS;
         EntityFinder.InitialContainer initialContainer = EntityFinder.InitialContainer.NONE;

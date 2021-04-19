@@ -19,13 +19,12 @@ import org.sagebionetworks.web.client.EntityTypeUtils;
 
 public enum EntityFilter {
 	ALL(EntityType.values()),
-	ALL_DIRECTORY(project, folder, file, link),
+	PROJECT_FOLDER_FILE_LINK(project, folder, file, link),
 	CONTAINER(project, folder),
 	PROJECT(project),
 	FOLDER(folder),
 	FILE(file),
 	TABLE(table),
-	ALL_DIRECTORY_BUT_LINK(project, folder, file),
 	ALL_TABLES(table, entityview, submissionview),
 	PROJECT_OR_TABLE(project, table, entityview, submissionview);
 

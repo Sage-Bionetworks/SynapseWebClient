@@ -88,7 +88,6 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 					.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
 					.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
 					.setSelectableTypes(EntityFilter.CONTAINER)
-					.setVisibleTypesInList(EntityFilter.ALL_DIRECTORY)
 					.setHelpMarkdown("Search or Browse Synapse to find " + EntityTypeUtils.getDisplayName(EntityType.folder) + "s containing items for this " + friendlyEntityType)
 					.setPromptCopy("Find and select " + EntityTypeUtils.getDisplayName(EntityType.folder) + "s to add their contents");
 		}

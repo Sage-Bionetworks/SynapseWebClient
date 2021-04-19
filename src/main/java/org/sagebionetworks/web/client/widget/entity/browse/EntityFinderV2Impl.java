@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.ALL;
-import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.ALL_DIRECTORY;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.CONTAINER;
 
 import java.util.ArrayList;
