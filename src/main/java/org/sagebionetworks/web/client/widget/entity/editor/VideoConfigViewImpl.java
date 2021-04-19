@@ -55,7 +55,7 @@ public class VideoConfigViewImpl implements VideoConfigView {
 				.setPromptCopy("Find Video File to insert into this Wiki")
 				.setMultiSelect(false)
 				.setSelectableTypes(EntityFilter.FILE)
-				.setShowVersions(false)
+				.setShowVersions(true)
 				.setSelectedHandler(((selected, finder) -> presenter.validateSelection(selected)))
 				.build();
 		button.addClickHandler(event -> entityFinder.show());
