@@ -17,15 +17,15 @@ import org.sagebionetworks.web.client.callback.OnSelectCallback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -41,6 +41,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 
 	private AuthenticationController authController;
 	private SynapseJSNIUtils jsniUtils;
+	private SynapseAlert synAlert;
 
 	// the modal dialog
 	private Modal modal;
@@ -62,14 +63,15 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 	HelpWidget helpWidget;
 
 	@UiField
-	SynapseAlertView synAlert;
+	SimplePanel synAlertPanel;
 
 	@Inject
-	public EntityFinderV2ViewImpl(AuthenticationController authenticationController, SynapseJSNIUtils jsniUtils) {
+	public EntityFinderV2ViewImpl(AuthenticationController authenticationController, SynapseJSNIUtils jsniUtils, SynapseAlert synAlert) {
 		this.modal = (Modal) uiBinder.createAndBindUi(this);
 
 		this.authController = authenticationController;
 		this.jsniUtils = jsniUtils;
+		this.synAlert = synAlert;
 
 		// Initially, nothing is selected, so we disable the confirm button
 		okButton.setEnabled(false);
@@ -121,7 +123,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 				result -> {
 					List<Reference> selected = new ArrayList<>();
 					for (int i = 0; i < result.length(); i++) {
-						selected.add(convertFromJso(result.get(i)));
+						selected.add(result.get(i).getJavaObject());
 					}
 					okButton.setEnabled(selected.size() > 0);
 					if (multiSelect) {
@@ -142,6 +144,12 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 	}
 
 	@Override
+	public void setSynAlertWidget(SynapseAlert synAlert) {
+		this.synAlert = synAlert;
+		this.synAlertPanel.setWidget(synAlert.asWidget());
+	}
+
+	@Override
 	public void showErrorMessage(String message) {
 		synAlert.showError(message);
 	}
@@ -156,7 +164,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 
 	@Override
 	public void clear() {
-		clearError();
+		synAlert.clear();
 		entityFinderContainer.clear();
 		presenter.clearSelectedEntities();
 		okButton.setEnabled(false);
@@ -182,17 +190,6 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 	}
 
 	@Override
-	public void setErrorMessage(String errorMessage) {
-		clearError();
-		synAlert.showError(errorMessage);
-	}
-
-	@Override
-	public void clearError() {
-		synAlert.clearState();
-	}
-
-	@Override
 	public void setModalTitle(String modalTitle) {
 		this.modalTitle.setText(modalTitle);
 	}
@@ -210,27 +207,6 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 	@Override
 	public void setConfirmButtonCopy(String confirmButtonCopy) {
 		this.okButton.setText(confirmButtonCopy);
-	}
-
-	public static class ReferenceJso extends JavaScriptObject {
-
-		protected ReferenceJso() {}
-
-		public final native String getTargetId() /*-{ return this.targetId }-*/;
-
-		public final native int getTargetVersionNumber() /*-{ return this.targetVersionNumber || -1 }-*/;
-
-	}
-
-	private Reference convertFromJso(ReferenceJso jso) {
-		Reference r = new Reference();
-		r.setTargetId(jso.getTargetId());
-		if (jso.getTargetVersionNumber() == -1) {
-			r.setTargetVersionNumber(null);
-		} else {
-			r.setTargetVersionNumber(Long.valueOf(jso.getTargetVersionNumber()));
-		}
-		return r;
 	}
 
 	private static native void _showEntityFinderReactComponent(Element el, String sessionToken, String projectId, String initialContainer, String initialScope, JsArrayString selectableTypes, JsArrayString visibleTypesInList, JsArrayString visibleTypesInTree, boolean showVersions, boolean multiSelect, String selectedCopy, boolean treeOnly, OnSelectCallback onSelectedCallback) /*-{

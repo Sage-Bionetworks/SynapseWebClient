@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import static org.sagebionetworks.repo.model.EntityType.dockerrepo;
 import static org.sagebionetworks.repo.model.EntityType.entityview;
 import static org.sagebionetworks.repo.model.EntityType.file;
 import static org.sagebionetworks.repo.model.EntityType.folder;
@@ -19,6 +20,7 @@ import org.sagebionetworks.web.client.EntityTypeUtils;
 
 public enum EntityFilter {
 	ALL(EntityType.values()),
+	ALL_BUT_LINK(project, folder, file, table, entityview, dockerrepo, submissionview),
 	PROJECT_FOLDER_FILE_LINK(project, folder, file, link),
 	CONTAINER(project, folder),
 	PROJECT(project),

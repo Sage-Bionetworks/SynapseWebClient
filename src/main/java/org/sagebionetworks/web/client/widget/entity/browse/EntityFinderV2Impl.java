@@ -14,7 +14,9 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.exceptions.WebClientConfigurationException;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -27,6 +29,7 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
     private List<Reference> selectedEntities;
     GlobalApplicationState globalApplicationState;
     private SynapseJavascriptClient jsClient;
+    private SynapseAlert synAlert;
 
     private boolean multiSelect;
     private InitialContainer initialContainer;
@@ -47,12 +50,14 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
     private String confirmButtonCopy;
 
     @Inject
-    public EntityFinderV2Impl(EntityFinderV2View view, GlobalApplicationState globalApplicationState, SynapseJavascriptClient jsClient) {
+    public EntityFinderV2Impl(EntityFinderV2View view, GlobalApplicationState globalApplicationState, SynapseJavascriptClient jsClient, SynapseAlert synAlert) {
         this.view = view;
         this.globalApplicationState = globalApplicationState;
         this.jsClient = jsClient;
+        this.synAlert = synAlert;
         this.selectedEntities = new ArrayList<>();
         view.setPresenter(this);
+        view.setSynAlertWidget(synAlert);
     }
 
     private EntityFinderV2Impl(Builder builder) {
@@ -62,13 +67,9 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         this.view = builder.view;
         this.globalApplicationState = builder.globalApplicationState;
         this.jsClient = builder.jsClient;
+        this.synAlert = builder.synAlert;
 
         this.view.setPresenter(this);
-
-        // Validation
-        if (builder.selectableTypes == null) {
-            throw new IllegalArgumentException("Selectable types must be explicitly specified in the Entity Finder Builder.");
-        }
 
         // Configuration
         if (builder.modalTitle != null) {
@@ -98,6 +99,22 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         showVersions = builder.showVersions;
         initialScope = builder.initialScope;
         visibleTypesInTree = builder.visibleTypesInTree;
+
+        // Validation
+        try {
+            if (selectableTypes == null) {
+                throw new WebClientConfigurationException("Selectable types must be explicitly specified in the Entity Finder Builder.");
+            }
+            if (!multiSelect && selectedHandler == null) {
+                throw new WebClientConfigurationException("No selected handler set in Entity Finder with multiSelect=false");
+            }
+            if (multiSelect && selectedMultiHandler == null) {
+                throw new WebClientConfigurationException("No selected multi-handler set in Entity Finder with multiSelect=false when multiselect is true");
+            }
+        } catch (WebClientConfigurationException e) {
+            synAlert.handleException(e);
+        }
+
         renderComponent();
     }
 
@@ -105,6 +122,7 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         private EntityFinderV2View view;
         GlobalApplicationState globalApplicationState;
         private SynapseJavascriptClient jsClient;
+        private SynapseAlert synAlert;
 
         private SelectedHandler<Reference> selectedHandler = (selected, finder) -> {
         };
@@ -128,10 +146,11 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         private String helpMarkdown = "Finding items in Synapse can be done by either “browsing”, “searching,” or directly entering the Synapse ID.&#10;Alternatively, navigate to the desired location in the current project, favorite projects or projects you own.";
 
         @Inject
-        public Builder(EntityFinderV2View view, GlobalApplicationState globalApplicationState, SynapseJavascriptClient jsClient) {
+        public Builder(EntityFinderV2View view, GlobalApplicationState globalApplicationState, SynapseJavascriptClient jsClient, SynapseAlert synAlert) {
             this.view = view;
             this.globalApplicationState = globalApplicationState;
             this.jsClient = jsClient;
+            this.synAlert = synAlert;
         }
 
         @Override
@@ -153,18 +172,12 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
 
         @Override
         public EntityFinder.Builder setSelectedHandler(SelectedHandler<Reference> handler) {
-            if (multiSelect) {
-                throw new IllegalArgumentException("Attempted to set handler for single selection in Entity Finder when multiselect is true");
-            }
             this.selectedHandler = handler;
             return this;
         }
 
         @Override
         public EntityFinder.Builder setSelectedMultiHandler(SelectedHandler<List<Reference>> handler) {
-            if (!multiSelect) {
-                throw new IllegalArgumentException("Attempted to set handler for single selection in Entity Finder when multiselect is true");
-            }
             this.selectedMultiHandler = handler;
             return this;
         }
@@ -238,30 +251,30 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
 
     @Override
     public void setSelectedEntity(Reference selected) {
-        view.clearError();
+        synAlert.clear();
         selectedEntities.clear();
         selectedEntities.add(selected);
     }
 
     @Override
     public void setSelectedEntities(List<Reference> selected) {
-        view.clearError();
+        synAlert.clear();
         selectedEntities.clear();
         selectedEntities.addAll(selected);
     }
 
     @Override
     public void clearSelectedEntities() {
-        view.clearError();
+        synAlert.clear();
         selectedEntities.clear();
     }
 
     @Override
     public void okClicked() {
-        view.clearError();
+        synAlert.clear();
         // check for valid selection
         if (selectedEntities == null || selectedEntities.isEmpty()) {
-            view.setErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+            synAlert.showError(DisplayConstants.PLEASE_MAKE_SELECTION);
         } else {
             fireEntitiesSelected();
         }

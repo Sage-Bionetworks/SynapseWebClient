@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.exceptions.WebClientConfigurationException;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -88,7 +89,7 @@ public class SynapseAlertImpl implements SynapseAlert {
 			view.showError(DisplayConstants.ERROR_CONFLICTING_UPDATE + "\n" + message);
 		} else if (ex instanceof DeprecatedServiceException) {
 			view.showError(DisplayConstants.ERROR_DEPRECATED_SERVICE + "\n" + message);
-		} else if (ex instanceof UnknownErrorException) {
+		} else if (ex instanceof UnknownErrorException || ex instanceof WebClientConfigurationException) {
 			// An unknown error occurred.
 			// Exception handling on the backend now throws the reason into the exception message. Easy!
 			view.showError(message);

@@ -31,6 +31,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderV2Impl;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderV2View;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -51,6 +52,9 @@ public class EntityFinderV2ImplTest {
 
     @Mock
     SynapseJavascriptClient mockJsClient;
+
+    @Mock
+    SynapseAlert mockSynAlert;
 
     @Mock
     Synapse mockPlace;

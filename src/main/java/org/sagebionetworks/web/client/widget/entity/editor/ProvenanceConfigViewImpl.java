@@ -44,7 +44,7 @@ public class ProvenanceConfigViewImpl implements ProvenanceConfigView {
 				.setHelpMarkdown("Search or Browse Synapse to find an item and display the Provenance Graph within the Wiki page")
 				.setPromptCopy("Find items to insert a Provenance Graph")
 				.setMultiSelect(true)
-				.setSelectableTypes(EntityFilter.ALL)
+				.setSelectableTypes(EntityFilter.ALL_BUT_LINK)
 				.setShowVersions(true)
 				.setSelectedMultiHandler((selected, finder) -> {
 					for (Reference entity : selected) {

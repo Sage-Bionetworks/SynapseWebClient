@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.ui.Widget;
 
@@ -22,9 +23,7 @@ public interface EntityFinderV2View extends SynapseView {
 
 	void renderComponent(EntityFinderScope initialScope, EntityFinder.InitialContainer initialContainer, String initialProject, String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter selectableTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, String selectedCopy, boolean treeOnly);
 
-	void setErrorMessage(String errorMessage);
-
-	void clearError();
+	void setSynAlertWidget(SynapseAlert synAlert);
 
     void setModalTitle(String modalTitle);
 
