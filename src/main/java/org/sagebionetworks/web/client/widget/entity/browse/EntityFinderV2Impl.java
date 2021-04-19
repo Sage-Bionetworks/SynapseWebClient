@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.ALL;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.ALL_DIRECTORY;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.CONTAINER;
 
@@ -65,6 +66,11 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
 
         this.view.setPresenter(this);
 
+        // Validation
+        if (builder.selectableTypes == null) {
+            throw new IllegalArgumentException("Selectable types must be explicitly specified in the Entity Finder Builder.");
+        }
+
         // Configuration
         if (builder.modalTitle != null) {
             this.view.setModalTitle(builder.modalTitle);
@@ -107,8 +113,8 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         };
 
         private boolean showVersions = false;
-        private EntityFilter visibleTypesInList = ALL_DIRECTORY;
-        private EntityFilter selectableTypes = ALL_DIRECTORY;
+        private EntityFilter visibleTypesInList = ALL;
+        private EntityFilter selectableTypes = null;
         private EntityFilter visibleTypesInTree = CONTAINER;
         boolean treeOnly = false;
 

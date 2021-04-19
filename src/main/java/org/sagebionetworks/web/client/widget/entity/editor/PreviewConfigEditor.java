@@ -35,7 +35,6 @@ public class PreviewConfigEditor implements PreviewConfigView.Presenter, WidgetE
 				.setConfirmButtonCopy("Insert")
 				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
 				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
-				.setVisibleTypesInList(EntityFilter.ALL_DIRECTORY_BUT_LINK)
 				.setSelectableTypes(EntityFilter.FILE)
 				.setShowVersions(true)
 				.setSelectedHandler((selected, finder) -> {

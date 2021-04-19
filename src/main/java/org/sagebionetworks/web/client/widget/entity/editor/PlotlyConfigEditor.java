@@ -89,9 +89,8 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 				.setHelpMarkdown("Search or Browse Synapse to find a Table or View to display in the Simple Plot")
 				.setPromptCopy("Find a Table or View to Display in the Simple Plot")
 				.setVisibleTypesInTree(EntityFilter.PROJECT)
-				.setVisibleTypesInList(EntityFilter.ALL)
 				.setMultiSelect(false)
-				.setSelectableTypes(EntityFilter.PROJECT_OR_TABLE)
+				.setSelectableTypes(EntityFilter.ALL_TABLES)
 				.setShowVersions(false)
 				.setSelectedHandler((selected, entityFinder) -> {
 					setTableId(selected.getTargetId());

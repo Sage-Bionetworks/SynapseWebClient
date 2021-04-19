@@ -94,7 +94,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
 				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
 				.setMultiSelect(false)
-				.setVisibleTypesInList(EntityFilter.ALL_DIRECTORY)
 				.setSelectableTypes(EntityFilter.FILE)
 				.setShowVersions(true)
 				.setSelectedHandler((selected, entityFinder) -> {

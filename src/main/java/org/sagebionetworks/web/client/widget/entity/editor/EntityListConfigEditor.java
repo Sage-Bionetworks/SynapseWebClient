@@ -93,10 +93,9 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 				.setModalTitle("Insert Item List")
 				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
 				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
-				.setVisibleTypesInList(EntityFilter.ALL)
 				.setSelectableTypes(EntityFilter.ALL)
-				.setHelpMarkdown("Search or Browse Synapse to find Projects, Folders or Files and insert them as a list into this Wiki page")
-				.setPromptCopy("Find items in Synapse to insert them as a list")
+				.setHelpMarkdown("Search or Browse Synapse to find items and insert them as a list into this Wiki page")
+				.setPromptCopy("Find items in Synapse to insert them as a list into this Wiki")
 				.setMultiSelect(true)
 				.setShowVersions(true)
 				.setSelectedMultiHandler(((selected, entityFinder) -> {

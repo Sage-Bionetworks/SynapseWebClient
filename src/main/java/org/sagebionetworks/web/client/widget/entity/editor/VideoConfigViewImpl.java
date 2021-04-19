@@ -52,9 +52,8 @@ public class VideoConfigViewImpl implements VideoConfigView {
 		this.entityFinder = entityFinderBuilder
 				.setModalTitle("Find Video File")
 				.setHelpMarkdown("Search or Browse Synapse to find a Video to insert into this Wiki")
-				.setPromptCopy("Find a Video File")
+				.setPromptCopy("Find Video File to insert into this Wiki")
 				.setMultiSelect(false)
-				.setVisibleTypesInList(EntityFilter.ALL_DIRECTORY)
 				.setSelectableTypes(EntityFilter.FILE)
 				.setShowVersions(false)
 				.setSelectedHandler(((selected, finder) -> presenter.validateSelection(selected)))

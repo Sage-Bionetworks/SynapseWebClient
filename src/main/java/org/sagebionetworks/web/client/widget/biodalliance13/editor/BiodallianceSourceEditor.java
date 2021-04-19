@@ -44,9 +44,11 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 		this.entityFinder = entityFinderBuilder
 				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
 				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
-				.setModalTitle("Find File")
+				.setModalTitle("Find Genome Browser File")
+				.setHelpMarkdown("Search or Browse Synapse to find supported Files for this Genome Browser")
+				.setPromptCopy("Find File to add a track")
 				.setMultiSelect(false)
-				.setSelectableTypes(EntityFilter.ALL_DIRECTORY_BUT_LINK)
+				.setSelectableTypes(EntityFilter.FILE)
 				.setShowVersions(true)
 				.setSelectedHandler((selected, finder) -> entitySelected(selected))
 				.build();

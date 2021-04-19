@@ -36,7 +36,6 @@ public class SynapseFormConfigEditor implements SynapseFormConfigView.Presenter,
 				.setHelpMarkdown("Search or Browse Synapse to find a Table and create a form in this Wiki")
 				.setPromptCopy("Find Table to create a form")
 				.setVisibleTypesInTree(EntityFilter.PROJECT)
-				.setVisibleTypesInList(EntityFilter.TABLE)
 				.setSelectableTypes(EntityFilter.TABLE)
 				.setShowVersions(true)
 				.setSelectedHandler((selected, entityFinder) -> {

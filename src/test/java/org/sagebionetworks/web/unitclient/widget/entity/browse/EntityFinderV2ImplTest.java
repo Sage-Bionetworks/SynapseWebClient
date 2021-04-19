@@ -142,6 +142,7 @@ public class EntityFinderV2ImplTest {
         path.setPath(pathList);
         bundle.setPath(path);
 
+        builder.setSelectableTypes(EntityFilter.ALL);
         builder.setInitialScope(EntityFinderScope.CURRENT_PROJECT);
         builder.setInitialContainer(EntityFinder.InitialContainer.PARENT);
         entityFinder = builder.build();
@@ -159,6 +160,7 @@ public class EntityFinderV2ImplTest {
 
     @Test
     public void testFireSingleEntity() {
+        builder.setSelectableTypes(EntityFilter.ALL);
         builder.setMultiSelect(false);
         builder.setSelectedHandler(singleHandler);
         entityFinder = builder.build();
@@ -180,6 +182,7 @@ public class EntityFinderV2ImplTest {
 
     @Test
     public void testFireMultipleEntities() {
+        builder.setSelectableTypes(EntityFilter.ALL);
         builder.setMultiSelect(true);
         builder.setSelectedMultiHandler(multiHandler);
         entityFinder = builder.build();
