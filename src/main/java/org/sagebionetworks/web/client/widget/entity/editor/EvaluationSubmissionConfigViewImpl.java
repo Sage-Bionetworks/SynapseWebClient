@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -70,6 +71,8 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 		this.cookies = cookies;
 		findProjectButton.addClickHandler(event -> {
 			entityFinderBuilder
+					.setInitialScope(EntityFinderScope.ALL_PROJECTS)
+					.setInitialContainer(EntityFinder.InitialContainer.SCOPE)
 					.setModalTitle("Find Project")
 					.setHelpMarkdown("Search or Browse Synapse to find a Project to display a Challenge Evaluation submission button")
 					.setPromptCopy("Find a Project to create a submission button")

@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -53,6 +54,8 @@ public class VideoConfigViewImpl implements VideoConfigView {
 				.setModalTitle("Find Video File")
 				.setHelpMarkdown("Search or Browse Synapse to find a Video to insert into this Wiki")
 				.setPromptCopy("Find Video File to insert into this Wiki")
+				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
+				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
 				.setMultiSelect(false)
 				.setSelectableTypes(EntityFilter.FILE)
 				.setShowVersions(true)

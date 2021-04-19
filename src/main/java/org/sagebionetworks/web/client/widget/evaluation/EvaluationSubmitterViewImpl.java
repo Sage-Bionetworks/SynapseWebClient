@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.FormParams;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -185,6 +186,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 
 		entityFinderButton.addClickHandler(event -> {
 			this.entityFinder = entityFinderBuilder
+					.setInitialScope(EntityFinderScope.ALL_PROJECTS)
+					.setInitialContainer(EntityFinder.InitialContainer.SCOPE)
 					.setHelpMarkdown("Search or Browse Synapse to find items to submit to this Challenge")
 					.setPromptCopy("Find items to Submit to this Challenge")
 					.setMultiSelect(false)

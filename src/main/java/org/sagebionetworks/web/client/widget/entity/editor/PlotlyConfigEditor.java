@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
@@ -88,6 +89,8 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 				.setModalTitle("Find a Table or View")
 				.setHelpMarkdown("Search or Browse Synapse to find a Table or View to display in the Simple Plot")
 				.setPromptCopy("Find a Table or View to Display in the Simple Plot")
+				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
+				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
 				.setVisibleTypesInTree(EntityFilter.PROJECT)
 				.setMultiSelect(false)
 				.setSelectableTypes(EntityFilter.ALL_TABLES)

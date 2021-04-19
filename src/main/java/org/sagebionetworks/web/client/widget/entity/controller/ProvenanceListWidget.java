@@ -8,6 +8,8 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
+
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -31,6 +33,8 @@ public class ProvenanceListWidget implements ProvenanceListWidgetView.Presenter,
 		this.entityFinderBuilder = entityFinderBuilder;
 		this.entityFinder = entityFinderBuilder
 				.setModalTitle("Find in Synapse")
+				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
+				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
 				.setShowVersions(true)
 				.setMultiSelect(true)
 				.setSelectableTypes(EntityFilter.ALL)

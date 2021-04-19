@@ -14,6 +14,8 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -38,6 +40,8 @@ public class ImportTableViewColumnsButton implements IsWidget {
 		button.setType(ButtonType.DEFAULT);
 		button.setIcon(IconType.ARROW_CIRCLE_O_DOWN);
 		this.finder = entityFinderBuilder
+				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
+				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
 				.setModalTitle("Find Table")
 				.setHelpMarkdown("Search or Browse Synapse to find an existing Table in order to import columns into this Table")
 				.setPromptCopy("Find Tables to import columns")

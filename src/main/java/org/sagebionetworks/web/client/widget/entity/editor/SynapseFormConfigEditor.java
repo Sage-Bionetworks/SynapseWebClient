@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -35,6 +36,8 @@ public class SynapseFormConfigEditor implements SynapseFormConfigView.Presenter,
 				.setModalTitle("Find Table")
 				.setHelpMarkdown("Search or Browse Synapse to find a Table and create a form in this Wiki")
 				.setPromptCopy("Find Table to create a form")
+				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
+				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
 				.setVisibleTypesInTree(EntityFilter.PROJECT)
 				.setSelectableTypes(EntityFilter.TABLE)
 				.setShowVersions(true)
