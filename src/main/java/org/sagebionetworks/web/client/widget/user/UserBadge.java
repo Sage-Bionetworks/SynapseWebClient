@@ -19,7 +19,7 @@ import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import com.google.gwt.core.client.GWT;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -59,7 +59,7 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 		this.userProfileAsyncHandler = userProfileAsyncHandler;
 		this.adapterFactory = adapterFactory;
 		this.jsClient = jsClient;
-		setSize(BadgeSize.DEFAULT);
+		setSize(BadgeSize.SMALL);
 		clearState();
 	}
 
@@ -74,7 +74,7 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 	
 	public void configure(UserProfile profile, Boolean isCertified, Boolean isValidated) {
 		this.profile = profile;
-		if (BadgeSize.DEFAULT.equals(currentBadgeSize) && profile.getProfilePicureFileHandleId() != null) {
+		if (BadgeSize.SMALL.equals(currentBadgeSize) && profile.getProfilePicureFileHandleId() != null) {
 			// small preview image
 			// http://rest-docs.synapse.org/rest/GET/userProfile/profileId/image/preview.html
 			configure(profile, jsClient.getProfilePicturePreviewURL(profile.getOwnerId(), true), isCertified, isValidated);
@@ -93,8 +93,8 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 		view.setTextHidden(isTextHidden);
 	}
 
-	public void setTooltipHidden(boolean isTooltipHidden) {
-		view.setTooltipHidden(isTooltipHidden);
+	public void setShowCardOnHover(boolean showCardOnHover) {
+		view.setShowCardOnHover(showCardOnHover);
 	}
 
 	public void setSize(BadgeSize size) {

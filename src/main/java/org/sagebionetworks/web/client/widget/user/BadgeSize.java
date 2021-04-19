@@ -2,15 +2,24 @@ package org.sagebionetworks.web.client.widget.user;
 
 
 public enum BadgeSize {
-	DEFAULT("SMALL USER CARD"), MEDIUM("MEDIUM USER CARD"), LARGE("LARGE USER CARD");
+	SMALL("SMALL USER CARD", "LARGE"),
+	MEDIUM("MEDIUM USER CARD", "LARGE"),
+	LARGE("LARGE USER CARD", "LARGE"),
+	SMALL_AVATAR("AVATAR", "SMALL"),
+	LARGE_AVATAR("AVATAR", "LARGE");
 
-	String reactClientSize;
+	private String reactClientSize;
+	private String avatarSize;
 
-	private BadgeSize(String reactClientSize) {
+	private BadgeSize(String reactClientSize, String avatarSize) {
 		this.reactClientSize = reactClientSize;
+		this.avatarSize = avatarSize;
 	}
 
 	public String getReactClientSize() {
 		return reactClientSize;
+	}
+	public String getAvatarSize() {
+		return avatarSize;
 	}
 }

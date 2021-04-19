@@ -18,10 +18,9 @@
 				<t:TableHeader width="42px"
 					addStyleNames="min-width-42" /> <!-- expand/contract icon + entity icon -->
 				<tr:SortableTableHeaderImpl
-					ui:field="nameColumnHeader" text="Name" width="400px"
-					addStyleNames="min-width-400" />
+					ui:field="nameColumnHeader" text="Name" />
 				<t:TableHeader ui:field="nameColumnHeaderUnsortable"
-					visible="false" width="400px" addStyleNames="min-width-400">
+					visible="false">
 					<bh:Span text="Name" />
 				</t:TableHeader>
 				<t:TableHeader addStyleNames="min-width-140" width="140px" /> <!-- icons -->
@@ -55,7 +54,7 @@
 					</b:Tooltip>
 				</t:TableHeader>
 				<t:TableHeader ui:field="md5ColumnHeader"
-					addStyleNames="visible-xl min-width-150" width="150px">
+					addStyleNames="visible-xl min-width-165" width="165px">
 					<bh:Span text="MD5" />
 				</t:TableHeader>
 				<t:TableHeader ui:field="modifiedByColumnHeader"
