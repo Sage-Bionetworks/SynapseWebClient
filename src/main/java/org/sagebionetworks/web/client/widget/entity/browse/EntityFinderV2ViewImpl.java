@@ -157,6 +157,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 		clearError();
 		entityFinderContainer.clear();
 		presenter.clearSelectedEntities();
+		okButton.setEnabled(false);
 	}
 
 	@Override
