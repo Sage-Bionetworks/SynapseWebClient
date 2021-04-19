@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import static org.sagebionetworks.web.client.utils.JavaScriptArrayUtils.convertToJsArray;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -99,9 +101,9 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
         entityFinderContainer.clear();
 
 		// Convert EntityFilters to JS-compatible string arrays
-        JsArrayString selectableTypes = toJsArray(selectableEntityTypes.getEntityQueryValues().stream().map(e -> e.toString()).collect(Collectors.toList()));
-        JsArrayString visibleInList = toJsArray(visibleTypesInList.getEntityQueryValues().stream().map(e -> e.toString()).collect(Collectors.toList()));
-        JsArrayString visibleInTree = toJsArray(visibleTypesInTree.getEntityQueryValues().stream().map(e -> e.toString()).collect(Collectors.toList()));
+        JsArrayString selectableTypes = convertToJsArray(selectableEntityTypes.getEntityQueryValues().stream().map(e -> e.toString()).collect(Collectors.toList()));
+        JsArrayString visibleInList = convertToJsArray(visibleTypesInList.getEntityQueryValues().stream().map(e -> e.toString()).collect(Collectors.toList()));
+        JsArrayString visibleInTree = convertToJsArray(visibleTypesInTree.getEntityQueryValues().stream().map(e -> e.toString()).collect(Collectors.toList()));
 
 		_showEntityFinderReactComponent(
 				entityFinderContainer.getElement(),
@@ -258,15 +260,6 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 			console.error(err);
 		}
 	}-*/;
-
-	public static JsArrayString toJsArray(List<String> list) {
-		JsArrayString jsArrayString = JsArrayString.createArray().cast();
-		for (String s : list) {
-			jsArrayString.push(s);
-		}
-		return jsArrayString;
-	}
-
 }
 
 
