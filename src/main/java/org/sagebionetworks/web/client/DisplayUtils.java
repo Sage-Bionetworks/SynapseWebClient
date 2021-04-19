@@ -285,8 +285,8 @@ public class DisplayUtils {
 		if (timeout != null) {
 			settings.setDelay(timeout);
 		} else {
-			// TODO: For Entity Finder testing, we set notifications to stay open for 30s by default.
-			settings.setDelay(30 * 1000);
+			// By default, notifications stay open for 15s
+			settings.setDelay(15 * 1000);
 		}
 		settings.setZIndex(2001);
 		notify(message, iconType, settings);
