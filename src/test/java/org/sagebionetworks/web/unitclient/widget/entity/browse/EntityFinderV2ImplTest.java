@@ -4,6 +4,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -25,6 +26,7 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.exceptions.WebClientConfigurationException;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
@@ -109,6 +111,7 @@ public class EntityFinderV2ImplTest {
         verify(mockView).setPromptCopy(prompt);
         verify(mockView).setConfirmButtonCopy(confirmCopy);
 
+        verify(mockSynAlert, never()).handleException(any());
 
         // Call under test: show the modal, triggering rendering
         entityFinder.show();
@@ -210,5 +213,46 @@ public class EntityFinderV2ImplTest {
         entityFinder.okClicked();
 
         verify(multiHandler).onSelected(eq(Arrays.asList(selectedEntity1, selectedEntity2)), eq(entityFinder));
+    }
+
+    @Test
+    public void testMisconfigurationTriggersAlert_NoSelectableTypes() {
+        builder
+                .setSelectableTypes(null) // !
+                .setMultiSelect(false)
+                .setSelectedHandler((selected, finder) -> {});
+
+        // Method under test
+        builder.build();
+
+        verify(mockSynAlert).handleException(any(WebClientConfigurationException.class));
+    }
+
+
+    @Test
+    public void testMisconfigurationTriggersAlert_NoSingleHandler() {
+        builder
+                .setSelectableTypes(EntityFilter.ALL)
+                .setMultiSelect(false)
+                .setSelectedHandler(null); // !
+
+        // Method under test
+        builder.build();
+
+        verify(mockSynAlert).handleException(any(WebClientConfigurationException.class));
+    }
+
+
+    @Test
+    public void testMisconfigurationTriggersAlert_NoMultiHandler() {
+        builder
+                .setSelectableTypes(EntityFilter.ALL)
+                .setMultiSelect(true)
+                .setSelectedMultiHandler(null); // !
+
+        // Method under test
+        builder.build();
+
+        verify(mockSynAlert).handleException(any(WebClientConfigurationException.class));
     }
 }
