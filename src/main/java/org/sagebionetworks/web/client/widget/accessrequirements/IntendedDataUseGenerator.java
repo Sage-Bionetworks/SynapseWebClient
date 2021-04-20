@@ -97,9 +97,9 @@ public class IntendedDataUseGenerator {
 			String projectLead = submission.getProjectLead();
 			String currentInstitution = submission.getInstitution();
 			String currentIDU = submission.getIntendedDataUseStatement();
-			sb.append("\n**Researcher:** ");
+			sb.append("\n**Project Lead:** ");
 			sb.append(projectLead);
-			sb.append("\n**Affiliation:** ");
+			sb.append("\n**Institution:** ");
 			sb.append(currentInstitution);
 			sb.append("\n**Data Access Request Submitted By:** @");
 			sb.append(userId2AliasMap.get(submission.getSubmittedBy()));
