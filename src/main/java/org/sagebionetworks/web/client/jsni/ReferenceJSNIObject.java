@@ -2,9 +2,12 @@ package org.sagebionetworks.web.client.jsni;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
-public class Reference extends JavaScriptObject {
+/**
+ * JSNI-compatible object for {@link org.sagebionetworks.repo.model.Reference}
+ */
+public class ReferenceJSNIObject extends JavaScriptObject {
 
-    protected Reference() {
+    protected ReferenceJSNIObject() {
     }
 
     public final native void setTargetId(String targetId) /*-{
