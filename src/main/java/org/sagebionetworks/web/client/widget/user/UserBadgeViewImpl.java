@@ -121,18 +121,27 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	@Override
 	public void setSize(BadgeSize size) {
 		this.badgeSize = size;
-		if (badgeSize.equals(BadgeSize.SMALL_AVATAR)) {
-			isReactHandlingClickEvents = false;
-			addStyleName("vertical-align-middle");
-			addStyleName("default-user-badge");
-			removeStyleName("inline-user-badge");
-		} else {
-			isReactHandlingClickEvents = true;
-			removeStyleName("default-user-badge");
-			if (badgeSize.equals(BadgeSize.SMALL)) {
-				addStyleName("inline-user-badge");
+		switch (badgeSize) {
+			case SMALL:
+				isReactHandlingClickEvents = true;
+				removeStyleName("default-user-badge");
 				removeStyleName("vertical-align-middle");
-			}
+				addStyleName("inline-user-badge");
+				break;
+			case MEDIUM:
+			case LARGE:
+				isReactHandlingClickEvents = true;
+				removeStyleName("default-user-badge");
+				removeStyleName("vertical-align-middle");
+				removeStyleName("inline-user-badge");
+				break;
+			case SMALL_AVATAR:
+			case LARGE_AVATAR:
+				isReactHandlingClickEvents = false;
+				addStyleName("default-user-badge");
+				addStyleName("vertical-align-middle");
+				removeStyleName("inline-user-badge");
+				break;
 		}
 	}
 
