@@ -101,10 +101,10 @@ public class IntendedDataUseGenerator {
 			sb.append(projectLead);
 			sb.append("\n**Affiliation:** ");
 			sb.append(currentInstitution);
-			sb.append("\n**Submitted By:** @");
+			sb.append("\n**Data Access Request Submitted By:** @");
 			sb.append(userId2AliasMap.get(submission.getSubmittedBy()));
 			String lastModifiedOn = dateTimeUtils.getDateString(submission.getModifiedOn());
-			sb.append("\n**Intended Data Use Statement (accepted on " + lastModifiedOn + "):**\n<div>");
+			sb.append("\n**Intended Data Use Statement (accepted on " + lastModifiedOn + "):** <div>");
 			sb.append(currentIDU);
 			sb.append("</div>");
 			if (submission.getAccessorChanges() != null) {
