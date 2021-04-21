@@ -9,6 +9,7 @@
 		<w:LoadingSpinner ui:field="loading" size="31px" addStyleNames="center-block center min-height-400"/>
 		<g:SimplePanel ui:field="refreshAlertContainer"/>
 		<g:SimplePanel ui:field="synapseAlertContainer"/>
+		<bh:Div ui:field="modalDialogContainer" />
 		<bh:Div addStyleNames="margin-left-15 margin-right-15">
 			<g:SimplePanel ui:field="fileBreadcrumbContainer"/>
 			<g:SimplePanel ui:field="folderTitlebarContainer" visible="false"/>
