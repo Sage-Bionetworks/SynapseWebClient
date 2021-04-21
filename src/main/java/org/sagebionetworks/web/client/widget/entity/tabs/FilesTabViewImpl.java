@@ -11,8 +11,8 @@ import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -65,6 +65,8 @@ public class FilesTabViewImpl implements FilesTabView {
 	Anchor expandProvenanceLink;
 	@UiField
 	Anchor expandPreviewLink;
+	@UiField
+	Div modalDialogContainer;
 	Widget provenanceGraphWidget, previewWidget;
 	HandlerRegistration expandPreviewHandlerRegistration, expandProvHandlerRegistration;
 
@@ -85,33 +87,35 @@ public class FilesTabViewImpl implements FilesTabView {
 	}
 
 	private ClickHandler getExpandClickHandler(final Widget w) {
-		return new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				final Modal window = new Modal();
-				window.addStyleName("modal-fullscreen");
-				final ModalBody body = new ModalBody();
-				final Div oldParent = (Div) w.getParent();
+		return event -> {
+			modalDialogContainer.clear();
+			final Modal window = new Modal();
+			window.addStyleName("modal-fullscreen");
+			final ModalBody body = new ModalBody();
+			final Div oldParent = (Div) w.getParent();
+			w.removeFromParent();
+			body.add(new ScrollPanel(w));
+			w.setHeight(new Double(com.google.gwt.user.client.Window.getClientHeight()).intValue() - 170 + "px");
+			ClickHandler closeHandler = closeEvent -> {
 				w.removeFromParent();
-				body.add(new ScrollPanel(w));
-				w.setHeight(new Double(com.google.gwt.user.client.Window.getClientHeight()).intValue() - 170 + "px");
-				ClickHandler closeHandler = new ClickHandler() {
-					@Override
-					public void onClick(ClickEvent event) {
-						w.removeFromParent();
-						oldParent.add(w);
-						w.setHeight(DEFAULT_WIDGET_HEIGHT);
-						window.hide();
-					}
-				};
-				window.addCloseHandler(closeHandler);
-				window.add(body);
-				ModalFooter footer = new ModalFooter();
-				Button closeButton = new Button(DisplayConstants.CLOSE, closeHandler);
-				footer.add(closeButton);
-				window.add(footer);
-				window.show();
-			}
+				oldParent.add(w);
+				w.setHeight(DEFAULT_WIDGET_HEIGHT);
+				window.hide();
+			};
+			window.addAttachHandler(attachEvent -> {
+				if (!attachEvent.isAttached()) {
+					// detached
+					closeHandler.onClick(null);
+				}
+			});
+			window.addCloseHandler(closeHandler);
+			window.add(body);
+			ModalFooter footer = new ModalFooter();
+			Button closeButton = new Button(DisplayConstants.CLOSE, closeHandler);
+			footer.add(closeButton);
+			window.add(footer);
+			modalDialogContainer.add(window);
+			window.show();
 		};
 	}
 
