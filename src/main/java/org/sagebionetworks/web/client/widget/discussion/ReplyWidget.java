@@ -17,6 +17,8 @@ import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditReplyModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.user.AvatarSize;
+import org.sagebionetworks.web.client.widget.user.BadgeType;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 import com.google.gwt.http.client.Request;
@@ -93,6 +95,9 @@ public class ReplyWidget implements ReplyWidgetView.Presenter {
 		this.moderatorIds = moderatorIds;
 		this.deleteReplyCallback = deleteReplyCallback;
 		this.isThreadDeleted = isThreadDeleted;
+		authorWidget.setBadgeType(BadgeType.SMALL);
+		authorWidget.setShowAvatar(true);
+		authorWidget.setAvatarSize(AvatarSize.MEDIUM);
 		authorWidget.configure(bundle.getCreatedBy());
 		view.setCreatedOn(SingleDiscussionThreadWidget.CREATED_ON_PREFIX + dateTimeUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setMessageVisible(true);

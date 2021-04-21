@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.user;
 
 import static org.sagebionetworks.web.client.DisplayUtils.DO_NOTHING_CLICKHANDLER;
 import static org.sagebionetworks.web.client.DisplayUtils.newWindow;
+
 import org.gwtbootstrap3.client.ui.constants.Emphasis;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
@@ -35,11 +36,12 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	public static final CallbackP<String> NEW_WINDOW_HANDLER = userId -> {
 		newWindow("#!Profile:" + userId, "_blank", "");
 	};
-	boolean isTextHidden = false;
+	boolean showAvatar = false;
 	boolean showCardOnHover = true;
 	AdapterFactory adapterFactory;
 	SynapseJSNIUtils jsniUtils;
-	BadgeSize badgeSize = BadgeSize.SMALL;
+	BadgeType badgeType = BadgeType.SMALL;
+	AvatarSize avatarSize = AvatarSize.MEDIUM;
 	CallbackP<String> currentClickHandler = STANDARD_HANDLER;
 	FocusPanel userBadgeContainer = new FocusPanel();
 	ReactComponentDiv userBadgeReactDiv = new ReactComponentDiv();
@@ -55,6 +57,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		this.authController = authController;
 		setMarginRight(2);
 		setMarginLeft(2);
+		addStyleName("UserBadge");
 		addStyleName("vertical-align-middle");
 		currentClickHandler = STANDARD_HANDLER;
 		userBadgeContainer.addClickHandler(event -> {
@@ -79,7 +82,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		} catch (Throwable e) {
 			jsniUtils.consoleError(e);
 		}
-		_showBadge(userBadgeReactDiv.getElement(), profileJson, userId, badgeSize.getReactClientSize(), badgeSize.getAvatarSize(), showCardOnHover, pictureUrl, !authController.isLoggedIn(), isCertified , isValidated, menuActionsArray, this);
+		_showBadge(userBadgeReactDiv.getElement(), profileJson, userId, badgeType.getUserCardType(), avatarSize.getAvatarSize(), showCardOnHover, pictureUrl, !authController.isLoggedIn(), showAvatar, isCertified, isValidated, menuActionsArray, this);
 	}
 
 	public void setClickHandler(ClickHandler clickHandler) {
@@ -109,40 +112,41 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	}
 
 	@Override
-	public void setTextHidden(boolean isTextHidden) {
-		this.isTextHidden = isTextHidden;
-	}
-
-	@Override
 	public void setShowCardOnHover(boolean showCardOnHover) {
 		this.showCardOnHover = showCardOnHover;
 	}
 
 	@Override
-	public void setSize(BadgeSize size) {
-		this.badgeSize = size;
-		switch (badgeSize) {
+	public void setBadgeType(BadgeType badgeType) {
+		this.badgeType = badgeType;
+		switch (this.badgeType) {
 			case SMALL:
 				isReactHandlingClickEvents = true;
-				removeStyleName("default-user-badge");
 				removeStyleName("vertical-align-middle");
 				addStyleName("inline-user-badge");
 				break;
 			case MEDIUM:
 			case LARGE:
 				isReactHandlingClickEvents = true;
-				removeStyleName("default-user-badge");
 				removeStyleName("vertical-align-middle");
 				removeStyleName("inline-user-badge");
 				break;
-			case SMALL_AVATAR:
-			case LARGE_AVATAR:
+			case AVATAR:
 				isReactHandlingClickEvents = false;
-				addStyleName("default-user-badge");
 				addStyleName("vertical-align-middle");
-				removeStyleName("inline-user-badge");
+				addStyleName("inline-user-badge");
 				break;
 		}
+	}
+
+	@Override
+	public void setShowAvatar(boolean showAvatar) {
+		this.showAvatar = showAvatar;
+	}
+
+	@Override
+	public void setAvatarSize(AvatarSize avatarSize) {
+		this.avatarSize = avatarSize;
 	}
 
 	@Override
@@ -179,13 +183,13 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 		_addToMenuActionsArray(commandName, callback, menuActionsArray);
 	}
 
-	private static native void _showBadge(Element el, String userProfileJson, String userId, String reactClientSize, String avatarSize, boolean showCardOnHover, String pictureUrl, boolean isEmailHidden, Boolean isCertifiedUser, Boolean isValidatedProfile, JsArray<JavaScriptObject> menuActionsArray, UserBadgeViewImpl userBadgeView) /*-{
+	private static native void _showBadge(Element el, String userProfileJson, String userId, String userCardType, String avatarSize, boolean showCardOnHover, String pictureUrl, boolean isEmailHidden, boolean showAvatar, Boolean isCertifiedUser, Boolean isValidatedProfile, JsArray<JavaScriptObject> menuActionsArray, UserBadgeViewImpl userBadgeView) /*-{
 
 		try {
 			var userProfileObject = JSON.parse(userProfileJson);
 			var userCardProps = {
 				userProfile : userProfileObject,
-				size : reactClientSize,
+				size : userCardType,
 				avatarSize: avatarSize,
 				showCardOnHover: showCardOnHover,
 				menuActions : menuActionsArray,
@@ -193,7 +197,8 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 				hideEmail : isEmailHidden,
 				link : '#!Profile:' + userId,
 				isCertified: isCertifiedUser,
-				isValidated: isValidatedProfile 
+				isValidated: isValidatedProfile,
+				withAvatar: showAvatar
 			};
 
 			$wnd.ReactDOM.render($wnd.React.createElement(

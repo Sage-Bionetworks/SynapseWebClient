@@ -29,6 +29,8 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
+import org.sagebionetworks.web.client.widget.user.AvatarSize;
+import org.sagebionetworks.web.client.widget.user.BadgeType;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 import com.google.gwt.http.client.Request;
@@ -186,7 +188,9 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		configureView(bundle);
 		boolean isAuthorModerator = moderatorIds.contains(bundle.getCreatedBy());
 		view.setIsAuthorModerator(isAuthorModerator);
-
+		authorWidget.setBadgeType(BadgeType.SMALL);
+		authorWidget.setShowAvatar(true);
+		authorWidget.setAvatarSize(AvatarSize.MEDIUM);
 		authorWidget.configure(bundle.getCreatedBy());
 		configureMessage();
 		if (!bundle.getId().equals(ginInjector.getSynapseProperties().getSynapseProperty(ForumWidget.DEFAULT_THREAD_ID_KEY))) {

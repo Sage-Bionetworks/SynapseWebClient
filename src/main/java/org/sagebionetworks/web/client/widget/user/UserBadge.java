@@ -38,7 +38,9 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 	private String principalId = null, username = null;
 	UserProfileAsyncHandler userProfileAsyncHandler;
 	private AdapterFactory adapterFactory;
-	BadgeSize currentBadgeSize;
+	BadgeType currentBadgeType;
+	boolean showAvatar;
+	AvatarSize currentAvatarSize;
 	SynapseJavascriptClient jsClient;
 	
 	public static final ClickHandler DO_NOTHING_ON_CLICK = new ClickHandler() {
@@ -59,7 +61,7 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 		this.userProfileAsyncHandler = userProfileAsyncHandler;
 		this.adapterFactory = adapterFactory;
 		this.jsClient = jsClient;
-		setSize(BadgeSize.SMALL);
+		setBadgeType(BadgeType.SMALL);
 		clearState();
 	}
 
@@ -74,7 +76,7 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 	
 	public void configure(UserProfile profile, Boolean isCertified, Boolean isValidated) {
 		this.profile = profile;
-		if (BadgeSize.SMALL.equals(currentBadgeSize) && profile.getProfilePicureFileHandleId() != null) {
+		if (BadgeType.SMALL.equals(currentBadgeType) && profile.getProfilePicureFileHandleId() != null) {
 			// small preview image
 			// http://rest-docs.synapse.org/rest/GET/userProfile/profileId/image/preview.html
 			configure(profile, jsClient.getProfilePicturePreviewURL(profile.getOwnerId(), true), isCertified, isValidated);
@@ -89,17 +91,23 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 		view.configure(profile, pictureUrl, isCertified, isValidated);
 	}
 
-	public void setTextHidden(boolean isTextHidden) {
-		view.setTextHidden(isTextHidden);
-	}
-
 	public void setShowCardOnHover(boolean showCardOnHover) {
 		view.setShowCardOnHover(showCardOnHover);
 	}
 
-	public void setSize(BadgeSize size) {
-		this.currentBadgeSize = size;
-		view.setSize(size);
+	public void setBadgeType(BadgeType type) {
+		this.currentBadgeType = type;
+		view.setBadgeType(type);
+	}
+
+	public void setShowAvatar(boolean showAvatar) {
+		this.showAvatar = showAvatar;
+		view.setShowAvatar(showAvatar);
+	}
+
+	public void setAvatarSize(AvatarSize avatarSize) {
+		this.currentAvatarSize = avatarSize;
+		view.setAvatarSize(avatarSize);
 	}
 
 	/**

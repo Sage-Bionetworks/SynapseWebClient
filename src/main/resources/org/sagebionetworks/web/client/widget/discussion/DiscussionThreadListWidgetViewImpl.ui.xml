@@ -17,7 +17,7 @@
 						<t:TableRow>
 							<tr:SortableTableHeaderImpl
 								ui:field="sortByTopic" text="Topic" />
-							<t:TableHeader width="60px"
+							<t:TableHeader width="200px"
 								addStyleNames="visible-lg">
 								<bh:Span text="Author" />
 							</t:TableHeader>
