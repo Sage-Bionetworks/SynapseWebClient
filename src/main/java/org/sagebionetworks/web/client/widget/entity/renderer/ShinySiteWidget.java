@@ -14,7 +14,7 @@ import com.google.inject.Inject;
 public class ShinySiteWidget implements WidgetRendererPresenter {
 
 	// Note: *.synapse.org is also in the whitelist
-	private static final String[] VALID_URL_BASES = {"http://spark.rstudio.com/", "https://s3.amazonaws.com/static.synapse.org/", "https://docs.google.com/a/sagebase.org/forms/", "https://calendar.google.com/calendar/", "https://sage-bionetworks.shinyapps.io/", "https://publish.smartsheet.com/", "https://dce.seattlebiosoftware.com/"
+	private static final String[] VALID_URL_BASES = {"http://spark.rstudio.com/", "https://s3.amazonaws.com/static.synapse.org/", "https://docs.google.com/a/sagebase.org/forms/", "https://calendar.google.com/calendar/", "https://sage-bionetworks.shinyapps.io/", "https://publish.smartsheet.com/", "https://dce.seattlebiosoftware.com/", "https://olssol.shinyapps.io/rwebgenie/"
 	};
 	private IFrameView view;
 	private Map<String, String> descriptor;
