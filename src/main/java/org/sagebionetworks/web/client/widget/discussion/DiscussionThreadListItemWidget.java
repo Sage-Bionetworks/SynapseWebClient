@@ -40,7 +40,7 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 		this.bundle = bundle;
 		view.setTitle(bundle.getTitle());
 		view.setThreadUrl(TopicUtils.buildThreadLink(bundle.getProjectId(), bundle.getId()));
-		authorWidget.setBadgeType(BadgeType.SMALL);
+		authorWidget.setBadgeType(BadgeType.SMALL_CARD);
 		authorWidget.configure(bundle.getCreatedBy());
 		view.clearActiveAuthors();
 		for (String userId : bundle.getActiveAuthors()) {

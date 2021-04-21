@@ -40,7 +40,7 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	boolean showCardOnHover = true;
 	AdapterFactory adapterFactory;
 	SynapseJSNIUtils jsniUtils;
-	BadgeType badgeType = BadgeType.SMALL;
+	BadgeType badgeType = BadgeType.SMALL_CARD;
 	AvatarSize avatarSize = AvatarSize.MEDIUM;
 	CallbackP<String> currentClickHandler = STANDARD_HANDLER;
 	FocusPanel userBadgeContainer = new FocusPanel();
@@ -120,13 +120,13 @@ public class UserBadgeViewImpl extends Div implements UserBadgeView {
 	public void setBadgeType(BadgeType badgeType) {
 		this.badgeType = badgeType;
 		switch (this.badgeType) {
-			case SMALL:
+			case SMALL_CARD:
 				isReactHandlingClickEvents = true;
 				removeStyleName("vertical-align-middle");
 				addStyleName("inline-user-badge");
 				break;
-			case MEDIUM:
-			case LARGE:
+			case MEDIUM_CARD:
+			case LARGE_CARD:
 				isReactHandlingClickEvents = true;
 				removeStyleName("vertical-align-middle");
 				removeStyleName("inline-user-badge");

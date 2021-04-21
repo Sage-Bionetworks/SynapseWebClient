@@ -3,9 +3,9 @@ package org.sagebionetworks.web.client.widget.user;
 
 public enum BadgeType {
 	AVATAR("AVATAR"),
-	SMALL("SMALL USER CARD"),
-	MEDIUM("MEDIUM USER CARD"),
-	LARGE("LARGE USER CARD");
+	SMALL_CARD("SMALL USER CARD"),
+	MEDIUM_CARD("MEDIUM USER CARD"),
+	LARGE_CARD("LARGE USER CARD");
 
 	private String userCardType;
 

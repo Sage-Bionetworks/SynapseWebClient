@@ -61,7 +61,7 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 		this.userProfileAsyncHandler = userProfileAsyncHandler;
 		this.adapterFactory = adapterFactory;
 		this.jsClient = jsClient;
-		setBadgeType(BadgeType.SMALL);
+		setBadgeType(BadgeType.SMALL_CARD);
 		clearState();
 	}
 
@@ -76,7 +76,7 @@ public class UserBadge implements SynapseWidgetPresenter, WidgetRendererPresente
 	
 	public void configure(UserProfile profile, Boolean isCertified, Boolean isValidated) {
 		this.profile = profile;
-		if (BadgeType.SMALL.equals(currentBadgeType) && profile.getProfilePicureFileHandleId() != null) {
+		if (BadgeType.SMALL_CARD.equals(currentBadgeType) && profile.getProfilePicureFileHandleId() != null) {
 			// small preview image
 			// http://rest-docs.synapse.org/rest/GET/userProfile/profileId/image/preview.html
 			configure(profile, jsClient.getProfilePicturePreviewURL(profile.getOwnerId(), true), isCertified, isValidated);

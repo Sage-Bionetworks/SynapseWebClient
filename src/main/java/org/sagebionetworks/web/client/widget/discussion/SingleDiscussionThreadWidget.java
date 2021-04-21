@@ -188,7 +188,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		configureView(bundle);
 		boolean isAuthorModerator = moderatorIds.contains(bundle.getCreatedBy());
 		view.setIsAuthorModerator(isAuthorModerator);
-		authorWidget.setBadgeType(BadgeType.SMALL);
+		authorWidget.setBadgeType(BadgeType.SMALL_CARD);
 		authorWidget.setShowAvatar(true);
 		authorWidget.setAvatarSize(AvatarSize.MEDIUM);
 		authorWidget.configure(bundle.getCreatedBy());

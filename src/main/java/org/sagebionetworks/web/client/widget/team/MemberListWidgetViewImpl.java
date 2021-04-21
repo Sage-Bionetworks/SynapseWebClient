@@ -55,7 +55,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements MemberListWid
 			singleGridItem.addStyleName("SRC-grid-item");
 			final UserProfile member = teamMember.getUserProfile();
 			UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
-			userBadge.setBadgeType(BadgeType.MEDIUM);
+			userBadge.setBadgeType(BadgeType.MEDIUM_CARD);
 
 			Div userBadgeWrapper = new Div();
 			userBadgeWrapper.add(userBadge);

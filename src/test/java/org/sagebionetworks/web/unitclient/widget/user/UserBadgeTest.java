@@ -135,7 +135,7 @@ public class UserBadgeTest {
 		AsyncMockStubber.callSuccessWith(profile).when(mockUserProfileAsyncHandler).getUserProfile(eq(principalId), any(AsyncCallback.class));
 		when(mockCache.get(anyString())).thenReturn("invalid user profile json");
 		
-		userBadge.setBadgeType(BadgeType.LARGE);
+		userBadge.setBadgeType(BadgeType.LARGE_CARD);
 		userBadge.configure(principalId);
 		
 		verify(mockCache).get(anyString());
@@ -149,7 +149,7 @@ public class UserBadgeTest {
 		profile.writeToJSONObject(adapter);
 		when(mockCache.get(anyString())).thenReturn(adapter.toJSONString());
 		
-		userBadge.setBadgeType(BadgeType.MEDIUM);
+		userBadge.setBadgeType(BadgeType.MEDIUM_CARD);
 		userBadge.configure(principalId);
 		
 		verify(mockCache).get(anyString());

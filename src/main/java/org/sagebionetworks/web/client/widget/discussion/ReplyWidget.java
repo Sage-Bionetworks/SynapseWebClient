@@ -95,7 +95,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter {
 		this.moderatorIds = moderatorIds;
 		this.deleteReplyCallback = deleteReplyCallback;
 		this.isThreadDeleted = isThreadDeleted;
-		authorWidget.setBadgeType(BadgeType.SMALL);
+		authorWidget.setBadgeType(BadgeType.SMALL_CARD);
 		authorWidget.setShowAvatar(true);
 		authorWidget.setAvatarSize(AvatarSize.MEDIUM);
 		authorWidget.configure(bundle.getCreatedBy());

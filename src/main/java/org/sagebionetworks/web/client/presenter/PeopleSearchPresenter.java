@@ -87,7 +87,7 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 				for (UserGroupHeader header : result.getChildren()) {
 					if (header.getIsIndividual()) {
 						UserBadge badge = ginInjector.getUserBadgeWidget();
-						badge.setBadgeType(BadgeType.MEDIUM);
+						badge.setBadgeType(BadgeType.MEDIUM_CARD);
 						badge.addStyleNames("SRC-grid-item");
 						badge.configure(header.getOwnerId());
 						loadMoreWidgetContainer.add(badge.asWidget());
