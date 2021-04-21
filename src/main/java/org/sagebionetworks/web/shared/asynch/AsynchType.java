@@ -1,35 +1,24 @@
 package org.sagebionetworks.web.shared.asynch;
 
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.*;
-
-
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.doi.v2.DoiRequest;
 import org.sagebionetworks.repo.model.doi.v2.DoiResponse;
+import org.sagebionetworks.repo.model.download.DownloadListQueryRequest;
+import org.sagebionetworks.repo.model.download.DownloadListQueryResponse;
 import org.sagebionetworks.repo.model.file.AddFileToDownloadListRequest;
 import org.sagebionetworks.repo.model.file.AddFileToDownloadListResponse;
 import org.sagebionetworks.repo.model.file.BulkFileDownloadRequest;
 import org.sagebionetworks.repo.model.file.BulkFileDownloadResponse;
 import org.sagebionetworks.repo.model.report.DownloadStorageReportRequest;
 import org.sagebionetworks.repo.model.report.DownloadStorageReportResponse;
-import org.sagebionetworks.repo.model.table.AppendableRowSetRequest;
 import org.sagebionetworks.repo.model.schema.CreateSchemaRequest;
 import org.sagebionetworks.repo.model.schema.CreateSchemaResponse;
+import org.sagebionetworks.repo.model.schema.GetValidationSchemaRequest;
+import org.sagebionetworks.repo.model.schema.GetValidationSchemaResponse;
 import org.sagebionetworks.repo.model.table.*;
-import org.sagebionetworks.repo.model.table.DownloadFromTableResult;
-import org.sagebionetworks.repo.model.table.HasEntityId;
-import org.sagebionetworks.repo.model.table.QueryBundleRequest;
-import org.sagebionetworks.repo.model.table.QueryNextPageToken;
-import org.sagebionetworks.repo.model.table.QueryResult;
-import org.sagebionetworks.repo.model.table.QueryResultBundle;
-import org.sagebionetworks.repo.model.table.RowReferenceSetResults;
-import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
-import org.sagebionetworks.repo.model.table.TableUpdateTransactionResponse;
-import org.sagebionetworks.repo.model.table.UploadToTablePreviewRequest;
-import org.sagebionetworks.repo.model.table.UploadToTablePreviewResult;
-import org.sagebionetworks.repo.model.schema.*;
-import org.sagebionetworks.repo.model.table.UploadToTableResult;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
@@ -41,7 +30,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public enum AsynchType implements IsSerializable {
 	TableAppendRowSet(TABLE_APPEND, AppendableRowSetRequest.class, RowReferenceSetResults.class), TableQuery(TABLE_QUERY, QueryBundleRequest.class, QueryResultBundle.class), TableQueryNextPage(TABLE_QUERY_NEXTPAGE, QueryNextPageToken.class, QueryResult.class), TableCSVUpload(TABLE_UPLOAD_CSV, UploadToTableRequest.class, UploadToTableResult.class), TableCSVUploadPreview(TABLE_UPLOAD_CSV_PREVIEW, UploadToTablePreviewRequest.class, UploadToTablePreviewResult.class), TableCSVDownload(TABLE_DOWNLOAD_CSV, DownloadFromTableRequest.class, DownloadFromTableResult.class), BulkFileDownload(FILE_BULK, BulkFileDownloadRequest.class, BulkFileDownloadResponse.class), TableTransaction(TABLE_TRANSACTION, TableUpdateTransactionRequest.class, TableUpdateTransactionResponse.class), Doi(DOI, DoiRequest.class, DoiResponse.class), AddFileToDownloadList(DOWNLOAD_LIST_ADD, AddFileToDownloadListRequest.class, AddFileToDownloadListResponse.class), DownloadStorageReport(STORAGE_REPORT,
-			DownloadStorageReportRequest.class, DownloadStorageReportResponse.class), CreateJsonSchema(SCHEMA_TYPE_CREATE, CreateSchemaRequest.class, CreateSchemaResponse.class), ViewColumnModelRequest(VIEW_COLUMN_MODEL_REQUEST, ViewColumnModelRequest.class, ViewColumnModelResponse.class), GetValidationSchema(SCHEMA_TYPE_VALIDATION, GetValidationSchemaRequest.class, GetValidationSchemaResponse.class);
+			DownloadStorageReportRequest.class, DownloadStorageReportResponse.class), CreateJsonSchema(SCHEMA_TYPE_CREATE, CreateSchemaRequest.class, CreateSchemaResponse.class), ViewColumnModelRequest(VIEW_COLUMN_MODEL_REQUEST, ViewColumnModelRequest.class, ViewColumnModelResponse.class), GetValidationSchema(SCHEMA_TYPE_VALIDATION, GetValidationSchemaRequest.class, GetValidationSchemaResponse.class), QueryDownloadList(DOWNLOAD_LIST_V2, DownloadListQueryRequest.class, DownloadListQueryResponse.class);
 
 	String prefix;
 	Class<? extends AsynchronousRequestBody> requestClass;

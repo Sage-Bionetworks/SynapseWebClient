@@ -308,7 +308,7 @@ public class UserProfileEditorWidgetViewImpl implements UserProfileEditorWidgetV
 		changePasswordLink.setVisible(isEditing);
 		if (!isEditing) {
 			DisplayUtils.showLoading(saveProfileButton, false, originalButtonText);	
-		}		
+		}
 	}
 
 	@Override

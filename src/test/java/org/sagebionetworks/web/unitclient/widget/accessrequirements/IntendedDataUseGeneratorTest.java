@@ -2,7 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.accessrequirements;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import java.util.ArrayList;
@@ -16,6 +16,9 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.dataaccess.AccessType;
+import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionInfo;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionInfoPage;
 import org.sagebionetworks.web.client.DateTimeUtils;
@@ -32,6 +35,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class IntendedDataUseGeneratorTest {
 	public static final Long AR_ID = 8888L;
 	public static final String NEXT_PAGE_TOKEN = "28DJcDS";
+	public static final String SUBMISSION1_USER_ID = "10001";
+	public static final String USER1_ALIAS = "the-one";
+	public static final String SUBMISSION2_USER_ID = "10002";
+	public static final String USER2_ALIAS = "the-two";
+	public static final String USER3_ID = "10003";
+	public static final String USER3_ALIAS = "the-three";
 	public static final String RESEARCH_PROJECT_1_ID = "rp1";
 	public static final String RESEARCH_PROJECT_1_LEAD = "Luke";
 	public static final String RESEARCH_PROJECT_1_INSTITUTION = "Rebel";
@@ -59,6 +68,8 @@ public class IntendedDataUseGeneratorTest {
 	@Mock
 	SubmissionInfo mockSubmission1InPage1;
 	@Mock
+	AccessorChange mockAccessorChange;
+	@Mock
 	SubmissionInfo mockSubmission2InPage1;
 	@Mock
 	SubmissionInfoPage mockSubmissionPage2;
@@ -68,6 +79,13 @@ public class IntendedDataUseGeneratorTest {
 	ArgumentCaptor<String> stringCaptor;
 	@Mock
 	DateTimeUtils mockDateTimeUtils;
+	
+	@Mock
+	UserProfile mockUserProfile1;
+	@Mock
+	UserProfile mockUserProfile2;
+	@Mock
+	UserProfile mockUserProfile3;
 
 	@Before
 	public void setUp() throws Exception {
@@ -84,10 +102,27 @@ public class IntendedDataUseGeneratorTest {
 		when(mockSubmission1InPage1.getProjectLead()).thenReturn(RESEARCH_PROJECT_1_LEAD);
 		when(mockSubmission1InPage1.getInstitution()).thenReturn(RESEARCH_PROJECT_1_INSTITUTION);
 		when(mockSubmission1InPage1.getIntendedDataUseStatement()).thenReturn(RESEARCH_PROJECT_1_IDU);
+		when(mockSubmission1InPage1.getSubmittedBy()).thenReturn(SUBMISSION1_USER_ID);
 
 		when(mockSubmission2InPage1.getProjectLead()).thenReturn(RESEARCH_PROJECT_2_LEAD);
 		when(mockSubmission2InPage1.getInstitution()).thenReturn(RESEARCH_PROJECT_2_INSTITUTION);
 		when(mockSubmission2InPage1.getIntendedDataUseStatement()).thenReturn(RESEARCH_PROJECT_2_IDU);
+		when(mockSubmission2InPage1.getSubmittedBy()).thenReturn(SUBMISSION2_USER_ID);
+		when(mockSubmission2InPage1.getAccessorChanges()).thenReturn(Collections.singletonList(mockAccessorChange));
+		when(mockAccessorChange.getUserId()).thenReturn(USER3_ID);
+		when(mockAccessorChange.getType()).thenReturn(AccessType.GAIN_ACCESS);
+		when(mockUserProfile1.getOwnerId()).thenReturn(SUBMISSION1_USER_ID);
+		when(mockUserProfile1.getUserName()).thenReturn(USER1_ALIAS);
+		when(mockUserProfile2.getOwnerId()).thenReturn(SUBMISSION2_USER_ID);
+		when(mockUserProfile2.getUserName()).thenReturn(USER2_ALIAS);
+		when(mockUserProfile3.getOwnerId()).thenReturn(USER3_ID);
+		when(mockUserProfile3.getUserName()).thenReturn(USER3_ALIAS);
+
+		List profiles = new ArrayList<>();
+		profiles.add(mockUserProfile1);
+		profiles.add(mockUserProfile2);
+		profiles.add(mockUserProfile3);
+		AsyncMockStubber.callSuccessWith(profiles).when(mockJsClient).listUserProfiles(anyList(), any(AsyncCallback.class));
 	}
 
 	@Test
@@ -100,8 +135,11 @@ public class IntendedDataUseGeneratorTest {
 		assertTrue(markdownOutput.contains(RESEARCH_PROJECT_1_LEAD));
 		assertTrue(markdownOutput.contains(RESEARCH_PROJECT_1_INSTITUTION));
 		assertTrue(markdownOutput.contains(RESEARCH_PROJECT_1_IDU));
+		assertTrue(markdownOutput.contains("@" + USER1_ALIAS)); // submission1 submitted by user1
+		assertTrue(markdownOutput.contains("@" + USER3_ALIAS)); // submission1 accessor changes include user3
 		assertTrue(markdownOutput.contains(RESEARCH_PROJECT_2_LEAD));
 		assertTrue(markdownOutput.contains(RESEARCH_PROJECT_2_INSTITUTION));
 		assertTrue(markdownOutput.contains(RESEARCH_PROJECT_2_IDU));
+		assertTrue(markdownOutput.contains("@" + USER2_ALIAS)); // submission2 submitted by user2
 	}
 }

@@ -292,6 +292,7 @@ public class SynapseJavascriptClient {
 	public static final String SCHEMA_TYPE_CREATE = "/schema/type/create/";
 	public static final String VIEW_COLUMN_MODEL_REQUEST = "/column/view/scope";
 	public static final String SCHEMA_TYPE_VALIDATION = "/schema/type/validation/";
+	public static final String DOWNLOAD_LIST_V2 = "/download/list/query/";
 	
 	public static final String ASYNC_START = "/async/start";
 	public static final String ASYNC_GET = "/async/get/";
