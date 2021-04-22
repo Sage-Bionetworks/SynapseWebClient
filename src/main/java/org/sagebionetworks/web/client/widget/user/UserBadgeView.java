@@ -11,7 +11,11 @@ public interface UserBadgeView extends IsWidget, SynapseView {
 
 	void showLoadError(String error);
 
-	void setSize(BadgeSize size);
+	void setBadgeType(BadgeType badgeType);
+
+	void setShowAvatar(boolean showAvatar);
+
+	void setAvatarSize(AvatarSize avatarSize);
 
 	void addStyleName(String styles);
 
@@ -20,8 +24,6 @@ public interface UserBadgeView extends IsWidget, SynapseView {
 	void setCustomClickHandler(ClickHandler clickHandler);
 
 	void doNothingOnClick();
-
-	void setTextHidden(boolean isTextHidden);
 
 	void setShowCardOnHover(boolean isTooltipHidden);
 

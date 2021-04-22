@@ -12,7 +12,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-import org.sagebionetworks.web.client.widget.user.BadgeSize;
+import org.sagebionetworks.web.client.widget.user.BadgeType;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.TeamMemberBundle;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -55,7 +55,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements MemberListWid
 			singleGridItem.addStyleName("SRC-grid-item");
 			final UserProfile member = teamMember.getUserProfile();
 			UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
-			userBadge.setSize(BadgeSize.MEDIUM);
+			userBadge.setBadgeType(BadgeType.MEDIUM_CARD);
 
 			Div userBadgeWrapper = new Div();
 			userBadgeWrapper.add(userBadge);
