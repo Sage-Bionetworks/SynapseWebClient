@@ -30,7 +30,8 @@ import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.widget.FullWidthAlert;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
-import org.sagebionetworks.web.client.widget.user.BadgeSize;
+import org.sagebionetworks.web.client.widget.user.AvatarSize;
+import org.sagebionetworks.web.client.widget.user.BadgeType;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 import com.google.gwt.core.client.GWT;
@@ -147,8 +148,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		this.sageImageBundle = sageImageBundle;
 		this.userBadge = userBadge;
 		this.globalAppState = globalAppState;
-		userBadge.setTextHidden(true);
-		userBadge.setSize(BadgeSize.SMALL_AVATAR);
+		userBadge.setBadgeType(BadgeType.AVATAR);
+		userBadge.setAvatarSize(AvatarSize.MEDIUM);
+		userBadge.setShowCardOnHover(false);
 		userBadge.addStyleNames("padding-top-13 padding-left-10");
 		// add search panel first
 		searchBox.setVisible(true);

@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.TopicUtils;
+import org.sagebionetworks.web.client.widget.user.BadgeType;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -39,12 +40,12 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 		this.bundle = bundle;
 		view.setTitle(bundle.getTitle());
 		view.setThreadUrl(TopicUtils.buildThreadLink(bundle.getProjectId(), bundle.getId()));
-		authorWidget.setTextHidden(true);
+		authorWidget.setBadgeType(BadgeType.SMALL_CARD);
 		authorWidget.configure(bundle.getCreatedBy());
 		view.clearActiveAuthors();
 		for (String userId : bundle.getActiveAuthors()) {
 			UserBadge user = ginInjector.getUserBadgeWidget();
-			user.setTextHidden(true);
+			user.setBadgeType(BadgeType.AVATAR);
 			user.configure(userId);
 			view.addActiveAuthor(user.asWidget());
 		}

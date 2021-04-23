@@ -11,7 +11,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.profile.ProfileCertifiedValidatedWidget;
-import org.sagebionetworks.web.client.widget.user.BadgeSize;
+import org.sagebionetworks.web.client.widget.user.BadgeType;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -117,7 +117,7 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 		} else {
 			userBadge.configure(userId);
 		}
-		userBadge.setSize(BadgeSize.SMALL);
+		userBadge.setBadgeType(BadgeType.SMALL_CARD);
 		userBadge.setCustomClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
