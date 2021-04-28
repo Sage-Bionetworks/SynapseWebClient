@@ -161,6 +161,7 @@ public class FilesTabViewImpl implements FilesTabView {
 		if (expandProvHandlerRegistration != null) {
 			expandProvHandlerRegistration.removeHandler();
 		}
+		modalDialogContainer.clear();
 		expandProvHandlerRegistration = expandProvenanceLink.addClickHandler(getExpandClickHandler(provenanceGraphWidget));
 	}
 
