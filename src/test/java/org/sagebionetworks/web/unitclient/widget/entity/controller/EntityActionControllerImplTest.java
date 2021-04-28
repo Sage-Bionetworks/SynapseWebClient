@@ -180,6 +180,7 @@ public class EntityActionControllerImplTest {
 	EntityActionControllerImpl controller;
 	String parentId;
 	String entityId;
+	String entityName = "my entity";
 	String currentUserId = "12344321";
 	String wikiPageId = "999";
 	@Mock
@@ -289,6 +290,7 @@ public class EntityActionControllerImplTest {
 		parentId = "syn456";
 		entityId = "syn123";
 		TableEntity table = new TableEntity();
+		table.setName(entityName);
 		table.setId(entityId);
 		table.setParentId(parentId);
 		table.setVersionNumber(3L);
@@ -1249,10 +1251,9 @@ public class EntityActionControllerImplTest {
 		String error = "An error";
 		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).moveEntity(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-		entityBundle.setEntity(new Folder());
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.MOVE_ENTITY);
-		verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.CONTAINER);
+		verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.PROJECT);
 		verify(mockEntityFinderBuilder).setShowVersions(false);
 		verify(mockEntityFinderBuilder).build();
 		verify(mockEntityFinder).show();
@@ -1265,11 +1266,10 @@ public class EntityActionControllerImplTest {
 	public void testOnMoveCanUpdateSuccess() {
 		AsyncMockStubber.callSuccessWith(new Folder()).when(mockSynapseClient).moveEntity(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-		entityBundle.setEntity(new Folder());
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.MOVE_ENTITY);
 		verify(mockEntityFinderBuilder)
-				.setSelectableTypes(EntityFilter.CONTAINER);
+				.setSelectableTypes(EntityFilter.PROJECT);
 		verify(mockEntityFinderBuilder)
 				.setShowVersions(false);
 		verify(mockEntityFinderBuilder)
