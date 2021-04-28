@@ -22,13 +22,11 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
-import org.sagebionetworks.web.client.widget.user.BadgeSize;
+import org.sagebionetworks.web.client.widget.user.BadgeType;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadgeView;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -137,7 +135,7 @@ public class UserBadgeTest {
 		AsyncMockStubber.callSuccessWith(profile).when(mockUserProfileAsyncHandler).getUserProfile(eq(principalId), any(AsyncCallback.class));
 		when(mockCache.get(anyString())).thenReturn("invalid user profile json");
 		
-		userBadge.setSize(BadgeSize.LARGE);
+		userBadge.setBadgeType(BadgeType.LARGE_CARD);
 		userBadge.configure(principalId);
 		
 		verify(mockCache).get(anyString());
@@ -151,7 +149,7 @@ public class UserBadgeTest {
 		profile.writeToJSONObject(adapter);
 		when(mockCache.get(anyString())).thenReturn(adapter.toJSONString());
 		
-		userBadge.setSize(BadgeSize.MEDIUM);
+		userBadge.setBadgeType(BadgeType.MEDIUM_CARD);
 		userBadge.configure(principalId);
 		
 		verify(mockCache).get(anyString());

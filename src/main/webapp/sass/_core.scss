@@ -2218,6 +2218,14 @@ Looks for any child element under .modal-fullscreen that has a class that contai
     max-width: 95%;
 }
 
+/*
+ The opaque modal backdrop doesn't work for nested modals i.e. a modal does not obscure another modal.
+  We can simulate the effect with a very large box shadow
+*/
+.modal-content {
+    -webkit-box-shadow: 0px 0px 5000px 5000px rgba(0, 0, 0, .5);
+    box-shadow: 0px 0px 5000px 5000px rgba(0, 0, 0, .5);
+}
 
 .gwt-TreeItem-selected [class*="link"] {
 	text-decoration: underline;
@@ -2228,14 +2236,16 @@ Looks for any child element under .modal-fullscreen that has a class that contai
 	margin-right: 0px;
 }
 
-#body .default-user-badge {
-	height: 35px;
-	display: inline-block;
-}
 #body .inline-user-badge {
-	display: inline;
+	display: inline-flex;
 	div {
-	    display: inline;
+        display: inline;
+	}
+	.SRC-userImgSmall,
+	.SRC-userImgMedium,
+	.SRC-userImgLarge,
+	.SRC-centerContentInline {
+	    display: inline-flex;
 	}
 }
 
@@ -2952,6 +2962,13 @@ div.border {
 		padding-top: 5px;
 		padding-bottom: 5px;
 	}
+	.UserBadge {
+        display: inline-flex;
+        .SRC-userImgSmall,
+        .SRC-userImgMedium {
+            padding: 0px;
+        }
+	}
 }
 #body {
 	.dropdown-menu>li>a {
@@ -3205,9 +3222,6 @@ div.border {
 	.SRC-primary-background-color-hover:hover.SRC-nested-color:hover *  {
 		background: $synapse-blue;
 		color: white;
-	}
-	.SRC-userImgSmall {
-		padding: 0px;
 	}
 }
 

@@ -11,7 +11,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.PeopleSearchView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.user.BadgeSize;
+import org.sagebionetworks.web.client.widget.user.BadgeType;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -87,7 +87,7 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 				for (UserGroupHeader header : result.getChildren()) {
 					if (header.getIsIndividual()) {
 						UserBadge badge = ginInjector.getUserBadgeWidget();
-						badge.setSize(BadgeSize.MEDIUM);
+						badge.setBadgeType(BadgeType.MEDIUM_CARD);
 						badge.addStyleNames("SRC-grid-item");
 						badge.configure(header.getOwnerId());
 						loadMoreWidgetContainer.add(badge.asWidget());
