@@ -196,7 +196,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 
 	@Override
 	public void setPromptCopy(String promptCopy) {
-		this.promptCopy.setText(promptCopy);
+		this.promptCopy.setHTML(promptCopy);
 	}
 
 	@Override

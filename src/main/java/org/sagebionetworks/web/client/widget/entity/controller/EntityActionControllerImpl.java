@@ -92,6 +92,7 @@ import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -1214,7 +1215,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				.setTreeOnly(true)
 				.setModalTitle("Create Link to " + entityTypeDisplay)
 				.setHelpMarkdown("Search or Browse to find a Project or Folder that you have access to, and place a symbolic link for easy access")
-				.setPromptCopy("Find a destination and place a link to " + entity.getName() + " (" + entity.getId() + ")")
+				.setPromptCopy("Find a destination and place a link to <b>" + SafeHtmlUtils.fromString(entity.getName()).asString() + "</b> (" + entity.getId() + ")")
 				.setSelectedCopy("Destination")
 				.setConfirmButtonCopy("Create Link")
 				.build()
@@ -1281,7 +1282,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		EntityFinder.Builder builder = getEntityFinderBuilder()
 				.setModalTitle("Move " + entityTypeDisplay)
 				.setHelpMarkdown("Search or Browse Synapse to find a destination to move this " + entityTypeDisplay)
-				.setPromptCopy("Find a destination to move " + entity.getName() + " (" + entity.getId() + ")")
+				.setPromptCopy("Find a destination to move <b>" + SafeHtmlUtils.fromString(entity.getName()).asString() + "</b> (" + entity.getId() + ")")
 				.setSelectedCopy("Destination")
 				.setConfirmButtonCopy("Move")
 				.setShowVersions(false)
