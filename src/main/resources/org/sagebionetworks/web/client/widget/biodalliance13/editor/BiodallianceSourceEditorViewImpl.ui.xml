@@ -20,7 +20,7 @@
 					<b:TextBox ui:field="entityPickerTextbox" />
 					<b:InputGroupButton>
 						<b:Button ui:field="entityPickerButton" icon="SEARCH"
-							text="" height="30px" />
+							text="" height="35px" />
 					</b:InputGroupButton>
 				</b:InputGroup>
 			</t:TableData>
@@ -29,7 +29,7 @@
 					<b:TextBox ui:field="indexEntityPickerTextbox" />
 					<b:InputGroupButton>
 						<b:Button ui:field="indexEntityPickerButton"
-							icon="SEARCH" text="" height="30px" />
+							icon="SEARCH" text="" height="35px" />
 					</b:InputGroupButton>
 				</b:InputGroup>
 			</t:TableData>

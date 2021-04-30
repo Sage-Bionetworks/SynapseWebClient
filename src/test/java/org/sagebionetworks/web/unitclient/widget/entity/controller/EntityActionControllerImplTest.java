@@ -14,6 +14,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -29,11 +30,13 @@ import static org.sagebionetworks.web.client.widget.entity.controller.EntityActi
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.UPDATE_DOI_FOR;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WIKI;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.junit.Before;
@@ -75,7 +78,6 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -131,6 +133,8 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.CallbackMockStubber;
+import org.sagebionetworks.web.test.helper.SelfReturningAnswer;
+
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -157,6 +161,7 @@ public class EntityActionControllerImplTest {
 	EditFileMetadataModalWidget mockEditFileMetadataModalWidget;
 	@Mock
 	EditProjectMetadataModalWidget mockEditProjectMetadataModalWidget;
+	EntityFinder.Builder mockEntityFinderBuilder;
 	@Mock
 	EntityFinder mockEntityFinder;
 	@Mock
@@ -175,6 +180,7 @@ public class EntityActionControllerImplTest {
 	EntityActionControllerImpl controller;
 	String parentId;
 	String entityId;
+	String entityName = "my entity";
 	String currentUserId = "12344321";
 	String wikiPageId = "999";
 	@Mock
@@ -228,6 +234,8 @@ public class EntityActionControllerImplTest {
 	@Mock
 	SynapseProperties mockSynapseProperties;
 	@Captor
+	ArgumentCaptor<EntityFinder.SelectedHandler<Reference>> entityFinderSelectedHandlerCaptor;
+	@Captor
 	ArgumentCaptor<CallbackP<List<String>>> callbackListStringCaptor;
 	@Captor
 	ArgumentCaptor<TableUpdateTransactionRequest> tableUpdateTransactionRequestCaptor;
@@ -244,6 +252,8 @@ public class EntityActionControllerImplTest {
 
 	@Before
 	public void before() {
+		mockEntityFinderBuilder = mock(EntityFinder.Builder.class, new SelfReturningAnswer());
+
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -253,7 +263,9 @@ public class EntityActionControllerImplTest {
 		when(mockPortalGinInjector.getRenameEntityModalWidget()).thenReturn(mockRenameEntityModalWidget);
 		when(mockPortalGinInjector.getEditFileMetadataModalWidget()).thenReturn(mockEditFileMetadataModalWidget);
 		when(mockPortalGinInjector.getEditProjectMetadataModalWidget()).thenReturn(mockEditProjectMetadataModalWidget);
-		when(mockPortalGinInjector.getEntityFinder()).thenReturn(mockEntityFinder);
+		when(mockPortalGinInjector.getEntityFinderBuilder()).thenReturn(mockEntityFinderBuilder);
+		when(mockEntityFinderBuilder.build()).thenReturn(mockEntityFinder);
+
 		when(mockPortalGinInjector.getUploadDialogWidget()).thenReturn(mockUploader);
 		when(mockPortalGinInjector.getWikiMarkdownEditor()).thenReturn(mockMarkdownEditorWidget);
 		when(mockPortalGinInjector.getProvenanceEditorWidget()).thenReturn(mockProvenanceEditorWidget);
@@ -278,6 +290,7 @@ public class EntityActionControllerImplTest {
 		parentId = "syn456";
 		entityId = "syn123";
 		TableEntity table = new TableEntity();
+		table.setName(entityName);
 		table.setId(entityId);
 		table.setParentId(parentId);
 		table.setVersionNumber(3L);
@@ -302,15 +315,17 @@ public class EntityActionControllerImplTest {
 		when(mockPublicPrincipalIds.isPublic(PUBLIC_USER_ID)).thenReturn(true);
 		selected = new Reference();
 		selected.setTargetId("syn9876");
+
 		// Setup the mock entity selector to select an entity.
 		Mockito.doAnswer(new Answer<Void>() {
 			@Override
 			public Void answer(InvocationOnMock invocation) throws Throwable {
-				SelectedHandler<Reference> handler = (SelectedHandler<Reference>) invocation.getArguments()[2];
-				handler.onSelected(selected);
+				verify(mockEntityFinderBuilder).setSelectedHandler(entityFinderSelectedHandlerCaptor.capture());
+				EntityFinder.SelectedHandler<Reference> handler = entityFinderSelectedHandlerCaptor.getValue();
+				handler.onSelected(selected, mockEntityFinder);
 				return null;
 			}
-		}).when(mockEntityFinder).configure(any(EntityFilter.class), anyBoolean(), any(SelectedHandler.class));
+		}).when(mockEntityFinder).show();
 		currentEntityArea = null;
 		CallbackMockStubber.invokeCallback().when(mockGWT).scheduleExecution(any(Callback.class), anyInt());
 	}
@@ -1226,7 +1241,7 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(new Folder());
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.MOVE_ENTITY);
-		verify(mockEntityFinder, never()).configure(anyBoolean(), any(SelectedHandler.class));
+		verify(mockEntityFinderBuilder, never()).build();
 		verify(mockEntityFinder, never()).show();
 		verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
 	}
@@ -1236,24 +1251,30 @@ public class EntityActionControllerImplTest {
 		String error = "An error";
 		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).moveEntity(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-		entityBundle.setEntity(new Folder());
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.MOVE_ENTITY);
-		verify(mockEntityFinder).configure(eq(EntityFilter.CONTAINER), anyBoolean(), any(SelectedHandler.class));
+		verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.PROJECT);
+		verify(mockEntityFinderBuilder).setShowVersions(false);
+		verify(mockEntityFinderBuilder).build();
 		verify(mockEntityFinder).show();
-		verify(mockEntityFinder).hide();
+		verify(mockEntityFinder, never()).hide();
 		verify(mockEventBus, never()).fireEvent(any(EntityUpdatedEvent.class));
-		verify(mockView).showErrorMessage(error);
+		verify(mockEntityFinder).showError(error);
 	}
 
 	@Test
 	public void testOnMoveCanUpdateSuccess() {
 		AsyncMockStubber.callSuccessWith(new Folder()).when(mockSynapseClient).moveEntity(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-		entityBundle.setEntity(new Folder());
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.MOVE_ENTITY);
-		verify(mockEntityFinder).configure(eq(EntityFilter.CONTAINER), anyBoolean(), any(SelectedHandler.class));
+		verify(mockEntityFinderBuilder)
+				.setSelectableTypes(EntityFilter.PROJECT);
+		verify(mockEntityFinderBuilder)
+				.setShowVersions(false);
+		verify(mockEntityFinderBuilder)
+				.setSelectedHandler(any(EntityFinder.SelectedHandler.class));
+		verify(mockEntityFinderBuilder).build();
 		verify(mockEntityFinder).show();
 		verify(mockEntityFinder).hide();
 		verify(mockSynapseClient).moveEntity(anyString(), anyString(), any(AsyncCallback.class));
@@ -1265,24 +1286,28 @@ public class EntityActionControllerImplTest {
 	public void testCreateLinkBadRequest() {
 		AsyncMockStubber.callFailureWith(new BadRequestException("bad")).when(mockSynapseJavascriptClient).createEntity(any(Entity.class), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		controller.createLink("syn9876");
-		verify(mockView).showErrorMessage(DisplayConstants.ERROR_CANT_MOVE_HERE);
+		controller.createLink("syn9876", mockEntityFinder);
+		verify(mockEntityFinder).showError(DisplayConstants.ERROR_CANT_MOVE_HERE);
+		verify(mockEntityFinder, never()).hide();
 	}
 
 	@Test
 	public void testCreateLinkNotFound() {
 		AsyncMockStubber.callFailureWith(new NotFoundException("not found")).when(mockSynapseJavascriptClient).createEntity(any(Entity.class), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		controller.createLink("syn9876");
-		verify(mockView).showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
+		controller.createLink("syn9876", mockEntityFinder);
+		verify(mockEntityFinder).showError(DisplayConstants.ERROR_NOT_FOUND);
+		verify(mockEntityFinder, never()).hide();
 	}
 
 	@Test
 	public void testCreateLinkUnauthorizedException() {
 		AsyncMockStubber.callFailureWith(new UnauthorizedException("no way")).when(mockSynapseJavascriptClient).createEntity(any(Entity.class), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		controller.createLink("syn9876");
-		verify(mockView).showErrorMessage(DisplayConstants.ERROR_NOT_AUTHORIZED);
+		controller.createLink("syn9876", mockEntityFinder);
+		verify(mockEntityFinder).showError(DisplayConstants.ERROR_NOT_AUTHORIZED);
+		verify(mockEntityFinder, never()).hide();
+
 	}
 
 	@Test
@@ -1290,8 +1315,9 @@ public class EntityActionControllerImplTest {
 		String error = "some error";
 		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseJavascriptClient).createEntity(any(Entity.class), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
-		controller.createLink("syn9876");
-		verify(mockView).showErrorMessage(error);
+		controller.createLink("syn9876", mockEntityFinder);
+		verify(mockEntityFinder).showError(error);
+		verify(mockEntityFinder, never()).hide();
 	}
 
 	@Test
@@ -1307,9 +1333,10 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, isCurrentVersion, wikiPageId, currentEntityArea);
 		controller.setIsShowingVersion(true);
 		String target = "syn9876";
-		controller.createLink(target);
+		controller.createLink(target, mockEntityFinder);
 		verify(mockView, never()).showErrorMessage(anyString());
 		verify(mockView).showSuccess(DisplayConstants.TEXT_LINK_SAVED);
+		verify(mockEntityFinder).hide();
 		Entity capture = argument.getValue();
 		assertNotNull(capture);
 		assertTrue(capture instanceof Link);
@@ -1334,7 +1361,8 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.setIsShowingVersion(false);
 		String target = "syn9876";
-		controller.createLink(target);
+		controller.createLink(target, mockEntityFinder);
+		verify(mockEntityFinder).hide();
 		Entity capture = argument.getValue();
 		assertNotNull(capture);
 		assertTrue(capture instanceof Link);
@@ -1352,7 +1380,6 @@ public class EntityActionControllerImplTest {
 		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.CREATE_LINK);
-		verify(mockEntityFinder, never()).configure(anyBoolean(), any(SelectedHandler.class));
 		verify(mockEntityFinder, never()).show();
 		verify(mockView, never()).showInfo(anyString());
 	}
@@ -1363,8 +1390,11 @@ public class EntityActionControllerImplTest {
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea);
 		controller.onAction(Action.CREATE_LINK);
-		verify(mockEntityFinder).configure(eq(EntityFilter.CONTAINER), anyBoolean(), any(SelectedHandler.class));
+		verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.CONTAINER);
+		verify(mockEntityFinderBuilder).setShowVersions(false);
+		verify(mockEntityFinderBuilder).build();
 		verify(mockEntityFinder).show();
+		verify(mockEntityFinder).hide();
 		verify(mockView).showSuccess(DisplayConstants.TEXT_LINK_SAVED);
 	}
 

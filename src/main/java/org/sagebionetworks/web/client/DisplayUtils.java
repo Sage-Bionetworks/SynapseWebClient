@@ -284,6 +284,9 @@ public class DisplayUtils {
 		settings.setType(notifyType);
 		if (timeout != null) {
 			settings.setDelay(timeout);
+		} else {
+			// By default, notifications stay open for 15s
+			settings.setDelay(15 * 1000);
 		}
 		settings.setZIndex(2001);
 		notify(message, iconType, settings);
@@ -821,10 +824,6 @@ public class DisplayUtils {
 			}
 		}
 		return fileHandle;
-	}
-
-	public interface SelectedHandler<T> {
-		public void onSelected(T selected);
 	}
 
 	public static void updateWidgetSelectionState(WidgetSelectionState state, String text, int cursorPos) {

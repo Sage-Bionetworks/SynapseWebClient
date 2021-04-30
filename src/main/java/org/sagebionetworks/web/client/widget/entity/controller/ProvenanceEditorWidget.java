@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import static org.sagebionetworks.web.client.widget.entity.controller.ProvenanceType.*;
+
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,7 +17,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -31,26 +32,22 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 	ProvenanceListWidget usedProvenanceList;
 	ProvenanceListWidget executedProvenanceList;
 	Activity activity;
-	EntityFinder entityFinder;
 	ProvenanceURLDialogWidget urlDialog;
 	EventBus eventBus;
 	Entity entity;
 	boolean isNewActivity;
 
 	@Inject
-	public ProvenanceEditorWidget(ProvenanceEditorWidgetView view, SynapseJavascriptClient jsClient, SynapseAlert synAlert, PortalGinInjector ginInjector, EntityFinder entityFinder, ProvenanceURLDialogWidget urlDialog, EventBus eventBus) {
+	public ProvenanceEditorWidget(ProvenanceEditorWidgetView view, SynapseJavascriptClient jsClient, SynapseAlert synAlert, PortalGinInjector ginInjector, ProvenanceURLDialogWidget urlDialog, EventBus eventBus) {
 		this.view = view;
 		this.jsClient = jsClient;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
-		this.entityFinder = entityFinder;
 		this.urlDialog = urlDialog;
 		this.eventBus = eventBus;
 		usedProvenanceList = ginInjector.getProvenanceListWidget();
 		executedProvenanceList = ginInjector.getProvenanceListWidget();
-		usedProvenanceList.setEntityFinder(entityFinder);
 		usedProvenanceList.setURLDialog(urlDialog);
-		executedProvenanceList.setEntityFinder(entityFinder);
 		executedProvenanceList.setURLDialog(urlDialog);
 		view.setSynAlertWidget(synAlert);
 		view.setUsedProvenanceList(usedProvenanceList);
@@ -70,8 +67,8 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 				if (caught instanceof NotFoundException) {
 					isNewActivity = true;
 					activity = new Activity();
-					usedProvenanceList.configure(new LinkedList<ProvenanceEntry>());
-					executedProvenanceList.configure(new LinkedList<ProvenanceEntry>());
+					usedProvenanceList.configure(new LinkedList<ProvenanceEntry>(), USED);
+					executedProvenanceList.configure(new LinkedList<ProvenanceEntry>(), EXECUTED);
 				} else {
 					synAlert.handleException(caught);
 				}
@@ -117,8 +114,8 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 							usedEntries.add(toAdd);
 						}
 					}
-					usedProvenanceList.configure(usedEntries);
-					executedProvenanceList.configure(executedEntries);
+					usedProvenanceList.configure(usedEntries, USED);
+					executedProvenanceList.configure(executedEntries, EXECUTED);
 				}
 			}
 		});

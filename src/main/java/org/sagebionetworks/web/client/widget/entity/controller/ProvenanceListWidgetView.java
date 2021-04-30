@@ -15,7 +15,7 @@ public interface ProvenanceListWidgetView {
 
 		void addURLRow();
 
-		void configure(List<ProvenanceEntry> provEntries);
+		void configure(List<ProvenanceEntry> provEntries, ProvenanceType provenanceType);
 	}
 
 	void removeRow(IsWidget toRemove);

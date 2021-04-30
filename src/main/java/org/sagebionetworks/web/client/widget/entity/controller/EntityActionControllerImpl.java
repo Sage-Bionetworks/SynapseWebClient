@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.CONTAINER;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.PROJECT;
+import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.PROJECT_OR_TABLE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,6 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -66,8 +66,8 @@ import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialog;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
@@ -92,6 +92,7 @@ import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -136,7 +137,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	AuthenticationController authenticationController;
 	AccessControlListModalWidget accessControlListModalWidget;
 	RenameEntityModalWidget renameEntityModalWidget;
-	EntityFinder entityFinder;
+	EntityFinder.Builder entityFinderBuilder;
 	EvaluationSubmitter submitter;
 	EditFileMetadataModalWidget editFileMetadataModalWidget;
 	EditProjectMetadataModalWidget editProjectMetadataModalWidget;
@@ -346,11 +347,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		return editProjectMetadataModalWidget;
 	}
 
-	private EntityFinder getEntityFinder() {
-		if (entityFinder == null) {
-			entityFinder = ginInjector.getEntityFinder();
+	private EntityFinder.Builder getEntityFinderBuilder() {
+		if (entityFinderBuilder == null) {
+			entityFinderBuilder = ginInjector.getEntityFinderBuilder();
 		}
-		return entityFinder;
+		return entityFinderBuilder;
 	}
 
 	private EvaluationSubmitter getEvaluationSubmitter() {
@@ -1203,14 +1204,22 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void postCheckLink() {
-		getEntityFinder().configure(CONTAINER, false, new SelectedHandler<Reference>() {
-			@Override
-			public void onSelected(Reference selected) {
-				createLink(selected.getTargetId());
-				getEntityFinder().hide();
-			}
-		});
-		getEntityFinder().show();
+		getEntityFinderBuilder()
+				.setInitialScope(EntityFinderScope.ALL_PROJECTS)
+				.setInitialContainer(EntityFinder.InitialContainer.NONE)
+				.setSelectableTypes(CONTAINER)
+				.setShowVersions(false)
+				.setSelectedHandler((selected, entityFinder) -> {
+					createLink(selected.getTargetId(), entityFinder);
+				})
+				.setTreeOnly(true)
+				.setModalTitle("Create Link to " + entityTypeDisplay)
+				.setHelpMarkdown("Search or Browse to find a Project or Folder that you have access to, and place a symbolic link for easy access")
+				.setPromptCopy("Find a destination and place a link to <b>" + SafeHtmlUtils.fromString(entity.getName()).asString() + "</b> (" + entity.getId() + ")")
+				.setSelectedCopy("Destination")
+				.setConfirmButtonCopy("Create Link")
+				.build()
+				.show();
 	}
 
 	/**
@@ -1218,7 +1227,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * 
 	 * @param target
 	 */
-	public void createLink(String target) {
+	public void createLink(String target, EntityFinder finder) {
 		Link link = new Link();
 		link.setParentId(target);
 		Reference ref = new Reference();
@@ -1236,23 +1245,24 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			@Override
 			public void onSuccess(Entity result) {
 				view.showSuccess(DisplayConstants.TEXT_LINK_SAVED);
+				finder.hide();
 			}
 
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught instanceof BadRequestException) {
-					view.showErrorMessage(DisplayConstants.ERROR_CANT_MOVE_HERE);
+					finder.showError(DisplayConstants.ERROR_CANT_MOVE_HERE);
 					return;
 				}
 				if (caught instanceof NotFoundException) {
-					view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
+					finder.showError(DisplayConstants.ERROR_NOT_FOUND);
 					return;
 				}
 				if (caught instanceof UnauthorizedException) {
-					view.showErrorMessage(DisplayConstants.ERROR_NOT_AUTHORIZED);
+					finder.showError(DisplayConstants.ERROR_NOT_AUTHORIZED);
 					return;
 				}
-				view.showErrorMessage(caught.getMessage());
+				finder.showError(caught.getMessage());
 
 			}
 		});
@@ -1269,36 +1279,45 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void postCheckMove() {
-		EntityFilter filter = entityBundle.getEntity() instanceof Table ? PROJECT : CONTAINER;
-		getEntityFinder().configure(filter, false, new SelectedHandler<Reference>() {
-			@Override
-			public void onSelected(Reference selected) {
-				moveEntity(selected.getTargetId());
-				getEntityFinder().hide();
-			}
-		});
-		getEntityFinder().show();
-	}
+		EntityFinder.Builder builder = getEntityFinderBuilder()
+				.setModalTitle("Move " + entityTypeDisplay)
+				.setHelpMarkdown("Search or Browse Synapse to find a destination to move this " + entityTypeDisplay)
+				.setPromptCopy("Find a destination to move <b>" + SafeHtmlUtils.fromString(entity.getName()).asString() + "</b> (" + entity.getId() + ")")
+				.setSelectedCopy("Destination")
+				.setConfirmButtonCopy("Move")
+				.setShowVersions(false)
+				.setTreeOnly(true)
+				.setSelectedHandler((selected, finder) -> {
+					String entityId = entityBundle.getEntity().getId();
+					getSynapseClient().moveEntity(entityId, selected.getTargetId(), new AsyncCallback<Entity>() {
 
-	/**
-	 * Move the entity to the given target.
-	 * 
-	 * @param target
-	 */
-	private void moveEntity(String target) {
-		String entityId = entityBundle.getEntity().getId();
-		getSynapseClient().moveEntity(entityId, target, new AsyncCallback<Entity>() {
+						@Override
+						public void onSuccess(Entity result) {
+							finder.hide();
+							fireEntityUpdatedEvent();
+							view.showSuccess(result.getId() + " successfully moved");
+						}
 
-			@Override
-			public void onSuccess(Entity result) {
-				fireEntityUpdatedEvent();
-			}
+						@Override
+						public void onFailure(Throwable caught) {
+							finder.showError(caught.getMessage());
+						}
+					});
+				});
 
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
-			}
-		});
+		if (entityBundle.getEntity() instanceof Table) {
+			builder.setInitialScope(EntityFinderScope.ALL_PROJECTS)
+					.setInitialContainer(EntityFinder.InitialContainer.NONE)
+					.setVisibleTypesInTree(PROJECT)
+					.setSelectableTypes(PROJECT);
+		} else {
+			builder.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
+					.setInitialContainer(EntityFinder.InitialContainer.PARENT)
+					.setVisibleTypesInTree(CONTAINER)
+					.setSelectableTypes(CONTAINER);
+		}
+
+		builder.build().show();
 	}
 
 	private void onViewWikiSource() {

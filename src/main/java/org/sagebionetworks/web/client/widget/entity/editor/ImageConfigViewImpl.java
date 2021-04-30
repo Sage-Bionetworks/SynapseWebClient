@@ -5,18 +5,16 @@ import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Text;
-import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -32,7 +30,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 
 	private Presenter presenter;
 	SageImageBundle sageImageBundle;
-	EntityFinder entityFinder;
 	ClientCache clientCache;
 	SynapseJSNIUtils synapseJSNIUtils;
 
@@ -79,10 +76,9 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	private ImageParamsPanel uploadParamsPanel, synapseParamsPanel;
 
 	@Inject
-	public ImageConfigViewImpl(ImageConfigViewImplUiBinder binder, SageImageBundle sageImageBundle, EntityFinder entityFinder, ClientCache clientCache, SynapseJSNIUtils synapseJSNIUtils, ImageParamsPanel synapseParamsPanel, ImageParamsPanel uploadParamsPanel) {
+	public ImageConfigViewImpl(ImageConfigViewImplUiBinder binder, SageImageBundle sageImageBundle, EntityFinder.Builder entityFinderBuilder, ClientCache clientCache, SynapseJSNIUtils synapseJSNIUtils, ImageParamsPanel synapseParamsPanel, ImageParamsPanel uploadParamsPanel) {
 		widget = binder.createAndBindUi(this);
 		this.sageImageBundle = sageImageBundle;
-		this.entityFinder = entityFinder;
 		this.clientCache = clientCache;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseParamsPanel = synapseParamsPanel;
@@ -91,24 +87,23 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		uploadParamsPanelContainer.setWidget(uploadParamsPanel.asWidget());
 		synapseParamsPanelContainer.setWidget(synapseParamsPanel.asWidget());
 
-		initClickHandlers();
+		findEntitiesButton.addClickHandler(event -> entityFinderBuilder
+				.setModalTitle("Find Image File")
+				.setHelpMarkdown("Search or Browse Synapse to find an image file to insert into the Wiki page")
+				.setPromptCopy("Find an image to insert into this Wiki")
+				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
+				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
+				.setMultiSelect(false)
+				.setSelectableTypes(EntityFilter.FILE)
+				.setShowVersions(true)
+				.setSelectedHandler((selected, entityFinder) -> {
+					entityField.setValue(DisplayUtils.createEntityVersionString(selected));
+					entityFinder.hide();
+				})
+				.build()
+				.show());
 	}
 
-	private void initClickHandlers() {
-		findEntitiesButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				entityFinder.configure(EntityFilter.ALL_BUT_LINK, true, new SelectedHandler<Reference>() {
-					@Override
-					public void onSelected(Reference selected) {
-						entityField.setValue(DisplayUtils.createEntityVersionString(selected));
-						entityFinder.hide();
-					}
-				});
-				entityFinder.show();
-			}
-		});
-	}
 
 	@Override
 	public void initView() {

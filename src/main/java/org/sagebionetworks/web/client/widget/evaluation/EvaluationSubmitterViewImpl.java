@@ -19,7 +19,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.ReactComponentDiv;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.FormParams;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -51,6 +52,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	private Presenter presenter;
 	private EvaluationList evaluationList;
 	private EntityFinder entityFinder;
+	private EntityFinder.Builder entityFinderBuilder;
 	private boolean showEntityFinder;
 	private Reference selectedReference;
 	AuthenticationController authController;
@@ -128,9 +130,9 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	private PortalGinInjector ginInjector;
 	String originalNextButtonText, originalSubmitButtonText;
 	@Inject
-	public EvaluationSubmitterViewImpl(Binder binder, EntityFinder entityFinder, EvaluationList evaluationList, PortalGinInjector ginInjector, AuthenticationController authController) {
+	public EvaluationSubmitterViewImpl(Binder binder, EntityFinder.Builder entityFinderBuilder, EvaluationList evaluationList, PortalGinInjector ginInjector, AuthenticationController authController) {
 		widget = binder.createAndBindUi(this);
-		this.entityFinder = entityFinder;
+		this.entityFinderBuilder = entityFinderBuilder;
 		this.evaluationList = evaluationList;
 		this.ginInjector = ginInjector;
 		this.authController = authController;
@@ -183,18 +185,24 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		});
 
 		entityFinderButton.addClickHandler(event -> {
-			entityFinder.configure(true, new SelectedHandler<Reference>() {
-				@Override
-				public void onSelected(Reference selected) {
-					if (selected.getTargetId() != null) {
-						selectedReference = selected;
-						selectedText.setText(DisplayUtils.createEntityVersionString(selected));
-						entityFinder.hide();
-					} else {
-						showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-					}
-				}
-			});
+			this.entityFinder = entityFinderBuilder
+					.setInitialScope(EntityFinderScope.ALL_PROJECTS)
+					.setInitialContainer(EntityFinder.InitialContainer.SCOPE)
+					.setHelpMarkdown("Search or Browse Synapse to find items to submit to this Challenge")
+					.setPromptCopy("Find items to Submit to this Challenge")
+					.setMultiSelect(false)
+					.setSelectableTypes(EntityFilter.ALL)
+					.setShowVersions(true)
+					.setSelectedHandler((selected, finder) -> {
+						if (selected.getTargetId() != null) {
+							selectedReference = selected;
+							selectedText.setText(DisplayUtils.createEntityVersionString(selected));
+							finder.hide();
+						} else {
+							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+						}
+					})
+					.build();
 			entityFinder.show();
 		});
 

@@ -13,26 +13,29 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.editor.PreviewConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.PreviewConfigView;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.test.helper.SelfReturningAnswer;
 
 public class PreviewConfigEditorTest {
 
 	PreviewConfigEditor editor;
 	PreviewConfigView mockView;
+	EntityFinder.Builder mockEntityFinderBuilder;
 	EntityFinder mockEntityFinder;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 
 	@Before
 	public void setup() {
+		mockEntityFinderBuilder = mock(EntityFinder.Builder.class, new SelfReturningAnswer());
+		when(mockEntityFinderBuilder.build()).thenReturn(mockEntityFinder);
 		mockView = mock(PreviewConfigView.class);
 		mockEntityFinder = mock(EntityFinder.class);
-		editor = new PreviewConfigEditor(mockView, mockEntityFinder);
+		editor = new PreviewConfigEditor(mockView, mockEntityFinderBuilder);
 	}
 
 
@@ -41,15 +44,18 @@ public class PreviewConfigEditorTest {
 		verify(mockView).setPresenter(editor);
 		verify(mockView).initView();
 		// verify entity finder is configured
-		ArgumentCaptor<SelectedHandler> captor = ArgumentCaptor.forClass(SelectedHandler.class);
-		verify(mockEntityFinder).configure(eq(EntityFilter.ALL_BUT_LINK), eq(true), captor.capture());
-		SelectedHandler selectedHandler = captor.getValue();
+		ArgumentCaptor<EntityFinder.SelectedHandler> captor = ArgumentCaptor.forClass(EntityFinder.SelectedHandler.class);
+		verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.FILE);
+		verify(mockEntityFinderBuilder).setShowVersions(true);
+		verify(mockEntityFinderBuilder).setSelectedHandler(captor.capture());
+		verify(mockEntityFinderBuilder).build();
+		EntityFinder.SelectedHandler selectedHandler = captor.getValue();
 		Reference selected = new Reference();
 
 		// invalid selection is handled by the entity finder
 		String targetId = "syn314";
 		selected.setTargetId(targetId);
-		selectedHandler.onSelected(selected);
+		selectedHandler.onSelected(selected, mockEntityFinder);
 		verify(mockView).setVersion("");
 		verify(mockView).setEntityId(targetId);
 		verify(mockEntityFinder).hide();
@@ -58,7 +64,7 @@ public class PreviewConfigEditorTest {
 		reset(mockView);
 		Long version = 55L;
 		selected.setTargetVersionNumber(version);
-		selectedHandler.onSelected(selected);
+		selectedHandler.onSelected(selected, mockEntityFinder);
 		verify(mockView).setVersion(version.toString());
 		verify(mockView).setEntityId(targetId);
 	}

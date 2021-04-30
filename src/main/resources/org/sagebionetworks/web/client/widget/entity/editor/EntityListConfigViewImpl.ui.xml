@@ -13,7 +13,7 @@
         		<b:Button ui:field="editNoteButton" icon="EDIT" type="INFO" addStyleNames="right" size="EXTRA_SMALL">Edit Note</b:Button>
         	</bh:Div>
         	<bh:Div ui:field="entityListContainer"/>
-            <b:Button ui:field="addEntityButton" icon="PLUS" type="INFO" addStyleNames="margin-10">Add Entity</b:Button>
+            <b:Button ui:field="addEntityButton" icon="PLUS" type="INFO" addStyleNames="margin-10">Add Entities</b:Button>
             <bh:Div ui:field="widgets"/>
 		</bh:Div>
 	</bh:Div>

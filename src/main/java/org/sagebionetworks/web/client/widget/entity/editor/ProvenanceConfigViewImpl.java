@@ -4,12 +4,11 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -21,7 +20,6 @@ public class ProvenanceConfigViewImpl implements ProvenanceConfigView {
 
 	private Presenter presenter;
 
-	EntityFinder entityFinder;
 
 	@UiField
 	TextBox entityListField;
@@ -37,30 +35,26 @@ public class ProvenanceConfigViewImpl implements ProvenanceConfigView {
 	Widget widget;
 
 	@Inject
-	public ProvenanceConfigViewImpl(ProvenanceConfigViewImplUiBinder binder, EntityFinder entityFinder) {
+	public ProvenanceConfigViewImpl(ProvenanceConfigViewImplUiBinder binder, EntityFinder.Builder entityFinderBuilder) {
 		widget = binder.createAndBindUi(this);
-		this.entityFinder = entityFinder;
-		initClickHandlers();
-	}
 
-	private void initClickHandlers() {
-		entityFinderButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				entityFinder.configure(true, new SelectedHandler<Reference>() {
-					@Override
-					public void onSelected(Reference selected) {
-						if (selected.getTargetId() != null) {
-							appendEntityListValue(selected);
-							entityFinder.hide();
-						} else {
-							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-						}
+		entityFinderButton.addClickHandler(event -> entityFinderBuilder
+				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
+				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
+				.setHelpMarkdown("Search or Browse Synapse to find an item and display the Provenance Graph within the Wiki page")
+				.setPromptCopy("Find items to insert a Provenance Graph")
+				.setMultiSelect(true)
+				.setSelectableTypes(EntityFilter.ALL_BUT_LINK)
+				.setShowVersions(true)
+				.setSelectedMultiHandler((selected, finder) -> {
+					for (Reference entity : selected) {
+						appendEntityListValue(entity);
 					}
-				});
-				entityFinder.show();
-			}
-		});
+					finder.hide();
+				})
+				.build()
+				.show()
+		);
 	}
 
 	@Override

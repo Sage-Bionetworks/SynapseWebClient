@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -64,41 +65,60 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 	Div submissionTypeOptions;
 	Widget widget;
 
-	EntityFinder entityFinder;
-
 	@Inject
-	public EvaluationSubmissionConfigViewImpl(EvaluationSubmissionConfigViewImplUiBinder binder, EntityFinder entityFinder, CookieProvider cookies) {
+	public EvaluationSubmissionConfigViewImpl(EvaluationSubmissionConfigViewImplUiBinder binder, EntityFinder.Builder entityFinderBuilder, CookieProvider cookies) {
 		widget = binder.createAndBindUi(this);
-		this.entityFinder = entityFinder;
 		this.cookies = cookies;
 		findProjectButton.addClickHandler(event -> {
-			entityFinder.configure(EntityFilter.PROJECT, false, selectedRef -> {
-				challengeProjectField.setValue(selectedRef.getTargetId());
-				entityFinder.hide();
-			});
-			entityFinder.show();
+			entityFinderBuilder
+					.setInitialScope(EntityFinderScope.ALL_PROJECTS)
+					.setInitialContainer(EntityFinder.InitialContainer.SCOPE)
+					.setModalTitle("Find Project")
+					.setHelpMarkdown("Search or Browse Synapse to find a Project to display a Challenge Evaluation submission button")
+					.setPromptCopy("Find a Project to create a submission button")
+					.setMultiSelect(false)
+					.setSelectableTypes(EntityFilter.PROJECT)
+					.setShowVersions(false)
+					.setSelectedHandler(((selected, entityFinder) -> {
+						challengeProjectField.setValue(selected.getTargetId());
+						entityFinder.hide();
+					}))
+					.build()
+					.show();
 		});
 
 		findFormContainerButton.addClickHandler(event -> {
-			entityFinder.configure(EntityFilter.CONTAINER, false, selectedRef -> {
-				formContainerIdField.setValue(selectedRef.getTargetId());
-				entityFinder.hide();
-			});
-			entityFinder.show();
+			entityFinderBuilder.setMultiSelect(false)
+					.setSelectableTypes(EntityFilter.CONTAINER)
+					.setShowVersions(false)
+					.setSelectedHandler(((selected, entityFinder) -> {
+						formContainerIdField.setValue(selected.getTargetId());
+						entityFinder.hide();
+					}))
+					.build()
+					.show();
 		});
 		findSchemaFileButton.addClickHandler(event -> {
-			entityFinder.configure(EntityFilter.ALL_BUT_LINK, false, selectedRef -> {
-				schemaFileSynIdField.setValue(selectedRef.getTargetId());
-				entityFinder.hide();
-			});
-			entityFinder.show();
+			entityFinderBuilder.setMultiSelect(false)
+					.setSelectableTypes(EntityFilter.FILE)
+					.setShowVersions(false)
+					.setSelectedHandler(((selected, entityFinder) -> {
+						schemaFileSynIdField.setValue(selected.getTargetId());
+						entityFinder.hide();
+					}))
+					.build()
+					.show();
 		});
 		findUiSchemaFileButton.addClickHandler(event -> {
-			entityFinder.configure(EntityFilter.ALL_BUT_LINK, false, selectedRef -> {
-				uiSchemaFileSynIdField.setValue(selectedRef.getTargetId());
-				entityFinder.hide();
-			});
-			entityFinder.show();
+			entityFinderBuilder.setMultiSelect(false)
+					.setSelectableTypes(EntityFilter.FILE)
+					.setShowVersions(false)
+					.setSelectedHandler(((selected, entityFinder) -> {
+						uiSchemaFileSynIdField.setValue(selected.getTargetId());
+						entityFinder.hide();
+					}))
+					.build()
+					.show();
 		});
 
 		challengeRadioOption.addClickHandler(event -> {

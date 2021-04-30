@@ -375,6 +375,7 @@
 								<copy file="${project.basedir}/node_modules/react-jsonschema-form/dist/react-jsonschema-form.js" tofile="src/main/webapp/generated/react-jsonschema-form.js" />
 								<copy file="${project.basedir}/node_modules/universal-cookie/umd/universalCookie.min.js" tofile="src/main/webapp/generated/universalCookie.min.js" />
 								<copy file="${project.basedir}/node_modules/react-bootstrap/dist/react-bootstrap.min.js" tofile="src/main/webapp/generated/react-bootstrap.min.js" />
+								<copy file="${project.basedir}/node_modules/sanitize-html/dist/sanitize-html.min.js" tofile="src/main/webapp/generated/sanitize-html.min.js" />
 								<copy file="${project.basedir}/node_modules/prop-types/prop-types.min.js" tofile="src/main/webapp/generated/prop-types.min.js" />
 								<copy file="${project.basedir}/node_modules/font-awesome/css/font-awesome.css" tofile="src/main/webapp/generated/font-awesome.css" />
 								<copy file="${project.basedir}/node_modules/font-awesome/fonts/fontawesome-webfont.woff" tofile="src/main/webapp/fonts/fontawesome-webfont.woff" />

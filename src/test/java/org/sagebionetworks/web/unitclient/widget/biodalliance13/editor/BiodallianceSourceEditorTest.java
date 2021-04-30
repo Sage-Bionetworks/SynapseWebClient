@@ -4,10 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource;
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource.SourceType;
 import org.junit.Before;
@@ -20,7 +21,6 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditor;
@@ -28,11 +28,14 @@ import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceS
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+import org.sagebionetworks.web.test.helper.SelfReturningAnswer;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class BiodallianceSourceEditorTest {
 	BiodallianceSourceEditorView mockView;
 	SynapseClientAsync mockSynapseClient;
+	EntityFinder.Builder mockEntityFinderBuilder;
 	EntityFinder mockEntityFinder, mockIndexEntityFinder;
 	BiodallianceSource mockSource;
 	@Mock
@@ -59,8 +62,12 @@ public class BiodallianceSourceEditorTest {
 		MockitoAnnotations.initMocks(this);
 		mockView = mock(BiodallianceSourceEditorView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
+		mockEntityFinderBuilder = mock(EntityFinder.Builder.class, new SelfReturningAnswer());
 		mockEntityFinder = mock(EntityFinder.class);
 		mockIndexEntityFinder = mock(EntityFinder.class);
+
+		when(mockEntityFinderBuilder.build()).thenReturn(mockEntityFinder, mockIndexEntityFinder);
+
 		mockSource = mock(BiodallianceSource.class);
 		mockEntityBundle = mock(EntityBundle.class);
 		String dataFileHandleId = "9";
@@ -81,14 +88,17 @@ public class BiodallianceSourceEditorTest {
 		when(mockSource.getHeightPx()).thenReturn(heightPx);
 
 		when(mockView.getHeight()).thenReturn(viewHeight);
-		editor = new BiodallianceSourceEditor(mockView, mockEntityFinder, mockIndexEntityFinder, mockSource, mockSynapseJavascriptClient);
+		editor = new BiodallianceSourceEditor(mockView, mockEntityFinderBuilder, mockSource, mockSynapseJavascriptClient);
 	}
 
 	@Test
 	public void testConstructorAndUpdateViewFromSource() {
 		verify(mockView).setPresenter(editor);
-		verify(mockEntityFinder).configure(eq(EntityFilter.ALL_BUT_LINK), eq(true), any(SelectedHandler.class));
-		verify(mockIndexEntityFinder).configure(eq(EntityFilter.ALL_BUT_LINK), eq(true), any(SelectedHandler.class));
+		verify(mockEntityFinderBuilder).setMultiSelect(false);
+		verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.FILE);
+		verify(mockEntityFinderBuilder).setShowVersions(true);
+		verify(mockEntityFinderBuilder, times(2)).setSelectedHandler(any(EntityFinder.SelectedHandler.class));
+		verify(mockEntityFinderBuilder, times(2)).build();
 
 		verify(mockView).setSourceName(sourceName);
 		verify(mockView).setEntityFinderText(entityId + "." + version);

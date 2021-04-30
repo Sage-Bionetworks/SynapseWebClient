@@ -7,13 +7,14 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
+
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -33,27 +34,29 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 	SynapseJavascriptClient jsClient;
 
 	@Inject
-	public BiodallianceSourceEditor(BiodallianceSourceEditorView view, EntityFinder entityFinder, EntityFinder indexEntityFinder, BiodallianceSource source, SynapseJavascriptClient jsClient) {
+	public BiodallianceSourceEditor(BiodallianceSourceEditorView view, EntityFinder.Builder entityFinderBuilder, BiodallianceSource source, SynapseJavascriptClient jsClient) {
 		this.view = view;
-		this.entityFinder = entityFinder;
-		this.indexEntityFinder = indexEntityFinder;
 		this.source = source;
 		this.jsClient = jsClient;
 
 		view.setPresenter(this);
-		entityFinder.configure(EntityFilter.ALL_BUT_LINK, true, new SelectedHandler<Reference>() {
-			@Override
-			public void onSelected(Reference selected) {
-				entitySelected(selected);
-			}
-		});
 
-		indexEntityFinder.configure(EntityFilter.ALL_BUT_LINK, true, new SelectedHandler<Reference>() {
-			@Override
-			public void onSelected(Reference selected) {
-				indexEntitySelected(selected);
-			}
-		});
+		this.entityFinder = entityFinderBuilder
+				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
+				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
+				.setModalTitle("Find Genome Browser File")
+				.setHelpMarkdown("Search or Browse Synapse to find supported Files for this Genome Browser")
+				.setPromptCopy("Find File to add a track")
+				.setMultiSelect(false)
+				.setSelectableTypes(EntityFilter.FILE)
+				.setShowVersions(true)
+				.setSelectedHandler((selected, finder) -> entitySelected(selected))
+				.build();
+
+		this.indexEntityFinder = entityFinderBuilder
+				.setSelectedHandler((selected, finder) -> indexEntitySelected(selected))
+				.build();
+
 		updateViewFromSource();
 	}
 

@@ -47,7 +47,7 @@
 				<b:InputGroup width="350px">
 					<b:TextBox placeholder="Select a Synapse Table/View" autoComplete="false" ui:field="tableViewSynId" enabled="false" />
 					<b:InputGroupButton>
-						<b:Button ui:field="entityPickerButton" icon="SEARCH" text="" height="30px"/>
+						<b:Button ui:field="entityPickerButton" icon="SEARCH" text="" height="35px"/>
 					</b:InputGroupButton>
 				</b:InputGroup>
 			</b:FormGroup>

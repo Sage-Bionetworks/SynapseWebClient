@@ -7,34 +7,62 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.AdditionalMatchers;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityRefProvEntryView;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEntry;
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWidgetView;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceType;
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceURLDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryView;
+import org.sagebionetworks.web.test.helper.SelfReturningAnswer;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ProvenanceListWidgetTest {
 
+	@Mock
 	ProvenanceListWidgetView mockView;
+
+	@Mock
 	PortalGinInjector mockInjector;
+
+	EntityFinder.Builder mockEntityFinderBuilder;
+	@Mock
 	EntityFinder mockEntityFinder;
+
+	@Mock
 	ProvenanceURLDialogWidget mockUrlDialog;
-	ProvenanceListWidget presenter;
+
+	@Mock
 	Reference mockRef;
+
+	@Mock
 	EntityRefProvEntryView mockEntityProvEntry;
+
+	@Mock
 	URLProvEntryView mockURLProvEntry;
+
+	ProvenanceListWidget presenter;
+
+
+	@Captor
+	ArgumentCaptor<EntityFinder.SelectedHandler<List<Reference>>> captor;
 
 	String urlName = "test";
 	String urlAddress = "test.com";
@@ -44,15 +72,10 @@ public class ProvenanceListWidgetTest {
 
 	@Before
 	public void setup() {
-		mockView = mock(ProvenanceListWidgetView.class);
-		mockInjector = mock(PortalGinInjector.class);
-		mockEntityFinder = mock(EntityFinder.class);
-		mockUrlDialog = mock(ProvenanceURLDialogWidget.class);
-		mockRef = mock(Reference.class);
-		mockEntityProvEntry = mock(EntityRefProvEntryView.class);
-		mockURLProvEntry = mock(URLProvEntryView.class);
-		presenter = new ProvenanceListWidget(mockView, mockInjector);
-		presenter.setEntityFinder(mockEntityFinder);
+		mockEntityFinderBuilder = mock(EntityFinder.Builder.class, new SelfReturningAnswer());
+		when(mockEntityFinderBuilder.build()).thenReturn(mockEntityFinder);
+
+		presenter = new ProvenanceListWidget(mockView, mockInjector, mockEntityFinderBuilder);
 		presenter.setURLDialog(mockUrlDialog);
 		when(mockInjector.getEntityRefEntry()).thenReturn(mockEntityProvEntry);
 		when(mockInjector.getURLEntry()).thenReturn(mockURLProvEntry);
@@ -71,25 +94,26 @@ public class ProvenanceListWidgetTest {
 
 	@Test
 	public void testConfigure() {
-		presenter.configure(rows);
+		presenter.configure(rows, ProvenanceType.USED);
 		verify(mockView, times(2)).addRow(AdditionalMatchers.or(eq(mockEntityProvEntry), eq(mockURLProvEntry)));
 		verify(mockEntityProvEntry).setRemoveCallback(any(Callback.class));
 		verify(mockURLProvEntry).setRemoveCallback(any(Callback.class));
+
+		verify(mockEntityFinderBuilder).setShowVersions(true);
+		verify(mockEntityFinderBuilder).setSelectedMultiHandler(captor.capture());
+		captor.getValue().onSelected(Collections.singletonList(mockRef), mockEntityFinder);
+		verify(mockEntityProvEntry).configure(targetId, version.toString());
+		verify(mockEntityProvEntry).setAnchorTarget(anyString());
+		verify(mockEntityProvEntry, times(2)).setRemoveCallback(any(Callback.class));
+		verify(mockView, times(2)).addRow(mockEntityProvEntry);
+		verify(mockEntityFinder).hide();
 	}
 
 	@Test
 	public void testAddEntityRow() {
 		presenter.addEntityRow();
-		ArgumentCaptor<SelectedHandler> captor = ArgumentCaptor.forClass(SelectedHandler.class);
 		verify(mockEntityFinder).clearState();
-		verify(mockEntityFinder).configure(eq(true), captor.capture());
 		verify(mockEntityFinder).show();
-		captor.getValue().onSelected(mockRef);
-		verify(mockEntityProvEntry).configure(targetId, version.toString());
-		verify(mockEntityProvEntry).setAnchorTarget(anyString());
-		verify(mockEntityProvEntry).setRemoveCallback(any(Callback.class));
-		verify(mockView).addRow(mockEntityProvEntry);
-		verify(mockEntityFinder).hide();
 	}
 
 	@Test

@@ -38,7 +38,7 @@ public class EntityFilterTest {
 
 	@Test
 	public void testFilterAllAllowed() {
-		EntityFilter filter = EntityFilter.ALL;
+		EntityFilter filter = EntityFilter.PROJECT_FOLDER_FILE_LINK;
 		List<EntityType> queryValues = filter.getEntityQueryValues();
 
 		assertTrue(queryValues.contains(EntityType.project));
@@ -104,17 +104,17 @@ public class EntityFilterTest {
 
 	@Test
 	public void testFilterFiles() {
-		EntityFilter filter = EntityFilter.ALL_BUT_LINK;
+		EntityFilter filter = EntityFilter.FILE;
 		List<EntityType> queryValues = filter.getEntityQueryValues();
 
-		assertTrue(queryValues.contains(EntityType.project));
-		assertTrue(queryValues.contains(EntityType.folder));
+		assertFalse(queryValues.contains(EntityType.project));
+		assertFalse(queryValues.contains(EntityType.folder));
 		assertTrue(queryValues.contains(EntityType.file));
 		assertFalse(queryValues.contains(EntityType.link));
 
 		List<EntityHeader> filteredHeaders = filter.filterForBrowsing(headers);
-		assertTrue(filteredHeaders.contains(projectHeader));
-		assertTrue(filteredHeaders.contains(folderHeader));
+		assertFalse(filteredHeaders.contains(projectHeader));
+		assertFalse(filteredHeaders.contains(folderHeader));
 		assertTrue(filteredHeaders.contains(fileHeader));
 		assertFalse(filteredHeaders.contains(linkHeader));
 	}

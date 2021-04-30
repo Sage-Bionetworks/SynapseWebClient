@@ -2,16 +2,17 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.List;
 import java.util.Map;
-import org.sagebionetworks.repo.model.Reference;
+
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -22,30 +23,33 @@ public class PreviewConfigEditor implements PreviewConfigView.Presenter, WidgetE
 	EntityFinder entityFinder;
 
 	@Inject
-	public PreviewConfigEditor(PreviewConfigView view, EntityFinder entityFinder) {
+	public PreviewConfigEditor(PreviewConfigView view, EntityFinder.Builder entityFinderBuilder) {
 		this.view = view;
-		this.entityFinder = entityFinder;
 		view.setPresenter(this);
 		view.initView();
 
-		configureEntityFinder();
-	}
+		this.entityFinder = entityFinderBuilder
+				.setModalTitle("Insert File Preview")
+				.setHelpMarkdown("Search or Browse Synapse to find Files and insert a preview into this Wiki page")
+				.setPromptCopy("Find a File to insert a preview into this Wiki")
+				.setConfirmButtonCopy("Insert")
+				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
+				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
+				.setSelectableTypes(EntityFilter.FILE)
+				.setShowVersions(true)
+				.setSelectedHandler((selected, finder) -> {
+					view.setEntityId(selected.getTargetId());
+					Long version = selected.getTargetVersionNumber();
+					if (version != null) {
+						view.setVersion(version.toString());
+					} else {
+						view.setVersion("");
+					}
 
-	private void configureEntityFinder() {
-		entityFinder.configure(EntityFilter.ALL_BUT_LINK, true, new SelectedHandler<Reference>() {
-			@Override
-			public void onSelected(Reference selected) {
-				view.setEntityId(selected.getTargetId());
-				Long version = selected.getTargetVersionNumber();
-				if (version != null) {
-					view.setVersion(version.toString());
-				} else {
-					view.setVersion("");
+					finder.hide();
 				}
-
-				entityFinder.hide();
-			}
-		});
+				)
+				.build();
 	}
 
 	@Override
@@ -106,7 +110,4 @@ public class PreviewConfigEditor implements PreviewConfigView.Presenter, WidgetE
 	public List<String> getDeletedFileHandleIds() {
 		return null;
 	}
-	/*
-	 * Private Methods
-	 */
 }

@@ -2213,6 +2213,11 @@ Looks for any child element under .modal-fullscreen that has a class that contai
 	width: 90%;
 }
 
+.modal-max-content [class*="modal-dialog"] {
+    width: max-content;
+    max-width: 95%;
+}
+
 /*
  The opaque modal backdrop doesn't work for nested modals i.e. a modal does not obscure another modal.
   We can simulate the effect with a very large box shadow

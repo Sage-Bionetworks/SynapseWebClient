@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CheckBoxState;
@@ -13,7 +12,9 @@ import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptForValuesModalView;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
@@ -30,16 +31,16 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 	private EntityListConfigView view;
 	private Map<String, String> descriptor;
 	AuthenticationController authenticationController;
-	EntityFinder entityFinder;
+	EntityFinder.Builder entityFinderBuilder;
 	EntityListWidget entityListWidget;
 	WikiPageKey wikiKey;
 	PromptForValuesModalView promptForNoteModal;
 
 	@Inject
-	public EntityListConfigEditor(EntityListConfigView view, AuthenticationController authenticationController, EntityListWidget entityListWidget, EntityFinder entityFinder, PromptForValuesModalView promptForNoteModal) {
+	public EntityListConfigEditor(EntityListConfigView view, AuthenticationController authenticationController, EntityListWidget entityListWidget, EntityFinder.Builder entityFinderBuilder, PromptForValuesModalView promptForNoteModal) {
 		this.view = view;
 		this.authenticationController = authenticationController;
-		this.entityFinder = entityFinder;
+		this.entityFinderBuilder = entityFinderBuilder;
 		this.entityListWidget = entityListWidget;
 		this.promptForNoteModal = promptForNoteModal;
 		view.setSelectionToolbarHandler(entityListWidget.getRowWidgets());
@@ -88,16 +89,25 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 
 	@Override
 	public void onAddRecord() {
-		entityFinder.configure(true, new SelectedHandler<Reference>() {
-			@Override
-			public void onSelected(Reference selected) {
-				entityFinder.hide();
-				EntityGroupRecord record = createRecord(selected.getTargetId(), selected.getTargetVersionNumber(), null);
-				entityListWidget.addRecord(record);
-				view.setButtonToolbarVisible(true);
-			}
-		});
-		entityFinder.show();
+		entityFinderBuilder
+				.setModalTitle("Insert Item List")
+				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
+				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
+				.setSelectableTypes(EntityFilter.ALL)
+				.setHelpMarkdown("Search or Browse Synapse to find items and insert them as a list into this Wiki page")
+				.setPromptCopy("Find items in Synapse to insert them as a list into this Wiki")
+				.setMultiSelect(true)
+				.setShowVersions(true)
+				.setSelectedMultiHandler(((selected, entityFinder) -> {
+					entityFinder.hide();
+					for (Reference ref : selected) {
+						EntityGroupRecord record = createRecord(ref.getTargetId(), ref.getTargetVersionNumber(), null);
+						entityListWidget.addRecord(record);
+					}
+					view.setButtonToolbarVisible(true);
+				}))
+				.build()
+				.show();
 	}
 
 	public void clearState() {

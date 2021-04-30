@@ -17,7 +17,6 @@ import java.util.Map;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -28,6 +27,7 @@ import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
@@ -63,9 +63,8 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	SynapseJavascriptClient jsClient;
 
 	@Inject
-	public PlotlyConfigEditor(final PlotlyConfigView view, EntityFinder finder, SynapseAlert synAlert, Button showHideAdvancedButton, SynapseJavascriptClient jsClient) {
+	public PlotlyConfigEditor(final PlotlyConfigView view, EntityFinder.Builder entityFinderBuilder, SynapseAlert synAlert, Button showHideAdvancedButton, SynapseJavascriptClient jsClient) {
 		this.view = view;
-		this.finder = finder;
 		this.synAlert = synAlert;
 		this.jsClient = jsClient;
 		this.showHideAdvancedButton = showHideAdvancedButton;
@@ -85,6 +84,22 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 				setAdvancedModeVisible(!isAdvancedVisible);
 			}
 		});
+
+		this.finder = entityFinderBuilder
+				.setModalTitle("Find a Table or View")
+				.setHelpMarkdown("Search or Browse Synapse to find a Table or View to display in the Simple Plot")
+				.setPromptCopy("Find a Table or View to Display in the Simple Plot")
+				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
+				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
+				.setVisibleTypesInTree(EntityFilter.PROJECT)
+				.setMultiSelect(false)
+				.setSelectableTypes(EntityFilter.ALL_TABLES)
+				.setShowVersions(false)
+				.setSelectedHandler((selected, entityFinder) -> {
+					setTableId(selected.getTargetId());
+					finder.hide();
+				})
+				.build();
 	}
 
 	public void setAdvancedModeVisible(boolean visible) {
@@ -353,13 +368,6 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 
 	@Override
 	public void onFindTable() {
-		finder.configure(EntityFilter.PROJECT_OR_TABLE, false, new DisplayUtils.SelectedHandler<Reference>() {
-			@Override
-			public void onSelected(Reference selected) {
-				setTableId(selected.getTargetId());
-				finder.hide();
-			}
-		});
 		finder.show();
 	}
 

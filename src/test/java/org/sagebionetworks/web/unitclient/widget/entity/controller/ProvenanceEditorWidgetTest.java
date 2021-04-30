@@ -59,8 +59,6 @@ public class ProvenanceEditorWidgetTest {
 	@Mock
 	Activity mockActivity;
 	@Mock
-	EntityFinder mockEntityFinder;
-	@Mock
 	ProvenanceURLDialogWidget mockUrlDialog;
 	ProvenanceEditorWidget presenter;
 	@Mock
@@ -69,10 +67,6 @@ public class ProvenanceEditorWidgetTest {
 	Entity mockEntity;
 	@Mock
 	Reference mockRef;
-	@Mock
-	UsedURL mockUsedUrl;
-	@Mock
-	UsedEntity mockUsedEntity;
 	@Mock
 	EntityRefProvEntryView mockEntityProvEntry;
 	@Mock
@@ -90,7 +84,7 @@ public class ProvenanceEditorWidgetTest {
 	@Before
 	public void before() {
 		when(mockInjector.getProvenanceListWidget()).thenReturn(mockProvenanceList);
-		presenter = new ProvenanceEditorWidget(mockView, mockJsClient, mockSynAlert, mockInjector, mockEntityFinder, mockUrlDialog, mockEventBus);
+		presenter = new ProvenanceEditorWidget(mockView, mockJsClient, mockSynAlert, mockInjector, mockUrlDialog, mockEventBus);
 
 		when(mockInjector.getEntityRefEntry()).thenReturn(mockEntityProvEntry);
 		when(mockInjector.getURLEntry()).thenReturn(mockUrlProvEntry);
@@ -116,7 +110,6 @@ public class ProvenanceEditorWidgetTest {
 	@Test
 	public void testConstruction() {
 		verify(mockInjector, times(2)).getProvenanceListWidget();
-		verify(mockProvenanceList, times(2)).setEntityFinder(mockEntityFinder);
 		verify(mockProvenanceList, times(2)).setURLDialog(mockUrlDialog);
 		verify(mockView).setSynAlertWidget(mockSynAlert);
 		verify(mockView).setUsedProvenanceList(mockProvenanceList);
@@ -140,7 +133,7 @@ public class ProvenanceEditorWidgetTest {
 		verify(mockInjector, Mockito.never()).getURLEntry();
 		verify(mockInjector.getURLEntry(), Mockito.never()).configure(name, url);
 		verify(mockInjector.getURLEntry(), Mockito.never()).setAnchorTarget(anyString());
-		verify(mockProvenanceList, Mockito.never()).configure(anyList());
+		verify(mockProvenanceList, Mockito.never()).configure(anyList(), any());
 
 
 		presenter.onSave();
@@ -166,7 +159,7 @@ public class ProvenanceEditorWidgetTest {
 		verify(mockInjector).getURLEntry();
 		verify(mockInjector.getURLEntry()).configure(name, url);
 		verify(mockInjector.getURLEntry()).setAnchorTarget(anyString());
-		verify(mockProvenanceList, times(2)).configure(anyList());
+		verify(mockProvenanceList, times(2)).configure(anyList(), any());
 	}
 
 	@Test

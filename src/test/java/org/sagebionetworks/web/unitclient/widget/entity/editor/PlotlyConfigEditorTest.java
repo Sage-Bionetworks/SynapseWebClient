@@ -8,6 +8,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -43,8 +44,6 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.BarMode;
@@ -58,6 +57,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigView;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+import org.sagebionetworks.web.test.helper.SelfReturningAnswer;
+
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -67,12 +68,11 @@ public class PlotlyConfigEditorTest {
 	@Mock
 	PlotlyConfigView mockView;
 
+	EntityFinder.Builder mockEntityFinderBuilder;
 	@Mock
 	EntityFinder mockFinder;
 	@Mock
 	SynapseAlert mockSynAlert;
-	@Mock
-	SynapseClientAsync mockSynapseClient;
 	@Mock
 	Button mockShowHideAdvancedButton;
 	@Captor
@@ -87,7 +87,7 @@ public class PlotlyConfigEditorTest {
 	@Captor
 	ArgumentCaptor<List<String>> availableColumnNamesCaptor;
 	@Captor
-	ArgumentCaptor<DisplayUtils.SelectedHandler<Reference>> finderCallbackCaptor;
+	ArgumentCaptor<EntityFinder.SelectedHandler<Reference>> finderCallbackCaptor;
 	public static String X_COLUMN_NAME = "x Column";
 	public static String Y_COLUMN_NAME = "y column";
 	public static String Y2_COLUMN_NAME = "y2 column";
@@ -100,7 +100,9 @@ public class PlotlyConfigEditorTest {
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		editor = new PlotlyConfigEditor(mockView, mockFinder, mockSynAlert, mockShowHideAdvancedButton, mockSynapseJavascriptClient);
+		mockEntityFinderBuilder = mock(EntityFinder.Builder.class, new SelfReturningAnswer());
+		when(mockEntityFinderBuilder.build()).thenReturn(mockFinder);
+		editor = new PlotlyConfigEditor(mockView, mockEntityFinderBuilder, mockSynAlert, mockShowHideAdvancedButton, mockSynapseJavascriptClient);
 		columnModels = new ArrayList<ColumnModel>();
 		AsyncMockStubber.callSuccessWith(columnModels).when(mockSynapseJavascriptClient).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
 		when(mockXColumnModel.getName()).thenReturn(X_COLUMN_NAME);
@@ -364,13 +366,17 @@ public class PlotlyConfigEditorTest {
 	@Test
 	public void testOnFindTable() {
 		editor.onFindTable();
-		verify(mockFinder).configure(eq(EntityFilter.PROJECT_OR_TABLE), eq(false), finderCallbackCaptor.capture());
+		verify(mockEntityFinderBuilder).setMultiSelect(false);
+		verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.ALL_TABLES);
+		verify(mockEntityFinderBuilder).setShowVersions(false);
+		verify(mockEntityFinderBuilder).setSelectedHandler(finderCallbackCaptor.capture());
+		verify(mockEntityFinderBuilder).build();
 		verify(mockFinder).show();
-		DisplayUtils.SelectedHandler<Reference> callback = finderCallbackCaptor.getValue();
+		EntityFinder.SelectedHandler<Reference> callback = finderCallbackCaptor.getValue();
 		String newTableId = "syn222";
 		Reference r = new Reference();
 		r.setTargetId(newTableId);
-		callback.onSelected(r);
+		callback.onSelected(r, mockFinder);
 		verify(mockFinder).hide();
 		verify(mockSynapseJavascriptClient).getEntity(eq(newTableId), any(AsyncCallback.class));
 	}
