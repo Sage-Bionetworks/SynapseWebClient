@@ -73,6 +73,8 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 		this.jsniUtils = jsniUtils;
 		this.synAlert = synAlert;
 
+		synAlertPanel.setWidget(synAlert);
+
 		// Initially, nothing is selected, so we disable the confirm button
 		okButton.setEnabled(false);
 		okButton.addClickHandler(event -> {
@@ -144,12 +146,6 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 	}
 
 	@Override
-	public void setSynAlertWidget(SynapseAlert synAlert) {
-		this.synAlert = synAlert;
-		this.synAlertPanel.setWidget(synAlert.asWidget());
-	}
-
-	@Override
 	public void showErrorMessage(String message) {
 		synAlert.showError(message);
 	}
@@ -168,6 +164,11 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 		entityFinderContainer.clear();
 		presenter.clearSelectedEntities();
 		okButton.setEnabled(false);
+	}
+
+	@Override
+	public void clearError() {
+		synAlert.clear();
 	}
 
 	@Override

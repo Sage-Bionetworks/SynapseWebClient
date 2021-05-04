@@ -18,7 +18,7 @@
 		<b:ModalBody>
 			<bh:Paragraph ui:field="promptCopy"></bh:Paragraph>
 			<w:ReactComponentDiv ui:field="entityFinderContainer" />
-			<g:SimplePanel ui:field="synAlertPanel" />
+			<g:SimplePanel ui:field="synAlertPanel" addStyleNames="synAlertPanel" />
 		</b:ModalBody>
 		<b:ModalFooter>
 			<b:Button ui:field="cancelButton" type="LINK">Cancel</b:Button>

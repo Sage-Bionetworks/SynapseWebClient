@@ -50,14 +50,13 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
     private String confirmButtonCopy;
 
     @Inject
-    public EntityFinderV2Impl(EntityFinderV2View view, GlobalApplicationState globalApplicationState, SynapseJavascriptClient jsClient, SynapseAlert synAlert) {
+    public EntityFinderV2Impl(EntityFinderV2View view, GlobalApplicationState globalApplicationState, SynapseJavascriptClient jsClient) {
         this.view = view;
         this.globalApplicationState = globalApplicationState;
         this.jsClient = jsClient;
         this.synAlert = synAlert;
         this.selectedEntities = new ArrayList<>();
         view.setPresenter(this);
-        view.setSynAlertWidget(synAlert);
     }
 
     private EntityFinderV2Impl(Builder builder) {
@@ -251,30 +250,30 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
 
     @Override
     public void setSelectedEntity(Reference selected) {
-        synAlert.clear();
+        view.clearError();
         selectedEntities.clear();
         selectedEntities.add(selected);
     }
 
     @Override
     public void setSelectedEntities(List<Reference> selected) {
-        synAlert.clear();
+        view.clearError();
         selectedEntities.clear();
         selectedEntities.addAll(selected);
     }
 
     @Override
     public void clearSelectedEntities() {
-        synAlert.clear();
+        view.clearError();
         selectedEntities.clear();
     }
 
     @Override
     public void okClicked() {
-        synAlert.clear();
+        view.clearError();
         // check for valid selection
         if (selectedEntities == null || selectedEntities.isEmpty()) {
-            synAlert.showError(DisplayConstants.PLEASE_MAKE_SELECTION);
+            view.showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
         } else {
             fireEntitiesSelected();
         }
