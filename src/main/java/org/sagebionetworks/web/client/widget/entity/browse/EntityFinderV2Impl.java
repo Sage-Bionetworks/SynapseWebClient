@@ -113,8 +113,6 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         } catch (WebClientConfigurationException e) {
             synAlert.handleException(e);
         }
-
-        renderComponent();
     }
 
     public static class Builder implements EntityFinder.Builder {
@@ -324,7 +322,7 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
     @Override
     public void show() {
         view.clear();
-        view.show();
+        renderComponent();
     }
 
     @Override
