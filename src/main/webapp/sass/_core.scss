@@ -3428,3 +3428,7 @@ div.border {
     position: relative;
     z-index: 1;
 }
+
+#body .EntityFinderSelectionPane.alert.alert-warning {
+    border-left: none;
+}
