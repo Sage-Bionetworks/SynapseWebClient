@@ -23,7 +23,7 @@ public interface EntityFinderV2View extends SynapseView {
 
 	void renderComponent(EntityFinderScope initialScope, EntityFinder.InitialContainer initialContainer, String initialProject, String initialContainerId, boolean showVersions, boolean multiSelect, EntityFilter selectableTypes, EntityFilter visibleTypesInList, EntityFilter visibleTypesInTree, String selectedCopy, boolean treeOnly);
 
-	void setSynAlertWidget(SynapseAlert synAlert);
+	void clearError();
 
     void setModalTitle(String modalTitle);
 
