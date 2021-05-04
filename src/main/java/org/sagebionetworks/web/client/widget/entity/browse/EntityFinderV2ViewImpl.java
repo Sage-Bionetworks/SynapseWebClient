@@ -4,7 +4,6 @@ import static org.sagebionetworks.web.client.utils.JavaScriptArrayUtils.convertT
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.gwtbootstrap3.client.ui.Button;
@@ -171,13 +170,6 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 	@Override
 	public void clearError() {
 		synAlert.clear();
-	}
-
-	@Override
-	public void show() {
-		// render component will show modal
-		presenter.renderComponent();
-		helpWidget.focus();
 	}
 
 	@Override
