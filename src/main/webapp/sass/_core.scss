@@ -3432,3 +3432,11 @@ div.border {
 #body .EntityFinderSelectionPane.alert.alert-warning {
     border-left: none;
 }
+
+.entityFinder .synAlertPanel {
+    display: flex;
+    > * {
+        width: 600px;
+        flex-grow: 1;
+    }
+}
