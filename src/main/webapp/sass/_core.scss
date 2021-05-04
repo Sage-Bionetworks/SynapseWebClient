@@ -225,9 +225,6 @@ end sticky footer
 		padding-left: 0px;
 		min-width: 27px;
 	}
-	input[type="checkbox"], input[type="radio"] {
-		display:none;
-	}
 
 	.radio {		
 		flex-wrap: nowrap;
@@ -254,6 +251,13 @@ end sticky footer
 		margin-right: 5px;		
 		flex-shrink: 0;
 	}
+
+    .checkbox:focus-within > label::before,
+    .radio:focus-within::before,
+    .radio-inline:focus-within::before {
+        box-shadow: 0px 0px 2px 2px $synapse-blue;
+    }
+
 	
 	.radio::before {
 		border-radius: 50%;
