@@ -34,6 +34,8 @@ import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
+
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -466,6 +468,9 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			for (String principalId : originalPrincipalIdSet) {
 				newPrincipalIdSet.remove(principalId);
 			}
+			// SWC-5576: don't send a notification from the current user to the current user about the change
+			newPrincipalIdSet.remove(getCurrentUserId());
+			
 			// never try to notify all users
 			newPrincipalIdSet.remove(publicPrincipalIds.getAnonymousUserPrincipalId().toString());
 			newPrincipalIdSet.remove(publicPrincipalIds.getAuthenticatedAclPrincipalId().toString());
