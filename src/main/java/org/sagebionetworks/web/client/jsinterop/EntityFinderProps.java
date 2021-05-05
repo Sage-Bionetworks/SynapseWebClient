@@ -55,13 +55,6 @@ public class EntityFinderProps extends ReactComponentProps {
             String selectedCopy,
             boolean treeOnly
     ) {
-        if (sessionToken == null) {
-            throw new WebClientConfigurationException("sessionToken is null");
-        }
-        if (onSelectedChange == null) {
-            throw new WebClientConfigurationException("onSelectedChange is null");
-        }
-
         EntityFinderProps props = new EntityFinderProps();
         props.sessionToken = sessionToken;
         props.onSelectedChange = onSelectedChange;
