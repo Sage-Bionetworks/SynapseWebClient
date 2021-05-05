@@ -19,7 +19,7 @@ Using JsInterop to call your React component can be summarized in these basic st
 
 ### Create a Prop Class
 
-Create a class in `org.sagebionetworks.web.client.jsinterop` that matches your prop type. You want to ensure that the class is annotated with `@JsType`, which will ensure that the class is compatible with the JavaScript runtime environment. Your class should also extend [ReactComponentProps](src/main/java/org/sagebionetworks/web/client/jsinterop/ReactComponentProps.java), which just nominally indicates that this class is used to represent a JsInterop prop type.  
+Create a class in `org.sagebionetworks.web.client.jsinterop` that matches your prop type. You want to ensure that the class is annotated with `@JsType`, which will ensure that the class is compatible with the JavaScript runtime environment. Your class should also extend [ReactComponentProps](../src/main/java/org/sagebionetworks/web/client/jsinterop/ReactComponentProps.java), which just nominally indicates that this class is used to represent a JsInterop prop type.  
 
 As a convention, we implement a static `create` method on these types to make it easier to instantiate an object. These methods have the `@JsOverlay` annotation. `@JsOverlay` methods are only callable from Java, so you could do light validation here, but note some JsInterop constraints are still present. 
 
@@ -34,7 +34,7 @@ Make sure you specify your prop type in the type parameter, and also make sure t
 
 ### Add a ReactComponentDiv to your View
 
-While you can append your React component to any element, we have a [ReactComponentDiv](src/main/java/org/sagebionetworks/web/client/widget/ReactComponentDiv.java) widget that methods specifically for unmounting and rerendering a React component. Add this to your View in code or `*.ui.xml` file, and make sure you can reference it for the next step.
+While you can append your React component to any element, we have a [ReactComponentDiv](../src/main/java/org/sagebionetworks/web/client/widget/ReactComponentDiv.java) widget that methods specifically for unmounting and rerendering a React component. Add this to your View in code or `*.ui.xml` file, and make sure you can reference it for the next step.
 
 ### Render the element
 
