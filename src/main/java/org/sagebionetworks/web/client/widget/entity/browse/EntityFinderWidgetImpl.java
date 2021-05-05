@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.exceptions.WebClientConfigurationException;
+import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
@@ -24,15 +25,15 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Presenter, IsWidget {
-    private EntityFinderV2View view;
+public class EntityFinderWidgetImpl implements EntityFinderWidget, EntityFinderWidgetView.Presenter, IsWidget {
+    private EntityFinderWidgetView view;
     private List<Reference> selectedEntities;
     GlobalApplicationState globalApplicationState;
     private SynapseJavascriptClient jsClient;
     private SynapseAlert synAlert;
 
     private boolean multiSelect;
-    private InitialContainer initialContainer;
+    private EntityFinderWidget.InitialContainer initialContainer;
     private EntityFinderScope initialScope;
 
     private boolean showVersions;
@@ -40,8 +41,8 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
     private EntityFilter selectableTypes;
     private EntityFilter visibleTypesInTree;
     private boolean treeOnly;
-    private SelectedHandler<Reference> selectedHandler;
-    private SelectedHandler<List<Reference>> selectedMultiHandler;
+    private EntityFinderWidget.SelectedHandler<Reference> selectedHandler;
+    private EntityFinderWidget.SelectedHandler<List<Reference>> selectedMultiHandler;
 
 
     private String modalTitle;
@@ -50,7 +51,7 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
     private String confirmButtonCopy;
 
     @Inject
-    public EntityFinderV2Impl(EntityFinderV2View view, GlobalApplicationState globalApplicationState, SynapseJavascriptClient jsClient) {
+    public EntityFinderWidgetImpl(EntityFinderWidgetView view, GlobalApplicationState globalApplicationState, SynapseJavascriptClient jsClient) {
         this.view = view;
         this.globalApplicationState = globalApplicationState;
         this.jsClient = jsClient;
@@ -59,7 +60,7 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         view.setPresenter(this);
     }
 
-    private EntityFinderV2Impl(Builder builder) {
+    private EntityFinderWidgetImpl(Builder builder) {
         this.selectedEntities = new ArrayList<>();
 
         // Dependencies injected into the builder
@@ -115,15 +116,15 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         }
     }
 
-    public static class Builder implements EntityFinder.Builder {
-        private EntityFinderV2View view;
+    public static class Builder implements EntityFinderWidget.Builder {
+        private EntityFinderWidgetView view;
         GlobalApplicationState globalApplicationState;
         private SynapseJavascriptClient jsClient;
         private SynapseAlert synAlert;
 
-        private SelectedHandler<Reference> selectedHandler = (selected, finder) -> {
+        private EntityFinderWidget.SelectedHandler<Reference> selectedHandler = (selected, finder) -> {
         };
-        private SelectedHandler<List<Reference>> selectedMultiHandler = (selected, finder) -> {
+        private EntityFinderWidget.SelectedHandler<List<Reference>> selectedMultiHandler = (selected, finder) -> {
         };
 
         private boolean showVersions = false;
@@ -133,7 +134,7 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         boolean treeOnly = false;
 
         private boolean multiSelect = false;
-        private InitialContainer initialContainer = InitialContainer.NONE;
+        private EntityFinderWidget.InitialContainer initialContainer = EntityFinderWidget.InitialContainer.NONE;
 
         private EntityFinderScope initialScope = EntityFinderScope.CREATED_BY_ME;
         private String modalTitle = "Find in Synapse";
@@ -143,7 +144,7 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         private String helpMarkdown = "Finding items in Synapse can be done by either “browsing”, “searching,” or directly entering the Synapse ID.&#10;Alternatively, navigate to the desired location in the current project, favorite projects or projects you own.";
 
         @Inject
-        public Builder(EntityFinderV2View view, GlobalApplicationState globalApplicationState, SynapseJavascriptClient jsClient, SynapseAlert synAlert) {
+        public Builder(EntityFinderWidgetView view, GlobalApplicationState globalApplicationState, SynapseJavascriptClient jsClient, SynapseAlert synAlert) {
             this.view = view;
             this.globalApplicationState = globalApplicationState;
             this.jsClient = jsClient;
@@ -151,96 +152,96 @@ public class EntityFinderV2Impl implements EntityFinder, EntityFinderV2View.Pres
         }
 
         @Override
-        public EntityFinderV2Impl build() {
-            return new EntityFinderV2Impl(this);
+        public EntityFinderWidgetImpl build() {
+            return new EntityFinderWidgetImpl(this);
         }
 
         @Override
-        public EntityFinder.Builder setMultiSelect(boolean multiSelect) {
+        public EntityFinderWidget.Builder setMultiSelect(boolean multiSelect) {
             this.multiSelect = multiSelect;
             return this;
         }
 
         @Override
-        public EntityFinder.Builder setInitialContainer(InitialContainer initialContainer) {
+        public EntityFinderWidget.Builder setInitialContainer(EntityFinderWidget.InitialContainer initialContainer) {
             this.initialContainer = initialContainer;
             return this;
         }
 
         @Override
-        public EntityFinder.Builder setSelectedHandler(SelectedHandler<Reference> handler) {
+        public EntityFinderWidget.Builder setSelectedHandler(EntityFinderWidget.SelectedHandler<Reference> handler) {
             this.selectedHandler = handler;
             return this;
         }
 
         @Override
-        public EntityFinder.Builder setSelectedMultiHandler(SelectedHandler<List<Reference>> handler) {
+        public EntityFinderWidget.Builder setSelectedMultiHandler(EntityFinderWidget.SelectedHandler<List<Reference>> handler) {
             this.selectedMultiHandler = handler;
             return this;
         }
 
         @Override
-        public EntityFinder.Builder setSelectableTypes(EntityFilter selectableFilter) {
+        public EntityFinderWidget.Builder setSelectableTypes(EntityFilter selectableFilter) {
             this.selectableTypes = selectableFilter;
             return this;
         }
 
         @Override
-        public EntityFinder.Builder setVisibleTypesInList(EntityFilter visibleFilter) {
+        public EntityFinderWidget.Builder setVisibleTypesInList(EntityFilter visibleFilter) {
             this.visibleTypesInList = visibleFilter;
             return this;
         }
 
         @Override
-        public EntityFinder.Builder setVisibleTypesInTree(EntityFilter visibleTypesInTree) {
+        public EntityFinderWidget.Builder setVisibleTypesInTree(EntityFilter visibleTypesInTree) {
             this.visibleTypesInTree = visibleTypesInTree;
             return this;
         }
 
         @Override
-        public EntityFinder.Builder setShowVersions(boolean showVersions) {
+        public EntityFinderWidget.Builder setShowVersions(boolean showVersions) {
             this.showVersions = showVersions;
             return this;
         }
 
         @Override
-        public EntityFinder.Builder setModalTitle(String modalTitle) {
+        public EntityFinderWidget.Builder setModalTitle(String modalTitle) {
             this.modalTitle = modalTitle;
             return this;
         }
 
         @Override
-        public EntityFinder.Builder setPromptCopy(String promptCopy) {
+        public EntityFinderWidget.Builder setPromptCopy(String promptCopy) {
             this.promptCopy = promptCopy;
             return this;
         }
 
         @Override
-        public EntityFinder.Builder setHelpMarkdown(String helpMarkdown) {
+        public EntityFinderWidget.Builder setHelpMarkdown(String helpMarkdown) {
             this.helpMarkdown = helpMarkdown;
             return this;
         }
 
         @Override
-        public EntityFinder.Builder setSelectedCopy(String selectedCopy) {
+        public EntityFinderWidget.Builder setSelectedCopy(String selectedCopy) {
             this.selectedCopy = selectedCopy;
             return this;
         }
 
         @Override
-        public EntityFinder.Builder setInitialScope(EntityFinderScope initialScope) {
+        public EntityFinderWidget.Builder setInitialScope(EntityFinderScope initialScope) {
             this.initialScope = initialScope;
             return this;
         }
 
         @Override
-        public EntityFinder.Builder setConfirmButtonCopy(String confirmButtonCopy) {
+        public EntityFinderWidget.Builder setConfirmButtonCopy(String confirmButtonCopy) {
             this.confirmButtonCopy = confirmButtonCopy;
             return this;
         }
 
         @Override
-        public EntityFinder.Builder setTreeOnly(boolean treeOnly) {
+        public EntityFinderWidget.Builder setTreeOnly(boolean treeOnly) {
             this.treeOnly = treeOnly;
             return this;
         }

@@ -25,7 +25,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetView;
@@ -39,9 +39,9 @@ public class EntityContainerListWidgetTest {
 
 	@Mock
 	EntityContainerListWidgetView mockView;
-	EntityFinder.Builder mockEntityFinderBuilder;
+	EntityFinderWidget.Builder mockEntityFinderBuilder;
 	@Mock
-	EntityFinder mockEntityFinder;
+    EntityFinderWidget mockEntityFinder;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
@@ -57,7 +57,7 @@ public class EntityContainerListWidgetTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		mockEntityFinderBuilder = mock(EntityFinder.Builder.class, new SelfReturningAnswer());
+		mockEntityFinderBuilder = mock(EntityFinderWidget.Builder.class, new SelfReturningAnswer());
 		when(mockEntityFinderBuilder.build()).thenReturn(mockEntityFinder);
 		widget = new EntityContainerListWidget(mockView, mockEntityFinderBuilder, mockSynapseJavascriptClient, mockSynapseAlert);
 		when(mockEntityHeader.getId()).thenReturn(headerId);
@@ -96,7 +96,7 @@ public class EntityContainerListWidgetTest {
 
 		boolean showVersions = false;
 		verify(mockEntityFinderBuilder).setMultiSelect(true);
-		verify(mockEntityFinderBuilder).setSelectedMultiHandler(any(EntityFinder.SelectedHandler.class));
+		verify(mockEntityFinderBuilder).setSelectedMultiHandler(any(EntityFinderWidget.SelectedHandler.class));
 		verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.CONTAINER);
 		verify(mockEntityFinderBuilder).setShowVersions(showVersions);
 		verify(mockEntityFinderBuilder).build();
@@ -113,7 +113,7 @@ public class EntityContainerListWidgetTest {
 
 		boolean showVersions = false;
 		verify(mockEntityFinderBuilder).setMultiSelect(true);
-		verify(mockEntityFinderBuilder).setSelectedMultiHandler(any(EntityFinder.SelectedHandler.class));
+		verify(mockEntityFinderBuilder).setSelectedMultiHandler(any(EntityFinderWidget.SelectedHandler.class));
 		verify(mockEntityFinderBuilder).setSelectableTypes(EntityFilter.PROJECT);
 		verify(mockEntityFinderBuilder).setShowVersions(showVersions);
 

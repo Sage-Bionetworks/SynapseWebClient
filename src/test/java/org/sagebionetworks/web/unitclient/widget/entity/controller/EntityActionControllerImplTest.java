@@ -106,7 +106,7 @@ import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerView;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
@@ -161,9 +161,9 @@ public class EntityActionControllerImplTest {
 	EditFileMetadataModalWidget mockEditFileMetadataModalWidget;
 	@Mock
 	EditProjectMetadataModalWidget mockEditProjectMetadataModalWidget;
-	EntityFinder.Builder mockEntityFinderBuilder;
+	EntityFinderWidget.Builder mockEntityFinderBuilder;
 	@Mock
-	EntityFinder mockEntityFinder;
+    EntityFinderWidget mockEntityFinder;
 	@Mock
 	EvaluationSubmitter mockSubmitter;
 	@Mock
@@ -234,7 +234,7 @@ public class EntityActionControllerImplTest {
 	@Mock
 	SynapseProperties mockSynapseProperties;
 	@Captor
-	ArgumentCaptor<EntityFinder.SelectedHandler<Reference>> entityFinderSelectedHandlerCaptor;
+	ArgumentCaptor<EntityFinderWidget.SelectedHandler<Reference>> entityFinderSelectedHandlerCaptor;
 	@Captor
 	ArgumentCaptor<CallbackP<List<String>>> callbackListStringCaptor;
 	@Captor
@@ -252,7 +252,7 @@ public class EntityActionControllerImplTest {
 
 	@Before
 	public void before() {
-		mockEntityFinderBuilder = mock(EntityFinder.Builder.class, new SelfReturningAnswer());
+		mockEntityFinderBuilder = mock(EntityFinderWidget.Builder.class, new SelfReturningAnswer());
 
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
@@ -321,7 +321,7 @@ public class EntityActionControllerImplTest {
 			@Override
 			public Void answer(InvocationOnMock invocation) throws Throwable {
 				verify(mockEntityFinderBuilder).setSelectedHandler(entityFinderSelectedHandlerCaptor.capture());
-				EntityFinder.SelectedHandler<Reference> handler = entityFinderSelectedHandlerCaptor.getValue();
+				EntityFinderWidget.SelectedHandler<Reference> handler = entityFinderSelectedHandlerCaptor.getValue();
 				handler.onSelected(selected, mockEntityFinder);
 				return null;
 			}
@@ -1273,7 +1273,7 @@ public class EntityActionControllerImplTest {
 		verify(mockEntityFinderBuilder)
 				.setShowVersions(false);
 		verify(mockEntityFinderBuilder)
-				.setSelectedHandler(any(EntityFinder.SelectedHandler.class));
+				.setSelectedHandler(any(EntityFinderWidget.SelectedHandler.class));
 		verify(mockEntityFinderBuilder).build();
 		verify(mockEntityFinder).show();
 		verify(mockEntityFinder).hide();

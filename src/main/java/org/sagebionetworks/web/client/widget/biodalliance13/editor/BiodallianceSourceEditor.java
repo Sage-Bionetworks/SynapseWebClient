@@ -8,12 +8,12 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -29,12 +29,12 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 	// view, may not be set if only using this class to pass data around
 	BiodallianceSourceEditorView view;
 	private BiodallianceSource source;
-	EntityFinder entityFinder, indexEntityFinder;
+	EntityFinderWidget entityFinder, indexEntityFinder;
 	Callback selectionChangedCallback;
 	SynapseJavascriptClient jsClient;
 
 	@Inject
-	public BiodallianceSourceEditor(BiodallianceSourceEditorView view, EntityFinder.Builder entityFinderBuilder, BiodallianceSource source, SynapseJavascriptClient jsClient) {
+	public BiodallianceSourceEditor(BiodallianceSourceEditorView view, EntityFinderWidget.Builder entityFinderBuilder, BiodallianceSource source, SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.source = source;
 		this.jsClient = jsClient;
@@ -43,7 +43,7 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 
 		this.entityFinder = entityFinderBuilder
 				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
-				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
+				.setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
 				.setModalTitle("Find Genome Browser File")
 				.setHelpMarkdown("Search or Browse Synapse to find supported Files for this Genome Browser")
 				.setPromptCopy("Find File to add a track")

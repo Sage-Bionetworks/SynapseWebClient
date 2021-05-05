@@ -8,9 +8,9 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -66,13 +66,13 @@ public class EvaluationSubmissionConfigViewImpl implements EvaluationSubmissionC
 	Widget widget;
 
 	@Inject
-	public EvaluationSubmissionConfigViewImpl(EvaluationSubmissionConfigViewImplUiBinder binder, EntityFinder.Builder entityFinderBuilder, CookieProvider cookies) {
+	public EvaluationSubmissionConfigViewImpl(EvaluationSubmissionConfigViewImplUiBinder binder, EntityFinderWidget.Builder entityFinderBuilder, CookieProvider cookies) {
 		widget = binder.createAndBindUi(this);
 		this.cookies = cookies;
 		findProjectButton.addClickHandler(event -> {
 			entityFinderBuilder
 					.setInitialScope(EntityFinderScope.ALL_PROJECTS)
-					.setInitialContainer(EntityFinder.InitialContainer.SCOPE)
+					.setInitialContainer(EntityFinderWidget.InitialContainer.SCOPE)
 					.setModalTitle("Find Project")
 					.setHelpMarkdown("Search or Browse Synapse to find a Project to display a Challenge Evaluation submission button")
 					.setPromptCopy("Find a Project to create a submission button")

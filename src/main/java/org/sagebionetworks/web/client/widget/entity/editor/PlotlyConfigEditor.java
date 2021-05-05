@@ -20,14 +20,14 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
@@ -49,7 +49,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	private static final String QUERY_OTHER_COLUMNS_REG_EX = "select\\s+[\"']?([a-zA-Z0-9_ ]+)[\"']?[,]{1}(.+)from";
 	private static final RegExp Y_COLUMNS_PATTERN = RegExp.compile(QUERY_OTHER_COLUMNS_REG_EX, "i");
 
-	EntityFinder finder;
+	EntityFinderWidget finder;
 	String xColumnName;
 	List<String> yColumnsList = new ArrayList<>();
 	SynapseAlert synAlert;
@@ -63,7 +63,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	SynapseJavascriptClient jsClient;
 
 	@Inject
-	public PlotlyConfigEditor(final PlotlyConfigView view, EntityFinder.Builder entityFinderBuilder, SynapseAlert synAlert, Button showHideAdvancedButton, SynapseJavascriptClient jsClient) {
+	public PlotlyConfigEditor(final PlotlyConfigView view, EntityFinderWidget.Builder entityFinderBuilder, SynapseAlert synAlert, Button showHideAdvancedButton, SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.jsClient = jsClient;
@@ -90,7 +90,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 				.setHelpMarkdown("Search or Browse Synapse to find a Table or View to display in the Simple Plot")
 				.setPromptCopy("Find a Table or View to Display in the Simple Plot")
 				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
-				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
+				.setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
 				.setVisibleTypesInTree(EntityFilter.PROJECT)
 				.setMultiSelect(false)
 				.setSelectableTypes(EntityFilter.ALL_TABLES)

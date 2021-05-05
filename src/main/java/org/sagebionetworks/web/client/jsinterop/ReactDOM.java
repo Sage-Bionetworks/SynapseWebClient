@@ -7,5 +7,7 @@ import jsinterop.annotations.JsType;
 public class ReactDOM {
 	public static native ReactElement render(ReactElement element, Element container);
 
+	public static native ReactElement render(ReactElement element, Element container, EvaluationCardProps.Callback callback);
+
 	public static native boolean unmountComponentAtNode(Element container);
 }

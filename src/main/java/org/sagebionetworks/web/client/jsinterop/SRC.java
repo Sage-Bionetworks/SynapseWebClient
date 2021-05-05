@@ -7,6 +7,7 @@ import jsinterop.annotations.JsType;
 public class SRC {
 	@JsType(isNative = true)
 	public static class SynapseComponents{
+		public static ReactFunctionComponent<EntityFinderProps> EntityFinder;
 		public static ReactFunctionComponent<EvaluationCardProps> EvaluationCard;
 		public static ReactFunctionComponent<EvaluationEditorPageProps> EvaluationEditorPage;
 	}

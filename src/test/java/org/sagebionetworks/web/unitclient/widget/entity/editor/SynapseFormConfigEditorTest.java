@@ -16,7 +16,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.entity.editor.SynapseFormConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.SynapseFormConfigView;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -28,16 +28,16 @@ public class SynapseFormConfigEditorTest {
 	@Mock
 	SynapseFormConfigView mockView;
 	@Mock
-	EntityFinder mockEntityFinder;
-	EntityFinder.Builder mockEntityFinderBuilder;
+    EntityFinderWidget mockEntityFinder;
+	EntityFinderWidget.Builder mockEntityFinderBuilder;
 	@Captor
-	ArgumentCaptor<EntityFinder.SelectedHandler> captor;
+	ArgumentCaptor<EntityFinderWidget.SelectedHandler> captor;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		mockEntityFinderBuilder = mock(EntityFinder.Builder.class, new SelfReturningAnswer());
+		mockEntityFinderBuilder = mock(EntityFinderWidget.Builder.class, new SelfReturningAnswer());
 		when(mockEntityFinderBuilder.build()).thenReturn(mockEntityFinder);
 		editor = new SynapseFormConfigEditor(mockView, mockEntityFinderBuilder);
 	}
@@ -52,7 +52,7 @@ public class SynapseFormConfigEditorTest {
 		verify(mockEntityFinderBuilder).setSelectedHandler(captor.capture());
 		verify(mockEntityFinderBuilder).build();
 
-		EntityFinder.SelectedHandler selectedHandler = captor.getValue();
+		EntityFinderWidget.SelectedHandler selectedHandler = captor.getValue();
 		Reference selected = new Reference();
 
 		// invalid selection is handled by the entity finder

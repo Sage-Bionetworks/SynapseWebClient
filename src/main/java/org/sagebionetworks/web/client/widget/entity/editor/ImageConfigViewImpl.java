@@ -11,9 +11,9 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -76,7 +76,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	private ImageParamsPanel uploadParamsPanel, synapseParamsPanel;
 
 	@Inject
-	public ImageConfigViewImpl(ImageConfigViewImplUiBinder binder, SageImageBundle sageImageBundle, EntityFinder.Builder entityFinderBuilder, ClientCache clientCache, SynapseJSNIUtils synapseJSNIUtils, ImageParamsPanel synapseParamsPanel, ImageParamsPanel uploadParamsPanel) {
+	public ImageConfigViewImpl(ImageConfigViewImplUiBinder binder, SageImageBundle sageImageBundle, EntityFinderWidget.Builder entityFinderBuilder, ClientCache clientCache, SynapseJSNIUtils synapseJSNIUtils, ImageParamsPanel synapseParamsPanel, ImageParamsPanel uploadParamsPanel) {
 		widget = binder.createAndBindUi(this);
 		this.sageImageBundle = sageImageBundle;
 		this.clientCache = clientCache;
@@ -92,7 +92,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 				.setHelpMarkdown("Search or Browse Synapse to find an image file to insert into the Wiki page")
 				.setPromptCopy("Find an image to insert into this Wiki")
 				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
-				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
+				.setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
 				.setMultiSelect(false)
 				.setSelectableTypes(EntityFilter.FILE)
 				.setShowVersions(true)

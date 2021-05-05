@@ -22,9 +22,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityRefProvEntryView;
-import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEntry;
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWidgetView;
@@ -42,9 +41,9 @@ public class ProvenanceListWidgetTest {
 	@Mock
 	PortalGinInjector mockInjector;
 
-	EntityFinder.Builder mockEntityFinderBuilder;
+	EntityFinderWidget.Builder mockEntityFinderBuilder;
 	@Mock
-	EntityFinder mockEntityFinder;
+    EntityFinderWidget mockEntityFinder;
 
 	@Mock
 	ProvenanceURLDialogWidget mockUrlDialog;
@@ -62,7 +61,7 @@ public class ProvenanceListWidgetTest {
 
 
 	@Captor
-	ArgumentCaptor<EntityFinder.SelectedHandler<List<Reference>>> captor;
+	ArgumentCaptor<EntityFinderWidget.SelectedHandler<List<Reference>>> captor;
 
 	String urlName = "test";
 	String urlAddress = "test.com";
@@ -72,7 +71,7 @@ public class ProvenanceListWidgetTest {
 
 	@Before
 	public void setup() {
-		mockEntityFinderBuilder = mock(EntityFinder.Builder.class, new SelfReturningAnswer());
+		mockEntityFinderBuilder = mock(EntityFinderWidget.Builder.class, new SelfReturningAnswer());
 		when(mockEntityFinderBuilder.build()).thenReturn(mockEntityFinder);
 
 		presenter = new ProvenanceListWidget(mockView, mockInjector, mockEntityFinderBuilder);

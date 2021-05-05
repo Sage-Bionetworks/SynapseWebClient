@@ -5,7 +5,7 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -28,12 +28,12 @@ public class CytoscapeConfigViewImpl implements CytoscapeConfigView {
 	@UiField
 	TextBox displayHeightField;
 
-	EntityFinder cyJsFinder, styleFinder;
+	EntityFinderWidget cyJsFinder, styleFinder;
 
 	Widget widget;
 
 	@Inject
-	public CytoscapeConfigViewImpl(CytoscapeConfigViewImplUiBinder binder, EntityFinder.Builder entityFinderBuilder) {
+	public CytoscapeConfigViewImpl(CytoscapeConfigViewImplUiBinder binder, EntityFinderWidget.Builder entityFinderBuilder) {
 		widget = binder.createAndBindUi(this);
 
 		this.cyJsFinder = entityFinderBuilder

@@ -10,14 +10,12 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -29,10 +27,10 @@ public class ImportTableViewColumnsButton implements IsWidget {
 	public PortalGinInjector ginInjector;
 	SynapseJavascriptClient jsClient;
 	CallbackP<List<ColumnModel>> callback;
-	EntityFinder finder;
+	EntityFinderWidget finder;
 
 	@Inject
-	public ImportTableViewColumnsButton(Button button, final EntityFinder.Builder entityFinderBuilder, SynapseJavascriptClient jsClient) {
+	public ImportTableViewColumnsButton(Button button, final EntityFinderWidget.Builder entityFinderBuilder, SynapseJavascriptClient jsClient) {
 		this.button = button;
 		this.jsClient = jsClient;
 		button.setText(BUTTON_TEXT);
@@ -41,7 +39,7 @@ public class ImportTableViewColumnsButton implements IsWidget {
 		button.setIcon(IconType.ARROW_CIRCLE_O_DOWN);
 		this.finder = entityFinderBuilder
 				.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
-				.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
+				.setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
 				.setModalTitle("Find Table")
 				.setHelpMarkdown("Search or Browse Synapse to find an existing Table in order to import columns into this Table")
 				.setPromptCopy("Find Tables to import columns")

@@ -9,10 +9,10 @@ import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder.SelectedHandler;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget.SelectedHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -21,8 +21,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityContainerListWidget implements EntityContainerListWidgetView.Presenter, IsWidget {
-	EntityFinder finder;
-	EntityFinder.Builder entityFinderBuilder;
+	EntityFinderWidget finder;
+	EntityFinderWidget.Builder entityFinderBuilder;
 	EntityContainerListWidgetView view;
 	SynapseJavascriptClient jsClient;
 	List<String> entityIds;
@@ -32,7 +32,7 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 	SelectedHandler<List<Reference>> selectionHandler;
 
 	@Inject
-	public EntityContainerListWidget(EntityContainerListWidgetView view, EntityFinder.Builder entityFinderBuilder, SynapseJavascriptClient jsClient, SynapseAlert synAlert) {
+	public EntityContainerListWidget(EntityContainerListWidgetView view, EntityFinderWidget.Builder entityFinderBuilder, SynapseJavascriptClient jsClient, SynapseAlert synAlert) {
 		this.view = view;
 		this.entityFinderBuilder = entityFinderBuilder;
 		this.jsClient = jsClient;
@@ -42,7 +42,7 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 		entityIds = new ArrayList<String>();
 		selectionHandler = new SelectedHandler<List<Reference>>() {
 			@Override
-			public void onSelected(List<Reference> selected, EntityFinder finder) {
+			public void onSelected(List<Reference> selected, EntityFinderWidget finder) {
 				for (Reference ref : selected) {
 					onAddProject(ref.getTargetId());
 				}
@@ -78,7 +78,7 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 			String friendlyEntityType = "Project View";
 			entityFinderBuilder
 					.setInitialScope(EntityFinderScope.ALL_PROJECTS)
-					.setInitialContainer(EntityFinder.InitialContainer.SCOPE)
+					.setInitialContainer(EntityFinderWidget.InitialContainer.SCOPE)
 					.setSelectableTypes(EntityFilter.PROJECT)
 					.setHelpMarkdown("Search or Browse Synapse to find " + EntityTypeUtils.getDisplayName(EntityType.project) + "s to put into this " + friendlyEntityType)
 					.setPromptCopy("Find " + EntityTypeUtils.getDisplayName(EntityType.project) + "s for this View");
@@ -86,7 +86,7 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 			String friendlyEntityType = "File View";
 			entityFinderBuilder
 					.setInitialScope(EntityFinderScope.CURRENT_PROJECT)
-					.setInitialContainer(EntityFinder.InitialContainer.PROJECT)
+					.setInitialContainer(EntityFinderWidget.InitialContainer.PROJECT)
 					.setSelectableTypes(EntityFilter.CONTAINER)
 					.setHelpMarkdown("Search or Browse Synapse to find " + EntityTypeUtils.getDisplayName(EntityType.folder) + "s containing items for this " + friendlyEntityType)
 					.setPromptCopy("Find and select " + EntityTypeUtils.getDisplayName(EntityType.folder) + "s to add their contents");

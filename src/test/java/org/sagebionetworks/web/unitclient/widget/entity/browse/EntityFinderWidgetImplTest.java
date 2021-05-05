@@ -27,27 +27,27 @@ import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.exceptions.WebClientConfigurationException;
+import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderScope;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderV2Impl;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderV2View;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidget;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidgetImpl;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 @RunWith(MockitoJUnitRunner.class)
-public class EntityFinderV2ImplTest {
+public class EntityFinderWidgetImplTest {
 
     @Mock
-    EntityFinder.SelectedHandler<Reference> singleHandler;
+    EntityFinderWidget.SelectedHandler<Reference> singleHandler;
 
     @Mock
-    EntityFinder.SelectedHandler<List<Reference>> multiHandler;
+    EntityFinderWidget.SelectedHandler<List<Reference>> multiHandler;
 
     @Mock
-    EntityFinderV2View mockView;
+    EntityFinderWidgetView mockView;
 
     @Mock
     GlobalApplicationState mockGlobalState;
@@ -65,9 +65,9 @@ public class EntityFinderV2ImplTest {
     ArgumentCaptor<AsyncCallback<EntityBundle>> getBundleCaptor;
 
     @InjectMocks
-    EntityFinderV2Impl.Builder builder;
+    EntityFinderWidgetImpl.Builder builder;
 
-    EntityFinderV2Impl entityFinder;
+    EntityFinderWidgetImpl entityFinder;
 
     @Test
     public void testBuildAndRender() {
@@ -78,7 +78,7 @@ public class EntityFinderV2ImplTest {
         EntityFilter visibleTypesInList = EntityFilter.ALL;
         EntityFilter visibleTypesInTree = EntityFilter.PROJECT;
         EntityFinderScope scope = EntityFinderScope.ALL_PROJECTS;
-        EntityFinder.InitialContainer initialContainer = EntityFinder.InitialContainer.NONE;
+        EntityFinderWidget.InitialContainer initialContainer = EntityFinderWidget.InitialContainer.NONE;
         boolean treeOnly = true;
 
         String title = "Custom modal title";
@@ -116,7 +116,7 @@ public class EntityFinderV2ImplTest {
         // Call under test: show the modal, triggering rendering
         entityFinder.show();
 
-        verify(mockView).renderComponent(scope, EntityFinder.InitialContainer.NONE, null, null, showVersions, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selected, treeOnly);
+        verify(mockView).renderComponent(scope, EntityFinderWidget.InitialContainer.NONE, null, null, showVersions, multiSelect, selectableTypes, visibleTypesInList, visibleTypesInTree, selected, treeOnly);
     }
 
     @Test
@@ -151,7 +151,7 @@ public class EntityFinderV2ImplTest {
 
         builder.setSelectableTypes(EntityFilter.ALL);
         builder.setInitialScope(EntityFinderScope.CURRENT_PROJECT);
-        builder.setInitialContainer(EntityFinder.InitialContainer.PARENT);
+        builder.setInitialContainer(EntityFinderWidget.InitialContainer.PARENT);
         entityFinder = builder.build();
 
         // Call under test: showing the modal will trigger finding the current project
@@ -162,7 +162,7 @@ public class EntityFinderV2ImplTest {
         getBundleCaptor.getValue().onSuccess(bundle);
 
 
-        verify(mockView).renderComponent(eq(EntityFinderScope.CURRENT_PROJECT), eq(EntityFinder.InitialContainer.PARENT), eq(projectId), eq(containerId), anyBoolean(), anyBoolean(), any(EntityFilter.class), any(EntityFilter.class), any(EntityFilter.class), anyString(), anyBoolean());
+        verify(mockView).renderComponent(eq(EntityFinderScope.CURRENT_PROJECT), eq(EntityFinderWidget.InitialContainer.PARENT), eq(projectId), eq(containerId), anyBoolean(), anyBoolean(), any(EntityFilter.class), any(EntityFilter.class), any(EntityFilter.class), anyString(), anyBoolean());
     }
 
     @Test
