@@ -137,7 +137,8 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 							presenter.clearSelectedEntities();
 						}
 					}
-				});
+				},
+				() -> modal.show());
 	}
 
 	@Override
@@ -172,14 +173,6 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 	}
 
 	@Override
-	public void show() {
-		// show modal
-		modal.show();
-		presenter.renderComponent();
-		helpWidget.focus();
-	}
-
-	@Override
 	public void hide() {
 		this.jsniUtils.unmountComponentAtNode(entityFinderContainer.getElement());
 		modal.hide();
@@ -210,7 +203,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 		this.okButton.setText(confirmButtonCopy);
 	}
 
-	private static native void _showEntityFinderReactComponent(Element el, String sessionToken, String projectId, String initialContainer, String initialScope, JsArrayString selectableTypes, JsArrayString visibleTypesInList, JsArrayString visibleTypesInTree, boolean showVersions, boolean multiSelect, String selectedCopy, boolean treeOnly, OnSelectCallback onSelectedCallback) /*-{
+	private static native void _showEntityFinderReactComponent(Element el, String sessionToken, String projectId, String initialContainer, String initialScope, JsArrayString selectableTypes, JsArrayString visibleTypesInList, JsArrayString visibleTypesInTree, boolean showVersions, boolean multiSelect, String selectedCopy, boolean treeOnly, OnSelectCallback onSelectedCallback, Runnable onRender) /*-{
 		try {
 			var callback = function(selected) {
 				onSelectedCallback.@org.sagebionetworks.web.client.callback.OnSelectCallback::onSelect(Lcom/google/gwt/core/client/JsArray;)(selected)
@@ -231,7 +224,8 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 			};
 			$wnd.ReactDOM.render(
 				$wnd.React.createElement($wnd.SRC.SynapseComponents.EntityFinder, props, null),
-				el
+				el,
+				function() { onRender.@java.lang.Runnable::run()() }
 			);
 		} catch (err) {
 			console.error(err);

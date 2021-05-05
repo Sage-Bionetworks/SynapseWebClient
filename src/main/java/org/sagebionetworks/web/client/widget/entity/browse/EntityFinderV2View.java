@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.ui.Widget;
 
@@ -16,8 +15,6 @@ public interface EntityFinderV2View extends SynapseView {
 	 * @param presenter
 	 */
 	void setPresenter(Presenter presenter);
-
-	void show();
 
 	void hide();
 
