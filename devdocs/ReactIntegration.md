@@ -41,8 +41,6 @@ While you can append your React component to any element, we have a [ReactCompon
 How you manage updating your widget's view will vary based on the scenario, but when you're ready to render the component, this is all you have to do:
 
 ```java
-import org.sagebionetworks.web.client.jsinterop.SRC;
-
 class MyView {
     void render() {
         MyProps props = props.create(/**/);
