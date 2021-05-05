@@ -13,7 +13,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderProps;
 import org.sagebionetworks.web.client.jsinterop.EntityFinderScope;
-import org.sagebionetworks.web.client.jsinterop.EvaluationCardProps;
 import org.sagebionetworks.web.client.jsinterop.React;
 import org.sagebionetworks.web.client.jsinterop.ReactDOM;
 import org.sagebionetworks.web.client.jsinterop.ReferenceJsObject;
@@ -141,12 +140,11 @@ public class EntityFinderWidgetViewImpl implements EntityFinderWidgetView {
 						treeOnly
 				);
 
-		EvaluationCardProps.Callback callback = () -> modal.show();
 		ReactDOM.render(
 				React.createElement(SRC.SynapseComponents.EntityFinder, props),
-				entityFinderContainer.getElement());//,
-//				callback
-//		);
+				entityFinderContainer.getElement(),
+				() -> modal.show()
+		);
 		modal.show();
 	}
 
