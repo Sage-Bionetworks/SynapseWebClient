@@ -108,7 +108,7 @@
 						<b:Divider />
 						<b:AnchorListItem ui:field="documentationLink"
 							icon="EXTERNAL_LINK" iconFixedWidth="true" iconPosition="RIGHT"
-							href="http://docs.synapse.org">Documentation</b:AnchorListItem>
+							href="http://help.synapse.org">Documentation</b:AnchorListItem>
 						<b:AnchorListItem ui:field="helpForumLink">Help Forum</b:AnchorListItem>
 						<b:AnchorListItem
 							ui:field="emailSynapseSupportLink" icon="ENVELOPE_O"

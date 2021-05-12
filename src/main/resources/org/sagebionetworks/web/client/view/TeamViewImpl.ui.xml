@@ -25,7 +25,7 @@
 					<bh:Div>
 						<w:HelpWidget
 							helpMarkdown="Teams are a way to easily manage groups of users for the purposes of project access, communication, and challenge participation."
-							href="http://docs.synapse.org/articles/teams.html"
+							href="https://help.synapse.org/docs/Teams.1985446029.html"
 							iconStyles="lightGreyText font-size-18 displayInlineBlock"
 							addStyleNames="margin-top-15 margin-bottom-10" placement="LEFT" />
 						<b:DropDown ui:field="dashboardDropdown"

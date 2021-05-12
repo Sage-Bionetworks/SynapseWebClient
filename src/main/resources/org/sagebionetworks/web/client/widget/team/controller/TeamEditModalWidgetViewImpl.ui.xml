@@ -16,7 +16,7 @@
 				addStyleNames="displayInline" />
 			<w:HelpWidget
 				helpMarkdown="Teams are a way to easily manage groups of users for the purposes of project access, communication, and challenge participation."
-				href="http://docs.synapse.org/articles/teams.html"
+				href="https://help.synapse.org/docs/Teams.1985446029.html"
 				addStyleNames="margin-left-5" placement="BOTTOM" />
 		</b:ModalHeader>
 		<b:ModalBody>

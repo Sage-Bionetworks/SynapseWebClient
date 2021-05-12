@@ -22,7 +22,7 @@
 					<bh:Text>Schema</bh:Text>
 					<w:HelpWidget
 						helpMarkdown="Every table has a schema that describes the columns and types of data stored in each column."
-						href="http://docs.synapse.org/articles/tables.html"
+						href="https://help.synapse.org/docs/Tables.2011038095.html"
 						addStyleNames="margin-left-5" />
 				</bh:Div>
 				<g:SimplePanel ui:field="columnDetailsPanel" />

@@ -54,8 +54,8 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 		container.clear();
 
 		HelpWidget helpWidget = new HelpWidget();
-		helpWidget.setHelpMarkdown("##### Sharing Settings: Controls who can view the content.\nBy default, folders and files inherit  the Sharing Settings of the parent folder or project.");
-		helpWidget.setHref(WebConstants.DOCS_URL + "access_controls.html#sharing-setting");
+		helpWidget.setHelpMarkdown("##### Sharing Settings: Controls who can view the content.\nBy default, folders and files inherit the Sharing Settings of the parent folder or project.");
+		helpWidget.setHref(WebConstants.DOCS_URL + "Sharing-Settings-and-Permissions.2024276030.html");
 		container.add(helpWidget.asWidget());
 
 		// add share settings
@@ -83,7 +83,7 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 
 		helpWidget = new HelpWidget();
 		helpWidget.setHelpMarkdown("##### Conditions For Use: Controls how the data can be used.\nBy default, folders and files inherit the Conditions For Use of the parent folder.");
-		helpWidget.setHref(WebConstants.DOCS_URL + "access_controls.html#conditions-for-use");
+		helpWidget.setHref(WebConstants.DOCS_URL + "Conditions-for-Use.2009596938.html");
 		container.add(helpWidget.asWidget());
 
 		container.add(new InlineHTML("<h5 class=\"inline-block margin-right-10\">Access</h5>"));

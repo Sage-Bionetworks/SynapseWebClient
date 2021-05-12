@@ -23,7 +23,7 @@
 					<w:HelpWidget
 						helpMarkdown="A Synapse Qualified Researcher is a Certified User with a validated user profile."
 						text="validated user profile"
-						href="http://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#validated-profile"
+						href="https://help.synapse.org/docs/User-Types.2007072795.html#UserAccountTiers-ValidatedUsers"
 						addMoreInfoStyleNames="font-italic" iconStyles="hide" />
 				</bh:Div>
 				<bh:Div ui:field="peopleSuggestContainer" />

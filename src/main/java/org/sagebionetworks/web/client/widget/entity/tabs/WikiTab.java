@@ -23,7 +23,7 @@ public class WikiTab {
 	public WikiTab(Tab tab, PortalGinInjector ginInjector) {
 		this.ginInjector = ginInjector;
 		this.tab = tab;
-		tab.configure("Wiki", "Build narrative content to describe your project in the Wiki.", WebConstants.DOCS_URL + "wikis.html", EntityArea.WIKI);
+		tab.configure("Wiki", "Build narrative content to describe your project in the Wiki.", WebConstants.DOCS_URL + "Wikis.1975746682.html", EntityArea.WIKI);
 	}
 
 	public void lazyInject() {

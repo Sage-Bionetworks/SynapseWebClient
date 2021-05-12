@@ -16,7 +16,7 @@
 				addStyleNames="displayInline" />
 			<w:HelpWidget
 				helpMarkdown="Certified Users can apply to have their user profile validated. A Synapse user with a Validated Profile is eligible to request access to Bridge data (data collected in research studies conducted via self-guided mobile applications.)"
-				href="http://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#validated-profile"
+				href="https://help.synapse.org/docs/User-Types.2007072795.html#UserAccountTiers-ValidatedUsers"
 				addStyleNames="margin-left-5" placement="BOTTOM" />
 		</b:ModalHeader>
 

@@ -27,8 +27,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class SelfSignAccessRequirementWidget implements SelfSignAccessRequirementWidgetView.Presenter, IsWidget {
-	public static final String GET_VALIDATED_PROFILE_PAGE = "accounts_certified_users_and_profile_validation.html#validated-profile";
-	public static final String GET_CERTIFIED_PAGE = "accounts_certified_users_and_profile_validation.html#certified-users";
+	public static final String GET_VALIDATED_PROFILE_PAGE = "User-Types.2007072795.html#UserAccountTiers-ValidatedUsers";
+	public static final String GET_CERTIFIED_PAGE = "User-Types.2007072795.html#UserAccountTiers-CertifiedUsers";
 	private SelfSignAccessRequirementWidgetView view;
 	SynapseClientAsync synapseClient;
 	DataAccessClientAsync dataAccessClient;

@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * View only widget used to show a help icon (and help text). When clicked, a popover is shown that
  * contains basic help, and a More Info button. When the More Info button is clicked, the browser
- * will open a new tab to the full help documentation (typically to the docs.synapse.org site).
+ * will open a new tab to the full help documentation (typically to the help.synapse.org site).
  * 
  * ## Usage
  * 

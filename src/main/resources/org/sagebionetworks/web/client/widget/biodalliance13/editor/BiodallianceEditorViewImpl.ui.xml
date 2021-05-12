@@ -9,7 +9,7 @@
 	<bh:Div>
 		<bh:Div>
 			<b:Anchor icon="QUESTION_CIRCLE"
-				href="http://docs.synapse.org/articles/genome_browser.html"
+				href="https://help.synapse.org/docs/Genome-Browser.1985183909.html"
 				target="_blank" text="Help me configure" />
 			<b:FieldSet addStyleNames="margin-top-20">
 				<b:FormGroup>

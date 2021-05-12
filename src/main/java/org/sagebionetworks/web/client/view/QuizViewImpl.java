@@ -88,7 +88,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 		tutorialButton1.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent arg0) {
-				DisplayUtils.newWindow(WebConstants.DOCS_URL + "getting_started.html", "", "");
+				DisplayUtils.newWindow(WebConstants.DOCS_URL + "Getting-Started.2055471150.html", "", "");
 			}
 		});
 		submitButton.addClickHandler(new ClickHandler() {

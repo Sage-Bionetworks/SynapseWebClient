@@ -14,7 +14,7 @@
 			</b:PanelBody>
 			<b:PanelFooter>
 				<bh:Span text="Powered by" addStyleNames="margin-right-5" />
-				<b:Anchor href="http://docs.synapse.org/articles/forms.html" target="_blank">Synapse Forms</b:Anchor>
+				<b:Anchor href="https://help.synapse.org/docs/Forms.1985249569.html" target="_blank">Synapse Forms</b:Anchor>
 			</b:PanelFooter>
 		</b:Panel>
 		<bh:Div ui:field="synAlertContainer"/>

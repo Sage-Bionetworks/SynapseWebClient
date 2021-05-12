@@ -56,7 +56,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		this.ginInjector = ginInjector;
 
 		helpWidget.setHelpMarkdown("Learn more about managing access controls and permissions in Synapse.");
-		helpWidget.setHref(WebConstants.DOCS_URL + "access_controls.html");
+		helpWidget.setHref(WebConstants.DOCS_URL + "Conditions-for-Use.2009596938.html");
 		helpWidget.setAddStyleNames("margin-left-5");
 
 		// 'Delete ACL' button

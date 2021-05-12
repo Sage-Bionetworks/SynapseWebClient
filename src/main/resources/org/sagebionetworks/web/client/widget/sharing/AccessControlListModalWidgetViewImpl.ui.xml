@@ -18,7 +18,7 @@
 			<w:HelpWidget
 				helpMarkdown="Sharing settings determine who can access your content, and what kind of access they have. Choose people/teams and define their level of access below. &#10;&#10;_Only Administrators can add, delete, or change access levels for other people._"
 				addStyleNames="margin-left-5" placement="BOTTOM"
-				href="http://docs.synapse.org/articles/access_controls.html" />
+				href="https://help.synapse.org/docs/Sharing-Settings-and-Permissions.2024276030.html" />
 		</b:ModalHeader>
 		<b:ModalBody>
 			<g:SimplePanel ui:field="editorPanel" />
