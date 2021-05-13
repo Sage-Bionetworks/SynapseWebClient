@@ -19,12 +19,6 @@ public class UserDataProvider {
 	static private Logger logger = LogManager.getLogger(UserDataProvider.class);
 
 	/**
-	 * The key used to put the session token in a header.
-	 */
-
-	public static final String SESSION_TOKEN_KEY = "sessionToken";
-
-	/**
 	 * Get the user data from the Cookies of the ThreadLocalRequest. Will return null if the cookie does
 	 * not exist.
 	 * 

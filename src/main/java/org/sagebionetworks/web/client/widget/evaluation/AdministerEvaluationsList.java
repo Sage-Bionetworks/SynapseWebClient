@@ -72,7 +72,7 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Evalua
 		view.clearRows();
 		synAlert.clear();
 		boolean timeInUtc = globalApplicationState.isShowingUTCTime();
-		String sessionToken = authenticationController.getCurrentUserSessionToken();
+		String sessionToken = authenticationController.getCurrentUserAccessToken();
 
 		challengeClient.getSharableEvaluations(entityId, new AsyncCallback<List<Evaluation>>() {
 			@Override

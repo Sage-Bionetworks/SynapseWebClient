@@ -112,12 +112,9 @@ public class BulkPresenterProxy extends AbstractActivity {
 	@Override
 	public void start(final AcceptsOneWidget panel, final EventBus eventBus) {
 		globalApplicationState.checkVersionCompatibility(versionCheckCallback);
-		if (!(place instanceof LoginPlace)) {
-			// Note, SessionDetector checks for a user change every 10 seconds (and on initial app load). Do not
-			// call authController.checkForUserChange();
-			// refresh session
-			authController.refreshSessionToken();
-		}
+		// Note, SessionDetector checks for a user change every 10 seconds (and on initial app load). Do not
+		// call authController.checkForUserChange();
+		// No way to refresh an access token.
 		globalApplicationState.setIsEditing(false);
 		// detect prefetch
 		if (panel == null && eventBus == null)

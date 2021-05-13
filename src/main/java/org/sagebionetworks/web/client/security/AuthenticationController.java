@@ -15,18 +15,18 @@ public interface AuthenticationController {
 	public void loginUser(String username, String password, AsyncCallback<UserProfile> callback);
 
 	/**
-	 * sets a new session token
+	 * sets a new access token
 	 * 
 	 * @param token
 	 */
-	void setNewSessionToken(String token, final AsyncCallback<UserProfile> callback);
+	void setNewAccessToken(String token, final AsyncCallback<UserProfile> callback);
 
 	/**
 	 * attempts to load from an existing session cookie
 	 * 
 	 * @param callback
 	 */
-	void initializeFromExistingSessionCookie(final AsyncCallback<UserProfile> callback);
+	void initializeFromExistingAccessCookie(final AsyncCallback<UserProfile> callback);
 
 	/**
 	 * Terminates the session of the current user
@@ -53,7 +53,7 @@ public interface AuthenticationController {
 	 * 
 	 * @return
 	 */
-	public String getCurrentUserSessionToken();
+	public String getCurrentUserAccessToken();
 
 	/**
 	 * Get the UserProfile object
@@ -65,12 +65,9 @@ public interface AuthenticationController {
 	/**
 	 * Signs the terms of use for a user
 	 */
-	public void signTermsOfUse(boolean accepted, AsyncCallback<Void> callback);
+	public void signTermsOfUse(AsyncCallback<Void> callback);
 
 	public void updateCachedProfile(UserProfile updatedProfile);
 
 	void checkForUserChange();
-
-	// refreshes the session token (iff logged in)
-	void refreshSessionToken();
 }

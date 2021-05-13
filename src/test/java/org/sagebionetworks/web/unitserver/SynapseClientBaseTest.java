@@ -64,7 +64,7 @@ public class SynapseClientBaseTest {
 		String sessionToken = "fakeSessionToken";
 		SynapseClient createdClient = synapseClientBase.createSynapseClient(sessionToken);
 		assertEquals(mockSynapseClient, createdClient);
-		verify(mockSynapseClient).setSessionToken(sessionToken);
+		verify(mockSynapseClient).setBearerAuthorizationToken(sessionToken);
 		verify(mockSynapseClient).setRepositoryEndpoint(REPO_BASE);
 		verify(mockSynapseClient).setAuthEndpoint(AUTH_BASE);
 		verify(mockSynapseClient).setFileEndpoint(FILE_BASE);

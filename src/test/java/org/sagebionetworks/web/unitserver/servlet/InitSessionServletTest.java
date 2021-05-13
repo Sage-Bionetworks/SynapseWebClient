@@ -7,14 +7,17 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
+
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -22,13 +25,13 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.server.servlet.InitSessionServlet;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
+import org.sagebionetworks.web.shared.AccessTokenWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.unitserver.SynapseClientBaseTest;
 
@@ -68,9 +71,9 @@ public class InitSessionServletTest {
 
 	private void setupSessionInRequest(String token) throws JSONObjectAdapterException, IOException {
 		JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
-		Session session = new Session();
-		session.setSessionToken(token);
-		session.writeToJSONObject(adapter);
+		AccessTokenWrapper wrapper = new AccessTokenWrapper();
+		wrapper.setToken(token);
+		wrapper.writeToJSONObject(adapter);
 		BufferedReader br = new BufferedReader(new StringReader(adapter.toJSONString()));
 		when(mockRequest.getReader()).thenReturn(br);
 	}

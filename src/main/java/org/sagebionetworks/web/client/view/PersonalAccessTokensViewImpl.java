@@ -49,7 +49,7 @@ public class PersonalAccessTokensViewImpl extends Composite implements PersonalA
 	@Override
 	public void render() {
 		Window.scrollTo(0, 0); // scroll user to top of page
-		_showPersonalAccessTokensComponent(container.getElement(), authController.getCurrentUserSessionToken());
+		_showPersonalAccessTokensComponent(container.getElement(), authController.getCurrentUserAccessToken());
 	}
 
 	private static native void _showPersonalAccessTokensComponent(Element el, String sessionToken) /*-{

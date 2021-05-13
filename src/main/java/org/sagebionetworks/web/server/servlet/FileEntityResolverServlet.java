@@ -121,7 +121,7 @@ public class FileEntityResolverServlet extends HttpServlet {
 		client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
 		client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
 		if (sessionToken != null)
-			client.setSessionToken(sessionToken);
+			client.setBearerAuthorizationToken(sessionToken);
 		return client;
 	}
 

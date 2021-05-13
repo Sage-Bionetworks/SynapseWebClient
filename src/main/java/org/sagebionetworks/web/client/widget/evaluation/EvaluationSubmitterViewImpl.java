@@ -320,7 +320,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 			// here we go! add the SRC entityform component to the formDiv (and listen for detach for cleanup)
 			// going to need some space
 			modal1.addStyleName("modal-fullscreen");
-			String sessionToken = authController.getCurrentUserSessionToken();
+			String sessionToken = authController.getCurrentUserAccessToken();
 			_showForm(formDiv.getElement(), sessionToken, formParams.getContainerSynId(), formParams.getJsonSchemaSynId(), formParams.getUiSchemaSynId(), this);
 		} else {
 			modal1.removeStyleName("modal-fullscreen");

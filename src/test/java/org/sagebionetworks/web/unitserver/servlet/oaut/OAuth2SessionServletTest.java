@@ -6,11 +6,14 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import java.io.IOException;
 import java.net.URLEncoder;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -19,7 +22,7 @@ import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
-import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.oauth.OAuthAccountCreationRequest;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.oauth.OAuthUrlRequest;
@@ -78,9 +81,9 @@ public class OAuth2SessionServletTest {
 	@Test
 	public void testValidate() throws ServletException, IOException, SynapseException {
 		ArgumentCaptor<OAuthValidationRequest> argument = ArgumentCaptor.forClass(OAuthValidationRequest.class);
-		Session session = new Session();
-		session.setSessionToken("sessiontoken");
-		when(mockClient.validateOAuthAuthenticationCode(argument.capture())).thenReturn(session);
+		LoginResponse resp = new LoginResponse();
+		resp.setAccessToken("accesstoken");
+		when(mockClient.validateOAuthAuthenticationCodeForAccessToken(argument.capture())).thenReturn(resp);
 		when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER)).thenReturn(OAuthProvider.GOOGLE_OAUTH_2_0.name());
 		String authCode = "authCode";
 		when(mockRequest.getParameter(WebConstants.OAUTH2_CODE)).thenReturn(authCode);
@@ -90,16 +93,16 @@ public class OAuth2SessionServletTest {
 		assertEquals("http://127.0.0.1:8888/?oauth2provider=GOOGLE_OAUTH_2_0", request.getRedirectUrl());
 		assertEquals(OAuthProvider.GOOGLE_OAUTH_2_0, request.getProvider());
 		assertEquals(authCode, request.getAuthenticationCode());
-		verify(mockResponse).sendRedirect("/#!LoginPlace:sessiontoken");
+		verify(mockResponse).sendRedirect("/#!LoginPlace:accesstoken");
 	}
 
 	@Test
 	public void testCreateAccountViaOAuth() throws ServletException, IOException, SynapseException {
 		ArgumentCaptor<OAuthAccountCreationRequest> argument = ArgumentCaptor.forClass(OAuthAccountCreationRequest.class);
-		Session session = new Session();
+		LoginResponse resp = new LoginResponse();
 		String state = "my-username";
-		session.setSessionToken("sessiontoken");
-		when(mockClient.createAccountViaOAuth2(argument.capture())).thenReturn(session);
+		resp.setAccessToken("accesstoken");
+		when(mockClient.createAccountViaOAuth2ForAccessToken(argument.capture())).thenReturn(resp);
 		when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER)).thenReturn(OAuthProvider.GOOGLE_OAUTH_2_0.name());
 		when(mockRequest.getParameter(WebConstants.OAUTH2_STATE)).thenReturn(state);
 		String authCode = "authCode";
@@ -111,14 +114,14 @@ public class OAuth2SessionServletTest {
 		assertEquals(OAuthProvider.GOOGLE_OAUTH_2_0, request.getProvider());
 		assertEquals(authCode, request.getAuthenticationCode());
 		assertEquals(state, request.getUserName());
-		verify(mockResponse).sendRedirect("/#!LoginPlace:sessiontoken");
+		verify(mockResponse).sendRedirect("/#!LoginPlace:accesstoken");
 	}
 
 	@Test
 	public void testCreateAccountViaOAuthError() throws ServletException, IOException, SynapseException {
 		String state = "my-username";
 		String errorMessage = "this be an error during oauth based account creation";
-		when(mockClient.createAccountViaOAuth2(any(OAuthAccountCreationRequest.class))).thenThrow(new SynapseBadRequestException(errorMessage));
+		when(mockClient.createAccountViaOAuth2ForAccessToken(any(OAuthAccountCreationRequest.class))).thenThrow(new SynapseBadRequestException(errorMessage));
 		when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER)).thenReturn(OAuthProvider.GOOGLE_OAUTH_2_0.name());
 		when(mockRequest.getParameter(WebConstants.OAUTH2_STATE)).thenReturn(state);
 		String authCode = "authCode";
@@ -132,7 +135,7 @@ public class OAuth2SessionServletTest {
 	@Test
 	public void testValidateNotFound() throws ServletException, IOException, SynapseException {
 		ArgumentCaptor<OAuthValidationRequest> argument = ArgumentCaptor.forClass(OAuthValidationRequest.class);
-		when(mockClient.validateOAuthAuthenticationCode(argument.capture())).thenThrow(new SynapseNotFoundException("an error message"));
+		when(mockClient.validateOAuthAuthenticationCodeForAccessToken(argument.capture())).thenThrow(new SynapseNotFoundException("an error message"));
 		when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER)).thenReturn(OAuthProvider.GOOGLE_OAUTH_2_0.name());
 		when(mockRequest.getParameter(WebConstants.OAUTH2_CODE)).thenReturn("auth code");
 		servlet.doGet(mockRequest, mockResponse);

@@ -185,7 +185,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	@Override
 	public void configureCurrentAccessComponent(String entityId, Long versionNumber) {
 		String versionNumberString = versionNumber == null ? null : versionNumber.toString();
-		_showHasAccess(hasAccessContainer.getElement(), entityId, versionNumberString, authController.getCurrentUserSessionToken());
+		_showHasAccess(hasAccessContainer.getElement(), entityId, versionNumberString, authController.getCurrentUserAccessToken());
 	}
 	
 	private static native void _showHasAccess(Element el, String synapseEntityId, String versionNumber, String sessionToken) /*-{

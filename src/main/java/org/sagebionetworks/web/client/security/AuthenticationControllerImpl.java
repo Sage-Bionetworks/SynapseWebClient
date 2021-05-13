@@ -1,9 +1,13 @@
 package org.sagebionetworks.web.client.security;
 
+import static com.google.common.util.concurrent.Futures.getDone;
+import static com.google.common.util.concurrent.Futures.whenAllComplete;
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Objects;
+
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.principal.EmailQuarantineReason;
@@ -19,11 +23,13 @@ import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Down;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+
+import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.StatusCodeException;
@@ -40,7 +46,7 @@ import com.google.inject.Inject;
 public class AuthenticationControllerImpl implements AuthenticationController {
 	public static final String USER_AUTHENTICATION_RECEIPT = "last_user_authentication_receipt";
 	private static final String AUTHENTICATION_MESSAGE = "Invalid username or password.";
-	private static String currentUserSessionToken;
+	private static String currentUserAccessToken;
 	private static UserProfile currentUserProfile;
 	private UserAccountServiceAsync userAccountService;
 	private ClientCache localStorage;
@@ -67,9 +73,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		LoginRequest loginRequest = getLoginRequest(username, password);
 		ginInjector.getSynapseJavascriptClient().login(loginRequest, new AsyncCallback<LoginResponse>() {
 			@Override
-			public void onSuccess(LoginResponse session) {
-				storeAuthenticationReceipt(session.getAuthenticationReceipt());
-				setNewSessionToken(session.getSessionToken(), callback);
+			public void onSuccess(LoginResponse response) {
+				storeAuthenticationReceipt(response.getAuthenticationReceipt());
+				setNewAccessToken(response.getAccessToken(), callback);
 			}
 
 			@Override
@@ -93,12 +99,12 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 
 	/**
-	 * Called to update the session token.
+	 * Called to update the access token.
 	 * 
 	 * @param token
 	 * @param callback
 	 */
-	public void setNewSessionToken(String token, AsyncCallback<UserProfile> callback) {
+	public void setNewAccessToken(String token, AsyncCallback<UserProfile> callback) {
 		if (token == null) {
 			callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 			return;
@@ -116,37 +122,36 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 			@Override
 			public void onSuccess(Void result) {
-				initializeFromExistingSessionCookie(callback);
+				initializeFromExistingAccessCookie(callback);
 			}
 		});
 	}
 
 	/**
-	 * Session cookie should be set before this call
+	 * Access cookie should be set before this call
 	 * 
 	 * @param callback
 	 */
-	public void initializeFromExistingSessionCookie(AsyncCallback<UserProfile> callback) {
-		userAccountService.getCurrentUserSessionData(new AsyncCallback<UserSessionData>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
+	public void initializeFromExistingAccessCookie(AsyncCallback<UserProfile> callback) {
+		// ask for these in parallel
+		ListenableFuture<String> accessTokenFuture;
+		ListenableFuture<UserProfile> userProfileFuture;
 
-			@Override
-			public void onSuccess(UserSessionData newData) {
-				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
-				currentUserSessionToken = newData.getSession().getSessionToken();
-				currentUserProfile = newData.getProfile();
-				ginInjector.getSessionDetector().initializeSessionTokenState();
-				if (!newData.getSession().getAcceptsTermsOfUse()) {
-					ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
-				} else {
-					jsniUtils.setAnalyticsUserId(getCurrentUserPrincipalId());
-					callback.onSuccess(newData.getProfile());
-				}
-			}
-		});
+		accessTokenFuture = ginInjector.getSynapseJavascriptClient().getAccessToken();
+		userProfileFuture = ginInjector.getSynapseJavascriptClient().getMyUserProfile();
+		FluentFuture.from(whenAllComplete(accessTokenFuture, userProfileFuture).call(() -> {
+			cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
+			// Retrieve the resolved values from the futures
+			currentUserAccessToken = getDone(accessTokenFuture);
+			currentUserProfile = getDone(userProfileFuture);
+			ginInjector.getSessionDetector().initializeAccessTokenState();
+			jsniUtils.setAnalyticsUserId(getCurrentUserPrincipalId());
+			callback.onSuccess(currentUserProfile);
+			return null;
+		}, directExecutor())).catching(Throwable.class, e -> {
+			callback.onFailure(e);
+			return null;
+		}, directExecutor());
 	}
 
 	public void checkForQuarantinedEmail() {
@@ -173,7 +178,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	@Override
 	public void logoutUser() {
 		// terminate the session, remove the cookie
-		ginInjector.getSynapseJavascriptClient().logout();
 		jsniUtils.setAnalyticsUserId("");
 		String receipt = localStorage.get(USER_AUTHENTICATION_RECEIPT);
 		localStorage.clear();
@@ -182,9 +186,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		Place lastPlace = ginInjector.getGlobalApplicationState().getLastPlace();
 		sessionStorage.clear();
 		ginInjector.getGlobalApplicationState().setLastPlace(lastPlace);
-		currentUserSessionToken = null;
+		currentUserAccessToken = null;
 		currentUserProfile = null;
-		ginInjector.getSessionDetector().initializeSessionTokenState();
+		ginInjector.getSessionDetector().initializeAccessTokenState();
 		ginInjector.getSynapseJavascriptClient().initSession(WebConstants.EXPIRE_SESSION_TOKEN);
 		ginInjector.getGlobalApplicationState().refreshPage();
 	}
@@ -196,7 +200,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 	@Override
 	public boolean isLoggedIn() {
-		return currentUserSessionToken != null && !currentUserSessionToken.isEmpty() && currentUserProfile != null;
+		return currentUserAccessToken != null && !currentUserAccessToken.isEmpty() && currentUserProfile != null;
 	}
 
 	@Override
@@ -213,19 +217,19 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 
 	@Override
-	public String getCurrentUserSessionToken() {
-		return currentUserSessionToken;
+	public String getCurrentUserAccessToken() {
+		return currentUserAccessToken;
 	}
 
 	@Override
-	public void signTermsOfUse(boolean accepted, AsyncCallback<Void> callback) {
-		userAccountService.signTermsOfUse(getCurrentUserSessionToken(), accepted, callback);
+	public void signTermsOfUse(AsyncCallback<Void> callback) {
+		userAccountService.signTermsOfUse(getCurrentUserAccessToken(), callback);
 	}
 
 	@Override
 	public void checkForUserChange() {
-		String oldUserSessionToken = currentUserSessionToken;
-		initializeFromExistingSessionCookie(new AsyncCallback<UserProfile>() {
+		String oldUserAccessToken = currentUserAccessToken;
+		initializeFromExistingAccessCookie(new AsyncCallback<UserProfile>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				// if the exception was not due to a network failure, then log the user out
@@ -238,14 +242,14 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			@Override
 			public void onSuccess(UserProfile result) {
 				// is this a user session change?  if so, refresh the page.
-				if (!Objects.equals(currentUserSessionToken, oldUserSessionToken)) {
+				if (!Objects.equals(currentUserAccessToken, oldUserAccessToken)) {
 					// we've reinitialized the app with the correct session, refresh the page (do not get rid of js state)!
 					ginInjector.getGlobalApplicationState().refreshPage();
 					checkForQuarantinedEmail();
 				} else {
 					ginInjector.getHeader().refresh();
-					// we've determined that the session has not changed, update the cookie expiration for the session token
-					ginInjector.getSynapseJavascriptClient().initSession(currentUserSessionToken, new AsyncCallback<Void>() {
+					// we've determined that the session has not changed, update the cookie expiration for the token
+					ginInjector.getSynapseJavascriptClient().initSession(currentUserAccessToken, new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							jsniUtils.consoleError(caught);
@@ -253,16 +257,11 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 						@Override
 						public void onSuccess(Void result) {
-							// the set-cookie response header has updated the expiration of the session token cookie
+							// the set-cookie response header has updated the expiration of the token cookie
 						}
 					});
 				}
 			}
 		});
-	}
-
-	@Override
-	public void refreshSessionToken() {
-		ginInjector.getSynapseJavascriptClient().refreshCurrentSessionToken();
 	}
 }

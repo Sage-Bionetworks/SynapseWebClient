@@ -47,7 +47,6 @@ import static org.sagebionetworks.web.client.SynapseJavascriptClient.OPEN_MEMBER
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.OPEN_MEMBERSHIP_REQUEST_COUNT;
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.REPO_SUFFIX_VERSION;
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.RESTRICTION_INFORMATION;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.SESSION;
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.SESSION_TOKEN_HEADER;
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_DOWNLOAD_CSV;
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_QUERY;
@@ -66,8 +65,10 @@ import static org.sagebionetworks.web.client.SynapseJavascriptClient.getExceptio
 import static org.sagebionetworks.web.shared.WebConstants.AUTH_PUBLIC_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -95,7 +96,6 @@ import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.asynch.AsynchJobState;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
-import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundle;
 import org.sagebionetworks.repo.model.entitybundle.v2.EntityBundleRequest;
@@ -132,6 +132,7 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
@@ -197,7 +198,7 @@ public class SynapseJavascriptClientTest {
 		when(mockSynapseProperties.getSynapseProperty(AUTH_PUBLIC_SERVICE_URL_KEY)).thenReturn(AUTH_ENDPOINT);
 		when(mockGinInjector.getRequestBuilder()).thenReturn(mockRequestBuilder);
 		when(mockGinInjector.getAuthenticationController()).thenReturn(mockAuthController);
-		when(mockJsniUtils.getSessionCookieUrl()).thenReturn(SESSION_COOKIE_URL);
+		when(mockJsniUtils.getAccessTokenCookieUrl()).thenReturn(SESSION_COOKIE_URL);
 
 		when(mockRequestBuilder.sendRequest(anyString(), any(RequestCallback.class))).thenReturn(mockRequest1, mockRequest2);
 		client = new SynapseJavascriptClient(jsonObjectAdapter, mockSynapseProperties, mockGwt, synapseJsFactory, mockGinInjector, mockJsniUtils, entityId2BundleCache);
@@ -306,7 +307,7 @@ public class SynapseJavascriptClientTest {
 		EntityBundleRequest request = new EntityBundleRequest();
 		Long versionNumber = 5L;
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
-		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
+		when(mockAuthController.getCurrentUserAccessToken()).thenReturn(USER_SESSION_TOKEN);
 
 		client.getEntityBundleForVersion(entityId, versionNumber, request, mockAsyncCallback);
 
@@ -336,7 +337,7 @@ public class SynapseJavascriptClientTest {
 		EntityBundleRequest request = new EntityBundleRequest();
 		Long versionNumber = 5L;
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
-		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
+		when(mockAuthController.getCurrentUserAccessToken()).thenReturn(USER_SESSION_TOKEN);
 		client.getEntityBundleForVersion(entityId, versionNumber, request, mockAsyncCallback);
 
 		verify(mockRequestBuilder).sendRequest(anyString(), requestCallbackCaptor.capture());
@@ -402,7 +403,7 @@ public class SynapseJavascriptClientTest {
 		EntityChildrenRequest entityChildrenRequest = new EntityChildrenRequest();
 		entityChildrenRequest.setParentId("syn982");
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
-		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
+		when(mockAuthController.getCurrentUserAccessToken()).thenReturn(USER_SESSION_TOKEN);
 
 		client.getEntityChildren(entityChildrenRequest, mockAsyncCallback);
 		// verify url and method
@@ -653,7 +654,7 @@ public class SynapseJavascriptClientTest {
 		String tableId = "syn3889291";
 		String jobId = "99994";
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
-		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
+		when(mockAuthController.getCurrentUserAccessToken()).thenReturn(USER_SESSION_TOKEN);
 		TableUpdateTransactionRequest request = new TableUpdateTransactionRequest();
 		request.setEntityId(tableId);
 		client.getAsynchJobResults(AsynchType.TableTransaction, jobId, request, mockAsyncCallback);
@@ -670,7 +671,7 @@ public class SynapseJavascriptClientTest {
 		QueryBundleRequest request = new QueryBundleRequest();
 		request.setEntityId("syn292");
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
-		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
+		when(mockAuthController.getCurrentUserAccessToken()).thenReturn(USER_SESSION_TOKEN);
 
 		client.startAsynchJob(AsynchType.TableQuery, request, mockAsyncCallback);
 		// verify url and method
@@ -686,7 +687,7 @@ public class SynapseJavascriptClientTest {
 		String entityId = "syn387453";
 		String jobId = "99992";
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
-		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
+		when(mockAuthController.getCurrentUserAccessToken()).thenReturn(USER_SESSION_TOKEN);
 		QueryBundleRequest request = new QueryBundleRequest();
 		request.setEntityId(entityId);
 		client.getAsynchJobResults(AsynchType.TableQuery, jobId, request, mockAsyncCallback);
@@ -720,7 +721,7 @@ public class SynapseJavascriptClientTest {
 	public void testAsyncBulkFileDownload() throws RequestException, JSONObjectAdapterException {
 		String jobId = "99993";
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
-		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
+		when(mockAuthController.getCurrentUserAccessToken()).thenReturn(USER_SESSION_TOKEN);
 		BulkFileDownloadRequest request = new BulkFileDownloadRequest();
 		request.setRequestedFiles(new ArrayList<>());
 		client.getAsynchJobResults(AsynchType.BulkFileDownload, jobId, request, mockAsyncCallback);
@@ -737,7 +738,7 @@ public class SynapseJavascriptClientTest {
 		String tableId = "syn388378";
 		String jobId = "99994";
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
-		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
+		when(mockAuthController.getCurrentUserAccessToken()).thenReturn(USER_SESSION_TOKEN);
 		DownloadFromTableRequest request = new DownloadFromTableRequest();
 		request.setEntityId(tableId);
 		client.getAsynchJobResults(AsynchType.TableCSVDownload, jobId, request, mockAsyncCallback);
@@ -775,43 +776,6 @@ public class SynapseJavascriptClientTest {
 	}
 
 	@Test
-	public void testRefreshSessionToken() throws RequestException, JSONObjectAdapterException {
-		when(mockAuthController.isLoggedIn()).thenReturn(true);
-		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
-
-		client.refreshCurrentSessionToken();
-
-		// verify url and method
-		String url = AUTH_ENDPOINT + SESSION;
-		verify(mockRequestBuilder).configure(PUT, url);
-		verify(mockRequestBuilder, times(2)).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
-		verify(mockRequestBuilder, times(2)).setHeader(WebConstants.CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
-		verify(mockRequestBuilder, times(2)).sendRequest(stringCaptor.capture(), requestCallbackCaptor.capture());
-
-		verify(mockRequestBuilder).configure(POST, SESSION_COOKIE_URL);
-
-		// verify request data
-		List<String> jsonValues = stringCaptor.getAllValues();
-		for (String json : jsonValues) {
-			Session request = new Session(jsonObjectAdapter.createNew(json));
-			assertEquals(USER_SESSION_TOKEN, request.getSessionToken());
-		}
-	}
-
-	@Test
-	public void testRefreshSessionTokenAnonymous() throws RequestException, JSONObjectAdapterException {
-		when(mockAuthController.isLoggedIn()).thenReturn(false);
-		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
-
-		client.refreshCurrentSessionToken();
-
-		String url = AUTH_ENDPOINT + SESSION;
-		verify(mockRequestBuilder, never()).configure(PUT, url);
-		verify(mockRequestBuilder, never()).sendRequest(anyString(), any(RequestCallback.class));
-		verify(mockRequestBuilder, never()).configure(POST, SESSION_COOKIE_URL);
-	}
-
-	@Test
 	public void testGetTeamMembersFirstStep() throws RequestException, JSONObjectAdapterException {
 		String teamId = "122234";
 		int offset = 10;
@@ -820,7 +784,7 @@ public class SynapseJavascriptClientTest {
 		TeamMemberTypeFilterOptions memberType = TeamMemberTypeFilterOptions.ALL;
 		when(mockGwt.encodeQueryString(anyString())).thenReturn(fragment, memberType.toString());
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
-		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
+		when(mockAuthController.getCurrentUserAccessToken()).thenReturn(USER_SESSION_TOKEN);
 
 		client.getTeamMembers(teamId, fragment, memberType, limit, offset, mockAsyncCallback);
 
@@ -917,8 +881,8 @@ public class SynapseJavascriptClientTest {
 		when(mockRequest2.isPending()).thenReturn(true);
 		when(mockGwt.getCurrentURL()).thenReturn(currentUrl);
 
-		client.logout();
-
+		client.deleteEntityById("syn111", null);
+		
 		verify(mockRequestBuilder).sendRequest(anyString(), any());
 
 		// verify no requests are associated to the current URL

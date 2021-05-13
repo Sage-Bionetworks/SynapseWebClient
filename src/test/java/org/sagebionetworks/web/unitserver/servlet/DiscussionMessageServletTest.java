@@ -76,7 +76,7 @@ public class DiscussionMessageServletTest {
 		verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
 		verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
 		verify(mockSynapse).setFileEndpoint(SynapseClientBaseTest.FILE_BASE);
-		verify(mockSynapse).setSessionToken(sessionToken);
+		verify(mockSynapse).setBearerAuthorizationToken(sessionToken);
 	}
 
 	@Test
@@ -99,7 +99,7 @@ public class DiscussionMessageServletTest {
 		verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
 		verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
 		verify(mockSynapse).setFileEndpoint(SynapseClientBaseTest.FILE_BASE);
-		verify(mockSynapse).setSessionToken(sessionToken);
+		verify(mockSynapse).setBearerAuthorizationToken(sessionToken);
 	}
 
 	@Test

@@ -93,7 +93,7 @@ public class ChallengeTab implements ChallengeTabView.Presenter {
 		EvaluationEditorReactComponentPage evaluationEditor = ginInjector.createEvaluationEditorReactComponentPage();
 		globalApplicationState.setIsEditing(true);
 		evaluationEditor.configure(evaluationId,
-				entityId, authenticationController.getCurrentUserSessionToken(),
+				entityId, authenticationController.getCurrentUserAccessToken(),
 				globalApplicationState.isShowingUTCTime(),
 				// onPageBack() callback
 				() ->{

@@ -96,7 +96,7 @@ public class FileHandleAssociationServletTest {
 		verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
 		verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
 		verify(mockSynapse).setFileEndpoint(anyString());
-		verify(mockSynapse).setSessionToken(sessionToken);
+		verify(mockSynapse).setBearerAuthorizationToken(sessionToken);
 
 		// look for 30 second cache header
 		verify(mockResponse).setHeader(WebConstants.CACHE_CONTROL_KEY, "max-age=" + FileHandleAssociationServlet.CACHE_TIME_SECONDS);

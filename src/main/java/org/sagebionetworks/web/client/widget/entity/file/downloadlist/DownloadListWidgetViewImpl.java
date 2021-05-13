@@ -35,7 +35,7 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 	@Override
 	public void refreshView() {
 		if (authController.isLoggedIn()) {
-			_showDownloadList(downloadListContainer.getElement(), authController.getCurrentUserSessionToken(), this);
+			_showDownloadList(downloadListContainer.getElement(), authController.getCurrentUserAccessToken(), this);
 		}
 	}
 

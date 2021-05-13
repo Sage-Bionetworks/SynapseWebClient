@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.shared.AccessTokenWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
@@ -47,12 +48,12 @@ public class InitSessionServlet extends HttpServlet {
 	@Override
 	public void doPost(final HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		// return the Set-Cookie response with the session token
+		// return the Set-Cookie response with the access token
 		try {
 			String sessionJson = IOUtils.toString(request.getReader());
 			JSONObjectAdapter adapter = new JSONObjectAdapterImpl(sessionJson);
-			Session s = new Session(adapter);
-			String sessionToken = s.getSessionToken();
+			AccessTokenWrapper s = new AccessTokenWrapper(adapter);
+			String sessionToken = s.getToken();
 			if (sessionToken == null || sessionToken.isEmpty()) {
 				sessionToken = WebConstants.EXPIRE_SESSION_TOKEN;
 			}

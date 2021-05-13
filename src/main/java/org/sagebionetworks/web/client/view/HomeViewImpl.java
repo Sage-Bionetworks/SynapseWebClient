@@ -56,7 +56,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@Override
 	public void render() {
 		scrollToTop();
-		_showHomepageComponent(container.getElement(), authController.getCurrentUserSessionToken(), PROJECT_VIEW_ID);
+		_showHomepageComponent(container.getElement(), authController.getCurrentUserAccessToken(), PROJECT_VIEW_ID);
 	}
 
 

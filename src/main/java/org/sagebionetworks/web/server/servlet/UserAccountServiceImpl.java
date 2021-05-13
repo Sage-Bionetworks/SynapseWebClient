@@ -4,6 +4,7 @@ import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.AuthorizationConstants;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
@@ -53,12 +54,12 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 
 	@Override
-	public void signTermsOfUse(String sessionToken, boolean acceptsTerms) throws RestServiceException {
+	public void signTermsOfUse(String accessToken) throws RestServiceException {
 		validateService();
 
 		SynapseClient synapseClient = createSynapseClient();
 		try {
-			synapseClient.signTermsOfUse(sessionToken, acceptsTerms);
+			synapseClient.signTermsOfUse(accessToken);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -77,19 +78,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 
 	@Override
-	public UserSessionData getCurrentUserSessionData() throws RestServiceException {
-		validateService();
-
-		SynapseClient client = createSynapseClient();
-		try {
-			return client.getUserSessionData();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-
-	@Override
 	public String createUserStep2(String userName, String fName, String lName, String password, EmailValidationSignedToken emailValidationSignedToken) throws RestServiceException {
 		validateService();
 
@@ -101,8 +89,8 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			accountSetup.setUsername(userName);
 			accountSetup.setPassword(password);
 			accountSetup.setEmailValidationSignedToken(emailValidationSignedToken);
-			Session s = client.createNewAccount(accountSetup);
-			return s.getSessionToken();
+			LoginResponse s = client.createNewAccountForAccessToken(accountSetup);
+			return s.getAccessToken();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -152,7 +140,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		if (sessionToken == null) {
 			sessionToken = tokenProvider.getSessionToken();
 		}
-		synapseClient.setSessionToken(sessionToken);
+		synapseClient.setBearerAuthorizationToken(sessionToken);
 		synapseClient.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
 		synapseClient.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
 		return synapseClient;

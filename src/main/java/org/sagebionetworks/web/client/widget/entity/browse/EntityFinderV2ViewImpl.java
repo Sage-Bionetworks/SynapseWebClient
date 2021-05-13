@@ -111,7 +111,7 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 
 		_showEntityFinderReactComponent(
 				entityFinderContainer.getElement(),
-				authController.getCurrentUserSessionToken(),
+				authController.getCurrentUserAccessToken(),
 				projectId,
 				getInitialContainerAsString(initialContainer, projectId, initialContainerId),
 				initialScope.getValue(),
