@@ -31,7 +31,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter {
 	public DiscussionTab(Tab tab, PortalGinInjector ginInjector) {
 		this.tab = tab;
 		this.ginInjector = ginInjector;
-		tab.configure("Discussion", "Engage your collaborators in project specific Discussions.", WebConstants.DOCS_URL + "discussion.html", EntityArea.DISCUSSION);
+		tab.configure("Discussion", "Engage your collaborators in project specific Discussions.", WebConstants.DOCS_URL + "Discussion-Forums.1985904796.html", EntityArea.DISCUSSION);
 	}
 
 	public void lazyInject() {

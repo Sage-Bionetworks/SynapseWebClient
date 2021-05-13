@@ -69,7 +69,7 @@ public class FilesTab {
 	public FilesTab(Tab tab, PortalGinInjector ginInjector) {
 		this.tab = tab;
 		this.ginInjector = ginInjector;
-		tab.configure("Files", "Organize your data by uploading files into a directory structure built in the Files section.", WebConstants.DOCS_URL + "versioning.html", EntityArea.FILES);
+		tab.configure("Files", "Organize your data by uploading files into a directory structure built in the Files section.", WebConstants.DOCS_URL + "Files-and-Folders.2048458885.html", EntityArea.FILES);
 	}
 
 	public void lazyInject() {

@@ -44,7 +44,7 @@
 							<w:HelpWidget
 								helpMarkdown="There are times where human data can only be shared with certain restrictions. Learn what the rules are and how to apply and comply with data privacy levels. This topic is covered during certification."
 								text="More info..."
-								href="https://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#certified-users" />
+								href="https://help.synapse.org/docs/User-Types.2007072795.html#UserAccountTiers-CertifiedUsers" />
 						</bh:Div>
 					</bh:Div>
 					<bh:Div ui:field="profileValidationUI"
@@ -91,8 +91,8 @@
 												text="Download the Synapse Pledge. Complete the form by typing your name, checking each statement, signing, and dating the document." target="_blank" />
 										</b:ListItem>
 										<b:ListItem>
-											<b:Anchor href="https://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#validated-profile"
-												text="Obtain your identity attestation documentation." target="_blank" />																				
+											<b:Anchor href="https://help.synapse.org/docs/User-Types.2007072795.html#UserAccountTiers-ValidatedUsers"
+												text="Obtain your identity attestation documentation." target="_blank" />
 										</b:ListItem>
 										<b:ListItem>
 											<b:Anchor ui:field="requestProfileValidationLink2"
@@ -105,7 +105,7 @@
 						<w:HelpWidget
 							helpMarkdown="A Synapse Qualified Researcher is a Certified User with a validated user profile.&#10;Synapse Qualified Researchers are eligible to request access to Bridge data."
 							text="More info..."
-							href="http://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#validated-profile" />
+							href="https://help.synapse.org/docs/User-Types.2007072795.html#UserAccountTiers-ValidatedUsers" />
 					</bh:Div>
 				</b:Column>
 				<b:Column size="LG_6">
@@ -211,7 +211,7 @@
 					<bh:Text>Following</bh:Text>
 					<w:HelpWidget
 						helpMarkdown="These are discussion threads and forums that you have been subscribed to which means you will receive an email when someone responds or creates a thread."
-						href="http://docs.synapse.org/articles/discussion.html"
+						href="https://help.synapse.org/docs/Discussion-Forums.1985904796.html"
 						addStyleNames="margin-left-5" />
 				</bh:Div>
 				<bh:Div ui:field="subscriptionsContainer" />

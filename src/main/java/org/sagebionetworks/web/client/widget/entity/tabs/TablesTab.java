@@ -61,7 +61,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler {
 	Map<String, String> configMap;
 	CallbackP<String> entitySelectedCallback;
 	public static final String TABLES_HELP = "Build structured queryable data that can be described by a schema using the Tables.";
-	public static final String TABLES_HELP_URL = WebConstants.DOCS_URL + "tables.html";
+	public static final String TABLES_HELP_URL = WebConstants.DOCS_URL + "Tables.2011038095.html";
 	Long version;
 
 	@Inject

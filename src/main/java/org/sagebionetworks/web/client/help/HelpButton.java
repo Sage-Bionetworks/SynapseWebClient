@@ -17,7 +17,7 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * Import: xmlns:h="urn:import:org.sagebionetworks.web.client.help"
  * 
- * Use: <h:HelpButton href="https://docs.synapse.org/discussionForum" placement="RIGHT">
+ * Use: <h:HelpButton href="https://help.synapse.org/docs/Discussion-Forums.1985904796.html" placement="RIGHT">
  * <bh:Text><ui:text from='{help.discussionForum}'/></bh:Text> </h:HelpButton>
  * 
  */
