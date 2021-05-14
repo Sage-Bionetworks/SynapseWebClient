@@ -188,12 +188,12 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		_showHasAccess(hasAccessContainer.getElement(), entityId, versionNumberString, authController.getCurrentUserAccessToken());
 	}
 	
-	private static native void _showHasAccess(Element el, String synapseEntityId, String versionNumber, String sessionToken) /*-{
+	private static native void _showHasAccess(Element el, String synapseEntityId, String versionNumber, String accessToken) /*-{
 		try {
 			var props = {
 				entityId: synapseEntityId,
 				entityVersionNumber: versionNumber,
-				token: sessionToken
+				token: accessToken
 			};
 	
 			$wnd.ReactDOM.render($wnd.React.createElement(

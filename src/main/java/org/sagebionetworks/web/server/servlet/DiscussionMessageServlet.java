@@ -20,7 +20,7 @@ public class DiscussionMessageServlet extends HttpServlet {
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
 	private TokenProvider tokenProvider = new TokenProvider() {
 		@Override
-		public String getSessionToken() {
+		public String getToken() {
 			return UserDataProvider.getThreadLocalUserToken(DiscussionMessageServlet.perThreadRequest.get());
 		}
 	};
@@ -34,7 +34,7 @@ public class DiscussionMessageServlet extends HttpServlet {
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		String token = tokenProvider.getSessionToken();
+		String token = tokenProvider.getToken();
 		SynapseClient client = createNewClient(token);
 
 		String messageKey = request.getParameter(WebConstants.MESSAGE_KEY_PARAM);
@@ -60,13 +60,13 @@ public class DiscussionMessageServlet extends HttpServlet {
 	 *
 	 * @return
 	 */
-	private SynapseClient createNewClient(String sessionToken) {
+	private SynapseClient createNewClient(String accessToken) {
 		SynapseClient client = synapseProvider.createNewClient();
 		client.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
 		client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
 		client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
-		if (sessionToken != null)
-			client.setBearerAuthorizationToken(sessionToken);
+		if (accessToken != null)
+			client.setBearerAuthorizationToken(accessToken);
 		return client;
 	}
 }

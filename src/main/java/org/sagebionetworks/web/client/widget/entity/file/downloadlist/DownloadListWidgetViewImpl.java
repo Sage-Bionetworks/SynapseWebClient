@@ -39,13 +39,13 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 		}
 	}
 
-	private static native void _showDownloadList(Element el, String sessionToken, DownloadListWidgetViewImpl w) /*-{
+	private static native void _showDownloadList(Element el, String accessToken, DownloadListWidgetViewImpl w) /*-{
 		try {
 			function onUpdateDownloadList() {
 				w.@org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidgetViewImpl::fireDownloadListUpdatedEvent()();
 			}
 			var props = {
-				token: sessionToken,
+				token: accessToken,
 				listUpdatedCallback: onUpdateDownloadList
 			};
 			$wnd.ReactDOM.render($wnd.React.createElement(

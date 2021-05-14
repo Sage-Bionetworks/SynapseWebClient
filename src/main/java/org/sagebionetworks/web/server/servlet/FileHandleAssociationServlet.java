@@ -34,7 +34,7 @@ public class FileHandleAssociationServlet extends HttpServlet {
 	public static final long CACHE_TIME_SECONDS = 30; // 30 seconds
 	private TokenProvider tokenProvider = new TokenProvider() {
 		@Override
-		public String getSessionToken() {
+		public String getToken() {
 			return UserDataProvider.getThreadLocalUserToken(FileHandleAssociationServlet.perThreadRequest.get());
 		}
 	};
@@ -72,7 +72,7 @@ public class FileHandleAssociationServlet extends HttpServlet {
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setHeader(WebConstants.CACHE_CONTROL_KEY, "max-age=" + CACHE_TIME_SECONDS);
-		String token = getSessionToken(request);
+		String token = getToken(request);
 		SynapseClient client = createNewClient(token);
 
 		String objectId = request.getParameter(WebConstants.ASSOCIATED_OBJECT_ID_PARAM_KEY);
@@ -119,8 +119,8 @@ public class FileHandleAssociationServlet extends HttpServlet {
 	 * @param request
 	 * @return
 	 */
-	public String getSessionToken(final HttpServletRequest request) {
-		return tokenProvider.getSessionToken();
+	public String getToken(final HttpServletRequest request) {
+		return tokenProvider.getToken();
 	}
 
 	/**
@@ -128,13 +128,13 @@ public class FileHandleAssociationServlet extends HttpServlet {
 	 *
 	 * @return
 	 */
-	private SynapseClient createNewClient(String sessionToken) {
+	private SynapseClient createNewClient(String accessToken) {
 		SynapseClient client = synapseProvider.createNewClient();
 		client.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
 		client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
 		client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
-		if (sessionToken != null)
-			client.setBearerAuthorizationToken(sessionToken);
+		if (accessToken != null)
+			client.setBearerAuthorizationToken(accessToken);
 		return client;
 	}
 

@@ -64,10 +64,6 @@ public class Portal implements EntryPoint {
 				@Override
 				public void onSuccess() {
 					try {
-						// start timer to check for user session state change (session expired, or user explicitly logged
-						// out)
-						ginjector.getSessionDetector().start();
-
 						// previous session will be detected on place change (if there is one). do not block app load to
 						// check.
 						// make sure jsni utils code is available to the client
@@ -75,6 +71,10 @@ public class Portal implements EntryPoint {
 						ginjector.getSynapseJSNIUtils();
 						
 						ginjector.getSynapseProperties().initSynapseProperties(() -> {
+							// start timer to check for user session state change (session expired, or user explicitly logged
+							// out).  Backend endpoints must be set before starting this (because it attempts to get "my user profile")
+							ginjector.getSessionDetector().start();
+
 							EventBus eventBus = ginjector.getEventBus();
 							PlaceController placeController = new PlaceController(eventBus);
 

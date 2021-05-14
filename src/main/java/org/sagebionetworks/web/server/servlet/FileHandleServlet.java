@@ -8,12 +8,14 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Enumeration;
 import java.util.logging.Logger;
+
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -52,7 +54,7 @@ public class FileHandleServlet extends HttpServlet {
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
 	private TokenProvider tokenProvider = new TokenProvider() {
 		@Override
-		public String getSessionToken() {
+		public String getToken() {
 			return UserDataProvider.getThreadLocalUserToken(FileHandleServlet.perThreadRequest.get());
 		}
 	};
@@ -94,7 +96,7 @@ public class FileHandleServlet extends HttpServlet {
 		response.setHeader(WebConstants.PRAGMA_KEY, WebConstants.NO_CACHE_VALUE); // Set standard HTTP/1.0 no-cache header.
 		response.setDateHeader(WebConstants.EXPIRES_KEY, 0L); // Proxy
 
-		String token = getSessionToken(request);
+		String token = getToken(request);
 		SynapseClient client = createNewClient(token);
 		boolean isProxy = false;
 		String proxy = request.getParameter(WebConstants.PROXY_PARAM_KEY);
@@ -301,8 +303,8 @@ public class FileHandleServlet extends HttpServlet {
 	 * @param request
 	 * @return
 	 */
-	public String getSessionToken(final HttpServletRequest request) {
-		return tokenProvider.getSessionToken();
+	public String getToken(final HttpServletRequest request) {
+		return tokenProvider.getToken();
 	}
 
 	/**
@@ -323,13 +325,13 @@ public class FileHandleServlet extends HttpServlet {
 	 *
 	 * @return
 	 */
-	private SynapseClient createNewClient(String sessionToken) {
+	private SynapseClient createNewClient(String accessToken) {
 		SynapseClient client = synapseProvider.createNewClient();
 		client.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
 		client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
 		client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
-		if (sessionToken != null)
-			client.setBearerAuthorizationToken(sessionToken);
+		if (accessToken != null)
+			client.setBearerAuthorizationToken(accessToken);
 		return client;
 	}
 

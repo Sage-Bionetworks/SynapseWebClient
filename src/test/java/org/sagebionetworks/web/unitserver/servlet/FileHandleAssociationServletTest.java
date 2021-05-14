@@ -73,7 +73,7 @@ public class FileHandleAssociationServletTest {
 		when(mockRequest.getRequestURL()).thenReturn(new StringBuffer("https://www.synapse.org/"));
 		when(mockRequest.getRequestURI()).thenReturn("");
 		when(mockRequest.getContextPath()).thenReturn("");
-		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
+		when(mockTokenProvider.getToken()).thenReturn(sessionToken);
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};
 		when(mockRequest.getCookies()).thenReturn(cookies);
 

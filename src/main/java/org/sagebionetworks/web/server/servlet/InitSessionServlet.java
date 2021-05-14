@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.server.servlet;
 
 import static org.sagebionetworks.web.client.cookie.CookieKeys.USER_LOGIN_TOKEN;
+
 import java.io.IOException;
 import java.io.PrintWriter;
+
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -10,10 +12,10 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.shared.AccessTokenWrapper;
@@ -53,13 +55,13 @@ public class InitSessionServlet extends HttpServlet {
 			String sessionJson = IOUtils.toString(request.getReader());
 			JSONObjectAdapter adapter = new JSONObjectAdapterImpl(sessionJson);
 			AccessTokenWrapper s = new AccessTokenWrapper(adapter);
-			String sessionToken = s.getToken();
-			if (sessionToken == null || sessionToken.isEmpty()) {
-				sessionToken = WebConstants.EXPIRE_SESSION_TOKEN;
+			String accessToken = s.getToken();
+			if (accessToken == null || accessToken.isEmpty()) {
+				accessToken = WebConstants.EXPIRE_SESSION_TOKEN;
 			}
-			Cookie cookie = new Cookie(USER_LOGIN_TOKEN, sessionToken);
+			Cookie cookie = new Cookie(USER_LOGIN_TOKEN, accessToken);
 
-			if (!WebConstants.EXPIRE_SESSION_TOKEN.equals(sessionToken)) {
+			if (!WebConstants.EXPIRE_SESSION_TOKEN.equals(accessToken)) {
 				cookie.setMaxAge(ONE_DAY_IN_SECONDS);
 			} else {
 				cookie.setMaxAge(0);
@@ -99,13 +101,13 @@ public class InitSessionServlet extends HttpServlet {
 
 	private TokenProvider tokenProvider = new TokenProvider() {
 		@Override
-		public String getSessionToken() {
+		public String getToken() {
 			return UserDataProvider.getThreadLocalUserToken(InitSessionServlet.perThreadRequest.get());
 		}
 	};
 
-	public String getSessionToken(final HttpServletRequest request) {
-		return tokenProvider.getSessionToken();
+	public String getToken(final HttpServletRequest request) {
+		return tokenProvider.getToken();
 	}
 
 	@Override
@@ -115,7 +117,7 @@ public class InitSessionServlet extends HttpServlet {
 		response.setHeader(WebConstants.PRAGMA_KEY, WebConstants.NO_CACHE_VALUE); // Set standard HTTP/1.0 no-cache header.
 		response.setDateHeader(WebConstants.EXPIRES_KEY, 0L); // Proxy
 
-		String token = getSessionToken(request);
+		String token = getToken(request);
 		if (token != null) {
 			token = SimpleHtmlSanitizer.sanitizeHtml(token).asString(); // The token should not be HTML, but just in case (SWC-5504)
 			response.setContentType(WebConstants.TEXT_PLAIN_CHARSET_UTF8);

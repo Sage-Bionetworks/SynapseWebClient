@@ -33,7 +33,7 @@ public class FileEntityResolverServlet extends HttpServlet {
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
 	private TokenProvider tokenProvider = new TokenProvider() {
 		@Override
-		public String getSessionToken() {
+		public String getToken() {
 			return UserDataProvider.getThreadLocalUserToken(FileEntityResolverServlet.perThreadRequest.get());
 		}
 	};
@@ -74,7 +74,7 @@ public class FileEntityResolverServlet extends HttpServlet {
 		response.setHeader(WebConstants.CACHE_CONTROL_KEY, WebConstants.CACHE_CONTROL_VALUE_NO_CACHE); // Set standard HTTP/1.1 no-cache headers.
 		response.setHeader(WebConstants.PRAGMA_KEY, WebConstants.NO_CACHE_VALUE); // Set standard HTTP/1.0 no-cache header.
 		response.setDateHeader(WebConstants.EXPIRES_KEY, 0L);
-		String token = getSessionToken(request);
+		String token = getToken(request);
 		SynapseClient client = createNewClient(token);
 		String entityId = request.getParameter(WebConstants.ENTITY_PARAM_KEY);
 		String entityVersion = request.getParameter(WebConstants.ENTITY_VERSION_PARAM_KEY);
@@ -101,13 +101,13 @@ public class FileEntityResolverServlet extends HttpServlet {
 
 
 	/**
-	 * Get the session token
+	 * Get the access token
 	 * 
 	 * @param request
 	 * @return
 	 */
-	public String getSessionToken(final HttpServletRequest request) {
-		return tokenProvider.getSessionToken();
+	public String getToken(final HttpServletRequest request) {
+		return tokenProvider.getToken();
 	}
 
 	/**
@@ -115,13 +115,13 @@ public class FileEntityResolverServlet extends HttpServlet {
 	 *
 	 * @return
 	 */
-	private SynapseClient createNewClient(String sessionToken) {
+	private SynapseClient createNewClient(String accessToken) {
 		SynapseClient client = synapseProvider.createNewClient();
 		client.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
 		client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
 		client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
-		if (sessionToken != null)
-			client.setBearerAuthorizationToken(sessionToken);
+		if (accessToken != null)
+			client.setBearerAuthorizationToken(accessToken);
 		return client;
 	}
 

@@ -7,8 +7,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.CloudProviderFileHandleInterface;
@@ -26,6 +28,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 public class LinkedInServiceImpl extends RemoteServiceServlet implements LinkedInService, TokenProvider {
@@ -215,23 +218,23 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements LinkedI
 	}
 
 	@Override
-	public String getSessionToken() {
+	public String getToken() {
 		// By default, we get the token from the request cookies.
 		return UserDataProvider.getThreadLocalUserToken(this.getThreadLocalRequest());
 	}
 
 	private org.sagebionetworks.client.SynapseClient createSynapseClient() {
-		return createSynapseClient(getSessionToken());
+		return createSynapseClient(getToken());
 	}
 
 	/**
 	 * The org.sagebionetworks.client.SynapseClient client is stateful so we must create a new one for
 	 * each request
 	 */
-	private SynapseClient createSynapseClient(String sessionToken) {
+	private SynapseClient createSynapseClient(String accessToken) {
 		// Create a new syanpse
 		SynapseClient synapseClient = synapseProvider.createNewClient();
-		synapseClient.setBearerAuthorizationToken(sessionToken);
+		synapseClient.setBearerAuthorizationToken(accessToken);
 		synapseClient.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
 		synapseClient.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
 		synapseClient.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());

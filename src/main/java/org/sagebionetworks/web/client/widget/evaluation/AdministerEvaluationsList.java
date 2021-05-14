@@ -72,14 +72,14 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Evalua
 		view.clearRows();
 		synAlert.clear();
 		boolean timeInUtc = globalApplicationState.isShowingUTCTime();
-		String sessionToken = authenticationController.getCurrentUserAccessToken();
+		String accessToken = authenticationController.getCurrentUserAccessToken();
 
 		challengeClient.getSharableEvaluations(entityId, new AsyncCallback<List<Evaluation>>() {
 			@Override
 			public void onSuccess(List<Evaluation> evaluations) {
 				for (Evaluation evaluation : evaluations) {
 					if(evaluation.getQuota() == null){
-						createEvaluationCardReactComponent(evaluation,timeInUtc,sessionToken,onEditEvaluation);
+						createEvaluationCardReactComponent(evaluation,timeInUtc,accessToken,onEditEvaluation);
 					} else{
 						view.addRow(evaluation);
 					}
@@ -93,7 +93,7 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Evalua
 		});
 	}
 
-	private void createEvaluationCardReactComponent(Evaluation evaluation, boolean timeInUtc, String sessionToken, Consumer<String> onEditEvaluation) {
+	private void createEvaluationCardReactComponent(Evaluation evaluation, boolean timeInUtc, String accessToken, Consumer<String> onEditEvaluation) {
 		EvaluationCardProps.Callback onEdit = () -> onEditEvaluation.accept(evaluation.getId());
 		EvaluationCardProps.Callback onModifyAccess = () -> onShareClicked(evaluation);
 		EvaluationCardProps.Callback onSubmit = () -> {
@@ -109,7 +109,7 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Evalua
 
 		EvaluationCardProps props = EvaluationCardProps.create(
 			EvaluationJSObject.fromEvaluation(evaluation),
-				sessionToken,
+				accessToken,
 				timeInUtc,
 				onEdit,
 				onModifyAccess,

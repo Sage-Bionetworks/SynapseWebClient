@@ -421,14 +421,14 @@ public class SynapseJavascriptClient {
 	}
 
 	public Request doGetString(String url, boolean forceAnonymous, AsyncCallback callback) {
-		String sessionToken = forceAnonymous ? null : authController.getCurrentUserAccessToken();
-		return doGet(url, OBJECT_TYPE.String, null, sessionToken, callback);
+		String accessToken = forceAnonymous ? null : authController.getCurrentUserAccessToken();
+		return doGet(url, OBJECT_TYPE.String, null, accessToken, callback);
 	}
 
-	private Request doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, String sessionToken, AsyncCallback callback) {
+	private Request doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, String accessToken, AsyncCallback callback) {
 		// can almost always cancel a GET request
 		boolean canCancel = true;
-		return doGet(url, responseType, acceptedResponseType, sessionToken, canCancel, callback);
+		return doGet(url, responseType, acceptedResponseType, accessToken, canCancel, callback);
 	}
 	
 	private Request doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, String accessToken, boolean canCancel, AsyncCallback callback) {

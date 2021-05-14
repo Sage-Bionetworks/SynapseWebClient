@@ -126,7 +126,7 @@ public class InitSessionServletTest {
 	@Test
 	public void testDoGetSession() throws Exception {
 		String sessionToken = "abc123-fake";
-		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
+		when(mockTokenProvider.getToken()).thenReturn(sessionToken);
 
 		servlet.doGet(mockRequest, mockResponse);
 
@@ -138,7 +138,7 @@ public class InitSessionServletTest {
 
 	@Test
 	public void testDoGetSessionNull() throws Exception {
-		when(mockTokenProvider.getSessionToken()).thenReturn(null);
+		when(mockTokenProvider.getToken()).thenReturn(null);
 
 		servlet.doGet(mockRequest, mockResponse);
 

@@ -143,7 +143,7 @@ public class FileHandleServletTest {
 		String sessionToken = "fake";
 		// set up general synapse client configuration test
 
-		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
+		when(mockTokenProvider.getToken()).thenReturn(sessionToken);
 
 		setupFileEntity();
 

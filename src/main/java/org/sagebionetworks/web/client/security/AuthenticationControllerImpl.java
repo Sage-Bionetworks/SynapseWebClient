@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.security;
 
-import static com.google.common.util.concurrent.Futures.getDone;
-import static com.google.common.util.concurrent.Futures.whenAllComplete;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
@@ -32,7 +30,7 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.ListenableFuture;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.StatusCodeException;
@@ -147,6 +145,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				userProfileFuture.addCallback(new FutureCallback<UserProfile>() {
 					@Override
 					public void onSuccess(UserProfile profile) {
+						GWT.debugger();
 						currentUserProfile = profile;
 						ginInjector.getSessionDetector().initializeAccessTokenState();
 						jsniUtils.setAnalyticsUserId(getCurrentUserPrincipalId());

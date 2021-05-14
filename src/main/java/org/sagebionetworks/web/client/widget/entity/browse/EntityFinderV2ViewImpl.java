@@ -203,13 +203,13 @@ public class EntityFinderV2ViewImpl implements EntityFinderV2View {
 		this.okButton.setText(confirmButtonCopy);
 	}
 
-	private static native void _showEntityFinderReactComponent(Element el, String sessionToken, String projectId, String initialContainer, String initialScope, JsArrayString selectableTypes, JsArrayString visibleTypesInList, JsArrayString visibleTypesInTree, boolean showVersions, boolean multiSelect, String selectedCopy, boolean treeOnly, OnSelectCallback onSelectedCallback, Runnable onRender) /*-{
+	private static native void _showEntityFinderReactComponent(Element el, String token, String projectId, String initialContainer, String initialScope, JsArrayString selectableTypes, JsArrayString visibleTypesInList, JsArrayString visibleTypesInTree, boolean showVersions, boolean multiSelect, String selectedCopy, boolean treeOnly, OnSelectCallback onSelectedCallback, Runnable onRender) /*-{
 		try {
 			var callback = function(selected) {
 				onSelectedCallback.@org.sagebionetworks.web.client.callback.OnSelectCallback::onSelect(Lcom/google/gwt/core/client/JsArray;)(selected)
 			};
 			var props = {
-				sessionToken: sessionToken,
+				accessToken: token,
 				projectId: projectId,
 				initialContainer: initialContainer,
 				initialScope: initialScope,

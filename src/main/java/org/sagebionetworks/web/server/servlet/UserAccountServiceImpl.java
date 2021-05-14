@@ -3,10 +3,8 @@ package org.sagebionetworks.web.server.servlet;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.AuthorizationConstants;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.NewUser;
-import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.web.client.StackEndpoints;
@@ -15,6 +13,7 @@ import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.springframework.web.client.RestClientException;
+
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 public class UserAccountServiceImpl extends RemoteServiceServlet implements UserAccountService, TokenProvider {
@@ -97,7 +96,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 
 	@Override
-	public String getSessionToken() {
+	public String getToken() {
 		// By default, we get the token from the request cookies.
 		return UserDataProvider.getThreadLocalUserToken(this.getThreadLocalRequest());
 	}
@@ -135,12 +134,12 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		return createSynapseClient(null);
 	}
 
-	private SynapseClient createSynapseClient(String sessionToken) {
+	private SynapseClient createSynapseClient(String accessToken) {
 		SynapseClient synapseClient = synapseProvider.createNewClient();
-		if (sessionToken == null) {
-			sessionToken = tokenProvider.getSessionToken();
+		if (accessToken == null) {
+			accessToken = tokenProvider.getToken();
 		}
-		synapseClient.setBearerAuthorizationToken(sessionToken);
+		synapseClient.setBearerAuthorizationToken(accessToken);
 		synapseClient.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
 		synapseClient.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
 		return synapseClient;

@@ -29,7 +29,7 @@ public class FileUploaderJnlp extends HttpServlet {
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
 	private TokenProvider tokenProvider = new TokenProvider() {
 		@Override
-		public String getSessionToken() {
+		public String getToken() {
 			return UserDataProvider.getThreadLocalUserToken(FileUploaderJnlp.perThreadRequest.get());
 		}
 	};
@@ -84,7 +84,7 @@ public class FileUploaderJnlp extends HttpServlet {
 		PrintWriter out = null;
 		try {
 			out = response.getWriter();
-			out.println(buildJnlp(getFullURL(request), jarUrl, getSessionToken(request), entityId, isUpdate));
+			out.println(buildJnlp(getFullURL(request), jarUrl, getToken(request), entityId, isUpdate));
 		} finally {
 			if (out != null)
 				out.close();
@@ -103,14 +103,14 @@ public class FileUploaderJnlp extends HttpServlet {
 	 * @param request
 	 * @return
 	 */
-	public String getSessionToken(final HttpServletRequest request) {
-		return tokenProvider.getSessionToken();
+	public String getToken(final HttpServletRequest request) {
+		return tokenProvider.getToken();
 	}
 
-	private static String buildJnlp(String jnlpServletUrl, String fileUploaderJarUrl, String sessionToken, String entityId, boolean isUpdate) {
+	private static String buildJnlp(String jnlpServletUrl, String fileUploaderJarUrl, String accessToken, String entityId, boolean isUpdate) {
 		String jnlp = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<jnlp spec=\"1.0+\" href=\"" + jnlpServletUrl + "\" codebase=\"https://s3.amazonaws.com/versions.synapse.sagebase.org/\">\n" + "    <information>\n" + "        <title>Synapse File Uploader</title>\n" + "        <vendor>Synapse</vendor>\n" + "    </information>\n" + "    <resources>\n" + "        <!-- Application Resources -->\n" + "        <j2se version=\"1.7+\" href=\"http://java.sun.com/products/autodl/j2se\"/>\n" + "        <jar href=\"" + fileUploaderJarUrl + "\" main=\"true\" />\n" + "    </resources>\n" + "    <application-desc\n" + "         main-class=\"org.sagebionetworks.client.fileuploader.App\"\n" +
 		// " width=\"800\"\n" + " height=\"600\"" +
-				">\n" + "        <argument>--sessionToken=" + sessionToken + "</argument>\n" + "        <argument>--entityId=" + entityId + "</argument>\n" + "     </application-desc>\n" + "     <security><all-permissions/></security>\n" + "</jnlp>";
+				">\n" + "        <argument>--sessionToken=" + accessToken + "</argument>\n" + "        <argument>--entityId=" + entityId + "</argument>\n" + "     </application-desc>\n" + "     <security><all-permissions/></security>\n" + "</jnlp>";
 		return jnlp;
 	}
 

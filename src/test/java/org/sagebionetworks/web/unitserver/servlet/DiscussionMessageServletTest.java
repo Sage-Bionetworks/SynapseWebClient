@@ -61,7 +61,7 @@ public class DiscussionMessageServletTest {
 	public void testDoGetThreadMessage() throws Exception {
 		String sessionToken = "fake";
 
-		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
+		when(mockTokenProvider.getToken()).thenReturn(sessionToken);
 
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};
 		when(mockRequest.getCookies()).thenReturn(cookies);
@@ -84,7 +84,7 @@ public class DiscussionMessageServletTest {
 		String sessionToken = "fake";
 
 		// set up general synapse client configuration test
-		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
+		when(mockTokenProvider.getToken()).thenReturn(sessionToken);
 
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};
 		when(mockRequest.getCookies()).thenReturn(cookies);
@@ -107,7 +107,7 @@ public class DiscussionMessageServletTest {
 		String sessionToken = "fake";
 
 		// set up general synapse client configuration test
-		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
+		when(mockTokenProvider.getToken()).thenReturn(sessionToken);
 
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};
 		when(mockRequest.getCookies()).thenReturn(cookies);
@@ -122,7 +122,7 @@ public class DiscussionMessageServletTest {
 		String sessionToken = "fake";
 
 		// set up general synapse client configuration test
-		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
+		when(mockTokenProvider.getToken()).thenReturn(sessionToken);
 
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};
 		when(mockRequest.getCookies()).thenReturn(cookies);
