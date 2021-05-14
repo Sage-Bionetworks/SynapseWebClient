@@ -103,7 +103,9 @@ public class SynapseClientBase extends RemoteServiceServlet implements TokenProv
 	public org.sagebionetworks.client.SynapseClient createSynapseClient(String accessToken) {
 		// Create a new syanpse
 		org.sagebionetworks.client.SynapseClient synapseClient = synapseProvider.createNewClient();
-		synapseClient.setBearerAuthorizationToken(accessToken);
+		if (accessToken != null) {
+			synapseClient.setBearerAuthorizationToken(accessToken);	
+		}
 		synapseClient.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
 		synapseClient.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
 		synapseClient.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());

@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
+
 import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -64,62 +65,62 @@ public class Portal implements EntryPoint {
 				@Override
 				public void onSuccess() {
 					try {
-						// previous session will be detected on place change (if there is one). do not block app load to
-						// check.
 						// make sure jsni utils code is available to the client
-						
 						ginjector.getSynapseJSNIUtils();
 						
 						ginjector.getSynapseProperties().initSynapseProperties(() -> {
-							// start timer to check for user session state change (session expired, or user explicitly logged
-							// out).  Backend endpoints must be set before starting this (because it attempts to get "my user profile")
-							ginjector.getSessionDetector().start();
+							ginjector.getAuthenticationController().checkForUserChange(() -> {
+								EventBus eventBus = ginjector.getEventBus();
+								PlaceController placeController = new PlaceController(eventBus);
 
-							EventBus eventBus = ginjector.getEventBus();
-							PlaceController placeController = new PlaceController(eventBus);
+								// Start ActivityManager for the main widget with our ActivityMapper
+								AppActivityMapper activityMapper = new AppActivityMapper(ginjector, new SynapseJSNIUtilsImpl(), null);
+								ActivityManager activityManager = new ActivityManager(activityMapper, eventBus);
+								activityManager.setDisplay(appWidget);
 
-							// Start ActivityManager for the main widget with our ActivityMapper
-							AppActivityMapper activityMapper = new AppActivityMapper(ginjector, new SynapseJSNIUtilsImpl(), null);
-							ActivityManager activityManager = new ActivityManager(activityMapper, eventBus);
-							activityManager.setDisplay(appWidget);
+								// All pages get added to the root panel
+								appWidget.addStyleName("rootPanel");
 
-							// All pages get added to the root panel
-							appWidget.addStyleName("rootPanel");
+								// Start PlaceHistoryHandler with our PlaceHistoryMapper
+								AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);
+								final PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);
+								historyHandler.register(placeController, eventBus, AppActivityMapper.getDefaultPlace());
+								Header header = ginjector.getHeader();
+								RootPanel.get("headerPanel").add(header);
+								Footer footer = ginjector.getFooter();
+								RootPanel.get("footerPanel").add(footer);
 
-							// Start PlaceHistoryHandler with our PlaceHistoryMapper
-							AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);
-							final PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);
-							historyHandler.register(placeController, eventBus, AppActivityMapper.getDefaultPlace());
-							Header header = ginjector.getHeader();
-							RootPanel.get("headerPanel").add(header);
-							Footer footer = ginjector.getFooter();
-							RootPanel.get("footerPanel").add(footer);
+								RootPanel.get("rootPanel").add(appWidget);
+								RootPanel.get("initialLoadingUI").setVisible(false);
+								fullOpacity(RootPanel.get("headerPanel"), RootPanel.get("rootPanel"));
+								final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
+								globalApplicationState.setPlaceController(placeController);
+								globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
+								
+								globalApplicationState.init(new Callback() {
+									@Override
+									public void invoke() {
+										// listen for window close (or navigating away)
+										registerWindowClosingHandler(globalApplicationState);
+										registerOnPopStateHandler(globalApplicationState);
 
-							RootPanel.get("rootPanel").add(appWidget);
-							RootPanel.get("initialLoadingUI").setVisible(false);
-							fullOpacity(RootPanel.get("headerPanel"), RootPanel.get("rootPanel"));
-							final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
-							globalApplicationState.setPlaceController(placeController);
-							globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
-							
-							globalApplicationState.init(new Callback() {
-								@Override
-								public void invoke() {
-									// listen for window close (or navigating away)
-									registerWindowClosingHandler(globalApplicationState);
-									registerOnPopStateHandler(globalApplicationState);
-
-									// start version timer
-									ginjector.getVersionTimer().start();
-									// start timer to check for Synapse outage or scheduled maintenance
-									ginjector.getSynapseStatusDetector().start();
-									// Goes to place represented on URL or default place
-									historyHandler.handleCurrentHistory();
-									globalApplicationState.initializeDropZone();
-									// initialize the view default columns so that they're ready when we need them (do this by constructing that singleton object)
-									ginjector.getViewDefaultColumns();
-								}
+										// start version timer
+										ginjector.getVersionTimer().start();
+										// start timer to check for Synapse outage or scheduled maintenance
+										ginjector.getSynapseStatusDetector().start();
+										// Goes to place represented on URL or default place
+										historyHandler.handleCurrentHistory();
+										globalApplicationState.initializeDropZone();
+										// initialize the view default columns so that they're ready when we need them (do this by constructing that singleton object)
+										ginjector.getViewDefaultColumns();
+										
+										// start timer to check for user session state change (session expired, or user explicitly logged
+										// out).  Backend endpoints must be set before starting this (because it attempts to get "my user profile")
+										ginjector.getSessionDetector().start();
+									}
+								});
 							});
+							
 						});
 					} catch (Throwable e) {
 						onFailure(e);

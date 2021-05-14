@@ -139,7 +139,9 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		if (accessToken == null) {
 			accessToken = tokenProvider.getToken();
 		}
-		synapseClient.setBearerAuthorizationToken(accessToken);
+		if (accessToken != null) {
+			synapseClient.setBearerAuthorizationToken(accessToken);	
+		}
 		synapseClient.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
 		synapseClient.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
 		return synapseClient;

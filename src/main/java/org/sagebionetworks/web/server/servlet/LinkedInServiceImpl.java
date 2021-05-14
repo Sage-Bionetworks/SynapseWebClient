@@ -234,7 +234,9 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements LinkedI
 	private SynapseClient createSynapseClient(String accessToken) {
 		// Create a new syanpse
 		SynapseClient synapseClient = synapseProvider.createNewClient();
-		synapseClient.setBearerAuthorizationToken(accessToken);
+		if (accessToken != null) {
+			synapseClient.setBearerAuthorizationToken(accessToken);	
+		}
 		synapseClient.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
 		synapseClient.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
 		synapseClient.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());

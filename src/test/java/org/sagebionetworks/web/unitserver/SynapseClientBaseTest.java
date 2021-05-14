@@ -34,7 +34,7 @@ public class SynapseClientBaseTest {
 	HttpServletRequest mockRequest;
 
 	String userIp = "127.0.0.1";
-	public static final String ENDPOINT_PREFIX = "endpointprefix";
+	public static final String ENDPOINT_PREFIX = "https://repo-test.prod.sagebase.org";
 	public static final String FILE_BASE = ENDPOINT_PREFIX + "/file/v1";
 	public static final String AUTH_BASE = ENDPOINT_PREFIX + "/auth/v1";
 	public static final String REPO_BASE = ENDPOINT_PREFIX + "/repo/v1";

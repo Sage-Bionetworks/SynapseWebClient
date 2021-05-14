@@ -16,8 +16,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sagebionetworks.client.SynapseClient;
+import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.shared.AccessTokenWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -35,6 +38,10 @@ public class InitSessionServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 	public static final int ONE_DAY_IN_SECONDS = 60 * 60 * 24;
+	private SynapseProvider synapseProvider = new SynapseProviderImpl();
+	public void setSynapseProvider(SynapseProvider synapseProvider) {
+		this.synapseProvider = synapseProvider;
+	}
 
 	@Override
 	protected void service(HttpServletRequest arg0, HttpServletResponse arg1) throws ServletException, IOException {
@@ -118,15 +125,34 @@ public class InitSessionServlet extends HttpServlet {
 		response.setDateHeader(WebConstants.EXPIRES_KEY, 0L); // Proxy
 
 		String token = getToken(request);
+		response.setContentType(WebConstants.TEXT_PLAIN_CHARSET_UTF8);
 		if (token != null) {
 			token = SimpleHtmlSanitizer.sanitizeHtml(token).asString(); // The token should not be HTML, but just in case (SWC-5504)
-			response.setContentType(WebConstants.TEXT_PLAIN_CHARSET_UTF8);
-			response.setHeader(WebConstants.CONTENT_TYPE_OPTIONS, WebConstants.NOSNIFF);
-			response.setStatus(HttpServletResponse.SC_OK);
-			response.getOutputStream().write(token.getBytes("UTF-8"));
-			response.getOutputStream().flush();
+			SynapseClient synapseClient = createNewClient(token);
+			try {
+				synapseClient.getMyProfile();
+				response.setHeader(WebConstants.CONTENT_TYPE_OPTIONS, WebConstants.NOSNIFF);
+				response.setStatus(HttpServletResponse.SC_OK);
+				response.getOutputStream().write(token.getBytes("UTF-8"));
+			} catch (SynapseException e) {
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				response.getOutputStream().write(e.getMessage().getBytes("UTF-8"));
+			}
 		} else {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.getOutputStream().write("token unavailable".getBytes("UTF-8"));
 		}
+		response.getOutputStream().flush();
 	}
+	
+	private SynapseClient createNewClient(String accessToken) {
+		SynapseClient client = synapseProvider.createNewClient();
+		client.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
+		client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
+		client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
+		if (accessToken != null)
+			client.setBearerAuthorizationToken(accessToken);
+		return client;
+	}
+
 }

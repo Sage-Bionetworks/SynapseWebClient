@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
@@ -30,7 +31,6 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.StatusCodeException;
@@ -145,7 +145,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				userProfileFuture.addCallback(new FutureCallback<UserProfile>() {
 					@Override
 					public void onSuccess(UserProfile profile) {
-						GWT.debugger();
 						currentUserProfile = profile;
 						ginInjector.getSessionDetector().initializeAccessTokenState();
 						jsniUtils.setAnalyticsUserId(getCurrentUserPrincipalId());
@@ -160,11 +159,13 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 						}
 					}
 				}, directExecutor());
-				
 			}
 
 			@Override
 			public void onFailure(Throwable t) {
+				currentUserAccessToken = null;
+				currentUserProfile = null;
+				ginInjector.getSessionDetector().initializeAccessTokenState();
 				callback.onFailure(t);
 			}
 		}, directExecutor());
@@ -244,15 +245,24 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 	@Override
 	public void checkForUserChange() {
+		checkForUserChange(null);
+	}
+	
+	@Override
+	public void checkForUserChange(Callback optionalCallback) {
 		String oldUserAccessToken = currentUserAccessToken;
 		initializeFromExistingAccessTokenCookie(new AsyncCallback<UserProfile>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				// if the exception was not due to a network failure, then log the user out
-				if (!(caught instanceof UnknownErrorException || caught instanceof StatusCodeException)) {
-					logoutUser();	
-				}
 				jsniUtils.consoleError(caught);
+				if (optionalCallback != null) {
+					optionalCallback.invoke();
+				} else {
+					// if the exception was not due to a network failure, then log the user out
+					if (!(caught instanceof UnknownErrorException || caught instanceof StatusCodeException)) {
+						logoutUser();	
+					}
+				}
 			}
 
 			@Override
@@ -260,22 +270,18 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				// is this a user session change?  if so, refresh the page.
 				if (!Objects.equals(currentUserAccessToken, oldUserAccessToken)) {
 					// we've reinitialized the app with the correct session, refresh the page (do not get rid of js state)!
-					ginInjector.getGlobalApplicationState().refreshPage();
+					if (optionalCallback != null) {
+						optionalCallback.invoke();
+					} else {
+						ginInjector.getGlobalApplicationState().refreshPage();	
+					}
 					checkForQuarantinedEmail();
 				} else {
 					ginInjector.getHeader().refresh();
-					// we've determined that the session has not changed, update the cookie expiration for the token
-					ginInjector.getSynapseJavascriptClient().initSession(currentUserAccessToken, new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							jsniUtils.consoleError(caught);
-						}
-
-						@Override
-						public void onSuccess(Void result) {
-							// the set-cookie response header has updated the expiration of the token cookie
-						}
-					});
+					// we've determined that the session has not changed
+					if (optionalCallback != null) {
+						optionalCallback.invoke();
+					} 
 				}
 			}
 		});
