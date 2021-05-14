@@ -162,13 +162,13 @@ public class AuthenticationControllerImplTest {
 		String username = "testusername";
 		String password = "pw";
 		String oldAuthReceipt = "1234";
-		String newSessionToken = "abcdzxcvbn";
+		String newAccessToken = "abcdzxcvbn";
 		String newAuthReceipt = "5678";
 		when(mockClientCache.get(USER_AUTHENTICATION_RECEIPT)).thenReturn(oldAuthReceipt);
 		LoginResponse loginResponse = new LoginResponse();
 		loginResponse.setAcceptsTermsOfUse(true);
 		loginResponse.setAuthenticationReceipt(newAuthReceipt);
-		loginResponse.setSessionToken(newSessionToken);
+		loginResponse.setAccessToken(newAccessToken);
 		AsyncMockStubber.callSuccessWith(loginResponse).when(mockJsClient).login(any(LoginRequest.class), any(AsyncCallback.class));
 		AsyncCallback loginCallback = mock(AsyncCallback.class);
 
